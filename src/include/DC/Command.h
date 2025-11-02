@@ -19,7 +19,7 @@ class Command
 {
 public:
     Command(QString name = QString(), command_gen1_t ptr1 = nullptr, command_gen1b_t ptr1b = nullptr, command_gen2_t ptr2 = nullptr, command_gen3_t ptr3 = nullptr,
-            position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
+            position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
             bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
         : name_(name),
           command_pointer1_(ptr1), command_pointer1b_(ptr1b), command_pointer2_(ptr2), command_pointer3_(ptr3),
@@ -28,7 +28,7 @@ public:
     {
     }
     Command(QString name, command_gen1_t ptr1,
-            position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
+            position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
             bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
         : name_(name),
           command_pointer1_(ptr1), command_pointer1b_(nullptr), command_pointer2_(nullptr), command_pointer3_(nullptr),
@@ -37,7 +37,7 @@ public:
     {
     }
     Command(QString name, command_gen1b_t ptr1b,
-            position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
+            position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
             bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
         : name_(name),
           command_pointer1_(nullptr), command_pointer1b_(ptr1b), command_pointer2_(nullptr), command_pointer3_(nullptr),
@@ -46,7 +46,7 @@ public:
     {
     }
     Command(QString name, command_gen2_t ptr2,
-            position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
+            position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
             bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
         : name_(name),
           command_pointer1_(nullptr), command_pointer1b_(nullptr), command_pointer2_(ptr2), command_pointer3_(nullptr),
@@ -55,7 +55,7 @@ public:
     {
     }
     Command(QString name, command_gen3_t ptr3,
-            position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
+            position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
             bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
         : name_(name),
           command_pointer1_(nullptr), command_pointer1b_(nullptr), command_pointer2_(nullptr), command_pointer3_(ptr3),
@@ -82,8 +82,8 @@ public:
     [[nodiscard]] inline command_gen3_t getFunction3(void) const { return command_pointer3_; }
     void setFunction3(const command_gen3_t function) { command_pointer3_ = function; }
 
-    [[nodiscard]] inline level_t getNumber(void) const { return command_number_; }
-    void setNumber(const level_t number) { command_number_ = number; }
+    [[nodiscard]] inline cmd_t getNumber(void) const { return command_number_; }
+    void setNumber(const cmd_t number) { command_number_ = number; }
 
     [[nodiscard]] inline level_t getMinimumLevel(void) const { return minimum_level_; }
     void setMinimumLevel(const level_t level) { minimum_level_ = level; }
@@ -98,9 +98,9 @@ public:
 
     QString name_;
 
-    // int (*command_pointer_)(class Character *ch, char *argument, int cmd);               /* Function that does it            */
-    // command_return_t (*command_pointer2_)(Character *ch, std::string argument, int cmd); /* Function that does it            */
-    // command_return_t (Character::*command_pointer3_)(QStringList arguments, int cmd);    /* Function that does it            */
+    // int (*command_pointer_)(class Character *ch, char *argument, cmd_t cmd);               /* Function that does it            */
+    // command_return_t (*command_pointer2_)(Character *ch, std::string argument, cmd_t cmd); /* Function that does it            */
+    // command_return_t (Character::*command_pointer3_)(QStringList arguments, cmd_t cmd);    /* Function that does it            */
 
     command_gen1_t command_pointer1_;
     command_gen1b_t command_pointer1b_;
@@ -108,7 +108,7 @@ public:
     command_gen3_t command_pointer3_;
     position_t minimum_position_; /* Position commander must be in    */
     level_t minimum_level_;       /* Minimum level needed             */
-    int command_number_;          /* Passed to function as argument   */
+    cmd_t command_number_;        /* Passed to function as argument   */
     bool allow_charmie_;
     uint8_t toggle_hide_;
     CommandType type_;
@@ -119,8 +119,14 @@ public:
     Commands(void);
     void add(Command cmd);
     auto find(QString arg) -> std::expected<Command, search_error>;
+    auto find(cmd_t cmd) -> std::expected<Command, search_error>;
     const static QList<Command> commands_;
-    static QMap<QString, Command> map_;
+    static QMap<QString, Command> qstring_command_map_;
+    static QMap<cmd_t, Command> cmd_t_command_map_;
 };
 
+bool isCommandTypeDirection(cmd_t cmd);
+bool isCommandTypeCasino(cmd_t cmd);
+auto getCommandFromDirection(int dir) -> std::expected<cmd_t, bool>;
+auto getDirectionFromCommand(cmd_t cmd) -> std::expected<int, bool>;
 #endif

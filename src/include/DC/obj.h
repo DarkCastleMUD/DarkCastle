@@ -252,8 +252,8 @@ public:
     static const QStringList extra_bits;
     static const QStringList apply_types;
 
-    vnum_t vnum = {};             /* Where in data-base               */
-    room_t vroom = {};            /* for corpse saving */
+    int32_t item_number = {};     /* Where in data-base               */
+    int vroom = {};               /* for corpse saving */
     obj_flag_data obj_flags = {}; /* Object information               */
     int16_t num_affects = {};
     obj_affected_type *affected = {}; /* Which abilities in PC to change  */
@@ -289,6 +289,135 @@ public:
     {
         return obj_flags.type_flag == ITEM_TOTEM;
     }
+    bool isWeapon(void)
+    {
+        return obj_flags.type_flag == ITEM_WEAPON;
+    }
+    bool isArmor(void)
+    {
+        return obj_flags.type_flag == ITEM_ARMOR;
+    }
+    bool isInstrument(void)
+    {
+        return obj_flags.type_flag == ITEM_INSTRUMENT;
+    }
+    bool isContainer(void)
+    {
+        return obj_flags.type_flag == ITEM_CONTAINER;
+    }
+    bool isLight(void)
+    {
+        return obj_flags.type_flag == ITEM_LIGHT;
+    }
+    bool isScroll(void)
+    {
+        return obj_flags.type_flag == ITEM_SCROLL;
+    }
+    bool isWand(void)
+    {
+        return obj_flags.type_flag == ITEM_WAND;
+    }
+    bool isStaff(void)
+    {
+        return obj_flags.type_flag == ITEM_STAFF;
+    }
+    bool isFireWeapon(void)
+    {
+        return obj_flags.type_flag == ITEM_FIREWEAPON;
+    }
+    bool isMissle(void)
+    {
+        return obj_flags.type_flag == ITEM_MISSILE;
+    }
+    bool isTreasure(void)
+    {
+        return obj_flags.type_flag == ITEM_TREASURE;
+    }
+    bool isPotion(void)
+    {
+        return obj_flags.type_flag == ITEM_POTION;
+    }
+    bool isWorn(void)
+    {
+        return obj_flags.type_flag == ITEM_WORN;
+    }
+    bool isOther(void)
+    {
+        return obj_flags.type_flag == ITEM_OTHER;
+    }
+    bool isTrash(void)
+    {
+        return obj_flags.type_flag == ITEM_TRASH;
+    }
+    bool isTrap(void)
+    {
+        return obj_flags.type_flag == ITEM_TRAP;
+    }
+    bool isNote(void)
+    {
+        return obj_flags.type_flag == ITEM_NOTE;
+    }
+    bool isDrinkContainer(void)
+    {
+        return obj_flags.type_flag == ITEM_DRINKCON;
+    }
+    bool isKey(void)
+    {
+        return obj_flags.type_flag == ITEM_KEY;
+    }
+    bool isFood(void)
+    {
+        return obj_flags.type_flag == ITEM_FOOD;
+    }
+    bool isMoney(void)
+    {
+        return obj_flags.type_flag == ITEM_MONEY;
+    }
+    bool isPen(void)
+    {
+        return obj_flags.type_flag == ITEM_PEN;
+    }
+    bool isBoat(void)
+    {
+        return obj_flags.type_flag == ITEM_BOAT;
+    }
+    bool isBoard(void)
+    {
+        return obj_flags.type_flag == ITEM_BOARD;
+    }
+    bool isFountain(void)
+    {
+        return obj_flags.type_flag == ITEM_FOUNTAIN;
+    }
+    bool isUtility(void)
+    {
+        return obj_flags.type_flag == ITEM_UTILITY;
+    }
+    bool isBeacon(void)
+    {
+        return obj_flags.type_flag == ITEM_BEACON;
+    }
+    bool isLockpick(void)
+    {
+        return obj_flags.type_flag == ITEM_LOCKPICK;
+    }
+    bool isClimbable(void)
+    {
+        return obj_flags.type_flag == ITEM_CLIMBABLE;
+    }
+    bool isMegaphone(void)
+    {
+        return obj_flags.type_flag == ITEM_MEGAPHONE;
+    }
+    bool isAltar(void)
+    {
+        return obj_flags.type_flag == ITEM_ALTAR;
+    }
+    bool isKeyring(void)
+    {
+        return obj_flags.type_flag == ITEM_KEYRING;
+    }
+
     room_t getPortalDestinationRoom(void)
     {
         if (!isPortal())
@@ -333,6 +462,13 @@ public:
     bool isPortalTypePermanentNoLook(void)
     {
         return getPortalType() == portal_types_t::PermanentNoLook;
+    }
+    bool isQuest(void);
+    bool isTest(void);
+    bool isGodload(void);
+    bool isCustom(void)
+    {
+        return isSet(obj_flags.more_flags, ITEM_NO_CUSTOM);
     }
 
     int32_t getPortalLeaveZone(void)
@@ -415,7 +551,7 @@ private:
 struct obj_file_elem
 {
     int16_t version = {};
-    vnum_t vnum = {};
+    int32_t item_number = {};
     int16_t timer = {};
     int16_t wear_pos = {};
     int16_t container_depth = {};

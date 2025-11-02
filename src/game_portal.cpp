@@ -18,23 +18,8 @@
 #include "DC/handler.h"
 
 #include <cstring>
-#include <cstdint>
-
-#define MAX_GAME_PORTALS 9
-#define FOREVER -5
-
-typedef uint64_t room_t;
 
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer);
-struct game_portal
-{
-  room_t to_room;  /* Room to make the portal to */
-  int *from_rooms; /* Rooms to make the portal from */
-  int num_rooms;   /* Number of rooms in from_rooms */
-  int obj_num;     /* Object to duplicate for portal */
-  int max_timer;   /* What does the timer reset to? -- game days */
-  int cur_timer;   /* What is the timer at now? -- game days */
-};
 
 struct game_portal game_portals[MAX_GAME_PORTALS];
 
@@ -94,7 +79,7 @@ void load_game_portals()
     |    WILL CAUSE THE GAME TO CRASH.  I could build a sanity check, but
     |    if people read this it's not necessary.  -Morc 24 Apr 1997
     */
-    if (fscanf(cur_file, "%lu\n%d\n%d\n",
+    if (fscanf(cur_file, "%d\n%d\n%d\n",
                &(game_portals[i].to_room),
                &(game_portals[i].obj_num),
                &(game_portals[i].max_timer)) != 3)
@@ -161,7 +146,7 @@ void process_portals()
     */
     if (game_portals[i].cur_timer <= 0)
     {
-      room_t from_room =
+      int from_room =
           game_portals[i].from_rooms[number(0, game_portals[i].num_rooms - 1)];
 
       /* So the portal is already gone, all we do is create a new one */
@@ -172,7 +157,7 @@ void process_portals()
               game_portals[i].max_timer) == 0)
       {
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "Making portal from %lu to %lu failed.", from_room,
+        sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
                 game_portals[i].to_room);
         logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }
@@ -228,7 +213,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
                                        "shimmers in the air before you.");
 
     from_portal->obj_flags.type_flag = ITEM_PORTAL;
-    from_portal->vnum = 0;
+    from_portal->item_number = (-1);
 
     /* Only need to do this if I didn't clone it */
     from_portal->next = DC::getInstance()->object_list;
@@ -236,7 +221,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   }
   else /* Duplicate the object # duplicate */
   {
-    from_portal = DC::getInstance()->clone_object(duplicate);
+    from_portal = clone_object(real_object(duplicate));
 
     if (!from_portal->isPortal())
     {

@@ -33,15 +33,17 @@
 
 /* uses */
 
+extern struct time_info_data time_info;
 extern struct weather_data weather_info;
 
 /* In ths part. */
 
+void another_hour(int mode);
 void weather_change(void);
 
 /* Here comes the code */
 
-void DC::time_update(void)
+void time_update()
 {
    another_hour(1);
 }
@@ -51,7 +53,7 @@ void weather_update()
    weather_change();
 }
 
-void DC::another_hour(int mode)
+void another_hour(int mode)
 {
    time_info.hours++;
 
@@ -129,7 +131,7 @@ void DC::another_hour(int mode)
 void weather_change(void)
 {
    int diff, change;
-   if ((DC::getInstance()->time_info.month >= 9) && (DC::getInstance()->time_info.month <= 16))
+   if ((time_info.month >= 9) && (time_info.month <= 16))
       diff = (weather_info.pressure > 985 ? -2 : 2);
    else
       diff = (weather_info.pressure > 1015 ? -2 : 2);

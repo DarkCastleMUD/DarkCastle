@@ -194,8 +194,7 @@ int spell_protection_from_evil(uint8_t level, Character *ch,
                                Character *victim, class Object *obj, int skill);
 int spell_protection_from_good(uint8_t level, Character *ch,
                                Character *victim, class Object *obj, int skill);
-int spell_remove_curse(uint8_t level, Character *ch,
-                       Character *victim, class Object *obj, int skill);
+int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill, quint64 mana_cost = {});
 int spell_remove_poison(uint8_t level, Character *ch,
                         Character *victim, class Object *obj, int skill);
 int spell_fireshield(uint8_t level, Character *ch,
@@ -380,8 +379,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
                               Character *tar_ch, class Object *tar_obj, int skill);
 int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
                               Character *tar_ch, class Object *tar_obj, int skill);
-int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, class Object *tar_obj, int skill);
+int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill, quint64 mana_cost = {});
 int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
                        Character *tar_ch, class Object *tar_obj, int skill);
 int cast_fireshield(uint8_t level, Character *ch, char *arg, int type,

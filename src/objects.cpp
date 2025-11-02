@@ -32,8 +32,6 @@ extern const char *drinks[];
 extern const char *dirs[];
 extern int drink_aff[][3];
 
-extern struct spell_info_type spell_info[MAX_SPL_LIST];
-
 void add_obj_affect(Object *obj, int loc, int mod)
 {
   obj->num_affects++;
@@ -135,7 +133,7 @@ void eq_remove_damage(Object *obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 int damage_eq_once(Object *obj)
 {
-  if (obj->vnum == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
+  if (DC::getInstance()->obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
     send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
@@ -158,19 +156,19 @@ int damage_eq_once(Object *obj)
   return 1;
 }
 
-void object_activity(uint64_t pulse_type)
+void DC::object_activity(uint64_t pulse_type)
 {
-  for (const auto &obj : DC::getInstance()->active_obj_list)
+  for (const auto &obj : active_obj_list)
   {
-    int32_t item_number = obj->vnum;
+    int32_t item_number = obj->item_number;
 
-    if (DC::getInstance()->obj_index[item_number].non_combat_func)
+    if (obj_index[item_number].non_combat_func)
     {
-      DC::getInstance()->obj_index[item_number].non_combat_func(nullptr, obj, 0, "", nullptr);
+      obj_index[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = DC::getInstance()->obj_index[item_number].item->obj_flags.value[1];
+      obj->obj_flags.value[0] = ((Object *)obj_index[item_number].item)->obj_flags.value[1];
       send_to_room(obj->ex_description->description, obj->in_room, true);
     }
     else
@@ -179,7 +177,7 @@ void object_activity(uint64_t pulse_type)
 
       if (obj->in_room != DC::NOWHERE)
       {
-        if (DC::getInstance()->zones.value(DC::getInstance()->world[obj->in_room].zone).players > 0)
+        if (zones.value(world[obj->in_room].zone).players > 0)
           retval = oprog_rand_trigger(obj);
       }
       else
@@ -189,7 +187,7 @@ void object_activity(uint64_t pulse_type)
     }
   }
 
-  DC::getInstance()->removeDead();
+  removeDead();
   return;
 }
 
@@ -208,7 +206,7 @@ void name_from_drinkcon(class Object *obj)
   }
 }
 
-int do_switch(Character *ch, char *arg, int cmd)
+int do_switch(Character *ch, char *arg, cmd_t cmd)
 {
   class Object *between;
 
@@ -251,7 +249,7 @@ int do_switch(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_quaff(Character *ch, char *argument, int cmd)
+int do_quaff(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *temp;
@@ -305,7 +303,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
     act("During combat, $n drops $p and it SMASHES!", ch, temp, 0, TO_ROOM, 0);
     act("During combat, you drop $p which SMASHES!", ch, temp, 0, TO_CHAR, 0);
     if (equipped)
-      unequip_char(ch, pos);
+      ch->unequip_char(pos);
     extract_obj(temp);
     return eSUCCESS;
   }
@@ -329,10 +327,15 @@ int do_quaff(Character *ch, char *argument, int cmd)
   {
     if (temp->obj_flags.value[i] >= 1)
     {
-      if (spell_info[temp->obj_flags.value[i]].spell_pointer)
+      if (spell_info[temp->obj_flags.value[i]].spell_pointer())
       {
         lvl = (int)(1.5 * temp->obj_flags.value[0]);
-        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer)((uint8_t)temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
+        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer())((uint8_t)temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
+      }
+      else if (spell_info[temp->obj_flags.value[i]].spell_pointer2())
+      {
+        lvl = (int)(1.5 * temp->obj_flags.value[0]);
+        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer2())((uint8_t)temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl, 0));
       }
     }
     if (isSet(retval, eCH_DIED))
@@ -341,13 +344,13 @@ int do_quaff(Character *ch, char *argument, int cmd)
   if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
-      unequip_char(ch, pos, 1);
+      ch->unequip_char(pos, 1);
     extract_obj(temp);
   }
   return retval;
 }
 
-int do_recite(Character *ch, char *argument, int cmd)
+int do_recite(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *scroll, *obj;
@@ -440,14 +443,10 @@ int do_recite(Character *ch, char *argument, int cmd)
       if (scroll->obj_flags.value[i] >= 1)
       {
         lvl = (int)(1.5 * scroll->obj_flags.value[0]);
-        if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
+
+        if (spell_info[scroll->obj_flags.value[i]].spell_pointer())
         {
-          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%lu].spell_pointer == nullptr", scroll->vnum, i, i);
-          continue;
-        }
-        else
-        {
-          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)((uint8_t)scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
+          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer())((uint8_t)scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
           if (SOMEONE_DIED(retval))
           {
             break;
@@ -457,13 +456,30 @@ int do_recite(Character *ch, char *argument, int cmd)
             break;
           }
         }
+        else if (spell_info[scroll->obj_flags.value[i]].spell_pointer2())
+        {
+          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer2())((uint8_t)scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl, 0));
+          if (SOMEONE_DIED(retval))
+          {
+            break;
+          }
+          if (victim && ch->in_room != victim->in_room)
+          {
+            break;
+          }
+        }
+        else
+        {
+          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
+          continue;
+        }
       }
     }
   }
   if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
-      unequip_char(ch, pos, 1);
+      ch->unequip_char(pos, 1);
     extract_obj(scroll);
   }
   return eSUCCESS;
@@ -481,7 +497,7 @@ void set_movement_trap(Character *ch, class Object *obj)
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make a new item
-  trap_obj = DC::getInstance()->clone_object(GOD_TRAP_ITEM);
+  trap_obj = clone_object(GOD_TRAP_ITEM);
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)
@@ -502,7 +518,7 @@ void set_exit_trap(Character *ch, class Object *obj, char *arg)
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make a new item
-  trap_obj = DC::getInstance()->clone_object(GOD_TRAP_ITEM);
+  trap_obj = clone_object(GOD_TRAP_ITEM);
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)
@@ -561,13 +577,13 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   }
 
   // make a new item
-  trap_obj = DC::getInstance()->clone_object(MORTAR_ROUND_OBJECT_ID);
+  trap_obj = clone_object(real_object(MORTAR_ROUND_OBJECT_ID));
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)
     trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
 
-  do_say(ch, "Fire in the hole!", CMD_DEFAULT);
+  do_say(ch, "Fire in the hole!");
   act("$n sets off $o with a flash and bang!.", ch, obj, 0, TO_ROOM, 0);
   ch->sendln("You set off the device with a loud bang.");
 
@@ -658,7 +674,7 @@ void set_utility_item(Character *ch, class Object *obj, char *argument)
   extract_obj(obj);
 }
 
-int do_mortal_set(Character *ch, char *argument, int cmd)
+int do_mortal_set(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *obj = nullptr;
   char arg[MAX_INPUT_LENGTH];
@@ -694,7 +710,7 @@ int do_mortal_set(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_use(Character *ch, char *argument, int cmd)
+int do_use(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   char targ[MAX_INPUT_LENGTH + 1];
@@ -741,8 +757,10 @@ int do_use(Character *ch, char *argument, int cmd)
       lvl = (int)(1.5 * stick->obj_flags.value[0]);
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       int retval = 0;
-      if (spell_info[stick->obj_flags.value[3]].spell_pointer)
-        retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
+      if (spell_info[stick->obj_flags.value[3]].spell_pointer())
+        retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
+      else if (spell_info[stick->obj_flags.value[3]].spell_pointer2())
+        retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer2())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl, 0));
       else
         retval = eFAILURE;
       return retval;
@@ -776,8 +794,10 @@ int do_use(Character *ch, char *argument, int cmd)
         lvl = (int)(1.5 * stick->obj_flags.value[0]);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         int retval;
-        if (spell_info[stick->obj_flags.value[3]].spell_pointer)
-          retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+        if (spell_info[stick->obj_flags.value[3]].spell_pointer())
+          retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+        else if (spell_info[stick->obj_flags.value[3]].spell_pointer2())
+          retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer2())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl, 0));
         else
           retval = eFAILURE;
         return retval;
@@ -800,7 +820,7 @@ int do_use(Character *ch, char *argument, int cmd)
 }
 
 // Allows a player to change his "name" (short_desc) (Sadus)
-int do_name(Character *ch, char *arg, int cmd)
+int do_name(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[200];
   char _convert[2];
@@ -892,7 +912,7 @@ int do_name(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_drink(Character *ch, char *argument, int cmd)
+int do_drink(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *temp;
@@ -1044,7 +1064,7 @@ int do_drink(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_eat(Character *ch, char *argument, int cmd)
+int do_eat(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *temp;
@@ -1109,7 +1129,7 @@ int do_eat(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pour(Character *ch, char *argument, int cmd)
+int do_pour(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -1227,7 +1247,7 @@ int do_pour(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sip(Character *ch, char *argument, int cmd)
+int do_sip(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -1290,7 +1310,7 @@ int do_sip(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_taste(Character *ch, char *argument, int cmd)
+int do_taste(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   class Object *temp;
@@ -1311,7 +1331,7 @@ int do_taste(Character *ch, char *argument, int cmd)
 
   if (temp->obj_flags.type_flag == ITEM_DRINKCON)
   {
-    return do_sip(ch, argument, 0);
+    return do_sip(ch, argument);
   }
 
   if (!(temp->obj_flags.type_flag == ITEM_FOOD))
@@ -1441,7 +1461,7 @@ int charmie_restricted(Character *ch, class Object *obj, int wear_loc)
   return false; // sigh, work for nohin'
   if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
   {
-    int vnum = DC::getInstance()->mob_index[ch->mobdata->vnum].vnum;
+    int vnum = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     if (vnum == 8 || (vnum > 22388 && vnum < 22399))
       return false; // golems and corpses wear all
     switch (ch->race)
@@ -1640,7 +1660,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   {
     if (ch->getLevel() < obj_object->obj_flags.eq_level)
     {
-      sprintf(buffer, "You must be level %llu to use $p.",
+      sprintf(buffer, "You must be level %d to use $p.",
               obj_object->obj_flags.eq_level);
       act(buffer, ch, obj_object, 0, TO_CHAR, 0);
       return;
@@ -1648,17 +1668,17 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   }
   else
   {
-    if (DC::getInstance()->mob_index[ch->mobdata->vnum].vnum != 8)
+    if (DC::getInstance()->mob_index[ch->mobdata->nr].virt != 8)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
-        sprintf(buffer, "You must be level %llu to use $p.",
+        sprintf(buffer, "You must be level %d to use $p.",
                 obj_object->obj_flags.eq_level);
         act(buffer, ch, obj_object, 0, TO_CHAR, 0);
         return;
       }
   }
-  /*  if (IS_NPC(ch) && (DC::getInstance()->mob_index[ch->mobdata->nr].vnum < 22394 &&
-    DC::getInstance()->mob_index[ch->mobdata->nr].vnum > 22388))
+  /*  if (IS_NPC(ch) && (DC::getInstance()->mob_index[ch->mobdata->nr].virt < 22394 &&
+    DC::getInstance()->mob_index[ch->mobdata->nr].virt > 22388))
     {
        return;
     }*/
@@ -1696,14 +1716,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
           sprintf(buffer, "You put the %s on your right ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_FINGER_R);
+          ch->equip_char(obj_object, WEAR_FINGER_R);
         }
         else
         {
           sprintf(buffer, "You put the %s on your left ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_FINGER_L);
+          ch->equip_char(obj_object, WEAR_FINGER_L);
         }
       }
     }
@@ -1728,12 +1748,12 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         if (ch->equipment[WEAR_NECK_1])
         {
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_NECK_2);
+          ch->equip_char(obj_object, WEAR_NECK_2);
         }
         else
         {
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_NECK_1);
+          ch->equip_char(obj_object, WEAR_NECK_1);
         }
       }
     }
@@ -1755,7 +1775,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_BODY);
+        ch->equip_char(obj_object, WEAR_BODY);
       }
     }
     else
@@ -1776,7 +1796,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_HEAD);
+        ch->equip_char(obj_object, WEAR_HEAD);
       }
     }
     else
@@ -1797,7 +1817,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_LEGS);
+        ch->equip_char(obj_object, WEAR_LEGS);
       }
     }
     else
@@ -1818,7 +1838,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_FEET);
+        ch->equip_char(obj_object, WEAR_FEET);
       }
     }
     else
@@ -1839,7 +1859,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_HANDS);
+        ch->equip_char(obj_object, WEAR_HANDS);
       }
     }
     else
@@ -1860,7 +1880,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_ARMS);
+        ch->equip_char(obj_object, WEAR_ARMS);
       }
     }
     else
@@ -1881,7 +1901,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_ABOUT);
+        ch->equip_char(obj_object, WEAR_ABOUT);
       }
     }
     else
@@ -1902,7 +1922,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_WAISTE);
+        ch->equip_char(obj_object, WEAR_WAISTE);
       }
     }
     else
@@ -1928,13 +1948,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         {
           sprintf(buffer, "You wear the %s around your right wrist.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
-          equip_char(ch, obj_object, WEAR_WRIST_R);
+          ch->equip_char(obj_object, WEAR_WRIST_R);
         }
         else
         {
           sprintf(buffer, "You wear the %s around your left wrist.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
-          equip_char(ch, obj_object, WEAR_WRIST_L);
+          ch->equip_char(obj_object, WEAR_WRIST_L);
         }
       }
     }
@@ -1957,7 +1977,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_FACE);
+        ch->equip_char(obj_object, WEAR_FACE);
       }
     }
     else
@@ -1985,16 +2005,16 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       else if (IS_AFFECTED(ch, AFF_CHARM))
       {
         ch->sendln("Sorry, charmies can't wield stuff anymore:(");
-        do_say(ch, "I'm sorry my master, I lack the dexterity.", 0);
+        do_say(ch, "I'm sorry my master, I lack the dexterity.");
       }
       else
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WIELD])
-          equip_char(ch, obj_object, SECOND_WIELD);
+          ch->equip_char(obj_object, SECOND_WIELD);
         else
-          equip_char(ch, obj_object, WIELD);
+          ch->equip_char(obj_object, WIELD);
       }
     }
     else
@@ -2023,7 +2043,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_SHIELD);
+        ch->equip_char(obj_object, WEAR_SHIELD);
       }
     }
 
@@ -2054,9 +2074,9 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[HOLD])
-          equip_char(ch, obj_object, HOLD2);
+          ch->equip_char(obj_object, HOLD2);
         else
-          equip_char(ch, obj_object, HOLD);
+          ch->equip_char(obj_object, HOLD);
       }
     }
     else
@@ -2081,13 +2101,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         {
           act("You wear $p in your right ear.", ch, obj_object, 0, TO_CHAR, 0);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_EAR_R);
+          ch->equip_char(obj_object, WEAR_EAR_R);
         }
         else
         {
           act("You wear $p in your left ear.", ch, obj_object, 0, TO_CHAR, 0);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_EAR_L);
+          ch->equip_char(obj_object, WEAR_EAR_L);
         }
       }
     }
@@ -2117,7 +2137,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     {
       obj_from_char(obj_object);
       perform_wear(ch, obj_object, keyword);
-      equip_char(ch, obj_object, WEAR_LIGHT);
+      ch->equip_char(obj_object, WEAR_LIGHT);
     }
   }
   break;
@@ -2153,7 +2173,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
 
       class Object *obj_temp = ch->equipment[WIELD];
-      obj_to_char(unequip_char(ch, WIELD), ch);
+      obj_to_char(ch->unequip_char(WIELD), ch);
       wear(ch, obj_object, 12);
       wear(ch, obj_temp, 12);
       return;
@@ -2226,7 +2246,7 @@ int Object::keywordfind(void)
   return keyword;
 }
 
-int do_wear(Character *ch, char *argument, int cmd)
+int do_wear(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -2323,7 +2343,7 @@ int do_wear(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_wield(Character *ch, char *argument, int cmd)
+int do_wield(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -2373,7 +2393,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_grab(Character *ch, char *argument, int cmd)
+int do_grab(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -2467,7 +2487,7 @@ int Character::hands_are_free(int number)
     return (0);
 }
 
-int do_remove(Character *ch, char *argument, int cmd)
+int do_remove(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   class Object *obj_object;
@@ -2499,20 +2519,20 @@ int do_remove(Character *ch, char *argument, int cmd)
               send_to_char(arg1, ch);
               continue;
             }
-            if (obj_object->vnum == 30010 && obj_object->obj_flags.timer < 40)
+            if (DC::getInstance()->obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
             {
               ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
               continue;
             }
 
-            if (obj_object->vnum == SPIRIT_SHIELD_OBJ_NUMBER)
+            if (DC::getInstance()->obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
               continue;
             }
             else
-              obj_to_char(unequip_char(ch, j), ch);
+              obj_to_char(ch->unequip_char(j), ch);
             act("You stop using $p.", ch, obj_object, 0, TO_CHAR, 0);
             act("$n stops using $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
           }
@@ -2542,7 +2562,7 @@ int do_remove(Character *ch, char *argument, int cmd)
             send_to_char(arg1, ch);
             return eFAILURE;
           }
-          if (obj_object->vnum == 30010 && obj_object->obj_flags.timer < 40)
+          if (DC::getInstance()->obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
           {
             ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
             return eFAILURE;
@@ -2555,18 +2575,18 @@ int do_remove(Character *ch, char *argument, int cmd)
           }
           if (j == WIELD)
           {
-            obj_to_char(unequip_char(ch, j), ch);
+            obj_to_char(ch->unequip_char(j), ch);
             ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
             ch->equipment[SECOND_WIELD] = 0;
           }
-          else if (obj_object->vnum == SPIRIT_SHIELD_OBJ_NUMBER)
+          else if (DC::getInstance()->obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);
             return eSUCCESS;
           }
           else
-            obj_to_char(unequip_char(ch, j), ch);
+            obj_to_char(ch->unequip_char(j), ch);
 
           act("You stop using $p.", ch, obj_object, 0, TO_CHAR, 0);
           act("$n stops using $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
@@ -2599,7 +2619,7 @@ int Character::recheck_height_wears(void)
 {
   int j;
   class Object *obj = nullptr;
-  if (IS_NPC(this))
+  if (!this || IS_NPC(this))
     return eFAILURE; // NPCs get to wear the stuff.
 
   for (j = 0; j < MAX_WEAR; j++)
@@ -2609,7 +2629,7 @@ int Character::recheck_height_wears(void)
 
     if (size_restricted(this, this->equipment[j]))
     {
-      obj = unequip_char(this, j);
+      obj = unequip_char(j);
       obj_to_char(obj, this);
       act("$n looks uncomfortable, and shifts $p into $s inventory.", this, obj, nullptr, TO_ROOM, 0);
       act("$p feels uncomfortable and you shift it into your inventory.", this, obj, nullptr, TO_CHAR, 0);
@@ -2743,6 +2763,29 @@ bool Object::isDark(void)
 uint64_t Object::getLevel(void)
 {
   return obj_flags.eq_level;
+}
+
+bool Object::isQuest(void)
+{
+  return isexact("quest", name) ||
+         DC::getInstance()->obj_index[item_number].virt == 3124 ||
+         DC::getInstance()->obj_index[item_number].virt == 3125 ||
+         DC::getInstance()->obj_index[item_number].virt == 3126 ||
+         DC::getInstance()->obj_index[item_number].virt == 3127 ||
+         DC::getInstance()->obj_index[item_number].virt == 3128 ||
+         DC::getInstance()->obj_index[item_number].virt == 27997 ||
+         DC::getInstance()->obj_index[item_number].virt == 27998 ||
+         DC::getInstance()->obj_index[item_number].virt == 27999;
+}
+
+bool Object::isTest(void)
+{
+  return isexact(QStringLiteral("test"), getName());
+}
+
+bool Object::isGodload(void)
+{
+  return isexact(QStringLiteral("gl"), getName()) || isexact(QStringLiteral("godload"), getName()) || isSet(obj_flags.extra_flags, ITEM_SPECIAL);
 }
 
 bool Object::hasPortalFlagNoLeave(void)

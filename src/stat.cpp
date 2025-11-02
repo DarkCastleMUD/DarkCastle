@@ -98,7 +98,7 @@ void AreaData::SortAreaData(Character *ch, SortState state)
 		{
 			i++;
 			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())), "%s", DC::getInstance()->zones.value(lit->area).NameC());
-			snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%lds $5%%15lld$R xps\r\n", 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
+			snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%ds $5%%15lld$R xps\r\n", 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
 			csendf(ch, buf2, i, buf, lit->xps);
 		}
 	}
@@ -110,7 +110,7 @@ void AreaData::SortAreaData(Character *ch, SortState state)
 			i++;
 			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())), "%s",
 					 DC::getInstance()->zones.value(lit->area).NameC());
-			snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%lds $5%%15lld$R gold\r\n",
+			snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%ds $5%%15lld$R gold\r\n",
 					 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
 			csendf(ch, buf2, i, buf, lit->gold);
 		}
@@ -132,7 +132,7 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
 		ch->send("Area number is outside the limits\r\n");
 		return;
 	}
-	snprintf(buf, MAX_STRING_LENGTH, "%lu)%30s -- $5%12ld$R xps -- $5%12ld$R gold\n\r", area, DC::getInstance()->zones.value(area).NameC(), areaStats[area].xps, areaStats[area].gold);
+	snprintf(buf, MAX_STRING_LENGTH, "%d)%30s -- $5%12ld$R xps -- $5%12ld$R gold\n\r", area, DC::getInstance()->zones.value(area).NameC(), areaStats[area].xps, areaStats[area].gold);
 	csendf(ch, buf);
 	snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5s\r\n", "Mob Name", "Killed");
 	csendf(ch, buf);
@@ -196,7 +196,7 @@ void AreaData::GetAreaData(zone_t zone, int mob, int64_t xps, int64_t gold)
 
 AreaData areaData;
 
-int do_areastats(Character *ch, char *argument, int cmd)
+int do_areastats(Character *ch, char *argument, cmd_t cmd)
 {
 	char buf[MAX_STRING_LENGTH];
 

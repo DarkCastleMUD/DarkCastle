@@ -20,7 +20,7 @@
 #include "DC/race.h"
 #include "DC/const.h"
 
-int do_boot(Character *ch, char *arg, int cmd)
+int do_boot(Character *ch, char *arg, cmd_t cmd)
 {
   Character *victim;
   char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
@@ -149,7 +149,7 @@ int do_boot(Character *ch, char *arg, int cmd)
                    victim);
     }
     move_char(victim, real_room(START_ROOM));
-    do_quit(victim, "", 666);
+    do_quit(victim, "", cmd_t::SAVE_SILENTLY);
   }
 
   else
@@ -158,7 +158,7 @@ int do_boot(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_disconnect(Character *ch, char *argument, int cmd)
+int do_disconnect(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -170,7 +170,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
 
   one_argument(argument, arg);
   sdesc = atoi(arg);
-  if (arg[0] == '\0')
+  if (arg == 0)
   {
     ch->sendln("Illegal descriptor number.");
     ch->sendln("Usage: release <#>");
@@ -201,7 +201,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_fsave(Character *ch, std::string argument, int cmd)
+int do_fsave(Character *ch, std::string argument, cmd_t cmd)
 {
   Character *vict = {};
   std::string name = {}, buf = {};
@@ -238,7 +238,7 @@ int do_fsave(Character *ch, std::string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_fighting(Character *ch, char *argument, int cmd)
+int do_fighting(Character *ch, char *argument, cmd_t cmd)
 {
   const int CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
   Character *i;
@@ -295,7 +295,7 @@ int do_fighting(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_peace(Character *ch, char *argument, int cmd)
+int do_peace(Character *ch, char *argument, cmd_t cmd)
 {
   Character *rch;
 
@@ -311,12 +311,12 @@ int do_peace(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_matrixinfo(Character *ch, char *argument, int cmd)
+int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;
   buf[0] = '\0';
-  for (; i < DC::MAX_RACE; i++)
+  for (; i < MAX_RACE; i++)
   {
     char immbuf[MAX_STRING_LENGTH], resbuf[MAX_STRING_LENGTH], susbuf[MAX_STRING_LENGTH];
     immbuf[0] = resbuf[0] = susbuf[0] = '\0';
@@ -385,7 +385,7 @@ int lookupRoom(Character *ch, char *str)
   return room;
 }
 
-int do_guild(Character *ch, char *argument, int cmd)
+int do_guild(Character *ch, char *argument, cmd_t cmd)
 {
   int c_class = 0, room = 0, old_room = 0;
   char arg1[MAX_STRING_LENGTH] = {0};
@@ -523,7 +523,7 @@ int do_guild(Character *ch, char *argument, int cmd)
 
   old_room = ch->in_room;
   ch->in_room = room;
-  do_rsave(ch, "", CMD_DEFAULT);
+  do_rsave(ch, "");
   ch->in_room = old_room;
 
   return eSUCCESS;

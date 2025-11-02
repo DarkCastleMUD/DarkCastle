@@ -17,8 +17,9 @@
 #include "DC/fileinfo.h"
 #include "DC/const.h"
 #include "DC/Timer.h"
+#include "DC/common.h"
 
-int do_clearaff(Character *ch, char *argument, int cmd)
+int do_clearaff(Character *ch, char *argument, cmd_t cmd)
 {
   bool found = false;
   char buf[MAX_INPUT_LENGTH];
@@ -63,7 +64,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_reloadhelp(Character *ch, char *argument, int cmd)
+int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
 {
   extern FILE *help_fl;
   extern struct help_index_element *help_index;
@@ -80,7 +81,7 @@ int do_reloadhelp(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_log(Character *ch, char *argument, int cmd)
+int do_log(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   class Object *dummy;
@@ -122,7 +123,7 @@ int do_log(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_showbits(Character *ch, char *argument, int cmd)
+int do_showbits(Character *ch, char *argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
   Character *victim;
@@ -229,7 +230,7 @@ int do_showbits(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_debug(Character *ch, char *args, int cmd)
+int do_debug(Character *ch, char *args, cmd_t cmd)
 {
   std::string arg1, arg2, arg3;
   std::string remainder;
@@ -339,7 +340,7 @@ int do_debug(Character *ch, char *args, int cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)
         {
-          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->vnum].vnum == vnum)
+          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].virt == vnum)
           {
             if (!first_npc_found)
             {
@@ -347,7 +348,7 @@ int do_debug(Character *ch, char *args, int cmd)
               first_npc_debug_state = c->getDebug();
             }
             c->setDebug(!first_npc_debug_state);
-            ch->sendln(QStringLiteral("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->vnum).arg(c->getDebug() ? "on" : "off"));
+            ch->sendln(QStringLiteral("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
             change_count++;
           }
         }
@@ -372,7 +373,7 @@ int do_debug(Character *ch, char *args, int cmd)
   return eSUCCESS;
 }
 
-int do_pardon(Character *ch, char *argument, int cmd)
+int do_pardon(Character *ch, char *argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
   char flag[MAX_INPUT_LENGTH];
@@ -437,7 +438,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_dmg_eq(Character *ch, char *argument, int cmd)
+int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   class Object *obj_object;
@@ -506,7 +507,7 @@ struct skill_quest *find_sq(int sq)
   return nullptr;
 }
 
-int do_sqedit(Character *ch, char *argument, int cmd)
+int do_sqedit(Character *ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   argument = one_argument(argument, command);
@@ -748,7 +749,7 @@ int wear_bitv[MAX_WEAR] = {
     1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072,
     262144, 262144};
 
-int do_eqmax(Character *ch, char *argument, int cmd)
+int do_eqmax(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   char arg[MAX_INPUT_LENGTH];
@@ -795,11 +796,13 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   bool nodouble = false;
   if (!str_cmp(arg, "nodouble"))
     nodouble = true;
-
+  int i = 1;
   class Object *obj;
-  for (const auto &obj_index_entry : DC::getInstance()->obj_index)
+  for (i = 1; i < 32000; i++)
   {
-    obj = obj_index_entry.item;
+    if (real_object(i) < 0)
+      continue;
+    obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, ITEM_TAKE) &&
@@ -815,7 +818,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = obj->vnum;
+              last_vnum[0][o] = DC::getInstance()->obj_index[obj->item_number].virt;
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -829,7 +832,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
               for (v = 0; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = obj->vnum;
+                  last_vnum[v][o] = DC::getInstance()->obj_index[obj->item_number].virt;
                   break;
                 }
             }
@@ -839,7 +842,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   }
   char buf1[MAX_STRING_LENGTH];
   int tot = 0;
-  for (auto i = 1U; i < MAX_WEAR; i++)
+  for (i = 1; i < MAX_WEAR; i++)
   {
     buf1[0] = '\0';
     sprintf(buf1, "%d. ", i);
@@ -852,7 +855,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, (DC::getInstance()->obj_index[last_vnum[a][i]].item)->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
@@ -863,9 +866,8 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_reload(Character *ch, char *argument, int cmd)
+int do_reload(Character *ch, char *argument, cmd_t cmd)
 {
-  int do_reload_help(Character * ch, char *argument, int cmd);
   extern char motd[MAX_STRING_LENGTH];
   extern char imotd[MAX_STRING_LENGTH];
   extern char new_help[MAX_STRING_LENGTH];
@@ -897,6 +899,7 @@ int do_reload(Character *ch, char *argument, int cmd)
     file_to_string(GREETINGS2_FILE, greetings2);
     file_to_string(GREETINGS3_FILE, greetings3);
     file_to_string(GREETINGS4_FILE, greetings4);
+    ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "credits"))
     file_to_string(CREDITS_FILE, credits);
@@ -916,7 +919,7 @@ int do_reload(Character *ch, char *argument, int cmd)
     file_to_string(NEW_IHELP_PAGE_FILE, new_ihelp);
   else if (!str_cmp(arg, "xhelp"))
   {
-    do_reload_help(ch, 0, 0);
+    do_reload_help(ch, str_hsh(""));
     ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "greetings"))
@@ -925,6 +928,7 @@ int do_reload(Character *ch, char *argument, int cmd)
     file_to_string(GREETINGS2_FILE, greetings2);
     file_to_string(GREETINGS3_FILE, greetings3);
     file_to_string(GREETINGS4_FILE, greetings4);
+    ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "vaults"))
   {
@@ -940,7 +944,7 @@ int do_reload(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listproc(Character *ch, char *argument, int a)
+int do_listproc(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int start, i, end, tot;
@@ -963,7 +967,7 @@ int do_listproc(Character *ch, char *argument, int a)
   {
     if (mob && (real_mobile(i) < 0 || !DC::getInstance()->mob_index[real_mobile(i)].mobprogs))
       continue;
-    else if (!mob && (i < 0 || !DC::getInstance()->obj_index[i].mobprogs))
+    else if (!mob && (real_object(i) < 0 || !DC::getInstance()->obj_index[real_object(i)].mobprogs))
       continue;
     if (tot++ > 100)
       break;
@@ -973,7 +977,7 @@ int do_listproc(Character *ch, char *argument, int a)
     }
     else
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, (DC::getInstance()->obj_index[i].item)->name);
+      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)DC::getInstance()->obj_index[real_object(i)].item)->name);
     }
   }
   ch->send(buf);

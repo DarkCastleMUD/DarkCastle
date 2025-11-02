@@ -218,7 +218,7 @@ void list_quests(Character *ch, int lownum, int highnum)
       {
          // Create a format std::string based on a space offset that takes color codes into account
          snprintf(buffer, MAX_STRING_LENGTH,
-                  "%%3d. $B$2Name:$7 %%-%lus$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n\r",
+                  "%%3d. $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n\r",
                   35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
          csendf(ch, buffer, quest->number, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward, quest->level);
@@ -292,7 +292,7 @@ bool check_quest_current(Character *ch, int number)
 
 bool check_quest_cancel(Character *ch, int number)
 {
-   for (int i = 0; i < QUEST_CANCEL; i++)
+   for (int i = 0; i < QUEST_MAX_CANCEL; i++)
       if (ch->player->quest_cancel[i] == number)
          return true;
    return false;
@@ -420,7 +420,7 @@ int show_one_available_quest(Character *ch, struct quest_info *quest, int count)
    char buffer[MAX_STRING_LENGTH];
    // Create a format std::string based on a space offset that takes color codes into account
    snprintf(buffer, MAX_STRING_LENGTH,
-            "$B$7%3d. $2Name:$7 %%-%lus$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
+            "$B$7%3d. $2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
             quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
    csendf(ch, buffer, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward);
@@ -557,7 +557,7 @@ int start_quest(Character *ch, struct quest_info *quest)
 
    if (quest->brownie)
    {
-      brownie = get_obj_in_list_num(27906, ch->carrying);
+      brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
       if (!brownie)
       {
          csendf(ch, "You need a brownie point to start this quest!\n\r", price);
@@ -586,7 +586,7 @@ int start_quest(Character *ch, struct quest_info *quest)
       return eFAILURE;
    }
 
-   obj = DC::getInstance()->clone_object(quest->objnum);
+   obj = clone_object(real_object(quest->objnum));
    obj->short_description = str_hsh(quest->objshort);
    obj->description = str_hsh(quest->objlong);
 
@@ -606,7 +606,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    if (quest->number)
       quest->active = true;
    count = 0;
-   while (count < QUEST_CANCEL)
+   while (count < QUEST_MAX_CANCEL)
    {
       if (ch->player->quest_cancel[count] == quest->number)
       {
@@ -637,12 +637,12 @@ int cancel_quest(Character *ch, struct quest_info *quest)
    if (!check_quest_current(ch, quest->number))
       return eFAILURE;
 
-   while (count < QUEST_CANCEL)
+   while (count < QUEST_MAX_CANCEL)
    {
       if (!ch->player->quest_cancel[count])
          break;
       count++;
-      if (count >= QUEST_CANCEL)
+      if (count >= QUEST_MAX_CANCEL)
          return eEXTRA_VALUE;
    }
 
@@ -790,7 +790,7 @@ void quest_update()
             {
                if ((mob = get_mob_vnum(quest->mobnum)))
                {
-                  obj = DC::getInstance()->clone_object(quest->objnum);
+                  obj = clone_object(quest->objnum);
                   obj->short_description = str_hsh(quest->objshort);
                   obj->description = str_hsh(quest->objlong);
                   sprintf(buf, "%s q%d", quest->objkey, quest->number);
@@ -805,13 +805,13 @@ void quest_update()
    DC::getInstance()->removeDead();
 }
 
-int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
+int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
 {
    int retval = 0;
    char buf[MAX_STRING_LENGTH];
    struct quest_info *quest;
 
-   if (cmd != 1)
+   if (cmd != cmd_t::QUEST_LIST)
    {
       quest = get_quest_struct(name);
       if (quest == 0)
@@ -823,39 +823,39 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
 
    switch (cmd)
    {
-   case 1:
-      do_emote(qmaster, "looks at his notes and writes a scroll.", CMD_DEFAULT);
+   case cmd_t::QUEST_LIST:
+      do_emote(qmaster, "looks at his notes and writes a scroll.");
       sprintf(buf, "%s Here are some currently available quests.", GET_NAME(ch));
-      do_psay(qmaster, buf, CMD_DEFAULT);
+      do_psay(qmaster, buf);
       show_available_quests(ch);
       break;
-   case 2:
+   case cmd_t::QUEST_CANCEL:
       retval = cancel_quest(ch, quest);
       if (isSet(retval, eSUCCESS))
       {
          sprintf(buf, "%s You may begin this quest again if you speak with me.", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       else if (isSet(retval, eEXTRA_VALUE))
       {
          sprintf(buf, "%s You cannot cancel up any more quests without completing some of them.", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       else
       {
          sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       break;
-   case 3:
+   case cmd_t::QUEST_START:
       retval = start_quest(ch, quest);
       if (isSet(retval, eSUCCESS))
       {
          if (quest->number)
          {
             sprintf(buf, "%s Excellent!  Let me write down the quest information for you.", GET_NAME(ch));
-            do_psay(qmaster, buf, CMD_DEFAULT);
-            do_emote(qmaster, "gives up the scroll.", CMD_DEFAULT);
+            do_psay(qmaster, buf);
+            do_emote(qmaster, "gives up the scroll.");
             show_quest_header(ch);
             show_one_quest(ch, quest, 0);
             show_quest_footer(ch);
@@ -863,9 +863,9 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
          else
          {
             sprintf(buf, "%s I have placed a token of Phire upon a creature somewhere within the realms.", GET_NAME(ch));
-            do_psay(qmaster, buf, CMD_DEFAULT);
+            do_psay(qmaster, buf);
             sprintf(buf, "%s Retrieve it for me within 12 hours for a reward!", GET_NAME(ch));
-            do_psay(qmaster, buf, CMD_DEFAULT);
+            do_psay(qmaster, buf);
             show_quest_header(ch);
             show_one_quest(ch, quest, 0);
             show_quest_footer(ch);
@@ -874,41 +874,41 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
       else if (isSet(retval, eEXTRA_VALUE))
       {
          sprintf(buf, "%s You cannot start any more quests without completing some first.", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       else if (isSet(retval, eEXTRA_VAL2))
       {
          sprintf(buf, "%s You do not have the required funds to get the clue from me, beggar!", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       else if (!retval)
       {
          sprintf(buf, "%s The quest item has left this world.  It will appear again soon.", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       else
       {
          sprintf(buf, "%s Sorry, you cannot start this quest right now.", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       break;
-   case 4:
+   case cmd_t::QUEST_FINISH:
       retval = complete_quest(ch, quest);
       if (isSet(retval, eSUCCESS))
       {
          sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
-         ch->save(666);
+         do_psay(qmaster, buf);
+         ch->save(cmd_t::SAVE_SILENTLY);
       }
       else if (isSet(retval, eEXTRA_VALUE))
       {
          sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
-         do_psay(qmaster, buf, CMD_DEFAULT);
+         do_psay(qmaster, buf);
       }
       else
       {
          sprintf(buf, "%s You have not yet completed this quest.", GET_NAME(ch));
-         do_say(qmaster, buf, CMD_DEFAULT);
+         do_say(qmaster, buf);
       }
       break;
    default:
@@ -919,12 +919,12 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
 }
 
 // Not used currently. Use quest list or quest start <name> instead of list or buy.
-int quest_master(Character *ch, Object *obj, int cmd, char *arg, Character *owner)
+int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *owner)
 {
    int choice;
    char buf[MAX_STRING_LENGTH];
 
-   if ((cmd != 59) && (cmd != 56))
+   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY))
       return eFAILURE;
 
    if (IS_AFFECTED(ch, AFF_BLIND))
@@ -933,13 +933,13 @@ int quest_master(Character *ch, Object *obj, int cmd, char *arg, Character *owne
    if (IS_NPC(ch))
       return eFAILURE;
 
-   if (cmd == 59)
+   if (cmd == cmd_t::LIST)
    {
       show_available_quests(ch);
       return eSUCCESS;
    }
 
-   if (cmd == 56)
+   if (cmd == cmd_t::BUY)
    {
       if ((choice = atoi(arg)) == 0 || choice < 0)
       {
@@ -950,7 +950,7 @@ int quest_master(Character *ch, Object *obj, int cmd, char *arg, Character *owne
       switch (atoi(arg))
       {
       case 1:
-         do_say(owner, "Sure, bum.", CMD_DEFAULT);
+         do_say(owner, "Sure, bum.");
          break;
       default:
          sprintf(buf, "%s I don't offer that service.", GET_NAME(ch));
@@ -962,7 +962,7 @@ int quest_master(Character *ch, Object *obj, int cmd, char *arg, Character *owne
    return eSUCCESS;
 }
 
-int do_quest(Character *ch, char *arg, int cmd)
+int do_quest(Character *ch, char *arg, cmd_t cmd)
 {
    int retval = 0;
    char name[MAX_STRING_LENGTH];
@@ -990,7 +990,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (ch->in_room != qmaster->in_room)
          ch->sendln("You must ask the Quest Master for available quests.");
       else
-         retval = quest_handler(ch, qmaster, 1, 0);
+         retval = quest_handler(ch, qmaster, cmd_t::QUEST_LIST, 0);
    }
    else if (is_abbrev(arg, "cancel") && *name)
    {
@@ -999,7 +999,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (ch->in_room != qmaster->in_room)
          ch->sendln("You must let the Quest Master know of your intentions.");
       else
-         retval = quest_handler(ch, qmaster, 2, name);
+         retval = quest_handler(ch, qmaster, cmd_t::QUEST_CANCEL, name);
       return retval;
    }
    else if (is_abbrev(arg, "start") && *name)
@@ -1009,7 +1009,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (ch->in_room != qmaster->in_room)
          ch->sendln("You may only begin quests given from the Quest Master.");
       else
-         retval = quest_handler(ch, qmaster, 3, name);
+         retval = quest_handler(ch, qmaster, cmd_t::QUEST_START, name);
       return retval;
    }
    else if (is_abbrev(arg, "finish") && *name)
@@ -1019,7 +1019,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (ch->in_room != qmaster->in_room)
          ch->sendln("You may only finish quests in the presence of the Quest Master.");
       else
-         retval = quest_handler(ch, qmaster, 4, name);
+         retval = quest_handler(ch, qmaster, cmd_t::QUEST_FINISH, name);
       return retval;
    }
    else if (is_abbrev(arg, "reset"))
@@ -1077,7 +1077,7 @@ int do_quest(Character *ch, char *arg, int cmd)
          return eEXTRA_VAL2;
       }
 
-      Object *brownie = get_obj_in_list_num(27906, ch->carrying);
+      Object *brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
       if (!brownie)
       {
          ch->sendln("You need a brownie point to reset all quests!");
@@ -1118,7 +1118,7 @@ int do_quest(Character *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_qedit(Character *ch, char *argument, int cmd)
+int do_qedit(Character *ch, char *argument, cmd_t cmd)
 {
    char arg[MAX_STRING_LENGTH];
    char field[MAX_STRING_LENGTH];
@@ -1242,7 +1242,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
          memset(vict->player->quest_complete, 0, sizeof(vict->player->quest_complete));
 
          ch->send(QStringLiteral("Reset quests for player %1\r\n").arg(GET_NAME(vict)));
-         vict->save(666);
+         vict->save(cmd_t::SAVE_SILENTLY);
          return eSUCCESS;
       }
    }
@@ -1464,13 +1464,13 @@ int do_qedit(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character *owner)
+int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
    char buf[MAX_STRING_LENGTH];
    int rnum = 0;
 
    // list & buy & sell
-   if ((cmd != CMD_LIST) && (cmd != CMD_BUY) && (cmd != CMD_SELL))
+   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY) && (cmd != cmd_t::SELL))
    {
       return eFAILURE;
    }
@@ -1487,11 +1487,11 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
 
    if (!CAN_SEE(owner, ch))
    {
-      do_say(owner, "I don't trade with people I can't see!", 0);
+      do_say(owner, "I don't trade with people I can't see!");
       return eSUCCESS;
    }
 
-   if (cmd == CMD_LIST)
+   if (cmd == cmd_t::LIST)
    { /* List */
       ch->sendln("$B$2Orro tells you, 'This is what I can do for you...$R ");
       ch->sendln("$BQuest Equipment:$R");
@@ -1499,46 +1499,46 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       int n = 0;
       for (int qvnum = 27975; qvnum < 27997; qvnum++)
       {
-         rnum = qvnum;
+         rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
       }
       for (int qvnum = 27943; qvnum <= 27953; qvnum++)
       {
-         rnum = qvnum;
+         rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
       }
       for (int qvnum = 3124; qvnum <= 3128; qvnum++)
       {
-         rnum = qvnum;
+         rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
       }
       for (int qvnum = 3151; qvnum <= 3158; qvnum++)
       {
-         rnum = qvnum;
+         rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
       }
    }
-   else if (cmd == CMD_BUY)
+   else if (cmd == cmd_t::BUY)
    { /* buy */
       char arg2[MAX_INPUT_LENGTH];
       one_argument(arg, arg2);
@@ -1554,7 +1554,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       int n = 0;
       for (int qvnum = 27975; qvnum <= 27996; qvnum++)
       {
-         rnum = qvnum;
+         rnum = real_object(qvnum);
          if (rnum >= 0 && n++ == want_num)
          {
             FOUND = true;
@@ -1565,7 +1565,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       {
          for (int qvnum = 27943; qvnum <= 27953; qvnum++)
          {
-            rnum = qvnum;
+            rnum = real_object(qvnum);
             if (rnum >= 0 && n++ == want_num)
             {
                FOUND = true;
@@ -1577,7 +1577,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       {
          for (int qvnum = 3124; qvnum <= 3128; qvnum++)
          {
-            rnum = qvnum;
+            rnum = real_object(qvnum);
             if (rnum >= 0 && n++ == want_num)
             {
                FOUND = true;
@@ -1589,7 +1589,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       {
          for (int qvnum = 3151; qvnum <= 3158; qvnum++)
          {
-            rnum = qvnum;
+            rnum = real_object(qvnum);
             if (rnum >= 0 && n++ == want_num)
             {
                FOUND = true;
@@ -1605,21 +1605,21 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       }
 
       class Object *obj;
-      obj = DC::getInstance()->clone_object(rnum);
+      obj = clone_object(rnum);
 
       /*      if (class_restricted(ch, obj)) {
            sprintf(buf, "%s That item is meant for another class.", GET_NAME(ch));
-           do_tell(owner, buf, 0);
+           do_tell(owner, buf);
            extract_obj(obj);
            return eSUCCESS;
             } else if (size_restricted(ch, obj)) {
            sprintf(buf, "%s That item would not fit you.", GET_NAME(ch));
-           do_tell(owner, buf, 0);
+           do_tell(owner, buf);
            extract_obj(obj);
            return eSUCCESS;
             } else */
       if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
-          search_char_for_item(ch, obj->vnum, false))
+          search_char_for_item(ch, obj->item_number, false))
       {
          owner->do_tell(QStringLiteral("%1 You already have one of those.").arg(GET_NAME(ch)).split(' '));
          extract_obj(obj);
@@ -1643,7 +1643,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
       return eSUCCESS;
    }
-   else if (cmd == CMD_SELL)
+   else if (cmd == cmd_t::SELL)
    { /* Sell */
       char arg2[MAX_INPUT_LENGTH];
       one_argument(arg, arg2);
@@ -1655,15 +1655,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          return eSUCCESS;
       }
 
-      if (!isexact("quest", ((DC::getInstance()->obj_index[obj->vnum].item))->name) &&
-          obj->vnum != 3124 &&
-          obj->vnum != 3125 &&
-          obj->vnum != 3126 &&
-          obj->vnum != 3127 &&
-          obj->vnum != 3128 &&
-          obj->vnum != 27997 &&
-          obj->vnum != 27998 &&
-          obj->vnum != 27999)
+      if (!obj->isQuest())
       {
          owner->do_tell(QStringLiteral("%1 I only buy quest equipment.").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;

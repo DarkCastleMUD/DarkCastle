@@ -13,7 +13,7 @@
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 
-int do_archive(Character *ch, char *argument, int cmd)
+int do_archive(Character *ch, char *argument, cmd_t cmd)
 {
   char name[50];
   Character *victim;
@@ -44,13 +44,13 @@ int do_archive(Character *ch, char *argument, int cmd)
   csendf(victim, "You have been archived by %s.  Goodbye.\r\n", GET_NAME(ch));
   act("$N is grabbed up and packed into a small ball by $n.", ch, 0,
       victim, TO_ROOM, 0);
-  do_quit(victim, "", 666);
+  do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
   util_archive(name, ch);
   return eSUCCESS;
 }
 
-int do_unarchive(Character *ch, char *argument, int cmd)
+int do_unarchive(Character *ch, char *argument, cmd_t cmd)
 {
   char name[50];
   argument = one_argument(argument, name);
@@ -59,11 +59,11 @@ int do_unarchive(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pview(Character *ch, char *argument, int cmd)
+int do_pview(Character *ch, char *argument, cmd_t cmd)
 {
   char name[200];
   Character *victim;
-  QString tprompt;
+  std::string tprompt;
 
   argument = one_argument(argument, name);
 
@@ -79,7 +79,7 @@ int do_pview(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  tprompt = victim->desc->createPrompt();
+  make_prompt(victim->desc, tprompt);
   ch->sendln("Target's prompt is:");
   ch->send(tprompt);
   ch->sendln("\r\n");
@@ -87,7 +87,7 @@ int do_pview(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_snoop(QStringList arguments, int cmd)
+command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 {
   Character *victim;
 
@@ -175,7 +175,7 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_stealth(Character *ch, char *argument, int cmd)
+int do_stealth(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -198,7 +198,7 @@ int do_stealth(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_send(Character *ch, char *argument, int cmd)
+int do_send(Character *ch, char *argument, cmd_t cmd)
 {
 
   Character *vict;

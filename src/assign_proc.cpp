@@ -18,9 +18,13 @@
 #include "DC/player.h"
 #include "DC/utility.h"
 
-typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument, Character *owner);
-typedef int ROOM_PROC(Character *ch, int cmd, const char *argument);
+typedef int SPEC_FUN(Character *ch, Object *obj, cmd_t cmd, const char *argument, Character *owner);
+typedef int ROOM_PROC(Character *ch, cmd_t cmd, const char *argument);
 
+void boot_the_shops();
+void boot_player_shops();
+void assign_the_shopkeepers();
+void assign_the_player_shopkeepers();
 void assign_non_combat_procs();
 void assign_combat_procs();
 
@@ -74,19 +78,33 @@ void assign_one_mob_com(int vnum, special_function func)
   }
 }
 
-void DC::assign_one_obj_non(vnum_t vnum, special_function func)
+void assign_one_obj_non(int vnum, special_function func)
 {
-  if (obj_index.contains(vnum))
+  if (vnum >= 0)
   {
-    obj_index[vnum].non_combat_func = func;
+    DC::getInstance()->obj_non_combat_functions[vnum] = func;
+  }
+
+  int rnum = real_object(vnum);
+
+  if (rnum >= 0)
+  {
+    DC::getInstance()->obj_index[rnum].non_combat_func = func;
   }
 }
 
-void DC::assign_one_obj_com(vnum_t vnum, special_function func)
+void assign_one_obj_com(int vnum, special_function func)
 {
-  if (obj_index.contains(vnum))
+  if (vnum >= 0)
   {
-    obj_index[vnum].combat_func = func;
+    DC::getInstance()->obj_combat_functions[vnum] = func;
+  }
+
+  int rnum = real_object(vnum);
+
+  if (rnum >= 0)
+  {
+    DC::getInstance()->obj_index[rnum].combat_func = func;
   }
 }
 
@@ -140,6 +158,7 @@ void assign_non_combat_procs()
   SPEC_FUN cardinal;
   SPEC_FUN eddie_shopkeeper;
   SPEC_FUN reroll_trader;
+  SPEC_FUN redeem_trader;
 
   assign_one_mob_non(3071, cardinal);
 
@@ -278,6 +297,7 @@ void assign_non_combat_procs()
   assign_one_mob_non(32047, repair_shop);
   assign_one_mob_non(10031, eddie_shopkeeper);
   assign_one_mob_non(10032, reroll_trader);
+  assign_one_mob_non(23006, redeem_trader);
 
   return;
 }
@@ -394,7 +414,7 @@ void assign_combat_procs()
 }
 
 /* assign special procedures to objects */
-void DC::assign_objects(void)
+void assign_objects(void)
 {
   SPEC_FUN board;
   SPEC_FUN bank;

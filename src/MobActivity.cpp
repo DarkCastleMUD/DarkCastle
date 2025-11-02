@@ -238,7 +238,7 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
     ch->sendln("Room successfully added to path.");
 }
 
-int do_newPath(Character *ch, char *argument, int cmd)
+int do_newPath(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -264,7 +264,7 @@ int do_newPath(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listPathsByZone(Character *ch, char *argument, int cmd)
+int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
 {
   auto &zones = DC::getInstance()->zones;
   int i = DC::getInstance()->world[ch->in_room].zone;
@@ -296,7 +296,7 @@ int do_listPathsByZone(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listAllPaths(Character *ch, char *argument, int cmd)
+int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
 {
   class Path *p;
   bool found = false;
@@ -315,7 +315,7 @@ int do_listAllPaths(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_addRoom(Character *ch, char *argument, int cmd)
+int do_addRoom(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -337,7 +337,7 @@ int do_addRoom(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_findPath(Character *ch, char *argument, int cmd)
+int do_findPath(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -360,7 +360,7 @@ int do_findPath(Character *ch, char *argument, int cmd)
 
   if (!arg1[0] || !is_number(arg1))
   {
-    do_findPath(ch, "", CMD_DEFAULT);
+    do_findPath(ch, "");
     return eFAILURE;
   }
   start = atoi(arg1);
@@ -368,7 +368,7 @@ int do_findPath(Character *ch, char *argument, int cmd)
 
   if (!arg1[0] || !is_number(arg1))
   {
-    do_findPath(ch, "", CMD_DEFAULT);
+    do_findPath(ch, "");
     return eFAILURE;
   }
   end = atoi(arg1);
@@ -428,7 +428,7 @@ bool determinePath(class Path *goal, class Path *at, int beststeps, int steps, c
   return false;
 }
 
-int do_pathpath(Character *ch, char *argument, int cmd)
+int do_pathpath(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -594,7 +594,7 @@ char *findPath(int from, int to, Character *ch = nullptr)
   return &endbuf[0];
 }
 
-int do_findpath(Character *ch, char *argument, int cmd)
+int do_findpath(Character *ch, char *argument, cmd_t cmd)
 {
   Path *p;
   for (p = mPathList; p; p = p->next)

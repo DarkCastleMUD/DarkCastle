@@ -318,8 +318,8 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
   FILE **f = 0;
   int stream = 1;
   std::stringstream logpath;
-  DC *dc = dynamic_cast<DC *>(DC::instance());
-  DC::config &cf = dc->cf;
+  // DC *dc = dynamic_cast<DC *>(DC::instance());
+  // DC::config &cf = dc->cf;
 
   if (DC::getInstance()->cf.bport)
   {
@@ -391,7 +391,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
     logpath << SOCKET_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      qFatal("%s", qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
+      qFatal(qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
     }
     break;
   case DC::LogChannel::LOG_PLAYER:
@@ -401,7 +401,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
       logpath << vict->getName().toStdString();
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
-        qCritical("%s", qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
+        qCritical(qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
       }
     }
     else
@@ -470,7 +470,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
 
   if (stream == STDIN_FILENO || type == DC::LogChannel::LOG_BUG)
   {
-    if (cf.stderr_timestamp == true)
+    if (DC::getInstance()->cf.stderr_timestamp == true)
     {
       std::cerr << QStringLiteral("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
     }
@@ -503,6 +503,11 @@ void logbug(QString message)
 void logmisc(QString message)
 {
   logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
+}
+
+void logworld(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
 }
 
 // function for new SETBIT et al. commands
@@ -1072,7 +1077,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   if (!noprog && IS_NPC(obj))
   {
-    int prog = mprog_can_see_trigger(sub, obj);
+    int prog = sub->mprog_can_see_trigger(obj);
     if (isSet(prog, eEXTRA_VALUE))
       return true;
     else if (isSet(prog, eEXTRA_VAL2))
@@ -1141,7 +1146,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   if (!IS_NPC(sub) && sub->player->holyLite)
     return true;
 
-  int prog = oprog_can_see_trigger(sub, obj);
+  int prog = sub->oprog_can_see_trigger(obj);
   if (isSet(prog, eEXTRA_VALUE))
     return true;
   else if (isSet(prog, eEXTRA_VAL2))
@@ -1217,7 +1222,7 @@ bool check_blind(Character *ch)
   return false;
 }
 
-int do_order(Character *ch, char *argument, int cmd)
+int do_order(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
   char buf[256];
@@ -1295,7 +1300,7 @@ int do_order(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_idea(Character *ch, char *argument, int cmd)
+int do_idea(Character *ch, char *argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1323,14 +1328,14 @@ int do_idea(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%u]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
   return eSUCCESS;
 }
 
-int do_typo(Character *ch, char *argument, int cmd)
+int do_typo(Character *ch, char *argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1358,7 +1363,7 @@ int do_typo(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%u]: %s\n",
+  sprintf(str, "**%s[%d]: %s\n",
           GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
@@ -1366,7 +1371,7 @@ int do_typo(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_bug(Character *ch, char *argument, int cmd)
+int do_bug(Character *ch, char *argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1394,14 +1399,14 @@ int do_bug(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%u]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.");
   return eSUCCESS;
 }
 
-command_return_t Character::do_recall(QStringList arguments, int cmd)
+command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 {
   int location = {}, level = {}, cost = {}, x = {};
   Character *victim = {};
@@ -1609,18 +1614,18 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   if (!is_mob && !isSet(retval, eCH_DIED))
   { // if it was a mob, we might have died moving
     act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    do_look(victim, "", 0);
+    do_look(victim, "");
   }
   return retval;
 }
 
-int do_qui(Character *ch, char *argument, int cmd)
+int do_qui(Character *ch, char *argument, cmd_t cmd)
 {
   ch->sendln("You have to write quit - no less, to quit!");
   return eSUCCESS;
 }
 
-int do_quit(Character *ch, char *argument, int cmd)
+int do_quit(Character *ch, char *argument, cmd_t cmd)
 {
   int iWear;
   struct follow_type *k;
@@ -1644,7 +1649,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && !ch->isImmortalPlayer())
+  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
   {
     ch->sendln("This room doesn't feel...SAFE enough to do that.");
     return eFAILURE;
@@ -1656,7 +1661,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   // we'll end up with a fully equipped char with huge stats reset to level
   // 1
 
-  if (cmd != 666)
+  if (cmd != cmd_t::SAVE_SILENTLY)
   {
     for (k = ch->followers; k; k = k->next)
     {
@@ -1673,19 +1678,19 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (ch->getPosition() == position_t::FIGHTING && cmd != 666)
+    if (GET_POS(ch) == position_t::FIGHTING && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln("No way! You are fighting.");
       return eFAILURE;
     }
 
-    if (ch->getPosition() < position_t::STUNNED)
+    if (GET_POS(ch) < position_t::STUNNED)
     {
       ch->sendln("You're not DEAD yet.");
       return eFAILURE;
     }
 
-    if ((ch->isPlayerCantQuit() && cmd != 666) ||
+    if ((ch->isPlayerCantQuit() && cmd != cmd_t::SAVE_SILENTLY) ||
         ch->isPlayerObjectThief() ||
         ch->isPlayerGoldThief())
     {
@@ -1693,7 +1698,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != 666)
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln("Something about this room makes it seem like a bad place to quit.");
       return eFAILURE;
@@ -1705,7 +1710,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != 666)
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1728,7 +1733,7 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   // Finish off any performances
   if (IS_SINGING(ch))
-    do_sing(ch, "stop", CMD_DEFAULT);
+    do_sing(ch, "stop");
 
   extractFamiliar(ch);
   struct follow_type *fol, *fol_next;
@@ -1737,7 +1742,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   {
     fol_next = fol->next;
     if (IS_NPC(fol->follower) &&
-        DC::getInstance()->mob_index[fol->follower->mobdata->vnum].vnum == 8)
+        DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false, QStringLiteral("do_quit/followers"));
@@ -1759,7 +1764,7 @@ int do_quit(Character *ch, char *argument, int cmd)
     for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (obj->vnum == CONSECRATE_OBJ_NUMBER)
+      if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
         if (ch == (Character *)(obj->obj_flags.origin))
           extract_obj(obj);
     }
@@ -1775,13 +1780,16 @@ int do_quit(Character *ch, char *argument, int cmd)
     af.location = APPLY_NONE;
     af.bitvector = -1;
     affect_to_char(ch, &af);
-    sprintf(buf, "\n\r##%s has just logged out, watch for the Champion flag to reappear!\n\r", GET_NAME(ch));
-    send_info(buf);
+
+    if (obj && obj->short_description)
+      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for %2 to reappear!\n\r").arg(GET_NAME(ch)).arg(obj->short_description));
+    else
+      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for the Champion flag to reappear!\n\r").arg(GET_NAME(ch)));
   }
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);
 
-  if (cmd != 666)
+  if (cmd != cmd_t::SAVE_SILENTLY)
     clan_logout(ch);
 
   DC::getInstance()->update_wizlist(ch);
@@ -1794,20 +1802,20 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   if (ch->desc)
   {
-    save_char_obj(ch);
+    ch->save_char_obj();
     if (!close_socket(ch->desc)) // if returns 0, then it already quit us out
       return eFAILURE | eCH_DIED;
   }
   else
   {
-    save_char_obj(ch);
+    ch->save_char_obj();
   }
 
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   for (iWear = 0; iWear < MAX_WEAR; iWear++)
     if (ch->equipment[iWear])
-      obj_to_char(unequip_char(ch, iWear, 1), ch);
+      obj_to_char(ch->unequip_char(iWear, 1), ch);
 
   while (ch->carrying)
     extract_obj(ch->carrying);
@@ -1816,7 +1824,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   return eSUCCESS | eCH_DIED;
 }
 
-command_return_t Character::save(int cmd)
+command_return_t Character::save(cmd_t cmd)
 {
   // With the cmd numbers
   // 666 = save quietly
@@ -1827,14 +1835,14 @@ command_return_t Character::save(int cmd)
   if (IS_NPC(this) || level_ > IMPLEMENTER)
     return eFAILURE;
 
-  if (cmd != 666)
+  if (cmd != cmd_t::SAVE_SILENTLY)
   {
     send(QStringLiteral("Saving %1.\r\n").arg(GET_NAME(this)));
   }
 
   if (IS_PC(this))
   {
-    save_char_obj(this);
+    save_char_obj();
 #ifdef USE_SQL
     save_char_obj_db(this);
 #endif
@@ -1857,7 +1865,7 @@ command_return_t Character::save(int cmd)
 //        that save after every other kill don't actually do it, but it
 //        pretends that it does.  That way we can start reducing the amount
 //        of writing we're doing.
-command_return_t Character::do_save(QStringList arguments, int cmd)
+command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
 {
   if (IS_IMMORTAL(this))
   {
@@ -1875,7 +1883,7 @@ command_return_t Character::do_save(QStringList arguments, int cmd)
   return save(cmd);
 }
 
-int do_home(Character *ch, char *argument, int cmd)
+int do_home(Character *ch, char *argument, cmd_t cmd)
 {
   clan_data *clan;
   struct clan_room_data *room;
@@ -1930,14 +1938,14 @@ int do_home(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::generic_command(QStringList argument, int cmd)
+command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
 {
   switch (cmd)
   {
-  case CMD_SELL:
+  case cmd_t::SELL:
     send("You can't sell anything here!\r\n");
     break;
-  case CMD_ERASE:
+  case cmd_t::ERASE:
     send("You can't erase anything here!\r\n");
     break;
   default:
@@ -1948,7 +1956,7 @@ command_return_t Character::generic_command(QStringList argument, int cmd)
   return eFAILURE;
 }
 
-int do_beep(Character *ch, char *argument, int cmd)
+int do_beep(Character *ch, char *argument, cmd_t cmd)
 {
   ch->sendln("Beep!\a");
   return eSUCCESS;
@@ -2384,11 +2392,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name.toStdString().c_str());
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name.toStdString().c_str());
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2406,11 +2414,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name.toStdString().c_str());
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name.toStdString().c_str());
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2649,8 +2657,8 @@ void unique_scan(Character *victim)
     {
       if (isSet(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
       {
-        if (virtnums.end() == virtnums.find(victim->equipment[k]->vnum))
-          virtnums[victim->equipment[k]->vnum] = 1;
+        if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[victim->equipment[k]->item_number].virt))
+          virtnums[DC::getInstance()->obj_index[victim->equipment[k]->item_number].virt] = 1;
         else
           found_items.push(victim->equipment[k]);
       }
@@ -2660,8 +2668,8 @@ void unique_scan(Character *victim)
         {
           if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
           {
-            if (virtnums.end() == virtnums.find(j->vnum))
-              virtnums[j->vnum] = 1;
+            if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[j->item_number].virt))
+              virtnums[DC::getInstance()->obj_index[j->item_number].virt] = 1;
             else
               found_items.push(j);
           }
@@ -2674,8 +2682,8 @@ void unique_scan(Character *victim)
   {
     if (isSet(i->obj_flags.more_flags, ITEM_UNIQUE))
     {
-      if (virtnums.end() == virtnums.find(i->vnum))
-        virtnums[i->vnum] = 1;
+      if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[i->item_number].virt))
+        virtnums[DC::getInstance()->obj_index[i->item_number].virt] = 1;
       else
         found_items.push(i);
     }
@@ -2687,8 +2695,8 @@ void unique_scan(Character *victim)
       {
         if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
         {
-          if (virtnums.end() == virtnums.find(j->vnum))
-            virtnums[j->vnum] = 1;
+          if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[j->item_number].virt))
+            virtnums[DC::getInstance()->obj_index[j->item_number].virt] = 1;
           else
             found_items.push(j);
         }
@@ -2730,7 +2738,6 @@ std::string replaceString(std::string message, std::string find, std::string rep
 
 QString replaceString(QString message, QString find, QString replace)
 {
-  qDebug() << message << find << replace;
   if (find.isEmpty())
     return message;
   if (replace.isEmpty())
@@ -2821,7 +2828,7 @@ splitstring("std::string  with 2 spaces", " ", true)
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty)
 {
   std::vector<std::string> result;
-  std::size_t splitter;
+  unsigned int splitter;
   while ((splitter = splitme.find_first_of(delims)) != splitme.npos)
   {
     if (ignore_empty && splitter > 0)
@@ -2894,7 +2901,7 @@ bool class_can_go(int ch_class, int room)
   return true;
 }
 
-QString find_profession(int c_class, uint8_t profession)
+const char *find_profession(int c_class, uint8_t profession)
 {
   // TODO Fix
   return "Unknown";
@@ -2975,11 +2982,6 @@ std::string get_isr_string(uint32_t isr, int8_t loc)
   default:
     return "ErCode: Somebodydunfuckedup";
   }
-}
-
-bool isNowhere(Character *ch)
-{
-  return (ch && ch->in_room == DC::NOWHERE);
 }
 
 bool file_exists(std::string filename)

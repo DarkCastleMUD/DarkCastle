@@ -45,7 +45,7 @@ command_return_t Character::check_social(QString pcomm)
     return SOCIAL_true;
   }
 
-  switch (this->getPosition())
+  switch (GET_POS(this))
   {
   case position_t::DEAD:
     this->sendln("Lie still; you are DEAD.");
@@ -58,11 +58,6 @@ command_return_t Character::check_social(QString pcomm)
   case position_t::SLEEPING:
     this->sendln("In your dreams, or what?");
     return SOCIAL_true;
-  case position_t::RESTING:
-  case position_t::SITTING:
-  case position_t::FIGHTING:
-  case position_t::STANDING:
-    break;
   }
 
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
@@ -109,7 +104,7 @@ command_return_t Character::check_social(QString pcomm)
       act(action->others_auto, this, 0, 0, TO_ROOM,
           (action->hide) ? INVIS_NULL : 0);
   }
-  else if (vict->getPosition() < action->min_victim_position)
+  else if (GET_POS(vict) < action->min_victim_position)
   {
     act("$N is not in a proper position for that.",
         this, 0, vict, TO_CHAR, 0);
@@ -315,7 +310,7 @@ void DC::clean_socials_from_memory()
   soc_mess_list = nullptr;
 }
 
-int do_social(Character *ch, char *argument, int cmd)
+int do_social(Character *ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

@@ -29,7 +29,7 @@ std::queue<std::string> imp_history;
 
 #define MAX_MESSAGE_LENGTH 4096
 
-command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
+command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 {
   if (!isImmortalPlayer())
   {
@@ -116,7 +116,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_goto(QStringList arguments, int cmd)
+command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 {
   int loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};
@@ -345,7 +345,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       }
     }
 
-  do_look(this, "", 15);
+  do_look(this, "");
 
   if (followers)
     for (k = followers; k; k = next_dude)
@@ -355,13 +355,13 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
           k->follower->getLevel() >= IMMORTAL)
       {
         csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(this));
-        k->follower->do_goto(arguments, CMD_DEFAULT);
+        k->follower->do_goto(arguments, cmd_t::DEFAULT);
       }
     }
   return eSUCCESS;
 }
 
-int do_poof(Character *ch, char *arg, int cmd)
+int do_poof(Character *ch, char *arg, cmd_t cmd)
 {
   char inout[100], buf[100];
   int ctr, nope;
@@ -463,7 +463,7 @@ int do_poof(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_at(Character *ch, char *argument, int cmd)
+int do_at(Character *ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
   int loc_nr, location, original_loc;
@@ -535,7 +535,7 @@ int do_at(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_highfive(Character *ch, char *argument, int cmd)
+int do_highfive(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char buf[200];
@@ -569,7 +569,7 @@ int do_highfive(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_holylite(Character *ch, char *argument, int cmd)
+int do_holylite(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -592,7 +592,7 @@ int do_holylite(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_wizinvis(Character *ch, char *argument, int cmd)
+int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[200];
 
@@ -625,12 +625,12 @@ int do_wizinvis(Character *ch, char *argument, int cmd)
       arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
-  sprintf(buf, "WizInvis Set to: %d \n\r", ch->player->wizinvis);
+  sprintf(buf, "WizInvis Set to: %ld \n\r", ch->player->wizinvis);
   ch->send(buf);
   return eSUCCESS;
 }
 
-int do_nohassle(Character *ch, char *argument, int cmd)
+int do_nohassle(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -648,9 +648,9 @@ int do_nohassle(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-// cmd == CMD_DEFAULT - imm
+// cmd == cmd_t::DEFAULT - imm
 // cmd == 8 - /
-command_return_t do_wiz(Character *ch, std::string argument, int cmd)
+command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
 {
   std::string buf1 = {};
   Connection *i = nullptr;
@@ -660,7 +660,7 @@ command_return_t do_wiz(Character *ch, std::string argument, int cmd)
     return eFAILURE;
   }
 
-  if (cmd == CMD_IMPCHAN && !ch->has_skill(COMMAND_IMP_CHAN))
+  if (cmd == cmd_t::IMPCHAN && !ch->has_skill(COMMAND_IMP_CHAN))
   {
     ch->sendln("Huh?");
     return eFAILURE;
@@ -672,12 +672,12 @@ command_return_t do_wiz(Character *ch, std::string argument, int cmd)
   if (argument.empty())
   {
     std::queue<std::string> tmp;
-    if (cmd == CMD_IMMORT)
+    if (cmd == cmd_t::IMMORT)
     {
       tmp = imm_history;
       ch->sendln("Here are the last 10 imm messages:");
     }
-    else if (cmd == CMD_IMPCHAN)
+    else if (cmd == cmd_t::IMPCHAN)
     {
       tmp = imp_history;
       ch->sendln("Here are the last 10 imp messages:");
@@ -701,7 +701,7 @@ command_return_t do_wiz(Character *ch, std::string argument, int cmd)
       argument = remove_all_codes(argument);
     }
 
-    if (cmd == CMD_IMMORT)
+    if (cmd == cmd_t::IMMORT)
     {
       buf1 = fmt::format("$B$4{}$7: $7$B{}$R\r\n", GET_SHORT(ch), argument);
       imm_history.push(buf1);
@@ -716,19 +716,19 @@ command_return_t do_wiz(Character *ch, std::string argument, int cmd)
         imp_history.pop();
     }
 
-    send_to_char(buf1, ch);
+    send_to_char(buf1.c_str(), ch);
     ansi_color(NTEXT, ch);
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && IS_PC(i->character))
       {
-        if (cmd == CMD_IMPCHAN && !i->character->has_skill(COMMAND_IMP_CHAN))
+        if (cmd == cmd_t::IMPCHAN && !i->character->has_skill(COMMAND_IMP_CHAN))
           continue;
 
         if (STATE(i) == Connection::states::PLAYING)
         {
-          send_to_char(buf1, i->character);
+          send_to_char(buf1.c_str(), i->character);
         }
         else
         {
@@ -740,7 +740,7 @@ command_return_t do_wiz(Character *ch, std::string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_findfix(Character *ch, char *argument, int cmd)
+int do_findfix(Character *ch, char *argument, cmd_t cmd)
 {
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
@@ -782,14 +782,14 @@ int do_findfix(Character *ch, char *argument, int cmd)
       {
         ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
         char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
-        do_zedit(ch, buffer, CMD_DEFAULT);
+        do_zedit(ch, buffer);
         free(buffer);
       }
       else
       {
         ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
         char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
-        do_zedit(ch, buffer, CMD_DEFAULT);
+        do_zedit(ch, buffer);
         free(buffer);
       }
     }
@@ -797,7 +797,7 @@ int do_findfix(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_varstat(Character *ch, char *argument, int cmd)
+int do_varstat(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);

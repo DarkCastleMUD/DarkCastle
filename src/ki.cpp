@@ -27,7 +27,7 @@
 #include <vector>
 #include "DC/handler.h"
 
-struct ki_info_type ki_info[] = {
+const QList<ki_info_type> ki_info = {
     {/* 0 */
      3 * DC::PULSE_TIMER, position_t::FIGHTING, 12,
      TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, ki_blast,
@@ -99,10 +99,10 @@ bool ARE_GROUPED(Character *sub, Character *obj);
 
 int16_t use_ki(Character *ch, int kn)
 {
-  return (ki_info[kn].min_useski);
+  return (ki_info[kn].min_useski());
 }
 
-int do_ki(Character *ch, char *argument, int cmd)
+int do_ki(Character *ch, char *argument, cmd_t cmd)
 {
   Character *tar_char = ch;
   char name[MAX_STRING_LENGTH];
@@ -157,11 +157,11 @@ int do_ki(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ki_info[spl].ki_pointer)
+  if (ki_info[spl].ki_pointer())
   {
-    if (ch->getPosition() < ki_info[spl].minimum_position || (spl == KI_MEDITATION && (ch->getPosition() == position_t::FIGHTING || ch->getPosition() <= position_t::SLEEPING)))
+    if (GET_POS(ch) < ki_info[spl].minimum_position() || (spl == KI_MEDITATION && (GET_POS(ch) == position_t::FIGHTING || GET_POS(ch) <= position_t::SLEEPING)))
     {
-      switch (ch->getPosition())
+      switch (GET_POS(ch))
       {
       case position_t::SLEEPING:
         ch->sendln("You dream of wonderful ki powers.");
@@ -190,16 +190,16 @@ int do_ki(Character *ch, char *argument, int cmd)
     /* Locate targets */
     target_ok = false;
 
-    if (!isSet(ki_info[spl].targets, TAR_IGNORE))
+    if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
     {
       argument = one_argument(argument, name);
       if (*name)
       {
-        if (isSet(ki_info[spl].targets, TAR_CHAR_ROOM))
+        if (isSet(ki_info[spl].targets(), TAR_CHAR_ROOM))
           if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
             target_ok = true;
 
-        if (!target_ok && isSet(ki_info[spl].targets, TAR_SELF_ONLY))
+        if (!target_ok && isSet(ki_info[spl].targets(), TAR_SELF_ONLY))
           if (str_cmp(GET_NAME(ch), name) == 0)
           {
             tar_char = ch;
@@ -210,14 +210,14 @@ int do_ki(Character *ch, char *argument, int cmd)
       /* No argument was typed */
       else if (!*name)
       {
-        if (isSet(ki_info[spl].targets, TAR_FIGHT_VICT))
+        if (isSet(ki_info[spl].targets(), TAR_FIGHT_VICT))
           if (ch->fighting)
             if ((ch->fighting)->in_room == ch->in_room)
             {
               tar_char = ch->fighting;
               target_ok = true;
             }
-        if (!target_ok && isSet(ki_info[spl].targets, TAR_SELF_ONLY))
+        if (!target_ok && isSet(ki_info[spl].targets(), TAR_SELF_ONLY))
         {
           tar_char = ch;
           target_ok = true;
@@ -228,7 +228,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         target_ok = false;
     }
 
-    if (isSet(ki_info[spl].targets, TAR_IGNORE))
+    if (isSet(ki_info[spl].targets(), TAR_IGNORE))
       target_ok = true;
 
     if (target_ok != true)
@@ -243,12 +243,12 @@ int do_ki(Character *ch, char *argument, int cmd)
 
     else if (target_ok)
     {
-      if ((tar_char == ch) && isSet(ki_info[spl].targets, TAR_SELF_NONO))
+      if ((tar_char == ch) && isSet(ki_info[spl].targets(), TAR_SELF_NONO))
       {
         ch->sendln("You cannot use this power on yourself.");
         return eFAILURE;
       }
-      else if ((tar_char != ch) && isSet(ki_info[spl].targets, TAR_SELF_ONLY))
+      else if ((tar_char != ch) && isSet(ki_info[spl].targets(), TAR_SELF_ONLY))
       {
         ch->sendln("You can only use this power upon yourself.");
         return eFAILURE;
@@ -264,7 +264,7 @@ int do_ki(Character *ch, char *argument, int cmd)
      * -Sadus
      * This has hence been fixed. - Pir
      */
-    if (!isSet(ki_info[spl].targets, TAR_IGNORE))
+    if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!tar_char)
       {
         logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
@@ -283,7 +283,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!isSet(ki_info[spl].targets, TAR_IGNORE))
+    if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
         return eFAILURE;
 
@@ -293,9 +293,9 @@ int do_ki(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    WAIT_STATE(ch, ki_info[spl].beats);
+    WAIT_STATE(ch, ki_info[spl].beats());
 
-    if ((ki_info[spl].ki_pointer == nullptr) && spl > 0)
+    if ((ki_info[spl].ki_pointer() == nullptr) && spl > 0)
       ch->sendln("Sorry, this power has not yet been implemented.");
     else
     {
@@ -305,12 +305,12 @@ int do_ki(Character *ch, char *argument, int cmd)
       {
         ch->sendln("You lost your concentration!");
         GET_KI(ch) -= use_ki(ch, spl) / 2;
-        WAIT_STATE(ch, ki_info[spl].beats / 2);
+        WAIT_STATE(ch, ki_info[spl].beats() / 2);
 
         return eSUCCESS;
       }
 
-      if (!isSet(ki_info[spl].targets, TAR_IGNORE))
+      if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
         if (!tar_char || (ch->in_room != tar_char->in_room))
         {
           ch->sendln("Whom should the power be used upon?");
@@ -318,7 +318,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         }
 
       /* Stop abusing your betters  */
-      if (!isSet(ki_info[spl].targets, TAR_IGNORE))
+      if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
         if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
           ch->sendln("That just might annoy them!");
@@ -326,7 +326,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         }
 
       /* Imps ignore safe flags  */
-      if (!isSet(ki_info[spl].targets, TAR_IGNORE))
+      if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
         if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
         {
           tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
@@ -335,8 +335,8 @@ int do_ki(Character *ch, char *argument, int cmd)
       ch->sendln("Ok.");
       GET_KI(ch) -= use_ki(ch, spl);
 
-      return ((*ki_info[spl].ki_pointer)(ch->getLevel(), ch, argument,
-                                         tar_char));
+      return ((*ki_info[spl].ki_pointer())(ch->getLevel(), ch, argument,
+                                           tar_char));
     }
     return eFAILURE;
   }
@@ -383,7 +383,7 @@ int Character::ki_gain_lookup(void)
     gain = (int)(gain * 1.25);
 
   int multiplyer = 1;
-  switch (this->getPosition())
+  switch (GET_POS(this))
   {
   case position_t::SLEEPING:
     multiplyer = 3;
@@ -839,7 +839,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
         0);
 
     if (IS_NPC(victim) && (!victim->fighting) &&
-        ch->getPosition() > position_t::SLEEPING)
+        GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);

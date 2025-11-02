@@ -28,15 +28,27 @@ typedef int KI_FUN(uint8_t level, Character *ch, char *arg, Character *vict);
 #define MAJOR_EFFECT 3
 #define MINOR_EFFECT 4
 
-struct ki_info_type
+class ki_info_type
 {
-	uint32_t beats;				 /* Waiting time after ki */
-	position_t minimum_position; /* min position for use */
-	uint8_t min_useski;			 /* minimum ki used */
-	int16_t targets;			 /* Legal targets */
-	KI_FUN *ki_pointer;			 /* function to call */
-	int difficulty;
+	uint32_t beats_;			  /* Waiting time after ki */
+	position_t minimum_position_; /* min position for use */
+	uint8_t min_useski_;		  /* minimum ki used */
+	int16_t targets_;			  /* Legal targets */
+	KI_FUN *ki_pointer_;		  /* function to call */
+	int difficulty_;
+
+public:
+	ki_info_type(uint32_t beats, position_t minimum_position, uint8_t min_useski, int16_t targets, KI_FUN *ki_pointer, int difficulty)
+		: beats_(beats), minimum_position_(minimum_position), min_useski_(min_useski), targets_(targets), ki_pointer_(ki_pointer), difficulty_(difficulty) {}
+	uint32_t beats(void) const { return beats_; }
+	position_t minimum_position(void) const { return minimum_position_; }
+	uint8_t min_useski(void) const { return min_useski_; }
+	int16_t targets(void) const { return targets_; }
+	KI_FUN *ki_pointer(void) const { return ki_pointer_; }
+	int difficulty(void) const { return difficulty_; }
 };
+
+extern const QList<ki_info_type> ki_info;
 
 /************************************************************************
 | Function declarations

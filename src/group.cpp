@@ -24,7 +24,7 @@
 #include "DC/terminal.h"
 #include "DC/comm.h"
 
-int do_abandon(Character *ch, char *argument, int cmd)
+int do_abandon(Character *ch, char *argument, cmd_t cmd)
 {
   Character *k;
   char buf[MAX_INPUT_LENGTH + 1];
@@ -70,11 +70,11 @@ int do_abandon(Character *ch, char *argument, int cmd)
     ch->player->group_kills = 0;
   }
 
-  stop_follower(ch, STOP_FOLLOW);
+  stop_follower(ch);
   return eSUCCESS;
 }
 
-int do_found(Character *ch, char *argument, int cmd)
+int do_found(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
 
@@ -130,7 +130,7 @@ int do_found(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_split(QStringList arguments, int cmd)
+command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 {
   quint64 share = 0, extra = 0;
   quint64 no_members = 0;
@@ -205,7 +205,7 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
   share = amount / no_members;
   extra = amount % no_members;
   removeGold(amount);
-  save(666);
+  save(cmd_t::SAVE_SILENTLY);
 
   send(QStringLiteral("You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
   addGold(share + extra);
@@ -272,19 +272,19 @@ void setup_group_buf(char *report, Character *j, Character *i)
     if (IS_PC(i) && isSet(i->player->toggles, Player::PLR_ANSI))
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
+        sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
                 j->getLevel(),
                 calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
                 calc_color(GET_KI(j), GET_MAX_KI(j)), GET_KI(j), NTEXT, GET_MAX_KI(j),
                 calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
       else if (GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
                GET_CLASS(j) == CLASS_BARBARIAN)
-        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp    -====-    %s%5d%s/%-5dmv]",
+        sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp    -====-    %s%5d%s/%-5dmv]",
                 j->getLevel(),
                 calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
                 calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
       else
-        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dm %s%5d%s/%-5dmv]",
+        sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dm %s%5d%s/%-5dmv]",
                 j->getLevel(),
                 calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
                 calc_color(GET_MANA(j), GET_MAX_MANA(j)), GET_MANA(j), NTEXT, GET_MAX_MANA(j),
@@ -293,23 +293,23 @@ void setup_group_buf(char *report, Character *j, Character *i)
     else
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-        sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
+        sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
                 j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_KI(j),
                 GET_MAX_KI(j), GET_MOVE(j), GET_MAX_MOVE(j));
       else if (GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
                GET_CLASS(j) == CLASS_BARBARIAN)
-        sprintf(report, "[Lv %3llu| %6d/%-6dhp    -====-    %5d/%-5dmv]",
+        sprintf(report, "[Lv %3d| %6d/%-6dhp    -====-    %5d/%-5dmv]",
                 j->getLevel(), j->getHP(), GET_MAX_HIT(j),
                 GET_MOVE(j), GET_MAX_MOVE(j));
       else
-        sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
+        sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
                 j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_MANA(j),
                 GET_MAX_MANA(j), GET_MOVE(j), GET_MAX_MOVE(j));
     }
   }
 }
 
-int do_group(Character *ch, char *argument, int cmd)
+int do_group(Character *ch, char *argument, cmd_t cmd)
 {
   char name[256];
   char buf[256], report[256];
@@ -425,7 +425,7 @@ int do_group(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_promote(Character *ch, char *argument, int cmd)
+int do_promote(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[250];
@@ -511,7 +511,7 @@ int do_promote(Character *ch, char *argument, int cmd)
   else
     new_new_leader->group_name = str_dup("I am a dork");
 
-  stop_follower(new_new_leader, CHANGE_LEADER);
+  stop_follower(new_new_leader, follower_reasons_t::CHANGE_LEADER);
 
   for (f = ch->followers; f; f = next_f)
   {
@@ -519,18 +519,18 @@ int do_promote(Character *ch, char *argument, int cmd)
     if (IS_PC(f->follower))
     {
       k = f->follower;
-      stop_follower(k, CHANGE_LEADER);
-      add_follower(k, new_new_leader, 2);
+      stop_follower(k, follower_reasons_t::CHANGE_LEADER);
+      add_follower(k, new_new_leader, follower_reasons_t::CHANGE_LEADER);
     }
     else
       REMBIT(f->follower->affected_by, AFF_GROUP);
   }
 
-  add_follower(ch, new_new_leader, 2);
+  add_follower(ch, new_new_leader, follower_reasons_t::CHANGE_LEADER);
   return eSUCCESS;
 }
 
-int do_disband(Character *ch, char *argument, int cmd)
+int do_disband(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[200];
@@ -588,7 +588,7 @@ int do_disband(Character *ch, char *argument, int cmd)
       if (IS_PC(f->follower))
       {
         stop_grouped_bards(f->follower, 1);
-        stop_follower(f->follower, STOP_FOLLOW);
+        stop_follower(f->follower);
       }
       else
         REMBIT(f->follower->affected_by, AFF_GROUP);
@@ -630,17 +630,14 @@ int do_disband(Character *ch, char *argument, int cmd)
     adios->player->group_pkills = 0;
     adios->player->group_kills = 0;
   }
-  stop_follower(adios, STOP_FOLLOW);
+  stop_follower(adios);
   return eSUCCESS;
 }
 
-int do_follow(Character *ch, char *argument, int cmd)
+int do_follow(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   Character *leader;
-
-  void stop_follower(Character * ch, int cmd);
-  void add_follower(Character * ch, Character * leader, int cmd);
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -663,7 +660,7 @@ int do_follow(Character *ch, char *argument, int cmd)
     ch->sendln("Who do you wish to follow?");
     return eFAILURE;
   }
-  if (cmd == 9 && !CAN_SEE(ch, leader))
+  if (cmd == cmd_t::DEFAULT && !CAN_SEE(ch, leader))
   { // check it like this instead o' get_char_room_vis 'cause stalk checks.
     ch->sendln("I see no person by that name here!");
     return eFAILURE;
@@ -689,7 +686,7 @@ int do_follow(Character *ch, char *argument, int cmd)
         ch->sendln("You are already following yourself.");
         return eFAILURE;
       }
-      stop_follower(ch, STOP_FOLLOW);
+      stop_follower(ch);
     }
     else
     {
@@ -701,30 +698,30 @@ int do_follow(Character *ch, char *argument, int cmd)
       }
       if (ch->master)
       {
-        if (cmd == 10)
-          stop_follower(ch, END_STALK); /* stalk  */
+        if (cmd == cmd_t::TRACK)
+          stop_follower(ch, follower_reasons_t::END_STALK); /* stalk  */
         else
-          stop_follower(ch, STOP_FOLLOW); /* follow */
+          stop_follower(ch); /* follow */
       }
 
       //	    if((abs(ch->getLevel()-leader->getLevel())<60) || ch->getLevel()>=IMMORTAL) {
-      if (cmd == 10)
-        add_follower(ch, leader, 1); /* stalk  */
+      if (cmd == cmd_t::TRACK)
+        add_follower(ch, leader, follower_reasons_t::END_STALK); /* stalk  */
       else
-        add_follower(ch, leader, 0); /* follow */
-                                     //          }
-                                     //	    else
-                                     //	      {
-                                     //		act("Sorry, but you are not of the right caliber to follow.",
-                                     //		ch, 0, 0, TO_CHAR, 0);
-                                     //		return eFAILURE;
-                                     //	      }
+        add_follower(ch, leader); /* follow */
+                                  //          }
+                                  //	    else
+                                  //	      {
+                                  //		act("Sorry, but you are not of the right caliber to follow.",
+                                  //		ch, 0, 0, TO_CHAR, 0);
+                                  //		return eFAILURE;
+                                  //	      }
     }
   }
   return eSUCCESS;
 }
 
-command_return_t do_autojoin(Character *ch, std::string str_arguments, int cmd)
+command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd)
 {
   if (ch->player == nullptr)
   {

@@ -44,6 +44,8 @@
 #include "DC/const.h"
 #include "DC/corpse.h"
 
+int FOUNTAINisPresent(Character *ch);
+
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */
 /* When age in 30..44 calculate the line between p2 & p3 */
@@ -119,7 +121,7 @@ int Character::mana_gain_lookup(void)
 		//    gain = graf(age().year, 2,3,4,6,7,8,9);
 
 		gain = (int)(this->max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
-		switch (this->getPosition())
+		switch (GET_POS(this))
 		{
 		case position_t::SLEEPING:
 			divisor = 1;
@@ -453,7 +455,7 @@ void advance_level(Character *ch, int is_conversion)
 	case CLASS_CLERIC:
 		add_ki += (effective_level % 2);
 		add_hp += number(4, 8);
-		add_mana += number(4, 9);
+		add_mana += number(4, 8);
 		add_moves += number(1, (effective_con / 2));
 		break;
 
@@ -635,7 +637,7 @@ void gain_exp(Character *ch, int64_t gain)
 	if (IS_PC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
 		gain_exp(ch->player->golem, gain);
 
-	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->vnum].vnum == 8) // it's a golem
+	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt == 8) // it's a golem
 		golem_gain_exp(ch);
 
 	if (IS_NPC(ch))
@@ -725,11 +727,6 @@ void gain_condition(Character *ch, int condition, int value)
 
 void food_update(void)
 {
-	class Object *bring_type_to_front(Character * ch, int item_type);
-	int do_eat(Character * ch, char *argument, int cmd);
-	int do_drink(Character * ch, char *argument, int cmd);
-	int FOUNTAINisPresent(Character * ch);
-
 	class Object *food = nullptr;
 
 	const auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
@@ -738,19 +735,19 @@ void food_update(void)
 		if (i->affected_by_spell(SPELL_PARALYZE))
 			continue;
 		int amt = -1;
-		if (i->equipment[WEAR_FACE] && i->equipment[WEAR_FACE]->vnum == 536)
+		if (i->equipment[WEAR_FACE] && DC::getInstance()->obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
 			amt = -3;
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && i->getLevel() < 60)
 		{ // i'm hungry
-			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (i->getPosition() > position_t::SLEEPING))
+			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", CMD_DEFAULT);
+					do_drink(i, "fountain");
 				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
-					do_eat(i, food->name, CMD_DEFAULT);
+					do_eat(i, food->name);
 				else
 					i->sendln("You are out of food.");
 			}
@@ -759,14 +756,14 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && i->getLevel() < 60)
 		{ // i'm thirsty
-			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (i->getPosition() > position_t::SLEEPING))
+			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", CMD_DEFAULT);
+					do_drink(i, "fountain");
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
-					do_drink(i, food->name, CMD_DEFAULT);
+					do_drink(i, food->name);
 				else
 					i->sendln("You are out of drink.");
 			}
@@ -816,7 +813,7 @@ void point_update(void)
 		}
 
 		// only heal linkalive's and mobs
-		if (i->getPosition() > position_t::DEAD && (IS_NPC(i) || i->desc))
+		if (GET_POS(i) > position_t::DEAD && (IS_NPC(i) || i->desc))
 		{
 			i->setHP(MIN(i->getHP() + i->hit_gain(), hit_limit(i)));
 
@@ -828,7 +825,7 @@ void point_update(void)
 		else if (!IS_NPC(i) && i->getLevel() < 1 && !i->desc)
 		{
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
-			do_quit(i, "", 666);
+			do_quit(i, "", cmd_t::SAVE_SILENTLY);
 		}
 	} /* for */
 }

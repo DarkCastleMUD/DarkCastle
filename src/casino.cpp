@@ -8,8 +8,6 @@
 
 #include <cctype>
 #include <cstring>
-#include <expected>
-
 #include "DC/structs.h"
 #include "DC/room.h"
 #include "DC/character.h"
@@ -94,7 +92,7 @@ void free_player(player_data *plr)
    }
    if (plr->ch && charExists(plr->ch) && IS_PC(plr->ch))
    {
-      plr->ch->save(666);
+      plr->ch->save(cmd_t::SAVE_SILENTLY);
    }
    if (tbl->cr == plr)
    {
@@ -107,7 +105,7 @@ void free_player(player_data *plr)
    }
    if (!tbl->plr)
       reset_table(tbl);
-   delete plr;
+   dc_free(plr);
 }
 
 void nextturn(table_data *tbl)
@@ -1131,7 +1129,7 @@ void Character::sendBlackjackPrompt(void)
    send(createBlackjackPrompt());
 }
 
-int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
+int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                     Character *invoker)
 {
    bool showColor = false;
@@ -1142,7 +1140,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
 
    char arg1[MAX_INPUT_LENGTH];
    arg = one_argument(arg, arg1);
-   if (cmd < 189 || cmd > 194)
+   if (!isCommandTypeCasino(cmd))
    {
       return eFAILURE;
    }
@@ -1160,7 +1158,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
 
    player_data *plr = getPlayer(ch, obj->table);
 
-   if (cmd == 189) // bet
+   if (cmd == cmd_t::BET) // bet
    {
       if (obj->table->state > 1 || obj->table->cr || obj->table->hand_data[0])
       {
@@ -1255,7 +1253,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       return eSUCCESS;
    }
-   else if (cmd == 190) // insurance
+   else if (cmd == cmd_t::INSURANCE) // insurance
    {
       if (!plr)
       {
@@ -1289,7 +1287,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       ch->sendln("You make an insurance bet.");
       return eSUCCESS;
    }
-   else if (cmd == 191) // doubledown
+   else if (cmd == cmd_t::DOUBLE) // doubledown
    {
       if (!plr)
       {
@@ -1350,7 +1348,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       //     pulse_table_bj(plr->table);
       return eSUCCESS;
    }
-   else if (cmd == 192) // stand
+   else if (cmd == cmd_t::STAY) // stand
    {
       if (!plr)
       {
@@ -1369,7 +1367,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       nextturn(plr->table);
       return eSUCCESS;
    }
-   else if (cmd == 193) // split
+   else if (cmd == cmd_t::SPLIT) // split
    {
       if (!plr)
       {
@@ -1406,7 +1404,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       pulse_table_bj(plr->table);
       return eSUCCESS;
    }
-   else if (cmd == 194) // hit
+   else if (cmd == cmd_t::HIT) // hit
    {
       if (!plr)
       {
@@ -1805,7 +1803,7 @@ int handcompare(int hand1[5], int hand2[5])
    return -1;
 }
 
-int do_testhand(Character *ch, char *argument, int cmd)
+int do_testhand(Character *ch, char *argument, cmd_t cmd)
 {
    char arg[MAX_INPUT_LENGTH];
    one_argument(argument, arg);
@@ -2007,25 +2005,26 @@ void save_slot_machines()
       return;
    }
 
-   auto range = DC::getInstance()->object_fileindex.findRange(21900, 21999);
-   if (!range)
+   world_file_list_item *curr;
+   char buf[180];
+   char buf2[180];
+
+   curr = DC::getInstance()->obj_file_list;
+   while (curr && curr->filename != "21900-21999.obj")
+      curr = curr->next;
+
+   if (!curr)
    {
-      logentry(QStringLiteral("Object range 21900-21999 via file '21900-21999.obj' is missing. Recreating."), IMMORTAL, DC::LogChannel::LOG_BUG);
-      range = DC::getInstance()->object_fileindex.newRange("21900-21999.obj", 21900, 21999);
-      if (!range)
-      {
-         logentry(QStringLiteral("Error recreating object range 21900-21999 via file '21900-21999.obj'."), IMMORTAL, DC::LogChannel::LOG_BUG);
-         return;
-      }
+      logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      return;
    }
 
-   LegacyFile lf("objects", range.filename, "Couldn't open obj save file %1 for save_slot_machines.");
+   LegacyFile lf("objects", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
    if (lf.isOpen())
    {
-      for (vnum_t vnum = range.firstnum; vnum <= range.lastnum; vnum++)
+      for (int x = curr->firstnum; x <= curr->lastnum; x++)
       {
-         if (DC::getInstance()->obj_index.contains(vnum))
-            write_object(lf, DC::getInstance()->obj_index[vnum].item);
+         write_object(lf, (Object *)DC::getInstance()->obj_index[x].item);
       }
       fprintf(lf.file_handle_, "$~\n");
    }
@@ -2075,9 +2074,9 @@ void update_linked_slots(machine_data *machine)
             machine->gold ? "coins" : "plats");
 
    // Find all the slot machines
-   for (int i = 21906; i < 21918 && DC::getInstance()->obj_index.contains(i); i++)
+   for (int i = 21906; i < 21918; i++)
    {
-      Object *slot_obj = DC::getInstance()->obj_index[i].item;
+      Object *slot_obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
 
       // Find all the slot machines linked to the same slot machine as us
       // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -2094,7 +2093,7 @@ void update_linked_slots(machine_data *machine)
          // Update instances of the original slot obj
          for (Object *j = DC::getInstance()->object_list; j; j = j->next)
          {
-            if (j->vnum == i)
+            if (j->item_number == real_object(i))
             {
                // if(!ishashed(j->description)) dc_free(j->description);
                j->description = str_dup(ldesc);
@@ -2177,13 +2176,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          }
          else
          {
-            DC::getInstance()->obj_index[machine->obj->vnum].item->obj_flags.value[1] = (int)machine->jackpot;
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            if (!ishashed(DC::getInstance()->obj_index[machine->obj->vnum].item->description))
-               dc_free(DC::getInstance()->obj_index[machine->obj->vnum].item->description);
-            DC::getInstance()->obj_index[machine->obj->vnum].item->description = str_dup(buf);
+            if (!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description))
+               dc_free(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description);
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
       }
 
@@ -2207,13 +2206,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          }
          else
          {
-            DC::getInstance()->obj_index[machine->obj->vnum].item->obj_flags.value[1] = (int)machine->jackpot;
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            // if(!ishashed(DC::getInstance()->obj_index[machine->obj->vnum].item->description))
-            //    dc_free(((Object*)obj_index[machine->obj->vnum].item)->description);
-            DC::getInstance()->obj_index[machine->obj->vnum].item->description = str_dup(buf);
+            // if(!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description))
+            //    dc_free(((Object*)obj_index[machine->obj->item_number].item)->description);
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
       }
       else if (payout)
@@ -2240,11 +2239,11 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
    save_slot_machines();
 }
 
-int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character *invoker)
+int slot_machine(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
    char buf[MAX_STRING_LENGTH];
 
-   if (cmd != 186 && cmd != 189 && cmd != 185) // pull or bet or push
+   if (cmd != cmd_t::PULL && cmd != cmd_t::BET && cmd != cmd_t::PUSH) // pull or bet or push
       return eFAILURE;
    if (!ch || IS_NPC(ch))
       return eFAILURE;
@@ -2257,7 +2256,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
 
    one_argument(arg, buf);
 
-   if (cmd == 186 && strcmp(buf, "handle"))
+   if (cmd == cmd_t::PULL && strcmp(buf, "handle"))
    {
       ch->sendln("Try pulling the handle.");
       return eSUCCESS;
@@ -2272,7 +2271,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
       return eSUCCESS;
    }
 
-   if (cmd == 189)
+   if (cmd == cmd_t::BET)
    {
       if (atoi(buf) >= 1 && atoi(buf) <= 5)
       {
@@ -2293,7 +2292,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
       return eSUCCESS;
    }
 
-   if (cmd == 185)
+   if (cmd == cmd_t::PUSH)
    {
       if (obj->slot->button)
       {
@@ -2665,7 +2664,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
    }
 }
 
-int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
+int roulette_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
    char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
    uint32_t bet = 0;
@@ -2673,7 +2672,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
    bool playing = false;
    arg = one_argument(arg, arg1);
    arg = one_argument(arg, arg2);
-   if (cmd != 189)
+   if (cmd != cmd_t::BET)
       return eFAILURE;
    if (!ch || IS_NPC(ch))
       return eFAILURE; // craziness
@@ -2725,7 +2724,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
       }
    }
 
-   if (cmd == 189) // bet
+   if (cmd == cmd_t::BET) // bet
    {
       if (!*arg2)
       {

@@ -32,7 +32,7 @@ int get_weapon_damage_type(class Object *wielded);
 int check_autojoiners(Character *ch, int skill = 0);
 int check_joincharmie(Character *ch, int skill = 0);
 
-int do_eyegouge(Character *ch, char *argument, int cmd)
+int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -113,7 +113,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
   return retval | eSUCCESS;
 }
 
-command_return_t Character::do_backstab(QStringList arguments, int cmd)
+command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 {
   Character *victim;
 
@@ -224,7 +224,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[SECOND_WIELD]) && ((this->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
+  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[SECOND_WIELD]) && ((this->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
     if (skill_success(victim, SKILL_DUAL_BACKSTAB) || IS_NPC(this))
     {
@@ -299,7 +299,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
   }
 
   // If we're intended to have a dual backstab AND we still can
-  if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && victim->getPosition() != position_t::DEAD && victim->in_room != DC::NOWHERE)
+  if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && GET_POS(victim) != position_t::DEAD && victim->in_room != DC::NOWHERE)
   {
     if (was_in == this->in_room)
     {
@@ -334,7 +334,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
   return retval;
 }
 
-int do_circle(Character *ch, char *argument, int cmd)
+int do_circle(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   int retval;
@@ -498,7 +498,7 @@ int do_circle(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_trip(Character *ch, char *argument, int cmd)
+int do_trip(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim = 0;
   char name[256];
@@ -599,7 +599,7 @@ int do_trip(Character *ch, char *argument, int cmd)
       act("$n trips you and you go down!", ch, nullptr, victim, TO_VICT, 0);
       act("You trip $N and $N goes down!", ch, nullptr, victim, TO_CHAR, 0);
       act("$n trips $N and $N goes down!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-      if (victim->getPosition() > position_t::SITTING)
+      if (GET_POS(victim) > position_t::SITTING)
         victim->setSitting();
       SET_BIT(victim->combat, COMBAT_BASH2);
       WAIT_STATE(victim, DC::PULSE_VIOLENCE * 1);
@@ -610,7 +610,7 @@ int do_trip(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_sneak(Character *ch, char *argument, int cmd)
+int do_sneak(Character *ch, char *argument, cmd_t cmd)
 {
 
   auto &arena = DC::getInstance()->arena_;
@@ -631,7 +631,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   if (IS_AFFECTED(ch, AFF_SNEAK))
   {
     affect_from_char(ch, SKILL_SNEAK);
-    if (cmd != 10)
+    if (cmd != cmd_t::PALM)
     {
       ch->sendln("You won't be so sneaky anymore.");
       return eFAILURE;
@@ -641,7 +641,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_SNEAK))
     return eSUCCESS;
 
-  do_hide(ch, "", 12);
+  do_hide(ch, "", cmd_t::LOOK);
 
   ch->sendln("You try to move silently for a while.");
 
@@ -657,7 +657,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_stalk(Character *ch, char *argument, int cmd)
+int do_stalk(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_STRING_LENGTH];
   Character *leader;
@@ -692,7 +692,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
     else if (IS_AFFECTED(ch, AFF_GROUP))
       ch->sendln("You must first abandon your group.");
     else
-      stop_follower(ch, 1);
+      stop_follower(ch, follower_reasons_t::END_STALK);
     return eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_GROUP))
@@ -707,22 +707,22 @@ int do_stalk(Character *ch, char *argument, int cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
   if (!skill_success(ch, leader, SKILL_STALK))
-    do_follow(ch, argument, CMD_DEFAULT);
+    do_follow(ch, argument);
 
   else
   {
-    do_follow(ch, argument, 10);
-    do_sneak(ch, argument, 10);
+    do_follow(ch, argument, cmd_t::TRACK);
+    do_sneak(ch, argument, cmd_t::TRACK);
   }
   return eSUCCESS;
 }
 
-int do_hide(Character *ch, const char *argument, int cmd)
+int do_hide(Character *ch, const char *argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (!ch->canPerform(SKILL_HIDE))
   {
-    if (cmd != 12)
+    if (cmd != cmd_t::LOOK)
       ch->sendln("You don't know how to hide. What do you think you are, a thief?");
     return eFAILURE;
   }
@@ -795,7 +795,7 @@ int max_level(Character *ch)
 }
 
 // steal an ITEM... not gold
-int do_steal(Character *ch, char *argument, int cmd)
+int do_steal(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   class Object *obj, *loop_obj, *next_obj;
@@ -838,7 +838,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (victim->getPosition() == position_t::DEAD)
+  if (GET_POS(victim) == position_t::DEAD)
   {
     ch->sendln("Don't steal from dead people!");
     return eFAILURE;
@@ -873,7 +873,7 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
-    return do_say(ch, "Nice try, silly thief.", CMD_DEFAULT);
+    return do_say(ch, "Nice try, silly thief.");
   }
 
   if (victim->fighting)
@@ -893,8 +893,8 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   WAIT_STATE(ch, 12); /* It takes TIME to steal */
 
-  //  if(victim->getPosition() <= position_t::SLEEPING &&
-  //   victim->getPosition() != position_t::STUNNED)
+  //  if(GET_POS(victim) <= position_t::SLEEPING &&
+  //   GET_POS(victim) != position_t::STUNNED)
   // percent = -1; /* ALWAYS SUCCESS */
 
   if ((obj = get_obj_in_list_vis(ch, obj_name, victim->carrying)))
@@ -910,7 +910,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return eFAILURE;
     }
-    if (obj->vnum == CHAMPION_ITEM)
+    if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
     {
       ch->send("You must earn that flag, no stealing allowed!");
       return eFAILURE;
@@ -957,7 +957,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           else
             _exp = (GET_OBJ_WEIGHT(obj) * 1000);
 
-          if (victim->getPosition() <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
+          if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
             _exp = 0;
 
           ch->sendln("Got it!");
@@ -970,8 +970,8 @@ int do_steal(Character *ch, char *argument, int cmd)
 
           if (IS_PC(victim))
           {
-            victim->save(666);
-            ch->save(666);
+            victim->save(cmd_t::SAVE_SILENTLY);
+            ch->save(cmd_t::SAVE_SILENTLY);
             if (!AWAKE(victim))
             {
               //              if(number(1, 3) == 1)
@@ -1005,20 +1005,20 @@ int do_steal(Character *ch, char *argument, int cmd)
           if (IS_PC(victim))
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s stole %s[%lu] from %s",
+            sprintf(log_buf, "%s stole %s[%d] from %s",
                     GET_NAME(ch), obj->short_description,
-                    obj->vnum, victim->getNameC());
+                    DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%lu]",
+              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
                    loop_obj->short_description,
-                   loop_obj->vnum);
+                   DC::getInstance()->obj_index[loop_obj->item_number].virt);
           }
-          if (obj->vnum != 76)
+          if (DC::getInstance()->obj_index[obj->item_number].virt != 76)
           {
             obj_from_char(obj);
-            has_item = search_char_for_item(ch, obj->vnum, false);
+            has_item = search_char_for_item(ch, obj->item_number, false);
             obj_to_char(obj, ch);
           }
           if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1128,8 +1128,8 @@ int do_steal(Character *ch, char *argument, int cmd)
       }
       int mod = ch->has_skill(SKILL_STEAL) - chance;
 
-      if (victim->getPosition() > position_t::SLEEPING ||
-          victim->getPosition() == position_t::STUNNED)
+      if (GET_POS(victim) > position_t::SLEEPING ||
+          GET_POS(victim) == position_t::STUNNED)
       {
         ch->sendln("Steal the equipment now? Impossible!");
         return eFAILURE;
@@ -1153,9 +1153,9 @@ int do_steal(Character *ch, char *argument, int cmd)
         act("You remove $p and attempt to steal it.", ch, obj, 0, TO_CHAR, 0);
         ch->sendln("Your victim wakes up before you can complete the theft!");
         act("$n tries to steal $p from $N, but fails.", ch, obj, victim, TO_ROOM, NOTVICT);
-        obj_to_char(unequip_char(victim, eq_pos), victim);
+        obj_to_char(victim->unequip_char(eq_pos), victim);
         act("You awake to find $n removing some of your equipment.", ch, obj, victim, TO_VICT, 0);
-        victim->save(666);
+        victim->save(cmd_t::SAVE_SILENTLY);
         set_cantquit(ch, victim);
         if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
         {
@@ -1167,12 +1167,12 @@ int do_steal(Character *ch, char *argument, int cmd)
       {
         act("You remove $p and steal it.", ch, obj, 0, TO_CHAR, 0);
         act("$n steals $p from $N.", ch, obj, victim, TO_ROOM, NOTVICT);
-        obj_to_char(unequip_char(victim, eq_pos), ch);
+        obj_to_char(victim->unequip_char(eq_pos), ch);
         if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
           _exp = (GET_OBJ_WEIGHT(obj) * victim->getLevel());
-        if (victim->getPosition() <= position_t::SLEEPING)
+        if (GET_POS(victim) <= position_t::SLEEPING)
           _exp = 1;
         GET_EXP(ch) += _exp; /* exp for stealing :) */
         sprintf(buf, "You receive %d exps.\r\n", _exp);
@@ -1182,8 +1182,8 @@ int do_steal(Character *ch, char *argument, int cmd)
         logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (!IS_NPC(victim))
         {
-          victim->save(666);
-          ch->save(666);
+          victim->save(cmd_t::SAVE_SILENTLY);
+          ch->save(cmd_t::SAVE_SILENTLY);
           if (!AWAKE(victim))
           {
             //            if(number(1, 3) == 1)
@@ -1214,7 +1214,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           }
         } // !is_npc
         obj_from_char(obj);
-        has_item = search_char_for_item(ch, obj->vnum, false);
+        has_item = search_char_for_item(ch, obj->item_number, false);
         obj_to_char(obj, ch);
 
         if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1251,7 +1251,8 @@ int do_steal(Character *ch, char *argument, int cmd)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
-      victim->do_shout({QStringLiteral("%1 is a bloody thief.").arg(GET_SHORT(ch))});
+      sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
+      do_shout(victim, buf);
     }
     else
     {
@@ -1264,7 +1265,7 @@ int do_steal(Character *ch, char *argument, int cmd)
 }
 
 // Steal gold
-int do_pocket(Character *ch, char *argument, int cmd)
+int do_pocket(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   struct affected_type pthiefaf;
@@ -1294,7 +1295,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (victim->getPosition() == position_t::DEAD)
+  if (GET_POS(victim) == position_t::DEAD)
   {
     ch->sendln("Don't steal from dead people.");
     return eFAILURE;
@@ -1332,7 +1333,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
-    return do_say(ch, "Nice try.", CMD_DEFAULT);
+    return do_say(ch, "Nice try.");
   }
 
   if (victim->fighting)
@@ -1394,7 +1395,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
         _exp = 0;
       if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
         _exp = 1;
-      if (victim->getPosition() <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
+      if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = 0;
 
       sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\r\n", gold);
@@ -1408,8 +1409,8 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
       if (IS_PC(victim))
       {
-        victim->save(666);
-        ch->save(666);
+        victim->save(cmd_t::SAVE_SILENTLY);
+        ch->save(cmd_t::SAVE_SILENTLY);
         if (!victim->isPlayerGoldThief())
         {
           // set_cantquit( ch, victim );
@@ -1434,7 +1435,8 @@ int do_pocket(Character *ch, char *argument, int cmd)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
-      victim->do_shout({QStringLiteral("%1 is a bloody thief.").arg(GET_SHORT(ch))});
+      sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
+      do_shout(victim, buf);
     }
     else
     {
@@ -1446,7 +1448,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pick(Character *ch, char *argument, int cmd)
+int do_pick(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room, j;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
@@ -1468,7 +1470,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   //      has_lockpicks = true;
 
   for (j = 0; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || ch->equipment[j]->vnum == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || DC::getInstance()->obj_index[ch->equipment[j]->item_number].virt == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1555,13 +1557,11 @@ int do_pick(Character *ch, char *argument, int cmd)
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)
       {
-        act("$n skillfully picks the lock of the $F.", ch, 0,
-            EXIT(ch, door)->keyword, TO_ROOM, 0);
+        act("$n skillfully picks the lock of the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
       }
       else
       {
-        act("$n picks the lock of the.", ch, 0, 0, TO_ROOM,
-            INVIS_NULL);
+        act("$n picks the lock of the.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       }
 
       ch->sendln("The lock quickly yields to your skills.");
@@ -1577,6 +1577,17 @@ int do_pick(Character *ch, char *argument, int cmd)
           }
         }
       }
+
+      QString door_keyword = QStringLiteral("door");
+      if (EXIT(ch, door)->keyword)
+      {
+        door_keyword = fname(EXIT(ch, door)->keyword);
+      }
+
+      ch->sendln(QStringLiteral("You open the %1.").arg(door_keyword));
+      auto copy_of_door_keyword = strdup(qPrintable(QStringLiteral("%1 %2").arg(door_keyword).arg(dir)));
+      auto rc = do_open(ch, copy_of_door_keyword);
+      free(copy_of_door_keyword);
     }
   }
   else
@@ -1587,7 +1598,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_slip(Character *ch, char *argument, int cmd)
+int do_slip(Character *ch, char *argument, cmd_t cmd)
 {
   char obj_name[200], vict_name[200], buf[200];
   char arg[MAX_INPUT_LENGTH];
@@ -1717,7 +1728,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       }
 
       ch->save();
-      save_char_obj(vict);
+      vict->save_char_obj();
     }
 
     return eFAILURE;
@@ -1783,7 +1794,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
          container->obj_flags.value[0]) &&
-        (container->vnum != 536 ||
+        (DC::getInstance()->obj_index[container->item_number].virt != 536 ||
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
       ch->sendln("It won't fit...cheater.");
@@ -1798,7 +1809,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (container->vnum != 536)
+    if (DC::getInstance()->obj_index[container->item_number].virt != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
@@ -1810,7 +1821,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(vict) && DC::getInstance()->mob_index[vict->mobdata->vnum].non_combat_func == shop_keeper)
+  if (IS_NPC(vict) && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
   {
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
     return eFAILURE;
@@ -1844,7 +1855,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    if (search_char_for_item(vict, obj->vnum, false))
+    if (search_char_for_item(vict, obj->item_number, false))
     {
       ch->sendln("The item's uniqueness prevents it!");
       return eFAILURE;
@@ -1855,7 +1866,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (obj->vnum == 393)
+    if (DC::getInstance()->obj_index[obj->item_number].virt == 393)
     {
       ch->sendln("Whoa, you almost dropped your hot potato!");
       return eFAILURE;
@@ -1895,12 +1906,12 @@ int do_slip(Character *ch, char *argument, int cmd)
     act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS | NOTVICT);
     act("$n slips you $p.", ch, obj, vict, TO_VICT, GODS);
     ch->save();
-    save_char_obj(vict);
+    vict->save_char_obj();
   }
   return eSUCCESS;
 }
 
-int do_vitalstrike(Character *ch, char *argument, int cmd)
+int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
 
@@ -1959,7 +1970,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_deceit(Character *ch, char *argument, int cmd)
+int do_deceit(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
 
@@ -2039,7 +2050,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_jab(Character *ch, char *argument, int cmd)
+int do_jab(Character *ch, char *argument, cmd_t cmd)
 {
   int retval = eFAILURE, learned;
 
@@ -2189,7 +2200,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   }
 }
 
-int do_appraise(Character *ch, char *argument, int cmd)
+int do_appraise(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim = {};
   Object *obj = {};
@@ -2332,7 +2343,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_cripple(Character *ch, char *argument, int cmd)
+int do_cripple(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   char name[MAX_STRING_LENGTH];

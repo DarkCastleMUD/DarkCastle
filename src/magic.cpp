@@ -30,13 +30,13 @@
 
 #include <fmt/format.h>
 
+#include "DC/spells.h"
 #include "DC/obj.h"
 #include "DC/room.h"
 #include "DC/connect.h"
 #include "DC/DC.h"
 #include "DC/race.h"
 #include "DC/character.h"
-#include "DC/spells.h"
 #include "DC/magic.h"
 #include "DC/player.h"
 #include "DC/fight.h"
@@ -146,10 +146,10 @@ bool can_heal(Character *ch, Character *victim, int spellnum)
 
   // You cannot heal an elemental from "conjure elemental"
   if (IS_NPC(victim) &&
-      (DC::getInstance()->mob_index[victim->mobdata->vnum].vnum == 88 ||
-       DC::getInstance()->mob_index[victim->mobdata->vnum].vnum == 89 ||
-       DC::getInstance()->mob_index[victim->mobdata->vnum].vnum == 90 ||
-       DC::getInstance()->mob_index[victim->mobdata->vnum].vnum == 91))
+      (DC::getInstance()->mob_index[victim->mobdata->nr].virt == 88 ||
+       DC::getInstance()->mob_index[victim->mobdata->nr].virt == 89 ||
+       DC::getInstance()->mob_index[victim->mobdata->nr].virt == 90 ||
+       DC::getInstance()->mob_index[victim->mobdata->nr].virt == 91))
   {
     ch->sendln("The heavy magics surrounding this being prevent healing.");
     return false;
@@ -646,7 +646,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
 
       if (tmp_char->fighting)
       {
-        do_say(tmp_char, "Screw this! I'm going home!", CMD_DEFAULT);
+        do_say(tmp_char, "Screw this! I'm going home!");
         if (tmp_char->fighting->fighting == tmp_char)
           stop_fighting(tmp_char->fighting);
 
@@ -959,7 +959,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
       break;
     }
 
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1140,13 +1140,13 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
       "from Above.",
       "\n"};
 
-  int to_charge[6] = {
-      3,
-      4,
-      1,
-      2,
-      6,
-      5};
+  cmd_t to_charge[6] = {
+      cmd_t::SOUTH,
+      cmd_t::WEST,
+      cmd_t::NORTH,
+      cmd_t::EAST,
+      cmd_t::DOWN,
+      cmd_t::UP};
 
   // do room caster is in
   ch->sendln("A Bright light comes down from the heavens.");
@@ -1189,8 +1189,8 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
-        if (IS_NPC(tmp_victim) && DC::getInstance()->mob_index[tmp_victim->mobdata->vnum].vnum >= 2300 &&
-            DC::getInstance()->mob_index[tmp_victim->mobdata->vnum].vnum <= 2399)
+        if (IS_NPC(tmp_victim) && DC::getInstance()->mob_index[tmp_victim->mobdata->nr].virt >= 2300 &&
+            DC::getInstance()->mob_index[tmp_victim->mobdata->nr].virt <= 2399)
         {
           ch->sendln("The clan hall's enchantments absorbs part of your spell.");
           continue;
@@ -1285,7 +1285,7 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1319,7 +1319,7 @@ int spell_group_fly(uint8_t level, Character *ch, Character *victim, class Objec
   for (const auto &tmp_victim : character_list)
   {
 
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1353,7 +1353,7 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Ob
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1380,7 +1380,7 @@ int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1406,7 +1406,7 @@ int spell_heal_spray(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1470,7 +1470,7 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1746,7 +1746,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   move_char(victim, to_room);
   act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
 
-  do_look(victim, "", 0);
+  do_look(victim, "");
   return eSUCCESS;
 }
 
@@ -1765,7 +1765,7 @@ int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *o
   if (obj)
   {
     if ((5 * level > GET_OBJ_WEIGHT(obj)) &&
-        (ch->getPosition() != position_t::FIGHTING))
+        (GET_POS(ch) != position_t::FIGHTING))
     {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_BLESS);
       act("$p briefly glows.", ch, obj, 0, TO_CHAR, 0);
@@ -1820,7 +1820,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
       if (number(0, 1))
       {
         ch->sendln("The combined magics fizzle!");
-        if (victim->getPosition() == position_t::SLEEPING)
+        if (GET_POS(victim) == position_t::SLEEPING)
         {
           victim->sendln("You are awakened by a burst of $6energy$R!");
           act("$n is awakened in a burst of $6energy$R!", victim, nullptr, nullptr, TO_ROOM, 0);
@@ -1857,7 +1857,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     act("$N resists your attempt to paralyze $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to paralyze $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
-    if ((!victim->fighting) && victim->getPosition() > position_t::SLEEPING && victim != ch)
+    if ((!victim->fighting) && GET_POS(victim) > position_t::SLEEPING && victim != ch)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1886,7 +1886,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     {
       act("$n tried to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && victim->getPosition() > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1911,7 +1911,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
 
   // Finish off any singing performances (bard)
   if (IS_SINGING(victim))
-    do_sing(victim, "stop", CMD_DEFAULT);
+    do_sing(victim, "stop");
 
   act("$n seems to be paralyzed!", victim, 0, 0, TO_ROOM, INVIS_NULL);
   victim->sendln("Your entire body rebels against you and you are paralyzed!");
@@ -1958,7 +1958,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
     act("$N resists your attempt to blind $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to blind $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to blind you!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1979,7 +1979,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
     {
       act("$n tried to blind you!", ch, nullptr, victim, TO_VICT, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && victim->getPosition() > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -2011,9 +2011,9 @@ int spell_create_food(uint8_t level, Character *ch, Character *victim, class Obj
   class Object *tmp_obj;
 
   if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_PALADIN)
-    tmp_obj = DC::getInstance()->clone_object(8);
+    tmp_obj = clone_object(real_object(8));
   else
-    tmp_obj = DC::getInstance()->clone_object(7);
+    tmp_obj = clone_object(real_object(7));
 
   tmp_obj->obj_flags.value[0] += skill / 2;
 
@@ -3026,7 +3026,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
   {
     // TODO
     // Removed for now because it's keep locate spell from seeing portals or corpses
-    //	  if (i->vnum == -1) {
+    //	  if (i->item_number == -1) {
     //		  continue;
     //	  }
     //
@@ -3192,7 +3192,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
       victim->sendln("You feel very sick.");
       act("$N looks very sick.", ch, 0, victim, TO_CHAR, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -3290,7 +3290,7 @@ int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, 
 
 /* REMOVE CURSE */
 
-int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
+int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill, quint64 mana_cost)
 {
   int j;
   assert(ch && (victim || obj));
@@ -3301,7 +3301,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     {
       act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
       REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-      if (obj->vnum == 514)
+      if (DC::getInstance()->obj_index[obj->item_number].virt == 514)
       {
         int i = 0;
         for (i = 0; i < obj->num_affects; i++)
@@ -3316,7 +3316,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         else
           z = WEAR_FINGER_R;
         if (t)
-          obj_to_char(unequip_char(t, z), t);
+          obj_to_char(t->unequip_char(z), t);
         add_obj_affect(obj, APPLY_MANA_REGEN, 2);
         if (t)
           wear(t, obj, 0);
@@ -3332,64 +3332,87 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     return eSUCCESS;
   }
 
+  quint64 curses_removed = 0;
   /* Then it is a PC | NPC */
   if (victim->affected_by_spell(SPELL_CURSE))
   {
     act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
     act("You feel better.", victim, 0, 0, TO_CHAR, 0);
     affect_from_char(victim, SPELL_CURSE);
-    return eSUCCESS;
+    if (!mana_cost)
+      return eSUCCESS;
+    curses_removed++;
   }
 
   for (j = 0; j < MAX_WEAR; j++)
   {
     if ((obj = victim->equipment[j]) && isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
-      if (skill > 70 && obj->vnum == 514)
+      if (!curses_removed || GET_MANA(victim) > mana_cost)
       {
-        int i = 0;
-        for (i = 0; i < obj->num_affects; i++)
-          if (obj->affected[i].location == APPLY_MANA_REGEN)
-            return eSUCCESS; // only do it once
-        SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
-        add_obj_affect(obj, APPLY_MANA_REGEN, 2);
-        victim->mana_regen += 2;
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        if (curses_removed++)
+          GET_MANA(victim) -= mana_cost;
+        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+        {
+          int i = 0;
+          for (i = 0; i < obj->num_affects; i++)
+            if (obj->affected[i].location == APPLY_MANA_REGEN)
+              break; // only do it once
+          SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+          add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+          victim->mana_regen += 2;
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        }
+        act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
+        act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
+        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+        if (!mana_cost)
+          return eSUCCESS;
       }
-      act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
-      act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
-      REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-      return eSUCCESS;
     }
   }
 
   for (obj = victim->carrying; obj; obj = obj->next_content)
+  {
     if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
-      act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
-      act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
-      if (skill > 70 && obj->vnum == 514)
+      if (!curses_removed || GET_MANA(victim) > mana_cost)
       {
-        int i = 0;
-        for (i = 0; i < obj->num_affects; i++)
-          if (obj->affected[i].location == APPLY_MANA_REGEN)
-            return eSUCCESS; // only do it once
-        SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
-        add_obj_affect(obj, APPLY_MANA_REGEN, 2);
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        if (curses_removed++)
+          GET_MANA(victim) -= mana_cost;
+        act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
+        act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
+        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+        {
+          int i = 0;
+          for (i = 0; i < obj->num_affects; i++)
+            if (obj->affected[i].location == APPLY_MANA_REGEN)
+              break; // only do it once
+          SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+          add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        }
+        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+        if (!mana_cost)
+          return eSUCCESS;
       }
-      REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-      break;
     }
+  }
 
   if (victim->affected_by_spell(SPELL_ATTRITION))
   {
-    act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
-    act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
-    affect_from_char(victim, SPELL_ATTRITION);
-    return eSUCCESS;
+    if (!curses_removed || GET_MANA(victim) > mana_cost)
+    {
+      if (curses_removed++)
+        GET_MANA(victim) -= mana_cost;
+      act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
+      act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
+      affect_from_char(victim, SPELL_ATTRITION);
+      if (!mana_cost)
+        return eSUCCESS;
+    }
   }
 
   return eSUCCESS;
@@ -3507,7 +3530,7 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Obje
   char dammsg[30];
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->vnum].vnum == 8)
+    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
     {
       heal = (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       heal = number(heal - (heal / 10), heal + (heal / 10));
@@ -4014,7 +4037,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
     act("$N resists your attempt to sleep $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to sleep $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to sleep you!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -4047,7 +4070,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
       af.bitvector = AFF_SLEEP;
       affect_join(victim, &af, false, false);
 
-      if (victim->getPosition() > position_t::SLEEPING)
+      if (GET_POS(victim) > position_t::SLEEPING)
       {
         act("You feel very sleepy ..... zzzzzz", victim, 0, 0, TO_CHAR, 0);
         act("$n goes to sleep.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -4280,7 +4303,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
   act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   move_char(victim, location);
   act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  do_look(victim, "", 15);
+  do_look(victim, "");
   return eSUCCESS;
 }
 
@@ -4326,7 +4349,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
 
   move_char(ch, target, false);
   ch->sendln("A vision forms in your mind... ");
-  do_look(ch, "", 15);
+  do_look(ch, "");
   move_char(ch, original_loc);
   return eSUCCESS;
 }
@@ -4375,7 +4398,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
 
   move_char(ch, target, false);
   ch->sendln("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...");
-  do_look(ch, "", 15);
+  do_look(ch, "");
   move_char(ch, original_loc);
   return eSUCCESS;
 }
@@ -4465,7 +4488,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   move_char(victim, target);
   act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
-  do_look(victim, "", 15);
+  do_look(victim, "");
 
   if (IS_NPC(victim) && victim->getLevel() >= ch->getLevel())
   {
@@ -4478,7 +4501,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   {
     act("$n freaks shit.", victim, 0, 0, TO_ROOM, 0);
     victim->add_memory(GET_NAME(ch), 'f');
-    do_flee(victim, "", 0);
+    do_flee(victim, "");
   }
   return eSUCCESS;
 }
@@ -4489,9 +4512,6 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
 {
   struct affected_type af;
   class Object *tempobj;
-
-  void add_follower(Character * ch, Character * leader, int cmd);
-  void stop_follower(Character * ch, int cmd);
 
   ch->sendln("Disabled currently.");
   return eFAILURE;
@@ -4538,9 +4558,9 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   if (victim->master)
-    stop_follower(victim, STOP_FOLLOW);
+    stop_follower(victim);
 
-  add_follower(victim, ch, 0);
+  add_follower(victim, ch);
 
   af.type = SPELL_CHARM_PERSON;
 
@@ -4559,10 +4579,10 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   {
     if (victim->equipment[SECOND_WIELD])
     {
-      tempobj = unequip_char(victim, SECOND_WIELD);
+      tempobj = victim->unequip_char(SECOND_WIELD);
       obj_to_room(tempobj, victim->in_room);
     }
-    tempobj = unequip_char(victim, WIELD);
+    tempobj = victim->unequip_char(WIELD);
     obj_to_room(tempobj, victim->in_room);
     act("$n's eyes dull and $s hands slacken dropping $s weapons.", victim, 0, 0, TO_ROOM, 0);
   }
@@ -4663,7 +4683,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     strcat(buf, "\r\n");
     ch->send(buf);
 
-    sprintf(buf, "Weight: %d, Value: %d, Level: %llu\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
+    sprintf(buf, "Weight: %d, Value: %d, Level: %d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
     ch->send(buf);
 
     switch (GET_ITEM_TYPE(obj))
@@ -4936,7 +4956,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -4977,7 +4997,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -5038,7 +5058,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
     return eFAILURE;
   }
 
-  if (victim->getPosition() == position_t::SLEEPING)
+  if (GET_POS(victim) == position_t::SLEEPING)
   {
     ch->sendln("How do you expect a sleeping person to be scared?");
     return eFAILURE;
@@ -5090,7 +5110,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
         0);
     if (IS_NPC(
             victim) &&
-        (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
+        (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -5119,7 +5139,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
   }
 
   victim->sendln("You suddenly feel very frightened, and you attempt to flee!");
-  do_flee(victim, "", 151);
+  do_flee(victim, "", cmd_t::FEAR);
 
   return eSUCCESS;
 }
@@ -5223,7 +5243,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
     return eSUCCESS;
   }
 
-  tmp_obj = DC::getInstance()->clone_object(6);
+  tmp_obj = clone_object(real_object(6));
 
   obj_to_char(tmp_obj, ch);
 
@@ -5298,7 +5318,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  mob = clone_mobile(r_num);
+  mob = ch->getDC()->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
   IS_CARRYING_W(mob) = 0;
@@ -5357,7 +5377,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
   affect_to_char(mob, &af);
   if (isSet(mob->immune, ISR_PIERCE))
     REMOVE_BIT(mob->immune, ISR_PIERCE);
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   extract_obj(corpse);
 
@@ -5504,7 +5524,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
     act("$N resists your attempt to dispel minor!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to dispel minor!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to dispel minor!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -5775,7 +5795,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     act("$N resists your attempt to dispel magic!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to dispel magic!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to dispel magic!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -6475,7 +6495,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
   for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim;
        tmp_victim = tmp_victim->next_in_room)
   {
-    if (ch->in_room == tmp_victim->in_room)
+    if ((ch->in_room == tmp_victim->in_room))
       if (!tmp_victim->affected_by_spell(SPELL_INVISIBLE))
       {
 
@@ -6536,8 +6556,8 @@ void make_portal(Character *ch, Character *vict)
   clear_object(ch_portal);
   clear_object(vict_portal);
 
-  ch_portal->vnum = -1;
-  vict_portal->vnum = -1;
+  ch_portal->item_number = -1;
+  vict_portal->item_number = -1;
   ch_portal->in_room = DC::NOWHERE;
   vict_portal->in_room = DC::NOWHERE;
 
@@ -6695,7 +6715,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
   bool found_hunt_or_quest_item = false;
   for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
   {
-    if (search_char_for_item(tmpch, 76, false) || search_char_for_item(tmpch, 51, false))
+    if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
     {
       found_hunt_or_quest_item = true;
     }
@@ -7717,7 +7737,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
             }
-            else if (tar_ch->getPosition() == position_t::FIGHTING)
+            else if (GET_POS(tar_ch) == position_t::FIGHTING)
               ch->sendln("Nothing seems to happen.");
             else
               retval &= spell_bless(level, ch, tar_ch, 0, skill);
@@ -7731,7 +7751,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
           }
-          else if (leader->getPosition() == position_t::FIGHTING)
+          else if (GET_POS(leader) == position_t::FIGHTING)
             ch->sendln("Nothing seems to happen.");
           else
             retval &= spell_bless(level, ch, leader, 0, skill);
@@ -7739,7 +7759,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
 
         return retval;
       }
-      if (tar_ch->getPosition() == position_t::FIGHTING)
+      if (GET_POS(tar_ch) == position_t::FIGHTING)
       {
         ch->sendln("Nothing seems to happen.");
         return eFAILURE;
@@ -7748,7 +7768,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   case SPELL_TYPE_POTION:
-    if (ch->getPosition() == position_t::FIGHTING)
+    if (GET_POS(ch) == position_t::FIGHTING)
     {
       ch->sendln("Nothing seems to happen.");
       return eFAILURE;
@@ -7771,7 +7791,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
       if (!tar_ch)
         tar_ch = ch;
 
-      if (tar_ch->getPosition() == position_t::FIGHTING)
+      if (GET_POS(tar_ch) == position_t::FIGHTING)
       {
         ch->sendln("Nothing seems to happen.");
         return eFAILURE;
@@ -7792,7 +7812,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
     else
     { /* Then it is a PC | NPC */
 
-      if (tar_ch->getPosition() == position_t::FIGHTING)
+      if (GET_POS(tar_ch) == position_t::FIGHTING)
       {
         ch->sendln("Nothing seems to happen.");
         return eFAILURE;
@@ -9253,13 +9273,12 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, class Object *tar_obj, int skill)
+int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill, quint64 mana_cost)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    return spell_remove_curse(level, ch, tar_ch, tar_obj, skill);
+    return spell_remove_curse(level, ch, tar_ch, tar_obj, skill, mana_cost);
     break;
   case SPELL_TYPE_POTION:
     return spell_remove_curse(level, ch, ch, 0, skill);
@@ -10169,7 +10188,7 @@ int elemental_damage_bonus(int spell, Character *ch)
     // if (IS_NPC(f->follower) && f->follower->height == 77)
     if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
     {
-      switch (DC::getInstance()->mob_index[f->follower->mobdata->vnum].vnum)
+      switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].virt)
       {
       case 88:
         fire = true;
@@ -10193,7 +10212,7 @@ int elemental_damage_bonus(int spell, Character *ch)
         // if (IS_NPC(t->follower) && t->follower->height == 77)
         if (IS_NPC(t->follower) && t->follower->mobdata->mob_flags.value[3] == 77)
         {
-          switch (DC::getInstance()->mob_index[t->follower->mobdata->vnum].vnum)
+          switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].virt)
           {
           case 88:
             fire = true;
@@ -10275,7 +10294,7 @@ bool elemental_score(Character *ch, int level)
     {
       // if (f->follower->height == 77) // improved
       if (f->follower->mobdata->mob_flags.value[3] == 77)
-        switch (DC::getInstance()->mob_index[f->follower->mobdata->vnum].vnum)
+        switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].virt)
         {
         case 88:
           fire = true;
@@ -10301,7 +10320,7 @@ bool elemental_score(Character *ch, int level)
         {
           if (t->follower->mobdata->mob_flags.value[3] == 77)
           {
-            switch (DC::getInstance()->mob_index[t->follower->mobdata->vnum].vnum)
+            switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].virt)
             {
             case 88:
               fire = true;
@@ -11266,7 +11285,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -11528,7 +11547,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
       ch->sendln("You don't seem to be carrying any such root.");
       return eFAILURE;
     }
-    int virt = obj->vnum;
+    int virt = DC::getInstance()->obj_index[obj->item_number].virt;
     int aff = 0, spl = 0;
     switch (virt)
     {
@@ -11725,7 +11744,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
   move_char(victim, ch->in_room);
   act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
-  do_look(victim, "", 15);
+  do_look(victim, "");
 
   if (!OUTSIDE(ch))
   {
@@ -11787,7 +11806,7 @@ int spell_entangle(uint8_t level, Character *ch, Character *victim, class Object
     if (!number(0, skill))
       spell_blindness(level, ch, victim, 0, 0); /* The plants blind the victim . . */
   }
-  if (victim->getPosition() > position_t::SITTING)
+  if (GET_POS(victim) > position_t::SITTING)
   {
     victim->setSitting(); /* And pull the victim down to the ground */
     if (victim->fighting)
@@ -12057,7 +12076,7 @@ int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character 
   }
 
   // Load up the standard fire ruler from elemental canyon (mob #19309) */
-  mob = clone_mobile(number);
+  mob = ch->getDC()->clone_mobile(number);
   char_to_room(mob, ch->in_room);
 
   // I am not sure of a better way to do this, so I just set the duration
@@ -12069,7 +12088,7 @@ int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character 
   af.modifier = 0;
   af.location = 0;
   af.bitvector = AFF_CHARM;
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
   affect_join(mob, &af, false, false);
 
   // The mob should have zero xp
@@ -12160,13 +12179,13 @@ int check_components(Character *ch, int destroy, int item_one = 0,
   if (!ch->carrying)
     return false;
 
-  ptr_one = get_obj_in_list_num(item_one, ch->carrying);
+  ptr_one = get_obj_in_list_num(real_object(item_one), ch->carrying);
   if (item_two)
-    ptr_two = get_obj_in_list_num(item_two, ch->carrying);
+    ptr_two = get_obj_in_list_num(real_object(item_two), ch->carrying);
   if (item_three)
-    ptr_three = get_obj_in_list_num(item_three, ch->carrying);
+    ptr_three = get_obj_in_list_num(real_object(item_three), ch->carrying);
   if (item_four)
-    ptr_four = get_obj_in_list_num(item_four, ch->carrying);
+    ptr_four = get_obj_in_list_num(real_object(item_four), ch->carrying);
 
   // Destroy the components if needed
 
@@ -12294,7 +12313,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
 
   // create golem
 
-  mob = clone_mobile(real_mobile(201));
+  mob = ch->getDC()->clone_mobile(real_mobile(201));
   if (!mob)
   {
     ch->sendln("Warning: Load mob not found in create_corpse");
@@ -12350,7 +12369,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
     else
       k = k->next;
 
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   // add random abilities
   if (number(1, 3) > 1)
@@ -12541,13 +12560,13 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
     ch->sendln("Failure in move_char.  Major fuckup.  Contact a god.");
     return eFAILURE;
   }
-  do_look(ch, "", CMD_DEFAULT);
+  do_look(ch, "");
 
   act("$n steps out from a dimensional rip.", ch, 0, 0, TO_ROOM, 0);
   return eSUCCESS;
 }
 
-int do_beacon(Character *ch, char *argument, int cmd)
+int do_beacon(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *new_obj = nullptr;
   if (IS_NPC(ch))
@@ -12585,7 +12604,7 @@ int do_beacon(Character *ch, char *argument, int cmd)
   ch->sendln("You set a magical beacon in the air.");
   if (!ch->beacon)
   {
-    if (!(new_obj = DC::getInstance()->clone_object(BEACON_OBJ_NUMBER)))
+    if (!(new_obj = clone_object(real_object(BEACON_OBJ_NUMBER))))
     {
       ch->sendln("Error setting beacon.  Contact a god.");
       return eFAILURE;
@@ -12755,7 +12774,7 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
     else
       k = k->next;
 
-  mob = clone_mobile(r_num);
+  mob = ch->getDC()->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
   SETBIT(mob->affected_by, AFF_FAMILIAR);
@@ -12771,7 +12790,7 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
   IS_CARRYING_N(mob) = 0;
 
   familiar_creation_message(ch, fam_type);
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   return eSUCCESS;
 }
@@ -13305,7 +13324,7 @@ int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, cla
     dur = 2;
     mod = 15;
   }
-  globe = DC::getInstance()->clone_object(GLOBE_OF_DARKNESS_OBJECT);
+  globe = clone_object(real_object(GLOBE_OF_DARKNESS_OBJECT));
 
   if (!globe)
   {
@@ -13412,7 +13431,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -14008,7 +14027,7 @@ int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character 
     else
     {
       ch->sendln("You need to specify whether you want protection against magic or physical.");
-      ch->mana += spell_info[SPELL_HOLY_AURA].min_usesmana;
+      ch->mana += spell_info[SPELL_HOLY_AURA].min_usesmana();
       return eFAILURE;
     }
 
@@ -14180,7 +14199,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
     return eFAILURE;
   }
 
-  switch (DC::getInstance()->mob_index[victim->mobdata->vnum].vnum)
+  switch (DC::getInstance()->mob_index[victim->mobdata->nr].virt)
   {
   case FIRE_ELEMENTAL:
     act("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -14340,6 +14359,9 @@ int cast_blessed_halo(uint8_t level, Character *ch, char *arg, int type, Charact
 
 int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
+  if (!ch)
+    return eFAILURE;
+
   if (ch->fighting)
   {
     ch->sendln("You're a bit too distracted by the battle.");
@@ -14406,8 +14428,8 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
   }
 
   Character *mob;
-  mob = clone_mobile(mobile);
-  mob->hometown = DC::getInstance()->world[ch->in_room].number;
+  mob = ch->getDC()->clone_mobile(mobile);
+  mob->hometown = ch->getDC()->world[ch->in_room].number;
   char_to_room(mob, ch->in_room);
 
   ch->sendln("You call upon the spirits of this area, shifting into a trance-state.");
@@ -14438,6 +14460,8 @@ int cast_ghost_walk(uint8_t level, Character *ch, char *arg, int type, Character
 
 int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *victim, class Object *component, int skill)
 {
+  if (!ch)
+    return eFAILURE;
   Character *mob;
   int r_num, liquid, virt;
   // 88 = fire fire
@@ -14533,7 +14557,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
     return eFAILURE;
   }
 
-  mob = clone_mobile(r_num);
+  mob = ch->getDC()->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
   mob->max_hit += skill * 5;
   mob->hit = mob->max_hit;
@@ -14545,7 +14569,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
   SETBIT(mob->affected_by, AFF_ELEMENTAL);
   SETBIT(mob->affected_by, AFF_CHARM);
 
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   return eSUCCESS;
 }
@@ -14750,7 +14774,7 @@ int spell_silence(uint8_t level, Character *ch, Character *victim, Object *obj, 
   ch->sendln("Your chants fade softy to an eerie quiet as the silence takes hold...");
   act("$n's chants fade to an eerie quiet as the silence takes hold...", ch, 0, 0, TO_ROOM, 0);
 
-  if (!(silence_obj = DC::getInstance()->clone_object(SILENCE_OBJ_NUMBER)))
+  if (!(silence_obj = clone_object(real_object(SILENCE_OBJ_NUMBER))))
   {
     ch->sendln("Error setting silence object.  Tell an immortal.");
     return eFAILURE;
@@ -14786,7 +14810,7 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj,
 {
   struct affected_type af;
 
-  if ((spell_info[spl].targets & TAR_IGNORE))
+  if ((spell_info[spl].targets() & TAR_IGNORE))
   {
     ch->sendln("You find it impossible to immunize yourself against this type of spell.");
     return eSUCCESS;
@@ -15368,7 +15392,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class O
     return eFAILURE;
   }
 
-  if (!(ssobj = DC::getInstance()->clone_object(SPIRIT_SHIELD_OBJ_NUMBER)))
+  if (!(ssobj = clone_object(real_object(SPIRIT_SHIELD_OBJ_NUMBER))))
   {
     ch->sendln("Error setting spirit shield object.  Tell an immortal.");
     return eFAILURE;
@@ -15384,7 +15408,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class O
 
   ssobj->obj_flags.timer = 4 + skill / 5;
 
-  equip_char(ch, ssobj, WEAR_SHIELD);
+  ch->equip_char(ssobj, WEAR_SHIELD);
 
   ch->sendln("Your prayers to the gods for protection are answered as a glowing shield suddenly appears in your hand!");
   act("$n's prays to the gods for protection and a glowing shield appears in $s hand!", ch, 0, 0, TO_ROOM, 0);
@@ -15531,10 +15555,10 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[HOLD];
-      if ((component == 0) || (compNum != component->vnum))
+      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
       {
         component = ch->equipment[HOLD2];
-        if ((component == 0) || (compNum != component->vnum))
+        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
         {
           ch->sendln("You do not have the required components.");
           return eFAILURE;
@@ -15627,7 +15651,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
 
   ch->cRooms++;
 
-  cItem = DC::getInstance()->clone_object(CONSECRATE_OBJ_NUMBER);
+  cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
   if (cItem == nullptr)
   {
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");
@@ -15688,10 +15712,10 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[HOLD];
-      if ((component == 0) || (compNum != component->vnum))
+      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
       {
         component = ch->equipment[HOLD2];
-        if ((component == 0) || (compNum != component->vnum))
+        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
         {
           ch->sendln("You do not have the required components.");
           return eFAILURE;
@@ -15785,7 +15809,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
 
   ch->cRooms++;
 
-  cItem = DC::getInstance()->clone_object(CONSECRATE_OBJ_NUMBER);
+  cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
   if (!cItem)
   {
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");
@@ -15885,7 +15909,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class 
   {
     next_ally = ally->next_in_room;
 
-    if (IS_PC(ally) && ally->getPosition() > position_t::SLEEPING &&
+    if (IS_PC(ally) && GET_POS(ally) > position_t::SLEEPING &&
         (ally->master == ch || ch->master == ally || (ch->master && ch->master == ally->master)))
     {
       ally->sendln("Your mind's eye focuses, you still your body, and poise yourself to react to anything!");

@@ -16,7 +16,7 @@
  *  10/23/2003   Onager   Commented out effect wear-off stuff in            *
  *                        affect_update() (moved to affect_remove())        *
  *  10/27/2003   Onager   Changed stop_follower() cmd values to be readable *
- *                        #defines, added a BROKE_CHARM cmd                 *
+ *                        #defines, added a cmd_t::BROKE_CHARM cmd                 *
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
@@ -61,7 +61,6 @@ extern struct class_skill_defines k_skills[];
 extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
-extern struct song_info_type song_info[];
 extern char *spell_wear_off_msg[];
 
 // Functions used in spells.C
@@ -80,7 +79,7 @@ SPELL_FUN *spell_pointer;    /* Function to call             */
 int16_t difficulty;
 #endif
 
-struct spell_info_type spell_info[] =
+const QList<spell_info_type> spell_info =
     {
         {/* 00 */ /* Note: All arrays start at 0! CGT */ 0, position_t::DEAD, 0, 0, 0},
 
@@ -96,11 +95,11 @@ struct spell_info_type spell_info[] =
 
         {/* 06 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_iridescent_aura, SKILL_INCREASE_MEDIUM},
 
-        {/* 07 */ /* 18, position_t::STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 07 */ /* 18, position_t::STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 08 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_chill_touch, SKILL_INCREASE_HARD},
 
-        {/* 09 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 40, TAR_CHAR_ROOM, cast_clone); */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 09 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 40, TAR_CHAR_ROOM, cast_clone); */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 10 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_colour_spray, SKILL_INCREASE_HARD},
 
@@ -276,7 +275,7 @@ struct spell_info_type spell_info[] =
 
         {/* 96 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 40, TAR_IGNORE, cast_group_fly, SKILL_INCREASE_MEDIUM},
 
-        {/* 97 */ /* 24, position_t::STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 97 */ /* 24, position_t::STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 98 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_fire, SKILL_INCREASE_HARD},
 
@@ -302,7 +301,7 @@ struct spell_info_type spell_info[] =
 
         {/* 109 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_forest_meld, SKILL_INCREASE_HARD},
 
-        {/* 110 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 150, TAR_IGNORE, cast_companion */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 110 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 150, TAR_IGNORE, cast_companion */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 111 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_drown, SKILL_INCREASE_HARD},
 
@@ -342,9 +341,9 @@ struct spell_info_type spell_info[] =
 
         {/* 129 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_iron_roots, SKILL_INCREASE_HARD},
 
-        {/* 130 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 130 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, position_t::DEAD, 0, 0, 0},
 
-        {/* 131 */ /* 3*DC::PULSE_TIMER, position_t::STANDING,  0, TAR_CHAR_ROOM, nullptr */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 131 */ /* 3*DC::PULSE_TIMER, position_t::STANDING,  0, TAR_CHAR_ROOM, nullptr */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 132 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD},
 
@@ -376,17 +375,17 @@ struct spell_info_type spell_info[] =
 
         {/* 146 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stability, SKILL_INCREASE_MEDIUM},
 
-        {/* 147 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 147 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
-        {/* 148*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 148*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
         {/* 149*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_solidity, SKILL_INCREASE_MEDIUM},
 
-        {/* 150*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 150*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
-        {/* 151*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 151*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
-        {/* 152*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 152*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
         {/* 153*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD},
 
@@ -436,7 +435,7 @@ struct spell_info_type spell_info[] =
         {/* 176 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_ROOM_EXIT, cast_elemental_wall, SKILL_INCREASE_MEDIUM},
         {/* 177 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_IGNORE, cast_ethereal_focus, SKILL_INCREASE_EASY}};
 
-struct skill_stuff skill_info[] =
+const QList<skill_stuff> skill_info =
     {
         /*  1 */ {"trip", SKILL_INCREASE_MEDIUM},
         /*  2 */ {"dodge", SKILL_INCREASE_HARD},
@@ -912,7 +911,7 @@ int dam_percent(int learned, int damage)
 
 int use_mana(Character *ch, int sn)
 {
-  int base = spell_info[sn].min_usesmana;
+  int base = spell_info[sn].min_usesmana();
 
   // TODO - if we want mana to be modified by anything, we'll need to put something
   // here.  Since the "min_level_x" stuff doesn't exist anymore, and i'm too lazy
@@ -1123,7 +1122,7 @@ bool circle_follow(Character *ch, Character *victim)
 
 // Called when stop following persons, or stopping charm
 // This will NOT do if a character quits/dies!!
-void stop_follower(Character *ch, int cmd)
+void stop_follower(Character *ch, follower_reasons_t reason)
 {
   struct follow_type *j, *k;
 
@@ -1134,16 +1133,16 @@ void stop_follower(Character *ch, int cmd)
   }
   /*
     if(ISSET(ch->affected_by, AFF_FAMILIAR)) {
-      do_emote(ch, "screams in pain as its connection with its master is broken.", CMD_DEFAULT);
+      do_emote(ch, "screams in pain as its connection with its master is broken.");
       extract_char(ch, true);
       return;
     }
   */
   //  if(IS_AFFECTED(ch, AFF_CHARM)) {
-  if (cmd == BROKE_CHARM || cmd == BROKE_CHARM_LILITH)
+  if (reason == follower_reasons_t::BROKE_CHARM || reason == follower_reasons_t::BROKE_CHARM_LILITH)
   {
 
-    if (GET_CLASS(ch->master) != CLASS_RANGER || cmd == BROKE_CHARM_LILITH)
+    if (GET_CLASS(ch->master) != CLASS_RANGER || reason == follower_reasons_t::BROKE_CHARM_LILITH)
     {
       act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
       act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
@@ -1157,14 +1156,14 @@ void stop_follower(Character *ch, int cmd)
     }
     if (ch->fighting && ch->fighting != ch->master)
     {
-      do_say(ch, "Screw this, I'm going home!", 0);
+      do_say(ch, "Screw this, I'm going home!");
       stop_fighting(ch->fighting);
       stop_fighting(ch);
     }
   }
   else
   {
-    if (cmd == END_STALK)
+    if (reason == follower_reasons_t::END_STALK)
     {
       act("You sneakily stop following $N.",
           ch, 0, ch->master, TO_CHAR, 0);
@@ -1212,7 +1211,7 @@ void stop_follower(Character *ch, int cmd)
 
   /* do this after setting master to nullptr, to prevent endless loop */
   /* between affect_remove() and stop_follower()                   */
-  if (cmd != CHANGE_LEADER)
+  if (reason != follower_reasons_t::CHANGE_LEADER)
   {
     if (ch->affected_by_spell(SPELL_CHARM_PERSON))
       affect_from_char(ch, SPELL_CHARM_PERSON);
@@ -1228,7 +1227,7 @@ void die_follower(Character *ch)
   Character *zombie;
 
   if (ch->master)
-    stop_follower(ch, STOP_FOLLOW);
+    stop_follower(ch);
 
   for (k = ch->followers; k; k = j)
   {
@@ -1238,7 +1237,7 @@ void die_follower(Character *ch)
     {
       if (zombie->affected_by_spell(SPELL_CHARM_PERSON))
         affect_from_char(zombie, SPELL_CHARM_PERSON);
-      stop_follower(zombie, STOP_FOLLOW);
+      stop_follower(zombie);
     }
     if (GET_RACE(zombie) == RACE_UNDEAD)
     {
@@ -1256,11 +1255,11 @@ void die_follower(Character *ch)
 
 /* Do NOT call ths before having checked if a circle of followers */
 /* will arise. CH will follow leader                               */
-void add_follower(Character *ch, Character *leader, int cmd)
+void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
 {
   struct follow_type *k;
 
-  if (cmd != 2)
+  if (reason != follower_reasons_t::CHANGE_LEADER)
     REMBIT(ch->affected_by, AFF_GROUP);
 
   assert(!ch->master);
@@ -1277,12 +1276,10 @@ void add_follower(Character *ch, Character *leader, int cmd)
   k->next = leader->followers;
   leader->followers = k;
 
-  if (cmd == 1)
+  if (reason == follower_reasons_t::END_STALK)
     act("You stalk $N.", ch, 0, leader, TO_CHAR, 0);
-
-  else if (cmd == 2)
+  else if (reason == follower_reasons_t::CHANGE_LEADER)
     return;
-
   else
   {
     act("You now follow $N.", ch, 0, leader, TO_CHAR, 0);
@@ -1481,23 +1478,24 @@ char *skip_spaces(char *string)
 /*
     Release command.
 */
-int do_release(Character *ch, char *argument, int cmd)
+int do_release(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type *aff, *aff_next;
   bool printed = false;
   argument = skip_spaces(argument);
-  bool done = false;
-  int learned = ch->has_skill(SKILL_RELEASE);
 
-  if (!learned)
-  {
-    ch->sendln("You don't know how!");
+  if (!ch->canPerform(SKILL_RELEASE, "You don't know how!"))
     return eFAILURE;
+
+  if (!ch->affected)
+  {
+    ch->sendln("You have no spell effects to release.");
+    return eSUCCESS;
   }
 
   if (!*argument)
   {
-    ch->sendln("Release what spell?");
+    ch->sendln("Specify the spell to release or 'all' to release all spells.");
     for (aff = ch->affected; aff; aff = aff_next)
     {
       aff_next = aff->next;
@@ -1510,59 +1508,51 @@ int do_release(Character *ch, char *argument, int cmd)
         ch->sendln("You can release the following spells:");
         printed = true;
       }
-      if (((spell_info[aff->type].targets & TAR_SELF_DEFAULT) ||
+      if (((spell_info[aff->type].targets() & TAR_SELF_DEFAULT) ||
            aff->type == SPELL_HOLY_AURA) &&
           aff->type != SPELL_IMMUNITY)
       { // Spells that default to self seems a good measure of
         // allow to release spells..
-        QString aff_name = get_skill_name(aff->type);
-        ch->send(aff_name);
-        ch->sendln("");
+        ch->sendln(get_skill_name(aff->type));
       }
     }
     return eSUCCESS;
   }
   else
   {
-    if (ch->getMove() < 25)
-    {
-      ch->sendln("You don't have enough moves.");
-      return eFAILURE;
-    }
-
+    bool found = false;
     for (aff = ch->affected; aff; aff = aff_next)
     {
       aff_next = aff->next;
       while (aff_next && aff_next->type == aff->type)
         aff_next = aff_next->next;
 
-      if (get_skill_name(aff->type).isEmpty())
-        continue;
-      if (str_prefix(argument, get_skill_name(aff->type).toStdString().c_str()))
-        continue;
       if (aff->type > MAX_SPL_LIST)
         continue;
-      if (!isSet(spell_info[aff->type].targets,
-                 TAR_SELF_DEFAULT) &&
-          aff->type != SPELL_HOLY_AURA)
+      if (!isSet(spell_info[aff->type].targets(), TAR_SELF_DEFAULT) && aff->type != SPELL_HOLY_AURA)
         continue;
-      if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
-        if (!done && !skill_success(ch, nullptr, SKILL_RELEASE))
-        {
-          ch->sendln("You failed to release the spell, and are left momentarily dazed.");
-          act(
-              "$n fails to release the magic surrounding $m and is left momentarily dazed.",
-              ch, 0, 0, TO_ROOM, INVIS_NULL);
-          WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
-          ch->decrementMove(10);
-          return eFAILURE;
-        }
+      if (get_skill_name(aff->type).isEmpty())
+        continue;
+      if (QString(argument) != "all" && str_prefix(argument, get_skill_name(aff->type).toStdString().c_str()))
+        continue;
 
-      if (!done)
+      if (ch->getMove() < 25)
       {
-        ch->decrementMove(25);
+        ch->sendln(QStringLiteral("You don't have enough movement points to release the spell effect '%1'.").arg(get_skill_name(aff->type)));
+        return eFAILURE;
       }
-      ch->sendln("You release the spell.");
+
+      if (aff->type > 0 && aff->type <= MAX_SPL_LIST && !skill_success(ch, nullptr, SKILL_RELEASE))
+      {
+        ch->sendln(QStringLiteral("You failed to release the spell effect '%1', and are left momentarily dazed.").arg(get_skill_name(aff->type)));
+        act("$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
+        ch->decrementMove(10);
+        return eFAILURE;
+      }
+
+      ch->decrementMove(25);
+      ch->sendln(QStringLiteral("You release the spell effect '%1'.").arg(get_skill_name(aff->type)));
       char buffer[255];
       int aftype = aff->type;
 
@@ -1573,14 +1563,14 @@ int do_release(Character *ch, char *argument, int cmd)
       }
       affect_from_char(ch, aftype);
       //	  affect_remove(ch,aff,0);
-      snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aftype).toStdString().c_str());
-      act(buffer, ch, 0, 0, TO_ROOM, INVIS_NULL);
-
-      done = true;
+      act(QStringLiteral("$n concentrates for a moment and releases their %1.").arg(get_skill_name(aftype)), ch, 0, 0, TO_ROOM, INVIS_NULL);
+      found = true;
     }
+
+    if (!found)
+      ch->sendln(QStringLiteral("No such spell effect '%1' found to be released.").arg(argument));
   }
-  if (!done)
-    ch->sendln("No such spell to release.");
+
   return eSUCCESS;
 }
 
@@ -1601,16 +1591,13 @@ int stat_mod[] = {
 
 int get_difficulty(int skillnum)
 {
-  //  extern struct skill_stuff skill_info[];
-  extern struct ki_info_type ki_info[];
-  extern struct song_info_type song_info[];
 
   if (skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
-    return skill_info[skillnum - SKILL_BASE].difficulty;
+    return skill_info[skillnum - SKILL_BASE].difficulty();
   if (skillnum >= KI_OFFSET && skillnum <= KI_OFFSET + MAX_KI_LIST)
-    return ki_info[skillnum - KI_OFFSET].difficulty;
+    return ki_info[skillnum - KI_OFFSET].difficulty();
   if (skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
-    return song_info[skillnum - SKILL_SONG_BASE].difficulty;
+    return song_info[skillnum - SKILL_SONG_BASE].difficulty();
 
   return 0;
 }
@@ -1762,14 +1749,14 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
 
   if (i > number(1, 100) || getLevel() >= IMMORTAL)
   {
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (this->getPosition() == position_t::RESTING || this->getPosition() == position_t::SLEEPING)))
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a + 500);
     return true; // Success
   }
   else
   {
     /* Check for skill improvement anyway */
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (this->getPosition() == position_t::RESTING || this->getPosition() == position_t::SLEEPING)))
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a);
     return false; // Failure
   }
@@ -1810,7 +1797,7 @@ bool check_conc_loss(Character *ch, int spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-int do_cast(Character *ch, char *argument, int cmd)
+int do_cast(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *tar_obj;
   Character *tar_char;
@@ -1836,7 +1823,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
   Object *tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (tmp_obj->vnum == SILENCE_OBJ_NUMBER)
+    if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from casting!");
       return eFAILURE;
@@ -1930,11 +1917,11 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (spell_info[spl].spell_pointer)
+  if (spell_info[spl].spell_pointer() || spell_info[spl].spell_pointer2())
   {
-    if (ch->getPosition() < spell_info[spl].minimum_position)
+    if (GET_POS(ch) < spell_info[spl].minimum_position())
     {
-      switch (ch->getPosition())
+      switch (GET_POS(ch))
       {
       case position_t::SLEEPING:
         ch->sendln("You dream about great magical powers.");
@@ -1986,7 +1973,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       int oldroom = 0;
       int dir = -1;
       bool group_spell = false;
-      if (spl == SPELL_LIGHTNING_BOLT && ch->has_skill(SKILL_SPELLCRAFT) && cmd != CMD_FILTER)
+      if (spl == SPELL_LIGHTNING_BOLT && ch->has_skill(SKILL_SPELLCRAFT) && cmd != cmd_t::FILTER)
       { // Oh the special cases of spellcraft.
 
         name[0] = '\0';
@@ -2059,8 +2046,8 @@ int do_cast(Character *ch, char *argument, int cmd)
             return eFAILURE;
           }
 
-          if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->vnum].vnum >= 2300 &&
-              DC::getInstance()->mob_index[tar_char->mobdata->vnum].vnum <= 2399)
+          if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->nr].virt >= 2300 &&
+              DC::getInstance()->mob_index[tar_char->mobdata->nr].virt <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
@@ -2108,7 +2095,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       int fil = 0;
       float rel = 1;
       int fillvl = ch->has_skill(SKILL_ELEMENTAL_FILTER);
-      if (cmd == CMD_FILTER && fillvl)
+      if (cmd == cmd_t::FILTER && fillvl)
       {
         if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM ||
             spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM || spl == SPELL_LIGHTNING_BOLT || spl == SPELL_CHILL_TOUCH)
@@ -2188,13 +2175,13 @@ int do_cast(Character *ch, char *argument, int cmd)
 
         } // end if filterable spell
       } // end filter
-      if (!target_ok && !isSet(spell_info[spl].targets, TAR_IGNORE))
+      if (!target_ok && !isSet(spell_info[spl].targets(), TAR_IGNORE))
       {
         argument = one_argument(argument, name);
 
         if (*name)
         {
-          if (isSet(spell_info[spl].targets, TAR_CHAR_ROOM))
+          if (isSet(spell_info[spl].targets(), TAR_CHAR_ROOM))
           {
             if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
               target_ok = true;
@@ -2215,7 +2202,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             }
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_CHAR_WORLD))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_CHAR_WORLD))
           {
             bool orig = ISSET(ch->affected_by, AFF_true_SIGHT);
             if (spl == SPELL_EAGLE_EYE)
@@ -2225,23 +2212,23 @@ int do_cast(Character *ch, char *argument, int cmd)
             if (!orig)
               REMBIT(ch->affected_by, AFF_true_SIGHT);
           }
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_INV))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_INV))
             if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
               target_ok = true;
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_ROOM))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_ROOM))
           {
             tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
             if (tar_obj != nullptr)
               target_ok = true;
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_WORLD))
             if ((tar_obj = get_obj_vis(ch, name, true)) != nullptr)
               /* && !(isSet(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
               target_ok = true;
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_EQUIP))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_EQUIP))
           {
             for (i = 0; i < MAX_WEAR && !target_ok; i++)
               if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
@@ -2251,7 +2238,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               }
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_SELF_ONLY))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_SELF_ONLY))
             if (str_cmp(GET_NAME(ch), name) == 0)
             {
               tar_char = ch;
@@ -2261,14 +2248,14 @@ int do_cast(Character *ch, char *argument, int cmd)
         else
         { // !*name No argument was typed
 
-          if (isSet(spell_info[spl].targets, TAR_FIGHT_SELF))
+          if (isSet(spell_info[spl].targets(), TAR_FIGHT_SELF))
             if ((ch->fighting) && ((ch->fighting)->in_room == ch->in_room))
             {
               tar_char = ch;
               target_ok = true;
             }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             if (ch->fighting && (ch->in_room == ch->fighting->in_room))
             // added the in_room checks -pir2/23/01
             {
@@ -2276,14 +2263,14 @@ int do_cast(Character *ch, char *argument, int cmd)
               target_ok = true;
             }
 
-          if (!target_ok && (isSet(spell_info[spl].targets, TAR_SELF_ONLY) ||
-                             isSet(spell_info[spl].targets, TAR_SELF_DEFAULT)))
+          if (!target_ok && (isSet(spell_info[spl].targets(), TAR_SELF_ONLY) ||
+                             isSet(spell_info[spl].targets(), TAR_SELF_DEFAULT)))
           {
             tar_char = ch;
             target_ok = true;
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_NONE_OK))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_NONE_OK))
           {
             target_ok = true;
           }
@@ -2294,28 +2281,29 @@ int do_cast(Character *ch, char *argument, int cmd)
         target_ok = true; /* No target, is a good target */
       }
 
+      quint64 mana_cost{};
       if (!target_ok)
       {
         if (*name)
         {
-          if (isSet(spell_info[spl].targets, TAR_CHAR_ROOM))
+          if (isSet(spell_info[spl].targets(), TAR_CHAR_ROOM))
             ch->sendln("Nobody here by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_CHAR_WORLD))
+          else if (isSet(spell_info[spl].targets(), TAR_CHAR_WORLD))
             ch->sendln("Nobody playing by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_INV))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_INV))
             ch->sendln("You are not carrying anything like that.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_ROOM))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_ROOM))
             ch->sendln("Nothing here by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_WORLD))
             ch->sendln("Nothing at all by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_EQUIP))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_EQUIP))
             ch->sendln("You are not wearing anything like that.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_WORLD))
             ch->sendln("Nothing at all by that name.");
         }
         else
         { /* Nothing was given as argument */
-          if (spell_info[spl].targets < TAR_OBJ_INV)
+          if (spell_info[spl].targets() < TAR_OBJ_INV)
             ch->sendln("Whom should the spell be cast upon?");
           else
             ch->sendln("What should the spell be cast upon?");
@@ -2324,7 +2312,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       }
       else
       { /* TARGET IS OK */
-        if ((tar_char == ch) && !ok_self && isSet(spell_info[spl].targets, TAR_SELF_NONO))
+        if ((tar_char == ch) && !ok_self && isSet(spell_info[spl].targets(), TAR_SELF_NONO))
         {
           if (oldroom)
           {
@@ -2334,7 +2322,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           ch->sendln("You can not cast this spell upon yourself.");
           return eFAILURE;
         }
-        else if ((tar_char != ch) && isSet(spell_info[spl].targets, TAR_SELF_ONLY))
+        else if ((tar_char != ch) && isSet(spell_info[spl].targets(), TAR_SELF_ONLY))
         {
           ch->sendln("You can only cast this spell upon yourself.");
           return eFAILURE;
@@ -2359,7 +2347,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
-      if (tar_char && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+      if (tar_char && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
       {
         if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
         {
@@ -2384,17 +2372,17 @@ int do_cast(Character *ch, char *argument, int cmd)
         }
       }
 
-      if (cmd == CMD_FILTER && fillvl)
+      if (cmd == cmd_t::FILTER && fillvl)
       {
         ch->skill_increase_check(SKILL_ELEMENTAL_FILTER, fillvl, SKILL_INCREASE_HARD);
       }
 
       if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL))
-        WAIT_STATE(ch, spell_info[spl].beats);
+        WAIT_STATE(ch, spell_info[spl].beats());
       else
-        WAIT_STATE(ch, (int)(spell_info[spl].beats / 1.5));
+        WAIT_STATE(ch, (int)(spell_info[spl].beats() / 1.5));
 
-      if ((spell_info[spl].spell_pointer == 0) && spl > 0)
+      if ((spell_info[spl].spell_pointer() == 0 && spell_info[spl].spell_pointer2() == 0) && spl > 0)
         ch->sendln("Sorry, this magic has not yet been implemented :(");
       else
       {
@@ -2436,7 +2424,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1) * rel;
           act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
-          ch->skill_increase_check(spl, learned, spell_info[spl].difficulty);
+          ch->skill_increase_check(spl, learned, spell_info[spl].difficulty());
           if (oldroom)
           {
             char_from_room(ch);
@@ -2482,13 +2470,17 @@ int do_cast(Character *ch, char *argument, int cmd)
             ch->sendln("You do not have enough mana to cast this group spell.");
             return eFAILURE;
           }
-          GET_MANA(ch) -= counter;
+          mana_cost = counter;
+          GET_MANA(ch) -= mana_cost;
         }
         else
-          GET_MANA(ch) -= (use_mana(ch, spl) * rel);
+        {
+          mana_cost = (use_mana(ch, spl) * rel);
+          GET_MANA(ch) -= mana_cost;
+        }
         if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1, 5) < 3)
           tar_char->sendln("Your sleep is restless.");
-        ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty);
+        ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty());
 
         if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
         {
@@ -2505,7 +2497,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           auto &arena = DC::getInstance()->arena_;
           if (ch->room().isArena() && arena.isPrize() && spl != 88)
           {
-            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
@@ -2533,7 +2525,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           // Clan Chaos
           if (ch->room().isArena() && arena.isChaos() && spl != 88)
           {
-            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
+            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
@@ -2541,7 +2533,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               return eFAILURE;
             }
 
-            if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+            if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
@@ -2551,7 +2543,7 @@ int do_cast(Character *ch, char *argument, int cmd)
                    GET_NAME(tar_char), get_clan_name(tar_char));
               return eFAILURE;
             }
-            else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+            else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
@@ -2651,7 +2643,10 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
         }
 
-        int retval = ((*spell_info[spl].spell_pointer)(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+        if (spell_info[spl].spell_pointer())
+          int retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+        else if (spell_info[spl].spell_pointer2())
+          int retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
         if (argument_ptr != nullptr)
         {
           free(argument_ptr);
@@ -2661,7 +2656,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         {
           char_from_room(ch);
           char_to_room(ch, oldroom);
-          WAIT_STATE(ch, (int)(spell_info[spl].beats));
+          WAIT_STATE(ch, (int)(spell_info[spl].beats()));
 
           if (spl == SPELL_LIGHTNING_BOLT)
           {
@@ -2704,7 +2699,7 @@ int do_cast(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_skills(Character *ch, char *arg, int cmd)
+int do_skills(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -2733,7 +2728,7 @@ int do_skills(Character *ch, char *arg, int cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
+        sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2744,7 +2739,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
+        sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2756,7 +2751,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         thief = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Thi(%llu)", t_skills[j].levelavailable);
+        sprintf(buf3, "Thi(%d)", t_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2768,7 +2763,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         warrior = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "War(%llu)", w_skills[j].levelavailable);
+        sprintf(buf3, "War(%d)", w_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2780,7 +2775,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
+        sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2792,7 +2787,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
+        sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2804,7 +2799,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         barb = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Bar(%llu)", b_skills[j].levelavailable);
+        sprintf(buf3, "Bar(%d)", b_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2816,7 +2811,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         monk = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Mon(%llu)", k_skills[j].levelavailable);
+        sprintf(buf3, "Mon(%d)", k_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2828,7 +2823,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
+        sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2840,7 +2835,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         bard = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Brd(%llu)", d_skills[j].levelavailable);
+        sprintf(buf3, "Brd(%d)", d_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2852,7 +2847,7 @@ int do_skills(Character *ch, char *arg, int cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
+        sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2925,7 +2920,7 @@ int do_skills(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_songs(Character *ch, char *arg, int cmd)
+int do_songs(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
 
@@ -2938,9 +2933,9 @@ int do_songs(Character *ch, char *arg, int cmd)
   {
     if (d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX)
     {
-      sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%llu)",
+      sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%d)",
               UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
-              song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski,
+              song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
               "Brd", d_skills[i].levelavailable);
       strcat(buf, "\n\r");
     }
@@ -2952,7 +2947,7 @@ int do_songs(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_spells(Character *ch, char *arg, int cmd)
+int do_spells(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -2977,7 +2972,7 @@ int do_spells(Character *ch, char *arg, int cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
+        sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2988,7 +2983,7 @@ int do_spells(Character *ch, char *arg, int cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
+        sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3000,7 +2995,7 @@ int do_spells(Character *ch, char *arg, int cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
+        sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3012,7 +3007,7 @@ int do_spells(Character *ch, char *arg, int cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
+        sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3024,7 +3019,7 @@ int do_spells(Character *ch, char *arg, int cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
+        sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3036,7 +3031,7 @@ int do_spells(Character *ch, char *arg, int cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
+        sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3044,32 +3039,32 @@ int do_spells(Character *ch, char *arg, int cmd)
     if (mage)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, spell_info[mage].min_usesmana);
+              UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, spell_info[mage].min_usesmana());
     }
     else if (cleric)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, spell_info[cleric].min_usesmana);
+              UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, spell_info[cleric].min_usesmana());
     }
     else if (anti)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, spell_info[anti].min_usesmana);
+              UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, spell_info[anti].min_usesmana());
     }
     else if (pal)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, spell_info[pal].min_usesmana);
+              UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, spell_info[pal].min_usesmana());
     }
     else if (ranger)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, spell_info[ranger].min_usesmana);
+              UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, spell_info[ranger].min_usesmana());
     }
     else if (druid)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, spell_info[druid].min_usesmana);
+              UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, spell_info[druid].min_usesmana());
     }
     else
       continue;

@@ -4,11 +4,11 @@
 */
 #include <cstring>
 
+#include "DC/spells.h"
 #include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/player.h"
 #include "DC/character.h"
-#include "DC/spells.h"
 #include "DC/utility.h"
 #include "DC/fight.h"
 #include "DC/mobile.h"
@@ -19,8 +19,6 @@
 #include "DC/returnvals.h"
 #include "DC/room.h"
 #include "DC/db.h"
-
-extern struct spell_info_type spell_info[MAX_SPL_LIST];
 
 int spellcraft(Character *ch, int spell)
 {
@@ -93,7 +91,7 @@ int spellcraft(Character *ch, int spell)
   return false;
 }
 
-int do_focused_repelance(Character *ch, char *argument, int cmd)
+int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
 {
   // uint8_t percent;
   struct affected_type af;
@@ -140,7 +138,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_imbue(Character *ch, char *argument, int cmd)
+int do_imbue(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int lvl = ch->has_skill(SKILL_IMBUE);
@@ -202,7 +200,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  manacost = 4 + (11 - lvl / 10) * spell_info[wand->obj_flags.value[3]].min_usesmana;
+  manacost = 4 + (11 - lvl / 10) * spell_info[wand->obj_flags.value[3]].min_usesmana();
 
   if (GET_MANA(ch) < manacost)
   {
@@ -326,24 +324,24 @@ int check_ethereal_focus(Character *ch, int trigger_type)
       break;
 
     // If for some reason the caster is busy, the spell fails.
-    if (i->getPosition() <= position_t::RESTING ||
-        i->getPosition() == position_t::FIGHTING || i->fighting ||
+    if (GET_POS(i) <= position_t::RESTING ||
+        GET_POS(i) == position_t::FIGHTING || i->fighting ||
         IS_AFFECTED(i, AFF_PARALYSIS) ||
         (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
     {
       sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
-      do_say(i, buf, CMD_DEFAULT);
+      do_say(i, buf);
       break;
     }
 
     if (i == ch)
     {
-      do_say(i, "Wait, I didn't mean to move .... crap.", CMD_DEFAULT);
+      do_say(i, "Wait, I didn't mean to move .... crap.");
     }
     else
     {
       sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
-      do_say(i, buf, CMD_DEFAULT);
+      do_say(i, buf);
       set_fighting(i, ch);
       set_fighting(ch, i);
       retval = attack(i, ch, TYPE_UNDEFINED);
@@ -363,7 +361,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
 
       // Skip anyone unable to fight
       // Note that since they are joining the mage here, we don't check CAN_SEE.  Magical join!
-      if (ally == ch || ally == i || ally->fighting || ally->getPosition() != position_t::STANDING ||
+      if (ally == ch || ally == i || ally->fighting || GET_POS(ally) != position_t::STANDING ||
           (IS_PC(ally) && !ally->desc) // linkdead groupies won't help
       )
         continue;
@@ -383,7 +381,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         {
           // Get um!
           sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
-          do_say(ally, buf, CMD_DEFAULT);
+          do_say(ally, buf);
           set_fighting(ally, ch);
           set_fighting(ch, ally);
           retval = attack(ally, ch, TYPE_UNDEFINED);

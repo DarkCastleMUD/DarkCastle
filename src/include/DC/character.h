@@ -36,7 +36,8 @@ class Character;
 #include "DC/utility.h"
 #include "DC/Zone.h"
 #include "DC/room.h"
-#include "DC/types.h"
+
+typedef uint64_t gold_t;
 
 bool on_forbidden_name_list(const char *name);
 QString color_to_code(QString color);
@@ -63,6 +64,81 @@ typedef QQueue<communication> history_t;
 typedef QString player_config_key_t;
 typedef QString player_config_value_t;
 typedef QMap<player_config_key_t, player_config_value_t> player_config_t;
+
+class ChannelMessage
+{
+    QString sender_name_;
+    level_t wizinvis_;
+    DC::LogChannel type_;
+    QString msg_;
+    QDateTime timestamp_;
+
+public:
+    ChannelMessage(const Character *sender, const DC::LogChannel type, const char *msg)
+        : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
+    {
+        set_wizinvis(sender);
+        set_name(sender);
+    }
+
+    ChannelMessage(const Character *sender, const DC::LogChannel type, const QString &msg)
+        : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
+    {
+        set_wizinvis(sender);
+        set_name(sender);
+    }
+
+    QString getMessage(Character *ch) const;
+    QString getMessage(const level_t receiver_level, bool show_timestamps = false, QTimeZone timezone = {}, Qt::DateFormat timestamp_format = {}) const
+    {
+        QString msg;
+        QTextStream output(&msg);
+        QString sender_name;
+
+        if (receiver_level < wizinvis_)
+        {
+            sender_name = "Someone";
+        }
+        else
+        {
+            sender_name = sender_name_;
+        }
+
+        switch (type_)
+        {
+        case DC::LogChannel::CHANNEL_GOSSIP:
+            if (show_timestamps)
+                output << "$5$B" << getTimestamp(timezone, timestamp_format) << ": " << sender_name << " gossips '" << msg_ << "$5$B'$R";
+            else
+                output << "$5$B" << sender_name << " gossips '" << msg_ << "$5$B'$R";
+            break;
+        case DC::LogChannel::CHANNEL_TELL:
+            if (show_timestamps)
+                output << "$2$B" << getTimestamp(timezone, timestamp_format) << ": " << msg_ << "$R";
+            else
+                output << "$2$B" << msg_ << "$R";
+            break;
+        default:
+            output << "$5$B" << sender_name << " " << type_ << " '" << msg << "$5$B'$R";
+            break;
+        }
+
+        return msg;
+    }
+
+    QString getTimestamp(void) const
+    {
+        return timestamp_.toString();
+    }
+
+    QString getTimestamp(const QTimeZone &timezone, const Qt::DateFormat format = Qt::DateFormat::ISODate) const
+    {
+        return timestamp_.toTimeZone(timezone).toString(format);
+    }
+
+    void set_wizinvis(const class Character *sender);
+    void set_name(const class Character *sender);
+};
 
 class PlayerConfig : public QObject
 {
@@ -130,50 +206,14 @@ struct mob_prog_act_list
     void *vo{};
 };
 
-class MobProgram
+struct mob_prog_data
 {
-public:
-    QSharedPointer<class MobProgram> next{};
+    mob_prog_data *next{};
     int type{};
     char *arglist{};
     char *comlist{};
 };
-char *mprog_type_to_name(int type);
-void write_mprog_recur(auto &fl, QSharedPointer<MobProgram> mprg, bool mob)
-{
-    if (mprg->next)
-    {
-        write_mprog_recur(fl, mprg->next, mob);
-    }
 
-    if (mob)
-    {
-        fl << ">" << mprog_type_to_name(mprg->type) << " ";
-    }
-    else
-    {
-        fl << "\\" << mprog_type_to_name(mprg->type) << " ";
-    }
-
-    if (mprg->arglist)
-    {
-        string_to_file(fl, QString(mprg->arglist));
-    }
-    else
-    {
-        string_to_file(fl, QStringLiteral("Saved During Edit"));
-    }
-
-    if (mprg->comlist)
-    {
-        string_to_file(fl, QString(mprg->comlist));
-    }
-    else
-    {
-        string_to_file(fl, QStringLiteral("Saved During Edit"));
-    }
-}
-void write_mprog_recur(FILE *fl, QSharedPointer<class MobProgram> mprg, bool mob);
 #define ERROR_PROG -1
 #define IN_FILE_PROG 0
 #define ACT_PROG 1
@@ -237,7 +277,7 @@ struct follow_type
     Character *follower;
     struct follow_type *next;
 };
-typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
+typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
 class Toggle
 {
 public:
@@ -252,14 +292,33 @@ public:
     uint64_t value_{};
     QString on_message_;
     QString off_message_;
-    command_return_t (Character::*function_)(QStringList arguments, int cmd);
+    command_return_t (Character::*function_)(QStringList arguments, cmd_t cmd);
 };
 
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
 class Player
 {
+    QString prompt_;
+    QString last_prompt_;
+
 public:
+    void setPrompt(QString prompt)
+    {
+        prompt_ = prompt;
+    }
+    QString getPrompt(void) const
+    {
+        return prompt_;
+    }
+    void setLastPrompt(QString last_prompt)
+    {
+        last_prompt_ = last_prompt;
+    }
+    QString getLastPrompt(void) const
+    {
+        return last_prompt_;
+    }
     /************************************************************************
     | Player vectors
     | Character->player->toggles
@@ -393,13 +452,13 @@ public:
     bool hide[MAX_HIDE] = {};
     Character *hiding_from[MAX_HIDE] = {};
     QQueue<QString> away_msgs = {};
-    history_t tell_history;
-    history_t gtell_history;
+    QQueue<ChannelMessage> tell_history = {};
+    history_t gtell_history = {};
     joining_t joining = {};
     uint32_t quest_points = {};
     int16_t quest_current[QUEST_MAX] = {};
     uint32_t quest_current_ticksleft[QUEST_MAX] = {};
-    int16_t quest_cancel[QUEST_CANCEL] = {};
+    int16_t quest_cancel[QUEST_MAX_CANCEL] = {};
     uint32_t quest_complete[QUEST_TOTAL / ASIZE + 1] = {};
     std::multimap<int, std::pair<timeval, timeval>> *lastseen = {};
     uint8_t profession = {};
@@ -413,15 +472,8 @@ public:
     QString perform_alias(QString orig);
     void save(FILE *fpsave, time_data tmpage);
     bool read(FILE *fpsave, Character *ch, QString filename);
-    aliases_t aliases_; /* Aliases */
-    QString getPrompt(void);
-    QString getLastPrompt(void);
-    void setPrompt(QString prompt);
-    void setLastPrompt(QString prompt);
 
-private:
-    QString prompt_;
-    QString last_prompt_;
+    aliases_t aliases_; /* Aliases */
 };
 
 enum mob_type_t
@@ -443,7 +495,7 @@ struct mob_flag_data
 class Mobile
 {
 public:
-    int32_t vnum = {};
+    int32_t nr = {};
     position_t default_pos = {};                 // Default position for NPC
     int8_t last_direction = {};                  // Last direction the mobile went in
     uint32_t attack_type = {};                   // Bitvector of damage type for bare-handed combat
@@ -476,7 +528,7 @@ private:
 
 typedef uint_fast8_t class_t;
 typedef int32_t move_t;
-typedef QSharedPointer<Mobile> mobdata_t;
+
 // Character, Character
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
@@ -485,6 +537,7 @@ class Character : public Entity
 {
     Q_GADGET
 public:
+    Character(DC *dc) : dc_(dc) {}
     enum Type
     {
         Undefined,
@@ -512,7 +565,7 @@ public:
     static const QList<int> wear_to_item_wear;
     static bool validateName(QString name);
 
-    mobdata_t mobdata = {};
+    class Mobile *mobdata = nullptr;
     class Player *player = nullptr;
     class Object *objdata = nullptr;
 
@@ -865,7 +918,7 @@ public:
 
     bool addGold(uint64_t gold);
     bool save_pc_or_mob_data(FILE *fpsave, time_data tmpage);
-    void add_command_lag(int cmdnum, int lag);
+    void add_command_lag(cmd_t cmd, int lag);
     bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
     int char_to_store_variable_data(FILE *fpsave);
     void display_string_list(QStringList list);
@@ -875,7 +928,7 @@ public:
     int check_charmiejoin(void);
     struct time_info_data age(void);
     void add_memory(QString victim_name, char type);
-    bool can_use_command(int cmdnum);
+    bool can_use_command(cmd_t cmd);
     Object *clan_altar(void);
     void do_inate_race_abilities(void);
     void do_on_login_stuff(void);
@@ -887,66 +940,67 @@ public:
     command_return_t command_interpreter(QString argument, bool procced = 0);
     Object *get_object_in_equip_vis(char *arg, Object *equipment[], int *j, bool blindfighting);
 
-    command_return_t do_clanarea(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_config(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_experience(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_split(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_zsave(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_wizhelp(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_goto(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_save(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_search(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_identify(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_recall(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_cdeposit(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t generic_command(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_sockets(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_who(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_beep_set(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_bard_song_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_brief(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_news_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_ascii_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_damage_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_charmiejoin_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_guide(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_lfg_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_notax_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_guide_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_summon_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_nodupekeys_toggle(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_compact(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_anonymous(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_ansi(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_vt100(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_wimpy(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_pager(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_autoeat(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_shutdow(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_shutdown(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_linkload(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_rename_char(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_auction(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_shout(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_test(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_tell(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_wake(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_rescue(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_rage(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_join(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_outcast(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_backstab(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_snoop(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_zap(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_track(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_hit(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_ambush(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_botcheck(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_mpsettemp(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_bestow(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t do_alias(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    auto do_arena(QStringList arguments = {}, int cmd = CMD_DEFAULT) -> command_return_t;
+    command_return_t do_clanarea(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_config(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_experience(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_split(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_zsave(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_wizhelp(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_goto(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_save(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_search(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_identify(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_recall(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_cdeposit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t generic_command(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_sockets(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_who(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_beep_set(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_bard_song_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_brief(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_news_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_ascii_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_damage_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_charmiejoin_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_guide(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_lfg_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_notax_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_guide_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_summon_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_nodupekeys_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_compact(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_anonymous(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_ansi(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_vt100(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_wimpy(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_pager(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_autoeat(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_shutdow(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_shutdown(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_linkload(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_rename_char(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_auction(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_test(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_tell(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_wake(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_rescue(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_rage(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_join(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_outcast(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_backstab(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_snoop(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_zap(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_track(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_hit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_ambush(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_botcheck(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_mpsettemp(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_bestow(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_alias(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_kick(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    auto do_arena(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
+    auto do_notitle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
     auto do_arena_info(QStringList arguments) -> command_return_t;
     auto do_arena_start(QStringList arguments) -> command_return_t;
     auto do_arena_join(QStringList arguments) -> command_return_t;
@@ -955,8 +1009,8 @@ public:
 
     command_return_t wake(Character *victim = nullptr);
     command_return_t oprog_command_trigger(QString command, QString arguments);
-    command_return_t save(int cmd = CMD_DEFAULT);
-    command_return_t special(QString arg, int cmd = CMD_DEFAULT);
+    command_return_t save(cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t special(QString arg, cmd_t cmd = cmd_t::DEFAULT);
 
     void show_obj_to_char(Object *object, int mode);
     void list_obj_to_char(Object *list, int mode, bool show);
@@ -1101,13 +1155,62 @@ public:
     QString get_parsed_legacy_prompt_variable(QString var);
     QString calc_name(bool use_color = false);
 
-    QString getPrompt(void);
-    void setPrompt(QString prompt);
-    QString getLastPrompt(void);
-    void setLastPrompt(QString prompt);
+    QString getPrompt(void) const
+    {
+        if (player)
+            return player->getPrompt();
+        return {};
+    }
+    void setPrompt(QString prompt)
+    {
+        if (player)
+            player->setPrompt(prompt);
+    }
+    QString getLastPrompt(void) const
+    {
+        if (player)
+            return player->getLastPrompt();
+        return {};
+    }
+    void setLastPrompt(QString prompt)
+    {
+        if (player)
+            player->setLastPrompt(prompt);
+    }
     QString createPrompt(void);
     QString createBlackjackPrompt(void);
     void sendBlackjackPrompt(void);
+    void setDC(DC *dc) { dc_ = dc; }
+    DC *getDC(void) { return dc_; }
+    void prog_error(QString error_message);
+    bool isNowhere(void)
+    {
+        return in_room == DC::NOWHERE;
+    }
+    void vault_access(QString owner);
+    void vault_myaccess(QString owner);
+    void vault_balance(QString owner);
+    void vault_stats(QString owner);
+    void add_vault_access(QString name, vault_data *vault);
+    void remove_vault_access(QString name, vault_data *vault);
+    void vault_list(QString owner);
+    void load_golem_data(int golemtype);
+    int mprog_greet_trigger(void);
+    int mprog_can_see_trigger(Character *mob);
+    int mprog_speech_trigger(const char *txt);
+    int oprog_can_see_trigger(Object *item);
+    int oprog_speech_trigger(const char *txt);
+    int oprog_act_trigger(QString txt);
+    int oprog_greet_trigger(void);
+    int oprog_load_trigger(void);
+    int oprog_weapon_trigger(Object *item);
+    int oprog_armour_trigger(Object *item);
+    bool mprog_seval(const char *lhs, const char *opr, const char *rhs);
+    bool isTank(void);
+    void save_char_obj(void);
+    void char_to_store(struct char_file_u4 *st, time_data &tmpage);
+    bool equip_char(Object *obj, int pos, bool flag = false);
+    Object *unequip_char(int pos, bool flag = false);
 
 private:
     Type type_ = Type::Undefined;
@@ -1117,6 +1220,7 @@ private:
     move_t move_ = {};
     QString name_; // Keyword 'kill X'
     position_t position_ = {};
+    DC *dc_ = DC::getInstance();
 };
 
 class communication

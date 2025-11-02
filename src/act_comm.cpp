@@ -38,7 +38,7 @@
 
 extern bool MOBtrigger;
 
-int do_report(Character *ch, char *argument, int cmd)
+int do_report(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[256];
   char report[200];
@@ -228,7 +228,7 @@ int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
   return (1);
 }
 
-int do_channel(Character *ch, char *arg, int cmd)
+int do_channel(Character *ch, char *arg, cmd_t cmd)
 {
   int x;
   int y = 0;
@@ -370,7 +370,7 @@ int do_channel(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_ignore(Character *ch, std::string args, int cmd)
+command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -471,7 +471,7 @@ int is_ignoring(const Character *const ch, const Character *const i)
 
 #define MAX_NOTE_LENGTH 1000 /* arbitrary */
 
-int do_write(Character *ch, char *argument, int cmd)
+int do_write(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *paper = 0, *pen = 0;
   char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
@@ -556,6 +556,7 @@ int do_write(Character *ch, char *argument, int cmd)
     act("You can't write on $p.", ch, paper, 0, TO_CHAR, 0);
   }
   else if (!paper->ActionDescription().isEmpty())
+    /*    else if (paper->item_number != real_object(1205) )  */
     ch->sendln("There's something written on it already.");
   else
   {
@@ -571,7 +572,7 @@ int do_write(Character *ch, char *argument, int cmd)
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
-int do_insult(Character *ch, char *argument, int cmd)
+int do_insult(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[100];
   char arg[MAX_STRING_LENGTH];
@@ -627,7 +628,7 @@ int do_insult(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_emote(Character *ch, char *argument, int cmd)
+int do_emote(Character *ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

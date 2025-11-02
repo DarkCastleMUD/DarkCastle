@@ -40,7 +40,7 @@ bool verbose_mode = false;
 void test_handle_ansi(QString test)
 {
   // std::cerr <<  "Testing '" << test << "'" << std::endl;
-  Character *ch = new Character;
+  Character *ch = new Character(DC::getInstance());
   ch->player = new Player;
   ch->setType(Character::Type::Player);
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
@@ -49,7 +49,7 @@ void test_handle_ansi(QString test)
   // QString str1 = "$b$B$1test$R $ $$ $$$ $$$";
   QString str1 = test;
   char *str2 = new char[1024];
-  memset(str2, 0, 1024);
+  memset(str2, 1024, 0);
   strncpy(str2, str1.toStdString().c_str(), 1024);
   QString result1 = handle_ansi(str1, ch);
   QString result2 = QString(handle_ansi_(str2, ch));
@@ -142,7 +142,7 @@ QString showObjectAffects(Object *obj)
 
 QString showObjectVault(Object *obj)
 {
-  // std::cerr <<  obj->vnum << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
   QString buffer = sprintbit(obj->obj_flags.wear_flags, Object::wear_bits);
   // std::cerr <<  buf << ":";
 
@@ -163,7 +163,7 @@ QString showObjectVault(Object *obj)
 
 void showObject(Character *ch, Object *obj)
 {
-  // std::cerr <<  obj->vnum << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
   char buf[255];
 
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
@@ -248,20 +248,20 @@ int main(int argc, char **argv)
   renum_world();
 
   logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
-  debug.load_objects();
+  debug.generate_obj_indices(&top_of_objt, debug.obj_index);
 
   logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
-  debug.load_mobiles();
+  debug.generate_mob_indices(&top_of_mobt, debug.mob_index);
 
   logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
-  debug.renum_zone_table();
+  renum_zone_table();
 
   class Connection *d = new Connection;
 
   /* Create 1 blank obj to be used when playerfile loads */
-  create_blank_item(1UL);
+  debug.create_blank_item(1);
 
-  DC::getInstance()->load_vaults();
+  debug.load_vaults();
 
   chdir(orig_cwd.toStdString().c_str());
 
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
   }
 
   d = new Connection;
-  Character *ch = new Character;
+  Character *ch = new Character(&debug);
   ch->setName("Debugimp");
   ch->player = new Player;
   ch->setType(Character::Type::Player);
@@ -294,21 +294,21 @@ int main(int argc, char **argv)
 
   update_max_who();
 
-  do_stand(ch, str_hsh(""), CMD_DEFAULT);
+  do_stand(ch, "");
   d->process_output();
 
   char_to_room(ch, 3001);
   d->process_output();
-  // ch->do_toggle({"pager"}, CMD_DEFAULT);
-  // ch->do_toggle({"ansi"}, CMD_DEFAULT);
-  // ch->do_toggle({}, CMD_DEFAULT);
-  //  do_goto(ch, "23", CMD_DEFAULT);
-  // do_score(ch, "", CMD_DEFAULT);
+  // ch->do_toggle({"pager"}, cmd_t::DEFAULT);
+  // ch->do_toggle({"ansi"}, cmd_t::DEFAULT);
+  // ch->do_toggle({}, cmd_t::DEFAULT);
+  //  do_goto(ch, "23");
+  // do_score(ch, "");
   // d->process_output();
 
-  // do_load(ch, "m 23", CMD_DEFAULT);
+  // do_load(ch, "m 23");
   // d->process_output();
-  do_look(ch, "debugimp", CMD_LOOK);
+  do_look(ch, "debugimp");
   d->process_output();
 
   ch->do_bestow({"debugimp", "load"});
@@ -396,9 +396,9 @@ int main(int argc, char **argv)
             if (path.isEmpty() == false && path[0] != '.')
             {
               // std::cerr << pfile.path().c_str() << std::endl;
-              ch->do_linkload(path.split(' '), CMD_DEFAULT);
+              ch->do_linkload(path.split(' '), cmd_t::DEFAULT);
               d->process_output();
-              do_fsave(ch, path.toStdString().c_str(), CMD_DEFAULT);
+              do_fsave(ch, path.toStdString().c_str());
               d->process_output();
             }
             else
@@ -416,7 +416,7 @@ int main(int argc, char **argv)
                   obj = ch->equipment[iWear];
                   if (obj)
                   {
-                    if (vnum > 0 && obj->vnum == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
                     {
                       showObject(ch, obj);
                     }
@@ -426,7 +426,7 @@ int main(int argc, char **argv)
 
               for (Object *obj = ch->carrying; obj; obj = obj->next_content)
               {
-                if (vnum == 0 || (vnum > 0 && obj->vnum == vnum))
+                if (vnum == 0 || (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum))
                 {
                   showObject(ch, obj);
                 }
@@ -435,7 +435,7 @@ int main(int argc, char **argv)
                 {
                   for (Object *container = obj->contains; container; container = container->next_content)
                   {
-                    if (vnum > 0 && container->vnum == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[container->item_number].virt == vnum)
                     {
                       showObject(ch, container);
                     }
@@ -454,22 +454,22 @@ int main(int argc, char **argv)
     for (const auto &c : DC::getInstance()->character_list)
     {
       c->desc = d;
-      do_score(c, str_hsh(""));
+      do_score(c, "");
       d->process_output();
-      do_vault(c, str_hsh("list"));
+      do_vault(c, "list");
       d->process_output();
 
       if (c->isImmortalPlayer())
       {
-        qWarning("%s", QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
+        qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
       }
     }
 
     if (argv[1] == QStringLiteral("leaderboard"))
     {
-      do_leaderboard(ch, str_hsh("scan"), CMD_DEFAULT);
+      do_leaderboard(ch, "scan");
       d->process_output();
-      do_leaderboard(ch, str_hsh(""), CMD_DEFAULT);
+      do_leaderboard(ch, "");
       d->process_output();
     }
     /*
@@ -504,7 +504,7 @@ int main(int argc, char **argv)
 
     // leaderboard.check_offline();
     // // std::cerr <<  DC::getInstance()->character_list.size() << std::endl;
-    // do_leaderboard(ch, "", CMD_DEFAULT);
+    // do_leaderboard(ch, "");
     // d->process_output();
 
     struct vault_data *vault;
@@ -514,13 +514,13 @@ int main(int argc, char **argv)
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
         Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
-        if (vnum > 0 && obj->vnum == vnum)
+        if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
         {
           ch->send(showObjectVault(obj));
         }
       }
     }
-    do_look(ch, "", CMD_LOOK);
+    do_look(ch, "");
     d->process_output();
     do_force(ch, "all save");
     d->process_output();
@@ -530,7 +530,7 @@ int main(int argc, char **argv)
     try
     {
       Object *obj;
-      if (load_char_obj(d, argv[1]) != load_status_t::success)
+      if (debug.load_char_obj(d, argv[1]) != load_status_t::success)
       {
         std::cerr << "Unable to load " << argv[1] << std::endl;
         exit(1);

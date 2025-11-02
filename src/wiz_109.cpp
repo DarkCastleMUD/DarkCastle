@@ -30,7 +30,7 @@
 #include "DC/bandwidth.h"
 #endif
 
-command_return_t Character::do_linkload(QStringList arguments, int cmd)
+command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 {
   class Connection d;
   Character *new_new;
@@ -49,7 +49,7 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (!(load_char_obj(&d, arg1)))
+  if (!(dc_->load_char_obj(&d, arg1)))
   {
     this->sendln("Unable to load! (Character might not exist...)");
     return eFAILURE;
@@ -76,7 +76,7 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_processes(Character *ch, char *arg, int cmd)
+int do_processes(Character *ch, char *arg, cmd_t cmd)
 {
   FILE *fl;
   char *tmp;
@@ -115,7 +115,7 @@ int do_processes(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_guide(QStringList arguments, int cmd)
+command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
 {
   Character *victim{};
   QString name = arguments.value(0);
@@ -152,7 +152,7 @@ command_return_t Character::do_guide(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_advance(Character *ch, char *argument, int cmd)
+int do_advance(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[100], level[100], buf[300], passwd[100];
@@ -263,7 +263,7 @@ int do_advance(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_zap(QStringList arguments, int cmd)
+command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 {
   Character *victim{};
   int room{};
@@ -317,7 +317,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
                       .arg(GET_SHORT(this));
 
     remove_familiars(victim->getNameC(), ZAPPED);
-    if (cmd == CMD_DEFAULT) // cmd9 = someone typed it. 10 = rename.
+    if (cmd == cmd_t::DEFAULT) // cmd_t::DEFAULT = someone typed it. cmd_t::TRACK = rename.
       remove_vault(victim->getNameC(), ZAPPED);
 
     victim->setLevel(1);
@@ -328,7 +328,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
 
     DC::getInstance()->TheAuctionHouse.HandleDelete(victim->getName());
 
-    do_quit(victim, "", 666);
+    do_quit(victim, "", cmd_t::SAVE_SILENTLY);
     remove_character(victim->getName(), ZAPPED);
 
     send_to_room(buf, room);
@@ -346,7 +346,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
   return eFAILURE;
 }
 
-int do_global(Character *ch, char *argument, int cmd)
+int do_global(Character *ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
@@ -370,7 +370,7 @@ int do_global(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_shutdown(QStringList arguments, int cmd)
+command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 {
   extern int _shutdown;
   extern int try_to_hotboot_on_crash;
@@ -513,7 +513,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_shutdow(QStringList arguments, int cmd)
+command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
 {
   if (!has_skill(COMMAND_SHUTDOWN))
   {
@@ -525,7 +525,7 @@ command_return_t Character::do_shutdow(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_testport(Character *ch, char *argument, int cmd)
+int do_testport(Character *ch, char *argument, cmd_t cmd)
 {
   int errnosave = 0;
   static pid_t child = 0;
@@ -578,7 +578,7 @@ int do_testport(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_testuser(Character *ch, char *argument, int cmd)
+int do_testuser(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -620,7 +620,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
   }
 
   snprintf(savefile, 255, "../save/%c/%s", UPPER(username[0]), username);
-  snprintf(bsavefile, 255, "/srv/dcastle_test/bsave/%c/%s", UPPER(username[0]), username);
+  snprintf(bsavefile, 255, "/srv/dcastle3/save/%c/%s", UPPER(username[0]), username);
 
   if (!file_exists(savefile))
   {
@@ -657,7 +657,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
 }
 
 #ifdef BANDWIDTH
-int do_bandwidth(Character *ch, char *argument, int cmd)
+int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
 {
   csendf(ch, "Bytes sent in %ld seconds: %ld\n\r",
          get_bandwidth_start(), get_bandwidth_amount());
@@ -665,7 +665,7 @@ int do_bandwidth(Character *ch, char *argument, int cmd)
 }
 #endif
 
-int do_skilledit(Character *ch, char *argument, int cmd)
+int do_skilledit(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[MAX_INPUT_LENGTH];

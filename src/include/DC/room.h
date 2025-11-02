@@ -13,7 +13,6 @@
 #include "DC/class.h"
 #include "DC/Zone.h"
 #include "DC/common.h"
-#include "DC/Arena.h"
 
 /* Bitvector For 'room_flags' */
 
@@ -78,9 +77,7 @@ const auto SOUTH = 2;
 const auto WEST = 3;
 const auto UP = 4;
 const auto DOWN = 5;
-const auto MAX_DIRS = 6
-
-    ;
+const auto MAX_DIRS = 6;
 const auto EX_ISDOOR = 1;
 const auto EX_CLOSED = 2;
 const auto EX_LOCKED = 4;
@@ -118,7 +115,7 @@ struct room_direction_data
     int16_t exit_info;         /* Exit info                       */
     Character *bracee;         /* This is who is bracing the door */
     int16_t key;               /* Key's number (-1 for no key)    */
-    room_t to_room;            /* Where direction leeds (NOWHERE) */
+    int16_t to_room;           /* Where direction leeds (NOWHERE) */
 };
 
 struct room_track_data
@@ -193,12 +190,12 @@ public:
     constexpr auto isNoWhere() const -> bool { return isSet(room_flags, NO_WHERE); }
     constexpr auto isLightRoom() const -> bool { return isSet(room_flags, LIGHT_ROOM); }
 
-    Arena &arena(void);
+    auto arena() -> class Arena &;
 
     uint32_t temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
     int16_t light = {};            // Light factor of room
 
-    int (*funct)(Character *, int, const char *) = {}; // special procedure
+    int (*funct)(Character *, cmd_t, const char *) = {}; // special procedure
 
     class Object *contents = {}; // List of items in room
     Character *people = nullptr; // List of NPC / PC in room
@@ -206,7 +203,7 @@ public:
     int nTracks = {};                 // number of tracks in the room
     room_track_data *tracks = {};     // beginning of the list of scents
     room_track_data *last_track = {}; // last in the scent list
-    quint64 iFlags = {};              // Internal flags. These do NOT save.
+    int iFlags = {};                  // Internal flags. These do NOT save.
     struct path_data *paths = {};
     bool allow_class[CLASS_MAX] = {};
 

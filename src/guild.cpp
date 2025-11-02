@@ -22,7 +22,7 @@
 
 extern std::vector<profession> professions;
 
-int do_practice(Character *ch, char *arg, int cmd)
+int do_practice(Character *ch, char *arg, cmd_t cmd)
 {
   /* Call "guild" with a null std::string for an argument.
      This displays the character's skills. */
@@ -38,7 +38,7 @@ int do_practice(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_profession(Character *ch, char *args, int cmdnum)
+int do_profession(Character *ch, char *args, cmd_t cmd)
 {
   // Command is enabled by giving someone the profession skill
   if (!ch->has_skill(SKILL_PROFESSION))
@@ -508,7 +508,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(this, "\n\r$B%s Profession Skills:$R\n\r", find_profession(c_class, skilllist[i].group).toStdString().c_str());
+        csendf(this, "\n\r$B%s Profession Skills:$R\n\r", find_profession(c_class, skilllist[i].group));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -520,7 +520,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       self_learn_max = getLevel() * 2;
     }
 
-    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3llu/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
+    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
             per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(skilllist[i].skillnum));
     send(buf);
     if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
@@ -533,13 +533,11 @@ void Character::output_praclist(class_skill_defines *skilllist)
     }
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
     {
-      extern struct song_info_type song_info[];
-      send(QStringLiteral("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski, 3));
+      send(QStringLiteral("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski(), 3));
     }
     else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET + MAX_KI_LIST)
     {
-      extern struct ki_info_type ki_info[];
-      send(QStringLiteral("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski, 3));
+      send(QStringLiteral("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski(), 3));
     }
     else if (skilllist[i].skillnum == 318) // scan
     {
@@ -668,7 +666,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     return eSUCCESS;
   }
 
-  if (this->getPosition() == position_t::SLEEPING)
+  if (GET_POS(this) == position_t::SLEEPING)
   {
     sendln("You cannot practice in your sleep.");
     return eSUCCESS;
@@ -694,7 +692,7 @@ int Character::skills_guild(const char *arg, Character *owner)
   {
     if (GET_CLASS(this) != GET_CLASS(owner))
     {
-      do_say(owner, "I am sorry, I cannot teach you that.  You will have to find another trainer.", 9);
+      do_say(owner, "I am sorry, I cannot teach you that.  You will have to find another trainer.");
       return eSUCCESS;
     }
     else
@@ -716,8 +714,8 @@ int Character::skills_guild(const char *arg, Character *owner)
         case SPELL_RELEASE_ELEMENTAL:
         case SKILL_CRIPPLE:
         case SKILL_NAT_SELECT:
-          do_say(owner, "Alternately, should you feel that you are not up to the task of an exciting quest, you can seek the Skills Master west of town.", 9);
-          do_say(owner, "Rumour has it he will teach certain skills for a hefty fee.  He will give you a LIST of what he has to offer.", 9);
+          do_say(owner, "Alternately, should you feel that you are not up to the task of an exciting quest, you can seek the Skills Master west of town.");
+          do_say(owner, "Rumour has it he will teach certain skills for a hefty fee.  He will give you a LIST of what he has to offer.");
           return eFAILURE;
         default:
           break;
@@ -729,7 +727,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
     if (skilllist[skillnumber].group && IS_PC(this) && skilllist[skillnumber].group != player->profession)
     {
-      csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group).toStdString().c_str());
+      csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group));
       return eSUCCESS;
     }
   }
@@ -741,9 +739,9 @@ int Character::skills_guild(const char *arg, Character *owner)
 
   if (known >= get_max(x))
   {
-    do_emote(owner, "eyes you up and down.", CMD_DEFAULT);
-    do_say(owner, "Taking into account your current attributes, your", 9);
-    do_say(owner, "maximum proficiency in this ability has been reached.", CMD_DEFAULT);
+    do_emote(owner, "eyes you up and down.");
+    do_say(owner, "Taking into account your current attributes, your");
+    do_say(owner, "maximum proficiency in this ability has been reached.");
     return eSUCCESS;
   }
 
@@ -778,7 +776,7 @@ int Character::skills_guild(const char *arg, Character *owner)
   case SPELL_CONJURE_ELEMENTAL:
   case SPELL_RELEASE_ELEMENTAL:
   case SKILL_NAT_SELECT:
-    do_say(owner, "I cannot teach you that. You need to learn it by yourself.", 9);
+    do_say(owner, "I cannot teach you that. You need to learn it by yourself.");
 
     return eFAILURE;
   default:
@@ -789,37 +787,37 @@ int Character::skills_guild(const char *arg, Character *owner)
     switch (GET_CLASS(this))
     {
     case CLASS_WARRIOR:
-      do_say(owner, "Yar! I can be teachin' ye that skill myself! It should only take but a moment.", 9);
+      do_say(owner, "Yar! I can be teachin' ye that skill myself! It should only take but a moment.");
       break;
     case CLASS_BARBARIAN:
-      do_say(owner, "Hah! That easy to learn! I teach you meself.", 9);
+      do_say(owner, "Hah! That easy to learn! I teach you meself.");
       break;
     case CLASS_THIEF:
-      do_say(owner, "So young rogue, you wish to advance your skills.  I can teach you of this particular one myself.", 9);
+      do_say(owner, "So young rogue, you wish to advance your skills.  I can teach you of this particular one myself.");
       break;
     case CLASS_MONK:
-      do_say(owner, "Ahh, well met grasshopper!  I can teach you of this from my own knowledge.", 9);
+      do_say(owner, "Ahh, well met grasshopper!  I can teach you of this from my own knowledge.");
       break;
     case CLASS_RANGER:
-      do_say(owner, "My woodland lore is more than sufficient to teach you this myself young apprentice!", 9);
+      do_say(owner, "My woodland lore is more than sufficient to teach you this myself young apprentice!");
       break;
     case CLASS_ANTI_PAL:
-      do_say(owner, "Ahh, young dark lord, it is but a simple matter to learn this ability.  Follow my instruction.", 9);
+      do_say(owner, "Ahh, young dark lord, it is but a simple matter to learn this ability.  Follow my instruction.");
       break;
     case CLASS_PALADIN:
-      do_say(owner, "This ability is one that I am capable of teaching you myself young novice.  Observe closely.", 9);
+      do_say(owner, "This ability is one that I am capable of teaching you myself young novice.  Observe closely.");
       break;
     case CLASS_BARD:
-      do_say(owner, "Ahh young prodigy, that is a tune with which I myself am familiar! Allow me to show you...", 9);
+      do_say(owner, "Ahh young prodigy, that is a tune with which I myself am familiar! Allow me to show you...");
       break;
     case CLASS_MAGIC_USER:
-      do_say(owner, "Ahh young apprentice, this is a simple matter for me to teach you if you are capable of comprehending.", 9);
+      do_say(owner, "Ahh young apprentice, this is a simple matter for me to teach you if you are capable of comprehending.");
       break;
     case CLASS_CLERIC:
-      do_say(owner, "Well met Acolyte!  I shall pray for you to receive knowledge of the blessing you request.", 9);
+      do_say(owner, "Well met Acolyte!  I shall pray for you to receive knowledge of the blessing you request.");
       break;
     case CLASS_DRUID:
-      do_say(owner, "Nature be with you, young druid.  I can teach you the ability you seek myself if you are willing.", 9);
+      do_say(owner, "Nature be with you, young druid.  I can teach you the ability you seek myself if you are willing.");
       break;
     }
 
@@ -839,12 +837,12 @@ int Character::skills_guild(const char *arg, Character *owner)
   return eSUCCESS;
 }
 
-int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
+int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
   int64_t exp_needed;
   int x = 0;
 
-  if (cmd == 171 && !IS_NPC(ch))
+  if (cmd == cmd_t::GAIN && !IS_NPC(ch))
   { /*   gain crap...  */
 
     if (ch->isImmortalPlayer() || ch->getLevel() >= DC::MAX_MORTAL_LEVEL)
@@ -923,15 +921,15 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
       if (ch->getLevel() == 60)
       {
         sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
-        do_say(owner, buf, CMD_DEFAULT);
-        do_say(owner, "As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!", 9);
+        do_say(owner, buf);
+        do_say(owner, "As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!");
         //	     ch->send(buf);
       }
       else
       {
         sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.", pc_clss_types3[GET_CLASS(ch)]);
 
-        do_say(owner, buf, CMD_DEFAULT);
+        do_say(owner, buf);
         sprintf(buf, "Your guildmaster gives you %d platinum coins.\r\n", bonus);
         ch->send(buf);
         GET_PLATINUM(ch) += bonus;
@@ -940,7 +938,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
     return eSUCCESS;
   }
 
-  if (cmd == 80)
+  if (cmd == cmd_t::REMORT)
   { // remort crap
     int groupnumber;
 
@@ -984,11 +982,11 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
 
     SET_BIT(ch->player->toggles, Player::PLR_REMORTED);
 
-    ch->save(666);
+    ch->save(cmd_t::SAVE_SILENTLY);
     return eSUCCESS;
   }
 
-  if ((cmd != 164))
+  if ((cmd != cmd_t::PRACTICE))
     return eFAILURE;
 
   if (IS_NPC(ch))
@@ -1009,7 +1007,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
     if (isSet(ch->skills_guild(arg, owner), eSUCCESS))
       return eSUCCESS;
     else if (search_skills(arg, g_skills) != -1)
-      do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn ch ability.", CMD_DEFAULT);
+      do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn ch ability.");
     else
       ch->sendln("You do not know of ch ability...");
   }
@@ -1017,7 +1015,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   return eSUCCESS;
 }
 
-int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
+int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
   char buf[MAX_STRING_LENGTH];
   int number, i, percent;
@@ -1030,7 +1028,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
     return eFAILURE;
   }
 
-  if ((cmd != 164) && (cmd != 170) && (cmd != 56) && cmd != 59)
+  if (cmd != cmd_t::PRACTICE && cmd != cmd_t::BUY && cmd != cmd_t::LIST)
     return eFAILURE;
 
   for (; *arg == ' '; arg++)
@@ -1073,7 +1071,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
     skl = SKILL_SONG_HYPNOTIC_HARMONY;
     break;
   }
-  if (cmd == 59)
+  if (cmd == cmd_t::LIST)
   {
     char buf[MAX_STRING_LENGTH];
 
@@ -1081,32 +1079,32 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
     ch->send(buf);
     return eSUCCESS;
   }
-  if (cmd == 56)
+  if (cmd == cmd_t::BUY)
   {
     if (ch->getLevel() < 50)
     {
-      do_say(invoker, "You have not obtained a high enough level to buy anything from me.", 9);
+      do_say(invoker, "You have not obtained a high enough level to buy anything from me.");
       return eSUCCESS;
     }
     if (str_cmp(arg, "questskill"))
     {
-      do_say(invoker, "I cannot teach you that. Type LIST to see what is available.", 9);
+      do_say(invoker, "I cannot teach you that. Type LIST to see what is available.");
       //      do_say(invoker,"I could teach you your Quest Skill, for a price of 2000 platinum coins.",9);
       //     do_say(invoker,"Just \"buy questskill\" to obtain it.",9);
       return eSUCCESS;
     }
     if (ch->has_skill(skl))
     {
-      do_say(invoker, "I cannot teach you anything further.", 9);
+      do_say(invoker, "I cannot teach you anything further.");
       return eSUCCESS;
     }
     if (GET_PLATINUM(ch) < 2000)
     {
-      do_say(invoker, "You can't afford it, you need 2000 platinum!", 9);
+      do_say(invoker, "You can't afford it, you need 2000 platinum!");
       return eSUCCESS;
     }
     GET_PLATINUM(ch) -= 2000;
-    do_say(invoker, "Okay, you've got a deal!", 9);
+    do_say(invoker, "Okay, you've got a deal!");
     ch->learn_skill(skl, 1, 1);
 
     extern void prepare_character_for_sixty(Character * ch);
@@ -1135,7 +1133,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
       int known = ch->has_skill(g_skills[i].skillnum);
       if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
-      sprintf(buf, " %-20s%14s   (Level %2llu)\r\n", g_skills[i].skillname,
+      sprintf(buf, " %-20s%14s   (Level %2d)\r\n", g_skills[i].skillname,
               how_good(known), g_skills[i].levelavailable);
       ch->send(buf);
     }
@@ -1148,7 +1146,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
     if (!skilllist)
       return eFAILURE;
     if (search_skills(arg, skilllist) != -1)
-      do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.", CMD_DEFAULT);
+      do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.");
     else
       ch->sendln("You do not know of ch skill...");
     return eSUCCESS;
@@ -1206,9 +1204,6 @@ int Character::get_stat(attribute_t stat)
     break;
   case attribute_t::CONSTITUTION:
     return GET_RAW_CON(this);
-    break;
-  case attribute_t::UNDEFINED:
-    return 0;
     break;
   };
   return 0;

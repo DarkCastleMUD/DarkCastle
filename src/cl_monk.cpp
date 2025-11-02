@@ -22,7 +22,7 @@
 /************************************************************************
 | OFFENSIVE commands.
 */
-int do_eagle_claw(Character *ch, char *argument, int cmd)
+int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[MAX_INPUT_LENGTH];
@@ -100,7 +100,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
       ptr_time = localtime(&time_raw_format);
       if (11 == ptr_time->tm_mon)
       {
-        do_say(victim, "Laaaaaaast Christmas, I gave you my....", CMD_DEFAULT);
+        do_say(victim, "Laaaaaaast Christmas, I gave you my....");
       }
       act("$N blinks and stares glassy-eyed into the distance blissfully no longer aware of $n RIPPING OUT $S $B$4heart$R!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("You feel empty inside and full of heart-ache as if something important to you is missing.  Memories flash of your longing fo....", ch, 0, victim, TO_VICT, 0);
@@ -117,7 +117,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_quivering_palm(Character *ch, char *argument, int cmd)
+int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
 {
 
   struct affected_type af;
@@ -224,7 +224,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_stun(Character *ch, char *argument, int cmd)
+int do_stun(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -358,7 +358,7 @@ int do_stun(Character *ch, char *argument, int cmd)
     }
     return eSUCCESS;
   }
-  if ((!skill_success(ch, victim, SKILL_STUN) && victim->getPosition() != position_t::SLEEPING) || do_frostshield(ch, victim))
+  if ((!skill_success(ch, victim, SKILL_STUN) && GET_POS(victim) != position_t::SLEEPING) || do_frostshield(ch, victim))
   {
     act_return ar = act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, nullptr, victim, TO_VICT, 0);
     retval = ar.retval;
@@ -484,7 +484,7 @@ int do_stun(Character *ch, char *argument, int cmd)
       }
 
       WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
-      if (victim->getPosition() > position_t::STUNNED)
+      if (GET_POS(victim) > position_t::STUNNED)
         victim->setStunned();
       ;
       SET_BIT(victim->combat, COMBAT_STUNNED);

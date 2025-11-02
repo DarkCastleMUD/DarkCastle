@@ -52,6 +52,7 @@
 #include "DC/handler.h"
 #include "DC/const.h"
 #include "DC/vault.h"
+#include "DC/sing.h"
 
 /* extern variables */
 
@@ -375,7 +376,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
          if (object->obj_flags.timer)
          {
             char timebuffer[101] = {};
-            snprintf(timebuffer, 100, " $R($B$0%u ticks left$R)", object->obj_flags.timer);
+            snprintf(timebuffer, 100, " $R($B$0%lu ticks left$R)", object->obj_flags.timer);
             strcat(buffer, timebuffer);
          }
       }
@@ -392,14 +393,14 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
 {
    class Object *i;
    bool found = false;
-   uint64_t number = 1;
+   int number = 1;
    int can_see;
    char buf[50];
 
    for (i = list; i; i = i->next_content)
    {
       if ((can_see = CAN_SEE_OBJ(this, i)) && i->next_content &&
-          i->next_content->vnum == i->vnum && i->vnum != -1 && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
+          i->next_content->item_number == i->item_number && i->item_number != -1 && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
       {
          number++;
          continue;
@@ -408,7 +409,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
       {
          if (number > 1)
          {
-            sprintf(buf, "[%lu] ", number);
+            sprintf(buf, "[%d] ", number);
             this->send(buf);
          }
          show_obj_to_char(i, mode);
@@ -512,7 +513,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       }
       ch->send("$B$3");
 
-      if (!(i->long_desc) || (IS_NPC(i) && (i->getPosition() != i->mobdata->default_pos)))
+      if (!(i->long_desc) || (IS_NPC(i) && (GET_POS(i) != i->mobdata->default_pos)))
       {
          /* A char without long descr, or not in default pos. */
          if (IS_PC(i))
@@ -561,7 +562,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             buffer[0] = toupper(buffer[0]);
          }
 
-         switch (i->getPosition())
+         switch (GET_POS(i))
          {
          case position_t::STUNNED:
             buffer.append(" is on the ground, stunned.");
@@ -773,7 +774,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
    }
 }
 
-command_return_t Character::do_botcheck(QStringList arguments, int cmd)
+command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 {
    QString name = arguments.value(0);
    if (name.isEmpty())
@@ -857,7 +858,7 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
 
       if (nr >= 0)
       {
-         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].vnum,
+         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].virt,
                 ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
       }
    }
@@ -895,7 +896,7 @@ void Character::list_char_to_char(Character *list, int mode)
             }
 
             gettimeofday(&tv, nullptr);
-            this->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->vnum, std::pair<timeval, timeval>(tv, tv_zero)));
+            this->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
          }
       }
       else if (IS_DARK(this->in_room))
@@ -993,7 +994,7 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
       // if negative show "- difference"
       if (swapcolors)
       {
-         buf2 = QStringLiteral("%1%2$R").arg(color_good).arg(random - base);
+         buf2 = QStringLiteral("%s%d$R").arg(color_good).arg(random - base);
       }
       else
       {
@@ -1063,15 +1064,15 @@ bool identify(Character *ch, Object *obj)
    ch->send(QStringLiteral("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
 
    const Object *vobj = nullptr;
-   if (obj->vnum >= 0)
+   if (obj->item_number >= 0)
    {
-      const int vnum = obj->vnum;
+      const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
       if (vnum >= 0)
       {
-         const rnum_t rn_of_vnum = vnum;
+         const int rn_of_vnum = real_object(vnum);
          if (rn_of_vnum >= 0)
          {
-            vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
+            vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
          }
       }
    }
@@ -1249,7 +1250,7 @@ bool identify(Character *ch, Object *obj)
    return true;
 }
 
-command_return_t Character::do_identify(QStringList arguments, int cmd)
+command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
 {
    if (arguments.isEmpty())
    {
@@ -1266,13 +1267,13 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
       QString buffer = match.captured("vnum");
 
       vnum_t vnum = buffer.toULongLong();
-      vnum_t rnum = vnum;
+      vnum_t rnum = real_object(vnum);
       if (rnum == -1)
       {
          send("Invalid VNUM.\r\n");
          return eFAILURE;
       }
-      obj = DC::getInstance()->obj_index[rnum].item;
+      obj = (Object *)DC::getInstance()->obj_index[rnum].item;
 
       if (obj->isDark() && !isImmortalPlayer())
       {
@@ -1301,7 +1302,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
    return eFAILURE;
 }
 
-int do_look(Character *ch, const char *argument, int cmd)
+int do_look(Character *ch, const char *argument, cmd_t cmd)
 {
    char buffer[MAX_STRING_LENGTH] = {0};
    char arg1[MAX_STRING_LENGTH] = {0};
@@ -1322,9 +1323,9 @@ int do_look(Character *ch, const char *argument, int cmd)
    int weight_in(class Object * obj);
    if (!ch->desc)
       return 1;
-   if (ch->getPosition() < position_t::SLEEPING)
+   if (GET_POS(ch) < position_t::SLEEPING)
       ch->sendln("You can't see anything but stars!");
-   else if (ch->getPosition() == position_t::SLEEPING)
+   else if (GET_POS(ch) == position_t::SLEEPING)
       ch->sendln("You can't see anything, you're sleeping!");
    else if (check_blind(ch))
    {
@@ -1430,8 +1431,8 @@ int do_look(Character *ch, const char *argument, int cmd)
                      if (temp > 3)
                      {
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                             "Bug in Object %lu. v2: %d > v1: %d. Resetting.",
-                             tmp_object->vnum,
+                             "Bug in object %d. v2: %d > v1: %d. Resetting.",
+                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
                              tmp_object->obj_flags.value[1],
                              tmp_object->obj_flags.value[0]);
                         tmp_object->obj_flags.value[1] =
@@ -1467,7 +1468,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                      {
 
                         int weight_in(class Object * obj);
-                        if (tmp_object->vnum == 536)
+                        if (DC::getInstance()->obj_index[tmp_object->item_number].virt == 536)
                            temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                         else
                            temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
@@ -1485,8 +1486,8 @@ int do_look(Character *ch, const char *argument, int cmd)
                      {
                         temp = 3;
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                             "Bug in Object %lu. Weight: %d v1: %d",
-                             tmp_object->vnum,
+                             "Bug in object %d. Weight: %d v1: %d",
+                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
                              tmp_object->obj_flags.weight,
                              tmp_object->obj_flags.value[0]);
                      }
@@ -1537,7 +1538,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                   try_to_peek_into_container(tmp_char, ch, arg3);
                   return eSUCCESS;
                }
-               if (cmd == 20)
+               if (cmd == cmd_t::GLANCE)
                   show_char_to_char(tmp_char, ch, 3);
                else
                   show_char_to_char(tmp_char, ch, 1);
@@ -1547,7 +1548,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                   {
                      return eSUCCESS;
                   }
-                  if ((cmd == 20) && !IS_AFFECTED(ch, AFF_HIDE))
+                  if ((cmd == cmd_t::GLANCE) && !IS_AFFECTED(ch, AFF_HIDE))
                   {
                      act("$n glances at you.", ch, 0, tmp_char, TO_VICT,
                          INVIS_NULL);
@@ -1748,7 +1749,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                        sector_buf);
             sprintbit((int32_t)DC::getInstance()->world[ch->in_room].room_flags, room_bits,
                       rflag_buf);
-            csendf(ch, "\r\nLight[%lu] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
+            csendf(ch, "\r\nLight[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
             if (DC::getInstance()->world[ch->in_room].temp_room_flags)
             {
                sprintbit((int32_t)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
@@ -1809,7 +1810,7 @@ int do_look(Character *ch, const char *argument, int cmd)
             ch->send("None.");
          ch->sendln("");
          if (IS_PC(ch) && !ch->hunting.isEmpty())
-            ch->do_track(QString(ch->hunting).split(' '), 10);
+            ch->do_track(QString(ch->hunting).split(' '), cmd_t::TRACK);
       }
          ch->in_room = original_loc;
          break;
@@ -1828,7 +1829,7 @@ int do_look(Character *ch, const char *argument, int cmd)
 
 /* end of look */
 
-int do_read(Character *ch, char *arg, int cmd)
+int do_read(Character *ch, char *arg, cmd_t cmd)
 {
    char buf[200];
 
@@ -1836,18 +1837,18 @@ int do_read(Character *ch, char *arg, int cmd)
 
    // yeah right.  -Sadus
    sprintf(buf, "at %s", arg);
-   do_look(ch, buf, 15);
+   do_look(ch, buf);
    return eSUCCESS;
 }
 
-int do_examine(Character *ch, char *argument, int cmd)
+int do_examine(Character *ch, char *argument, cmd_t cmd)
 {
    char name[200], buf[200];
    Character *tmp_char;
    class Object *tmp_object;
 
    sprintf(buf, "at %s", argument);
-   do_look(ch, buf, 15);
+   do_look(ch, buf);
 
    one_argument(argument, name);
 
@@ -1865,13 +1866,13 @@ int do_examine(Character *ch, char *argument, int cmd)
       {
          ch->sendln("When you look inside, you see:");
          sprintf(buf, "in %s", argument);
-         do_look(ch, buf, 15);
+         do_look(ch, buf);
       }
    }
    return eSUCCESS;
 }
 
-int do_exits(Character *ch, char *argument, int cmd)
+int do_exits(Character *ch, char *argument, cmd_t cmd)
 {
    int door;
    char buf[MAX_STRING_LENGTH];
@@ -1894,7 +1895,7 @@ int do_exits(Character *ch, char *argument, int cmd)
          continue;
 
       if (!IS_NPC(ch) && ch->player->holyLite)
-         sprintf(buf + strlen(buf), "%s - %s [%u]\n\r", exits[door],
+         sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name,
                  DC::getInstance()->world[EXIT(ch, door)->to_room].number);
       else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
@@ -1927,7 +1928,7 @@ char frills[] = {
     '~',
     '\\'};
 
-int do_score(Character *ch, char *argument, int cmd)
+int do_score(Character *ch, char *argument, cmd_t cmd)
 {
    char race[100];
    char buf[MAX_STRING_LENGTH], scratch;
@@ -1964,7 +1965,7 @@ int do_score(Character *ch, char *argument, int cmd)
    sprintf(buf,
            "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
            "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-           "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3llu        $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+           "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3d        $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
            "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
            "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\n\r"
            "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
@@ -1989,25 +1990,44 @@ int do_score(Character *ch, char *argument, int cmd)
          experience_needed = QStringLiteral("%L1").arg(exp_needed);
       }
 
-      sprintf(buf,
-              "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
-              "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
-              "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\n\r"
-              "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
-              "|~|  $3BonusDam$7: %+4d   $3SplDam$7:  %+5d  |o|  $3Experience$7:   %-18s |\\|\n\r"
-              "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7: %-18s |o|\n\r"
-              "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-25s  |/|\n\r"
-              "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-25s  |-|\n\r"
-              "|-|                                   |o|  $3Platinum$7: %-6d  $3QPoints$7: %-6d|/|\r\n"
-              "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
-              GET_ARMOR(ch), GET_PKILLS(ch), IS_CARRYING_N(ch), CAN_CARRY_N(ch),
-              to_hit, GET_PDEATHS(ch), IS_CARRYING_W(ch), CAN_CARRY_W(ch),
-              to_dam, spell_dam, QStringLiteral("%L1").arg(GET_EXP(ch)).toStdString().c_str(),
-              get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), experience_needed.toStdString().c_str(),
-              get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), QStringLiteral("%L1").arg(ch->getGold()).toStdString().c_str(),
-              ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, QStringLiteral("%L1").arg(GET_BANK(ch)).toStdString().c_str(), (int)GET_PLATINUM(ch), GET_QPOINTS(ch));
-
-      ch->send(buf);
+      int instrument_combat{}, instrument_non_combat{};
+      get_instrument_bonus(ch, instrument_combat, instrument_non_combat);
+      ch->sendln(QStringLiteral("($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
+                                "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
+                                "|o|  $3Armor$7:   %1   $3Pkills$7:  %2  |~|  $3Items Carried$7:  %3 |/|\n\r"
+                                "|\\|  $3BonusHit$7: %4   $3PDeaths$7: %5  |/|  $3Weight Carried$7: %6 |~|\n\r"
+                                "|~|  $3BonusDam$7: %7   $3SplDam$7:  %8  |o|  $3Experience$7:   %L9 |\\|\n\r"
+                                "|/|  $3InstrCom$7: %10   $3InstrNon$7:%11  |\\|  $3ExpTillLevel$7: %L12 |/|\r\n"
+                                "|o|  $B$4FIRE$R[%13]  $B$3COLD$R[%14]  $B$5NRGY$R[%15]  |\\|  $3Gold$7: %L16 |o|\n\r"
+                                "|\\|  $B$2ACID$R[%17]  $B$7MAGK$R[%18]  $2POIS$7[%19]  |~|  $3Bank$7: %L20 |/|\n\r"
+                                "|-|  $3MELE$R[%21]  $3SPEL$R[%22]   $3KI$R [%23]  |/|  $3QPoints$7: %L24 $3Platinum$7: %L25 |-|\n\r"
+                                "|/|                                   |o|                                   |/|\r\n"
+                                "($5:$7)===================================($5:$7)===================================($5:$7)")
+                     .arg(GET_ARMOR(ch), 5)
+                     .arg(GET_PKILLS(ch), 5)
+                     .arg(QStringLiteral("%1/%2").arg(IS_CARRYING_N(ch)).arg(CAN_CARRY_N(ch)), 16)
+                     .arg(QStringLiteral("%1%2").arg(to_hit > 0 ? "+" : "").arg(to_hit), 4)
+                     .arg(QString::number(GET_PDEATHS(ch)), 5)
+                     .arg(QStringLiteral("%1/%2").arg(IS_CARRYING_W(ch)).arg(CAN_CARRY_W(ch)), 16)
+                     .arg(QStringLiteral("%1%2").arg(to_dam > 0 ? "+" : "").arg(to_dam), 4)                                                   // +4d
+                     .arg(QStringLiteral("%1%2").arg(spell_dam > 0 ? "+" : "").arg(spell_dam), 5)                                             //+5d
+                     .arg(GET_EXP(ch), 18)                                                                                                    // -18s
+                     .arg(QStringLiteral("%1%2").arg(instrument_combat > 0 ? "+" : "").arg(instrument_combat), 4)                             //+4
+                     .arg(QStringLiteral("%1%2").arg(instrument_non_combat > 0 ? "+" : "").arg(instrument_non_combat), 5)                     //+5
+                     .arg(experience_needed, 18)                                                                                              // -18s
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_FIRE) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_FIRE)), 3)     //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_COLD) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_COLD)), 3)     //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_ENERGY) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ENERGY)), 3) //+3
+                     .arg(ch->getGold(), 26)
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_ACID) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ACID)), 3)     //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_MAGIC) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_MAGIC)), 3)   //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_POISON) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_POISON)), 3) //+3
+                     .arg(GET_BANK(ch), 26)                                                                                                   // -25s
+                     .arg(QStringLiteral("%1%2").arg(ch->melee_mitigation > 0 ? "+" : "").arg(ch->melee_mitigation), 3)                       // +3
+                     .arg(QStringLiteral("%1%2").arg(ch->spell_mitigation > 0 ? "+" : "").arg(ch->spell_mitigation), 3)                       // +3
+                     .arg(QStringLiteral("%1%2").arg(ch->song_mitigation > 0 ? "+" : "").arg(ch->song_mitigation), 3)                         // +3
+                     .arg(GET_QPOINTS(ch), 5)                                                                                                 // -25s
+                     .arg(GET_PLATINUM(ch), 7));                                                                                              // -6d
    }
    else
       ch->sendln("($5:$7)===================================($5:$7)==================================($5:$7)");
@@ -2282,7 +2302,7 @@ int do_score(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_time(Character *ch, char *argument, int cmd)
+int do_time(Character *ch, char *argument, cmd_t cmd)
 {
    char buf[100];
    char const *suf;
@@ -2290,21 +2310,22 @@ int do_time(Character *ch, char *argument, int cmd)
    time_t timep;
    int32_t h, m;
    // int32_t s;
+   extern struct time_info_data time_info;
    extern char *weekdays[];
    extern char *month_name[];
    struct tm *pTime = nullptr;
 
    /* 35 days in a month */
-   weekday = ((35 * DC::getInstance()->time_info.month) + DC::getInstance()->time_info.day + 1) % 7;
+   weekday = ((35 * time_info.month) + time_info.day + 1) % 7;
 
    sprintf(buf, "It is %d o'clock %s, on %s.\r\n",
-           ((DC::getInstance()->time_info.hours % 12 == 0) ? 12 : ((DC::getInstance()->time_info.hours) % 12)),
-           ((DC::getInstance()->time_info.hours >= 12) ? "pm" : "am"),
+           ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)),
+           ((time_info.hours >= 12) ? "pm" : "am"),
            weekdays[weekday]);
 
    ch->send(buf);
 
-   day = DC::getInstance()->time_info.day + 1; /* day in [1..35] */
+   day = time_info.day + 1; /* day in [1..35] */
 
    if (day == 1)
       suf = "st";
@@ -2326,8 +2347,8 @@ int do_time(Character *ch, char *argument, int cmd)
    sprintf(buf, "The %d%s Day of the %s, Year %d.  (game time)\n\r",
            day,
            suf,
-           month_name[DC::getInstance()->time_info.month],
-           DC::getInstance()->time_info.year);
+           month_name[time_info.month],
+           time_info.year);
 
    ch->send(buf);
 
@@ -2369,17 +2390,17 @@ int do_time(Character *ch, char *argument, int cmd)
    // 	s = timep % 60;
    // 	sprintf (buf, "The mud has been running for: %02li:%02li:%02li \n\r",
    // 			h,m,s);
-   sprintf(buf, "The mud has been running for: %02d:%02d \n\r", h, m);
+   sprintf(buf, "The mud has been running for: %02li:%02li \n\r", h, m);
    ch->send(buf);
    return eSUCCESS;
 }
 
-int do_weather(Character *ch, char *argument, int cmd)
+int do_weather(Character *ch, char *argument, cmd_t cmd)
 {
    extern struct weather_data weather_info;
    char buf[256];
 
-   if (ch->getPosition() <= position_t::SLEEPING)
+   if (GET_POS(ch) <= position_t::SLEEPING)
    {
       ch->sendln("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.");
       return eSUCCESS;
@@ -2405,7 +2426,7 @@ int do_weather(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_help(Character *ch, char *argument, int cmd)
+int do_help(Character *ch, char *argument, cmd_t cmd)
 {
    extern struct help_index_element *help_index;
    extern FILE *help_fl;
@@ -2468,7 +2489,7 @@ int do_help(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_count(Character *ch, char *arg, int cmd)
+int do_count(Character *ch, char *arg, cmd_t cmd)
 {
    class Connection *d;
    Character *i;
@@ -2508,14 +2529,14 @@ int do_count(Character *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_inventory(Character *ch, char *argument, int cmd)
+int do_inventory(Character *ch, char *argument, cmd_t cmd)
 {
    ch->sendln("You are carrying:");
    ch->list_obj_to_char(ch->carrying, 1, true);
    return eSUCCESS;
 }
 
-int do_equipment(Character *ch, char *argument, int cmd)
+int do_equipment(Character *ch, char *argument, cmd_t cmd)
 {
    int j;
    bool found;
@@ -2551,38 +2572,37 @@ int do_equipment(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_credits(Character *ch, char *argument, int cmd)
+int do_credits(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, credits, 0);
    return eSUCCESS;
 }
 
-int do_story(Character *ch, char *argument, int cmd)
+int do_story(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, story, 0);
    return eSUCCESS;
 }
 /*
-int do_news(Character *ch, char *argument, int cmd)
+int do_news(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, news, 0);
    return eSUCCESS;
 }
 
 */
-int do_info(Character *ch, char *argument, int cmd)
+int do_info(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, info, 0);
    return eSUCCESS;
 }
 
 /*********------------ locate objects -----------------***************/
-int do_olocate(Character *ch, char *name, int cmd)
+int do_olocate(Character *ch, char *name, cmd_t cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
    class Object *k;
-   room_t in_room = 0;
-   int count = 0;
+   int in_room = 0, count = 0;
    int vnum = 0;
    int searchnum = 0;
 
@@ -2590,7 +2610,7 @@ int do_olocate(Character *ch, char *name, int cmd)
    if (isdigit(*name))
    {
       vnum = atoi(name);
-      searchnum = vnum;
+      searchnum = real_object(vnum);
    }
 
    ch->sendln("-#-- Short Description ------- Room Number\n");
@@ -2601,7 +2621,7 @@ int do_olocate(Character *ch, char *name, int cmd)
       // allow search by vnum
       if (vnum)
       {
-         if (k->vnum != searchnum)
+         if (k->item_number != searchnum)
             continue;
       }
       else if (!(isexact(name, k->name)))
@@ -2649,7 +2669,7 @@ int do_olocate(Character *ch, char *name, int cmd)
       count++;
 
       if (in_room != DC::NOWHERE)
-         sprintf(buf, "[%2d] %-26s %lu", count, k->short_description, in_room);
+         sprintf(buf, "[%2d] %-26s %d", count, k->short_description, in_room);
       else
          sprintf(buf, "[%2d] %-26s %s", count, k->short_description,
                  "(Item at DC::NOWHERE.)");
@@ -2698,7 +2718,7 @@ int do_olocate(Character *ch, char *name, int cmd)
 
 /* -----------------   MOB LOCATE FUNCTION ---------------------------- */
 // locates ONLY mobiles.  If cmd == 18, it locates pc's AND mobiles
-int do_mlocate(Character *ch, char *name, int cmd)
+int do_mlocate(Character *ch, char *name, cmd_t cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
    int count = 0;
@@ -2719,13 +2739,13 @@ int do_mlocate(Character *ch, char *name, int cmd)
    {
 
       if ((IS_PC(i) &&
-           (cmd != 18 || !CAN_SEE(ch, i))))
+           (cmd != cmd_t::MLOCATE_CHARACTER || !CAN_SEE(ch, i))))
          continue;
 
       // allow find by vnum
       if (vnum)
       {
-         if (searchnum != i->mobdata->vnum)
+         if (searchnum != i->mobdata->nr)
             continue;
       }
       else if (!(isexact(name, i->getName())))
@@ -2758,7 +2778,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
 }
 /* --------------------- End of Mob locate function -------------------- */
 
-int do_consider(Character *ch, char *argument, int cmd)
+int do_consider(Character *ch, char *argument, cmd_t cmd)
 {
    Character *victim;
    char name[256];
@@ -3060,7 +3080,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 
          percent -= mod;
 
-         if (victim->getPosition() <= position_t::SLEEPING)
+         if (GET_POS(victim) <= position_t::SLEEPING)
             percent = 100;
          if (victim->getLevel() > IMMORTAL)
             percent = 0;
@@ -3145,7 +3165,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 }
 
 /* Shows characters in adjacent rooms -- Sadus */
-int do_scan(Character *ch, char *argument, int cmd)
+int do_scan(Character *ch, char *argument, cmd_t cmd)
 {
    int i;
    Character *vict;
@@ -3284,7 +3304,7 @@ int do_scan(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_tick(Character *ch, char *argument, int cmd)
+int do_tick(Character *ch, char *argument, cmd_t cmd)
 {
    int ntick;
    char buf[256];
@@ -3325,7 +3345,7 @@ int do_tick(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-command_return_t Character::do_experience(QStringList arguments, int cmd)
+command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
 {
    if (level_ >= IMMORTAL)
    {
@@ -3335,7 +3355,6 @@ command_return_t Character::do_experience(QStringList arguments, int cmd)
 
    level_t next_level = level_;
    qint64 experience_remaining = 0;
-   QLocale::setDefault(QLocale::English);
 
    do
    {
@@ -3373,13 +3392,13 @@ void check_champion_and_website_who_list()
          buf << GET_SHORT(ch) << std::endl;
       }
 
-      if ((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying)))
+      if ((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
       {
          obj_from_char(obj);
          obj_to_room(obj, CFLAG_HOME);
       }
 
-      if (IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying)))
+      if (IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
       {
          REMBIT(ch->affected_by, AFF_CHAMPION);
       }
@@ -3388,9 +3407,9 @@ void check_champion_and_website_who_list()
    buf << "endminutenobodywillhavethisnameever" << std::endl;
    addminute++;
 
-   if (!(obj = get_obj_num(CHAMPION_ITEM)))
+   if (!(obj = get_obj_num(real_object(CHAMPION_ITEM))))
    {
-      if ((obj = DC::getInstance()->clone_object(CHAMPION_ITEM)))
+      if ((obj = clone_object(real_object(CHAMPION_ITEM))))
       {
          obj_to_room(obj, CFLAG_HOME);
       }
@@ -3423,7 +3442,7 @@ void check_champion_and_website_who_list()
    flwo.close();
 }
 
-int do_sector(Character *ch, char *arg, int cmd)
+int do_sector(Character *ch, char *arg, cmd_t cmd)
 {
    std::string art = "a";
 
@@ -3446,7 +3465,7 @@ int do_sector(Character *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_version(Character *ch, char *arg, int cmd)
+int do_version(Character *ch, char *arg, cmd_t cmd)
 {
    if (ch)
    {
@@ -3758,9 +3777,6 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_AFFECTED:
-   case O_CARRIED_BY:
-   case O_EQUIPPED_BY:
-   case LIMIT:
       break;
    }
    return false;
@@ -3790,7 +3806,7 @@ bool search_object(Object *obj, QList<Search> sl)
    return matches;
 }
 
-command_return_t Character::do_search(QStringList arguments, int cmd)
+command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 {
    if (arguments.empty())
    {
@@ -4236,7 +4252,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       uint64_t vaults_searched = 0;
       for (auto vault = vault_table; vault; vault = vault->next)
       {
-         if (vault && !vault->owner.isEmpty() && has_vault_access(GET_NAME(this), vault))
+         if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(GET_NAME(this), vault))
          {
             vaults_searched++;
             struct vault_items_data *items;
@@ -4382,10 +4398,16 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    }
    else
    {
-      for (const auto &obj_index_entry : DC::getInstance()->obj_index)
+      for (int vnum = 0; vnum < DC::getInstance()->obj_index[top_of_objt].virt; ++vnum)
       {
-         Object *obj = obj_index_entry.item;
-         if (!obj)
+         int rnum = 0;
+         // real_object returns -1 for missing VNUMs
+         if ((rnum = real_object(vnum)) < 0)
+         {
+            continue;
+         }
+         Object *obj = static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
+         if (obj == nullptr)
          {
             continue;
          }
@@ -4423,7 +4445,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       }
       if (obj_results.empty())
       {
-         send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(DC::getInstance()->obj_index.size()));
+         send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
          return eFAILURE;
       }
 
@@ -4466,11 +4488,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    {
       if (limit_output)
       {
-         send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(DC::getInstance()->obj_index.size()).arg(obj_results.size()).arg(limit_output));
+         send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
       }
       else
       {
-         send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(DC::getInstance()->obj_index.size()).arg(obj_results.size()));
+         send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
       }
    }
 
@@ -4566,9 +4588,6 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          case Search::locations::in_clan_vault:
             custom_columns += QStringLiteral(" [%1 vault]").arg(result.getName(), 13);
             break;
-         case Search::locations::in_object_database:
-            custom_columns += QStringLiteral(" [%1]").arg("in Object DB", 19);
-            break;
          }
       }
 
@@ -4583,15 +4602,15 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
       // Needed to show details or affects below
       const Object *vobj = nullptr;
-      if (obj->vnum >= 0)
+      if (obj->item_number >= 0)
       {
-         const int vnum = obj->vnum;
+         const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
          if (vnum >= 0)
          {
-            const rnum_t rn_of_vnum = vnum;
+            const int rn_of_vnum = real_object(vnum);
             if (rn_of_vnum >= 0)
             {
-               vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
+               vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
             }
          }
       }

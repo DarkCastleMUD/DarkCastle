@@ -43,10 +43,15 @@ struct skill_quest
   int level;
 };
 
-struct skill_stuff
+class skill_stuff
 {
-  char *name;
-  int difficulty;
+  char *name_;
+  int difficulty_;
+
+public:
+  skill_stuff(char *name, int difficulty) : name_(name), difficulty_(difficulty) {}
+  char *name(void) const { return name_; }
+  int difficulty(void) const { return difficulty_; }
 };
 
 void barb_magic_resist(Character *ch, int old, int nw);
@@ -631,19 +636,54 @@ typedef int SPELL_FUN(uint8_t level, Character *ch,
                       Character *tar_ch,
                       class Object *tar_obj,
                       int skill);
+typedef int SPELL_FUN2(uint8_t level, Character *ch,
+                       char *arg, int type,
+                       Character *tar_ch,
+                       class Object *tar_obj,
+                       int skill, quint64 mana_cost);
+// typedef int (*spell_gen1_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill);
+// typedef command_return_t (*spell_gen2_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill, quint64 mana_cost);
 
 // NOTE:  If you change this structure, keep in mind how it is used in guild.C
 // The min_level_XXX stuff MUST be updated in guild.C if you change this.  It is
 // using an offset from min_level_magic depending on class *(min_level_magic+2bytes)
-struct spell_info_type
+class spell_info_type
 {
-  uint32_t beats;              /* Waiting time after spell	*/
-  position_t minimum_position; /* Position for caster		*/
-  uint8_t min_usesmana;        /* Mana used			*/
-  int16_t targets;             /* Legal targets		*/
-  SPELL_FUN *spell_pointer;    /* Function to call		*/
-  int16_t difficulty;          /* Spell difficulty */
+public:
+  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, int16_t difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(nullptr), spell_pointer2_(nullptr), difficulty_(difficulty)
+  {
+  }
+  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN *spell_pointer, int16_t difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(spell_pointer), difficulty_(difficulty)
+  {
+  }
+  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN2 *spell_pointer, int16_t difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer2_(spell_pointer), difficulty_(difficulty)
+  {
+  }
+  // spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, spell_gen2_t spell_pointer, int16_t difficulty)
+  //     : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(nullptr), spell_pointer2_(spell_pointer), difficulty_(difficulty)
+  //{
+  // }
+  uint32_t beats(void) const { return beats_; }
+  position_t minimum_position(void) const { return minimum_position_; }
+  uint8_t min_usesmana(void) const { return min_usesmana_; }
+  int16_t targets(void) const { return targets_; }
+  SPELL_FUN *spell_pointer(void) const { return spell_pointer_; }
+  int16_t difficulty(void) const { return difficulty_; }
+  SPELL_FUN2 *spell_pointer2(void) const { return spell_pointer2_; }
+
+private:
+  uint32_t beats_;              /* Waiting time after spell	*/
+  position_t minimum_position_; /* Position for caster		*/
+  uint8_t min_usesmana_;        /* Mana used			*/
+  int16_t targets_;             /* Legal targets		*/
+  SPELL_FUN *spell_pointer_;    /* Function to call		*/
+  int16_t difficulty_;          /* Spell difficulty */
+  SPELL_FUN2 *spell_pointer2_;  /* Function to call		*/
 };
+extern const QList<spell_info_type> spell_info;
 
 #define SPELL_TYPE_SPELL 0
 #define SPELL_TYPE_POTION 1
@@ -699,16 +739,6 @@ struct attack_hit_type
 #define FILTER_ENERGY 4
 #define FILTER_ACID 5
 #define FILTER_POISON 6
-
-/*
- * reasons for stopping following
- * passed as the cmd arg to stop_follow()
- */
-#define STOP_FOLLOW 0
-#define END_STALK 1
-#define CHANGE_LEADER 2
-#define BROKE_CHARM 3
-#define BROKE_CHARM_LILITH 4
 
 #define DETECT_GOOD_VNUM 6302
 #define DETECT_EVIL_VNUM 6301

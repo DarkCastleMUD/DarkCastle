@@ -24,7 +24,7 @@
 #include "DC/interp.h"
 #include "DC/const.h"
 
-int do_suicide(Character *ch, char *argument, int cmd)
+int do_suicide(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE; // just in case
@@ -53,7 +53,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
     ch->sendln("Something blocks your attempted suicide, be happy!  You have a new lease on life!");
     return eFAILURE;
   }
-  if (ch->getPosition() == position_t::FIGHTING || ch->fighting)
+  if (GET_POS(ch) == position_t::FIGHTING || ch->fighting)
   {
     ch->sendln("You are too busy trying to kill somebody else!");
     return eFAILURE;
@@ -77,7 +77,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
 
 // TODO - check differences between hit, murder, and kill....I think we can
 // just pull out alot of the code into a function.
-command_return_t Character::do_hit(QStringList arguments, int cmd)
+command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
 {
   Character *victim, *k, *next_char;
   int count = 0;
@@ -107,7 +107,7 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
           return eFAILURE;
         }
 
-        if ((this->getPosition() == position_t::STANDING) &&
+        if ((GET_POS(this) == position_t::STANDING) &&
             (victim != this->fighting))
         {
 
@@ -138,7 +138,7 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
   return eFAILURE;
 }
 
-int do_murder(Character *ch, char *argument, int cmd)
+int do_murder(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   Character *victim;
@@ -170,7 +170,7 @@ int do_murder(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        if ((ch->getPosition() == position_t::STANDING) &&
+        if ((GET_POS(ch) == position_t::STANDING) &&
             (victim != ch->fighting))
         {
           WAIT_STATE(ch, DC::PULSE_VIOLENCE + 2); /* HVORFOR DET?? */
@@ -188,7 +188,7 @@ int do_murder(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_slay(Character *ch, char *argument, int cmd)
+int do_slay(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
@@ -247,7 +247,7 @@ int do_slay(Character *ch, char *argument, int cmd)
   return eSUCCESS; // shouldn't get here
 }
 
-int do_kill(Character *ch, char *argument, int cmd)
+int do_kill(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
@@ -318,7 +318,7 @@ int do_kill(Character *ch, char *argument, int cmd)
 // if you send do_join a number as the argument, ch will attempt to
 // join a mob of that number.  Only works if ch is mob.
 //
-command_return_t Character::do_join(QStringList arguments, int cmd)
+command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
 {
   if (fighting)
   {
@@ -358,7 +358,7 @@ command_return_t Character::do_join(QStringList arguments, int cmd)
       Character *possible_victim = DC::getInstance()->world[in_room].people;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
-        if (possible_victim->isNPC() && DC::getInstance()->mob_index[victim->mobdata->vnum].vnum == victim_vnum)
+        if (possible_victim->isNPC() && DC::getInstance()->mob_index[victim->mobdata->nr].virt == victim_vnum)
         {
           victim = possible_victim;
           break;

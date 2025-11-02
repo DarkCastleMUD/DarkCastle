@@ -49,7 +49,7 @@ int FOUNTAINisPresent(Character *ch)
  *  Fill skins and any other drink containers.                           *
  ************************************************************************/
 
-int do_fill(Character *ch, char *argument, int cmd)
+int do_fill(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   class Object *to_obj;

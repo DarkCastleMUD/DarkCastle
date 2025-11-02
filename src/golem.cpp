@@ -78,8 +78,8 @@ void golem_gain_exp(Character *ch)
     ch->exp = 0;
     ch->incrementLevel();
     advance_golem_level(ch);
-    ch->master->save(666);
-    do_say(ch, "Errrrrhhgg...", 0);
+    ch->master->save(cmd_t::SAVE_SILENTLY);
+    do_say(ch, "Errrrrhhgg...");
   }
 }
 
@@ -108,7 +108,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      int vnum = curr->vnum;
+      int vnum = DC::getInstance()->obj_index[curr->item_number].virt;
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
@@ -126,7 +126,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == curr->vnum)
+      if (golem_list[golemtype].components[i] == DC::getInstance()->obj_index[curr->item_number].virt)
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
@@ -256,27 +256,27 @@ void set_golem(Character *golem, int golemtype)
   golem->weight = 255; // Was 530, ditto
 }
 
-void load_golem_data(Character *ch, int golemtype)
+void Character::load_golem_data(int golemtype)
 {
   char file[200];
   FILE *fpfile = nullptr;
   Character *golem;
-  if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && ch->getLevel() < OVERSEER) || ch->player->golem)
+  if (IS_NPC(this) || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
+  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, this->getNameC()[0], this->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
-    golem = clone_mobile(real_mobile(8));
+    golem = dc_->clone_mobile(real_mobile(8));
     set_golem(golem, golemtype);
-    golem->alignment = ch->alignment;
-    ch->player->golem = golem;
+    golem->alignment = this->alignment;
+    this->player->golem = golem;
     return;
   }
-  golem = clone_mobile(real_mobile(8));
+  golem = dc_->clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
-  ch->player->golem = golem;
+  this->player->golem = golem;
   uint8_t golem_level{};
   fread(&(golem_level), sizeof(golem_level), 1, fpfile);
   golem->setLevel(golem_level);
@@ -324,7 +324,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     ch->sendln("Since you do not have the required spell components, the magic fades into nothingness.");
     return eFAILURE;
   }
-  load_golem_data(ch, i); // Load the golem up;
+  ch->load_golem_data(i); // Load the golem up;
   ch->skill_increase_check(SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
   golem = ch->player->golem;
   if (!golem)
@@ -339,7 +339,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     SET_BIT(golem->resist, golem_list[i].special_res);
   }
   char_to_room(golem, ch->in_room);
-  add_follower(golem, ch, 0);
+  add_follower(golem, ch);
   SETBIT(golem->affected_by, AFF_CHARM);
   //  struct affected_type af;
   send_to_char(golem_list[i].creation_message, ch);
@@ -348,7 +348,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
 
 extern char frills[];
 
-int do_golem_score(Character *ch, char *argument, int cmd)
+int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 { /* Pretty much a rip of score */
   char race[100];
   char buf[MAX_STRING_LENGTH], scratch;
@@ -357,12 +357,83 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   Character *master = ch;
   if (IS_NPC(ch))
     return eFAILURE;
-  if (!ch->player->golem)
+
+  if (cmd == cmd_t::GOLEMSCORE)
   {
-    ch->sendln("But you don't have a golem!");
+    if (!ch->player->golem)
+    {
+      ch->sendln("But you don't have a golem!");
+      return eFAILURE;
+    }
+    else
+    {
+      ch = ch->player->golem;
+    }
+  }
+  else if (cmd == cmd_t::FSCORE)
+  {
+    follow_type *folnext;
+    uint_fast8_t charmies_found = 0;
+    for (auto fol = ch->followers; fol; fol = folnext)
+    {
+      folnext = fol->next;
+      if (IS_AFFECTED(fol->follower, AFF_CHARM))
+        charmies_found++;
+    }
+
+    if (charmies_found > 1)
+    {
+      if (QString(argument).isEmpty())
+      {
+        ch->sendln(QStringLiteral("Specify which non-player follower you want to fscore."));
+        return eFAILURE;
+      }
+      else
+      {
+        auto vict = get_mob_room_vis(ch, argument);
+        if (!vict)
+        {
+          ch->sendln("No mob by that name here.");
+          return eFAILURE;
+        }
+        if (!IS_AFFECTED(vict, AFF_CHARM))
+        {
+          ch->sendln(QStringLiteral("%1 is not a charmie.").arg(GET_SHORT(vict)));
+          return eFAILURE;
+        }
+        if (vict->master != ch)
+        {
+          ch->sendln(QStringLiteral("%1 is not your charmie.").arg(GET_SHORT(vict)));
+          return eFAILURE;
+        }
+        ch = vict;
+      }
+    }
+    else
+    {
+      for (auto fol = ch->followers; fol; fol = folnext)
+      {
+        folnext = fol->next;
+        if (IS_AFFECTED(fol->follower, AFF_CHARM))
+        {
+          ch = fol->follower;
+          break;
+        }
+      }
+    }
+
+    if (ch == master)
+    {
+      ch->sendln("But you don't have any non-player followers!");
+      return eFAILURE;
+    }
+  }
+  else
+  {
+    logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
     return eFAILURE;
   }
-  ch = ch->player->golem;
+
   struct affected_type *aff;
 
   int64_t exp_needed;
@@ -371,7 +442,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   std::string isrString;
 
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
-  if (ch->getLevel() + 19 > 60)
+  if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
     logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
@@ -396,7 +467,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   sprintf(buf,
           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
           "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6d     $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
           "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
           "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\n\r"
           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
@@ -424,7 +495,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
           to_dam, 0, GET_EXP(ch),
           get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
-          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), ch->getGold(), (int)GET_PLATINUM(ch),
+          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)ch->getGold(), (int)GET_PLATINUM(ch),
           ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
   master->send(buf);
 
@@ -541,8 +612,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\n\r",
                 scratch, aff_name.toStdString().c_str(),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-                scratch);
-        // apply_types[(int)aff->location], aff->caster.c_str(),
+                apply_types[(int)aff->location], aff->caster.c_str());
       }
       else
       {
@@ -566,7 +636,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->vnum].vnum == 8)
+    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);

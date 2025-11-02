@@ -72,11 +72,10 @@ int charm_levels(Character *ch)
   return i;
 }
 
-int do_free_animal(Character *ch, char *arg, int cmd)
+int do_free_animal(Character *ch, char *arg, cmd_t cmd)
 {
   Character *victim = nullptr;
   char buf[MAX_INPUT_LENGTH];
-  void stop_follower(Character * ch, int cmd);
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
   {
@@ -116,12 +115,12 @@ int do_free_animal(Character *ch, char *arg, int cmd)
   act("With a gentle pat to the head, $n sets $N free to roam the wilds again.",
       ch, nullptr, victim, TO_ROOM, INVIS_NULL);
 
-  stop_follower(victim, 0);
+  stop_follower(victim);
 
   return eSUCCESS;
 }
 
-int do_tame(Character *ch, char *arg, int cmd)
+int do_tame(Character *ch, char *arg, cmd_t cmd)
 {
   struct affected_type af;
   Character *victim;
@@ -187,10 +186,10 @@ int do_tame(Character *ch, char *arg, int cmd)
          }
          if (vict) {
       if (vict->in_room == ch->in_room && vict->position > position_t::SLEEPING)
-        do_say(vict, "Hey... but what about ME!?", CMD_DEFAULT);
+        do_say(vict, "Hey... but what about ME!?");
              remove_memory(vict, 'h');
       if (vict->master) {
-             stop_follower(vict, BROKE_CHARM);
+             stop_follower(vict, cmd_t::BROKE_CHARM);
              vict->add_memory( GET_NAME(ch), 'h');
       }
          }*/
@@ -217,12 +216,12 @@ int do_tame(Character *ch, char *arg, int cmd)
   }
 
   if (victim->master)
-    stop_follower(victim, 0);
+    stop_follower(victim);
 
   /* make charmie stop hating tamer */
   remove_memory(victim, 'h', ch);
 
-  add_follower(victim, ch, 0);
+  add_follower(victim, ch);
 
   af.type = SPELL_CHARM_PERSON;
 
@@ -243,7 +242,7 @@ int do_tame(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_track(QStringList arguments, int cmd)
+command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 {
   int x, y;
   int retval, how_deep, learned;
@@ -368,9 +367,13 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
           if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
           {
             this->mobdata->last_direction = y;
-            retval = do_move(this, "", (y + 1));
-            if (isSet(retval, eCH_DIED))
-              return retval;
+            auto cmd_dir = getCommandFromDirection(y);
+            if (cmd_dir)
+            {
+              retval = do_move(this, "", *cmd_dir);
+              if (isSet(retval, eCH_DIED))
+                return retval;
+            }
           }
 
           if (hunting.isEmpty())
@@ -406,7 +409,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
             {
               retval = mprog_attack_trigger(this, tmp_ch);
             }
-            if (SOMEONE_DIED(retval) || (this->fighting) || !!hunting.isEmpty())
+            if (SOMEONE_DIED(retval) || (this && this->fighting) || !!hunting.isEmpty())
               return retval;
             else
               return do_hit(hunting.split(' '));
@@ -508,7 +511,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_ambush(QStringList arguments, int cmd)
+command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
 {
   if (!canPerform(SKILL_AMBUSH))
   {
@@ -703,7 +706,7 @@ struct forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
      {28301, {36, 34, 32, 30}}},
 };
 
-int do_forage(Character *ch, char *arg, int cmd)
+int do_forage(Character *ch, char *arg, cmd_t cmd)
 {
   int learned;
   class Object *new_obj = 0;
@@ -772,7 +775,7 @@ int do_forage(Character *ch, char *arg, int cmd)
         return eFAILURE;
       }
 
-      new_obj = DC::getInstance()->clone_object(ovnum);
+      new_obj = clone_object(real_object(ovnum));
       break;
     }
     last = last + forage_lookup_table[cur_sector][i].rate[lgroup];
@@ -939,7 +942,7 @@ int mob_arrow_response(Character *ch, Character *victim,
   if (ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
     if (!number(0, 20))
-      victim->do_shout({QStringLiteral("Duh George, someone keeps shooting me!")});
+      do_shout(victim, "Duh George, someone keeps shooting me!");
     return eSUCCESS;
   }
 
@@ -962,7 +965,7 @@ int mob_arrow_response(Character *ch, Character *victim,
     /* Send the mob in a random dir */
     if (number(1, 2) == 1)
     {
-      do_say(victim, "Where are these fricken arrows coming from?!", 0);
+      do_say(victim, "Where are these fricken arrows coming from?!");
       dir2 = number(0, 5);
       if (CAN_GO(victim, dir2))
         if (EXIT(victim, dir2))
@@ -970,8 +973,12 @@ int mob_arrow_response(Character *ch, Character *victim,
           if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
                 DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(victim, dir2)->to_room].zone).isTown()) &&
               !isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
-            /* send 1-6 since attempt move --cmd's it */
-            return attempt_move(victim, dir2 + 1, 0);
+          /* send 1-6 since attempt move --cmd's it */
+          {
+            auto cmd_dir = getCommandFromDirection(dir2);
+            if (cmd_dir)
+              return attempt_move(victim, *cmd_dir, 0);
+          }
         }
     }
   }
@@ -980,7 +987,7 @@ int mob_arrow_response(Character *ch, Character *victim,
     /* Send the mob after the fucker! */
     if (number(1, 2) == 1)
     {
-      do_say(victim, "There he is!", 0);
+      do_say(victim, "There he is!");
     }
     dir2 = rev_dir[dir];
     for (int i = 0; i < 4; i++)
@@ -994,23 +1001,27 @@ int mob_arrow_response(Character *ch, Character *victim,
           if (!isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
           {
             /* dir+1 it since attempt_move will --cmd it */
-            retval = attempt_move(victim, (dir2 + 1), 0);
-            if (SOMEONE_DIED(retval))
-              return retval;
+            auto cmd_dir = getCommandFromDirection(dir2);
+            if (cmd_dir)
+            {
+              retval = attempt_move(victim, *cmd_dir, 0);
+              if (SOMEONE_DIED(retval))
+                return retval;
+            }
 
             if (isSet(retval, eFAILURE)) // can't go after the archer
-              return do_flee(victim, "", 0);
+              return do_flee(victim, "");
           }
     }
     if (number(1, 5) == 1)
     {
       if (number(0, 1))
       {
-        victim->do_shout({QStringLiteral("Where the fuck are these arrows coming from?!")});
+        do_shout(victim, "Where the fuck are these arrows coming from?!");
       }
       else
       {
-        victim->do_shout({QStringLiteral("Quit shooting me dammit!")});
+        do_shout(victim, "Quit shooting me dammit!");
       }
     }
   }
@@ -1106,7 +1117,7 @@ int do_arrow_damage(Character *ch, Character *victim,
 }
 */
 
-int do_fire(Character *ch, char *arg, int cmd)
+int do_fire(Character *ch, char *arg, cmd_t cmd)
 {
   Character *victim;
   int dam, dir = -1, artype, cost, retval, victroom;
@@ -1140,7 +1151,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
   /*
-   if(ch->getPosition() == position_t::FIGHTING)
+   if(GET_POS(ch) == position_t::FIGHTING)
    {
    ch->sendln("Aren't you a bit busy with hand to hand combat?");
    return eFAILURE;
@@ -1398,7 +1409,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         found = find_arrow(ch->equipment[where]);
         if (found)
         {
-          get(ch, found, ch->equipment[where], 0, CMD_DEFAULT);
+          get(ch, found, ch->equipment[where], 0, cmd_t::DEFAULT);
         }
         break;
       }
@@ -1410,7 +1421,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(victim) && DC::getInstance()->mob_index[victim->mobdata->vnum].vnum >= 2300 && DC::getInstance()->mob_index[victim->mobdata->vnum].vnum <= 2399)
+  if (IS_NPC(victim) && DC::getInstance()->mob_index[victim->mobdata->nr].virt >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].virt <= 2399)
   {
     ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
     extract_obj(found);
@@ -1721,7 +1732,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   return retval;
 }
 
-int do_mind_delve(Character *ch, char *arg, int cmd)
+int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[1000];
   Character *target = nullptr;
@@ -1784,11 +1795,11 @@ void check_eq(Character *ch)
   for (pos = 0; pos < MAX_WEAR; pos++)
   {
     if (ch->equipment[pos])
-      equip_char(ch, unequip_char(ch, pos), pos);
+      ch->equip_char(ch->unequip_char(pos), pos);
   }
 }
 
-int do_natural_selection(Character *ch, char *arg, int cmd)
+int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

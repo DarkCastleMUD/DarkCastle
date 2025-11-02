@@ -15,7 +15,7 @@
 
 class Character;
 
-void rebuild_mob_rnum_references(int startAt);
+void rebuild_rnum_references(int startAt, int type);
 void mprog_driver(char *com_list, Character *mob,
                   Character *actor, class Object *obj,
                   void *vo, struct mprog_throw_type *thrw, Character *rndm);

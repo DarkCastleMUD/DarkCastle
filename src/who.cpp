@@ -63,7 +63,7 @@ void clear_who_buffer()
   gWhoBufferCurSize = 0; // update the size
 }
 
-int do_whogroup(Character *ch, char *argument, int cmd)
+int do_whogroup(Character *ch, char *argument, cmd_t cmd)
 {
 
   Connection *d;
@@ -129,7 +129,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
       if ((!IS_NPC(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
         sprintf(tempbuffer,
-                "   $B%-18s %-10s %-14s   Level %2lld      $1($7Leader$1)$R \n\r",
+                "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
                 pc_clss_types[(int)GET_CLASS(k)], k->getLevel());
       }
@@ -152,7 +152,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
               foundtarget = 1;
             // First if they're not anonymous
             if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
-              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2lld\n\r",
+              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\n\r",
                       GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
                       pc_clss_types[(int)GET_CLASS(f->follower)], f->follower->getLevel());
             else
@@ -189,7 +189,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_whosolo(Character *ch, char *argument, int cmd)
+int do_whosolo(Character *ch, char *argument, cmd_t cmd)
 {
   Connection *d;
   Character *i;
@@ -226,7 +226,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
       {
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
           sprintf(tempbuffer,
-                  "   %-15s %-9s %-13s %2lld     %-4d%-7d%d\n\r",
+                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
                   i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),
@@ -250,7 +250,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_who(QStringList arguments, int cmd)
+command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
 {
   const QStringList immortFields = {
       "   Immortal  ",
@@ -526,11 +526,13 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
     auto clanPtr = get_clan(i);
     if (i->clan && clanPtr && i->getLevel() < OVERSEER)
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 %5 $2[%6$R$2] %7$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
+      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
+      buf += QStringLiteral("%5 $2[%6$R$2] %7$R\n\r").arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
     }
     else
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 %5 %6$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(tailBuf);
+      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
+      buf += QStringLiteral("%5 %6$R\n\r").arg(extraBuf).arg(tailBuf);
     }
 
     if (addimmbuf)
@@ -564,7 +566,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_whoarena(Character *ch, char *argument, int cmd)
+int do_whoarena(Character *ch, char *argument, cmd_t cmd)
 {
   int count = 0;
   clan_data *clan;
@@ -621,7 +623,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_where(Character *ch, char *argument, int cmd)
+int do_where(Character *ch, char *argument, cmd_t cmd)
 {
   class Connection *d;
   int zonenumber;
@@ -638,12 +640,12 @@ int do_where(Character *ch, char *argument, int cmd)
       {
         if (d->original)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%lu] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
                  DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
         }
         else
         {
-          csendf(ch, "%-20s - %s$R [%lu]\n\r",
+          csendf(ch, "%-20s - %s$R [%d]\n\r",
                  d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
         }
       }
@@ -660,7 +662,7 @@ int do_where(Character *ch, char *argument, int cmd)
         { // If switched
           if (is_abbrev(buf, d->original->getName()))
           {
-            csendf(ch, "%-20s - %s$R [%lu] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+            csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
                    DC::getInstance()->world[d->character->in_room].number, fname(d->character->getName()).toStdString().c_str());
           }
         }
@@ -668,7 +670,7 @@ int do_where(Character *ch, char *argument, int cmd)
         {
           if (is_abbrev(buf, d->character->getNameC()))
           {
-            csendf(ch, "%-20s - %s$R [%lu]\n\r",
+            csendf(ch, "%-20s - %s$R [%d]\n\r",
                    d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
           }
         }

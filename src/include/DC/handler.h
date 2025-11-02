@@ -26,6 +26,7 @@
 /* handling the affected-structures */
 void affect_total(Character *ch);
 void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag = 0);
+void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_type = DC::PULSE_TIME);
 void affect_from_char(Character *ch, int skill, int flags = 0);
 void affect_remove(Character *ch, struct affected_type *af, int flags);
 void affect_join(Character *ch, struct affected_type *af,
@@ -61,14 +62,11 @@ int obj_from_room(class Object *object);
 int obj_to_obj(class Object *obj, class Object *obj_to);
 int obj_from_obj(class Object *obj);
 
-int equip_char(Character *ch, class Object *obj, int pos, int flag = 0);
-class Object *unequip_char(Character *ch, int pos, int flag = 0);
-
 class Object *get_obj_in_list(char *name, class Object *list);
-class Object *get_obj_in_list_num(vnum_t num, class Object *list);
+class Object *get_obj_in_list_num(int num, class Object *list);
 class Object *get_obj(char *name);
-class Object *get_obj(vnum_t vnum);
-class Object *get_obj_num(vnum_t nr);
+class Object *get_obj(int vnum);
+class Object *get_obj_num(int nr);
 
 void object_list_new_new_owner(class Object *list, Character *ch);
 
@@ -82,7 +80,6 @@ Character *get_char_room(const char *name, room_t room, bool careful = false);
 Character *get_char_num(int nr);
 Character *get_char(QString name);
 Character *get_mob(char *name);
-
 Character *get_pc(QString name);
 
 int char_from_room(Character *ch, bool stop_all_fighting);
@@ -104,6 +101,10 @@ Character *get_random_mob_vnum(int vnum);
 Character *get_mob_room_vis(Character *ch, const char *name);
 Character *get_mob_vnum(int vnum);
 Object *get_obj_vnum(int vnum);
+Object *get_obj_vnum(QString vnum);
+Object *get_objindex_vnum(vnum_t vnum);
+Object *get_objindex_vnum(QString vnum);
+vnum_t get_vnum(QString vnum_str);
 class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *list, bool bf = false);
 class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *list, bool bf = false);
 class Object *get_obj_vis(Character *ch, const char *name, bool loc = false);

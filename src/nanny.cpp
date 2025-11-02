@@ -465,7 +465,7 @@ void Character::do_on_login_stuff(void)
    if (this->player->time.logon < 1151506181)
    {
       this->player->quest_points = 0;
-      for (int i = 0; i < QUEST_CANCEL; i++)
+      for (int i = 0; i < QUEST_MAX_CANCEL; i++)
          this->player->quest_cancel[i] = 0;
       for (int i = 0; i < QUEST_TOTAL / ASIZE; i++)
          this->player->quest_complete[i] = 0;
@@ -654,7 +654,7 @@ void Character::do_on_login_stuff(void)
    while (!todelete.empty())
    {
       logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, DC::LogChannel::LOG_MORTAL);
-      remove_vault_access(this, todelete.front(), vault);
+      remove_vault_access(todelete.front(), vault);
       todelete.pop();
    }
 
@@ -828,7 +828,7 @@ void DC::nanny(class Connection *d, std::string arg)
         STATE(d) == Connection::states::GET_STATS))
    {
       arg.erase(0, 4);
-      do_new_help(d->character, arg.data(), 88);
+      do_new_help(d->character, arg.data(), cmd_t::PAGING_HELP);
       return;
    }
 
@@ -1041,7 +1041,7 @@ void DC::nanny(class Connection *d, std::string arg)
             else
             {
                d->character->player->bad_pw_tries++;
-               save_char_obj(d->character);
+               d->character->save_char_obj();
             }
          }
          close_socket(d);
@@ -1786,9 +1786,9 @@ void DC::nanny(class Connection *d, std::string arg)
          if (ch->getLevel() == 0)
          {
             do_start(ch);
-            do_new_help(ch, "new", 0);
+            do_new_help(ch, "new");
          }
-         do_look(ch, "", 8);
+         do_look(ch, "");
          {
             if (ch->getLevel() >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
             {
@@ -1957,7 +1957,7 @@ void DC::nanny(class Connection *d, std::string arg)
          load_char_obj(d, blah1);
          ch = d->character;
          strcpy(ch->player->pwd, blah2);
-         save_char_obj(ch);
+         ch->save_char_obj();
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
          logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
       }
@@ -2183,7 +2183,7 @@ void update_characters()
       {
          if (!charge_moves(i, SKILL_BATTERBRACE, 0.5) || !is_bracing(i, i->brace_at))
          {
-            do_brace(i, "", 0);
+            do_brace(i, "");
          }
          else
          {
@@ -2277,7 +2277,7 @@ void check_silence_beacons(void)
    for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
    {
       tmp_obj = obj->next;
-      if (obj->vnum == SILENCE_OBJ_NUMBER)
+      if (DC::getInstance()->obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER)
       {
          if (obj->obj_flags.value[0] == 0)
             extract_obj(obj);
@@ -2301,7 +2301,7 @@ void checkConsecrate(int pulseType)
       for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
-         if (obj->vnum == CONSECRATE_OBJ_NUMBER)
+         if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
          {
             spl = obj->obj_flags.value[0];
             obj->obj_flags.value[1]--;
@@ -2366,7 +2366,7 @@ void checkConsecrate(int pulseType)
       for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
-         if (obj->vnum == CONSECRATE_OBJ_NUMBER)
+         if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
          {
             spl = obj->obj_flags.value[0];
             if (charExists(obj->obj_flags.origin))
@@ -2860,7 +2860,7 @@ bool handle_get_stats(Connection *d, std::string arg)
       else if (arg.find("help") == 0)
       {
          arg.erase(0, 5);
-         do_help(d->character, arg.data(), CMD_DEFAULT);
+         do_help(d->character, arg.data());
          return false;
       }
       else if (arg == "confirm")

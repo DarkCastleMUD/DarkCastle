@@ -7,7 +7,6 @@
  */
 
 #include <cassert>
-#include <expected>
 
 #include "DC/DC.h"
 #include "DC/db.h"
@@ -20,13 +19,13 @@ const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 
 DC::DC(int &argc, char **argv)
-	: QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse(this, "auctionhouse")
+	: QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse("auctionhouse")
 {
 	setup();
 }
 
 DC::DC(config c)
-	: QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse(this, "auctionhouse")
+	: QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse("auctionhouse")
 {
 	setup();
 }
@@ -229,7 +228,7 @@ void DC::setZoneModified(zone_t zone_key)
 	{
 		if (dc->zones.contains(zone_key))
 		{
-			dc->zones[zone_key].setNeedsSaving();
+			dc->zones[zone_key].setModified();
 		}
 	}
 }
@@ -241,7 +240,7 @@ void DC::setZoneNotModified(zone_t zone_key)
 	{
 		if (dc->zones.contains(zone_key))
 		{
-			dc->zones[zone_key].setNeedsSaving(false);
+			dc->zones[zone_key].setModified(false);
 		}
 	}
 }
@@ -330,11 +329,14 @@ bool DC::isAllowedHost(QHostAddress address)
 
 Object *DC::getObject(vnum_t vnum)
 {
-	if (obj_index.contains(vnum))
+	vnum_t rnum = real_object(vnum);
+
+	if (rnum == -1)
 	{
-		return obj_index[vnum].item;
+		return nullptr;
 	}
-	return {};
+
+	return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
 }
 
 void DC::logverbose(QString str, uint64_t god_level, DC::LogChannel type, Character *vict)
@@ -449,161 +451,4 @@ auto Character::do_arena_usage(QStringList arguments) -> command_return_t
 	sendln("arena cancel        - Cancel an arena");
 
 	return command_return_t();
-}
-
-world_file_list_item &FileIndexes::newRange(QString filename, vnum_t firstvnum, vnum_t lastvnum)
-{
-	auto &item = files_[filename];
-	item.filename = filename;
-	item.firstnum = firstvnum;
-	item.lastnum = firstvnum;
-	item.flags = {};
-
-	item.setNeedsSaving(true);
-	saveRangeIndex();
-	return item;
-}
-
-bool FileIndexes::saveRangeIndex(void)
-{
-	QQueue<world_file_list_item> ranges_to_remove{};
-	for (auto &range : files_)
-	{
-		for (auto &larger_range : files_)
-		{
-			if (!range.isRemoved() &&
-				!larger_range.isRemoved() &&
-				range != larger_range &&
-				range.firstnum >= larger_range.firstnum &&
-				range.firstnum <= larger_range.lastnum &&
-				range.lastnum >= larger_range.firstnum &&
-				range.lastnum <= larger_range.lastnum)
-			{
-				range.setRemoved();
-				ranges_to_remove.push_back(range);
-				larger_range.setNeedsSaving();
-			}
-		}
-	}
-
-	while (!ranges_to_remove.isEmpty())
-	{
-		auto range = ranges_to_remove.back();
-		files_.remove(range.filename);
-		if (!QFile(range.filename).remove())
-			qDebug("Failed to remove range file '%s'", qUtf8Printable(range.filename));
-		else
-			qDebug("Removed range file '%s'", qUtf8Printable(range.filename));
-		ranges_to_remove.pop_back();
-	}
-
-	QFile objectindex{QFile(QStringLiteral("objectindex"))};
-	if (objectindex.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		objectindex.write("* This file contains the list of the files which make up the objects\n"
-						  "* Comments are on lines that begin with a \"*\"\n"
-						  "* The files themselves, are located in the lib/objects directory\n"
-						  "* The file name should be surrounded with <tilda>s on a line of it's own.\n"
-						  "* ie: <tilda><enter>filename<tilda>\n"
-						  "* DO NOT USE TILDAS IN THE COMMENTS*\n"
-						  "~\n");
-		for (const auto &range : files_)
-		{
-			objectindex.write(qUtf8Printable(QStringLiteral("%1~\n").arg(range.filename)));
-		}
-		objectindex.write(qUtf8Printable(QStringLiteral("$~")));
-		objectindex.close();
-	}
-	else
-	{
-		logbug("Error writing to objectindex.");
-		return false;
-	}
-
-	return true;
-}
-
-world_file_list_item::operator bool(void) const
-{
-	return !filename.isEmpty();
-}
-
-world_file_list_item &FileIndexes::findRange(QString filename)
-{
-	return files_[filename];
-}
-
-world_file_list_item &FileIndexes::findRange(vnum_t firstvnum, vnum_t lastvnum)
-{
-	if (!lastvnum)
-		lastvnum = firstvnum;
-	for (auto &owf : files_)
-	{
-		if (firstvnum >= owf.firstnum && lastvnum <= owf.lastnum)
-		{
-			return owf;
-		}
-	}
-	static world_file_list_item empty{};
-	empty = {};
-	return empty;
-}
-
-bool world_file_list_item::isNeedsSaving(void)
-{
-	return isSet(flags, WORLD_FILE_MODIFIED);
-}
-
-bool world_file_list_item::isRemoved(void)
-{
-	return isSet(flags, WORLD_FILE_REMOVED);
-}
-
-void world_file_list_item::setNeedsSaving(bool modified)
-{
-	if (modified)
-		SET_BIT(flags, WORLD_FILE_MODIFIED);
-	else
-		REMOVE_BIT(flags, WORLD_FILE_MODIFIED);
-}
-
-void world_file_list_item::setRemoved(bool removed)
-{
-	if (removed)
-		SET_BIT(flags, WORLD_FILE_REMOVED);
-	else
-		REMOVE_BIT(flags, WORLD_FILE_REMOVED);
-}
-
-bool world_file_list_item::operator==(const world_file_list_item wfli)
-{
-	return wfli.filename == filename && wfli.firstnum == firstnum && wfli.lastnum == lastnum && wfli.flags == flags;
-}
-
-FileIndexes::FileIndexes(QString filename)
-	: filename_(filename)
-{
-}
-
-world_file_list_t FileIndexes::getFiles(void) const
-{
-	return files_;
-}
-
-void FileIndexes::setNeedsSaving(vnum_t vnum)
-{
-	auto range = findRange(vnum);
-	if (range)
-		range.flags = WORLD_FILE_MODIFIED;
-	else
-		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(vnum));
-}
-
-void FileIndexes::setSaved(vnum_t vnum)
-{
-	auto range = findRange(vnum);
-	if (range)
-		range.flags = {};
-	else
-		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(vnum));
 }

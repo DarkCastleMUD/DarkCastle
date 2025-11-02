@@ -38,7 +38,6 @@
 #include "DC/vault.h"
 #include "DC/const.h"
 #include "DC/guild.h"
-#include "DC/save.h"
 
 #ifdef USE_SQL
 #include <iostream>
@@ -178,7 +177,7 @@ char *fread_var_string(FILE *fpsave)
 
 void Mobile::save(FILE *fpsave)
 {
-  fwrite(&(vnum), sizeof(vnum), 1, fpsave);
+  fwrite(&(nr), sizeof(nr), 1, fpsave);
   fwrite(&(default_pos), sizeof(default_pos), 1, fpsave);
   fwrite(&(attack_type), sizeof(attack_type), 1, fpsave);
   fwrite(&(actflags), sizeof(actflags), 1, fpsave);
@@ -193,7 +192,7 @@ void Mobile::save(FILE *fpsave)
 
 void Mobile::read(FILE *fpsave)
 {
-  fread(&(vnum), sizeof(vnum), 1, fpsave);
+  fread(&(nr), sizeof(nr), 1, fpsave);
   fread(&(default_pos), sizeof(default_pos), 1, fpsave);
   fread(&(attack_type), sizeof(attack_type), 1, fpsave);
   fread(&(actflags), sizeof(actflags), 1, fpsave);
@@ -215,6 +214,12 @@ void Mobile::read(FILE *fpsave)
 // TODO - make sure I go back and update the time_data structs everywhere when
 // we lose link, or logout, etc so that the 'played' variable is correct
 
+void fwrite_string_tilde(FILE *fpsave)
+{
+  char buf[40];
+  strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
+  fwrite(&buf, 37, 1, fpsave);
+}
 void Player::save(FILE *fpsave, struct time_data tmpage)
 {
   fwrite(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
@@ -275,7 +280,7 @@ void Player::save(FILE *fpsave, struct time_data tmpage)
 
   fwrite("QST", sizeof(char), 3, fpsave);
   fwrite(&(quest_points), sizeof(quest_points), 1, fpsave);
-  for (int j = 0; j < QUEST_CANCEL; j++)
+  for (int j = 0; j < QUEST_MAX_CANCEL; j++)
     fwrite(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
   for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
     fwrite(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
@@ -326,9 +331,12 @@ void Player::save(FILE *fpsave, struct time_data tmpage)
       if (setting.key() == "color.good" ||
           setting.key() == "color.bad" ||
           setting.key() == "tell.history.timestamp" ||
+          setting.key() == "gossip.history.timestamp" ||
           setting.key() == "locale" ||
           setting.key() == "mode" ||
-          setting.key() == "fighting.showdps")
+          setting.key() == "timezone" ||
+          setting.key() == "fighting.showdps" ||
+          setting.key() == "dateformat")
       {
         fwrite("OPT", sizeof(char), 3, fpsave);
         fwrite_var_string(setting.key(), fpsave);
@@ -365,13 +373,13 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
   {
     if (feof(fpsave))
     {
-      qDebug("%s", QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
+      qDebug(QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
       return characters_read;
     }
 
     if (ferror(fpsave))
     {
-      qDebug("%s", QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
+      qDebug(QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
       return characters_read;
     }
 
@@ -380,7 +388,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
     long after_fread_offset = ftell(fpsave);
     if (read_count != 1)
     {
-      qDebug("%s", QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
+      qDebug(QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
     }
 
     buffer += a;
@@ -392,7 +400,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
 
   if (characters_read >= 160)
   {
-    qDebug("%s", QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
+    qDebug(QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
   }
 
   return characters_read;
@@ -408,7 +416,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   char typeflag[4] = {};
   golem = 0;
   quest_points = 0;
-  for (int j = 0; j < QUEST_CANCEL; j++)
+  for (int j = 0; j < QUEST_MAX_CANCEL; j++)
     quest_cancel[j] = 0;
   for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
     quest_complete[j] = 0;
@@ -488,7 +496,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   if (!strcmp("QST", typeflag))
   {
     fread(&(quest_points), sizeof(quest_points), 1, fpsave);
-    for (int j = 0; j < QUEST_CANCEL; j++)
+    for (int j = 0; j < QUEST_MAX_CANCEL; j++)
       fread(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
     for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
       fread(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
@@ -543,7 +551,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
 
     QString key = fread_var_string(fpsave);
     QString value = fread_var_string(fpsave);
-    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp" || key == "locale" || key == "mode" || key == "fighting.showdps")
+    if (QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
     {
       config->insert(key, value);
     }
@@ -600,7 +608,11 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
   if (IS_NPC(ch))
   {
     ch->player = nullptr;
-    ch->mobdata = mobdata_t::create();
+#ifdef LEAK_CHECK
+    ch->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
+#else
+    ch->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
+#endif
     ch->mobdata->read(fpsave);
   }
   else
@@ -818,7 +830,7 @@ void save_char_obj_db(Character *ch)
   memset(&uchar, 0, sizeof(uchar));
   memset(&tmpage, 0, sizeof(tmpage));
 
-  char_to_store(ch, &uchar, tmpage);
+  char_to_store(&uchar, tmpage);
 
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
@@ -871,7 +883,7 @@ void save_char_obj_db(Character *ch)
 
 // save a character and inventory.
 // maybe modify it to save mobs for quest purposes too
-void save_char_obj(Character *ch)
+void Character::save_char_obj(void)
 {
   char_file_u4 uchar = {};
   time_data tmpage;
@@ -881,31 +893,31 @@ void save_char_obj(Character *ch)
 
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if (IS_NPC(ch) || ch->getLevel() < 1)
+  if (IS_NPC(this) || getLevel() < 1)
   {
     return;
   }
 
-  if (ch->getName().isEmpty())
+  if (getName().isEmpty())
   {
-    ch->setName("Unknown");
+    setName("Unknown");
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
   if (DC::getInstance()->cf.bport)
   {
-    sprintf(name, "%s/%c/%s", BSAVE_DIR, ch->getNameC()[0], ch->getNameC());
+    sprintf(name, "%s/%c/%s", BSAVE_DIR, getNameC()[0], getNameC());
   }
   else
   {
-    sprintf(name, "%s/%c/%s", SAVE_DIR, ch->getNameC()[0], ch->getNameC());
+    sprintf(name, "%s/%c/%s", SAVE_DIR, getNameC()[0], getNameC());
   }
 
   sprintf(strsave, "%s.back", name);
 
   if (!(fpsave = fopen(strsave, "wb")))
   {
-    ch->sendln("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.");
+    sendln("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.");
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
@@ -913,31 +925,31 @@ void save_char_obj(Character *ch)
     return;
   }
 
-  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+  SETBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
-  char_to_store(ch, &uchar, tmpage);
+  char_to_store(&uchar, tmpage);
 
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
 
-  if (ch->in_room < 1)
+  if (in_room < 1)
   {
     uchar.load_room = START_ROOM;
   }
   else
   {
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
-      uchar.load_room = DC::getInstance()->world[ch->in_room].number;
+    if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
+      uchar.load_room = DC::getInstance()->world[in_room].number;
     else
-      uchar.load_room = real_room(GET_HOME(ch));
+      uchar.load_room = real_room(GET_HOME(this));
   }
 
   if ((fwrite(&uchar, sizeof(uchar), 1, fpsave)) &&
-      (ch->char_to_store_variable_data(fpsave)) &&
-      (ch->save_pc_or_mob_data(fpsave, tmpage)) &&
-      (obj_to_store(ch->carrying, ch, fpsave, -1)) &&
-      (store_worn_eq(ch, fpsave)))
+      (char_to_store_variable_data(fpsave)) &&
+      (save_pc_or_mob_data(fpsave, tmpage)) &&
+      (obj_to_store(carrying, this, fpsave, -1)) &&
+      (store_worn_eq(this, fpsave)))
   {
     if (fpsave != nullptr)
       fclose(fpsave);
@@ -952,14 +964,14 @@ void save_char_obj(Character *ch)
       fclose(fpsave);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Save_char_obj: %s", strsave);
-    ch->send("WARNING: file problem. You did not save!");
+    send("WARNING: file problem. You did not save!");
     perror(log_buf);
     logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
-  REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   struct vault_data *vault;
-  if ((vault = has_vault(GET_NAME(ch))))
+  if ((vault = has_vault(getName())))
     save_vault(vault->owner);
 }
 
@@ -974,7 +986,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 }
 
 // Load a char and inventory into a new_new ch structure.
-load_status_t load_char_obj(class Connection *d, QString name)
+load_status_t DC::load_char_obj(class Connection *d, QString name)
 {
   FILE *fpsave = nullptr;
   QString strsave;
@@ -986,7 +998,7 @@ load_status_t load_char_obj(class Connection *d, QString name)
     return load_status_t::bad_input;
   name[0] = name[0].toUpper();
 
-  ch = new Character;
+  ch = new Character(this);
   auto &free_list = DC::getInstance()->free_list;
   free_list.erase(ch);
 
@@ -1034,8 +1046,7 @@ load_status_t load_char_obj(class Connection *d, QString name)
 
   if (IS_PC(ch) && ch->player->time.logon < 1117527906)
   {
-    extern int do_clearaff(Character * ch, char *argument, int cmd);
-    do_clearaff(ch, "", 9);
+    do_clearaff(ch, "");
     ch->affected_by[0] = ch->affected_by[1] = 0;
   }
 
@@ -1063,6 +1074,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   //  struct extra_descr_data *ed, *next_ed;
 
   int j;
+  int nr;
   uint16_t length; // do not change this type
   int wear_pos;
   char mod_type[4];
@@ -1078,10 +1090,10 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   // if it's a current object, clone it and continue
   // if it's not, then we need to remove it from the pfile so clone obj 1
 
-  if (DC::getInstance()->obj_index.contains(object.vnum))
-    obj = DC::getInstance()->clone_object(object.vnum);
+  if ((nr = real_object(object.item_number)) > -1)
+    obj = clone_object(nr);
   else
-    obj = DC::getInstance()->clone_object(1);
+    obj = clone_object(1);
 
   obj->obj_flags.timer = object.timer;
   wear_pos = object.wear_pos;
@@ -1244,7 +1256,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   // TODO - put extra desc support here
   // NEW READS GO HERE
 
-  if (!DC::getInstance()->obj_index.contains(object.vnum))
+  if (nr == -1)
   {
     extract_obj(obj);
     return last_cont;
@@ -1252,12 +1264,12 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   // Handle worn EQ
   if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos]) && CAN_WEAR(obj, Character::wear_to_item_wear[wear_pos]))
   {
-    equip_char(ch, obj, wear_pos, 1);
+    ch->equip_char(obj, wear_pos, 1);
     return obj;
   }
   else if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos + 1]) && CAN_WEAR(obj, Character::wear_to_item_wear[wear_pos + 1]))
   {
-    equip_char(ch, obj, wear_pos + 1, 1);
+    ch->equip_char(obj, wear_pos + 1, 1);
     return obj;
   }
   else if (object.container_depth == 1 && last_cont)
@@ -1268,7 +1280,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if (!last_cont->equipped_by && last_cont->vnum != 536)
+      if (!last_cont->equipped_by && DC::getInstance()->obj_index[last_cont->item_number].virt != 536)
         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else
@@ -1346,12 +1358,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     }
   }
 
-  if (obj->vnum < 1)
+  if (obj->item_number < 0)
     return true;
 
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
-  object.vnum = obj->vnum;
+  object.item_number = DC::getInstance()->obj_index[obj->item_number].virt;
   object.timer = obj->obj_flags.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
@@ -1364,7 +1376,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = DC::getInstance()->obj_index[obj->vnum].item;
+  standard_obj = ((class Object *)DC::getInstance()->obj_index[obj->item_number].item);
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1448,7 +1460,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
 
     tmp_weight = obj->obj_flags.weight;
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
-    && DC::getInstance()->obj_index[obj->item->number].vnum != 536)
+    && DC::getInstance()->obj_index[obj->item->number].virt != 536)
       for (; loop_obj; loop_obj = loop_obj->next_content)
         tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
     if(tmp_weight      != standard_obj->obj_flags.weight)
@@ -1566,7 +1578,7 @@ void restore_weight(class Object *obj)
 
   if (obj == nullptr)
     return;
-  if (obj->vnum == 536)
+  if (DC::getInstance()->obj_index[obj->item_number].virt == 536)
     return;
   restore_weight(obj->contains);
   restore_weight(obj->next_content);
@@ -1659,7 +1671,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
 
 // copy vital data from a players char-structure to the file structure
 // return 'age' of character unmodified
-void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmpage)
+void Character::char_to_store(struct char_file_u4 *st, struct time_data &tmpage)
 {
   int i;
   int x;
@@ -1669,84 +1681,84 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   // Remove all the eq and store it in temp storage
   for (i = 0; i < MAX_WEAR; i++)
   {
-    if (ch->equipment[i])
-      char_eq[i] = unequip_char(ch, i, 1);
+    if (equipment[i])
+      char_eq[i] = unequip_char(i, true);
     else
       char_eq[i] = 0;
   }
 
   // Unaffect everything a character can be affected by spell-wise
-  for (af = ch->affected; af; af = af->next)
+  for (af = affected; af; af = af->next)
   {
-    affect_modify(ch, af->location, af->modifier, af->bitvector, false);
+    affect_modify(this, af->location, af->modifier, af->bitvector, false);
   }
 
-  st->sex = GET_SEX(ch);
-  st->c_class = GET_CLASS(ch);
-  st->race = GET_RACE(ch);
-  st->level = ch->getLevel();
+  st->sex = GET_SEX(this);
+  st->c_class = GET_CLASS(this);
+  st->race = GET_RACE(this);
+  st->level = getLevel();
 
-  st->raw_str = GET_RAW_STR(ch);
-  st->raw_intel = GET_RAW_INT(ch);
-  st->raw_wis = GET_RAW_WIS(ch);
-  st->raw_dex = GET_RAW_DEX(ch);
-  st->raw_con = GET_RAW_CON(ch);
+  st->raw_str = GET_RAW_STR(this);
+  st->raw_intel = GET_RAW_INT(this);
+  st->raw_wis = GET_RAW_WIS(this);
+  st->raw_dex = GET_RAW_DEX(this);
+  st->raw_con = GET_RAW_CON(this);
 
-  st->mana = GET_MANA(ch);
-  st->raw_mana = GET_RAW_MANA(ch);
-  st->hit = ch->getHP();
-  st->raw_hit = GET_RAW_HIT(ch);
-  st->move = GET_MOVE(ch);
-  st->raw_move = GET_RAW_MOVE(ch);
-  st->ki = GET_KI(ch);
-  st->raw_ki = GET_RAW_KI(ch);
+  st->mana = GET_MANA(this);
+  st->raw_mana = GET_RAW_MANA(this);
+  st->hit = getHP();
+  st->raw_hit = GET_RAW_HIT(this);
+  st->move = GET_MOVE(this);
+  st->raw_move = GET_RAW_MOVE(this);
+  st->ki = GET_KI(this);
+  st->raw_ki = GET_RAW_KI(this);
 
-  st->weight = GET_WEIGHT(ch);
-  st->height = GET_HEIGHT(ch);
+  st->weight = GET_WEIGHT(this);
+  st->height = GET_HEIGHT(this);
   for (i = 0; i < 3; i++)
-    st->conditions[i] = GET_COND(ch, i);
+    st->conditions[i] = GET_COND(this, i);
 
-  st->hometown = ch->hometown;
+  st->hometown = hometown;
 
   //  gets set outside
-  //  st->load_room = DC::getInstance()->world[ch->in_room].number;
+  //  st->load_room = DC::getInstance()->world[in_room].number;
 
-  //  st->gold      = ch->getGold();
+  //  st->gold      = getGold();
   st->gold = 0; // Moved
-  st->plat = GET_PLATINUM(ch);
-  st->exp = GET_EXP(ch);
-  st->immune = ch->immune;
-  st->resist = ch->resist;
-  st->suscept = ch->suscept;
-  st->alignment = ch->alignment;
-  st->misc = ch->misc;
+  st->plat = GET_PLATINUM(this);
+  st->exp = GET_EXP(this);
+  st->immune = immune;
+  st->resist = resist;
+  st->suscept = suscept;
+  st->alignment = alignment;
+  st->misc = misc;
 
-  st->hpmetas = GET_HP_METAS(ch);
-  st->manametas = GET_MANA_METAS(ch);
-  st->movemetas = GET_MOVE_METAS(ch);
-  st->clan = ch->clan;
+  st->hpmetas = GET_HP_METAS(this);
+  st->manametas = GET_MANA_METAS(this);
+  st->movemetas = GET_MOVE_METAS(this);
+  st->clan = clan;
 
   // make sure rest of unused are set to 0
   for (x = 0; x < 3; x++)
     st->extra_ints[x] = 0;
 
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
   {
-    st->armor = ch->armor;
-    st->hitroll = ch->hitroll;
-    st->damroll = ch->damroll;
-    st->afected_by = ch->affected_by[0];
-    st->afected_by2 = ch->affected_by[1];
+    st->armor = armor;
+    st->hitroll = hitroll;
+    st->damroll = damroll;
+    st->afected_by = affected_by[0];
+    st->afected_by2 = affected_by[1];
     //  x=0;
-    //  while(ch->afected_by[x] != -1) {
-    //     st->afected_by[x] = ch->affected_by[x];
+    //  while(afected_by[x] != -1) {
+    //     st->afected_by[x] = affected_by[x];
     //     x++;
     //  }
     //  st->afected_by[x] = -1;
   }
   else
   {
-    switch (GET_CLASS(ch))
+    switch (GET_CLASS(this))
     {
     case CLASS_MAGE:
       st->armor = 150;
@@ -1789,33 +1801,21 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
     st->damroll = 0;
     st->afected_by = 0;
     st->afected_by2 = 0;
-    st->acmetas = GET_AC_METAS(ch);
-    st->agemetas = GET_AGE_METAS(ch);
-    tmpage = ch->player->time;
+    st->acmetas = GET_AC_METAS(this);
+    st->agemetas = GET_AGE_METAS(this);
+    tmpage = player->time;
   }
 
   // re-affect the character with spells
-  for (af = ch->affected; af; af = af->next)
+  for (af = affected; af; af = af->next)
   {
-    affect_modify(ch, af->location, af->modifier, af->bitvector, true);
+    affect_modify(this, af->location, af->modifier, af->bitvector, true);
   }
 
   // re-equip the character with his eq
   for (i = 0; i < MAX_WEAR; i++)
   {
     if (char_eq[i])
-      equip_char(ch, char_eq[i], i, 1);
+      equip_char(char_eq[i], i, 1);
   }
-}
-
-int fwrite_string_tilde(FILE *fpsave)
-{
-  char buf[40];
-  strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
-  return fwrite(&buf, 37, 1, fpsave);
-}
-
-int fwrite_string(char *buf, FILE *fl)
-{
-  return fprintf(fl, "%s~\n", buf);
 }

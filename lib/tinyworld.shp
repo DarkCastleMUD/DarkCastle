@@ -148,6 +148,35 @@
 28
 0
 0
+#5~
+-1
+-1
+-1
+-1
+3002
+3003
+1.0
+1.0
+0
+0
+0
+0
+0
+%s Sorry cutie that's not on avaialble today - try list!~  
+%s I only sell "goods"!~  
+%s I only sell "goods"!~ 
+%s I only sell "goods"!~ 
+%s If you have no money, you'll have to go!~ 
+%s That'll be %d coins.  Would you like a lapdance?~ 
+%s Oops - %d a minor bug - please report!~  0
+0
+3042
+0
+2391
+0
+28
+0
+0
 #6~
 -1
 -1
@@ -298,6 +327,36 @@
 22
 6
 22
+#11~
+-1
+3100
+3101
+3102
+-1
+-1
+1.1
+0.9
+0
+0
+0
+0
+0
+%s I got no such drink.~
+%s I see no such thing.~
+%s I do not buy, would you like a drink?~
+%s BUG, Please report~
+%s You can't afford such a fine drink, try the Grubby Inn.~
+%s Fine, that'll be %d gold pieces.~
+%s Bug, please report (%d).~
+0
+0
+3100
+0
+3106
+6
+23
+23
+24
 #12~
 -1
 -1
@@ -418,6 +477,66 @@
 28
 0
 0
+#18~
+1351
+1352
+3010
+3100
+3101
+-1
+2.1
+0.5
+17
+19
+0
+0
+0
+%s Havn't got that in storage, try LIST!~
+%s You cant sell what you dont HAVE!~
+%s Sorry, I'm not a fence.~
+%s I'd love to buy it, I just cant spare the coinage~
+%s Bah, come back when you can pay!~
+%s That'll be %d coins -- thank you.~
+%s I'll give ya %d coins for that!~
+0
+1
+1305
+0
+1318
+0
+28
+0
+0
+#19~
+3050
+3051
+3053
+1353
+1354
+-1
+2.5
+0.3
+2
+3
+4
+10
+21
+%s Say again?~
+%s You dont have that, try INVENTORY!~
+%s What do I look like, a fence?~
+%s Sorry, I just cant afford such a costly item.~
+%s You cant afford it!~
+%s You're getting a bargain for that at only %d!~
+%s I guess I could give ya %d for that.~
+0
+1
+1306
+0
+1319
+0
+28
+0
+0
 #20~
 -1
 -1
@@ -447,6 +566,156 @@
 218
 0
 28
+0
+0
+#21~
+-1
+9023
+9025
+9026
+9028
+9022
+1.8
+0.5
+19
+5
+9
+17
+13
+m%  Check the list again buddy!~
+m%  Check your possessions again you caucasian!~
+m%  I don't like those type of things, westerner!~
+m%  Forget it!  I don't have enough money.~
+m%  You poor westerner, you haven't enough money!~
+m%  Lemme have it!  Here's your %d coins for it.~
+m%  Here you go, sucker!  That's %d more coins for me.~
+1
+1
+9018
+0
+9103
+0
+18
+18
+24
+#22~
+-1
+914
+918
+919
+920
+921
+1.1
+1.0
+0
+0
+0
+0
+0
+s%  The delicious fruits must have blinded you!~
+s%  I don't buy!~
+s%  I don't buy!~
+s%  I don't buy!~
+s%  I need to make some money somewhere!~
+s%  That will be %d coins.~
+%s  Oups - %d a minor bug - please report!~
+0
+0
+915
+0
+924
+0
+28
+0
+0
+#23~
+-1
+10117
+10118
+10119
+10120
+10121
+1.2
+0.5
+9
+5
+0
+0
+0
+%s Haven't got that on storage - try list!~
+%s You don't seem to have that.~
+%s I only buy armours and weapons.. Go away!~
+%s That is too expensive for me - Try a wizard!~
+%s You can't afford it!~
+%s That'll be %d coins, please.~
+%s You'll get %d coins for it!~
+0
+0
+10120
+0
+10107
+7
+20
+0
+0
+#24~
+-1
+-1
+-1
+10111
+10112
+10113
+1.2
+0.8
+1
+15
+10
+3
+8
+%s Haven't got that on storage - try list!~
+%s You don't seem to have that.~
+%s I don't buy THAT,... Try another shop.~
+%s I can't afford such a treasure.~
+%s You can't afford it!~
+%s That'll be %d coins, please.~
+%s You'll get %d coins for it!~
+0
+0
+10118
+0
+10105
+7
+20
+0
+0
+#25~
+-1
+-1
+-1
+10114
+10115
+10116
+1.2
+0.8
+0
+0
+0
+0
+0
+%s Haven't got that on storage - try list!~
+%s I don't buy!~
+%s I don't buy!~
+%s I don't buy!~
+%s If you have no money, you'll have to go!~
+%s That'll be %d coins.~
+%s Oops - %d a minor bug - please report!~
+0
+0
+10119
+0
+10121
+7
+20
 0
 0
 #26~
@@ -479,6 +748,156 @@
 28
 0
 0
+#27~
+-1
+26442
+26443
+26445
+-1
+-1
+1.4
+0.6
+5
+6
+2
+3
+4
+%s Do you see any here?  Use the list!~
+%s Okay, you dork!  Where is it?~
+%s What am I supposed to do with that?~
+%s Buy something, maybe then we can talk!~
+%s Get out of here, you deadbeat!~
+%s That'll be %d coins.  Would you like a receipt?~
+%s Here's %d coins -- go buy yourself something nice!~
+0
+0
+26439
+0
+26451
+8
+14
+15
+21
+#28~
+-1
+26447
+26448
+26449
+-1
+-1
+1.4
+0.3
+9
+10
+11
+0
+0
+%s Do you see any here?  Use the list!~
+%s Okay, you dork!  Where is it?~
+%s What am I supposed to do with that?  We sell sportswear!~
+%s Buy something, sport, then we can talk.~
+%s Get outta here, you deadbeat, before I call the Mall Police!~
+%s That'll be %d coins.  Need a bag?~
+%s Here's %d coins -- buy yourself something nice.~
+0
+0
+26440
+0
+26452
+8
+14
+15
+21
+#29~
+-1
+26420
+26421
+26422
+26441
+0
+1.4
+0.3
+10
+19
+2
+3
+4
+%s Do you see any here?  Use the list, for pete's sake!~
+%s Okay, you dork!  Where is it!~
+%s What am I supposed to do with junk like that?~
+%s Buy a potion, maybe then we can talk!~
+%s Get out of here, you deadbeat, and try the 7-11!~
+%s That'll be %d coins.  Need some breath mints too?~
+%s Here's %d coins -- go buy yourself something nice.~
+0
+0
+26437
+0
+26454
+8
+14
+15
+21
+#30~
+-1
+26438
+26439
+26440
+-1
+-1
+1.4
+0.3
+6
+7
+8
+11
+0
+%s Do you and me a favor and try using the list.~
+%s The stars are not favorable for that at this time.~
+%s While I respect your space, that item would be useless to me.~
+%s Buy something, I got seven cats to support at home.~
+%s Oh, man, your penniless trip is strictly for the birds.~
+%s That'll be %d coins.  Anything else you'd like?~
+%s Here's %d coins -- hope you're happy!~
+0
+0
+26436
+0
+26456
+8
+14
+15
+21
+#31~
+-1
+26451
+26452
+26453
+26454
+26455
+1.4
+0.3
+19
+10
+0
+0
+0
+%s Please consult our menu for available taste treats.~
+%s Okay, you dork!  Where is it?~
+%s That's really not something I want in my space.~
+%s I'm afraid you must buy something first.~
+%s Go beg for handouts somewhere else!~
+%s That'll be %d coins.  Want some sprouts with it?~
+%s Here's %d coins -- go buy yourself somethign nice.~
+0
+0
+26441
+0
+26460
+8
+14
+15
+21
 #32~
 27900
 27901
@@ -509,6 +928,397 @@
 10
 12
 16
+#33~
+-1
+-1
+9308
+9306
+9307
+-1
+1.3
+0.5
+0
+0
+0
+0
+0
+%s Never heard of it, BUT with a few days I'm sure I can get some.~
+%s Are you trying to sell me a hit of air?~
+%s Buy? I'm in this to sell so I can get a few police in my pocket.~
+%s Coupla punks are gobbling up my action, don't have the cash for that.~
+%s Its free the first time kid, but now your hooked, and I'm charging.~
+%s Well I'm %d coins richer, and you're up some cheap drugs.~
+%s I could send %d coins your way for that.~
+0
+0
+9310
+0
+9334
+0
+28
+0
+0
+#34~
+-1
+-1
+-1
+9311
+9310
+-1
+1
+1
+0
+0
+0
+0
+0
+%s See this hotdog cart? Get a clue pal.~
+%s What are you some sort of wiseass?  I've got five fingers to fix that.~
+%s Go throw your trash away, I don't want it.~
+%s You think I carry a million bucks around in this cart ya moron.~
+%s You put the money in my hand, THEN you get the food ya retod.~
+%s That's %d gold coins. You want some condiments?~
+%s About %d bucks is what the pawn shops would pay for that junk.~
+0
+0
+9311
+0
+9311
+0
+28
+0
+0
+#35~
+26461
+26462
+26463
+26464
+26465
+26466
+1.4
+0.3
+12
+0
+0
+0
+0
+%s What am I, ACME Rents?  Use the list!~
+%s Trying to rip me off?  I'll tell your mother!~
+%s What am I supposed to do with that?~
+%s I'm broke!  I had to pay-off Phire!~
+%s Go scrounge free samples at Hickory Farms, you deadbeat!~
+%s That'll be %d coins.~
+%s Hmmm...guess I could give you %d coins for that.~
+0
+0
+26457
+0
+26481
+6
+10
+12
+16
+#36~
+26456
+26457
+26458
+26459
+26460
+-1
+1.4
+0.3
+12
+19
+5
+0
+0
+%s Who do you think I am, Chain?   Use the list!~
+%s Cruising for a zap, are we?~
+%s And with that, you expect me to...?~
+%s I'm broke!  You think it's cheap maintaining my exotic lifestyle?~
+%s Go scrounge free sample at Hickory Farms, you deadbeat!~
+%s %d coins, a bargain at twice the price.~
+%s I'll give you %d coins for it, but you have to throw in your sister.~
+0
+0
+26455
+0
+26478
+1
+11
+12
+23
+#37~
+18030
+18032
+18033
+18034
+0
+0
+1.4
+0.3
+2
+10
+15
+19
+0
+%s What am I, Rose's attic?  Use the list!~
+%s Trying to rip me off?  I'm gonna tell Llevity!~
+%s Get out of here with that trash!~
+%s I'm broke!  Tell Eas I need a raise!~
+%s Get out of here, you deadbeat!~
+%s That'll be %d coins.~
+%s You'll get %d coins for that.~
+0
+0
+18021
+0
+18012
+5
+11
+12
+19
+#38~
+26805
+26806
+0
+0
+0
+0
+1.4
+0.3
+5
+3
+0
+0
+0
+%s What, you think this is some kind of rummage sale?  Use the list!~
+%s Trying to cheat me?  Prepare to die an honorable death!~
+%s I have no use for such trash.~
+%s I'm all out of credits.~
+%s Go beg on the streets, you deadbeat scum.~
+%s That'll be %d coins.~
+%s You get %d coins for that.~
+0
+0
+26816
+0
+26825
+6
+10
+12
+16
+#39~
+26801
+26802
+26803
+26804
+0
+-1
+1.4
+0.3
+10
+15
+17
+19
+0
+%s Alas, I do not have that valuable merchandise currently in stock.~
+%s I admire your fierce trading spirit, but you do not have that item~
+%s Worthless garbage!  Offer me something else....~
+%s I lack the funds for such a monumental purchase.~
+%s You're all out of money, and I must ask you to leave.~
+%s That'll be %d coins.  A pleasure doing business with you.~
+%s You're gouging me!  %d coins for THAT??~
+0
+0
+26815
+0
+26824
+1
+11
+12
+23
+#40~
+905
+28101
+17416
+7208
+0
+-1
+1.8
+0.8
+2
+3
+4
+10
+19
+%s Patty Cake Patty Cake...~
+%s When I was a boy, we have to walk ten miles to school, uphill both ways..~
+%s You smell that?  That's the smell of profit.~
+%s Sixty four bottles of beer on the wall, sixty four bottles of..~
+%s What the FUCK are you looking at?!?~
+%s God, I've gotta scratch my ass something fierce.~
+%s Got a few crates of mothballs arriving from shire next week.~
+0
+0
+191
+0
+196
+1
+11
+12
+23 
+#41~
+-1
+732
+733
+734
+735
+736
+1.1
+1.0
+5
+9
+0
+0
+0
+%s Go away kid!  You bother me!.~
+%s If you can't show me it, I won't buy it!~
+%s I only purchase fine weapons and armor!~
+%s Unfortunately, I cannot afford the expense of such an item.~
+%s Hey, cash and carry... show me the cash or I carry you out!~
+%s That'll be %d coins please.~
+%s I'll give you %d coins for that.~
+0
+0
+705
+0
+741
+8
+12
+13
+18
+#42~
+728
+730
+731
+-1
+-1
+-1
+1.5
+1.0
+2
+3
+4
+10
+0
+%s I'm sorry, apprentice. I don't seem to have that in stock at the moment.~
+%s Apprentice, be wary I don't take action against you if you try to con me.~
+%s I only deal in magical supplies. ~
+%s I seem to have run low on gold.. let me dial my alchemist.~
+%s You don't have enough money to complete that transaction, I'm afraid.~
+%s That'll be %d coins, apprentice.~
+%s Here's %d coins for that items, apprentice.~
+0
+0
+706
+0
+738
+7
+12
+13
+19
+#44~
+17200
+17209
+-1
+-1
+-1
+-1
+1.2
+0.8
+10
+0
+0
+0
+0
+0
+%s I'm not familiar with that concoction.~
+%s It doesn't seem you have that for sale.~
+%s I deal in potions, exclusively.~
+%s Business has been poor.  I blame the pirates.~
+%s What do you think I run here?  A charity?~
+%s %d coins for your exquisite purchase.~
+%s I think I could part with %d coins for...that.~
+0
+0
+17227
+0
+17262
+0
+28
+0
+0
+#45~
+17207
+17208
+17213
+-1
+-1
+-1
+1.2
+0.5
+19
+0
+0
+0
+0
+%s My skills are vast, but I've never baked THAT.~
+%s You seem to be lacking what you offer.~
+%s What would I want with that?!  I'm a baker!~
+%s Ooops!  I've eaten up all the profit again.~
+%s No money?  How about washing some pans for me?~
+%s Such a delight will cost you %d coins.~
+%s For that, I'll give you %d coins.~
+0
+0
+17226
+0
+17261
+0
+28
+0
+0
+#46~
+26328
+26329
+26330
+-1
+-1
+-1
+1.2
+0.8
+11
+0
+0
+0
+0
+%s I just have what's on the counter, honey.~
+%s I'll sell you air, but I don't buy it myself.~
+%s What would I want with that?~
+%s Hee hee.  I'm a little short.  No pun intended.~
+%s Sheesh.  I drag out my wares and now you can't pay?!~
+%s That'll be %d coins for that superb choice you made.~
+%s Hmm, I'll give you %d coins for this substandard thing.~
+0
+0
+26336
+0
+26351
+0
+28
+0
+0
 #47~
 -1
 3001
@@ -539,6 +1349,66 @@
 28
 0  
 0  
+#48~ 
+0
+0
+0
+0
+0
+0
+1.3
+0.4
+19
+10
+0
+0
+0
+%s Arr, I don't seem to have that, matey.~
+%s Ye don't seem to have it. ~
+%s I only deal with foodstuffs.~
+%s I seem to be out of golds at the moment, matey.~
+%s I'm gonna have to see the cash first!~
+%s That'll be %d gold coins, matey.~
+%s Here's %d gold coins for that.~
+0
+0
+704
+0
+736
+0
+28
+0
+0
+#49~ greg the trader in astoria
+0
+0
+0
+0
+0
+0
+1.3
+0.3
+5
+9
+6
+7
+26
+%s I don't seem to have that item.~
+%s You don't seem to own anything like that.~
+%s But this is just junk!~
+%s Come back when I make a few more trades.. I'm low on cash.~
+%s Don't try to screw me! We here in Sarosa are smart folks.~
+%s Sure, that'll be %d coins.~
+%s I'll give you %d coins for that.~
+0
+0
+718
+0
+800
+0
+28
+0
+0
 #51~
 0
 0
@@ -565,6 +1435,636 @@
 21902
 0
 21902
+0
+28
+0
+0
+#52~
+0
+0
+0
+0
+0
+0
+1.7
+0.5
+6
+7
+0
+0
+0
+%s I'm very sorry, I don't seem to have that in stock.  Perhaps there's something else you like?~
+%s I'm afraid you'll need some money to purchase my goods!~
+%s I only deal in archery equipment I'm afraid.  I AM a feltch...err, fletcher after all! ~
+%s I'm afraid I can't use that, perhaps there is something else I can help you with?~
+%s You're going to need a little more to afford that I'm afraid.~
+%s That will be %d coins, please.~
+%s Ahh, very nice!  Here's %d coins for that item.~
+0
+0
+10123
+0
+10125
+7
+20
+0
+0
+#53~
+0
+0
+0
+0
+0
+0
+1.7
+0.5
+17
+2
+3
+4
+10
+%s I'm very sorry, I don't seem to have that in stock.  Perhaps there's something else you like?~
+%s I'm afraid you'll need some money to "support the church" my child.~
+%s I only deal in holy potions, scrolls, and imbued magical items! ~
+%s I'm afraid I can't use that my child, perhaps there is something else I can help you with?~
+%s You're going to need a bit larger donation to afford that I'm afraid.~
+%s That will be %d coins, please. Remember to say your prayers!~
+%s Ahh, very nice!  Here's %d coins for that most holy item.~
+0
+0
+3079
+0
+3091
+6
+20
+0
+0
+#54~
+0
+0
+0
+0
+0
+0
+1.7
+0.5
+17
+2
+3
+4
+8
+%s I'm very sorry, I don't seem to have that in stock.  Perhaps there's something else you like?~
+%s I'm afraid you'll need some money to shop here.~
+%s Sorry, I don't deal in those kinds of items. ~
+%s I'm afraid I can't use that, perhaps there is something else I can help you with?~
+%s You're going to need a bit larger donation to afford that I'm afraid.~
+%s That will be %d coins, please. Remember to view all the exhibits!~
+%s Ahh, very nice!  Here are %d coins for that item.~
+0
+0
+9704
+0
+9752
+6
+20
+0
+0
+#55~
+-1
+-1
+-1
+-1
+-1
+-1
+1.1
+0.9
+0
+0
+0
+0
+0
+%s I'm sorry, I don't sell that - try list!~
+%s I only sell food!~
+%s I only sell food!~
+%s I only sell food!~
+%s If you have no money, you'll have to go hungry!~
+%s That'll be %d coins.  Thanks!~
+%s Oops - %d a minor bug - please report!~
+0
+0
+3167
+0
+3158
+6
+20
+0
+0
+#56~
+-1
+-1
+-1
+-1
+-1
+-1
+1.1
+0.9
+0
+0
+0
+0
+0
+%s I'm sorry, I don't sell that - try list!~
+%s I only sell fruit!~
+%s I only sell fruit!~
+%s I only sell fruit!~
+%s If you have no money, you'll have to go hungry!~
+%s That'll be %d coins.  Thanks!~
+%s Oops - %d a minor bug - please report!~
+0
+0
+3171
+0
+3149
+6
+20
+0
+0
+#57~
+-1
+-1
+-1
+-1
+-1
+-1
+1.1
+0.9
+0
+0
+0
+0
+0
+%s I'm afraid I don't sell that - try list!~
+%s I'm sorry, I only sell goods in the service of the Dark Lord!~
+%s I'm sorry, I only sell goods in the service of the Dark Lord!~
+%s I'm sorry, I only sell goods in the service of the Dark Lord!~
+%s You must have some coins as an offering to acquire my goods!~
+%s That will cost %d coins.~
+%s Oops - %d a minor bug - please report!~
+0
+0
+2314
+0
+2352
+0
+28
+0
+0
+#58~
+-1
+-1
+-1
+-1
+-1
+-1
+1.1
+0.9
+8
+0
+0
+0
+0
+%s I'm sorry, I don't sell that - try list!~
+%s I only sell special gems!~
+%s I only sell special gems!~
+%s I only sell special gems!~
+%s If you have no money, you'll have to go without!~
+%s That'll be %d coins.  Thanks!~
+%s I'll give you %d coins for that.~
+0
+0
+13416
+0
+13484
+6
+20
+0
+0
+#59~
+-1
+-1
+-1
+-1
+-1
+-1
+1.1
+0.9
+0
+0
+0
+0
+0
+%s I'm sorry, I don't sell that - try list!~
+%s I only sell special arrows!~
+%s I only sell special arrows!~
+%s I only sell special arrows!~
+%s If you have no money, you'll have to go without!~
+%s That'll be %d coins.  Thanks!~
+%s Small bug! Please report to an Immortal!~
+0
+0
+13421
+0
+13422
+6
+20
+0
+0
+#60~
+-1 
+-1 
+-1 
+-1 
+-1 
+-1 
+1.8 
+0.4 
+8 
+20 
+0 
+0
+0
+%s Alassss effendi, I do not sssstock such goodssss -- try list!~ 
+%s Alassss effendi, I am afraid you do not have that item!~
+%s I only deal in treasuressss and magic artifactssss, sorry!~
+%s Alassss effendi, I cannot afford such a treasure.~
+%s Ahh, by the sands, you are a clever one -- but ssssadly you need ssssome money first!~
+%s A mosssst exccccellent choice effendi.  That will be a mere %d gold.~
+%s Ah, mossssst clever effendi! You drive a hard bargain you ssssneaky kafir...here is your %d gold nonethelessss.~
+0 
+0 
+5222 
+0 
+5300 
+8 
+12 
+13 
+18
+#61~
+-1
+-1
+-1
+-1
+-1
+-1
+1.7
+0.5
+5
+6
+9
+0
+0
+%s Sorry effendi! I do not stock such goods -- try list!~
+%s Sorry effend1! I am afraid you do not have that item!~
+%s I only deal in armours and weapons, sorry!~
+%s Sorry effendi! I cannot afford such a powerful item.~
+%s You try to fool me you son of a camel!? Get some money first!~
+%s A most excellent choice effendi.  That will be a mere %d gold.~
+%s By Allah! You drive a hard bargain you sneaky kafir, but here is your %d gold nonetheless.~
+0
+0
+5257
+0
+5313
+7
+18
+0
+0
+#62~
+-1
+-1
+-1
+-1
+-1
+-1
+1.6
+0.3
+10
+0
+0
+0
+0
+%s Alas effendi, I do not stock such goods -- try list!~
+%s Alas effendi, I am afraid you do not have that item!~
+%s I only deal in potions and elixirs, sorry!~
+%s Alas effendi, I cannot afford this.~
+%s You try to fool me you son of a camel!? Get some money first!~
+%s A most excellent choice effendi.  That will be a mere %d gold.~
+%s By Allah! You drive a hard bargain you sneaky kafir, but here is your %d gold nonetheless.~
+0
+0
+5256
+0
+5368
+10
+16
+0
+0
+#63~
+-1
+-1
+-1
+-1
+-1
+-1
+1.3
+0.4
+8
+0
+0
+0
+0
+%s You must think me a dullard or a fool -- try list!~
+%s Perhaps you need your eyes examined as you do not have that item!~
+%s I only deal in gems and jewels, sorry!~
+%s Alas but business has been poor, I cannot afford this.~
+%s You think you can cheat the master of cheats!? Get some money first!~
+%s A beautiful treasure, but I'm willing to part with it for a mere %d gold.~
+%s I'll buy it despite the blood stains, here is your %d gold.~
+0
+0
+17800
+0
+17855
+12
+26
+0
+0 
+#64~
+-1
+-1
+-1
+-1
+-1
+-1
+1.3
+0.4
+5
+0
+0
+0
+0
+%s I'm afraid I don't have what you're looking for -- try list for an inventory!~
+%s Counting chickens before they hatch?! Come back when you have something to sell~
+%s I only deal in arms and armor, sorry!~
+%s Do you think me a bank?! I cannot afford this.~
+%s You think this is the Salvation Army!? No gold, no merchandise!~
+%s A real beaut, forged it myself, but I'm willing to part with it for a mere %d gold.~
+%s I'll buy it despite the dings and dents, here is your %d gold.~
+0
+0
+17801
+0
+17861
+9
+17
+0
+0 
+#65~
+-1
+-1
+-1
+-1
+-1
+-1
+1.3
+0.4
+9
+0
+0
+0
+0
+%s I'm sorry Hon', I don't seem to have that -- try list for an inventory!~
+%s I think you've been robbed because it doesn't look like you have that item~
+%s I only deal in clothing, sorry!~
+%s As much as I'd like to take it off your hands, I cannot afford this.~
+%s Sorry sweetie, but it looks like you're a bit short on cash.~
+%s Oh a fantastic choice! It's yours for a mere %d gold.~
+%s I don't usually buy, but this is too good to resist.  Here is your %d gold.~
+0
+0
+17802
+0
+17863
+10
+18
+0
+0
+#66~
+-1
+-1
+-1
+-1
+-1
+-1
+1.3
+0.4
+2
+3
+4
+10
+0
+%s Though I can turn things invisible, I'm fairly certain I don't have that item -- try list for an inventory!~
+%s With my magical senses I can see that you do not have that item.~
+%s I only deal in magical goods, sorry!~
+%s Truly a remarkable item, but I cannot afford this.~
+%s You're short on funds.  Perhaps you should find an alchemist to turn the lead in your head into gold!.~
+%s You won't be sorry with this purchase! It's yours for a mere %d gold.~
+%s This will be an excellent addition to my shop.  Here is your %d gold.~
+0
+0
+17803
+0
+17872
+9
+20
+0
+0
+#67~
+-1
+-1
+-1
+-1
+-1
+-1
+1.3
+0
+1
+15
+17
+19
+29
+%s I'm sorry but I don't have that item -- try list for an inventory!~
+%s You dont have that!~
+%s Company policy states I cannot buy such goods.~
+%s Sorry, that's just too rich for my blood.~
+%s It doesn't look like you have the cash for such a purchase.~
+%s It's yours for a mere %d gold. Thank you, please come again.~
+%s Sorry, I don't buy goods.~
+0
+0
+17804
+0
+17875
+0
+28
+0
+0
+#68~
+-1
+-1
+-1
+-1
+-1
+-1
+1.3
+0.4
+6
+7
+0
+0
+0
+%s And where should I pull that item from, my arse?! -- try list for an inventory!~
+%s Unless you're using your colon to smuggle goods, it doesn't look like you have that item.~
+%s Sorry, I only deal with bows and arrows.~
+%s Bugger, I knew shouldn't have wasted my gold on that two-bit whore.  You'll have to come back when I've earned some more money.~
+%s Looks like you're short on funds.  Well, you can always make a buck in the Red Lantern District if you catch my drift.~
+%s Here ya go, try not to poke your eye out.  It's yours for a mere %d gold.~ 
+%s This will be an excellent addition to my shop.  Here is your %d gold.~
+0
+0
+1651
+0
+1658
+7
+16
+0
+0 
+#69~
+-1
+-1
+-1
+-1
+-1
+-1
+1.0
+0.8
+0
+0
+0
+0
+0
+%s I don't sell those - try list!~
+%s I'm sorry, I'm not allowed to buy!~
+%s I'm sorry, I'm not allowed to buy!~
+%s I'm sorry, I'm not allowed to buy!~
+%s You can't afford that, go run some gold!~
+%s That'll be %d coins, please!~
+%s I'll give you $d coins for that!~
+0
+0
+2319
+0
+2362
+0
+28
+0
+0
+#70~
+-1
+-1
+-1
+-1
+-1
+-1
+1.0
+0.8
+0
+0
+0
+0
+0
+%s I don't sell those - try list!~
+%s I'm sorry, I'm not allowed to buy!~
+%s I'm sorry, I'm not allowed to buy!~
+%s I'm sorry, I'm not allowed to buy!~
+%s You can't afford that, go run some gold!~
+%s That'll be %d coins, please!~
+%s I'll give you $d coins for that!~
+0
+0
+2320
+0
+2326
+0
+28
+0
+0
+#71~
+-1
+-1
+-1
+-1
+-1
+-1
+1.1
+0.9
+0
+0
+0
+0
+0
+%s I'm afraid I don't sell that - try list!~
+%s I'm sorry, I only sell goods in the service of the Dark Lord!~
+%s I'm sorry, I only sell goods in the service of the Dark Lord!~
+%s I'm sorry, I only sell goods in the service of the Dark Lord!~
+%s You must have some coins as an offering to acquire my goods!~
+%s That will cost %d coins.~
+%s Oops - %d a minor bug - please report!~
+0
+0
+2325
+0
+2334
+0
+28
+0
+0
+#72~
+-1
+-1
+-1
+-1
+-1
+-1
+10000
+0.001
+0
+0
+0
+0
+0
+%s Mmmm nope.  Don't have that!~
+%s Nope.  No refunds!', Natalie giggles~
+%s Nope.  No refunds!', Natalie giggles~
+%s Nope.  No refunds!', Natalie giggles~
+%s You can't afford it!~
+%s Thank you so much! That costs %d coins.  No refunds!~
+%s Oops - %d a minor bug - please report!~
+0
+0
+30036
+0
+30087
 0
 28
 0

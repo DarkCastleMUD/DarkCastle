@@ -46,7 +46,7 @@ void check_eq(Character *ch);
 //        SING_FUN *intrp_pointer; /* other other function to call */
 //	  int difficulty
 
-struct song_info_type song_info[] = {
+const QList<song_info_type> song_info = {
 
 	{/* 0 */
 	 1, position_t::RESTING, 0, SKILL_SONG_LIST_SONGS,
@@ -198,7 +198,7 @@ bool ARE_GROUPED(Character *sub, Character *obj);
 
 int16_t use_song(Character *ch, int kn)
 {
-	return (song_info[kn].min_useski);
+	return (song_info[kn].min_useski());
 }
 
 int getTotalRating(Character *ch)
@@ -208,7 +208,7 @@ int getTotalRating(Character *ch)
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
 	{
-		rating += song_info[(*i).song_number].rating;
+		rating += song_info[(*i).song_number].rating();
 	}
 
 	return rating;
@@ -227,7 +227,7 @@ void stop_grouped_bards(Character *ch, int bardsing)
 		{
 			if (bardsing)
 				origsing = master;
-			do_sing(ch, "stop", CMD_DEFAULT);
+			do_sing(ch, "stop");
 			origsing = nullptr;
 		}
 		for (fvictim = master->followers; fvictim; fvictim = fvictim->next)
@@ -236,7 +236,7 @@ void stop_grouped_bards(Character *ch, int bardsing)
 				continue;
 			else
 				origsing = fvictim->follower;
-			do_sing(ch, "stop", CMD_DEFAULT);
+			do_sing(ch, "stop");
 			origsing = nullptr;
 		}
 	}
@@ -252,12 +252,12 @@ void stop_grouped_bards(Character *ch, int bardsing)
 		{
 			// end any performances
 			if (IS_SINGING(fvictim->follower))
-				do_sing(fvictim->follower, "stop", CMD_DEFAULT);
+				do_sing(fvictim->follower, "stop");
 		}
 
 		if (IS_SINGING(master))
 		{
-			do_sing(master, "stop", CMD_DEFAULT);
+			do_sing(master, "stop");
 		}
 		origsing = nullptr;
 	}
@@ -277,7 +277,7 @@ void get_instrument_bonus(Character *ch, int &comb, int &non_comb)
 	non_comb = ch->equipment[HOLD]->obj_flags.value[0];
 }
 
-int do_sing(Character *ch, char *arg, int cmd)
+int do_sing(Character *ch, char *arg, cmd_t cmd)
 {
 	Character *tar_char = 0;
 	Object *tar_obj = 0;
@@ -331,7 +331,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		ch->sendln("You know not of that song.");
 		return eFAILURE;
 	}
-	if (cmd == CMD_ORCHESTRATE)
+	if (cmd == cmd_t::ORCHESTRATE)
 	{
 		if (!IS_SINGING(ch))
 		{
@@ -344,7 +344,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 	}
-	else if (song_info[spl].rating > 0 && IS_SINGING(ch))
+	else if (song_info[spl].rating() > 0 && IS_SINGING(ch))
 	{
 		if (ch->has_skill(SKILL_ORCHESTRATE))
 			ch->sendln("You are already in the middle of another song!  Try using orchestrate.");
@@ -371,11 +371,11 @@ int do_sing(Character *ch, char *arg, int cmd)
 		return eFAILURE;
 	}
 
-	if (song_info[spl].song_pointer)
+	if (song_info[spl].song_pointer())
 	{
-		if (ch->getPosition() < song_info[spl].minimum_position && IS_PC(ch) && spl != SPELL_TYPE_WAND)
+		if (GET_POS(ch) < song_info[spl].minimum_position() && IS_PC(ch) && spl != SPELL_TYPE_WAND)
 		{
-			switch (ch->getPosition())
+			switch (GET_POS(ch))
 			{
 			case position_t::SLEEPING:
 				ch->sendln("You dream of beautiful music.");
@@ -398,7 +398,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		else
 		{
 			if (ch->getLevel() < ARCHANGEL && spl != 0 && spl != SPELL_TYPE_WAND)
-				if (!(learned = ch->has_skill(song_info[spl].skill_num)))
+				if (!(learned = ch->has_skill(song_info[spl].skill_num())))
 				{
 					if (IS_NPC(ch) && !ch->master)
 						learned = 50;
@@ -410,7 +410,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				}
 		}
 
-		if (getTotalRating(ch) + song_info[spl].rating > BARD_MAX_RATING)
+		if (getTotalRating(ch) + song_info[spl].rating() > BARD_MAX_RATING)
 		{
 			ch->sendln("You are unable to orchestrate such a complicated melody!");
 			return eFAILURE;
@@ -427,30 +427,30 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 		one_argument(argument, name);
 
-		if (!isSet(song_info[spl].targets, TAR_IGNORE))
+		if (!isSet(song_info[spl].targets(), TAR_IGNORE))
 		{
 			if (*name)
 			{
-				if (isSet(song_info[spl].targets, TAR_CHAR_ROOM))
+				if (isSet(song_info[spl].targets(), TAR_CHAR_ROOM))
 					if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && isSet(song_info[spl].targets, TAR_CHAR_WORLD))
+				if (!target_ok && isSet(song_info[spl].targets(), TAR_CHAR_WORLD))
 					if ((tar_char = get_char_vis(ch, name)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && isSet(song_info[spl].targets, TAR_OBJ_INV))
+				if (!target_ok && isSet(song_info[spl].targets(), TAR_OBJ_INV))
 					if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && isSet(song_info[spl].targets, TAR_OBJ_ROOM))
+				if (!target_ok && isSet(song_info[spl].targets(), TAR_OBJ_ROOM))
 				{
 					tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
 					if (tar_obj != nullptr)
 						target_ok = true;
 				}
 
-				if (!target_ok && isSet(song_info[spl].targets, TAR_OBJ_EQUIP))
+				if (!target_ok && isSet(song_info[spl].targets(), TAR_OBJ_EQUIP))
 				{
 					for (int i = 0; i < MAX_WEAR && !target_ok; i++)
 						if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
@@ -460,11 +460,11 @@ int do_sing(Character *ch, char *arg, int cmd)
 						}
 				}
 
-				if (!target_ok && isSet(song_info[spl].targets, TAR_OBJ_WORLD))
+				if (!target_ok && isSet(song_info[spl].targets(), TAR_OBJ_WORLD))
 					if ((tar_obj = get_obj_vis(ch, name)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && isSet(song_info[spl].targets, TAR_SELF_ONLY))
+				if (!target_ok && isSet(song_info[spl].targets(), TAR_SELF_ONLY))
 					if (str_cmp(GET_NAME(ch), name) == 0)
 					{
 						tar_char = ch;
@@ -475,14 +475,14 @@ int do_sing(Character *ch, char *arg, int cmd)
 			/* No argument was typed */
 			else if (!*name)
 			{
-				if (isSet(song_info[spl].targets, TAR_FIGHT_VICT))
+				if (isSet(song_info[spl].targets(), TAR_FIGHT_VICT))
 					if (ch->fighting)
 						if ((ch->fighting)->in_room == ch->in_room)
 						{
 							tar_char = ch->fighting;
 							target_ok = true;
 						}
-				if (!target_ok && isSet(song_info[spl].targets, TAR_SELF_ONLY))
+				if (!target_ok && isSet(song_info[spl].targets(), TAR_SELF_ONLY))
 				{
 					tar_char = ch;
 					target_ok = true;
@@ -493,26 +493,26 @@ int do_sing(Character *ch, char *arg, int cmd)
 				target_ok = false;
 		}
 
-		if (isSet(song_info[spl].targets, TAR_IGNORE))
+		if (isSet(song_info[spl].targets(), TAR_IGNORE))
 			target_ok = true;
 
 		if (target_ok != true)
 		{
 			if (*name)
 			{
-				if (isSet(song_info[spl].targets, TAR_CHAR_ROOM))
+				if (isSet(song_info[spl].targets(), TAR_CHAR_ROOM))
 					ch->sendln("Nobody here by that name.");
-				else if (isSet(song_info[spl].targets, TAR_CHAR_WORLD))
+				else if (isSet(song_info[spl].targets(), TAR_CHAR_WORLD))
 					ch->sendln("Nobody playing by that name.");
-				else if (isSet(song_info[spl].targets, TAR_OBJ_INV))
+				else if (isSet(song_info[spl].targets(), TAR_OBJ_INV))
 					ch->sendln("You are not carrying anything like that.");
-				else if (isSet(song_info[spl].targets, TAR_OBJ_ROOM))
+				else if (isSet(song_info[spl].targets(), TAR_OBJ_ROOM))
 					ch->sendln("Nothing here by that name.");
-				else if (isSet(song_info[spl].targets, TAR_OBJ_WORLD))
+				else if (isSet(song_info[spl].targets(), TAR_OBJ_WORLD))
 					ch->sendln("Nothing at all by that name.");
-				else if (isSet(song_info[spl].targets, TAR_OBJ_EQUIP))
+				else if (isSet(song_info[spl].targets(), TAR_OBJ_EQUIP))
 					ch->sendln("You are not wearing anything like that.");
-				else if (isSet(song_info[spl].targets, TAR_OBJ_WORLD))
+				else if (isSet(song_info[spl].targets(), TAR_OBJ_WORLD))
 					ch->sendln("Nothing at all by that name.");
 			}
 			else
@@ -523,12 +523,12 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 		else if (target_ok)
 		{
-			if ((tar_char == ch) && isSet(song_info[spl].targets, TAR_SELF_NONO))
+			if ((tar_char == ch) && isSet(song_info[spl].targets(), TAR_SELF_NONO))
 			{
 				ch->sendln("You cannot sing this to yourself!");
 				return eFAILURE;
 			}
-			else if ((tar_char != ch) && isSet(song_info[spl].targets, TAR_SELF_ONLY))
+			else if ((tar_char != ch) && isSet(song_info[spl].targets(), TAR_SELF_ONLY))
 			{
 				ch->sendln("You can only sing this song to yourself.");
 				return eFAILURE;
@@ -540,7 +540,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			}
 		}
 
-		if (!isSet(song_info[spl].targets, TAR_IGNORE))
+		if (!isSet(song_info[spl].targets(), TAR_IGNORE))
 			if (!tar_char && !tar_obj)
 			{
 				logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
@@ -563,13 +563,13 @@ int do_sing(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 
-		// WAIT_STATE(ch, song_info[spl].beats);
+		// WAIT_STATE(ch, song_info[spl].beats());
 		// Bards don't get a wait state for singing.  The songs take time
 		// to go off, and 'beats' is how long it takes them.  Certain songs
 		// DO give a wait state, but those songs apply the wait state internal
 		// to the "do_song" code
 
-		if ((song_info[spl].song_pointer == nullptr) && spl > 0)
+		if ((song_info[spl].song_pointer() == nullptr) && spl > 0)
 		{
 			ch->sendln("Sorry, this power has not yet been implemented.");
 			return eFAILURE;
@@ -577,7 +577,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		else
 		{
 
-			learned = ch->has_skill(song_info[spl].skill_num);
+			learned = ch->has_skill(song_info[spl].skill_num());
 
 			if (spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE || spl == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || spl == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE)
 			{
@@ -599,7 +599,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			}
 
 			/* Stop abusing your betters  */
-			if (!isSet(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
+			if (!isSet(song_info[spl].targets(), TAR_IGNORE) && !tar_obj)
 				if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
 				{
 					ch->sendln("That just might annoy them!");
@@ -607,13 +607,13 @@ int do_sing(Character *ch, char *arg, int cmd)
 				}
 
 			/* Imps ignore safe flags  */
-			if (!isSet(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
+			if (!isSet(song_info[spl].targets(), TAR_IGNORE) && !tar_obj)
 				if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
 				{
 					tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
 				}
 
-			if (cmd != CMD_ORCHESTRATE && IS_SINGING(ch)) // I'm singing
+			if (cmd != cmd_t::ORCHESTRATE && IS_SINGING(ch)) // I'm singing
 			{
 				if (!origsing)
 				{
@@ -657,13 +657,13 @@ int do_sing(Character *ch, char *arg, int cmd)
 				// interrupted so we stop and remove the affects
 				for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
 				{
-					if ((song_info[(*i).song_number].intrp_pointer))
-						((*song_info[(*i).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, learned));
+					if ((song_info[(*i).song_number].intrp_pointer()))
+						((*song_info[(*i).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, learned));
 				}
 				if (spl != SPELL_TYPE_WAND && !origsing) // song 'stop'
 					ch->songs.clear();
 			}
-			else if (cmd == CMD_ORCHESTRATE)
+			else if (cmd == cmd_t::ORCHESTRATE)
 			{
 				if (!skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 				{
@@ -684,7 +684,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 			// There's no sense adding a song to the list if it's a 1-time song with no stop function
 			// like stop, whistle sharp or listsongs
-			if (song_info[spl].rating > 0 && spl != SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE)
+			if (song_info[spl].rating() > 0 && spl != SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE)
 			{
 				struct songInfo data;
 				data.song_number = spl;
@@ -693,7 +693,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				ch->songs.push_back(data);
 			}
 
-			return ((*song_info[spl].song_pointer)(ch->getLevel(), ch, argument, tar_char, learned));
+			return ((*song_info[spl].song_pointer())(ch->getLevel(), ch, argument, tar_char, learned));
 		}
 	}
 	return eFAILURE;
@@ -706,9 +706,9 @@ void update_character_singing(Character *ch)
 		if ((*j).song_timer == -1)
 		{
 			ch->sendln("You run out of lyrics and end the song.");
-			if ((song_info[(*j).song_number].intrp_pointer))
+			if ((song_info[(*j).song_number].intrp_pointer()))
 			{
-				((*song_info[(*j).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, -1));
+				((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
 				if (ch->songs.empty())
 				{
 					break;
@@ -735,9 +735,9 @@ void update_character_singing(Character *ch)
 			if (ch->getLevel() < IMPLEMENTER && ((isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI) || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && ((*j).song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE)))
 			{
 				ch->sendln("In this room, your song quiety fades away.");
-				if ((song_info[(*j).song_number].intrp_pointer))
+				if ((song_info[(*j).song_number].intrp_pointer()))
 				{
-					((*song_info[(*j).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, -1));
+					((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
 					if (ch->songs.empty())
 					{
 						break;
@@ -754,13 +754,13 @@ void update_character_singing(Character *ch)
 				--j;
 				continue;
 			}
-			else if ((((ch->getPosition() < song_info[(*j).song_number].minimum_position) && IS_PC(ch)) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
+			else if ((((GET_POS(ch) < song_info[(*j).song_number].minimum_position()) && IS_PC(ch)) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
 			{
 				ch->sendln("You can't keep singing in this position!");
 				(*j).song_timer = 0;
-				if ((song_info[(*j).song_number].intrp_pointer))
+				if ((song_info[(*j).song_number].intrp_pointer()))
 				{
-					((*song_info[(*j).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, -1));
+					((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
 					if (ch->songs.empty())
 					{
 						break;
@@ -781,9 +781,9 @@ void update_character_singing(Character *ch)
 				if ((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
 				{
 					ch->sendln("Without an instrument, your song dies away.");
-					if ((song_info[(*j).song_number].intrp_pointer))
+					if ((song_info[(*j).song_number].intrp_pointer()))
 					{
-						((*song_info[(*j).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, -1));
+						((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
 						if (ch->songs.empty())
 						{
 							break;
@@ -826,9 +826,9 @@ void update_character_singing(Character *ch)
 			int learned = ch->has_skill(((*j).song_number + SKILL_SONG_BASE));
 			int retval = 0;
 
-			if ((song_info[(*j).song_number].exec_pointer))
+			if ((song_info[(*j).song_number].exec_pointer()))
 			{
-				retval = ((*song_info[(*j).song_number].exec_pointer)(ch->getLevel(), ch, nullptr, nullptr, learned));
+				retval = ((*song_info[(*j).song_number].exec_pointer())(ch->getLevel(), ch, nullptr, nullptr, learned));
 				if (ch->songs.empty())
 				{
 					break;
@@ -899,7 +899,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
 	}
 
 	(*i).song_data = str_dup(arg);
-	(*i).song_timer = (song_info[(*i).song_number].beats - (skill / 15));
+	(*i).song_timer = (song_info[(*i).song_number].beats() - (skill / 15));
 
 	return eSUCCESS;
 }
@@ -955,11 +955,11 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	}
 
 	if (victim->master)
-		stop_follower(victim, 0);
+		stop_follower(victim);
 
 	remove_memory(victim, 'h');
 
-	add_follower(victim, ch, 0);
+	add_follower(victim, ch);
 
 	af.type = SPELL_CHARM_PERSON;
 	af.duration = 24 + ((level > 40) * 6) + ((level > 60) * 6) + ((level > 80) * 12);
@@ -985,7 +985,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
-	int learned = ch->has_skill(song_info[SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE].skill_num);
+	int learned = ch->has_skill(song_info[SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE].skill_num());
 
 	act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", ch, 0, victim, TO_VICT, 0);
 	act("$n sings a hilarious limerick about a man from Nantucket to $N!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1096,7 +1096,7 @@ int song_healing_melody(uint8_t level, Character *ch, char *arg, Character *vict
 		if ((*i).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = (song_info[(*i).song_number].beats - (skill / 15));
+	(*i).song_timer = (song_info[(*i).song_number].beats() - (skill / 15));
 
 	if (ch->getLevel() > MORTAL)
 		(*i).song_timer = 1;
@@ -1168,7 +1168,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 		return eSUCCESS;
 	}
 
-	(*i).song_timer = (song_info[(*i).song_number].beats - (skill / 15));
+	(*i).song_timer = (song_info[(*i).song_number].beats() - (skill / 15));
 
 	if (ch->getLevel() > MORTAL)
 		(*i).song_timer = 1;
@@ -1187,7 +1187,7 @@ int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *v
 		if ((*i).song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -1273,7 +1273,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 		return eSUCCESS;
 	}
 
-	(*k).song_timer = song_info[(*k).song_number].beats;
+	(*k).song_timer = song_info[(*k).song_number].beats();
 	return eSUCCESS;
 }
 
@@ -1291,7 +1291,7 @@ int song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *v
 
 	ch->sendln("You begin to sing a long single note...");
 	act("$n sings a long solitary note.", ch, 0, 0, TO_ROOM, 0);
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -1349,7 +1349,7 @@ int song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victi
 		if ((*i).song_number == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 	return eSUCCESS;
 }
 
@@ -1412,7 +1412,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 		return eSUCCESS;
 	}
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 	return eSUCCESS;
 }
 
@@ -1423,10 +1423,10 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 	ch->sendln("Available Songs\n\r---------------");
 	for (qsizetype i = 0; i < Character::song_names.length(); i++)
 	{
-		if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num))
+		if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))
 			continue;
 
-		sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(i).toStdString().c_str(), song_info[i].min_useski);
+		sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(i).toStdString().c_str(), song_info[i].min_useski());
 		ch->send(buf);
 	}
 	return eSUCCESS;
@@ -1443,7 +1443,7 @@ int song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character
 		if ((*i).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - skill / 18;
+	(*i).song_timer = song_info[(*i).song_number].beats() - skill / 18;
 	return eSUCCESS;
 }
 
@@ -1509,7 +1509,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 		return eSUCCESS;
 	}
 
-	(*i).song_timer = song_info[(*i).song_number].beats - skill / 18;
+	(*i).song_timer = song_info[(*i).song_number].beats() - skill / 18;
 
 	return eSUCCESS;
 }
@@ -1525,7 +1525,7 @@ int song_traveling_march(uint8_t level, Character *ch, char *arg, Character *vic
 		if ((*i).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (skill / 15);
+	(*i).song_timer = song_info[(*i).song_number].beats() - (skill / 15);
 
 	if (ch->getLevel() > MORTAL)
 		(*i).song_timer = 1;
@@ -1607,7 +1607,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 		return eSUCCESS;
 	}
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (skill / 15);
+	(*i).song_timer = song_info[(*i).song_number].beats() - (skill / 15);
 
 	if (ch->getLevel() > MORTAL)
 		(*i).song_timer = 1;
@@ -1637,8 +1637,8 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
 		{
 			if (spl == (*i).song_number)
 			{
-				if ((song_info[(*i).song_number].intrp_pointer))
-					((*song_info[(*i).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, -1));
+				if ((song_info[(*i).song_number].intrp_pointer()))
+					((*song_info[(*i).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
 				ch->songs.erase(i);
 				--i;
 			}
@@ -1652,12 +1652,12 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
 	else
 	{
 		for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
-			if ((song_info[(*i).song_number].intrp_pointer))
-				((*song_info[(*i).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, -1));
+			if ((song_info[(*i).song_number].intrp_pointer()))
+				((*song_info[(*i).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
 		ch->songs.clear();
 	}
 
-	ch->skill_increase_check(SKILL_SONG_STOP, ch->has_skill(song_info[SKILL_SONG_STOP - SKILL_SONG_BASE].skill_num), SKILL_INCREASE_EASY);
+	ch->skill_increase_check(SKILL_SONG_STOP, ch->has_skill(song_info[SKILL_SONG_STOP - SKILL_SONG_BASE].skill_num()), SKILL_INCREASE_EASY);
 
 	ch->sendln("You finish off your music with a flourish...");
 	act("$n finishes $s music in a flourish and a bow.", ch, 0, 0, TO_ROOM, 0);
@@ -1676,7 +1676,7 @@ int song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victi
 		if ((*i).song_number == SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (skill / 10);
+	(*i).song_timer = song_info[(*i).song_number].beats() - (skill / 10);
 
 	// Store it for later, since we can't store the vict pointer
 	(*i).song_data = str_dup(arg);
@@ -1723,7 +1723,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 	Character *tmpch;
 
 	for (tmpch = DC::getInstance()->world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-		if (search_char_for_item(tmpch, 76, false) || search_char_for_item(tmpch, 51, false))
+		if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
 		{
 			victim->sendln("Your astral travels fail to find your destination.");
 			return;
@@ -1739,7 +1739,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 		return;
 	}
 
-	do_look(victim, "", CMD_DEFAULT);
+	do_look(victim, "");
 	WAIT_STATE(victim, DC::PULSE_VIOLENCE);
 	act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
@@ -1780,7 +1780,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 		Character *tmpch;
 
 		for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-			if (search_char_for_item(tmpch, 51, false))
+			if (search_char_for_item(tmpch, real_object(51), false))
 			{
 				ch->sendln("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R");
 				status = eFAILURE;
@@ -1858,7 +1858,7 @@ int song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *vi
 		if ((*i).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - skill / 15;
+	(*i).song_timer = song_info[(*i).song_number].beats() - skill / 15;
 
 	// store the arg here, cause there's no place to save it before we execute
 	(*i).song_data = str_dup(arg);
@@ -1909,7 +1909,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 	{
 		// Die bard!
 		ch->sendln("Uh oh.");
-		do_say(victim, "Die you spoony bard!", CMD_DEFAULT);
+		do_say(victim, "Die you spoony bard!");
 		retval = attack(victim, ch, TYPE_UNDEFINED);
 		retval = SWAP_CH_VICT(retval);
 		return retval;
@@ -1929,9 +1929,9 @@ int song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character
 			break;
 
 	if (ch->getLevel() > 49)
-		(*i).song_timer = (song_info[(*i).song_number].beats - 1);
+		(*i).song_timer = (song_info[(*i).song_number].beats() - 1);
 	else
-		(*i).song_timer = song_info[(*i).song_number].beats;
+		(*i).song_timer = song_info[(*i).song_number].beats();
 
 	// store the arg here, cause there's no place to save it before we execute
 	(*i).song_data = str_dup(arg);
@@ -2034,7 +2034,7 @@ int song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim
 		if ((*i).song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 	return eSUCCESS;
 }
 
@@ -2087,7 +2087,7 @@ int song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victi
 		if ((*i).song_number == SKILL_SONG_FLIGHT_OF_BEE - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -2137,7 +2137,7 @@ int song_searching_song(uint8_t level, Character *ch, char *arg, Character *vict
 		if ((*i).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	// store the char name here, cause A, we don't pass tar_char
 	// and B, there's no place to save it before we execute
@@ -2178,7 +2178,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 
 	snprintf(buf, 200, "Your song finds %s ", GET_SHORT(target));
 
-	switch (target->getPosition())
+	switch (GET_POS(target))
 	{
 	case position_t::STUNNED:
 		sprintf(buf, "%s%s at ", buf, "on the ground, stunned");
@@ -2225,7 +2225,7 @@ int song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vic
 		if ((*i).song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -2241,7 +2241,7 @@ int song_fanatical_fanfare(uint8_t level, Character *ch, char *Aag, Character *v
 		if ((*i).song_number == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -2256,7 +2256,7 @@ int song_summon_song(uint8_t level, Character *ch, char *Aag, Character *victim,
 		if ((*i).song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (skill / 10);
+	(*i).song_timer = song_info[(*i).song_number].beats() - (skill / 10);
 
 	return eSUCCESS;
 }
@@ -2271,7 +2271,7 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
 			if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_NPC(fvictim->follower) && ch->in_room != fvictim->follower->in_room)
 			{
 				summoned = true;
-				do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n", CMD_DEFAULT);
+				do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n");
 				move_char(fvictim->follower, ch->in_room);
 				act("With a $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R flash of (disco?) light $n appears!", fvictim->follower, 0, 0, TO_ROOM, 0);
 			}
@@ -2294,7 +2294,7 @@ int song_mking_charge(uint8_t level, Character *ch, char *Aag, Character *victim
 		if ((*i).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -2365,7 +2365,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
 
 	GET_KI(ch) -= 2;
 
-	(*i).song_timer = song_info[(*i).song_number].beats + (ch->getLevel() > 33) + (ch->getLevel() > 43);
+	(*i).song_timer = song_info[(*i).song_number].beats() + (ch->getLevel() > 33) + (ch->getLevel() > 43);
 
 	return eSUCCESS;
 }
@@ -2502,7 +2502,7 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
 
 	GET_KI(ch) -= 5;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 	return eSUCCESS;
 }
 
@@ -2633,7 +2633,7 @@ int song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim
 		if ((*i).song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -2711,7 +2711,7 @@ int song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *vi
 		if ((*i).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -2798,11 +2798,11 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 		return eFAILURE;
 	}
 	int type = 0;
-	if (DC::getInstance()->mob_index[target->mobdata->vnum].vnum == 8)
+	if (DC::getInstance()->mob_index[target->mobdata->nr].virt == 8)
 		type = 4;
 	else if (IS_AFFECTED(target, AFF_FAMILIAR))
 		type = 3;
-	else if (DC::getInstance()->mob_index[target->mobdata->vnum].vnum >= 22394 && DC::getInstance()->mob_index[target->mobdata->vnum].vnum <= 22398)
+	else if (DC::getInstance()->mob_index[target->mobdata->nr].virt >= 22394 && DC::getInstance()->mob_index[target->mobdata->nr].virt <= 22398)
 		type = 2;
 	else
 		type = 1;
@@ -2851,7 +2851,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 	act("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, TO_ROOM, NOTVICT);
 	if (target->fighting)
 	{
-		do_say(target, "Hey, this sucks. I'm goin' home!", CMD_DEFAULT);
+		do_say(target, "Hey, this sucks. I'm goin' home!");
 		if (target->fighting->fighting == target)
 			stop_fighting(target->fighting);
 		stop_fighting(target);
@@ -2870,7 +2870,7 @@ int song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *v
 		if ((*i).song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (ch->getLevel() / 10);
+	(*i).song_timer = song_info[(*i).song_number].beats() - (ch->getLevel() / 10);
 	if ((*i).song_timer < 1)
 		(*i).song_timer = 1;
 
@@ -2892,7 +2892,7 @@ int song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *v
 		if ((*i).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (ch->getLevel() / 10);
+	(*i).song_timer = song_info[(*i).song_number].beats() - (ch->getLevel() / 10);
 	if ((*i).song_timer < 1)
 		(*i).song_timer = 1;
 
@@ -2990,7 +2990,7 @@ int song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *vict
 		if ((*i).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 	if (ch->getLevel() < 40)
 		(*i).song_timer += 2;
 
@@ -3132,7 +3132,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
 
 	GET_KI(ch) -= skill > 85 ? 2 : 1;
 
-	(*i).song_timer = song_info[(*i).song_number].beats + (ch->getLevel() > 48);
+	(*i).song_timer = song_info[(*i).song_number].beats() + (ch->getLevel() > 48);
 	return eSUCCESS;
 }
 
@@ -3207,7 +3207,7 @@ int song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *
 		if ((*i).song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 
 	return eSUCCESS;
 }
@@ -3255,7 +3255,7 @@ int song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *
 		if ((*i).song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 	(*i).song_data = 0; // first round.
 
 	return eSUCCESS;
@@ -3377,15 +3377,15 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 
 	if (((int64_t)(*i).song_data) != 3)
 	{
-		if (GET_KI(ch) < song_info[(*i).song_number].min_useski)
+		if (GET_KI(ch) < song_info[(*i).song_number].min_useski())
 		{
 			ch->sendln("Having run out of ki, your song ends abruptly.");
 			(*i).song_data = 0; // Reset, just in case.
 			return eSUCCESS;
 		}
-		GET_KI(ch) -= song_info[(*i).song_number].min_useski;
+		GET_KI(ch) -= song_info[(*i).song_number].min_useski();
 	}
-	(*i).song_timer = song_info[(*i).song_number].beats;
+	(*i).song_timer = song_info[(*i).song_number].beats();
 	return eSUCCESS;
 }
 
@@ -3400,7 +3400,7 @@ int song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *
 		if ((*i).song_number == SKILL_SONG_SUBMARINERS_ANTHEM - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (1 + skill / 10);
+	(*i).song_timer = song_info[(*i).song_number].beats() - (1 + skill / 10);
 
 	return eSUCCESS;
 }

@@ -26,7 +26,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all, in
 void check_for_awaymsgs(Character *);
 
 /*  handle some editor commands */
-void parse_action(int command, char *str, class Connection *d)
+void parse_action(parse_t action, char *str, class Connection *d)
 {
    int indent = 0, rep_all = 0, flags = 0, total_len, replaced;
    int j = 0;
@@ -34,9 +34,9 @@ void parse_action(int command, char *str, class Connection *d)
    char *s, *t, temp, buf[32768], buf2[32768];
    std::string sbuffer;
 
-   switch (command)
+   switch (action)
    {
-   case PARSE_HELP:
+   case parse_t::HELP:
       sprintf(buf,
               "Editor command formats: /<letter>\r\n\r\n"
               "/a         -  aborts editor\r\n"
@@ -55,7 +55,7 @@ void parse_action(int command, char *str, class Connection *d)
               "/s         -  saves text\r\n");
       SEND_TO_Q(buf, d);
       break;
-   case PARSE_FORMAT:
+   case parse_t::FORMAT:
       while (isalpha(str[j]) && j < 2)
       {
          switch (str[j])
@@ -76,7 +76,7 @@ void parse_action(int command, char *str, class Connection *d)
       sprintf(buf, "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
       SEND_TO_Q(buf, d);
       break;
-   case PARSE_REPLACE:
+   case parse_t::REPLACE:
       while (isalpha(str[j]) && j < 2)
       {
          switch (str[j])
@@ -141,7 +141,7 @@ void parse_action(int command, char *str, class Connection *d)
          SEND_TO_Q("Not enough space left in buffer.\r\n", d);
       }
       break;
-   case PARSE_DELETE:
+   case parse_t::DELETE:
       switch (sscanf(str, " %d - %d ", &line_low, &line_high))
       {
       case 0:
@@ -208,7 +208,7 @@ void parse_action(int command, char *str, class Connection *d)
          return;
       }
       break;
-   case PARSE_LIST_NORM:
+   case parse_t::LIST_NORM:
       /* note: my buf,buf1,buf2 vars are defined at 32k sizes so they
        * are prolly ok fer what i want to do here. */
       *buf = '\0';
@@ -283,7 +283,7 @@ void parse_action(int command, char *str, class Connection *d)
       // page_string(d, buf, true);
       SEND_TO_Q(buf, d);
       break;
-   case PARSE_LIST_NUM:
+   case parse_t::LIST_NUM:
       /* note: my buf,buf1,buf2 vars are defined at 32k sizes so they
        * are prolly ok fer what i want to do here. */
       *buf = '\0';
@@ -363,7 +363,7 @@ void parse_action(int command, char *str, class Connection *d)
       SEND_TO_Q(buf, d);
       break;
 
-   case PARSE_INSERT:
+   case parse_t::INSERT:
       half_chop(str, buf, buf2);
       if (*buf == '\0')
       {
@@ -418,7 +418,7 @@ void parse_action(int command, char *str, class Connection *d)
       }
       break;
 
-   case PARSE_EDIT:
+   case parse_t::EDIT:
       half_chop(str, buf, buf2);
       if (*buf == '\0')
       {
@@ -724,40 +724,40 @@ void new_string_add(class Connection *d, char *str)
             SEND_TO_Q("Current buffer empty.\r\n", d);
          break;
       case 'd':
-         parse_action(PARSE_DELETE, actions, d);
+         parse_action(parse_t::DELETE, actions, d);
          break;
       case 'e':
-         parse_action(PARSE_EDIT, actions, d);
+         parse_action(parse_t::EDIT, actions, d);
          break;
       case 'f':
          if (*(d->strnew))
-            parse_action(PARSE_FORMAT, actions, d);
+            parse_action(parse_t::FORMAT, actions, d);
          else
             SEND_TO_Q("Current buffer empty.\r\n", d);
          break;
       case 'i':
          if (*(d->strnew))
-            parse_action(PARSE_INSERT, actions, d);
+            parse_action(parse_t::INSERT, actions, d);
          else
             SEND_TO_Q("Current buffer empty.\r\n", d);
          break;
       case 'h':
-         parse_action(PARSE_HELP, actions, d);
+         parse_action(parse_t::HELP, actions, d);
          break;
       case 'l':
          if (*d->strnew)
-            parse_action(PARSE_LIST_NORM, actions, d);
+            parse_action(parse_t::LIST_NORM, actions, d);
          else
             SEND_TO_Q("Current buffer empty.\r\n", d);
          break;
       case 'n':
          if (*d->strnew)
-            parse_action(PARSE_LIST_NUM, actions, d);
+            parse_action(parse_t::LIST_NUM, actions, d);
          else
             SEND_TO_Q("Current buffer empty.\r\n", d);
          break;
       case 'r':
-         parse_action(PARSE_REPLACE, actions, d);
+         parse_action(parse_t::REPLACE, actions, d);
          break;
       case 's':
          terminator = 1;
@@ -846,7 +846,7 @@ void new_string_add(class Connection *d, char *str)
          else
          {
             if (STATE(d) == Connection::states::EXDSCR)
-               save_char_obj(d->character);
+               d->character->save_char_obj();
             if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
                dc_free(*d->strnew);
             d->backstr = nullptr;

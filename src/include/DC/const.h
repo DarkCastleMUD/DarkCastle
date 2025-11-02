@@ -1,5 +1,11 @@
 #ifndef CONST_H
 #define CONST_H
+#include "DC/obj.h"
+#include "DC/mobile.h"
+#include "DC/db.h"
+#include "DC/character.h"
+#include "DC/DC.h"
+
 extern const char *dirs[];
 extern struct race_data races[];
 extern const char *spells[];
@@ -44,12 +50,14 @@ extern const char *equipment_types[];
 extern const char *utility_item_types[];
 
 extern int top_of_mobt;
+extern int top_of_objt;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *size_bitfields[];
 extern char *strs_damage_types[];
 extern char *obj_types[];
 extern std::vector<std::string> continent_names;
+extern int top_of_objt;
 
 extern const char *drinks[];
 extern const char *portal_bits[];

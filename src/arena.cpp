@@ -14,7 +14,7 @@
 #include "DC/spells.h" // INTERNAL_SLEEPING
 #include "DC/act.h"    // TO_ROOM
 
-auto Character::do_arena(QStringList arguments, int cmd) -> command_return_t
+auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 {
   auto rufus = get_mob_room_vis(this, "rufus arena-keeper");
   if (!isImmortalPlayer() && !rufus)
@@ -54,7 +54,7 @@ auto Character::do_arena(QStringList arguments, int cmd) -> command_return_t
   return eSUCCESS;
 }
 
-auto do_joinarena(Character *ch, char *arg, int cmd) -> int
+auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
 {
   char buf[256];
   int send_to = DC::NOWHERE;
@@ -104,7 +104,7 @@ auto do_joinarena(Character *ch, char *arg, int cmd) -> int
     return eFAILURE;
   }
 
-  if (ch->getPosition() == position_t::SLEEPING)
+  if (GET_POS(ch) == position_t::SLEEPING)
   {
     affect_from_char(ch, INTERNAL_SLEEPING);
     ch->wake();
@@ -143,6 +143,6 @@ auto do_joinarena(Character *ch, char *arg, int cmd) -> int
   act("$n appears, preparing for battle.", ch, 0, 0, TO_ROOM, 0);
   sprintf(buf, "## %s has joined the bloodbath!\n\r", GET_SHORT(ch));
   send_info(buf);
-  do_look(ch, "", 8);
+  do_look(ch, "");
   return eSUCCESS;
 }

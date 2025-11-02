@@ -60,7 +60,7 @@ public:
     {
         NO_TELEPORT = 1,
         IS_TOWN = 1 << 1, // Keep out the really bad baddies that are STAY_NO_TOWN
-        NEEDS_SAVING = 1 << 2,
+        MODIFIED = 1 << 2,
         UNUSED = 1 << 3,
         BPORT = 1 << 4,
         NOCLAIM = 1 << 5, // cannot claim this area
@@ -69,7 +69,7 @@ public:
 
     static QStringList zone_bits;
 
-    explicit Zone(uint64_t zone_key = 0);
+    Zone(uint64_t zone_key = 0);
 
     uint64_t lifespan = {}; /* how long between resets (minutes)  */
     QDateTime last_full_reset = {};
@@ -117,8 +117,8 @@ public:
     bool isNoHunt(void);
     void setNoHunt(bool flag = true);
 
-    bool isNeedsSaving(void);
-    void setNeedsSaving(bool flag = true);
+    bool isModified(void);
+    void setModified(bool flag = true);
 
     void incrementDiedThisTick(void);
     void setDiedThisTick(uint64_t died = {});

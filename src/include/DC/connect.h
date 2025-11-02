@@ -5,14 +5,10 @@
 | connect.h
 | Description: State of connectedness information.
 */
-// #include "DC/character.h"
-// #include "DC/structs.h" // MAX_INPUT_LENGTH
-// #include "DC/comm.h"
-
+#include "DC/character.h"
+#include "DC/structs.h" // MAX_INPUT_LENGTH
+#include "DC/comm.h"
 #include "DC/common.h"
-#include <QHostAddress>
-#include <queue>
-#include <QMap>
 
 int isbanned(QHostAddress address);
 
@@ -150,8 +146,8 @@ public:
   time_t login_time = {};
   stat_data *stats = {}; // for rolling up a char
 
-  char **strnew = {};    /* for the modify-str system	*/
-  QString *qstrnew = {}; // for the modify-str system for QStrings */
+  char **strnew = {}; /* for the modify-str system	*/
+  QString qstrnew = {};
   char *backstr = {};
   int idle_time = {}; // How long the descriptor has been idle, overall.
   bool color = {};
@@ -162,14 +158,55 @@ public:
 
   const char *getPeerOriginalAddressC(void);
 
-  QHostAddress getPeerAddress(void);
-  QHostAddress getPeerOriginalAddress(void);
-  QString getPeerFullAddressString(void);
-  void setPeerAddress(QHostAddress address);
-  void setPeerPort(uint16_t port);
+  QHostAddress getPeerAddress(void)
+  {
+    return peer_address_;
+  }
+  QHostAddress getPeerOriginalAddress(void)
+  {
+    if (proxy.isActive())
+    {
+      return proxy.getSourceAddress();
+    }
+    return getPeerAddress();
+  }
+
+  QString getPeerFullAddressString(void)
+  {
+    if (proxy.isActive())
+    {
+      return QStringLiteral("%1 via %2").arg(getPeerOriginalAddress().toString()).arg(getPeerAddress().toString());
+    }
+    else
+    {
+      return getPeerOriginalAddress().toString();
+    }
+  }
+
+  void setPeerAddress(QHostAddress address)
+  {
+    peer_address_ = address;
+  }
+
+  void setPeerPort(uint16_t port)
+  {
+    peer_port_ = port;
+  }
+
   QString getName(void);
-  bool isEditing(void) const noexcept;
-  bool isPlaying(void) const noexcept;
+  inline bool isEditing(void) const noexcept
+  {
+    return connected == Connection::states::EDITING ||
+           connected == Connection::states::EDITING_V2 ||
+           connected == Connection::states::WRITE_BOARD ||
+           connected == Connection::states::EDIT_MPROG ||
+           connected == Connection::states::SEND_MAIL ||
+           connected == Connection::states::EXDSCR;
+  }
+  inline bool isPlaying(void) const noexcept
+  {
+    return connected == Connection::states::PLAYING;
+  }
   int process_output(void);
   QString createBlackjackPrompt(void);
   QString createPrompt(void);

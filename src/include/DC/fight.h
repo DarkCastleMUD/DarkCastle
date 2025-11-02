@@ -43,7 +43,6 @@ void make_bowels(Character *ch);
 void make_blood(Character *ch);
 void make_scraps(Character *ch, class Object *obj);
 void room_mobs_only_hate(Character *ch);
-void stop_follower(Character *ch, int cmd);
 int attack(Character *ch, Character *vict, int type, int attack = FIRST);
 void perform_violence(void);
 void dam_message(int dam, Character *ch, Character *vict, int w_type, int32_t modifier);

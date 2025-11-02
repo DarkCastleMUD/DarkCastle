@@ -160,15 +160,15 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
   {
     return "";
   }
-  if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FORCE))
+  if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FLAG_FORCE))
     return "";
-  if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
+  if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
     return "";
   if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
     return "";
   if ((send_to->getLevel() < MIN_GOD) && (flags & GODS))
     return "";
-  if ((send_to->getPosition() <= position_t::SLEEPING) && !(flags & ASLEEP))
+  if ((GET_POS(send_to) <= position_t::SLEEPING) && !(flags & ASLEEP))
     return "";
 
   // Ok, now bother

@@ -38,28 +38,29 @@
 // decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 {
-  if (GET_OBJ_VNUM(obj) == 0)
+
+  if (GET_OBJ_RNUM(obj) == DC::NOWHERE)
     return;
 
   if (!decay)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%lu] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%lu] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]\n",
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
          GET_OBJ_SHORT(obj),
          GET_OBJ_SHORT(loop_obj),
          GET_OBJ_VNUM(loop_obj));
   }
 }
 
-int do_sacrifice(Character *ch, char *argument, int cmd)
+int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
@@ -115,7 +116,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (obj->vnum == CHAMPION_ITEM)
+  if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
   {
     ch->sendln("In soviet russia, champion flag sacrifice YOU!");
     return eFAILURE;
@@ -149,7 +150,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_visible(Character *ch, char *argument, int cmd)
+int do_visible(Character *ch, char *argument, cmd_t cmd)
 {
   if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
@@ -170,14 +171,14 @@ int do_visible(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_donate(Character *ch, char *argument, int cmd)
+int do_donate(Character *ch, char *argument, cmd_t cmd)
 {
-  class Object *obj;
-  char name[MAX_INPUT_LENGTH + 1];
-  char buf[MAX_STRING_LENGTH];
-  int location;
+  class Object *obj{};
+  char name[MAX_INPUT_LENGTH + 1]{};
+  char buf[MAX_STRING_LENGTH]{};
+  int location{};
   int room = 3099;
-  int origin;
+  int origin{};
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -222,8 +223,7 @@ int do_donate(Character *ch, char *argument, int cmd)
       {
         REMBIT(ch->affected_by, AFF_CHAMPION);
 
-        sprintf(buf, "\n\r##%s has just yielded the Champion flag!\n\r",
-                GET_NAME(ch));
+        sprintf(buf, "\n\r##%s has just yielded %s!\r\n", GET_NAME(ch), obj->short_description);
         send_info(buf);
 
         struct affected_type af;
@@ -246,20 +246,19 @@ int do_donate(Character *ch, char *argument, int cmd)
         move_char(ch, origin);
         move_obj(obj, location);
 
-        ch->save(0);
+        ch->save();
         return eSUCCESS;
       }
       else
       {
-        sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
-                GET_NAME(ch));
+        sprintf(buf, "%s had %s, but no AFF_CHAMPION.", GET_NAME(ch), obj->short_description);
         logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         return eFAILURE;
       }
     }
     else
     {
-      ch->sendln("You can only yield the Champion flag from a safe room.");
+      ch->sendln(QStringLiteral("You can only yield %1 from a safe room.").arg(obj->short_description));
       return eFAILURE;
     }
   }
@@ -308,12 +307,12 @@ int do_donate(Character *ch, char *argument, int cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%lu]", GET_NAME(ch), obj->name, obj->vnum);
+    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, DC::getInstance()->obj_index[obj->item_number].virt);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]", obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
-           loop_obj->vnum);
+           DC::getInstance()->obj_index[loop_obj->item_number].virt);
   }
 
   location = real_room(room);
@@ -327,18 +326,26 @@ int do_donate(Character *ch, char *argument, int cmd)
   move_char(ch, origin, false);
   move_obj(obj, location);
 
-  ch->save(0);
+  ch->save();
   return eSUCCESS;
 }
 
-int do_title(Character *ch, char *argument, int cmd)
+auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
+{
+  sendln("You now have no title.");
+  title = str_hsh("");
+  save(cmd_t::SAVE_SILENTLY);
+  return eSUCCESS;
+}
+
+int do_title(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[100];
   int ctr;
 
   if (!*argument)
   {
-    ch->sendln("Change your title to what?");
+    ch->sendln("Type \"title message\" to set a title or \"notitle\" to remove your title.");
     return eFAILURE;
   }
 
@@ -382,7 +389,7 @@ int do_title(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
   {
@@ -437,13 +444,13 @@ command_return_t Character::do_toggle(QStringList arguments, int cmd)
 
   if (found_toggle.function_)
   {
-    return (this->*(found_toggle.function_))({}, CMD_DEFAULT);
+    return (this->*(found_toggle.function_))({}, cmd_t::DEFAULT);
   }
 
   return eSUCCESS;
 }
 
-int Character::do_config(QStringList arguments, int cmd)
+int Character::do_config(QStringList arguments, cmd_t cmd)
 {
   if (player->config == nullptr)
   {
@@ -536,8 +543,9 @@ int Character::do_config(QStringList arguments, int cmd)
   {
     if (player->config->find(key) != player->config->end())
     {
-      send(QStringLiteral("%1 unset.\r\n").arg(key));
+      sendln(QStringLiteral("%1 unset.").arg(key));
       player->config->insert(key, QString());
+      save(cmd_t::SAVE_SILENTLY);
       return eSUCCESS;
     }
     send(QStringLiteral("%1 not found.\r\n").arg(key));
@@ -588,13 +596,80 @@ int Character::do_config(QStringList arguments, int cmd)
         return eFAILURE;
       }
     }
-    else if (key != "tell.history.timestamp" && key != "locale" && key != "fighting.showdps")
+    else if (key == "locale")
+    {
+      QList<QLocale> locales = QLocale::matchingLocales(QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyTerritory);
+      bool found_locale = false;
+      for (const auto &locale : locales)
+        if (locale.name() == value)
+        {
+          found_locale = true;
+          break;
+        }
+
+      if (!found_locale)
+      {
+        if (value != QStringLiteral("?"))
+        {
+          sendln(QStringLiteral("'%1' is an invalid locale. Type config locale=? to see a list of valid locales.").arg(value));
+          return eSUCCESS;
+        }
+        sendln(QStringLiteral("Here's a list of valid locales:"));
+        for (const auto &locale : locales)
+        {
+          sendln(locale.name());
+        }
+        return eSUCCESS;
+      }
+    }
+    else if (key == "timezone")
+    {
+      bool found = false;
+      for (const auto &tz : QTimeZone::availableTimeZoneIds())
+      {
+        if (value == "?")
+          sendln(tz);
+        else if (value == tz)
+        {
+          found = true;
+          break;
+        }
+      }
+      if (value != "?")
+      {
+        if (!found)
+        {
+          sendln(QStringLiteral("Invalid timezone '%1' specified. Type config timezone=? to see the full list.").arg(value));
+          return eSUCCESS;
+        }
+      }
+      else
+        return eSUCCESS;
+    }
+    else if (key == "dateformat")
+    {
+      if (QStringLiteral("TextDate").compare(value, Qt::CaseInsensitive) &&
+          QStringLiteral("ISODateWithMs").compare(value, Qt::CaseInsensitive) &&
+          QStringLiteral("ISODate").compare(value, Qt::CaseInsensitive) &&
+          QStringLiteral("RFC2822Date").compare(value, Qt::CaseInsensitive))
+      {
+        sendln("Valid timestamp formats are:");
+        auto timezone_str = getSetting("timezone", "America/Chicago");
+        auto timezone = QTimeZone(timezone_str.toLatin1());
+        sendln(QStringLiteral("%1 %2").arg("TextDate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::TextDate)));
+        sendln(QStringLiteral("%1 %2").arg("ISODateWithMs", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODateWithMs)));
+        sendln(QStringLiteral("%1 %2").arg("ISODate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODate)));
+        sendln(QStringLiteral("%1 %2").arg("RFC2822Date", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::RFC2822Date)));
+        return eSUCCESS;
+      }
+    }
+    else if (!QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
     {
       send("Invalid config option.\r\n");
       return eFAILURE;
     }
 
-    if (key == "fighting.showdps" && !QRegularExpression("^([01tf]{1}|true|false)$").match(value).hasMatch())
+    if (QRegularExpression("^((tell|gossip).history.timestamp|fighting.showdps)$").match(key).hasMatch() && !QRegularExpression("^([01tf]{1}|true|false)$").match(value).hasMatch())
     {
       sendln("Invalid config option. Valid options are: 0, 1, t, f, true and false.");
       return eFAILURE;
@@ -603,13 +678,14 @@ int Character::do_config(QStringList arguments, int cmd)
     player->config->insert(key, value);
 
     send(QStringLiteral("Setting %1=%2\r\n").arg(key).arg(value));
+    save(cmd_t::SAVE_SILENTLY);
     return eSUCCESS;
   }
 
   return eFAILURE;
 }
 
-command_return_t Character::do_brief(QStringList arguments, int cmd)
+command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -627,7 +703,7 @@ command_return_t Character::do_brief(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_ansi(QStringList arguments, int cmd)
+command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -645,7 +721,7 @@ command_return_t Character::do_ansi(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_vt100(QStringList arguments, int cmd)
+command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -663,7 +739,7 @@ command_return_t Character::do_vt100(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_compact(QStringList arguments, int cmd)
+command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -681,7 +757,7 @@ command_return_t Character::do_compact(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_summon_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -701,7 +777,7 @@ command_return_t Character::do_summon_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_lfg_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -719,7 +795,7 @@ command_return_t Character::do_lfg_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_guide_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -743,7 +819,7 @@ command_return_t Character::do_guide_toggle(QStringList arguments, int cmd)
 
   return eSUCCESS;
 }
-command_return_t Character::do_news_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -762,7 +838,7 @@ command_return_t Character::do_news_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_ascii_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -781,7 +857,7 @@ command_return_t Character::do_ascii_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_damage_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -800,7 +876,7 @@ command_return_t Character::do_damage_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_notax_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -819,7 +895,7 @@ command_return_t Character::do_notax_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_charmiejoin_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -838,7 +914,7 @@ command_return_t Character::do_charmiejoin_toggle(QStringList arguments, int cmd
   return eSUCCESS;
 }
 
-command_return_t Character::do_autoeat(QStringList arguments, int cmd)
+command_return_t Character::do_autoeat(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -856,7 +932,7 @@ command_return_t Character::do_autoeat(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_anonymous(QStringList arguments, int cmd)
+command_return_t Character::do_anonymous(QStringList arguments, cmd_t cmd)
 {
   if (level_ < 40)
   {
@@ -876,7 +952,7 @@ command_return_t Character::do_anonymous(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_wimpy(QStringList arguments, int cmd)
+command_return_t Character::do_wimpy(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_WIMPY))
   {
@@ -892,7 +968,7 @@ command_return_t Character::do_wimpy(QStringList arguments, int cmd)
 
 // Remember that his is "no-pager".  So if it's set, we don't page
 // If it's not set, we do.
-command_return_t Character::do_pager(QStringList arguments, int cmd)
+command_return_t Character::do_pager(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_PAGER))
   {
@@ -906,7 +982,7 @@ command_return_t Character::do_pager(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_bard_song_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_BARD_SONG))
   {
@@ -920,7 +996,7 @@ command_return_t Character::do_bard_song_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_nodupekeys_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_NODUPEKEYS))
   {
@@ -934,7 +1010,7 @@ command_return_t Character::do_nodupekeys_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_beep_set(QStringList arguments, int cmd)
+command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -951,9 +1027,9 @@ command_return_t Character::do_beep_set(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_stand(Character *ch, char *argument, int cmd)
+int do_stand(Character *ch, char *argument, cmd_t cmd)
 {
-  switch (ch->getPosition())
+  switch (GET_POS(ch))
   {
   case position_t::STANDING:
   {
@@ -1003,7 +1079,7 @@ int do_stand(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sit(Character *ch, char *argument, int cmd)
+int do_sit(Character *ch, char *argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1012,7 +1088,7 @@ int do_sit(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  switch (ch->getPosition())
+  switch (GET_POS(ch))
   {
   case position_t::STANDING:
   {
@@ -1057,7 +1133,7 @@ int do_sit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_rest(Character *ch, char *argument, int cmd)
+int do_rest(Character *ch, char *argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1066,7 +1142,7 @@ int do_rest(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  switch (ch->getPosition())
+  switch (GET_POS(ch))
   {
   case position_t::STANDING:
   {
@@ -1109,7 +1185,7 @@ int do_rest(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sleep(Character *ch, char *argument, int cmd)
+int do_sleep(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type *paf;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1129,10 +1205,10 @@ int do_sleep(Character *ch, char *argument, int cmd)
     }
 
   if ((paf = ch->affected_by_spell(SPELL_SLEEP)) &&
-      paf->modifier == 1 && ch->getPosition() != position_t::SLEEPING)
+      paf->modifier == 1 && GET_POS(ch) != position_t::SLEEPING)
     paf->modifier = 0;
 
-  switch (ch->getPosition())
+  switch (GET_POS(ch))
   {
   case position_t::STANDING:
     ch->sendln("You lie down and go to sleep.");
@@ -1198,7 +1274,7 @@ command_return_t Character::wake(Character *victim)
   return eSUCCESS;
 }
 
-command_return_t Character::do_wake(QStringList arguments, int cmd)
+command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 {
   Character *tmp_char{};
   QString arg1 = arguments.value(0);
@@ -1226,7 +1302,7 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
     }
   }
 
-  if (tmp_char->getPosition() != position_t::SLEEPING)
+  if (GET_POS(tmp_char) != position_t::SLEEPING)
   {
     if (tmp_char == this)
     {
@@ -1253,7 +1329,7 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (this->getPosition() == position_t::FIGHTING)
+  if (GET_POS(this) == position_t::FIGHTING)
   {
     if (number(1, 100) > GET_DEX(this) && tmp_char != this)
     {
@@ -1290,7 +1366,7 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
 // global tag var
 Character *tagged_person;
 
-int do_tag(Character *ch, char *argument, int cmd)
+int do_tag(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
   Character *victim;
@@ -1505,7 +1581,7 @@ void CVoteData::OutToFile()
 
   fprintf(the_file, "%s\n", vote_question.c_str());
 
-  fprintf(the_file, "%lu\n", answers.size());
+  fprintf(the_file, "%d\n", answers.size());
 
   std::vector<SVoteData>::iterator answer_it;
 
@@ -1517,13 +1593,13 @@ void CVoteData::OutToFile()
 
   std::map<std::string, bool>::iterator ip_it;
 
-  fprintf(the_file, "%lu\n", ip_voted.size());
+  fprintf(the_file, "%d\n", ip_voted.size());
   for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  fprintf(the_file, "%lu\n", char_voted.size());
+  fprintf(the_file, "%d\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());
@@ -1645,7 +1721,7 @@ CVoteData::~CVoteData()
 {
 }
 
-int do_vote(Character *ch, char *arg, int cmd)
+int do_vote(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int vote;
@@ -1681,7 +1757,7 @@ int do_vote(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_random(Character *ch, char *argument, int cmd)
+int do_random(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;

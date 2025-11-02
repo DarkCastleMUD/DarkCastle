@@ -52,7 +52,8 @@ public:
     QByteArray checksumFile(QString filename)
     {
         QFile file(filename);
-        file.open(QIODeviceBase::ReadOnly);
+        if (!file.open(QIODeviceBase::ReadOnly))
+            qFatal("Unable to read %s", filename);
         QCryptographicHash file_hash(QCryptographicHash::Algorithm::Sha512);
         file_hash.addData(file.readAll());
         return file_hash.result();
@@ -114,27 +115,21 @@ private slots:
 
     void test_handle_ansi()
     {
-        Connection conn{};
-        Character ch{};
-        ch.setType(Character::Type::Player);
-        ch.desc = &conn;
-        conn.character = &ch;
-        conn.descriptor = 1;
-        Player player{};
-        ch.player = &player;
+        DC::config cf;
+        cf.sql = false;
 
-        QVERIFY(!isSet(ch.player->toggles, Player::PLR_ANSI));
-        QCOMPARE(ch.desc->output, "");
-        QCOMPARE(ch.do_toggle({"ansi"}), eSUCCESS);
-        QCOMPARE(ch.desc->output, "ANSI COLOR on.\r\n");
-        ch.desc->output = {};
-        QVERIFY(isSet(ch.player->toggles, Player::PLR_ANSI));
-        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), &ch), QStringLiteral(STRING_LITERAL1_COLOR));
+        DC dc(cf);
+        std::unique_ptr<Character> ch = std::make_unique<Character>(&dc);
+        std::unique_ptr<Player> player = std::make_unique<Player>();
+        ch->player = player.get();
+        ch->setType(Character::Type::Player);
+        ch->do_toggle({"ansi"});
+        QVERIFY(isSet(ch->player->toggles, Player::PLR_ANSI));
+        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_COLOR));
 
-        QCOMPARE(ch.do_toggle({"ansi"}), eSUCCESS);
-        QVERIFY(!isSet(ch.player->toggles, Player::PLR_ANSI));
-        QCOMPARE(ch.desc->output, "ANSI COLOR \x1B[1m\x1B[31moff\x1B[0m\x1B[37m.\r\n");
-        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), &ch), QStringLiteral(STRING_LITERAL1_NOCOLOR));
+        ch->do_toggle({"ansi"});
+        QVERIFY(!isSet(ch->player->toggles, Player::PLR_ANSI));
+        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_NOCOLOR));
     }
 
     void test_str_dup0()
@@ -221,7 +216,7 @@ private slots:
         dc.boot_db();
         dc.random_ = QRandomGenerator(0);
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Testsing"));
         ch.in_room = 3;
         ch.height = 72;
@@ -352,7 +347,7 @@ private slots:
         dc.boot_db();
         dc.random_ = QRandomGenerator(0);
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Testvault"));
         ch.in_room = 3;
         ch.height = 72;
@@ -367,12 +362,13 @@ private slots:
         ch.desc = &conn;
         dc.character_list.insert(&ch);
         ch.do_on_login_stuff();
-        auto new_rnum = create_blank_item(1UL);
-        QCOMPARE(new_rnum.has_value(), false);
+
+        auto new_rnum = dc.create_blank_item(1);
         QCOMPARE(new_rnum.error(), create_error::entry_exists);
-        Object *o1 = dc.clone_object(1);
-        Object *o2 = dc.clone_object(1);
-        Object *o3 = dc.clone_object(1);
+        int rnum = real_object(1);
+        Object *o1 = clone_object(rnum);
+        Object *o2 = clone_object(rnum);
+        Object *o3 = clone_object(rnum);
         QVERIFY(o1);
         QVERIFY(o2);
         QVERIFY(o3);
@@ -620,7 +616,7 @@ private slots:
         DC dc(cf);
 
         QFile testfile(QStringLiteral("fread_tests.txt"));
-        testfile.open(QIODeviceBase::WriteOnly);
+        QVERIFY(testfile.open(QIODeviceBase::WriteOnly));
         testfile.write("3\n");
         testfile.write("-1\n");
         testfile.write("abc\n123~\n");
@@ -746,7 +742,7 @@ private slots:
             fstream_world_file << "$~\n";
         }
 
-        qInfo("Wrote %lu rooms to '%s'.", rooms_written, qPrintable(filename));
+        qInfo("Wrote %d rooms to '%s'.", rooms_written, qPrintable(filename));
 
         auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
         auto legacyfile_checksum = checksumFile(legacyfile_filename);
@@ -803,7 +799,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Testvend"));
         ch.in_room = 3;
         ch.height = 72;
@@ -829,7 +825,7 @@ private slots:
         ch.setMove(GET_MAX_MOVE(&ch));
         conn.output = {};
 
-        Character ch2;
+        Character ch2(&dc);
         ch2.setName(QStringLiteral("Testvend2"));
         ch2.in_room = 3;
         ch2.height = 72;
@@ -874,10 +870,11 @@ private slots:
         auto new_mob_rnum = real_mobile(5258);
         QVERIFY(new_mob_rnum != -1);
 
-        auto new_rnum = create_blank_item(1UL);
+        auto new_rnum = dc.create_blank_item(1);
         QCOMPARE(new_rnum.error(), create_error::entry_exists);
-        Object *o1 = dc.clone_object(1);
-        Object *o2 = dc.clone_object(1);
+        int rnum = real_object(1);
+        Object *o1 = clone_object(rnum);
+        Object *o2 = clone_object(rnum);
         QVERIFY(o1);
         QVERIFY(o2);
         GET_OBJ_NAME(o1) = str_hsh("sword");
@@ -977,7 +974,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Test"));
         Player player;
         ch.player = &player;
@@ -991,19 +988,7 @@ private slots:
         conn.output = {};
 
         auto rc = do_medit(&ch, str_hsh(""));
-        QCOMPARE(conn.output, "Syntax:  medit [mob_num] [field] [arg]\r\n"
-                              "  Edit a mob_num with no field or arg to view the item.\r\n"
-                              "  Edit a field with no args for help on that field.\r\n\r\nThe field must be one of the following:\n\r"
-                              "          keywords         shortdesc          longdesc       description\r\n"
-                              "               sex             class              race             level\r\n"
-                              "         alignment      loadposition   defaultposition          actflags\r\n"
-                              "       affectflags        numdamdice       sizedamdice           damroll\r\n"
-                              "           hitroll       hphitpoints              gold  experiencepoints\r\n"
-                              "            immune           suscept            resist        armorclass\r\n"
-                              "              stat          strength         dexterity      intelligence\r\n"
-                              "            wisdom      constitution               new            delete\r\n"
-                              "              type                v1                v2                v3\r\n"
-                              "                v4\r\n");
+        QCOMPARE(conn.output, "Syntax:  medit [mob_num] [field] [arg]\r\n  Edit a mob_num with no field or arg to view the item.\r\n  Edit a field with no args for help on that field.\r\n\r\nThe field must be one of the following:\n\r          keywords         shortdesc          longdesc       description\r\n               sex             class              race             level\r\n         alignment      loadposition   defaultposition          actflags\r\n       affectflags        numdamdice       sizedamdice           damroll\r\n           hitroll       hphitpoints              gold  experiencepoints\r\n            immune           suscept            resist        armorclass\r\n              stat          strength         dexterity      intelligence\r\n            wisdom      constitution               new            delete\r\n              type                v1                v2                v3\r\n                v4\r\n");
         conn.output = {};
         ch.player->last_mob_edit = {};
         QCOMPARE(rc, eFAILURE);
@@ -1043,7 +1028,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Test"));
         ch.setPosition(position_t::STANDING);
         Player player;
@@ -1092,15 +1077,23 @@ private slots:
 
         DC dc(cf);
         dc.boot_db();
-        auto obj = dc.obj_index[1].item;
-        QCOMPARE(dc.getObjectVNUM(obj), dc.obj_index[1].vnum);
+        auto obj = reinterpret_cast<Object *>(DC::getInstance()->obj_index[0].item);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[0].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
 
         bool ok = false;
-        dc.getObjectVNUM(obj, &ok);
+        DC::getInstance()->getObjectVNUM(obj, &ok);
         QCOMPARE(ok, true);
         ok = false;
+        DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].virt;
+        QCOMPARE(ok, true);
+        DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, &ok), DC::INVALID_VNUM;
+        QCOMPARE(ok, false);
 
-        QCOMPARE(dc.getObjectVNUM(obj, nullptr), dc.obj_index[1].vnum);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
     }
     void test_blackjack()
     {
@@ -1112,7 +1105,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Test"));
         ch.setPosition(position_t::STANDING);
         Player player;
@@ -1372,397 +1365,16 @@ private slots:
         conn.output = {};
     }
 
-    void test_movement()
-    {
-        DC::config cf;
-        cf.sql = false;
-        DC dc(cf);
-        dc.boot_db();
-
-        Character ch;
-        ch.setName(QStringLiteral("Testmob"));
-        ch.in_room = 3;
-        ch.height = 72;
-        ch.weight = 150;
-        ch.setClass(CLASS_WARRIOR);
-        ch.setPosition(position_t::STANDING);
-        Player player;
-        ch.player = &player;
-        ch.setType(Character::Type::Player);
-        Connection conn;
-        dc.descriptor_list = &conn;
-        conn.descriptor = 1;
-        conn.character = &ch;
-        ch.desc = &conn;
-        dc.character_list.insert(&ch);
-        conn.output = {};
-
-        auto rc = do_move(&ch, str_hsh(""), CMD_NORTH);
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "Alas, you can't go that way.\r\n");
-        conn.output = {};
-
-        rc = do_move(&ch, str_hsh(""), CMD_UP);
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "You are too exhausted.\r\n");
-        conn.output = {};
-
-        ch.setMove(100);
-        rc = do_move(&ch, str_hsh(""), CMD_UP);
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "Seasick Wench Inn\r\n"
-                              "   You are inside the Seasick Wench Inn, where only the foolish and very brave\r\nventure.  The unsavory clientele sit at their round oak tables, glancing at you\r\nover their shoulders.  A few pigeons coo from the rafters of the mouldering\r\nroof, and a rat runs across a roof beam in search of food scraps.  The smell of\r\nunwashed people and ancient beer hits you in the face in a dizzying wave of\r\nstench.\r\nAn oozing green blob is here, sucking in bits of debris.\r\nA beggar is here, asking for a few coins.\r\nQuark is standing here, eager to serve you a special drink.\r\n-Quark has: aura! \r\nExits: west \r\n");
-        conn.output = {};
-    }
-
-    void test_immortal_object_commands()
-    {
-        DC::config cf;
-        cf.sql = false;
-        DC dc(cf);
-        dc.boot_db();
-        QVERIFY(QFile(QStringLiteral("objects/00000-96.obj")).exists());
-        Character ch, ch2, ch3;
-        ch.setName(QStringLiteral("TestImmortal1"));
-        ch2.setName(QStringLiteral("Testplayer1"));
-        ch3.setName(QStringLiteral("Testplayer2"));
-        ch.in_room = 3;
-        ch2.in_room = 3;
-        ch3.in_room = 3;
-        ch.height = 72;
-        ch2.height = 72;
-        ch3.height = 72;
-        ch.weight = 150;
-        ch2.weight = 150;
-        ch3.weight = 150;
-        ch.setClass(CLASS_WARRIOR);
-        ch2.setClass(CLASS_WARRIOR);
-        ch3.setClass(CLASS_WARRIOR);
-        ch.setPosition(position_t::STANDING);
-        ch2.setPosition(position_t::STANDING);
-        ch3.setPosition(position_t::STANDING);
-        ch.setLevel(110);
-        ch2.setLevel(60);
-        ch3.setLevel(60);
-        Player player, player2, player3;
-        ch.player = &player;
-        ch2.player = &player2;
-        ch3.player = &player3;
-        ch.setType(Character::Type::Player);
-        ch2.setType(Character::Type::Player);
-        ch3.setType(Character::Type::Player);
-        Connection conn, conn2, conn3;
-        dc.descriptor_list = &conn;
-        dc.descriptor_list->next = &conn2;
-        dc.descriptor_list->next->next = &conn3;
-        conn.descriptor = 1;
-        conn2.descriptor = 1;
-        conn3.descriptor = 1;
-        conn.character = &ch;
-        conn2.character = &ch2;
-        conn3.character = &ch3;
-        ch.desc = &conn;
-        ch2.desc = &conn2;
-        ch3.desc = &conn3;
-        dc.character_list.insert(&ch);
-        dc.character_list.insert(&ch2);
-        dc.character_list.insert(&ch3);
-        conn.output = {};
-        conn2.output = {};
-        conn3.output = {};
-
-        command_return_t rc{};
-        // oedit
-        QCOMPARE(ch.command_interpreter("oedit"), eFAILURE);
-        QCOMPARE(conn.output, "Syntax:  oedit new [obj vnum]           -- Create new object\n\r"
-                              "         oedit [obj vnum]               -- Stat object\n\r"
-                              "         oedit [obj vnum] [field]       -- Help info for that field\n\r"
-                              "         oedit [obj vnum] [field] [arg] -- Change that field\n\r"
-                              "         oedit [field] [arg]            -- Change that field using last vnum\n\r"
-                              "\n\rThe field must be one of the following:\n\r"
-                              "          keywords          longdesc         shortdesc        actiondesc\r\n"
-                              "              type              wear              size             extra\r\n"
-                              "            weight             value         moreflags             level\r\n"
-                              "                v1                v2                v3                v4\r\n"
-                              "           affects            exdesc               new            delete\r\n"
-                              "              stat             timer       description\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        rc = ch2.command_interpreter("oedit");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        rc = ch.command_interpreter("oedit new");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "Syntax: oedit new [vnum]\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch.command_interpreter("oedit new 1");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "You cannot create items in that range.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch.command_interpreter("oedit new 0");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "You cannot create items in that range.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch.command_interpreter("oedit new -1");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "Please specifiy a valid number.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch.command_interpreter("bestow TestImmortal1 range");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "TestImmortal1 has been bestowed range.\r\n"
-                              "TestImmortal1 has bestowed range upon you.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        QCOMPARE(ch.player->last_obj_vnum, 0);
-        rc = ch.command_interpreter("oedit new 100");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "Item '100' created successfully.\r\n"
-                              "Range [100-100.obj] [100] [100] created.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        QCOMPARE(ch.player->last_obj_vnum, 100);
-
-        // osave
-        QCOMPARE(ch.command_interpreter("osave"), eSUCCESS);
-        QCOMPARE(conn.output, "Saved object range ['100-100.obj' 100-100] for vnum 100.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
-        QCOMPARE(conn.output, "This range has not been modified.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        rc = ch2.command_interpreter("osave");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        // show
-        QCOMPARE(ch.command_interpreter("show"), eFAILURE);
-        QCOMPARE(conn.output, "Format: show <type> <name>.\r\n"
-                              "Types:\r\n"
-                              "  keydoorcombo\r\n"
-                              "  mob\r\n"
-                              "  obj\r\n"
-                              "  room\r\n"
-                              "  zone\r\n"
-                              "  zone all\r\n"
-                              "  rfiles\r\n"
-                              "  mfiles\r\n"
-                              "  ofiles\r\n"
-                              "  search\r\n"
-                              " msearch\r\n"
-                              " rsearch\r\n"
-                              " counts\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        rc = ch2.command_interpreter("show");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "You burst into a charming medley of Broadway hit tunes.\r\n");
-        conn2.output = {};
-
-        // show obj
-        rc = ch.command_interpreter("show obj");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "Format:  show obj <keyword>\r\n"
-                              "                  <number>\r\n"
-                              "                  <beginrange> <endrange>\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        // show ofiles
-        QCOMPARE(ch.command_interpreter("oedit"), eFAILURE);
-        QCOMPARE(conn.output, "Syntax:  oedit new [obj vnum]           -- Create new object\n\r"
-                              "         oedit [obj vnum]               -- Stat object\n\r"
-                              "         oedit [obj vnum] [field]       -- Help info for that field\n\r"
-                              "         oedit [obj vnum] [field] [arg] -- Change that field\n\r"
-                              "         oedit [field] [arg]            -- Change that field using last vnum\n\r\n\rThe field must be one of the following:\n\r"
-                              "          keywords          longdesc         shortdesc        actiondesc\r\n"
-                              "              type              wear              size             extra\r\n"
-                              "            weight             value         moreflags             level\r\n"
-                              "                v1                v2                v3                v4\r\n"
-                              "           affects            exdesc               new            delete\r\n"
-                              "              stat             timer       description\r\n\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        rc = ch2.command_interpreter("oedit");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        // find o
-        rc = ch.command_interpreter("find o");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "Huh?\r\n");
-        conn.output = {};
-        rc = ch.command_interpreter("bestow TestImmortal1 find");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "TestImmortal1 has been bestowed find.\r\n"
-                              "TestImmortal1 has bestowed find upon you.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        rc = ch.command_interpreter("find o");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "Usage:  find <mob|pc|char|obj> <name>\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch2.command_interpreter("find o");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        // stat
-        QCOMPARE(ch.command_interpreter("stat"), eFAILURE);
-        QCOMPARE(conn.output, "Huh?\r\n");
-        conn.output = {};
-        rc = ch.command_interpreter("bestow TestImmortal1 stat");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "TestImmortal1 has been bestowed stat.\r\n"
-                              "TestImmortal1 has bestowed stat upon you.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        QCOMPARE(ch.command_interpreter("stat"), eFAILURE);
-        QCOMPARE(conn.output, "Usage:  stat <mob|obj|char> <name>\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch2.command_interpreter("stat");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        // stat o
-        rc = ch.command_interpreter("stat o");
-        QCOMPARE(rc, eFAILURE);
-        QCOMPARE(conn.output, "Usage:  stat <mob|obj|char> <name>\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        rc = ch2.command_interpreter("stat o");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        // purloin
-        QCOMPARE(ch.command_interpreter("purloin"), eFAILURE);
-        QCOMPARE(conn.output, "Huh?\r\n");
-        conn.output = {};
-        rc = ch.command_interpreter("bestow TestImmortal1 purloin");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "TestImmortal1 has been bestowed purloin.\r\n"
-                              "TestImmortal1 has bestowed purloin upon you.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        QCOMPARE(ch.command_interpreter("purloin"), eFAILURE);
-        QCOMPARE(conn.output, "Retrieves any item in the game and puts it in your inventory.\r\n"
-                              "Works well in combination with the 'find obj' command.\r\n"
-                              "Usage: purloin [number.]name\n\r"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch2.command_interpreter("purloin");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        // load
-        QCOMPARE(ch.command_interpreter("load"), eFAILURE);
-        QCOMPARE(conn.output, "Huh?\r\n");
-        conn.output = {};
-        rc = ch.command_interpreter("bestow TestImmortal1 load");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "TestImmortal1 has been bestowed load.\r\n"
-                              "TestImmortal1 has bestowed load upon you.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        QCOMPARE(ch.command_interpreter("load"), eFAILURE);
-        QCOMPARE(conn.output, "Usage:  load <mob> <name|vnum> [qty]\r\n"
-                              "        load <obj> <name|vnum> [qty] [random]\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-
-        rc = ch2.command_interpreter("load");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        // string
-        QCOMPARE(ch.command_interpreter("string"), eSUCCESS);
-        QCOMPARE(conn.output, "Huh?\r\n");
-        conn.output = {};
-        rc = ch.command_interpreter("bestow TestImmortal1 string");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "TestImmortal1 has been bestowed string.\r\n"
-                              "TestImmortal1 has bestowed string upon you.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        QCOMPARE(ch.command_interpreter("string"), eSUCCESS);
-        QCOMPARE(conn.output, "Huh?\r\n");
-        conn.output = {};
-
-        rc = ch2.command_interpreter("string");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "Huh?\r\n");
-        conn2.output = {};
-
-        rc = ch.command_interpreter("oedit delete yesiwanttodeletethisitem");
-        QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "Item deleted.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-        QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
-        QCOMPARE(conn.output, "This range has not been modified.\r\n"
-                              "\x1B[1m\x1B[0m\x1B[37m");
-        conn.output = {};
-    }
-
-    void test_mortal_object_commands()
-    {
-        // get
-        // take
-        // drop
-        // junk, sacrifice
-        // give
-        // put
-        // donate
-        // wear
-        // grab
-        // inventory
-        // equipment
-        // remove
-        // examine
-        // look
-        // eat
-        // drink
-        // push
-        // pull
-        // pour
-        // assemble
-        // taste
-        // sip
-        // loot
-    }
-
     void test_legacy_prompts()
     {
         DC::config cf;
         cf.sql = false;
         DC dc(cf);
         dc.boot_db();
-
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character p1, g1, g2, g3, g4;
+        Character p1(&dc), g1(&dc), g2(&dc), g3(&dc), g4(&dc);
 
         auto count = 0;
         QStringList names = {QStringLiteral("agis"), QStringLiteral("thalanil"), QStringLiteral("elluin"), QStringLiteral("dakath"), QStringLiteral("reptar")};
@@ -1906,18 +1518,18 @@ private slots:
         g1.setHP(1000);
         g2.setHP(1000);
         // 14905, 2256, 3181
-        QVERIFY(dc.obj_index.contains(14905));
-        QVERIFY(dc.obj_index.contains(2256));
-        QVERIFY(dc.obj_index.contains(3181));
-        QVERIFY(dc.obj_index.contains(107));
-        QVERIFY(dc.obj_index.contains(108));
-        QVERIFY(dc.obj_index.contains(7004));
-        QVERIFY(obj_to_char(dc.clone_object(14905), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(2256), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(3181), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(107), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(108), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(7004), &p1));
+        QVERIFY(real_object(14905) != -1);
+        QVERIFY(real_object(2256) != -1);
+        QVERIFY(real_object(3181) != -1);
+        QVERIFY(real_object(107) != -1);
+        QVERIFY(real_object(108) != -1);
+        QVERIFY(real_object(7004) != -1);
+        QVERIFY(obj_to_char(clone_object(real_object(14905)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(2256)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(3181)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(107)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(108)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(7004)), &p1));
 
         p1.setClass(CLASS_MAGE);
         auto spell = find_skills_by_name("create_golem");
@@ -2012,56 +1624,33 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%~"), "%~ ");                                // %~
     }
 
-    void initTestCase()
+    void test_redeem_trader()
     {
-        for (QString file : {"lib/objectindex", "lib/objects/00000-96.obj", "lib/objects/00101-0199.obj"})
-        {
-            QFile backup{file + ".testDCbackup"};
-            if (backup.exists())
-                if (!backup.remove())
-                    qDebug("Failed to remove %s", qUtf8Printable(file + ".testDCbackup"));
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
 
-            QFile original{file};
-            if (original.exists())
-                if (!backup.exists())
-                {
-                    if (!original.copy(backup.fileName()))
-                        qDebug("Failed to copy %s to %s", qUtf8Printable(original.fileName()), qUtf8Printable(backup.fileName()));
-                }
-                else
-                {
-                    qFatal("%s exists but should have been removed earlier", qUtf8Printable(backup.fileName()));
-                }
-            else
-                qDebug("%s does not exist surprisingly.", qUtf8Printable(original.fileName()));
-        }
-    }
+        QCOMPARE(get_vnum(QStringLiteral("v0")), 0);
+        QCOMPARE(get_vnum(QStringLiteral("0")), 0);
+        QCOMPARE(get_vnum(QStringLiteral("1")), 1);
+        QCOMPARE(get_vnum(QStringLiteral("v1")), 1);
 
-    void cleanup()
-    {
-        for (QString file : {"objectindex", "objects/00000-96.obj", "objects/00101-0199.obj"})
-        {
-            QFile backup{file + ".testDCbackup"};
-            if (backup.exists())
-            {
-                if (!QFile(file).remove())
-                    qDebug("Failed to remove %s", qUtf8Printable(file));
-                if (!backup.copy(file))
-                    qDebug("Failed to copy %s to %s", qUtf8Printable(backup.fileName()), qUtf8Printable(file));
-            }
-        }
-    }
+        QCOMPARE(get_objindex_vnum(QStringLiteral("v0")), nullptr);
+        QCOMPARE_NE(get_objindex_vnum(QStringLiteral("v1")), nullptr);
+        QCOMPARE_NE(get_objindex_vnum(QStringLiteral("v99")), nullptr);
 
-    void cleanupTestCase()
-    {
-        for (QString file : {"objectindex", "objects/00000-96.obj", "objects/00101-0199.obj"})
-        {
-            QFile(file + ".testDCbackup").remove();
-        }
-        for (QString file : {"objects/100-100.obj"})
-        {
-            QFile(file).remove();
-        }
+        QCOMPARE(get_obj_vnum(QStringLiteral("v0")), nullptr);
+        QCOMPARE(get_obj_vnum(QStringLiteral("v1")), nullptr);
+        QCOMPARE_NE(get_obj_vnum(QStringLiteral("v99")), nullptr);
+
+        QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(QStringLiteral("v99"))->item_number].virt, 99);
+        QCOMPARE(get_obj_vnum(QStringLiteral("v99"))->carried_by, nullptr);
+        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v1"))->item_number].virt, 1);
+        QCOMPARE(get_objindex_vnum(QStringLiteral("v1"))->carried_by, nullptr);
+        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->item_number].virt, 99);
+        QCOMPARE(get_objindex_vnum(QStringLiteral("v99"))->carried_by, nullptr);
     }
 };
 

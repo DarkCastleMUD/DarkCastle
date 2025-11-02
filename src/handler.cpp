@@ -529,7 +529,7 @@ const struct set_data set_list[] = {
 void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 {
 	// obj has just been worn
-	int obj_vnum = obj->vnum;
+	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
 	int i;
 	int z = 0, y;
 	// Quadruple nested for. Annoying, but it's gotta be done.
@@ -549,7 +549,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && ch->equipment[i]->vnum == set_list[z].vnum[y])
+						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -800,7 +800,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 void remove_set_stats(Character *ch, Object *obj, int flag)
 {
 	// obj has just been removed
-	int obj_vnum = obj->vnum;
+	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
 	int i;
 	int z = 0, y;
 	// Quadruply nested for. Annoying, but it's gotta be done.
@@ -818,7 +818,7 @@ void remove_set_stats(Character *ch, Object *obj, int flag)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && ch->equipment[i]->vnum == set_list[z].vnum[y])
+						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -852,13 +852,13 @@ void check_weapon_weights(Character *ch)
 	{
 		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
 		act("$n stops using $p.", ch, ch->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(unequip_char(ch, WIELD), ch);
+		obj_to_char(ch->unequip_char(WIELD), ch);
 		if (ch->equipment[SECOND_WIELD])
 		{
 			act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
 			act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-			weapon = unequip_char(ch, SECOND_WIELD);
-			equip_char(ch, weapon, WIELD);
+			weapon = ch->unequip_char(SECOND_WIELD);
+			ch->equip_char(weapon, WIELD);
 			check_weapon_weights(ch); // Not a loop, since it'll only happen once.
 									  // It'll recheck primary wield.
 		}
@@ -869,7 +869,7 @@ void check_weapon_weights(Character *ch)
 	{
 		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
 		act("$n stops using $p.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(unequip_char(ch, SECOND_WIELD), ch);
+		obj_to_char(ch->unequip_char(SECOND_WIELD), ch);
 	}
 
 	if (ch->equipment[WEAR_SHIELD] && ((ch->equipment[WIELD] &&
@@ -879,7 +879,7 @@ void check_weapon_weights(Character *ch)
 	{
 		act("You shift your shield into your inventory.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
 		act("$n stops using $p.", ch, ch->equipment[WEAR_SHIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(unequip_char(ch, WEAR_SHIELD), ch);
+		obj_to_char(ch->unequip_char(WEAR_SHIELD), ch);
 	}
 }
 
@@ -1822,31 +1822,31 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 			{
 				if ((obj = ch->equipment[SECOND_WIELD]))
 				{
-					obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[HOLD]))
 				{
-					obj_to_char(unequip_char(ch, HOLD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(HOLD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[HOLD2]))
 				{
-					obj_to_char(unequip_char(ch, HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[WEAR_SHIELD]))
 				{
-					obj_to_char(unequip_char(ch, WEAR_SHIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_SHIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[WEAR_LIGHT]))
 				{
-					obj_to_char(unequip_char(ch, WEAR_LIGHT, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_LIGHT, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
@@ -1858,7 +1858,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 				obj = ch->equipment[WIELD];
 				if (obj)
 				{
-					obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
@@ -1950,7 +1950,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		{
 			if (!(flags & SUPPRESS_CONSEQUENCES) && GET_CLASS(ch->master) != CLASS_RANGER)
 				ch->add_memory(ch->master->getName(), 'h');
-			stop_follower(ch, BROKE_CHARM);
+			stop_follower(ch, follower_reasons_t::BROKE_CHARM);
 		}
 		break;
 	case SKILL_TACTICS:
@@ -2126,7 +2126,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 				}
 				if (!(flags & SUPPRESS_CONSEQUENCES))
 					ch->add_memory(ch->master->getName(), 'h');
-				stop_follower(ch, BROKE_CHARM_LILITH);
+				stop_follower(ch, follower_reasons_t::BROKE_CHARM_LILITH);
 			}
 		}
 	default:
@@ -2421,7 +2421,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
 	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty()))
 	{
-		do_sing(ch, "stop", CMD_DEFAULT);
+		do_sing(ch, "stop");
 	}
 
 	return (1);
@@ -2450,13 +2450,13 @@ int apply_ac(Character *ch, int eq_pos)
 
 // return 0 on failure
 // 1 on success
-int equip_char(Character *ch, class Object *obj, int pos, int flag)
+bool Character::equip_char(class Object *obj, int pos, bool flag)
 {
 	int j;
 
-	if (!ch || !obj)
+	if (!obj)
 	{
-		logentry(QStringLiteral("Null ch or obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
+		logentry(QStringLiteral("Null obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 	if (pos < 0 || pos >= MAX_WEAR)
@@ -2464,16 +2464,16 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
-	if (ch->equipment[pos])
+	if (equipment[pos])
 	{
-		logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(ch), pos);
+		logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(this), pos);
 		produce_coredump();
 		return 0;
 	}
-	if (IS_AFFECTED(ch, AFF_CHARM) && (pos == WIELD || pos == SECOND_WIELD))
+	if (IS_AFFECTED(this, AFF_CHARM) && (pos == WIELD || pos == SECOND_WIELD))
 	{ // best indentation ever
-		ch->recheck_height_wears();
-		obj_to_char(obj, ch);
+		recheck_height_wears();
+		obj_to_char(obj, this);
 		return 0;
 	}
 
@@ -2489,157 +2489,157 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		return 0;
 	}
 
-	if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) && IS_PC(ch))
+	if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && IS_PC(this))
 	{
-		if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || ch->isPlayerObjectThief() || contains_no_trade_item(obj))
+		if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || this->isPlayerObjectThief() || contains_no_trade_item(obj))
 		{
-			act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
-			ch->recheck_height_wears();
-			obj_to_char(obj, ch);
-			if (pos == WIELD && ch->equipment[SECOND_WIELD])
+			act("You are zapped by $p but it stays with you.", this, obj, 0, TO_CHAR, 0);
+			this->recheck_height_wears();
+			obj_to_char(obj, this);
+			if (pos == WIELD && this->equipment[SECOND_WIELD])
 			{
-				equip_char(ch, unequip_char(ch, SECOND_WIELD), WIELD);
+				equip_char(unequip_char(SECOND_WIELD), WIELD);
 			}
 			return 1;
 		}
-		if (ch->in_room != DC::NOWHERE)
+		if (this->in_room != DC::NOWHERE)
 		{
-			act("You are zapped by $p and instantly drop it.", ch, obj, 0, TO_CHAR, 0);
-			act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
-			ch->recheck_height_wears();
-			obj_to_room(obj, ch->in_room);
-			if (pos == WIELD && ch->equipment[SECOND_WIELD])
+			act("You are zapped by $p and instantly drop it.", this, obj, 0, TO_CHAR, 0);
+			act("$n is zapped by $p and instantly drops it.", this, obj, 0, TO_ROOM, 0);
+			this->recheck_height_wears();
+			obj_to_room(obj, this->in_room);
+			if (pos == WIELD && this->equipment[SECOND_WIELD])
 			{
-				equip_char(ch, unequip_char(ch, SECOND_WIELD), WIELD);
+				equip_char(unequip_char(SECOND_WIELD), WIELD);
 			}
 			return 1;
 		}
 		else
 		{
-			logentry(QStringLiteral("ch->in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
+			logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
 		}
 	}
 
-	if (obj->vnum == 30010 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30010 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("$p binds to your skin and won't let go. It hurts!", ch, obj, 0, TO_CHAR, 0);
-		act("$p binds to $n's skin!", ch, obj, 0, TO_ROOM, 0);
+		act("$p binds to your skin and won't let go. It hurts!", this, obj, 0, TO_CHAR, 0);
+		act("$p binds to $n's skin!", this, obj, 0, TO_ROOM, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (obj->vnum == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", ch, obj, 0, TO_CHAR, 0);
+		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (obj->vnum == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", ch, obj, 0, TO_CHAR, 0);
+		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
-	if (obj->vnum == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", ch, obj, 0, TO_CHAR, 0);
+		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 5;
 	}
 
-	ch->equipment[pos] = obj;
-	obj->equipped_by = ch;
-	if (IS_PC(ch))
+	this->equipment[pos] = obj;
+	obj->equipped_by = this;
+	if (IS_PC(this))
 		for (int a = 0; a < obj->num_affects; a++)
 		{
 			if (obj->affected[a].location >= 1000)
 			{
-				obj->next_skill = ch->player->skillchange;
-				ch->player->skillchange = obj;
+				obj->next_skill = this->player->skillchange;
+				this->player->skillchange = obj;
 				break;
 			}
 		}
 
 	if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
-		ch->glow_factor++;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light++;
+		this->glow_factor++;
+		if (this->in_room > DC::NOWHERE)
+			DC::getInstance()->world[this->in_room].light++;
 		//  this crashes in a reconnect cause player isn't around yet
 		//  rather than fixing it, i'm leaving it out because it's annoying anyway cause
 		//  it tells you every time you save
 		// TODO - make it not be annoying
-		//      act("The soft glow from $p brightens the area around $n.", ch, obj, 0, TO_ROOM, 0);
-		//      act("The soft glow from $p brightens the area around you.", ch, obj, 0, TO_CHAR, 0);
+		//      act("The soft glow from $p brightens the area around $n.", this, obj, 0, TO_ROOM, 0);
+		//      act("The soft glow from $p brightens the area around you.", this, obj, 0, TO_CHAR, 0);
 	}
 	if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
 	{
-		ch->glow_factor++;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light++;
+		this->glow_factor++;
+		if (this->in_room > DC::NOWHERE)
+			DC::getInstance()->world[this->in_room].light++;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
-		GET_AC(ch) -= apply_ac(ch, pos);
+		GET_AC(this) -= apply_ac(this, pos);
 
-	for (j = 0; ch->equipment[pos] && j < ch->equipment[pos]->num_affects; j++)
-		affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, -1, true, flag);
+	for (j = 0; this->equipment[pos] && j < this->equipment[pos]->num_affects; j++)
+		affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, true, flag);
 
-	add_set_stats(ch, obj, flag, pos);
+	add_set_stats(this, obj, flag, pos);
 
-	redo_hitpoints(ch);
-	redo_mana(ch);
-	redo_ki(ch);
+	redo_hitpoints(this);
+	redo_mana(this);
+	redo_ki(this);
 
 	return 1;
 }
 
-class Object *unequip_char(Character *ch, int pos, int flag)
+class Object *Character::unequip_char(int pos, bool flag)
 {
 	int j;
 	class Object *obj;
 
 	assert(pos >= 0 && pos < MAX_WEAR);
-	assert(ch->equipment[pos]);
+	assert(equipment[pos]);
 
-	obj = ch->equipment[pos];
+	obj = equipment[pos];
 
-	if (obj->vnum == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", ch, obj, 0, TO_CHAR, 0);
-		GET_MANA(ch) = GET_MANA(ch) / 2;
+		act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", this, obj, 0, TO_CHAR, 0);
+		GET_MANA(this) = GET_MANA(this) / 2;
 	}
-	if (obj->vnum == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", ch, obj, 0, TO_CHAR, 0);
-		ch->setHP(ch->getHP() / 2);
+		act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", this, obj, 0, TO_CHAR, 0);
+		setHP(getHP() / 2);
 	}
-	if (obj->vnum == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("The spring in your step has subsided.", ch, obj, 0, TO_CHAR, 0);
+		act("The spring in your step has subsided.", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
-		GET_AC(ch) += apply_ac(ch, pos);
+		GET_AC(this) += apply_ac(this, pos);
 
-	remove_set_stats(ch, obj, flag);
+	remove_set_stats(this, obj, flag);
 	class Object *a, *b = nullptr;
 b: // ew
-	if (IS_PC(ch))
-		for (a = ch->player->skillchange; a; a = a->next_skill)
+	if (IS_PC(this))
+		for (a = player->skillchange; a; a = a->next_skill)
 		{
 			if (a == (Object *)0x95959595)
 			{
 				int i;
-				ch->player->skillchange = nullptr;
+				player->skillchange = nullptr;
 				for (i = 0; i < MAX_WEAR; i++)
 				{
 					int j;
-					if (!ch->equipment[i])
+					if (!equipment[i])
 						continue;
-					for (j = 0; j < ch->equipment[i]->num_affects; j++)
+					for (j = 0; j < equipment[i]->num_affects; j++)
 					{
-						if (ch->equipment[i]->affected[j].location > 1000)
+						if (equipment[i]->affected[j].location > 1000)
 						{
-							ch->equipment[i]->next_skill = ch->player->skillchange;
-							ch->player->skillchange = ch->equipment[i];
+							equipment[i]->next_skill = player->skillchange;
+							player->skillchange = equipment[i];
 							break;
 						}
 					}
@@ -2651,37 +2651,37 @@ b: // ew
 				if (b)
 					b->next_skill = a->next_skill;
 				else
-					ch->player->skillchange = a->next_skill;
+					player->skillchange = a->next_skill;
 				break;
 			}
 			b = a;
 		}
 
-	ch->equipment[pos] = 0;
+	equipment[pos] = 0;
 	obj->equipped_by = 0;
 
 	if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
-		ch->glow_factor--;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light--;
+		glow_factor--;
+		if (in_room > DC::NOWHERE)
+			DC::getInstance()->world[in_room].light--;
 		// this is just annoying cause it tells you every time you save
 		// TODO - make it not be annoying
-		//      act("The soft glow around $n from $p fades.", ch, obj, 0, TO_ROOM, 0);
-		//      act("The glow around you fades slightly.", ch, obj, 0, TO_CHAR, 0);
+		//      act("The soft glow around $n from $p fades.", this, obj, 0, TO_ROOM, 0);
+		//      act("The glow around you fades slightly.", this, obj, 0, TO_CHAR, 0);
 	}
 	if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
 	{
-		ch->glow_factor--;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light--;
+		glow_factor--;
+		if (in_room > DC::NOWHERE)
+			DC::getInstance()->world[in_room].light--;
 	}
 
 	for (j = 0; j < obj->num_affects; j++)
-		affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, -1, false);
-	redo_hitpoints(ch);
-	redo_mana(ch);
-	redo_ki(ch);
+		affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, false);
+	redo_hitpoints(this);
+	redo_mana(this);
+	redo_ki(this);
 
 	return (obj);
 }
@@ -2784,12 +2784,12 @@ class Object *get_obj_in_list(char *name, class Object *list)
 }
 
 /* Search a given list for an object number, and return a ptr to that obj */
-class Object *get_obj_in_list_num(vnum_t num, class Object *list)
+class Object *get_obj_in_list_num(int num, class Object *list)
 {
 	class Object *i;
 
 	for (i = list; i; i = i->next_content)
-		if (i->vnum == num)
+		if (i->item_number == num)
 			return (i);
 
 	return (0);
@@ -2819,19 +2819,20 @@ class Object *get_obj(char *name)
 	return (0);
 }
 
-class Object *get_obj(vnum_t vnum)
+class Object *get_obj(int vnum)
 {
+	int num = real_object(vnum);
 
-	return DC::getInstance()->obj_index[vnum].item;
+	return ((class Object *)DC::getInstance()->obj_index[num].item);
 }
 
 /*search the entire world for an object number, and return a pointer  */
-class Object *get_obj_num(vnum_t nr)
+class Object *get_obj_num(int nr)
 {
 	class Object *i;
 
 	for (i = DC::getInstance()->object_list; i; i = i->next)
-		if (i->vnum == nr)
+		if (i->item_number == nr)
 			return (i);
 
 	return (0);
@@ -2858,7 +2859,7 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 			continue;
 		if (number == 1 || number == 0)
 		{
-			if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && DC::getInstance()->mob_index[i->mobdata->vnum].vnum == 12))
+			if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && DC::getInstance()->mob_index[i->mobdata->nr].virt == 12))
 				return (i);
 			else if (isprefix(tmp, GET_NAME(i)))
 			{
@@ -2975,10 +2976,10 @@ Character *get_char_num(int nr)
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
 						  {
-		if (IS_NPC(i) && i->mobdata->vnum == nr) {
-			return true;
-		}
-		return false; });
+ 		if (IS_NPC(i) && i->mobdata->nr == nr) {
+ 			return true;
+ 		}
+ 		return false; });
 
 	if (result != end(character_list))
 	{
@@ -3004,7 +3005,7 @@ int move_obj(Object *obj, int dest)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3052,17 +3053,17 @@ int move_obj(Object *obj, int dest)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (1): %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (1): %1.\n").arg(obj->name)));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (2) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (2) : %1.\n").arg(obj->name)));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name)));
 		}
 
 		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->name, DC::getInstance()->world[dest].number);
@@ -3089,7 +3090,7 @@ int move_obj(Object *obj, Object *dest_obj)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3133,17 +3134,17 @@ int move_obj(Object *obj, Object *dest_obj)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (4): %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (4): %1.\n").arg(obj->name)));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (5) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (5) : %1.\n").arg(obj->name)));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name)));
 		}
 
 		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->name, dest_obj->name);
@@ -3172,7 +3173,7 @@ int move_obj(Object *obj, Character *ch)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3218,7 +3219,7 @@ int move_obj(Object *obj, Character *ch)
 	 if(obj->obj_flags.type_flag == ITEM_MONEY &&
 	 obj->obj_flags.value[0] >= 1 ) {
 	 sprintf(buffer,"There was %d coins.\r\n", obj->obj_flags.value[0]);
-	 ch->send(buffer);
+	 send(buffer);
 	 GET_GOLD(ch) += obj->obj_flags.value[0];
 	 extract_obj(obj);
 	 return 1;
@@ -3232,17 +3233,17 @@ int move_obj(Object *obj, Character *ch)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (7): %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (7): %1.\n").arg(obj->name)));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (8) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (8) : %1.\n").arg(obj->name)));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name)));
 		}
 
 		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->name, GET_NAME(ch));
@@ -3260,7 +3261,7 @@ int obj_to_char(class Object *object, Character *ch)
 	// class Object *obj;
 	/*
 	 if(!(obj = ch->carrying) ||
-	 (!obj->next_content && obj->vnum > object->vnum))
+	 (!obj->next_content && obj->item_number > object->item_number))
 	 {
 	 */
 	object->next_content = ch->carrying;
@@ -3286,7 +3287,7 @@ int obj_to_char(class Object *object, Character *ch)
 	 }
 
 	 while(obj->next_content &&
-	 obj->next_content->vnum < object->vnum)
+	 obj->next_content->item_number < object->item_number)
 	 obj = obj->next_content;
 
 	 object->next_content = obj->next_content;
@@ -3350,9 +3351,9 @@ int obj_to_room(class Object *object, int room)
 	if (!object)
 		return 0;
 
-	if (!DC::getInstance()->rooms.contains(room))
+	if (&DC::getInstance()->world[room] == nullptr)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%lu] == nullptr", room);
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
 		produce_coredump();
 		return 0;
 	}
@@ -3378,7 +3379,7 @@ int obj_to_room(class Object *object, int room)
 	// search through for the last object, or another object just like this one
 	for (obj = DC::getInstance()->world[room].contents; obj && obj->next_content; obj = obj->next_content)
 	{
-		if (obj->vnum == object->vnum)
+		if (obj->item_number == object->item_number)
 			break;
 	}
 
@@ -3400,7 +3401,7 @@ int obj_to_room(class Object *object, int room)
 
 	/*
 	 if(!(obj = DC::getInstance()->world[room].contents) ||
-	 (!obj->next_content && obj->vnum > object->vnum))
+	 (!obj->next_content && obj->item_number > object->item_number))
 	 {
 	 object->next_content = DC::getInstance()->world[room].contents;
 	 DC::getInstance()->world[room].contents = object;
@@ -3413,7 +3414,7 @@ int obj_to_room(class Object *object, int room)
 	 }
 
 	 while(obj->next_content &&
-	 obj->next_content->vnum < object->vnum)
+	 obj->next_content->item_number < object->item_number)
 	 obj = obj->next_content;
 
 	 object->next_content = obj->next_content;
@@ -3477,7 +3478,7 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 	// search through for the last object, or another object just like this one
 	for (tobj = obj_to->contains; tobj && tobj->next_content; tobj = tobj->next_content)
 	{
-		if (tobj->vnum == obj->vnum)
+		if (tobj->item_number == obj->item_number)
 			break;
 	}
 
@@ -3495,7 +3496,7 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 
 	// recursively upwards add the weight.  Since we only have 1 layer of containers,
 	// this loop only happens once, but it's good to leave later in case we change our mind
-	if (obj_to->vnum != 536)
+	if (DC::getInstance()->obj_index[obj_to->item_number].virt != 536)
 	{
 		for (tobj = obj->in_obj; tobj;
 			 GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj), tobj = tobj->in_obj)
@@ -3539,7 +3540,7 @@ int obj_from_obj(class Object *obj)
 
 	// Subtract weight from containers container
 
-	if (!obj_from || obj_from->vnum != 536)
+	if (!obj_from || DC::getInstance()->obj_index[obj_from->item_number].virt != 536)
 	{
 		for (tmp = obj->in_obj; tmp->in_obj; tmp = tmp->in_obj)
 			GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
@@ -3592,7 +3593,7 @@ void extract_obj(class Object *obj)
 		for (iEq = 0; iEq < MAX_WEAR; iEq++)
 			if (vict->equipment[iEq] == obj)
 			{
-				obj_to_char(unequip_char(vict, iEq, 1), vict);
+				obj_to_char(vict->unequip_char(iEq, 1), vict);
 				break;
 			}
 	}
@@ -3636,9 +3637,9 @@ void extract_obj(class Object *obj)
 			temp1->next = obj->next;
 	}
 
-	if (obj->vnum >= 0)
+	if (obj->item_number >= 0)
 	{
-		(DC::getInstance()->obj_index[obj->vnum].qty)--;
+		(DC::getInstance()->obj_index[obj->item_number].qty)--;
 	}
 
 	for (auto &r : reroll_sessions)
@@ -3662,7 +3663,7 @@ void extract_obj(class Object *obj)
 
 void update_object(class Object *obj, int use)
 {
-	if (obj->obj_flags.timer > 0 && (obj->vnum != 30010 && obj->vnum != 30036 && obj->vnum != 30033 && obj->vnum != 30097 && obj->vnum != 30019))
+	if (obj->obj_flags.timer > 0 && (DC::getInstance()->obj_index[obj->item_number].virt != 30010 && DC::getInstance()->obj_index[obj->item_number].virt != 30036 && DC::getInstance()->obj_index[obj->item_number].virt != 30033 && DC::getInstance()->obj_index[obj->item_number].virt != 30097 && DC::getInstance()->obj_index[obj->item_number].virt != 30019))
 		obj->obj_flags.timer -= use;
 	if (obj->contains)
 		update_object(obj->contains, use);
@@ -3692,7 +3693,7 @@ void update_char_objects(Character *ch)
 	{
 		if (ch->equipment[i])
 		{
-			if (ch->equipment[i]->vnum == SPIRIT_SHIELD_OBJ_NUMBER)
+			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
 			{
 				update_object(ch->equipment[i], 1);
 
@@ -3729,7 +3730,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	if (IS_PC(ch) && !ch->desc)
 		for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
 			if (t_desc->original == ch)
-				ret = do_return(t_desc->character, "", 0);
+				ret = do_return(t_desc->character, "");
 	if (SOMEONE_DIED(ret))
 	{ // already taken care of
 		return;
@@ -3755,7 +3756,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 			extract_char(ch->player->golem, false);
 		}
 	}
-	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->vnum].vnum == 8)
+	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt == 8)
 	{
 		isGolem = true;
 		if (pull)
@@ -3827,7 +3828,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		{
 			if (ch->equipment[l])
 			{
-				obj_to_room(unequip_char(ch, l), was_in);
+				obj_to_room(ch->unequip_char(l), was_in);
 			}
 		}
 		if (ch->carrying)
@@ -3843,7 +3844,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	}
 	if (isGolem && omast)
 	{
-		omast->save(666);
+		omast->save(cmd_t::SAVE_SILENTLY);
 		omast->player->golem = 0; // Reset the golem flag.
 	}
 	/*
@@ -3908,10 +3909,10 @@ void extract_char(Character *ch, bool pull, Trace t)
 	GET_AC(ch) -= GET_AC_METAS(ch);
 
 	if (ch->desc && ch->desc->original)
-		do_return(ch, "", 12);
+		do_return(ch, "", cmd_t::LOOK);
 
-	if (IS_NPC(ch) && ch->mobdata->vnum > -1)
-		DC::getInstance()->mob_index[ch->mobdata->vnum].vnum--;
+	if (IS_NPC(ch) && ch->mobdata->nr > -1)
+		DC::getInstance()->mob_index[ch->mobdata->nr].qty--;
 
 	if (pull || isGolem)
 	{
@@ -4000,7 +4001,7 @@ void lastseen_targeted(Character *ch, Character *victim)
 	if (ch->player->lastseen == 0)
 		ch->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
 
-	int nr = victim->mobdata->vnum;
+	int nr = victim->mobdata->nr;
 
 	std::multimap<int, std::pair<timeval, timeval>>::iterator i;
 	i = ch->player->lastseen->find(nr);
@@ -4221,11 +4222,44 @@ Character *get_mob_vis(Character *ch, char *name)
 Object *get_obj_vnum(int vnum)
 {
 	Object *i;
-	rnum_t num = vnum;
+	int num = real_object(vnum);
 	for (i = DC::getInstance()->object_list; i; i = i->next)
-		if (i->vnum == num)
+		if (i->item_number == num)
 			return i;
 	return nullptr;
+}
+
+vnum_t get_vnum(QString vnum_str)
+{
+	if (vnum_str.isEmpty())
+		return {};
+	if (vnum_str.startsWith('v', Qt::CaseInsensitive))
+		vnum_str.removeFirst();
+
+	bool ok = false;
+	auto vnum = vnum_str.toULongLong(&ok);
+	if (!ok || !vnum)
+		return {};
+	return vnum;
+}
+
+Object *get_obj_vnum(QString vnum_str)
+{
+	return get_obj_vnum(get_vnum(vnum_str));
+}
+
+Object *get_objindex_vnum(vnum_t vnum)
+{
+	rnum_t rnum = real_object(vnum);
+	if (rnum == -1)
+		return nullptr;
+
+	return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
+}
+
+Object *get_objindex_vnum(QString vnum_str)
+{
+	return get_objindex_vnum(get_vnum(vnum_str));
 }
 
 Character *get_random_mob_vnum(int vnum)
@@ -4238,7 +4272,7 @@ Character *get_random_mob_vnum(int vnum)
 
 	auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](Character *const &i)
 						  {
-		if(IS_NPC(i) && i->mobdata->vnum == num)
+		if(IS_NPC(i) && i->mobdata->nr == num)
 		{
 			if (total == which)
 			return true;
@@ -4263,7 +4297,7 @@ Character *get_mob_vnum(int vnum)
 
 	auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)
 						  {
-		if(IS_NPC(i) && i->mobdata->vnum == number) {
+		if(IS_NPC(i) && i->mobdata->nr == number) {
 			return true;
 		}
 		return false; });
@@ -4360,7 +4394,7 @@ Character *get_pc(QString name)
 		return *result;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 Character *get_active_pc(QString name)
@@ -4561,14 +4595,14 @@ Character *Character::get_active_pc_vis(QString name)
 class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *list, bool blindfighting)
 {
 	class Object *i;
-	rnum_t number = item_num;
+	int number = real_object(item_num);
 
 	// never match invalid items
 	if (number == -1)
 		return nullptr;
 
 	for (i = list; i; i = i->next_content)
-		if (i->vnum == number && CAN_SEE_OBJ(ch, i, blindfighting))
+		if (i->item_number == number && CAN_SEE_OBJ(ch, i, blindfighting))
 			return i;
 
 	return nullptr;
@@ -4628,7 +4662,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 	{
 		// TODO
 		// For now they want me to remove this becuase portals and corpses are item_number -1
-		// if (i->vnum == -1) continue;
+		// if (i->item_number == -1) continue;
 		//
 		if (loc && isSet(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
 			ch->getLevel() < 101)
@@ -4686,7 +4720,7 @@ class Object *create_money(int amount)
 	obj->obj_flags.wear_flags = ITEM_TAKE;
 	obj->obj_flags.value[0] = amount;
 	obj->obj_flags.cost = amount;
-	obj->vnum = -1;
+	obj->item_number = -1;
 
 	obj->next = DC::getInstance()->object_list;
 	DC::getInstance()->object_list = obj;
@@ -4986,7 +5020,7 @@ void remove_memory(Character *ch, char type)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_NPC(ch) || !ch->mobdata)
+	if (!IS_NPC(ch))
 		return;
 
 	if (type == 'h' && !ch->mobdata->hated.isEmpty())

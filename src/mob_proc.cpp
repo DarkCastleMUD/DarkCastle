@@ -56,39 +56,39 @@ bool many_charms(Character *ch);
 // Marauder proc uses this
 int call_for_help_in_room(Character *ch, int iFriendId)
 {
-  Character *ally = nullptr;
-  int friends = 0;
+    Character *ally = nullptr;
+    int friends = 0;
 
-  if (!ch)
-    return false;
+    if (!ch)
+        return false;
 
-  // Any friends in the room?  Call for help!   int friends = 0;
-  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
-  {
-    if (!IS_NPC(ally))
-      continue;
-    if (ally == ch)
-      continue;
-    if (ally == ch->fighting)
-      continue;
-
-    if (real_mobile(iFriendId) == ally->mobdata->vnum)
+    // Any friends in the room?  Call for help!   int friends = 0;
+    for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
     {
-      if (!can_be_attacked(ally, ch->fighting))
-        continue;
-      if (ally->fighting)
-        continue;
+        if (!IS_NPC(ally))
+            continue;
+        if (ally == ch)
+            continue;
+        if (ally == ch->fighting)
+            continue;
 
-      if (!friends)
-      {
-        do_say(ch, "This guy is beating the hell out of me!  HELP!!", CMD_DEFAULT);
-        friends = 1;
-      }
-      do_say(ally, "I shall come to your aid!", CMD_DEFAULT);
-      attack(ally, ch->fighting, TYPE_UNDEFINED);
+        if (real_mobile(iFriendId) == ally->mobdata->nr)
+        {
+            if (!can_be_attacked(ally, ch->fighting))
+                continue;
+            if (ally->fighting)
+                continue;
+
+            if (!friends)
+            {
+                do_say(ch, "This guy is beating the hell out of me!  HELP!!", cmd_t::DEFAULT);
+                friends = 1;
+            }
+            do_say(ally, "I shall come to your aid!", cmd_t::DEFAULT);
+            attack(ally, ch->fighting, TYPE_UNDEFINED);
+        }
     }
-  }
-  return friends;
+    return friends;
 }
 
 // Protect is another purely utilitarian function to include inside a proc.
@@ -100,52 +100,52 @@ int call_for_help_in_room(Character *ch, int iFriendId)
 // Several procs use this
 int protect(Character *ch, int iFriendId)
 {
-  Character *ally = nullptr;
-  Character *tmp_ch = nullptr;
-  int retval;
+    Character *ally = nullptr;
+    Character *tmp_ch = nullptr;
+    int retval;
 
-  if (!ch)
-    return eFAILURE;
+    if (!ch)
+        return eFAILURE;
 
-  // Any one I need to protect in the room?
-  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
-  {
-    if (!IS_NPC(ally))
-      continue;
-    if (!ally->fighting) // if they arne't fighting, they're safe
-      continue;
-    if (ally == ch)
-      continue;
-    if (ally == ch->fighting)
-      continue;
-
-    if (real_mobile(iFriendId) == ally->mobdata->vnum)
+    // Any one I need to protect in the room?
+    for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
     {
-      // obscure whitney houston joke
-      do_say(ch, "and IiiiIIiiii will always, looove yooooou!", CMD_DEFAULT);
-      // do join
-      retval = attack(ch, ally->fighting, TYPE_UNDEFINED);
-      if (SOMEONE_DIED(retval))
-        return retval;
-      // pertant rescue code (easier than calling it)
-      ch->sendln("Banzai! To the rescue...");
-      act("You are rescued by $N, you are confused!",
-          ally, 0, ch, TO_CHAR, 0);
-      act("$n heroically rescues $N.", ch, 0, ally, TO_ROOM, NOTVICT);
+        if (!IS_NPC(ally))
+            continue;
+        if (!ally->fighting) // if they arne't fighting, they're safe
+            continue;
+        if (ally == ch)
+            continue;
+        if (ally == ch->fighting)
+            continue;
 
-      tmp_ch = ally->fighting;
-      stop_fighting(ally);
-      if (tmp_ch->fighting)
-        stop_fighting(tmp_ch);
-      if (ch->fighting)
-        stop_fighting(ch);
+        if (real_mobile(iFriendId) == ally->mobdata->nr)
+        {
+            // obscure whitney houston joke
+            do_say(ch, "and IiiiIIiiii will always, looove yooooou!", cmd_t::DEFAULT);
+            // do join
+            retval = attack(ch, ally->fighting, TYPE_UNDEFINED);
+            if (SOMEONE_DIED(retval))
+                return retval;
+            // pertant rescue code (easier than calling it)
+            ch->sendln("Banzai! To the rescue...");
+            act("You are rescued by $N, you are confused!",
+                ally, 0, ch, TO_CHAR, 0);
+            act("$n heroically rescues $N.", ch, 0, ally, TO_ROOM, NOTVICT);
 
-      set_fighting(ch, tmp_ch);
-      set_fighting(tmp_ch, ch);
-      return eSUCCESS;
+            tmp_ch = ally->fighting;
+            stop_fighting(ally);
+            if (tmp_ch->fighting)
+                stop_fighting(tmp_ch);
+            if (ch->fighting)
+                stop_fighting(ch);
+
+            set_fighting(ch, tmp_ch);
+            set_fighting(tmp_ch, ch);
+            return eSUCCESS;
+        }
     }
-  }
-  return eFAILURE;
+    return eFAILURE;
 }
 
 // find_random_player_in_room is another purely utilitarian function to
@@ -156,31 +156,31 @@ int protect(Character *ch, int iFriendId)
 // Pagoda place uses this
 Character *find_random_player_in_room(Character *ch)
 {
-  Character *vict = nullptr;
-  int count = 0;
+    Character *vict = nullptr;
+    int count = 0;
 
-  // Count the number of players in room
-  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
-    if (IS_PC(vict))
-      count++;
+    // Count the number of players in room
+    for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+        if (IS_PC(vict))
+            count++;
 
-  if (!count) // no players
+    if (!count) // no players
+        return nullptr;
+
+    // Pick a random one
+    count = number(1, count);
+
+    // Find the "count" player and return them
+    for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+        if (IS_PC(vict))
+        {
+            if (count > 1)
+                count--;
+            else
+                return vict;
+        }
+    // we should never get here
     return nullptr;
-
-  // Pick a random one
-  count = number(1, count);
-
-  // Find the "count" player and return them
-  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
-    if (IS_PC(vict))
-    {
-      if (count > 1)
-        count--;
-      else
-        return vict;
-    }
-  // we should never get here
-  return nullptr;
 }
 
 // Call this for any "area effect" damage you want to do to all the
@@ -189,31 +189,31 @@ Character *find_random_player_in_room(Character *ch)
 // and the call this function to deal the damage you want to do
 void damage_all_players_in_room(Character *ch, int damage)
 {
-  Character *vict = nullptr;
-  Character *next_vict = nullptr;
-  void inform_victim(Character * ch, Character * vict, int dam);
+    Character *vict = nullptr;
+    Character *next_vict = nullptr;
+    void inform_victim(Character * ch, Character * vict, int dam);
 
-  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_vict)
-  {
-    // we need this here in case fight_kill moves our victim
-    next_vict = vict->next_in_room;
+    for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_vict)
+    {
+        // we need this here in case fight_kill moves our victim
+        next_vict = vict->next_in_room;
 
-    if (IS_NPC(vict))
-      continue;
-    if (ch == vict)
-      continue;
-    if (vict->getLevel() >= IMMORTAL)
-      continue;
+        if (IS_NPC(vict))
+            continue;
+        if (ch == vict)
+            continue;
+        if (vict->getLevel() >= IMMORTAL)
+            continue;
 
-    if (vict->affected_by_spell(SPELL_DIVINE_INTER) && damage > vict->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
-      vict->removeHP(vict->affected_by_spell(SPELL_DIVINE_INTER)->modifier);
-    else
-      vict->removeHP(damage); // Note -damage will HEAL the player
-    update_pos(vict);
-    inform_victim(ch, vict, damage);
-    if (vict->getHP() < 1)
-      fight_kill(ch, vict, TYPE_CHOOSE, 0);
-  }
+        if (vict->affected_by_spell(SPELL_DIVINE_INTER) && damage > vict->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+            vict->removeHP(vict->affected_by_spell(SPELL_DIVINE_INTER)->modifier);
+        else
+            vict->removeHP(damage); // Note -damage will HEAL the player
+        update_pos(vict);
+        inform_victim(ch, vict, damage);
+        if (vict->getHP() < 1)
+            fight_kill(ch, vict, TYPE_CHOOSE, 0);
+    }
 }
 
 // Call this function with the summoner, and the vnum of the mobs
@@ -221,19 +221,19 @@ void damage_all_players_in_room(Character *ch, int damage)
 // anywhere in the world to you.
 void summon_all_of_mob_to_room(Character *ch, int iFriendId)
 {
-  if (!ch)
-    return;
+    if (!ch)
+        return;
 
-  const auto &character_list = DC::getInstance()->character_list;
-  for (const auto &victim : character_list)
-  {
-    if (!IS_NPC(victim))
-      continue;
-    if (real_mobile(iFriendId) == victim->mobdata->vnum)
+    const auto &character_list = DC::getInstance()->character_list;
+    for (const auto &victim : character_list)
     {
-      move_char(victim, ch->in_room);
+        if (!IS_NPC(victim))
+            continue;
+        if (real_mobile(iFriendId) == victim->mobdata->nr)
+        {
+            move_char(victim, ch->in_room);
+        }
     }
-  }
 }
 
 // Call this function with the finder, and the vnum of the mob you
@@ -242,221 +242,221 @@ void summon_all_of_mob_to_room(Character *ch, int iFriendId)
 // If it doesn't, return nullptr
 Character *find_mob_in_room(Character *ch, int iFriendId)
 {
-  Character *ally = nullptr;
+    Character *ally = nullptr;
 
-  if (!ch)
+    if (!ch)
+        return nullptr;
+
+    // Is my friend in the room?
+    for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
+    {
+        if (!IS_NPC(ally))
+            continue;
+        if (real_mobile(iFriendId) == ally->mobdata->nr)
+            return ally;
+    }
     return nullptr;
-
-  // Is my friend in the room?
-  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
-  {
-    if (!IS_NPC(ally))
-      continue;
-    if (real_mobile(iFriendId) == ally->mobdata->vnum)
-      return ally;
-  }
-  return nullptr;
 }
 
 // Spellcraft golem stuff.
-int sc_golem(Character *ch, class Object *obj, int cmd, const char *arg,
+int sc_golem(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
              Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
-  if (!ch->fighting)
-    return eFAILURE;
-  bool iron = false;
-  if (IS_AFFECTED(ch, AFF_GOLEM))
-    iron = true;
-  SPELL_FUN *iron_list[] = {
-      cast_shocking_grasp,
-      cast_lightning_bolt,
-      cast_sparks,
-      cast_chill_touch,
-      cast_cure_critic};
-  SPELL_FUN *stone_list[] = {
-      cast_fireball,
-      cast_cause_critical,
-      cast_meteor_swarm,
-      cast_bee_sting,
-      cast_cure_critic};
-  if (!(owner = ch->master) || !(ch->master->has_skill(SKILL_SPELLCRAFT) > 80))
-    return eFAILURE;
-  int i = number(0, 4);
-  SPELL_FUN *func = iron ? iron_list[i] : stone_list[i];
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
+    bool iron = false;
+    if (IS_AFFECTED(ch, AFF_GOLEM))
+        iron = true;
+    SPELL_FUN *iron_list[] = {
+        cast_shocking_grasp,
+        cast_lightning_bolt,
+        cast_sparks,
+        cast_chill_touch,
+        cast_cure_critic};
+    SPELL_FUN *stone_list[] = {
+        cast_fireball,
+        cast_cause_critical,
+        cast_meteor_swarm,
+        cast_bee_sting,
+        cast_cure_critic};
+    if (!(owner = ch->master) || !(ch->master->has_skill(SKILL_SPELLCRAFT) > 80))
+        return eFAILURE;
+    int i = number(0, 4);
+    SPELL_FUN *func = iron ? iron_list[i] : stone_list[i];
 
-  if (i == 4)
-    return (*func)(50, ch, "", SPELL_TYPE_SPELL, ch, 0, 0);
-  else
-    return (*func)(50, ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, 0);
+    if (i == 4)
+        return (*func)(50, ch, "", SPELL_TYPE_SPELL, ch, 0, 0);
+    else
+        return (*func)(50, ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
 
 // Couple mobs actually still use this.
-int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
+int fighter(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
             Character *owner)
 {
-  /*class Object *obj;*/
-  class Object *wielded;
-  Character *vict;
+    /*class Object *obj;*/
+    class Object *wielded;
+    Character *vict;
 
-  if (cmd)
-    return eFAILURE;
-  if (ch->getPosition() < position_t::FIGHTING)
-    return eFAILURE;
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
-    return eFAILURE;
-  if (MOB_WAIT_STATE(ch))
-  {
-    return eFAILURE;
-  }
-
-  vict = ch->fighting;
-
-  if (!vict)
-    return eFAILURE;
-
-  // Deathstroke my opponent whenever possible
-  if (ch->getLevel() > 39 && vict->getPosition() < position_t::FIGHTING)
-  {
-    MOB_WAIT_STATE(ch) = 2;
-    return do_deathstroke(ch, "", CMD_DEFAULT);
-  }
-
-  if (ch->equipment[WIELD] && vict->equipment[WIELD])
-    if (IS_PC(ch) || IS_PC(vict))
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (GET_POS(ch) < position_t::FIGHTING)
+        return eFAILURE;
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+    if (MOB_WAIT_STATE(ch))
     {
-      wielded = vict->equipment[WIELD];
-      if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
-          (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
-        if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
-        {
-          MOB_WAIT_STATE(ch) = 2;
-          disarm(ch, vict);
-          return eSUCCESS;
-        }
+        return eFAILURE;
     }
 
-  if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
-  {
-    MOB_WAIT_STATE(ch) = 3;
-    return do_bash(ch, "", CMD_DEFAULT);
-  }
-  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
-  {
-    MOB_WAIT_STATE(ch) = 2;
-    return do_kick(ch, "", CMD_DEFAULT);
-  }
+    vict = ch->fighting;
 
-  return eFAILURE;
+    if (!vict)
+        return eFAILURE;
+
+    // Deathstroke my opponent whenever possible
+    if (ch->getLevel() > 39 && GET_POS(vict) < position_t::FIGHTING)
+    {
+        MOB_WAIT_STATE(ch) = 2;
+        return do_deathstroke(ch, "", cmd_t::DEFAULT);
+    }
+
+    if (ch->equipment[WIELD] && vict->equipment[WIELD])
+        if (IS_PC(ch) || IS_PC(vict))
+        {
+            wielded = vict->equipment[WIELD];
+            if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
+                (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
+                if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
+                {
+                    MOB_WAIT_STATE(ch) = 2;
+                    disarm(ch, vict);
+                    return eSUCCESS;
+                }
+        }
+
+    if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
+    {
+        MOB_WAIT_STATE(ch) = 3;
+        return do_bash(ch, "", cmd_t::DEFAULT);
+    }
+    if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
+    {
+        MOB_WAIT_STATE(ch) = 2;
+        return ch->do_kick();
+    }
+
+    return eFAILURE;
 }
 
-int active_tarrasque(Character *ch, class Object *obj, int cmd, const char *arg,
+int active_tarrasque(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                      Character *owner)
 {
-  Character *vict;
+    Character *vict;
 
-  if ((ch->getPosition() != position_t::FIGHTING) || (!ch->fighting))
-  {
-    return eFAILURE;
-  }
-
-  vict = ch->fighting;
-
-  if (!vict)
-    return eFAILURE;
-
-  if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (ch->getLevel() > 30 && number(0, 2) == 0)
+    if ((GET_POS(ch) != position_t::FIGHTING) || (!ch->fighting))
     {
-      if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
-          (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
-          (IS_AFFECTED(vict, AFF_HASTE)))
-      {
+        return eFAILURE;
+    }
 
-        act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM,
+    vict = ch->fighting;
+
+    if (!vict)
+        return eFAILURE;
+
+    if (!IS_AFFECTED(vict, AFF_PARALYSIS))
+        if (ch->getLevel() > 30 && number(0, 2) == 0)
+        {
+            if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
+                (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
+                (IS_AFFECTED(vict, AFF_HASTE)))
+            {
+
+                act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM,
+                    INVIS_NULL);
+                return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+            }
+        }
+
+    if (ch->getLevel() > 40 && number(0, 2) == 0)
+    {
+        act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM,
             INVIS_NULL);
-        return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-      }
+        return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
     }
 
-  if (ch->getLevel() > 40 && number(0, 2) == 0)
-  {
-    act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM,
-        INVIS_NULL);
-    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-  }
-
-  if (ch->getLevel() > 40 && number(0, 1) == 0)
-  {
-    act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
-        INVIS_NULL);
-    return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-  }
-
-  act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
-      INVIS_NULL);
-  return cast_acid_blast(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-}
-
-int active_grandmaster(Character *ch, class Object *obj, int command, const char *arg,
-                       Character *owner)
-{
-  Character *vict;
-  /* Find a dude to do evil things upon ! */
-  if ((ch->getPosition() != position_t::FIGHTING))
-  {
-    return eFAILURE;
-  }
-
-  vict = ch->fighting;
-
-  if (!vict)
-    return eFAILURE;
-
-  if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (ch->getLevel() > 30 && number(0, 4) == 0)
-    {
-      if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
-          (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
-          (IS_AFFECTED(vict, AFF_HASTE)))
-      {
-
-        act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0,
-            TO_ROOM, INVIS_NULL);
-        return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-      }
-    }
-
-  if (ch->getLevel() > 40 && number(0, 2) == 0)
-  {
-    act("$n utters the words 'Burn them suckers'.", ch, 0, 0, TO_ROOM,
-        INVIS_NULL);
-    return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-  }
-
-  if (ch->getLevel() > 40 && number(0, 2) == 0)
-  {
-    act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM,
-        INVIS_NULL);
-    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-  }
-
-  if (!IS_AFFECTED(vict, AFF_PARALYSIS))
     if (ch->getLevel() > 40 && number(0, 1) == 0)
     {
-      act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
-          INVIS_NULL);
-      return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+        act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
+            INVIS_NULL);
+        return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
     }
 
-  act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
-      INVIS_NULL);
-  return cast_acid_blast(
-      ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
+        INVIS_NULL);
+    return cast_acid_blast(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-static const char *frostyYellText[] = {
+int active_grandmaster(Character *ch, class Object *obj, cmd_t command, const char *arg,
+                       Character *owner)
+{
+    Character *vict;
+    /* Find a dude to do evil things upon ! */
+    if ((GET_POS(ch) != position_t::FIGHTING))
+    {
+        return eFAILURE;
+    }
+
+    vict = ch->fighting;
+
+    if (!vict)
+        return eFAILURE;
+
+    if (!IS_AFFECTED(vict, AFF_PARALYSIS))
+        if (ch->getLevel() > 30 && number(0, 4) == 0)
+        {
+            if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
+                (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
+                (IS_AFFECTED(vict, AFF_HASTE)))
+            {
+
+                act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0,
+                    TO_ROOM, INVIS_NULL);
+                return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+            }
+        }
+
+    if (ch->getLevel() > 40 && number(0, 2) == 0)
+    {
+        act("$n utters the words 'Burn them suckers'.", ch, 0, 0, TO_ROOM,
+            INVIS_NULL);
+        return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    }
+
+    if (ch->getLevel() > 40 && number(0, 2) == 0)
+    {
+        act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM,
+            INVIS_NULL);
+        return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    }
+
+    if (!IS_AFFECTED(vict, AFF_PARALYSIS))
+        if (ch->getLevel() > 40 && number(0, 1) == 0)
+        {
+            act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
+                INVIS_NULL);
+            return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+        }
+
+    act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
+        INVIS_NULL);
+    return cast_acid_blast(
+        ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+}
+
+static char *frostyYellText[] = {
     "I >WAS< female but my breasts slid down in the heat.",
     "WOW, it sure is hot, who wants a frosty? *winkwink*",
     "Hey, who made me out of yellow snow?",
@@ -480,25 +480,25 @@ static const char *frostyYellText[] = {
 
 #define FROSTY_YELL_TEXT_SIZE (sizeof(frostyYellText) / sizeof(char *))
 
-int frosty(Character *ch, class Object *obj, int cmd, const char *arg,
+int frosty(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
            Character *owner)
 {
-  quint64 x;
+    quint64 x;
 
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    x = number((quint64)0, (quint64)FROSTY_YELL_TEXT_SIZE * 60);
+
+    if ((unsigned)x < FROSTY_YELL_TEXT_SIZE)
+    {
+        do_shout(ch, frostyYellText[x], cmd_t::DEFAULT);
+        return eSUCCESS;
+    }
     return eFAILURE;
-
-  if (cmd)
-    return eFAILURE;
-
-  x = number((quint64)0, (quint64)FROSTY_YELL_TEXT_SIZE * 60);
-
-  if ((unsigned)x < FROSTY_YELL_TEXT_SIZE)
-  {
-    ch->do_shout({frostyYellText[x]});
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
 static char *poetSayText[] = {
@@ -540,33 +540,33 @@ static char *poetEmoteText[] = {
 #define POET_SAY_TEXT_SIZE (sizeof(poetSayText) / sizeof(char *))
 #define POET_EMOTE_TEXT_SIZE (sizeof(poetEmoteText) / sizeof(char *))
 
-int poet(Character *ch, class Object *obj, int cmd, const char *arg,
+int poet(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
          Character *owner)
 {
-  int x;
+    int x;
 
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    x = number((quint64)0, (quint64)POET_SAY_TEXT_SIZE * 10);
+
+    if ((unsigned)x < POET_SAY_TEXT_SIZE)
+    {
+        do_say(ch, poetSayText[x]);
+        return eSUCCESS;
+    }
+
+    x = number((quint64)0, (quint64)POET_EMOTE_TEXT_SIZE * 30);
+
+    if ((unsigned)x < POET_EMOTE_TEXT_SIZE)
+    {
+        do_emote(ch, poetEmoteText[x]);
+        return eSUCCESS;
+    }
     return eFAILURE;
-
-  if (cmd)
-    return eFAILURE;
-
-  x = number((quint64)0, (quint64)POET_SAY_TEXT_SIZE * 10);
-
-  if ((unsigned)x < POET_SAY_TEXT_SIZE)
-  {
-    do_say(ch, poetSayText[x], 0);
-    return eSUCCESS;
-  }
-
-  x = number((quint64)0, (quint64)POET_EMOTE_TEXT_SIZE * 30);
-
-  if ((unsigned)x < POET_EMOTE_TEXT_SIZE)
-  {
-    do_emote(ch, poetEmoteText[x], 0);
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
 static char *stcrewEmoteText[] = {
@@ -575,25 +575,25 @@ static char *stcrewEmoteText[] = {
 
 #define STCREW_EMOTE_TEXT_SIZE (sizeof(stcrewEmoteText) / sizeof(char *))
 
-int stcrew(Character *ch, class Object *obj, int cmd, const char *arg,
+int stcrew(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
            Character *owner)
 {
-  int x;
+    int x;
 
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    x = number((quint64)0, (quint64)STCREW_EMOTE_TEXT_SIZE * 20);
+
+    if ((unsigned)x < STCREW_EMOTE_TEXT_SIZE)
+    {
+        do_emote(ch, stcrewEmoteText[x]);
+        return eSUCCESS;
+    }
     return eFAILURE;
-
-  if (cmd)
-    return eFAILURE;
-
-  x = number((quint64)0, (quint64)STCREW_EMOTE_TEXT_SIZE * 20);
-
-  if ((unsigned)x < STCREW_EMOTE_TEXT_SIZE)
-  {
-    do_emote(ch, stcrewEmoteText[x], 0);
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
 static char *stofficerEmoteText[] = {
@@ -602,513 +602,525 @@ static char *stofficerEmoteText[] = {
 
 #define OFFICER_EMOTE_TEXT_SIZE (sizeof(stofficerEmoteText) / sizeof(char *))
 
-int stofficer(Character *ch, class Object *obj, int cmd, const char *arg,
+int stofficer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
               Character *owner)
 {
-  int x;
+    int x;
 
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    x = number((quint64)0, (quint64)OFFICER_EMOTE_TEXT_SIZE * 20);
+
+    if ((unsigned)x < OFFICER_EMOTE_TEXT_SIZE)
+    {
+        do_emote(ch, stofficerEmoteText[x]);
+        return eSUCCESS;
+    }
     return eFAILURE;
-
-  if (cmd)
-    return eFAILURE;
-
-  x = number((quint64)0, (quint64)OFFICER_EMOTE_TEXT_SIZE * 20);
-
-  if ((unsigned)x < OFFICER_EMOTE_TEXT_SIZE)
-  {
-    do_emote(ch, stofficerEmoteText[x], 0);
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
-int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
+int backstabber(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
-  Character *tch;
-  /*Character *mob;
-   char buf[MAX_INPUT_LENGTH];
+    Character *tch;
+    /*Character *mob;
+     char buf[MAX_INPUT_LENGTH];
 
-   char *strName;*/
+     char *strName;*/
 
-  if (cmd || !AWAKE(ch))
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
+        return eFAILURE;
 
-  if (ch->fighting)
-  {
+    if (ch->fighting)
+    {
 
-    if (number(0, 6) == 0)
-      do_flee(ch, "", 0);
-
-    return eSUCCESS;
-  }
-
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-  {
-
-    if (IS_PC(tch))
-      if (CAN_SEE(ch, tch))
-      {
-
-        if (!can_attack(ch) || !can_be_attacked(ch, tch))
-          return eFAILURE;
-
-        if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
-          continue;
-
-        if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
-        {
-          if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
-            continue;
-        }
-        if (tch->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
-        {
-          if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
-            continue;
-        }
-
-        if (MOB_WAIT_STATE(ch))
-          continue;
-        if (IS_AFFECTED(tch, AFF_ALERT))
-          continue;
-        if (ch->equipment[WIELD])
-        {
-
-          if (tch->fighting)
-          {
-
-            act("$n circles around $s target....\r\n", ch, 0, 0, TO_ROOM,
-                INVIS_NULL);
-            SET_BIT(ch->combat, COMBAT_CIRCLE);
-          }
-
-          return attack(ch, tch, SKILL_BACKSTAB);
-        }
-        else
-          return attack(ch, tch, TYPE_UNDEFINED);
+        if (number(0, 6) == 0)
+            do_flee(ch, "");
 
         return eSUCCESS;
-      }
-  }
-  return eFAILURE;
+    }
+
+    for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
+    {
+
+        if (IS_PC(tch))
+            if (CAN_SEE(ch, tch))
+            {
+
+                if (!can_attack(ch) || !can_be_attacked(ch, tch))
+                    return eFAILURE;
+
+                if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+                    continue;
+
+                if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
+                {
+                    if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
+                        continue;
+                }
+                if (tch->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
+                {
+                    if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
+                        continue;
+                }
+
+                if (MOB_WAIT_STATE(ch))
+                    continue;
+                if (IS_AFFECTED(tch, AFF_ALERT))
+                    continue;
+                if (ch->equipment[WIELD])
+                {
+
+                    if (tch->fighting)
+                    {
+
+                        act("$n circles around $s target....\r\n", ch, 0, 0, TO_ROOM,
+                            INVIS_NULL);
+                        SET_BIT(ch->combat, COMBAT_CIRCLE);
+                    }
+
+                    return attack(ch, tch, SKILL_BACKSTAB);
+                }
+                else
+                    return attack(ch, tch, TYPE_UNDEFINED);
+
+                return eSUCCESS;
+            }
+    }
+    return eFAILURE;
 }
 
-int white_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
+int white_dragon(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
-  Character *vict = ch->fighting;
+    Character *vict = ch->fighting;
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
 
-  if (!ch->fighting)
-    return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
 
-  if (number(0, 6) > 1)
-    return eFAILURE;
+    if (number(0, 6) > 1)
+        return eFAILURE;
 
-  act("$n breathes frost.", ch, 0, 0, TO_ROOM, 0);
-  cast_frost_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    act("$n breathes frost.", ch, 0, 0, TO_ROOM, 0);
+    cast_frost_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 
-  return eSUCCESS;
+    return eSUCCESS;
 }
 
-int black_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
+int black_dragon(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
-  Character *vict = ch->fighting;
+    Character *vict = ch->fighting;
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
 
-  if (!ch->fighting)
-    return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
 
-  /* Find a dude to do evil things upon ! */
+    /* Find a dude to do evil things upon ! */
 
-  if (number(0, 6) > 1)
-    return eFAILURE;
+    if (number(0, 6) > 1)
+        return eFAILURE;
 
-  act("$n breathes acid.", ch, 0, 0, TO_ROOM, 0);
-  return cast_acid_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    act("$n breathes acid.", ch, 0, 0, TO_ROOM, 0);
+    return cast_acid_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-int red_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
+int red_dragon(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                Character *owner)
 {
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
 
-  if (!ch->fighting)
-    return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
 
-  if (number(0, 6) > 1)
-    return eFAILURE;
+    if (number(0, 6) > 1)
+        return eFAILURE;
 
-  act("$n breathes fire.", ch, 0, 0, TO_ROOM, 0);
-  return cast_fire_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+    act("$n breathes fire.", ch, 0, 0, TO_ROOM, 0);
+    return cast_fire_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
-int green_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
+int green_dragon(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
 
-  if (!ch->fighting)
-    return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
 
-  if (number(0, 6) > 1)
-    return eFAILURE;
+    if (number(0, 6) > 1)
+        return eFAILURE;
 
-  act("$n breathes gas.", ch, 0, 0, TO_ROOM, 0);
-  return cast_gas_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-}
-
-int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
-                 Character *owner)
-{
-  Character *vict;
-
-  if (cmd == 4 && ch->in_room == real_room(5065))
-  {
-    act("The brass dragon says '$n isn't invited'",
-        ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("The brass dragon says 'you're not invited'");
-    return eSUCCESS;
-  }
-
-  if (cmd)
-    return eFAILURE;
-
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
-
-  if (!ch->fighting)
-    return eFAILURE;
-
-  if (number(0, 4) == 0)
-  {
     act("$n breathes gas.", ch, 0, 0, TO_ROOM, 0);
     return cast_gas_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-  }
-
-  vict = ch->fighting;
-
-  if (!vict)
-  {
-    if (number(0, 2) == 0)
-    {
-      vict = ch->fighting;
-      if (vict == nullptr)
-        return eFAILURE;
-    }
-    else
-      return eFAILURE;
-  }
-
-  act("$n breathes lightning.", ch, 0, 0, TO_ROOM, 0);
-  return cast_lightning_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-int francis_guard(Character *ch, class Object *obj, int cmd, const char *arg,
+int brass_dragon(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                 Character *owner)
+{
+    Character *vict;
+
+    if (cmd == cmd_t::WEST && ch->in_room == real_room(5065))
+    {
+        act("The brass dragon says '$n isn't invited'",
+            ch, 0, 0, TO_ROOM, 0);
+        ch->sendln("The brass dragon says 'you're not invited'");
+        return eSUCCESS;
+    }
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
+
+    if (!ch->fighting)
+        return eFAILURE;
+
+    if (number(0, 4) == 0)
+    {
+        act("$n breathes gas.", ch, 0, 0, TO_ROOM, 0);
+        return cast_gas_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+    }
+
+    vict = ch->fighting;
+
+    if (!vict)
+    {
+        if (number(0, 2) == 0)
+        {
+            vict = ch->fighting;
+            if (vict == nullptr)
+                return eFAILURE;
+        }
+        else
+            return eFAILURE;
+    }
+
+    act("$n breathes lightning.", ch, 0, 0, TO_ROOM, 0);
+    return cast_lightning_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+}
+
+int francis_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                   Character *owner)
 {
-  if (cmd != 1)
+    if (cmd != cmd_t::NORTH)
+        return eFAILURE;
+    if (DC::getInstance()->world[ch->in_room].number == 7077)
+    {
+        do_say(owner, "Oh no you don't!", cmd_t::DEFAULT);
+        attack(owner, ch, 0);
+        return eSUCCESS;
+    }
     return eFAILURE;
-  if (DC::getInstance()->world[ch->in_room].number == 7077)
-  {
-    do_say(owner, "Oh no you don't!", CMD_DEFAULT);
-    attack(owner, ch, 0);
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
 /* ********************************************************************
  *  Special procedures for mobiles                                      *
  ******************************************************************** */
 
-int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
+int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                 Character *owner)
 {
-  if (cmd > 6 || cmd < 1)
-    return eFAILURE;
-  int dir = 0, clas = 0, align = 0, dir2 = 0;
-  // TODO - go through these and remove all of the ones that are in
-  // room that no longer exist on the mud
-  // 3 = south, 2 = east, 5 = up
-  // 1 = north, 4  = west, 6 = down
+    if (!isCommandTypeDirection(cmd))
+        return eFAILURE;
+    int clas = 0, align = 0;
+    cmd_t dir_cmd = cmd_t::UNDEFINED;
+    // TODO - go through these and remove all of the ones that are in
+    // room that no longer exist on the mud
+    // 3 = south, 2 = east, 5 = up
+    // 1 = north, 4  = west, 6 = down
 
-  switch (DC::getInstance()->world[ch->in_room].number)
-  {
-  case 1978:
-    dir = 4;
-    clas = CLASS_MAGIC_USER;
-    break;
-  case 1910:
-    dir = 1;
-    clas = CLASS_THIEF;
-    break;
-  case 3004:
-    dir = 0;
-    clas = CLASS_CLERIC;
-    break;
-  case 1960:
-    dir = 0;
-    clas = CLASS_MONK;
-    break;
-  case 1926:
-    dir = 0;
-    clas = CLASS_BARBARIAN;
-    break;
-  case 1968:
-    dir = 0;
-    clas = CLASS_PALADIN;
-    align = 3;
-    break;
-  case 1942:
-    dir = 2;
-    clas = CLASS_WARRIOR;
-    break;
-  case 1988:
-    dir = 2;
-    clas = CLASS_DRUID;
-    break;
-  case 1900:
-    dir = 3;
-    clas = CLASS_BARD;
-    break;
-  case 1920:
-    dir = 3;
-    align = 1;
-    clas = CLASS_ANTI_PAL;
-    break;
-  case 1935:
-    dir = 3;
-    clas = CLASS_RANGER;
-    break;
-  default:
-    return eFAILURE;
-  }
-  dir++;
-  //    cmd++;
-  if (cmd == dir || cmd == dir2)
-  {
-    if (IS_PC(ch))
+    switch (DC::getInstance()->world[ch->in_room].number)
     {
-      if (IS_IMMORTAL(ch))
-      {
-        if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
-        {
-          ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n");
-          return eFAILURE;
-        }
-        else if (IS_AFFECTED(ch, AFF_CHAMPION))
-        {
-          ch->sendln("Despite having the Champion flag, the guard allows you to go through because you're an immortal.\r\n");
-          return eFAILURE;
-        }
-        else if (GET_CLASS(ch) != clas)
-        {
-          ch->sendln("Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n");
-          return eFAILURE;
-        }
-        else if (align == 1 && !IS_EVIL(ch))
-        {
-          ch->sendln("Despite not being evil, the guard allows you to go through because you're an immortal.\r\n");
-          return eFAILURE;
-        }
-        else if (align == 3 && !IS_GOOD(ch))
-        {
-          ch->sendln("Despite not being good, the guard allows you to go through because you're an immortal.\r\n");
-          return eFAILURE;
-        }
-      }
-      else
-      {
-        if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
-        {
-          act("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, TO_ROOM, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because of your crimes.");
-          return eSUCCESS;
-        }
-        else if (IS_AFFECTED(ch, AFF_CHAMPION))
-        {
-          act("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, TO_ROOM, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because you have the Champion flag.");
-          return eSUCCESS;
-        }
-        else if (GET_CLASS(ch) != clas)
-        {
-          act("The guard humiliates $n, and blocks $s way because they are the wrong class.", ch, 0, 0, TO_ROOM, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because you are the wrong class.");
-          return eSUCCESS;
-        }
-        else if (align == 1 && !IS_EVIL(ch))
-        {
-          act("The guard humiliates $n, and blocks $s way because they are not evil.", ch, 0, 0, TO_ROOM, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because you are not evil.");
-          return eSUCCESS;
-        }
-        else if (align == 3 && !IS_GOOD(ch))
-        {
-          act("The guard humiliates $n, and blocks $s way because they are not good.", ch, 0, 0, TO_ROOM, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because you are not good.");
-          return eSUCCESS;
-        }
-      }
+    case 1978:
+        dir_cmd = cmd_t::UP;
+        clas = CLASS_MAGIC_USER;
+        break;
+    case 1910:
+        dir_cmd = cmd_t::EAST;
+        clas = CLASS_THIEF;
+        break;
+    case 3004:
+        dir_cmd = cmd_t::NORTH;
+        clas = CLASS_CLERIC;
+        break;
+    case 1960:
+        dir_cmd = cmd_t::NORTH;
+        clas = CLASS_MONK;
+        break;
+    case 1926:
+        dir_cmd = cmd_t::NORTH;
+        clas = CLASS_BARBARIAN;
+        break;
+    case 1968:
+        dir_cmd = cmd_t::NORTH;
+        clas = CLASS_PALADIN;
+        align = 3;
+        break;
+    case 1942:
+        dir_cmd = cmd_t::EAST;
+        clas = CLASS_WARRIOR;
+        break;
+    case 1988:
+        dir_cmd = cmd_t::EAST;
+        clas = CLASS_DRUID;
+        break;
+    case 1900:
+        dir_cmd = cmd_t::WEST;
+        clas = CLASS_BARD;
+        break;
+    case 1920:
+        dir_cmd = cmd_t::WEST;
+        align = 1;
+        clas = CLASS_ANTI_PAL;
+        break;
+    case 1935:
+        dir_cmd = cmd_t::WEST;
+        clas = CLASS_RANGER;
+        break;
+    default:
+        return eFAILURE;
     }
-  }
+    if (cmd == dir_cmd || cmd == cmd_t::UNDEFINED)
+    {
+        if (IS_PC(ch))
+        {
+            if (IS_IMMORTAL(ch))
+            {
+                if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
+                {
+                    ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n");
+                    return eFAILURE;
+                }
+                else if (IS_AFFECTED(ch, AFF_CHAMPION))
+                {
+                    auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
+                    if (obj && obj->short_description)
+                        ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\r\n").arg(obj->short_description));
+                    else
+                        ch->sendln(QStringLiteral("Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\r\n"));
+                    return eFAILURE;
+                }
+                else if (GET_CLASS(ch) != clas)
+                {
+                    ch->sendln("Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n");
+                    return eFAILURE;
+                }
+                else if (align == 1 && !IS_EVIL(ch))
+                {
+                    ch->sendln("Despite not being evil, the guard allows you to go through because you're an immortal.\r\n");
+                    return eFAILURE;
+                }
+                else if (align == 3 && !IS_GOOD(ch))
+                {
+                    ch->sendln("Despite not being good, the guard allows you to go through because you're an immortal.\r\n");
+                    return eFAILURE;
+                }
+            }
+            else
+            {
+                if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
+                {
+                    act("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, TO_ROOM, 0);
+                    ch->sendln("The guard humiliates you, and blocks your way because of your crimes.");
+                    return eSUCCESS;
+                }
+                else if (IS_AFFECTED(ch, AFF_CHAMPION))
+                {
+                    auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
+                    if (obj && obj->short_description)
+                    {
+                        act("The guard humiliates $n, and blocks $s way because they have $p.", ch, obj, 0, TO_ROOM, 0);
+                        ch->sendln(QStringLiteral("The guard humiliates you, and blocks your way because you have %1.").arg(obj->short_description));
+                    }
+                    else
+                    {
+                        act("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, TO_ROOM, 0);
+                        ch->sendln("The guard humiliates you, and blocks your way because you have the Champion flag.");
+                    }
+                    return eSUCCESS;
+                }
+                else if (GET_CLASS(ch) != clas)
+                {
+                    act("The guard humiliates $n, and blocks $s way because they are the wrong class.", ch, 0, 0, TO_ROOM, 0);
+                    ch->sendln("The guard humiliates you, and blocks your way because you are the wrong class.");
+                    return eSUCCESS;
+                }
+                else if (align == 1 && !IS_EVIL(ch))
+                {
+                    act("The guard humiliates $n, and blocks $s way because they are not evil.", ch, 0, 0, TO_ROOM, 0);
+                    ch->sendln("The guard humiliates you, and blocks your way because you are not evil.");
+                    return eSUCCESS;
+                }
+                else if (align == 3 && !IS_GOOD(ch))
+                {
+                    act("The guard humiliates $n, and blocks $s way because they are not good.", ch, 0, 0, TO_ROOM, 0);
+                    ch->sendln("The guard humiliates you, and blocks your way because you are not good.");
+                    return eSUCCESS;
+                }
+            }
+        }
+    }
 
-  return eFAILURE;
+    return eFAILURE;
 }
 
-int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
+int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                Character *owner)
 {
-  auto in_room = ch->in_room;
-  int guard_clan = 0;
-  int guard_room = 0;
-  int guard_direction = 0;
+    int in_room = ch->in_room;
+    int guard_clan = 0;
+    int guard_room = 0;
+    int guard_direction = 0;
 
-  if (cmd > 6 || cmd < 1)
+    if (!isCommandTypeDirection(cmd))
+        return eFAILURE;
+    // 3 = south, 2 = east, 5 = up
+    // 1 = north, 4  = west, 6 = down
+
+    // If the mob is of type MOB_CLAN_GUARD then we look at v1-v4 to know how to guard
+    if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+    {
+        guard_room = owner->mobdata->mob_flags.value[0];
+        guard_direction = owner->mobdata->mob_flags.value[1];
+        guard_clan = owner->mobdata->mob_flags.value[2];
+
+        if (in_room != real_room(guard_room) || cmd != static_cast<cmd_t>(guard_direction))
+        {
+            return eFAILURE;
+        }
+    }
+    else
+    {
+        if ((in_room == real_room(2300) && cmd != cmd_t::NORTH) || // up
+            (in_room == real_room(2310) && cmd != cmd_t::EAST) ||  // east
+            (in_room == real_room(2320) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2330) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2340) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2350) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2360) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2370) && cmd != cmd_t::DOWN) ||  // down
+            (in_room == real_room(2380) && cmd != cmd_t::NORTH) || // north
+            (in_room == real_room(2390) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2400) && cmd != cmd_t::WEST) ||  // west
+            (in_room == real_room(2410) && cmd != cmd_t::UP) ||    // up
+            (in_room == real_room(2420) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2430) && cmd != cmd_t::SOUTH) || // south
+            (in_room == real_room(2440) && cmd != cmd_t::NORTH) || // north
+            (in_room == real_room(2450) && cmd != cmd_t::WEST) ||  // west
+            (in_room == real_room(2460) && cmd != cmd_t::NORTH) || // north
+            (in_room == real_room(2470) && cmd != cmd_t::WEST) ||  // west
+            (in_room == real_room(2480) && cmd != cmd_t::NORTH) || // north
+            (in_room == real_room(2500) && cmd != cmd_t::NORTH))   // north
+            return eFAILURE;
+    }
+
+    int clan_num = ch->clan;
+    if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
+    {
+        int b = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
+        switch (b)
+        {
+        case 8:     // golem
+        case 88:    // fire elemental
+        case 89:    // ice elemental
+        case 90:    // lightning elemental
+        case 91:    // earth elemental
+        case 22389: // figment undead corpse
+        case 22390: // apparation undead corpse
+        case 22391:
+        case 22392:
+        case 22393:
+        case 22394:
+        case 22395:
+        case 22396:
+        case 22397:
+        case 22398:
+            if (ch->master)
+                clan_num = ch->master->clan;
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+    {
+        if (clan_num != guard_clan && in_room == real_room(guard_room))
+        {
+            act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+            ch->sendln("The clan guard throws you out on your ass.");
+            return eSUCCESS;
+        }
+    }
+    else
+    {
+        if ((clan_num != 14 && in_room == real_room(2300))    // moor
+            || (clan_num != 4 && in_room == real_room(2310))  // darkened
+            || (clan_num != 18 && in_room == real_room(2320)) // anarchist
+            || (clan_num != 1 && in_room == real_room(2330))  // uln'hyrr
+            || (clan_num != 10 && in_room == real_room(2340)) // black_axe
+            || (clan_num != 9 && in_room == real_room(2350))  // nazgul
+            || (clan_num != 3 && in_room == real_room(2360))  // arcana
+            || (clan_num != 17 && in_room == real_room(2370)) // the_horde
+            || (clan_num != 13 && in_room == real_room(2380)) // slackers
+            || (clan_num != 20 && in_room == real_room(2390)) // sindicate
+            || (clan_num != 8 && in_room == real_room(2400))  // merc
+            || (clan_num != 6 && in_room == real_room(2410))  // timewarp
+            || (clan_num != 19 && in_room == real_room(2420)) // solaris
+            || (clan_num != 10 && in_room == real_room(2430)) // black_axe #2
+            || (clan_num != 2 && in_room == real_room(2440))  // dark_tide
+            || (clan_num != 16 && in_room == real_room(2450)) // tel'mithrim
+            || (clan_num != 12 && in_room == real_room(2460)) // legion_of_ruin
+            || (clan_num != 7 && in_room == real_room(2470))  // the_resistance
+            || (clan_num != 15 && in_room == real_room(2480)) // sng
+            || (clan_num != 11 && in_room == real_room(2500)) // triad
+        )
+        {
+            act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+            ch->sendln("The clan guard throws you out on your ass.");
+            return eSUCCESS;
+        }
+    }
+
+    if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
+    {
+        act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+        ch->sendln("The clan guard says 'Hey don't be bringing trouble around here!'");
+        return eSUCCESS;
+    }
+    else if (IS_AFFECTED(ch, AFF_CHAMPION))
+    {
+        act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+        ch->sendln("The clan guard says, 'Hey, don't be a wuss, get outta here.'");
+        return eSUCCESS;
+    }
     return eFAILURE;
-  // 3 = south, 2 = east, 5 = up
-  // 1 = north, 4  = west, 6 = down
-
-  // If the mob is of type MOB_CLAN_GUARD then we look at v1-v4 to know how to guard
-  if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
-  {
-    guard_room = owner->mobdata->mob_flags.value[0];
-    guard_direction = owner->mobdata->mob_flags.value[1];
-    guard_clan = owner->mobdata->mob_flags.value[2];
-
-    if (in_room != real_room(guard_room) || cmd != guard_direction)
-    {
-      return eFAILURE;
-    }
-  }
-  else
-  {
-    if ((in_room == real_room(2300) && cmd != CMD_NORTH) || // up
-        (in_room == real_room(2310) && cmd != CMD_EAST) ||  // east
-        (in_room == real_room(2320) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2330) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2340) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2350) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2360) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2370) && cmd != CMD_DOWN) ||  // down
-        (in_room == real_room(2380) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2390) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2400) && cmd != CMD_WEST) ||  // west
-        (in_room == real_room(2410) && cmd != CMD_UP) ||    // up
-        (in_room == real_room(2420) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2430) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2440) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2450) && cmd != CMD_WEST) ||  // west
-        (in_room == real_room(2460) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2470) && cmd != CMD_WEST) ||  // west
-        (in_room == real_room(2480) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2500) && cmd != CMD_NORTH))   // north
-      return eFAILURE;
-  }
-
-  int clan_num = ch->clan;
-  if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
-  {
-    int b = DC::getInstance()->mob_index[ch->mobdata->vnum].vnum;
-    switch (b)
-    {
-    case 8:     // golem
-    case 88:    // fire elemental
-    case 89:    // ice elemental
-    case 90:    // lightning elemental
-    case 91:    // earth elemental
-    case 22389: // figment undead corpse
-    case 22390: // apparation undead corpse
-    case 22391:
-    case 22392:
-    case 22393:
-    case 22394:
-    case 22395:
-    case 22396:
-    case 22397:
-    case 22398:
-      if (ch->master)
-        clan_num = ch->master->clan;
-      break;
-    default:
-      break;
-    }
-  }
-
-  if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
-  {
-    if (clan_num != guard_clan && in_room == real_room(guard_room))
-    {
-      act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The clan guard throws you out on your ass.");
-      return eSUCCESS;
-    }
-  }
-  else
-  {
-    if ((clan_num != 14 && in_room == real_room(2300))    // moor
-        || (clan_num != 4 && in_room == real_room(2310))  // darkened
-        || (clan_num != 18 && in_room == real_room(2320)) // anarchist
-        || (clan_num != 1 && in_room == real_room(2330))  // uln'hyrr
-        || (clan_num != 10 && in_room == real_room(2340)) // black_axe
-        || (clan_num != 9 && in_room == real_room(2350))  // nazgul
-        || (clan_num != 3 && in_room == real_room(2360))  // arcana
-        || (clan_num != 17 && in_room == real_room(2370)) // the_horde
-        || (clan_num != 13 && in_room == real_room(2380)) // slackers
-        || (clan_num != 20 && in_room == real_room(2390)) // sindicate
-        || (clan_num != 8 && in_room == real_room(2400))  // merc
-        || (clan_num != 6 && in_room == real_room(2410))  // timewarp
-        || (clan_num != 19 && in_room == real_room(2420)) // solaris
-        || (clan_num != 10 && in_room == real_room(2430)) // black_axe #2
-        || (clan_num != 2 && in_room == real_room(2440))  // dark_tide
-        || (clan_num != 16 && in_room == real_room(2450)) // tel'mithrim
-        || (clan_num != 12 && in_room == real_room(2460)) // legion_of_ruin
-        || (clan_num != 7 && in_room == real_room(2470))  // the_resistance
-        || (clan_num != 15 && in_room == real_room(2480)) // sng
-        || (clan_num != 11 && in_room == real_room(2500)) // triad
-    )
-    {
-      act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The clan guard throws you out on your ass.");
-      return eSUCCESS;
-    }
-  }
-
-  if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
-  {
-    act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("The clan guard says 'Hey don't be bringing trouble around here!'");
-    return eSUCCESS;
-  }
-  else if (IS_AFFECTED(ch, AFF_CHAMPION))
-  {
-    act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("The clan guard says, 'Hey, don't be a wuss, get outta here.'");
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
@@ -1884,274 +1896,274 @@ std::vector<std::string> ChainSayText =
 
 // ENDOFCHAIN
 
-int chain_gossips(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
+int chain_gossips(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
-  int x;
+    int x;
 
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    if (number(1, 360) != 1)
+    {
+        return eFAILURE;
+    }
+
+    x = number((quint64)0, (quint64)ChainSayText.size());
+
+    std::string message;
+    try
+    {
+        message = ChainSayText.at(x);
+    }
+    catch (...)
+    {
+        return eFAILURE;
+    }
+
+    do_gossip(ch, message.data());
+
     return eFAILURE;
-
-  if (cmd)
-    return eFAILURE;
-
-  if (number(1, 360) != 1)
-  {
-    return eFAILURE;
-  }
-
-  x = number((quint64)0, (quint64)ChainSayText.size());
-
-  std::string message;
-  try
-  {
-    message = ChainSayText.at(x);
-  }
-  catch (...)
-  {
-    return eFAILURE;
-  }
-
-  do_gossip(ch, message.data(), 0);
-
-  return eFAILURE;
 }
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int fido(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
+int fido(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
-  class Object *i, *temp, *next_obj, *deep, *next_deep;
+    class Object *i, *temp, *next_obj, *deep, *next_deep;
 
-  if (cmd || !AWAKE(ch))
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
+        return eFAILURE;
 
-  if (IS_AFFECTED(ch, AFF_CHARM))
-    return eFAILURE;
+    if (IS_AFFECTED(ch, AFF_CHARM))
+        return eFAILURE;
 
-  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
-  {
-    if (GET_ITEM_TYPE(i) == ITEM_CONTAINER && i->obj_flags.value[3])
+    for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
     {
-      act("$n savagely devours a corpse.", ch, 0, 0, TO_ROOM, 0);
-      for (temp = i->contains; temp; temp = next_obj)
-      {
-        next_obj = temp->next_content;
-        move_obj(temp, ch->in_room);
-      }
-      extract_obj(i);
-      return eSUCCESS;
-    }
-  }
-  return eFAILURE;
-}
-
-int janitor(Character *ch, class Object *obj, int cmd, const char *arg,
-            Character *owner)
-{
-  class Object *i;
-
-  if (cmd || !AWAKE(ch))
-    return eFAILURE;
-
-  if (IS_AFFECTED(ch, AFF_CHARM))
-    return eFAILURE;
-
-  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
-  {
-    if (isSet(i->obj_flags.wear_flags, ITEM_TAKE) &&
-        GET_OBJ_WEIGHT(i) < 20 &&
-        !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
-        i->vnum != CHAMPION_ITEM)
-    {
-      act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
-      move_obj(i, ch);
-      return eSUCCESS;
-    }
-  }
-  return eFAILURE;
-}
-
-int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *arg,
-                         Character *owner)
-{
-  Character *temp, *tmp_victim;
-  struct affected_type af;
-  int dam;
-  int retval;
-
-  if (cmd)
-    return eFAILURE;
-
-  if (ch->getPosition() == position_t::FIGHTING)
-    return eFAILURE;
-
-  if (ch->mobdata->hated.isEmpty())
-    return eFAILURE;
-
-  if (ch->fighting)
-    return eFAILURE;
-
-  // TODO - make this Crydragon proc into something better
-  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim; tmp_victim = temp)
-  {
-    temp = tmp_victim->next_in_room;
-    if ((IS_NPC(tmp_victim) || IS_NPC(ch)) && (tmp_victim != ch))
-    {
-      tmp_victim->sendln("You choke and gag as noxious gases fill the air.");
-      dam = dice(ch->getLevel(), 8);
-      act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
-          TO_ROOM, 0);
-      retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
-      if (isSet(retval, eCH_DIED))
-        return retval;
-      if (!tmp_victim->affected_by_spell(SPELL_POISON))
-        if (!isSet(tmp_victim->immune, ISR_POISON))
+        if (GET_ITEM_TYPE(i) == ITEM_CONTAINER && i->obj_flags.value[3])
         {
-          af.type = SPELL_POISON;
-          af.duration = ch->getLevel() * 2;
-          af.modifier = -5;
-          af.location = APPLY_STR;
-          af.bitvector = AFF_POISON;
-
-          affect_join(tmp_victim, &af, false, false);
-          tmp_victim->sendln("You feel very sick.");
-          return eSUCCESS;
+            act("$n savagely devours a corpse.", ch, 0, 0, TO_ROOM, 0);
+            for (temp = i->contains; temp; temp = next_obj)
+            {
+                next_obj = temp->next_content;
+                move_obj(temp, ch->in_room);
+            }
+            extract_obj(i);
+            return eSUCCESS;
         }
     }
-  }
-  return eFAILURE;
+    return eFAILURE;
 }
 
-int adept(Character *ch, class Object *obj, int cmd, const char *arg,
+int janitor(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+            Character *owner)
+{
+    class Object *i;
+
+    if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
+        return eFAILURE;
+
+    if (IS_AFFECTED(ch, AFF_CHARM))
+        return eFAILURE;
+
+    for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
+    {
+        if (isSet(i->obj_flags.wear_flags, ITEM_TAKE) &&
+            GET_OBJ_WEIGHT(i) < 20 &&
+            !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
+            DC::getInstance()->obj_index[i->item_number].virt != CHAMPION_ITEM)
+        {
+            act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
+            move_obj(i, ch);
+            return eSUCCESS;
+        }
+    }
+    return eFAILURE;
+}
+
+int mother_moat_and_moad(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                         Character *owner)
+{
+    Character *temp, *tmp_victim;
+    struct affected_type af;
+    int dam;
+    int retval;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    if (GET_POS(ch) == position_t::FIGHTING)
+        return eFAILURE;
+
+    if (ch->mobdata->hated.isEmpty())
+        return eFAILURE;
+
+    if (ch->fighting)
+        return eFAILURE;
+
+    // TODO - make this Crydragon proc into something better
+    for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim; tmp_victim = temp)
+    {
+        temp = tmp_victim->next_in_room;
+        if ((IS_NPC(tmp_victim) || IS_NPC(ch)) && (tmp_victim != ch))
+        {
+            tmp_victim->sendln("You choke and gag as noxious gases fill the air.");
+            dam = dice(ch->getLevel(), 8);
+            act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
+                TO_ROOM, 0);
+            retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
+            if (isSet(retval, eCH_DIED))
+                return retval;
+            if (!tmp_victim->affected_by_spell(SPELL_POISON))
+                if (!isSet(tmp_victim->immune, ISR_POISON))
+                {
+                    af.type = SPELL_POISON;
+                    af.duration = ch->getLevel() * 2;
+                    af.modifier = -5;
+                    af.location = APPLY_STR;
+                    af.bitvector = AFF_POISON;
+
+                    affect_join(tmp_victim, &af, false, false);
+                    tmp_victim->sendln("You feel very sick.");
+                    return eSUCCESS;
+                }
+        }
+    }
+    return eFAILURE;
+}
+
+int adept(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           Character *owner)
 {
-  Character *tch;
+    Character *tch;
 
-  if (cmd || !AWAKE(ch))
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
+        return eFAILURE;
 
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
-      break;
+    for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
+        if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
+            break;
 
-  if (!tch)
-    return eFAILURE;
+    if (!tch)
+        return eFAILURE;
 
-  switch (number(0, 10))
-  {
-  case 3:
-    act("$n utters the words 'garf'.", ch, 0, 0, TO_ROOM, 0);
-    cast_cure_light(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
-    return eSUCCESS;
-  case 7:
-    act("$n utters the words 'nahk'.", ch, 0, 0, TO_ROOM, 0);
-    cast_bless(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
-    return eSUCCESS;
-  case 6:
-    act("$n utters the words 'tehctah'.", ch, 0, 0, TO_ROOM, 0);
-    cast_armor(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
-    return eSUCCESS;
-  case 4:
-    do_say(ch, "Finish school.  Don't drop out.", 0);
-    return eSUCCESS;
-  case 5:
-    do_say(ch, "Move it.  Others want to go to this school.", 0);
-    return eSUCCESS;
-  default:
-    return eFAILURE;
-  }
+    switch (number(0, 10))
+    {
+    case 3:
+        act("$n utters the words 'garf'.", ch, 0, 0, TO_ROOM, 0);
+        cast_cure_light(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
+        return eSUCCESS;
+    case 7:
+        act("$n utters the words 'nahk'.", ch, 0, 0, TO_ROOM, 0);
+        cast_bless(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
+        return eSUCCESS;
+    case 6:
+        act("$n utters the words 'tehctah'.", ch, 0, 0, TO_ROOM, 0);
+        cast_armor(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
+        return eSUCCESS;
+    case 4:
+        do_say(ch, "Finish school.  Don't drop out.");
+        return eSUCCESS;
+    case 5:
+        do_say(ch, "Move it.  Others want to go to this school.");
+        return eSUCCESS;
+    default:
+        return eFAILURE;
+    }
 }
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int mud_school_adept(Character *ch, class Object *obj, int cmd, const char *arg,
+int mud_school_adept(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                      Character *owner)
 {
-  Character *tch;
+    Character *tch;
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (!AWAKE(ch))
-    return eFAILURE;
+    if (!AWAKE(ch))
+        return eFAILURE;
 
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
-      break;
+    for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
+        if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
+            break;
 
-  if (!tch)
-    return eFAILURE;
+    if (!tch)
+        return eFAILURE;
 
-  /* .... to be finished ...
-  "What are you staring at?",
-  "Hi, I'm your friend.",
-  "Isn't this a fine school?",
-  "Finish school.  Dont drop out.",
-  "Move it.  Others want to go to this school.",
-  "Be careful, don't get killed by those monsters!",
-  "Don't forget to wear your clothes, young students!",
-  "What are you doing just STANDING there?!?!!?",
-  "GET going!",
-  "Hello....Hello, are you listening to me?",
-  */
+    /* .... to be finished ...
+    "What are you staring at?",
+    "Hi, I'm your friend.",
+    "Isn't this a fine school?",
+    "Finish school.  Dont drop out.",
+    "Move it.  Others want to go to this school.",
+    "Be careful, don't get killed by those monsters!",
+    "Don't forget to wear your clothes, young students!",
+    "What are you doing just STANDING there?!?!!?",
+    "GET going!",
+    "Hello....Hello, are you listening to me?",
+    */
 
-  switch (number(0, 20))
-  {
-  case 15:
-    do_say(ch, "What are you staring at?", 0);
-    break;
-  case 18:
-    do_say(ch, "Hi, I'm your friend.", 0);
-    break;
-  case 3:
-    do_say(ch, "Isn't this a fine school?", 0);
-    break;
-  case 12:
-    do_say(ch, "Finish school.  Dont drop out.", 0);
-    break;
-  case 5:
-    do_say(ch, "Move it.  Others want to go to this school.", 0);
-    break;
-  case 6:
-    do_say(ch, "Be careful, don't get killed by those monsters!", 0);
-    break;
-  case 7:
-    do_say(ch, "Don't forget to wear your clothes, young students!", 0);
-    break;
-  case 8:
-    do_say(ch, "What are you doing just STANDING there?!?!!?", 0);
-    do_say(ch, "GET going!", 0);
-    break;
-  case 9:
-    do_say(ch, "Hello....Hello, are you listening to me?", 0);
-    break;
-  default:
-    return eFAILURE;
-  }
-  return eSUCCESS;
+    switch (number(0, 20))
+    {
+    case 15:
+        do_say(ch, "What are you staring at?");
+        break;
+    case 18:
+        do_say(ch, "Hi, I'm your friend.");
+        break;
+    case 3:
+        do_say(ch, "Isn't this a fine school?");
+        break;
+    case 12:
+        do_say(ch, "Finish school.  Dont drop out.");
+        break;
+    case 5:
+        do_say(ch, "Move it.  Others want to go to this school.");
+        break;
+    case 6:
+        do_say(ch, "Be careful, don't get killed by those monsters!");
+        break;
+    case 7:
+        do_say(ch, "Don't forget to wear your clothes, young students!");
+        break;
+    case 8:
+        do_say(ch, "What are you doing just STANDING there?!?!!?");
+        do_say(ch, "GET going!");
+        break;
+    case 9:
+        do_say(ch, "Hello....Hello, are you listening to me?");
+        break;
+    default:
+        return eFAILURE;
+    }
+    return eSUCCESS;
 }
 
-int bee(Character *ch, class Object *obj, int cmd, const char *arg,
+int bee(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
 
-  if (ch->fighting &&
-      (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * MAX(ch->getLevel(), 1))
-  {
-    act("You sting $N!", ch, 0, ch->fighting, TO_CHAR,
-        INVIS_NULL);
-    act("$n stings at $N with its barbed stinger!", ch, 0,
-        ch->fighting, TO_ROOM, INVIS_NULL | NOTVICT);
-    act("$n sinks a barbed stinger into you!", ch, 0,
-        ch->fighting, TO_VICT, 0);
-    return cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL,
-                       ch->fighting, 0, ch->getLevel());
-  }
-  return eFAILURE;
+    if (ch->fighting &&
+        (ch->fighting->in_room == ch->in_room) &&
+        number(0, 120) < 2 * MAX(ch->getLevel(), 1))
+    {
+        act("You sting $N!", ch, 0, ch->fighting, TO_CHAR,
+            INVIS_NULL);
+        act("$n stings at $N with its barbed stinger!", ch, 0,
+            ch->fighting, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n sinks a barbed stinger into you!", ch, 0,
+            ch->fighting, TO_VICT, 0);
+        return cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL,
+                           ch->fighting, 0, ch->getLevel());
+    }
+    return eFAILURE;
 }
 
 static char *apiary_workerEmoteText[] = {
@@ -2171,245 +2183,245 @@ static char *apiary_workerEmoteText[] = {
 
 #define APIARY_WORKER_EMOTE_TEXT_SIZE (sizeof(apiary_workerEmoteText) / sizeof(char *))
 
-int apiary_worker(Character *ch, class Object *obj, int cmd, const char *arg,
+int apiary_worker(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                   Character *owner)
 {
-  int x;
+    int x;
 
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    x = number((quint64)0, (quint64)APIARY_WORKER_EMOTE_TEXT_SIZE * 25);
+
+    if ((unsigned)x < APIARY_WORKER_EMOTE_TEXT_SIZE)
+    {
+        do_emote(ch, apiary_workerEmoteText[x]);
+        return eSUCCESS;
+    }
     return eFAILURE;
-
-  if (cmd)
-    return eFAILURE;
-
-  x = number((quint64)0, (quint64)APIARY_WORKER_EMOTE_TEXT_SIZE * 25);
-
-  if ((unsigned)x < APIARY_WORKER_EMOTE_TEXT_SIZE)
-  {
-    do_emote(ch, apiary_workerEmoteText[x], 0);
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
 /*********************************************************************
  *  Special procedures for shops                                      *
  *********************************************************************/
 
-int pet_shops(Character *ch, int cmd, char const *arg)
+int pet_shops(Character *ch, cmd_t cmd, char const *arg)
 {
-  char buf[MAX_STRING_LENGTH], pet_name[256];
-  int pet_room;
-  Character *pet;
+    char buf[MAX_STRING_LENGTH], pet_name[256];
+    int pet_room;
+    Character *pet;
 
-  pet_room = ch->in_room + 1;
+    pet_room = ch->in_room + 1;
 
-  if (cmd == 59)
-  { /* List */
-    ch->sendln("Available pets are:");
-    for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
-    {
-      sprintf(buf, "%8ld - %s\n\r",
-              3 * GET_EXP(pet), pet->short_desc);
-      ch->send(buf);
+    if (cmd == cmd_t::LIST)
+    { /* List */
+        ch->sendln("Available pets are:");
+        for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
+        {
+            sprintf(buf, "%8ld - %s\n\r",
+                    3 * GET_EXP(pet), pet->short_desc);
+            ch->send(buf);
+        }
+        return eSUCCESS;
     }
-    return eSUCCESS;
-  }
-  else if (cmd == 56)
-  { /* Buy */
+    else if (cmd == cmd_t::BUY)
+    { /* Buy */
 
-    arg = one_argument(arg, buf);
-    arg = one_argument(arg, pet_name);
+        arg = one_argument(arg, buf);
+        arg = one_argument(arg, pet_name);
 
-    if (!(pet = get_char_room(buf, pet_room)))
-    {
-      ch->sendln("There is no such pet!");
-      return eSUCCESS;
+        if (!(pet = get_char_room(buf, pet_room)))
+        {
+            ch->sendln("There is no such pet!");
+            return eSUCCESS;
+        }
+
+        if (ch->getGold() < (uint32_t)(GET_EXP(pet) * 3))
+        {
+            ch->sendln("You don't have enough gold!");
+            return eSUCCESS;
+        }
+        if (many_charms(ch))
+        {
+            ch->send("How you plan on feeding all your pets?");
+            return eSUCCESS;
+        }
+
+        ch->removeGold(GET_EXP(pet) * 3);
+
+        /*
+         * Should be some code here to defend against weird monsters
+         * getting loaded into the pet shop back room.  -- Furey
+         */
+        pet = ch->getDC()->clone_mobile(pet->mobdata->nr);
+        GET_EXP(pet) = 0;
+        SETBIT(pet->affected_by, AFF_CHARM);
+
+        /* people were using this to steal plats from people transing in meta */
+        if (/* *pet_name */ 0)
+        {
+            sprintf(buf, "%s %s", pet->getNameC(), pet_name);
+            pet->setName(buf);
+
+            sprintf(buf, "%sA small sign on a chain around the neck "
+                         "says 'My Name is %s'\n\r",
+                    pet->description, pet_name);
+            pet->description = str_hsh(buf);
+        }
+
+        char_to_room(pet, ch->in_room);
+        add_follower(pet, ch);
+
+        /* Be certain that pet's can't get/carry/use/weild/wear items */
+        IS_CARRYING_W(pet) = 1000;
+        IS_CARRYING_N(pet) = 100;
+
+        ch->sendln("May you enjoy your pet.");
+        act("$n bought $N as a pet.", ch, 0, pet, TO_ROOM, 0);
+
+        return eSUCCESS;
     }
 
-    if (ch->getGold() < (uint32_t)(GET_EXP(pet) * 3))
-    {
-      ch->sendln("You don't have enough gold!");
-      return eSUCCESS;
-    }
-    if (many_charms(ch))
-    {
-      ch->send("How you plan on feeding all your pets?");
-      return eSUCCESS;
-    }
-
-    ch->removeGold(GET_EXP(pet) * 3);
-
-    /*
-     * Should be some code here to defend against weird monsters
-     * getting loaded into the pet shop back room.  -- Furey
-     */
-    pet = clone_mobile(pet->mobdata->vnum);
-    GET_EXP(pet) = 0;
-    SETBIT(pet->affected_by, AFF_CHARM);
-
-    /* people were using this to steal plats from people transing in meta */
-    if (/* *pet_name */ 0)
-    {
-      sprintf(buf, "%s %s", pet->getNameC(), pet_name);
-      pet->setName(buf);
-
-      sprintf(buf, "%sA small sign on a chain around the neck "
-                   "says 'My Name is %s'\n\r",
-              pet->description, pet_name);
-      pet->description = str_hsh(buf);
-    }
-
-    char_to_room(pet, ch->in_room);
-    add_follower(pet, ch, 0);
-
-    /* Be certain that pet's can't get/carry/use/weild/wear items */
-    IS_CARRYING_W(pet) = 1000;
-    IS_CARRYING_N(pet) = 100;
-
-    ch->sendln("May you enjoy your pet.");
-    act("$n bought $N as a pet.", ch, 0, pet, TO_ROOM, 0);
-
-    return eSUCCESS;
-  }
-
-  /* All commands except list and buy */
-  return eFAILURE;
+    /* All commands except list and buy */
+    return eFAILURE;
 }
 
-int newbie_zone_guard(Character *ch, class Object *obj, int cmd, const char *arg,
+int newbie_zone_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                       Character *owner)
 {
-  if (cmd > 6 || cmd < 1)
+    if (!isCommandTypeDirection(cmd))
+        return eFAILURE;
+
+    if (IS_NPC(ch))
+        return eFAILURE;
+
+    if ((ch->getLevel() > 10                                      /* mud school */
+         && ch->in_room == real_room(257) && cmd == cmd_t::NORTH) /* north */
+        ||
+        (ch->getLevel() > 20                                      /* newbie caves */
+         && ch->in_room == real_room(6400) && cmd == cmd_t::DOWN) /* down */
+    )
+
+    {
+        if (ch->in_room == real_room(257)) /* mud school */
+        {
+            act("The guard refuses $n entrance to this sacred school.",
+                ch, 0, 0, TO_ROOM, 0);
+            ch->sendln("The guard refuses you entrance to the school.");
+            return eSUCCESS;
+        }
+        else if (ch->in_room == real_room(6400)) /* newbie caves */
+        {
+            act("The guard stops $n from entering the caves.",
+                ch, 0, 0, TO_ROOM, 0);
+            ch->sendln("The guard refuses you entrance to the caves.");
+            return eSUCCESS;
+        }
+        else /* default */
+        {
+            act("The guard humiliates $n, and blocks $s way.",
+                ch, 0, 0, TO_ROOM, 0);
+            ch->sendln("The guard humiliates you, and blocks your way.");
+            return eSUCCESS;
+        }
+    }
+
     return eFAILURE;
-
-  if (IS_NPC(ch))
-    return eFAILURE;
-
-  if ((ch->getLevel() > 10                           /* mud school */
-       && ch->in_room == real_room(257) && cmd == 1) /* north */
-      ||
-      (ch->getLevel() > 20                            /* newbie caves */
-       && ch->in_room == real_room(6400) && cmd == 6) /* down */
-  )
-
-  {
-    if (ch->in_room == real_room(257)) /* mud school */
-    {
-      act("The guard refuses $n entrance to this sacred school.",
-          ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The guard refuses you entrance to the school.");
-      return eSUCCESS;
-    }
-    else if (ch->in_room == real_room(6400)) /* newbie caves */
-    {
-      act("The guard stops $n from entering the caves.",
-          ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The guard refuses you entrance to the caves.");
-      return eSUCCESS;
-    }
-    else /* default */
-    {
-      act("The guard humiliates $n, and blocks $s way.",
-          ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The guard humiliates you, and blocks your way.");
-      return eSUCCESS;
-    }
-  }
-
-  return eFAILURE;
 }
 
 // I just like to hellstream every other round.
-int hellstreamer(Character *ch, class Object *obj, int cmd, const char *arg,
+int hellstreamer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
-  Character *vict;
-  // int percent;
-  /* Find a dude to do evil things upon ! */
+    Character *vict;
+    // int percent;
+    /* Find a dude to do evil things upon ! */
 
-  if ((ch->getPosition() != position_t::FIGHTING))
-  {
+    if ((GET_POS(ch) != position_t::FIGHTING))
+    {
+        return eFAILURE;
+    }
+
+    vict = ch->fighting;
+
+    if (!vict)
+        return eFAILURE;
+
+    if (IS_AFFECTED(ch, AFF_BLIND))
+    {
+        act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
+            INVIS_NULL);
+        cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
+        return eSUCCESS;
+    }
+
+    // removed && ch->getLevel() > 49
+    if (number(0, 2) == 0)
+    {
+        act("$n utters the words 'Burn motherfucker!'.", ch, 0, 0,
+            TO_ROOM, INVIS_NULL);
+        return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    }
+
     return eFAILURE;
-  }
-
-  vict = ch->fighting;
-
-  if (!vict)
-    return eFAILURE;
-
-  if (IS_AFFECTED(ch, AFF_BLIND))
-  {
-    act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
-        INVIS_NULL);
-    cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  // removed && ch->getLevel() > 49
-  if (number(0, 2) == 0)
-  {
-    act("$n utters the words 'Burn motherfucker!'.", ch, 0, 0,
-        TO_ROOM, INVIS_NULL);
-    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-  }
-
-  return eFAILURE;
 }
 
 // I just firestorm every round...stupid groupies!
-int firestormer(Character *ch, class Object *obj, int cmd, const char *arg,
+int firestormer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                 Character *owner)
 {
-  Character *vict = nullptr;
-  // int percent;
+    Character *vict = nullptr;
+    // int percent;
 
-  act("$n utters the words 'Fry bitch!'.", ch, 0, 0,
-      TO_ROOM, INVIS_NULL);
-  return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    act("$n utters the words 'Fry bitch!'.", ch, 0, 0,
+        TO_ROOM, INVIS_NULL);
+    return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
+int humaneater(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                Character *owner)
 {
-  Character *tch;
+    Character *tch;
 
-  if (cmd || !AWAKE(ch))
+    if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
+        return eFAILURE;
+
+    if (ch->fighting)
+    {
+        return eSUCCESS;
+    }
+
+    for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
+    {
+
+        if (IS_PC(tch))
+            if (CAN_SEE(ch, tch))
+            {
+
+                if (!can_attack(ch) || !can_be_attacked(ch, tch))
+                    continue;
+
+                if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+                    continue;
+
+                if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
+                    if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
+                        continue;
+                if (tch->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
+                    if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
+                        continue;
+
+                if (GET_RACE(tch) != RACE_HUMAN)
+                    continue;
+
+                do_say(ch, "Ahh...more humans have come to feed our hunger!!\r\n");
+                return attack(ch, tch, TYPE_UNDEFINED);
+            }
+    }
     return eFAILURE;
-
-  if (ch->fighting)
-  {
-    return eSUCCESS;
-  }
-
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-  {
-
-    if (IS_PC(tch))
-      if (CAN_SEE(ch, tch))
-      {
-
-        if (!can_attack(ch) || !can_be_attacked(ch, tch))
-          continue;
-
-        if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
-          continue;
-
-        if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
-          if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
-            continue;
-        if (tch->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
-          if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
-            continue;
-
-        if (GET_RACE(tch) != RACE_HUMAN)
-          continue;
-
-        do_say(ch, "Ahh...more humans have come to feed our hunger!!\r\n", 0);
-        return attack(ch, tch, TYPE_UNDEFINED);
-      }
-  }
-  return eFAILURE;
 }
 
 static char *pir_slutSayText[] = {
@@ -2463,1190 +2475,1192 @@ static char *pir_slutSayText[] = {
 
 #define PIR_SAY_TEXT_SIZE (sizeof(pir_slutSayText) / sizeof(char *))
 
-int pir_slut(Character *ch, class Object *obj, int cmd, const char *arg,
+int pir_slut(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
              Character *owner)
 {
-  int x;
-  if (cmd)
+    int x;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+    x = number((quint64)0, (quint64)PIR_SAY_TEXT_SIZE * 6);
+    if ((unsigned)x < PIR_SAY_TEXT_SIZE)
+    {
+        do_say(ch, pir_slutSayText[x], cmd_t::DEFAULT);
+        return eSUCCESS;
+    }
     return eFAILURE;
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
-    return eFAILURE;
-  x = number((quint64)0, (quint64)PIR_SAY_TEXT_SIZE * 6);
-  if ((unsigned)x < PIR_SAY_TEXT_SIZE)
-  {
-    do_say(ch, pir_slutSayText[x], CMD_DEFAULT);
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
-int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *arg,
+int clutchdrone_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                        Character *owner)
 {
-  /*class Object *obj;*/
-  // class Object *wielded;
-  Character *vict;
-  // int dam;
-  int retval;
+    /*class Object *obj;*/
+    // class Object *wielded;
+    Character *vict;
+    // int dam;
+    int retval;
 
-  if (cmd)
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (GET_POS(ch) < position_t::FIGHTING)
+        return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    vict = ch->fighting;
+
+    if (!vict)
+        return eFAILURE;
+
+    if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > position_t::SITTING)
+    {
+        retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH, 0);
+        if (isSet(retval, eCH_DIED))
+            return retval;
+
+        act("Your bash at $N sends $M sprawling.", ch, nullptr, vict, TO_CHAR, 0);
+        act("$n sends you sprawling.", ch, nullptr, vict, TO_VICT, 0);
+        act("$n sends $N sprawling with a powerful bash.", ch, nullptr, vict, TO_ROOM, NOTVICT);
+
+        vict->setSitting();
+        SET_BIT(vict->combat, COMBAT_BASH1);
+        WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
+
+        return eSUCCESS;
+    }
+    if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
+    {
+        return damage(ch, vict, ch->getLevel() >> 1, TYPE_HIT, SKILL_KICK, 0);
+    }
+
     return eFAILURE;
-  if (ch->getPosition() < position_t::FIGHTING)
-    return eFAILURE;
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
-  if (!ch->fighting)
-    return eFAILURE;
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
-    return eFAILURE;
-
-  vict = ch->fighting;
-
-  if (!vict)
-    return eFAILURE;
-
-  if (ch->getLevel() > 3 && number(0, 3) == 0 && vict->getPosition() > position_t::SITTING)
-  {
-    retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH, 0);
-    if (isSet(retval, eCH_DIED))
-      return retval;
-
-    act("Your bash at $N sends $M sprawling.", ch, nullptr, vict, TO_CHAR, 0);
-    act("$n sends you sprawling.", ch, nullptr, vict, TO_VICT, 0);
-    act("$n sends $N sprawling with a powerful bash.", ch, nullptr, vict, TO_ROOM, NOTVICT);
-
-    vict->setSitting();
-    SET_BIT(vict->combat, COMBAT_BASH1);
-    WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
-
-    return eSUCCESS;
-  }
-  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
-  {
-    return damage(ch, vict, ch->getLevel() >> 1, TYPE_HIT, SKILL_KICK, 0);
-  }
-
-  return eFAILURE;
 }
 
-int generic_guard(Character *ch, class Object *obj, int cmd, const char *arg,
+int generic_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                   Character *owner)
 {
-  if (cmd > 6 || cmd < 1)
+    if (!isCommandTypeDirection(cmd))
+        return eFAILURE;
+
+    /* lathander's zone */
+    if ((ch->in_room == real_room(20700) && cmd == cmd_t::EAST))
+    {
+        act("A statue magically holds $n back.",
+            ch, 0, 0, TO_ROOM, 0);
+        ch->sendln("A statue magically holds you from going east.");
+        return eSUCCESS;
+    }
+
     return eFAILURE;
-
-  /* lathander's zone */
-  if ((ch->in_room == real_room(20700) && cmd == 2))
-  {
-    act("A statue magically holds $n back.",
-        ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("A statue magically holds you from going east.");
-    return eSUCCESS;
-  }
-
-  return eFAILURE;
 }
 
-int portal_guard(Character *ch, class Object *obj, int cmd, const char *arg,
+int portal_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
-  char buf[200];
+    char buf[200];
 
-  one_argument(arg, buf);
+    one_argument(arg, buf);
 
-  if (cmd != 60)
+    if (cmd != cmd_t::CLIMB && cmd != cmd_t::ENTER)
+        return eFAILURE;
+
+    /* lathander's zone */
+    if ((ch->in_room == real_room(20720) && !str_cmp(buf, "door")))
+    {
+        act("Dense vegetation blocks $n's path through the door.",
+            ch, 0, 0, TO_ROOM, 0);
+        ch->sendln("There is too much vegetation in the way to get through.");
+        return eSUCCESS;
+    }
+
     return eFAILURE;
-
-  /* lathander's zone */
-  if ((ch->in_room == real_room(20720) && !str_cmp(buf, "door")))
-  {
-    act("Dense vegetation blocks $n's path through the door.",
-        ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("There is too much vegetation in the way to get through.");
-    return eSUCCESS;
-  }
-
-  return eFAILURE;
 }
 
-int blindingparrot(Character *ch, class Object *obj, int cmd, const char *arg,
+int blindingparrot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                    Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
 
-  if (ch->fighting &&
-      (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * MAX(ch->getLevel(), 1))
-  {
-    act("You peck $N!", ch, 0, ch->fighting, TO_CHAR,
-        INVIS_NULL);
-    act("$n pecks at $N with its beak!", ch, 0,
-        ch->fighting, TO_ROOM, INVIS_NULL | NOTVICT);
-    act("$n pecks at you with it's beak!", ch, 0,
-        ch->fighting, TO_VICT, 0);
-    return cast_blindness(ch->getLevel(), ch, "", SPELL_TYPE_SPELL,
-                          ch->fighting, 0, ch->getLevel());
-  }
-  return eFAILURE;
+    if (ch->fighting &&
+        (ch->fighting->in_room == ch->in_room) &&
+        number(0, 120) < 2 * MAX(ch->getLevel(), 1))
+    {
+        act("You peck $N!", ch, 0, ch->fighting, TO_CHAR,
+            INVIS_NULL);
+        act("$n pecks at $N with its beak!", ch, 0,
+            ch->fighting, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n pecks at you with it's beak!", ch, 0,
+            ch->fighting, TO_VICT, 0);
+        return cast_blindness(ch->getLevel(), ch, "", SPELL_TYPE_SPELL,
+                              ch->fighting, 0, ch->getLevel());
+    }
+    return eFAILURE;
 }
 
-int doorcloser(Character *ch, class Object *obj, int cmd, const char *arg,
+int doorcloser(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                Character *owner)
 {
-  // int x;
+    // int x;
 
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
-    return eFAILURE;
-  if (cmd)
-    return eFAILURE;
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  /* but not every time */
-  if (number(0, 1))
-    return eFAILURE;
-
-  if ((EXIT(ch, 1) && !isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
-      (EXIT(ch, 3) && !isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
-  {
+    /* but not every time */
     if (number(0, 1))
-      do_say(ch, "How the hell do these doors keep opening?", CMD_DEFAULT);
-    else
-      do_say(ch, "I coulda sworn I just closed this....", CMD_DEFAULT);
+        return eFAILURE;
 
-    do_close(ch, "cell e", CMD_DEFAULT);
-    do_close(ch, "cell w", CMD_DEFAULT);
+    if ((EXIT(ch, 1) && !isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
+        (EXIT(ch, 3) && !isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
+    {
+        if (number(0, 1))
+            do_say(ch, "How the hell do these doors keep opening?", cmd_t::DEFAULT);
+        else
+            do_say(ch, "I coulda sworn I just closed this....", cmd_t::DEFAULT);
 
-    return eSUCCESS;
-  }
-  return eFAILURE;
+        do_close(ch, "cell e", cmd_t::DEFAULT);
+        do_close(ch, "cell w", cmd_t::DEFAULT);
+
+        return eSUCCESS;
+    }
+    return eFAILURE;
 }
 
-int panicprisoner(Character *ch, class Object *obj, int cmd, const char *arg,
+int panicprisoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                   Character *owner)
 {
-  // int x;
-  Character *vict = nullptr;
+    // int x;
+    Character *vict = nullptr;
 
-  if (cmd)
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    /* check for a guard */
+    if ((vict = ch->get_char_room_vis("guard")))
+    {
+        if (number(0, 1))
+            do_say(ch, "Run!  It's the fuzz!", cmd_t::DEFAULT);
+        else
+            do_say(ch, "Uh oh, guard.  I'm off like a prom dress!", cmd_t::DEFAULT);
+        do_flee(ch, "");
+        return eSUCCESS;
+    }
+
+    /* open any closed cells */
+    /* but not every time */
+    if (number(0, 2))
+        return eFAILURE;
+
+    if ((EXIT(ch, 1) && isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
+        (EXIT(ch, 3) && isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
+    {
+        if (number(0, 1))
+            do_say(ch, "I must free my fellow prisoners!", cmd_t::DEFAULT);
+        else
+            do_say(ch, "Viva la resistance!", cmd_t::DEFAULT);
+
+        do_open(ch, "cell e", cmd_t::DEFAULT);
+        do_open(ch, "cell w", cmd_t::DEFAULT);
+
+        return eSUCCESS;
+    }
     return eFAILURE;
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
-    return eFAILURE;
-
-  /* check for a guard */
-  if ((vict = ch->get_char_room_vis("guard")))
-  {
-    if (number(0, 1))
-      do_say(ch, "Run!  It's the fuzz!", CMD_DEFAULT);
-    else
-      do_say(ch, "Uh oh, guard.  I'm off like a prom dress!", CMD_DEFAULT);
-    do_flee(ch, "", 0);
-    return eSUCCESS;
-  }
-
-  /* open any closed cells */
-  /* but not every time */
-  if (number(0, 2))
-    return eFAILURE;
-
-  if ((EXIT(ch, 1) && isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
-      (EXIT(ch, 3) && isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
-  {
-    if (number(0, 1))
-      do_say(ch, "I must free my fellow prisoners!", CMD_DEFAULT);
-    else
-      do_say(ch, "Viva la resistance!", CMD_DEFAULT);
-
-    do_open(ch, "cell e", CMD_DEFAULT);
-    do_open(ch, "cell w", CMD_DEFAULT);
-
-    return eSUCCESS;
-  }
-  return eFAILURE;
 }
 
 // let's teleport people around the mud:)
-int bounder(Character *ch, class Object *obj, int cmd, const char *arg,
+int bounder(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
             Character *owner)
 {
-  Character *vict;
-  // int percent;
+    Character *vict;
+    // int percent;
 
-  /* Find a dude to do evil things upon ! */
+    /* Find a dude to do evil things upon ! */
 
-  if ((ch->getPosition() != position_t::FIGHTING))
-  {
-    return eFAILURE;
-  }
-  vict = ch->fighting;
+    if ((GET_POS(ch) != position_t::FIGHTING))
+    {
+        return eFAILURE;
+    }
+    vict = ch->fighting;
 
-  if (!vict)
-    return eFAILURE;
+    if (!vict)
+        return eFAILURE;
 
-  if (IS_AFFECTED(ch, AFF_BLIND))
-  {
-    act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
+    if (IS_AFFECTED(ch, AFF_BLIND))
+    {
+        act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
+            INVIS_NULL);
+        cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
+        return eSUCCESS;
+    }
+
+    do_say(ch, "I hope you land in enfan hell!", cmd_t::DEFAULT);
+    act("$n recites a bound scroll.", ch, 0, vict, TO_ROOM,
         INVIS_NULL);
-    cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  do_say(ch, "I hope you land in enfan hell!", CMD_DEFAULT);
-  act("$n recites a bound scroll.", ch, 0, vict, TO_ROOM,
-      INVIS_NULL);
-  return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
 // I love to dispel stuff!
-int dispelguy(Character *ch, class Object *obj, int cmd, const char *arg,
+int dispelguy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
               Character *owner)
 {
-  Character *vict;
-  // int percent;
+    Character *vict;
+    // int percent;
 
-  if ((ch->getPosition() != position_t::FIGHTING))
-  {
+    if ((GET_POS(ch) != position_t::FIGHTING))
+    {
+        return eFAILURE;
+    }
+
+    vict = ch->fighting;
+    if (!vict)
+        return eFAILURE;
+
+    if (IS_AFFECTED(ch, AFF_BLIND))
+    {
+        act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
+            INVIS_NULL);
+        cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
+        return eSUCCESS;
+    }
+
+    if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
+        (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
+        (IS_AFFECTED(vict, AFF_HASTE)))
+    {
+        act("$n utters the words 'fjern magi'.", ch, 0, 0,
+            TO_ROOM, INVIS_NULL);
+        return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    }
+    else
+    {
+        act("$n utters the words 'frys din nisse'.", ch, 0, 0,
+            TO_ROOM, INVIS_NULL);
+        return cast_chill_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
+    }
     return eFAILURE;
-  }
-
-  vict = ch->fighting;
-  if (!vict)
-    return eFAILURE;
-
-  if (IS_AFFECTED(ch, AFF_BLIND))
-  {
-    act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
-        INVIS_NULL);
-    cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
-      (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
-      (IS_AFFECTED(vict, AFF_HASTE)))
-  {
-    act("$n utters the words 'fjern magi'.", ch, 0, 0,
-        TO_ROOM, INVIS_NULL);
-    return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-  }
-  else
-  {
-    act("$n utters the words 'frys din nisse'.", ch, 0, 0,
-        TO_ROOM, INVIS_NULL);
-    return cast_chill_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
-  }
-  return eFAILURE;
 }
 
-int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
+int marauder(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
              Character *owner)
 {
-  /*class Object *obj;*/
-  class Object *wielded;
-  Character *vict;
+    /*class Object *obj;*/
+    class Object *wielded;
+    Character *vict;
 
-  if (cmd)
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    if (GET_POS(ch) < position_t::FIGHTING)
+        return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
+    if (IS_AFFECTED(ch, AFF_PARALYSIS))
+        return eFAILURE;
+
+    vict = ch->fighting;
+    if (!vict)
+        return eFAILURE;
+
+    // Reinforcements!
+    call_for_help_in_room(ch, 22701);
+
+    wielded = vict->equipment[WIELD];
+
+    if (ch->equipment[WIELD] && vict->equipment[WIELD])
+        if (IS_PC(ch) || IS_PC(vict))
+            if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
+                (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
+                if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
+                {
+                    disarm(ch, vict);
+                    return eSUCCESS;
+                }
+
+    if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
+    {
+        return do_bash(ch, "", cmd_t::DEFAULT);
+    }
+    if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
+    {
+        return ch->do_kick();
+    }
+
     return eFAILURE;
-
-  if (ch->getPosition() < position_t::FIGHTING)
-    return eFAILURE;
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
-  if (!ch->fighting)
-    return eFAILURE;
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
-    return eFAILURE;
-
-  vict = ch->fighting;
-  if (!vict)
-    return eFAILURE;
-
-  // Reinforcements!
-  call_for_help_in_room(ch, 22701);
-
-  wielded = vict->equipment[WIELD];
-
-  if (ch->equipment[WIELD] && vict->equipment[WIELD])
-    if (IS_PC(ch) || IS_PC(vict))
-      if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
-          (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
-        if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
-        {
-          disarm(ch, vict);
-          return eSUCCESS;
-        }
-
-  if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
-  {
-    return do_bash(ch, "", CMD_DEFAULT);
-  }
-  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
-  {
-    return do_kick(ch, "", CMD_DEFAULT);
-  }
-
-  return eFAILURE;
 }
 
-int foggy_combat(Character *ch, class Object *obj, int cmd, const char *arg,
+int foggy_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
-  Character *mob = nullptr;
+    if (!ch)
+        return eFAILURE;
+    Character *mob = nullptr;
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (ch->getPosition() != position_t::FIGHTING)
-    return eFAILURE;
+    if (GET_POS(ch) != position_t::FIGHTING)
+        return eFAILURE;
 
-  if (!ch->fighting)
-    return eFAILURE;
+    if (!ch->fighting)
+        return eFAILURE;
 
-  // do this 50% of the time
-  if (number(0, 1))
-    return eFAILURE;
+    // do this 50% of the time
+    if (number(0, 1))
+        return eFAILURE;
 
-  act("$n glows in power and summons a horde of spirits to $s aid!",
-      ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act("$n glows in power and summons a horde of spirits to $s aid!",
+        ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  // create the mob
-  mob = clone_mobile(real_mobile(22026));
-  if (!mob)
-  {
-    logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
-  }
-  // put it in the room ch is in
-  char_to_room(mob, ch->in_room);
+    // create the mob
+    mob = ch->getDC()->clone_mobile(real_mobile(22026));
+    if (!mob)
+    {
+        logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);
+        return eFAILURE;
+    }
+    // put it in the room ch is in
+    char_to_room(mob, ch->in_room);
 
-  // make it attack the person ch is
-  act("$n issues the order 'destroy'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  attack(mob, ch->fighting, TYPE_UNDEFINED);
-  // ignore if it died or not
-  return eSUCCESS;
+    // make it attack the person ch is
+    act("$n issues the order 'destroy'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    attack(mob, ch->fighting, TYPE_UNDEFINED);
+    // ignore if it died or not
+    return eSUCCESS;
 }
 
-int foggy_non(Character *ch, class Object *obj, int cmd, const char *arg,
+int foggy_non(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
               Character *owner)
 {
-  // n s e s u d are commands 1-6.  For anything but that, ignore
-  // the command and return
-  if (cmd > 6 || cmd < 1)
-    return eFAILURE;
+    // n s e s u d are commands 1-6.  For anything but that, ignore
+    // the command and return
+    if (!isCommandTypeDirection(cmd))
+        return eFAILURE;
 
-  // message the player
-  act("The foggy guardian flows in front of $n, and blocks $s way.",
-      ch, 0, 0, TO_ROOM, 0);
-  ch->sendln("The foggy guardian flows in front of you, and blocks your way.");
+    // message the player
+    act("The foggy guardian flows in front of $n, and blocks $s way.",
+        ch, 0, 0, TO_ROOM, 0);
+    ch->sendln("The foggy guardian flows in front of you, and blocks your way.");
 
-  // return true.  This lets the mud know that you already took care of
-  // the command, and to ignore whatever it was.  (ie, don't move)
-  return eSUCCESS;
+    // return true.  This lets the mud know that you already took care of
+    // the command, and to ignore whatever it was.  (ie, don't move)
+    return eSUCCESS;
 }
 
-int iasenko_combat(Character *ch, class Object *obj, int cmd, const char *arg,
+int iasenko_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                    Character *owner)
 {
-  Character *vict = nullptr;
-  int dam = 0;
-  int retval;
-  // char buf[200];
+    Character *vict = nullptr;
+    int dam = 0;
+    int retval;
+    // char buf[200];
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  retval = protect(ch, 8543); // rescue Koban if he's fighting
-  if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
-    return retval;
+    retval = protect(ch, 8543); // rescue Koban if he's fighting
+    if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+        return retval;
 
-  switch (number(1, 3))
-  {
-
-  case 1:
-    // hitall
-    act("$n begins to twitch as the fury of his ancestors takes form!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(6, 800);
-    damage_all_players_in_room(ch, dam);
-    act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(6, 800);
-    damage_all_players_in_room(ch, dam);
-    break;
-
-  case 2:
-    // earthquake
-    act("$n utters the words, 'kao naga chi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(6, 400);
-    damage_all_players_in_room(ch, dam);
-    act("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(6, 400);
-    damage_all_players_in_room(ch, dam);
-    break;
-
-  case 3:
-    // redirect
-    act("$n's eyes glaze over as he swings into a great fury!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    if ((vict = find_random_player_in_room(ch)))
+    switch (number(1, 3))
     {
-      stop_fighting(ch);
-      return attack(ch, vict, TYPE_UNDEFINED);
-    }
-    break;
 
-  } // end of switch
+    case 1:
+        // hitall
+        act("$n begins to twitch as the fury of his ancestors takes form!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(6, 800);
+        damage_all_players_in_room(ch, dam);
+        act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(6, 800);
+        damage_all_players_in_room(ch, dam);
+        break;
 
-  return eSUCCESS;
+    case 2:
+        // earthquake
+        act("$n utters the words, 'kao naga chi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(6, 400);
+        damage_all_players_in_room(ch, dam);
+        act("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(6, 400);
+        damage_all_players_in_room(ch, dam);
+        break;
+
+    case 3:
+        // redirect
+        act("$n's eyes glaze over as he swings into a great fury!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        if ((vict = find_random_player_in_room(ch)))
+        {
+            stop_fighting(ch);
+            return attack(ch, vict, TYPE_UNDEFINED);
+        }
+        break;
+
+    } // end of switch
+
+    return eSUCCESS;
 }
 
-int iasenko_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
+int iasenko_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                        Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  return protect(ch, 8543); // rescue Koban if he's fighting
+    return protect(ch, 8543); // rescue Koban if he's fighting
 }
 
-int koban_combat(Character *ch, class Object *obj, int cmd, const char *arg,
+int koban_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
-  Character *iasenko = nullptr;
-  Character *temp_chr = nullptr;
+    Character *iasenko = nullptr;
+    Character *temp_chr = nullptr;
 
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  iasenko = find_mob_in_room(ch, 8542);
+    iasenko = find_mob_in_room(ch, 8542);
 
-  // re-sanct Iasenko if his sanct is down
-  if (iasenko && !IS_AFFECTED(iasenko, AFF_SANCTUARY))
-  {
-    // stop koban from fighting so the sanct goes off, then start again
-    temp_chr = ch->fighting;
-    stop_fighting(ch);
-    act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
-    set_fighting(ch, temp_chr);
-    return eSUCCESS;
-  }
-
-  // full-heal Iasenko if he's hurt
-  if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)) && number(0, 1))
-  {
-    act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  // call lightning
-  act("$n utters the words, 'kao naga chi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  return cast_call_lightning(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-}
-
-int koban_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
-                     Character *owner)
-{
-  Character *iasenko = nullptr;
-
-  if (cmd)
-    return eFAILURE;
-
-  if (ch->fighting)
-    return eFAILURE;
-
-  iasenko = find_mob_in_room(ch, 8542);
-
-  // re-sanct Iasenko if his sanct is down
-  if (iasenko && !IS_AFFECTED(iasenko, AFF_SANCTUARY))
-  {
-    act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  // full heal Iasenko if he's hurt
-  if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)))
-  {
-    act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  // re-sanct myself if my sanct is down
-  if (!IS_AFFECTED(ch, AFF_SANCTUARY))
-  {
-    act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  // full-heal myself if i'm hurt
-  if ((ch->getHP() + 5) < GET_MAX_HIT(ch))
-  {
-    act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
-    return eSUCCESS;
-  }
-
-  return eFAILURE;
-}
-
-int kogiro_combat(Character *ch, class Object *obj, int cmd, const char *arg,
-                  Character *owner)
-{
-  Character *vict = nullptr;
-  int dam = 0;
-  int retval;
-
-  if (cmd)
-    return eFAILURE;
-
-  retval = protect(ch, 8605); // rescue Takahashi if he's fighting
-  if (SOMEONE_DIED(retval) || isSet(retval, eSUCCESS))
-    return retval;
-
-  switch (number(1, 3))
-  {
-
-  case 1:
-    // backstab random pc in room
-    act("$n dives into the waters, buying him precious time to select a target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    vict = find_random_player_in_room(ch);
-    stop_fighting(vict);
-    stop_fighting(ch);
-    return ch->do_backstab(vict->getName().split(' '));
-    break;
-
-  case 2:
-    // room punch
-    act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(6, 800);
-    damage_all_players_in_room(ch, dam);
-    break;
-
-  case 3:
-    // summon all mobs 8606
-    act("$n utters the words 'gaisi ni gochi!'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    if (!find_mob_in_room(ch, 8606))
-      summon_all_of_mob_to_room(ch, 8606);
-    break;
-  }
-
-  return eSUCCESS;
-}
-
-int takahashi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
-                     Character *owner)
-{
-  int retval;
-
-  if (cmd)
-    return eFAILURE;
-
-  switch (number(1, 2))
-  {
-
-  case 1:
-    // firestorm
-    act("$n summons the power of the shadows to envelop you in fire!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    retval = cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    if (SOMEONE_DIED(retval))
-      return retval;
-    return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    break;
-
-  case 2:
-    // vampiric touch
-    act("$n calls upon the arcane knowledge of his ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    retval = cast_vampiric_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    if (SOMEONE_DIED(retval))
-      return retval;
-    return cast_vampiric_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    break;
-
-  } // end of switch
-
-  return eSUCCESS;
-}
-
-int askari_combat(Character *ch, class Object *obj, int cmd, const char *arg,
-                  Character *owner)
-{
-  int dam;
-  int retval;
-
-  if (cmd)
-    return eFAILURE;
-
-  retval = protect(ch, 8646); // rescue Surimoto if he's fighting
-  if (SOMEONE_DIED(retval) || isSet(retval, eSUCCESS))
-    return retval;
-
-  switch (number(1, 2))
-  {
-
-  case 1:
-    // hitall
-    act("$n sizes you up, then swings with deadly acuracy!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(6, 800);
-    damage_all_players_in_room(ch, dam);
-    act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(6, 800);
-    damage_all_players_in_room(ch, dam);
-    break;
-
-  case 2:
-    // wanna be arrow damage
-    act("$n takes aim with his mighty longbow...at YOU!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(300, 800);
-    damage_all_players_in_room(ch, dam);
-    break;
-
-  } // end of switch
-
-  return eSUCCESS;
-}
-
-int surimoto_combat(Character *ch, class Object *obj, int cmd, const char *arg,
-                    Character *owner)
-{
-  int dam;
-
-  if (cmd)
-    return eFAILURE;
-
-  switch (number(1, 8))
-  {
-
-  case 1:
-    act("$n utters the words, 'moshi-moshi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    break;
-
-  default:
-    // wanna be arrow damage
-    act("$n takes aim with his mighty longbow...at YOU!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    dam = number(300, 800);
-    damage_all_players_in_room(ch, dam);
-    break;
-
-  } // end of switch
-
-  return eSUCCESS;
-}
-
-int hiryushi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
-                    Character *owner)
-{
-  Character *victim = nullptr;
-
-  if (cmd)
-    return eFAILURE;
-
-  switch (number(1, 3))
-  {
-
-  case 1:
-    act("$n utters the words, 'solar flare'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return cast_solar_gate(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    break;
-
-  case 2:
-    act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    break;
-
-  case 3:
-    act("$n leaps back and readies a wand...", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
+    // re-sanct Iasenko if his sanct is down
+    if (iasenko && !IS_AFFECTED(iasenko, AFF_SANCTUARY))
     {
-      if (IS_NPC(victim))
-        continue;
-      act("$n points a wand at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
-      return cast_drown(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, victim, 0, ch->getLevel());
+        // stop koban from fighting so the sanct goes off, then start again
+        temp_chr = ch->fighting;
+        stop_fighting(ch);
+        act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
+        set_fighting(ch, temp_chr);
+        return eSUCCESS;
     }
-    break;
 
-  } // end of switch
+    // full-heal Iasenko if he's hurt
+    if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)) && number(0, 1))
+    {
+        act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
+        return eSUCCESS;
+    }
 
-  return eSUCCESS;
+    // call lightning
+    act("$n utters the words, 'kao naga chi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    return cast_call_lightning(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
-int izumi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
+int koban_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                     Character *owner)
+{
+    Character *iasenko = nullptr;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    if (ch->fighting)
+        return eFAILURE;
+
+    iasenko = find_mob_in_room(ch, 8542);
+
+    // re-sanct Iasenko if his sanct is down
+    if (iasenko && !IS_AFFECTED(iasenko, AFF_SANCTUARY))
+    {
+        act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
+        return eSUCCESS;
+    }
+
+    // full heal Iasenko if he's hurt
+    if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)))
+    {
+        act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
+        return eSUCCESS;
+    }
+
+    // re-sanct myself if my sanct is down
+    if (!IS_AFFECTED(ch, AFF_SANCTUARY))
+    {
+        act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
+        return eSUCCESS;
+    }
+
+    // full-heal myself if i'm hurt
+    if ((ch->getHP() + 5) < GET_MAX_HIT(ch))
+    {
+        act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
+        return eSUCCESS;
+    }
+
+    return eFAILURE;
+}
+
+int kogiro_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                  Character *owner)
+{
+    Character *vict = nullptr;
+    int dam = 0;
+    int retval;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    retval = protect(ch, 8605); // rescue Takahashi if he's fighting
+    if (SOMEONE_DIED(retval) || isSet(retval, eSUCCESS))
+        return retval;
+
+    switch (number(1, 3))
+    {
+
+    case 1:
+        // backstab random pc in room
+        act("$n dives into the waters, buying him precious time to select a target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        vict = find_random_player_in_room(ch);
+        stop_fighting(vict);
+        stop_fighting(ch);
+        return ch->do_backstab(vict->getName().split(' '));
+        break;
+
+    case 2:
+        // room punch
+        act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(6, 800);
+        damage_all_players_in_room(ch, dam);
+        break;
+
+    case 3:
+        // summon all mobs 8606
+        act("$n utters the words 'gaisi ni gochi!'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        if (!find_mob_in_room(ch, 8606))
+            summon_all_of_mob_to_room(ch, 8606);
+        break;
+    }
+
+    return eSUCCESS;
+}
+
+int takahashi_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                     Character *owner)
+{
+    int retval;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    switch (number(1, 2))
+    {
+
+    case 1:
+        // firestorm
+        act("$n summons the power of the shadows to envelop you in fire!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        retval = cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        if (SOMEONE_DIED(retval))
+            return retval;
+        return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        break;
+
+    case 2:
+        // vampiric touch
+        act("$n calls upon the arcane knowledge of his ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        retval = cast_vampiric_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        if (SOMEONE_DIED(retval))
+            return retval;
+        return cast_vampiric_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        break;
+
+    } // end of switch
+
+    return eSUCCESS;
+}
+
+int askari_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                  Character *owner)
+{
+    int dam;
+    int retval;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    retval = protect(ch, 8646); // rescue Surimoto if he's fighting
+    if (SOMEONE_DIED(retval) || isSet(retval, eSUCCESS))
+        return retval;
+
+    switch (number(1, 2))
+    {
+
+    case 1:
+        // hitall
+        act("$n sizes you up, then swings with deadly acuracy!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(6, 800);
+        damage_all_players_in_room(ch, dam);
+        act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(6, 800);
+        damage_all_players_in_room(ch, dam);
+        break;
+
+    case 2:
+        // wanna be arrow damage
+        act("$n takes aim with his mighty longbow...at YOU!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(300, 800);
+        damage_all_players_in_room(ch, dam);
+        break;
+
+    } // end of switch
+
+    return eSUCCESS;
+}
+
+int surimoto_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                    Character *owner)
+{
+    int dam;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    switch (number(1, 8))
+    {
+
+    case 1:
+        act("$n utters the words, 'moshi-moshi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        break;
+
+    default:
+        // wanna be arrow damage
+        act("$n takes aim with his mighty longbow...at YOU!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        dam = number(300, 800);
+        damage_all_players_in_room(ch, dam);
+        break;
+
+    } // end of switch
+
+    return eSUCCESS;
+}
+
+int hiryushi_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                    Character *owner)
+{
+    Character *victim = nullptr;
+
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    switch (number(1, 3))
+    {
+
+    case 1:
+        act("$n utters the words, 'solar flare'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        return cast_solar_gate(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        break;
+
+    case 2:
+        act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        break;
+
+    case 3:
+        act("$n leaps back and readies a wand...", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
+        {
+            if (IS_NPC(victim))
+                continue;
+            act("$n points a wand at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+            return cast_drown(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, victim, 0, ch->getLevel());
+        }
+        break;
+
+    } // end of switch
+
+    return eSUCCESS;
+}
+
+int izumi_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
-  int retval;
-  if (cmd)
-    return eFAILURE;
+    int retval;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  switch (number(1, 7))
-  {
+    switch (number(1, 7))
+    {
 
-  case 1:
-    act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    retval = cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    if (SOMEONE_DIED(retval))
-      return retval;
-    cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    break;
+    case 1:
+        act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        retval = cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        if (SOMEONE_DIED(retval))
+            return retval;
+        cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        break;
 
-  default:
-    act("$n utters the words, 'ga!'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return cast_colour_spray(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-    break;
+    default:
+        act("$n utters the words, 'ga!'", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        return cast_colour_spray(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+        break;
 
-  } // end of switch
+    } // end of switch
 
-  return eSUCCESS;
+    return eSUCCESS;
 }
 
-int shogura_combat(Character *ch, class Object *obj, int cmd, const char *arg,
+int shogura_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                    Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (GET_HIT(ch->fighting) < 5000)
-  {
-    do_say(ch, "It's time to finish this, little one.", CMD_DEFAULT);
-    return ki_punch(ch->getLevel(), ch, "", ch->fighting);
-  }
-
-  if (IS_AFFECTED(ch->fighting, AFF_FIRESHIELD) ||
-      IS_AFFECTED(ch->fighting, AFF_FIRESHIELD))
-  {
-    return ki_disrupt(ch->getLevel(), ch, "", ch->fighting);
-  }
-
-  switch (number(1, 2))
-  {
-
-  case 1:
-    if (!number(0, 10))
+    if (GET_HIT(ch->fighting) < 5000)
     {
-      act("$n summons up his iron will!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      return do_quivering_palm(ch, "", CMD_DEFAULT);
+        do_say(ch, "It's time to finish this, little one.", cmd_t::DEFAULT);
+        return ki_punch(ch->getLevel(), ch, "", ch->fighting);
     }
-    break;
 
-  case 2:
-    // summon all mobs 8668
-    do_say(ch, "Multi-form technique!", CMD_DEFAULT);
-    if (!find_mob_in_room(ch, 8668))
-      summon_all_of_mob_to_room(ch, 8668);
-    break;
-  }
+    if (IS_AFFECTED(ch->fighting, AFF_FIRESHIELD) ||
+        IS_AFFECTED(ch->fighting, AFF_FIRESHIELD))
+    {
+        return ki_disrupt(ch->getLevel(), ch, "", ch->fighting);
+    }
 
-  return eSUCCESS;
+    switch (number(1, 2))
+    {
+
+    case 1:
+        if (!number(0, 10))
+        {
+            act("$n summons up his iron will!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+            return do_quivering_palm(ch, "", cmd_t::DEFAULT);
+        }
+        break;
+
+    case 2:
+        // summon all mobs 8668
+        do_say(ch, "Multi-form technique!", cmd_t::DEFAULT);
+        if (!find_mob_in_room(ch, 8668))
+            summon_all_of_mob_to_room(ch, 8668);
+        break;
+    }
+
+    return eSUCCESS;
 }
 
 // Proc for the arena mobs to make DAMN sure they stay in the arena.
-int arena_only(Character *ch, class Object *obj, int cmd, const char *arg,
+int arena_only(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                Character *owner)
 {
-  if (cmd || ch->fighting)
+    if (cmd != cmd_t::UNDEFINED || ch->fighting)
+        return eFAILURE;
+
+    if (!ch->room().isArena())
+    {
+        do_gossip(ch, "My life has no meaning outside of glorious arena combat!");
+        act("$n goes out in a blaze of glory!", ch, 0, 0, TO_ROOM, NOTVICT);
+        // remove my eq
+        for (int i = 0; i < MAX_WEAR; i++)
+            if (ch->equipment[i])
+                obj_to_char(ch->unequip_char(i), ch);
+
+        while (ch->carrying)
+            extract_obj(ch->carrying);
+
+        // get rid of me
+        stop_fighting(ch);
+        extract_char(ch, true);
+        // It's important we return true
+        return eSUCCESS | eCH_DIED;
+    }
     return eFAILURE;
-
-  if (!ch->room().isArena())
-  {
-    do_gossip(ch, "My life has no meaning outside of glorious arena combat!", 0);
-    act("$n goes out in a blaze of glory!", ch, 0, 0, TO_ROOM, NOTVICT);
-    // remove my eq
-    for (int i = 0; i < MAX_WEAR; i++)
-      if (ch->equipment[i])
-        obj_to_char(unequip_char(ch, i), ch);
-
-    while (ch->carrying)
-      extract_obj(ch->carrying);
-
-    // get rid of me
-    stop_fighting(ch);
-    extract_char(ch, true);
-    // It's important we return true
-    return eSUCCESS | eCH_DIED;
-  }
-  return eFAILURE;
 }
 
 int druid_elemental(Character *ch, class Object *obj,
-                    int cmd, const char *arg, Character *owner)
+                    cmd_t cmd, const char *arg, Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
-  if (!ch->master)
-  {
-    extract_char(ch, true);
-    return (eCH_DIED | eSUCCESS);
-  }
-  if (ch->getPosition() < position_t::STANDING)
-    return eFAILURE;
-  if (!ch->fighting)
-  {
-    if (ch->in_room != ch->master->in_room)
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+    if (!ch->master)
     {
-      do_emote(ch, "creates an elemental gateway and steps through.\r\n", CMD_DEFAULT);
-      move_char(ch, ch->master->in_room);
-      act("An elemental gateway shimmers into existance and $n emerges.", ch, 0, 0, TO_ROOM, 0);
-      return eSUCCESS;
+        extract_char(ch, true);
+        return (eCH_DIED | eSUCCESS);
     }
-  }
+    if (GET_POS(ch) < position_t::STANDING)
+        return eFAILURE;
+    if (!ch->fighting)
+    {
+        if (ch->in_room != ch->master->in_room)
+        {
+            do_emote(ch, "creates an elemental gateway and steps through.\r\n", cmd_t::DEFAULT);
+            move_char(ch, ch->master->in_room);
+            act("An elemental gateway shimmers into existance and $n emerges.", ch, 0, 0, TO_ROOM, 0);
+            return eSUCCESS;
+        }
+    }
 
-  return eSUCCESS;
+    return eSUCCESS;
 }
 
-int mage_golem(Character *ch, class Object *obj, int cmd,
+int mage_golem(Character *ch, class Object *obj, cmd_t cmd,
                const char *arg, Character *owner)
 {
-  if (cmd || !ch->master || ch->fighting || ch->in_room != ch->master->in_room)
+    if (cmd != cmd_t::UNDEFINED || !ch->master || ch->fighting || ch->in_room != ch->master->in_room)
+        return eFAILURE;
+
+    if (ch->master->fighting && IS_NPC(ch->master->fighting))
+        ch->do_join(ch->master->getName().split(' '));
+
     return eFAILURE;
-
-  if (ch->master->fighting && IS_NPC(ch->master->fighting))
-    ch->do_join(ch->master->getName().split(' '));
-
-  return eFAILURE;
 }
 
 int gremlinthing(Character *ch)
 {
-  if (ch->getPosition() < position_t::STANDING)
-    return eFAILURE;
+    if (GET_POS(ch) < position_t::STANDING)
+        return eFAILURE;
 
-  if (ch->master && IS_PC(ch->master) && ch->master->player->golem &&
-      ch->master->player->golem->in_room == ch->in_room)
-  {
-    Character *gol = ch->master->player->golem;
-    if (gol->hit < gol->max_hit)
+    if (ch->master && IS_PC(ch->master) && ch->master->player->golem &&
+        ch->master->player->golem->in_room == ch->in_room)
     {
-      do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", CMD_DEFAULT);
-      gol->hit += number(40, 60);
-      if (gol->hit > gol->max_hit)
-        gol->hit = gol->max_hit;
+        Character *gol = ch->master->player->golem;
+        if (gol->hit < gol->max_hit)
+        {
+            do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", cmd_t::DEFAULT);
+            gol->hit += number(40, 60);
+            if (gol->hit > gol->max_hit)
+                gol->hit = gol->max_hit;
+        }
     }
-  }
-  return eFAILURE;
+    return eFAILURE;
 }
 
-int mage_familiar_gremlin(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
+int mage_familiar_gremlin(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
-  if (number(0, 1))
-    return eFAILURE;
-  return gremlinthing(ch);
+    if (number(0, 1))
+        return eFAILURE;
+    return gremlinthing(ch);
 }
 
 int mage_familiar_gremlin_non(Character *ch, class Object *obj,
-                              int cmd, const char *arg, Character *owner)
+                              cmd_t cmd, const char *arg, Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
-  if (!ch->master)
-  {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
-    extract_char(ch, true);
-    return (eCH_DIED | eSUCCESS);
-  }
-  if (ch->getPosition() < position_t::STANDING)
-    return eFAILURE;
-  if (!ch->fighting)
-  {
-    if (ch->in_room != ch->master->in_room)
-    {
-      do_emote(ch, "looks around, glances at its watch then skitters out of the room.\r\n", CMD_DEFAULT);
-      move_char(ch, ch->master->in_room);
-      do_emote(ch, "skitters into the room, anxiously looking for its master.\r\n", CMD_DEFAULT);
-      return eFAILURE;
-    }
-
-    if (ch->master->fighting)
-    { // help him!
-      ch->do_join(ch->master->getName().split(' '));
-      return eFAILURE;
-    }
-
-    if (number(1, 500) == 1)
-    {
-      act("$n chatters incessantly while magically fusing two small rocks together.", ch, 0, 0, TO_ROOM, 0);
-      return eFAILURE;
-    }
-  }
-
-  if (number(0, 4))
-    return eFAILURE;
-
-  return gremlinthing(ch);
-}
-
-int mage_familiar_imp(Character *ch, class Object *obj, int cmd, const char *arg,
-                      Character *owner)
-{
-  if (number(0, 1))
-    return cast_fireball(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
-
-  return eFAILURE;
-}
-
-int mage_familiar_imp_non(Character *ch, class Object *obj, int cmd, const char *arg,
-                          Character *owner)
-{
-  if (cmd)
-    return eFAILURE;
-
-  if (ch->fighting)
-    return eFAILURE;
-
-  if (!ch->master)
-  {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
-    extract_char(ch, true);
-    return (eCH_DIED | eSUCCESS);
-  }
-
-  // do nothing unless doing nothing :)
-  if (ch->getPosition() < position_t::STANDING)
-    return eFAILURE;
-
-  if (!ch->fighting)
-  {
-    if (ch->in_room != ch->master->in_room)
-    {
-      do_emote(ch, "looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n", CMD_DEFAULT);
-      move_char(ch, ch->master->in_room);
-      do_emote(ch, "steps out of a nearby shadow relieved to be back in its master's presence.\r\n", CMD_DEFAULT);
-      return eFAILURE;
-    }
-
-    if (ch->master->fighting)
-    { // help him!
-      ch->do_join(ch->master->getName().split(' '));
-      return eFAILURE;
-    }
-
-    if (number(1, 500) == 1)
-    {
-      do_emote(ch, "chitters about for a bit then settles down.", CMD_DEFAULT);
-      return eFAILURE;
-    }
-  }
-
-  return eFAILURE;
-}
-
-int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
-{
-  if (ch->fighting)
-    return eFAILURE;
-
-  if (cmd == 155 && !owner->fighting && !ch->fighting && owner->master == ch)
-  {
-    char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-    arg = one_argument(arg, arg1);
-    arg = one_argument(arg, arg2);
-    if (str_cmp(arg1, "far") && str_cmp(arg1, "near"))
-    {
-      ch->sendln("$BDo you want to spy $3far$7 or $3near$7?$R");
-      return eSUCCESS;
-    }
-    int dir;
-
-    for (dir = 0; *dirs[dir] != '\n'; dir++)
-      if (!str_cmp(dirs[dir], arg2))
-        break;
-    if (*dirs[dir] == '\n' || !DC::getInstance()->world[ch->in_room].dir_option[dir])
-    {
-      ch->sendln("In what direction did you say?");
-      return eSUCCESS;
-    }
-    int to_room = 0;
-    bool ts = IS_AFFECTED(ch, AFF_true_SIGHT);
-    if (!str_cmp(arg1, "far") && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
-      to_room = DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
-    if (!to_room)
-      to_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
-    if (!check_components(ch, 1, 44, 0, 0, 0, true))
-    {
-      ch->sendln("The owl requires a feeding to do this for you.");
-      return eSUCCESS;
-    }
-    ch->sendln("The owl accepts your mouse greedily.");
-    ch->sendln("You see through the eyes of your familiar, looking into the distant room...");
-    int oldroom = ch->in_room;
-    char_from_room(ch);
-    char_to_room(ch, to_room);
-    SETBIT(ch->affected_by, AFF_true_SIGHT);
-    do_look(ch, "", CMD_DEFAULT);
-    if (!ts)
-      REMBIT(ch->affected_by, AFF_true_SIGHT);
-    char_from_room(ch);
-    char_to_room(ch, oldroom);
-    return eSUCCESS;
-  }
-  else if (!cmd)
-  {
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
     if (!ch->master)
     {
-      logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
-      extract_char(ch, true);
-      return (eCH_DIED | eSUCCESS);
+        logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+        extract_char(ch, true);
+        return (eCH_DIED | eSUCCESS);
+    }
+    if (GET_POS(ch) < position_t::STANDING)
+        return eFAILURE;
+    if (!ch->fighting)
+    {
+        if (ch->in_room != ch->master->in_room)
+        {
+            do_emote(ch, "looks around, glances at its watch then skitters out of the room.\r\n", cmd_t::DEFAULT);
+            move_char(ch, ch->master->in_room);
+            do_emote(ch, "skitters into the room, anxiously looking for its master.\r\n", cmd_t::DEFAULT);
+            return eFAILURE;
+        }
+
+        if (ch->master->fighting)
+        { // help him!
+            ch->do_join(ch->master->getName().split(' '));
+            return eFAILURE;
+        }
+
+        if (number(1, 500) == 1)
+        {
+            act("$n chatters incessantly while magically fusing two small rocks together.", ch, 0, 0, TO_ROOM, 0);
+            return eFAILURE;
+        }
+    }
+
+    if (number(0, 4))
+        return eFAILURE;
+
+    return gremlinthing(ch);
+}
+
+int mage_familiar_imp(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                      Character *owner)
+{
+    if (number(0, 1))
+        return cast_fireball(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
+
+    return eFAILURE;
+}
+
+int mage_familiar_imp_non(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
+                          Character *owner)
+{
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    if (ch->fighting)
+        return eFAILURE;
+
+    if (!ch->master)
+    {
+        logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+        extract_char(ch, true);
+        return (eCH_DIED | eSUCCESS);
     }
 
     // do nothing unless doing nothing :)
-    if (ch->getPosition() < position_t::STANDING)
-      return eFAILURE;
+    if (GET_POS(ch) < position_t::STANDING)
+        return eFAILURE;
 
     if (!ch->fighting)
     {
-      if (ch->in_room != ch->master->in_room)
-      {
-        do_emote(ch, "lifts from its perch and flies out of the room.\r\n", CMD_DEFAULT);
-        move_char(ch, ch->master->in_room);
-        do_emote(ch, "swoops into the room perching itself high up, watching its master.\r\n", CMD_DEFAULT);
-        return eFAILURE;
-      }
+        if (ch->in_room != ch->master->in_room)
+        {
+            do_emote(ch, "looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n", cmd_t::DEFAULT);
+            move_char(ch, ch->master->in_room);
+            do_emote(ch, "steps out of a nearby shadow relieved to be back in its master's presence.\r\n", cmd_t::DEFAULT);
+            return eFAILURE;
+        }
 
-      if (ch->master->fighting)
-      { // help him!
-        ch->do_join(ch->master->getName().split(' '));
-        return eFAILURE;
-      }
+        if (ch->master->fighting)
+        { // help him!
+            ch->do_join(ch->master->getName().split(' '));
+            return eFAILURE;
+        }
 
-      if (number(1, 500) == 1)
-      {
-        do_emote(ch, "circles above, looking for mice.", CMD_DEFAULT);
-        return eFAILURE;
-      }
+        if (number(1, 500) == 1)
+        {
+            do_emote(ch, "chitters about for a bit then settles down.", cmd_t::DEFAULT);
+            return eFAILURE;
+        }
     }
-  }
-  return eFAILURE;
+
+    return eFAILURE;
 }
 
-int druid_familiar_chipmunk_non(Character *ch, class Object *obj, int cmd, const char *arg,
+int druid_familiar_owl_non(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+{
+    if (ch->fighting)
+        return eFAILURE;
+
+    if (cmd == cmd_t::WATCH && !owner->fighting && !ch->fighting && owner->master == ch)
+    {
+        char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+        arg = one_argument(arg, arg1);
+        arg = one_argument(arg, arg2);
+        if (str_cmp(arg1, "far") && str_cmp(arg1, "near"))
+        {
+            ch->sendln("$BDo you want to spy $3far$7 or $3near$7?$R");
+            return eSUCCESS;
+        }
+        int dir;
+
+        for (dir = 0; *dirs[dir] != '\n'; dir++)
+            if (!str_cmp(dirs[dir], arg2))
+                break;
+        if (*dirs[dir] == '\n' || !DC::getInstance()->world[ch->in_room].dir_option[dir])
+        {
+            ch->sendln("In what direction did you say?");
+            return eSUCCESS;
+        }
+        int to_room = 0;
+        bool ts = IS_AFFECTED(ch, AFF_true_SIGHT);
+        if (!str_cmp(arg1, "far") && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
+            to_room = DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
+        if (!to_room)
+            to_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
+        if (!check_components(ch, 1, 44, 0, 0, 0, true))
+        {
+            ch->sendln("The owl requires a feeding to do this for you.");
+            return eSUCCESS;
+        }
+        ch->sendln("The owl accepts your mouse greedily.");
+        ch->sendln("You see through the eyes of your familiar, looking into the distant room...");
+        int oldroom = ch->in_room;
+        char_from_room(ch);
+        char_to_room(ch, to_room);
+        SETBIT(ch->affected_by, AFF_true_SIGHT);
+        do_look(ch, "", cmd_t::DEFAULT);
+        if (!ts)
+            REMBIT(ch->affected_by, AFF_true_SIGHT);
+        char_from_room(ch);
+        char_to_room(ch, oldroom);
+        return eSUCCESS;
+    }
+    else if (cmd == cmd_t::UNDEFINED)
+    {
+        if (!ch->master)
+        {
+            logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+            extract_char(ch, true);
+            return (eCH_DIED | eSUCCESS);
+        }
+
+        // do nothing unless doing nothing :)
+        if (GET_POS(ch) < position_t::STANDING)
+            return eFAILURE;
+
+        if (!ch->fighting)
+        {
+            if (ch->in_room != ch->master->in_room)
+            {
+                do_emote(ch, "lifts from its perch and flies out of the room.\r\n", cmd_t::DEFAULT);
+                move_char(ch, ch->master->in_room);
+                do_emote(ch, "swoops into the room perching itself high up, watching its master.\r\n", cmd_t::DEFAULT);
+                return eFAILURE;
+            }
+
+            if (ch->master->fighting)
+            { // help him!
+                ch->do_join(ch->master->getName().split(' '));
+                return eFAILURE;
+            }
+
+            if (number(1, 500) == 1)
+            {
+                do_emote(ch, "circles above, looking for mice.", cmd_t::DEFAULT);
+                return eFAILURE;
+            }
+        }
+    }
+    return eFAILURE;
+}
+
+int druid_familiar_chipmunk_non(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                                 Character *owner)
 {
-  if (cmd)
-    return eFAILURE;
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
 
-  if (ch->fighting)
-    return eFAILURE;
+    if (ch->fighting)
+        return eFAILURE;
 
-  if (!ch->master)
-  {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
-    extract_char(ch, true);
-    return (eCH_DIED | eSUCCESS);
-  }
-
-  // do nothing unless doing nothing :)
-  if (ch->getPosition() < position_t::STANDING)
-    return eFAILURE;
-
-  if (!ch->fighting)
-  {
-    if (ch->in_room != ch->master->in_room)
+    if (!ch->master)
     {
-      do_emote(ch, "looks around for its master than runs off.\r\n", CMD_DEFAULT);
-      move_char(ch, ch->master->in_room);
-      do_emote(ch, "runs in and drops by its masters feet, obviously tired.\r\n", CMD_DEFAULT);
-      return eFAILURE;
+        logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+        extract_char(ch, true);
+        return (eCH_DIED | eSUCCESS);
     }
 
-    if (ch->master->fighting)
-    { // help him!
-      ch->do_join(ch->master->getName().split(' '));
-      return eFAILURE;
-    }
+    // do nothing unless doing nothing :)
+    if (GET_POS(ch) < position_t::STANDING)
+        return eFAILURE;
 
-    if (number(1, 500) == 1)
+    if (!ch->fighting)
     {
-      do_emote(ch, "sqeaks with delight at a found nut.", CMD_DEFAULT);
-      return eFAILURE;
+        if (ch->in_room != ch->master->in_room)
+        {
+            do_emote(ch, "looks around for its master than runs off.\r\n", cmd_t::DEFAULT);
+            move_char(ch, ch->master->in_room);
+            do_emote(ch, "runs in and drops by its masters feet, obviously tired.\r\n", cmd_t::DEFAULT);
+            return eFAILURE;
+        }
+
+        if (ch->master->fighting)
+        { // help him!
+            ch->do_join(ch->master->getName().split(' '));
+            return eFAILURE;
+        }
+
+        if (number(1, 500) == 1)
+        {
+            do_emote(ch, "sqeaks with delight at a found nut.", cmd_t::DEFAULT);
+            return eFAILURE;
+        }
+
+        if (number(1, 100) == 1)
+        {
+            ch->master->sendln("The presence of your chipmunk is soothing to your mind.");
+            GET_MANA(ch->master) += 10;
+            if (GET_MANA(ch->master) > GET_MAX_MANA(ch->master))
+                GET_MANA(ch->master) = GET_MAX_MANA(ch->master);
+            return eFAILURE;
+        }
     }
 
-    if (number(1, 100) == 1)
-    {
-      ch->master->sendln("The presence of your chipmunk is soothing to your mind.");
-      GET_MANA(ch->master) += 10;
-      if (GET_MANA(ch->master) > GET_MAX_MANA(ch->master))
-        GET_MANA(ch->master) = GET_MAX_MANA(ch->master);
-      return eFAILURE;
-    }
-  }
-
-  return eFAILURE;
+    return eFAILURE;
 }
 
 // This is here so we don't need 2398429 procs that are just for a bodyguard
 // Just add a case for your mob, and the mob he's supposed to protect
-int bodyguard(Character *ch, class Object *obj, int cmd, const char *arg,
+int bodyguard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
               Character *owner)
 {
-  if (cmd)
+    if (cmd != cmd_t::UNDEFINED)
+        return eFAILURE;
+
+    switch (DC::getInstance()->mob_index[ch->mobdata->nr].virt)
+    {
+    case 9511:                    // sura mutant
+        return protect(ch, 9510); // laiger
+
+    case 9531:                    // andar
+        return protect(ch, 9530); // andara
+
+    case 9532:                    // Adua
+        return protect(ch, 9529); // adele
+
+    default:
+        return eFAILURE;
+    }
     return eFAILURE;
-
-  switch (DC::getInstance()->mob_index[ch->mobdata->vnum].vnum)
-  {
-  case 9511:                  // sura mutant
-    return protect(ch, 9510); // laiger
-
-  case 9531:                  // andar
-    return protect(ch, 9530); // andara
-
-  case 9532:                  // Adua
-    return protect(ch, 9529); // adele
-
-  default:
-    return eFAILURE;
-  }
-  return eFAILURE;
 }
 
-int generic_blocker(Character *ch, class Object *obj, int cmd, const char *arg,
+int generic_blocker(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                     Character *owner)
 {
-  if (cmd > 6 || cmd < 1)
+    if (!isCommandTypeDirection(cmd))
+        return eFAILURE;
+
+    switch (ch->in_room)
+    {
+    case 6420:
+        if (cmd != cmd_t::NORTH) // north
+            break;
+        act("$n is prevented from going north by $N.", ch, 0, owner, TO_ROOM, 0);
+        act("You are prevented from going north by $N.", ch, 0, owner, TO_CHAR, 0);
+        return eSUCCESS;
+    }
+
     return eFAILURE;
-
-  switch (ch->in_room)
-  {
-  case 6420:
-    if (cmd != 1) // north
-      break;
-    act("$n is prevented from going north by $N.", ch, 0, owner, TO_ROOM, 0);
-    act("You are prevented from going north by $N.", ch, 0, owner, TO_CHAR, 0);
-    return eSUCCESS;
-  }
-
-  return eFAILURE;
 }
 
-int generic_doorpick_blocker(Character *ch, class Object *obj, int cmd, const char *arg,
+int generic_doorpick_blocker(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                              Character *owner)
 {
-  if (cmd != 35) // pick
+    if (cmd != cmd_t::PICK) // pick
+        return eFAILURE;
+
+    switch (ch->in_room)
+    {
+    case 3725: // bishop room in nefarious
+        act("$n stands protectively before the door.", owner, 0, 0, TO_ROOM, 0);
+        return eSUCCESS;
+        break;
+    case 1382: // Weapon enchanter room in TOHS
+        act("$n stands protectively in front of the chest.", owner, 0, 0, TO_ROOM, 0);
+        return eSUCCESS;
+        break;
+    }
+
     return eFAILURE;
-
-  switch (ch->in_room)
-  {
-  case 3725: // bishop room in nefarious
-    act("$n stands protectively before the door.", owner, 0, 0, TO_ROOM, 0);
-    return eSUCCESS;
-    break;
-  case 1382: // Weapon enchanter room in TOHS
-    act("$n stands protectively in front of the chest.", owner, 0, 0, TO_ROOM, 0);
-    return eSUCCESS;
-    break;
-  }
-
-  return eFAILURE;
 }
 
-int startrek_miles(Character *ch, class Object *obj, int cmd, const char *arg,
+int startrek_miles(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                    Character *owner)
 {
-  if (cmd != 185)
-    return eFAILURE;
+    if (cmd != cmd_t::PUSH)
+        return eFAILURE;
 
-  do_say(owner, "Don't push anything.  This is highly sophisticated equipment.\r\n", CMD_DEFAULT);
-  return eSUCCESS;
+    do_say(owner, "Don't push anything.  This is highly sophisticated equipment.\r\n", cmd_t::DEFAULT);
+    return eSUCCESS;
 }

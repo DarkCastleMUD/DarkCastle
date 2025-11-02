@@ -71,7 +71,7 @@ void Leaderboard::check(void)
 	{
 		if (!d->character || d->character->getLevel() >= IMMORTAL || IS_NPC(d->character))
 			continue;
-		if (d->connected != Connection::states::PLAYING)
+		if (!d->connected == Connection::states::PLAYING)
 			continue;
 		if (!d->character->player)
 			continue;
@@ -1359,7 +1359,7 @@ int Leaderboard::pdscore(Character *ch)
  things, otherwise renames will crash the server hard.
  */
 
-int do_leaderboard(Character *ch, char *argument, int cmd)
+int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
 {
 	class Connection *d;
 	FILE *fl;
@@ -1573,7 +1573,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 
 		if (!d->character || d->character->getLevel() >= IMMORTAL)
 			continue;
-		if (d->connected != Connection::states::PLAYING)
+		if (!d->connected == Connection::states::PLAYING)
 			continue;
 		if (!d->character->player)
 			continue;

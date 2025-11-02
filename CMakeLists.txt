@@ -78,6 +78,7 @@ set(CPACK_RPM_PACKAGE_RELOCATABLE ON)
 set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
 set(CPACK_RPM_PACKAGE_REQUIRES "qt6-sql-postgresql qt6-sql-sqlite")
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/bin/qt.conf)
+list(APPEND CPACK_SOURCE_IGNORE_FILES "/\.gitignore.*")
 
 execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE BUILD_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
@@ -128,7 +129,6 @@ add_library(DC SHARED
     src/CommandStack.cpp
     src/Command.cpp
     src/comm.cpp
-    src/Connection.cpp
     src/const.cpp
     src/corpse.cpp
     src/Database.cpp
@@ -302,17 +302,17 @@ install (TARGETS dcastle debug testDC benchmarkDC
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-install (DIRECTORY archive DESTINATION /var/lib/dcastle)
-install (DIRECTORY blog DESTINATION /var/lib/dcastle)
-install (DIRECTORY bsave DESTINATION /var/lib/dcastle)
-install (DIRECTORY docs DESTINATION /var/lib/dcastle)
-install (DIRECTORY familiar DESTINATION /var/lib/dcastle)
-install (DIRECTORY follower DESTINATION /var/lib/dcastle)
-install (DIRECTORY lib DESTINATION /var/lib/dcastle)
-install (DIRECTORY log DESTINATION /var/lib/dcastle)
-install (DIRECTORY save DESTINATION /var/lib/dcastle)
-install (DIRECTORY scripts DESTINATION /var/lib/dcastle)
-install (DIRECTORY vaults DESTINATION /var/lib/dcastle)
+install (DIRECTORY archive DESTINATION dcastle FILES_MATCHING)
+install (DIRECTORY blog DESTINATION dcastle FILES_MATCHING)
+install (DIRECTORY bsave DESTINATION dcastle FILES_MATCHING)
+install (DIRECTORY docs DESTINATION dcastle PATTERN .gitignore EXCLUDE)
+install (DIRECTORY familiar DESTINATION dcastle FILES_MATCHING)
+install (DIRECTORY follower DESTINATION dcastle FILES_MATCHING)
+install (DIRECTORY lib DESTINATION dcastle PATTERN .gitignore EXCLUDE)
+install (DIRECTORY log DESTINATION dcastle FILES_MATCHING)
+install (DIRECTORY save DESTINATION dcastle FILES_MATCHING)
+install (DIRECTORY scripts DESTINATION dcastle PATTERN .gitignore EXCLUDE)
+install (DIRECTORY vaults DESTINATION dcastle FILES_MATCHING PATTERN vaultindex)
 qt_generate_deploy_app_script(
     TARGET dcastle
     OUTPUT_SCRIPT deploy_script

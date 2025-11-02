@@ -27,7 +27,7 @@
 
 extern int rev_dir[];
 
-int do_batter(Character *ch, char *argument, int cmd)
+int do_batter(Character *ch, char *argument, cmd_t cmd)
 {
   bool battervbrace = false;
   bool batterwins = false;
@@ -156,7 +156,7 @@ int do_batter(Character *ch, char *argument, int cmd)
           act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
           exit->bracee->setSitting();
           update_pos(exit->bracee);
-          do_brace(exit->bracee, "", 0); // unbrace
+          do_brace(exit->bracee, ""); // unbrace
         }
         else
         { // brace wins
@@ -200,7 +200,7 @@ int do_batter(Character *ch, char *argument, int cmd)
           act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
           move_char(ch, exit->to_room);
           act("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, TO_ROOM, 0);
-          do_look(ch, "", CMD_LOOK);
+          do_look(ch, "");
         }
         else
         {
@@ -219,7 +219,7 @@ int do_batter(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_brace(Character *ch, char *argument, int cmd)
+int do_brace(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   struct room_direction_data *back, *exit;
@@ -237,7 +237,7 @@ int do_brace(Character *ch, char *argument, int cmd)
   {
     if (ch->brace_at != nullptr)
     {
-      if (cmd == 0)
+      if (cmd == cmd_t::UNDEFINED)
       {
         csendf(ch, "You are no longer able to brace the %s.\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
       }
@@ -334,7 +334,7 @@ int do_brace(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-command_return_t Character::do_rage(QStringList arguments, int cmd)
+command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
 {
   if (getHP() == 1)
   {
@@ -426,7 +426,7 @@ command_return_t Character::do_rage(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_battlecry(Character *ch, char *argument, int cmd)
+int do_battlecry(Character *ch, char *argument, cmd_t cmd)
 {
   struct follow_type *f = 0;
 
@@ -498,7 +498,7 @@ int do_battlecry(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_berserk(Character *ch, char *argument, int cmd)
+int do_berserk(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -621,7 +621,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_headbutt(Character *ch, char *argument, int cmd)
+int do_headbutt(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -752,7 +752,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
-          ch->equipment[WEAR_HEAD] && ch->equipment[WEAR_HEAD]->vnum == 508)
+          ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
       {
         act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
         act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);
@@ -767,7 +767,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_bloodfury(Character *ch, char *argument, int cmd)
+int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
   float modifier;
@@ -821,7 +821,7 @@ int do_bloodfury(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_crazedassault(Character *ch, char *argument, int cmd)
+int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
   int duration = 20;
@@ -874,7 +874,7 @@ void rush_reset(varg_t arg1, void *arg2, void *arg3)
   REMBIT(ch->affected_by, AFF_RUSH_CD);
 }
 
-int do_bullrush(Character *ch, char *argument, int cmd)
+int do_bullrush(Character *ch, char *argument, cmd_t cmd)
 {
   char direction[MAX_INPUT_LENGTH];
   char who[MAX_INPUT_LENGTH];
@@ -931,9 +931,14 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 
   // before we move anyone, we need to check for any spec procs in the
   // room like guild guards
-  retval = ch->special("", dir);
-  if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
-    return retval;
+  auto cmd_dir = getCommandFromDirection(dir);
+  if (cmd_dir)
+  {
+    retval = ch->special("", *cmd_dir);
+    if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+      return retval;
+  }
+
   SETBIT(ch->affected_by, AFF_RUSH_CD);
   extern void addtimer(struct timer_data * add);
 
@@ -944,9 +949,12 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   timer->timeleft = 5;
   addtimer(timer);
 
-  retval = attempt_move(ch, dir);
-  if (SOMEONE_DIED(retval))
-    return retval;
+  if (cmd_dir)
+  {
+    retval = attempt_move(ch, *cmd_dir);
+    if (SOMEONE_DIED(retval))
+      return retval;
+  }
 
   if (!(victim = ch->get_char_room_vis(who)))
   {
@@ -975,7 +983,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-int do_ferocity(Character *ch, char *argument, int cmd)
+int do_ferocity(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
 
@@ -1061,7 +1069,7 @@ void barb_magic_resist(Character *ch, int old, int nw)
       ch->saves[i] += bonus;
 }
 
-int do_knockback(Character *ch, char *argument, int cmd)
+int do_knockback(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
@@ -1305,7 +1313,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_primalfury(Character *ch, char *argument, int cmd)
+int do_primalfury(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
 
@@ -1319,7 +1327,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
     ch->sendln("You must wait before using this ability again.");
     return eSUCCESS;
   }
-  if (!ch->fighting || ch->getPosition() != position_t::FIGHTING)
+  if (!ch->fighting || GET_POS(ch) != position_t::FIGHTING)
   {
     ch->sendln("You must be in combat in order to use this ability.");
     return eSUCCESS;
@@ -1372,7 +1380,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pursue(Character *ch, char *argument, int cmd)
+int do_pursue(Character *ch, char *argument, cmd_t cmd)
 {
   if (!ch->has_skill(SKILL_PURSUIT))
   {

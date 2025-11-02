@@ -132,7 +132,6 @@ Database db;
 #endif
 
 /* functions in this file */
-void update_mprog_throws(void);
 void update_characters(void);
 void short_activity();
 void skip_spaces(char **string);
@@ -146,6 +145,8 @@ void flush_queues(class Connection *d);
 int perform_subst(class Connection *t, char *orig, char *subst);
 
 void check_idle_passwords(void);
+void init_heartbeat();
+void heartbeat();
 void report_debug_logging();
 
 /* extern fcnts */
@@ -158,11 +159,11 @@ void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, char *str);
 void perform_violence(void);
+void time_update();
 void weather_update();
 void send_hint();
 extern void pulse_command_lag();
 void checkConsecrate(int);
-void game_test_init(void);
 
 // extern char greetings1[MAX_STRING_LENGTH];
 // extern char greetings2[MAX_STRING_LENGTH];
@@ -213,7 +214,7 @@ int DC::write_hotboot_file(void)
           d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
           d->original->player->time.logon = time(0);
         }
-        save_char_obj(d->original);
+        d->original->save_char_obj();
       }
       else
       {
@@ -223,7 +224,7 @@ int DC::write_hotboot_file(void)
           d->character->player->last_site = d->character->desc->getPeerOriginalAddress().toString();
           d->character->player->time.logon = time(0);
         }
-        save_char_obj(d->character);
+        d->character->save_char_obj();
       }
       write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
     }
@@ -277,26 +278,31 @@ int DC::load_hotboot_descs(void)
   if (hotboot_file.open(QFile::ReadOnly))
   {
     unlink("hotboot");
-    logverbose(QStringLiteral("Hotboot, reloading characters."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Hotboot, reloading characters."));
 
     QTextStream out(&hotboot_file);
     for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
              {
              int fd;
             out >> fd;
-            qDebug("Read %d for port %d", fd, port);
+            //qDebug("Read %d for port %d", fd, port);
             server_descriptor_list.insert(fd); });
 
     while (!out.atEnd())
     {
       int descriptor;
       out >> descriptor;
-
+      if (out.atEnd())
+        break;
       QString character_name;
       out >> character_name;
-
+      if (out.atEnd())
+        break;
       QString address;
       out >> address;
+      if (out.atEnd())
+        break;
+      // qDebug("Read %d as descriptor for character '%s' from %s", descriptor, qPrintable(character_name), qPrintable(address));
 
       auto d = new Connection;
       d->idle_time = 0;
@@ -339,23 +345,59 @@ int DC::load_hotboot_descs(void)
 
 vnum_t DC::getObjectVNUM(Object *obj, bool *ok)
 {
-  if (obj && !obj_index.isEmpty())
+  if (obj && obj_index)
   {
     if (ok)
     {
       *ok = true;
     }
-    return obj->vnum;
+    return obj_index[obj->item_number].virt;
   }
 
   if (ok)
   {
     *ok = false;
   }
-  return INVALID_OBJ_VNUM;
+  return INVALID_VNUM;
 }
 
-void finish_hotboot()
+vnum_t DC::getObjectVNUM(legacy_rnum_t nr, bool *ok)
+{
+  if (nr >= 0 && nr <= top_of_objt && obj_index)
+  {
+    if (ok)
+    {
+      *ok = true;
+    }
+    return obj_index[nr].virt;
+  }
+
+  if (ok)
+  {
+    *ok = false;
+  }
+  return INVALID_VNUM;
+}
+
+vnum_t DC::getObjectVNUM(rnum_t nr, bool *ok)
+{
+  if (nr != DC::INVALID_RNUM && nr <= top_of_objt && obj_index)
+  {
+    if (ok)
+    {
+      *ok = true;
+    }
+    return obj_index[nr].virt;
+  }
+
+  if (ok)
+  {
+    *ok = false;
+  }
+  return INVALID_VNUM;
+}
+
+void DC::finish_hotboot(void)
 {
   class Connection *d;
   char buf[MAX_STRING_LENGTH];
@@ -388,8 +430,8 @@ void finish_hotboot()
 
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
-    do_look(d->character, "", 8);
-    d->character->save(666);
+    do_look(d->character, "");
+    d->character->save(cmd_t::SAVE_SILENTLY);
   }
 }
 
@@ -653,15 +695,27 @@ void DC::game_loop(void)
   for (d = descriptor_list; d; d = next_d)
   {
     next_d = d->next;
+
+    const auto idle_seconds = d->idle_time / DC::PASSES_PER_SEC;
     if (FD_ISSET(d->descriptor, &input_set))
     {
       if (process_input(d) < 0)
       {
-        if (d->getPeerOriginalAddress() != QHostAddress("127.0.0.1"))
-        {
-          logsocket(QStringLiteral("Connection attempt bailed from %1").arg(d->getPeerOriginalAddress().toString()));
-        }
         close_socket(d);
+      }
+    }
+    else
+    {
+      switch (d->connected)
+      {
+      case Connection::states::GET_NAME:
+      case Connection::states::GET_OLD_PASSWORD:
+        if (idle_seconds > 30)
+        {
+          SEND_TO_Q(QStringLiteral("Disconnected for being idle for over 30 seconds.\r\n"), d);
+          close_socket(d);
+        }
+        break;
       }
     }
   }
@@ -671,8 +725,7 @@ void DC::game_loop(void)
   {
     if (d->character != nullptr)
     {
-      QString locale = d->character->getSetting("locale", "en_US");
-      QLocale::setDefault(QLocale(locale));
+      QLocale::setDefault(QLocale(d->character->getSetting("locale", "en_US")));
     }
 
     next_d = d->next;
@@ -906,7 +959,7 @@ void DC::game_loop_init(void)
   ssh.close();
 }
 
-void game_test_init(void)
+void DC::game_test_init(void)
 {
   assert(remove_all_codes(QStringLiteral("$B")) == "$$B");
   assert(remove_non_color_codes(QStringLiteral("$B")) == "$B");
@@ -922,7 +975,7 @@ void game_test_init(void)
   assert(!strcmp(name, "1"));
 
   auto d = new Connection;
-  Character *ch = new Character;
+  Character *ch = new Character(this);
   ch->setName("Debugimp");
   ch->player = new Player;
   ch->setType(Character::Type::Player);
@@ -947,30 +1000,30 @@ void game_test_init(void)
 
   update_max_who();
 
-  do_restore(ch, "debugimp", CMD_DEFAULT);
+  do_restore(ch, "debugimp");
 
-  do_stand(ch, "", CMD_DEFAULT);
+  do_stand(ch, "");
   d->process_output();
 
   char_to_room(ch, 3001);
   d->process_output();
-  ch->do_toggle({"pager"}, CMD_DEFAULT);
-  ch->do_toggle({"ansi"}, CMD_DEFAULT);
-  ch->do_toggle({}, CMD_DEFAULT);
+  ch->do_toggle({"pager"}, cmd_t::DEFAULT);
+  ch->do_toggle({"ansi"}, cmd_t::DEFAULT);
+  ch->do_toggle({}, cmd_t::DEFAULT);
   ch->do_goto({"23"});
-  do_score(ch, "", CMD_DEFAULT);
+  do_score(ch, "");
   d->process_output();
 
-  do_load(ch, "m 23", CMD_DEFAULT);
+  do_load(ch, "m 23");
   d->process_output();
 
-  do_look(ch, "debugimp", CMD_LOOK);
+  do_look(ch, "debugimp");
   d->process_output();
 
   ch->do_bestow({"debugimp", "load"});
   d->process_output();
 
-  do_load(ch, "m 23", CMD_DEFAULT);
+  do_load(ch, "m 23");
   d->process_output();
 
   ch->do_test({"all"});
@@ -982,7 +1035,7 @@ void game_test_init(void)
 }
 
 extern void pulse_hunts();
-void DC::init_heartbeat(void)
+void init_heartbeat()
 {
   pulse_mobile = DC::PULSE_MOBILE;
   pulse_timer = DC::PULSE_TIMER;
@@ -1129,7 +1182,7 @@ void DC::heartbeat(void)
     leaderboard.check(); // good place to put this
     PerfTimers["leaderboard"].stop();
 
-    if (DC::getInstance()->cf.bport == false)
+    if (cf.bport == false)
     {
       PerfTimers["check_champ"].start();
       check_champion_and_website_who_list();
@@ -1205,7 +1258,7 @@ void telnet_ga(Connection *d)
   SEND_TO_Q(QByteArray(go_ahead), d);
 }
 
-int do_lastprompt(Character *ch, char *arg, int cmd)
+int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
 {
   if (ch->getLastPrompt().isEmpty())
     ch->sendln("Last prompt: unset");
@@ -1215,7 +1268,7 @@ int do_lastprompt(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_prompt(Character *ch, char *arg, int cmd)
+int do_prompt(Character *ch, char *arg, cmd_t cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1437,7 +1490,7 @@ void flush_queues(class Connection *d)
     ;
   if (!d->output.isEmpty())
   {
-    write_to_descriptor(d->descriptor, qPrintable(d->output));
+    write_to_descriptor(d->descriptor, d->output);
   }
 }
 
@@ -1517,7 +1570,7 @@ void write_to_output(QByteArray txt, class Connection *t)
   {
     txt = scramble_text(txt.toStdString().c_str()).toStdString().c_str();
   }
-  t->output += txt.toStdString();
+  t->output.append(txt);
 }
 
 /* ******************************************************************
@@ -1562,10 +1615,9 @@ int new_descriptor(int s)
   /* determine if the site is banned */
   if (isbanned(newd->getPeerOriginalAddress()) == BAN_ALL)
   {
-    write_to_descriptor(desc,
-                        "Your site has been banned from Dark Castle. If you have any\n\r"
-                        "Questions, please email us at:\n\r"
-                        "imps@dcastle.org\n\r");
+    write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\n\r"
+                              "Questions, please email us at:\n\r"
+                              "imps@dcastle.org\n\r");
 
     CLOSE_SOCKET(desc);
     logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
@@ -1617,10 +1669,9 @@ QByteArray Connection::getOutput(void) const
 
 int Connection::process_output(void)
 {
-  QByteArray i;
+  QByteArray i = output;
 
   /* now, append the 'real' output */
-  i += qUtf8Printable(output);
   i += qUtf8Printable(createBlackjackPrompt());
   i += qUtf8Printable(createPrompt());
 
@@ -1665,26 +1716,20 @@ int write_to_descriptor(int desc, QByteArray txt)
     return 0;
 
   auto txtPtr = txt.constData();
+
   auto total = txt.size();
   do
   {
     auto bytes_written = write(desc, txtPtr, total);
     if (bytes_written < 0)
     {
-#ifdef EWOULDBLOCK
-      if (errno == EWOULDBLOCK)
-        errno = EAGAIN;
-#endif /* EWOULDBLOCK */
-      if (errno == EAGAIN)
+      if (errno != EAGAIN && errno != EWOULDBLOCK)
       {
-        logmisc(QStringLiteral("process_output: socket write would block"));
+        logmisc(QStringLiteral("write(%1,-,%2) returned %3 and errno=%4").arg(desc).arg(total).arg(bytes_written).arg(errno));
+        if (errno != EPIPE)
+          return -1;
       }
-      else
-      {
-        perror("Write to socket");
-        return (-1);
-      }
-      return (0);
+      return 0;
     }
     else
     {
@@ -2079,10 +2124,10 @@ int process_input(class Connection *t)
   //
   // now move the rest of the buffer up to the beginning for the next pass
   //
-  write_point = t->inbuf.data();
-  while (*read_point)
-    *(write_point++) = *(read_point++);
-  *write_point = '\0';
+      write_point = t->inbuf.data();
+    while (*read_point)
+      *(write_point++) = *(read_point++);
+    *write_point = '\0';
   */
 
   return 1;
@@ -2181,14 +2226,14 @@ int close_socket(class Connection *d)
     // target_idnum = GET_IDNUM(d->character);
     if (d->isPlaying() || d->isEditing())
     {
-      save_char_obj(d->character);
+      d->character->save_char_obj();
       // clan area stuff
       extern void check_quitter(Character * ch);
       check_quitter(d->character);
 
       // end any performances
       if (IS_SINGING(d->character))
-        do_sing(d->character, "stop", CMD_DEFAULT);
+        do_sing(d->character, "stop");
 
       act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
 
@@ -2249,7 +2294,7 @@ int close_socket(class Connection *d)
        next_i = i->next;
        if(IS_NPC(i))
          continue;
-       do_quit(i, "", 666);
+       do_quit(i, "", cmd_t::SAVE_SILENTLY);
     }
     return 0;
   }*/
@@ -2524,7 +2569,7 @@ void record_msg(QString messg, Character *ch)
   }
 }
 
-int do_awaymsgs(Character *ch, char *argument, int cmd)
+int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
 {
   int lines = 0;
   QString tmp;
@@ -2573,27 +2618,14 @@ void check_for_awaymsgs(Character *ch)
   ch->sendln("Type awaymsgs to view them.");
 }
 
-void send_to_char(const char *mesg, Character *ch)
-{
-  if (mesg)
-  {
-    send_to_char(std::string(mesg), ch);
-  }
-}
-
 void send_to_char(QString messg, Character *ch)
 {
-  send_to_char(messg.toStdString(), ch);
-}
+  if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.isEmpty())
+    mprog_act_trigger(messg.toStdString(), ch, 0, 0, 0);
+  if (IS_NPC(ch) && !ch->desc && !selfpurge && MOBtrigger && !messg.isEmpty())
+    ch->oprog_act_trigger(messg);
 
-void send_to_char(std::string messg, Character *ch)
-{
-  if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.empty())
-    mprog_act_trigger(messg, ch, 0, 0, 0);
-  if (IS_NPC(ch) && !ch->desc && !selfpurge && MOBtrigger && !messg.empty())
-    oprog_act_trigger(messg.c_str(), ch);
-
-  if (!selfpurge && (ch->desc && !messg.empty()) && (!is_busy(ch)))
+  if (!selfpurge && (ch->desc && !messg.isEmpty()) && (!is_busy(ch)))
   {
     SEND_TO_Q(messg, ch->desc);
   }
@@ -2718,7 +2750,7 @@ void send_to_room(QString messg, int room, bool awakeonly, Character *nta)
   if (!messg.isEmpty())
     for (i = DC::getInstance()->world[room].people; i; i = i->next_in_room)
       if (i->desc && !is_busy(i) && nta != i)
-        if (!awakeonly || i->getPosition() > position_t::SLEEPING)
+        if (!awakeonly || GET_POS(i) > position_t::SLEEPING)
           SEND_TO_Q(messg, i->desc);
 }
 
@@ -2825,7 +2857,7 @@ void warn_if_duplicate_ip(Character *ch)
   }
 }
 
-int do_editor(Character *ch, char *argument, int cmd)
+int do_editor(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)
@@ -2928,4 +2960,9 @@ Proxy::Proxy(QString h)
 
     active = true;
   }
+}
+
+const char *Connection::getPeerOriginalAddressC(void)
+{
+  return getPeerOriginalAddress().toString().toStdString().c_str();
 }

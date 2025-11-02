@@ -1,5 +1,6 @@
 #include <QStringTokenizer>
 #include <QFile>
+#include <QMetaEnum>
 
 #include "DC/character.h"
 #include "DC/db.h"
@@ -120,14 +121,20 @@ PlayerConfig::PlayerConfig(QObject *parent)
     config["color.good"] = "green";
     config["color.bad"] = "red";
     config["tell.history.timestamp"] = "0";
+    config["gossip.history.timestamp"] = "0";
     config["locale"] = "en_US";
+    config["timezone"] = "America/Chicago";
     config["mode"] = "line";
     config["fighting.showdps"] = "0";
+    config["dateformat"] = "ISODate";
 }
 
 player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const
 {
-    return config.value(key, defaultValue);
+    if (config.contains(key) && config.value(key).isEmpty())
+        return defaultValue;
+    else
+        return config.value(key, defaultValue);
 }
 
 player_config_key_t PlayerConfig::key(const player_config_value_t &value, const player_config_key_t &defaultKey) const
@@ -267,7 +274,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
         return false;
     }
 
-    Character *charmie = clone_mobile(real_mobile(8));
+    Character *charmie = dc_->clone_mobile(real_mobile(8));
     if (charmie == nullptr)
     {
         logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
@@ -638,7 +645,7 @@ const QList<Toggle> Player::togglables = {
     {"damage", PLR_DAMAGE_BIT, &Character::do_damage_toggle},
     {"nodupekeys", PLR_NODUPEKEYS_BIT, &Character::do_nodupekeys_toggle}};
 
-Toggle::Toggle(QString name, uint64_t shift, command_return_t (Character::*function)(QStringList arguments, int cmd), uint64_t dependency_shift, QString on_message, QString off_message)
+Toggle::Toggle(QString name, uint64_t shift, command_return_t (Character::*function)(QStringList arguments, cmd_t cmd), uint64_t dependency_shift, QString on_message, QString off_message)
     : name_(name), valid_(true), shift_(shift), dependency_shift_(dependency_shift), value_(1U << shift), on_message_(on_message), off_message_(off_message), function_(function)
 {
 }
@@ -1116,42 +1123,57 @@ QString Character::calc_name(bool use_color)
     return name;
 }
 
-QString Player::getPrompt(void)
+void ChannelMessage::set_wizinvis(const class Character *sender)
 {
-    return prompt_;
-}
-void Player::setPrompt(QString prompt)
-{
-    prompt_ = prompt;
-}
-QString Player::getLastPrompt(void)
-{
-    return last_prompt_;
-}
-void Player::setLastPrompt(QString prompt)
-{
-    last_prompt_ = prompt;
+    if (sender && sender->isPlayer())
+    {
+        wizinvis_ = sender->player->wizinvis;
+    }
+    else
+    {
+        wizinvis_ = 0;
+    }
 }
 
-QString Character::getPrompt(void)
+void ChannelMessage::set_name(const class Character *sender)
 {
-    if (player)
-        return player->getPrompt();
-    return {};
+    if (sender)
+    {
+        sender_name_ = GET_SHORT(sender);
+    }
+    else
+    {
+        sender_name_ = QStringLiteral("Unknown");
+        logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
+    }
 }
-void Character::setPrompt(QString prompt)
+
+QString ChannelMessage::getMessage(Character *ch) const
 {
-    if (player)
-        player->setPrompt(prompt);
-}
-QString Character::getLastPrompt(void)
-{
-    if (player)
-        return player->getLastPrompt();
-    return {};
-}
-void Character::setLastPrompt(QString prompt)
-{
-    if (player)
-        player->setLastPrompt(prompt);
+    if (!ch)
+        return {};
+
+    QString prefix;
+    switch (type_)
+    {
+    case DC::LogChannel::CHANNEL_TELL:
+        prefix = "tell";
+        break;
+    case DC::LogChannel::CHANNEL_GOSSIP:
+        prefix = "gossip";
+        break;
+    default:
+        prefix = "unknown";
+        break;
+    }
+
+    QTimeZone timezone = QTimeZone(ch->getSetting("timezone", "America/Chicago").toLatin1());
+    QString timestamp = ch->getSetting(QStringLiteral("%1.history.timestamp").arg(prefix));
+    QString dateformat_str = ch->getSetting("dateformat", "ISODate");
+    Qt::DateFormat dateformat = Qt::DateFormat(QMetaEnum::fromType<Qt::DateFormat>().keyToValue(qPrintable(dateformat_str)));
+
+    if (timestamp == "1" || timestamp.startsWith('t', Qt::CaseInsensitive))
+        return getMessage(ch->getLevel(), true, timezone, dateformat);
+    else
+        return getMessage(ch->getLevel(), false, timezone, dateformat);
 }

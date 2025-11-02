@@ -202,6 +202,8 @@ bool IS_DARK(int room);
 #define GET_AC_METAS(ch) ((ch)->acmetas)
 #define GET_AGE_METAS(ch) ((ch)->agemetas)
 #define GET_KI_METAS(ch) ((ch)->player->kimetas)
+
+#define GET_POS(ch) ((ch)->getPosition())
 #define GET_COND(ch, i) ((ch)->conditions[(i)])
 #define GET_NAME(ch) ((ch)->getNameC())
 #define GET_SHORT(ch) ((ch)->short_desc ? (ch)->short_desc : (ch)->getNameC())
@@ -213,6 +215,7 @@ bool IS_DARK(int room);
 #define GET_OBJ_SHORT(obj) ((obj)->short_description)
 #define GET_OBJ_NAME(obj) ((obj)->name)
 
+#define GET_OBJ_RNUM(obj) ((obj)->item_number)
 #define GET_OBJ_VAL(obj, val) ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_VROOM(obj) ((obj)->vroom)
 #define GET_OBJ_EXTRA(obj) ((obj)->obj_flags.extra_flags)
@@ -221,7 +224,7 @@ bool IS_DARK(int room);
 #define GET_OBJ_WEAR(obj) ((obj)->obj_flags.wear_flags)
 #define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
 #define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
-#define GET_OBJ_VNUM(obj) ((obj)->vnum)
+#define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? DC::getInstance()->obj_index[GET_OBJ_RNUM(obj)].virt : -1)
 #define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= DC::getInstance()->top_of_world)
 #define GET_ROOM_VNUM(rnum) \
    ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
@@ -303,7 +306,7 @@ auto getBitvector(auto value)
 }
 #define IS_UNDEAD(ch) ((GET_RACE(ch) == RACE_UNDEAD) || (GET_RACE(ch) == RACE_GHOST))
 
-#define AWAKE(ch) (ch->getPosition() != position_t::SLEEPING)
+#define AWAKE(ch) (GET_POS(ch) != position_t::SLEEPING)
 
 #define IS_ANONYMOUS(ch) (IS_NPC(ch) ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
 /*
@@ -481,6 +484,7 @@ char *str_dup0(const char *str);
 void logbug(QString message);
 void logsocket(QString message);
 void logmisc(QString message);
+void logworld(QString message);
 
 void sprintbit(uint value[], const char *names[], char *result);
 std::string sprintbit(uint value[], const char *names[]);
@@ -546,8 +550,7 @@ bool is_number(QString str);
 void gain_condition(Character *ch, int condition, int value);
 void set_fighting(Character *ch, Character *vict);
 void stop_fighting(Character *ch, int clearlag = 1);
-int do_simple_move(Character *ch, int cmd, int following);
-// int	attempt_move	(Character *ch, int cmd, int is_retreat = 0);
+int do_simple_move(Character *ch, cmd_t cmd, int following);
 int32_t mana_limit(Character *ch);
 int32_t ki_limit(Character *ch);
 int32_t hit_limit(Character *ch);
@@ -574,6 +577,7 @@ void redo_hitpoints(Character *ch); /* Rua's put in  */
 void redo_mana(Character *ch);      /* Rua's put in  */
 void redo_ki(Character *ch);        /* And Urizen*/
 void assign_rooms(void);
+void assign_objects(void);
 void free_obj(class Object *obj);
 
 int char_from_room(Character *ch, bool stop_fighting);
@@ -586,14 +590,11 @@ void death_cry(Character *ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
 
-void add_follower(Character *ch, Character *leader, int cmd);
 void send_to_outdoor(char *messg);
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman(void);
 int file_to_string(const char *name, char *buf);
-load_status_t load_char_obj(class Connection *d, QString name);
-void save_char_obj(Character *ch);
 
 #ifdef USE_SQL
 void save_char_obj_db(Character *ch);
@@ -603,7 +604,17 @@ void unique_scan(Character *victim);
 void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmpage);
 bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void check_idling(Character *ch);
-void stop_follower(Character *ch, int cmd);
+
+enum class follower_reasons_t
+{
+   DEFAULT,           // 0
+   END_STALK,         // 1
+   CHANGE_LEADER,     // 2
+   BROKE_CHARM,       // 3
+   BROKE_CHARM_LILITH // 4
+};
+void stop_follower(Character *ch, follower_reasons_t reason = follower_reasons_t::DEFAULT);
+void add_follower(Character *ch, Character *leader, follower_reasons_t reason = follower_reasons_t::DEFAULT);
 bool CAN_SEE(Character *sub, Character *obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
@@ -613,17 +624,14 @@ void raw_kill(Character *ch, Character *victim);
 void check_killer(Character *ch, Character *victim);
 int map_eq_level(Character *mob);
 void disarm(Character *ch, Character *victim);
-int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker);
+int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker);
 void send_to_all(QString messg);
 void ansi_color(const char *txt, Character *ch);
 void send_to_char(QString messg, Character *ch);
-void send_to_char(std::string messg, Character *ch);
-void send_to_char(const char *messg, Character *ch);
 void send_to_char_nosp(const char *messg, Character *ch);
 void send_to_char_nosp(QString messg, Character *ch);
 void send_to_room(QString messg, int room, bool awakeonly = false, Character *nta = nullptr);
-void record_track_data(Character *ch, int cmd);
-int write_to_descriptor(int desc, QByteArray txt);
+void record_track_data(Character *ch, cmd_t cmd);
 int write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(const std::string txt, std::queue<std::string> &queue);
 int use_mana(Character *ch, int sn);
@@ -691,49 +699,27 @@ int _parse_name(const char *arg, char *name);
 void mob_suprised_sayings(Character *ch, Character *aggressor);
 
 // MOBProgs prototypes
-int mprog_wordlist_check(QString arg, Character *mob,
-                         Character *actor, Object *object,
-                         void *vo, int type, bool reverse = false);
-void mprog_percent_check(Character *mob, Character *actor,
-                         Object *object, void *vo,
-                         int type);
-int mprog_act_trigger(std::string buf, Character *mob,
-                      Character *ch, Object *obj,
-                      void *vo);
-int mprog_bribe_trigger(Character *mob, Character *ch,
-                        int amount);
+int mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *object, void *vo, int type, bool reverse = false);
+void mprog_percent_check(Character *mob, Character *actor, Object *object, void *vo, int type);
+int mprog_act_trigger(std::string buf, Character *mob, Character *ch, Object *obj, void *vo);
+int mprog_bribe_trigger(Character *mob, Character *ch, int amount);
 int mprog_entry_trigger(Character *mob);
-int mprog_give_trigger(Character *mob, Character *ch,
-                       Object *obj);
-int mprog_greet_trigger(Character *mob);
+int mprog_give_trigger(Character *mob, Character *ch, Object *obj);
 int mprog_fight_trigger(Character *mob, Character *ch);
 int mprog_hitprcnt_trigger(Character *mob, Character *ch);
 int mprog_death_trigger(Character *mob, Character *killer);
 int mprog_random_trigger(Character *mob);
 int mprog_arandom_trigger(Character *mob);
-int mprog_speech_trigger(const char *txt, Character *mob);
 int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm);
 int mprog_attack_trigger(Character *mob, Character *ch);
 int mprog_load_trigger(Character *mob);
-int mprog_can_see_trigger(Character *ch, Character *mob);
 int mprog_damage_trigger(Character *mob, Character *ch, int amount);
-
-int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
-int oprog_act_trigger(const char *txt, Character *ch);
-int oprog_speech_trigger(const char *txt, Character *ch);
-int oprog_command_trigger(const char *txt, Character *ch, char *arg);
-int oprog_weapon_trigger(Character *ch, Object *item);
-int oprog_armour_trigger(Character *ch, Object *item);
-int oprog_rand_trigger(Object *item);
-int oprog_arand_trigger(Object *item);
-int oprog_greet_trigger(Character *ch);
-int oprog_load_trigger(Object *item);
-int oprog_can_see_trigger(Character *ch, Object *item);
 bool is_in_game(Character *ch);
 int get_stat(Character *ch, attribute_t stat);
 const char *pluralize(int qty, const char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(const QStringView str);
+void make_prompt(class Connection *d, std::string &prompt);
 
 qsizetype find(QString haystack, auto needle, qsizetype pos)
 {
@@ -825,10 +811,8 @@ T remove_non_color_codes(T input)
    return output;
 }
 
-void prog_error(Character *mob, char *format, ...);
 bool str_prefix(const char *astr, const char *bstr);
 bool str_infix(QString astr, QString bstr);
-Character *initiate_oproc(Character *ch, Object *obj);
 
 extern const char menu[];
 
@@ -891,12 +875,10 @@ char *numToStringTH(int);
 bool champion_can_go(int room);
 bool class_can_go(int ch_class, int room);
 
-QString find_profession(int c_class, uint8_t profession);
+const char *find_profession(int c_class, uint8_t profession);
 
 std::string get_isr_string(uint32_t, int8_t);
 
-bool isDead(Character *ch);
-bool isNowhere(Character *ch);
 bool file_exists(std::string filename);
 bool file_exists(QString filename);
 bool char_file_exists(std::string name);
