@@ -4,17 +4,44 @@
 
 The game is available to login via telnet dcastle.org over ports 23 or 6969 for the standard no-botting/no-multiplaying server or dcastle.org 6666 for the botting/multiplaying server.
 
-## Use existing Docker image
+## Use existing container image with Podman or Docker
 ```
-$ docker create -p 4000 --name darkcastle jhhudso/darkcastle
-567cc580ca65a9fe249ba77312a358a11ab772291a8f4ab01104e1102a7d112d
-$ docker start darkcastle
-darkcastle
-$ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' darkcastle
-172.17.0.2
-$ telnet 172.17.0.2 4000
-Trying 172.17.0.2...
-Connected to 172.17.0.2.
+localhost:~ > podman run -d -p 4000:4000 --name darkcastle docker.io/jhhudso/darkcastle:latest
+Trying to pull docker.io/jhhudso/darkcastle:latest...
+Getting image source signatures
+Copying blob 4f4fb700ef54 done   | 
+Copying blob 743cbdefc427 done   | 
+Copying blob d02f6ccf6f02 done   | 
+Copying blob 4f4fb700ef54 done   | 
+Copying blob 8a98d0457244 done   | 
+Copying blob 73a452477877 done   | 
+Copying blob 780e35cb8324 done   | 
+Copying blob 17df0f60aa11 done   | 
+Copying blob 4f4fb700ef54 skipped: already exists  
+Copying config 6713af0e16 done   | 
+Writing manifest to image destination
+a01460cd48638e867970e302ef36c24a6e66d0aff21339d0f35c07209d5f2a70
+```
+```
+localhost:~ # docker pull docker.io/jhhudso/darkcastle:latest
+latest: Pulling from jhhudso/darkcastle
+743cbdefc427: Already exists 
+73a452477877: Already exists 
+d02f6ccf6f02: Already exists 
+4f4fb700ef54: Already exists 
+8a98d0457244: Already exists 
+780e35cb8324: Already exists 
+17df0f60aa11: Already exists 
+Digest: sha256:fe80408a8ab8559b61fd6cd2aac411bd95ea93caedb170d96d662205b91454eb
+Status: Downloaded newer image for jhhudso/darkcastle:latest
+docker.io/jhhudso/darkcastle:latest
+~ # docker run -d -p 4000:4000 --name darkcastle docker.io/jhhudso/darkcastle:latest
+f47f42e34429e62e7f3b556c5f493d60670dc10887b3f34634dc2bbedec4cde4
+```
+```
+localhost:~ > telnet localhost 4000
+Trying ::1...
+Connected to localhost.
 Escape character is '^]'.
 
 What name for the roster? 
@@ -38,8 +65,6 @@ openSUSE Leap 15.5
 sudo zypper ref
 sudo zypper in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel qt6-httpserver-devel libstdc++6-devel-gcc12 gcc12-c++ libssh-devel
 ```
-
-
 
 Ubuntu 22.04
 ```
