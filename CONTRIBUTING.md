@@ -1,1 +1,1 @@
-I would prefer you create an issue first at https://github.com/DarkCastleMUD/DarkCastle/issues before contributing code via a pull request to solve a problem or add a feature.
+If you contribute code via a pull request and there is no accompanying GitHub Issue then please create one.
