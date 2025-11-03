@@ -22,7 +22,6 @@ RUN zypper -n in --allow-unsigned-rpm build/dc*rpm
 WORKDIR /srv/dcastle/git/DarkCastle/lib
 RUN /usr/bin/testDC
 COPY lib /srv/dcastle/lib
-RUN cp -av build/dc*rpm /srv/dcastle
 
 CMD ["/usr/bin/dcastle", "-P"]
 
