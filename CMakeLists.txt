@@ -96,6 +96,7 @@ message("Patch: ${VERSION_PATCH}")
 message("SHA1: ${VERSION_SHA1}")
 
 project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
+include(CTest)
 configure_file(src/buildinfo.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/include/DC/buildinfo.h)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql HttpServer Concurrent Test)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql HttpServer Concurrent Test)
