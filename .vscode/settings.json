@@ -75,7 +75,9 @@
         "__locale": "cpp",
         "cstdarg": "cpp",
         "cinttypes": "cpp",
-        "qhttpserver": "cpp"
+        "qhttpserver": "cpp",
+        "ostream": "cpp",
+        "charconv": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
