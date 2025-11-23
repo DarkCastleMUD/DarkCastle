@@ -7186,7 +7186,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
       return eFAILURE;
     if (GET_POS(vict) == position_t::DEAD)
       return eSUCCESS | eVICT_DIED;
-    chance = number(0, 101);
+    chance = number(1, 100);
     percent = weap->affected[i].modifier;
     current_affect = weap->affected[i].location;
 
