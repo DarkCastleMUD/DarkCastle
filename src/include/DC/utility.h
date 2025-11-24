@@ -56,7 +56,17 @@ char *index(char *buf, char op);
 
 #define GET_WAIT(ch) (IS_NPC((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
 
-#define WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) : (IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
+// #define WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) : (IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
+static inline void WAIT_STATE(auto ch, auto cycle)
+{
+   if (ch->desc && !ch->isImmortalPlayer())
+   {
+      if (ch->desc->wait < cycle)
+         ch->desc->wait = cycle;
+   }
+   else if (ch->isNPC())
+      ch->deaths = cycle;
+}
 
 #define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
                                                                                                                                                        : 0)

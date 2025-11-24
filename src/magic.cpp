@@ -379,42 +379,18 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
   }
 
   set_cantquit(ch, victim);
-  dam = 265;
-  retval = damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, weap_spell);
-  if (SOMEONE_DIED(retval))
-    return retval;
-
-  if (isSet(retval, eEXTRA_VAL2))
-  {
-    victim = ch;
-  }
-
-  if (isSet(retval, eEXTRA_VALUE))
-  {
-    return retval;
-  }
 
   /* Drown BINGO Effect */
-  if (skill > 80)
+  if (skill > 80 && number(1, 100) == 1 && !victim->isImmortalPlayer())
   {
-    if (number(1, 100) == 1)
-    {
-      if (victim->isImmortalPlayer())
-      {
-        victim->sendln(QStringLiteral("%1 attempts to tear you apart with a watery blast but fails because you are an Immortal.").arg(ch->getName()));
-        act("$n attempts to tear $N apart with a watery blast but fails because they are an Immortal.", ch, 0, victim, TO_ROOM, NOTVICT);
-        act("$N is not torn apart by the force of your watery blast because they are an Immortal.", ch, 0, victim, TO_CHAR, 0);
-        return eSUCCESS;
-      }
-
-      dam = victim->getHP() * 5 + 20;
-      victim->sendln(QStringLiteral("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
-      act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
-      act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
-      return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
-    }
+    dam = victim->getHP() * 5 + 20;
+    victim->sendln(QStringLiteral("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
+    act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
+    return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
   }
-  return eSUCCESS;
+
+  return damage(ch, victim, 265, TYPE_WATER, SPELL_DROWN, weap_spell);
 }
 
 /* ENERGY DRAIN */
