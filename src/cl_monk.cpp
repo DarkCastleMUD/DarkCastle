@@ -90,7 +90,7 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   if (!skill_success(ch, victim, SKILL_EAGLE_CLAW))
-    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW);
   else
   {
     // 1% bingo chance
@@ -111,7 +111,7 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
     {
       dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, ch->getLevel()) + 100;
     }
-    retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+    retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EAGLE_CLAW);
   }
 
   return retval;
@@ -200,7 +200,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_QUIVERING_PALM))
   {
-    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM);
     duration = 6;
   }
   else
@@ -210,7 +210,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
       dam = 500;
     if (dam > 2000)
       dam = 2000;
-    retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
+    retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM);
     duration = 12;
   }
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
@@ -388,7 +388,7 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
     }
     else
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 4);
-    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN);
   }
   else
   {
@@ -432,7 +432,7 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
         REMOVE_BIT(victim->combat, COMBAT_STUNNED);
         REMOVE_BIT(victim->combat, COMBAT_STUNNED2);
       }
-      return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
+      return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN);
     }
 
     act_return ar;
@@ -489,7 +489,7 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
       ;
       SET_BIT(victim->combat, COMBAT_STUNNED);
     }
-    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN);
   }
   return retval;
 }

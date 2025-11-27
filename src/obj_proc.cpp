@@ -1608,7 +1608,7 @@ int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       continue;
     }
     v->sendln("You feel the evil in your soul being burned away!");
-    damage(ch, v, 250, TYPE_COLD, TYPE_UNDEFINED, 0);
+    damage(ch, v, 250, TYPE_COLD, TYPE_UNDEFINED);
     act("The evil in $N's soul is burned away!", ch, 0, v, TO_CHAR, 0);
   }
   SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
@@ -3317,7 +3317,7 @@ int glove_combat_procs(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     act("The mud on $n's gloves spoils $N's flesh causing boils.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
     act("The mud on $n's gloves spoils your flesh causing boils.", ch, obj, ch->fighting, TO_VICT, 0);
     ch->sendln("The mud on your gloves spoils the flesh of your enemy.");
-    return damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED, 0);
+    return damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED);
     break;
 
   case 4818:
@@ -4386,7 +4386,7 @@ int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
     c = a->next_in_room; // 'cause mobs get freed
     if (a == b)
       continue;
-    damage(b, a, 1000, TYPE_HIT, 50000, 0);
+    damage(b, a, 1000, TYPE_HIT, 50000);
   }
 
   end_oproc(b);
@@ -4803,5 +4803,5 @@ int godload_hydratail(Character *ch, class Object *obj, cmd_t cmd, const char *a
   strwithoutdam << "A head on your whip lashes out of its own accord unleashing a " << damtypeStr << " blast at $N!";
   send_damage(strwithdam.str().c_str(), ch, obj, ch->fighting, dammsg, strwithoutdam.str().c_str(), TO_CHAR);
 
-  return damage(ch, victim, dam, damtype, 0, 0);
+  return damage(ch, victim, dam, damtype, 0);
 }

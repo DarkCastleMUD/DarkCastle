@@ -84,7 +84,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   if (!skill_success(victim, SKILL_KICK))
   {
     dam = 0;
-    retval = damage(this, victim, 0, TYPE_BLUDGEON, SKILL_KICK, 0);
+    retval = damage(this, victim, 0, TYPE_BLUDGEON, SKILL_KICK);
     if (SOMEONE_DIED(retval))
       return retval;
   }
@@ -99,7 +99,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
     }
     else
       dam = (GET_DEX(this) * 3) + (GET_STR(this) * 2) + (has_skill(SKILL_KICK));
-    retval = damage(this, victim, dam, TYPE_BLUDGEON, SKILL_KICK, 0);
+    retval = damage(this, victim, dam, TYPE_BLUDGEON, SKILL_KICK);
     if (SOMEONE_DIED(retval))
       return retval;
   }
@@ -126,12 +126,12 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
     if (!skill_success(next_victim, SKILL_KICK))
     {
       dam = 0;
-      retval = damage(this, next_victim, 0, TYPE_UNDEFINED, SKILL_KICK, 0);
+      retval = damage(this, next_victim, 0, TYPE_UNDEFINED, SKILL_KICK);
     }
     else
     {
       dam = (GET_DEX(this) * 2) + (GET_STR(this)) + (has_skill(SKILL_KICK) / 2);
-      retval = damage(this, next_victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
+      retval = damage(this, next_victim, dam, TYPE_UNDEFINED, SKILL_KICK);
     }
     if (SOMEONE_DIED(retval))
       return retval;
@@ -235,7 +235,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_DEATHSTROKE, -25))
   {
-    retval = damage(ch, victim, 0, attacktype, SKILL_DEATHSTROKE, 0);
+    retval = damage(ch, victim, 0, attacktype, SKILL_DEATHSTROKE);
     if (number(1, 100) > failchance)
     {
       ch->sendln("You manage to retain your balance!");
@@ -262,7 +262,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
       act("$N's heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
       dam = 0;
     }
-    retval = damage(ch, victim, dam, attacktype, SKILL_DEATHSTROKE, 0);
+    retval = damage(ch, victim, dam, attacktype, SKILL_DEATHSTROKE);
   }
 
   return retval;
@@ -574,7 +574,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   {
     ch->setSitting();
     SET_BIT(ch->combat, COMBAT_BASH1);
-    retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH, 0);
+    retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH);
   }
   else
   {
@@ -584,13 +584,13 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
       act("$N's heightened battlesense sees your bash coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, TO_VICT, 0);
       act("$N's heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
-      retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH, 0);
+      retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH);
     }
     else
     {
       victim->setSitting();
       SET_BIT(victim->combat, COMBAT_BASH1);
-      retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BASH, 0);
+      retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BASH);
     }
     if (!(retval & eEXTRA_VALUE))
     {

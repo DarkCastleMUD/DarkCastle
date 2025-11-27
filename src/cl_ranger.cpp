@@ -1476,7 +1476,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
           "An arrow flies into the room with incredible speed!\n\r",
           victroom);
 
-    retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
+    retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY);
 
     if (isSet(retval, eVICT_DIED))
     {
@@ -1633,11 +1633,8 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
             victim, 0, 0, buffer,
             "The flames surrounding the arrow burns $n's wound!",
             TO_ROOM);
-        retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW,
-                        0);
-        ch->skill_increase_check(SKILL_FIRE_ARROW,
-                                 ch->has_skill(SKILL_FIRE_ARROW),
-                                 get_difficulty(SKILL_FIRE_ARROW));
+        retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW);
+        ch->skill_increase_check(SKILL_FIRE_ARROW, ch->has_skill(SKILL_FIRE_ARROW), get_difficulty(SKILL_FIRE_ARROW));
         enchantmentused = true;
         break;
       case 2:
@@ -1657,7 +1654,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
               0);
           WAIT_STATE(victim, DC::PULSE_VIOLENCE);
         }
-        retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
+        retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW);
         ch->skill_increase_check(SKILL_ICE_ARROW,
                                  ch->has_skill(SKILL_ICE_ARROW),
                                  get_difficulty(SKILL_ICE_ARROW));

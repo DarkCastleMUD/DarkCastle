@@ -1050,7 +1050,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 		act("Your piercing note causes $N's brain to leak out $S ears in a "
 			"painful death.",
 			ch, 0, victim, TO_CHAR, 0);
-		return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_SONG_WHISTLE_SHARP, 0);
+		return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_SONG_WHISTLE_SHARP);
 	}
 
 	int combat, non_combat;
@@ -1070,7 +1070,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 	char buf[MAX_STRING_LENGTH];
 	strcpy(buf, victim->short_desc);
 
-	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_WHISTLE_SHARP, 0);
+	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_WHISTLE_SHARP);
 	if (isSet(retval, eCH_DIED))
 		return retval;
 
@@ -1386,7 +1386,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 	}
 	char buf[MAX_STRING_LENGTH];
 	strcpy(buf, victim->short_desc);
-	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_TERRIBLE_CLEF, 0);
+	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_TERRIBLE_CLEF);
 	if (isSet(retval, eCH_DIED))
 		return retval;
 	if (isSet(retval, eVICT_DIED))
@@ -3349,7 +3349,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 	char buf[MAX_STRING_LENGTH];
 	strcpy(buf, victim->short_desc);
 
-	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_CRUSHING_CRESCENDO, 0);
+	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_CRUSHING_CRESCENDO);
 	if (isSet(retval, eCH_DIED))
 		return retval;
 

@@ -89,7 +89,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
   else
   {
     dam = 750;
-    retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH, 0);
+    retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     if (isSet(retval, eVICT_DIED) && !isSet(retval, eCH_DIED))
     {
@@ -291,7 +291,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
       act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
       act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
       act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
-      retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD, 0);
+      retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
       return eSUCCESS | retval;
     }
 
@@ -300,7 +300,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
       act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
       act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
-      retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD, 0);
+      retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
       return eSUCCESS | retval;
     }
 
@@ -320,7 +320,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
     act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
     act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
     act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-    retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD, 0);
+    retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
   }
 
   return retval;

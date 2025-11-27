@@ -80,7 +80,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
   int retval = 0;
   if (!skill_success(ch, victim, SKILL_EYEGOUGE))
   {
-    retval = damage(ch, victim, 0, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
+    retval = damage(ch, victim, 0, TYPE_PIERCE, SKILL_EYEGOUGE);
   }
   else
   {
@@ -105,7 +105,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
       affect_to_char(victim, &af, DC::PULSE_VIOLENCE);
     }
 
-    retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
+    retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE);
   }
 
   if (!SOMEONE_DIED(retval) || (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY)))
@@ -241,12 +241,12 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     if (perform_dual_backstab && IS_PC(this))
     {
       this->player->unjoinable = true;
-      retval = damage(this, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
+      retval = damage(this, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB);
       this->player->unjoinable = false;
     }
     else
     {
-      retval = damage(this, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
+      retval = damage(this, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB);
     }
   }
   // success
@@ -263,7 +263,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     act("BINGO! You brutally assassinate $N, and $S body crumples "
         "before you.",
         this, 0, victim, TO_CHAR, 0);
-    return damage(this, victim, 9999999, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
+    return damage(this, victim, 9999999, TYPE_UNDEFINED, SKILL_BACKSTAB);
   }
   else
   {
@@ -583,7 +583,7 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
     act("You fumble the trip!", ch, nullptr, victim, TO_CHAR, 0);
     act("$n fumbles as $e tries to trip $N!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP);
   }
   else
   {
@@ -605,7 +605,7 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
       WAIT_STATE(victim, DC::PULSE_VIOLENCE * 1);
     }
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP);
   }
   return retval;
 }
@@ -2138,11 +2138,11 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_JAB))
   {
-    retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_JAB, 0);
+    retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_JAB);
     return eSUCCESS;
   }
 
-  retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB, 0);
+  retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB);
 
   // if there wasn't a failure and not immune to attack
   if (!(retval & eFAILURE) && !(retval & eIMMUNE_VICTIM))

@@ -289,9 +289,9 @@ int spell_burning_hands(uint8_t level, Character *ch, Character *victim, class O
   set_cantquit(ch, victim);
   dam = 165;
   if (level > 200)
-    return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_BURNING_HANDS, 0);
+    return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_BURNING_HANDS);
   else
-    return damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS, 0);
+    return damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS);
 }
 
 /* SHOCKING GRASP */
@@ -300,7 +300,7 @@ int spell_shocking_grasp(uint8_t level, Character *ch, Character *victim, class 
 {
   int dam;
   dam = 130;
-  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SHOCKING_GRASP, 0);
+  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SHOCKING_GRASP);
 }
 
 /* LIGHTNING BOLT */
@@ -387,7 +387,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
     victim->sendln(QStringLiteral("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
     act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
     act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
-    return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
+    return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN);
   }
 
   return damage(ch, victim, 265, TYPE_WATER, SPELL_DROWN, weap_spell);
@@ -560,7 +560,7 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
     {
       act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
       act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
-      retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
+      retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL);
     }
   return retval;
 }
@@ -1143,7 +1143,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
     {
 
       dam = 660;
-      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
+      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
       if (isSet(retval, eCH_DIED))
         return retval;
       if (isSet(retval, eEXTRA_VALUE))
@@ -1178,7 +1178,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
           sprintf(buf, "You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.", desc_dirs[i]);
           act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
-          retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
+          retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
           if (isSet(retval, eCH_DIED))
             return retval;
 
@@ -1423,11 +1423,11 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
 
     if (level > 200)
     {
-      retval2 = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM, 0);
+      retval2 = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM);
     }
     else
     {
-      retval2 = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
+      retval2 = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIRESTORM);
     }
 
     if (isSet(retval2, eVICT_DIED))
@@ -1583,7 +1583,7 @@ int spell_call_lightning(uint8_t level, Character *ch, Character *victim, class 
   if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
   {
     dam = dice(MIN((int)GET_MANA(ch), 725), 1);
-    return damage(ch, victim, dam, TYPE_ENERGY, SPELL_CALL_LIGHTNING, 0);
+    return damage(ch, victim, dam, TYPE_ENERGY, SPELL_CALL_LIGHTNING);
   }
   return eFAILURE;
 }
@@ -1631,7 +1631,7 @@ int spell_divine_fury(uint8_t level, Character *ch, Character *victim, class Obj
     dam = 0;
   }
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
+  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY);
 }
 
 /* TELEPORT */
@@ -1804,7 +1804,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
       else
       {
         ch->sendln("The combined magics cause an explosion!");
-        retval = damage(ch, ch, number(5, 10), 0, TYPE_MAGIC, 0);
+        retval = damage(ch, ch, number(5, 10), 0, TYPE_MAGIC);
       }
       return retval;
     }
@@ -4837,7 +4837,7 @@ int spell_frost_breath(uint8_t level, Character *ch, Character *victim, class Ob
   //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
   //	   dam >>= 1;
 
-  retval = damage(ch, victim, dam, TYPE_COLD, SPELL_FROST_BREATH, 0);
+  retval = damage(ch, victim, dam, TYPE_COLD, SPELL_FROST_BREATH);
   if (SOMEONE_DIED(retval))
   {
     /* The character's DEAD, don't mess with him */
@@ -4888,7 +4888,7 @@ int spell_acid_breath(uint8_t level, Character *ch, Character *victim, class Obj
   //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ACID) >= 0)
   //	   dam >>= 1;
 
-  retval = damage(ch, victim, dam, TYPE_ACID, SPELL_ACID_BREATH, 0);
+  retval = damage(ch, victim, dam, TYPE_ACID, SPELL_ACID_BREATH);
   if (SOMEONE_DIED(retval))
   {
     return retval;
@@ -4950,7 +4950,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
       //      if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_FIRE) >= 0)
       //      dam >>= 1;
 
-      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH, 0);
+      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH);
       if (SOMEONE_DIED(retval))
         return retval;
     }
@@ -4985,7 +4985,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
       // if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_POISON) >= 0)
       //	dam >>= 1;
 
-      retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
+      retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH);
       if (isSet(retval, eCH_DIED))
         return retval;
     }
@@ -5011,7 +5011,7 @@ int spell_lightning_breath(uint8_t level, Character *ch, Character *victim, clas
   //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
   //	   dam >>= 1;
 
-  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BREATH, 0);
+  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BREATH);
 }
 
 /* **************************************************************** */
@@ -6048,7 +6048,7 @@ int spell_cause_serious(uint8_t level, Character *ch, Character *victim, class O
 
   dam = dice(2, 9) + (skill / 1.75);
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_SERIOUS, 0);
+  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_SERIOUS);
 }
 
 /* FLAMESTRIKE */
@@ -6508,9 +6508,9 @@ int spell_hellstream(uint8_t level, Character *ch, Character *victim, class Obje
   set_cantquit(ch, victim);
   dam = 950;
   if (level > 200)
-    return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_HELLSTREAM, 0);
+    return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_HELLSTREAM);
   else
-    return damage(ch, victim, dam, TYPE_FIRE, SPELL_HELLSTREAM, 0);
+    return damage(ch, victim, dam, TYPE_FIRE, SPELL_HELLSTREAM);
 }
 
 /* PORTAL (Creates the portal "item") */
@@ -11270,7 +11270,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
 
       set_cantquit(ch, tmp_victim);
 
-      retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
+      retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM);
       if (isSet(retval, eCH_DIED))
         return retval;
     }
@@ -11330,7 +11330,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
       GET_MANA(ch) = 0;
   }
 
-  retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_CREEPING_DEATH, 0);
+  retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_CREEPING_DEATH);
   if (SOMEONE_DIED(retval))
     return retval;
 
@@ -11387,7 +11387,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
                    victim);
       act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("$N is completely consumed by your insects!", ch, 0, victim, TO_CHAR, 0);
-      return damage(ch, victim, dam, TYPE_UNDEFINED, SPELL_CREEPING_DEATH, 0);
+      return damage(ch, victim, dam, TYPE_UNDEFINED, SPELL_CREEPING_DEATH);
     }
   }
   return eSUCCESS;
@@ -12937,7 +12937,7 @@ int spell_sun_ray(uint8_t level, Character *ch, Character *victim, class Object 
     //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
     //		dam >>= 1;
 
-    return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY, 0);
+    return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY);
   }
   else
     act("The sun ray cannot reach $N!", ch, 0, victim, TO_CHAR, 0);
@@ -13427,7 +13427,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
         act("$N shivers and looks very $B$3chilled$R as $E suffers the affects of $n's storm.", ch, 0, tmp_victim, TO_ROOM, NOTVICT);
       }
 
-      retval2 = damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM, 0);
+      retval2 = damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM);
 
       if (isSet(retval2, eVICT_DIED))
         SET_BIT(retval, eVICT_DIED);
@@ -13595,7 +13595,7 @@ int spell_blue_bird(uint8_t level, Character *ch, Character *victim, class Objec
   dam = number(10, ch_level + 5) + getRealSpellDamage(ch);
   while (!SOMEONE_DIED(retval) && count--)
   {
-    retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
+    retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD);
     dam = number(10, ch_level + 5);
   }
 
@@ -14658,14 +14658,14 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *
     dam = victim->getLevel() * 10 + skill * 2;
     sprintf(buf, "$B%d$R", dam_percent(skill, dam));
     send_damage("The holy tempest damages you for | hitpoints!", victim, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
-    retval &= damage(ch, victim, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD, 0);
+    retval &= damage(ch, victim, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
   }
 
   // damage the caster!!
   dam = ch->getLevel() * 10 + skill * 2;
   sprintf(buf, "$B%d$R", dam_percent(skill, dam));
   send_damage("The holy tempest damages you for | hitpoints!", ch, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
-  retval &= damage(ch, ch, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD, 0);
+  retval &= damage(ch, ch, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
 
   return retval;
 }

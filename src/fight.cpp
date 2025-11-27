@@ -2042,8 +2042,7 @@ void Character::addHP(int newhp, Character *causer)
 }
 
 // returns standard returnvals.h return codes
-int damage(Character *ch, Character *victim,
-           int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog)
+int damage(Character *ch, Character *victim, int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog, Object *obj)
 {
   int can_miss = 1;
   int32_t weapon_bit;

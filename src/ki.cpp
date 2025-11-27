@@ -476,7 +476,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     int prev = vict->getHP();
 
     strcpy(name, GET_SHORT(vict));
-    int retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST, 0);
+    int retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
     if (!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
@@ -509,12 +509,12 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 
     {
       GET_MANA(vict) -= manadam;
-      retval = damage(ch, vict, dam, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH, 0);
+      retval = damage(ch, vict, dam, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH);
       return retval;
     }
     else
     {
-      retval = damage(ch, vict, 0, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH, 0);
+      retval = damage(ch, vict, 0, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH);
 
       ch->removeHP((1 / 8) * (GET_MAX_HIT(ch)));
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);

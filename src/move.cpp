@@ -1363,7 +1363,7 @@ int ambush(Character *ch)
 				//         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
 				//         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
 				//         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
-				retval = damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH, 0);
+				retval = damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH);
 				if (isSet(retval, eVICT_DIED))
 					return (eSUCCESS | eCH_DIED); // ch = damage vict
 				if (isSet(retval, eCH_DIED))

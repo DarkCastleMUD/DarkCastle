@@ -717,7 +717,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) || isSet(victim->immune, weapon_bit) || do_frostshield(ch, victim))
   {
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-    retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
+    retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
     // the damage call here takes care of starting combat and such
     retval = eSUCCESS;
   }
@@ -736,7 +736,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       }
 
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-      retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
+      retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
       // the damage call here takes care of starting combat and such
       retval = eSUCCESS;
     }
@@ -750,14 +750,14 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
 
       WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
-      retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
+      retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
           ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
       {
         act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
         act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);
         act("Your spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_CHAR, 0);
-        //	retval = damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED, 0);
+        //	retval = damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED);
         retval = spell_shocking_grasp(50, ch, victim, 0, 60);
         // TWEAKME
       }
@@ -1209,7 +1209,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
 
     ch->setSitting();
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
+    retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK);
     return eFAILURE;
   }
   else if (!victim_paralyzed && victim->affected_by_spell(SKILL_BATTLESENSE) &&
@@ -1239,7 +1239,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     // the room?
     char temp[256]; // what did my innocent bugfix ever do to you?
     sprintf(temp, "%s", GET_SHORT(victim));
-    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
+    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
       sprintf(buf, "You smash %s apart!", temp);
@@ -1288,7 +1288,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   {
     char temp[256];
     sprintf(temp, "%s", GET_SHORT(victim));
-    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
+    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
       sprintf(buf, "You smash %s apart!", temp);

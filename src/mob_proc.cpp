@@ -2012,7 +2012,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, cmd_t cmd, const char
             dam = dice(ch->getLevel(), 8);
             act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
                 TO_ROOM, 0);
-            retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
+            retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH);
             if (isSet(retval, eCH_DIED))
                 return retval;
             if (!tmp_victim->affected_by_spell(SPELL_POISON))
@@ -2519,7 +2519,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, cmd_t cmd, const char *
 
     if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > position_t::SITTING)
     {
-        retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH, 0);
+        retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH);
         if (isSet(retval, eCH_DIED))
             return retval;
 
@@ -2535,7 +2535,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, cmd_t cmd, const char *
     }
     if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
     {
-        return damage(ch, vict, ch->getLevel() >> 1, TYPE_HIT, SKILL_KICK, 0);
+        return damage(ch, vict, ch->getLevel() >> 1, TYPE_HIT, SKILL_KICK);
     }
 
     return eFAILURE;

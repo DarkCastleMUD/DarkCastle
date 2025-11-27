@@ -357,14 +357,14 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
            if(saves_spell(ch, vict, 1, SAVE_TYPE_POISON) < 0)
              dam = 25;
            else dam = 15;
-           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);
+           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type);
            break;
 
         case 1: // low quality cyanide
            if(saves_spell(ch, vict, 10, SAVE_TYPE_POISON) < 0)
              dam = 35;
            else dam = 25;
-           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);
+           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type);
            break;
 
         case 2: // crude strychnine
@@ -374,7 +374,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
              dam = 10;
            }
            else dam = 0;
-           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);
+           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type);
            break;
 
         case 3: // vampire kiss
@@ -385,7 +385,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
            if(saves_spell(ch, vict, 1, SAVE_TYPE_POISON) < 0)
              dam = 40;
            else dam = 20;
-           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);
+           retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type);
            break;
 
         default:
