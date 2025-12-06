@@ -755,7 +755,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else if (otarget)
 			{
-				stringval = &otarget->description;
+				stringval = &otarget->long_description;
 			}
 			else if (rtarget >= 0)
 			{

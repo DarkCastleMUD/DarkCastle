@@ -4388,7 +4388,7 @@ void make_scraps(Character *ch, class Object *obj)
 
   sprintf(buf, "A pile of scraps from %s is lying here.",
           obj->short_description);
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "a pile of scraps.");
   corpse->short_description = str_hsh(buf);
@@ -4458,7 +4458,7 @@ void make_corpse(Character *ch)
 
   sprintf(buf, "the corpse of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "the corpse of %s",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4756,7 +4756,7 @@ void make_husk(Character *ch)
   corpse->name = str_hsh("husk");
   sprintf(buf, "The withered husk of %s, its soul drained, flutters here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
   sprintf(buf, "Husk of %s",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
@@ -4799,7 +4799,7 @@ void make_head(Character *ch)
 
   sprintf(buf, "The head of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Head of %s",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4845,7 +4845,7 @@ void make_arm(Character *ch)
 
   sprintf(buf, "The arm of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Arm of %s",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4891,7 +4891,7 @@ void make_leg(Character *ch)
 
   sprintf(buf, "The leg of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Leg of %s",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4937,7 +4937,7 @@ void make_bowels(Character *ch)
 
   sprintf(buf, "The steaming bowels of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Bowels of %s",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4983,7 +4983,7 @@ void make_blood(Character *ch)
 
   sprintf(buf, "A pool of %s's blood is here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Pooled blood of %s",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -5032,7 +5032,7 @@ void make_heart(Character *ch, Character *vict)
 
   sprintf(buf, "%s's heart is laying here.",
           (IS_NPC(vict) ? vict->short_desc : GET_NAME(vict)));
-  corpse->description = str_hsh(buf);
+  corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "the heart of %s",
           (IS_NPC(vict) ? vict->short_desc : GET_NAME(vict)));

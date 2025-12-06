@@ -995,7 +995,7 @@ void obj_stat(Character *ch, class Object *j)
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long description$R:\n\r%s\n\r",
           ((j->short_description) ? j->short_description : "None"),
-          ((j->description) ? j->description : "None"));
+          ((j->long_description) ? j->long_description : "None"));
   ch->send(buf);
   if (j->ex_description)
   {

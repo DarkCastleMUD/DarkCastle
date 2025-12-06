@@ -672,7 +672,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     containerobj->obj_flags.value[3] = 0;
     containerobj->name = str_dup(potionname.str().c_str());
     GET_OBJ_SHORT(containerobj) = str_dup(potionshort.str().c_str());
-    containerobj->description = str_dup(potionlong.str().c_str());
+    containerobj->long_description = str_dup(potionlong.str().c_str());
     // We set the item to custom so that it will save everytime uniquely
     SET_BIT(containerobj->obj_flags.more_flags, ITEM_CUSTOM);
 
@@ -1151,7 +1151,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     paperobj->obj_flags.value[3] = 0;
     paperobj->name = str_dup(scrollname.str().c_str());
     GET_OBJ_SHORT(paperobj) = str_dup(scrollshort.str().c_str());
-    paperobj->description = str_dup(scrolllong.str().c_str());
+    paperobj->long_description = str_dup(scrolllong.str().c_str());
 
     // We set the item to custom so that it will save uniquely every time
     SET_BIT(paperobj->obj_flags.more_flags, ITEM_CUSTOM);

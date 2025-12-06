@@ -588,7 +588,7 @@ int start_quest(Character *ch, struct quest_info *quest)
 
    obj = clone_object(real_object(quest->objnum));
    obj->short_description = str_hsh(quest->objshort);
-   obj->description = str_hsh(quest->objlong);
+   obj->long_description = str_hsh(quest->objlong);
 
    sprintf(buf, "%s %s q%d", quest->objkey, GET_NAME(ch), quest->number);
    obj->name = str_hsh(buf);
@@ -792,7 +792,7 @@ void quest_update()
                {
                   obj = clone_object(quest->objnum);
                   obj->short_description = str_hsh(quest->objshort);
-                  obj->description = str_hsh(quest->objlong);
+                  obj->long_description = str_hsh(quest->objlong);
                   sprintf(buf, "%s q%d", quest->objkey, quest->number);
                   obj->name = str_hsh(buf);
                   obj_to_char(obj, mob);

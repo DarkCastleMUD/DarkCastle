@@ -262,7 +262,7 @@ public:
     inline const char *getNameC(void) { return name; }
     QString getName(void) { return name; }
 
-    char *description = {};                       /* When in room                     */
+    char *long_description = {};                  /* When in room                     */
     char *short_description = {};                 /* when worn/carry/in cont.         */
     struct extra_descr_data *ex_description = {}; /* extra descriptions     */
     Character *carried_by = {};                   /* Carried by :NULL in room/conta   */

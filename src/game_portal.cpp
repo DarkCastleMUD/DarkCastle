@@ -209,8 +209,8 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   {
     from_portal->name = str_hsh("portal");
     from_portal->short_description = str_hsh("a path to a hidden world");
-    from_portal->description = str_hsh("A mystical path to a hidden world "
-                                       "shimmers in the air before you.");
+    from_portal->long_description = str_hsh("A mystical path to a hidden world "
+                                            "shimmers in the air before you.");
 
     from_portal->obj_flags.type_flag = ITEM_PORTAL;
     from_portal->item_number = (-1);

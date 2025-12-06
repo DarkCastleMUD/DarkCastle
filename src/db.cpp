@@ -3395,7 +3395,7 @@ auto DC::create_blank_item(int nr) -> std::expected<int, create_error>
 	clear_object(obj);
 	obj->name = str_hsh("empty obj");
 	obj->short_description = str_hsh("An empty obj");
-	obj->description = str_hsh("An empty obj sits here dejectedly.");
+	obj->long_description = str_hsh("An empty obj sits here dejectedly.");
 	obj->ActionDescription("Fixed.");
 	obj->in_room = DC::NOWHERE;
 	obj->next_content = 0;
@@ -3791,7 +3791,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
 	}
 
-	obj->description = fread_string(fl, 1);
+	obj->long_description = fread_string(fl, 1);
 
 	obj->ActionDescription(fread_string(fl, 1));
 	fl.skipWhiteSpace();
@@ -3952,7 +3952,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 		obj->short_description = tmpptr;
 	}
 
-	obj->description = fread_string(fl, 1);
+	obj->long_description = fread_string(fl, 1);
 	obj->ActionDescription(fread_string(fl, 1));
 	if ((!obj->ActionDescription().isEmpty() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~')) && !obj->ActionDescription()[0].isNull())
 	{
@@ -4100,7 +4100,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 	{
 		obj->short_description = tmpptr;
 	}
-	obj->description = fread_string(in, 1);
+	obj->long_description = fread_string(in, 1);
 	obj->ActionDescription(fread_string(in, 1));
 	obj->table = 0;
 	DC::getInstance()->currentVNUM(nr);
@@ -4199,7 +4199,7 @@ void write_object(LegacyFile &lf, Object *obj)
 	fprintf(fl, "#%d\n", DC::getInstance()->obj_index[obj->item_number].virt);
 	string_to_file(fl, obj->name);
 	string_to_file(fl, obj->short_description);
-	string_to_file(fl, obj->description);
+	string_to_file(fl, obj->long_description);
 	string_to_file(fl, obj->ActionDescription());
 
 	fprintf(fl, "%d %d %d %d\n"
@@ -4249,7 +4249,7 @@ std::ofstream &operator<<(std::ofstream &out, Object *obj)
 	out << "#" << DC::getInstance()->obj_index[obj->item_number].virt << "\n";
 	string_to_file(out, obj->name);
 	string_to_file(out, obj->short_description);
-	string_to_file(out, obj->description);
+	string_to_file(out, obj->long_description);
 	string_to_file(out, obj->ActionDescription());
 
 	out << int(obj->obj_flags.type_flag) << " "
@@ -4381,7 +4381,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 		fout << DC::getInstance()->obj_index[obj->item_number].virt << ",";
 		fout << "\"" << obj->name << "\",";
 		fout << "\"" << quotequotes(obj->short_description) << "\",";
-		fout << "\"" << quotequotes(obj->description) << "\",";
+		fout << "\"" << quotequotes(obj->long_description) << "\",";
 		fout << "\"" << quotequotes(obj->ActionDescription().toStdString().c_str()) << "\",";
 		fout << item_types[obj->obj_flags.type_flag].toStdString() << ",";
 		fout << obj->obj_flags.size << ",";
@@ -6150,7 +6150,7 @@ void clear_object(class Object *obj)
 	obj->affected = nullptr;
 
 	obj->name = nullptr;
-	obj->description = nullptr;
+	obj->long_description = nullptr;
 	obj->short_description = nullptr;
 	obj->ActionDescription(QString());
 	obj->ex_description = nullptr;
@@ -6706,9 +6706,9 @@ void copySaveData(Object *target, Object *source)
 	{
 		GET_OBJ_SHORT(target) = str_hsh(GET_OBJ_SHORT(source));
 	}
-	if (strcmp(source->description, target->description))
+	if (strcmp(source->long_description, target->long_description))
 	{
-		target->description = str_hsh(source->description);
+		target->long_description = str_hsh(source->long_description);
 	}
 
 	if (strcmp(source->name, target->name))

@@ -237,7 +237,7 @@ void write_object(Object *obj, auto &out)
   out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
   string_to_file(out, obj->name);
   string_to_file(out, obj->short_description);
-  string_to_file(out, obj->description);
+  string_to_file(out, obj->long_description);
   string_to_file(out, obj->ActionDescription());
   out << obj->obj_flags;
   out << obj->ex_description;

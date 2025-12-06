@@ -162,7 +162,7 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
 			"%d %d %d %d %d\n",
 			obj->name ? obj->name : "undefined",
 			obj->short_description ? obj->short_description : "undefined",
-			obj->description ? obj->description : "undefined",
+			obj->long_description ? obj->long_description : "undefined",
 			buf1,
 			GET_OBJ_TYPE(obj),
 			GET_OBJ_WEAR(obj),
@@ -373,15 +373,15 @@ void DC::load_corpses(void)
 					}
 				}
 
-				if ((temp->description = fread_string_new(fp, buf2)) == nullptr)
+				if ((temp->long_description = fread_string_new(fp, buf2)) == nullptr)
 				{
-					temp->description = "undefined";
+					temp->long_description = "undefined";
 				}
 				else
 				{
 					if (debug == 1)
 					{
-						sprintf(buf3, "   -DESC: %s\n", temp->description);
+						sprintf(buf3, "   -DESC: %s\n", temp->long_description);
 						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 					}
 				}

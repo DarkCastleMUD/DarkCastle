@@ -216,8 +216,8 @@ void Character::show_obj_to_char(class Object *object, int mode)
       return;
 
    buffer[0] = '\0';
-   if ((mode == 0) && object->description)
-      strcpy(buffer, object->description);
+   if ((mode == 0) && object->long_description)
+      strcpy(buffer, object->long_description);
    else if (object->short_description && ((mode == 1) ||
                                           (mode == 2) || (mode == 3) || (mode == 4)))
       strcpy(buffer, object->short_description);

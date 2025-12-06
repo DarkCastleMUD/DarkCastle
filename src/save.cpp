@@ -1218,7 +1218,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->description = str_hsh(buf);
+    obj->long_description = str_hsh(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("SDE", mod_type))
@@ -1514,12 +1514,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->name, sizeof(char), length, fpsave);
   }
-  if (obj->description && strcmp(obj->description, standard_obj->description))
+  if (obj->long_description && strcmp(obj->long_description, standard_obj->long_description))
   {
     fwrite("DES", sizeof(char), 3, fpsave);
-    length = strlen(obj->description);
+    length = strlen(obj->long_description);
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(obj->description, sizeof(char), length, fpsave);
+    fwrite(obj->long_description, sizeof(char), length, fpsave);
   }
   if (obj->short_description && strcmp(obj->short_description, standard_obj->short_description))
   {

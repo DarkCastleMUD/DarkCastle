@@ -303,7 +303,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 			ch->desc->hashstr = &obj->short_description;
 			break;
 		case 3:
-			ch->desc->hashstr = &obj->description;
+			ch->desc->hashstr = &obj->long_description;
 			break;
 		case 4:
 			// TODO - remove this when the obj pfile saving keeps track of extra descs

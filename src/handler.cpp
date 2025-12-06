@@ -3370,7 +3370,7 @@ int obj_to_room(class Object *object, int room)
 			if (GET_ITEM_TYPE(obj) == ITEM_MONEY)
 			{
 				object->obj_flags.value[0] += obj->obj_flags.value[0];
-				object->description = str_hsh("A pile of $B$5gold$R coins.");
+				object->long_description = str_hsh("A pile of $B$5gold$R coins.");
 				extract_obj(obj);
 				break;
 			}
@@ -4698,7 +4698,7 @@ class Object *create_money(int amount)
 	{
 		obj->name = str_hsh("coin gold");
 		obj->short_description = str_hsh("a gold coin");
-		obj->description = str_hsh("One miserable gold coin.");
+		obj->long_description = str_hsh("One miserable gold coin.");
 
 		new_new_descr->keyword = str_hsh("coin gold");
 		new_new_descr->description = str_hsh("One miserable gold coin.");
@@ -4707,7 +4707,7 @@ class Object *create_money(int amount)
 	{
 		obj->name = str_hsh("coins gold");
 		obj->short_description = str_hsh("gold coins");
-		obj->description = str_hsh("A pile of gold coins.");
+		obj->long_description = str_hsh("A pile of gold coins.");
 
 		new_new_descr->keyword = str_hsh("coins gold");
 		new_new_descr->description = str_hsh("They look like coins...of gold...duh.");

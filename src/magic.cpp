@@ -6546,10 +6546,10 @@ void make_portal(Character *ch, Character *vict)
   ch_portal->short_description = str_hsh("an extradimensional portal");
   vict_portal->short_description = str_hsh("an extradimensional portal");
 
-  ch_portal->description = str_hsh("An extradimensional portal shimmers in "
-                                   "the air before you.");
-  vict_portal->description = str_hsh("An extradimensional portal shimmers in "
-                                     "the air before you.");
+  ch_portal->long_description = str_hsh("An extradimensional portal shimmers in "
+                                        "the air before you.");
+  vict_portal->long_description = str_hsh("An extradimensional portal shimmers in "
+                                          "the air before you.");
 
   ch_portal->obj_flags.type_flag = ITEM_PORTAL;
   vict_portal->obj_flags.type_flag = ITEM_PORTAL;
@@ -15791,7 +15791,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
   }
   sprintf(buf, "%s",
           "A circle of ominously humming blood runes are etched upon the ground here.");
-  cItem->description = str_hsh(buf);
+  cItem->long_description = str_hsh(buf);
   cItem->obj_flags.value[0] = spl;
   cItem->obj_flags.value[1] = 2 + skill / 50;
   cItem->obj_flags.value[2] = skill;
