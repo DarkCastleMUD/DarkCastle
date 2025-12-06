@@ -407,7 +407,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("stat"), do_stat, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("redit"), do_redit, position_t::DEAD, ANGEL, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("guild"), do_guild, position_t::DEAD, ANGEL, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
-        Command(QStringLiteral("oedit"), do_oedit, position_t::DEAD, ANGEL, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
+        Command(QStringLiteral("oedit"), &Character::do_oedit, position_t::DEAD, ANGEL, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("clear"), do_clear, position_t::DEAD, ANGEL, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("repop"), do_repop, position_t::DEAD, ANGEL, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("medit"), do_medit, position_t::DEAD, ANGEL, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),

@@ -410,7 +410,6 @@ command_return_t generic_command(Character *ch, char *argument, cmd_t cmd = cmd_
 
 command_return_t do_oclone(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_mclone(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
-command_return_t do_oedit(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_offer(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_olocate(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_oneway(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);

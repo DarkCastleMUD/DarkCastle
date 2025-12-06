@@ -2405,9 +2405,8 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
 
 	if (r2 < 0)
 	{
-		char buf[30];
-		sprintf(buf, "new %d", v2);
-		int retval = do_oedit(ch, buf);
+		QString buf = QStringLiteral("new %1").arg(v2);
+		int retval = ch->do_oedit(buf.split(' '));
 		if (!isSet(retval, eSUCCESS))
 			return eFAILURE;
 		r1 = real_object(v1);

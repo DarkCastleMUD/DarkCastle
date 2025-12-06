@@ -944,6 +944,51 @@ public:
     command_return_t do_config(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_experience(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_split(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    /*
+    command_return_t do_oedit_new(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    template <typename T>
+    command_return_t do_oedit_generic(T **obj_field, QString fieldname, QString desc, QStringList arguments)
+    {
+        assert(obj_field);
+
+        if (arguments.isEmpty())
+        {
+            send(QStringLiteral("$3%1$R: ").arg(desc));
+            if (*obj_field)
+                sendln(QStringLiteral("%1").arg(*obj_field));
+
+            sendln(QStringLiteral("$3Syntax$R: oedit [obj vnum] %1 <value>").arg(fieldname));
+            return eFAILURE;
+        }
+        char *str_hsh(const char *);
+        *obj_field = str_hsh(qPrintable(arguments.join(' ')));
+        sendln(QStringLiteral("Item %1 set to '%2'.").arg(fieldname).arg(*obj_field));
+        return eSUCCESS;
+    }
+
+    command_return_t do_oedit_keywords(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_longdesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_shortdesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_actiondesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_type(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_wear(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_size(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_extra(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_weight(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_value(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_moreflags(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_level(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_v1(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_v2(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_v3(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_v4(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_affects(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_exdesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_delete(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_timer(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_description(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    */
+    command_return_t do_oedit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_zsave(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_wizhelp(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_goto(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);

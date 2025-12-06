@@ -1997,7 +1997,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
   return eSUCCESS;
 }
 
-int do_oedit(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH] = {};
   char buf2[MAX_INPUT_LENGTH] = {};
@@ -2035,10 +2035,10 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
           "description",
           "\n"};
 
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  half_chop(argument, buf, buf2);
+  half_chop(qPrintable(arguments.join(' ')), buf, buf2);
   half_chop(buf2, buf3, buf4);
 
   // at this point, buf  = item_num
@@ -2059,8 +2059,8 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
                  "         oedit [obj vnum] [field] [arg] -- Change that field\n\r"
                  "         oedit [field] [arg]            -- Change that field using last vnum\n\r\n\r"
                  "The field must be one of the following:\n\r",
-                 ch);
-    ch->display_string_list(fields);
+                 this);
+    display_string_list(fields);
     return eFAILURE;
   }
 
@@ -2078,23 +2078,23 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
     rnum = real_object(vnum);
     if (rnum < 0 || vnum < 1)
     {
-      ch->sendln("Invalid item number.");
+      sendln("Invalid item number.");
       return eSUCCESS;
     }
 
-    if (ch->player->last_obj_vnum != vnum)
+    if (player->last_obj_vnum != vnum)
     {
-      ch->send(fmt::format("$3Current obj set to:$R {}\r\n", vnum));
-      ch->player->last_obj_vnum = vnum;
+      send(fmt::format("$3Current obj set to:$R {}\r\n", vnum));
+      player->last_obj_vnum = vnum;
     }
   }
   else
   {
-    vnum = ch->player->last_obj_vnum;
+    vnum = player->last_obj_vnum;
     rnum = real_object(vnum);
     if (rnum < 0 || vnum < 1)
     {
-      ch->sendln("Invalid item number.");
+      sendln("Invalid item number.");
       return eSUCCESS;
     }
 
@@ -2114,7 +2114,7 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
 
   if (!*buf3) // no field.  Stat the item.
   {
-    obj_stat(ch, (Object *)DC::getInstance()->obj_index[rnum].item);
+    obj_stat(this, (Object *)DC::getInstance()->obj_index[rnum].item);
     return eSUCCESS;
   }
 
@@ -2123,7 +2123,7 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (fields[x][0] == '\n')
     {
-      ch->sendln("Invalid field.");
+      sendln("Invalid field.");
       return eFAILURE;
     }
     if (is_abbrev(buf3, fields[x]))
@@ -2132,9 +2132,9 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
 
   // a this point, item_num is the index
   if (x != 18) // Checked in there
-    if (!can_modify_object(ch, vnum))
+    if (!can_modify_object(this, vnum))
     {
-      ch->sendln("You are unable to work creation outside of your range.");
+      sendln("You are unable to work creation outside of your range.");
       return eFAILURE;
     }
 
@@ -2146,12 +2146,12 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] keywords <new_keywords>");
+      sendln("$3Syntax$R: oedit [item_num] keywords <new_keywords>");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->name = str_hsh(buf4);
     sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2160,12 +2160,12 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] longdesc <new_desc>");
+      sendln("$3Syntax$R: oedit [item_num] longdesc <new_desc>");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->long_description = str_hsh(buf4);
     sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2174,12 +2174,12 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] shortdesc <new_desc>");
+      sendln("$3Syntax$R: oedit [item_num] shortdesc <new_desc>");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->short_description = str_hsh(buf4);
     sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2188,12 +2188,12 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] actiondesc <new_desc>");
+      sendln("$3Syntax$R: oedit [item_num] actiondesc <new_desc>");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->ActionDescription(buf4);
     sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2204,20 +2204,20 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
     {
       send_to_char("$3Syntax$R: oedit [item_num] type <>\n\r"
                    "$3Current$R: ",
-                   ch);
+                   this);
       snprintf(buf, sizeof(buf), "%s\n", item_types[((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag].toStdString().c_str());
-      ch->send(buf);
-      ch->sendln("\r\n$3Valid types$R:");
+      send(buf);
+      sendln("\r\n$3Valid types$R:");
 
       for (i = 1; i < item_types.size(); i++)
       {
-        ch->send(QStringLiteral("%1) %2\r\n").arg(i, 3).arg(item_types[i]));
+        send(QStringLiteral("%1) %2\r\n").arg(i, 3).arg(item_types[i]));
       }
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 1, ITEM_TYPE_MAX))
     {
-      ch->sendln("Value out of valid range.");
+      sendln("Value out of valid range.");
       return eFAILURE;
     }
     if (intval == 24)
@@ -2230,7 +2230,7 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag = intval;
     sprintf(buf, "Item type set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2241,17 +2241,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
     {
       send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\n\r"
                    "$3Current$R: ",
-                   ch);
+                   this);
       sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags, Object::wear_bits, buf);
-      ch->send(buf);
-      ch->sendln("\r\n$3Valid types$R:");
+      send(buf);
+      sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::wear_bits.size(); i++)
       {
-        ch->send(QStringLiteral("  %1\r\n").arg(Object::wear_bits[i]));
+        send(QStringLiteral("  %1\r\n").arg(Object::wear_bits[i]));
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), ch, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags);
+    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), this, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags);
   }
   break;
 
@@ -2262,19 +2262,19 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
     {
       send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\n\r"
                    "$3Current$R: ",
-                   ch);
+                   this);
       sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.size,
                 size_bitfields, buf);
-      ch->send(buf);
-      ch->sendln("\r\n$3Valid types$R:");
+      send(buf);
+      sendln("\r\n$3Valid types$R:");
       for (i = 0; *size_bitfields[i] != '\n'; i++)
       {
         sprintf(buf, "  %s\n\r", size_bitfields[i]);
-        ch->send(buf);
+        send(buf);
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(size_bitfields, buf4, ch,
+    parse_bitstrings_into_int(size_bitfields, buf4, this,
                               ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.size);
   }
   break;
@@ -2286,17 +2286,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
     {
       send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\n\r"
                    "$3Current$R: ",
-                   ch);
+                   this);
       sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.extra_flags, Object::extra_bits, buf);
-      ch->send(buf);
-      ch->sendln("\r\n$3Valid types$R:");
+      send(buf);
+      sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::extra_bits.size(); i++)
       {
-        ch->send(QStringLiteral("  %1\r\n").arg(Object::extra_bits[i]));
+        send(QStringLiteral("  %1\r\n").arg(Object::extra_bits[i]));
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.extra_flags);
+    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), this, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.extra_flags);
   }
   break;
 
@@ -2305,17 +2305,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] weight <>");
+      sendln("$3Syntax$R: oedit [item_num] weight <>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 99999))
     {
-      ch->sendln("Value out of valid range.");
+      sendln("Value out of valid range.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.weight = intval;
     sprintf(buf, "Item weight set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2324,17 +2324,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] value <>");
+      sendln("$3Syntax$R: oedit [item_num] value <>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 5000000))
     {
-      ch->sendln("Value out of valid range.");
+      sendln("Value out of valid range.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.cost = intval;
     sprintf(buf, "Item value set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2345,17 +2345,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
     {
       send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\n\r"
                    "$3Current$R: ",
-                   ch);
+                   this);
       sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.more_flags, Object::more_obj_bits, buf);
-      ch->send(buf);
-      ch->sendln("\r\n$3Valid types$R:");
+      send(buf);
+      sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::more_obj_bits.size(); i++)
       {
-        ch->send(QStringLiteral("  %1\r\n").arg(Object::more_obj_bits[i]));
+        send(QStringLiteral("  %1\r\n").arg(Object::more_obj_bits[i]));
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), ch, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.more_flags);
+    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), this, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.more_flags);
   }
   break;
 
@@ -2364,17 +2364,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [vnum] level <>");
+      sendln("$3Syntax$R: oedit [vnum] level <>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 110))
     {
-      ch->sendln("Value out of valid range.");
+      sendln("Value out of valid range.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.eq_level = intval;
     sprintf(buf, "Item minimum level set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2383,17 +2383,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [vnum] 1value <num>");
+      sendln("$3Syntax$R: oedit [vnum] 1value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
     {
-      ch->sendln("Please specifiy a valid number.");
+      sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[0] = intval;
     sprintf(buf, "Item value 1 set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2402,17 +2402,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [vnum] 2value <num>");
+      sendln("$3Syntax$R: oedit [vnum] 2value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
     {
-      ch->sendln("Please specifiy a valid number.");
+      sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[1] = intval;
     sprintf(buf, "Item value 2 set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2421,17 +2421,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [vnum] 3value <num>");
+      sendln("$3Syntax$R: oedit [vnum] 3value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
     {
-      ch->sendln("Please specifiy a valid number.");
+      sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[2] = intval;
     sprintf(buf, "Item value 3 set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
@@ -2440,31 +2440,31 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [vnum] 4value <num>");
+      sendln("$3Syntax$R: oedit [vnum] 4value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
     {
-      ch->sendln("Please specifiy a valid number.");
+      sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[3] = intval;
     sprintf(buf, "Item value 4 set to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
 
   /* affects */
   case 16:
   {
-    return oedit_affects(ch, rnum, buf4);
+    return oedit_affects(this, rnum, buf4);
     break;
   }
 
   // exdesc
   case 17:
   {
-    return oedit_exdesc(ch, rnum, buf4);
+    return oedit_exdesc(this, rnum, buf4);
     break;
   }
 
@@ -2473,43 +2473,43 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit new [vnum]");
+      sendln("$3Syntax$R: oedit new [vnum]");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 35000))
     {
-      ch->sendln("Please specifiy a valid number.");
+      sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
     /*        if (real_object(intval) <= 0)
             {
-        ch->sendln("Object already exists.");
+        sendln("Object already exists.");
         return eFAILURE;
       }
          */
-    /*if (!ch->has_skill( COMMAND_RANGE))
+    /*if (!has_skill( COMMAND_RANGE))
     {
-      ch->sendln("You cannot create items.");
+      sendln("You cannot create items.");
       return eFAILURE;
     }*/
-    if (!can_modify_object(ch, intval))
+    if (!can_modify_object(this, intval))
     {
-      ch->sendln("You cannot create items in that range.");
+      sendln("You cannot create items in that range.");
       return eFAILURE;
     }
     /*
-            if(!can_modify_object(ch, intval)) {
-              ch->sendln("You are unable to work creation outside of your range.");
+            if(!can_modify_object(this, intval)) {
+              sendln("You are unable to work creation outside of your range.");
               return eFAILURE;
             }
     */
-    auto x = ch->getDC()->create_blank_item(intval);
+    auto x = getDC()->create_blank_item(intval);
     if (!x.has_value())
     {
-      ch->send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists. %2\r\n").arg(intval).arg(QVariant::fromValue(x.error()).toString()));
+      send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists. %2\r\n").arg(intval).arg(QVariant::fromValue(x.error()).toString()));
       return eFAILURE;
     }
-    ch->send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));
+    send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));
     break;
   }
 
@@ -2518,12 +2518,12 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4 || strncmp(buf4, "yesiwanttodeletethisitem", 24))
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] delete yesiwanttodeletethisitem");
-      ch->sendln("\r\nDeleting an item is $3permanent$R and will cause ALL copies of");
-      ch->sendln("that items in the world to disappear.  Logged out players will lose the");
-      ch->sendln("item upon logging in as long as no other items is created with that number.");
-      ch->sendln("(Creating a new items with that number will cause the others to remain on");
-      ch->sendln("the player.)");
+      sendln("$3Syntax$R: oedit [item_num] delete yesiwanttodeletethisitem");
+      sendln("\r\nDeleting an item is $3permanent$R and will cause ALL copies of");
+      sendln("that items in the world to disappear.  Logged out players will lose the");
+      sendln("item upon logging in as long as no other items is created with that number.");
+      sendln("(Creating a new items with that number will cause the others to remain on");
+      sendln("the player.)");
       return eFAILURE;
     }
 
@@ -2570,14 +2570,14 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
 
     // remove the item from index
     delete_item_from_index(rnum);
-    ch->sendln("Item deleted.");
+    sendln("Item deleted.");
     break;
   }
 
   // stat
   case 20:
   {
-    obj_stat(ch, (Object *)DC::getInstance()->obj_index[rnum].item);
+    obj_stat(this, (Object *)DC::getInstance()->obj_index[rnum].item);
     return eSUCCESS;
     break;
   }
@@ -2585,17 +2585,17 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      ch->sendln("$3Syntax$R: oedit [item_num] 3value <num>");
+      sendln("$3Syntax$R: oedit [item_num] 3value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
     {
-      ch->sendln("Please specifiy a valid number.");
+      sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
     ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.timer = intval;
     sprintf(buf, "Item timer to %d.\r\n", intval);
-    ch->send(buf);
+    send(buf);
   }
   break;
   case 22:
@@ -2611,13 +2611,13 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
       curr->next = ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description;
       ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description = curr;
     }
-    ch->sendln("Write your object's description. End with /s.");
-    ch->desc->connected = Connection::states::EDITING;
-    ch->desc->strnew = &(curr->description);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    sendln("Write your object's description. End with /s.");
+    desc->connected = Connection::states::EDITING;
+    desc->strnew = &(curr->description);
+    desc->max_str = MAX_MESSAGE_LENGTH;
     break;
   default:
-    ch->sendln("Illegal value, tell pir.");
+    sendln("Illegal value, tell a coder.");
     break;
   }
 
