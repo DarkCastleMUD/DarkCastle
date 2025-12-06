@@ -52,9 +52,6 @@ vault_search_parameter::~vault_search_parameter()
 int total_vaults = 0;
 int get_line(FILE *fl, char *buf);
 
-void item_remove(Object *obj, struct vault_data *vault);
-void item_add(int vnum, struct vault_data *vault);
-
 Character *find_owner(QString name);
 void vault_log(Character *ch, char *owner);
 QString clanVName(uint64_t clan_id);
