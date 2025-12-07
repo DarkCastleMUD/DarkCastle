@@ -27,6 +27,7 @@
 #include "DC/race.h"
 #include "DC/returnvals.h"
 #include "DC/clan.h" // vault stuff
+#include "DC/const.h"
 
 extern const char *drinks[];
 extern const char *dirs[];
@@ -2244,6 +2245,19 @@ int Object::keywordfind(void)
   else if (CAN_WEAR(obj_object, ITEM_WEAR_EAR))
     keyword = 15;
   return keyword;
+}
+
+QString Object::TypeString(void)
+{
+  return item_types.value(Type());
+}
+
+bool Object::TypeString(QString type)
+{
+  if (Type(item_types.indexOf(type.toUpper())))
+    return true;
+  else
+    return false;
 }
 
 int do_wear(Character *ch, char *argument, cmd_t cmd)

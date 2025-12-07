@@ -217,6 +217,23 @@ struct obj_flag_data
     level_t eq_level = {};        /* Min level to use it for eq       */
     int16_t timer = {};           /* Timer for object                 */
     Character *origin = {};       /* Creator of object, previously was stored at value[3] */
+    bool Value(qsizetype i, object_value_t v)
+    {
+        if (i >= 0 && i < 4)
+        {
+            value[i] = v;
+            return true;
+        }
+        return false;
+    }
+    object_value_t Value(qsizetype i)
+    {
+        if (i >= 0 && i < 4)
+        {
+            return value[i];
+        }
+        return {};
+    }
 };
 
 typedef int32_t location_t;
@@ -504,11 +521,33 @@ public:
     {
         return !isSet(obj_flags.more_flags, ITEM_NO_TRADE);
     }
-    void ActionDescription(QString action_description)
+    bool ActionDescription(QString action_description)
     {
         action_description_ = action_description;
+        if (action_description.isEmpty())
+            return false;
+        else
+            return true;
     }
     QString ActionDescription(void) { return action_description_; }
+    object_type_t Type(void) { return obj_flags.type_flag; }
+    QString TypeString(void);
+    bool Type(object_type_t type)
+    {
+        if (type >= ITEM_TYPE_MAX)
+        {
+            type = 0;
+            obj_flags.Value(2, 0);
+            return false;
+        }
+        obj_flags.type_flag = type;
+        if (obj_flags.type_flag == 24)
+            obj_flags.Value(2, -1);
+        else
+            obj_flags.Value(2, 0);
+        return true;
+    }
+    bool TypeString(QString type);
 
 private:
     QString owner_;
