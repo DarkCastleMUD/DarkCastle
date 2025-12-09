@@ -944,51 +944,104 @@ public:
     command_return_t do_config(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_experience(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_split(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    /*
-    command_return_t do_oedit_new(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    template <typename T>
-    command_return_t do_oedit_generic(T **obj_field, QString fieldname, QString desc, QStringList arguments)
+
+    command_return_t do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
     {
-        assert(obj_field);
+        sendln(QStringLiteral("$3%1$R: %2").arg(desc).arg(value));
 
-        if (arguments.isEmpty())
-        {
-            send(QStringLiteral("$3%1$R: ").arg(desc));
-            if (*obj_field)
-                sendln(QStringLiteral("%1").arg(*obj_field));
+        auto command = dc_->CMD_.find(cmd);
+        if (command)
+            sendln(QStringLiteral("$3Syntax$R: %1 [vnum] %2 <value>").arg(command->getName()).arg(fieldname));
 
-            sendln(QStringLiteral("$3Syntax$R: oedit [obj vnum] %1 <value>").arg(fieldname));
-            return eFAILURE;
-        }
-        char *str_hsh(const char *);
-        *obj_field = str_hsh(qPrintable(arguments.join(' ')));
-        sendln(QStringLiteral("Item %1 set to '%2'.").arg(fieldname).arg(*obj_field));
         return eSUCCESS;
     }
 
-    command_return_t do_oedit_keywords(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_longdesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_shortdesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_actiondesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_type(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_wear(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_size(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_extra(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_weight(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_value(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_moreflags(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_level(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_v1(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_v2(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_v3(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_v4(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_affects(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_exdesc(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_delete(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_timer(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    command_return_t do_oedit_description(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
-    */
+    command_return_t do_edit_generic(auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+    {
+        if (arguments.isEmpty())
+            return do_edit_generic_show(getfnc(), fieldname, desc, arguments, cmd);
+
+        setfnc(arguments.join(' '));
+        sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(getfnc()));
+        return eSUCCESS;
+    }
+
+    command_return_t do_edit_generic(auto *entity, auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+    {
+        if (!entity)
+            return eFAILURE;
+
+        auto getter = [entity, getfnc]()
+        {
+            return (*entity.*(getfnc))();
+        };
+        auto setter = [entity, setfnc](QString value)
+        {
+            return (*entity.*(setfnc))(value);
+        };
+
+        return do_edit_generic(getter, setter, fieldname, desc, arguments, cmd);
+    }
+
+    command_return_t do_edit_generic(auto **field, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+    {
+        if (!field)
+            return eFAILURE;
+
+        auto getter = [field]()
+        {
+            return QString(*field);
+        };
+        auto setter = [field](QString value)
+        {
+            char *str_hsh(const char *);
+            *field = str_hsh(qPrintable(value));
+        };
+        return do_edit_generic(getter, setter, fieldname, desc, arguments, cmd);
+    }
+
+    template <typename T>
+    command_return_t do_edit_generic_numeric(auto *entity, auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+    {
+        if (!entity)
+            return eFAILURE;
+
+        if (arguments.isEmpty())
+        {
+            do_edit_generic_show((*entity.*(getfnc))(), fieldname, desc, arguments, cmd);
+            sendln(QStringLiteral("$3Valid types$R:"));
+
+            extern item_types_t item_types;
+            uint64_t longest_typename{};
+            for (const auto &type : item_types)
+                if (longest_typename < type.length())
+                    longest_typename = type.length();
+
+            uint8_t column = 1;
+            for (const auto &type : item_types)
+            {
+                send(QStringLiteral("%1").arg(type.toLower(), longest_typename));
+                if (!(column++ % 3))
+                    sendln();
+                else
+                    send("   ");
+            }
+            sendln();
+            return eFAILURE;
+        }
+
+        if ((!(*entity.*(setfnc))(arguments.join(' ').toLower())))
+        {
+            sendln(QStringLiteral("Invalid input."));
+            return eFAILURE;
+        }
+        sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(arguments.join(' ').toLower()));
+        return eSUCCESS;
+    }
+
     command_return_t do_oedit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_new(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_oedit_delete(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_zsave(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_wizhelp(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_goto(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
