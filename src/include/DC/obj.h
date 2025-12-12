@@ -263,6 +263,9 @@ public:
         No_Enter = 1 << 1
     };
 
+    typedef QString (Object::*getter_t)(void);
+    typedef bool (Object::*setter_t)(QString);
+
     static const QStringList wear_bits;
     static const QStringList size_bits;
     static const QStringList more_obj_bits;
