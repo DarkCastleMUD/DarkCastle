@@ -343,11 +343,27 @@ int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
 int64_t fread_int(std::ifstream &in, int64_t beg_range, int64_t end_range);
 template <class T>
 T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max());
-uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
+
+uint64_t fread_uint(FILE *fl, uint64_t minval = std::numeric_limits<uint64_t>::min(), uint64_t maxval = std::numeric_limits<uint64_t>::max());
+uint64_t fread_uint(auto &in, uint64_t minval = std::numeric_limits<uint64_t>::min(), uint64_t maxval = std::numeric_limits<uint64_t>::max())
+{
+  uint64_t val;
+  in >> val;
+  return val;
+}
+
 char fread_char(FILE *fl);
 char fread_char(QTextStream &fl);
 int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
 int fread_bitvector(std::ifstream &fl, int32_t minval, int32_t maxval);
+template <class T>
+T fread_bitvector(auto &in)
+{
+  auto value = fread_uint(in);
+  T flags = T::fromInt(value);
+
+  return flags;
+}
 
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
