@@ -68,25 +68,25 @@ class Character;
 
 /* Bitvector For 'wear_flags' */
 
-#define ITEM_TAKE 1
-#define ITEM_WEAR_FINGER 2
-#define ITEM_WEAR_NECK 4
-#define ITEM_WEAR_BODY 8
-#define ITEM_WEAR_HEAD 16
-#define ITEM_WEAR_LEGS 32
-#define ITEM_WEAR_FEET 64
-#define ITEM_WEAR_HANDS 128
-#define ITEM_WEAR_ARMS 256
-#define ITEM_WEAR_SHIELD 512
-#define ITEM_WEAR_ABOUT 1024
-#define ITEM_WEAR_WAISTE 2048
-#define ITEM_WEAR_WRIST 4096
-#define ITEM_WEAR_WIELD 8192
-#define ITEM_WEAR_HOLD 16384
-#define ITEM_THROW 32768
-#define ITEM_LIGHT_SOURCE 65536
-#define ITEM_WEAR_FACE 131072
-#define ITEM_WEAR_EAR 262144
+#define TAKE 1
+#define FINGER 2
+#define NECK 4
+#define BODY 8
+#define HEAD 16
+#define LEGS 32
+#define FEET 64
+#define HANDS 128
+#define ARMS 256
+#define SHIELD 512
+#define ABOUT 1024
+#define WAISTE 2048
+#define WRIST 4096
+#define WIELD 8192
+#define HOLD 16384
+#define THROW 32768
+#define LIGHT_SOURCE 65536
+#define FACE 131072
+#define EAR 262144
 
 /* Bitvector for 'extra_flags' */
 

@@ -1700,7 +1700,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   {
   case 0:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_FINGER))
+    if (CAN_WEAR(obj_object, FINGER))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FINGER_L))
         ch->sendln("You cannot wear this.");
@@ -1734,7 +1734,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 1:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_NECK))
+    if (CAN_WEAR(obj_object, NECK))
     {
       if (charmie_restricted(ch, obj_object, WEAR_NECK_1))
         ch->sendln("You cannot wear this.");
@@ -1764,7 +1764,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 2:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_BODY))
+    if (CAN_WEAR(obj_object, BODY))
     {
       if (charmie_restricted(ch, obj_object, WEAR_BODY))
         ch->sendln("You cannot wear this.");
@@ -1785,7 +1785,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 3:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_HEAD))
+    if (CAN_WEAR(obj_object, HEAD))
     {
       if (charmie_restricted(ch, obj_object, WEAR_HEAD))
         ch->sendln("You cannot wear this.");
@@ -1806,7 +1806,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 4:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_LEGS))
+    if (CAN_WEAR(obj_object, LEGS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_LEGS))
         ch->sendln("You cannot wear this.");
@@ -1827,7 +1827,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 5:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_FEET))
+    if (CAN_WEAR(obj_object, FEET))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FEET))
         ch->sendln("You cannot wear this.");
@@ -1848,7 +1848,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 6:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_HANDS))
+    if (CAN_WEAR(obj_object, HANDS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_HANDS))
         ch->sendln("You cannot wear this.");
@@ -1869,7 +1869,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 7:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_ARMS))
+    if (CAN_WEAR(obj_object, ARMS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_ARMS))
         ch->sendln("You cannot wear this.");
@@ -1890,7 +1890,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 8:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_ABOUT))
+    if (CAN_WEAR(obj_object, ABOUT))
     {
       if (charmie_restricted(ch, obj_object, WEAR_ABOUT))
         ch->sendln("You cannot wear this.");
@@ -1911,7 +1911,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 9:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_WAISTE))
+    if (CAN_WEAR(obj_object, WAISTE))
     {
       if (charmie_restricted(ch, obj_object, WEAR_WAISTE))
         ch->sendln("You cannot wear this.");
@@ -1932,7 +1932,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case 10:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_WRIST))
+    if (CAN_WEAR(obj_object, WRIST))
     {
       if (charmie_restricted(ch, obj_object, WEAR_WRIST_L))
         ch->sendln("You cannot wear this.");
@@ -1966,7 +1966,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   case 11:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_FACE))
+    if (CAN_WEAR(obj_object, FACE))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FACE))
         ch->sendln("You cannot wear this.");
@@ -1987,7 +1987,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
 
   case 12:
-    if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
+    if (CAN_WEAR(obj_object, WIELD))
     {
       if (!ch->equipment[WEAR_WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, attribute_t::STRENGTH)) &&
           !ISSET(ch->affected_by, AFF_POWERWIELD))
@@ -2024,7 +2024,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   case 13:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_SHIELD))
+    if (CAN_WEAR(obj_object, SHIELD))
     {
       if (charmie_restricted(ch, obj_object, WEAR_SHIELD))
         ch->sendln("You cannot wear this.");
@@ -2054,7 +2054,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
 
   case 14:
-    if (CAN_WEAR(obj_object, ITEM_WEAR_HOLD))
+    if (CAN_WEAR(obj_object, HOLD))
     {
 
       if (charmie_restricted(ch, obj_object, WEAR_HOLD))
@@ -2086,7 +2086,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   case 15:
   {
-    if (CAN_WEAR(obj_object, ITEM_WEAR_EAR))
+    if (CAN_WEAR(obj_object, EAR))
     {
       if (charmie_restricted(ch, obj_object, WEAR_EAR_L))
         ch->sendln("You cannot wear this.");
@@ -2144,7 +2144,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
 
   case 17: // primary
-    if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
+    if (CAN_WEAR(obj_object, WIELD))
     {
       // if not wielding anything, just call regular wield
       if (!ch->equipment[WEAR_WIELD])
@@ -2212,37 +2212,37 @@ int Object::keywordfind(void)
   int keyword;
 
   keyword = -2;
-  if (CAN_WEAR(obj_object, ITEM_WEAR_FINGER))
+  if (CAN_WEAR(obj_object, FINGER))
     keyword = 0;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_NECK))
+  else if (CAN_WEAR(obj_object, NECK))
     keyword = 1;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_BODY))
+  else if (CAN_WEAR(obj_object, BODY))
     keyword = 2;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_HEAD))
+  else if (CAN_WEAR(obj_object, HEAD))
     keyword = 3;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_LEGS))
+  else if (CAN_WEAR(obj_object, LEGS))
     keyword = 4;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_FEET))
+  else if (CAN_WEAR(obj_object, FEET))
     keyword = 5;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_HANDS))
+  else if (CAN_WEAR(obj_object, HANDS))
     keyword = 6;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_ARMS))
+  else if (CAN_WEAR(obj_object, ARMS))
     keyword = 7;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_ABOUT))
+  else if (CAN_WEAR(obj_object, ABOUT))
     keyword = 8;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_WAISTE))
+  else if (CAN_WEAR(obj_object, WAISTE))
     keyword = 9;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_WRIST))
+  else if (CAN_WEAR(obj_object, WRIST))
     keyword = 10;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_FACE))
+  else if (CAN_WEAR(obj_object, FACE))
     keyword = 11;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
+  else if (CAN_WEAR(obj_object, WIELD))
     keyword = 12;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_SHIELD))
+  else if (CAN_WEAR(obj_object, SHIELD))
     keyword = 13;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_HOLD))
+  else if (CAN_WEAR(obj_object, HOLD))
     keyword = 14;
-  else if (CAN_WEAR(obj_object, ITEM_WEAR_EAR))
+  else if (CAN_WEAR(obj_object, EAR))
     keyword = 15;
   return keyword;
 }

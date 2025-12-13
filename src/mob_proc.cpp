@@ -1969,7 +1969,7 @@ int janitor(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
     {
-        if (isSet(i->obj_flags.wear_flags, ITEM_TAKE) &&
+        if (isSet(i->obj_flags.wear_flags, TAKE) &&
             GET_OBJ_WEIGHT(i) < 20 &&
             !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
             DC::getInstance()->obj_index[i->item_number].virt != CHAMPION_ITEM)

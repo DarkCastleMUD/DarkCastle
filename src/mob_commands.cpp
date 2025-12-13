@@ -588,7 +588,7 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
     randomize_object(obj);
   }
 
-  if (CAN_WEAR(obj, ITEM_TAKE))
+  if (CAN_WEAR(obj, TAKE))
   {
     obj_to_char(obj, ch);
   }

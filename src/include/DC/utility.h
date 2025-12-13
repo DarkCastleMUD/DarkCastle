@@ -347,8 +347,8 @@ inline const short IS_ANONYMOUS(Character *ch)
 #define CAN_CARRY_OBJ(ch, obj)                                        \
    (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) && \
     ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)))
-#define CAN_GET_OBJ(ch, obj)                                    \
-   (CAN_WEAR((obj), ITEM_TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
+#define CAN_GET_OBJ(ch, obj)                               \
+   (CAN_WEAR((obj), TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
     CAN_SEE_OBJ((ch), (obj)))
 
 #define IS_OBJ_STAT(obj, stat) (isSet((obj)->obj_flags.extra_flags, stat))

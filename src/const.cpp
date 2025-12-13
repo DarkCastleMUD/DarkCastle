@@ -3690,29 +3690,29 @@ QList<bestowable_god_commands_type> DC::bestowable_god_commands =
 // WEAR, ITEM_WEAR correspondances
 const QList<int> Character::wear_to_item_wear =
     {
-        ITEM_LIGHT_SOURCE, // 0
-        ITEM_WEAR_FINGER,
-        ITEM_WEAR_FINGER,
-        ITEM_WEAR_NECK,
-        ITEM_WEAR_NECK,
-        ITEM_WEAR_BODY, // 5
-        ITEM_WEAR_HEAD,
-        ITEM_WEAR_LEGS,
-        ITEM_WEAR_FEET,
-        ITEM_WEAR_HANDS,
-        ITEM_WEAR_ARMS, // 10
-        ITEM_WEAR_SHIELD,
-        ITEM_WEAR_ABOUT,
-        ITEM_WEAR_WAISTE,
-        ITEM_WEAR_WRIST,
-        ITEM_WEAR_WRIST, // 15
-        ITEM_WEAR_WIELD,
-        ITEM_WEAR_WIELD,
-        ITEM_WEAR_HOLD,
-        ITEM_WEAR_HOLD,
-        ITEM_WEAR_FACE, // 20
-        ITEM_WEAR_EAR,
-        ITEM_WEAR_EAR};
+        LIGHT_SOURCE, // 0
+        FINGER,
+        FINGER,
+        NECK,
+        NECK,
+        BODY, // 5
+        HEAD,
+        LEGS,
+        FEET,
+        HANDS,
+        ARMS, // 10
+        SHIELD,
+        ABOUT,
+        WAISTE,
+        WRIST,
+        WRIST, // 15
+        WIELD,
+        WIELD,
+        HOLD,
+        HOLD,
+        FACE, // 20
+        EAR,
+        EAR};
 
 const QStringList DC::connected_states =
     {

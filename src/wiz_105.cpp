@@ -805,7 +805,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
     obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
-        CAN_WEAR(obj, ITEM_TAKE) &&
+        CAN_WEAR(obj, TAKE) &&
         !isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) &&
         obj->obj_flags.eq_level <= vict->getLevel() &&
         !isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))

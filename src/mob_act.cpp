@@ -692,7 +692,7 @@ void scavenge(Character *ch)
     {
       if (ch->hands_are_free(1))
       {
-        if (CAN_WEAR(obj, ITEM_WEAR_WIELD))
+        if (CAN_WEAR(obj, WIELD))
         {
           if (GET_OBJ_WEIGHT(obj) < GET_STR(ch))
           {
@@ -727,7 +727,7 @@ void scavenge(Character *ch)
           {
 
           case 0:
-            if ((CAN_WEAR(obj, ITEM_WEAR_FINGER)) &&
+            if ((CAN_WEAR(obj, FINGER)) &&
                 ((!ch->equipment[WEAR_FINGER_L]) || (!ch->equipment[WEAR_FINGER_R])))
             {
               move_obj(obj, ch);
@@ -743,7 +743,7 @@ void scavenge(Character *ch)
             break;
 
           case 1:
-            if ((CAN_WEAR(obj, ITEM_WEAR_NECK)) &&
+            if ((CAN_WEAR(obj, NECK)) &&
                 ((!ch->equipment[WEAR_NECK_1]) || (!ch->equipment[WEAR_NECK_2])))
             {
               move_obj(obj, ch);
@@ -759,7 +759,7 @@ void scavenge(Character *ch)
             break;
 
           case 2:
-            if ((CAN_WEAR(obj, ITEM_WEAR_BODY)) && (!ch->equipment[WEAR_BODY]))
+            if ((CAN_WEAR(obj, BODY)) && (!ch->equipment[WEAR_BODY]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -771,7 +771,7 @@ void scavenge(Character *ch)
             break;
 
           case 3:
-            if ((CAN_WEAR(obj, ITEM_WEAR_HEAD)) && (!ch->equipment[WEAR_HEAD]))
+            if ((CAN_WEAR(obj, HEAD)) && (!ch->equipment[WEAR_HEAD]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -783,7 +783,7 @@ void scavenge(Character *ch)
             break;
 
           case 4:
-            if ((CAN_WEAR(obj, ITEM_WEAR_LEGS)) && (!ch->equipment[WEAR_LEGS]))
+            if ((CAN_WEAR(obj, LEGS)) && (!ch->equipment[WEAR_LEGS]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -795,7 +795,7 @@ void scavenge(Character *ch)
             break;
 
           case 5:
-            if ((CAN_WEAR(obj, ITEM_WEAR_FEET)) && (!ch->equipment[WEAR_FEET]))
+            if ((CAN_WEAR(obj, FEET)) && (!ch->equipment[WEAR_FEET]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -807,7 +807,7 @@ void scavenge(Character *ch)
             break;
 
           case 6:
-            if ((CAN_WEAR(obj, ITEM_WEAR_HANDS)) && (!ch->equipment[WEAR_HANDS]))
+            if ((CAN_WEAR(obj, HANDS)) && (!ch->equipment[WEAR_HANDS]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -819,7 +819,7 @@ void scavenge(Character *ch)
             break;
 
           case 7:
-            if ((CAN_WEAR(obj, ITEM_WEAR_ARMS)) && (!ch->equipment[WEAR_ARMS]))
+            if ((CAN_WEAR(obj, ARMS)) && (!ch->equipment[WEAR_ARMS]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -831,7 +831,7 @@ void scavenge(Character *ch)
             break;
 
           case 8:
-            if ((CAN_WEAR(obj, ITEM_WEAR_ABOUT)) && (!ch->equipment[WEAR_ABOUT]))
+            if ((CAN_WEAR(obj, ABOUT)) && (!ch->equipment[WEAR_ABOUT]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -843,7 +843,7 @@ void scavenge(Character *ch)
             break;
 
           case 9:
-            if ((CAN_WEAR(obj, ITEM_WEAR_WAISTE)) && (!ch->equipment[WEAR_WAISTE]))
+            if ((CAN_WEAR(obj, WAISTE)) && (!ch->equipment[WEAR_WAISTE]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -855,7 +855,7 @@ void scavenge(Character *ch)
             break;
 
           case 10:
-            if ((CAN_WEAR(obj, ITEM_WEAR_WRIST)) &&
+            if ((CAN_WEAR(obj, WRIST)) &&
                 ((!ch->equipment[WEAR_WRIST_L]) || (!ch->equipment[WEAR_WRIST_R])))
             {
               move_obj(obj, ch);
@@ -871,7 +871,7 @@ void scavenge(Character *ch)
             break;
 
           case 11:
-            if ((CAN_WEAR(obj, ITEM_WEAR_FACE)) && (!ch->equipment[WEAR_FACE]))
+            if ((CAN_WEAR(obj, FACE)) && (!ch->equipment[WEAR_FACE]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -887,7 +887,7 @@ void scavenge(Character *ch)
             break;
 
           case 13:
-            if ((CAN_WEAR(obj, ITEM_WEAR_SHIELD)) && (!ch->equipment[WEAR_SHIELD]))
+            if ((CAN_WEAR(obj, SHIELD)) && (!ch->equipment[WEAR_SHIELD]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
@@ -899,7 +899,7 @@ void scavenge(Character *ch)
             break;
 
           case 14:
-            if ((CAN_WEAR(obj, ITEM_WEAR_HOLD)) && (!ch->equipment[WEAR_HOLD]))
+            if ((CAN_WEAR(obj, HOLD)) && (!ch->equipment[WEAR_HOLD]))
             {
               if ((obj->obj_flags.type_flag == ITEM_LIGHT) &&
                   (!ch->equipment[WEAR_LIGHT]))
@@ -924,7 +924,7 @@ void scavenge(Character *ch)
             break;
 
           case 15:
-            if ((CAN_WEAR(obj, ITEM_WEAR_EAR)) &&
+            if ((CAN_WEAR(obj, EAR)) &&
                 ((!ch->equipment[WEAR_EAR_L]) || (!ch->equipment[WEAR_EAR_R])))
             {
               move_obj(obj, ch);

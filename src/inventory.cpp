@@ -498,7 +498,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           ch->send(buffer);
           fail = true;
         }
-        else if (CAN_WEAR(obj_object, ITEM_TAKE))
+        else if (CAN_WEAR(obj_object, TAKE))
         {
           get(ch, obj_object, sub_object, 0, cmd);
           found = true;
@@ -509,7 +509,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           fail = true;
         }
       }
-      else if (CAN_SEE_OBJ(ch, obj_object) && ch->isImmortalPlayer() && CAN_WEAR(obj_object, ITEM_TAKE))
+      else if (CAN_SEE_OBJ(ch, obj_object) && ch->isImmortalPlayer() && CAN_WEAR(obj_object, TAKE))
       {
         get(ch, obj_object, sub_object, 0, cmd);
         found = true;
@@ -596,7 +596,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           found = true;
         }
       }
-      else if (CAN_WEAR(obj_object, ITEM_TAKE))
+      else if (CAN_WEAR(obj_object, TAKE))
       {
         if (cmd == cmd_t::PALM)
           palm(ch, obj_object, sub_object, 0);
@@ -750,7 +750,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   continue;
                 }
 
-                if (CAN_WEAR(obj_object, ITEM_TAKE))
+                if (CAN_WEAR(obj_object, TAKE))
                 {
                   get(ch, obj_object, sub_object, 0, cmd);
                   found = true;
@@ -930,7 +930,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                 }
               }
             }
-            else if (CAN_WEAR(obj_object, ITEM_TAKE))
+            else if (CAN_WEAR(obj_object, TAKE))
             {
               if (cmd == cmd_t::PALM)
                 palm(ch, obj_object, sub_object, has_consent);

@@ -4717,7 +4717,7 @@ class Object *create_money(int amount)
 	obj->ex_description = new_new_descr;
 
 	obj->obj_flags.type_flag = ITEM_MONEY;
-	obj->obj_flags.wear_flags = ITEM_TAKE;
+	obj->obj_flags.wear_flags = TAKE;
 	obj->obj_flags.value[0] = amount;
 	obj->obj_flags.cost = amount;
 	obj->item_number = -1;

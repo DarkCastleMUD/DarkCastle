@@ -2933,7 +2933,7 @@ int spell_invisibility(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (obj)
   {
-    if (CAN_WEAR(obj, ITEM_TAKE))
+    if (CAN_WEAR(obj, TAKE))
     {
       if (!isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
       {
@@ -5206,7 +5206,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
       ch->sendln("Only pieces of equipment may be magically lit in such a way.");
       return eFAILURE;
     }
-    if (!CAN_WEAR(obj, ITEM_WEAR_EAR) && !CAN_WEAR(obj, ITEM_WEAR_SHIELD) && !CAN_WEAR(obj, ITEM_WEAR_FINGER))
+    if (!CAN_WEAR(obj, EAR) && !CAN_WEAR(obj, SHIELD) && !CAN_WEAR(obj, FINGER))
     {
       ch->sendln("Only earrings, rings, and shields can be magically lit in such a way.");
       return eFAILURE;

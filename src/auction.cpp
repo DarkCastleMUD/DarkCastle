@@ -448,55 +448,55 @@ bool AuctionHouse::IsSlot(QString slot, int vnum)
   switch (keyword)
   {
   case 0:
-    return CAN_WEAR(obj, ITEM_WEAR_FINGER);
+    return CAN_WEAR(obj, FINGER);
     break;
   case 1:
-    return CAN_WEAR(obj, ITEM_WEAR_NECK);
+    return CAN_WEAR(obj, NECK);
     break;
   case 2:
-    return CAN_WEAR(obj, ITEM_WEAR_BODY);
+    return CAN_WEAR(obj, BODY);
     break;
   case 3:
-    return CAN_WEAR(obj, ITEM_WEAR_HEAD);
+    return CAN_WEAR(obj, HEAD);
     break;
   case 4:
-    return CAN_WEAR(obj, ITEM_WEAR_LEGS);
+    return CAN_WEAR(obj, LEGS);
     break;
   case 5:
-    return CAN_WEAR(obj, ITEM_WEAR_FEET);
+    return CAN_WEAR(obj, FEET);
     break;
   case 6:
-    return CAN_WEAR(obj, ITEM_WEAR_HANDS);
+    return CAN_WEAR(obj, HANDS);
     break;
   case 7:
-    return CAN_WEAR(obj, ITEM_WEAR_ARMS);
+    return CAN_WEAR(obj, ARMS);
     break;
   case 8:
-    return CAN_WEAR(obj, ITEM_WEAR_ABOUT);
+    return CAN_WEAR(obj, ABOUT);
     break;
   case 9:
-    return CAN_WEAR(obj, ITEM_WEAR_WAISTE);
+    return CAN_WEAR(obj, WAISTE);
     break;
   case 10:
-    return CAN_WEAR(obj, ITEM_WEAR_WRIST);
+    return CAN_WEAR(obj, WRIST);
     break;
   case 11:
-    return CAN_WEAR(obj, ITEM_WEAR_FACE);
+    return CAN_WEAR(obj, FACE);
     break;
   case 12:
-    return CAN_WEAR(obj, ITEM_WEAR_WIELD);
+    return CAN_WEAR(obj, WIELD);
     break;
   case 13:
-    return CAN_WEAR(obj, ITEM_WEAR_SHIELD);
+    return CAN_WEAR(obj, SHIELD);
     break;
   case 14:
-    return CAN_WEAR(obj, ITEM_WEAR_HOLD);
+    return CAN_WEAR(obj, HOLD);
     break;
   case 15:
-    return CAN_WEAR(obj, ITEM_WEAR_EAR);
+    return CAN_WEAR(obj, EAR);
     break;
   case 16:
-    return CAN_WEAR(obj, ITEM_LIGHT);
+    return CAN_WEAR(obj, LIGHT_SOURCE);
     break;
   default:
     return false;
