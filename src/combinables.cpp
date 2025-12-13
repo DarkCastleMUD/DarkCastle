@@ -220,7 +220,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   }
 
   // find weapon
-  Object *weapon = ch->equipment[WIELD];
+  Object *weapon = ch->equipment[WEAR_WIELD];
   if (!weapon)
   {
     ch->sendln("You aren't wielding a weapon to poison.");
@@ -345,7 +345,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
   int retval = eSUCCESS;
   // unused   int dam;
 
-  if (!ch->equipment[WIELD])
+  if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("In handle_poisoned_weapon_atack() with null wield.  Tell a god.");
     return (eFAILURE | eINTERNAL_ERROR);
@@ -394,7 +394,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
      }
 
      // you can do this even if the mob died, because the weapon is still valid
-     remove_obj_affect_by_type(ch->equipment[WIELD], WEP_THIEF_POISON);
+     remove_obj_affect_by_type(ch->equipment[WEAR_WIELD], WEP_THIEF_POISON);
   */
   return retval;
 }

@@ -21,8 +21,8 @@ void send_damage(QString buf, Character *, Object *, Character *, QString dmg, Q
 
 int getRealSpellDamage(Character *ch);
 
-#define FIRST WIELD
-#define SECOND SECOND_WIELD
+#define FIRST WEAR_WIELD
+#define SECOND WEAR_SECOND_WIELD
 
 #define COMBAT_MOD_FRENZY 1
 #define COMBAT_MOD_RESIST 1 << 1

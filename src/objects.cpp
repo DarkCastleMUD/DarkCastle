@@ -217,7 +217,7 @@ int do_switch(Character *ch, char *arg, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!ch->equipment[WIELD] || !ch->equipment[SECOND_WIELD])
+  if (!ch->equipment[WEAR_WIELD] || !ch->equipment[WEAR_SECOND_WIELD])
   {
     send_to_char("You must be wielding two weapons to switch their "
                  "positions.\r\n",
@@ -238,14 +238,14 @@ int do_switch(Character *ch, char *arg, cmd_t cmd)
     act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
+  if (GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
   {
     ch->sendln("Your primary wield is too heavy to wield as secondary.");
     return eFAILURE;
   }
-  between = ch->equipment[WIELD];
-  ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
-  ch->equipment[SECOND_WIELD] = between;
+  between = ch->equipment[WEAR_WIELD];
+  ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
+  ch->equipment[WEAR_SECOND_WIELD] = between;
   ch->sendln("You switch your weapon positions.");
   return eSUCCESS;
 }
@@ -266,13 +266,13 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
 
   if (!(temp = get_obj_in_list_vis(ch, buf, ch->carrying)))
   {
-    temp = ch->equipment[HOLD];
+    temp = ch->equipment[WEAR_HOLD];
     equipped = true;
-    pos = HOLD;
+    pos = WEAR_HOLD;
     if ((temp == 0) || !isexact(buf, temp->name))
     {
-      temp = ch->equipment[HOLD2];
-      pos = HOLD2;
+      temp = ch->equipment[WEAR_HOLD2];
+      pos = WEAR_HOLD2;
       if ((temp == 0) || !isexact(buf, temp->name))
       {
         equipped = false;
@@ -375,13 +375,13 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
 
   if (!(scroll = get_obj_in_list_vis(ch, buf, ch->carrying)))
   {
-    scroll = ch->equipment[HOLD];
+    scroll = ch->equipment[WEAR_HOLD];
     equipped = true;
-    pos = HOLD;
+    pos = WEAR_HOLD;
     if ((scroll == 0) || !isexact(buf, scroll->name))
     {
-      scroll = ch->equipment[HOLD2];
-      pos = HOLD2;
+      scroll = ch->equipment[WEAR_HOLD2];
+      pos = WEAR_HOLD2;
       if ((scroll == 0) || !isexact(buf, scroll->name))
       {
         act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
@@ -735,16 +735,16 @@ int do_use(Character *ch, char *argument, cmd_t cmd)
 
   argument = one_argument(argument, buf);
 
-  if ((ch->equipment[HOLD] == 0 || !isexact(buf, ch->equipment[HOLD]->name)) &&
-      (ch->equipment[HOLD2] == 0 || !isexact(buf, ch->equipment[HOLD2]->name)))
+  if ((ch->equipment[WEAR_HOLD] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD]->name)) &&
+      (ch->equipment[WEAR_HOLD2] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD2]->name)))
   {
     act("You must be holding an item in order to to use it.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (ch->equipment[HOLD] && isexact(buf, ch->equipment[HOLD]->name))
-    stick = ch->equipment[HOLD];
+  if (ch->equipment[WEAR_HOLD] && isexact(buf, ch->equipment[WEAR_HOLD]->name))
+    stick = ch->equipment[WEAR_HOLD];
   else
-    stick = ch->equipment[HOLD2];
+    stick = ch->equipment[WEAR_HOLD2];
 
   argument = one_argument(argument, targ);
   argument = one_argument(argument, xtra_arg);
@@ -1989,10 +1989,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   case 12:
     if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
     {
-      if (!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, attribute_t::STRENGTH)) &&
+      if (!ch->equipment[WEAR_WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, attribute_t::STRENGTH)) &&
           !ISSET(ch->affected_by, AFF_POWERWIELD))
         ch->sendln("It is too heavy for you to use.");
-      else if (ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) &&
+      else if (ch->equipment[WEAR_WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) &&
                !ISSET(ch->affected_by, AFF_POWERWIELD))
 
         act("$p is too heavy for you to use as a secondary weapon.", ch, obj_object, 0, TO_CHAR, 0);
@@ -2012,10 +2012,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        if (ch->equipment[WIELD])
-          ch->equip_char(obj_object, SECOND_WIELD);
+        if (ch->equipment[WEAR_WIELD])
+          ch->equip_char(obj_object, WEAR_SECOND_WIELD);
         else
-          ch->equip_char(obj_object, WIELD);
+          ch->equip_char(obj_object, WEAR_WIELD);
       }
     }
     else
@@ -2057,7 +2057,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_HOLD))
     {
 
-      if (charmie_restricted(ch, obj_object, HOLD))
+      if (charmie_restricted(ch, obj_object, WEAR_HOLD))
         ch->sendln("You cannot wear this.");
       else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
@@ -2066,7 +2066,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         ch->sendln("You need both hands for this item.");
       }
-      else if (obj_object->obj_flags.extra_flags == ITEM_INSTRUMENT && ((ch->equipment[HOLD] && ch->equipment[HOLD]->obj_flags.type_flag == ITEM_INSTRUMENT) || (ch->equipment[HOLD2] && ch->equipment[HOLD2]->obj_flags.type_flag == ITEM_INSTRUMENT)))
+      else if (obj_object->obj_flags.extra_flags == ITEM_INSTRUMENT && ((ch->equipment[WEAR_HOLD] && ch->equipment[WEAR_HOLD]->obj_flags.type_flag == ITEM_INSTRUMENT) || (ch->equipment[WEAR_HOLD2] && ch->equipment[WEAR_HOLD2]->obj_flags.type_flag == ITEM_INSTRUMENT)))
       {
         ch->sendln("You're busy enough playing the instrument you're already using.");
       }
@@ -2074,10 +2074,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        if (ch->equipment[HOLD])
-          ch->equip_char(obj_object, HOLD2);
+        if (ch->equipment[WEAR_HOLD])
+          ch->equip_char(obj_object, WEAR_HOLD2);
         else
-          ch->equip_char(obj_object, HOLD);
+          ch->equip_char(obj_object, WEAR_HOLD);
       }
     }
     else
@@ -2147,7 +2147,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
     {
       // if not wielding anything, just call regular wield
-      if (!ch->equipment[WIELD])
+      if (!ch->equipment[WEAR_WIELD])
       {
         wear(ch, obj_object, 12);
         return;
@@ -2173,8 +2173,8 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         return;
       }
 
-      class Object *obj_temp = ch->equipment[WIELD];
-      obj_to_char(ch->unequip_char(WIELD), ch);
+      class Object *obj_temp = ch->equipment[WEAR_WIELD];
+      obj_to_char(ch->unequip_char(WEAR_WIELD), ch);
       wear(ch, obj_object, 12);
       wear(ch, obj_temp, 12);
       return;
@@ -2458,15 +2458,15 @@ int Character::hands_are_free(int number)
   class Object *wielded;
   int hands = 0;
 
-  wielded = this->equipment[WIELD];
+  wielded = this->equipment[WEAR_WIELD];
 
   if (wielded)
     if (isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(this->affected_by, AFF_POWERWIELD))
       hands = 2;
 
-  if (this->equipment[WIELD])
+  if (this->equipment[WEAR_WIELD])
     hands++;
-  if (this->equipment[SECOND_WIELD])
+  if (this->equipment[WEAR_SECOND_WIELD])
     hands++;
 
   if (this->equipment[WEAR_SHIELD])
@@ -2476,9 +2476,9 @@ int Character::hands_are_free(int number)
       hands++;
     hands++;
   }
-  if (this->equipment[HOLD])
+  if (this->equipment[WEAR_HOLD])
   {
-    if (isSet(this->equipment[HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+    if (isSet(this->equipment[WEAR_HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
         !ISSET(this->affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
@@ -2490,7 +2490,7 @@ int Character::hands_are_free(int number)
       hands++;
     hands++;
   }
-  if (this->equipment[HOLD2])
+  if (this->equipment[WEAR_HOLD2])
     hands++;
 
   if (number == 1 && hands < 2)
@@ -2587,11 +2587,11 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
             // will_screwup_worn_sizes() takes care of the messages
             return eFAILURE;
           }
-          if (j == WIELD)
+          if (j == WEAR_WIELD)
           {
             obj_to_char(ch->unequip_char(j), ch);
-            ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
-            ch->equipment[SECOND_WIELD] = 0;
+            ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
+            ch->equipment[WEAR_SECOND_WIELD] = 0;
           }
           else if (DC::getInstance()->obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
           {

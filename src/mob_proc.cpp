@@ -323,10 +323,10 @@ int fighter(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         return do_deathstroke(ch, "", cmd_t::DEFAULT);
     }
 
-    if (ch->equipment[WIELD] && vict->equipment[WIELD])
+    if (ch->equipment[WEAR_WIELD] && vict->equipment[WEAR_WIELD])
         if (IS_PC(ch) || IS_PC(vict))
         {
-            wielded = vict->equipment[WIELD];
+            wielded = vict->equipment[WEAR_WIELD];
             if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
                 (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
                 if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
@@ -671,7 +671,7 @@ int backstabber(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
                     continue;
                 if (IS_AFFECTED(tch, AFF_ALERT))
                     continue;
-                if (ch->equipment[WIELD])
+                if (ch->equipment[WEAR_WIELD])
                 {
 
                     if (tch->fighting)
@@ -2777,9 +2777,9 @@ int marauder(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     // Reinforcements!
     call_for_help_in_room(ch, 22701);
 
-    wielded = vict->equipment[WIELD];
+    wielded = vict->equipment[WEAR_WIELD];
 
-    if (ch->equipment[WIELD] && vict->equipment[WIELD])
+    if (ch->equipment[WEAR_WIELD] && vict->equipment[WEAR_WIELD])
         if (IS_PC(ch) || IS_PC(vict))
             if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
                 (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))

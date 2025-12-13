@@ -37,13 +37,13 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
   }
 
   int hands = 0;
-  if (ch->equipment[WIELD])
+  if (ch->equipment[WEAR_WIELD])
     hands++;
-  if (ch->equipment[SECOND_WIELD])
+  if (ch->equipment[WEAR_SECOND_WIELD])
     hands++;
-  if (ch->equipment[HOLD])
+  if (ch->equipment[WEAR_HOLD])
     hands++;
-  if (ch->equipment[HOLD2])
+  if (ch->equipment[WEAR_HOLD2])
     hands++;
   if (ch->equipment[WEAR_SHIELD])
     hands++;
@@ -140,9 +140,9 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   }
 
   int hands = 0;
-  if (ch->equipment[WIELD])
+  if (ch->equipment[WEAR_WIELD])
     hands++;
-  if (ch->equipment[SECOND_WIELD])
+  if (ch->equipment[WEAR_SECOND_WIELD])
     hands++;
   if (ch->equipment[WEAR_SHIELD])
     hands++;

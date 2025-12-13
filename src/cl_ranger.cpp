@@ -1139,13 +1139,13 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!ch->equipment[HOLD])
+  if (!ch->equipment[WEAR_HOLD])
   {
     ch->sendln("You need to be holding a bow, moron.");
     return eFAILURE;
   }
 
-  if (!(ch->equipment[HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
+  if (!(ch->equipment[WEAR_HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
   {
     ch->sendln("You need to be holding a bow, moron.");
     return eFAILURE;
@@ -1458,8 +1458,8 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   else
   {
     dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
-    dam += dice(ch->equipment[HOLD]->obj_flags.value[1],
-                ch->equipment[HOLD]->obj_flags.value[2]);
+    dam += dice(ch->equipment[WEAR_HOLD]->obj_flags.value[1],
+                ch->equipment[WEAR_HOLD]->obj_flags.value[2]);
     for (int i = 0; i < found->num_affects; i++)
       if (found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
         dam += found->affected[i].modifier;

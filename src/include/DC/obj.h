@@ -575,10 +575,10 @@ private:
 #define WEAR_WAISTE 13
 #define WEAR_WRIST_R 14
 #define WEAR_WRIST_L 15
-#define WIELD 16
-#define SECOND_WIELD 17
-#define HOLD 18
-#define HOLD2 19
+#define WEAR_WIELD 16
+#define WEAR_SECOND_WIELD 17
+#define WEAR_HOLD 18
+#define WEAR_HOLD2 19
 #define WEAR_FACE 20
 #define WEAR_EAR_L 21
 #define WEAR_EAR_R 22

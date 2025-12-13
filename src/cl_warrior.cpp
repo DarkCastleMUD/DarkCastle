@@ -187,7 +187,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!ch->equipment[WIELD])
+  if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("You must be wielding a weapon to deathstrike someone.");
     return eFAILURE;
@@ -225,13 +225,13 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(victim))
     to_dam = (int)((float)to_dam * .8);
 
-  dam = dice(ch->equipment[WIELD]->obj_flags.value[1],
-             ch->equipment[WIELD]->obj_flags.value[2]);
+  dam = dice(ch->equipment[WEAR_WIELD]->obj_flags.value[1],
+             ch->equipment[WEAR_WIELD]->obj_flags.value[2]);
   dam += to_dam;
   dam *= (ch->getLevel() / 6); // 10 at level 50
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-  attacktype = ch->equipment[WIELD]->obj_flags.value[3] + TYPE_HIT;
+  attacktype = ch->equipment[WEAR_WIELD]->obj_flags.value[3] + TYPE_HIT;
 
   if (!skill_success(ch, victim, SKILL_DEATHSTROKE, -25))
   {
@@ -452,7 +452,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   }
 
   //    if (IS_PC(ch))
-  if (!ch->equipment[WIELD])
+  if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("You need to wield a weapon, to make it a success.");
     return eFAILURE;
@@ -531,7 +531,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   {
     modifier = -20;
     // but 3/4 as accurate with a 2hander
-    if (ch->equipment[WIELD] && isSet(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
+    if (ch->equipment[WEAR_WIELD] && isSet(ch->equipment[WEAR_WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
     {
       modifier += 10;
       // if the basher is a barb though, give them the full effect
@@ -700,7 +700,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (ch->equipment[WIELD] == nullptr)
+  if (ch->equipment[WEAR_WIELD] == nullptr)
   {
     ch->sendln("You must wield a weapon to disarm.");
     return eFAILURE;
@@ -717,7 +717,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (victim->equipment[WIELD] == nullptr)
+  if (victim->equipment[WEAR_WIELD] == nullptr)
   {
     ch->sendln("Your opponent is not wielding a weapon!");
     return eFAILURE;
@@ -744,25 +744,25 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You can't seem to work it loose.");
       return eFAILURE;
     }
-    if (DC::getInstance()->obj_index[ch->equipment[WIELD]->item_number].virt == 27997)
+    if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].virt == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n\r", ch->in_room);
       return eSUCCESS;
     }
     act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     ch->sendln("You disarm yourself!  Congratulations!  Try using 'remove' next-time.");
-    obj = ch->unequip_char(WIELD);
+    obj = ch->unequip_char(WEAR_WIELD);
     obj_to_char(obj, ch);
-    if (ch->equipment[SECOND_WIELD])
+    if (ch->equipment[WEAR_SECOND_WIELD])
     {
-      obj = ch->unequip_char(SECOND_WIELD);
-      ch->equip_char(obj, WIELD);
+      obj = ch->unequip_char(WEAR_SECOND_WIELD);
+      ch->equip_char(obj, WEAR_WIELD);
     }
 
     return eSUCCESS;
   }
 
-  wielded = victim->equipment[WIELD];
+  wielded = victim->equipment[WEAR_WIELD];
 
   int modifier = 0;
   level_diff_t level_difference = victim->getLevel() - ch->getLevel();

@@ -528,22 +528,22 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     }
 
     /* one object was found. Now for the other one. */
-    if (!ch->equipment[HOLD])
+    if (!ch->equipment[WEAR_HOLD])
     {
       sprintf(buf, "You can't write with a %s alone.\r\n", papername);
       ch->send(buf);
       return eSUCCESS;
     }
-    if (!CAN_SEE_OBJ(ch, ch->equipment[HOLD]))
+    if (!CAN_SEE_OBJ(ch, ch->equipment[WEAR_HOLD]))
     {
       ch->sendln("The stuff in your hand is invisible! Yeech!!");
       return eSUCCESS;
     }
 
     if (pen)
-      paper = ch->equipment[HOLD];
+      paper = ch->equipment[WEAR_HOLD];
     else
-      pen = ch->equipment[HOLD];
+      pen = ch->equipment[WEAR_HOLD];
   }
 
   /* ok.. now let's see what kind of stuff we've found */

@@ -176,13 +176,13 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!this->equipment[WIELD])
+  if (!this->equipment[WEAR_WIELD])
   {
     this->sendln("You need to wield a weapon to make it a success.");
     return eFAILURE;
   }
 
-  if (this->equipment[WIELD]->obj_flags.value[3] != 11 && this->equipment[WIELD]->obj_flags.value[3] != 9)
+  if (this->equipment[WEAR_WIELD]->obj_flags.value[3] != 11 && this->equipment[WEAR_WIELD]->obj_flags.value[3] != 9)
   {
     this->sendln("You can't stab without a stabbing weapon...");
     return eFAILURE;
@@ -224,7 +224,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[SECOND_WIELD]) && ((this->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
+  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[WEAR_SECOND_WIELD]) && ((this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
     if (skill_success(victim, SKILL_DUAL_BACKSTAB) || IS_NPC(this))
     {
@@ -253,7 +253,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   else if (!victim->isImmortalPlayer() &&
            victim->getLevel() <= (getLevel() + 19) &&
            (isImmortalPlayer() || itemp > 95 || (victim->isPlayer() && isSet(victim->player->punish, PUNISH_UNLUCKY))) &&
-           ((equipment[WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (equipment[WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
+           ((equipment[WEAR_WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (equipment[WEAR_WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -397,7 +397,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!ch->equipment[WIELD])
+  if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("You need to wield a weapon to make it a success.");
     return eFAILURE;
@@ -415,7 +415,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
 
   bool stabbingCircle = false;
 
-  switch (get_weapon_damage_type(ch->equipment[WIELD]))
+  switch (get_weapon_damage_type(ch->equipment[WEAR_WIELD]))
   {
   case TYPE_PIERCE:
   case TYPE_STING:
@@ -462,7 +462,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
       return retval;
 
     // Now go for dual backstab
-    if (ch->equipment[SECOND_WIELD] && (ch->has_skill(SKILL_DUAL_BACKSTAB) || (ch->getLevel() >= ARCHANGEL)))
+    if (ch->equipment[WEAR_SECOND_WIELD] && (ch->has_skill(SKILL_DUAL_BACKSTAB) || (ch->getLevel() >= ARCHANGEL)))
     {
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       if (AWAKE(victim) && !skill_success(ch, victim, SKILL_DUAL_BACKSTAB))
@@ -471,7 +471,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
       {
         SET_BIT(ch->combat, COMBAT_CIRCLE);
 
-        switch (get_weapon_damage_type(ch->equipment[SECOND_WIELD]))
+        switch (get_weapon_damage_type(ch->equipment[WEAR_SECOND_WIELD]))
         {
         case TYPE_PIERCE:
         case TYPE_STING:
@@ -1096,11 +1096,11 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       case WEAR_FEET:
       case WEAR_WAISTE:
       case WEAR_HEAD:
-      case WIELD:
-      case SECOND_WIELD:
+      case WEAR_WIELD:
+      case WEAR_SECOND_WIELD:
       case WEAR_LIGHT:
-      case HOLD:
-      case HOLD2:
+      case WEAR_HOLD:
+      case WEAR_HOLD2:
       case WEAR_SHIELD:
         wakey = 60;
         break;
@@ -2066,7 +2066,7 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!ch->equipment[WIELD])
+  if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("Your must be wielding a weapon to make it a success.");
     return eFAILURE;

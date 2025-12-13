@@ -2995,10 +2995,10 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
 
          /* Average Damage */
 
-         if (victim->equipment[WIELD])
+         if (victim->equipment[WEAR_WIELD])
          {
-            x = victim->equipment[WIELD]->obj_flags.value[1];
-            y = victim->equipment[WIELD]->obj_flags.value[2];
+            x = victim->equipment[WEAR_WIELD]->obj_flags.value[1];
+            y = victim->equipment[WEAR_WIELD]->obj_flags.value[2];
             x = (((x * y - x) / 2) + x);
          }
          else

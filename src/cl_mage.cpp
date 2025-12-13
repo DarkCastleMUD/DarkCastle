@@ -176,10 +176,10 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
 
   if (!(wand = get_obj_in_list_vis(ch, buf, ch->carrying)))
   {
-    wand = ch->equipment[HOLD];
+    wand = ch->equipment[WEAR_HOLD];
     if ((wand == 0) || !isexact(buf, wand->name))
     {
-      wand = ch->equipment[HOLD2];
+      wand = ch->equipment[WEAR_HOLD2];
       if ((wand == 0) || !isexact(buf, wand->name))
       {
         ch->sendln("You do not have that wand.");

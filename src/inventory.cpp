@@ -2439,7 +2439,7 @@ bool has_key(Character *ch, int key)
     return false;
   }
 
-  Object *obj = ch->equipment[HOLD];
+  Object *obj = ch->equipment[WEAR_HOLD];
   if (obj && IS_KEY(obj))
   {
     if (DC::getInstance()->obj_index[obj->item_number].virt == key)

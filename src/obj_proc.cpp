@@ -747,7 +747,7 @@ int drainingstaff(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   }
 
-  staff = ch->equipment[WIELD];
+  staff = ch->equipment[WEAR_WIELD];
   dam = dice(staff->obj_flags.value[1], staff->obj_flags.value[2]);
   dam += GET_DAMROLL(ch);
   dam = (dam * 2) / 10; // Mages usually have 2-3 attacks
@@ -1364,10 +1364,10 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (!ch)
     return eFAILURE;
-  int pos = HOLD;
+  int pos = WEAR_HOLD;
   if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
   {
-    pos = HOLD2;
+    pos = WEAR_HOLD2;
     if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
       return eFAILURE;
   }
@@ -1423,8 +1423,8 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (!obj_object)
       return eFAILURE;
 
-    if (obj_object != ch->equipment[HOLD] &&
-        obj_object != ch->equipment[HOLD2])
+    if (obj_object != ch->equipment[WEAR_HOLD] &&
+        obj_object != ch->equipment[WEAR_HOLD2])
       return eFAILURE;
     if (obj_object->item_number != real_object(3611))
       return eFAILURE;
@@ -1452,10 +1452,10 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd != cmd_t::SAY)
     return eFAILURE;
 
-  if (!ch || !ch->equipment || !ch->equipment[WIELD])
+  if (!ch || !ch->equipment || !ch->equipment[WEAR_WIELD])
     return eFAILURE;
 
-  if (real_object(185) != ch->equipment[WIELD]->item_number)
+  if (real_object(185) != ch->equipment[WEAR_WIELD]->item_number)
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -1466,7 +1466,7 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!str_cmp("infrendeo", arg1))
   {
     act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
-    if (ch->equipment[WIELD]->obj_flags.value[3] == 8)
+    if (ch->equipment[WEAR_WIELD]->obj_flags.value[3] == 8)
     {
       ch->sendln("Nothing happens.");
       return true;
@@ -1475,13 +1475,13 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     act("Venom-flecked fangs grow and bristle from the bedeviled Cestus!", ch, 0, 0, TO_ROOM, 0);
     ch->sendln("Huge fangs spring forth from your weapon!");
 
-    ch->equipment[WIELD]->obj_flags.value[3] = 8;
+    ch->equipment[WEAR_WIELD]->obj_flags.value[3] = 8;
     return eSUCCESS;
   }
   if (!str_cmp("pulsus", arg1))
   {
     act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
-    if (ch->equipment[WIELD]->obj_flags.value[3] == 7)
+    if (ch->equipment[WEAR_WIELD]->obj_flags.value[3] == 7)
     {
       ch->sendln("Nothing happens.");
       return eSUCCESS;
@@ -1490,7 +1490,7 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     act("The fangs of $n's weapon retract magically into the metal.", ch, 0, 0, TO_ROOM, 0);
     ch->sendln("The fangs retract magically into the metal.");
 
-    ch->equipment[WIELD]->obj_flags.value[3] = 7;
+    ch->equipment[WEAR_WIELD]->obj_flags.value[3] = 7;
     return eSUCCESS;
   }
 
@@ -1626,10 +1626,10 @@ int eliara_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd != cmd_t::UNDEFINED)
     return eFAILURE;
 
-  if (!ch || !ch->equipment || !ch->equipment[WIELD])
+  if (!ch || !ch->equipment || !ch->equipment[WEAR_WIELD])
     return eFAILURE;
 
-  if (real_object(30627) != ch->equipment[WIELD]->item_number)
+  if (real_object(30627) != ch->equipment[WEAR_WIELD]->item_number)
   {
     remove_eliara(ch);
     return eFAILURE;
@@ -1657,7 +1657,7 @@ int eliara_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (!ch)
     return eFAILURE;
 
-  if (cmd == cmd_t::REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->item_number == real_object(30627))
+  if (cmd == cmd_t::REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment && ch->equipment[WEAR_WIELD] && ch->equipment[WEAR_WIELD]->item_number == real_object(30627))
   {
     ch->sendln("Eliara refuses to allow you to remove equipment during battle!");
     return eSUCCESS;
@@ -2032,7 +2032,7 @@ int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   if (!ch)
     return eFAILURE;
-  if (ch->equipment[HOLD] != obj)
+  if (ch->equipment[WEAR_HOLD] != obj)
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -2040,7 +2040,7 @@ int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (str_cmp("magiskhal", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
+  if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2056,7 +2056,7 @@ int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   {
     spell_portal(ch->getLevel(), ch, victim, 0, 0);
     // set charge time
-    ch->equipment[HOLD]->obj_flags.value[3] = 600;
+    ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 600;
   }
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
   return eSUCCESS;
@@ -2093,7 +2093,7 @@ int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   if (!ch)
     return eFAILURE;
-  if (ch->equipment[HOLD] != obj)
+  if (ch->equipment[WEAR_HOLD] != obj)
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -2101,7 +2101,7 @@ int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (str_cmp("heltlaka", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
+  if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2119,7 +2119,7 @@ int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     spell_full_heal(ch->getLevel(), ch, victim, 0, 0);
     spell_full_heal(ch->getLevel(), ch, victim, 0, 0);
     // set charge time
-    ch->equipment[HOLD]->obj_flags.value[3] = 300;
+    ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 300;
   }
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
   return eSUCCESS;
@@ -2133,7 +2133,7 @@ int mana_box(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   ch = obj->equipped_by;
   if (!ch)
     return eFAILURE;
-  if (ch->equipment[HOLD] != obj)
+  if (ch->equipment[WEAR_HOLD] != obj)
     return eFAILURE;
 
   if ((GET_MANA(ch) + 8) < GET_MAX_MANA(ch))
@@ -2175,7 +2175,7 @@ int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   if (!ch)
     return eFAILURE;
-  if (ch->equipment[HOLD] != obj)
+  if (ch->equipment[WEAR_HOLD] != obj)
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -2183,7 +2183,7 @@ int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (str_cmp("feuerschild", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
+  if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2193,7 +2193,7 @@ int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
   spell_fireshield(ch->getLevel(), ch, ch, 0, 0);
   // set charge time
-  ch->equipment[HOLD]->obj_flags.value[3] = 900;
+  ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 900;
 
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
   return eSUCCESS;
@@ -2230,7 +2230,7 @@ int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   if (!ch)
     return eFAILURE;
-  if (ch->equipment[HOLD] != obj)
+  if (ch->equipment[WEAR_HOLD] != obj)
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -2238,7 +2238,7 @@ int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (str_cmp("sbiadirsivia", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
+  if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2260,7 +2260,7 @@ int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   {
     spell_teleport(ch->getLevel(), ch, victim, 0, 0);
     // set charge time
-    ch->equipment[HOLD]->obj_flags.value[3] = 1000;
+    ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 1000;
   }
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
   return eSUCCESS;
@@ -2296,7 +2296,7 @@ int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   if (!ch)
     return eFAILURE;
-  if (ch->equipment[HOLD] != obj)
+  if (ch->equipment[WEAR_HOLD] != obj)
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -2306,7 +2306,7 @@ int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You quietly whisper 'moralevalore' into your hands.");
-  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
+  if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2322,7 +2322,7 @@ int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     ch->sendln("The box somehow seems......confused.");
 
   // set charge time
-  ch->equipment[HOLD]->obj_flags.value[3] = 500;
+  ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 500;
 
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
   return eSUCCESS;
@@ -2358,7 +2358,7 @@ int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   if (!ch)
     return eFAILURE;
-  if (ch->equipment[HOLD] != obj)
+  if (ch->equipment[WEAR_HOLD] != obj)
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -2366,7 +2366,7 @@ int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (str_cmp("protezione", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
+  if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return true;
@@ -2384,7 +2384,7 @@ int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   cast_barkskin(ch->getLevel(), ch, 0, SPELL_TYPE_SPELL, ch, 0, 0);
 
   // set charge time
-  ch->equipment[HOLD]->obj_flags.value[3] = 1000;
+  ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 1000;
 
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
   return eSUCCESS;
@@ -3025,8 +3025,8 @@ int gl_dragon_fire(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return eFAILURE;
   if (!ch || !ch->fighting)
     return eFAILURE;
-  if (ch->equipment[WIELD] != obj &&
-      ch->equipment[SECOND_WIELD] != obj)
+  if (ch->equipment[WEAR_WIELD] != obj &&
+      ch->equipment[WEAR_SECOND_WIELD] != obj)
     return eFAILURE;
 
   if (number(1, 100) > 5)
@@ -3046,8 +3046,8 @@ int dk_rend(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return eFAILURE;
   if (!ch || !ch->fighting)
     return eFAILURE;
-  if (ch->equipment[WIELD] != obj &&
-      ch->equipment[SECOND_WIELD] != obj)
+  if (ch->equipment[WEAR_WIELD] != obj &&
+      ch->equipment[WEAR_SECOND_WIELD] != obj)
     return eFAILURE;
 
   if (number(1, 100) > 5)
@@ -3136,8 +3136,8 @@ int generic_weapon_combat(Character *ch, class Object *obj, cmd_t cmd, char *arg
     return eFAILURE;
   if (!ch || !ch->fighting)
     return eFAILURE;
-  if (!obj || (ch->equipment[WIELD] != obj &&
-               ch->equipment[SECOND_WIELD] != obj))
+  if (!obj || (ch->equipment[WEAR_WIELD] != obj &&
+               ch->equipment[WEAR_SECOND_WIELD] != obj))
     return eFAILURE;
 
   if (obj->item_number < 0 || obj->item_number > top_of_objt)
@@ -3742,28 +3742,28 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (rnd == unequip)
       {
 
-        if (vict->equipment[WIELD] && DC::getInstance()->obj_index[vict->equipment[WIELD]->item_number].virt == 27997)
+        if (vict->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_WIELD]->item_number].virt == 27997)
         {
 
           act("Your $p unequips itself.",
-              vict, vict->equipment[WIELD], 0, TO_CHAR, 0);
-          act("$n stops using $p.", vict, vict->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
-          obj_to_char(vict->unequip_char(WIELD), vict);
-          if (vict->equipment[SECOND_WIELD])
+              vict, vict->equipment[WEAR_WIELD], 0, TO_CHAR, 0);
+          act("$n stops using $p.", vict, vict->equipment[WEAR_WIELD], 0, TO_ROOM, INVIS_NULL);
+          obj_to_char(vict->unequip_char(WEAR_WIELD), vict);
+          if (vict->equipment[WEAR_SECOND_WIELD])
           {
-            act("You move your $p to be your primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
-            act("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+            act("You move your $p to be your primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
+            act("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
             class Object *weapon;
-            weapon = vict->unequip_char(SECOND_WIELD);
-            vict->equip_char(weapon, WIELD);
+            weapon = vict->unequip_char(WEAR_SECOND_WIELD);
+            vict->equip_char(weapon, WEAR_WIELD);
           }
         }
-        else if (vict->equipment[SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[SECOND_WIELD]->item_number].virt == 27997)
+        else if (vict->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_SECOND_WIELD]->item_number].virt == 27997)
         {
 
-          act("Your $p unequips itself.", vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
-          act("$n stops using $p.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-          obj_to_char(vict->unequip_char(SECOND_WIELD), vict);
+          act("Your $p unequips itself.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, 0);
+          act("$n stops using $p.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+          obj_to_char(vict->unequip_char(WEAR_SECOND_WIELD), vict);
         }
       }
     }
@@ -4646,8 +4646,8 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
     return eFAILURE;
   if (!ch || !ch->fighting)
     return eFAILURE;
-  if (ch->equipment[WIELD] != obj &&
-      ch->equipment[SECOND_WIELD] != obj)
+  if (ch->equipment[WEAR_WIELD] != obj &&
+      ch->equipment[WEAR_SECOND_WIELD] != obj)
     return eFAILURE;
 
   if (number(1, 100) > 5)
@@ -4702,8 +4702,8 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
     return eFAILURE;
   if (!ch || !ch->fighting)
     return eFAILURE;
-  if (ch->equipment[WIELD] != obj &&
-      ch->equipment[SECOND_WIELD] != obj)
+  if (ch->equipment[WEAR_WIELD] != obj &&
+      ch->equipment[WEAR_SECOND_WIELD] != obj)
     return eFAILURE;
 
   if (number(1, 100) > 5)
@@ -4755,8 +4755,8 @@ int godload_hydratail(Character *ch, class Object *obj, cmd_t cmd, const char *a
     return eFAILURE;
   if (!ch || !ch->fighting)
     return eFAILURE;
-  if (ch->equipment[WIELD] != obj &&
-      ch->equipment[SECOND_WIELD] != obj)
+  if (ch->equipment[WEAR_WIELD] != obj &&
+      ch->equipment[WEAR_SECOND_WIELD] != obj)
     return eFAILURE;
 
   if (number(1, 100) > 10)

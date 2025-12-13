@@ -847,35 +847,35 @@ void check_weapon_weights(Character *ch)
 	if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 		return;
 	// make sure we're still strong enough to wield our weapons
-	if (!IS_NPC(ch) && ch->equipment[WIELD] &&
-		GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
+	if (!IS_NPC(ch) && ch->equipment[WEAR_WIELD] &&
+		GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
 	{
-		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
-		act("$n stops using $p.", ch, ch->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(ch->unequip_char(WIELD), ch);
-		if (ch->equipment[SECOND_WIELD])
+		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_WIELD], 0, TO_CHAR, 0);
+		act("$n stops using $p.", ch, ch->equipment[WEAR_WIELD], 0, TO_ROOM, INVIS_NULL);
+		obj_to_char(ch->unequip_char(WEAR_WIELD), ch);
+		if (ch->equipment[WEAR_SECOND_WIELD])
 		{
-			act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
-			act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-			weapon = ch->unequip_char(SECOND_WIELD);
-			ch->equip_char(weapon, WIELD);
+			act("You move your $p to be your primary weapon.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
+			act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+			weapon = ch->unequip_char(WEAR_SECOND_WIELD);
+			ch->equip_char(weapon, WEAR_WIELD);
 			check_weapon_weights(ch); // Not a loop, since it'll only happen once.
 									  // It'll recheck primary wield.
 		}
 	}
 
-	if (ch->equipment[SECOND_WIELD] &&
-		GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch) / 2 && !ISSET(ch->affected_by, AFF_POWERWIELD))
+	if (ch->equipment[WEAR_SECOND_WIELD] &&
+		GET_OBJ_WEIGHT(ch->equipment[WEAR_SECOND_WIELD]) > GET_STR(ch) / 2 && !ISSET(ch->affected_by, AFF_POWERWIELD))
 	{
-		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
-		act("$n stops using $p.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(ch->unequip_char(SECOND_WIELD), ch);
+		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, 0);
+		act("$n stops using $p.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+		obj_to_char(ch->unequip_char(WEAR_SECOND_WIELD), ch);
 	}
 
-	if (ch->equipment[WEAR_SHIELD] && ((ch->equipment[WIELD] &&
-										GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD)) ||
-									   (ch->equipment[SECOND_WIELD] &&
-										GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch) / 2 && !ISSET(ch->affected_by, AFF_POWERWIELD))))
+	if (ch->equipment[WEAR_SHIELD] && ((ch->equipment[WEAR_WIELD] &&
+										GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD)) ||
+									   (ch->equipment[WEAR_SECOND_WIELD] &&
+										GET_OBJ_WEIGHT(ch->equipment[WEAR_SECOND_WIELD]) > GET_STR(ch) / 2 && !ISSET(ch->affected_by, AFF_POWERWIELD))))
 	{
 		act("You shift your shield into your inventory.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
 		act("$n stops using $p.", ch, ch->equipment[WEAR_SHIELD], 0, TO_ROOM, INVIS_NULL);
@@ -1816,25 +1816,25 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		break;
 	case SKILL_INNATE_POWERWIELD:
 		class Object *obj;
-		obj = ch->equipment[WIELD];
+		obj = ch->equipment[WEAR_WIELD];
 		if (obj)
 			if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
 			{
-				if ((obj = ch->equipment[SECOND_WIELD]))
+				if ((obj = ch->equipment[WEAR_SECOND_WIELD]))
 				{
-					obj_to_char(ch->unequip_char(SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
-				else if ((obj = ch->equipment[HOLD]))
+				else if ((obj = ch->equipment[WEAR_HOLD]))
 				{
-					obj_to_char(ch->unequip_char(HOLD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_HOLD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
-				else if ((obj = ch->equipment[HOLD2]))
+				else if ((obj = ch->equipment[WEAR_HOLD2]))
 				{
-					obj_to_char(ch->unequip_char(HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
@@ -1851,14 +1851,14 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 			}
-		obj = ch->equipment[SECOND_WIELD];
+		obj = ch->equipment[WEAR_SECOND_WIELD];
 		if (obj)
 			if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
 			{
-				obj = ch->equipment[WIELD];
+				obj = ch->equipment[WEAR_WIELD];
 				if (obj)
 				{
-					obj_to_char(ch->unequip_char(SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
@@ -2470,7 +2470,7 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 		produce_coredump();
 		return 0;
 	}
-	if (IS_AFFECTED(this, AFF_CHARM) && (pos == WIELD || pos == SECOND_WIELD))
+	if (IS_AFFECTED(this, AFF_CHARM) && (pos == WEAR_WIELD || pos == WEAR_SECOND_WIELD))
 	{ // best indentation ever
 		recheck_height_wears();
 		obj_to_char(obj, this);
@@ -2496,9 +2496,9 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 			act("You are zapped by $p but it stays with you.", this, obj, 0, TO_CHAR, 0);
 			this->recheck_height_wears();
 			obj_to_char(obj, this);
-			if (pos == WIELD && this->equipment[SECOND_WIELD])
+			if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
 			{
-				equip_char(unequip_char(SECOND_WIELD), WIELD);
+				equip_char(unequip_char(WEAR_SECOND_WIELD), WEAR_WIELD);
 			}
 			return 1;
 		}
@@ -2508,9 +2508,9 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 			act("$n is zapped by $p and instantly drops it.", this, obj, 0, TO_ROOM, 0);
 			this->recheck_height_wears();
 			obj_to_room(obj, this->in_room);
-			if (pos == WIELD && this->equipment[SECOND_WIELD])
+			if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
 			{
-				equip_char(unequip_char(SECOND_WIELD), WIELD);
+				equip_char(unequip_char(WEAR_SECOND_WIELD), WEAR_WIELD);
 			}
 			return 1;
 		}

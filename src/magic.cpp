@@ -211,7 +211,7 @@ int spell_magic_missile(uint8_t level, Character *ch, Character *victim, class O
   int dam;
   int count = 1;
   int retval = eSUCCESS;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
 
   set_cantquit(ch, victim);
   dam = 15 + getRealSpellDamage(ch);
@@ -240,7 +240,7 @@ int spell_chill_touch(uint8_t level, Character *ch, Character *victim, class Obj
   struct affected_type af;
   int dam = 300;
   int save;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   int retval;
 
   if (level > 200)
@@ -308,7 +308,7 @@ int spell_shocking_grasp(uint8_t level, Character *ch, Character *victim, class 
 int spell_lightning_bolt(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 240;
   if (level > 200)
@@ -324,7 +324,7 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
 {
   bool victim_dazzled = false;
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 370;
 
@@ -364,7 +364,7 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
 int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam, retval;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
 
   /* Does not work in Desert or Underwater */
   if (DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
@@ -479,7 +479,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
 int spell_vampiric_touch(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 225;
   int adam = dam_percent(skill, 225); // Actual damage, for drainy purposes.
@@ -506,7 +506,7 @@ int spell_vampiric_touch(uint8_t level, Character *ch, Character *victim, class 
 int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 600;
   int retval;
@@ -535,7 +535,7 @@ int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, class Ob
 int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 340;
   int retval;
@@ -570,7 +570,7 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
 int spell_sparks(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = dice(level, 6);
   return damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, weap_spell);
@@ -582,7 +582,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
 {
   Character *tmp_char;
   int retval;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
 
   if (saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC) >= 0)
@@ -896,7 +896,7 @@ int cast_greater_stone_shield(uint8_t level, Character *ch, char *arg, int type,
 int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   bool capsize = false, underwater = false;
-  int dam = 0, retval = eSUCCESS, weap_spell = obj ? WIELD : 0, ch_zone = 0, tmp_vict_zone = 0;
+  int dam = 0, retval = eSUCCESS, weap_spell = obj ? WEAR_WIELD : 0, ch_zone = 0, tmp_vict_zone = 0;
   Object *tmp_obj = 0, *obj_next = 0;
 
   switch (DC::getInstance()->world[ch->in_room].sector_type)
@@ -1017,7 +1017,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
 int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam, retval = eSUCCESS;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   Character *tmp_victim, *temp;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
@@ -1505,7 +1505,7 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Obj
   else
   { // possible weapon spell
     int dam, align;
-    int weap_spell = obj ? WIELD : 0;
+    int weap_spell = obj ? WEAR_WIELD : 0;
     set_cantquit(ch, victim);
     if (IS_EVIL(ch))
       victim = ch;
@@ -1554,7 +1554,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
   else
   { // possible weapon spell
     int dam, align;
-    int weap_spell = obj ? WIELD : 0;
+    int weap_spell = obj ? WEAR_WIELD : 0;
     set_cantquit(ch, victim);
     if (IS_GOOD(ch))
       victim = ch;
@@ -1593,7 +1593,7 @@ int spell_call_lightning(uint8_t level, Character *ch, Character *victim, class 
 int spell_harm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 165;
 
@@ -1605,7 +1605,7 @@ int spell_harm(uint8_t level, Character *ch, Character *victim, class Object *ob
 int spell_power_harm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
 
   if (IS_EVIL(ch))
@@ -2237,7 +2237,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
   struct affected_type af;
   int retval;
 
-  if (obj && obj != ch->equipment[WIELD] && obj != ch->equipment[SECOND_WIELD])
+  if (obj && obj != ch->equipment[WEAR_WIELD] && obj != ch->equipment[WEAR_SECOND_WIELD])
   { // hack for weapon spells
     SET_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
     act("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);
@@ -4549,14 +4549,14 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   affect_to_char(victim, &af);
 
   act("Isn't $n just such a nice fellow?", ch, 0, victim, TO_VICT, 0);
-  if (victim->equipment[WIELD])
+  if (victim->equipment[WEAR_WIELD])
   {
-    if (victim->equipment[SECOND_WIELD])
+    if (victim->equipment[WEAR_SECOND_WIELD])
     {
-      tempobj = victim->unequip_char(SECOND_WIELD);
+      tempobj = victim->unequip_char(WEAR_SECOND_WIELD);
       obj_to_room(tempobj, victim->in_room);
     }
-    tempobj = victim->unequip_char(WIELD);
+    tempobj = victim->unequip_char(WEAR_WIELD);
     obj_to_room(tempobj, victim->in_room);
     act("$n's eyes dull and $s hands slacken dropping $s weapons.", victim, 0, 0, TO_ROOM, 0);
   }
@@ -6000,7 +6000,7 @@ int spell_cure_serious(uint8_t level, Character *ch, Character *victim, class Ob
 int spell_cause_light(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
 
   if (!ch || !victim)
   {
@@ -6018,7 +6018,7 @@ int spell_cause_light(uint8_t level, Character *ch, Character *victim, class Obj
 int spell_cause_critical(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
 
   if (!ch || !victim)
   {
@@ -6056,7 +6056,7 @@ int spell_cause_serious(uint8_t level, Character *ch, Character *victim, class O
 int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam, retval;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
 
   if (!ch || !victim)
   {
@@ -6493,7 +6493,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
 int spell_acid_blast(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 375;
   return damage(ch, victim, dam, TYPE_ACID, SPELL_ACID_BLAST, weap_spell);
@@ -11160,7 +11160,7 @@ int spell_bee_sting(uint8_t level, Character *ch, Character *victim, class Objec
   int i;
   set_cantquit(ch, victim);
   dam = dice(4, 3) + skill / 3 + getRealSpellDamage(ch);
-  int weap_spell = obj ? WIELD : 0;
+  int weap_spell = obj ? WEAR_WIELD : 0;
 
   for (i = 0; i < bees; i++)
   {
@@ -15528,10 +15528,10 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
   {
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
-      component = ch->equipment[HOLD];
+      component = ch->equipment[WEAR_HOLD];
       if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
       {
-        component = ch->equipment[HOLD2];
+        component = ch->equipment[WEAR_HOLD2];
         if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
         {
           ch->sendln("You do not have the required components.");
@@ -15685,10 +15685,10 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
   {
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
-      component = ch->equipment[HOLD];
+      component = ch->equipment[WEAR_HOLD];
       if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
       {
-        component = ch->equipment[HOLD2];
+        component = ch->equipment[WEAR_HOLD2];
         if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
         {
           ch->sendln("You do not have the required components.");

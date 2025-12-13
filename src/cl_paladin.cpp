@@ -214,7 +214,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!ch->equipment[WIELD] || !isSet(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WIELD]->obj_flags.value[3] != 3)) // TYPE_SLASH
+  if (!ch->equipment[WEAR_WIELD] || !isSet(ch->equipment[WEAR_WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WEAR_WIELD]->obj_flags.value[3] != 3)) // TYPE_SLASH
   {
     ch->sendln("You need to be wielding a two handed sword to behead!");
     return eFAILURE;

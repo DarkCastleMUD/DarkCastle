@@ -1864,42 +1864,42 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	case eISWIELDING:
 		if (fvict)
-			return fvict->equipment[WIELD] ? 1 : 0;
+			return fvict->equipment[WEAR_WIELD] ? 1 : 0;
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'i':
-			return (mob->equipment[WIELD]) ? 1 : 0;
+			return (mob->equipment[WEAR_WIELD]) ? 1 : 0;
 		case 'z':
 			if (mob->beacon)
-				return ((Character *)mob->beacon)->equipment[WIELD] ? 1 : 0;
+				return ((Character *)mob->beacon)->equipment[WEAR_WIELD] ? 1 : 0;
 			else
 				return -1;
 
 		case 'n':
 			if (actor)
-				return (actor->equipment[WIELD]) ? 1 : 0;
+				return (actor->equipment[WEAR_WIELD]) ? 1 : 0;
 			else
 				return 0;
 		case 't':
 			if (vict)
-				return (vict->equipment[WIELD]) ? 1 : 0;
+				return (vict->equipment[WEAR_WIELD]) ? 1 : 0;
 			else
 				return 0;
 		case 'r':
 			if (rndm)
-				return (rndm->equipment[WIELD]) ? 1 : 0;
+				return (rndm->equipment[WEAR_WIELD]) ? 1 : 0;
 			else
 				return 0;
 		case 'f':
 			if (actor && actor->fighting)
-				return (actor->fighting->equipment[WIELD]) ? 1 : 0;
+				return (actor->fighting->equipment[WEAR_WIELD]) ? 1 : 0;
 			else
 				return 0;
 		case 'g':
 			if (mob && mob->fighting)
-				return (mob->fighting->equipment[WIELD]) ? 1 : 0;
+				return (mob->fighting->equipment[WEAR_WIELD]) ? 1 : 0;
 			else
 				return 0;
 		default:
@@ -1909,35 +1909,35 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		break;
 
 	case eISWEAPPRI:
-		if (fvict && fvict->equipment[WIELD])
-			return mprog_veval(fvict->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+		if (fvict && fvict->equipment[WEAR_WIELD])
+			return mprog_veval(fvict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'i':
-			if (mob->equipment[WIELD])
-				return mprog_veval(mob->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (mob->equipment[WEAR_WIELD])
+				return mprog_veval(mob->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		case 'z':
-			if (mob->beacon && ((Character *)mob->beacon)->equipment[WIELD])
-				return mprog_veval(((Character *)mob->beacon)->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_WIELD])
+				return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return -1;
 		case 'n':
-			if (actor && actor->equipment[WIELD])
-				return mprog_veval(actor->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (actor && actor->equipment[WEAR_WIELD])
+				return mprog_veval(actor->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		case 't':
-			if (vict && vict->equipment[WIELD])
-				return mprog_veval(vict->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (vict && vict->equipment[WEAR_WIELD])
+				return mprog_veval(vict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		case 'r':
-			if (rndm && rndm->equipment[WIELD])
-				return mprog_veval(rndm->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (rndm && rndm->equipment[WEAR_WIELD])
+				return mprog_veval(rndm->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		default:
@@ -1947,35 +1947,35 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		break;
 
 	case eISWEAPSEC:
-		if (fvict && fvict->equipment[SECOND_WIELD])
-			return mprog_veval(fvict->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+		if (fvict && fvict->equipment[WEAR_SECOND_WIELD])
+			return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'i':
-			if (mob->equipment[SECOND_WIELD])
-				return mprog_veval(mob->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (mob->equipment[WEAR_SECOND_WIELD])
+				return mprog_veval(mob->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		case 'z':
-			if (mob->beacon && ((Character *)mob->beacon)->equipment[SECOND_WIELD])
-				return mprog_veval(((Character *)mob->beacon)->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD])
+				return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return -1;
 		case 'n':
-			if (actor && actor->equipment[SECOND_WIELD])
-				return mprog_veval(actor->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (actor && actor->equipment[WEAR_SECOND_WIELD])
+				return mprog_veval(actor->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		case 't':
-			if (vict && vict->equipment[SECOND_WIELD])
-				return mprog_veval(vict->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (vict && vict->equipment[WEAR_SECOND_WIELD])
+				return mprog_veval(vict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		case 'r':
-			if (rndm && rndm->equipment[SECOND_WIELD])
-				return mprog_veval(rndm->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			if (rndm && rndm->equipment[WEAR_SECOND_WIELD])
+				return mprog_veval(rndm->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
 			else
 				return 0;
 		default:

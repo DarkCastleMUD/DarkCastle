@@ -268,13 +268,13 @@ void get_instrument_bonus(Character *ch, int &comb, int &non_comb)
 	comb = 0;
 	non_comb = 0;
 
-	if (!ch->equipment[HOLD])
+	if (!ch->equipment[WEAR_HOLD])
 		return;
-	if (GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT)
+	if (GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT)
 		return;
 
-	comb = ch->equipment[HOLD]->obj_flags.value[1];
-	non_comb = ch->equipment[HOLD]->obj_flags.value[0];
+	comb = ch->equipment[WEAR_HOLD]->obj_flags.value[1];
+	non_comb = ch->equipment[WEAR_HOLD]->obj_flags.value[0];
 }
 
 int do_sing(Character *ch, char *arg, cmd_t cmd)
@@ -338,7 +338,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 			ch->sendln("You must be singing a song to orchestrate another melody.");
 			return eFAILURE;
 		}
-		if ((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
+		if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
 		{
 			ch->sendln("You must be holding an instrument to orchestrate songs.");
 			return eFAILURE;
@@ -581,7 +581,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 
 			if (spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE || spl == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || spl == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE)
 			{
-				if ((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
+				if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
 				{
 					ch->sendln("You can't even begin this song without an instrument.");
 					return eFAILURE;
@@ -778,7 +778,7 @@ void update_character_singing(Character *ch)
 			}
 			else if ((*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE || j != ch->songs.begin())
 			{
-				if ((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
+				if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
 				{
 					ch->sendln("Without an instrument, your song dies away.");
 					if ((song_info[(*j).song_number].intrp_pointer()))

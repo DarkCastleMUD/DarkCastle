@@ -696,23 +696,23 @@ void scavenge(Character *ch)
         {
           if (GET_OBJ_WEIGHT(obj) < GET_STR(ch))
           {
-            if (!ch->equipment[WIELD])
+            if (!ch->equipment[WEAR_WIELD])
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              ch->equip_char(obj, WIELD);
+              ch->equip_char(obj, WEAR_WIELD);
               break;
             }
             /* damage check */
-            if ((ch->equipment[WIELD]) && (!ch->equipment[SECOND_WIELD]))
+            if ((ch->equipment[WEAR_WIELD]) && (!ch->equipment[WEAR_SECOND_WIELD]))
             {
               move_obj(obj, ch);
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              ch->equip_char(obj, SECOND_WIELD);
+              ch->equip_char(obj, WEAR_SECOND_WIELD);
               break;
             }
           } // GET_OBJ_WEIGHT()
@@ -899,7 +899,7 @@ void scavenge(Character *ch)
             break;
 
           case 14:
-            if ((CAN_WEAR(obj, ITEM_WEAR_HOLD)) && (!ch->equipment[HOLD]))
+            if ((CAN_WEAR(obj, ITEM_WEAR_HOLD)) && (!ch->equipment[WEAR_HOLD]))
             {
               if ((obj->obj_flags.type_flag == ITEM_LIGHT) &&
                   (!ch->equipment[WEAR_LIGHT]))
@@ -917,7 +917,7 @@ void scavenge(Character *ch)
                 act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
                 perform_wear(ch, obj, keyword);
                 obj_from_char(obj);
-                ch->equip_char(obj, HOLD);
+                ch->equip_char(obj, WEAR_HOLD);
                 done = 1;
               }
             }

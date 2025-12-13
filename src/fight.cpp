@@ -518,7 +518,7 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
 
 bool gets_dual_wield_attack(Character *ch)
 {
-  if (!ch->equipment[SECOND_WIELD]) // only if we have a second wield:)
+  if (!ch->equipment[WEAR_SECOND_WIELD]) // only if we have a second wield:)
     return false;
 
   if (!ch->has_skill(SKILL_DUAL_WIELD))
@@ -598,7 +598,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     set_fighting(vict, ch); // So attacker starts round #2.
   else if (vict->in_room == ch->in_room)
     set_fighting(ch, vict);
-  wielded = ch->equipment[WIELD];
+  wielded = ch->equipment[WEAR_WIELD];
 
   if (type != SKILL_BACKSTAB)
     if (handle_any_guard(vict))
@@ -669,8 +669,8 @@ int attack(Character *ch, Character *vict, int type, int weapon)
         chance = 33;
       else
         chance = 66; // eq/bard is 66%
-      if ((ch->equipment[WIELD] && DC::getInstance()->obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
-          (ch->equipment[SECOND_WIELD] && DC::getInstance()->obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
+      if ((ch->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].virt == 586) ||
+          (ch->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[ch->equipment[WEAR_SECOND_WIELD]->item_number].virt == 586))
         chance = 101;
       if (chance > number(1, 100))
       {
@@ -741,8 +741,8 @@ int attack(Character *ch, Character *vict, int type, int weapon)
         chance = 33;
       else
         chance = 66; // eq/bard is 66%
-      if ((ch->equipment[WIELD] && DC::getInstance()->obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
-          (ch->equipment[SECOND_WIELD] && DC::getInstance()->obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
+      if ((ch->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].virt == 586) ||
+          (ch->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[ch->equipment[WEAR_SECOND_WIELD]->item_number].virt == 586))
         chance = 101;
 
       if (chance > number(1, 100))
@@ -1007,7 +1007,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
     }
     */
   ch->removeHP(dam);
-  do_dam_msgs(vict, ch, dam, SPELL_LIGHTNING_SHIELD, WIELD);
+  do_dam_msgs(vict, ch, dam, SPELL_LIGHTNING_SHIELD, WEAR_WIELD);
   update_pos(ch);
 
   if (GET_POS(ch) == position_t::DEAD)
@@ -1124,7 +1124,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
     }
   */
   ch->removeHP(dam);
-  do_dam_msgs(vict, ch, dam, SPELL_FIRESHIELD, WIELD);
+  do_dam_msgs(vict, ch, dam, SPELL_FIRESHIELD, WEAR_WIELD);
   update_pos(ch);
 
   if (GET_POS(ch) == position_t::DEAD)
@@ -1210,7 +1210,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
     }
     */
   ch->removeHP(dam);
-  do_dam_msgs(vict, ch, dam, SPELL_ACID_SHIELD, WIELD);
+  do_dam_msgs(vict, ch, dam, SPELL_ACID_SHIELD, WEAR_WIELD);
   update_pos(ch);
 
   if (GET_POS(ch) == position_t::DEAD)
@@ -1270,7 +1270,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   }
 
   ch->removeHP(dam);
-  do_dam_msgs(vict, ch, dam, SPELL_BONESHIELD, WIELD);
+  do_dam_msgs(vict, ch, dam, SPELL_BONESHIELD, WEAR_WIELD);
   update_pos(ch);
 
   if (GET_POS(ch) == position_t::DEAD)
@@ -1654,18 +1654,18 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         }
       }
 
-      if (ch->equipment[HOLD])
+      if (ch->equipment[WEAR_HOLD])
       {
-        retval = weapon_spells(ch, vict, HOLD);
+        retval = weapon_spells(ch, vict, WEAR_HOLD);
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
         }
 
-        if (ch->equipment[HOLD]->item_number >= 0)
+        if (ch->equipment[WEAR_HOLD]->item_number >= 0)
         {
-          if (DC::getInstance()->obj_index[ch->equipment[HOLD]->item_number].combat_func != nullptr)
-            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], cmd_t::UNDEFINED, "", ch));
+          if (DC::getInstance()->obj_index[ch->equipment[WEAR_HOLD]->item_number].combat_func != nullptr)
+            retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HOLD]->item_number].combat_func)(ch, ch->equipment[WEAR_HOLD], cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
             return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1673,19 +1673,19 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         }
       }
 
-      if (ch->equipment[HOLD2])
+      if (ch->equipment[WEAR_HOLD2])
       {
 
-        retval = weapon_spells(ch, vict, HOLD2);
+        retval = weapon_spells(ch, vict, WEAR_HOLD2);
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
         }
 
-        if (ch->equipment[HOLD2]->item_number >= 0)
+        if (ch->equipment[WEAR_HOLD2]->item_number >= 0)
         {
-          if (DC::getInstance()->obj_index[ch->equipment[HOLD2]->item_number].combat_func != nullptr)
-            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], cmd_t::UNDEFINED, "", ch));
+          if (DC::getInstance()->obj_index[ch->equipment[WEAR_HOLD2]->item_number].combat_func != nullptr)
+            retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HOLD2]->item_number].combat_func)(ch, ch->equipment[WEAR_HOLD2], cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
             return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1730,11 +1730,11 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
       DC::getInstance()->world[ch->in_room].light--;
       ch->glow_factor--;
     }
-    else if ((pos == WIELD) && (ch->equipment[SECOND_WIELD]))
+    else if ((pos == WEAR_WIELD) && (ch->equipment[WEAR_SECOND_WIELD]))
     {
       Object *temp;
-      temp = ch->unequip_char(SECOND_WIELD);
-      ch->equip_char(temp, WIELD);
+      temp = ch->unequip_char(WEAR_SECOND_WIELD);
+      ch->equip_char(temp, WEAR_WIELD);
     }
     act("$p carried by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
   }
@@ -2105,7 +2105,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   }
 
   if (!weapon)
-    weapon = WIELD;
+    weapon = WEAR_WIELD;
 
   // here goes le elemental stuff
 
@@ -3400,7 +3400,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 
   debug_isHit_generic(ch, victim, parry, dodge, block, martial, tumbling);
 
-  if (victim->equipment[WIELD] == nullptr)
+  if (victim->equipment[WEAR_WIELD] == nullptr)
     parry = 0;
 
   if (!victim->equipment[WEAR_SHIELD])
@@ -3519,7 +3519,7 @@ int checkCounterStrike(Character *ch, Character *victim)
   int retval, lvl = victim->has_skill(SKILL_COUNTER_STRIKE);
 
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
-      (victim->equipment[WIELD] != nullptr) ||
+      (victim->equipment[WEAR_WIELD] != nullptr) ||
       (isSet(victim->combat, COMBAT_STUNNED2)) ||
       (isSet(victim->combat, COMBAT_BASH1)) ||
       (isSet(victim->combat, COMBAT_BASH2)) ||
@@ -3625,7 +3625,7 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
   int retval;
 
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
-      (ch->equipment[WIELD] == nullptr && number(1, 101) >= 50) ||
+      (ch->equipment[WEAR_WIELD] == nullptr && number(1, 101) >= 50) ||
       (isSet(victim->combat, COMBAT_STUNNED2)) ||
       (isSet(victim->combat, COMBAT_BASH1)) ||
       (isSet(victim->combat, COMBAT_BASH2)) ||
@@ -3801,7 +3801,7 @@ bool check_parry(Character *ch, Character *victim, int attacktype, bool display_
 {
   int modifier = 0;
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
-      (victim->equipment[WIELD] == nullptr) ||
+      (victim->equipment[WEAR_WIELD] == nullptr) ||
       (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
       (isSet(victim->combat, COMBAT_STUNNED2)) ||
       ((isSet(victim->combat, COMBAT_BASH1) ||
@@ -5056,10 +5056,10 @@ void make_heart(Character *ch, Character *vict)
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
 
-  if (!ch->equipment[HOLD] && !ch->equipment[WIELD] && !ch->equipment[WEAR_LIGHT])
-    ch->equip_char(corpse, HOLD);
-  else if (!ch->equipment[HOLD2] && !ch->equipment[SECOND_WIELD])
-    ch->equip_char(corpse, HOLD2);
+  if (!ch->equipment[WEAR_HOLD] && !ch->equipment[WEAR_WIELD] && !ch->equipment[WEAR_LIGHT])
+    ch->equip_char(corpse, WEAR_HOLD);
+  else if (!ch->equipment[WEAR_HOLD2] && !ch->equipment[WEAR_SECOND_WIELD])
+    ch->equip_char(corpse, WEAR_HOLD2);
   else
     extract_obj(corpse);
 
@@ -6377,9 +6377,9 @@ void disarm(Character *ch, Character *victim)
 {
   class Object *obj;
 
-  if (victim->equipment[WIELD] == nullptr)
+  if (victim->equipment[WEAR_WIELD] == nullptr)
     return;
-  if (ch->equipment[WIELD] == nullptr)
+  if (ch->equipment[WEAR_WIELD] == nullptr)
     return;
 
   if (victim->affected_by_spell(SPELL_PARALYZE))
@@ -6398,12 +6398,12 @@ void disarm(Character *ch, Character *victim)
 
   // all disarms go to inventory right now -pir
   //  if (IS_PC(ch)) {
-  obj = victim->unequip_char(WIELD);
+  obj = victim->unequip_char(WEAR_WIELD);
   obj_to_char(obj, victim);
-  if (victim->equipment[SECOND_WIELD])
+  if (victim->equipment[WEAR_SECOND_WIELD])
   {
-    obj = victim->unequip_char(SECOND_WIELD);
-    victim->equip_char(obj, WIELD);
+    obj = victim->unequip_char(WEAR_SECOND_WIELD);
+    victim->equip_char(obj, WEAR_WIELD);
   }
   victim->recheck_height_wears();
   return;
@@ -6411,17 +6411,17 @@ void disarm(Character *ch, Character *victim)
 
   // we never get here cause of above code
 
-  obj = victim->unequip_char(WIELD);
+  obj = victim->unequip_char(WEAR_WIELD);
   /* If it's gl make it go to inventory. Morc. */
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     obj_to_char(obj, victim);
   else
     obj_to_room(obj, victim->in_room);
 
-  if (victim->equipment[SECOND_WIELD])
+  if (victim->equipment[WEAR_SECOND_WIELD])
   {
-    obj = victim->unequip_char(SECOND_WIELD);
-    victim->equip_char(obj, WIELD);
+    obj = victim->unequip_char(WEAR_SECOND_WIELD);
+    victim->equip_char(obj, WEAR_WIELD);
   }
 }
 
@@ -7382,7 +7382,7 @@ int fourth_attack(Character *ch)
     the skill.
 int second_wield(Character *ch)
 {
-  // If the ch is capable of using the SECOND_WIELD
+  // If the ch is capable of using the WEAR_SECOND_WIELD
   if((GET_CLASS(ch) == CLASS_MAGIC_USER) || (GET_CLASS(ch) == CLASS_MONK))
     return false;
   return true;
