@@ -4394,7 +4394,7 @@ void make_scraps(Character *ch, class Object *obj)
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = TAKE;
+  corpse->obj_flags.wear_flags = {TAKE};
   corpse->obj_flags.value[0] = 0;
   corpse->obj_flags.value[3] = 0;
   corpse->obj_flags.weight = obj->obj_flags.weight;
@@ -4447,7 +4447,7 @@ void make_corpse(Character *ch)
   }
   else
   {
-    corpse->obj_flags.wear_flags = TAKE;
+    corpse->obj_flags.wear_flags = {TAKE};
 
     if (ch->getLevel() >= 50)
       sprintf(buf, "corpse %s pc lootable", GET_NAME(ch));
