@@ -413,7 +413,7 @@ void DC::load_corpses(void)
 					}
 				}
 				temp->obj_flags.type_flag = t[0];
-				temp->obj_flags.wear_flags = t[1];
+				temp->obj_flags.wear_flags = ObjectPositions::fromInt(t[1]);
 				temp->obj_flags.weight = (t[2] > 0 ? t[2] : 0);
 				temp->obj_flags.cost = t[3];
 				size_t alloc_num_affects = std::max(0, t[4]);

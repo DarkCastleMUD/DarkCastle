@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <QStringList>
+#include <QMetaEnum>
 
 #include "DC/common.h"
 #include "DC/structs.h" // uint8_t
@@ -65,28 +66,6 @@ class Character;
 #define ITEM_TOTEM 33
 #define ITEM_KEYRING 34
 #define ITEM_TYPE_MAX 34
-
-/* Bitvector For 'wear_flags' */
-
-#define TAKE 1
-#define FINGER 2
-#define NECK 4
-#define BODY 8
-#define HEAD 16
-#define LEGS 32
-#define FEET 64
-#define HANDS 128
-#define ARMS 256
-#define SHIELD 512
-#define ABOUT 1024
-#define WAISTE 2048
-#define WRIST 4096
-#define WIELD 8192
-#define HOLD 16384
-#define THROW 32768
-#define LIGHT_SOURCE 65536
-#define FACE 131072
-#define EAR 262144
 
 /* Bitvector for 'extra_flags' */
 
@@ -204,19 +183,72 @@ class active_object
 typedef uint16_t object_type_t;
 typedef int32_t object_value_t;
 
+/* Bitvector For 'wear_flags' */
+
+// #define TAKE 1
+
+namespace DCNS
+{
+    Q_NAMESPACE
+
+    enum ObjectPosition
+    {
+        TAKE = 1 << 0,
+        FINGER = 1 << 1,
+        NECK = 1 << 2,
+        BODY = 1 << 3,
+        HEAD = 1 << 4,
+        LEGS = 1 << 5,
+        FEET = 1 << 6,
+        HANDS = 1 << 7,
+        ARMS = 1 << 8,
+        SHIELD = 1 << 9,
+        ABOUT = 1 << 10,
+        WAISTE = 1 << 11,
+        WRIST = 1 << 12,
+        WIELD = 1 << 13,
+        HOLD = 1 << 14,
+        THROW = 1 << 15,
+        LIGHT_SOURCE = 1 << 16,
+        FACE = 1 << 17,
+        EAR = 1 << 18
+    };
+    Q_DECLARE_FLAGS(ObjectPositions, ObjectPosition)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ObjectPositions)
+    Q_FLAG_NS(ObjectPositions)
+
+    template <typename T>
+    QStringList QFlagsToStrings(void)
+    {
+        QStringList list;
+        auto metaEnum = QMetaEnum::fromType<T>();
+        for (auto i = 0; i < metaEnum.keyCount(); ++i)
+        {
+            if (metaEnum.key(i))
+                list.push_back(QString(metaEnum.key(i)).replace('_', '-'));
+        }
+        return list;
+    }
+    template <typename T>
+    QString QFlagsToStrings(T flags)
+    {
+        return QMetaEnum::fromType<T>().valueToKeys(flags).replace('_', '-').replace('|', ' ');
+    }
+}
+using namespace DCNS;
 struct obj_flag_data
 {
     object_value_t value[4] = {}; /* Values of the item (see list)    */
     object_type_t type_flag = {}; /* Type of item                     */
-    uint32_t wear_flags = {};     /* Where you can wear it            */
-    uint16_t size = {};           /* Race restrictions                */
-    uint32_t extra_flags = {};    /* If it hums, glows etc            */
-    int16_t weight = {};          /* Weight what else                 */
-    int32_t cost = {};            /* Value when sold (gp.)            */
-    uint32_t more_flags = {};     /* A second bitvector (extra_flags2)*/
-    level_t eq_level = {};        /* Min level to use it for eq       */
-    int16_t timer = {};           /* Timer for object                 */
-    Character *origin = {};       /* Creator of object, previously was stored at value[3] */
+    ObjectPositions wear_flags = {};
+    uint16_t size = {};        /* Race restrictions                */
+    uint32_t extra_flags = {}; /* If it hums, glows etc            */
+    int16_t weight = {};       /* Weight what else                 */
+    int32_t cost = {};         /* Value when sold (gp.)            */
+    uint32_t more_flags = {};  /* A second bitvector (extra_flags2)*/
+    level_t eq_level = {};     /* Min level to use it for eq       */
+    int16_t timer = {};        /* Timer for object                 */
+    Character *origin = {};    /* Creator of object, previously was stored at value[3] */
     bool Value(qsizetype i, object_value_t v)
     {
         if (i >= 0 && i < 4)
@@ -266,7 +298,6 @@ public:
     typedef QString (Object::*getter_t)(void);
     typedef bool (Object::*setter_t)(QString);
 
-    static const QStringList wear_bits;
     static const QStringList size_bits;
     static const QStringList more_obj_bits;
     static const QStringList extra_bits;

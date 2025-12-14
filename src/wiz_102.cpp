@@ -2242,16 +2242,17 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\n\r"
                    "$3Current$R: ",
                    this);
-      sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags, Object::wear_bits, buf);
-      send(buf);
-      sendln("\r\n$3Valid types$R:");
-      for (i = 0; i < Object::wear_bits.size(); i++)
+
+      sendln(QFlagsToStrings<ObjectPositions>(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags));
+      sendln("$3Valid types$R:");
+      for (i = 0; i < QFlagsToStrings<ObjectPositions>().size(); i++)
       {
-        send(QStringLiteral("  %1\r\n").arg(Object::wear_bits[i]));
+        send(QStringLiteral("  %1\r\n").arg(QFlagsToStrings<ObjectPositions>().value(i)));
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), this, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags);
+
+    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags = parse_bitstrings<ObjectPositions>(buf4, this, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags);
   }
   break;
 

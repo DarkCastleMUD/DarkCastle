@@ -1321,6 +1321,39 @@ private:
     DC *dc_ = DC::getInstance();
 };
 
+template <typename T>
+T parse_bitstrings(QString arg1, Character *ch = nullptr, T value = {})
+{
+    bool found = false;
+    auto metaEnum = QMetaEnum::fromType<T>();
+
+    for (int x = 0; x < metaEnum.keyCount(); ++x)
+    {
+        auto obj_position = ObjectPosition(1 << x);
+        if (is_abbrev(arg1, metaEnum.key(x)))
+        {
+            if (value.testFlag(obj_position))
+            {
+                // value
+                value.setFlag(obj_position, false);
+                if (ch)
+                    ch->send(QStringLiteral("%1 flag REMOVED.\r\n").arg(metaEnum.key(x)));
+            }
+            else
+            {
+                value.setFlag(obj_position);
+                if (ch)
+                    ch->send(QStringLiteral("%1 flag ADDED.\r\n").arg(metaEnum.key(x)));
+            }
+            found = true;
+            break;
+        }
+    }
+    if (!found && ch)
+        ch->sendln("No matching bits found.");
+    return value;
+}
+
 class communication
 {
 public:

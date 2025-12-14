@@ -1652,6 +1652,20 @@ private slots:
         QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->item_number].virt, 99);
         QCOMPARE(get_objindex_vnum(QStringLiteral("v99"))->carried_by, nullptr);
     }
+
+    void test_qflags()
+    {
+        QCOMPARE(QFlagsToStrings<ObjectPositions>().size(), 19);
+        QCOMPARE(QFlagsToStrings<ObjectPositions>().first(), QStringLiteral("TAKE"));
+        QCOMPARE(QFlagsToStrings<ObjectPositions>().last(), QStringLiteral("EAR"));
+        obj_flag_data obj_flags{};
+        obj_flags.wear_flags = {TAKE, SHIELD};
+        qDebug() << obj_flags.wear_flags;
+        QVERIFY(obj_flags.wear_flags.testFlag(TAKE));
+        QVERIFY(obj_flags.wear_flags.testFlag(SHIELD));
+        QVERIFY(!obj_flags.wear_flags.testFlag(EAR));
+        QCOMPARE(QFlagsToStrings(obj_flags.wear_flags), QStringLiteral("TAKE SHIELD"));
+    }
 };
 
 QTEST_MAIN(TestDC)

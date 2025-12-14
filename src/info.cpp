@@ -1053,8 +1053,7 @@ bool identify(Character *ch, Object *obj)
       csendf(ch, "$3Owner: $R%s\r\n", obj->getOwner().toStdString().c_str());
    }
 
-   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
-   ch->send(QStringLiteral("$3Worn on: $R%1\r\n").arg(buf));
+   ch->send(QStringLiteral("$3Worn on: $R%1\r\n").arg(QFlagsToStrings(obj->obj_flags.wear_flags)));
 
    sprintbit(obj->obj_flags.size, Object::size_bits, buf);
    ch->send(QStringLiteral("$3Worn by: $R%1\r\n").arg(buf));
@@ -3525,8 +3524,7 @@ public:
    // type=
    void setObjectType(object_type_t object_type) { obj_flags_.type_flag = object_type; }
 
-   // wear=
-   void setObjectWearLocation(uint32_t location) { obj_flags_.wear_flags = location; }
+   void setObjectWearLocation(ObjectPositions location) { obj_flags_.wear_flags = location; }
 
    // size=
    void setObjectSize(uint16_t size) { obj_flags_.size = size; }
@@ -4031,8 +4029,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
          bool found = false;
          if (!arg2.isEmpty())
          {
-            uint32_t location = 0;
-            parse_bitstrings_into_int(Object::wear_bits, arg2, nullptr, location);
+            auto location = parse_bitstrings<ObjectPositions>(arg2);
             if (location)
             {
                found = true;
@@ -4045,7 +4042,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
          {
             send("What type are you searching for?\r\n");
             send("Here are some valid wear locations:\r\n");
-            for (const auto &w : Object::wear_bits)
+            for (const auto &w : QFlagsToStrings<ObjectPositions>())
             {
                send(w + "\r\n");
             }

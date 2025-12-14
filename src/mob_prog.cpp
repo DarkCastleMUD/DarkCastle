@@ -1316,7 +1316,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!otarget)
 				tError = true;
 			else
-				uintval = &otarget->obj_flags.wear_flags;
+			{
+				auto tmp_quint32 = otarget->obj_flags.wear_flags.toInt();
+				uintval = &tmp_quint32;
+			}
 		}
 		else if (!str_cmp(right, "weight"))
 		{

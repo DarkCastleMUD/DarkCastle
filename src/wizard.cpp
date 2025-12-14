@@ -1014,7 +1014,7 @@ void obj_stat(Character *ch, class Object *j)
     ch->send(buf);
   }
   ch->send("$3Can be worn on$R:");
-  sprintbit(j->obj_flags.wear_flags, Object::wear_bits, buf);
+  sprintbit(j->obj_flags.wear_flags, QFlagsToStrings<ObjectPositions>(), buf);
   strcat(buf, "\n\r");
   ch->send(buf);
 

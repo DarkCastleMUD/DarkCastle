@@ -143,7 +143,7 @@ QString showObjectAffects(Object *obj)
 QString showObjectVault(Object *obj)
 {
   // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
-  QString buffer = sprintbit(obj->obj_flags.wear_flags, Object::wear_bits);
+  QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
   // std::cerr <<  buf << ":";
 
   buffer += sprintbit(obj->obj_flags.size, Object::size_bits);
@@ -166,7 +166,7 @@ void showObject(Character *ch, Object *obj)
   // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
   char buf[255];
 
-  sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
+  QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
   // std::cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.size, Object::size_bits, buf);

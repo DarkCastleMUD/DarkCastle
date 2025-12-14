@@ -829,28 +829,6 @@ item_types_t item_types =
         "KEYRING",
         "\n"};
 
-const QStringList Object::wear_bits =
-    {
-        "TAKE",
-        "FINGER",
-        "NECK",
-        "BODY",
-        "HEAD",
-        "LEGS",
-        "FEET",
-        "HANDS",
-        "ARMS",
-        "SHIELD",
-        "ABOUT",
-        "WAIST",
-        "WRIST",
-        "WIELD",
-        "HOLD",
-        "THROW",
-        "LIGHT-SOURCE",
-        "FACE",
-        "EAR"};
-
 const char *zone_modes[] =
     {
         "Don't_Update",

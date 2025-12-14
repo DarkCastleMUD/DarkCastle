@@ -3806,7 +3806,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	DC::getInstance()->currentType("Object");
 	obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(fl);
 	obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(fl);
-	obj->obj_flags.wear_flags = fread_int<decltype(obj->obj_flags.wear_flags)>(fl);
+	obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(fl);
 	obj->obj_flags.size = fread_int<decltype(obj->obj_flags.size)>(fl);
 
 	obj->obj_flags.value[0] = fread_int<object_value_t>(fl);
@@ -3968,7 +3968,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 
 	obj->obj_flags.type_flag = fread_int(fl, -1000, 2147483467);
 	obj->obj_flags.extra_flags = fread_bitvector(fl, 0, 2147483467);
-	obj->obj_flags.wear_flags = fread_bitvector(fl, 0, 2147483467);
+	obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(fl);
 	obj->obj_flags.size = fread_bitvector(fl, 0, 2147483467);
 
 	obj->obj_flags.value[0] = fread_int(fl, -1000, 2147483467);
@@ -4112,7 +4112,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 	obj->obj_flags.type_flag = fread_int(in, -1000, 2147483467);
 
 	obj->obj_flags.extra_flags = fread_bitvector(in, 0, 2147483467);
-	obj->obj_flags.wear_flags = fread_bitvector(in, 0, 2147483467);
+	obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(in);
 	obj->obj_flags.size = fread_bitvector(in, 0, 2147483467);
 
 	obj->obj_flags.value[0] = fread_int(in, -1000, 2147483467);
@@ -4393,7 +4393,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 		fout << obj->obj_flags.weight << ",";
 		fout << obj->obj_flags.cost << ",";
 
-		write_bitvector_csv(obj->obj_flags.wear_flags, Object::wear_bits, fout);
+		write_bitvector_csv(obj->obj_flags.wear_flags, QFlagsToStrings<ObjectPositions>(), fout);
 		write_bitvector_csv(obj->obj_flags.extra_flags, Object::extra_bits, fout);
 		write_bitvector_csv(obj->obj_flags.more_flags, Object::more_obj_bits, fout);
 

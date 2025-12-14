@@ -860,10 +860,10 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   }
 
   int i = 1;
-  for (; i < Object::wear_bits.size(); i++)
-    if (Object::wear_bits[i] == QString(arg))
+  for (; i < QFlagsToStrings<ObjectPositions>().size(); i++)
+    if (QFlagsToStrings<ObjectPositions>().value(i) == QString(arg))
       break;
-  if (i >= Object::wear_bits.size())
+  if (i >= QFlagsToStrings<ObjectPositions>().size())
   {
     ch->sendln("Syntax: acfinder <wear slot>");
     return eFAILURE;
@@ -981,7 +981,7 @@ int do_export(Character *ch, char *args, cmd_t cmd)
     fout << "size,value[0],value[1],value[2],value[3],level,weight,cost,";
 
     // Print individual array values as columns
-    write_array_csv(Object::wear_bits, fout);
+    write_array_csv(QFlagsToStrings<ObjectPositions>(), fout);
     write_array_csv(Object::extra_bits, fout);
     write_array_csv(Object::more_obj_bits, fout);
 

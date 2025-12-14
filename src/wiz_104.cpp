@@ -1449,8 +1449,8 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 				goto endy;
 			}
 
-			for (i = 0; i < Object::wear_bits.size(); i++)
-				if (!str_nosp_cmp(Object::wear_bits[i], arg1))
+			for (i = 0; i < QFlagsToStrings<ObjectPositions>().size(); i++)
+				if (!str_nosp_cmp(QFlagsToStrings<ObjectPositions>().value(i), arg1))
 				{
 					SET_BIT(wear, 1 << i);
 					goto endy;
@@ -1552,10 +1552,10 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 		int o = 0, z;
 		if (!fo)
 		{
-			for (z = 0; z < Object::wear_bits.size(); z++)
+			for (z = 0; z < QFlagsToStrings<ObjectPositions>().size(); z++)
 			{
 				o++;
-				send_to_char_nosp(Object::wear_bits[z], ch);
+				send_to_char_nosp(QFlagsToStrings<ObjectPositions>().value(z), ch);
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
