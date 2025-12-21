@@ -5083,7 +5083,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 			{
 				if (!arguments.isEmpty())
 				{
-					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), cmd_t::OTHER);
+					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '));
 				}
 
 				vmob = dc_->initiate_oproc(this, item);
@@ -5103,7 +5103,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 		{
 			if (!arguments.isEmpty())
 			{
-				do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), cmd_t::OTHER);
+				do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '));
 			}
 			vmob = dc_->initiate_oproc(this, item);
 			if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
@@ -5123,7 +5123,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 			{
 				if (!arguments.isEmpty())
 				{
-					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), cmd_t::OTHER);
+					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '));
 				}
 
 				vmob = dc_->initiate_oproc(this, equipment[i]);

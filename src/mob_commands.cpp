@@ -1220,12 +1220,6 @@ QString Character::getTemp(QString name)
 command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
 {
   Character *victim;
-  if (IS_PC(this) && cmd != cmd_t::OTHER)
-  {
-    this->sendln("Huh?");
-    return eFAILURE;
-  }
-
   QString arg = arguments.value(0);
   QString temp = arguments.value(1);
   QString arg2 = arguments.value(2);
