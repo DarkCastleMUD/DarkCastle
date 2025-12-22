@@ -1952,6 +1952,12 @@ int fido(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character
             extract_obj(i);
             return eSUCCESS;
         }
+        else if (GET_ITEM_TYPE(i) == ITEM_TRASH)
+        {
+            act("$n eats some trash. YUCK!", ch, 0, 0, TO_ROOM, 0);
+            extract_obj(i);
+            return eSUCCESS;
+        }
     }
     return eFAILURE;
 }
