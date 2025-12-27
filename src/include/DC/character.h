@@ -1097,6 +1097,8 @@ public:
     command_return_t do_bestow(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_alias(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_kick(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_givealldot(QString name, QString target, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_give(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     auto do_arena(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
     auto do_notitle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
     auto do_arena_info(QStringList arguments) -> command_return_t;

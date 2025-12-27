@@ -111,7 +111,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("drop"), do_drop, position_t::RESTING, 0, cmd_t::DROP, true, 25, CommandType::all),
         Command(QStringLiteral("eat"), do_eat, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
         Command(QStringLiteral("fill"), do_fill, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
-        Command(QStringLiteral("give"), do_give, position_t::RESTING, 0, cmd_t::GIVE, true, 25, CommandType::all),
+        Command(QStringLiteral("give"), &Character::do_give, position_t::RESTING, 0, cmd_t::GIVE, true, 25, CommandType::all),
         Command(QStringLiteral("grab"), do_grab, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
         Command(QStringLiteral("hold"), do_grab, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
         Command(QStringLiteral("lock"), do_lock, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),

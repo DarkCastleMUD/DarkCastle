@@ -1552,138 +1552,127 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
   return eFAILURE;
 }
 
-void do_givealldot(Character *ch, char *name, char *target, cmd_t cmd)
+command_return_t Character::do_givealldot(QString name, QString target, cmd_t cmd)
 {
-  class Object *tmp_object;
-  class Object *next_object;
-  char buf[200];
   bool found = false;
 
-  for (tmp_object = ch->carrying; tmp_object; tmp_object = next_object)
+  for (auto tmp_object = carrying, next_object = carrying; tmp_object; tmp_object = next_object)
   {
     next_object = tmp_object->next_content;
-    if (!name && CAN_SEE_OBJ(ch, tmp_object))
+    if (name.isEmpty() && CAN_SEE_OBJ(this, tmp_object))
     {
-      sprintf(buf, "%s %s", fname(tmp_object->name).toStdString().c_str(), target);
-      buf[99] = 0;
       found = true;
-      do_give(ch, buf, cmd);
+      do_give({fname(tmp_object->name), target});
     }
-    else if (isexact(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object))
+    else if (isexact(name, tmp_object->name) && CAN_SEE_OBJ(this, tmp_object))
     {
-      sprintf(buf, "%s %s", name, target);
-      buf[99] = 0;
       found = true;
-      do_give(ch, buf, cmd);
+      do_give({name, target});
     }
   }
 
   if (!found)
-    ch->sendln("You don't have one.");
+  {
+    sendln("You don't have one.");
+    return eFAILURE;
+  }
+
+  return eSUCCESS;
 }
 
-int do_give(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
-  char obj_name[MAX_INPUT_LENGTH + 1], vict_name[MAX_INPUT_LENGTH + 1], buf[200];
-  char arg[80], allbuf[80];
-  int64_t amount;
-  int retval;
-  Character *vict;
-  class Object *obj;
+  command_return_t retval{};
+  Character *vict{};
+  class Object *obj{};
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
-  if (ch->isPlayerObjectThief())
+  if (isPlayerObjectThief())
   {
-    ch->sendln("Your criminal actions prohibit it.");
+    sendln("Your criminal actions prohibit it.");
     return eFAILURE;
   }
-  argument = one_argument(argument, obj_name);
+  auto obj_name = arguments.value(0);
+  if (!arguments.isEmpty())
+    arguments.removeFirst();
 
   if (is_number(obj_name))
   {
-    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+    if (!IS_NPC(this) && isPlayerGoldThief())
     {
-      ch->sendln("Your criminal acts prohibit it.");
+      sendln("Your criminal acts prohibit it.");
       return eFAILURE;
     }
-    /*
-        if(strlen(obj_name) > 7) {
-          ch->sendln("Number field too large.");
-          return eFAILURE;
-        }*/
-    amount = atoll(obj_name);
-    argument = one_argument(argument, arg);
-    if (str_cmp("gold", arg) && str_cmp("coins", arg) && str_cmp("coin", arg))
+    bool ok = false;
+    auto amount = obj_name.toULongLong(&ok);
+    auto arg = arguments.value(0);
+    if (!arguments.isEmpty())
+      arguments.removeFirst();
+
+    if (arg != QStringLiteral("gold") && arg != QStringLiteral("coins") && arg != QStringLiteral("coin"))
     {
-      ch->sendln("Sorry, you can't do that (yet)...");
+      sendln("Sorry, you can't do that (yet)...");
       return eFAILURE;
     }
-    if (amount < 0)
+    if (!amount || !ok)
     {
-      ch->sendln("Sorry, you can't do that!");
+      sendln("Sorry, you can't do that!");
       return eFAILURE;
     }
-    if (ch->getGold() < amount && ch->getLevel() < DEITY)
+    if (getGold() < amount && getLevel() < DEITY)
     {
-      ch->sendln("You haven't got that many coins!");
+      sendln("You haven't got that many coins!");
       return eFAILURE;
     }
-    argument = one_argument(argument, vict_name);
-    if (!*vict_name)
+    auto vict_name = arguments.value(0);
+    if (vict_name.isEmpty())
     {
-      ch->sendln("To whom?");
+      sendln("To whom?");
       return eFAILURE;
     }
 
-    if (!(vict = ch->get_char_room_vis(vict_name)))
+    if (!(vict = get_char_room_vis(vict_name)))
     {
-      ch->sendln("To whom?");
+      sendln("To whom?");
       return eFAILURE;
     }
 
-    if (ch == vict)
+    if (this == vict)
     {
-      ch->sendln("Umm okay, you give it to yourself.");
+      sendln("Umm okay, you give it to yourself.");
       return eFAILURE;
     }
     /*
           if(vict->getGold() > 2000000000) {
-             ch->sendln("They can't hold that much gold!");
+             sendln("They can't hold that much gold!");
              return eFAILURE;
           }
     */
-    csendf(ch, "You give %ld coin%s to %s.\r\n", amount,
-           amount == 1 ? "" : "s", GET_SHORT(vict));
+    sendln(QStringLiteral("You give %1 coin%2 to %3.").arg(amount).arg(amount == 1 ? "" : "s").arg(GET_SHORT(vict)));
+    logobjects(QStringLiteral("%1 gives %2 coin%3 to %4").arg(GET_NAME(this)).arg(amount).arg(pluralize(amount)).arg(GET_NAME(vict)));
+    act(QStringLiteral("%1 gives you %2 $B$5gold$R coin%3.").arg(PERS(this, vict)).arg(amount).arg(amount == 1 ? "" : "s"), this, 0, vict, TO_VICT, INVIS_NULL);
+    act("$n gives some gold to $N.", this, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
 
-    sprintf(buf, "%s gives %ld coin%s to %s", GET_NAME(ch), amount,
-            pluralize(amount), GET_NAME(vict));
-    logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    removeGold(amount);
 
-    sprintf(buf, "%s gives you %ld $B$5gold$R coin%s.", PERS(ch, vict), amount,
-            amount == 1 ? "" : "s");
-    act(buf, ch, 0, vict, TO_VICT, INVIS_NULL);
-    act("$n gives some gold to $N.", ch, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
-
-    ch->removeGold(amount);
-
-    if (IS_NPC(ch) && (!IS_AFFECTED(ch, AFF_CHARM) || ch->getLevel() > 50))
+    if (IS_NPC(this) && (!IS_AFFECTED(this, AFF_CHARM) || getLevel() > 50))
     {
-      special_log(QString(QStringLiteral("%1 (mob) giving %2 gold to %3 in room %4.")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
+      special_log(QString(QStringLiteral("%1 (mob) giving %2 gold to %3 in room %4.")).arg(getName()).arg(amount).arg(vict->getName()).arg(in_room));
     }
 
-    if (ch->getGold() < 0)
+    if (getGold() < 0)
     {
-      ch->setGold(0);
-      ch->sendln("Warning:  You are giving out more $B$5gold$R than you had.");
-      if (ch->getLevel() < IMPLEMENTER)
+      setGold(0);
+      sendln("Warning:  You are giving out more $B$5gold$R than you had.");
+      if (getLevel() < IMPLEMENTER)
       {
-        special_log(QString(QStringLiteral("%1 gives %2 coins to %3 (negative!) in room %4.")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
+        special_log(QString(QStringLiteral("%1 gives %2 coins to %3 (negative!) in room %4.")).arg(getName()).arg(amount).arg(vict->getName()).arg(in_room));
       }
     }
     vict->addGold(amount);
@@ -1695,29 +1684,29 @@ int do_give(Character *ch, char *argument, cmd_t cmd)
       SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
     }
 
-    ch->save();
+    save();
     vict->save();
     // bribe trigger automatically removes any gold given to mob
-    mprog_bribe_trigger(vict, ch, amount);
+    mprog_bribe_trigger(vict, this, amount);
 
     return eSUCCESS;
   }
 
-  argument = one_argument(argument, vict_name);
+  auto vict_name = arguments.value(0);
 
-  if (!*obj_name || !*vict_name)
+  if (obj_name.isEmpty() || vict_name.isEmpty())
   {
-    ch->sendln("Give what to whom?");
+    sendln("Give what to whom?");
     return eFAILURE;
   }
 
-  if (!strcmp(vict_name, "follower"))
+  if (vict_name == QStringLiteral("follower"))
   {
     bool found = false;
     struct follow_type *k;
-    int org_room = ch->in_room;
-    if (ch->followers)
-      for (k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next)
+    int org_room = in_room;
+    if (followers)
+      for (k = followers; k && k != (follow_type *)0x95959595; k = k->next)
       {
         if (org_room == k->follower->in_room)
           if (IS_AFFECTED(k->follower, AFF_CHARM))
@@ -1729,92 +1718,93 @@ int do_give(Character *ch, char *argument, cmd_t cmd)
 
     if (!found)
     {
-      ch->sendln("Nobody here are loyal subjects of yours!");
+      sendln("Nobody here are loyal subjects of yours!");
       return eFAILURE;
     }
   }
   else
   {
-    if (!(vict = ch->get_char_room_vis(vict_name)))
+    if (!(vict = get_char_room_vis(vict_name)))
     {
-      ch->sendln("No one by that name around here.");
+      sendln("No one by that name around here.");
       return eFAILURE;
     }
   }
 
-  if (ch == vict)
+  if (this == vict)
   {
-    ch->sendln("Why give yourself stuff?");
+    sendln("Why give yourself stuff?");
     return eFAILURE;
   }
 
-  if (!str_cmp(obj_name, "all"))
+  if (obj_name == QStringLiteral("all"))
   {
-    do_givealldot(ch, 0, vict_name, cmd);
+    do_givealldot({}, vict_name, cmd);
     return eSUCCESS;
   }
-  else if (sscanf(obj_name, "all.%s", allbuf) != 0)
+  else if (obj_name.startsWith(QStringLiteral("all.")))
   {
-    do_givealldot(ch, allbuf, vict_name, cmd);
+    auto allbuf = obj_name.split(".").value(1);
+    do_givealldot(allbuf, vict_name, cmd);
     return eSUCCESS;
   }
 
-  if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
+  if (!(obj = get_obj_in_list_vis(this, obj_name, carrying)))
   {
-    ch->sendln("You do not seem to have anything like that.");
+    sendln("You do not seem to have anything like that.");
     return eFAILURE;
   }
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < OVERSEER)
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && getLevel() < OVERSEER)
   {
-    ch->sendln("That sure would be a fucking stupid thing to do.");
+    sendln("That sure would be a fucking stupid thing to do.");
     return eFAILURE;
   }
 
-  if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!IS_NPC(this) && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    sendln("Your criminal acts prohibit it.");
     return eFAILURE;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
-    if (ch->getLevel() < DEITY)
+    if (getLevel() < DEITY)
     {
-      ch->sendln("You can't let go of it! Yeech!!");
+      sendln("You can't let go of it! Yeech!!");
       return eFAILURE;
     }
     else
-      ch->sendln("This item is NODROP btw.");
+      sendln("This item is NODROP btw.");
   }
 
   // Handle no-trade items
   if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    // Mortal ch can give immortal vict no-trade items
-    if (!ch->isImmortalPlayer() && vict->isImmortalPlayer())
+    // Mortal this can give immortal vict no-trade items
+    if (!isImmortalPlayer() && vict->isImmortalPlayer())
     {
-      ch->sendln("It seems to no longer be magically attached to you.");
+      sendln("It seems to no longer be magically attached to you.");
     }
     else
     {
       // You can give no_trade items to mobs for quest purposes.  It's taken care of later
-      if (IS_PC(vict) && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+      if (IS_PC(vict) && (IS_PC(this) || IS_AFFECTED(this, AFF_CHARM)))
       {
-        if (ch->getLevel() > IMMORTAL)
-          ch->sendln("That was a NO_TRADE item btw....");
+        if (getLevel() > IMMORTAL)
+          sendln("That was a NO_TRADE item btw....");
         else
         {
-          ch->sendln("It seems magically attached to you.");
+          sendln("It seems magically attached to you.");
           return eFAILURE;
         }
       }
       if (contains_no_trade_item(obj))
       {
-        if (ch->getLevel() > IMMORTAL)
-          ch->sendln("That was a NO_TRADE item btw....");
+        if (getLevel() > IMMORTAL)
+          sendln("That was a NO_TRADE item btw....");
         else
         {
-          ch->sendln("Something inside it seems magically attached to you.");
+          sendln("Something inside it seems magically attached to you.");
           return eFAILURE;
         }
       }
@@ -1823,64 +1813,62 @@ int do_give(Character *ch, char *argument, cmd_t cmd)
 
   if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->nr].virt == QUEST_MASTER))
   {
-    act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
+    act("$N graciously refuses your gift.", this, 0, vict, TO_CHAR, 0);
     return eFAILURE;
   }
   if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM) && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
   {
-    ch->sendln("The creature doesn't understand what you're trying to do.");
+    sendln("The creature doesn't understand what you're trying to do.");
     return eFAILURE;
   }
 
-  if (!IS_NPC(ch) && ch->isPlayerObjectThief() && !vict->desc)
+  if (!IS_NPC(this) && isPlayerObjectThief() && !vict->desc)
   {
-    ch->sendln("Now WHY would a thief give something to a linkdead char..?");
+    sendln("Now WHY would a thief give something to a linkdead char..?");
     return eFAILURE;
   }
 
-  // Check if mortal ch is trying to give more items to vict than they can carry
+  // Check if mortal this is trying to give more items to vict than they can carry
   if ((1 + IS_CARRYING_N(vict)) > CAN_CARRY_N(vict))
   {
-    if (ch->isImmortalPlayer())
+    if (isImmortalPlayer())
     {
-      act("$N seems to have $S hands full but you give it to $M anyways.", ch, 0, vict, TO_CHAR, 0);
+      act("$N seems to have $S hands full but you give it to $M anyways.", this, 0, vict, TO_CHAR, 0);
     }
     else
     {
       auto &arena = DC::getInstance()->arena_;
-      if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) && !strcmp(obj_name, "potato") &&
-          ch->room().isArena() && vict->room().isArena() &&
-          arena.isPotato())
+      if (in_room == -1 ||
+          in_room > DC::getInstance()->top_of_world ||
+          obj_name != QStringLiteral("potato") ||
+          !room().isArena() ||
+          !vict->room().isArena() ||
+          !arena.isPotato())
       {
-        ;
-      }
-      else
-      {
-        act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
+        act("$N seems to have $S hands full.", this, 0, vict, TO_CHAR, 0);
         return eFAILURE;
       }
     }
   }
 
-  // Check if mortal ch is trying to give more weight to vict than they can carry
+  // Check if mortal this is trying to give more weight to vict than they can carry
   if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
-    if (ch->isImmortalPlayer())
+    if (isImmortalPlayer())
     {
-      act("$E can't carry that much weight but you give it to $M anyways.", ch, 0, vict, TO_CHAR, 0);
+      act("$E can't carry that much weight but you give it to $M anyways.", this, 0, vict, TO_CHAR, 0);
     }
     else
     {
       auto &arena = DC::getInstance()->arena_;
-      if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) && !strcmp(obj_name, "potato") &&
-          ch->room().isArena() && vict->room().isArena() &&
-          arena.isPotato())
+      if (in_room == -1 ||
+          in_room > DC::getInstance()->top_of_world ||
+          obj_name != QStringLiteral("potato") ||
+          !room().isArena() ||
+          !vict->room().isArena() ||
+          !arena.isPotato())
       {
-        ;
-      }
-      else
-      {
-        act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
+        act("$E can't carry that much weight.", this, 0, vict, TO_CHAR, 0);
         return eFAILURE;
       }
     }
@@ -1890,26 +1878,24 @@ int do_give(Character *ch, char *argument, cmd_t cmd)
   {
     if (search_char_for_item(vict, obj->item_number, false))
     {
-      ch->sendln("The item's uniqueness prevents it.");
-      csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(ch));
+      sendln("The item's uniqueness prevents it.");
+      csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(this));
       return eFAILURE;
     }
   }
   if (contents_cause_unique_problem(obj, vict))
   {
-    ch->sendln("The uniqueness of something inside it prevents it.");
-    csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(ch));
+    sendln("The uniqueness of something inside it prevents it.");
+    csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(this));
     return eFAILURE;
   }
 
   move_obj(obj, vict);
-  act("$n gives $p to $N.", ch, obj, vict, TO_ROOM, INVIS_NULL | NOTVICT);
-  act("$n gives you $p.", ch, obj, vict, TO_VICT, 0);
-  act("You give $p to $N.", ch, obj, vict, TO_CHAR, 0);
+  act("$n gives $p to $N.", this, obj, vict, TO_ROOM, INVIS_NULL | NOTVICT);
+  act("$n gives you $p.", this, obj, vict, TO_VICT, 0);
+  act("You give $p to $N.", this, obj, vict, TO_CHAR, 0);
 
-  sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
-          GET_NAME(vict));
-  logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->name).arg(GET_NAME(vict)));
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
          obj->short_description,
@@ -1924,13 +1910,13 @@ int do_give(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
   }
 
-  //    ch->sendln("Ok.");
-  ch->save();
+  //    sendln("Ok.");
+  save();
   vict->save();
   // if I gave a no_trade item to a mob, the mob needs to destroy it
   // otherwise it defeats the purpose of no_trade:)
 
-  retval = mprog_give_trigger(vict, ch, obj);
+  retval = mprog_give_trigger(vict, this, obj);
   bool objExists(Object * obj);
   if (!isSet(retval, eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) &&
       objExists(obj))

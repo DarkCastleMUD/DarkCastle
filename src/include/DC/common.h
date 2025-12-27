@@ -299,7 +299,6 @@ command_return_t do_free_animal(Character *ch, char *argument, cmd_t cmd = cmd_t
 command_return_t do_freeze(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_fsave(Character *ch, std::string argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_get(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
-command_return_t do_give(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_global(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_gossip(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_golem_score(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
