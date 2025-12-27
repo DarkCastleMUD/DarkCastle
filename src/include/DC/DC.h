@@ -409,7 +409,7 @@ public:
     LOG_WORLD = 1U << 15,
     LOG_ARENA = 1U << 16,
     LOG_CLAN = 1U << 17,
-    LOG_WARNINGS = 1U << 18,
+    LOG_WARNING = 1U << 18,
     LOG_HELP = 1U << 19,
     LOG_DATABASE = 1U << 20,
     LOG_OBJECTS = 1U << 21,

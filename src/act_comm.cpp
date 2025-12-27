@@ -180,7 +180,7 @@ int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
   case DC::LogChannel::LOG_CLAN:
     typestr = "logclan";
     break;
-  case DC::LogChannel::LOG_WARNINGS:
+  case DC::LogChannel::LOG_WARNING:
     typestr = "warnings";
     break;
   case DC::LogChannel::LOG_DATABASE:

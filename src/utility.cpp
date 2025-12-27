@@ -490,9 +490,9 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
     send_to_gods(str, god_level, type);
 }
 
-void logsocket(QString message)
+void logarena(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_ARENA);
 }
 
 void logbug(QString message)
@@ -500,9 +500,74 @@ void logbug(QString message)
   logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
 }
 
+void logclan(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_CLAN);
+}
+
+void logdatabase(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_DATABASE);
+}
+
+void logdebug(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_DEBUG);
+}
+
+void loggod(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_GOD);
+}
+
+void loghelp(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_HELP);
+}
+
 void logmisc(QString message)
 {
   logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
+}
+
+void logmortal(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+}
+
+void logobjects(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_OBJECTS);
+}
+
+void logplayer(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_PLAYER);
+}
+
+void logprayer(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_PRAYER);
+}
+
+void logquest(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_QUEST);
+}
+
+void logsocket(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
+}
+
+void logvault(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
+}
+
+void logwarning(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_WARNING);
 }
 
 void logworld(QString message)
@@ -2706,10 +2771,10 @@ void unique_scan(Character *victim)
 
   if (!found_items.empty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WARNINGS, "Player %s has duplicate unique items.", victim->getNameC());
+    logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", victim->getNameC());
     while (!found_items.empty())
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WARNINGS, "%s", found_items.front()->short_description);
+      logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }

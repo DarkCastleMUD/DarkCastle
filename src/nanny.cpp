@@ -1753,12 +1753,12 @@ void DC::nanny(class Connection *d, std::string arg)
          if (ch->getGold() > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
-            logentry(log_buf, 100, DC::LogChannel::LOG_WARNINGS);
+            logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
          }
          if (GET_BANK(ch) > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
-            logentry(log_buf, 100, DC::LogChannel::LOG_WARNINGS);
+            logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
          }
          ch->sendln("\n\rWelcome to Dark Castle.");
          character_list.insert(ch);

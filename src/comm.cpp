@@ -2853,7 +2853,7 @@ void warn_if_duplicate_ip(Character *ch)
 
   for (std::list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
-    logf(108, DC::LogChannel::LOG_WARNINGS, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1.toStdString().c_str(), (*i).name2.toStdString().c_str());
+    logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1.toStdString().c_str(), (*i).name2.toStdString().c_str());
   }
 }
 
