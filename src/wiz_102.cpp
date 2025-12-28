@@ -2149,7 +2149,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("$3Syntax$R: oedit [item_num] keywords <new_keywords>");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->name = str_hsh(buf4);
+    ((Object *)DC::getInstance()->obj_index[rnum].item)->Name(buf4);
     sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
     send(buf);
   }
@@ -2602,12 +2602,12 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   case 22:
     extra_descr_data *curr;
     for (curr = ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description; curr; curr = curr->next)
-      if (!str_cmp(curr->keyword, ((Object *)DC::getInstance()->obj_index[rnum].item)->name))
+      if (!str_cmp(curr->keyword, qPrintable(((Object *)DC::getInstance()->obj_index[rnum].item)->Name())))
         break;
     if (!curr)
     { // None existing;
       curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-      curr->keyword = str_dup(((Object *)DC::getInstance()->obj_index[rnum].item)->name);
+      curr->keyword = str_dup(qPrintable(((Object *)DC::getInstance()->obj_index[rnum].item)->Name()));
       curr->description = str_dup("");
       curr->next = ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description;
       ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description = curr;
@@ -5506,7 +5506,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   {
     if (CAN_SEE_OBJ(ch, j))
     {
-      buffer += j->name;
+      buffer += j->Name().toStdString();
       buffer += "\n\r";
     }
   }
