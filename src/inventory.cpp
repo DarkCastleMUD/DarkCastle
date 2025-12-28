@@ -933,15 +933,14 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         }
         else
         {
-          sprintf(buffer, "The %s does not contain the %s.\r\n", qPrintable(fname(sub_object->Name())));
+          sprintf(buffer, "The %s does not contain the %s.\r\n", qPrintable(fname(sub_object->Name())), arg1);
           ch->send(buffer);
           fail = true;
         }
       }
       else
       {
-        sprintf(buffer,
-                "The %s is not a container.\r\n", fname(sub_object->Name()).toStdString().c_str());
+        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->Name())));
         ch->send(buffer);
         fail = true;
       }
