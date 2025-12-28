@@ -1404,7 +1404,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   for (; where < MAX_WEAR; where++)
   {
     if (ch->equipment[where])
-      if (IS_CONTAINER(ch->equipment[where]) && isexact("quiver", ch->equipment[where]->name))
+      if (IS_CONTAINER(ch->equipment[where]) && isexact("quiver", ch->equipment[where]->Name()))
       {
         found = find_arrow(ch->equipment[where]);
         if (found)
@@ -1599,7 +1599,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
         for (corpse = DC::getInstance()->object_list; corpse; corpse = next)
         {
           next = corpse->next;
-          if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isexact(GET_NAME(ch), GET_OBJ_NAME(corpse)))
+          if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isexact(GET_NAME(ch), corpse->Name()))
           {
             obj_from_room(corpse);
             obj_to_room(corpse, cur_room);

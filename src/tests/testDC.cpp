@@ -372,11 +372,11 @@ private slots:
         QVERIFY(o1);
         QVERIFY(o2);
         QVERIFY(o3);
-        GET_OBJ_NAME(o1) = str_hsh("sword");
+        o1->Name(QStringLiteral("sword"));
         GET_OBJ_SHORT(o1) = str_hsh("a short sword");
-        GET_OBJ_NAME(o2) = str_hsh("sword");
+        o2->Name(QStringLiteral("sword"));
         GET_OBJ_SHORT(o2) = str_hsh("a short sword");
-        GET_OBJ_NAME(o3) = str_hsh("mushroom");
+        o3->Name(QStringLiteral("mushroom"));
         GET_OBJ_SHORT(o3) = str_hsh("a small mushroom");
 
         command_return_t rc;
@@ -877,7 +877,7 @@ private slots:
         Object *o2 = clone_object(rnum);
         QVERIFY(o1);
         QVERIFY(o2);
-        GET_OBJ_NAME(o1) = str_hsh("sword");
+        o1->Name(QStringLiteral("sword"));
         GET_OBJ_SHORT(o1) = str_hsh("a short sword");
 
         rc = do_vend(&ch, str_hsh(""));

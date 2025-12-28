@@ -207,7 +207,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 
   if (duplicate < 0) /* Make a generic portal */
   {
-    from_portal->name = str_hsh("portal");
+    from_portal->Name(QStringLiteral("portal"));
     from_portal->short_description = str_hsh("a path to a hidden world");
     from_portal->long_description = str_hsh("A mystical path to a hidden world "
                                             "shimmers in the air before you.");
@@ -257,19 +257,19 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 
 void find_and_remove_player_portal(Character *ch)
 {
-  class Object *k;
-  class Object *next_k;
-  char searchstr[180];
+  class Object *k{};
+  class Object *next_k{};
+  QString searchstr;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
-    sprintf(searchstr, "cleric %s", GET_NAME(ch));
+    searchstr = QStringLiteral("cleric %1").arg(GET_NAME(ch));
   else
-    sprintf(searchstr, "only %s", GET_NAME(ch));
+    searchstr = QStringLiteral("only %1").arg(GET_NAME(ch));
 
   for (k = DC::getInstance()->object_list; k; k = next_k)
   {
     next_k = k->next;
-    if (!k->isPortal() || !strstr(k->name, searchstr))
+    if (!k->isPortal() || !k->Name().contains(searchstr))
       continue;
 
     // at this point, the portal belongs to the person that quit

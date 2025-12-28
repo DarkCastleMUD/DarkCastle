@@ -636,10 +636,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     act(buffer, ch, containerobj, 0, TO_ROOM, 0);
 
     // Find container key (crude, plain, etc)
-    char container_key[MAX_STRING_LENGTH];
-    char *conargs = one_argument(containerobj->name, container_key);
-    conargs = one_argument(conargs, container_key);
-    one_argument(conargs, container_key);
+    auto container_key = containerobj->Name().split(' ').value(2);
 
     // Find liquid key (salty, milk, strong)
     const char *liquid_key;
@@ -670,7 +667,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     containerobj->obj_flags.value[1] = spell;
     containerobj->obj_flags.value[2] = 0;
     containerobj->obj_flags.value[3] = 0;
-    containerobj->name = str_dup(potionname.str().c_str());
+    containerobj->Name(potionname.str().c_str());
     GET_OBJ_SHORT(containerobj) = str_dup(potionshort.str().c_str());
     containerobj->long_description = str_dup(potionlong.str().c_str());
     // We set the item to custom so that it will save everytime uniquely
@@ -978,7 +975,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
 
   argument = one_argument(argument, dust);
   argument = one_argument(argument, pen);
-  one_argument(argument, paper);
+  argument = one_argument(argument, paper);
 
   if (!*dust)
   {
@@ -1118,25 +1115,10 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    char ink_key[MAX_STRING_LENGTH], dust_key[MAX_STRING_LENGTH],
-        pen_key[MAX_STRING_LENGTH], paper_key[MAX_STRING_LENGTH];
-    char *args;
-
-    args = one_argument(inkobj->name, ink_key);
-    args = one_argument(args, ink_key);
-    args = one_argument(args, ink_key);
-
-    args = one_argument(dustobj->name, dust_key);
-    args = one_argument(args, dust_key);
-    args = one_argument(args, dust_key);
-
-    args = one_argument(penobj->name, pen_key);
-    args = one_argument(args, pen_key);
-    args = one_argument(args, pen_key);
-
-    args = one_argument(paperobj->name, paper_key);
-    args = one_argument(args, paper_key);
-    args = one_argument(args, paper_key);
+    auto ink_key = inkobj->Name().split(' ').value(2);
+    auto dust_key = dustobj->Name().split(' ').value(2);
+    auto pen_key = penobj->Name().split(' ').value(2);
+    auto paper_key = paperobj->Name().split(' ').value(2);
 
     // Put it all together into the new name
     std::stringstream scrollname, scrollshort, scrolllong;
@@ -1149,7 +1131,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     paperobj->obj_flags.value[1] = spell;
     paperobj->obj_flags.value[2] = 0;
     paperobj->obj_flags.value[3] = 0;
-    paperobj->name = str_dup(scrollname.str().c_str());
+    paperobj->Name(scrollname.str().c_str());
     GET_OBJ_SHORT(paperobj) = str_dup(scrollshort.str().c_str());
     paperobj->long_description = str_dup(scrolllong.str().c_str());
 

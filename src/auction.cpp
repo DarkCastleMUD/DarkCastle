@@ -580,7 +580,7 @@ bool AuctionHouse::IsName(QString name, int vnum)
     return false;
   }
 
-  return isexact(name, obj->name);
+  return isexact(name, obj->Name());
 }
 
 /*

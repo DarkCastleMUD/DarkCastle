@@ -309,9 +309,15 @@ public:
     int16_t num_affects = {};
     obj_affected_type *affected = {}; /* Which abilities in PC to change  */
 
-    char *name = {}; /* Title of object :get etc.        */
-    inline const char *getNameC(void) { return name; }
-    QString getName(void) { return name; }
+    [[nodiscard]] inline QString Name(void) const
+    {
+        return name_;
+    }
+    inline bool Name(QString name)
+    {
+        name_ = name;
+        return true;
+    }
 
     char *long_description = {};                  /* When in room                     */
     char *short_description = {};                 /* when worn/carry/in cont.         */
@@ -563,7 +569,7 @@ public:
         else
             return true;
     }
-    QString ActionDescription(void) { return action_description_; }
+    QString ActionDescription(void) const { return action_description_; }
     object_type_t Type(void) { return obj_flags.type_flag; }
     QString TypeString(void);
     bool Type(object_type_t type)
@@ -585,6 +591,7 @@ public:
 
 private:
     QString owner_;
+    QString name_;                    /* Title of object :get etc.        */
     QString action_description_ = {}; /* What to write when used          */
 };
 

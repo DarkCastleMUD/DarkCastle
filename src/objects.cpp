@@ -254,11 +254,11 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
     temp = ch->equipment[WEAR_HOLD];
     equipped = true;
     pos = WEAR_HOLD;
-    if ((temp == 0) || !isexact(buf, temp->name))
+    if ((temp == 0) || !isexact(buf, temp->Name()))
     {
       temp = ch->equipment[WEAR_HOLD2];
       pos = WEAR_HOLD2;
-      if ((temp == 0) || !isexact(buf, temp->name))
+      if ((temp == 0) || !isexact(buf, temp->Name()))
       {
         equipped = false;
         pos = -2;
@@ -363,11 +363,11 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
     scroll = ch->equipment[WEAR_HOLD];
     equipped = true;
     pos = WEAR_HOLD;
-    if ((scroll == 0) || !isexact(buf, scroll->name))
+    if ((scroll == 0) || !isexact(buf, scroll->Name()))
     {
       scroll = ch->equipment[WEAR_HOLD2];
       pos = WEAR_HOLD2;
-      if ((scroll == 0) || !isexact(buf, scroll->name))
+      if ((scroll == 0) || !isexact(buf, scroll->Name()))
       {
         act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
         return eFAILURE;
@@ -720,13 +720,13 @@ int do_use(Character *ch, char *argument, cmd_t cmd)
 
   argument = one_argument(argument, buf);
 
-  if ((ch->equipment[WEAR_HOLD] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD]->name)) &&
-      (ch->equipment[WEAR_HOLD2] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD2]->name)))
+  if ((ch->equipment[WEAR_HOLD] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD]->Name())) &&
+      (ch->equipment[WEAR_HOLD2] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD2]->Name())))
   {
     act("You must be holding an item in order to to use it.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (ch->equipment[WEAR_HOLD] && isexact(buf, ch->equipment[WEAR_HOLD]->name))
+  if (ch->equipment[WEAR_HOLD] && isexact(buf, ch->equipment[WEAR_HOLD]->Name()))
     stick = ch->equipment[WEAR_HOLD];
   else
     stick = ch->equipment[WEAR_HOLD2];
@@ -898,67 +898,65 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
   return eSUCCESS;
 }
 
-int do_drink(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
-  class Object *temp;
-  struct affected_type af;
-  int amount;
+  class Object *temp{};
+  struct affected_type af{};
+  int amount{};
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
-  if ((GET_COND(ch, DRUNK) > 10) && (GET_COND(ch, THIRST) > 0)) /* The pig is drunk */
+  if ((GET_COND(this, DRUNK) > 10) && (GET_COND(this, THIRST) > 0)) /* The pig is drunk */
   {
-    act("You simply fail to reach your mouth!", ch, 0, 0, TO_CHAR, 0);
-    act("$n tried to drink but missed $s mouth!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act("You simply fail to reach your mouth!", this, 0, 0, TO_CHAR, 0);
+    act("$n tried to drink but missed $s mouth!", this, 0, 0, TO_ROOM, INVIS_NULL);
     return eFAILURE;
   }
 
-  if (GET_COND(ch, FULL) > 20 && GET_COND(ch, THIRST) > 20) /* Stomach full */
+  if (GET_COND(this, FULL) > 20 && GET_COND(this, THIRST) > 20) /* Stomach full */
   {
-    act("Your stomach cannot contain anymore!", ch, 0, 0, TO_CHAR, 0);
+    act("Your stomach cannot contain anymore!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  one_argument(argument, buf);
-
-  if ((temp = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(ch, temp))
+  auto arg1 = arguments.value(0);
+  if ((temp = get_obj_in_list_vis(this, arg1, DC::getInstance()->world[this->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
   {
-    act("You drink from $p.", ch, temp, 0, TO_CHAR, 0);
-    act("$n drinks from $p.", ch, temp, 0, TO_ROOM, INVIS_NULL);
-    act("You are full.", ch, 0, 0, TO_CHAR, 0);
-    act("You are not thirsty anymore.", ch, 0, 0, TO_CHAR, 0);
+    act("You drink from $p.", this, temp, 0, TO_CHAR, 0);
+    act("$n drinks from $p.", this, temp, 0, TO_ROOM, INVIS_NULL);
+    act("You are full.", this, 0, 0, TO_CHAR, 0);
+    act("You are not thirsty anymore.", this, 0, 0, TO_CHAR, 0);
 
-    if (ch->isImmortalPlayer())
+    if (isImmortalPlayer())
       return eSUCCESS;
 
-    if (GET_COND(ch, FULL) != -1)
-      GET_COND(ch, FULL) = 22 + number(0, 5);
-    if (GET_COND(ch, THIRST) != -1)
-      GET_COND(ch, THIRST) = 22 + number(0, 5);
+    if (GET_COND(this, FULL) != -1)
+      GET_COND(this, FULL) = 22 + number(0, 5);
+    if (GET_COND(this, THIRST) != -1)
+      GET_COND(this, THIRST) = 22 + number(0, 5);
 
     return eSUCCESS;
   }
 
-  if (GET_COND(ch, THIRST) > 20)
+  if (GET_COND(this, THIRST) > 20)
   {
-    ch->sendln("Your stomach cannot contain anymore liquid!");
+    sendln("Your stomach cannot contain anymore liquid!");
     return eFAILURE;
   }
 
-  if (!(temp = get_obj_in_list_vis(ch, buf, ch->carrying)))
+  if (!(temp = get_obj_in_list_vis(this, arg1, this->carrying)))
   {
-    act("You cannot find it!", ch, 0, 0, TO_CHAR, 0);
+    act("You cannot find it!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
   if (temp->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    act("You can't drink from that!", ch, 0, 0, TO_CHAR, 0);
+    act("You can't drink from that!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -966,17 +964,15 @@ int do_drink(Character *ch, char *argument, cmd_t cmd)
   {
     if (temp->obj_flags.value[1] > 0) /* Not empty */
     {
-      sprintf(buf, "$n drinks %s from $p.", drinks[temp->obj_flags.value[2]]);
-      act(buf, ch, temp, 0, TO_ROOM, INVIS_NULL);
-      sprintf(buf, "You drink the %s.\r\n", drinks[temp->obj_flags.value[2]]);
-      ch->send(buf);
+      act(QStringLiteral("$n drinks %1 from $p.").arg(drinks[temp->obj_flags.value[2]]), this, temp, 0, TO_ROOM, INVIS_NULL);
+      sendln(QStringLiteral("You drink the %1.").arg(drinks[temp->obj_flags.value[2]]));
 
-      if (ch->isImmortalPlayer())
+      if (isImmortalPlayer())
         return eSUCCESS;
 
       // TODO what is this for?  the statement immediatly afterwards wipes out value
       if (drink_aff[temp->obj_flags.value[2]][DRUNK] > 0)
-        amount = (25 - GET_COND(ch, THIRST)) / drink_aff[temp->obj_flags.value[2]][DRUNK];
+        amount = (25 - GET_COND(this, THIRST)) / drink_aff[temp->obj_flags.value[2]][DRUNK];
       else
         amount = number(3, 10);
 
@@ -984,38 +980,37 @@ int do_drink(Character *ch, char *argument, cmd_t cmd)
 
       /* You can't subtract more than the object weighs */
 
-      gain_condition(ch, DRUNK, (int)((int)drink_aff[temp->obj_flags.value[2]][DRUNK] * amount) / 4);
+      gain_condition(this, DRUNK, (int)((int)drink_aff[temp->obj_flags.value[2]][DRUNK] * amount) / 4);
 
-      gain_condition(ch, FULL, (int)((int)drink_aff[temp->obj_flags.value[2]][FULL] * amount) / 4);
+      gain_condition(this, FULL, (int)((int)drink_aff[temp->obj_flags.value[2]][FULL] * amount) / 4);
 
-      gain_condition(ch, THIRST, (int)((int)drink_aff[temp->obj_flags.value[2]][THIRST] * amount) / 4);
+      gain_condition(this, THIRST, (int)((int)drink_aff[temp->obj_flags.value[2]][THIRST] * amount) / 4);
 
-      if (GET_COND(ch, DRUNK) > 10)
-        act("You feel drunk.", ch, 0, 0, TO_CHAR, 0);
+      if (GET_COND(this, DRUNK) > 10)
+        act("You feel drunk.", this, 0, 0, TO_CHAR, 0);
 
-      if (GET_COND(ch, THIRST) > 20)
-        act("You do not feel thirsty.", ch, 0, 0, TO_CHAR, 0);
+      if (GET_COND(this, THIRST) > 20)
+        act("You do not feel thirsty.", this, 0, 0, TO_CHAR, 0);
 
-      if (GET_COND(ch, FULL) > 20)
-        act("You are full.", ch, 0, 0, TO_CHAR, 0);
+      if (GET_COND(this, FULL) > 20)
+        act("You are full.", this, 0, 0, TO_CHAR, 0);
 
       if (temp->obj_flags.value[2] == LIQ_HOLYWATER &&
-          ch->getHP() < GET_MAX_HIT(ch) &&
+          getHP() < GET_MAX_HIT(this) &&
           number(0, 1))
       {
-        ch->sendln("You feel refreshed!");
-        ch->addHP(10);
+        sendln("You feel refreshed!");
+        addHP(10);
       }
 
-      if (temp->obj_flags.value[3] && (!ch->isImmortalPlayer()))
+      if (temp->obj_flags.value[3] && (!this->isImmortalPlayer()))
       {
         /* The shit was poisoned ! */
-        act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
-        act("$n chokes and utters some strange sounds.",
-            ch, 0, 0, TO_ROOM, 0);
-        if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
+        act("Ooups, it tasted rather strange ?!!?", this, 0, 0, TO_CHAR, 0);
+        act("$n chokes and utters some strange sounds.", this, 0, 0, TO_ROOM, 0);
+        if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
         {
-          ch->sendln("Luckily, your body rejects the poison almost immediately.");
+          this->sendln("Luckily, your body rejects the poison almost immediately.");
         }
         else
         {
@@ -1024,7 +1019,7 @@ int do_drink(Character *ch, char *argument, cmd_t cmd)
           af.modifier = 0;
           af.location = APPLY_NONE;
           af.bitvector = AFF_POISON;
-          affect_join(ch, &af, false, false);
+          affect_join(this, &af, false, false);
         }
       }
 
@@ -1038,7 +1033,7 @@ int do_drink(Character *ch, char *argument, cmd_t cmd)
       /*
               if(temp->obj_flags.value[1]<=0) {
                 act("It is now empty, and it magically disappears in a puff of smoke!",
-                  ch,0,0,TO_CHAR, 0);
+                  this,0,0,TO_CHAR, 0);
                 extract_obj(temp);
               }
       */
@@ -1046,59 +1041,58 @@ int do_drink(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  act("It's empty already.", ch, 0, 0, TO_CHAR, 0);
+  act("It's empty already.", this, 0, 0, TO_CHAR, 0);
   return eFAILURE;
 }
 
-int do_eat(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
-  class Object *temp;
-  struct affected_type af;
+  class Object *temp{};
+  struct affected_type af{};
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
-  one_argument(argument, buf);
+  auto arg1 = arguments.value(0);
 
-  if (!(temp = get_obj_in_list_vis(ch, buf, ch->carrying)))
+  if (!(temp = get_obj_in_list_vis(this, arg1, carrying)))
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    act("You can't find it!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (!ch->isImmortalPlayer()))
+  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (!isImmortalPlayer()))
   {
-    act("Your stomach refuses to eat that!?!", ch, 0, 0, TO_CHAR, 0);
+    act("Your stomach refuses to eat that!?!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (GET_COND(ch, FULL) > 20) /* Stomach full */
+  if (GET_COND(this, FULL) > 20) /* Stomach full */
   {
-    act("You are too full to eat more!", ch, 0, 0, TO_CHAR, 0);
+    act("You are too full to eat more!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  act("$n eats $p.", ch, temp, 0, TO_ROOM, INVIS_NULL);
-  act("You eat the $o.", ch, temp, 0, TO_CHAR, 0);
+  act("$n eats $p.", this, temp, 0, TO_ROOM, INVIS_NULL);
+  act("You eat the $o.", this, temp, 0, TO_CHAR, 0);
 
-  gain_condition(ch, FULL, temp->obj_flags.value[0]);
+  gain_condition(this, FULL, temp->obj_flags.value[0]);
 
-  if (GET_COND(ch, FULL) > 20)
-    act("You are full.", ch, 0, 0, TO_CHAR, 0);
+  if (GET_COND(this, FULL) > 20)
+    act("You are full.", this, 0, 0, TO_CHAR, 0);
 
-  if (temp->obj_flags.value[3] && (!ch->isImmortalPlayer()))
+  if (temp->obj_flags.value[3] && (!isImmortalPlayer()))
   {
     /* The shit was poisoned ! */
-    act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
-    act("$n coughs and utters some strange sounds.", ch, 0, 0, TO_ROOM, 0);
+    act("Ooups, it tasted rather strange ?!!?", this, 0, 0, TO_CHAR, 0);
+    act("$n coughs and utters some strange sounds.", this, 0, 0, TO_ROOM, 0);
 
-    if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
+    if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
     {
-      ch->sendln("Luckily, your body rejects the poison almost immediately.");
+      sendln("Luckily, your body rejects the poison almost immediately.");
     }
     else
     {
@@ -1107,7 +1101,7 @@ int do_eat(Character *ch, char *argument, cmd_t cmd)
       af.modifier = 0;
       af.location = APPLY_NONE;
       af.bitvector = AFF_POISON;
-      affect_join(ch, &af, false, false);
+      affect_join(this, &af, false, false);
     }
   }
 
@@ -1670,7 +1664,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     }*/
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      !isexact(GET_NAME(ch), obj->name) && ch->getLevel() < IMPLEMENTER)
+      !isexact(GET_NAME(ch), obj->Name()) && ch->getLevel() < IMPLEMENTER)
   {
     act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
     return;
@@ -1699,14 +1693,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_FINGER_L])
         {
-          sprintf(buffer, "You put the %s on your right ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
+          sprintf(buffer, "You put the %s on your right ring-finger.\r\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_FINGER_R);
         }
         else
         {
-          sprintf(buffer, "You put the %s on your left ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
+          sprintf(buffer, "You put the %s on your left ring-finger.\r\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_FINGER_L);
@@ -1932,13 +1926,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_WRIST_L])
         {
-          sprintf(buffer, "You wear the %s around your right wrist.\r\n", fname(obj_object->name).toStdString().c_str());
+          sprintf(buffer, "You wear the %s around your right wrist.\r\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           ch->equip_char(obj_object, WEAR_WRIST_R);
         }
         else
         {
-          sprintf(buffer, "You wear the %s around your left wrist.\r\n", fname(obj_object->name).toStdString().c_str());
+          sprintf(buffer, "You wear the %s around your left wrist.\r\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           ch->equip_char(obj_object, WEAR_WRIST_L);
         }
@@ -2170,13 +2164,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   case -1:
   {
-    sprintf(buffer, "Wear %s where?.\r\n", fname(obj_object->name).toStdString().c_str());
+    sprintf(buffer, "Wear %s where?.\r\n", qPrintable(fname(obj_object->Name())));
     ch->send(buffer);
   }
   break;
   case -2:
   {
-    sprintf(buffer, "You can't wear the %s.\r\n", fname(obj_object->name).toStdString().c_str());
+    sprintf(buffer, "You can't wear the %s.\r\n", qPrintable(fname(obj_object->Name())));
     ch->send(buffer);
   }
   break;
@@ -2649,7 +2643,7 @@ bool fullSave(Object *obj)
   if (!tmp_obj)
   {
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", obj->name);
+    sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", qPrintable(obj->Name()));
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return 0;
   }
@@ -2672,7 +2666,7 @@ bool fullSave(Object *obj)
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
 
-  if (strcmp(obj->name, tmp_obj->name)) // GL. and stuff.
+  if (obj->Name() != tmp_obj->Name()) // GL. and stuff.
     return 1;
 
   if (obj->obj_flags.extra_flags != tmp_obj->obj_flags.extra_flags)
@@ -2766,7 +2760,7 @@ uint64_t Object::getLevel(void)
 
 bool Object::isQuest(void)
 {
-  return isexact("quest", name) ||
+  return isexact("quest", Name()) ||
          DC::getInstance()->obj_index[item_number].virt == 3124 ||
          DC::getInstance()->obj_index[item_number].virt == 3125 ||
          DC::getInstance()->obj_index[item_number].virt == 3126 ||
@@ -2779,12 +2773,12 @@ bool Object::isQuest(void)
 
 bool Object::isTest(void)
 {
-  return isexact(QStringLiteral("test"), getName());
+  return isexact(QStringLiteral("test"), Name());
 }
 
 bool Object::isGodload(void)
 {
-  return isexact(QStringLiteral("gl"), getName()) || isexact(QStringLiteral("godload"), getName()) || isSet(obj_flags.extra_flags, ITEM_SPECIAL);
+  return isexact(QStringLiteral("gl"), Name()) || isexact(QStringLiteral("godload"), Name()) || isSet(obj_flags.extra_flags, ITEM_SPECIAL);
 }
 
 bool Object::hasPortalFlagNoLeave(void)

@@ -378,14 +378,14 @@ int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
 
     for (int l = 0; l < MAX_WEAR; l++)
       if (ch->equipment[l])
-        if (!dot || isexact(dotbuf, ch->equipment[l]->name))
+        if (!dot || isexact(dotbuf, ch->equipment[l]->Name()))
           extract_obj(ch->unequip_char(l));
 
     Object *x, *v;
     for (x = ch->carrying; x; x = v)
     {
       v = x->next_content;
-      if (!dot || isexact(dotbuf, x->name))
+      if (!dot || isexact(dotbuf, x->Name()))
         extract_obj(x);
     }
     return eSUCCESS;

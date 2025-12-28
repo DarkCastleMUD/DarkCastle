@@ -3006,7 +3006,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     //
     if (IS_OBJ_STAT(i, ITEM_NOSEE))
     {
-      if (isexact(tmp, i->name))
+      if (isexact(tmp, i->Name()))
       {
         skipped_nosee++;
       }
@@ -3015,7 +3015,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
     if (isSet(i->obj_flags.more_flags, ITEM_NOLOCATE))
     {
-      if (isexact(tmp, i->name))
+      if (isexact(tmp, i->Name()))
       {
         skipped_nolocate++;
       }
@@ -3049,7 +3049,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     if (owner && owner->player && is_in_game(owner) &&
         (owner->player->wizinvis > ch->getLevel()))
     {
-      if (isexact(tmp, i->name))
+      if (isexact(tmp, i->Name()))
       {
         skipped_other++;
       }
@@ -3059,7 +3059,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     // Skip objs in god rooms
     if (room >= 1 && room <= 47)
     {
-      if (isexact(tmp, i->name))
+      if (isexact(tmp, i->Name()))
       {
         skipped_god++;
       }
@@ -3067,7 +3067,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     }
 
     buf[0] = 0;
-    if (isexact(tmp, i->name))
+    if (isexact(tmp, i->Name()))
     {
       if (i->carried_by)
       {
@@ -4638,7 +4638,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     ch->sendln("You feel informed:");
 
-    sprintf(buf, "Object '%s', Item type: ", obj->name);
+    sprintf(buf, "Object '%s', Item type: ", qPrintable(obj->Name()));
     sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
     strcat(buf, buf2);
     strcat(buf, "\n\r");
@@ -5249,8 +5249,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   // check to see if its an eligible corpse
-  if ((GET_ITEM_TYPE(corpse) != ITEM_CONTAINER) ||
-      !corpse->obj_flags.value[3] || isexact("pc", corpse->name))
+  if ((GET_ITEM_TYPE(corpse) != ITEM_CONTAINER) || !corpse->obj_flags.value[3] || isexact("pc", corpse->Name()))
   {
     act("$p shudders for a second, then lies still.", ch, corpse, 0,
         TO_CHAR, 0);
@@ -6540,8 +6539,8 @@ void make_portal(Character *ch, Character *vict)
   else
     sprintf(buf, "pcportal portal only %s %s", GET_NAME(ch), GET_NAME(vict));
 
-  ch_portal->name = str_hsh(buf);
-  vict_portal->name = str_hsh(buf);
+  ch_portal->Name(buf);
+  vict_portal->Name(buf);
 
   ch_portal->short_description = str_hsh("an extradimensional portal");
   vict_portal->short_description = str_hsh("an extradimensional portal");
@@ -9481,8 +9480,8 @@ int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
     ;
   if (tar_obj)
   {
-    sprintf(buf1, "The %s says '%s'\n\r", fname(tar_obj->name).toStdString().c_str(), arg);
-    sprintf(buf2, "Someone makes it sound like the %s says '%s'.\r\n", fname(tar_obj->name).toStdString().c_str(), arg);
+    sprintf(buf1, "The %s says '%s'\n\r", qPrintable(fname(tar_obj->Name())), arg);
+    sprintf(buf2, "Someone makes it sound like the %s says '%s'.\r\n", qPrintable(fname(tar_obj->Name())), arg);
   }
   else
   {

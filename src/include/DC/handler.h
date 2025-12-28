@@ -93,6 +93,7 @@ Character *get_all_pc(char *name);
 Character *get_char_room_vis(Character *ch, QString name);
 Character *get_char_vis(Character *ch, const char *name);
 Character *get_char_vis(Character *ch, const std::string &name);
+Character *get_char_vis(Character *ch, const QString &name);
 Character *get_pc_vis(Character *ch, const char *name);
 Character *get_pc_vis(Character *ch, QString name);
 Character *get_pc_vis_exact(Character *ch, const char *name);

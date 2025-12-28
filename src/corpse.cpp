@@ -160,7 +160,7 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
 			"%s~\n"
 			"%s~\n"
 			"%d %d %d %d %d\n",
-			obj->name ? obj->name : "undefined",
+			!obj->Name().isEmpty() ? qPrintable(obj->Name()) : "undefined",
 			obj->short_description ? obj->short_description : "undefined",
 			obj->long_description ? obj->long_description : "undefined",
 			buf1,
@@ -347,16 +347,17 @@ void DC::load_corpses(void)
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
 					logentry(QStringLiteral("XAP Found"), 0, DC::LogChannel::LOG_MISC);
-				if ((temp->name = fread_string_new(fp, buf2)) == nullptr)
+
+				temp->Name(fread_string_new(fp, buf2));
+				if (temp->Name().isEmpty())
 				{
-					temp->name = "undefined";
+					temp->Name(QStringLiteral("undefined"));
 				}
 				else
 				{
 					if (debug == 1)
 					{
-						sprintf(buf3, "   -NAME: %s\n", temp->name);
-						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+						logmisc(QStringLiteral("   -NAME: %1").arg(temp->Name()));
 					}
 				}
 
@@ -505,8 +506,7 @@ void DC::load_corpses(void)
 						{
 							if (debug == 1)
 							{
-								sprintf(buf3, "  -Moving [%s] to [%s]", obj->name, temp->name);
-								logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+								logmisc(QStringLiteral("  -Moving [%1] to [%2]").arg(obj->Name()).arg(temp->Name()));
 							}
 							obj_from_room(obj);	   /* get those objs from that room */
 							obj_to_obj(obj, temp); /* and put them in the corpse */
@@ -517,8 +517,7 @@ void DC::load_corpses(void)
 						/* put the corpse in the right room */
 						if (debug == 1)
 						{
-							sprintf(buf3, "  -Moving corpse [%s] to [%d]", temp->name, GET_OBJ_VROOM(temp));
-							logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+							logmisc(QStringLiteral("  -Moving corpse [%1] to [%2]").arg(temp->Name()).arg(GET_OBJ_VROOM(temp)));
 						}
 						obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));
 					}
@@ -528,8 +527,7 @@ void DC::load_corpses(void)
 					/* just a plain obj..send it to a temp room until we load a corpse */
 					if (debug == 1)
 					{
-						sprintf(buf3, "  -Moving corpse [%s] to holding room.", temp->name);
-						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+						logmisc(QStringLiteral("  -Moving corpse [%1] to holding room.").arg(temp->Name()));
 					}
 					obj_to_room(temp, real_room(frozen_start_room));
 				}

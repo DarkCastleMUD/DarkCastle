@@ -347,7 +347,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 interp += HSSH((Character *)vict_obj);
                 break;
               case 'o':
-                if (send_to == nullptr || obj == nullptr || obj->name == nullptr)
+                if (send_to == nullptr || obj == nullptr || obj->Name().isEmpty())
                 {
                   break;
                 }
@@ -358,18 +358,18 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                     return {};
                   else if (flags & INVIS_VISIBLE)
                   {
-                    interp += fname(obj->name).toStdString();
+                    interp += fname(obj->Name()).toStdString();
                   }
                   else
                     interp += "something";
                 }
                 else
                 {
-                  interp += fname(obj->name).toStdString();
+                  interp += fname(obj->Name()).toStdString();
                 }
                 break;
               case 'O':
-                if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->name == nullptr)
+                if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->Name().isEmpty())
                 {
                   break;
                 }
@@ -380,7 +380,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                   else if (flags & INVIS_VISIBLE)
                   {
                     auto o = (Object *)vict_obj;
-                    auto n = QString(o->name);
+                    auto n = o->Name();
                     auto fs = fname(n).toStdString();
                     interp += fs;
                   }
@@ -390,7 +390,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 else
                 {
                   auto o = (Object *)vict_obj;
-                  auto n = QString(o->name);
+                  auto n = o->Name();
                   auto fs = fname(n).toStdString();
                   interp += fs;
                 }
@@ -436,12 +436,12 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 }
                 break;
               case 'a':
-                if (obj == nullptr || obj->name == nullptr)
+                if (obj == nullptr || obj->Name().isEmpty())
                 {
                   break;
                 }
 
-                switch (*(obj)->name)
+                switch (*qPrintable((obj)->Name()))
                 {
                 case 'a':
                 case 'A':
@@ -463,9 +463,9 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 }
                 break;
               case 'A':
-                if (vict_obj != nullptr && ((Object *)vict_obj)->name != nullptr)
+                if (vict_obj != nullptr && !((Object *)vict_obj)->Name().isEmpty())
                 {
-                  switch (*((Object *)vict_obj)->name)
+                  switch (*qPrintable(((Object *)vict_obj)->Name()))
                   {
                   case 'a':
                   case 'A':

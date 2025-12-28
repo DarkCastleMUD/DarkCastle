@@ -165,7 +165,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
 			if ((num = real_object(x)) < 0)
 				continue;
 
-			if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->name))
+			if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
 			{
 				cnt++;
 				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
@@ -268,7 +268,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
 				ch->sendln("Why would you want to load that?");
 				return eFAILURE;
 			}
-			else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[number].item))->name))
+			else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[number].item))->Name()))
 			{
 				ch->sendln("This command can only load prize items.");
 				return eFAILURE;
@@ -314,7 +314,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
 			ch->sendln("Why would you want to load that?");
 			return eFAILURE;
 		}
-		else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->name))
+		else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
 		{
 			ch->sendln("This command can only load prize items.");
 			return eFAILURE;
@@ -1020,8 +1020,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 				if ((nr = real_object(i)) < 0)
 					continue;
 
-				if (isexact(name,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->name))
+				if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[nr].item))->Name()))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
@@ -2051,7 +2050,7 @@ void opstat(Character *ch, int vnum)
 	}
 	obj = (Object *)DC::getInstance()->obj_index[num].item;
 	sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
-			obj->name, vnum);
+			qPrintable(obj->Name()), vnum);
 	ch->send(buf);
 	if (DC::getInstance()->obj_index[num].progtypes == 0)
 	{

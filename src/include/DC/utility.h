@@ -223,7 +223,6 @@ bool IS_DARK(int room);
 #define GET_ZONE(ch) (DC::getInstance()->world[(ch)->in_room].zone)
 
 #define GET_OBJ_SHORT(obj) ((obj)->short_description)
-#define GET_OBJ_NAME(obj) ((obj)->name)
 
 #define GET_OBJ_RNUM(obj) ((obj)->item_number)
 #define GET_OBJ_VAL(obj, val) ((obj)->obj_flags.value[(val)])

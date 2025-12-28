@@ -1210,7 +1210,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->name = str_hsh(buf);
+    obj->Name(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("DES", mod_type))
@@ -1507,12 +1507,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     }
   }
 
-  if (obj->name && strcmp(obj->name, standard_obj->name))
+  if (!obj->Name().isEmpty() && obj->Name() != standard_obj->Name())
   {
     fwrite("NAM", sizeof(char), 3, fpsave);
-    length = strlen(obj->name);
+    length = strlen(qPrintable(obj->Name()));
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(obj->name, sizeof(char), length, fpsave);
+    fwrite(qPrintable(obj->Name()), sizeof(char), length, fpsave);
   }
   if (obj->long_description && strcmp(obj->long_description, standard_obj->long_description))
   {

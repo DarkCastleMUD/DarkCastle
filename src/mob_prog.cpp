@@ -421,7 +421,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		{
 			Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
 			if ((cmp->in_room != DC::NOWHERE && DC::getInstance()->world[cmp->in_room].zone == z) || (cmp->carried_by && DC::getInstance()->world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && DC::getInstance()->world[cmp->equipped_by->in_room].zone == z))
-				if (isexact(left, otmp->name))
+				if (isexact(left, otmp->Name()))
 				{
 					otarget = otmp;
 					break;
@@ -3572,7 +3572,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
 	case 'o':
 		if (obj)
-			CAN_SEE_OBJ(mob, obj) ? one_argument(obj->name, t)
+			CAN_SEE_OBJ(mob, obj) ? strcpy(t, qPrintable(obj->Name().split(' ').value(0)))
 								  : strcpy(t, "something");
 		break;
 
@@ -3584,7 +3584,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
 	case 'p':
 		if (v_obj)
-			CAN_SEE_OBJ(mob, v_obj) ? one_argument(v_obj->name, t)
+			CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, qPrintable(v_obj->Name().split(' ').value(0)))
 									: strcpy(t, "something");
 		break;
 
@@ -3596,7 +3596,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
 	case 'a':
 		if (obj)
-			switch (*(obj->name))
+			switch (*qPrintable(obj->Name()))
 			{
 			case 'a':
 			case 'e':
@@ -3612,7 +3612,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
 	case 'A':
 		if (v_obj)
-			switch (*(v_obj->name))
+			switch (*(qPrintable(v_obj->Name())))
 			{
 			case 'a':
 			case 'e':
@@ -4346,7 +4346,7 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 
 			next = mprg->next;
 			one_argument(mprg->arglist, buf);
-			if ((mprg->type & GIVE_PROG) && ((!str_cmp(obj->name, mprg->arglist)) || (!str_cmp("all", buf))))
+			if ((mprg->type & GIVE_PROG) && ((obj->Name() == mprg->arglist)) || (!str_cmp("all", buf)))
 			{
 				okay = true;
 				mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
@@ -4710,9 +4710,8 @@ Character *DC::initiate_oproc(Character *ch, Object *obj)
 	//  temp->master = ch;
 	// dc_free(temp->short_desc);
 	temp->short_desc = str_hsh(obj->short_description);
-	// dc_free(temp->name);
 	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "%s", obj->name);
+	sprintf(buf, "%s", qPrintable(obj->Name()));
 	for (int i = strlen(buf) - 1; i > 0; i--)
 		if (buf[i] == ' ')
 		{

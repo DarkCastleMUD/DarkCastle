@@ -2773,7 +2773,7 @@ class Object *get_obj_in_list(char *name, class Object *list)
 		return (0);
 
 	for (i = list, j = 1; i && (j <= number); i = i->next_content)
-		if (isexact(tmp, i->name))
+		if (isexact(tmp, i->Name()))
 		{
 			if (j == number)
 				return i;
@@ -2809,7 +2809,7 @@ class Object *get_obj(char *name)
 		return (0);
 
 	for (i = DC::getInstance()->object_list, j = 1; i && (j <= number); i = i->next)
-		if (isexact(tmp, i->name))
+		if (isexact(tmp, i->Name()))
 		{
 			if (j == number)
 				return (i);
@@ -3005,7 +3005,7 @@ int move_obj(Object *obj, int dest)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->Name())));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3013,7 +3013,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->Name()), DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3023,7 +3023,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_char(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", obj->name, GET_NAME(obj->carried_by));
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", qPrintable(obj->Name()), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3041,7 +3041,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_obj(obj) == 0)
 		{
 			// Couldn't move obj from its container
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", obj->name, GET_NAME(obj->carried_by));
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3053,20 +3053,20 @@ int move_obj(Object *obj, int dest)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (1): %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (1): %1.\n").arg(obj->Name())));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (2) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (2) : %1.\n").arg(obj->Name())));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->Name())));
 		}
 
-		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->name, DC::getInstance()->world[dest].number);
+		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->Name(), DC::getInstance()->world[dest].number);
 		return 0;
 	}
 
@@ -3090,7 +3090,7 @@ int move_obj(Object *obj, Object *dest_obj)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->Name())));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3098,7 +3098,7 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3110,7 +3110,7 @@ int move_obj(Object *obj, Object *dest_obj)
 			// Couldn't move obj from the room
 			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
 													"remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3122,7 +3122,7 @@ int move_obj(Object *obj, Object *dest_obj)
 			// Couldn't move obj from its container
 			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
 													"remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3134,20 +3134,20 @@ int move_obj(Object *obj, Object *dest_obj)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (4): %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (4): %1.\n").arg(obj->Name())));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (5) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (5) : %1.\n").arg(obj->Name())));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->Name())));
 		}
 
-		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->name, dest_obj->name);
+		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->Name(), dest_obj->Name());
 		return 0;
 	}
 	add_totem(dest_obj, obj);
@@ -3173,7 +3173,7 @@ int move_obj(Object *obj, Character *ch)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->Name())));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3181,7 +3181,7 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3193,7 +3193,7 @@ int move_obj(Object *obj, Character *ch)
 			// Couldn't move obj from the room
 			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
 													"remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3208,7 +3208,7 @@ int move_obj(Object *obj, Character *ch)
 			// Couldn't move obj from its container
 			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
 													"remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3233,20 +3233,20 @@ int move_obj(Object *obj, Character *ch)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (7): %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (7): %1.\n").arg(obj->Name())));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (8) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (8) : %1.\n").arg(obj->Name())));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name)));
+			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->Name())));
 		}
 
-		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->name, GET_NAME(ch));
+		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->Name(), GET_NAME(ch));
 		return 0;
 	}
 
@@ -4312,6 +4312,11 @@ Character *get_char_vis(Character *ch, const std::string &name)
 	return get_char_vis(ch, name.c_str());
 }
 
+Character *get_char_vis(Character *ch, const QString &name)
+{
+	return get_char_vis(ch, qPrintable(name));
+}
+
 Character *get_char_vis(Character *ch, const char *name)
 {
 	Character *i;
@@ -4620,7 +4625,7 @@ class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *lis
 		return (0);
 
 	for (i = list, j = 1; i && (j <= number); i = i->next_content)
-		if (isexact(tmp, i->name))
+		if (isexact(tmp, i->Name()))
 			if (CAN_SEE_OBJ(ch, i, blindfighting))
 			{
 				if (j == number)
@@ -4667,7 +4672,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 		if (loc && isSet(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
 			ch->getLevel() < 101)
 			continue;
-		if (isexact(tmp, i->name))
+		if (isexact(tmp, i->Name()))
 			if (CAN_SEE_OBJ(ch, i))
 			{
 				if (j == number)
@@ -4696,7 +4701,7 @@ class Object *create_money(int amount)
 
 	if (amount == 1)
 	{
-		obj->name = str_hsh("coin gold");
+		obj->Name(QStringLiteral("coin gold"));
 		obj->short_description = str_hsh("a gold coin");
 		obj->long_description = str_hsh("One miserable gold coin.");
 
@@ -4705,7 +4710,7 @@ class Object *create_money(int amount)
 	}
 	else
 	{
-		obj->name = str_hsh("coins gold");
+		obj->Name(QStringLiteral("coins gold"));
 		obj->short_description = str_hsh("gold coins");
 		obj->long_description = str_hsh("A pile of gold coins.");
 
@@ -4830,11 +4835,11 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 			{
 				if ((*tar_obj)->short_description)
 				{
-					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->short_description);
+					ch->sendln(QStringLiteral("You find %1 in your inventory.").arg((*tar_obj)->short_description));
 				}
-				else if ((*tar_obj)->name)
+				else if (!(*tar_obj)->Name().isEmpty())
 				{
-					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->name);
+					ch->sendln(QStringLiteral("You find %1 in your inventory.").arg((*tar_obj)->Name()));
 				}
 				else
 				{
@@ -4849,7 +4854,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 	{
 		for (found = false, i = 0; i < MAX_WEAR && !found; i++)
 		{
-			if (ch->equipment[i] && isexact(name, ch->equipment[i]->name) && CAN_SEE_OBJ(ch, ch->equipment[i]))
+			if (ch->equipment[i] && isexact(name, ch->equipment[i]->Name()) && CAN_SEE_OBJ(ch, ch->equipment[i]))
 			{
 				*tar_obj = ch->equipment[i];
 				found = true;
@@ -4863,9 +4868,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				{
 					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->short_description);
 				}
-				else if ((*tar_obj)->name)
+				else if (!(*tar_obj)->Name().isEmpty())
 				{
-					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->Name());
 				}
 				else
 				{
@@ -4887,9 +4892,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				{
 					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->short_description);
 				}
-				else if ((*tar_obj)->name)
+				else if (!(*tar_obj)->Name().isEmpty())
 				{
-					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s in this room.\r\n", qPrintable((*tar_obj)->Name()));
 				}
 				else
 				{
@@ -4911,9 +4916,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				{
 					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_obj)->short_description);
 				}
-				else if ((*tar_obj)->name)
+				else if (!(*tar_obj)->Name().isEmpty())
 				{
-					csendf(ch, "You find %s somewhere in the world\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s somewhere in the world\r\n", qPrintable((*tar_obj)->Name()));
 				}
 				else
 				{

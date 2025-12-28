@@ -745,9 +745,9 @@ void food_update(void)
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain");
+					i->do_drink({QStringLiteral("fountain")});
 				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
-					do_eat(i, food->name);
+					i->do_eat(food->Name().split(' '));
 				else
 					i->sendln("You are out of food.");
 			}
@@ -761,9 +761,9 @@ void food_update(void)
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain");
+					i->do_drink({QStringLiteral("fountain")});
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
-					do_drink(i, food->name);
+					i->do_drink(food->Name().split(' '));
 				else
 					i->sendln("You are out of drink.");
 			}

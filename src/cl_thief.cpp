@@ -915,7 +915,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       ch->send("You must earn that flag, no stealing allowed!");
       return eFAILURE;
     }
-    if (IS_NPC(victim) && isexact("prize", obj->name))
+    if (IS_NPC(victim) && isexact("prize", obj->Name()))
     {
       ch->sendln("You have to HUNT the targets...its not a Treasture Steal!");
       return eFAILURE;
@@ -1056,8 +1056,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
     for (eq_pos = 0; (eq_pos < MAX_WEAR); eq_pos++)
     {
       if (victim->equipment[eq_pos] &&
-          (isexact(obj_name, victim->equipment[eq_pos]->name)) &&
-          CAN_SEE_OBJ(ch, victim->equipment[eq_pos]))
+          (isexact(obj_name, victim->equipment[eq_pos]->Name())) && CAN_SEE_OBJ(ch, victim->equipment[eq_pos]))
       {
         obj = victim->equipment[eq_pos];
         break;
@@ -1897,9 +1896,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
       special_log(QString(QStringLiteral("%1 slips %2 to %3 in room %4.")).arg(ch->getName()).arg(obj->short_description).arg(vict->getName()).arg(ch->in_room));
     }
 
-    sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
-            GET_NAME(vict));
-    logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    logobjects(QStringLiteral("%1 slips %2 to %3").arg(GET_NAME(ch)).arg(obj->Name()).arg(GET_NAME(vict)));
 
     move_obj(obj, vict);
     act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);

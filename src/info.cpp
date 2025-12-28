@@ -162,7 +162,7 @@ class Object *Character::get_object_in_equip_vis(char *arg, class Object *equipm
    for ((*j) = 0, k = 1; ((*j) < MAX_WEAR) && (k <= num); (*j)++)
       if (equipment[(*j)])
          if (CAN_SEE_OBJ(this, equipment[(*j)], blindfighting))
-            if (isexact(tmp, equipment[(*j)]->name))
+            if (isexact(tmp, equipment[(*j)]->Name()))
             {
                if (k == num)
                   return (equipment[(*j)]);
@@ -1037,7 +1037,7 @@ bool identify(Character *ch, Object *obj)
       ch->sendln("$3Short description: $R");
    }
 
-   ch->send(QStringLiteral("$3Keywords: '$R%1$3'$R\r\n").arg(obj->name));
+   ch->send(QStringLiteral("$3Keywords: '$R%1$3'$R\r\n").arg(obj->Name()));
 
    sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
    csendf(ch, "$3Item type: $R%s\r\n", buf2);
@@ -1449,7 +1449,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                {
                   if (!isSet(tmp_object->obj_flags.value[1], CONT_CLOSED))
                   {
-                     send_to_char(fname(tmp_object->name), ch);
+                     send_to_char(fname(tmp_object->Name()), ch);
                      switch (bits)
                      {
                      case FIND_OBJ_INV:
@@ -2623,7 +2623,7 @@ int do_olocate(Character *ch, char *name, cmd_t cmd)
          if (k->item_number != searchnum)
             continue;
       }
-      else if (!(isexact(name, k->name)))
+      else if (!(isexact(name, k->Name())))
          continue;
 
       if (!CAN_SEE_OBJ(ch, k))
@@ -3640,7 +3640,7 @@ bool Search::operator==(const Object *obj)
    switch (type_)
    {
    case O_NAME:
-      if (o_name_ == obj->name || isexact(o_name_, obj->name))
+      if (o_name_ == obj->Name() || isexact(o_name_, obj->Name()))
       {
          return true;
       }
@@ -4504,9 +4504,9 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       {
          break;
       }
-      if (QString(obj->name).size() > max_keyword_size)
+      if (obj->Name().size() > max_keyword_size)
       {
-         max_keyword_size = QString(obj->name).size();
+         max_keyword_size = obj->Name().size();
       }
 
       if (nocolor_strlen(obj->short_description) > max_short_description_size)
@@ -4565,7 +4565,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       if (std::count_if(sl.begin(), sl.end(), [](Search search_item)
                         { return (search_item.getType() == Search::types::O_NAME); }))
       {
-         custom_columns += QStringLiteral(" [%1]").arg(obj->name, -max_keyword_size);
+         custom_columns += QStringLiteral(" [%1]").arg(obj->Name(), -max_keyword_size);
       }
 
       if (search_world)

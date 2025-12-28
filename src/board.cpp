@@ -631,7 +631,7 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   if (!obj)
     return eFAILURE;
 
-  board = board_db.find(obj->name);
+  board = board_db.find(qPrintable(obj->Name()));
 
   if (board == board_db.end())
     return eFAILURE;
@@ -639,7 +639,7 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
 
-  if (!isexact(arg1, obj->name) && cmd == cmd_t::LOOK)
+  if (!isexact(arg1, obj->Name()) && cmd == cmd_t::LOOK)
     return eFAILURE;
 
   switch (cmd)
@@ -669,7 +669,7 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
       return eSUCCESS;
     }
     if (
-        ((!strcmp(obj->name, "board uruk")) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
+        ((obj->Name() == QStringLiteral("board uruk")) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
     {
       ch->sendln("You can't erase posts from this board.");
       return eSUCCESS;

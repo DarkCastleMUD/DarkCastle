@@ -456,7 +456,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     if (victim->equipment[iWear] &&
         isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      QString tmp(victim->equipment[iWear]->name);
+      QString tmp = victim->equipment[iWear]->Name();
       qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
       if (x >= 0 && x < tmp.length())
       {
@@ -464,7 +464,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       }
 
       tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-      victim->equipment[iWear]->name = str_hsh(tmp.toStdString().c_str());
+      victim->equipment[iWear]->Name(tmp);
     }
     if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
     {
@@ -472,14 +472,14 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       {
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          QString tmp(obj->name);
+          QString tmp = obj->Name();
           qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
           }
           tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-          obj->name = str_hsh(tmp.toStdString().c_str());
+          obj->Name(tmp);
         }
       }
     }
@@ -490,14 +490,14 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   {
     if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      QString tmp = QStringLiteral("%1").arg(obj->name);
+      QString tmp = QStringLiteral("%1").arg(obj->Name());
       qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
       }
       tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-      obj->name = str_hsh(tmp.toStdString().c_str());
+      obj->Name(tmp);
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
     {
@@ -506,14 +506,14 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       {
         if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          QString tmp = QStringLiteral("%1").arg(obj2->name);
+          QString tmp = QStringLiteral("%1").arg(obj2->Name());
           qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
           }
           tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-          obj2->name = str_hsh(tmp.toStdString().c_str());
+          obj2->Name(tmp);
         }
       }
     }

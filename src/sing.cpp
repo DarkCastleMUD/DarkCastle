@@ -453,7 +453,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 				if (!target_ok && isSet(song_info[spl].targets(), TAR_OBJ_EQUIP))
 				{
 					for (int i = 0; i < MAX_WEAR && !target_ok; i++)
-						if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
+						if (ch->equipment[i] && ch->equipment[i]->Name() == name)
 						{
 							tar_obj = ch->equipment[i];
 							target_ok = true;
@@ -1325,8 +1325,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
 	}
 	else if (skill > 80 && corpse)
 	{
-		sprintf(buf, "Corpse '%s'\n\r", corpse->name);
-		ch->send(buf);
+		ch->sendln(QStringLiteral("Corpse '%1'").arg(corpse->Name()));
 		spell_identify(ch->getLevel(), ch, 0, corpse, 0);
 	}
 	else if (skill > 85 && vict)
@@ -1989,7 +1988,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 		ch->sendln("You can't shatter that!");
 		return eFAILURE;
 	}
-	if (!isexact("pcportal", obj->name))
+	if (!isexact("pcportal", obj->Name()))
 	{
 		ch->sendln("The portal resists your song.");
 		return eFAILURE;

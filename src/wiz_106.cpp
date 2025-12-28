@@ -339,7 +339,7 @@ command_return_t test_casino(Character *ch)
 
   run_check(ch, &max_rc, do_look, "fountain", cmd_t::LOOK);
   run_check(ch, &max_rc, do_examine, "fountain", cmd_t::EXAMINE);
-  run_check(ch, &max_rc, do_drink, "fountain");
+  run_check(ch, &max_rc, &Character::do_drink, {"fountain"});
 
   run_check(ch, &max_rc, do_look, "machine", cmd_t::LOOK);
   run_check(ch, &max_rc, do_examine, "machine", cmd_t::EXAMINE);

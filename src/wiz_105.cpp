@@ -973,13 +973,12 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
       break;
     if (mob)
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Character *)DC::getInstance()->mob_index[real_mobile(i)].item)->getNameC());
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Character *)DC::getInstance()->mob_index[real_mobile(i)].item)->getName()));
     }
     else
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)DC::getInstance()->obj_index[real_object(i)].item)->name);
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Object *)DC::getInstance()->obj_index[real_object(i)].item)->Name()));
     }
   }
-  ch->send(buf);
   return eSUCCESS;
 }

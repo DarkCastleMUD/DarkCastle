@@ -1391,9 +1391,7 @@ int get_weapon_damage_type(class Object *wielded)
     return TYPE_PIERCE;
     break;
   default:
-    sprintf(log_buf, "WORLD: Unknown w_type for object #%d name: %s, fourth value flag is: %d.",
-            wielded->item_number, wielded->name, wielded->obj_flags.value[3]);
-    logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    logbug(QStringLiteral("WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3.").arg(wielded->item_number).arg(wielded->Name()).arg(wielded->obj_flags.value[3]));
     break;
   }
   return TYPE_HIT; // should never get here
@@ -4384,7 +4382,7 @@ void make_scraps(Character *ch, class Object *obj)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("scraps");
+  corpse->Name(QStringLiteral("scraps"));
 
   sprintf(buf, "A pile of scraps from %s is lying here.",
           obj->short_description);
@@ -4415,11 +4413,11 @@ static constexpr uint64_t MAX_PC_CORPSE_TIME = 30;
 
 void make_corpse(Character *ch)
 {
-  class Object *corpse, *o, *o_in_container, *next_o_in_container;
-  class Object *money, *next_obj;
+  class Object *corpse{}, *o{}, *o_in_container{}, *next_o_in_container{};
+  class Object *money{}, *next_obj{};
 
-  char buf[MAX_STRING_LENGTH];
-  int i;
+  char buf[MAX_STRING_LENGTH]{};
+  int i{};
 
   corpse = new Object;
   clear_object(corpse);
@@ -4454,7 +4452,7 @@ void make_corpse(Character *ch)
     else
       sprintf(buf, "corpse %s pc", GET_NAME(ch));
   }
-  corpse->name = str_hsh(buf);
+  corpse->Name(buf);
 
   sprintf(buf, "the corpse of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4753,7 +4751,7 @@ void make_husk(Character *ch)
   clear_object(corpse);
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("husk");
+  corpse->Name(QStringLiteral("husk"));
   sprintf(buf, "The withered husk of %s, its soul drained, flutters here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
@@ -4795,7 +4793,7 @@ void make_head(Character *ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("head");
+  corpse->Name(QStringLiteral("head"));
 
   sprintf(buf, "The head of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4841,7 +4839,7 @@ void make_arm(Character *ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("arm");
+  corpse->Name(QStringLiteral("arm"));
 
   sprintf(buf, "The arm of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4887,7 +4885,7 @@ void make_leg(Character *ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("leg");
+  corpse->Name(QStringLiteral("leg"));
 
   sprintf(buf, "The leg of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4933,7 +4931,7 @@ void make_bowels(Character *ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("bowels");
+  corpse->Name(QStringLiteral("bowels"));
 
   sprintf(buf, "The steaming bowels of %s is lying here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4979,7 +4977,7 @@ void make_blood(Character *ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("blood");
+  corpse->Name(QStringLiteral("blood"));
 
   sprintf(buf, "A pool of %s's blood is here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -5028,7 +5026,7 @@ void make_heart(Character *ch, Character *vict)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name = str_hsh("heart");
+  corpse->Name(QStringLiteral("heart"));
 
   sprintf(buf, "%s's heart is laying here.",
           (IS_NPC(vict) ? vict->short_desc : GET_NAME(vict)));

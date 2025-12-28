@@ -37,7 +37,7 @@ extern int rev_dir[];
 /* procedures related to get */
 void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, cmd_t cmd)
 {
-  std::string buffer;
+  QString buffer;
 
   if (!sub_object || sub_object->carried_by != ch)
   {
@@ -80,10 +80,10 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
   if (sub_object)
   {
-    buffer = fmt::format("{}_consent", GET_NAME(ch));
+    buffer = QStringLiteral("%1_consent").arg(GET_NAME(ch));
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
+      if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())) && !isexact(buffer, sub_object->Name()))
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
@@ -91,7 +91,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->item_number].virt, sub_object->name);
+        sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->item_number].virt, qPrintable(sub_object->Name()));
         logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
@@ -111,9 +111,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name))
+    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->Name()))
     {
-      if (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name))
+      if (cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name()))
       {
         struct affected_type pthiefaf;
 
@@ -126,8 +126,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %d coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
-        logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+        logmortal(QStringLiteral("%1 looted %2 coins from %3").arg(GET_NAME(ch)).arg(obj_object->obj_flags.value[0]).arg(sub_object->Name()));
 
         if (ch->isPlayerGoldThief())
         {
@@ -141,20 +140,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
-      char log_buf[MAX_STRING_LENGTH] = {};
-      sprintf(log_buf, "%s gets %s[%d] from %s[%d]",
-              GET_NAME(ch),
-              obj_object->name,
-              DC::getInstance()->obj_index[obj_object->item_number].virt,
-              sub_object->name,
-              DC::getInstance()->obj_index[sub_object->item_number].virt);
-      logentry(log_buf, 110, DC::LogChannel::LOG_OBJECTS);
+      logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(sub_object->Name()).arg(DC::getInstance()->obj_index[sub_object->item_number].virt));
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
-             obj_object->short_description,
-             DC::getInstance()->obj_index[obj_object->item_number].virt,
-             loop_obj->short_description,
-             DC::getInstance()->obj_index[loop_obj->item_number].virt);
+        logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].virt));
     }
     move_obj(obj_object, ch);
     if (sub_object->carried_by == ch)
@@ -165,8 +153,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     else
     {
       act("You get $p from $P.", ch, obj_object, sub_object, TO_CHAR, INVIS_NULL);
-      act("$n gets $p from $P.", ch, obj_object, sub_object, TO_ROOM,
-          INVIS_NULL);
+      act("$n gets $p from $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
     }
   }
   else
@@ -176,26 +163,20 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      char log_buf[MAX_STRING_LENGTH] = {};
-      sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, DC::getInstance()->obj_index[obj_object->item_number].virt,
-              ch->in_room);
-      logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(ch->in_room));
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-             obj_object->short_description,
-             loop_obj->short_description,
-             DC::getInstance()->obj_index[loop_obj->item_number].virt);
+        logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].virt));
     }
 
     if (DC::getInstance()->obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
     {
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      buffer = fmt::format("\r\n##{} has just picked up {}!\r\n", GET_NAME(ch), static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item)->short_description);
+      buffer = QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item)->short_description);
       send_info(buffer);
     }
   }
   if (sub_object && sub_object->obj_flags.value[3] == 1 &&
-      isexact("pc", sub_object->name))
+      isexact("pc", sub_object->Name()))
     ch->save(cmd_t::SAVE_SILENTLY);
 
   if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
@@ -203,8 +184,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
   {
     obj_from_char(obj_object);
 
-    buffer = fmt::format("There was {} coins.",
-                         obj_object->obj_flags.value[0]);
+    buffer = QStringLiteral("There was %1 coins.").arg(obj_object->obj_flags.value[0]);
     if (IS_NPC(ch) || !isSet(ch->player->toggles, Player::PLR_BRIEF))
     {
       ch->send(buffer);
@@ -221,20 +201,19 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
-        buffer = fmt::format("{} Bounty: {}", buffer, cgold);
+        buffer += QStringLiteral("Bounty: %2").arg(cgold);
         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
       }
       else
-        csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name, cgold,
-               obj_object->obj_flags.value[0]);
+        ch->sendln(QStringLiteral("Clan %1 collects %2 bounty, leaving %3 for you.").arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
-    //           !isexact("pc",sub_object->name) && ch->clan
+    //           !isexact("pc",sub_object->Name()) && ch->clan
     //            && get_clan(ch)->tax && !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
-    if (((sub_object && sub_object->obj_flags.value[3] == 1 &&
-          !isexact("pc", sub_object->name)) ||
-         !sub_object) &&
-        ch->clan && get_clan(ch)->tax && !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
+    if (((sub_object && sub_object->obj_flags.value[3] == 1 && !isexact("pc", sub_object->Name())) || !sub_object) &&
+        ch->clan &&
+        get_clan(ch)->tax &&
+        !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax) / 100.0));
       obj_object->obj_flags.value[0] -= cgold;
@@ -243,11 +222,11 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
-        buffer = fmt::format("{} ClanTax: {}", buffer, cgold);
+        buffer += QStringLiteral("ClanTax: %2").arg(cgold);
       }
       else
       {
-        csendf(ch, "Your clan taxes you %d $B$5gold$R, leaving %d $B$5gold$R for you.\r\n", cgold, obj_object->obj_flags.value[0]);
+        ch->sendln(QStringLiteral("Your clan taxes you %1 $B$5gold$R, leaving %2 $B$5gold$R for you.").arg(cgold).arg(obj_object->obj_flags.value[0]));
       }
       save_clans();
     }
@@ -263,11 +242,11 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     if (tax)
     {
-      buffer = fmt::format("{}. {} $B$5gold$R remaining.\r\n", buffer, obj_object->obj_flags.value[0]);
+      buffer += QStringLiteral(". %1 $B$5gold$R remaining.\r\n").arg(obj_object->obj_flags.value[0]);
     }
     else
     {
-      buffer = fmt::format("{}\r\n", buffer);
+      buffer += QStringLiteral("\r\n");
     }
 
     if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
@@ -417,7 +396,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       next_obj = obj_object->next_content;
 
       /* IF all.obj, only get those named "obj" */
-      if (alldot && !isexact(allbuf, obj_object->name))
+      if (alldot && !isexact(allbuf, obj_object->Name()))
         continue;
 
       // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
@@ -445,21 +424,21 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       }
 
       if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isexact(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
+          !isexact(GET_NAME(ch), obj_object->Name()) && ch->getLevel() < IMPLEMENTER)
       {
         ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
         continue;
       }
 
       // PC corpse
-      if ((obj_object->obj_flags.value[3] == 1 && isexact("pc", obj_object->name)) || isexact("thiefcorpse", obj_object->name))
+      if ((obj_object->obj_flags.value[3] == 1 && isexact("pc", obj_object->Name())) || isexact("thiefcorpse", obj_object->Name()))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if ((isexact("thiefcorpse", obj_object->name) &&
-             !isexact(GET_NAME(ch), obj_object->name)) ||
-            isexact(GET_NAME(ch), obj_object->name) || ch->getLevel() >= OVERSEER)
+        if ((isexact("thiefcorpse", obj_object->Name()) &&
+             !isexact(GET_NAME(ch), obj_object->Name())) ||
+            isexact(GET_NAME(ch), obj_object->Name()) || ch->getLevel() >= OVERSEER)
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), obj_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), obj_object->Name()))
         {
           if (ch->getLevel() < OVERSEER)
           {
@@ -488,13 +467,13 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
             !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
         {
-          sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
+          sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           fail = true;
         }
         else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
         {
-          sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
+          sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           fail = true;
         }
@@ -539,12 +518,12 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     {
       if (obj_object->obj_flags.type_flag == ITEM_CONTAINER &&
           obj_object->obj_flags.value[3] == 1 &&
-          isexact("pc", obj_object->name))
+          isexact("pc", obj_object->Name()))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if (isexact(GET_NAME(ch), obj_object->name))
+        if (isexact(GET_NAME(ch), obj_object->Name()))
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), obj_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), obj_object->Name()))
         {
           send_to_char("You don't have consent to take the "
                        "corpse.\r\n",
@@ -555,21 +534,21 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       }
 
       if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isexact(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
+          !isexact(GET_NAME(ch), obj_object->Name()) && ch->getLevel() < IMPLEMENTER)
       {
         ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
       }
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
       {
-        sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
+        sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
         ch->send(buffer);
         fail = true;
       }
       else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
                !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
       {
-        sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
+        sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
         ch->send(buffer);
         fail = true;
       }
@@ -643,13 +622,13 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     {
       if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
           ((sub_object->obj_flags.value[3] == 1 &&
-            isexact("pc", sub_object->name)) ||
-           isexact("thiefcorpse", sub_object->name)))
+            isexact("pc", sub_object->Name())) ||
+           isexact("thiefcorpse", sub_object->Name())))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if ((isexact("thiefcorpse", sub_object->name) && !isexact(GET_NAME(ch), sub_object->name)) || isexact(buffer, sub_object->name) || ch->getLevel() > 105)
+        if ((isexact("thiefcorpse", sub_object->Name()) && !isexact(GET_NAME(ch), sub_object->Name())) || isexact(buffer, sub_object->Name()) || ch->getLevel() > 105)
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), sub_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), sub_object->Name()))
         {
           ch->sendln("You don't have consent to touch the corpse.");
           return eFAILURE;
@@ -659,7 +638,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       {
         if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name).toStdString().c_str());
+          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->Name())));
           ch->send(buffer);
           return eFAILURE;
         }
@@ -670,7 +649,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           next_obj = obj_object->next_content;
           if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
           {
-            csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name).toStdString().c_str());
+            csendf(ch, "%s : It seems magically attached to the corpse.\r\n", qPrintable(fname(obj_object->Name())));
             continue;
           } /*
        class Object *temp,*next_contentthing;
@@ -685,7 +664,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
        }*/
           //		}
           /* IF all.obj, only get those named "obj" */
-          if (alldot && !isexact(allbuf, obj_object->name))
+          if (alldot && !isexact(allbuf, obj_object->Name()))
           {
             continue;
           }
@@ -698,7 +677,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           }
 
           if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-              !isexact(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
+              !isexact(GET_NAME(ch), obj_object->Name()) && ch->getLevel() < IMPLEMENTER)
           {
             ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
             continue;
@@ -709,7 +688,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
             if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                 !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
             {
-              sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
+              sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
               ch->send(buffer);
               fail = true;
             }
@@ -726,13 +705,13 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   // the other of the corpse, has_consent will be false.
                   if (!ch->isImmortalPlayer())
                   {
-                    if (isexact(obj_object->name, "thiefcorpse"))
+                    if (isexact(obj_object->Name(), "thiefcorpse"))
                     {
                       ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
                       extract_obj(obj_object);
                       continue;
                     }
-                    csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name).toStdString().c_str());
+                    csendf(ch, "%s : It seems magically attached to the corpse.\r\n", qPrintable(fname(obj_object->Name())));
                     continue;
                   }
                 }
@@ -763,8 +742,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
               }
               else
               {
-                sprintf(buffer,
-                        "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
+                sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
                 ch->send(buffer);
                 fail = true;
               }
@@ -773,14 +751,14 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         }
         if (!found && !fail)
         {
-          sprintf(buffer, "You do not see anything in the %s.\r\n", fname(sub_object->name).toStdString().c_str());
+          sprintf(buffer, "You do not see anything in the %s.\r\n", qPrintable(fname(sub_object->Name())));
           ch->send(buffer);
           fail = true;
         }
       }
       else
       {
-        sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->name).toStdString().c_str());
+        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->Name())));
         ch->send(buffer);
         fail = true;
       }
@@ -819,16 +797,16 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     {
       if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
           ((sub_object->obj_flags.value[3] == 1 &&
-            isexact("pc", sub_object->name)) ||
-           isexact("thiefcorpse", sub_object->name)))
+            isexact("pc", sub_object->Name())) ||
+           isexact("thiefcorpse", sub_object->Name())))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
 
-        if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->name) && !isexact(GET_NAME(ch), sub_object->name))) || isexact(buffer, sub_object->name))
+        if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->Name()) && !isexact(GET_NAME(ch), sub_object->Name()))) || isexact(buffer, sub_object->Name()))
           has_consent = true;
-        if (!isexact(GET_NAME(ch), sub_object->name) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
+        if (!isexact(GET_NAME(ch), sub_object->Name()) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), sub_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), sub_object->Name()))
         {
           send_to_char("You don't have consent to touch the "
                        "corpse.\r\n",
@@ -840,7 +818,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       {
         if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name).toStdString().c_str());
+          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->Name())));
           ch->send(buffer);
           return eFAILURE;
         }
@@ -869,7 +847,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                    !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
           {
-            sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
+            sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
             ch->send(buffer);
             fail = true;
           }
@@ -884,7 +862,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
               // the other of the corpse, has_consent will be false.
               if (!ch->isImmortalPlayer())
               {
-                if (isexact("thiefcorpse", sub_object->name) || (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)))
+                if (isexact("thiefcorpse", sub_object->Name()) || (cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())))
                 {
                   ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
 
@@ -893,7 +871,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                           GET_NAME(ch),
                           obj_object->short_description,
                           DC::getInstance()->obj_index[obj_object->item_number].virt,
-                          sub_object->name,
+                          qPrintable(sub_object->Name()),
                           DC::getInstance()->obj_index[sub_object->item_number].virt);
                   logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
@@ -901,7 +879,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   fail = true;
                   sprintf(buffer, "%s_consent", GET_NAME(ch));
 
-                  if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
+                  if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())) && !isexact(buffer, sub_object->Name()))
                   {
                     SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
                     struct affected_type pthiefaf;
@@ -925,7 +903,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                 }
                 else
                 {
-                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name).toStdString().c_str());
+                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", qPrintable(fname(obj_object->Name())));
                   fail = true;
                 }
               }
@@ -948,14 +926,14 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           }
           else
           {
-            sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
+            sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
             ch->send(buffer);
             fail = true;
           }
         }
         else
         {
-          sprintf(buffer, "The %s does not contain the %s.\r\n", fname(sub_object->name).toStdString().c_str(), arg1);
+          sprintf(buffer, "The %s does not contain the %s.\r\n", qPrintable(fname(sub_object->Name())));
           ch->send(buffer);
           fail = true;
         }
@@ -963,7 +941,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       else
       {
         sprintf(buffer,
-                "The %s is not a container.\r\n", fname(sub_object->name).toStdString().c_str());
+                "The %s is not a container.\r\n", fname(sub_object->Name()).toStdString().c_str());
         ch->send(buffer);
         fail = true;
       }
@@ -985,24 +963,21 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
 
 int do_consent(Character *ch, char *arg, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1], buf2[MAX_STRING_LENGTH + 1];
-  class Object *obj;
-  Character *vict;
+  class Object *obj{};
+  Character *vict{};
 
-  while (isspace(*arg))
-    ++arg;
+  auto arguments = QString(arg).trimmed().split(' ');
+  auto arg1 = arguments.value(0);
 
-  one_argument(arg, buf);
-
-  if (!*buf)
+  if (arg1.isEmpty())
   {
     ch->sendln("Give WHO consent to touch your rotting carcass?");
     return eFAILURE;
   }
 
-  if (!(vict = get_char_vis(ch, buf)))
+  if (!(vict = get_char_vis(ch, arg1)))
   {
-    ch->send(QStringLiteral("Consent whom?  You can't see any %1.\r\n").arg(buf));
+    ch->send(QStringLiteral("Consent whom?  You can't see any %1.\r\n").arg(arg1));
     return eFAILURE;
   }
 
@@ -1026,35 +1001,30 @@ int do_consent(Character *ch, char *arg, cmd_t cmd)
 
   for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
   {
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || !obj->name)
+    if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || obj->Name().isEmpty())
       continue;
 
-    if (!isexact(GET_NAME(ch), obj->name))
+    if (!isexact(GET_NAME(ch), obj->Name()))
       // corpse isn't owned by the consenting player
       continue;
 
     // check to see if this player is already consented for the corpse
-    sprintf(buf2, "%s_consent", buf);
-    if (isexact(buf2, obj->name))
+    if (isexact(QStringLiteral("%1_consent").arg(arg1), obj->Name()))
       // keep looking; there might be other corpses not yet consented
       continue;
 
     // check for buffer overflow before adding the new name to the list
-    if ((strlen(obj->name) + strlen(buf) + strlen(" _consent")) > (MAX_STRING_LENGTH / 2))
+    if (obj->Name().size() + arg1.size() + QStringLiteral(" _consent").size() > (MAX_STRING_LENGTH / 2))
     {
-      send_to_char("Don't you think there are enough perverts molesting "
-                   "your\r\nmaggot-ridden corpse already?\r\n",
-                   ch);
+      ch->sendln("Don't you think there are enough perverts molesting your");
+      ch->sendln("maggot-ridden corpse already?");
       return eFAILURE;
     }
-    sprintf(buf2, "%s %s_consent", obj->name, buf);
-    obj->name = str_hsh(buf2);
+    auto buf2 = QStringLiteral("%1 %1_consent").arg(obj->Name()).arg(arg1);
+    obj->Name(buf2);
   }
 
-  sprintf(buf2, "All corpses in the game which belong to you can now be "
-                "molested by\r\nanyone named %s.\r\n",
-          buf);
-  send_to_char(buf2, ch);
+  ch->sendln(QStringLiteral("All corpses in the game which belong to you can now be molested by anyone named %1.").arg(arg1));
   return eSUCCESS;
 }
 
@@ -1161,7 +1131,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
       {
         next_obj = tmp_object->next_content;
 
-        if (alldot[0] != '\0' && !isexact(alldot, tmp_object->name))
+        if (alldot[0] != '\0' && !isexact(alldot, tmp_object->Name()))
           continue;
 
         if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
@@ -1305,12 +1275,12 @@ void do_putalldot(Character *ch, char *name, char *target, cmd_t cmd)
     next_object = tmp_object->next_content;
     if (!name && CAN_SEE_OBJ(ch, tmp_object))
     {
-      sprintf(buf, "%s %s", fname(tmp_object->name).toStdString().c_str(), target);
+      sprintf(buf, "%s %s", fname(tmp_object->Name()).toStdString().c_str(), target);
       buf[99] = 0;
       found = true;
       do_put(ch, buf, cmd);
     }
-    else if (isexact(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object))
+    else if (isexact(name, tmp_object->Name()) && CAN_SEE_OBJ(ch, tmp_object))
     {
       sprintf(buf, "%s %s", name, target);
       buf[99] = 0;
@@ -1523,7 +1493,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
           }
           else
           {
-            sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->name).toStdString().c_str());
+            sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->Name()).toStdString().c_str());
             ch->send(buffer);
           }
         }
@@ -1562,9 +1532,9 @@ command_return_t Character::do_givealldot(QString name, QString target, cmd_t cm
     if (name.isEmpty() && CAN_SEE_OBJ(this, tmp_object))
     {
       found = true;
-      do_give({fname(tmp_object->name), target});
+      do_give({fname(tmp_object->Name()), target});
     }
-    else if (isexact(name, tmp_object->name) && CAN_SEE_OBJ(this, tmp_object))
+    else if (isexact(name, tmp_object->Name()) && CAN_SEE_OBJ(this, tmp_object))
     {
       found = true;
       do_give({name, target});
@@ -1895,7 +1865,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   act("$n gives you $p.", this, obj, vict, TO_VICT, 0);
   act("You give $p to $N.", this, obj, vict, TO_CHAR, 0);
 
-  logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->name).arg(GET_NAME(vict)));
+  logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->Name()).arg(GET_NAME(vict)));
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
          obj->short_description,
@@ -2655,7 +2625,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     sprintf(buffer, "%s_consent", GET_NAME(ch));
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      if (isexact("lootable", sub_object->name) && !isexact(buffer, sub_object->name))
+      if (isexact("lootable", sub_object->Name()) && !isexact(buffer, sub_object->Name()))
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
@@ -2678,9 +2648,9 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name))
+    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->Name()))
     {
-      if (isexact("lootable", sub_object->name))
+      if (isexact("lootable", sub_object->Name()))
       {
         struct affected_type pthiefaf;
 
@@ -2706,8 +2676,8 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   char log_buf[MAX_STRING_LENGTH] = {};
   if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
-    sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, DC::getInstance()->obj_index[obj_object->item_number].virt,
-            sub_object->name);
+    //"%s palms %s[%d] from %s", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->item_number].virt, qPrintable(sub_object->Name()));
+
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
@@ -2715,7 +2685,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
-    sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, DC::getInstance()->obj_index[obj_object->item_number].virt,
+    sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->item_number].virt,
             ch->in_room);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)

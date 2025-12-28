@@ -3393,7 +3393,7 @@ auto DC::create_blank_item(int nr) -> std::expected<int, create_error>
 
 	obj = new Object;
 	clear_object(obj);
-	obj->name = str_hsh("empty obj");
+	obj->Name(QStringLiteral("empty obj"));
 	obj->short_description = str_hsh("An empty obj");
 	obj->long_description = str_hsh("An empty obj sits here dejectedly.");
 	obj->ActionDescription("Fixed.");
@@ -3782,9 +3782,9 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	// read it, add it to the hsh table, free it
 	// that way, we only have one copy of it in memory at any time
 
-	obj->name = fread_string(fl, 1);
+	obj->Name(fread_string(fl, 1));
 
-	qDebug(QStringLiteral("Object name: %1").arg(obj->name).toStdString().c_str());
+	qDebug(qPrintable(QStringLiteral("Object name: %1").arg(obj->Name())));
 	obj->short_description = fread_string(fl, 1);
 	if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
 	{
@@ -3802,7 +3802,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	}
 	obj->table = 0;
 	DC::getInstance()->currentVNUM(nr);
-	DC::getInstance()->currentName(obj->name);
+	DC::getInstance()->currentName(obj->Name());
 	DC::getInstance()->currentType("Object");
 	obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(fl);
 	obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(fl);
@@ -3882,7 +3882,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 			break;
 
 		default:
-			logentry(QStringLiteral("Illegal obj addon flag [%1] in obj [%2].").arg(chk).arg(obj->name), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+			logentry(QStringLiteral("Illegal obj addon flag [%1] in obj [%2].").arg(chk).arg(obj->Name()), IMPLEMENTER, DC::LogChannel::LOG_BUG);
 			break;
 		} // switch
 		  // read in next flag
@@ -3933,7 +3933,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	/* *** std::string data *** */
 	// read it, add it to the hsh table, free it
 	// that way, we only have one copy of it in memory at any time
-	obj->name = fread_string(fl, 1);
+	obj->Name(fread_string(fl, 1));
 	char *tmpptr;
 
 	tmpptr = fread_string(fl, 1);
@@ -3961,7 +3961,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	}
 	obj->table = 0;
 	DC::getInstance()->currentVNUM(nr);
-	DC::getInstance()->currentName(obj->name);
+	DC::getInstance()->currentName(obj->Name());
 	DC::getInstance()->currentType("Object");
 
 	/* *** numeric data *** */
@@ -4034,8 +4034,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 			break;
 
 		default:
-			sprintf(log_buf, "Illegal obj addon flag %c in obj %s.", chk, obj->name);
-			logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_BUG);
+			logbug(QStringLiteral("Illegal obj addon flag %1 in obj %2.").arg(chk).arg(obj->Name()));
 			break;
 		} // switch
 		  // read in next flag
@@ -4082,7 +4081,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 	}
 	in >> std::ws;
 
-	obj->name = fread_string(in, true);
+	obj->Name(fread_string(in, true));
 
 	char *tmpptr;
 	tmpptr = fread_string(in, true);
@@ -4104,7 +4103,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 	obj->ActionDescription(fread_string(in, 1));
 	obj->table = 0;
 	DC::getInstance()->currentVNUM(nr);
-	DC::getInstance()->currentName(obj->name);
+	DC::getInstance()->currentName(obj->Name());
 	DC::getInstance()->currentType("Object");
 
 	// numeric data
@@ -4168,8 +4167,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 			break;
 
 		default:
-			sprintf(log_buf, "Illegal obj addon flag %c in obj %s.", chk, obj->name);
-			logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_BUG);
+			logbug(QStringLiteral("Illegal obj addon flag %1 in obj %2.").arg(chk).arg(obj->Name()));
 			break;
 		} // switch
 		  // read in next flag
@@ -4197,7 +4195,7 @@ void write_object(LegacyFile &lf, Object *obj)
 	struct extra_descr_data *currdesc;
 
 	fprintf(fl, "#%d\n", DC::getInstance()->obj_index[obj->item_number].virt);
-	string_to_file(fl, obj->name);
+	string_to_file(fl, obj->Name());
 	string_to_file(fl, obj->short_description);
 	string_to_file(fl, obj->long_description);
 	string_to_file(fl, obj->ActionDescription());
@@ -4247,7 +4245,7 @@ void write_object(LegacyFile &lf, Object *obj)
 std::ofstream &operator<<(std::ofstream &out, Object *obj)
 {
 	out << "#" << DC::getInstance()->obj_index[obj->item_number].virt << "\n";
-	string_to_file(out, obj->name);
+	string_to_file(out, obj->Name());
 	string_to_file(out, obj->short_description);
 	string_to_file(out, obj->long_description);
 	string_to_file(out, obj->ActionDescription());
@@ -4379,7 +4377,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 	try
 	{
 		fout << DC::getInstance()->obj_index[obj->item_number].virt << ",";
-		fout << "\"" << obj->name << "\",";
+		fout << "\"" << obj->Name().toStdString() << "\",";
 		fout << "\"" << quotequotes(obj->short_description) << "\",";
 		fout << "\"" << quotequotes(obj->long_description) << "\",";
 		fout << "\"" << quotequotes(obj->ActionDescription().toStdString().c_str()) << "\",";
@@ -6149,7 +6147,7 @@ void clear_object(class Object *obj)
 	obj->num_affects = 0;
 	obj->affected = nullptr;
 
-	obj->name = nullptr;
+	obj->Name(QStringLiteral(""));
 	obj->long_description = nullptr;
 	obj->short_description = nullptr;
 	obj->ActionDescription(QString());
@@ -6368,7 +6366,7 @@ int obj_in_index(char *name, int index)
 	for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
 					   ((class Object *)(DC::getInstance()->obj_index[i].item));
 		 i++)
-		if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[i].item))->name))
+		if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[i].item))->Name()))
 		{
 			if (j == index)
 				return i;
@@ -6711,9 +6709,9 @@ void copySaveData(Object *target, Object *source)
 		target->long_description = str_hsh(source->long_description);
 	}
 
-	if (strcmp(source->name, target->name))
+	if (source->Name() != target->Name())
 	{
-		target->name = str_hsh(source->name);
+		target->Name(source->Name());
 	}
 
 	if (source->obj_flags.type_flag != target->obj_flags.type_flag)
@@ -6805,7 +6803,7 @@ bool fullItemMatch(Object *obj, Object *obj2)
 		return false;
 	}
 
-	if (strcmp(obj->name, obj2->name))
+	if (obj->Name() != obj2->Name())
 	{
 		return false;
 	}

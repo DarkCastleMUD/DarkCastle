@@ -591,7 +591,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    obj->long_description = str_hsh(quest->objlong);
 
    sprintf(buf, "%s %s q%d", quest->objkey, GET_NAME(ch), quest->number);
-   obj->name = str_hsh(buf);
+   obj->Name(buf);
 
    SET_BIT(obj->obj_flags.extra_flags, ITEM_SPECIAL);
    SET_BIT(obj->obj_flags.extra_flags, ITEM_QUEST);
@@ -794,7 +794,7 @@ void quest_update()
                   obj->short_description = str_hsh(quest->objshort);
                   obj->long_description = str_hsh(quest->objlong);
                   sprintf(buf, "%s q%d", quest->objkey, quest->number);
-                  obj->name = str_hsh(buf);
+                  obj->Name(buf);
                   obj_to_char(obj, mob);
                   wear(mob, obj, obj->keywordfind());
                }

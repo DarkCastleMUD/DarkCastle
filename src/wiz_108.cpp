@@ -181,7 +181,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
 
   for (k = DC::getInstance()->object_list, j = 1; k && (j <= nIndex); k = k->next)
   {
-    if (!(isexact(pBuf, k->name)))
+    if (!(isexact(pBuf, k->Name())))
       continue;
     if (!CAN_SEE_OBJ(ch, k))
       continue;

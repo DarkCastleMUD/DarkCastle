@@ -86,7 +86,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
   if (obj == nullptr)
   {
     obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
-    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isexact("corpse", obj->name) || isexact("pc", obj->name))
+    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isexact("corpse", obj->Name()) || isexact("pc", obj->Name()))
     {
       act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
       return eFAILURE;
@@ -104,7 +104,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("(This item is cursed, BTW.)");
   }
 
-  if (obj->obj_flags.value[3] == 1 && isexact("pc", obj->name))
+  if (obj->obj_flags.value[3] == 1 && isexact("pc", obj->Name()))
   {
     ch->sendln("You probably don't *really* want to do that.");
     return eFAILURE;
@@ -307,7 +307,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, DC::getInstance()->obj_index[obj->item_number].virt);
+    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), qPrintable(obj->Name()), DC::getInstance()->obj_index[obj->item_number].virt);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,

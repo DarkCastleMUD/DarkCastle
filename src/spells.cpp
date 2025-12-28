@@ -2231,7 +2231,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_EQUIP))
           {
             for (i = 0; i < MAX_WEAR && !target_ok; i++)
-              if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
+              if (ch->equipment[i] && ch->equipment[i]->Name() == name)
               {
                 tar_obj = ch->equipment[i];
                 target_ok = true;

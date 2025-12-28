@@ -223,7 +223,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         if (target_obj->in_room != DC::NOWHERE)
         {
           location = target_obj->in_room;
-          send(QStringLiteral("Going to object %1 in room %2.\r\n").arg(GET_NAME(target_obj)).arg(location));
+          send(QStringLiteral("Going to object %1 in room %2.\r\n").arg(target_obj->Name()).arg(location));
         }
         else
         {

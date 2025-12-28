@@ -471,7 +471,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   determinePath(pt, pt2, i, 1, &p[0]);
   for (int z = 0; p[z]; z++)
   {
-    csendf(ch, "%s -- \r\n", p[z]->name);
+    ch->sendln(QStringLiteral("%1 -- ").arg(p[z]->name));
   }
   return eSUCCESS;
 }
@@ -582,7 +582,7 @@ char *findPath(int from, int to, Character *ch = nullptr)
   {
     if (!p[z])
       continue;
-    csendf(ch, "%s -- \r\n", p[z]->name);
+    ch->sendln(QStringLiteral("%1 -- ").arg(p[z]->name));
     if (z > 0 && p[z - 1])
       to = p[z]->connectRoom(p[z - 1]);
     else

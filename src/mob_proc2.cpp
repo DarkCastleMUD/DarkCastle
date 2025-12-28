@@ -428,7 +428,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 			if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
 				continue;
 
-			if (!isexact("pc", obj->name) || (!isexact(GET_NAME(ch), obj->name) && !isexact(buf, obj->name)))
+			if (!isexact("pc", obj->Name()) || (!isexact(GET_NAME(ch), obj->Name()) && !isexact(buf, obj->Name())))
 				continue;
 
 			if (obj->in_room == ch->in_room)
@@ -476,7 +476,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 		if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
 			continue;
 
-		if (!isexact("pc", obj->name) || (!isexact(GET_NAME(ch), obj->name) && !isexact(buf, obj->name)) || ++x < which)
+		if (!isexact("pc", obj->Name()) || (!isexact(GET_NAME(ch), obj->Name()) && !isexact(buf, obj->Name())) || ++x < which)
 			continue;
 
 		if (!obj->contains) // skip empty corpses
@@ -737,8 +737,8 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
 			return eSUCCESS;
 		}
 		GET_PLATINUM(ch) -= obj->obj_flags.cost / 10;
-		sprintf(buf, "%s %s", obj->name, GET_NAME(ch));
-		obj->name = str_hsh(buf);
+		sprintf(buf, "%s %s", qPrintable(obj->Name()), GET_NAME(ch));
+		obj->Name(buf);
 		obj_to_char(obj, ch);
 		owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
 		return eSUCCESS;

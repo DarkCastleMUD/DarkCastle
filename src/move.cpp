@@ -1172,7 +1172,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
 		return eFAILURE;
 	}
 
-	if (isexact("only", portal->name) && !isexact(GET_NAME(sesame), portal->name))
+	if (isexact("only", portal->Name()) && !isexact(GET_NAME(sesame), portal->Name()))
 	{
 		ch->sendln("The portal fades when you draw near, then shimmers as you withdraw.");
 		return eFAILURE;

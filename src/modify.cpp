@@ -297,7 +297,8 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 				ch->sendln("The moose will get you if you do that.");
 				return 1;
 			}
-			ch->desc->hashstr = &obj->name;
+			// TODO hashstr for qstring
+			// ch->desc->hashstr = &qPrintable(obj->Name());
 			break;
 		case 2:
 			ch->desc->hashstr = &obj->short_description;

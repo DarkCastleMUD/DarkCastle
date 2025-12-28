@@ -561,14 +561,14 @@ void rename_vault_owner(QString oldname, QString newname)
   {
     if (items->obj && isSet(items->obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      QStringList tmp = QString(items->obj->name).trimmed().split(' ');
+      QStringList tmp = QString(items->obj->Name()).trimmed().split(' ');
       if (tmp.length() >= 2)
       {
         tmp.pop_back();
       }
       tmp.push_back(newname);
 
-      items->obj->name = str_hsh(tmp.join(' ').toStdString().c_str());
+      items->obj->Name(tmp.join(' '));
     }
   }
   save_vault(newname);
@@ -1312,7 +1312,7 @@ struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char
   for (items = vault->items; items; items = items->next)
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
-    if (obj && isexact(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, obj->Name()))
     {
       if (i == num)
         return items;
@@ -1334,7 +1334,7 @@ class Object *get_unique_obj_in_vault(struct vault_data *vault, char *object, in
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
     //    obj = get_obj(items->item_vnum);
-    if (obj && isexact(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, obj->Name()))
     {
       if (i == num)
         return obj;
@@ -1356,14 +1356,14 @@ struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *objec
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
     //    obj = get_obj(items->item_vnum);
-    if (obj && isexact(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, obj->Name()))
     {
       if (i == num)
         return items;
       else
       {
         for (j = 1; j <= items->count; j++)
-          if (isexact(object, GET_OBJ_NAME(obj)))
+          if (isexact(object, obj->Name()))
           {
             if (i == num)
               return items;
@@ -1387,7 +1387,7 @@ class Object *get_obj_in_vault(struct vault_data *vault, QString object, int num
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
     //    obj = get_obj(items->item_vnum);
-    if (obj && isexact(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, obj->Name()))
     {
       if (i == num)
         return obj;
@@ -1484,7 +1484,7 @@ void vault_get(Character *ch, QString object, QString owner)
 
       for (int j = 0; j < items->count; j++, i++)
       {
-        strncpy(obj_list[i], fname(obj->getName()).toStdString().c_str(), sizeof(obj_list[i]));
+        strncpy(obj_list[i], qPrintable(fname(obj->Name())), sizeof(obj_list[i]));
         if (i > 49)
         {
           ch->send("You can only take out 50 items at a time.\r\n");
@@ -1515,7 +1515,7 @@ void vault_get(Character *ch, QString object, QString owner)
       if (obj == 0)
         continue;
 
-      if (isexact(object, GET_OBJ_NAME(obj)))
+      if (isexact(object, obj->Name()))
         num += items->count;
     }
 
@@ -1967,7 +1967,7 @@ void vault_put(Character *ch, QString object, QString owner)
     for (obj = ch->carrying; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next_content;
-      if (!isexact(object, GET_OBJ_NAME(obj)))
+      if (!isexact(object, obj->Name()))
         continue;
       if (!can_put_in_vault(obj, self, vault, ch))
         continue;
@@ -2671,7 +2671,7 @@ int vault_search(Character *ch, const char *args)
           case vault_search_type::UNDEFINED:
             break;
           case vault_search_type::KEYWORD:
-            if (!isexact((*p).str_argument, GET_OBJ_NAME(obj)))
+            if (!isexact((*p).str_argument, obj->Name()))
             {
               nomatch = true;
             }

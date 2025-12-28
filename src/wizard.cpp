@@ -21,7 +21,9 @@
 #include "DC/comm.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
+
 #include <fmt/format.h>
+#include <QString>
 
 int getRealSpellDamage(Character *ch);
 
@@ -986,7 +988,7 @@ void obj_stat(Character *ch, class Object *j)
 
   virt = (j->item_number >= 0) ? DC::getInstance()->obj_index[j->item_number].virt : 0;
   sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
-          j->name, j->item_number, virt);
+          qPrintable(j->Name()), j->item_number, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
   strcat(buf, buf2);
@@ -1050,7 +1052,7 @@ void obj_stat(Character *ch, class Object *j)
     strcat(buf, buf2);
   }
   strcat(buf, "  $3In object$R: ");
-  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->name).toStdString().c_str()));
+  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->Name()).toStdString().c_str()));
   strcat(buf, "  $3Carried by$R: ");
   strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
   strcat(buf, "\n\r");
@@ -1321,7 +1323,7 @@ void obj_stat(Character *ch, class Object *j)
   found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
   {
-    strcat(buf, fname(j2->name).toStdString().c_str());
+    strcat(buf, qPrintable(fname(j2->Name())));
     strcat(buf, "\n\r");
     found = true;
   }

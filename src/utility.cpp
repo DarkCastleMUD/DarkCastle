@@ -1220,13 +1220,13 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   skill = 0;
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_GOOD)))
     skill = (int)cur_af->modifier;
-  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->Name()) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
     return true;
 
   skill = 0;
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_EVIL)))
     skill = (int)cur_af->modifier;
-  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_DESECRATE)
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->Name()) && obj->obj_flags.value[0] == SPELL_DESECRATE)
     return true;
 
   if (IS_OBJ_STAT(obj, ITEM_NOSEE))
