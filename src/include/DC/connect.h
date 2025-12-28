@@ -59,9 +59,11 @@ private:
   quint16 destination_port = {};
 };
 
-class Connection
+class Connection : public QObject
 {
+  Q_OBJECT
 public:
+  Connection(QObject *parent = nullptr);
   enum states
   {
     PLAYING,

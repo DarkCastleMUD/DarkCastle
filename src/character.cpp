@@ -334,6 +334,11 @@ const char *Character::getNameC(void) const
     return str_hsh(name_.toStdString().c_str());
 }
 
+Connection::Connection(QObject *parent)
+    : QObject(parent)
+{
+}
+
 void Connection::send(QString txt)
 {
     /* if there's no descriptor, don't worry about output */
