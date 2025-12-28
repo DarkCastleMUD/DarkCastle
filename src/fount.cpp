@@ -53,8 +53,6 @@ int do_fill(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   class Object *to_obj;
-  void name_to_drinkcon(class Object * obj, int type);
-
   one_argument(argument, buf);
 
   if (!*buf) /* No arguments */

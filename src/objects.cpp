@@ -192,21 +192,6 @@ void DC::object_activity(uint64_t pulse_type)
   return;
 }
 
-void name_from_drinkcon(class Object *obj)
-{
-  int i;
-  char *new_new_name;
-
-  for (i = 0; (*((obj->name) + i) != ' ') && (*((obj->name) + i) != '\0'); i++)
-    ;
-
-  if (*((obj->name) + i) == ' ')
-  {
-    new_new_name = str_hsh((obj->name) + i + 1);
-    obj->name = new_new_name;
-  }
-}
-
 int do_switch(Character *ch, char *arg, cmd_t cmd)
 {
   class Object *between;
