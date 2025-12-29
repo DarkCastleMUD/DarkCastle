@@ -9,7 +9,7 @@
             "name": "Debug dcastle in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
+            "program": "${workspaceFolder}/build/default/dcastle",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
@@ -31,7 +31,7 @@
             "name": "Debug dcastle -P -p6969 in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
+            "program": "${workspaceFolder}/build/default/dcastle",
             "args": [
                 "-P",
                 "-p 6969"
@@ -57,7 +57,7 @@
             "name": "Debug dcastle -P -p6969 in dcastle.6969/lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
+            "program": "${workspaceFolder}/build/default/dcastle",
             "args": [
                 "-P",
                 "-p 6969"
@@ -80,7 +80,7 @@
             "name": "Production dcastle -P -p6969 in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
+            "program": "${workspaceFolder}/build/default/dcastle",
             "args": [
                 "-P",
                 "-p 6969"
@@ -103,7 +103,7 @@
             "name": "Production dcastle -P -p6969 in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
+            "program": "${workspaceFolder}/build/default/dcastle",
             "args": [
                 "-P",
                 "-p 6969"
@@ -126,7 +126,7 @@
             "name": "debug in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug",
+            "program": "${workspaceFolder}/build/default/debug",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib",
@@ -151,7 +151,7 @@
             "name": "debug ../save/D/Dummy in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug",
+            "program": "${workspaceFolder}/build/default/debug",
             "args": [
                 "${workspaceFolder}/save/D/Dummy"
             ],
@@ -178,7 +178,7 @@
             "name": "debug all in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug",
+            "program": "${workspaceFolder}/build/default/debug",
             "args": [
                 "all"
             ],
@@ -205,7 +205,7 @@
             "name": "debug all in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug",
+            "program": "${workspaceFolder}/build/default/debug",
             "args": [
                 "all"
             ],
@@ -232,7 +232,7 @@
             "name": "debug ../../dcastle/save/J/Julian",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug",
+            "program": "${workspaceFolder}/build/default/debug",
             "args": [
                 "${workspaceFolder}/../../dcastle/save/J/Julian"
             ],
@@ -259,7 +259,7 @@
             "name": "debug leaderboard in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug",
+            "program": "${workspaceFolder}/build/default/debug",
             "args": [
                 "leaderboard"
             ],
@@ -286,7 +286,7 @@
             "name": "testDC",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/testDC",
+            "program": "${workspaceFolder}/build/default/testDC",
             "args": [
                 // "test_redeem_trader"
             ],
@@ -312,7 +312,7 @@
             "name": "valgrind dcastle",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
+            "program": "${workspaceFolder}/build/default/dcastle",
             "targetArchitecture": "x64",
             "customLaunchSetupCommands": [
                 {
@@ -337,7 +337,7 @@
             "name": "valgrind testDC",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/testDC",
+            "program": "${workspaceFolder}/build/default/testDC",
             "targetArchitecture": "x64",
             "customLaunchSetupCommands": [
                 {
