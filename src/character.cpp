@@ -306,6 +306,138 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     return true;
 }
 
+Character::Character(Character *old, DC *dc, QObject *parent)
+    : Entity(parent), dc_(dc)
+{
+    if (!old)
+        return;
+
+    in_room = old->in_room;
+    // class Mobile *mobdata = nullptr;
+    // class Player *player = nullptr;
+    // class Object *objdata = nullptr;
+    // class Connection *desc = nullptr;
+    short_desc = str_hsh(old->short_desc);
+    long_desc = str_hsh(old->long_desc);
+    description = str_hsh(old->description);
+    title = str_hsh(old->title);
+    sex = old->sex;
+    c_class = old->c_class;
+    race = old->race;
+    str = old->str;
+    raw_str = old->raw_str;
+    str_bonus = old->str_bonus;
+    intel = old->intel;
+    raw_intel = old->raw_intel;
+    intel_bonus = old->intel_bonus;
+    wis = old->wis;
+    raw_wis = old->raw_wis;
+    wis_bonus = old->wis_bonus;
+    dex = old->dex;
+    raw_dex = old->raw_dex;
+    dex_bonus = old->dex_bonus;
+    con = old->con;
+    raw_con = old->raw_con;
+    con_bonus = old->con_bonus;
+    conditions[0] = old->conditions[0];
+    conditions[1] = old->conditions[1];
+    conditions[2] = old->conditions[2];
+    weight = old->weight;
+    height = old->height;
+    hometown = old->hometown;
+    plat = old->plat;
+    exp = old->exp;
+    immune = old->immune;
+    resist = old->resist;
+    suscept = old->suscept;
+    memcpy(saves, old->saves, sizeof(old->saves));
+    mana = old->mana;
+    max_mana = old->max_mana;
+    raw_mana = old->raw_mana;
+    hit = old->hit;
+    max_hit = old->max_hit;
+    raw_hit = old->raw_hit;
+    raw_move = old->raw_move;
+    max_move = old->max_move;
+    ki = old->ki;
+    max_ki = old->max_ki;
+    raw_ki = old->raw_ki;
+    alignment = old->alignment;
+    hpmetas = old->hpmetas;
+    manametas = old->manametas;
+    movemetas = old->movemetas;
+    acmetas = old->acmetas;
+    agemetas = old->agemetas;
+    hit_regen = old->hit_regen;
+    mana_regen = old->mana_regen;
+    move_regen = old->move_regen;
+    ki_regen = old->ki_regen;
+    melee_mitigation = old->melee_mitigation;
+    spell_mitigation = old->spell_mitigation;
+    song_mitigation = old->song_mitigation;
+    spell_reflect = old->spell_reflect;
+    clan = old->clan;
+    armor = old->armor;
+    hitroll = old->hitroll;
+    damroll = old->damroll;
+    glow_factor = old->glow_factor;
+    beacon = old->beacon;
+    songs = old->songs;
+    memcpy(equipment, old->equipment, sizeof(old->equipment));
+    skills = old->skills;
+    // struct affected_type *affected = nullptr;
+    // class Object *carrying = nullptr;
+    poison_amount = old->poison_amount;
+    carry_weight = old->carry_weight;
+    carry_items = old->carry_items;
+    hunting = old->hunting;
+    ambush = old->ambush;
+    // Character *guarding = {};
+    // follow_type *guarded_by = {};
+    // uint32_t affected_by[AFF_MAX / ASIZE + 1] = {};
+    memcpy(affected_by, old->affected_by, sizeof(affected_by));
+    combat = old->combat;
+    misc = old->misc;
+    // Character *fighting = {};
+    // Character *next = {};
+    // Character *next_in_room = {};
+    // Character *next_fighting = {};
+    // Object *altar = {};
+    // struct follow_type *followers = {};
+    // Character *master = {};
+    // char *group_name = {};
+    timer = old->timer;
+    shotsthisround = old->shotsthisround;
+    spellcraftglyph = old->spellcraftglyph;
+    changeLeadBonus = old->changeLeadBonus;
+    curLeadBonus = old->curLeadBonus;
+    cRooms = old->cRooms;
+    deaths = old->deaths;
+    cID = old->cID;
+    // struct timer_data *timerAttached = {};
+    // struct tempvariable *tempVariable = {};
+    spelldamage = old->spelldamage;
+#ifdef USE_SQL
+    player_id = old->player_id;
+#endif
+    spec = old->spec;
+    // struct room_direction_data *brace_at = {}, *brace_exit = {};
+    first_damage = old->first_damage;
+    damage_done = old->damage_done;
+    damages = old->damages;
+    last_damage = old->last_damage;
+    damage_per_second = old->damage_per_second;
+
+    type_ = old->type_;
+    gold_ = old->gold_;
+    level_ = old->level_;
+    debug_ = old->debug_;
+    move_ = old->move_;
+    name_ = old->name_;
+    position_ = old->position_;
+    dc_ = old->dc_;
+}
+
 bool Character::validateName(QString name)
 {
     if (name.isEmpty() || name.size() < Character::MIN_NAME_SIZE || name.size() > Character::MAX_NAME_SIZE)

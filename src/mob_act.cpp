@@ -79,7 +79,7 @@ void mobile_activity(void)
       continue;
     }
 
-    if (!IS_NPC(ch))
+    if (ch->isPlayer())
       continue;
 
     if (MOB_WAIT_STATE(ch) > 0)

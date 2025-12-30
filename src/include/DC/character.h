@@ -535,9 +535,8 @@ typedef int32_t move_t;
 // PC/MOB specific data are held in the appropriate pointed-to structs
 class Character : public Entity
 {
-    Q_GADGET
+    Q_OBJECT
 public:
-    Character(DC *dc) : dc_(dc) {}
     enum Type
     {
         Undefined,
@@ -546,9 +545,6 @@ public:
         ObjectProgram
     };
     Q_ENUM(Type)
-    void setType(const Type type);
-    auto getType(void) const -> Type;
-
     enum sex_t : int8_t
     {
         NEUTRAL = 0,
@@ -562,15 +558,138 @@ public:
     };
     static constexpr qsizetype MIN_NAME_SIZE = 3;
     static constexpr qsizetype MAX_NAME_SIZE = 12;
+    static constexpr quint64 PLAYER_OBJECT_THIEF = 297ULL;
+    static constexpr quint64 PLAYER_GOLD_THIEF = 298ULL;
+    static constexpr quint64 PLAYER_CANTQUIT = 299ULL;
+    static const QStringList class_names;
+    static const QStringList race_names;
+    static const QStringList position_types;
+    static const QStringList song_names;
     static const QList<int> wear_to_item_wear;
-    static bool validateName(QString name);
 
     class Mobile *mobdata = nullptr;
     class Player *player = nullptr;
     class Object *objdata = nullptr;
-
     class Connection *desc = nullptr; // nullptr normally for mobs
+    char *short_desc = nullptr;       // Action 'X hits you.'
+    char *long_desc = nullptr;        // For 'look room'
+    char *description = nullptr;      // For 'look mob'
+    char *title = nullptr;
+    sex_t sex = {};
+    int8_t c_class = {};
+    int8_t race = {};
+    int8_t str = {};
+    int8_t raw_str = {};
+    int8_t str_bonus = {};
+    int8_t intel = {};
+    int8_t raw_intel = {};
+    int8_t intel_bonus = {};
+    int8_t wis = {};
+    int8_t raw_wis = {};
+    int8_t wis_bonus = {};
+    int8_t dex = {};
+    int8_t raw_dex = {};
+    int8_t dex_bonus = {};
+    int8_t con = {};
+    int8_t raw_con = {};
+    int8_t con_bonus = {};
+    int8_t conditions[3] = {};             // Drunk full etc.
+    uint8_t weight = {};                   /* PC/NPC's weight */
+    uint8_t height = {};                   /* PC/NPC's height */
+    int16_t hometown = START_ROOM;         /* PC/NPC home town */
+    uint32_t plat = {};                    /* Platinum                                */
+    int64_t exp = {};                      /* The experience of the player            */
+    uint32_t immune = {};                  // Bitvector of damage types I'm immune to
+    uint32_t resist = {};                  // Bitvector of damage types I'm resistant to
+    uint32_t suscept = {};                 // Bitvector of damage types I'm susceptible to
+    int16_t saves[SAVE_TYPE_MAX + 1] = {}; // Saving throw bonuses
+    int32_t mana = {};
+    int32_t max_mana = {}; /* Not useable                             */
+    int32_t raw_mana = {}; /* before int bonus                        */
+    int32_t hit = {};
+    int32_t max_hit = {}; /* Max hit for NPC                         */
+    int32_t raw_hit = {}; /* before con bonus                        */
+    int32_t raw_move = {};
+    int32_t max_move = {}; /* Max move for NPC                        */
+    int32_t ki = {};
+    int32_t max_ki = {};
+    int32_t raw_ki = {};
+    int16_t alignment = {};        // +-1000 for alignments
+    uint32_t hpmetas = {};         // total number of times meta'd hps
+    uint32_t manametas = {};       // total number of times meta'd mana
+    uint32_t movemetas = {};       // total number of times meta'd moves
+    uint32_t acmetas = {};         // total number of times meta'd ac
+    int32_t agemetas = {};         // number of years age has been meta'd
+    int16_t hit_regen = {};        // modifier to hp regen
+    int16_t mana_regen = {};       // modifier to mana regen
+    int16_t move_regen = {};       // modifier to move regen
+    int16_t ki_regen = {};         // modifier to ki regen
+    int16_t melee_mitigation = {}; // modifies melee damage
+    int16_t spell_mitigation = {}; // modified spell damage
+    int16_t song_mitigation = {};  // modifies song damage
+    int16_t spell_reflect = {};
+    clan_t clan = {};                               /* Clan the char is in */
+    int16_t armor = 100;                            // Armor class
+    int16_t hitroll = {};                           // Any bonus or penalty to the hit roll
+    int16_t damroll = {};                           // Any bonus or penalty to the damage roll
+    int16_t glow_factor = {};                       // Amount that the character glows
+    Object *beacon = nullptr;                       /* pointer to my beacon */
+    std::vector<struct songInfo> songs = {};        // Song list
+    class Object *equipment[MAX_WEAR] = {};         // Equipment List
+    skill_list_t skills = {};                       // Skills List
+    struct affected_type *affected = nullptr;       // Affected by list
+    class Object *carrying = nullptr;               // Inventory List
+    int16_t poison_amount = {};                     // How much poison damage I'm taking every few seconds
+    int16_t carry_weight = {};                      // Carried weight
+    int16_t carry_items = {};                       // Number of items carried
+    QString hunting = {};                           // Name of "track" target
+    QString ambush = {};                            // Name of "ambush" target
+    Character *guarding = {};                       // Pointer to who I am guarding
+    follow_type *guarded_by = {};                   // List of people guarding me
+    uint32_t affected_by[AFF_MAX / ASIZE + 1] = {}; // Quick reference bitvector for spell affects
+    uint32_t combat = {};                           // Bitvector for combat related flags (bash, stun, shock)
+    uint32_t misc = {};                             // Bitvector for logs/channels.  So possessed mobs can channel
+    Character *fighting = {};                       /* Opponent     */
+    Character *next = {};                           /* Next anywhere in game */
+    Character *next_in_room = {};                   /* Next in room */
+    Character *next_fighting = {};                  /* Next fighting */
+    Object *altar = {};
+    struct follow_type *followers = {}; /* List of followers */
+    Character *master = {};             /* Who is char following? */
+    char *group_name = {};              /* Name of group */
+    int32_t timer = {};                 // Timer for update
+    int32_t shotsthisround = {};        // Arrows fired this round
+    int32_t spellcraftglyph = {};       // Used for spellcraft glyphs
+    bool changeLeadBonus = {};
+    int32_t curLeadBonus = {};
+    int cRooms = {}; // number of rooms consecrated/desecrated
+    // TODO - see if we can move the "wait" timer from desc to char
+    // since we need something to lag mobs too
+    int32_t deaths = {}; /* deaths is reused for mobs as a timer to check for WAIT_STATE */
+    int cID = {};        // character ID
+    struct timer_data *timerAttached = {};
+    struct tempvariable *tempVariable = {};
+    int spelldamage = {};
+#ifdef USE_SQL
+    int player_id = {};
+#endif
+    int spec = {};
+    struct room_direction_data *brace_at = {}, *brace_exit = {}; // exits affected by brace
+    time_t first_damage = {};
+    uint64_t damage_done = {};
+    uint64_t damages = {};
+    time_t last_damage = {};
+    uint64_t damage_per_second = {};
 
+    Character(DC *dc, QObject *parent = 0) : Entity(parent), dc_(dc)
+    {
+    }
+    Character(Character *old, DC *dc, QObject *parent = 0);
+
+    static bool validateName(QString name);
+
+    void setType(const Type type);
+    auto getType(void) const -> Type;
     const char *getNameC(void) const;
 
     inline QString getName(void)
@@ -581,15 +700,6 @@ public:
     {
         name_ = new_name;
     }
-
-    char *short_desc = nullptr;  // Action 'X hits you.'
-    char *long_desc = nullptr;   // For 'look room'
-    char *description = nullptr; // For 'look mob'
-    char *title = nullptr;
-
-    sex_t sex = {};
-
-    int8_t c_class = {};
     auto getClass(void) const
     {
         return c_class;
@@ -606,8 +716,6 @@ public:
     {
         return class_to_string(c_class);
     }
-
-    int8_t race = {};
     auto getRace(void) const
     {
         return race;
@@ -722,43 +830,6 @@ public:
         return &position_;
     }
 
-    int8_t str = {};
-    int8_t raw_str = {};
-    int8_t str_bonus = {};
-    int8_t intel = {};
-    int8_t raw_intel = {};
-    int8_t intel_bonus = {};
-    int8_t wis = {};
-    int8_t raw_wis = {};
-    int8_t wis_bonus = {};
-    int8_t dex = {};
-    int8_t raw_dex = {};
-    int8_t dex_bonus = {};
-    int8_t con = {};
-    int8_t raw_con = {};
-    int8_t con_bonus = {};
-
-    int8_t conditions[3] = {}; // Drunk full etc.
-
-    uint8_t weight = {}; /* PC/NPC's weight */
-    uint8_t height = {}; /* PC/NPC's height */
-
-    int16_t hometown = {}; /* PC/NPC home town */
-
-    uint32_t plat = {};                    /* Platinum                                */
-    int64_t exp = {};                      /* The experience of the player            */
-    uint32_t immune = {};                  // Bitvector of damage types I'm immune to
-    uint32_t resist = {};                  // Bitvector of damage types I'm resistant to
-    uint32_t suscept = {};                 // Bitvector of damage types I'm susceptible to
-    int16_t saves[SAVE_TYPE_MAX + 1] = {}; // Saving throw bonuses
-
-    int32_t mana = {};
-    int32_t max_mana = {}; /* Not useable                             */
-    int32_t raw_mana = {}; /* before int bonus                        */
-    int32_t hit = {};
-    int32_t max_hit = {}; /* Max hit for NPC                         */
-    int32_t raw_hit = {}; /* before con bonus                        */
-
     move_t move_limit(void);
     move_t getMove(void)
     {
@@ -808,98 +879,6 @@ public:
         return false;
     }
 
-    int32_t raw_move = {};
-    int32_t max_move = {}; /* Max move for NPC                        */
-    int32_t ki = {};
-    int32_t max_ki = {};
-    int32_t raw_ki = {};
-
-    int16_t alignment = {}; // +-1000 for alignments
-
-    uint32_t hpmetas = {};   // total number of times meta'd hps
-    uint32_t manametas = {}; // total number of times meta'd mana
-    uint32_t movemetas = {}; // total number of times meta'd moves
-    uint32_t acmetas = {};   // total number of times meta'd ac
-    int32_t agemetas = {};   // number of years age has been meta'd
-
-    int16_t hit_regen = {};  // modifier to hp regen
-    int16_t mana_regen = {}; // modifier to mana regen
-    int16_t move_regen = {}; // modifier to move regen
-    int16_t ki_regen = {};   // modifier to ki regen
-
-    int16_t melee_mitigation = {}; // modifies melee damage
-    int16_t spell_mitigation = {}; // modified spell damage
-    int16_t song_mitigation = {};  // modifies song damage
-    int16_t spell_reflect = {};
-
-    clan_t clan = {}; /* Clan the char is in */
-
-    int16_t armor = {};   // Armor class
-    int16_t hitroll = {}; // Any bonus or penalty to the hit roll
-    int16_t damroll = {}; // Any bonus or penalty to the damage roll
-
-    int16_t glow_factor = {}; // Amount that the character glows
-
-    Object *beacon = nullptr; /* pointer to my beacon */
-
-    std::vector<struct songInfo> songs = {}; // Song list
-                                             //     int16_t song_timer = {};       /* status for songs being sung */
-                                             //     int16_t song_number = {};      /* number of song being sung */
-                                             //     char * song_data = {};        /* args for the songs */
-
-    class Object *equipment[MAX_WEAR] = {}; // Equipment List
-
-    skill_list_t skills = {};                 // Skills List
-    struct affected_type *affected = nullptr; // Affected by list
-    class Object *carrying = nullptr;         // Inventory List
-
-    int16_t poison_amount = {}; // How much poison damage I'm taking every few seconds
-
-    int16_t carry_weight = {}; // Carried weight
-    int16_t carry_items = {};  // Number of items carried
-
-    QString hunting = {}; // Name of "track" target
-    QString ambush = {};  // Name of "ambush" target
-
-    Character *guarding = {};     // Pointer to who I am guarding
-    follow_type *guarded_by = {}; // List of people guarding me
-
-    uint32_t affected_by[AFF_MAX / ASIZE + 1] = {}; // Quick reference bitvector for spell affects
-    uint32_t combat = {};                           // Bitvector for combat related flags (bash, stun, shock)
-    uint32_t misc = {};                             // Bitvector for logs/channels.  So possessed mobs can channel
-
-    Character *fighting = {};      /* Opponent     */
-    Character *next = {};          /* Next anywhere in game */
-    Character *next_in_room = {};  /* Next in room */
-    Character *next_fighting = {}; /* Next fighting */
-    Object *altar = {};
-    struct follow_type *followers = {}; /* List of followers */
-    Character *master = {};             /* Who is char following? */
-    char *group_name = {};              /* Name of group */
-
-    int32_t timer = {};           // Timer for update
-    int32_t shotsthisround = {};  // Arrows fired this round
-    int32_t spellcraftglyph = {}; // Used for spellcraft glyphs
-    bool changeLeadBonus = {};
-    int32_t curLeadBonus = {};
-    int cRooms = {}; // number of rooms consecrated/desecrated
-
-    // TODO - see if we can move the "wait" timer from desc to char
-    // since we need something to lag mobs too
-
-    int32_t deaths = {}; /* deaths is reused for mobs as a
-                     timer to check for WAIT_STATE */
-
-    int cID = {}; // character ID
-
-    struct timer_data *timerAttached = {};
-    struct tempvariable *tempVariable = {};
-    int spelldamage = {};
-#ifdef USE_SQL
-    int player_id = {};
-#endif
-    int spec = {};
-
     bool getDebug(void) const
     {
         return debug_;
@@ -908,14 +887,6 @@ public:
     {
         debug_ = state;
     }
-
-    struct room_direction_data *brace_at{}, *brace_exit{}; // exits affected by brace
-    time_t first_damage = {};
-    uint64_t damage_done = {};
-    uint64_t damages = {};
-    time_t last_damage = {};
-    uint64_t damage_per_second = {};
-
     bool addGold(uint64_t gold);
     bool save_pc_or_mob_data(FILE *fpsave, time_data tmpage);
     void add_command_lag(cmd_t cmd, int lag);
@@ -1242,13 +1213,6 @@ public:
     int hands_are_free(int number);
     int recheck_height_wears(void);
     void heightweight(bool add);
-    static const QStringList class_names;
-    static const QStringList race_names;
-    static const QStringList position_types;
-    static const QStringList song_names;
-    static constexpr quint64 PLAYER_OBJECT_THIEF = 297ULL;
-    static constexpr quint64 PLAYER_GOLD_THIEF = 298ULL;
-    static constexpr quint64 PLAYER_CANTQUIT = 299ULL;
     bool isPlayerObjectThief(void) { return affected_by_spell(PLAYER_OBJECT_THIEF); }
     bool isPlayerGoldThief(void) { return affected_by_spell(PLAYER_GOLD_THIEF); }
     bool isPlayerCantQuit(void) { return affected_by_spell(PLAYER_CANTQUIT); }
@@ -1322,7 +1286,7 @@ private:
     bool debug_ = false;
     move_t move_ = {};
     QString name_; // Keyword 'kill X'
-    position_t position_ = {};
+    position_t position_ = position_t::STANDING;
     DC *dc_ = DC::getInstance();
 };
 

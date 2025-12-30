@@ -199,8 +199,9 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
       // std::cerr << "It's ansi or vt100 code" << std::endl;
 #endif
               if (IS_NPC(send_to) ||
-                  (isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
-                  (isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
+                  (send_to->isPlayer() &&
+                   ((isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
+                    (isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))))
               {
                 switch (current->GetBuf()[1])
                 {

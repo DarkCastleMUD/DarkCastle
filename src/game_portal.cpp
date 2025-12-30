@@ -179,17 +179,8 @@ void process_portals()
 */
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 {
-
-  class Object *from_portal;
   char log_buf[256];
-
-#ifdef LEAK_CHECK
-  from_portal = (class Object *)calloc(1, sizeof(class Object));
-#else
-  from_portal = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-  clear_object(from_portal);
-
+  auto from_portal = new Object;
   if (real_room(from_room) == DC::NOWHERE)
   {
     sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);

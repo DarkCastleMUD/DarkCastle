@@ -633,7 +633,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOEMOTE))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
     ch->sendln("You can't show your emotions!!");
     return eSUCCESS;

@@ -134,7 +134,6 @@ typedef std::set<int>::iterator client_descriptor_list_i;
 typedef std::set<int>::iterator server_descriptor_list_i;
 typedef std::vector<in_port_t>::iterator port_list_i;
 typedef std::unordered_map<Character *, Trace> death_list_t;
-typedef std::unordered_map<Character *, Trace> free_list_t;
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
 typedef uint64_t gold_t;
@@ -455,7 +454,6 @@ public:
   special_function_list_t mob_combat_functions;
   special_function_list_t obj_non_combat_functions;
   special_function_list_t obj_combat_functions;
-  free_list_t free_list;
   SSH::SSH ssh;
   fd_set input_set = {};
   fd_set output_set = {};

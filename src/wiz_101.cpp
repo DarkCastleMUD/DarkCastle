@@ -302,7 +302,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   send("\r\n");
 
-  if (!IS_NPC(this))
+  if (this->isPlayer())
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -324,7 +324,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   move_char(this, location);
 
-  if (!IS_NPC(this))
+  if (this->isPlayer())
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))

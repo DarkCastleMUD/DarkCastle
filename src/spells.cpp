@@ -1942,7 +1942,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      if (!IS_NPC(ch))
+      if (ch->isPlayer())
       {
         if (!(learned = ch->has_skill(spl)))
         {
@@ -2334,7 +2334,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         }
       }
 
-      if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch))
+      if (ch->getLevel() < ARCHANGEL && ch->isPlayer())
       {
         if (GET_MANA(ch) < use_mana(ch, spl) * rel)
         {

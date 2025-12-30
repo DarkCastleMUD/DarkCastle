@@ -560,7 +560,7 @@ void advance_level(Character *ch, int is_conversion)
 	ch->raw_ki += add_ki;
 	ch->max_ki += add_ki;
 	redo_ki(ch); // Ki gets level bonuses now
-	if (!IS_NPC(ch) && !is_conversion)
+	if (ch->isPlayer() && !is_conversion)
 		ch->player->practices += add_practices;
 
 	sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
@@ -740,9 +740,9 @@ void food_update(void)
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && i->getLevel() < 60)
 		{ // i'm hungry
-			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (i->isPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && i->isPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
 				else if (FOUNTAINisPresent(i))
 					i->do_drink({QStringLiteral("fountain")});
@@ -756,9 +756,9 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && i->getLevel() < 60)
 		{ // i'm thirsty
-			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (i->isPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && i->isPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
 				else if (FOUNTAINisPresent(i))
 					i->do_drink({QStringLiteral("fountain")});
@@ -822,7 +822,7 @@ void point_update(void)
 			i->setMove(MIN(GET_MOVE(i) + i->move_gain_lookup(), i->move_limit()));
 			GET_KI(i) = MIN(GET_KI(i) + i->ki_gain_lookup(), ki_limit(i));
 		}
-		else if (!IS_NPC(i) && i->getLevel() < 1 && !i->desc)
+		else if (i->isPlayer() && i->getLevel() < 1 && !i->desc)
 		{
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
 			do_quit(i, "", cmd_t::SAVE_SILENTLY);

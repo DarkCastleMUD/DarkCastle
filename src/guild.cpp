@@ -842,7 +842,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   int64_t exp_needed;
   int x = 0;
 
-  if (cmd == cmd_t::GAIN && !IS_NPC(ch))
+  if (cmd == cmd_t::GAIN && ch->isPlayer())
   { /*   gain crap...  */
 
     if (ch->isImmortalPlayer() || ch->getLevel() >= DC::MAX_MORTAL_LEVEL)

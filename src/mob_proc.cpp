@@ -65,7 +65,7 @@ int call_for_help_in_room(Character *ch, int iFriendId)
     // Any friends in the room?  Call for help!   int friends = 0;
     for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
     {
-        if (!IS_NPC(ally))
+        if (ally->isPlayer())
             continue;
         if (ally == ch)
             continue;
@@ -110,7 +110,7 @@ int protect(Character *ch, int iFriendId)
     // Any one I need to protect in the room?
     for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
     {
-        if (!IS_NPC(ally))
+        if (ally->isPlayer())
             continue;
         if (!ally->fighting) // if they arne't fighting, they're safe
             continue;
@@ -227,7 +227,7 @@ void summon_all_of_mob_to_room(Character *ch, int iFriendId)
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &victim : character_list)
     {
-        if (!IS_NPC(victim))
+        if (victim->isPlayer())
             continue;
         if (real_mobile(iFriendId) == victim->mobdata->nr)
         {
@@ -250,7 +250,7 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
     // Is my friend in the room?
     for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
     {
-        if (!IS_NPC(ally))
+        if (ally->isPlayer())
             continue;
         if (real_mobile(iFriendId) == ally->mobdata->nr)
             return ally;
@@ -653,7 +653,7 @@ int backstabber(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
                 if (!can_attack(ch) || !can_be_attacked(ch, tch))
                     return eFAILURE;
 
-                if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+                if (tch->isPlayer() && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
                     continue;
 
                 if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -2410,7 +2410,7 @@ int humaneater(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                 if (!can_attack(ch) || !can_be_attacked(ch, tch))
                     continue;
 
-                if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+                if (tch->isPlayer() && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
                     continue;
 
                 if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))

@@ -607,7 +607,6 @@ int char_from_room(Character *ch);
 void do_start(Character *ch);
 
 void update_pos(Character *victim);
-void clear_object(class Object *obj);
 void death_cry(Character *ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);

@@ -1713,7 +1713,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
               DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).continent));
   }
 
-  if ((IS_NPC(victim)) && (!IS_NPC(ch)))
+  if ((IS_NPC(victim)) && (ch->isPlayer()))
     victim->add_memory(GET_NAME(ch), 'h');
 
   act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
@@ -3962,7 +3962,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
 
   set_cantquit(ch, victim);
 
-  if (!IS_NPC(victim) && victim->getLevel() <= 15)
+  if (victim->isPlayer() && victim->getLevel() <= 15)
   {
     ch->sendln("Oh come on....at least wait till $e's high enough level to have decent gear.");
     return eFAILURE;
@@ -6525,9 +6525,6 @@ void make_portal(Character *ch, Character *vict)
 
   ch_portal = new Object;
   vict_portal = new Object;
-
-  clear_object(ch_portal);
-  clear_object(vict_portal);
 
   ch_portal->item_number = -1;
   vict_portal->item_number = -1;
@@ -11065,7 +11062,7 @@ int cast_portal(uint8_t level, Character *ch, char *arg,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!IS_NPC(ch) && GET_CLASS(ch) == CLASS_CLERIC)
+    if (ch->isPlayer() && GET_CLASS(ch) == CLASS_CLERIC)
     {
       if ((GET_MANA(ch) - 90) < 0)
       {

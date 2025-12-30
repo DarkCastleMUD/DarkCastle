@@ -321,8 +321,6 @@ void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
 void init_char(Character *ch);
-void clear_char(Character *ch);
-void clear_object(class Object *obj);
 void reset_char(Character *ch);
 void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);

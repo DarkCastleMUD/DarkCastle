@@ -122,7 +122,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   QString name = arguments.value(0);
 
-  if (!has_skill(SKILL_BACKSTAB) && !IS_NPC(this))
+  if (!has_skill(SKILL_BACKSTAB) && this->isPlayer())
   {
     this->sendln("You don't know how to backstab people!");
     return eFAILURE;
@@ -1179,7 +1179,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, victim->getNameC());
         logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
-        if (!IS_NPC(victim))
+        if (victim->isPlayer())
         {
           victim->save(cmd_t::SAVE_SILENTLY);
           ch->save(cmd_t::SAVE_SILENTLY);
@@ -1607,7 +1607,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
   extern int weight_in(Object *);
 
-  if (!IS_NPC(ch) && ch->isPlayerObjectThief())
+  if (ch->isPlayer() && ch->isPlayerObjectThief())
   {
     ch->sendln("Your criminal acts prohibit this action.");
     return eFAILURE;
@@ -1621,7 +1621,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+    if (ch->isPlayer() && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit this action.");
       return eFAILURE;

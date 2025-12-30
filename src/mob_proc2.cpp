@@ -86,7 +86,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 	if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
 		return eFAILURE;
 
-	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+	if (ch->isPlayer() && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -164,7 +164,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 	if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
 		return eFAILURE;
 
-	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+	if (ch->isPlayer() && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -265,7 +265,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
 	if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
 		return eFAILURE;
 
-	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+	if (ch->isPlayer() && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -792,7 +792,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 	if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
 		return eFAILURE;
 
-	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+	if (ch->isPlayer() && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;

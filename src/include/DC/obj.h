@@ -279,7 +279,13 @@ struct obj_affected_type
 /* ======================== Structure for object ========================= */
 class Object : public Entity
 {
+    Q_OBJECT
 public:
+    Object(QObject *parent = 0)
+        : Entity(parent)
+    {
+    }
+    Object(Object *old, QObject *parent = 0);
     enum class portal_types_t
     {
         Player = 0,
@@ -303,11 +309,26 @@ public:
     static const QStringList extra_bits;
     static const QStringList apply_types;
 
-    int32_t item_number = {};     /* Where in data-base               */
+    int32_t item_number = -1;     /* Where in data-base               */
     int vroom = {};               /* for corpse saving */
     obj_flag_data obj_flags = {}; /* Object information               */
     int16_t num_affects = {};
-    obj_affected_type *affected = {}; /* Which abilities in PC to change  */
+    obj_affected_type *affected = {};             /* Which abilities in PC to change  */
+    char *long_description = {};                  /* When in room                     */
+    char *short_description = {};                 /* when worn/carry/in cont.         */
+    struct extra_descr_data *ex_description = {}; /* extra descriptions     */
+    Character *carried_by = {};                   /* Carried by :NULL in room/conta   */
+    Character *equipped_by = {};                  /* so I can access the player :)    */
+    Object *in_obj = {};                          /* In what object NULL when none    */
+    Object *contains = {};                        /* Contains objects                 */
+    Object *next_content = {};                    /* For 'contains' lists             */
+    Object *next = {};                            /* For the object list              */
+    Object *next_skill = {};
+    table_data *table = {};
+    class machine_data *slot = {};
+    class wheel_data *wheel = {};
+    time_t save_expiration = {};
+    time_t no_sell_expiration = {};
 
     [[nodiscard]] inline QString Name(void) const
     {
@@ -318,25 +339,6 @@ public:
         name_ = name;
         return true;
     }
-
-    char *long_description = {};                  /* When in room                     */
-    char *short_description = {};                 /* when worn/carry/in cont.         */
-    struct extra_descr_data *ex_description = {}; /* extra descriptions     */
-    Character *carried_by = {};                   /* Carried by :NULL in room/conta   */
-    Character *equipped_by = {};                  /* so I can access the player :)    */
-
-    Object *in_obj = {};   /* In what object NULL when none    */
-    Object *contains = {}; /* Contains objects                 */
-
-    Object *next_content = {}; /* For 'contains' lists             */
-    Object *next = {};         /* For the object list              */
-    Object *next_skill = {};
-    table_data *table = {};
-    class machine_data *slot = {};
-    class wheel_data *wheel = {};
-    time_t save_expiration = {};
-    time_t no_sell_expiration = {};
-
     bool isDark(void);
     bool isPortal(void)
     {

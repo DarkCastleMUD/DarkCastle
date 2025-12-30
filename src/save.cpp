@@ -999,16 +999,12 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   name[0] = name[0].toUpper();
 
   ch = new Character(this);
-  auto &free_list = DC::getInstance()->free_list;
-  free_list.erase(ch);
-
   if (d->character)
   {
     free_char(d->character, Trace("load_char_obj"));
   }
 
   d->character = ch;
-  clear_char(ch);
   ch->desc = d;
 
   if (DC::getInstance()->cf.bport)
@@ -1051,7 +1047,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   }
 
   // stored names only matter for mobs
-  if (!IS_NPC(ch))
+  if (ch->isPlayer())
   {
     ch->setName(name);
   }

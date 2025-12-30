@@ -2668,11 +2668,11 @@ void ansi_color(const char *txt, Character *ch)
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
   {
-    if (!IS_NPC(ch) &&
+    if (ch->isPlayer() &&
         !isSet(GET_TOGGLES(ch), Player::PLR_ANSI) &&
         !isSet(GET_TOGGLES(ch), Player::PLR_VT100))
       return;
-    else if (!IS_NPC(ch) &&
+    else if (ch->isPlayer() &&
              isSet(GET_TOGGLES(ch), Player::PLR_VT100) &&
              !isSet(GET_TOGGLES(ch), Player::PLR_ANSI))
     {

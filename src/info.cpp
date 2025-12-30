@@ -542,7 +542,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             }
             else
             {
-               if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
+               if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
                {
                   buffer.append(" ");
                   buffer.append(GET_TITLE(i));
@@ -877,7 +877,7 @@ void Character::list_char_to_char(Character *list, int mode)
    {
       if (this == i)
          continue;
-      if (!IS_NPC(i) && (i->player->wizinvis > this->getLevel()))
+      if (i->isPlayer() && (i->player->wizinvis > this->getLevel()))
          if (!i->player->incognito || !(this->in_room == i->in_room))
             continue;
       if (IS_AFFECTED(this, AFF_SENSE_LIFE) || CAN_SEE(this, i))
@@ -1331,7 +1331,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
       ansi_color(GREY, ch);
       return eSUCCESS;
    }
-   else if (IS_DARK(ch->in_room) && (!IS_NPC(ch) && !ch->player->holyLite))
+   else if (IS_DARK(ch->in_room) && (ch->isPlayer() && !ch->player->holyLite))
    {
       ch->sendln("It is pitch black...");
       ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
@@ -1543,7 +1543,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                   show_char_to_char(tmp_char, ch, 1);
                if (ch != tmp_char)
                {
-                  if (!IS_NPC(ch) && (tmp_char->getLevel() < ch->player->wizinvis))
+                  if (ch->isPlayer() && (tmp_char->getLevel() < ch->player->wizinvis))
                   {
                      return eSUCCESS;
                   }
@@ -1742,7 +1742,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
          ansi_color(GREY, ch);
 
          // PUT SECTOR AND ROOMFLAG STUFF HERE
-         if (!IS_NPC(ch) && ch->player->holyLite)
+         if (ch->isPlayer() && ch->player->holyLite)
          {
             sprinttype(DC::getInstance()->world[ch->in_room].sector_type, sector_types,
                        sector_buf);
@@ -1759,7 +1759,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
 
          ch->sendln("");
 
-         if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
+         if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
             send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
 
          ansi_color(BLUE, ch);
@@ -1893,7 +1893,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
       if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
          continue;
 
-      if (!IS_NPC(ch) && ch->player->holyLite)
+      if (ch->isPlayer() && ch->player->holyLite)
          sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name,
                  DC::getInstance()->world[EXIT(ch, door)->to_room].number);

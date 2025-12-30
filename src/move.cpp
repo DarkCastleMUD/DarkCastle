@@ -1165,7 +1165,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
 		return eFAILURE;
 	}
 
-	if (!IS_NPC(ch) && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+	if (ch->isPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
 	{
 		ch->sendln("The portal's destination rebels against you.");
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
@@ -1339,7 +1339,7 @@ int ambush(Character *ch)
 			(isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) &&
 			 !IS_AFFECTED(ch, AFF_CANTQUIT)))
 			continue;
-		if (!IS_NPC(i) && !i->desc) // don't work if I'm linkdead
+		if (i->isPlayer() && !i->desc) // don't work if I'm linkdead
 			continue;
 		if (isexact(i->ambush, GET_NAME(ch)))
 		{
@@ -1368,7 +1368,7 @@ int ambush(Character *ch)
 					return (eSUCCESS | eCH_DIED); // ch = damage vict
 				if (isSet(retval, eCH_DIED))
 					return (eSUCCESS); // doesn't matter, but don't lag vict
-				if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_WIMPY))
+				if (i->isPlayer() && isSet(i->player->toggles, Player::PLR_WIMPY))
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 3);
 				else
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);

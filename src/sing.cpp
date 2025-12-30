@@ -556,7 +556,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 			return eFAILURE;
 		}
 
-		if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch) &&
+		if (ch->getLevel() < ARCHANGEL && ch->isPlayer() &&
 			GET_KI(ch) < use_song(ch, spl))
 		{
 			ch->sendln("You do not have enough ki!");

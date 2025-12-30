@@ -123,8 +123,6 @@ QString read_next_worldfile_name(FILE *flWorldIndex);
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void reset_time(void);
-void clear_char(Character *ch);
-
 // MOBprogram locals
 int mprog_name_to_type(QString name);
 // void		load_mobprogs           ( FILE* fp );
@@ -2629,10 +2627,7 @@ Character *DC::read_mobile(int nr, FILE *fl)
 	i = nr;
 
 	mob = new Character(this);
-	auto &free_list = DC::getInstance()->free_list;
-	free_list.erase(mob);
 
-	clear_char(mob);
 	GET_RACE(mob) = 0;
 
 	/***** String data *** */
@@ -3300,14 +3295,8 @@ Character *DC::clone_mobile(int nr)
 	if (nr < 0)
 		return 0;
 
-	mob = new Character(this);
-	auto &free_list = DC::getInstance()->free_list;
-	free_list.erase(mob);
-
-	clear_char(mob);
 	old = ((Character *)(DC::getInstance()->mob_index[nr].item)); /* cast void pointer */
-
-	*mob = *old;
+	mob = new Character(old, this);
 
 	mob->mobdata = new Mobile;
 
@@ -3392,7 +3381,7 @@ auto DC::create_blank_item(int nr) -> std::expected<int, create_error>
 	// create
 
 	obj = new Object;
-	clear_object(obj);
+
 	obj->Name(QStringLiteral("empty obj"));
 	obj->short_description = str_hsh("An empty obj");
 	obj->long_description = str_hsh("An empty obj sits here dejectedly.");
@@ -3481,7 +3470,6 @@ int DC::create_blank_mobile(int nr)
 
 	mob = new Character(this);
 
-	clear_char(mob);
 	reset_char(mob);
 	mob->setName("empty mob");
 	mob->short_desc = str_hsh("an empty mob");
@@ -3776,7 +3764,6 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	}
 
 	class Object *obj = new Object;
-	clear_object(obj);
 
 	/* *** std::string data *** */
 	// read it, add it to the hsh table, free it
@@ -3928,8 +3915,6 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	Object *obj = new Object;
 	assert(obj);
 
-	clear_object(obj);
-
 	/* *** std::string data *** */
 	// read it, add it to the hsh table, free it
 	// that way, we only have one copy of it in memory at any time
@@ -4073,7 +4058,6 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 		return in;
 	}
 
-	clear_object(obj);
 	in >> c;
 	if (c == '#')
 	{
@@ -4438,21 +4422,15 @@ class Object *clone_object(int nr)
 
 	if (nr < 0)
 		return 0;
-
-	obj = new Object;
-	clear_object(obj);
 	old = ((class Object *)DC::getInstance()->obj_index[nr].item); /* cast the void pointer */
-
-	if (old != 0)
-	{
-		*obj = *old;
-	}
-	else
+	if (!old)
 	{
 		qWarning(qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
 		dc_free(obj);
 		return nullptr;
 	}
+
+	obj = new Object(old);
 
 	/* *** extra descriptions *** */
 	obj->ex_description = 0;
@@ -5847,34 +5825,6 @@ void free_char(Character *ch, Trace trace)
 	struct char_player_alias *next;
 	mob_prog_act_list *currmprog;
 	auto &character_list = DC::getInstance()->character_list;
-	auto &free_list = DC::getInstance()->free_list;
-
-	if (free_list.contains(ch))
-	{
-		Trace trace = free_list.at(ch);
-		std::stringstream ss;
-		ss << trace;
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "free_char: previously freed Character %p found in free_list from %s", ch, ss.str().c_str());
-
-		if (character_list.contains(ch))
-		{
-			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "free_char: previously freed Character %p found in character_list", ch);
-		}
-
-		const auto &shooting_list = DC::getInstance()->shooting_list;
-		if (shooting_list.contains(ch))
-		{
-			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "free_char: previously freed Character %p found in shooting_list", ch);
-		}
-
-		produce_coredump(ch);
-		return;
-	}
-	else
-	{
-		free_list[ch] = trace;
-	}
-
 	character_list.erase(ch);
 
 	if (ch->tempVariable)
@@ -6113,60 +6063,6 @@ void reset_char(Character *ch)
 	ch->ambush = 0;
 	ch->guarding = 0;
 	ch->guarded_by = 0;
-}
-
-/*
- * Clear but do not de-alloc.
- */
-void clear_char(Character *ch)
-{
-	if (ch == nullptr)
-	{
-		return;
-	}
-
-	*ch = Character(ch->getDC());
-	ch->in_room = DC::NOWHERE;
-	ch->setStanding();
-	GET_HOME(ch) = START_ROOM;
-	GET_AC(ch) = 100; /* Basic Armor */
-}
-
-void clear_object(class Object *obj)
-{
-	if (obj == nullptr)
-	{
-		return;
-	}
-
-	*obj = {};
-	obj->item_number = -1;
-	obj->in_room = DC::NOWHERE;
-	obj->vroom = 0;
-	obj->obj_flags = obj_flag_data();
-	obj->num_affects = 0;
-	obj->affected = nullptr;
-
-	obj->Name(QStringLiteral(""));
-	obj->long_description = nullptr;
-	obj->short_description = nullptr;
-	obj->ActionDescription(QString());
-	obj->ex_description = nullptr;
-	obj->carried_by = nullptr;
-	obj->equipped_by = nullptr;
-
-	obj->in_obj = nullptr;
-	obj->contains = nullptr;
-
-	obj->next_content = nullptr;
-	obj->next = nullptr;
-	obj->next_skill = nullptr;
-	;
-	obj->table = nullptr;
-	obj->slot = nullptr;
-	obj->wheel = nullptr;
-	obj->save_expiration = 0;
-	obj->no_sell_expiration = 0;
 }
 
 // Roll up the random modifiers to saving throw for new character

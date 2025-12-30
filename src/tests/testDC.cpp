@@ -238,7 +238,7 @@ private slots:
         QVERIFY(!dc.character_list.empty());
 
         do_sing(&ch, str_hsh("'flight of the bumblebee'"));
-        QCOMPARE(conn.output, "Lie still; you are DEAD.\r\n");
+        QCOMPARE(conn.output, "You raise your clear (?) voice towards the sky.\r\n");
         conn.output = {};
 
         ch.setPosition(position_t::STANDING);
@@ -861,9 +861,9 @@ private slots:
         QCOMPARE(rc, eSUCCESS);
 
         rc = ch.do_auction({QStringLiteral("test")});
-        QCOMPARE(conn.output, "");
+        QCOMPARE(conn.output, "You auction 'test'\r\n");
         conn.output = {};
-        QCOMPARE(conn2.output, "");
+        QCOMPARE(conn2.output, "Testvend auctions 'test'\r\n");
         conn2.output = {};
         QCOMPARE(rc, eSUCCESS);
 
@@ -925,10 +925,11 @@ private slots:
         QCOMPARE(conn2.output, "");
         rc = do_vend(&ch, str_hsh("sell item 1000000"));
         QCOMPARE(conn.output, "You are now selling a reflecty test item for 1000000 coins.\r\n"
+                              "The Consignment Broker auctions 'Testvend is selling \"a reflecty test item\" for 1000000 gold.'\r\n"
                               "Saving Testvend.\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn2.output, "");
+        QCOMPARE(conn2.output, "The Consignment Broker auctions 'Testvend is selling \"a reflecty test item\" for 1000000 gold.'\r\n");
 
         rc = do_vend(&ch, str_hsh("list mine"));
         QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\n\r"

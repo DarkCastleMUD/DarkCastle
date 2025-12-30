@@ -43,7 +43,7 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
   int retval;
   extern bool MOBtrigger;
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("You try to speak but just look like an idiot!");
     return eSUCCESS;
@@ -201,13 +201,13 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
     return eSUCCESS;
   }
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("Duh...I'm too stupid!");
     return eSUCCESS;
   }
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOPRAY))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_NOPRAY))
   {
     ch->sendln("The gods are deaf to your prayers.");
     return eSUCCESS;
@@ -265,7 +265,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
 
   if (IS_PC(ch))
   {
-    if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_SILENCED))
+    if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
@@ -371,7 +371,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 
   if (IS_PC(this))
   {
-    if (!IS_NPC(this) && isSet(this->player->punish, PUNISH_SILENCED))
+    if (this->isPlayer() && isSet(this->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
@@ -734,7 +734,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   QString name = {}, message = {}, buf = {}, log_buf = {};
   Object *tmp_obj = nullptr;
 
-  if (!IS_NPC(this) && isSet(this->player->punish, PUNISH_NOTELL))
+  if (this->isPlayer() && isSet(this->player->punish, PUNISH_NOTELL))
   {
     this->sendln("Your message didn't get through!!");
     return eSUCCESS;
@@ -747,7 +747,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       return eFAILURE;
     }
 
-  if (!IS_NPC(this) && !isSet(this->misc, DC::LogChannel::CHANNEL_TELL))
+  if (this->isPlayer() && !isSet(this->misc, DC::LogChannel::CHANNEL_TELL))
   {
     this->sendln("You have tell channeled off!!");
     return eSUCCESS;
@@ -903,7 +903,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       this->tell_history(this, ar.str);
 
       // Log what I told a logged player under their name
-      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
+      if (vict->isPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
         logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
@@ -937,7 +937,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 
       this->sendln("They were sleeping btw...");
       // Log what I told a logged player under their name
-      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
+      if (vict->isPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
         logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
@@ -1122,7 +1122,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOTELL))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_NOTELL))
   {
     ch->sendln("Your message didn't get through!!");
     return eSUCCESS;

@@ -180,7 +180,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
           GET_KI(vict), GET_MAX_KI(vict));
   ch->send(buf);
 
-  if (ch->getLevel() >= OVERSEER && !IS_NPC(vict) && ch->getLevel() >= vict->getLevel())
+  if (ch->getLevel() >= OVERSEER && vict->isPlayer() && ch->getLevel() >= vict->getLevel())
   {
     ch->sendln(QStringLiteral("$3Last connected from$R: %1").arg(vict->player->last_site));
 
@@ -4423,7 +4423,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
 
     ch->sendln("Ok.");
 
-    if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
+    if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
@@ -5495,7 +5495,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     {
       strcat(buf, GET_NAME(k));
       strcat(buf,
-             (IS_PC(k) ? "(PC)\n\r" : (!IS_NPC(k) ? "(NPC)\n\r" : "(MOB)\n\r")));
+             (IS_PC(k) ? "(PC)\n\r" : (k->isPlayer() ? "(NPC)\n\r" : "(MOB)\n\r")));
     }
   }
   strcat(buf, "\n\r");

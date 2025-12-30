@@ -1031,7 +1031,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
     return eSUCCESS;
   }
 
-  if (!IS_NPC(ch))
+  if (ch->isPlayer())
     ch->player->last_mess_read = tmessage;
 
   sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());

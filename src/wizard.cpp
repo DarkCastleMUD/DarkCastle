@@ -482,7 +482,7 @@ void boro_mob_stat(Character *ch, Character *k)
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -495,7 +495,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
   {
     sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\n\r", k->getGold(),
             k->player->bank);
@@ -514,7 +514,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     ch->send(buf);
@@ -561,7 +561,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->sendln("");
   }
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
     display_punishes(ch, k);
 
   if (k->desc)
@@ -644,7 +644,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   ch->send(buf);
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -718,7 +718,7 @@ command_return_t mob_stat(Character *ch, Character *k)
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
   {
     sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
@@ -850,7 +850,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->combat, combat_bits, buf);
   ch->send(QStringLiteral("$3Combat flags$R: %1\n\r").arg(buf));
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
     display_punishes(ch, k);
 
   sprintbit(k->affected_by, affected_bits, buf);
@@ -865,7 +865,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->resist, isr_bits, buf);
   csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
 
-  if (!IS_NPC(k))
+  if (k->isPlayer())
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     ch->send(buf);

@@ -4378,7 +4378,6 @@ void make_scraps(Character *ch, class Object *obj)
   /*int i;*/
 
   corpse = new Object;
-  clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
@@ -4420,7 +4419,7 @@ void make_corpse(Character *ch)
   int i{};
 
   corpse = new Object;
-  clear_object(corpse);
+
   if (IS_PC(ch))
   {
     corpse->setOwner(GET_NAME(ch));
@@ -4743,12 +4742,7 @@ void make_husk(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-  clear_object(corpse);
+  corpse = new Object;
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
   corpse->Name(QStringLiteral("husk"));
@@ -4784,12 +4778,7 @@ void make_head(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-  clear_object(corpse);
+  corpse = new Object;
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
@@ -4830,12 +4819,7 @@ void make_arm(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-  clear_object(corpse);
+  corpse = new Object;
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
@@ -4876,12 +4860,7 @@ void make_leg(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-  clear_object(corpse);
+  corpse = new Object;
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
@@ -4922,12 +4901,7 @@ void make_bowels(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-  clear_object(corpse);
+  corpse = new Object;
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
@@ -4968,12 +4942,7 @@ void make_blood(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-  clear_object(corpse);
+  corpse = new Object;
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
@@ -5016,13 +4985,8 @@ void make_heart(Character *ch, Character *vict)
 
   if (!ch->hands_are_free(1))
     return;
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
 
-  clear_object(corpse);
+  corpse = new Object;
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
@@ -6649,7 +6613,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     // have to be level 20 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score
-    if (!IS_NPC(ch)
+    if (ch->isPlayer()
         // && victim->getLevel() > PKILL_COUNT_LIMIT
         && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {

@@ -1119,7 +1119,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     return false;
   }
 
-  if (!IS_NPC(obj))
+  if (obj->isPlayer())
   {
     if (!obj->player) // noncreated char
       return true;
@@ -1208,7 +1208,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   int skill = 0;
   struct affected_type *cur_af;
 
-  if (!IS_NPC(sub) && sub->player->holyLite)
+  if (sub->isPlayer() && sub->player->holyLite)
     return true;
 
   int prog = sub->oprog_can_see_trigger(obj);

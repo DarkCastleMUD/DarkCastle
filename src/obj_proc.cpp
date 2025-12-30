@@ -801,7 +801,7 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   /* deposit */
   if (cmd == cmd_t::DEPOSIT)
   {
-    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+    if (ch->isPlayer() && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;

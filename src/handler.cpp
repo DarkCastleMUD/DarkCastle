@@ -847,7 +847,7 @@ void check_weapon_weights(Character *ch)
 	if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 		return;
 	// make sure we're still strong enough to wield our weapons
-	if (!IS_NPC(ch) && ch->equipment[WEAR_WIELD] &&
+	if (ch->isPlayer() && ch->equipment[WEAR_WIELD] &&
 		GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
 	{
 		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_WIELD], 0, TO_CHAR, 0);
@@ -1036,7 +1036,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 		break;
 
 	case APPLY_AGE:
-		if (!IS_NPC(ch))
+		if (ch->isPlayer())
 			ch->player->time.birth -= ((int32_t)SECS_PER_MUD_YEAR * (int32_t)mod);
 		break;
 
@@ -2954,7 +2954,7 @@ Character *get_mob(char *name)
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
-		if(!IS_NPC(i)) {
+		if(i->isPlayer()) {
 			return false;
 		}
 		if (isexact(name, GET_NAME(i))) {
@@ -3981,6 +3981,9 @@ Character *Character::get_rand_other_char_room_vis(void)
 
 void lastseen_targeted(Character *ch, Character *victim)
 {
+	if (!ch->isPlayer())
+		return;
+
 	static Character *last_ch;
 	static Character *last_victim;
 
@@ -4121,7 +4124,7 @@ Character *get_mob_room_vis(Character *ch, const char *name)
 
 	for (i = DC::getInstance()->world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
 	{
-		if (!IS_NPC(i))
+		if (i->isPlayer())
 			continue;
 
 		if (number == 1)
@@ -4697,8 +4700,6 @@ class Object *create_money(int amount)
 	obj = new Object;
 	new_new_descr = new extra_descr_data;
 
-	clear_object(obj);
-
 	if (amount == 1)
 	{
 		obj->Name(QStringLiteral("coin gold"));
@@ -4962,7 +4963,7 @@ void Character::swap_hate_memory(void)
 
 int hates_someone(Character *ch)
 {
-	if (!IS_NPC(ch))
+	if (ch->isPlayer())
 		return 0;
 
 	return (ch->mobdata->hated != nullptr);
@@ -4970,7 +4971,7 @@ int hates_someone(Character *ch)
 
 int fears_someone(Character *ch)
 {
-	if (!IS_NPC(ch))
+	if (ch->isPlayer())
 		return 0;
 
 	return (ch->mobdata->fears != nullptr);
@@ -4984,7 +4985,7 @@ void remove_memory(Character *ch, char type, Character *vict)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_NPC(ch))
+	if (ch->isPlayer())
 		return;
 
 	if (type == 'h')
@@ -5025,7 +5026,7 @@ void remove_memory(Character *ch, char type)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_NPC(ch))
+	if (ch->isPlayer())
 		return;
 
 	if (type == 'h' && !ch->mobdata->hated.isEmpty())

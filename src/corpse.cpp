@@ -584,7 +584,7 @@ int get_line_new(FILE *fl, char *buf)
 class Object *create_obj_new(void)
 {
 	class Object *obj = new Object;
-	clear_object(obj);
+
 	obj->next = DC::getInstance()->object_list;
 	DC::getInstance()->object_list = obj;
 	/* Corpse saving stuff */

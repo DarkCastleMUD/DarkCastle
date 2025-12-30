@@ -122,7 +122,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit() && !IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && ch->isPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -208,7 +208,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit() && !IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && ch->isPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -349,7 +349,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOTITLE))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_NOTITLE))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;

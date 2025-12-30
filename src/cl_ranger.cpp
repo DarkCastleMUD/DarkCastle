@@ -1765,7 +1765,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!IS_NPC(target))
+  if (target->isPlayer())
   {
     sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
     ch->send(buf);

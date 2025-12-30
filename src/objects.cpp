@@ -813,7 +813,7 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
   int ctr;
   int nope = 0;
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NONAME))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_NONAME))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;
@@ -2746,6 +2746,38 @@ int obj_from(Object *obj)
   }
 
   return false;
+}
+
+Object::Object(Object *old, QObject *parent)
+    : Entity(parent)
+{
+  if (!old)
+    return;
+
+  in_room = old->in_room;
+  item_number = old->item_number;
+  vroom = old->vroom;
+  obj_flags = old->obj_flags;
+  // num_affects
+  // obj_affected_type *affected = {};
+  long_description = str_hsh(old->long_description);
+  short_description = str_hsh(old->short_description);
+  // struct extra_descr_data *ex_description = {};
+  // Character *carried_by = {};  /* Carried by :NULL in room/conta   */
+  // Character *equipped_by = {}; /* so I can access the player :)    */
+  // Object *in_obj = {};         /* In what object NULL when none    */
+  // Object *contains = {};       /* Contains objects                 */
+  // Object *next_content = {};   /* For 'contains' lists             */
+  // Object *next = {};           /* For the object list              */
+  // Object *next_skill = {};
+  // table_data *table = {};
+  // class machine_data *slot = {};
+  // class wheel_data *wheel = {};
+  save_expiration = old->save_expiration;
+  no_sell_expiration = old->no_sell_expiration;
+  owner_ = old->owner_;
+  name_ = old->name_;
+  action_description_ = old->action_description_;
 }
 
 bool Object::isDark(void)

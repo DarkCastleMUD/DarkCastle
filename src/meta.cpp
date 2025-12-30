@@ -682,7 +682,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 	move_cost = ch->meta_get_moves_plat_cost(1);
 	mana_cost = ch->meta_get_mana_plat_cost(1);
 
-	if (!IS_NPC(ch))
+	if (ch->isPlayer())
 	{
 		ki_exp = ch->meta_get_ki_exp_cost();
 		ki_cost = ch->meta_get_ki_plat_cost();
@@ -788,11 +788,11 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
 		ch->sendln("$BUse 'estimate' command to get costs for higher intervals.");
 
-		if (!IS_NPC(ch) && ki_cost && ki_exp)
+		if (ch->isPlayer() && ki_cost && ki_exp)
 		{ // mobs can't meta ki
 			csendf(ch, "$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n", ki_exp, ki_cost);
 		}
-		else if (!IS_NPC(ch))
+		else if (ch->isPlayer())
 			ch->sendln("$B$312)$R Add a point of ki:        You cannot do ch.");
 
 		ch->sendln("$BMonetary Exchange:$R");
@@ -807,7 +807,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 			"$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
 			"$B$320)$R Buy a practice session for 25 plats.\r\n",
 			ch);
-		if (!IS_NPC(ch))
+		if (ch->isPlayer())
 		{
 			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max) (current -%d)\r\n", GET_AC_METAS(ch));
 			ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
@@ -1137,7 +1137,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 		}
 		if (choice == 15)
 		{
-			if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+			if (ch->isPlayer() && ch->isPlayerGoldThief())
 			{
 				ch->sendln("Your criminal acts prohibit it.");
 				return eSUCCESS;

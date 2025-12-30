@@ -288,8 +288,18 @@ private:
 };
 
 bool operator==(const Room &r1, const Room &r2);
-struct Entity
+class Entity : public QObject
 {
+    Q_OBJECT
+public:
+    Entity(QObject *parent = 0)
+        : QObject(parent)
+    {
+    }
+    Entity(room_t room_id, QObject *parent = 0)
+        : QObject(parent), in_room(room_id)
+    {
+    }
     auto room(void) -> Room &;
     room_t in_room = {};
 };

@@ -45,7 +45,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
       act("$n casts a stream of fire at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
       return eFAILURE;
     }
-    if (!IS_NPC(victim) && victim->player->possesing)
+    if (victim->isPlayer() && victim->player->possesing)
     {
       ch->send("Oops! They ain't linkdead! Just possessing.");
       return eFAILURE;

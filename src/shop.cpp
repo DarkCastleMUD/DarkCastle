@@ -176,7 +176,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+  if (ch->isPlayer() && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -284,7 +284,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;

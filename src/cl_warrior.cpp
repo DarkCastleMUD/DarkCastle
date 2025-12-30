@@ -1070,7 +1070,7 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   char name[MAX_INPUT_LENGTH];
   Character *victim = nullptr;
 
-  if (!IS_NPC(ch) && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
+  if (ch->isPlayer() && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
     ch->sendln("You have no idea how to be a full time bodyguard.");
     return eFAILURE;
@@ -1198,7 +1198,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_MAKE_CAMP);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (ch->isPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to set up a safe camp.");
     return eFAILURE;
@@ -1359,7 +1359,7 @@ int do_battlesense(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_BATTLESENSE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (ch->isPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to heighten your battle awareness.");
     return eFAILURE;
@@ -1401,7 +1401,7 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_SMITE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (ch->isPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to smite your enemies effectively.");
     return eFAILURE;
@@ -1485,7 +1485,7 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_LEADERSHIP);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (ch->isPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know that ability.");
     return eFAILURE;
@@ -1544,7 +1544,7 @@ int do_perseverance(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_PERSEVERANCE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (ch->isPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("Your lack of fortitude is stunning.");
     return eFAILURE;
@@ -1585,7 +1585,7 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (ch->isPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to use this to your advantage.");
     return eFAILURE;

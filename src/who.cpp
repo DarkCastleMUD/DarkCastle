@@ -126,7 +126,7 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
         foundtarget = 1;
 
       // First, if they're not anonymous
-      if ((!IS_NPC(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
+      if ((ch->isPlayer() && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
         sprintf(tempbuffer,
                 "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
@@ -476,9 +476,9 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
         infoBuf = immortFields.value(i->getLevel() - IMMORTAL);
       }
 
-      if (level_ >= IMMORTAL && !IS_NPC(i) && i->player->wizinvis > 0)
+      if (level_ >= IMMORTAL && i->isPlayer() && i->player->wizinvis > 0)
       {
-        if (!IS_NPC(i) && i->player->incognito == true)
+        if (i->isPlayer() && i->player->incognito == true)
         {
           extraBuf = QStringLiteral(" (Incognito / WizInvis %1)").arg(i->player->wizinvis);
         }
