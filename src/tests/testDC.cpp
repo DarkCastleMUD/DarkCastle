@@ -224,6 +224,7 @@ private slots:
         Player player;
         ch.player = &player;
         ch.setType(Character::Type::Player);
+
         Connection conn;
         conn.descriptor = 1;
         conn.character = &ch;
@@ -241,9 +242,15 @@ private slots:
         QCOMPARE(conn.output, "You raise your clear (?) voice towards the sky.\r\n");
         conn.output = {};
 
+        ch.setClass(CLASS_BARD);
+
+        do_sing(&ch, str_hsh("'flight of the bumblebee'"));
+        QCOMPARE(conn.output, "You haven't learned that song.\r\n");
+        conn.output = {};
+
         ch.setPosition(position_t::STANDING);
         do_sing(&ch, str_hsh("'flight of the bumblebee'"));
-        QCOMPARE(conn.output, "You raise your clear (?) voice towards the sky.\r\n");
+        QCOMPARE(conn.output, "You haven't learned that song.\r\n");
         conn.output = {};
         QVERIFY(ch.songs.empty());
 
@@ -255,12 +262,6 @@ private slots:
         ch.learn_skill(skillnum, 1, 100);
         QCOMPARE(ch.has_skill(skillnum), 1);
 
-        do_sing(&ch, str_hsh("'flight of the bumblebee'"));
-        QCOMPARE(conn.output, "You raise your clear (?) voice towards the sky.\r\n");
-        conn.output = {};
-        QVERIFY(ch.songs.empty());
-
-        ch.setClass(10);
         do_sing(&ch, str_hsh("'flight of the bumblebee'"));
         QCOMPARE(conn.output, "You do not have enough ki!\r\n");
         conn.output = {};
