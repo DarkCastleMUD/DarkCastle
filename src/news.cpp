@@ -73,7 +73,7 @@ void savenews()
   FILE *fl;
   if (!(fl = fopen("news.data", "w")))
   {
-    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Cannot open news file 'news.data'"));
     abort();
   }
   struct news_data *tmpnews;
@@ -88,7 +88,7 @@ void savenews()
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
-    logentry(QStringLiteral("Cannot save news file to web dir."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Cannot save news file to web dir."));
 }
 
 void loadnews()
@@ -96,7 +96,7 @@ void loadnews()
   FILE *fl;
   if (!(fl = fopen("news.data", "r")))
   {
-    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Cannot open news file 'news.data'"));
     return;
   }
   int i;

@@ -3626,7 +3626,7 @@ int cast_freefloat(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_freefloat!"), ANGEL, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Serious screw-up in cast_freefloat!"));
     break;
   }
   return eFAILURE;

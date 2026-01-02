@@ -1656,7 +1656,7 @@ CVoteData::CVoteData()
   {
     fclose(the_file);
     this->Reset(nullptr);
-    logentry(QStringLiteral("Error reading question from vote file."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Error reading question from vote file."));
     return;
   }
   buf[strlen(buf) - 1] = 0;
@@ -1670,7 +1670,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading answers from vote file."), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Error reading answers from vote file."));
       this->Reset(nullptr);
       return;
     }
@@ -1688,7 +1688,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Error reading ip addresses from vote file."));
       this->Reset(nullptr);
       return;
     }
@@ -1703,7 +1703,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading char names from vote file."), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Error reading char names from vote file."));
       this->Reset(nullptr);
       return;
     }

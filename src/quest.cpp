@@ -54,7 +54,7 @@ int load_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "r")))
    {
-      logentry(QStringLiteral("Failed to open quest file for reading!"), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Failed to open quest file for reading!"));
       return eFAILURE;
    }
 
@@ -95,7 +95,7 @@ int save_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "w")))
    {
-      logentry(QStringLiteral("Failed to open quest file for writing!"), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Failed to open quest file for writing!"));
       return eFAILURE;
    }
 

@@ -220,8 +220,8 @@ void boot_clans(void)
         break;
       }
       default:
-        logentry(QStringLiteral("Illegal switch hit in boot_clans."), 0, DC::LogChannel::LOG_MISC);
-        logentry(buf, 0, DC::LogChannel::LOG_MISC);
+        logmisc(QStringLiteral("Illegal switch hit in boot_clans."));
+        logmisc(buf);
         break;
       }
     }
@@ -372,11 +372,10 @@ void save_clans(void)
     port1 = DC::getInstance()->cf.ports[0];
   }
 
-  std::stringstream ssbuffer;
-  ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
-  if (!(fl = fopen(ssbuffer.str().c_str(), "w")))
+  auto buffer = QStringLiteral("%1%2/%3").arg(HTDOCS_DIR).arg(port1).arg(WEBCLANSLIST_FILE);
+  if (!(fl = fopen(qPrintable(buffer), "w")))
   {
-    logf(0, DC::LogChannel::LOG_MISC, "Unable to open web clan file \'%s\' for writing.\n", ssbuffer.str().c_str());
+    logmisc(QStringLiteral("Unable to open web clan file \'%1\' for writing.").arg(buffer));
     return;
   }
 

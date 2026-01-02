@@ -437,11 +437,11 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
     logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
-    logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
     do_force(this, "all save");
     if (!DC::getInstance()->write_hotboot_file())
     {
-      logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
       this->sendln("Hot reboot failed.");
     }
   }

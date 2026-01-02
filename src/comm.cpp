@@ -187,7 +187,7 @@ int DC::write_hotboot_file(void)
   class Connection *sd;
   if ((fp = fopen("hotboot", "w")) == nullptr)
   {
-    logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Hotboot failed, unable to open hotboot file."));
     return 0;
   }
   // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
@@ -230,15 +230,14 @@ int DC::write_hotboot_file(void)
     }
   }
   fclose(fp);
-  logentry(QStringLiteral("Hotboot descriptor file successfully written."), 0, DC::LogChannel::LOG_MISC);
+  logmisc(QStringLiteral("Hotboot descriptor file successfully written."));
 
   chdir("../bin/");
 
-  char *cwd = get_current_dir_name();
-  if (cwd != nullptr)
+  if (char *cwd = get_current_dir_name(); cwd)
   {
-    logentry(QStringLiteral("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
-    delete[] cwd;
+    loggod(QStringLiteral("Hotbooting %1 at [%2]").arg(applicationFilePath()).arg(cwd));
+    free(cwd);
   }
 
   ssh.close();
@@ -247,7 +246,7 @@ int DC::write_hotboot_file(void)
     char execv_strerror[1024] = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
 
-    logentry(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(applicationFilePath()).arg(execv_strerror), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(applicationFilePath()).arg(execv_strerror));
 
     // wipe the file since we can't use it anyway
     if (unlink("hotboot") == -1)
@@ -255,7 +254,7 @@ int DC::write_hotboot_file(void)
       char unlink_strerror[1024] = {};
       strerror_r(errno, unlink_strerror, sizeof(unlink_strerror));
 
-      logentry(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror));
     }
 
     chdir(qPrintable(cf.library_directory));
@@ -339,7 +338,7 @@ int DC::load_hotboot_descs(void)
   unlink("hotboot"); // if the above unlink failed somehow(?),
                      // remove the hotboot file so that it dosen't think
                      // next reboot is another hotboot
-  logentry(QStringLiteral("Successful hotboot file read."), 0, DC::LogChannel::LOG_MISC);
+  logmisc(QStringLiteral("Successful hotboot file read."));
   return 1;
 }
 
@@ -476,7 +475,7 @@ void DC::init_game(void)
 
   if (was_hotboot)
   {
-    logentry(QStringLiteral("Connecting hotboot characters to their descriptiors"), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Connecting hotboot characters to their descriptiors"));
     finish_hotboot();
   }
 
@@ -486,7 +485,7 @@ void DC::init_game(void)
   // we got all the way through, let's turn auto-hotboot back on
   try_to_hotboot_on_crash = 1;
 
-  logentry(QStringLiteral("Entering game loop."), 0, DC::LogChannel::LOG_MISC);
+  logmisc(QStringLiteral("Entering game loop."));
 
   unlink("died_in_bootup");
 
@@ -506,7 +505,7 @@ void DC::init_game(void)
 
   do_not_save_corpses = 1;
 
-  logentry(QStringLiteral("Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+  logmisc(QStringLiteral("Closing all sockets."));
   while (DC::getInstance()->descriptor_list)
   {
     close_socket(DC::getInstance()->descriptor_list);
@@ -517,8 +516,8 @@ void DC::init_game(void)
              logf(0, DC::LogChannel::LOG_MISC, "Closing fd %d.", fd);
              CLOSE_SOCKET(fd); });
 
-  logentry(QStringLiteral("Goodbye."), 0, DC::LogChannel::LOG_MISC);
-  logentry(QStringLiteral("Normal termination of game."), 0, DC::LogChannel::LOG_MISC);
+  logmisc(QStringLiteral("Goodbye."));
+  logmisc(QStringLiteral("Normal termination of game."));
 }
 
 /*
@@ -923,7 +922,7 @@ void DC::game_loop_init(void)
                  QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
                  logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
-                 logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
+                 logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
 
                  for (const auto &ch : dc->character_list)
                  {
@@ -935,7 +934,7 @@ void DC::game_loop_init(void)
 
                  if (!write_hotboot_file())
                  {
-                   logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+                   logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
                    return QHttpServerResponse("Failed.\r\n");
                  }
 
@@ -2419,7 +2418,7 @@ void unrestrict_game(int sig)
 
 void hupsig(int sig)
 {
-  logentry(QStringLiteral("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."), 0, DC::LogChannel::LOG_MISC);
+  logmisc(QStringLiteral("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."));
   abort(); /* perhaps something more elegant should
             * substituted */
 }
@@ -2427,10 +2426,10 @@ void hupsig(int sig)
 void sigusr1(int sig)
 {
   do_not_save_corpses = 1;
-  logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
+  logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
   if (!DC::getInstance()->write_hotboot_file())
   {
-    logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
   }
 }
 
@@ -2479,10 +2478,10 @@ void signal_handler(int signal, siginfo_t *si, void *)
     do_not_save_corpses = 1;
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
     logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
-    logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
     if (!DC::getInstance()->write_hotboot_file())
     {
-      logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
     }
   }
 }

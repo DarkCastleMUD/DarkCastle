@@ -521,7 +521,7 @@ void loghelp(QString message)
 
 void logmisc(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
+  logmisc(message);
 }
 
 void logmortal(QString message)

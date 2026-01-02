@@ -471,7 +471,7 @@ void load_skillquests()
 
 	if (!(fl = fopen(SKILL_QUEST_FILE, "r")))
 	{
-		logentry(QStringLiteral("Cannot open skill quest file."), 0, DC::LogChannel::LOG_MISC);
+		logmisc(QStringLiteral("Cannot open skill quest file."));
 		abort();
 	}
 
@@ -1003,7 +1003,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
 
 		if (cf.verbose_mode)
 		{
-			logentry(temp, 0, DC::LogChannel::LOG_MISC);
+			logmisc(temp);
 		}
 
 		if (!(fl = fopen(endfile, "r")))
@@ -1050,7 +1050,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
 			else
 			{
 				sprintf(endfile, "Bad char (%s)", buf);
-				logentry(endfile, 0, DC::LogChannel::LOG_MISC);
+				logmisc(endfile);
 				abort();
 			}
 		}
@@ -1286,7 +1286,7 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
 
 	if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
 	{
-		logentry(QStringLiteral("Cannot open object file index."), 0, DC::LogChannel::LOG_MISC);
+		logmisc(QStringLiteral("Cannot open object file index."));
 		abort();
 	}
 	/*
@@ -1980,7 +1980,7 @@ void DC::boot_world(void)
 		}
 	}
 
-	// logentry(QStringLiteral("Booting individual world files"), 0, DC::LogChannel::LOG_MISC);
+	// logmisc(QStringLiteral("Booting individual world files"));
 
 	// note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
 	for (temp = read_next_worldfile_name(flWorldIndex);
@@ -1993,7 +1993,7 @@ void DC::boot_world(void)
 		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
 		{
-			logentry(temp, 0, DC::LogChannel::LOG_MISC);
+			logmisc(temp);
 		}
 
 		if (!(fl = fopen(endfile, "r")))
@@ -2021,7 +2021,7 @@ void DC::boot_world(void)
 
 		fclose(fl);
 	}
-	// logentry(QStringLiteral("World Boot done."), 0, DC::LogChannel::LOG_MISC);
+	// logmisc(QStringLiteral("World Boot done."));
 	fclose(flWorldIndex);
 
 	top_of_world = --room_nr;
@@ -2536,7 +2536,7 @@ void DC::boot_zones(void)
 		logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, DC::LogChannel::LOG_BUG);
 		abort();
 	}
-	// logentry(QStringLiteral("Booting individual zone files"), 0, DC::LogChannel::LOG_MISC);
+	// logmisc(QStringLiteral("Booting individual zone files"));
 
 	for (temp = read_next_worldfile_name(flZoneIndex);
 		 temp.isEmpty() == false;
@@ -2547,7 +2547,7 @@ void DC::boot_zones(void)
 
 		if (cf.verbose_mode)
 		{
-			logentry(temp, 0, DC::LogChannel::LOG_MISC);
+			logmisc(temp);
 		}
 
 		if (!(fl = fopen(endfile, "r")))
@@ -2565,7 +2565,7 @@ void DC::boot_zones(void)
 		fclose(fl);
 	}
 
-	// logentry(QStringLiteral("Zone Boot done."), 0, DC::LogChannel::LOG_MISC);
+	// logmisc(QStringLiteral("Zone Boot done."));
 
 	fclose(flZoneIndex);
 
@@ -4345,7 +4345,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 	{
 		std::stringstream errormsg;
 		errormsg << "Exception while writing in write_obj_csv.";
-		logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
+		logmisc(errormsg.str().c_str());
 	}
 
 	fout << std::endl;

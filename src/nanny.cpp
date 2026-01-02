@@ -933,7 +933,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       // Uncomment this if you think a playerfile may be crashing the mud. -pir
       //      sprintf(str_tmp, "Trying to login: %s", tmp_name);
-      //    logentry(str_tmp, 0, DC::LogChannel::LOG_MISC);
+      //    logmisc(str_tmp);
 
       // ch is allocated in load_char_obj
       ls = load_char_obj(d, tmp_name);
@@ -2507,7 +2507,7 @@ bool on_forbidden_name_list(const char *name)
    nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
    if (!nameList)
    {
-      logentry(QStringLiteral("Failed to open forbidden name file!"), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Failed to open forbidden name file!"));
       return false;
    }
    else

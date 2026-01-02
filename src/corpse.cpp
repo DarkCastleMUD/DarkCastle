@@ -278,7 +278,7 @@ void DC::load_corpses(void)
 		get_line_new(fp, line);
 	}
 	else
-		logentry(QStringLiteral("No corpses in file to load"), 0, DC::LogChannel::LOG_MISC);
+		logmisc(QStringLiteral("No corpses in file to load"));
 
 	while (!feof(fp) && !end)
 	{
@@ -295,7 +295,7 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -Loading Object: %d", nr);
-				logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+				logmisc(buf3);
 			}
 			/* we have the number, check it, load obj. */
 			if (nr == -1)
@@ -325,7 +325,7 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+				logmisc(buf3);
 			}
 			sscanf(line, "%d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7);
 			GET_OBJ_VAL(temp, 0) = t[1];
@@ -340,13 +340,13 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+				logmisc(buf3);
 			}
 			/* read line check for xap. */
 			if (!strcmp("XAP\n", line))
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
-					logentry(QStringLiteral("XAP Found"), 0, DC::LogChannel::LOG_MISC);
+					logmisc(QStringLiteral("XAP Found"));
 
 				temp->Name(fread_string_new(fp, buf2));
 				if (temp->Name().isEmpty())
@@ -370,7 +370,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -SHORT: %s\n", temp->short_description);
-						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+						logmisc(buf3);
 					}
 				}
 
@@ -383,7 +383,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -DESC: %s\n", temp->long_description);
-						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+						logmisc(buf3);
 					}
 				}
 
@@ -397,20 +397,20 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						snprintf(buf3, sizeof(buf3) - 1, "   -ACT_DESC: %s\n", temp->ActionDescription().toStdString().c_str());
-						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+						logmisc(buf3);
 					}
 				}
 				if (!get_line_new(fp, line) ||
 					(sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
 				{
-					logentry(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"), 0, DC::LogChannel::LOG_MISC);
+					logmisc(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"));
 				}
 				else
 				{
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -FLAGS: %s", line);
-						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+						logmisc(buf3);
 					}
 				}
 				temp->obj_flags.type_flag = t[0];
@@ -473,7 +473,7 @@ void DC::load_corpses(void)
 					continue;
 				}
 				if (debug == 1)
-					logentry(QStringLiteral("XAP NOT Found"), 0, DC::LogChannel::LOG_MISC);
+					logmisc(QStringLiteral("XAP NOT Found"));
 			}
 			if (temp != nullptr)
 			{

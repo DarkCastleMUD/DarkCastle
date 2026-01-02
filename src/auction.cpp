@@ -693,7 +693,7 @@ void AuctionHouse::Load()
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Unable to open the save file \"%s\" for Auction files!!", file_name.toStdString().c_str());
-    logentry(buf, 0, DC::LogChannel::LOG_MISC);
+    logmisc(buf);
     return;
   }
 
@@ -761,7 +761,7 @@ void AuctionHouse::Save()
 
   if (DC::getInstance()->cf.bport)
   {
-    logentry(QStringLiteral("Unable to save auction files because this is the testport!"), ANGEL, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Unable to save auction files because this is the testport!"));
     return;
   }
   QString temp_file_name = file_name + ".temp";
@@ -1145,7 +1145,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   }
   else
   {
-    logentry(QStringLiteral("bport mode: Not saving auction file to web dir."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("bport mode: Not saving auction file to web dir."));
   }
 }
 

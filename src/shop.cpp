@@ -145,7 +145,7 @@ void restock_keeper(Character *keeper, int shop_nr)
   char buf[50];
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
-  logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
+  logmisc(buf);
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
