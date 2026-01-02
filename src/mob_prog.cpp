@@ -4172,11 +4172,7 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
 	( IS_NPC( mob )
 		  && ( DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
 		{
-	#ifdef LEAK_CHECK
-		  tmp_act = (mob_prog_act_list *) calloc( 1, sizeof( mob_prog_act_list ) );
-	#else
-		  tmp_act = (mob_prog_act_list *) dc_alloc( 1, sizeof( mob_prog_act_list ) );
-	#endif
+		  tmp_act = new mob_prog_act_list;
 
 		  if(!mob->mobdata->mpact)
 			mob->mobdata->mpact = tmp_act;
@@ -4560,14 +4556,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 						}
 						else
 						{
-#ifdef LEAK_CHECK
-							eh = (struct tempvariable *)
-								calloc(1, sizeof(struct tempvariable));
-#else
-							eh = (struct tempvariable *)
-								dc_alloc(1, sizeof(struct tempvariable));
-#endif
-
+							eh = new struct tempvariable;
 							eh->data = var;
 							eh->name = str_dup("throw");
 							eh->next = mob->tempVariable;
@@ -4664,7 +4653,7 @@ void DC::update_mprog_throws(void)
 				mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
 			}
 
-			dc_free(action->orig);
+			delete[] action->orig;
 			action->orig = 0;
 		}
 		else if (action->data_num == -1000 && vict)
@@ -4674,7 +4663,7 @@ void DC::update_mprog_throws(void)
 				action->tMob->mobdata->paused = false;
 			}
 			mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
-			dc_free(action->orig);
+			delete[] action->orig;
 			action->orig = 0;
 		}
 		else if (vict)
@@ -4689,7 +4678,7 @@ void DC::update_mprog_throws(void)
 			oprog_catch_trigger(vobj, action->data_num, action->var, action->opt, action->actor, action->obj, action->vo, action->rndm);
 		}
 
-		dc_free(action);
+		delete action;
 	}
 }
 
@@ -4708,7 +4697,7 @@ Character *DC::initiate_oproc(Character *ch, Object *obj)
 		temp->beacon = (Object *)ch;
 	temp->mobdata->setObject(obj);
 	//  temp->master = ch;
-	// dc_free(temp->short_desc);
+	// delete temp->short_desc;
 	temp->short_desc = str_hsh(obj->short_description);
 	char buf[MAX_STRING_LENGTH];
 	sprintf(buf, "%s", qPrintable(obj->Name()));
@@ -4731,7 +4720,7 @@ void end_oproc(Character *ch, Trace trace)
 	static int core_counter = 0;
 	if (selfpurge)
 	{
-		logentry(QStringLiteral("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, DC::LogChannel::LOG_BUG);
+		logentry(QStringLiteral("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(QString::number(selfpurge.getState())), IMMORTAL, DC::LogChannel::LOG_BUG);
 
 		if (core_counter++ < 10)
 		{
@@ -4844,14 +4833,7 @@ int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Char
 					vmob = initiate_oproc(nullptr, obj);
 					if (var)
 					{
-						struct tempvariable *eh;
-
-#ifdef LEAK_CHECK
-						eh = (struct tempvariable *)calloc(1, sizeof(struct tempvariable));
-#else
-						eh = (struct tempvariable *)dc_alloc(1, sizeof(struct tempvariable));
-#endif
-
+						auto eh = new struct tempvariable;
 						eh->data = var;
 						eh->name = str_dup("throw");
 						eh->next = vmob->tempVariable;

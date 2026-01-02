@@ -382,7 +382,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (ch->title) // this should always be true, but why not check anyway?
-    dc_free(ch->title);
+    delete[] ch->title;
   ch->title = str_dup(argument);
   sprintf(buf, "Your title is now: %s\n\r", argument);
   ch->send(buf);

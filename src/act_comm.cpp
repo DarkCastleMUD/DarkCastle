@@ -702,7 +702,7 @@ void DC::load_hints(void)
       if (buffer != nullptr)
       {
         hints_.push_back(buffer);
-        free(buffer);
+        delete[] buffer;
       }
     }
 

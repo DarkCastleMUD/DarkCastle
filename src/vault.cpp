@@ -514,7 +514,7 @@ void DC::reload_vaults(void)
       for (items = vault->items; items; items = titems)
       {
         titems = items->next;
-        free(items);
+        delete items;
       }
     }
 
@@ -523,12 +523,12 @@ void DC::reload_vaults(void)
       for (access = vault->access; access; access = taccess)
       {
         taccess = access->next;
-        free(access);
+        delete access;
       }
     }
 
     if (vault)
-      free(vault);
+      delete vault;
   }
 
   vault_table = nullptr;
@@ -699,7 +699,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
       titems = items->next;
       if (items->obj)
         extract_obj(items->obj);
-      free(items);
+      delete items;
     }
   }
 
@@ -708,7 +708,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     for (access = vault->access; access; access = taccess)
     {
       taccess = access->next;
-      free(access);
+      delete access;
     }
   }
 
@@ -724,7 +724,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
         vault_table = vault->next;
       else
         prev_vault->next = vault->next;
-      free(vault);
+      delete vault;
       vault = nullptr;
       total_vaults--;
       return;
@@ -761,7 +761,7 @@ void DC::testing_load_vaults(void)
   logentry(QStringLiteral("load_vaults: found [%1] player vaults to read.").arg(total_vaults));
   if (total_vaults)
   {
-    CREATE(vault_table, struct vault_data, total_vaults);
+    vault_table = new struct vault_data[total_vaults];
   }
 
   QString line = vault_index_stream.readLine();
@@ -788,7 +788,7 @@ void DC::testing_load_vaults(void)
       //       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     QTextStream vault_file_stream(&vault_file);
-    CREATE(vault, struct vault_data, 1);
+    vault = new struct vault_data;
 
     vault->owner = line;
     vault->size = VAULT_BASE_SIZE;
@@ -817,7 +817,7 @@ void DC::testing_load_vaults(void)
       case 'O':
         vault_file_stream >> vnum >> count >> full >> Qt::ws;
 
-        CREATE(items, struct vault_items_data, 1);
+        items = new struct vault_items_data;
 
         if (!full)
         {
@@ -878,7 +878,7 @@ void DC::testing_load_vaults(void)
 
         if (!value.isEmpty() && !stat(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(value[0]).arg(value).toStdString().c_str(), &statbuf))
         {
-          CREATE(access, struct vault_access_data, 1);
+          access = new struct vault_access_data;
           access->name = value;
           access->next = vault->access;
           vault->access = access;
@@ -945,7 +945,7 @@ void Character::add_vault_access(QString name, struct vault_data *vault)
   }
 
   send(QStringLiteral("%1 now has access to your vault.\r\n").arg(name));
-  CREATE(access, struct vault_access_data, 1);
+  access = new struct vault_access_data;
   access->name = name;
   access->next = vault->access;
   vault->access = access;
@@ -985,7 +985,7 @@ void DC::load_vaults(void)
   logverbose(QStringLiteral("boot_vaults: found [%1] player vaults to read.").arg(total_vaults));
 
   if (total_vaults)
-    CREATE(vault_table, struct vault_data, total_vaults);
+    vault_table = new struct vault_data[total_vaults];
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
@@ -1013,7 +1013,7 @@ void DC::load_vaults(void)
       //      logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     }
 
-    CREATE(vault, struct vault_data, 1);
+    vault = new struct vault_data;
 
     vault->owner = str_dup(line);
     vault->size = VAULT_BASE_SIZE;
@@ -1076,7 +1076,7 @@ void DC::load_vaults(void)
           break;
         }
 
-        CREATE(items, struct vault_items_data, 1);
+        items = new struct vault_items_data;
 
         if (!full)
         {
@@ -1130,7 +1130,7 @@ void DC::load_vaults(void)
 
         if (0 == stat(src_filename, &statbuf))
         {
-          CREATE(access, struct vault_access_data, 1);
+          access = new struct vault_access_data;
           access->name = str_dup(value);
           access->next = vault->access;
           vault->access = access;
@@ -1195,8 +1195,8 @@ void Character::remove_vault_access(QString name, struct vault_data *vault)
 
 void remove_vault_accesses(QString name)
 {
-  struct vault_data *vault;
-  struct vault_access_data *access, *next_access;
+  struct vault_data *vault{};
+  struct vault_access_data *access{}, *next_access{};
   int num = 0;
 
   for (vault = vault_table; vault; vault = vault->next, num++)
@@ -1234,7 +1234,7 @@ void access_remove(QString name, struct vault_data *vault)
         prev_access->next = access->next;
       }
 
-      free(access);
+      delete access;
       access = nullptr;
       break;
     }
@@ -1619,7 +1619,7 @@ void item_add(int vnum, struct vault_data *vault)
     }
   }
 
-  CREATE(item, struct vault_items_data, 1);
+  item = new struct vault_items_data;
   item->item_vnum = vnum;
   item->count = 1;
   item->next = vault->items;
@@ -1644,7 +1644,7 @@ void item_add(Object *obj, struct vault_data *vault)
     }
   }
 
-  CREATE(item, struct vault_items_data, 1);
+  item = new struct vault_items_data;
   item->obj = obj;
   item->item_vnum = vnum;
   item->count = 1;
@@ -1678,7 +1678,7 @@ void item_remove(Object *obj, struct vault_data *vault)
         prev_item->next = item->next;
       }
 
-      free(item);
+      delete item;
       item = nullptr;
       vault->weight -= GET_OBJ_WEIGHT(get_obj(vnum));
       return;
@@ -2233,8 +2233,8 @@ void add_new_vault(const char *name, int indexonly)
 
   // files all done, now add it in game
   total_vaults++;
-  RECREATE(vault_table, struct vault_data, total_vaults);
-  CREATE(vault, struct vault_data, 1);
+  vault_table = new struct vault_data[total_vaults];
+  vault = new struct vault_data;
 
   vault->owner = str_dup(name);
   if (ch)

@@ -678,7 +678,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
     {
       //      This is str_hsh'd, don't delete it
       //      if(zone.cmd[cmd]->comment)
-      //        dc_free(zone.cmd[cmd]->comment);
+      //        delete zone.cmd[cmd]->comment;
       if (last == "none")
       {
         zone.cmd[cmd]->comment = {};
@@ -1167,14 +1167,14 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
-              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = str_dup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = str_dup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             do_zedit(ch, str);
-            free(str);
+            delete[] str;
           }
           break;
         case 'G': // G, E, and O have obj # in arg1
@@ -1185,15 +1185,15 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
-              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = str_dup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = str_dup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
             do_zedit(ch, str);
-            free(str);
+            delete[] str;
           }
           break;
         case 'P': // P has obj # in arg1 and arg3
@@ -1203,15 +1203,15 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
-              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = str_dup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = str_dup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
             do_zedit(ch, str);
-            free(str);
+            delete[] str;
           }
           break;
         default:
@@ -1628,7 +1628,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
                    ch);
       return eFAILURE;
     }
-    curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
+    curr = new extra_descr_data;
     curr->keyword = str_hsh(select);
     curr->description = str_hsh("Empty desc.\r\n");
     curr->next = obj->ex_description;
@@ -1669,12 +1669,12 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
     if (!curr2)
     { // first one
       obj->ex_description = curr->next;
-      dc_free(curr);
+      delete curr;
     }
     else
     {
       curr2->next = curr->next;
-      dc_free(curr);
+      delete curr;
     }
     ch->sendln("Deleted.");
     break;
@@ -1830,15 +1830,15 @@ int oedit_affects(Character *ch, int item_num, char *buf)
                    ch);
       return eFAILURE;
     }
-    if (!obj->affected)
+    if (obj->affected.isEmpty())
     {
       sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].virt);
       ch->send(buf);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->affected.size()))
     {
-      sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
+      sprintf(buf, "You must select between 1 and %d.\r\n", obj->affected.size());
       ch->send(buf);
       return eFAILURE;
     }
@@ -1850,7 +1850,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
   // list
   case 2:
   {
-    if (!obj->affected)
+    if (obj->affected.isEmpty())
     {
       ch->sendln("The object has no affects.");
       return eSUCCESS;
@@ -1858,7 +1858,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     send_to_char("$3Character Affects$R:\r\n"
                  "------------------\r\n",
                  ch);
-    for (x = 0; x < obj->num_affects; x++)
+    for (x = 0; x < obj->affected.size(); x++)
     {
       //          sprinttype(obj->affected[x].location, apply_types, buf2);
 
@@ -1891,15 +1891,15 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       ch->sendln("Make $B$5sure$R you don't use a spell that is restricted.  See builder guide.");
       return eFAILURE;
     }
-    if (!obj->affected)
+    if (obj->affected.isEmpty())
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].virt);
       ch->send(buf);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->affected.size()))
     {
-      sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
+      sprintf(buf, "You must select between 1 and %d.\r\n", obj->affected.size());
       ch->send(buf);
       return eFAILURE;
     }
@@ -1928,17 +1928,17 @@ int oedit_affects(Character *ch, int item_num, char *buf)
                    ch);
       return eFAILURE;
     }
-    if (!obj->affected)
+    if (obj->affected.isEmpty())
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
               DC::getInstance()->obj_index[item_num].virt);
       ch->send(buf);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->affected.size()))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n",
-              obj->num_affects);
+              obj->affected.size());
       ch->send(buf);
       return eFAILURE;
     }
@@ -1969,17 +1969,17 @@ int oedit_affects(Character *ch, int item_num, char *buf)
                    ch);
       return eFAILURE;
     }
-    if (!obj->affected)
+    if (obj->affected.isEmpty())
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
               DC::getInstance()->obj_index[item_num].virt);
       ch->send(buf);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->affected.size()))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n",
-              obj->num_affects);
+              obj->affected.size());
       ch->send(buf);
       return eFAILURE;
     }
@@ -2606,7 +2606,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
         break;
     if (!curr)
     { // None existing;
-      curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
+      curr = new extra_descr_data;
       curr->keyword = str_dup(qPrintable(((Object *)DC::getInstance()->obj_index[rnum].item)->Name()));
       curr->description = str_dup("");
       curr->next = ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description;
@@ -2754,8 +2754,8 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
     }
     prog = new mob_prog_data;
     prog->type = GREET_PROG;
-    prog->arglist = strdup("80");
-    prog->comlist = strdup("say This is my new mob prog!\n\r");
+    prog->arglist = str_dup("80");
+    prog->comlist = str_dup("say This is my new mob prog!\n\r");
     prog->next = nullptr;
 
     int prog_num = 1;
@@ -2810,9 +2810,9 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
       DC::getInstance()->mob_index[mob_num].mobprogs = currprog->next;
 
     currprog->type = 0;
-    dc_free(currprog->arglist);
-    dc_free(currprog->comlist);
-    dc_free(currprog);
+    delete[] currprog->arglist;
+    delete[] currprog->comlist;
+    delete currprog;
 
     update_mobprog_bits(mob_num);
 
@@ -2957,8 +2957,8 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
       return eFAILURE;
     }
 
-    dc_free(currprog->arglist);
-    currprog->arglist = strdup(buf3);
+    delete[] currprog->arglist;
+    currprog->arglist = str_dup(buf3);
 
     ch->sendln("Mob program arglist changed.");
   }
@@ -4209,7 +4209,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("$3Syntax$R: redit name <Room Name>");
       return eFAILURE;
     }
-    dc_free(DC::getInstance()->world[ch->in_room].name);
+    delete[] DC::getInstance()->world[ch->in_room].name;
     DC::getInstance()->world[ch->in_room].name = str_dup(remainder_args.c_str());
     ch->sendln("Ok.");
   }
@@ -4221,7 +4221,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     if (!remainder_args.empty())
     {
       std::string description = remainder_args + "\n\r";
-      dc_free(DC::getInstance()->world[ch->in_room].description);
+      delete[] DC::getInstance()->world[ch->in_room].description;
       DC::getInstance()->world[ch->in_room].description = str_dup(description.c_str());
       ch->sendln("Ok.");
       return eFAILURE;
@@ -4276,7 +4276,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
 
           int16_t destination_room = DC::getInstance()->world[ch->in_room].dir_option[x]->to_room;
           csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[x], ch->in_room, destination_room);
-          free(DC::getInstance()->world[ch->in_room].dir_option[x]);
+          delete DC::getInstance()->world[ch->in_room].dir_option[x];
           DC::getInstance()->world[ch->in_room].dir_option[x] = nullptr;
 
           if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
@@ -4288,7 +4288,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
               if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]->to_room == ch->in_room)
               {
                 csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[reverse_number[x]], destination_room, ch->in_room);
-                free(DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]);
+                delete DC::getInstance()->world[destination_room].dir_option[reverse_number[x]];
                 DC::getInstance()->world[destination_room].dir_option[reverse_number[x]] = nullptr;
                 return eSUCCESS;
               }
@@ -4406,7 +4406,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("Creating new exit.");
-      CREATE(DC::getInstance()->world[ch->in_room].dir_option[x], struct room_direction_data, 1);
+      DC::getInstance()->world[ch->in_room].dir_option[x] = new struct room_direction_data;
       DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
       DC::getInstance()->world[ch->in_room].dir_option[x]->keyword = 0;
     }
@@ -4417,7 +4417,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     if (!remainder_args.empty())
     {
       if (DC::getInstance()->world[ch->in_room].dir_option[x]->keyword)
-        dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->keyword);
+        delete[] DC::getInstance()->world[ch->in_room].dir_option[x]->keyword;
       DC::getInstance()->world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
     }
 
@@ -4438,9 +4438,9 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
                           return_directions[x], DC::getInstance()->world[ch->in_room].number,
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
         SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
-        char *tmp = strdup(buf.c_str());
+        char *tmp = str_dup(buf.c_str());
         do_at(ch, tmp);
-        free(tmp);
+        delete[] tmp;
         REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
       }
     }
@@ -4500,7 +4500,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
             prev->next = extra->next;
           }
           ch->send(QStringLiteral("Extra description with keyword '%1' deleted.\r\n").arg(extra->keyword));
-          FREE(extra);
+          delete extra;
           deleted = true;
           // break out of for loop
           break;
@@ -4520,7 +4520,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       {
         // No matching extra description found so make a new one
         csendf(ch, "Creating new extra description for keyword '%s'.\r\n", arg2.c_str());
-        CREATE(extra, struct extra_descr_data, 1);
+        extra = new struct extra_descr_data;
         extra->next = nullptr;
 
         if (!(DC::getInstance()->world[ch->in_room].ex_description))
@@ -4552,7 +4552,8 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       }
     }
 
-    FREE(extra->keyword);
+    if (extra->keyword)
+      delete[] extra->keyword;
     extra->keyword = str_dup(arg2.c_str());
     ch->sendln("Write your extra description. (/s saves /h for help)");
     ch->desc->strnew = &extra->description;
@@ -4598,7 +4599,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
                  "'~' on a new line.\n\r\n\r",
                  ch);
     /*        if(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description) {
-          dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description);
+          delete DC::getInstance()->world[ch->in_room].dir_option[x]->general_description;
           DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
         }
    */
@@ -4702,7 +4703,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
           pd->next = nd->next;
         else
           DC::getInstance()->world[ch->in_room].denied = nd->next;
-        dc_free(nd);
+        delete nd;
         ch->send(QStringLiteral("Mobile %1 ALLOWED entrance.\r\n").arg(mob));
         done = true;
         break;
@@ -4711,11 +4712,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     }
     if (done)
       break;
-#ifdef LEAK_CHECK
-    nd = (struct deny_data *)calloc(1, sizeof(struct deny_data));
-#else
-    nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
-#endif
+    nd = new struct deny_data;
     nd->next = DC::getInstance()->world[ch->in_room].denied;
     try
     {
@@ -4774,7 +4771,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
       ch->sendln("There is nothing there to remove.");
       return eFAILURE;
     }
-    dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]);
+    delete DC::getInstance()->world[ch->in_room].dir_option[x];
     DC::getInstance()->world[ch->in_room].dir_option[x] = 0;
     csendf(ch, "You stretch forth your hands and remove "
                "the %s exit.\r\n",
@@ -4797,7 +4794,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
     if (DC::getInstance()->world[ch->in_room].ex_description == i)
     {
       DC::getInstance()->world[ch->in_room].ex_description = i->next;
-      dc_free(i);
+      delete i;
       ch->sendln("You remove the extra description.");
     }
     else
@@ -4806,7 +4803,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
         if (extra->next == i)
         {
           extra->next = i->next;
-          dc_free(i);
+          delete i;
           ch->sendln("You remove the extra description.");
           break;
         }
@@ -4846,7 +4843,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 
     else
     {
-      dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description);
+      delete[] DC::getInstance()->world[ch->in_room].dir_option[x]->general_description;
       DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
       ch->sendln("Ok.");
     }

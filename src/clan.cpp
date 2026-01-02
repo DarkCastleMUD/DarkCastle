@@ -130,12 +130,8 @@ void boot_clans(void)
         break;
       if (b != 'R')
         continue;
-#ifdef LEAK_CHECK
-      new_new_room = (struct clan_room_data *)calloc(1, sizeof(struct clan_room_data));
-#else
-      new_new_room = (struct clan_room_data *)dc_alloc(1,
-                                                       sizeof(struct clan_room_data));
-#endif
+
+      new_new_room = new struct clan_room_data;
       new_new_room->next = new_new_clan->rooms;
       tempint = fread_int(fl, 0, 50000);
       new_new_room->room_number = (int16_t)tempint;
@@ -410,7 +406,7 @@ void delete_clan(const clan_data *currclan)
   for (curr_room = currclan->rooms; curr_room; curr_room = next_room)
   {
     next_room = curr_room->next;
-    dc_free(curr_room);
+    delete curr_room;
   }
   for (curr_member = currclan->members; curr_member; curr_member =
                                                          next_member)
@@ -419,15 +415,15 @@ void delete_clan(const clan_data *currclan)
     free_member(curr_member);
   }
   if (currclan->description)
-    dc_free(currclan->description);
+    delete[] currclan->description;
   if (currclan->email)
-    dc_free(currclan->email);
+    delete[] currclan->email;
   if (currclan->login_message)
-    dc_free(currclan->login_message);
+    delete[] currclan->login_message;
   if (currclan->logout_message)
-    dc_free(currclan->logout_message);
+    delete[] currclan->logout_message;
   if (currclan->death_message)
-    dc_free(currclan->death_message);
+    delete[] currclan->death_message;
 
   delete currclan;
 }
@@ -636,7 +632,7 @@ void add_clan(clan_data *new_new_clan)
 
 void free_member(ClanMember *member)
 {
-  dc_free(member);
+  delete member;
 }
 
 void delete_clan(clan_data *dead_clan)
@@ -678,26 +674,26 @@ void delete_clan(clan_data *dead_clan)
           if (isSet(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
             REMOVE_BIT(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM);
 
-        dc_free(room);
+        delete room;
 
         while (nextroom)
         {
           room = nextroom;
           nextroom = room->next;
-          dc_free(room);
+          delete room;
         }
       }
 
       if (dead_clan->email)
-        dc_free(dead_clan->email);
+        delete[] dead_clan->email;
       if (dead_clan->login_message)
-        dc_free(dead_clan->login_message);
+        delete[] dead_clan->login_message;
       if (dead_clan->logout_message)
-        dc_free(dead_clan->logout_message);
+        delete[] dead_clan->logout_message;
       if (dead_clan->death_message)
-        dc_free(dead_clan->death_message);
+        delete[] dead_clan->death_message;
       if (dead_clan->description)
-        dc_free(dead_clan->description);
+        delete[] dead_clan->description;
       delete dead_clan;
       return;
     }
@@ -1160,7 +1156,7 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
     return eFAILURE;
   }
   if (clan->leader)
-    dc_free(clan->leader);
+    delete[] clan->leader;
   clan->leader = str_dup(victim->getNameC());
 
   save_clans();
@@ -1187,7 +1183,7 @@ int clan_desc(Character *ch, char *arg)
   if (!strncmp(text, "delete", 6))
   {
     if (clan->description)
-      dc_free(clan->description);
+      delete[] clan->description;
     clan->description = nullptr;
     ch->sendln("Clan description removed.");
     return 1;
@@ -1203,7 +1199,7 @@ int clan_desc(Character *ch, char *arg)
   }
 
   /*  if(clan->description)
-      dc_free(clan->description);
+      delete clan->description;
     clan->description = nullptr;
   */
   // ch->sendln("Write new description.  ~ to end.");
@@ -1240,7 +1236,7 @@ int clan_motd(Character *ch, char *arg)
   if (!strncmp(text, "delete", 6))
   {
     if (clan->clanmotd)
-      dc_free(clan->clanmotd);
+      delete[] clan->clanmotd;
     clan->clanmotd = nullptr;
     ch->sendln("Clan motd removed.");
     return 1;
@@ -1256,7 +1252,7 @@ int clan_motd(Character *ch, char *arg)
   }
 
   /*  if(clan->clanmotd)
-      dc_free(clan->clanmotd);
+      delete clan->clanmotd;
     clan->clanmotd = nullptr;
   */
   // ch->sendln("Write new motd.  ~ to end.");
@@ -1302,7 +1298,7 @@ int clan_death_message(Character *ch, char *arg)
   {
     ch->sendln("Clan death message removed.");
     if (clan->death_message)
-      dc_free(clan->death_message);
+      delete[] clan->death_message;
     clan->death_message = nullptr;
     return 1;
   }
@@ -1340,7 +1336,7 @@ int clan_death_message(Character *ch, char *arg)
   }
 
   if (clan->death_message)
-    dc_free(clan->death_message);
+    delete[] clan->death_message;
 
   clan->death_message = str_dup(arg);
 
@@ -1370,7 +1366,7 @@ int clan_logout_message(Character *ch, char *arg)
   {
     ch->sendln("Clan logout message removed.");
     if (clan->logout_message)
-      dc_free(clan->logout_message);
+      delete[] clan->logout_message;
     clan->logout_message = nullptr;
     return 1;
   }
@@ -1396,7 +1392,7 @@ int clan_logout_message(Character *ch, char *arg)
   }
 
   if (clan->logout_message)
-    dc_free(clan->logout_message);
+    delete[] clan->logout_message;
 
   clan->logout_message = str_dup(arg);
 
@@ -1426,7 +1422,7 @@ int clan_login_message(Character *ch, char *arg)
   {
     ch->sendln("Clan login message removed.");
     if (clan->login_message)
-      dc_free(clan->login_message);
+      delete[] clan->login_message;
     clan->login_message = nullptr;
     return 1;
   }
@@ -1452,7 +1448,7 @@ int clan_login_message(Character *ch, char *arg)
   }
 
   if (clan->login_message)
-    dc_free(clan->login_message);
+    delete[] clan->login_message;
 
   clan->login_message = str_dup(arg);
 
@@ -1481,7 +1477,7 @@ int clan_email(Character *ch, char *arg)
   if (!strncmp(text, "delete", 6))
   {
     if (clan->email)
-      dc_free(clan->email);
+      delete[] clan->email;
     clan->email = nullptr;
     ch->sendln("Clan email address removed.");
     return 1;
@@ -1495,7 +1491,7 @@ int clan_email(Character *ch, char *arg)
   }
 
   if (clan->email)
-    dc_free(clan->email);
+    delete[] clan->email;
 
   clan->email = str_dup(text);
 
@@ -1913,7 +1909,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
     }
 
     if (tarclan->leader)
-      dc_free(tarclan->leader);
+      delete[] tarclan->leader;
     tarclan->leader = str_dup(last);
 
     ch->sendln("Clan leader name changed.");
@@ -1971,11 +1967,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
     }
 
     SET_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
-#ifdef LEAK_CHECK
-    newroom = (struct clan_room_data *)calloc(1, sizeof(clan_room_data));
-#else
-    newroom = (struct clan_room_data *)dc_alloc(1, sizeof(clan_room_data));
-#endif
+    newroom = new struct clan_room_data;
     newroom->room_number = skill;
     newroom->next = tarclan->rooms;
     tarclan->rooms = newroom;
@@ -2067,7 +2059,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
           REMOVE_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
       lastroom = tarclan->rooms;
       tarclan->rooms = tarclan->rooms->next;
-      dc_free(lastroom);
+      delete lastroom;
       ch->sendln("Deleted.");
       return;
     }
@@ -2080,7 +2072,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
           if (isSet(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM))
             REMOVE_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
         lastroom->next = newroom->next;
-        dc_free(newroom);
+        delete newroom;
         ch->sendln("Deleted.");
         return;
       }
@@ -2954,8 +2946,8 @@ void remove_totem(Object *altar, Object *totem)
            {
              if (IS_PC(t) && t->altar == altar)
              {
-               int j;
-               for (j = 0; j < totem->num_affects; j++)
+
+               for (qsizetype j = 0; j < totem->affected.size(); j++)
                  affect_modify(t, totem->affected[j].location,
                                totem->affected[j].modifier, -1, false);
                redo_hitpoints(t);
@@ -2974,8 +2966,8 @@ void add_totem(Object *altar, Object *totem)
            {
              if (IS_PC(t) && t->altar == altar)
              {
-               int j;
-               for (j = 0; j < totem->num_affects; j++)
+
+               for (qsizetype j = 0; j < totem->affected.size(); j++)
                  affect_modify(t, totem->affected[j].location,
                                totem->affected[j].modifier, -1, true);
              }
@@ -2989,10 +2981,10 @@ void remove_totem_stats(Character *ch, int stat)
     return;
   for (a = ch->altar->contains; a; a = a->next_content)
   {
-    int j;
+
     if (a->obj_flags.type_flag != ITEM_TOTEM)
       continue;
-    for (j = 0; j < a->num_affects; j++)
+    for (qsizetype j = 0; j < a->affected.size(); j++)
       if (stat && stat == a->affected[j].location)
         affect_modify(ch, a->affected[j].location,
                       a->affected[j].modifier, -1, false);
@@ -3015,10 +3007,10 @@ void add_totem_stats(Character *ch, int stat)
     return;
   for (a = ch->altar->contains; a; a = a->next_content)
   {
-    int j;
+
     if (a->obj_flags.type_flag != ITEM_TOTEM)
       continue;
-    for (j = 0; j < a->num_affects; j++)
+    for (qsizetype j = 0; j < a->affected.size(); j++)
       if (stat && stat == a->affected[j].location)
         affect_modify(ch, a->affected[j].location,
                       a->affected[j].modifier, -1, true);
@@ -3092,12 +3084,7 @@ bool can_challenge(int clan, int zone)
 
 void takeover_pause(int clan, int zone)
 {
-  struct takeover_pulse_data *pl;
-#ifdef LEAK_CHECK
-  pl = (struct takeover_pulse_data *)calloc(1, sizeof(struct takeover_pulse_data));
-#else
-  pl = (struct takeover_pulse_data *)dc_alloc(1, sizeof(struct takeover_pulse_data));
-#endif
+  auto pl = new struct takeover_pulse_data;
   pl->next = pulse_list;
   pl->clan1 = clan;
   pl->clan2 = -2;
@@ -3181,7 +3168,7 @@ void recycle_pulse_data(struct takeover_pulse_data *pl)
         plp->next = plc->next;
       else
         pulse_list = plc->next;
-      dc_free(pl);
+      delete pl;
       return; // No point going on..
     }
     plp = plc;
@@ -3582,12 +3569,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     affect_to_char(this, &af, DC::PULSE_TIMER);
 
     // no point checking for noclaim flag, at this point it already IS under someone's control
-    struct takeover_pulse_data *pl;
-#ifdef LEAK_CHECK
-    pl = (struct takeover_pulse_data *)calloc(1, sizeof(struct takeover_pulse_data));
-#else
-    pl = (struct takeover_pulse_data *)dc_alloc(1, sizeof(struct takeover_pulse_data));
-#endif
+    auto pl = new struct takeover_pulse_data;
     pl->next = pulse_list;
     pl->clan1 = DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner;
     pl->clan2 = clan;

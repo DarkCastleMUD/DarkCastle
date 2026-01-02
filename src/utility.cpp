@@ -181,10 +181,8 @@ size_t nocolor_strlen(const char *s)
 // tested in TestUtility::test_str_dup0
 char *str_dup0(const char *str)
 {
-  if (str == 0)
-  {
-    return 0;
-  }
+  if (!str)
+    return {};
 
   return str_dup(str);
 }
@@ -193,16 +191,12 @@ char *str_dup0(const char *str)
 // tested in TestUtility::test_str_dup
 char *str_dup(const char *str)
 {
-  char *str_new = 0;
-  size_t strlength = strlen(str);
+  if (!str)
+    return {};
 
-  str_new = (char *)dc_alloc(strlength + 1, sizeof(char));
-
-  if (!str_new)
-  {
-    qFatal("NO MEMORY DUPLICATING STRING!");
-  }
-  return strncpy(str_new, str, strlength);
+  auto strlength = strlen(str);
+  auto str_new = new char[strlength + 1];
+  return static_cast<char *>(memcpy(str_new, str, strlength + 1));
 }
 
 // simulates a dice roll
@@ -275,8 +269,8 @@ int str_nosp_cmp(const char *arg1, const char *arg2)
   char *tmp_arg1 = str_nospace(arg1);
   char *tmp_arg2 = str_nospace(arg2);
   int retval = str_cmp(tmp_arg1, tmp_arg2);
-  dc_free(tmp_arg2);
-  dc_free(tmp_arg1);
+  delete[] tmp_arg2;
+  delete[] tmp_arg1;
 
   return retval;
 }
@@ -293,8 +287,8 @@ int str_n_nosp_cmp(const char *arg1, const char *arg2, int size)
   char *tmp_arg1 = str_nospace(arg1);
   char *tmp_arg2 = str_nospace(arg2);
   int retval = strncasecmp(tmp_arg1, tmp_arg2, size);
-  dc_free(tmp_arg2);
-  dc_free(tmp_arg1);
+  delete[] tmp_arg2;
+  delete[] tmp_arg1;
 
   return retval;
 }

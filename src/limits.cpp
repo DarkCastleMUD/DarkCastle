@@ -349,7 +349,7 @@ void redo_hitpoints(Character *ch)
 	for (i = 0; i < MAX_WEAR; i++)
 	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			for (j = 0; j < ch->equipment[i]->affected.size(); j++)
 			{
 				if (ch->equipment[i]->affected[j].location == APPLY_HIT)
 					affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);
@@ -391,7 +391,7 @@ void redo_mana(Character *ch)
 	for (i = 0; i < MAX_WEAR; i++)
 	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			for (j = 0; j < ch->equipment[i]->affected.size(); j++)
 			{
 				if (ch->equipment[i]->affected[j].location == APPLY_MANA)
 					affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);
@@ -421,7 +421,7 @@ void redo_ki(Character *ch)
 	for (i = 0; i < MAX_WEAR; i++)
 	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			for (j = 0; j < ch->equipment[i]->affected.size(); j++)
 			{
 				if (ch->equipment[i]->affected[j].location == APPLY_KI)
 					affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);

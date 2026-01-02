@@ -602,11 +602,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
           clas = x;
       }
 
-#ifdef LEAK_CHECK
-    newOne = (struct skill_quest *)calloc(1, sizeof(struct skill_quest));
-#else
-    newOne = (struct skill_quest *)dc_alloc(1, sizeof(struct skill_quest));
-#endif
+    newOne = new struct skill_quest;
     newOne->num = i;
     newOne->level = 1;
     newOne->message = str_dup("New skillquest.");
@@ -625,8 +621,8 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
         else
           skill_list = curren->next;
         ch->sendln("Deleted.");
-        dc_free(curren->message);
-        dc_free(curren);
+        delete[] curren->message;
+        delete curren;
         return eSUCCESS;
       }
       last = curren;
@@ -722,7 +718,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
 int max_aff(class Object *obj, int type)
 {
   int a, b = -1;
-  for (a = 0; a < obj->num_affects; a++)
+  for (a = 0; a < obj->affected.size(); a++)
   {
     if (obj->affected[a].location > 30)
       continue;

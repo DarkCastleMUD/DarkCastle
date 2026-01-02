@@ -69,8 +69,8 @@ void free_emoting_obj_data(obj_emote_index *myobj)
     curr_data = myobj->data;
     myobj->data = curr_data->next;
 
-    dc_free(curr_data->emote_text);
-    dc_free(curr_data);
+    delete[] curr_data->emote_text;
+    delete curr_data;
   }
 }
 
@@ -84,7 +84,7 @@ void DC::free_emoting_objects_from_memory(void)
     obj_emote_head.next = curr_index->next;
 
     free_emoting_obj_data(curr_index);
-    dc_free(curr_index);
+    delete curr_index;
   }
 
   free_emoting_obj_data(&obj_emote_head);
@@ -102,26 +102,16 @@ void load_emoting_objects()
   short offset;
 
   fl = fopen(EMOTING_FILE, "r");
-#ifdef LEAK_CHECK
-  obj_emote_head.next = (struct obj_emote_index *)
-      calloc(1, sizeof(struct obj_emote_index));
-#else
-  obj_emote_head.next = (struct obj_emote_index *)
-      dc_alloc(1, sizeof(struct obj_emote_index));
-#endif
+  obj_emote_head.next = new struct obj_emote_index;
+
   index_cursor = obj_emote_head.next;
   index_cursor->next = nullptr;
   index_cursor->data = nullptr;
   index_cursor->room_number = DC::NOWHERE;
   index_cursor->emote_index_length = -1;
   index_cursor->frequency = 0;
-#ifdef LEAK_CHECK
-  data_cursor = (struct obj_emote_data *)
-      calloc(1, sizeof(struct obj_emote_index));
-#else
-  data_cursor = (struct obj_emote_data *)
-      dc_alloc(1, sizeof(struct obj_emote_index));
-#endif
+  data_cursor = new struct obj_emote_data;
+
   index_cursor->data = data_cursor;
   data_cursor->next = nullptr;
   while (!done2)
@@ -131,10 +121,6 @@ void load_emoting_objects()
     done = false;
     while (!done)
     {
-      // Why are we dc_alloc'ing the space when fread_string is returning us
-      // a pointer to the space IT allocs?  Azrack you silly goose.  I fixed it.
-      // -pir 05/03/00
-      // data_cursor->emote_text = (char *)dc_alloc(100, sizeof(char));
       data_cursor->emote_text = fread_string(fl, 0);
       index_cursor->emote_index_length++;
       if ((offset = 1) && ((fromfile = fgetc(fl)) == 'S') && ((offset = 2) && (fromfile = fgetc(fl)) == '\n'))
@@ -143,13 +129,8 @@ void load_emoting_objects()
       }
       else
       {
-#ifdef LEAK_CHECK
-        data_cursor->next = (struct obj_emote_data *)
-            calloc(1, sizeof(struct obj_emote_data));
-#else
-        data_cursor->next = (struct obj_emote_data *)
-            dc_alloc(1, sizeof(struct obj_emote_data));
-#endif
+        data_cursor->next = new struct obj_emote_data;
+
         data_cursor = data_cursor->next;
         data_cursor->next = nullptr;
         // Azrack -- fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
@@ -164,22 +145,12 @@ void load_emoting_objects()
     else
     {
       fseek(fl, (1 * sizeof(char)), SEEK_CUR);
-#ifdef LEAK_CHECK
-      index_cursor->next = (struct obj_emote_index *)
-          calloc(1, sizeof(struct obj_emote_index));
-#else
-      index_cursor->next = (struct obj_emote_index *)
-          dc_alloc(1, sizeof(struct obj_emote_index));
-#endif
+      index_cursor->next = new struct obj_emote_index;
+
       index_cursor = index_cursor->next;
       index_cursor->next = nullptr;
-#ifdef LEAK_CHECK
-      index_cursor->data = (struct obj_emote_data *)
-          calloc(1, sizeof(struct obj_emote_data));
-#else
-      index_cursor->data = (struct obj_emote_data *)
-          dc_alloc(1, sizeof(struct obj_emote_data));
-#endif
+      index_cursor->data = new struct obj_emote_data;
+
       index_cursor->room_number = DC::NOWHERE;
       index_cursor->emote_index_length = -1;
       index_cursor->frequency = -1;
@@ -1824,9 +1795,6 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   GET_PLATINUM(ch) -= (ch->getLevel());
 
-  //  dc_free(target_obj->short_description);
-  //  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
-  //  strcpy(target_obj->short_description, buf);
   char zarg[MAX_STRING_LENGTH];
   sprintf(zarg, "$B$7%s$R", buf);
   target_obj->short_description = str_hsh(zarg);
@@ -2540,7 +2508,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
               do_look(v, "");
 
               struct mprog_throw_type *throwitem = nullptr;
-              throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+              throwitem = new struct mprog_throw_type;
               throwitem->target_mob_num = 30033;
               strcpy(throwitem->target_mob_name, "");
               throwitem->data_num = 99;
@@ -4327,7 +4295,7 @@ int godload_tovmier(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     return eFAILURE;
 
   ch->sendln("You twist the handle of the staff.");
-  for (int i = 0; i < obj->num_affects; i++)
+  for (int i = 0; i < obj->affected.size(); i++)
     if (obj->affected[i].location == WEP_DISPEL_EVIL)
     {
       obj->affected[i].location = WEP_DISPEL_GOOD;

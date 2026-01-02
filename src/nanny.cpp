@@ -373,7 +373,7 @@ void Character::do_on_login_stuff(void)
    {
       if (!this->equipment[i])
          continue;
-      for (int a = 0; a < this->equipment[i]->num_affects; a++)
+      for (int a = 0; a < this->equipment[i]->affected.size(); a++)
       {
          if (this->equipment[i]->affected[a].location >= 1000)
          {
@@ -1809,13 +1809,9 @@ void DC::nanny(class Connection *d, std::string arg)
          {
             SEND_TO_Q("Old description:\n\r", d);
             SEND_TO_Q(ch->description, d);
-            dc_free(ch->description);
+            delete[] ch->description;
          }
-#ifdef LEAK_CHECK
-         ch->description = (char *)calloc(540, sizeof(char));
-#else
-         ch->description = (char *)dc_alloc(540, sizeof(char));
-#endif
+         ch->description = new char[540];
 
          // TODO - what happens if I get to this point, then disconnect, and reconnect?  memory leak?
 

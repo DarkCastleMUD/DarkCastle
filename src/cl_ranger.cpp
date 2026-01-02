@@ -1460,7 +1460,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
     dam += dice(ch->equipment[WEAR_HOLD]->obj_flags.value[1],
                 ch->equipment[WEAR_HOLD]->obj_flags.value[2]);
-    for (int i = 0; i < found->num_affects; i++)
+    for (int i = 0; i < found->affected.size(); i++)
       if (found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
         dam += found->affected[i].modifier;
       else if (found->affected[i].location == APPLY_HIT_N_DAM && found->affected[i].modifier != 0)

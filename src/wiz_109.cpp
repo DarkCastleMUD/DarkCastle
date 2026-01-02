@@ -111,7 +111,7 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
   fclose(fl);
 
   ch->send(tmp);
-  FREE(tmp);
+  delete[] tmp;
   return eSUCCESS;
 }
 

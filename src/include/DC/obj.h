@@ -294,6 +294,7 @@ public:
         LookOnly = 3,
         PermanentNoLook = 4
     };
+    ~Object(void);
 
     enum portal_flags_t
     {
@@ -309,11 +310,10 @@ public:
     static const QStringList extra_bits;
     static const QStringList apply_types;
 
-    int32_t item_number = -1;     /* Where in data-base               */
-    int vroom = {};               /* for corpse saving */
-    obj_flag_data obj_flags = {}; /* Object information               */
-    int16_t num_affects = {};
-    obj_affected_type *affected = {};             /* Which abilities in PC to change  */
+    int32_t item_number = -1;                     /* Where in data-base               */
+    int vroom = {};                               /* for corpse saving */
+    obj_flag_data obj_flags = {};                 /* Object information               */
+    QList<obj_affected_type> affected = {};       /* Which abilities in PC to change  */
     char *long_description = {};                  /* When in room                     */
     char *short_description = {};                 /* when worn/carry/in cont.         */
     struct extra_descr_data *ex_description = {}; /* extra descriptions     */
@@ -646,7 +646,7 @@ int damage_eq_once(Object *obj);
 int eq_current_damage(Object *obj);
 void eq_remove_damage(Object *obj);
 void add_obj_affect(Object *obj, int loc, int mod);
-void remove_obj_affect_by_index(Object *obj, int index);
+void remove_obj_affect_by_index(Object *obj, qsizetype index);
 void remove_obj_affect_by_type(Object *obj, int loc);
 bool fullSave(Object *obj);
 void heightweight(Character *ch, bool add);

@@ -115,7 +115,7 @@ void test_random_stats(void)
 QString showObjectAffects(Object *obj)
 {
   QString buffer;
-  for (int i = 0; i < obj->num_affects; ++i)
+  for (qsizetype i = 0; i < obj->affected.size(); ++i)
   {
     if (i > 0)
     {

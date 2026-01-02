@@ -33,11 +33,7 @@ class Path *mPathList = nullptr;
 struct path_data *newPath()
 {
   struct path_data *p;
-#ifdef LEAK_CHECK
-  p = (struct path_data *)calloc(1, sizeof(struct path_data));
-#else
-  p = (struct path_data *)dc_alloc(1, sizeof(struct path_data));
-#endif
+  p = new struct path_data;
   return p;
 }
 

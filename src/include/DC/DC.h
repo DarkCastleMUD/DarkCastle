@@ -115,6 +115,7 @@ typedef QList<QString> hints_t;
 #include "DC/Database.h"
 #include "DC/Command.h"
 #include "DC/shop.h"
+#include "DC/social.h"
 
 class Connection;
 class index_data;
@@ -485,7 +486,6 @@ public:
 
   static QString getBuildVersion();
   static QString getBuildTime();
-  static DC *getInstance();
   static zone_t getRoomZone(room_t room_nr);
   static QString getZoneName(zone_t zone_key);
   static void setZoneClanOwner(zone_t zone_key, int clan_key);
@@ -496,6 +496,13 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
+  static inline DC *getInstance(void)
+  {
+    DC *dc = dynamic_cast<DC *>(DC::instance());
+    assert(dc);
+    return dc;
+  }
+
   Object *getObject(vnum_t vnum);
   void findLibrary(void);
   int create_one_room(Character *ch, int vnum);
@@ -563,7 +570,6 @@ public:
   void logverbose(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
-  void clean_socials_from_memory(void);
   void remove_all_mobs_from_world(void);
   void remove_all_objs_from_world(void);
   void free_zones_from_memory(void);
@@ -621,7 +627,6 @@ public:
     /* TODO enable and fix all memory leaks
     remove_all_mobs_from_world();
     remove_all_objs_from_world();
-    clean_socials_from_memory();
     free_zones_from_memory();
     free_clans_from_memory();
     free_world_from_memory();
@@ -649,6 +654,7 @@ public:
   room_t last_char_room = {};
   Commands CMD_;
   Arena arena_;
+  Socials socials_;
 
 private:
   struct timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};

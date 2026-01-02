@@ -430,7 +430,7 @@ void shopping_value(const char *arg, Character *ch,
         do_say(keeper, buf);
         sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
         do_say(keeper, buf);
-        for (int i = 0; i < obj->num_affects; i++)
+        for (qsizetype i = 0; i < obj->affected.size(); i++)
         {
           if (obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0)
           {
@@ -477,7 +477,7 @@ void shopping_value(const char *arg, Character *ch,
         do_say(keeper, buf);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
-        for (int i = 0; i < obj->num_affects; i++)
+        for (qsizetype i = 0; i < obj->affected.size(); i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
@@ -569,7 +569,7 @@ void shopping_value(const char *arg, Character *ch,
         do_say(keeper, buf);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
-        for (int i = 0; i < obj->num_affects; i++)
+        for (qsizetype i = 0; i < obj->affected.size(); i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
@@ -757,18 +757,18 @@ void boot_the_shops()
     buf = fread_string(fp, 0);
     if (*buf == '$')
     {
-      dc_free(buf);
+      delete[] buf;
       break;
     }
     if (*buf != '#')
     {
-      dc_free(buf);
+      delete[] buf;
       continue;
     }
 
     // we don't seem to use buff after this point, so I'm going to free it
     // otherise, we're leaking memory
-    dc_free(buf);
+    delete[] buf;
 
     if (max_shop >= MAX_SHOP)
     {
@@ -891,7 +891,7 @@ player_shop *read_one_player_shop(FILE *fp)
   char code[4];
 
   player_shop_item *item = nullptr;
-  player_shop *shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
+  player_shop *shop = new player_shop;
 
   fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
   fread(&shop->room_num, sizeof(int32_t), 1, fp);
@@ -915,7 +915,7 @@ player_shop *read_one_player_shop(FILE *fp)
   shop->sale_list = nullptr;
   for (int i = 0; i < count; i++)
   {
-    item = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
+    item = new player_shop_item;
 
     fread(&item->item_vnum, sizeof(int), 1, fp);
     fread(&item->price, sizeof(int), 1, fp);
@@ -1129,7 +1129,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   }
 
   // add it to list
-  player_shop_item *newitem = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
+  player_shop_item *newitem = new player_shop_item;
   newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
   newitem->price = value;
   newitem->next = shop->sale_list;
@@ -1203,13 +1203,13 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
     if (curr == item)
     { // first item
       shop->sale_list = curr->next;
-      dc_free(curr);
+      delete curr;
       break;
     }
     if (curr->next == item)
     {
       curr->next = item->next;
-      dc_free(item);
+      delete item;
       break;
     }
   }
@@ -1346,7 +1346,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       ch->sendln("That room name is too long (60 chars max).");
       return;
     }
-    dc_free(DC::getInstance()->world[shop->room_num].name);
+    delete[] DC::getInstance()->world[shop->room_num].name;
     DC::getInstance()->world[shop->room_num].name = str_dup(text);
     csendf(ch, "Room name set to '%s'.\r\n", DC::getInstance()->world[shop->room_num].name);
     save_player_shop_world_range();
@@ -1508,7 +1508,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
          ch->sendln("You must choose a valid room number.");
          return eFAILURE;
       }
-      shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
+      shop = new player_shop;
       strcpy(shop->owner, buf);
       *shop->sell_message = '\0';
       shop->room_num = i;

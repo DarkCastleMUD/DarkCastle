@@ -57,7 +57,6 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include "DC/clan.h"
 #include "DC/character.h"
 #include "DC/utility.h" // false
-#include "DC/memory.h"
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
@@ -694,7 +693,7 @@ void new_edit_board_unlock_board(Character *ch, int abort)
   message new_msg;
 
   new_msg.text = reserve->buf;
-  dc_free(reserve->buf);
+  delete[] reserve->buf;
   new_msg.date = reserve->new_post.date;
   new_msg.author = reserve->new_post.author;
   new_msg.title = reserve->new_post.title;

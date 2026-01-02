@@ -1332,7 +1332,7 @@ void obj_stat(Character *ch, class Object *j)
   ch->send(buf);
 
   ch->sendln("$3Can affect char$R :");
-  for (i = 0; i < j->num_affects; i++)
+  for (i = 0; i < j->affected.size(); i++)
   {
     //      sprinttype(j->affected[i].location,apply_types,buf2);
     if (j->affected[i].location < 1000)
@@ -1683,8 +1683,8 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
           hunt_items_list = in;
 
         extract_obj(i->obj);
-        dc_free(i->mobname);
-        dc_free(i);
+        delete[] i->mobname;
+        delete i;
         continue;
       }
       else
@@ -1738,8 +1738,8 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       }
       p = hl;
     }
-    dc_free(h->huntname);
-    dc_free(h);
+    delete[] h->huntname;
+    delete h;
   }
 }
 
@@ -1779,8 +1779,8 @@ void huntclear_item(class Object *obj)
         hip->next = hin;
       else
         hunt_items_list = hin;
-      dc_free(hi->mobname);
-      dc_free(hi);
+      delete[] hi->mobname;
+      delete hi;
       continue; // Hopefully there's not two in the list, but just in case.
     }
     hip = hi;
@@ -1859,11 +1859,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   struct tm *pTime = nullptr;
   time_t ct;
 
-#ifdef LEAK_CHECK
-  n = (struct hunt_data *)calloc(1, sizeof(struct hunt_data));
-#else
-  n = (struct hunt_data *)dc_alloc(1, sizeof(struct hunt_data));
-#endif
+  n = new struct hunt_data;
   n->next = hunt_list;
   hunt_list = n;
   n->itemnum = item;
@@ -1942,11 +1938,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
     class Object *obj = clone_object(rnum);
     obj_to_char(obj, vict);
     struct hunt_items *ni;
-#ifdef LEAK_CHECK
-    ni = (struct hunt_items *)calloc(1, sizeof(struct hunt_items));
-#else
-    ni = (struct hunt_items *)dc_alloc(1, sizeof(struct hunt_items));
-#endif
+    ni = new struct hunt_items;
     ni->hunt = n;
     ni->obj = obj;
     ni->mobname = str_dup(vict->short_desc);
@@ -2040,8 +2032,8 @@ void pick_up_item(Character *ch, class Object *obj)
         obj_to_room(obj, 6345);
         break;
       }
-      dc_free(i->mobname);
-      dc_free(i);
+      delete[] i->mobname;
+      delete i;
       check_end_of_hunt(h);
       continue;
     }

@@ -1192,7 +1192,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
   { /* Head of follower-list? */
     k = ch->master->followers;
     ch->master->followers = k->next;
-    dc_free(k);
+    delete k;
   }
   else
   { /* locate follower who is not head of list */
@@ -1203,7 +1203,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 
       j = k->next;
       k->next = j->next;
-      dc_free(j);
+      delete j;
     }
   }
 
@@ -1266,11 +1266,7 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
 
   ch->master = leader;
 
-#ifdef LEAK_CHECK
-  k = (struct follow_type *)calloc(1, sizeof(struct follow_type));
-#else
-  k = (struct follow_type *)dc_alloc(1, sizeof(struct follow_type));
-#endif
+  k = new struct follow_type;
 
   k->follower = ch;
   k->next = leader->followers;
@@ -2593,7 +2589,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         {
           ch->sendln("You utter a swift prayer to the gods to amplify your powers.");
           act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
-          argument = strdup("communegroupspell");
+          argument = str_dup("communegroupspell");
           argument_ptr = argument;
         }
         else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY) && tar_char->affected_by_spell(SPELL_IMMUNITY)->modifier == spl - 1)
@@ -2649,7 +2645,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           int retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
         if (argument_ptr != nullptr)
         {
-          free(argument_ptr);
+          delete[] argument_ptr;
         }
 
         if (oldroom && !isSet(retval, eCH_DIED))
@@ -3120,7 +3116,7 @@ int Character::has_skill(skill_t skill)
     for (o = this->player->skillchange; o; o = o->next_skill)
     {
       int a;
-      for (a = 0; a < o->num_affects; a++)
+      for (a = 0; a < o->affected.size(); a++)
       {
         if (o->affected[a].location == skill * 1000)
         {

@@ -134,20 +134,18 @@ private slots:
 
     void test_str_dup0()
     {
-        std::unique_ptr<char, decltype(std::free) *> new_string = {str_dup0(STRING_LITERAL1), std::free};
+        std::unique_ptr<char[]> new_string(str_dup0(STRING_LITERAL1));
         QVERIFY(new_string.get() != nullptr);
         QCOMPARE(strlen(new_string.get()), strlen(STRING_LITERAL1));
-
         QCOMPARE(str_dup0(nullptr), nullptr);
     }
 
     void test_str_dup()
     {
-        std::unique_ptr<char, decltype(std::free) *> new_string = {str_dup(STRING_LITERAL1), std::free};
+        std::unique_ptr<char[]> new_string(str_dup(STRING_LITERAL1));
         QVERIFY(new_string.get() != nullptr);
         QCOMPARE(strlen(new_string.get()), strlen(STRING_LITERAL1));
-        // causes expected crash
-        // QCOMPARE(str_dup(nullptr), nullptr);
+        QCOMPARE(str_dup(nullptr), nullptr);
     }
 
     void test_dice()
@@ -176,7 +174,7 @@ private slots:
 
     void test_str_nospace()
     {
-        std::unique_ptr<char, decltype(std::free) *> result = {str_nospace("  this is a test  "), std::free};
+        std::unique_ptr<char[]> result(str_nospace("  this is a test  "));
         QVERIFY(result.get());
         QCOMPARE(result.get(), "__this_is_a_test__");
     }
@@ -217,7 +215,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
 
         Character ch(&dc);
-        ch.setName(QStringLiteral("Testsing"));
+        ch.setName(QStringLiteral("Testing"));
         ch.in_room = 3;
         ch.height = 72;
         ch.weight = 150;

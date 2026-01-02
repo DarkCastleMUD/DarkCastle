@@ -527,7 +527,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 	QString buf2;
 	qsizetype length{};
-	for (decltype(obj->num_affects) i = 0; i < obj->num_affects; i++)
+	for (decltype(obj->affected.size()) i = 0; i < obj->affected.size(); i++)
 	{
 		if ((obj->affected[i].location != APPLY_NONE) && (obj->affected[i].modifier != 0))
 		{
@@ -688,7 +688,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
 		{
 			char *tmp = gl_item((Object *)DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
 			ch->send(tmp);
-			dc_free(tmp);
+			delete[] tmp;
 		}
 		return eSUCCESS;
 	}

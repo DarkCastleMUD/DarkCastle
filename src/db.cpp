@@ -37,7 +37,6 @@ int load_debug = 0;
 #include "DC/obj.h"
 #include "DC/affect.h"
 #include "DC/db.h"
-#include "DC/memory.h"
 #include "DC/structs.h"	 // MAX_STRING_LENGTH
 #include "DC/weather.h"	 // structs
 #include "DC/timeinfo.h" // structs
@@ -145,7 +144,7 @@ void Room::FreeTracks()
 	{
 		tracks = tracks->next;
 		// trackee is a str_hsh, don't free it
-		dc_free(curr);
+		delete curr;
 	}
 	tracks = nullptr;
 	last_track = nullptr;
@@ -188,7 +187,7 @@ void Room::AddTrackItem(room_track_data *newTrack)
 		room_track_data *pScent;
 		pScent = last_track->previous;
 		pScent->next = 0;
-		dc_free(last_track);
+		delete last_track;
 		last_track = pScent;
 		nTracks--;
 	}
@@ -296,19 +295,10 @@ room_track_data *Room::TrackItem(int nIndex)
 
 void Character::add_to_bard_list(void)
 {
-	pulse_data *curr = nullptr;
-
 	if (GET_CLASS(this) != CLASS_BARD)
 		return;
 
-#ifdef LEAK_CHECK
-	curr = (struct pulse_data *)
-		calloc(1, sizeof(struct pulse_data));
-#else
-	curr = (struct pulse_data *)
-		dc_alloc(1, sizeof(struct pulse_data));
-#endif
-
+	auto curr = new struct pulse_data;
 	curr->thechar = this;
 	curr->next = DC::getInstance()->bard_list;
 	DC::getInstance()->bard_list = curr;
@@ -326,7 +316,7 @@ void Character::remove_from_bard_list(void)
 	{
 		curr = DC::getInstance()->bard_list;
 		DC::getInstance()->bard_list = DC::getInstance()->bard_list->next;
-		dc_free(curr);
+		delete curr;
 	}
 	else
 	{
@@ -336,7 +326,7 @@ void Character::remove_from_bard_list(void)
 			if (curr->thechar == this)
 			{
 				last->next = curr->next;
-				dc_free(curr);
+				delete curr;
 				break;
 			}
 			last = curr;
@@ -487,12 +477,7 @@ void load_skillquests()
 
 	while ((i = fread_int(fl, 0, 1000)) != 0)
 	{
-#ifdef LEAK_CHECK
-		newsq = (struct skill_quest *)calloc(1, sizeof(struct skill_quest));
-#else
-		newsq = (struct skill_quest *)dc_alloc(1, sizeof(struct skill_quest));
-#endif
-
+		auto newsq = new struct skill_quest;
 		newsq->num = i;
 		if (find_sq(i))
 		{
@@ -572,7 +557,7 @@ void DC::boot_db(void)
 		perror(NEW_HELP_FILE);
 		abort();
 	}
-	CREATE(new_help_table, struct help_index_element_new, help_rec_count);
+	new_help_table = new struct help_index_element_new[help_rec_count];
 	load_new_help(new_help_fl);
 	fclose(new_help_fl);
 	// end new help files
@@ -629,9 +614,6 @@ void DC::boot_db(void)
 	logverbose(QStringLiteral("Loading messages."));
 	load_messages(MESS_FILE);
 	load_messages(MESS2_FILE, 2000);
-
-	logverbose(QStringLiteral("Loading socials."));
-	boot_social_messages();
 
 	logverbose(QStringLiteral("Processing game portals..."));
 	load_game_portals();
@@ -762,7 +744,7 @@ void DC::write_wizlist(const char filename[])
 		}
 		if (entry.getLevel() >= IMMORTAL)
 		{
-			wizlist_file.write(QStringLiteral("%1 %2\n").arg(entry.getName()).arg(entry.getLevel()).toLocal8Bit());
+			wizlist_file.write(QStringLiteral("%1 %2\n").arg(entry.getName()).arg(QString::number(entry.getLevel())).toLocal8Bit());
 		}
 	}
 	wizlist_file.close();
@@ -956,7 +938,7 @@ void reset_time(void)
 		break;
 	}
 	}
-	DC::getInstance()->logverbose(QStringLiteral("Current Gametime: %1H %2D %3M %4Y.").arg(time_info.hours).arg(time_info.day).arg(time_info.month).arg(time_info.year));
+	DC::getInstance()->logverbose(QStringLiteral("Current Gametime: %1H %2D %3M %4Y.").arg(QString::number(time_info.hours)).arg(QString::number(time_info.day)).arg(QString::number(time_info.month)).arg(QString::number(time_info.year)));
 
 	weather_info.pressure = 960;
 	if ((time_info.month >= 7) && (time_info.month <= 12))
@@ -1533,7 +1515,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 			}
 			if (!found)
 			{
-				QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
+				QString error = QStringLiteral("Room %1 is outside of any zone.").arg(QString::number(room_nr));
 				logentry(error);
 				logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
 			}
@@ -1607,13 +1589,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 				// strip off the \n after the E
 				if (fread_char(fl) != '\n')
 					fseek(fl, -1, SEEK_CUR);
-#ifdef LEAK_CHECK
-				new_new_descr = (struct extra_descr_data *)
-					calloc(1, sizeof(struct extra_descr_data));
-#else
-				new_new_descr = (struct extra_descr_data *)
-					dc_alloc(1, sizeof(struct extra_descr_data));
-#endif
+				new_new_descr = new struct extra_descr_data;
 				new_new_descr->keyword = fread_string(fl, 0);
 				new_new_descr->description = fread_string(fl, 0);
 
@@ -1624,17 +1600,13 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 				}
 				else
 				{
-					dc_free(new_new_descr);
+					delete new_new_descr;
 				}
 			}
 			else if (ch == 'B')
 			{
 				struct deny_data *deni;
-#ifdef LEAK_CHECK
-				deni = (struct deny_data *)calloc(1, sizeof(struct deny_data));
-#else
-				deni = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
-#endif
+				deni = new struct deny_data;
 				deni->vnum = fread_int(fl, -1, 2147483467);
 
 				if (room_nr)
@@ -1644,7 +1616,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 				}
 				else
 				{
-					dc_free(deni);
+					delete deni;
 				}
 			}
 			else if (ch == 'S') /* end of current room */
@@ -1661,7 +1633,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 		return true;
 	} // if == $
-	  //  dc_free(temp); /* cleanup the area containing the terminal $  */
+	  //  delete temp; /* cleanup the area containing the terminal $  */
 	  // we no longer free temp, cause it's no longer used as a terminating char
 	return false;
 }
@@ -1787,7 +1759,7 @@ void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
 	if (!curr)
 	{
 		auto world_file = findWorldFileWithVNUM(modnum);
-		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(modnum));
+		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(QString::number(modnum)));
 		return;
 	}
 
@@ -1863,28 +1835,28 @@ void DC::free_world_from_memory(void)
 			continue;
 
 		if (DC::getInstance()->world[i].name)
-			dc_free(DC::getInstance()->world[i].name);
+			delete[] DC::getInstance()->world[i].name;
 
 		if (DC::getInstance()->world[i].description)
-			dc_free(DC::getInstance()->world[i].description);
+			delete[] DC::getInstance()->world[i].description;
 
 		while (DC::getInstance()->world[i].ex_description)
 		{
 			curr_extra = DC::getInstance()->world[i].ex_description->next;
 			if (DC::getInstance()->world[i].ex_description->keyword)
-				dc_free(DC::getInstance()->world[i].ex_description->keyword);
+				delete[] DC::getInstance()->world[i].ex_description->keyword;
 			if (DC::getInstance()->world[i].ex_description->description)
-				dc_free(DC::getInstance()->world[i].ex_description->description);
-			dc_free(DC::getInstance()->world[i].ex_description);
+				delete[] DC::getInstance()->world[i].ex_description->description;
+			delete DC::getInstance()->world[i].ex_description;
 			DC::getInstance()->world[i].ex_description = curr_extra;
 		}
 
 		for (int j = 0; j < 6; j++)
 			if (DC::getInstance()->world[i].dir_option[j])
 			{
-				dc_free(DC::getInstance()->world[i].dir_option[j]->general_description);
-				dc_free(DC::getInstance()->world[i].dir_option[j]->keyword);
-				dc_free(DC::getInstance()->world[i].dir_option[j]);
+				delete[] DC::getInstance()->world[i].dir_option[j]->general_description;
+				delete[] DC::getInstance()->world[i].dir_option[j]->keyword;
+				delete DC::getInstance()->world[i].dir_option[j];
 			}
 
 		DC::getInstance()->world[i].FreeTracks();
@@ -1897,7 +1869,7 @@ void DC::free_world_from_memory(void)
 	{
 
 		world_file_list = curr_wfli->next;
-		dc_free(curr_wfli);
+		delete curr_wfli;
 		curr_wfli = world_file_list;
 	}
 }
@@ -1933,11 +1905,7 @@ world_file_list_item *one_new_world_file_item(QString filename, int32_t room_nr)
 {
 	world_file_list_item *curr = nullptr;
 
-#ifdef LEAK_CHECK
-	curr = (world_file_list_item *)calloc(1, sizeof(world_file_list_item));
-#else
-	curr = (world_file_list_item *)dc_alloc(1, sizeof(world_file_list_item));
-#endif
+	curr = new world_file_list_item;
 
 	curr->filename = filename;
 	curr->firstnum = room_nr;
@@ -2070,22 +2038,16 @@ void setup_dir(FILE *fl, int room, int dir)
 		sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
 		logentry(buf, 0, DC::LogChannel::LOG_WORLD);
 		if (DC::getInstance()->world[room].dir_option[dir]->general_description)
-			dc_free(DC::getInstance()->world[room].dir_option[dir]->general_description);
+			delete[] DC::getInstance()->world[room].dir_option[dir]->general_description;
 		if (DC::getInstance()->world[room].dir_option[dir]->keyword)
-			dc_free(DC::getInstance()->world[room].dir_option[dir]->keyword);
+			delete[] DC::getInstance()->world[room].dir_option[dir]->keyword;
 
-		dc_free(DC::getInstance()->world[room].dir_option[dir]);
+		delete DC::getInstance()->world[room].dir_option[dir];
 	}
 
 	if (room)
 	{
-#ifdef LEAK_CHECK
-		DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
-			calloc(1, sizeof(struct room_direction_data));
-#else
-		DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
-			dc_alloc(1, sizeof(struct room_direction_data));
-#endif
+		DC::getInstance()->world[room].dir_option[dir] = new struct room_direction_data;
 	}
 	char *general_description = fread_string(fl, 0);
 
@@ -2408,7 +2370,6 @@ zone_t DC::read_one_zone(FILE *fl)
 	tmp = fread_int(fl, 0, 64000);
 	check = fread_string(fl, 0);
 	// a = fread_int(fl, 0, 64000);
-	/* alloc a new_new zone */
 	//*num = zon = a / 100;
 
 	auto &zones = DC::getInstance()->zones;
@@ -3487,11 +3448,7 @@ int DC::create_blank_mobile(int nr)
 	GET_RAW_CON(mob) = 11;
 	mob->height = 198;
 	mob->weight = 200;
-#ifdef LEAK_CHECK
-	mob->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-	mob->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+	mob->mobdata = new Mobile;
 	int i;
 	for (i = 0; i < ACT_MAX / ASIZE + 1; i++)
 		mob->mobdata->actflags[i] = 0;
@@ -3597,7 +3554,7 @@ void delete_mob_from_index(int nr)
 	if (nr < 0 || nr > top_of_mobt) // doesn't exist!
 		return;
 
-	dc_free(DC::getInstance()->mob_index[nr].item);
+	delete (Character *)DC::getInstance()->mob_index[nr].item;
 	// shift > items left
 	memmove(&DC::getInstance()->mob_index[nr], &DC::getInstance()->mob_index[nr + 1], ((top_of_mobt - nr) * sizeof(index_data)));
 	top_of_mobt--;
@@ -3675,7 +3632,7 @@ void delete_item_from_index(int nr)
 	if (nr < 0 || nr > top_of_objt) // doesn't exist!
 		return;
 
-	dc_free(DC::getInstance()->obj_index[nr].item);
+	delete (Object *)DC::getInstance()->obj_index[nr].item;
 
 	// shift > items left
 	memmove(&DC::getInstance()->obj_index[nr], &DC::getInstance()->obj_index[nr + 1],
@@ -3784,7 +3741,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	fl.skipWhiteSpace();
 	if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
 	{
-		logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].virt).arg(obj->ActionDescription()));
+		logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(QString::number(DC::getInstance()->obj_index[nr].virt)).arg(obj->ActionDescription()));
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
@@ -3809,8 +3766,6 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	obj->obj_flags.timer = 0;
 
 	obj->ex_description = nullptr;
-	obj->affected = nullptr;
-	obj->num_affects = 0;
 	/* *** other flags *** */
 
 	if (nr == 2866 && !obj->ActionDescription().isEmpty() && obj->ActionDescription()[0] == 'P')
@@ -3928,7 +3883,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 		tmpptr[MAX_OBJ_SDESC_LENGTH - 1] = 0;
 
 		obj->short_description = str_dup(tmpptr);
-		free(tmpptr);
+		delete[] tmpptr;
 
 		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
 	}
@@ -3969,8 +3924,6 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	obj->obj_flags.timer = 0;
 
 	obj->ex_description = nullptr;
-	obj->affected = nullptr;
-	obj->num_affects = 0;
 	/* *** other flags *** */
 
 	fscanf(fl, "%c\n", &chk);
@@ -3984,11 +3937,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 		case '\n':
 			break;
 		case 'E':
-#ifdef LEAK_CHECK
-			new_new_descr = (struct extra_descr_data *)calloc(1, sizeof(struct extra_descr_data));
-#else
-			new_new_descr = (struct extra_descr_data *)dc_alloc(1, sizeof(struct extra_descr_data));
-#endif
+			new_new_descr = new struct extra_descr_data;
 			new_new_descr->keyword = fread_string(fl, 1);
 			new_new_descr->description = fread_string(fl, 1);
 			new_new_descr->next = obj->ex_description;
@@ -4075,7 +4024,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 		tmpptr[MAX_OBJ_SDESC_LENGTH - 1] = 0;
 
 		obj->short_description = str_dup(tmpptr);
-		free(tmpptr);
+		delete[] tmpptr;
 
 		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum unknown short_description too long.");
 	}
@@ -4111,8 +4060,6 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 	obj->obj_flags.timer = 0;
 
 	obj->ex_description = nullptr;
-	obj->affected = nullptr;
-	obj->num_affects = 0;
 	// other flags
 
 	in >> chk;
@@ -4127,11 +4074,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 		case '\n':
 			break;
 		case 'E':
-#ifdef LEAK_CHECK
-			new_new_descr = (struct extra_descr_data *)calloc(1, sizeof(struct extra_descr_data));
-#else
-			new_new_descr = (struct extra_descr_data *)dc_alloc(1, sizeof(struct extra_descr_data));
-#endif
+			new_new_descr = new struct extra_descr_data;
 			new_new_descr->keyword = fread_string(in, 1);
 			new_new_descr->description = fread_string(in, 1);
 			new_new_descr->next = obj->ex_description;
@@ -4211,7 +4154,7 @@ void write_object(LegacyFile &lf, Object *obj)
 		currdesc = currdesc->next;
 	}
 
-	for (int i = 0; i < obj->num_affects; i++)
+	for (qsizetype i = 0; i < obj->affected.size(); i++)
 		fprintf(fl, "A\n"
 					"%d %d\n",
 				obj->affected[i].location,
@@ -4258,7 +4201,7 @@ std::ofstream &operator<<(std::ofstream &out, Object *obj)
 		currdesc = currdesc->next;
 	}
 
-	for (int i = 0; i < obj->num_affects; i++)
+	for (qsizetype i = 0; i < obj->affected.size(); i++)
 	{
 		out << "A\n";
 		out << obj->affected[i].location << " "
@@ -4380,7 +4323,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 		write_bitvector_csv(obj->obj_flags.more_flags, Object::more_obj_bits, fout);
 
 		char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-		for (int i = 0; i < obj->num_affects; i++)
+		for (qsizetype i = 0; i < obj->affected.size(); i++)
 		{
 			if (obj->affected[i].location < 1000)
 				sprinttype(obj->affected[i].location, apply_types, buf2);
@@ -4392,7 +4335,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 			sprintf(buf, "%s by %d", buf2, obj->affected[i].modifier);
 			fout << buf;
 
-			if (i + 1 < obj->num_affects)
+			if (i + 1 < obj->affected.size())
 			{
 				fout << " ";
 			}
@@ -4425,8 +4368,8 @@ class Object *clone_object(int nr)
 	old = ((class Object *)DC::getInstance()->obj_index[nr].item); /* cast the void pointer */
 	if (!old)
 	{
-		qWarning(qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
-		dc_free(obj);
+		qWarning(qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(QString::number(nr))));
+		delete obj;
 		return nullptr;
 	}
 
@@ -4436,25 +4379,14 @@ class Object *clone_object(int nr)
 	obj->ex_description = 0;
 	for (descr = old->ex_description; descr; descr = descr->next)
 	{
-#ifdef LEAK_CHECK
-		new_new_descr = (struct extra_descr_data *)
-			calloc(1, sizeof(struct extra_descr_data));
-#else
-		new_new_descr = (struct extra_descr_data *)
-			dc_alloc(1, sizeof(struct extra_descr_data));
-#endif
+		new_new_descr = new struct extra_descr_data;
 		new_new_descr->keyword = str_hsh(descr->keyword);
 		new_new_descr->description = str_hsh(descr->description);
 		new_new_descr->next = obj->ex_description;
 		obj->ex_description = new_new_descr;
 	}
 
-	obj->affected = (obj_affected_type *)calloc(obj->num_affects, sizeof(obj_affected_type));
-	for (int i = 0; i < obj->num_affects; i++)
-	{
-		obj->affected[i].location = old->affected[i].location;
-		obj->affected[i].modifier = old->affected[i].modifier;
-	}
+	obj->affected = old->affected;
 	obj->table = 0;
 	obj->next_skill = 0;
 	obj->next_content = 0;
@@ -4486,7 +4418,7 @@ void randomize_object_affects(Object *obj)
 		return;
 	}
 
-	for (int i = 0; i < obj->num_affects; i++)
+	for (qsizetype i = 0; i < obj->affected.size(); i++)
 	{
 		switch (obj->affected[i].location)
 		{
@@ -5194,7 +5126,7 @@ char *fread_string(QTextStream &in, bool hasher, bool *ok)
 	}
 	else
 	{
-		return strdup(qUtf8Printable(buffer));
+		return str_dup(qUtf8Printable(buffer));
 	}
 }
 
@@ -5293,24 +5225,16 @@ char *fread_string(FILE *fl, int hasher)
 			else if (hasher)
 			{
 				*pBufLast++ = '\0';
-#ifdef LEAK_CHECK
-				pAlloc = (char *)calloc(pBufLast - buf, sizeof(char));
-#else
-				pAlloc = (char *)dc_alloc(pBufLast - buf, sizeof(char));
-#endif
+				pAlloc = new char[pBufLast - buf];
 				memcpy(pAlloc, buf, pBufLast - buf);
 				temp = str_hsh(pAlloc);
-				dc_free(pAlloc);
+				delete[] pAlloc;
 				pAlloc = temp;
 			}
 			else
 			{
 				*pBufLast++ = '\0';
-#ifdef LEAK_CHECK
-				pAlloc = (char *)calloc(pBufLast - buf, sizeof(char));
-#else
-				pAlloc = (char *)dc_alloc(pBufLast - buf, sizeof(char));
-#endif
+				pAlloc = new char[pBufLast - buf];
 				memcpy(pAlloc, buf, pBufLast - buf);
 			}
 			return pAlloc;
@@ -5373,24 +5297,16 @@ char *fread_word(FILE *fl, int hasher)
 			else if (hasher)
 			{
 				*pBufLast++ = '\0';
-#ifdef LEAK_CHECK
-				pAlloc = (char *)calloc(pBufLast - buf, sizeof(char));
-#else
-				pAlloc = (char *)dc_alloc(pBufLast - buf, sizeof(char));
-#endif
+				pAlloc = new char[pBufLast - buf];
 				memcpy(pAlloc, buf, pBufLast - buf);
 				temp = str_hsh(pAlloc);
-				dc_free(pAlloc);
+				delete[] pAlloc;
 				pAlloc = temp;
 			}
 			else
 			{
 				*pBufLast++ = '\0';
-#ifdef LEAK_CHECK
-				pAlloc = (char *)calloc(pBufLast - buf, sizeof(char));
-#else
-				pAlloc = (char *)dc_alloc(pBufLast - buf, sizeof(char));
-#endif
+				pAlloc = new char[pBufLast - buf];
 				memcpy(pAlloc, buf, pBufLast - buf);
 			}
 			return pAlloc;
@@ -5829,8 +5745,8 @@ void free_char(Character *ch, Trace trace)
 
 	if (ch->tempVariable)
 	{
-		struct tempvariable *temp, *tmp;
-		for (temp = ch->tempVariable; temp; temp = tmp)
+		auto tmp = ch->tempVariable;
+		for (auto temp = ch->tempVariable; temp; temp = tmp)
 		{
 			tmp = temp->next;
 			delete temp;
@@ -5849,11 +5765,11 @@ void free_char(Character *ch, Trace trace)
 	if (IS_PC(ch))
 	{
 		if (ch->short_desc)
-			dc_free(ch->short_desc);
+			delete[] ch->short_desc;
 		if (ch->long_desc)
-			dc_free(ch->long_desc);
+			delete[] ch->long_desc;
 		if (ch->description)
-			dc_free(ch->description);
+			delete[] ch->description;
 		if (ch->player)
 		{
 			// these won't be here if you free an unloaded char
@@ -5887,8 +5803,8 @@ void free_char(Character *ch, Trace trace)
 		{
 			currmprog = ch->mobdata->mpact->next;
 			if (ch->mobdata->mpact->buf)
-				dc_free(ch->mobdata->mpact->buf);
-			dc_free(ch->mobdata->mpact);
+				delete[] ch->mobdata->mpact->buf;
+			delete ch->mobdata->mpact;
 			ch->mobdata->mpact = currmprog;
 		}
 		delete ch->mobdata;
@@ -5899,7 +5815,7 @@ void free_char(Character *ch, Trace trace)
 	}
 
 	if (ch->title)
-		dc_free(ch->title);
+		delete[] ch->title;
 	ch->title = nullptr;
 
 	remove_memory(ch, 't');
@@ -5914,16 +5830,6 @@ void free_char(Character *ch, Trace trace)
 /* release memory allocated for an obj struct */
 void free_obj(class Object *obj)
 {
-	struct extra_descr_data *ths, *next_one;
-
-	for (ths = obj->ex_description; ths; ths = next_one)
-	{
-		next_one = ths->next;
-		dc_free(ths);
-	}
-
-	dc_free(obj->affected);
-
 	delete obj;
 }
 
@@ -6655,27 +6561,7 @@ void copySaveData(Object *target, Object *source)
 			target->obj_flags.cost = source->obj_flags.cost;
 			target->obj_flags.value[1] = source->obj_flags.value[1];
 			target->obj_flags.value[2] = source->obj_flags.value[2];
-
-			// If new object does not have enough room for affects to be copied then realloc it
-			if (source->num_affects > target->num_affects)
-			{
-				errno = 0;
-				target->affected = (obj_affected_type *)realloc(target->affected,
-																(sizeof(obj_affected_type) * source->num_affects));
-				if (target->affected == nullptr)
-				{
-					perror("realloc");
-					abort();
-					exit(EXIT_FAILURE);
-				}
-				target->num_affects = source->num_affects;
-			}
-
-			for (int i = 0; i < source->num_affects; ++i)
-			{
-				target->affected[i].location = source->affected[i].location;
-				target->affected[i].modifier = source->affected[i].modifier;
-			}
+			target->affected = source->affected;
 		}
 	}
 
@@ -6744,7 +6630,7 @@ bool fullItemMatch(Object *obj, Object *obj2)
 		return false;
 	}
 
-	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->num_affects != obj2->num_affects)
+	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->affected.size() != obj2->affected.size())
 	{
 		return false;
 	}
@@ -6752,7 +6638,7 @@ bool fullItemMatch(Object *obj, Object *obj2)
 	// check if any of the affects don't match
 	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
 	{
-		for (int i = 0; i < obj->num_affects; ++i)
+		for (qsizetype i = 0; i < obj->affected.size(); ++i)
 		{
 			if ((obj->affected[i].location != obj2->affected[i].location) ||
 				(obj->affected[i].modifier != obj2->affected[i].modifier))

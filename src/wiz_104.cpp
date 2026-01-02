@@ -284,17 +284,17 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
 				Object *obj = (Object *)(DC::getInstance()->obj_index[number].item);
 				if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 				{
-					ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
+					ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(QString::number(num)));
 					return eFAILURE;
 				}
 				else if (isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
 				{
-					ch->send(QStringLiteral("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
+					ch->send(QStringLiteral("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(QString::number(num)));
 					return eFAILURE;
 				}
 				else if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
 				{
-					ch->send(QStringLiteral("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
+					ch->send(QStringLiteral("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(QString::number(num)));
 					return eFAILURE;
 				}
 			}
@@ -451,15 +451,15 @@ int Zone::show_info(Character *ch)
 					 "$3Flags:$R ")
 				 .arg(Name())
 				 .arg(filename)
-				 .arg(bottom, 6)
-				 .arg(top, 13)
+				 .arg(QString::number(bottom), 6)
+				 .arg(QString::number(top), 13)
 				 .arg(continent_name.c_str())
-				 .arg(bottom_rnum, 6)
-				 .arg(top_rnum, 13)
-				 .arg(lifespan, 6)
-				 .arg(age, 13)
-				 .arg(lifespan - age, 6)
-				 .arg(players, 4)
+				 .arg(QString::number(bottom_rnum), 6)
+				 .arg(QString::number(top_rnum), 13)
+				 .arg(QString::number(lifespan), 6)
+				 .arg(QString::number(age), 13)
+				 .arg(QString::number(lifespan - age), 6)
+				 .arg(QString::number(players), 4)
 				 .arg(zone_modes[reset_mode], -18)
 				 .arg(last_full_reset.toLocalTime().toString().toStdString().c_str())
 				 .arg(last_full_reset.toLocalTime().timeZoneAbbreviation().toStdString().c_str()));
@@ -727,7 +727,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 		ch->send(buf);
 		if (stats)
 		{
-			ch->sendln(QStringLiteral("      Last attempt: $B%1$R Last success: $B%2$R Average: $B%3$R").arg(lastStr).arg(lastSuccessStr).arg(successRate * 100.0));
+			ch->sendln(QStringLiteral("      Last attempt: $B%1$R Last success: $B%2$R Average: $B%3$R").arg(lastStr).arg(lastSuccessStr).arg(QString::number(successRate * 100.0)));
 		}
 	} // for
 
@@ -790,7 +790,7 @@ void show_legacy_files(Character *ch, world_file_list_item *head)
 			file_modified = "MODIFIED";
 		}
 
-		ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
+		ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(QString::number(i++), 3).arg(curr->filename, -30).arg(QString::number(curr->firstnum), -6).arg(QString::number(curr->lastnum), -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
 		curr = curr->next;
 	}
 }
@@ -1126,7 +1126,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 				room_t range_end = zone.getTop();
 				int num = count_rooms(range_start, range_end);
 
-				ch->send(QStringLiteral("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.Name()));
+				ch->send(QStringLiteral("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(QString::number(zone_key), 3).arg(QString::number(zone.getBottom()), 5).arg(QString::number(zone.getTop()), -5).arg(QString::number(zone.getRealBottom()), 5).arg(QString::number(zone.getRealTop()), -5).arg(QString::number(num), 5).arg(zone.Name()));
 			}
 			return eSUCCESS;
 		}
@@ -1187,7 +1187,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 		if (zon > last_room)
 		{
 
-			ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
+			ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(QString::number(zon)).arg(QString::number(last_room)));
 			return eFAILURE;
 		}
 		char buf[MAX_INPUT_LENGTH];
@@ -1694,9 +1694,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			//      int aff,total = 0;
 			//    bool found = false;
 			if (!item_type)
-				for (aff = 0;
-					 aff < ((class Object *)(DC::getInstance()->obj_index[nr].item))->num_affects;
-					 aff++)
+				for (aff = 0; aff < ((class Object *)(DC::getInstance()->obj_index[nr].item))->affected.size(); aff++)
 					if (affect == ((class Object *)(DC::getInstance()->obj_index[nr].item))->affected[aff].location)
 						found = true;
 			if (affect && !item_type)
@@ -1761,7 +1759,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			return eFAILURE;
 		}
 
-		ch->send(QStringLiteral("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
+		ch->send(QStringLiteral("$3Doors in game that use key %1$R:\r\n\r\n").arg(QString::number(count)));
 		for (i = 0; i < DC::getInstance()->top_of_world; i++)
 			for (nr = 0; nr < MAX_DIRS; nr++)
 				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
@@ -2165,8 +2163,8 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
 		}
 		prog = new mob_prog_data;
 		prog->type = ALL_GREET_PROG;
-		prog->arglist = strdup("80");
-		prog->comlist = strdup("say This is my new obj prog!\n\r");
+		prog->arglist = str_dup("80");
+		prog->comlist = str_dup("say This is my new obj prog!\n\r");
 		prog->next = nullptr;
 
 		if ((currprog = DC::getInstance()->obj_index[num].mobprogs))
@@ -2209,9 +2207,9 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
 			DC::getInstance()->obj_index[num].mobprogs = currprog->next;
 
 		currprog->type = 0;
-		dc_free(currprog->arglist);
-		dc_free(currprog->comlist);
-		dc_free(currprog);
+		delete[] currprog->arglist;
+		delete[] currprog->comlist;
+		delete currprog;
 
 		update_objprog_bits(num);
 
@@ -2310,8 +2308,8 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
 			ch->sendln("Invalid prog number.");
 			return eFAILURE;
 		}
-		dc_free(currprog->arglist);
-		currprog->arglist = strdup(argument + 1);
+		delete[] currprog->arglist;
+		currprog->arglist = str_dup(argument + 1);
 
 		ch->sendln("Arglist changed.");
 		return eSUCCESS;
@@ -2404,7 +2402,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
 
 	if (r2 < 0)
 	{
-		QString buf = QStringLiteral("new %1").arg(v2);
+		QString buf = QStringLiteral("new %1").arg(QString::number(v2));
 		int retval = ch->do_oedit(buf.split(' '));
 		if (!isSet(retval, eSUCCESS))
 			return eFAILURE;

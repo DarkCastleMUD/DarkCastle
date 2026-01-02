@@ -718,7 +718,7 @@ void update_character_singing(Character *ch)
 			if ((*j).song_data)
 			{
 				if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-					dc_free((*j).song_data);
+					delete[] (*j).song_data;
 				(*j).song_data = 0;
 			}
 			ch->songs.erase(j);
@@ -746,7 +746,7 @@ void update_character_singing(Character *ch)
 				if ((*j).song_data)
 				{
 					if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-						dc_free((*j).song_data);
+						delete[] (*j).song_data;
 					(*j).song_data = 0;
 				}
 				(*j).song_timer = 0;
@@ -769,7 +769,7 @@ void update_character_singing(Character *ch)
 				if ((*j).song_data)
 				{
 					if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-						dc_free((*j).song_data);
+						delete[] (*j).song_data;
 					(*j).song_data = 0;
 				}
 				ch->songs.erase(j);
@@ -793,7 +793,7 @@ void update_character_singing(Character *ch)
 					if ((*j).song_data)
 					{
 						if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-							dc_free((*j).song_data);
+							delete[] (*j).song_data;
 						(*j).song_data = 0;
 					}
 					ch->songs.erase(j);
@@ -923,12 +923,12 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 
 	if (!(victim = ch->get_char_room_vis((*i).song_data)))
 	{
-		dc_free((*i).song_data);
+		delete[] (*i).song_data;
 		(*i).song_data = 0;
 		ch->sendln("They seem to have left.\r\nIn the middle of your performance too!");
 		return eFAILURE;
 	}
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 
 	WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -1316,7 +1316,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
 	if (corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1))
 		corpse = nullptr;
 
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 
 	if (obj)
@@ -1799,7 +1799,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 					// free our stored char name
 					if ((*i).song_data)
 					{
-						dc_free((*i).song_data);
+						delete[] (*i).song_data;
 						(*i).song_data = 0;
 					}
 
@@ -1831,7 +1831,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 	// free our stored char name
 	if ((*i).song_data)
 	{
-		dc_free((*i).song_data);
+		delete[] (*i).song_data;
 		(*i).song_data = 0;
 	}
 
@@ -1879,11 +1879,11 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 	if (!(victim = ch->get_char_room_vis((*i).song_data)))
 	{
 		ch->sendln("You don't see that person here.");
-		dc_free((*i).song_data);
+		delete[] (*i).song_data;
 		(*i).song_data = 0;
 		return eFAILURE;
 	}
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 
 	act("$n sings to $N about beautiful rainbows.", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1953,11 +1953,11 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 	if (!(obj = get_obj_in_list((*i).song_data, DC::getInstance()->world[ch->in_room].contents)))
 	{
 		ch->sendln("You don't see that object here.");
-		dc_free((*i).song_data);
+		delete[] (*i).song_data;
 		(*i).song_data = 0;
 		return eFAILURE;
 	}
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 
 	// code to shatter a beacon
@@ -2159,7 +2159,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 
 	target = get_char((*i).song_data);
 
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 
 	act("$n's song ends and quietly fades away.", ch, 0, 0, TO_ROOM, 0);
@@ -2769,7 +2769,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
 	target = ch->get_char_room_vis((*i).song_data);
 
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 
 	act("$n's dirge ends in a shriek.", ch, 0, 0, TO_ROOM, 0);
@@ -2916,7 +2916,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 
 	target = ch->get_char_room_vis((*i).song_data);
 
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 
 	act("$n's song ends with an abrupt stop.", ch, 0, 0, TO_ROOM, 0);
@@ -3017,12 +3017,12 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
 		else
 		{
 			ch->sendln("You don't see that person here.");
-			dc_free((*i).song_data);
+			delete[] (*i).song_data;
 			(*i).song_data = 0;
 			return eFAILURE;
 		}
 	}
-	dc_free((*i).song_data);
+	delete[] (*i).song_data;
 	(*i).song_data = 0;
 	if (number(1, 100) < get_saves(victim, SAVE_TYPE_POISON))
 	{

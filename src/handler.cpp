@@ -1617,7 +1617,7 @@ void affect_total(Character *ch)
 	for (i = 0; i < MAX_WEAR; i++)
 	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			for (j = 0; j < ch->equipment[i]->affected.size(); j++)
 				affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, false);
 	}
 	remove_totem_stats(ch);
@@ -1632,7 +1632,7 @@ void affect_total(Character *ch)
 	for (i = 0; i < MAX_WEAR; i++)
 	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			for (j = 0; j < ch->equipment[i]->affected.size(); j++)
 				affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);
 	}
 	for (af = ch->affected; af; af = af->next)
@@ -1657,12 +1657,7 @@ void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_ty
 	struct affected_type *affected_alloc;
 	if (af->location >= 1000)
 		return; // Skill aff;
-#ifdef LEAK_CHECK
 	affected_alloc = new (std::nothrow) affected_type;
-#else
-	affected_alloc = new (std::nothrow) affected_type;
-	// affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
-#endif
 
 	*affected_alloc = *af;
 	affected_alloc->duration_type = duration_type;
@@ -2546,7 +2541,7 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 	this->equipment[pos] = obj;
 	obj->equipped_by = this;
 	if (IS_PC(this))
-		for (int a = 0; a < obj->num_affects; a++)
+		for (qsizetype a = 0; a < obj->affected.size(); a++)
 		{
 			if (obj->affected[a].location >= 1000)
 			{
@@ -2578,7 +2573,7 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
 		GET_AC(this) -= apply_ac(this, pos);
 
-	for (j = 0; this->equipment[pos] && j < this->equipment[pos]->num_affects; j++)
+	for (j = 0; this->equipment[pos] && j < this->equipment[pos]->affected.size(); j++)
 		affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, true, flag);
 
 	add_set_stats(this, obj, flag, pos);
@@ -2634,7 +2629,7 @@ b: // ew
 					int j;
 					if (!equipment[i])
 						continue;
-					for (j = 0; j < equipment[i]->num_affects; j++)
+					for (j = 0; j < equipment[i]->affected.size(); j++)
 					{
 						if (equipment[i]->affected[j].location > 1000)
 						{
@@ -2677,7 +2672,7 @@ b: // ew
 			DC::getInstance()->world[in_room].light--;
 	}
 
-	for (j = 0; j < obj->num_affects; j++)
+	for (j = 0; j < obj->affected.size(); j++)
 		affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, false);
 	redo_hitpoints(this);
 	redo_mana(this);
@@ -2888,13 +2883,13 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 
 Character *get_char_room(QString name, room_t room, bool careful)
 {
-	auto nameC = strdup(name.toStdString().c_str());
+	auto nameC = str_dup(qPrintable(name));
 	if (!nameC)
 	{
 		return nullptr;
 	}
 	auto ch = get_char_room(nameC, room, careful);
-	free(nameC);
+	delete[] nameC;
 	return ch;
 }
 
@@ -3774,7 +3769,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	// If I was the leader of a group, free the group name from memory
 	if (ch->group_name)
 	{
-		dc_free(ch->group_name);
+		delete[] ch->group_name;
 		ch->group_name = nullptr;
 		REMBIT(ch->affected_by, AFF_GROUP); // shrug
 	}
@@ -5067,7 +5062,7 @@ void Character::add_memory(QString victim_name, char type)
 	}
 	else if (type == 'f')
 	{
-		mobdata->fears = strdup(victim_name.toStdString().c_str());
+		mobdata->fears = str_dup(qPrintable(victim_name));
 	}
 	else if (type == 't')
 	{

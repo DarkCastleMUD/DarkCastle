@@ -36,8 +36,8 @@ void kill_hsh_tree_func(struct hash_info *leaf)
   if (leaf->right)
     kill_hsh_tree_func(leaf->right);
 
-  dc_free(leaf->name);
-  dc_free(leaf);
+  delete[] leaf->name;
+  delete leaf;
 }
 
 // Since the top of the tree is static, we have to free both sides
@@ -86,11 +86,7 @@ char *str_hsh(const char *arg)
     temp = current;
   }
 
-#ifdef LEAK_CHECK
-  current = (struct hash_info *)calloc(1, sizeof(struct hash_info));
-#else
-  current = (struct hash_info *)dc_alloc(1, sizeof(struct hash_info));
-#endif
+  current = new struct hash_info;
 
   current->right = current->left = nullptr;
   if (scratch < 0)
@@ -156,11 +152,7 @@ char *handle_ansi_(char *s, Character *ch)
     t++;
   }
 
-#ifdef LEAK_CHECK
-  t = (char *)calloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
-#else
-  t = (char *)dc_alloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
-#endif
+  t = new char[strlen(s) + numdollars * 11 + 1];
   *t = '\0';
 
   i = nullstring;

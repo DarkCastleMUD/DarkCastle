@@ -82,11 +82,7 @@ void string_hash_add(class Connection *d, char *str)
 			*(str + d->max_str) = '\0';
 			terminator = 1;
 		}
-#ifdef LEAK_CHECK
-		(*d->hashstr) = (char *)calloc(strlen(str) + 3, sizeof(char));
-#else
-		(*d->hashstr) = (char *)dc_alloc(strlen(str) + 3, sizeof(char));
-#endif
+		(*d->hashstr) = new char[strlen(str) + 3];
 		strcpy(*d->hashstr, str);
 	}
 
@@ -100,12 +96,12 @@ void string_hash_add(class Connection *d, char *str)
 
 		else
 		{
-			if (!(*d->hashstr = (char *)realloc(*d->hashstr, strlen(*d->hashstr) + strlen(str) + 3)))
-			{
-				perror("string_hash_add: ");
-				abort();
-			}
-
+			auto newsize = strlen(*d->hashstr) + strlen(str) + 3;
+			auto newstring = new char[newsize];
+			assert(newstring);
+			strncpy(newstring, *d->hashstr, newsize);
+			delete[] *d->hashstr;
+			*d->hashstr = newstring;
 			strcat(*d->hashstr, str);
 		}
 	}
@@ -113,7 +109,7 @@ void string_hash_add(class Connection *d, char *str)
 	if (terminator)
 	{
 		scan = str_hsh(*d->hashstr);
-		dc_free(*d->hashstr);
+		delete[] *d->hashstr;
 		*d->hashstr = scan;
 		d->hashstr = 0;
 		d->connected = Connection::states::PLAYING;
@@ -320,12 +316,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 			for (ed = obj->ex_description;; ed = ed->next)
 				if (!ed)
 				{ /* the field was not found. create a new_new one. */
-#ifdef LEAK_CHECK
-					ed = (struct extra_descr_data *)
-						calloc(1, sizeof(struct extra_descr_data));
-#else
-					ed = (struct extra_descr_data *)dc_alloc(1, sizeof(struct extra_descr_data));
-#endif
+					ed = new struct extra_descr_data;
 					ed->next = obj->ex_description;
 					obj->ex_description = ed;
 					ed->keyword = str_hsh(string);
@@ -370,7 +361,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 							;
 						tmp->next = ed->next;
 					}
-					dc_free(ed);
+					delete ed;
 					ch->sendln("Field deleted.");
 					return 1;
 				}
@@ -417,17 +408,9 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 					 "of a line.\r\n",
 					 ch);
 		if (type == TP_MOB && IS_PC(mob))
-#ifdef LEAK_CHECK
-			(*ch->desc->strnew) = (char *)calloc(length[field - 1], sizeof(char));
-#else
-			(*ch->desc->strnew) = (char *)dc_alloc(length[field - 1], sizeof(char));
-#endif
+			(*ch->desc->strnew) = new char[length[field - 1]];
 		else
-#ifdef LEAK_CHECK
-			(*ch->desc->hashstr) = (char *)calloc(length[field - 1], sizeof(char));
-#else
-			(*ch->desc->hashstr) = (char *)dc_alloc(length[field - 1], sizeof(char));
-#endif
+			(*ch->desc->hashstr) = new char[length[field - 1]];
 		ch->desc->max_str = length[field - 1];
 		ch->desc->connected = Connection::states::EDITING;
 	}
@@ -488,25 +471,20 @@ void DC::free_help_from_memory(void)
 
 	for (int i = 0; i < MAX_HELP; i++)
 		if (help_index[i].keyword)
-			dc_free(help_index[i].keyword);
+			delete[] help_index[i].keyword;
 
-	dc_free(help_index);
+	delete help_index;
 	help_index = nullptr;
 }
 
 struct help_index_element *build_help_index(FILE *fl, int *num)
 {
 	int nr = -1, issorted, i;
-	struct help_index_element *list = 0, mem;
 	char buf[81], tmp[81], *scan;
 	int32_t pos;
 
-#ifdef LEAK_CHECK
-	list = (struct help_index_element *)
-		calloc(MAX_HELP, sizeof(struct help_index_element));
-#else
-	list = (struct help_index_element *)dc_alloc(MAX_HELP, sizeof(struct help_index_element));
-#endif
+	help_index_element mem{};
+	auto list = new help_index_element[MAX_HELP];
 
 	for (;;)
 	{
@@ -704,7 +682,8 @@ void page_string_dep(class Connection *d, const char *str, int keep_internal)
 		return;
 	}
 
-	CREATE(d->showstr_vector, const char *, d->showstr_count = count_pages(str));
+	d->showstr_count = count_pages(str);
+	d->showstr_vector = new const char *[d->showstr_count];
 
 	if (keep_internal)
 	{
@@ -743,12 +722,12 @@ void show_string(class Connection *d, const char *input)
 
 	else if (*buf)
 	{
-		dc_free(d->showstr_vector);
+		delete[] d->showstr_vector;
 		d->showstr_vector = 0;
 		d->showstr_count = 0;
 		if (d->showstr_head)
 		{
-			dc_free(d->showstr_head);
+			delete[] d->showstr_head;
 			d->showstr_head = 0;
 		}
 		return;
@@ -760,12 +739,12 @@ void show_string(class Connection *d, const char *input)
 	{
 		// send them a carriage return first to make sure it looks right
 		send_to_char(d->showstr_vector[d->showstr_page], d->character);
-		dc_free(d->showstr_vector);
+		delete[] d->showstr_vector;
 		d->showstr_vector = 0;
 		d->showstr_count = 0;
 		if (d->showstr_head)
 		{
-			dc_free(d->showstr_head);
+			delete[] d->showstr_head;
 			d->showstr_head = nullptr;
 		}
 	}

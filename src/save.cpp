@@ -157,7 +157,7 @@ char *fread_var_string(FILE *fpsave)
   size_t records_read = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (tmp_size > 0 && records_read > 0)
   {
-    tmp_str = (char *)dc_alloc(tmp_size, sizeof(char));
+    tmp_str = new char[tmp_size];
     assert(tmp_str);
     if (tmp_str == nullptr)
     {
@@ -169,7 +169,7 @@ char *fread_var_string(FILE *fpsave)
     {
       return tmp_str;
     }
-    dc_free(tmp_str);
+    delete[] tmp_str;
   }
 
   return nullptr;
@@ -608,11 +608,7 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
   if (IS_NPC(ch))
   {
     ch->player = nullptr;
-#ifdef LEAK_CHECK
-    ch->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-    ch->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+    ch->mobdata = new Mobile;
     ch->mobdata->read(fpsave);
   }
   else
@@ -687,8 +683,7 @@ int Character::char_to_store_variable_data(FILE *fpsave)
     }
   }
 
-  struct tempvariable *mpv;
-  for (mpv = this->tempVariable; mpv; mpv = mpv->next)
+  for (auto mpv = tempVariable; mpv; mpv = mpv->next)
   {
     if (!mpv->save)
       continue;
@@ -784,12 +779,7 @@ int Character::store_to_char_variable_data(FILE *fpsave)
 
   while (!strcmp(typeflag, "MPV"))
   { // MobProgVars6
-    struct tempvariable *mpv;
-#ifdef LEAK_CHECK
-    mpv = (struct tempvariable *)calloc(1, sizeof(struct tempvariable));
-#else
-    mpv = (struct tempvariable *)dc_alloc(1, sizeof(struct tempvariable));
-#endif
+    auto mpv = new struct tempvariable;
     mpv->name = fread_var_string(fpsave);
     mpv->data = fread_var_string(fpsave);
     mpv->save = 1;
@@ -1161,44 +1151,21 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   }
   if (!strcmp("AFF", mod_type))
   {
-    fread(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
-    if (obj->affected)
-      dc_free(obj->affected);
-
-#ifdef LEAK_CHECK
-    obj->affected = (obj_affected_type *)calloc(obj->num_affects, sizeof(obj_affected_type));
-#else
-    obj->affected = (obj_affected_type *)dc_alloc(obj->num_affects, sizeof(obj_affected_type));
-#endif
-
-    for (j = 0; j < obj->num_affects; j++)
+    qsizetype num_affects{};
+    fread(&num_affects, sizeof(num_affects), 1, fpsave);
+    obj->affected = QList<obj_affected_type>(num_affects);
+    for (j = 0; j < obj->affected.size(); j++)
     {
       fread(&obj->affected[j].location, sizeof(obj->affected[j].location), 1, fpsave);
       fread(&obj->affected[j].modifier, sizeof(obj->affected[j].modifier), 1, fpsave);
     }
-
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("RPR", mod_type))
   {
-    struct obj_affected_type *a;
-#ifdef LEAK_CHECK
-    a = (obj_affected_type *)calloc(obj->num_affects + 1, sizeof(obj_affected_type));
-#else
-    a = (obj_affected_type *)dc_alloc(obj->num_affects + 1, sizeof(obj_affected_type));
-#endif
-    int i;
-    for (i = 0; i < obj->num_affects; i++)
-    {
-      a[i].location = obj->affected[i].location;
-      a[i].modifier = obj->affected[i].modifier;
-    }
-    if (obj->affected)
-      dc_free(obj->affected);
-    a[i].location = APPLY_DAMAGED;
-    fread(&a[i].modifier, sizeof(a[i].modifier), 1, fpsave);
-    obj->affected = a;
-    obj->num_affects++;
+    obj->affected = QList<obj_affected_type>(1);
+    obj->affected[0].location = APPLY_DAMAGED;
+    fread(&obj->affected[0].modifier, sizeof(obj->affected[0].modifier), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("NAM", mod_type))
@@ -1464,15 +1431,15 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
       fwrite("WEI", sizeof(char), 3, fpsave);
       fwrite(&tmp_weight, sizeof(tmp_weight), 1, fpsave);
     }
-    change = (obj->num_affects != standard_obj->num_affects);
+    change = (obj->affected.size() != standard_obj->affected.size());
     // since they aren't always in the same order (builder might have swapped them in an
     // rsave or something) we have to search through for each one to see if they are there,
     // just in a different spot
-    for (iAffect = 0; (iAffect < obj->num_affects) && !change; iAffect++)
+    for (iAffect = 0; (iAffect < obj->affected.size()) && !change; iAffect++)
     {
       // set it to changed, and if we find it, set it back to unchanged, then continue prior loop
       change = 1;
-      for(iAff2 = 0; (iAff2 < obj->num_affects) && change; iAff2++)
+      for(iAff2 = 0; (iAff2 < obj->affected.size()) && change; iAff2++)
         if( (obj->affected[iAffect].location == standard_obj->affected[iAff2].location) ||
             (obj->affected[iAffect].modifier == standard_obj->affected[iAff2].modifier))
           change = 0;
@@ -1482,8 +1449,9 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
   {
     fwrite("AFF", sizeof(char), 3, fpsave);
-    fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
-    for (int iAffect = 0; iAffect < obj->num_affects; iAffect++)
+    auto num_affects = obj->affected.size();
+    fwrite(&num_affects, sizeof(num_affects), 1, fpsave);
+    for (int iAffect = 0; iAffect < obj->affected.size(); iAffect++)
     {
       fwrite(&obj->affected[iAffect].location, sizeof(obj->affected[iAffect].location), 1, fpsave);
       fwrite(&obj->affected[iAffect].modifier, sizeof(obj->affected[iAffect].modifier), 1, fpsave);
@@ -1491,8 +1459,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   }
   else
   { // non-custom objects only get the damaged affect copied by way of RPR
-    int i;
-    for (i = 0; i < obj->num_affects; i++)
+    for (qsizetype i = 0; i < obj->affected.size(); i++)
     {
       if (obj->affected[i].location == APPLY_DAMAGED)
       {

@@ -182,8 +182,8 @@ void mobile_activity(void)
       for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
       {
         tmp2_act = tmp_act->next;
-        dc_free(tmp_act->buf);
-        dc_free(tmp_act);
+        delete[] tmp_act->buf;
+        delete tmp_act;
       }
       ch->mobdata->mpactnum = 0;
       ch->mobdata->mpact = nullptr;

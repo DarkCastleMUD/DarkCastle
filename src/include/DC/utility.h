@@ -33,7 +33,6 @@
 #include "DC/DC.h"
 #include "DC/structs.h"
 #include "DC/weather.h"
-#include "DC/memory.h"
 #include "DC/player.h"
 #include "DC/character.h"
 #include "DC/Trace.h"
@@ -112,48 +111,6 @@ bool is_hiding(Character *ch, Character *vict);
                                                   // where we could check to see if we were in an editor first.
 
 #define CAP(st) (*(st) = UPPER(*(st)), st)
-
-#ifdef LEAK_CHECK
-#define CREATE(result, type, number)                            \
-   do                                                           \
-   {                                                            \
-      if (!((result) = (type *)calloc((number), sizeof(type)))) \
-      {                                                         \
-         perror("calloc failure in CREATE: ");                  \
-         abort();                                               \
-      }                                                         \
-   } while (0)
-#else
-#define CREATE(result, type, number)                              \
-   do                                                             \
-   {                                                              \
-      if (!((result) = (type *)dc_alloc((number), sizeof(type)))) \
-      {                                                           \
-         perror("calloc failure in CREATE: ");                    \
-         abort();                                                 \
-      }                                                           \
-   } while (0)
-#endif
-
-#define RECREATE(result, type, number)                                         \
-   do                                                                          \
-   {                                                                           \
-      if (!((result) = (type *)dc_realloc((result), sizeof(type) * (number)))) \
-      {                                                                        \
-         perror("realloc failure in RECREATE");                                \
-         abort();                                                              \
-      }                                                                        \
-   } while (0)
-
-#define FREE(p)           \
-   do                     \
-   {                      \
-      if ((p) != nullptr) \
-      {                   \
-         dc_free((p));    \
-         (p) = 0;         \
-      }                   \
-   } while (0)
 
 #define ASIZE 32 // don't change unless you want to be screwed
 #define SETBIT(var, bit) ((var)[(bit) / ASIZE] |= (1 << (((bit) - (((bit) / ASIZE) * ASIZE) - 1))))

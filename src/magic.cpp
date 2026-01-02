@@ -2666,28 +2666,17 @@ int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, class 
   ch->sendln("This spell being revamped, sorry.");
   return eFAILURE;
 
-  if ((GET_ITEM_TYPE(obj) == ITEM_WEAPON) &&
-      !isSet(obj->obj_flags.extra_flags, ITEM_MAGIC))
+  if ((GET_ITEM_TYPE(obj) == ITEM_WEAPON) && !isSet(obj->obj_flags.extra_flags, ITEM_MAGIC))
   {
-
-    if (obj->affected)
+    if (!obj->affected.isEmpty())
       return eFAILURE;
 
-    SET_BIT(obj->obj_flags.extra_flags, ITEM_MAGIC);
-    obj->num_affects = 2;
-#ifdef LEAK_CHECK
-    obj->affected = (obj_affected_type *)calloc(obj->num_affects, sizeof(obj_affected_type));
-#else
-    obj->affected = (obj_affected_type *)dc_alloc(obj->num_affects, sizeof(obj_affected_type));
-#endif
-
+    obj->affected = QList<obj_affected_type>(2);
     obj->affected[0].location = APPLY_HITROLL;
-    obj->affected[0].modifier = 4 + (level >= 18) + (level >= 38) +
-                                (level >= 48) + (level >= DEITY);
-
+    obj->affected[0].modifier = 4 + (level >= 18) + (level >= 38) + (level >= 48) + (level >= DEITY);
     obj->affected[1].location = APPLY_DAMROLL;
-    obj->affected[1].modifier = 4 + (level >= 20) + (level >= 40) + (level >= DC::MAX_MORTAL_LEVEL) +
-                                (level >= DEITY);
+    obj->affected[1].modifier = 4 + (level >= 20) + (level >= 40) + (level >= DC::MAX_MORTAL_LEVEL) + (level >= DEITY);
+    SET_BIT(obj->obj_flags.extra_flags, ITEM_MAGIC);
 
     if (IS_GOOD(ch))
     {
@@ -3278,7 +3267,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
       if (DC::getInstance()->obj_index[obj->item_number].virt == 514)
       {
         int i = 0;
-        for (i = 0; i < obj->num_affects; i++)
+        for (i = 0; i < obj->affected.size(); i++)
           if (obj->affected[i].location == APPLY_MANA_REGEN)
             return eSUCCESS; // only do it once
         SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
@@ -3329,7 +3318,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
         {
           int i = 0;
-          for (i = 0; i < obj->num_affects; i++)
+          for (i = 0; i < obj->affected.size(); i++)
             if (obj->affected[i].location == APPLY_MANA_REGEN)
               break; // only do it once
           SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
@@ -3360,7 +3349,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
         {
           int i = 0;
-          for (i = 0; i < obj->num_affects; i++)
+          for (i = 0; i < obj->affected.size(); i++)
             if (obj->affected[i].location == APPLY_MANA_REGEN)
               break; // only do it once
           SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
@@ -4754,7 +4743,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     found = false;
 
-    for (i = 0; i < obj->num_affects; i++)
+    for (i = 0; i < obj->affected.size(); i++)
     {
       if ((obj->affected[i].location != APPLY_NONE) &&
           (obj->affected[i].modifier != 0))

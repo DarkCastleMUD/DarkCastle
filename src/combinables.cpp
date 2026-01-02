@@ -249,7 +249,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  for (int j = 0; j < weapon->num_affects; j++)
+  for (qsizetype j = 0; j < weapon->affected.size(); j++)
     if (weapon->affected[j].location == WEP_THIEF_POISON)
     {
       ch->sendln("Your weapon is already poisoned.");

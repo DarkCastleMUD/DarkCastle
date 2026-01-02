@@ -215,7 +215,7 @@ auto &operator<<(auto &out, extra_descr_data *currdesc)
 
 void affects_to_file(auto &out, Object *obj)
 {
-  for (int i = 0; i < obj->num_affects; i++)
+  for (qsizetype i = 0; i < obj->affected.size(); i++)
   {
     out << "A\n";
     out << obj->affected[i].location << " " << obj->affected[i].modifier << "\n";
@@ -386,7 +386,6 @@ bool fullItemMatch(Object *obj, Object *obj2);
 bool has_random(Object *obj);
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
 void load_messages(char *file, int base = 0);
-void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);
 void find_unordered_objects(void);

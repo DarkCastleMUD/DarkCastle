@@ -109,18 +109,16 @@ public:
               SEND_TO_Q("String too long - Truncated.\r\n", ch->desc);
               contents[ch->desc->max_str] = '\0';
             }
-            CREATE(*ch->desc->strnew, char, contents.size() + 5);
+            *ch->desc->strnew = new char[contents.size() + 5];
             strcpy(*ch->desc->strnew, contents.c_str());
           }
           else
           {
-            if (!(*ch->desc->strnew = (char *)dc_realloc(*ch->desc->strnew,
-                                                         strlen(*ch->desc->strnew) + contents.size() + 5)))
-            {
-              perror("string_add");
-              abort();
-            }
-            strcpy(*ch->desc->strnew, contents.c_str());
+            auto buffer = new char[strlen(*ch->desc->strnew) + contents.size() + 5];
+            strcpy(buffer, *ch->desc->strnew);
+            delete[] *ch->desc->strnew;
+            *ch->desc->strnew = buffer;
+            strcat(*ch->desc->strnew, contents.c_str());
           }
           ch->desc->web_connected = Connection::states::PLAYING;
           result = *(ch->desc->strnew);

@@ -1035,7 +1035,7 @@ void stop_guarding(Character *guard)
 
 void start_guarding(Character *guard, Character *victim)
 {
-  follow_type *curr = (struct follow_type *)dc_alloc(1, sizeof(struct follow_type));
+  auto curr = new struct follow_type;
 
   curr->follower = guard;
   curr->next = victim->guarded_by;
@@ -1057,7 +1057,7 @@ void stop_guarding_me(Character *victim)
     curr->follower->guarding = nullptr;
     last = curr;
     curr = curr->next;
-    dc_free(last);
+    delete last;
   }
 
   victim->guarded_by = nullptr;

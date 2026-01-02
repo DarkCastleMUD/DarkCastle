@@ -880,7 +880,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
     if (!CAN_WEAR(obj, i))
       continue;
     int ac = 0 - obj->obj_flags.value[0];
-    for (int z = 0; z < obj->num_affects; z++)
+    for (qsizetype z = 0; z < obj->affected.size(); z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",

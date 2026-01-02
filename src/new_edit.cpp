@@ -197,7 +197,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
          else
             total_len--;
          *t = '\0';
-         RECREATE(*d->strnew, char, strlen(*d->strnew) + 3);
+         *d->strnew = new char[strlen(*d->strnew) + 3];
          sprintf(buf, "%d line%sdeleted.\r\n", total_len,
                  ((total_len != 1) ? "s " : " "));
          SEND_TO_Q(buf, d);
@@ -407,7 +407,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
          strncat(buf, buf2, 32768 - strlen(buf) - 1);
          if (s && (*s != '\0'))
             strncat(buf, s, 32768 - strlen(buf) - 1);
-         RECREATE(*d->strnew, char, strlen(buf) + 3);
+         *d->strnew = new char[strlen(buf) + 3];
          strcpy(*d->strnew, buf);
          SEND_TO_Q("Line inserted.\r\n", d);
       }
@@ -479,7 +479,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
             return;
          }
          /* change the size of the REAL buffer to fit the new text */
-         RECREATE(*d->strnew, char, strlen(buf) + 3);
+         *d->strnew = new char[strlen(buf) + 3];
          strcpy(*d->strnew, buf);
          SEND_TO_Q("Line changed.\r\n", d);
       }
@@ -511,7 +511,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
    if ((int)(strlen(*string) - strlen(pattern)) + (int)strlen(replacement) > max_size)
       return -1;
 
-   CREATE(replace_buffer, char, max_size);
+   replace_buffer = new char[max_size];
    i = 0;
    jetsam = *string;
    flow = *string;
@@ -553,10 +553,10 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
       return 0;
    if (i > 0)
    {
-      RECREATE(*string, char, strlen(replace_buffer) + 3);
+      *string = new char[strlen(replace_buffer) + 3];
       strcpy(*string, replace_buffer);
    }
-   free(replace_buffer);
+   delete[] replace_buffer;
    return i;
 }
 
@@ -670,7 +670,7 @@ void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
 
    if ((int)strlen(formated) > maxlen)
       formated[maxlen] = '\0';
-   RECREATE(*ptr_string, char, MIN(maxlen, (int)strlen(formated) + 3));
+   *ptr_string = new char[MIN(maxlen, (int)strlen(formated) + 3)];
    strcpy(*ptr_string, formated);
 }
 
@@ -776,7 +776,7 @@ void new_string_add(class Connection *d, char *str)
          SEND_TO_Q("String too long - Truncated.\r\n", d);
          *(str + d->max_str) = '\0';
       }
-      CREATE(*d->strnew, char, strlen(str) + 5);
+      *d->strnew = new char[strlen(str) + 5];
       strcpy(*d->strnew, str);
    }
    else
@@ -788,7 +788,10 @@ void new_string_add(class Connection *d, char *str)
       }
       else
       {
-         if (!(*d->strnew = (char *)dc_realloc(*d->strnew, strlen(*d->strnew) + strlen(str) + 5)))
+         if (*d->strnew)
+            delete[] *d->strnew;
+         *d->strnew = new char[strlen(*d->strnew) + strlen(str) + 5];
+         if (!*d->strnew)
          {
             perror("string_add");
             abort();
@@ -803,7 +806,7 @@ void new_string_add(class Connection *d, char *str)
       if (terminator == 2 || *(d->strnew) == nullptr)
       {
          if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew))
-            dc_free(*d->strnew);
+            delete[] *d->strnew;
          if (d->backstr)
          {
             *d->strnew = d->backstr;
@@ -811,7 +814,7 @@ void new_string_add(class Connection *d, char *str)
          else
          {
             //         *d->strnew = nullptr;
-            *d->strnew = strdup("");
+            *d->strnew = str_dup("");
          }
          d->backstr = nullptr;
          d->strnew = nullptr;
@@ -848,7 +851,7 @@ void new_string_add(class Connection *d, char *str)
             if (STATE(d) == Connection::states::EXDSCR)
                d->character->save_char_obj();
             if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
-               dc_free(*d->strnew);
+               delete[] *d->strnew;
             d->backstr = nullptr;
             d->strnew = nullptr;
             if (d->connected == Connection::states::WRITE_BOARD)

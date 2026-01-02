@@ -218,11 +218,11 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
             upper_argument, GET_NAME(ch));
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_HELP);
 
-    dc_free(upper_argument);
+    delete[] upper_argument;
     return eFAILURE;
   }
 
-  dc_free(upper_argument);
+  delete[] upper_argument;
   int a = ch->getLevel() == 0 ? 1 : ch->getLevel();
   if (this_help->min_level > a)
   {
@@ -698,9 +698,10 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  FREE(new_help_table);
+  if (new_help_table)
+    delete[] new_help_table;
   DC::getInstance()->new_top_of_helpt = 0;
-  CREATE(new_help_table, struct help_index_element_new, help_rec_count);
+  new_help_table = new struct help_index_element_new[help_rec_count];
   ret = load_new_help(new_help_fl, 1, ch);
   fclose(new_help_fl);
 
@@ -762,7 +763,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     new_help.min_level = 75;
     new_help.entry = str_hsh("Blank help file!\r\n");
 
-    RECREATE(new_help_table, struct help_index_element_new, DC::getInstance()->new_top_of_helpt + 1);
+    new_help_table = new struct help_index_element_new[DC::getInstance()->new_top_of_helpt + 1];
     new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
     sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", DC::getInstance()->new_top_of_helpt, buf2);
     ch->send(buf);

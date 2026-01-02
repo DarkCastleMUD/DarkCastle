@@ -35,42 +35,18 @@ extern int drink_aff[][3];
 
 void add_obj_affect(Object *obj, int loc, int mod)
 {
-  obj->num_affects++;
-#ifdef LEAK_CHECK
-  obj->affected = (obj_affected_type *)realloc(obj->affected,
-                                               (sizeof(obj_affected_type) * obj->num_affects));
-#else
-  obj->affected = (obj_affected_type *)dc_realloc(obj->affected,
-                                                  (sizeof(obj_affected_type) * obj->num_affects));
-#endif
-  obj->affected[obj->num_affects - 1].location = loc;
-  obj->affected[obj->num_affects - 1].modifier = mod;
+  obj->affected.push_back({.location = loc, .modifier = mod});
 }
 
-void remove_obj_affect_by_index(Object *obj, int index)
+void remove_obj_affect_by_index(Object *obj, qsizetype index)
 {
-  // shift everyone to right of the one we're deleting to the left
-  // TODO - redo this with memmove
-  for (int i = index; i < obj->num_affects - 1; i++)
-  {
-    obj->affected[i].location = obj->affected[i + 1].location;
-    obj->affected[i].modifier = obj->affected[i + 1].modifier;
-  }
-
-  // remove the last unused affect
-  obj->num_affects--;
-  if (obj->num_affects)
-    obj->affected = (obj_affected_type *)realloc(obj->affected, (sizeof(obj_affected_type) * obj->num_affects));
-  else
-  {
-    dc_free(obj->affected);
-    obj->affected = nullptr;
-  }
+  if (index < obj->affected.size())
+    obj->affected.remove(index);
 }
 
 void remove_obj_affect_by_type(Object *obj, int loc)
 {
-  for (int i = 0; i < obj->num_affects; i++)
+  for (qsizetype i = 0; i < obj->affected.size(); i++)
     if (obj->affected[i].location == loc)
       remove_obj_affect_by_index(obj, i);
 }
@@ -112,7 +88,7 @@ int eq_max_damage(Object *obj)
 
 int eq_current_damage(Object *obj)
 {
-  for (int i = 0; i < obj->num_affects; i++)
+  for (int i = 0; i < obj->affected.size(); i++)
     if (obj->affected[i].location == APPLY_DAMAGED)
       return (obj->affected[i].modifier);
 
@@ -123,7 +99,7 @@ int eq_current_damage(Object *obj)
 // it gets damaged again, we don't have to realloc the affect list again
 void eq_remove_damage(Object *obj)
 {
-  for (int i = 0; i < obj->num_affects; i++)
+  for (int i = 0; i < obj->affected.size(); i++)
     if (obj->affected[i].location == APPLY_DAMAGED)
     {
       obj->affected[i].modifier = 0;
@@ -141,7 +117,7 @@ int damage_eq_once(Object *obj)
     return 0;
   }
   // look for existing damage
-  for (int i = 0; i < obj->num_affects; i++)
+  for (int i = 0; i < obj->affected.size(); i++)
     if (obj->affected[i].location == APPLY_DAMAGED)
     {
       obj->affected[i].modifier++;
@@ -888,7 +864,7 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
 
   // only free PC short descs
   if (GET_SHORT_ONLY(ch) && IS_PC(ch))
-    dc_free(GET_SHORT_ONLY(ch));
+    delete[] GET_SHORT_ONLY(ch);
 
   if (IS_NPC(ch))
     GET_SHORT_ONLY(ch) = str_hsh(buf);
@@ -1544,7 +1520,7 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   int mod = 0;
 
   // find out if the item affects the person's height
-  for (j = 0; j < obj->num_affects; j++)
+  for (j = 0; j < obj->affected.size(); j++)
     if (obj->affected[j].location == APPLY_CHAR_HEIGHT)
       mod += obj->affected[j].modifier;
 
@@ -2693,7 +2669,7 @@ void Character::heightweight(bool add)
   for (i = 0; i < MAX_WEAR; i++)
   {
     if (this->equipment[i])
-      for (j = 0; j < this->equipment[i]->num_affects; j++)
+      for (j = 0; j < this->equipment[i]->affected.size(); j++)
       {
         if (this->equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
           affect_modify(this, this->equipment[i]->affected[j].location,
@@ -2758,7 +2734,6 @@ Object::Object(Object *old, QObject *parent)
   item_number = old->item_number;
   vroom = old->vroom;
   obj_flags = old->obj_flags;
-  // num_affects
   // obj_affected_type *affected = {};
   long_description = str_hsh(old->long_description);
   short_description = str_hsh(old->short_description);
@@ -2778,6 +2753,16 @@ Object::Object(Object *old, QObject *parent)
   owner_ = old->owner_;
   name_ = old->name_;
   action_description_ = old->action_description_;
+}
+
+Object::~Object(void)
+{
+  auto ths = ex_description, next_one = ex_description;
+  for (; ths; ths = next_one)
+  {
+    next_one = ths->next;
+    delete ths;
+  }
 }
 
 bool Object::isDark(void)

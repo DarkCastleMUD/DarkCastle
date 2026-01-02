@@ -42,28 +42,28 @@ void sort_vault(const vault_data &vault, struct sorted_vault &sv);
 struct vault_data
 {
   QString owner;
-  unsigned int size;
-  unsigned int weight;
-  uint64_t gold;
+  unsigned int size{};
+  unsigned int weight{};
+  uint64_t gold{};
 
-  struct vault_access_data *access;
-  struct vault_items_data *items;
+  struct vault_access_data *access{};
+  struct vault_items_data *items{};
 
-  struct vault_data *next;
+  struct vault_data *next{};
 };
 
 struct vault_access_data
 {
   QString name;
-  struct vault_access_data *next;
+  struct vault_access_data *next{};
 };
 
 struct vault_items_data
 {
   int item_vnum;
   int count;
-  Object *obj; // for full-save items
-  struct vault_items_data *next;
+  Object *obj{}; // for full-save items
+  struct vault_items_data *next{};
 };
 
 struct sorted_vault

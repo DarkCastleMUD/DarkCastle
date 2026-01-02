@@ -116,11 +116,7 @@ void record_track_data(Character *ch, cmd_t cmd)
 	if (DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_SWIM || DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_NOSWIM)
 		return;
 
-#ifdef LEAK_CHECK
-	newScent = (room_track_data *)calloc(1, sizeof(struct room_track_data));
-#else
-	newScent = (room_track_data *)dc_alloc(1, sizeof(struct room_track_data));
-#endif
+	newScent = new room_track_data;
 	auto valid_dir = getDirectionFromCommand(cmd);
 	if (valid_dir)
 		newScent->direction = *valid_dir;

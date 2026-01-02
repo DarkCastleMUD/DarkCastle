@@ -61,11 +61,7 @@ int load_quests(void)
    while (fgetc(fl) != '$')
    {
 
-#ifdef LEAK_CHECK
-      quest = (struct quest_info *)calloc(1, sizeof(struct quest_info));
-#else
-      quest = (struct quest_info *)dc_alloc(1, sizeof(struct quest_info));
-#endif
+      quest = new struct quest_info;
 
       quest->number = fread_int(fl, 0, 32768);
       quest->name = fread_string(fl, 1);
@@ -171,11 +167,7 @@ int do_add_quest(Character *ch, char *name)
 {
    struct quest_info *quest; // new quest
 
-#ifdef LEAK_CHECK
-   quest = (struct quest_info *)calloc(1, sizeof(struct quest_info));
-#else
-   quest = (struct quest_info *)dc_alloc(1, sizeof(struct quest_info));
-#endif
+   quest = new struct quest_info;
 
    quest->name = str_hsh(name);
    quest->hint1 = str_hsh(" ");
@@ -1504,7 +1496,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
          {
             char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
-            dc_free(buffer);
+            delete[] buffer;
          }
       }
       for (int qvnum = 27943; qvnum <= 27953; qvnum++)
@@ -1514,7 +1506,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
          {
             char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
-            dc_free(buffer);
+            delete[] buffer;
          }
       }
       for (int qvnum = 3124; qvnum <= 3128; qvnum++)
@@ -1524,7 +1516,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
          {
             char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
-            dc_free(buffer);
+            delete[] buffer;
          }
       }
       for (int qvnum = 3151; qvnum <= 3158; qvnum++)
@@ -1534,7 +1526,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
          {
             char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
-            dc_free(buffer);
+            delete[] buffer;
          }
       }
    }

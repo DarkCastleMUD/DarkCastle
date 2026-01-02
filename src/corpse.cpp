@@ -167,9 +167,9 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
 			GET_OBJ_TYPE(obj),
 			GET_OBJ_WEAR(obj),
 			(GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
-			GET_OBJ_COST(obj), obj->num_affects);
+			GET_OBJ_COST(obj), obj->affected.size());
 	/* Do we have affects? */
-	for (counter = 0; counter < obj->num_affects; counter++)
+	for (counter = 0; counter < obj->affected.size(); counter++)
 		if (obj->affected[counter].modifier)
 			fprintf(fp, "A\n"
 						"%d %d\n",
@@ -417,17 +417,8 @@ void DC::load_corpses(void)
 				temp->obj_flags.wear_flags = ObjectPositions::fromInt(t[1]);
 				temp->obj_flags.weight = (t[2] > 0 ? t[2] : 0);
 				temp->obj_flags.cost = t[3];
-				size_t alloc_num_affects = std::max(0, t[4]);
-
-				temp->affected = (obj_affected_type *)calloc(alloc_num_affects, sizeof(obj_affected_type));
-
 				/* buf2 is error codes pretty much */
 				sprintf(buf2, ", after numeric constants (expecting E/#xxx)");
-
-				/* we're clearing these for good luck */
-
-				temp->num_affects = 0; // Cleared, No memory has previously
-									   // been assigned to 'em
 
 				/* You have to null out the extradescs when you're parsing a xap_obj.
 				 This is done right before the extradescs are read. */
@@ -443,7 +434,7 @@ void DC::load_corpses(void)
 					switch (*line)
 					{
 					case 'E':
-						CREATE(new_descr, struct extra_descr_data, 1);
+						new_descr = new struct extra_descr_data;
 						new_descr->keyword = fread_string_new(fp, buf2);
 						new_descr->description = fread_string_new(fp, buf2);
 						new_descr->next = temp->ex_description;
@@ -453,10 +444,7 @@ void DC::load_corpses(void)
 					case 'A':
 						get_line_new(fp, line);
 						sscanf(line, "%d %d", t, t + 1);
-
-						temp->affected[temp->num_affects].location = t[0];
-						temp->affected[temp->num_affects].modifier = t[1];
-						temp->num_affects++;
+						temp->affected.push_back({.location = t[0], .modifier = t[1]});
 						get_line_new(fp, line);
 						break;
 
@@ -473,11 +461,6 @@ void DC::load_corpses(void)
 						break;
 					}
 				} /* exit our for loop */
-				if (alloc_num_affects != temp->num_affects)
-				{
-					logf(0, DC::LogChannel::LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
-						 alloc_num_affects, temp->num_affects);
-				}
 			}
 			else
 			{ /* exit our xap loop */
@@ -642,7 +625,7 @@ char *fread_string_new(FILE *fl, char *error)
 	/* allocate space for the new std::string and copy it */
 	if (strlen(buf) > 0)
 	{
-		CREATE(rslt, char, length + 1);
+		rslt = new char[length + 1];
 		strcpy(rslt, buf);
 	}
 	else

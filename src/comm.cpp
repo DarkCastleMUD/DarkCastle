@@ -238,7 +238,7 @@ int DC::write_hotboot_file(void)
   if (cwd != nullptr)
   {
     logentry(QStringLiteral("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
-    free(cwd);
+    delete[] cwd;
   }
 
   ssh.close();
@@ -1501,7 +1501,7 @@ void DC::free_buff_pool_from_memory(void)
   while (bufpool)
   {
     curr = bufpool->next;
-    dc_free(bufpool);
+    delete bufpool;
     bufpool = curr;
   }
 }
@@ -2277,9 +2277,9 @@ int close_socket(class Connection *d)
   REMOVE_FROM_LIST(d, DC::getInstance()->descriptor_list, next);
 
   if (d->showstr_head)
-    dc_free(d->showstr_head);
+    delete[] d->showstr_head;
   if (d->showstr_count)
-    dc_free(d->showstr_vector);
+    delete[] d->showstr_vector;
 
   delete d;
   d = nullptr;
@@ -2550,7 +2550,7 @@ void send_to_char_nosp(const char *messg, Character *ch)
 {
   char *tmp = str_nospace(messg);
   ch->send(tmp);
-  dc_free(tmp);
+  delete[] tmp;
 }
 
 void send_to_char_nosp(QString messg, Character *ch)

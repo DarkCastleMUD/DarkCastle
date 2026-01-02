@@ -572,7 +572,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "$n disbands $s group: %s", k->group_name);
     act(buf, k, 0, 0, TO_ROOM, 0);
 
-    dc_free(k->group_name);
+    delete[] k->group_name;
     k->group_name = 0;
 
     if (IS_PC(k))

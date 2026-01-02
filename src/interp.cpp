@@ -132,7 +132,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(getName()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(QString::number(cstack.getDepth())).arg(QString::number(cstack.getMax())).arg(getName()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     return logcmd.setReturn(eFAILURE, "cstack exceeded");
   }
@@ -389,15 +389,15 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       // Normal dispatch
       if (found->getFunction1())
       {
-        auto c = strdup(command_arguments.toStdString().c_str());
+        auto c = str_dup(qPrintable(command_arguments));
         retval = (*(found->getFunction1()))(this, c, found->getNumber());
-        free(c);
+        delete[] c;
       }
       else if (found->getFunction1b())
       {
-        auto c = strdup(command_arguments.toStdString().c_str());
+        auto c = str_dup(qPrintable(command_arguments));
         retval = (*(found->getFunction1b()))(this, c, found->getNumber());
-        free(c);
+        delete[] c;
       }
       else if (found->getFunction2())
       {
@@ -451,7 +451,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     return logcmd.setReturn(eFAILURE, QStringLiteral("paralyzed"));
   }
   // Check social table
-  if ((retval = this->check_social(pcomm)))
+  if ((retval = check_social(pcomm)))
   {
     if (SOCIAL_true_WITH_NOISE == retval)
       return check_ethereal_focus(this, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
@@ -1188,13 +1188,8 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
 void Character::add_command_lag(cmd_t cmd, int lag)
 {
   command_lag *cmdl;
-#ifdef LEAK_CHECK
-  cmdl = (command_lag *)
-      calloc(1, sizeof(command_lag));
-#else
-  cmdl = (command_lag *)
-      dc_alloc(1, sizeof(command_lag));
-#endif
+  cmdl = new command_lag;
+
   cmdl->next = DC::getInstance()->getCommandLag();
   DC::getInstance()->setCommandLag(cmdl);
   cmdl->ch = this;
@@ -1229,7 +1224,7 @@ void pulse_command_lag()
         DC::getInstance()->setCommandLag(cmdl->next);
 
       cmdl->ch = 0;
-      dc_free(cmdl);
+      delete cmdl;
     }
     else
       cmdlp = cmdl;

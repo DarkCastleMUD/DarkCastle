@@ -263,7 +263,7 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("This item is unrepairable.");
     return eFAILURE;
   }
-  for (i = 0; i < obj->num_affects; i++)
+  for (qsizetype i = 0; i < obj->affected.size(); i++)
   {
     if (obj->affected[i].location == APPLY_DAMAGED)
     {
@@ -274,13 +274,11 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
         return eSUCCESS;
       }
       found = true;
-      obj->num_affects--;
-    }
-    else if (found)
-    {
-      obj->affected[i - 1] = obj->affected[i];
+      obj->affected.remove(i);
+      break;
     }
   }
+
   if (found)
   {
     act("Your knowledge of weapons and armour allow you to quickly repair $p.", ch, obj, obj, TO_CHAR, 0);

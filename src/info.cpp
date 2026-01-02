@@ -1200,14 +1200,10 @@ bool identify(Character *ch, Object *obj)
 
    found = false;
 
-   for (i = 0; i < obj->num_affects; i++)
+   for (i = 0; i < obj->affected.size(); i++)
    {
       if ((obj->affected[i].location != APPLY_NONE) &&
-          (obj->affected[i].modifier != 0 ||
-           (vobj != nullptr &&
-            i < vobj->num_affects &&
-            vobj->affected != nullptr &&
-            vobj->affected[i].location == obj->affected[i].location)))
+          (obj->affected[i].modifier != 0 || (vobj != nullptr && vobj->affected[i].location == obj->affected[i].location)))
       {
          if (!found)
          {
@@ -1223,10 +1219,7 @@ bool identify(Character *ch, Object *obj)
             strcpy(buf2, "Invalid");
          csendf(ch, "    $3Affects : $R%s$3 By $R%d", buf2, obj->affected[i].modifier);
 
-         if (vobj != nullptr &&
-             i < vobj->num_affects &&
-             vobj->affected != nullptr &&
-             vobj->affected[i].location == obj->affected[i].location)
+         if (vobj != nullptr && vobj->affected[i].location == obj->affected[i].location)
          {
             csendf(ch, " (");
             // Swap color for ARMOR so lower values use "good" color
@@ -3587,8 +3580,7 @@ private:
    uint64_t o_in_room_ = {};             /* In what room -1 when conta/carr  */
    uint64_t o_vroo_ = {};                /* for corpse saving */
    struct obj_flag_data obj_flags_ = {}; /* Object information               */
-   int16_t o_num_affects_ = {};
-   obj_affected_type o_affected_ = {}; /* Which abilities in PC to change  */
+   obj_affected_type o_affected_ = {};   /* Which abilities in PC to change  */
 
    QString o_name_ = {};               /* Title of object :get etc.        */
    QString o_description_ = {};        /* When in room                     */
@@ -4645,13 +4637,11 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       if (show_affects)
       {
          uint64_t affects_found = 0;
-         for (int16_t i = 0; i < obj->num_affects; i++)
+         for (qsizetype i = 0; i < obj->affected.size(); i++)
          {
             if ((obj->affected[i].location != APPLY_NONE) &&
                 (obj->affected[i].modifier != 0 ||
                  (vobj != nullptr &&
-                  i < vobj->num_affects &&
-                  vobj->affected != nullptr &&
                   vobj->affected[i].location == obj->affected[i].location)))
             {
                QString buffer;

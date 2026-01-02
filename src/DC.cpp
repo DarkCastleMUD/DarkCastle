@@ -136,13 +136,6 @@ QString DC::getBuildTime(void)
 	return Version::build_time_;
 }
 
-DC *DC::getInstance(void)
-{
-	DC *dc = dynamic_cast<DC *>(DC::instance());
-	assert(dc != nullptr);
-	return dc;
-}
-
 zone_t DC::getRoomZone(room_t room_nr)
 {
 	DC *dc = getInstance();

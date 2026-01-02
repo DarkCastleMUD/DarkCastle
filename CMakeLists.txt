@@ -151,7 +151,6 @@ add_library(DC SHARED
     src/Leaderboard.cpp
     src/limits.cpp
     src/magic.cpp
-    src/memory.cpp
     src/meta.cpp
     src/mob_act.cpp
     src/MobActivity.cpp
@@ -236,7 +235,6 @@ add_library(DC SHARED
     src/include/DC/Leaderboard.h
     src/include/DC/levels.h
     src/include/DC/magic.h
-    src/include/DC/memory.h
     src/include/DC/MobActivity.h
     src/include/DC/mobile.h
     src/include/DC/move.h

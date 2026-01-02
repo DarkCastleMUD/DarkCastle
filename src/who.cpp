@@ -48,7 +48,9 @@ void add_to_who(char *strAdd)
   {                                         // expand the buffer
     gWhoBufferMaxSize += (strLength + 500); // expand by the size + 500
 
-    gWhoBuffer = (char *)dc_realloc(gWhoBuffer, gWhoBufferMaxSize);
+    if (gWhoBuffer)
+      delete[] gWhoBuffer;
+    gWhoBuffer = new char[gWhoBufferMaxSize];
   }
 
   // guaranteed to work, since we just allocated enough for it + 500

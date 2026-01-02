@@ -40,7 +40,7 @@ void load_banned(void)
   }
   while (fscanf(fl, " %s %s %d %s ", ban_type, site_name, &date, name) == 4)
   {
-    CREATE(next_node, struct ban_list_element, 1);
+    next_node = new struct ban_list_element;
     strncpy(next_node->site, site_name, BANNED_SITE_LENGTH);
     next_node->site[BANNED_SITE_LENGTH] = '\0';
     strncpy(next_node->name, name, 100);
@@ -65,7 +65,7 @@ void DC::free_ban_list_from_memory(void)
   for (; ban_list; ban_list = next)
   {
     next = ban_list->next;
-    dc_free(ban_list);
+    delete ban_list;
   }
 }
 
@@ -189,7 +189,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  CREATE(ban_node, struct ban_list_element, 1);
+  ban_node = new struct ban_list_element;
   strncpy(ban_node->site, site, BANNED_SITE_LENGTH);
   for (nextchar = ban_node->site; *nextchar; nextchar++)
     *nextchar = LOWER(*nextchar);
@@ -246,7 +246,7 @@ int do_unban(Character *ch, char *argument, cmd_t cmd)
           GET_NAME(ch), ban_types[ban_node->type], ban_node->site);
   logentry(buf, POWER, DC::LogChannel::LOG_GOD);
 
-  dc_free(ban_node);
+  delete ban_node;
   write_ban_list();
   return eSUCCESS;
 }

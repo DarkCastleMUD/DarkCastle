@@ -1,33 +1,38 @@
-#ifndef SOCIAL_H_
-#define SOCIAL_H_
-/************************************************************************
-| $Id: social.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
-| social.h
-| Description:  This file defines the header information for the
-|   social functions to work properly.
-*/
+#ifndef SOCIAL_H
+#define SOCIAL_H
+#include <QList>
+#include <QMap>
 
-struct social_messg
+class Social
 {
-    char *name = {};
-    int hide = {};
-    position_t min_victim_position = {}; /* Position of victim */
-
+public:
+    QString name_;
     /* No argument was supplied */
-    char *char_no_arg = {};
-    char *others_no_arg = {};
-
+    QString char_no_arg_;
+    QString others_no_arg_;
     /* An argument was there, and a victim was found */
-    char *char_found = {}; /* if nullptr, read no further, ignore args */
-    char *others_found = {};
-    char *vict_found = {};
-
+    QString char_found_; /* if nullptr, read no further, ignore args */
+    QString others_found_;
+    QString vict_found_;
     /* An argument was there, but no victim was found */
-    char *not_found = {};
-
+    QString not_found_;
     /* The victim turned out to be the character */
-    char *char_auto = {};
-    char *others_auto = {};
+    QString char_auto_;
+    QString others_auto_;
+
+    int hide_ = {};
+    position_t min_victim_position_ = {}; /* Position of victim */
+};
+
+class Socials
+{
+    QList<Social> socials_;
+    QMap<QString, Social> abbreviated_socials_;
+
+public:
+    Socials(void);
+    auto find(QString arg) -> std::expected<Social, search_error>;
+    QStringList list(void);
 };
 
 #endif

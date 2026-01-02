@@ -103,13 +103,8 @@ void loadnews()
   while ((i = fread_int(fl, 0, 2147483467)) != 0)
   {
     struct news_data *nnews;
-#ifdef LEAK_CHECK
-    nnews = (struct news_data *)
-        calloc(1, sizeof(struct news_data));
-#else
-    nnews = (struct news_data *)
-        dc_alloc(1, sizeof(struct news_data));
-#endif
+    nnews = new struct news_data;
+
     nnews->time = i;
     nnews->addedby = fread_string(fl, 0);
     nnews->news = fread_string(fl, 0);
@@ -258,13 +253,8 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   }
   if (!nnews)
   {
-#ifdef LEAK_CHECK
-    nnews = (struct news_data *)
-        calloc(1, sizeof(struct news_data));
-#else
-    nnews = (struct news_data *)
-        dc_alloc(1, sizeof(struct news_data));
-#endif
+    nnews = new struct news_data;
+
     nnews->addedby = str_dup(GET_NAME(ch));
     nnews->time = thetime;
     addnews(nnews);

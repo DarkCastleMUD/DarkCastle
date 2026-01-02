@@ -454,11 +454,7 @@ void add_threat(Character *mob, Character *ch, int amt)
       return;
     }
   }
-#ifdef LEAK_CHECK
-  thr = (struct threat_struct *)calloc(1, sizeof(struct threat_struct));
-#else
-  thr = (struct threat_struct *)dc_alloc(1, sizeof(struct threat_struct));
-#endif
+  thr = new struct threat_struct;
   thr->next = mob->mobdata->threat;
   thr->threat = amt;
   thr->name = str_dup(GET_NAME(ch));
@@ -4060,13 +4056,8 @@ void load_messages(char *file, int base)
       exit(0);
     }
 
-#ifdef LEAK_CHECK
-    messages = (struct message_type *)
-        calloc(1, sizeof(struct message_type));
-#else
-    messages = (struct message_type *)
-        dc_alloc(1, sizeof(struct message_type));
-#endif
+    messages = new struct message_type;
+
     if (!base)
       fight_messages[i].number_of_attacks++;
     fight_messages[i].a_type = type;
@@ -4108,7 +4099,7 @@ void DC::free_messages_from_memory(void)
     while (fight_messages[i].msg)
     {
       next_message = fight_messages[i].msg->next;
-      dc_free(fight_messages[i].msg);
+      delete fight_messages[i].msg;
       fight_messages[i].msg = next_message;
     }
 }
@@ -7140,7 +7131,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   if (!weap)
     return eFAILURE;
 
-  for (i = 0; i < weap->num_affects; i++)
+  for (i = 0; i < weap->affected.size(); i++)
   {
     /* It's possible the victim has fled or died */
     if (ch->in_room != vict->in_room)

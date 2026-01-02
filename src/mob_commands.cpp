@@ -816,7 +816,7 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   {
     if (!DC::getInstance()->rooms.contains(1))
     {
-      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(location));
+      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(QString::number(location)));
       return eFAILURE | eINTERNAL_ERROR;
     }
     else
@@ -878,7 +878,7 @@ int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
       return eSUCCESS;
     }
 
-  vict->send(QStringLiteral("You receive %1 exps.\r\n").arg(reward));
+  vict->send(QStringLiteral("You receive %1 exps.\r\n").arg(QString::number(reward)));
   gain_exp(vict, reward);
   return eSUCCESS;
 }
@@ -1094,7 +1094,7 @@ int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
     opt = 0;
 
   // create struct
-  throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+  throwitem = new struct mprog_throw_type;
   throwitem->target_mob_num = mob_num;
   strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
@@ -1230,7 +1230,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
     {
       int num = DC::getInstance()->mob_index[this->mobdata->nr].virt;
 
-      logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
+      logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(QString::number(num)));
     }
     return eFAILURE;
   }
@@ -1325,7 +1325,7 @@ void free_dmg_list()
   for (c = dmg_list; c; c = n)
   {
     n = c->next;
-    dc_free(c);
+    delete c;
   }
   dmg_list = nullptr;
 }
@@ -1344,11 +1344,7 @@ void add_dmg(Character *ch, int dmg)
     }
   }
 
-#ifdef LEAK_CHECK
-  c = (struct damage_list *)calloc(1, sizeof(struct damage_list));
-#else
-  c = (struct damage_list *)dc_alloc(1, sizeof(struct damage_list));
-#endif
+  c = new struct damage_list;
   if (IS_NPC(ch))
     strcpy(c->name, GET_SHORT(ch));
   else
@@ -1620,8 +1616,7 @@ int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
   }
 
   // create struct
-  throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct
-                                                            mprog_throw_type));
+  throwitem = new struct mprog_throw_type;
   throwitem->target_mob_num = mob_num;
   strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
@@ -1770,7 +1765,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
       ch->prog_error(QStringLiteral("mpppause all - Invalid delay."));
       return eFAILURE;
     }
-    throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+    throwitem = new struct mprog_throw_type;
 
     if (ch && ch->mobdata)
     {
@@ -1785,7 +1780,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
       ch->prog_error(QStringLiteral("mppause - Invalid delay."));
       return eFAILURE;
     }
-    throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+    throwitem = new struct mprog_throw_type;
     throwitem->data_num = -999;
   }
 
@@ -2263,11 +2258,11 @@ void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->item_number].virt).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(QString::number(dc_->obj_index[objdata->item_number].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
   }
   else if (IS_NPC(this))
   {
-    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(dc_->mob_index[mobdata->nr].virt).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(QString::number(dc_->mob_index[mobdata->nr].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
   }
   else
   {

@@ -65,7 +65,7 @@ cDeck *create_deck(int decks)
 void freeDeck(cDeck *deck)
 {
    delete[] deck->cards;
-   dc_free(deck);
+   delete deck;
 }
 
 void switch_cards(cDeck *tDeck, int pos1, int pos2)
@@ -105,7 +105,7 @@ void free_player(player_data *plr)
    }
    if (!tbl->plr)
       reset_table(tbl);
-   dc_free(plr);
+   delete plr;
 }
 
 void nextturn(table_data *tbl)
@@ -834,12 +834,7 @@ void pulse_table_bj(table_data *tbl, int recall)
 
 void create_table(class Object *obj)
 {
-   table_data *table;
-#ifdef LEAK_CHECK
-   table = (table_data *)calloc(1, sizeof(table_data));
-#else
-   table = (table_data *)dc_alloc(1, sizeof(table_data));
-#endif
+   auto table = new table_data;
    table->obj = obj;
    if (obj->obj_flags.value[2])
       table->gold = false;
@@ -861,7 +856,7 @@ void destroy_table(table_data *tbl)
 {
    tbl->obj->table = nullptr;
    reset_table(tbl);
-   dc_free(tbl);
+   delete tbl;
 }
 
 bool playing(Character *ch, table_data *tbl)
@@ -1837,11 +1832,7 @@ struct tplayer *createTplayer(struct ttable *ttbl)
       return nullptr;
    struct tplayer *tplr;
 
-#ifdef LEAK_CHECK
-   tplr = (struct tplayer *)calloc(1, sizeof(struct tplayer));
-#else
-   tplr = (struct tplayer *)dc_alloc(1, sizeof(struct tplayer));
-#endif
+   tplr = new struct tplayer;
    ttbl->player[seat] = tplr;
    tplr->nw = true;
    tplr->table = ttbl;
@@ -2032,13 +2023,7 @@ void save_slot_machines()
 
 void create_slot(Object *obj)
 {
-   machine_data *slot;
-#ifdef LEAK_CHECK
-   slot = (machine_data *)calloc(1, sizeof(machine_data));
-#else
-   slot = (machine_data *)dc_alloc(1, sizeof(machine_data));
-#endif
-
+   auto slot = new machine_data;
    slot->obj = obj;
    slot->ch = nullptr;
    slot->prch = nullptr;
@@ -2083,8 +2068,8 @@ void update_linked_slots(machine_data *machine)
       // and their long description
       if (slot_obj->obj_flags.value[3] == machine->linkedto)
       {
-         // leaving the original desc from obj loading alone in the hash table
-         //  if(!ishashed(slot_obj->long_description)) dc_free(slot_obj->long_description);
+         if (slot_obj->long_description)
+            delete[] slot_obj->long_description;
          slot_obj->long_description = str_dup(ldesc);
          slot_obj->obj_flags.value[1] = (int)machine->jackpot;
          if (slot_obj->slot)
@@ -2095,7 +2080,8 @@ void update_linked_slots(machine_data *machine)
          {
             if (j->item_number == real_object(i))
             {
-               // if(!ishashed(j->long_description)) dc_free(j->long_description);
+               if (j->long_description)
+                  delete[] j->long_description;
                j->long_description = str_dup(ldesc);
                j->obj_flags.value[1] = (int)machine->jackpot;
                if (j->slot)
@@ -2178,10 +2164,11 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          {
             ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
-            // if(!ishashed(machine->obj->long_description)) dc_free(machine->obj->long_description);
+            if (machine->obj->long_description)
+               delete[] machine->obj->long_description;
             machine->obj->long_description = str_dup(buf);
-            if (!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description))
-               dc_free(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description);
+            if (((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description)
+               delete[] ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description;
             ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description = str_dup(buf);
          }
       }
@@ -2208,11 +2195,14 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          {
             ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
-            // if(!ishashed(machine->obj->long_description)) dc_free(machine->obj->long_description);
+            if (machine->obj->long_description)
+               delete[] machine->obj->long_description;
             machine->obj->long_description = str_dup(buf);
-            // if(!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description))
-            //    dc_free(((Object*)obj_index[machine->obj->item_number].item)->long_description);
-            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description = str_dup(buf);
+
+            auto obj = (Object *)DC::getInstance()->obj_index[machine->obj->item_number].item;
+            if (obj->long_description)
+               delete[] obj->long_description;
+            obj->long_description = str_dup(buf);
          }
       }
       else if (payout)
@@ -2390,20 +2380,11 @@ public:
 
 void create_wheel(Object *obj)
 {
-   wheel_data *wheel;
-#ifdef LEAK_CHECK
-   wheel = (wheel_data *)calloc(1, sizeof(wheel_data));
-#else
-   wheel = (wheel_data *)dc_alloc(1, sizeof(wheel_data));
-#endif
+   auto wheel = new wheel_data;
    wheel->obj = obj;
    for (int i = 0; i < 6; i++)
    {
-#ifdef LEAK_CHECK
-      wheel->plr[i] = (struct roulette_player *)calloc(1, sizeof(struct roulette_player));
-#else
-      wheel->plr[i] = (struct roulette_player *)dc_alloc(1, sizeof(struct roulette_player));
-#endif
+      wheel->plr[i] = new struct roulette_player;
       wheel->plr[i]->ch = nullptr;
       for (int j = 0; j < 48; j++)
          wheel->plr[i]->bet_array[j] = 0;
