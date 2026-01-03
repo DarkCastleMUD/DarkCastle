@@ -104,13 +104,13 @@ int do_social(Character *ch, char *argument, cmd_t cmd)
 }
 
 template <typename T>
-auto &operator>>(auto &in, QList<T> &container)
+auto &operator>>(auto &in, QMap<QString, T> &container)
 {
   T val;
   while (!in.atEnd())
   {
     in >> val;
-    container.push_back(val);
+    container[val.name_] = val;
   }
   return in;
 }
@@ -172,7 +172,7 @@ Socials::Socials(void)
   if (!social_file.open(QIODeviceBase::ReadOnly))
   {
     logbug(QStringLiteral("error reading %1").arg(SOCIAL_FILE));
-    return;
+    qFatal("unable to read SOCIAL_FILE");
   }
 
   QTextStream in(&social_file);
@@ -180,14 +180,14 @@ Socials::Socials(void)
 
   for (const auto &social : socials_)
   {
-    abbreviated_socials_[social.name_] = social;
+    abbreviated_socials_[social.name_] = social.name_;
     for (qsizetype position = 1; position < social.name_.length(); position++)
     {
       auto keyword = social.name_;
       keyword.truncate(social.name_.length() - position);
       if (!abbreviated_socials_.contains(keyword))
       {
-        abbreviated_socials_[keyword] = social;
+        abbreviated_socials_[keyword] = social.name_;
       }
     }
   }
@@ -195,8 +195,12 @@ Socials::Socials(void)
 
 auto Socials::find(QString arg) -> std::expected<Social, search_error>
 {
+  if (socials_.contains(arg))
+    return socials_[arg];
+
   if (abbreviated_socials_.contains(arg))
-    return abbreviated_socials_[arg];
+    if (socials_.contains(abbreviated_socials_[arg]))
+      return socials_[abbreviated_socials_[arg]];
 
   return std::unexpected(search_error::not_found);
 }

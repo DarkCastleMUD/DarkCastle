@@ -26,8 +26,8 @@ public:
 
 class Socials
 {
-    QList<Social> socials_;
-    QMap<QString, Social> abbreviated_socials_;
+    QMap<QString, Social> socials_;
+    QMap<QString, QString> abbreviated_socials_;
 
 public:
     Socials(void);
