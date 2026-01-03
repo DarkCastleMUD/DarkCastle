@@ -466,11 +466,11 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
   {
     if (DC::getInstance()->cf.stderr_timestamp == true)
     {
-      std::cerr << QStringLiteral("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
+      std::cerr << QStringLiteral("%1 :%2: %3").arg(tmstr).arg(QString::number(type)).arg(str).toStdString() << std::endl;
     }
     else
     {
-      std::cerr << QStringLiteral("%1:%2").arg(type).arg(str).toStdString() << std::endl;
+      std::cerr << QStringLiteral("%1:%2").arg(QString::number(type)).arg(str).toStdString() << std::endl;
     }
   }
 
