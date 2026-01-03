@@ -63,7 +63,7 @@
         {
             "label": "rebuild",
             "type": "shell",
-            "command": "scripts/rebuild.sh",
+            "command": "cmake --build --preset debug",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
