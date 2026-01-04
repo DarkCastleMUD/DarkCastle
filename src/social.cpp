@@ -171,7 +171,7 @@ Socials::Socials(void)
   QFile social_file(SOCIAL_FILE);
   if (!social_file.open(QIODeviceBase::ReadOnly))
   {
-    logbug(QStringLiteral("error reading %1").arg(SOCIAL_FILE));
+    DC::getInstance()->logbug(QStringLiteral("error reading %1").arg(SOCIAL_FILE));
     qFatal("unable to read SOCIAL_FILE");
   }
 

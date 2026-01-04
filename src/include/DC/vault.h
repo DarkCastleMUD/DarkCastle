@@ -23,7 +23,6 @@ void access_remove(QString name, struct vault_data *vault);
 void remove_vault_accesses(QString name);
 void vault_sell(Character *ch, char *object, char *arg);
 int vault_log_to_string(const char *name, char *buf);
-void logvault(QString message, QString name);
 void item_remove(Object *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 

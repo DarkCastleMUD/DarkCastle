@@ -126,7 +126,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        logmortal(QStringLiteral("%1 looted %2 coins from %3").arg(GET_NAME(ch)).arg(obj_object->obj_flags.value[0]).arg(sub_object->Name()));
+        DC::getInstance()->logmortal(QStringLiteral("%1 looted %2 coins from %3").arg(GET_NAME(ch)).arg(obj_object->obj_flags.value[0]).arg(sub_object->Name()));
 
         if (ch->isPlayerGoldThief())
         {
@@ -140,9 +140,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
-      logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(sub_object->Name()).arg(DC::getInstance()->obj_index[sub_object->item_number].virt));
+      DC::getInstance()->logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(sub_object->Name()).arg(DC::getInstance()->obj_index[sub_object->item_number].virt));
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].virt));
+        DC::getInstance()->logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].virt));
     }
     move_obj(obj_object, ch);
     if (sub_object->carried_by == ch)
@@ -163,9 +163,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(ch->in_room));
+      DC::getInstance()->logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].virt).arg(ch->in_room));
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].virt));
+        DC::getInstance()->logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].virt));
     }
 
     if (DC::getInstance()->obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
@@ -1168,10 +1168,10 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
             DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                   tmp_object->short_description,
-                   loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].virt);
+              DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+                                      tmp_object->short_description,
+                                      loop_obj->short_description,
+                                      DC::getInstance()->obj_index[loop_obj->item_number].virt);
           }
 
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
@@ -1236,10 +1236,10 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
             DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                   tmp_object->short_description,
-                   loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].virt);
+              DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+                                      tmp_object->short_description,
+                                      loop_obj->short_description,
+                                      DC::getInstance()->obj_index[loop_obj->item_number].virt);
           }
 
           move_obj(tmp_object, ch->in_room);
@@ -1461,23 +1461,23 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                 {
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
-                       ch->getNameC(),
-                       obj_object->short_description,
-                       DC::getInstance()->obj_index[obj_object->item_number].virt,
-                       sub_object->short_description,
-                       DC::getInstance()->obj_index[sub_object->item_number].virt);
+                  DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+                                          ch->getNameC(),
+                                          obj_object->short_description,
+                                          DC::getInstance()->obj_index[obj_object->item_number].virt,
+                                          sub_object->short_description,
+                                          DC::getInstance()->obj_index[sub_object->item_number].virt);
                 }
                 else
                 {
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
-                       ch->getNameC(),
-                       obj_object->short_description,
-                       DC::getInstance()->obj_index[obj_object->item_number].virt,
-                       sub_object->short_description,
-                       DC::getInstance()->obj_index[sub_object->item_number].virt);
+                  DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+                                          ch->getNameC(),
+                                          obj_object->short_description,
+                                          DC::getInstance()->obj_index[obj_object->item_number].virt,
+                                          sub_object->short_description,
+                                          DC::getInstance()->obj_index[sub_object->item_number].virt);
                 }
 
                 return eSUCCESS;
@@ -1624,7 +1624,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
           }
     */
     sendln(QStringLiteral("You give %1 coin%2 to %3.").arg(amount).arg(amount == 1 ? "" : "s").arg(GET_SHORT(vict)));
-    logobjects(QStringLiteral("%1 gives %2 coin%3 to %4").arg(GET_NAME(this)).arg(amount).arg(pluralize(amount)).arg(GET_NAME(vict)));
+    DC::getInstance()->logobjects(QStringLiteral("%1 gives %2 coin%3 to %4").arg(GET_NAME(this)).arg(amount).arg(pluralize(amount)).arg(GET_NAME(vict)));
     act(QStringLiteral("%1 gives you %2 $B$5gold$R coin%3.").arg(PERS(this, vict)).arg(amount).arg(amount == 1 ? "" : "s"), this, 0, vict, TO_VICT, INVIS_NULL);
     act("$n gives some gold to $N.", this, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
 
@@ -1864,13 +1864,13 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   act("$n gives you $p.", this, obj, vict, TO_VICT, 0);
   act("You give $p to $N.", this, obj, vict, TO_CHAR, 0);
 
-  logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->Name()).arg(GET_NAME(vict)));
+  DC::getInstance()->logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->Name()).arg(GET_NAME(vict)));
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
-         obj->short_description,
-         DC::getInstance()->obj_index[obj->item_number].virt,
-         loop_obj->short_description,
-         DC::getInstance()->obj_index[loop_obj->item_number].virt);
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+                            obj->short_description,
+                            DC::getInstance()->obj_index[obj->item_number].virt,
+                            loop_obj->short_description,
+                            DC::getInstance()->obj_index[loop_obj->item_number].virt);
 
   if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) && vict->isMortalPlayer() &&
       vict->room().isArena() && arena.isPotato() && DC::getInstance()->obj_index[obj->item_number].virt == 393)
@@ -2679,8 +2679,8 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].virt);
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                              DC::getInstance()->obj_index[loop_obj->item_number].virt);
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
@@ -2688,8 +2688,8 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
             ch->in_room);
     DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].virt);
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                              DC::getInstance()->obj_index[loop_obj->item_number].virt);
   }
 
   if (skill_success(ch, nullptr, SKILL_PALM))

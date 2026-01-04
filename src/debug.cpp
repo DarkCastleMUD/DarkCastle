@@ -235,25 +235,25 @@ int main(int argc, char **argv)
     }
   }
 
-  logmisc(QStringLiteral("Loading the zones"));
+  DC::getInstance()->logmisc(QStringLiteral("Loading the zones"));
   debug.boot_zones();
 
-  logmisc(QStringLiteral("Loading the world."));
+  DC::getInstance()->logmisc(QStringLiteral("Loading the world."));
 
   debug.top_of_world_alloc = 2000;
 
   debug.boot_world();
 
-  logmisc(QStringLiteral("Renumbering the world."));
+  DC::getInstance()->logmisc(QStringLiteral("Renumbering the world."));
   renum_world();
 
-  logmisc(QStringLiteral("Generating object indices/loading all objects"));
+  DC::getInstance()->logmisc(QStringLiteral("Generating object indices/loading all objects"));
   debug.generate_obj_indices(&top_of_objt, debug.obj_index);
 
-  logmisc(QStringLiteral("Generating mob indices/loading all mobiles"));
+  DC::getInstance()->logmisc(QStringLiteral("Generating mob indices/loading all mobiles"));
   debug.generate_mob_indices(&top_of_mobt, debug.mob_index);
 
-  logmisc(QStringLiteral("renumbering zone table"));
+  DC::getInstance()->logmisc(QStringLiteral("renumbering zone table"));
   renum_zone_table();
 
   class Connection *d = new Connection;

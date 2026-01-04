@@ -471,7 +471,7 @@ void load_skillquests()
 
 	if (!(fl = fopen(SKILL_QUEST_FILE, "r")))
 	{
-		logmisc(QStringLiteral("Cannot open skill quest file."));
+		DC::getInstance()->logmisc(QStringLiteral("Cannot open skill quest file."));
 		abort();
 	}
 
@@ -1003,13 +1003,13 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
 
 		if (cf.verbose_mode)
 		{
-			logmisc(temp);
+			DC::getInstance()->logmisc(temp);
 		}
 
 		if (!(fl = fopen(endfile, "r")))
 		{
 			perror(endfile);
-			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
 			abort();
 		}
 
@@ -1050,7 +1050,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
 			else
 			{
 				sprintf(endfile, "Bad char (%s)", buf);
-				logmisc(endfile);
+				DC::getInstance()->logmisc(endfile);
 				abort();
 			}
 		}
@@ -1286,7 +1286,7 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
 
 	if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
 	{
-		logmisc(QStringLiteral("Cannot open object file index."));
+		DC::getInstance()->logmisc(QStringLiteral("Cannot open object file index."));
 		abort();
 	}
 	/*
@@ -1759,7 +1759,7 @@ void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
 	if (!curr)
 	{
 		auto world_file = findWorldFileWithVNUM(modnum);
-		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(QString::number(modnum)));
+		DC::getInstance()->logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(QString::number(modnum)));
 		return;
 	}
 
@@ -1980,7 +1980,7 @@ void DC::boot_world(void)
 		}
 	}
 
-	// logmisc(QStringLiteral("Booting individual world files"));
+	// DC::getInstance()->logmisc(QStringLiteral("Booting individual world files"));
 
 	// note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
 	for (temp = read_next_worldfile_name(flWorldIndex);
@@ -1993,7 +1993,7 @@ void DC::boot_world(void)
 		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
 		{
-			logmisc(temp);
+			DC::getInstance()->logmisc(temp);
 		}
 
 		if (!(fl = fopen(endfile, "r")))
@@ -2021,7 +2021,7 @@ void DC::boot_world(void)
 
 		fclose(fl);
 	}
-	// logmisc(QStringLiteral("World Boot done."));
+	// DC::getInstance()->logmisc(QStringLiteral("World Boot done."));
 	fclose(flWorldIndex);
 
 	top_of_world = --room_nr;
@@ -2536,7 +2536,7 @@ void DC::boot_zones(void)
 		DC::getInstance()->logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, DC::LogChannel::LOG_BUG);
 		abort();
 	}
-	// logmisc(QStringLiteral("Booting individual zone files"));
+	// DC::getInstance()->logmisc(QStringLiteral("Booting individual zone files"));
 
 	for (temp = read_next_worldfile_name(flZoneIndex);
 		 temp.isEmpty() == false;
@@ -2547,13 +2547,13 @@ void DC::boot_zones(void)
 
 		if (cf.verbose_mode)
 		{
-			logmisc(temp);
+			DC::getInstance()->logmisc(temp);
 		}
 
 		if (!(fl = fopen(endfile, "r")))
 		{
 			perror(endfile);
-			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
 			abort();
 		}
 
@@ -2565,7 +2565,7 @@ void DC::boot_zones(void)
 		fclose(fl);
 	}
 
-	// logmisc(QStringLiteral("Zone Boot done."));
+	// DC::getInstance()->logmisc(QStringLiteral("Zone Boot done."));
 
 	fclose(flZoneIndex);
 
@@ -3732,7 +3732,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	obj->short_description = fread_string(fl, 1);
 	if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
 	}
 
 	obj->long_description = fread_string(fl, 1);
@@ -3885,7 +3885,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 		obj->short_description = str_dup(tmpptr);
 		delete[] tmpptr;
 
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
 	}
 	else
 	{
@@ -3896,7 +3896,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	obj->ActionDescription(fread_string(fl, 1));
 	if ((!obj->ActionDescription().isEmpty() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~')) && !obj->ActionDescription()[0].isNull())
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].virt, obj->ActionDescription().toStdString().c_str());
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].virt, obj->ActionDescription().toStdString().c_str());
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
@@ -3968,7 +3968,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 			break;
 
 		default:
-			logbug(QStringLiteral("Illegal obj addon flag %1 in obj %2.").arg(chk).arg(obj->Name()));
+			DC::getInstance()->logbug(QStringLiteral("Illegal obj addon flag %1 in obj %2.").arg(chk).arg(obj->Name()));
 			break;
 		} // switch
 		  // read in next flag
@@ -4026,7 +4026,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 		obj->short_description = str_dup(tmpptr);
 		delete[] tmpptr;
 
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum unknown short_description too long.");
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum unknown short_description too long.");
 	}
 	else
 	{
@@ -4094,7 +4094,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 			break;
 
 		default:
-			logbug(QStringLiteral("Illegal obj addon flag %1 in obj %2.").arg(chk).arg(obj->Name()));
+			DC::getInstance()->logbug(QStringLiteral("Illegal obj addon flag %1 in obj %2.").arg(chk).arg(obj->Name()));
 			break;
 		} // switch
 		  // read in next flag
@@ -4345,7 +4345,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 	{
 		std::stringstream errormsg;
 		errormsg << "Exception while writing in write_obj_csv.";
-		logmisc(errormsg.str().c_str());
+		DC::getInstance()->logmisc(errormsg.str().c_str());
 	}
 
 	fout << std::endl;
@@ -4765,7 +4765,7 @@ void Zone::reset(ResetType reset_type)
 																				   clone_object(cmd[reset_cmd_index]->arg1)))
 						obj_to_obj(obj, obj_to);
 					else
-						logf(
+						DC::getInstance()->logf(
 							IMMORTAL,
 							DC::LogChannel::LOG_WORLD,
 							"Null container obj in P command Zone: %d, Cmd: %d",
@@ -4816,7 +4816,7 @@ void Zone::reset(ResetType reset_type)
 				// We can't send a number less than one to number() otherwise a debug coredump occurs
 				if (cmd[reset_cmd_index]->arg2 < 1)
 				{
-					logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, reset_cmd_index, cmd[reset_cmd_index]->arg1, cmd[reset_cmd_index]->arg2);
+					DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, reset_cmd_index, cmd[reset_cmd_index]->arg1, cmd[reset_cmd_index]->arg2);
 					last_cmd = 0;
 					last_percent = 0;
 				}
@@ -5147,7 +5147,7 @@ char *fread_string(std::ifstream &in, int hasher)
 	}
 	catch (...)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "fread_string() error reading");
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "fread_string() error reading");
 		throw;
 	}
 	in.exceptions(orig_exceptions);
@@ -5356,7 +5356,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	{
 		if (ch == EOF)
 		{
-			logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+			DC::getInstance()->logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_bitvector: premature EOF");
 			abort();
 		}
@@ -5375,7 +5375,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 		}
 		else
 		{
-			logmisc(QStringLiteral("Reading %1 (%2)").arg(DC::getInstance()->current()).arg(ch));
+			DC::getInstance()->logmisc(QStringLiteral("Reading %1 (%2)").arg(DC::getInstance()->current()).arg(ch));
 			perror("fread_bitvector: illegal character");
 			abort();
 		}
@@ -5436,8 +5436,8 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 			}
 			else
 			{
-				logbug("fread_bitvector: illegal character");
-				logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+				DC::getInstance()->logbug("fread_bitvector: illegal character");
+				DC::getInstance()->logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 				throw;
 			}
 
@@ -5448,8 +5448,8 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 	}
 	catch (...)
 	{
-		logbug("fread_bitvector: unknown error");
-		logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+		DC::getInstance()->logbug("fread_bitvector: unknown error");
+		DC::getInstance()->logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 		throw;
 	}
 	in.exceptions(orig_exceptions);
@@ -5468,7 +5468,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	{
 		if (ch == EOF)
 		{
-			logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+			DC::getInstance()->logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_int: premature EOF");
 			abort();
 		}
@@ -5701,7 +5701,7 @@ char fread_char(QTextStream &fl)
 {
 	if (fl.atEnd())
 	{
-		logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+		DC::getInstance()->logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 		perror("fread_char: premature EOF");
 		abort();
 	}
@@ -5720,7 +5720,7 @@ char fread_char(FILE *fl)
 	{
 		if (ch == EOF)
 		{
-			logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+			DC::getInstance()->logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_char: premature EOF");
 			abort();
 		}
@@ -5811,7 +5811,7 @@ void free_char(Character *ch, Trace trace)
 	}
 	else
 	{
-		// logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
+		// DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
 	}
 
 	if (ch->title)
@@ -6264,7 +6264,7 @@ void mprog_file_read(char *f, int32_t i)
 	sprintf(name, "%s%s", MOB_DIR, f);
 	if (!(fp = fopen(name, "r")))
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d couldn't opne mobprog file.", i);
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d couldn't opne mobprog file.", i);
 		return;
 	}
 	for (;;)
@@ -6273,16 +6273,16 @@ void mprog_file_read(char *f, int32_t i)
 			break;
 		else if (letter != '>')
 		{
-			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mprog_file_read: Invalid letter mob %d.", i);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mprog_file_read: Invalid letter mob %d.", i);
 			return;
 		}
 		switch ((type = fread_int(fp, 0, MPROG_MAX_TYPE_VALUE)))
 		{
 		case ERROR_PROG:
-			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: in file prog error.", i);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: in file prog error.", i);
 			return;
 		case IN_FILE_PROG:
-			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: nested in file progs.", i);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: nested in file progs.", i);
 			return;
 		default:
 			SET_BIT(DC::getInstance()->mob_index[i].progtypes, type);
@@ -6306,7 +6306,7 @@ void load_mobprogs(FILE *fp)
 		switch (LOWER(letter = fread_char(fp)))
 		{
 		default:
-			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: bad command '%c'.", letter);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: bad command '%c'.", letter);
 			break;
 		case 's':
 			return;
@@ -6316,7 +6316,7 @@ void load_mobprogs(FILE *fp)
 			value = fread_int(fp, 0, 2147483467);
 			if (real_mobile(value) < 0)
 			{
-				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: vnum %d doesn't exist.", value);
+				DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: vnum %d doesn't exist.", value);
 				break;
 			}
 			mprog_file_read(fread_word(fp, 1), value);
@@ -6337,7 +6337,7 @@ void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 			break;
 		else if (letter != '>' && letter != '\\')
 		{
-			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG char", i);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG char", i);
 			ungetc(letter, fp);
 			return;
 		}
@@ -6345,7 +6345,7 @@ void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 		switch (type)
 		{
 		case ERROR_PROG:
-			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG type.", i);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG type.", i);
 			return;
 		case IN_FILE_PROG:
 			mprog_file_read(fread_string(fp, 1), i);
@@ -6463,7 +6463,7 @@ void find_unordered_objects(void)
 
 		if (cur_vnum < last_vnum)
 		{
-			logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
+			DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
 		}
 	}
 }
@@ -6478,7 +6478,7 @@ void find_unordered_mobiles(void)
 
 		if (cur_vnum < last_vnum)
 		{
-			logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
+			DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
 		}
 	}
 }

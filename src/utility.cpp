@@ -483,89 +483,89 @@ void DC::logentry(QString str, uint64_t god_level, DC::LogChannel type, Characte
     send_to_gods(str, god_level, type);
 }
 
-void logarena(QString message)
+void DC::logarena(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_ARENA);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_ARENA);
 }
 
-void logbug(QString message)
+void DC::logbug(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
 }
 
-void logclan(QString message)
+void DC::logclan(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_CLAN);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_CLAN);
 }
 
-void logdatabase(QString message)
+void DC::logdatabase(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_DATABASE);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_DATABASE);
 }
 
-void logdebug(QString message)
+void DC::logdebug(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_DEBUG);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_DEBUG);
 }
 
-void loggod(QString message)
+void DC::loggod(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_GOD);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
-void loghelp(QString message)
+void DC::loghelp(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_HELP);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_HELP);
 }
 
-void logmisc(QString message)
+void DC::logmisc(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
 }
 
-void logmortal(QString message)
+void DC::logmortal(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 }
 
-void logobjects(QString message)
+void DC::logobjects(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_OBJECTS);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_OBJECTS);
 }
 
-void logplayer(QString message)
+void DC::logplayer(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_PLAYER);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_PLAYER);
 }
 
-void logprayer(QString message)
+void DC::logprayer(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_PRAYER);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_PRAYER);
 }
 
-void logquest(QString message)
+void DC::logquest(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_QUEST);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_QUEST);
 }
 
-void logsocket(QString message)
+void DC::logsocket(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
 }
 
-void logvault(QString message)
+void DC::logvault(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
 }
 
-void logwarning(QString message)
+void DC::logwarning(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_WARNING);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_WARNING);
 }
 
-void logworld(QString message)
+void DC::logworld(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
 }
 
 // function for new SETBIT et al. commands
@@ -632,7 +632,7 @@ void sprintbit(uint32_t vektor, const char *names[], char *result)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -666,7 +666,7 @@ void sprintbit(uint32_t vektor, QStringList names, char *result)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -697,7 +697,7 @@ QString sprintbit(uint32_t vektor, QStringList names)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return {};
   }
 
@@ -733,7 +733,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return result;
   }
 
@@ -2375,13 +2375,13 @@ bool is_in_game(Character *ch)
 
 void produce_coredump(void *ptr)
 {
-  logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
+  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
 
   static int counter = 0;
 
   if (++counter > COREDUMP_MAX)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
     return;
   }
 
@@ -2394,11 +2394,11 @@ void produce_coredump(void *ptr)
   else if (pid > 0)
   {
     // Parent process
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
   }
   else
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
   }
 
   return;
@@ -2444,7 +2444,7 @@ void remove_character(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
     break;
   }
 
@@ -2521,7 +2521,7 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
     break;
   }
 
@@ -2764,10 +2764,10 @@ void unique_scan(Character *victim)
 
   if (!found_items.empty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", victim->getNameC());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", victim->getNameC());
     while (!found_items.empty())
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }
@@ -3118,13 +3118,13 @@ bool str_prefix(const char *astr, const char *bstr)
 {
   if (astr == nullptr)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr == nullptr)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 
@@ -3141,13 +3141,13 @@ bool str_prefix(QString astr, QString bstr)
 {
   if (astr.isEmpty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr.isEmpty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 

@@ -128,8 +128,8 @@ bool malediction_res(Character *ch, Character *victim, int spell)
     mod = 30; // Tweak this if paralyze needs adjusting
     break;
   default:
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in malediction_res(), sent spell %d.",
-         spell);
+    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in malediction_res(), sent spell %d.",
+                            spell);
     return true; // It's safer to have the victim resist an unknown spell
     break;
   }
@@ -3626,7 +3626,7 @@ int cast_freefloat(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logmisc(QStringLiteral("Serious screw-up in cast_freefloat!"));
+    DC::getInstance()->logmisc(QStringLiteral("Serious screw-up in cast_freefloat!"));
     break;
   }
   return eFAILURE;
@@ -14381,7 +14381,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
   int mobile;
   if ((mobile = real_mobile(vnum)) < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum);
     ch->sendln("\"Spirit\" for this sector not yet implented.");
     return eFAILURE | eINTERNAL_ERROR;
   }

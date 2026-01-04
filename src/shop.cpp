@@ -145,7 +145,7 @@ void restock_keeper(Character *keeper, int shop_nr)
   char buf[50];
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
-  logmisc(buf);
+  DC::getInstance()->logmisc(buf);
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
@@ -811,7 +811,7 @@ void boot_the_shops()
     int room_nr = real_room(temp);
     if (room_nr < 0 || room_nr > DC::getInstance()->top_of_world)
     {
-      logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
+      DC::getInstance()->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
       room_nr = 0;
     }
 
@@ -905,8 +905,8 @@ player_shop *read_one_player_shop(FILE *fp)
   {
     // add future stuff here
 
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
     exit(1);
   }
 
@@ -941,7 +941,7 @@ void write_one_player_shop(player_shop *shop)
 
   if ((fp = fopen(buf, "w")) == nullptr)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
   }
 
@@ -1000,7 +1000,7 @@ void save_player_shop_world_range()
   if (!curr)
   {
     // panic!
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
     exit(1);
   }
 

@@ -1281,7 +1281,7 @@ void ChannelMessage::set_name(const class Character *sender)
     else
     {
         sender_name_ = QStringLiteral("Unknown");
-        logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
+        DC::getInstance()->logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
     }
 }
 

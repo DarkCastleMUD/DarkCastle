@@ -2554,7 +2554,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
             void item_remove(Object * obj, struct vault_data * vault);
             item_remove(obj, vault);
             // items->obj = 0;
-            logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
+            DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
           }
         }
       }
@@ -4929,7 +4929,7 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
   FILE *f = nullptr;
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
-    logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(getName()));
+    DC::getInstance()->logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(getName()));
     return eFAILURE;
   }
 

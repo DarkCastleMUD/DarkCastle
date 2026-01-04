@@ -909,7 +909,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     }
 
     ch->sendln("You raise a level!");
-    logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
 
     ch->incrementLevel();
     advance_level(ch, 0);
@@ -1283,7 +1283,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 
   if (difficulty < 1)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(this), difficulty, skill);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(this), difficulty, skill);
     return; // Skill w/out difficulty.
   }
 
@@ -1415,7 +1415,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
   if (skillname.isEmpty())
   {
     send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
     return;
   }
 

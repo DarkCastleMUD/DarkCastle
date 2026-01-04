@@ -378,7 +378,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
 	  arena.type = CHAOS; // -2
 	  sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
 	  send_info(buf);
-	  logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
+	  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
 	}
 
 	if (!strcmp(arg4, "potato"))

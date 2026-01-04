@@ -2461,7 +2461,7 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 	}
 	if (equipment[pos])
 	{
-		logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(this), pos);
+		DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(this), pos);
 		produce_coredump();
 		return 0;
 	}
@@ -3008,7 +3008,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->Name()), DC::getInstance()->world[obj_in_room].number);
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->Name()), DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3018,7 +3018,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_char(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", qPrintable(obj->Name()), GET_NAME(obj->carried_by));
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", qPrintable(obj->Name()), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3036,7 +3036,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_obj(obj) == 0)
 		{
 			// Couldn't move obj from its container
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", obj->Name(), GET_NAME(obj->carried_by));
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3061,7 +3061,7 @@ int move_obj(Object *obj, int dest)
 			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->Name())));
 		}
 
-		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->Name(), DC::getInstance()->world[dest].number);
+		DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->Name(), DC::getInstance()->world[dest].number);
 		return 0;
 	}
 
@@ -3093,7 +3093,7 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3103,9 +3103,9 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_char(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
-													"remove it!",
-				 obj->Name(), GET_NAME(obj->carried_by));
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
+																	   "remove it!",
+									obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3115,9 +3115,9 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_obj(obj) == 0)
 		{
 			// Couldn't move obj from its container
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
-													"remove it!",
-				 obj->Name(), GET_NAME(obj->carried_by));
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
+																	   "remove it!",
+									obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3142,7 +3142,7 @@ int move_obj(Object *obj, Object *dest_obj)
 			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->Name())));
 		}
 
-		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->Name(), dest_obj->Name());
+		DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->Name(), dest_obj->Name());
 		return 0;
 	}
 	add_totem(dest_obj, obj);
@@ -3176,7 +3176,7 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3186,9 +3186,9 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_char(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
-													"remove it!",
-				 obj->Name(), GET_NAME(obj->carried_by));
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
+																	   "remove it!",
+									obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3201,9 +3201,9 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_obj(obj) == 0)
 		{
 			// Couldn't move obj from its container
-			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
-													"remove it!",
-				 obj->Name(), GET_NAME(obj->carried_by));
+			DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
+																	   "remove it!",
+									obj->Name(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3241,7 +3241,7 @@ int move_obj(Object *obj, Character *ch)
 			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->Name())));
 		}
 
-		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->Name(), GET_NAME(ch));
+		DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->Name(), GET_NAME(ch));
 		return 0;
 	}
 
@@ -3348,7 +3348,7 @@ int obj_to_room(class Object *object, int room)
 
 	if (&DC::getInstance()->world[room] == nullptr)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
 		produce_coredump();
 		return 0;
 	}
@@ -3917,7 +3917,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		{
 			std::stringstream ss;
 			ss << "extract_char: " << t << std::endl;
-			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "extract_char: death_list already contained Character %p from %s.", ch, ss.str().c_str());
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "extract_char: death_list already contained Character %p from %s.", ch, ss.str().c_str());
 			produce_coredump(ch);
 		}
 		else

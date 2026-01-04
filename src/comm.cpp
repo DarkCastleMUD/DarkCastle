@@ -187,7 +187,7 @@ int DC::write_hotboot_file(void)
   class Connection *sd;
   if ((fp = fopen("hotboot", "w")) == nullptr)
   {
-    logmisc(QStringLiteral("Hotboot failed, unable to open hotboot file."));
+    DC::getInstance()->logmisc(QStringLiteral("Hotboot failed, unable to open hotboot file."));
     return 0;
   }
   // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
@@ -230,7 +230,7 @@ int DC::write_hotboot_file(void)
     }
   }
   fclose(fp);
-  logmisc(QStringLiteral("Hotboot descriptor file successfully written."));
+  DC::getInstance()->logmisc(QStringLiteral("Hotboot descriptor file successfully written."));
 
   chdir("../bin/");
 
@@ -246,7 +246,7 @@ int DC::write_hotboot_file(void)
     char execv_strerror[1024] = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
 
-    logmisc(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(applicationFilePath()).arg(execv_strerror));
+    DC::getInstance()->logmisc(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(applicationFilePath()).arg(execv_strerror));
 
     // wipe the file since we can't use it anyway
     if (unlink("hotboot") == -1)
@@ -254,7 +254,7 @@ int DC::write_hotboot_file(void)
       char unlink_strerror[1024] = {};
       strerror_r(errno, unlink_strerror, sizeof(unlink_strerror));
 
-      logmisc(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror));
+      DC::getInstance()->logmisc(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror));
     }
 
     chdir(qPrintable(cf.library_directory));
@@ -277,7 +277,7 @@ int DC::load_hotboot_descs(void)
   if (hotboot_file.open(QFile::ReadOnly))
   {
     unlink("hotboot");
-    logmisc(QStringLiteral("Hotboot, reloading characters."));
+    DC::getInstance()->logmisc(QStringLiteral("Hotboot, reloading characters."));
 
     QTextStream out(&hotboot_file);
     for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
@@ -338,7 +338,7 @@ int DC::load_hotboot_descs(void)
   unlink("hotboot"); // if the above unlink failed somehow(?),
                      // remove the hotboot file so that it dosen't think
                      // next reboot is another hotboot
-  logmisc(QStringLiteral("Successful hotboot file read."));
+  DC::getInstance()->logmisc(QStringLiteral("Successful hotboot file read."));
   return 1;
 }
 
@@ -407,7 +407,7 @@ void DC::finish_hotboot(void)
 
     if (!load_char_obj(d, d->output))
     {
-      logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(d->output));
+      DC::getInstance()->logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(d->output));
       write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
@@ -458,7 +458,7 @@ void DC::init_game(void)
 
     for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
              {
-               logf(0, DC::LogChannel::LOG_MISC, "Opening port %d.", port);
+               DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Opening port %d.", port);
                int listen_fd = init_socket(port);
                if (listen_fd >= 0)
                {
@@ -466,7 +466,7 @@ void DC::init_game(void)
                }
                else
                {
-                 logf(0, DC::LogChannel::LOG_MISC, "Error opening port %d.", port);
+                 DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Error opening port %d.", port);
                } });
   }
 
@@ -475,7 +475,7 @@ void DC::init_game(void)
 
   if (was_hotboot)
   {
-    logmisc(QStringLiteral("Connecting hotboot characters to their descriptiors"));
+    DC::getInstance()->logmisc(QStringLiteral("Connecting hotboot characters to their descriptiors"));
     finish_hotboot();
   }
 
@@ -485,7 +485,7 @@ void DC::init_game(void)
   // we got all the way through, let's turn auto-hotboot back on
   try_to_hotboot_on_crash = 1;
 
-  logmisc(QStringLiteral("Entering game loop."));
+  DC::getInstance()->logmisc(QStringLiteral("Entering game loop."));
 
   unlink("died_in_bootup");
 
@@ -505,7 +505,7 @@ void DC::init_game(void)
 
   do_not_save_corpses = 1;
 
-  logmisc(QStringLiteral("Closing all sockets."));
+  DC::getInstance()->logmisc(QStringLiteral("Closing all sockets."));
   while (DC::getInstance()->descriptor_list)
   {
     close_socket(DC::getInstance()->descriptor_list);
@@ -513,11 +513,11 @@ void DC::init_game(void)
 
   for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [](const int &fd)
            {
-             logf(0, DC::LogChannel::LOG_MISC, "Closing fd %d.", fd);
+             DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Closing fd %d.", fd);
              CLOSE_SOCKET(fd); });
 
-  logmisc(QStringLiteral("Goodbye."));
-  logmisc(QStringLiteral("Normal termination of game."));
+  DC::getInstance()->logmisc(QStringLiteral("Goodbye."));
+  DC::getInstance()->logmisc(QStringLiteral("Normal termination of game."));
 }
 
 /*
@@ -836,7 +836,7 @@ void DC::game_loop(void)
   gettimeofday(&now_time_, nullptr);
 
   // temp removing this since it's spamming the crap out of us
-  // else logf(110, DC::LogChannel::LOG_BUG, "0 delay on pulse");
+  // else DC::getInstance()->logf(110, DC::LogChannel::LOG_BUG, "0 delay on pulse");
   gettimeofday(&last_time_, nullptr);
   PerfTimers["gameloop"].stop();
   FrameMark;
@@ -922,7 +922,7 @@ void DC::game_loop_init(void)
                  QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
                  DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
-                 logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
+                 DC::getInstance()->logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
 
                  for (const auto &ch : dc->character_list)
                  {
@@ -934,7 +934,7 @@ void DC::game_loop_init(void)
 
                  if (!write_hotboot_file())
                  {
-                   logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
+                   DC::getInstance()->logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
                    return QHttpServerResponse("Failed.\r\n");
                  }
 
@@ -945,12 +945,12 @@ void DC::game_loop_init(void)
   auto tcpserver = new QTcpServer();
   if (!tcpserver->listen(QHostAddress::LocalHost, 6980))
   {
-    logmisc(QStringLiteral("Unable to listen to port 6980."));
+    DC::getInstance()->logmisc(QStringLiteral("Unable to listen to port 6980."));
   }
 
   if (!server.bind(tcpserver))
   {
-    logmisc(QStringLiteral("Unable to bind HTTP server."));
+    DC::getInstance()->logmisc(QStringLiteral("Unable to bind HTTP server."));
   }
 
   exec();
@@ -1724,7 +1724,7 @@ int write_to_descriptor(int desc, QByteArray txt)
     {
       if (errno != EAGAIN && errno != EWOULDBLOCK)
       {
-        logmisc(QStringLiteral("write(%1,-,%2) returned %3 and errno=%4").arg(desc).arg(total).arg(bytes_written).arg(errno));
+        DC::getInstance()->logmisc(QStringLiteral("write(%1,-,%2) returned %3 and errno=%4").arg(desc).arg(total).arg(bytes_written).arg(errno));
         if (errno != EPIPE)
           return -1;
       }
@@ -2238,11 +2238,11 @@ int close_socket(class Connection *d)
 
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
       {
-        logsocket(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        DC::getInstance()->logsocket(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
       }
       else
       {
-        logsocket(QStringLiteral("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        DC::getInstance()->logsocket(QStringLiteral("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
       }
       d->character->desc = nullptr;
     }
@@ -2418,7 +2418,7 @@ void unrestrict_game(int sig)
 
 void hupsig(int sig)
 {
-  logmisc(QStringLiteral("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."));
+  DC::getInstance()->logmisc(QStringLiteral("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."));
   abort(); /* perhaps something more elegant should
             * substituted */
 }
@@ -2426,10 +2426,10 @@ void hupsig(int sig)
 void sigusr1(int sig)
 {
   do_not_save_corpses = 1;
-  logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
+  DC::getInstance()->logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
   if (!DC::getInstance()->write_hotboot_file())
   {
-    logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
+    DC::getInstance()->logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
   }
 }
 
@@ -2458,14 +2458,14 @@ void sigchld(int sig)
 
 void signal_handler(int signal, siginfo_t *si, void *)
 {
-  logf(IMMORTAL, DC::LogChannel::LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
-                                          "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
-                                          "int=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
-                                          "fd=%d",
-       si->si_signo, si->si_errno, si->si_code,
-       si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value.sival_int,
-       si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
-       si->si_fd);
+  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
+                                                             "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
+                                                             "int=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
+                                                             "fd=%d",
+                          si->si_signo, si->si_errno, si->si_code,
+                          si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value.sival_int,
+                          si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
+                          si->si_fd);
 
   if (signal == SIGINT || signal == SIGTERM)
   {
@@ -2478,10 +2478,10 @@ void signal_handler(int signal, siginfo_t *si, void *)
     do_not_save_corpses = 1;
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
     DC::getInstance()->logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
-    logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
+    DC::getInstance()->logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
     if (!DC::getInstance()->write_hotboot_file())
     {
-      logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
+      DC::getInstance()->logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
     }
   }
 }
@@ -2852,7 +2852,7 @@ void warn_if_duplicate_ip(Character *ch)
 
   for (std::list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
-    logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1.toStdString().c_str(), (*i).name2.toStdString().c_str());
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1.toStdString().c_str(), (*i).name2.toStdString().c_str());
   }
 }
 
@@ -2918,7 +2918,7 @@ Proxy::Proxy(QString h)
     else
     {
       inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
     }
   }
 
@@ -2940,7 +2940,7 @@ Proxy::Proxy(QString h)
     source_port = arg5.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg5).toStdString().c_str());
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg5).toStdString().c_str());
       return;
     }
   }
@@ -2953,7 +2953,7 @@ Proxy::Proxy(QString h)
     destination_port = arg6.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg6).toStdString().c_str());
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg6).toStdString().c_str());
       return;
     }
 

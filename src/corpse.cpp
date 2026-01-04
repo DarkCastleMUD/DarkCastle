@@ -278,7 +278,7 @@ void DC::load_corpses(void)
 		get_line_new(fp, line);
 	}
 	else
-		logmisc(QStringLiteral("No corpses in file to load"));
+		DC::getInstance()->logmisc(QStringLiteral("No corpses in file to load"));
 
 	while (!feof(fp) && !end)
 	{
@@ -295,7 +295,7 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -Loading Object: %d", nr);
-				logmisc(buf3);
+				DC::getInstance()->logmisc(buf3);
 			}
 			/* we have the number, check it, load obj. */
 			if (nr == -1)
@@ -325,7 +325,7 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				logmisc(buf3);
+				DC::getInstance()->logmisc(buf3);
 			}
 			sscanf(line, "%d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7);
 			GET_OBJ_VAL(temp, 0) = t[1];
@@ -340,13 +340,13 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				logmisc(buf3);
+				DC::getInstance()->logmisc(buf3);
 			}
 			/* read line check for xap. */
 			if (!strcmp("XAP\n", line))
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
-					logmisc(QStringLiteral("XAP Found"));
+					DC::getInstance()->logmisc(QStringLiteral("XAP Found"));
 
 				temp->Name(fread_string_new(fp, buf2));
 				if (temp->Name().isEmpty())
@@ -357,7 +357,7 @@ void DC::load_corpses(void)
 				{
 					if (debug == 1)
 					{
-						logmisc(QStringLiteral("   -NAME: %1").arg(temp->Name()));
+						DC::getInstance()->logmisc(QStringLiteral("   -NAME: %1").arg(temp->Name()));
 					}
 				}
 
@@ -370,7 +370,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -SHORT: %s\n", temp->short_description);
-						logmisc(buf3);
+						DC::getInstance()->logmisc(buf3);
 					}
 				}
 
@@ -383,7 +383,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -DESC: %s\n", temp->long_description);
-						logmisc(buf3);
+						DC::getInstance()->logmisc(buf3);
 					}
 				}
 
@@ -397,20 +397,20 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						snprintf(buf3, sizeof(buf3) - 1, "   -ACT_DESC: %s\n", temp->ActionDescription().toStdString().c_str());
-						logmisc(buf3);
+						DC::getInstance()->logmisc(buf3);
 					}
 				}
 				if (!get_line_new(fp, line) ||
 					(sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
 				{
-					logmisc(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"));
+					DC::getInstance()->logmisc(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"));
 				}
 				else
 				{
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -FLAGS: %s", line);
-						logmisc(buf3);
+						DC::getInstance()->logmisc(buf3);
 					}
 				}
 				temp->obj_flags.type_flag = t[0];
@@ -473,7 +473,7 @@ void DC::load_corpses(void)
 					continue;
 				}
 				if (debug == 1)
-					logmisc(QStringLiteral("XAP NOT Found"));
+					DC::getInstance()->logmisc(QStringLiteral("XAP NOT Found"));
 			}
 			if (temp != nullptr)
 			{
@@ -489,7 +489,7 @@ void DC::load_corpses(void)
 						{
 							if (debug == 1)
 							{
-								logmisc(QStringLiteral("  -Moving [%1] to [%2]").arg(obj->Name()).arg(temp->Name()));
+								DC::getInstance()->logmisc(QStringLiteral("  -Moving [%1] to [%2]").arg(obj->Name()).arg(temp->Name()));
 							}
 							obj_from_room(obj);	   /* get those objs from that room */
 							obj_to_obj(obj, temp); /* and put them in the corpse */
@@ -500,7 +500,7 @@ void DC::load_corpses(void)
 						/* put the corpse in the right room */
 						if (debug == 1)
 						{
-							logmisc(QStringLiteral("  -Moving corpse [%1] to [%2]").arg(temp->Name()).arg(GET_OBJ_VROOM(temp)));
+							DC::getInstance()->logmisc(QStringLiteral("  -Moving corpse [%1] to [%2]").arg(temp->Name()).arg(GET_OBJ_VROOM(temp)));
 						}
 						obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));
 					}
@@ -510,7 +510,7 @@ void DC::load_corpses(void)
 					/* just a plain obj..send it to a temp room until we load a corpse */
 					if (debug == 1)
 					{
-						logmisc(QStringLiteral("  -Moving corpse [%1] to holding room.").arg(temp->Name()));
+						DC::getInstance()->logmisc(QStringLiteral("  -Moving corpse [%1] to holding room.").arg(temp->Name()));
 					}
 					obj_to_room(temp, real_room(frozen_start_room));
 				}

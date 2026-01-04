@@ -112,13 +112,13 @@ void boot_clans(void)
     new_new_clan->number = fread_int(fl, 0, 2147483467);
     if (new_new_clan->number < 1 || new_new_clan->number >= 2147483467)
     {
-      logf(0, DC::LogChannel::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
       skip_clan = true;
     }
 
     if (get_clan(new_new_clan->number) != nullptr)
     {
-      logf(0, DC::LogChannel::LOG_BUG, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->number);
       skip_clan = true;
     }
 
@@ -220,15 +220,15 @@ void boot_clans(void)
         break;
       }
       default:
-        logmisc(QStringLiteral("Illegal switch hit in boot_clans."));
-        logmisc(buf);
+        DC::getInstance()->logmisc(QStringLiteral("Illegal switch hit in boot_clans."));
+        DC::getInstance()->logmisc(buf);
         break;
       }
     }
     if (skip_clan)
     {
       skip_clan = false;
-      logf(0, DC::LogChannel::LOG_BUG, "Deleting clan number %d.", new_new_clan->number);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Deleting clan number %d.", new_new_clan->number);
       delete_clan(new_new_clan);
       changes_made = true;
     }
@@ -242,7 +242,7 @@ void boot_clans(void)
 
   if (changes_made)
   {
-    logf(0, DC::LogChannel::LOG_BUG, "Changes made to clans. Saving ../lib/clan.txt.");
+    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Changes made to clans. Saving ../lib/clan.txt.");
     save_clans();
   }
 }
@@ -375,7 +375,7 @@ void save_clans(void)
   auto buffer = QStringLiteral("%1%2/%3").arg(HTDOCS_DIR).arg(port1).arg(WEBCLANSLIST_FILE);
   if (!(fl = fopen(qPrintable(buffer), "w")))
   {
-    logmisc(QStringLiteral("Unable to open web clan file \'%1\' for writing.").arg(buffer));
+    DC::getInstance()->logmisc(QStringLiteral("Unable to open web clan file \'%1\' for writing.").arg(buffer));
     return;
   }
 

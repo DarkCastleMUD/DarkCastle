@@ -455,7 +455,7 @@ void Character::do_on_login_stuff(void)
    {
       if (vault->size < (unsigned)(this->getLevel() * 10))
       {
-         logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(this), vault->size, this->getLevel() * 10);
+         DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(this), vault->size, this->getLevel() * 10);
          vault->size = this->getLevel() * 10;
       }
 
@@ -757,7 +757,7 @@ int DC::exceeded_connection_limit(class Connection *new_conn)
 
       for (const auto &d : to_close_list)
       {
-         logsocket(QStringLiteral("Closing socket %1 from IP %2 due to > %3 connections.").arg(d->desc_num).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
+         DC::getInstance()->logsocket(QStringLiteral("Closing socket %1 from IP %2 due to > %3 connections.").arg(d->desc_num).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
          close_socket(d);
       }
       return true;
@@ -771,23 +771,23 @@ void Character::check_hw(void)
    heightweight(false);
    if (this->height > races[this->race].max_height)
    {
-      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(this), GET_HEIGHT(this), races[this->race].max_height);
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(this), GET_HEIGHT(this), races[this->race].max_height);
       this->height = races[this->race].max_height;
    }
    if (this->height < races[this->race].min_height)
    {
-      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(this), GET_HEIGHT(this), races[this->race].min_height);
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(this), GET_HEIGHT(this), races[this->race].min_height);
       this->height = races[this->race].min_height;
    }
 
    if (this->weight > races[this->race].max_weight)
    {
-      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(this), GET_WEIGHT(this), races[this->race].max_weight);
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(this), GET_WEIGHT(this), races[this->race].max_weight);
       this->weight = races[this->race].max_weight;
    }
    if (this->weight < races[this->race].min_weight)
    {
-      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(this), GET_WEIGHT(this), races[this->race].min_weight);
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(this), GET_WEIGHT(this), races[this->race].min_weight);
       this->weight = races[this->race].min_weight;
    }
    heightweight(true);
@@ -796,9 +796,9 @@ void Character::check_hw(void)
 void Character::set_hw(void)
 {
    this->height = number(races[this->race].min_height, races[this->race].max_height);
-   // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
+   // DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
    this->weight = number(races[this->race].min_weight, races[this->race].max_weight);
-   // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
+   // DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
 }
 
 // Deal with sockets that haven't logged in yet.
@@ -933,7 +933,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       // Uncomment this if you think a playerfile may be crashing the mud. -pir
       //      sprintf(str_tmp, "Trying to login: %s", tmp_name);
-      //    logmisc(str_tmp);
+      //    DC::getInstance()->logmisc(str_tmp);
 
       // ch is allocated in load_char_obj
       ls = load_char_obj(d, tmp_name);
@@ -1012,7 +1012,7 @@ void DC::nanny(class Connection *d, std::string arg)
                if (ad->character && ad->character->getLevel() == IMPLEMENTER && IS_PC(ad->character))
                {
                   password = ad->character->player->pwd;
-                  logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
+                  DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
                   break;
                }
             }
@@ -2189,7 +2189,7 @@ void update_characters()
       }
       if (IS_AFFECTED(i, AFF_POISON) && !(i->affected_by_spell(SPELL_POISON)))
       {
-         logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getNameC());
+         DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getNameC());
          REMBIT(i->affected_by, AFF_POISON);
       }
 
@@ -2507,7 +2507,7 @@ bool on_forbidden_name_list(const char *name)
    nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
    if (!nameList)
    {
-      logmisc(QStringLiteral("Failed to open forbidden name file!"));
+      DC::getInstance()->logmisc(QStringLiteral("Failed to open forbidden name file!"));
       return false;
    }
    else

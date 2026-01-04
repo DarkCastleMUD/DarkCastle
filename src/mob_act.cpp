@@ -242,7 +242,7 @@ void mobile_activity(void)
         int room_nr_past_door = EXIT(ch, door)->to_room;
         if (room_nr_past_door < 0)
         {
-          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
+          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
         }
         Room room_past_door = DC::getInstance()->world[room_nr_past_door];

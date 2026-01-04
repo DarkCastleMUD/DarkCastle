@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   {
     dcastle.boot_zones();
     dcastle.boot_world();
-    logmisc(QStringLiteral("Done."));
+    DC::getInstance()->logmisc(QStringLiteral("Done."));
     exit(EXIT_SUCCESS);
   }
   else
@@ -96,7 +96,7 @@ DC::config parse_arguments(int argc, char **argv)
     case 'm':
       cf.test_mobs = 1;
       cf.test_objs = 1;
-      logmisc(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (MOB,OBJ)"));
+      DC::getInstance()->logmisc(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (MOB,OBJ)"));
       break;
     case 'n': // inhibits printing timeout on DC::LogChannel::LOG_MISC messages normally sent to STDERR
       cf.stderr_timestamp = false;
@@ -116,13 +116,13 @@ DC::config parse_arguments(int argc, char **argv)
       break;
     case 'w':
       cf.test_world = 1;
-      logmisc(QStringLiteral("Mud in world checking mode. TinyTinyworld being used. (WLD)"));
+      DC::getInstance()->logmisc(QStringLiteral("Mud in world checking mode. TinyTinyworld being used. (WLD)"));
       DC::getInstance()->logentry(QStringLiteral("Do NOT have mortals login when in world checking mode."), 0,
                                   DC::LogChannel::LOG_MISC);
       break;
     case 'c':
       cf.test_objs = 1;
-      logmisc(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (OBJ)"));
+      DC::getInstance()->logmisc(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (OBJ)"));
       break;
     default:
     case 'h':

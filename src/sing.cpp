@@ -1688,7 +1688,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	if (!victim || !target)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "do_astral_chanty_movement: nullptr pointer passed.");
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "do_astral_chanty_movement: nullptr pointer passed.");
 		produce_coredump();
 		return;
 	}

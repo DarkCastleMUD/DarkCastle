@@ -72,7 +72,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   char_to_room(new_new, in_room);
   act("$n gestures sharply and $N comes into existence!", this, 0, new_new, TO_ROOM, 0);
   act("You linkload $N.", this, 0, new_new, TO_CHAR, 0);
-  logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
+  DC::getInstance()->logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
   return eSUCCESS;
 }
 
@@ -437,11 +437,11 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
     DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
-    logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
+    DC::getInstance()->logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
     do_force(this, "all save");
     if (!DC::getInstance()->write_hotboot_file())
     {
-      logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
+      DC::getInstance()->logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
       this->sendln("Hot reboot failed.");
     }
   }
@@ -559,7 +559,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
       exit(0);
     }
 
-    logf(105, DC::LogChannel::LOG_MISC, "Starting testport.");
+    DC::getInstance()->logf(105, DC::LogChannel::LOG_MISC, "Starting testport.");
     ch->sendln("Testport successfully started.");
   }
   else if (!str_cmp(arg1, "stop"))
@@ -571,7 +571,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
       exit(0);
     }
 
-    logf(105, DC::LogChannel::LOG_MISC, "Shutdown testport under pid %d", child);
+    DC::getInstance()->logf(105, DC::LogChannel::LOG_MISC, "Shutdown testport under pid %d", child);
     ch->sendln("Testport successfully shutdown.");
   }
 
@@ -642,7 +642,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
+  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
 
   if (system(command))
   {

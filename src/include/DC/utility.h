@@ -448,23 +448,6 @@ char *str_nospace(const char *stri);
 char *str_dup(const char *str);
 char *str_dup0(const char *str);
 
-void logarena(QString message);
-void logbug(QString message);
-void logclan(QString message);
-void logprayer(QString message);
-void logquest(QString message);
-void logsocket(QString message);
-void logvault(QString message);
-void logdatabase(QString message);
-void logdebug(QString message);
-void loggod(QString message);
-void loghelp(QString message);
-void logmisc(QString message);
-void logmortal(QString message);
-void logworld(QString message);
-void logobjects(QString message);
-void logplayer(QString message);
-
 void sprintbit(uint value[], const char *names[], char *result);
 std::string sprintbit(uint value[], const char *names[]);
 

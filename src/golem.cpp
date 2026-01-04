@@ -191,11 +191,11 @@ void save_charmie_data(Character *ch)
       continue;
     }
 
-    // logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
+    // DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
     sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->getNameC()[0], ch->getNameC(), 0);
     if (!(fpfile = fopen(file, "w")))
     {
-      logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);

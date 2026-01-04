@@ -348,7 +348,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
 
 	if (ch == nullptr || ch->in_room < 1 || !valid_dir || DC::getInstance()->world[ch->in_room].dir_option[dir] == nullptr || DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room < 1)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
 		ch->send("There was an error performing that movement.\r\n");
 		return eFAILURE;
 	}
@@ -913,7 +913,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 		}
 		catch (...)
 		{
-			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+			DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
 			return_val = eFAILURE;
 		}
 
@@ -954,7 +954,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 	}
 	catch (...)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
 		return_val = eFAILURE;
 	}
 
@@ -1259,7 +1259,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 		{
 			qFatal(qUtf8Printable(QStringLiteral("Error in move_char(), character stuck in DC::NOWHERE: %1.\n").arg(GET_NAME(ch))));
 		}
-		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", GET_NAME(ch), DC::getInstance()->world[dest].number);
+		DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", GET_NAME(ch), DC::getInstance()->world[dest].number);
 		return eINTERNAL_ERROR;
 	}
 
@@ -1296,7 +1296,7 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
 
 	if (real_room(dest) < 0)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].virt);
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].virt);
 		ch->sendln("You can't climb that.");
 		return eFAILURE | eINTERNAL_ERROR;
 	}

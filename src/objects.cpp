@@ -432,7 +432,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
         }
         else
         {
-          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
+          DC::getInstance()->logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
           continue;
         }
       }
@@ -1530,19 +1530,19 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   // temporarily affect the person's height
   if (add)
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
   else
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
 
   if (add == 1 && size_restricted(ch, obj))
   {
     // Only have to check the item itself if we're wearing it, not removing
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
     ch->sendln("After modifying your height that item would not fit!");
     return true;
@@ -1564,12 +1564,12 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   // fix height back to normal
   if (add)
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
   else
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
 

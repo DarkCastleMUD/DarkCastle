@@ -312,7 +312,7 @@ void perform_violence(void)
       {
         // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
         // now invalid memory.  report what class we were and return
-        logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
+        DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
         break;
       }
       // DEBUG CODE
@@ -488,7 +488,7 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
   };
   if (!threat)
   { // Nothing set. Bugger.
-    logf(110, DC::LogChannel::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill).toStdString().c_str(), skill);
+    DC::getInstance()->logf(110, DC::LogChannel::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill).toStdString().c_str(), skill);
     return;
   }
   threat = (int)(threat * v); // vary depending on skill
@@ -1387,7 +1387,7 @@ int get_weapon_damage_type(class Object *wielded)
     return TYPE_PIERCE;
     break;
   default:
-    logbug(QStringLiteral("WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3.").arg(wielded->item_number).arg(wielded->Name()).arg(wielded->obj_flags.value[3]));
+    DC::getInstance()->logbug(QStringLiteral("WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3.").arg(wielded->item_number).arg(wielded->Name()).arg(wielded->obj_flags.value[3]));
     break;
   }
   return TYPE_HIT; // should never get here
@@ -5427,11 +5427,11 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch == nullptr)
       {
-        logf(0, DC::LogChannel::LOG_BUG, "selfpurge on nullptr to nullptr");
+        DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on nullptr to nullptr");
       }
       else
       {
-        // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
+        // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
       }
       selfpurge = true;
       selfpurge.setOwner(ch, "raw_kill");
@@ -6830,9 +6830,9 @@ void arena_kill(Character *ch, Character *victim, int type)
               victim->getNameC(), get_clan_name(victim_clan));
     }
 
-    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
-         ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-         victim->getNameC(), get_clan_name(victim_clan));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
+                            ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
+                            victim->getNameC(), get_clan_name(victim_clan));
   }
   else if (ch)
   {
@@ -6867,7 +6867,7 @@ void arena_kill(Character *ch, Character *victim, int type)
 
   if (ch && victim && (arena.isPrize() || arena.isChaos()))
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", GET_NAME(ch), victim->getNameC());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", GET_NAME(ch), victim->getNameC());
   }
 
   // if it's a chaos, see if the clan was eliminated
@@ -6885,7 +6885,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     {
       sprintf(killer_message, "## [%s] was just eliminated from the chaos!\n\r", get_clan_name(victim_clan));
       send_info(killer_message);
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", get_clan_name(victim_clan));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", get_clan_name(victim_clan));
     }
   }
 
@@ -6969,15 +6969,15 @@ int can_be_attacked(Character *ch, Character *vict)
     if (ch->fighting && ch->fighting != vict)
     {
       ch->sendln("You are already fighting someone.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
-           GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
+                              GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch)
     {
       ch->sendln("They are already fighting someone.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
-           GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
+                              GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
       return false;
     }
   }
@@ -6988,15 +6988,15 @@ int can_be_attacked(Character *ch, Character *vict)
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
       ch->sendln("You are already fighting someone from another clan.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
-           GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
+                              GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
       ch->sendln("They are already fighting someone.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
-           GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
+                              GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
       return false;
     }
   }
@@ -7268,7 +7268,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
       retval = eSUCCESS;
       // Don't want to log this since a non-spell affect is going to happen all
       // the time (like SAVE_VS_FIRE or HIT-N-DAM for example) -pir
-      // logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
+      // DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
       //     current_affect, DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].virt);
       break;
     } /* switch statement */

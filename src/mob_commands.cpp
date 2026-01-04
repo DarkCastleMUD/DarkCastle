@@ -671,7 +671,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
+    // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }
@@ -2258,14 +2258,14 @@ void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(QString::number(dc_->obj_index[objdata->item_number].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
+    DC::getInstance()->logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(QString::number(dc_->obj_index[objdata->item_number].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
   }
   else if (IS_NPC(this))
   {
-    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(QString::number(dc_->mob_index[mobdata->nr].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
+    DC::getInstance()->logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(QString::number(dc_->mob_index[mobdata->nr].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
   }
   else
   {
-    logworld(QStringLiteral("Unknown prog: %1").arg(error_message));
+    DC::getInstance()->logworld(QStringLiteral("Unknown prog: %1").arg(error_message));
   }
 }

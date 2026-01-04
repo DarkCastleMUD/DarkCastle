@@ -2180,8 +2180,8 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", GET_NAME(machine->ch), (int)machine->jackpot, machine->gold ? "coins" : "plats");
          send_info(buf);
 
-         logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
-              GET_NAME(machine->ch), (int)machine->jackpot, machine->gold ? "coins" : "plats");
+         DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
+                                 GET_NAME(machine->ch), (int)machine->jackpot, machine->gold ? "coins" : "plats");
          if (machine->gold)
             machine->ch->addGold((int)machine->jackpot);
          else

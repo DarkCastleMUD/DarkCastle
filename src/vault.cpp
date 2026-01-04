@@ -551,7 +551,7 @@ void rename_vault_owner(QString oldname, QString newname)
     vault->owner = newname;
     save_vault(newname);
 
-    logvault(QStringLiteral("Vault owner changed from '%1' to '%2'.").arg(oldname).arg(newname), newname);
+    DC::getInstance()->logvault(QStringLiteral("Vault owner changed from '%1' to '%2'.").arg(oldname).arg(newname), newname);
   }
 
   if (!vault)
@@ -582,7 +582,7 @@ void rename_vault_owner(QString oldname, QString newname)
     {
       if (oldname == access->name)
       {
-        logvault(QStringLiteral("Replaced '%1' with '%2' in %3's vault access list.").arg(access->name).arg(newname).arg(vault->owner), vault->owner);
+        DC::getInstance()->logvault(QStringLiteral("Replaced '%1' with '%2' in %3's vault access list.").arg(access->name).arg(newname).arg(vault->owner), vault->owner);
         access->name = newname;
         save_vault(vault->owner);
       }
@@ -623,8 +623,8 @@ void remove_vault(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, DC::LogChannel::LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
-         name.toStdString().c_str());
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
+                            name.toStdString().c_str());
     break;
   }
 
@@ -887,7 +887,7 @@ void DC::testing_load_vaults(void)
         }
         else
         {
-          logvault(QStringLiteral("Invalid access entry found. Removing %1's access to %2.").arg(value).arg(vault->owner), vault->owner);
+          DC::getInstance()->logvault(QStringLiteral("Invalid access entry found. Removing %1's access to %2.").arg(value).arg(vault->owner), vault->owner);
           saveChanges = true;
         }
 
@@ -905,7 +905,7 @@ void DC::testing_load_vaults(void)
 
     if (saveChanges)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
       save_vault(vault->owner);
     }
 
@@ -1035,7 +1035,7 @@ void DC::load_vaults(void)
 
         /*
         if (vault->size > 2000) {
-            logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
+            DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
             FILE *oldfl;
             char oldfname[MAX_INPUT_LENGTH], oldtype[MAX_INPUT_LENGTH];
@@ -1050,7 +1050,7 @@ void DC::load_vaults(void)
           if (*oldtype == 'S') {
               sscanf(oldtype, "%s %d", tmp, &vnum);
               vault->size = vnum;
-              logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
               saveChanges = true;
           }
 
@@ -1140,7 +1140,7 @@ void DC::load_vaults(void)
         else
         {
           snprintf(buf, sizeof(buf), "Invalid access entry found. Removing %s's access to %s.", value, vault->owner.toStdString().c_str());
-          logvault(buf, vault->owner);
+          DC::getInstance()->logvault(buf, vault->owner);
           saveChanges = true;
         }
         break;
@@ -1159,7 +1159,7 @@ void DC::load_vaults(void)
 
     if (saveChanges)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
       save_vault(vault->owner);
     }
 
@@ -1209,7 +1209,7 @@ void remove_vault_accesses(QString name)
       next_access = access->next;
       if (name == access->name)
       {
-        logvault(QStringLiteral("Removed %1's access to %2's vault.").arg(name).arg(vault->owner), vault->owner);
+        DC::getInstance()->logvault(QStringLiteral("Removed %1's access to %2's vault.").arg(name).arg(vault->owner), vault->owner);
         access_remove(name, vault);
         save_vault(vault->owner);
       }
@@ -1569,7 +1569,7 @@ void vault_get(Character *ch, QString object, QString owner)
     }
 
     sbuf = QStringLiteral("%1 removed %2(v%3) from %4's vault.").arg(ch->getName()).arg(GET_OBJ_SHORT(obj)).arg(QString::number(GET_OBJ_VNUM(obj))).arg(owner);
-    logvault(sbuf, owner);
+    DC::getInstance()->logvault(sbuf, owner);
     act(sbuf, ch, 0, 0, TO_ROOM, GODS);
     ch->send(QStringLiteral("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
@@ -1745,7 +1745,7 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
     ch->save_char_obj();
     save_vault(owner);
 
-    logvault(QStringLiteral("%1 added %2 gold to %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
+    DC::getInstance()->logvault(QStringLiteral("%1 added %2 gold to %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
     ch->send(QStringLiteral("You deposit %1 $B$5gold$R into the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
@@ -1798,7 +1798,7 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
     ch->addGold(amount);
     ch->save_char_obj();
     save_vault(owner);
-    logvault(QStringLiteral("%1 removed %2 gold from %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
+    DC::getInstance()->logvault(QStringLiteral("%1 removed %2 gold from %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
     ch->send(QStringLiteral("You withdraw %1 $B$5gold$R from the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
@@ -1929,7 +1929,7 @@ void vault_put(Character *ch, QString object, QString owner)
       else
         buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
-      logvault(buffer, owner);
+      DC::getInstance()->logvault(buffer, owner);
       ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
       QString sbuf;
@@ -1984,7 +1984,7 @@ void vault_put(Character *ch, QString object, QString owner)
       else
         buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
-      logvault(buffer, owner);
+      DC::getInstance()->logvault(buffer, owner);
 
       ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
       if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
@@ -2022,7 +2022,7 @@ void vault_put(Character *ch, QString object, QString owner)
     else
       buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
-    logvault(buffer, owner);
+    DC::getInstance()->logvault(buffer, owner);
 
     ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
@@ -2229,7 +2229,7 @@ void add_new_vault(const char *name, int indexonly)
   fclose(pvfl);
 
   sprintf(buf, "%s bought a vault.", name);
-  logvault(buf, name);
+  DC::getInstance()->logvault(buf, name);
 
   // files all done, now add it in game
   total_vaults++;
@@ -2299,7 +2299,7 @@ void vault_log(Character *ch, char *owner)
   page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
 
-void logvault(QString message, QString name)
+void DC::logvault(QString message, QString name)
 {
   struct tm *tm = nullptr;
   time_t ct;
@@ -2324,7 +2324,7 @@ void logvault(QString message, QString name)
       "Dec",
   };
 
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
 
   sprintf(fname, "../vaults/%c/%s.vault.log", name[0], name.toStdString().c_str());
   sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0], name.toStdString().c_str());
@@ -2334,7 +2334,7 @@ void logvault(QString message, QString name)
     if (!(ofile = fopen(fname, "w")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
-      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+      logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
     fprintf(ofile, "$\n");
@@ -2342,7 +2342,7 @@ void logvault(QString message, QString name)
     if (!(ofile = fopen(fname, "r")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
-      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+      logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
   }
@@ -2350,7 +2350,7 @@ void logvault(QString message, QString name)
   if (!(nfile = fopen(nfname, "w")))
   {
     sprintf(buf, "vault_log: could not open vault log file [%s].", nfname);
-    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 

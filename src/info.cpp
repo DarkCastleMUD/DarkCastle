@@ -1422,11 +1422,11 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                      temp = ((tmp_object->obj_flags.value[1] * 3) / tmp_object->obj_flags.value[0]);
                      if (temp > 3)
                      {
-                        logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                             "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
-                             tmp_object->obj_flags.value[1],
-                             tmp_object->obj_flags.value[0]);
+                        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
+                                                "Bug in object %d. v2: %d > v1: %d. Resetting.",
+                                                DC::getInstance()->obj_index[tmp_object->item_number].virt,
+                                                tmp_object->obj_flags.value[1],
+                                                tmp_object->obj_flags.value[0]);
                         tmp_object->obj_flags.value[1] =
                             tmp_object->obj_flags.value[0];
                         temp = 3;
@@ -1477,11 +1477,11 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                      else if (temp > 3)
                      {
                         temp = 3;
-                        logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                             "Bug in object %d. Weight: %d v1: %d",
-                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
-                             tmp_object->obj_flags.weight,
-                             tmp_object->obj_flags.value[0]);
+                        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
+                                                "Bug in object %d. Weight: %d v1: %d",
+                                                DC::getInstance()->obj_index[tmp_object->item_number].virt,
+                                                tmp_object->obj_flags.weight,
+                                                tmp_object->obj_flags.value[0]);
                      }
 
                      if (NOT_KEYRING(tmp_object))
@@ -3407,7 +3407,7 @@ void check_champion_and_website_who_list()
       }
       else
       {
-         logmisc(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."));
+         DC::getInstance()->logmisc(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."));
       }
    }
 

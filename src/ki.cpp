@@ -491,7 +491,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 

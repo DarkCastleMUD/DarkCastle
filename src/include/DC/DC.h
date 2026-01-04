@@ -567,7 +567,30 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
   }
 
+  void logarena(QString message);
+  void logbug(QString message);
+  void logclan(QString message);
+  void logdatabase(QString message);
+  void logdebug(QString message);
+  void loggod(QString message);
+  void loghelp(QString message);
+  void logmisc(QString message);
+  void logmortal(QString message);
+  void logobjects(QString message);
+  void logplayer(QString message);
+  void logprayer(QString message);
+  void logquest(QString message);
+  void logsocket(QString message);
+  void logvault(QString message);
+  void logwarning(QString message);
+  void logvault(QString message, QString name);
+  void logworld(QString message);
+
+  void logf(int level, DC::LogChannel type, const char *arg, ...);
+  void logf(int level, DC::LogChannel type, QString arg);
+  void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
   void logverbose(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
   void remove_all_mobs_from_world(void);
@@ -622,7 +645,6 @@ public:
   int oprog_rand_trigger(Object *item);
   int oprog_arand_trigger(Object *item);
 
-  void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
   ~DC(void)
   {
     /* TODO enable and fix all memory leaks
@@ -676,8 +698,6 @@ private:
   void nanny(class Connection *d, std::string arg = "");
   void object_activity(uint64_t pulse_type);
 };
-void logf(int level, DC::LogChannel type, const char *arg, ...);
-void logf(int level, DC::LogChannel type, QString arg);
 int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type);
 void produce_coredump(void *ptr = 0);
 

@@ -1010,10 +1010,10 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
                     DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
             DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
-                   obj->short_description,
-                   loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].virt);
+              DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
+                                      obj->short_description,
+                                      loop_obj->short_description,
+                                      DC::getInstance()->obj_index[loop_obj->item_number].virt);
           }
           if (DC::getInstance()->obj_index[obj->item_number].virt != 76)
           {
@@ -1422,7 +1422,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
             affect_to_char(ch, &pthiefaf);
         }
       }
-      logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, victim->getNameC(), GET_ROOM_VNUM(victim->in_room));
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, victim->getNameC(), GET_ROOM_VNUM(victim->in_room));
     }
     else
     {
@@ -1896,7 +1896,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
       special_log(QString(QStringLiteral("%1 slips %2 to %3 in room %4.")).arg(ch->getName()).arg(obj->short_description).arg(vict->getName()).arg(ch->in_room));
     }
 
-    logobjects(QStringLiteral("%1 slips %2 to %3").arg(GET_NAME(ch)).arg(obj->Name()).arg(GET_NAME(vict)));
+    DC::getInstance()->logobjects(QStringLiteral("%1 slips %2 to %3").arg(GET_NAME(ch)).arg(obj->Name()).arg(GET_NAME(vict)));
 
     move_obj(obj, vict);
     act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);

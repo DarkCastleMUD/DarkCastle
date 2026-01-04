@@ -1002,10 +1002,10 @@ int do_export(Character *ch, char *args, cmd_t cmd)
   {
     std::stringstream errormsg;
     errormsg << "Exception while writing to " << filename << ".";
-    logmisc(errormsg.str().c_str());
+    DC::getInstance()->logmisc(errormsg.str().c_str());
   }
 
-  logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
+  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
 
   return eSUCCESS;
 }

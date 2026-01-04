@@ -2056,7 +2056,7 @@ void pulse_hunts()
   {
     if (&DC::getInstance()->world[6345] == nullptr)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
     }
 
@@ -2069,7 +2069,7 @@ void pulse_hunts()
   }
   catch (...)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
   }
 }
 

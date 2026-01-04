@@ -229,7 +229,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         {
           sendln("Huh?");
           auto str = QStringLiteral("command_interpreter: Unable to find command [%1].").arg(found->getName());
-          logbug(str);
+          DC::getInstance()->logbug(str);
           return logcmd.setReturn(eFAILURE, str);
         }
         else if (IS_NPC(this))
@@ -1048,8 +1048,8 @@ std::tuple<std::string, std::string> last_argument(std::string arguments)
   }
   catch (...)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
-         arguments.c_str());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
+                            arguments.c_str());
   }
 
   return std::tuple<std::string, std::string>(std::string(), std::string());

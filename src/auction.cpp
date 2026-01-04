@@ -271,7 +271,7 @@ void AuctionHouse::HandleDelete(QString name)
     {
       if (unlink(obj_filename.str().c_str()) == -1)
       {
-        logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       }
     }
 
@@ -620,7 +620,7 @@ void AuctionHouse::AddRoom(Character *ch, int room)
   {
     auction_rooms[room] = 1;
     ch->send(QStringLiteral("Done. Room %1 added to auction houses.\r\n").arg(room));
-    logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just added room %d to auction houses.", GET_NAME(ch), room);
+    DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just added room %d to auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
@@ -637,7 +637,7 @@ void AuctionHouse::RemoveRoom(Character *ch, int room)
   if (1 == auction_rooms.remove(room))
   {
     ch->send(QStringLiteral("Done. Room %1 has been removed from auction houses.\r\n").arg(room));
-    logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
+    DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
@@ -693,7 +693,7 @@ void AuctionHouse::Load()
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Unable to open the save file \"%s\" for Auction files!!", file_name.toStdString().c_str());
-    logmisc(buf);
+    DC::getInstance()->logmisc(buf);
     return;
   }
 
@@ -761,7 +761,7 @@ void AuctionHouse::Save()
 
   if (DC::getInstance()->cf.bport)
   {
-    logmisc(QStringLiteral("Unable to save auction files because this is the testport!"));
+    DC::getInstance()->logmisc(QStringLiteral("Unable to save auction files because this is the testport!"));
     return;
   }
   QString temp_file_name = file_name + ".temp";
@@ -819,7 +819,7 @@ void AuctionHouse::Save()
       catch (...)
       {
         perror("AuctionHouse::Save()");
-        logf(IMMORTAL, DC::LogChannel::LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it.key());
+        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it.key());
       }
     }
   }
@@ -835,7 +835,7 @@ void AuctionHouse::Save()
   if (rename(temp_file_name.toStdString().c_str(), file_name.toStdString().c_str()) != 0)
   {
     perror("AuctionHouse::save() rename");
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "AuctionHouse::Save() rename: %s", strerror(errno));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "AuctionHouse::Save() rename: %s", strerror(errno));
   }
 
   return;
@@ -1079,7 +1079,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   {
     if (unlink(obj_filename.str().c_str()) == -1)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       return;
     }
   }
@@ -1117,7 +1117,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     errno = 0;
     if (!(fl = fopen(WEB_AUCTION_FILE, "r")))
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
       return;
     }
 
@@ -1132,7 +1132,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     errno = 0;
     if (!(fl = fopen(WEB_AUCTION_FILE, "w")))
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
       return;
     }
 
@@ -1145,7 +1145,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   }
   else
   {
-    logmisc(QStringLiteral("bport mode: Not saving auction file to web dir."));
+    DC::getInstance()->logmisc(QStringLiteral("bport mode: Not saving auction file to web dir."));
   }
 }
 
@@ -1173,25 +1173,25 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
       {
         if ((auction_obj_file.rdstate() & std::ios_base::eofbit) == std::ios_base::eofbit)
         {
-          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::eofbit", ticket);
+          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::eofbit", ticket);
         }
         else if ((auction_obj_file.rdstate() & std::ios_base::badbit) == std::ios_base::badbit)
         {
-          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::badbit", ticket);
+          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::badbit", ticket);
         }
         else if ((auction_obj_file.rdstate() & std::ios_base::failbit) == std::ios_base::failbit)
         {
-          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::failbit", ticket);
+          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::failbit", ticket);
         }
         else
         {
-          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
+          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
         }
         Item_it->obj = nullptr;
       }
       catch (...)
       {
-        logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): unknown error");
+        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): unknown error");
         Item_it->obj = nullptr;
       }
     }
@@ -1316,7 +1316,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     {
       if (unlink(obj_filename.str().c_str()) == -1)
       {
-        logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       }
     }
 
@@ -1347,7 +1347,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   {
     if (unlink(obj_filename.str().c_str()) == -1)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
     }
   }
 

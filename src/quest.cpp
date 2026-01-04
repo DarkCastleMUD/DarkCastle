@@ -54,7 +54,7 @@ int load_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "r")))
    {
-      logmisc(QStringLiteral("Failed to open quest file for reading!"));
+      DC::getInstance()->logmisc(QStringLiteral("Failed to open quest file for reading!"));
       return eFAILURE;
    }
 
@@ -95,7 +95,7 @@ int save_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "w")))
    {
-      logmisc(QStringLiteral("Failed to open quest file for writing!"));
+      DC::getInstance()->logmisc(QStringLiteral("Failed to open quest file for writing!"));
       return eFAILURE;
    }
 
@@ -591,7 +591,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    obj_to_char(obj, mob);
    wear(mob, obj, obj->keywordfind());
 
-   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", GET_NAME(ch), quest->number, quest->name, quest->cost, quest->brownie);
+   DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", GET_NAME(ch), quest->number, quest->name, quest->cost, quest->brownie);
 
    ch->player->quest_current[count] = quest->number;
    ch->player->quest_current_ticksleft[count] = quest->timer;
@@ -638,7 +638,7 @@ int cancel_quest(Character *ch, struct quest_info *quest)
          return eEXTRA_VALUE;
    }
 
-   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
+   DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
 
    ch->player->quest_cancel[count] = quest->number;
 
@@ -681,7 +681,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
       SETBIT(ch->player->quest_complete, quest->number);
    quest->active = false;
 
-   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", GET_NAME(ch), quest->number, quest->name, quest->reward);
+   DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", GET_NAME(ch), quest->number, quest->name, quest->reward);
 
    return eSUCCESS;
 }
@@ -766,7 +766,7 @@ void quest_update()
                   {
                      stop_current_quest(i, quest);
 
-                     logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
+                     DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
 
                      i->send(QStringLiteral("Time has expired for %1.  This quest has ended.\r\n").arg(quest->name));
                   }
@@ -1258,8 +1258,8 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
             return eFAILURE;
          }
 
-         logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
-              vict->player->quest_points, atoi(value));
+         DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
+                                 vict->player->quest_points, atoi(value));
          csendf(ch, "Setting %s's quest points from %d to %d.\r\n", GET_NAME(vict),
                 vict->player->quest_points, atoi(value));
 

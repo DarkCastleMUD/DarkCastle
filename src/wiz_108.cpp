@@ -241,8 +241,8 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
       {
         csendf(ch, "You purloin %s from %s.\r\n",
                k->short_description, GET_NAME(vict));
-        logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s",
-             GET_NAME(ch), k->short_description, GET_NAME(vict));
+        DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s",
+                                GET_NAME(ch), k->short_description, GET_NAME(vict));
       }
       else
       {
@@ -580,8 +580,8 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     val = atoll(buf);
     int64_t before_exp = vict->exp;
     vict->exp = val;
-    logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
-         GET_NAME(ch), GET_NAME(vict), before_exp, vict->exp);
+    DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
+                            GET_NAME(ch), GET_NAME(vict), before_exp, vict->exp);
   }
   break;
   case 14: /* mana */
@@ -712,8 +712,8 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       uint32_t before_plat = GET_PLATINUM(vict);
       GET_PLATINUM(vict) = atoi(buf);
-      logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
-           GET_NAME(ch), GET_NAME(vict), before_plat, GET_PLATINUM(vict));
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
+                              GET_NAME(ch), GET_NAME(vict), before_plat, GET_PLATINUM(vict));
     }
   }
   break;
