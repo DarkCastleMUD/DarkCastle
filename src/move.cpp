@@ -44,8 +44,8 @@ int move_player(Character *ch, int room)
 	{
 		retval = move_char(ch, real_room(START_ROOM));
 		if (!isSet(retval, eSUCCESS))
-			logentry(QStringLiteral("Error in move_player(), Failure moving ch to start room. move_player_home_nofail"),
-					 IMMORTAL, DC::LogChannel::LOG_BUG);
+			DC::getInstance()->logentry(QStringLiteral("Error in move_player(), Failure moving ch to start room. move_player_home_nofail"),
+										IMMORTAL, DC::LogChannel::LOG_BUG);
 	}
 
 	return retval;
@@ -285,7 +285,7 @@ int do_fall(Character *ch, short dir)
 		ch->sendln("You fall...");
 		break;
 	default:
-		logentry(QStringLiteral("Default hit in do_fall"), IMMORTAL, DC::LogChannel::LOG_MORTAL);
+		DC::getInstance()->logentry(QStringLiteral("Default hit in do_fall"), IMMORTAL, DC::LogChannel::LOG_MORTAL);
 		break;
 	}
 
@@ -965,7 +965,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 		/*
 		 sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
 		 GET_NAME(ch), SOMEONE_DIED(return_val), return_val);
-		 logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
+		 DC::getInstance()->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
 		 */
 		return return_val;
 	}
@@ -1011,7 +1011,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 				 sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d",
 				 GET_NAME(k->follower), GET_NAME(ch), was_in, k->follower->in_room,
 				 GET_POS(k->follower), is_retreat);
-				 logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
+				 DC::getInstance()->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
 				 */
 			}
 		}
@@ -1109,7 +1109,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
 	if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
 	{
 		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
-		logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
 		ch->sendln("You can't enter that.");
 		return eFAILURE;
 	}
@@ -1192,7 +1192,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
 		return eFAILURE;
 	default:
 		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
-		logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
 		return eFAILURE;
 	}
 
@@ -1234,7 +1234,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 {
 	if (!ch)
 	{
-		logentry(QStringLiteral("Error in move_char(), nullptr character"), OVERSEER, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(QStringLiteral("Error in move_char(), nullptr character"), OVERSEER, DC::LogChannel::LOG_BUG);
 		return eINTERNAL_ERROR;
 	}
 
@@ -1245,8 +1245,8 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 		// Couldn't move char from the room
 		if (char_from_room(ch, stop_all_fighting) == 0)
 		{
-			logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
-					 OVERSEER, DC::LogChannel::LOG_BUG);
+			DC::getInstance()->logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
+										OVERSEER, DC::LogChannel::LOG_BUG);
 			return eINTERNAL_ERROR;
 		}
 	}

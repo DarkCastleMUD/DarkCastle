@@ -46,7 +46,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
   assert(ch != 0);
   if (ch->in_room == DC::NOWHERE)
   {
-    logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return eSUCCESS;
   }
 
@@ -139,7 +139,7 @@ int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
 
   if (message.isEmpty())
   {
-    logentry(QStringLiteral("nullptr STRING sent to send_to_gods!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr STRING sent to send_to_gods!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 

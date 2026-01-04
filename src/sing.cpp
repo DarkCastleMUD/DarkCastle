@@ -543,7 +543,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 		if (!isSet(song_info[spl].targets(), TAR_IGNORE))
 			if (!tar_char && !tar_obj)
 			{
-				logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+				DC::getInstance()->logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
 				send_to_char("If you triggered this message, you almost crashed the\n\r"
 							 "game.  Tell a god what you did immediately.\r\n",
 							 ch);
@@ -885,7 +885,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
 
 	if (!victim || !ch)
 	{
-		logentry(QStringLiteral("Serious problem in song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(QStringLiteral("Serious problem in song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 	act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, TO_VICT, 0);
@@ -911,7 +911,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 
 	if (!ch || ch->songs.empty())
 	{
-		logentry(QStringLiteral("Serious problem in execute_song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(QStringLiteral("Serious problem in execute_song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -981,7 +981,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 {
 	if (!victim || !ch)
 	{
-		logentry(QStringLiteral("Serious problem in song_disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(QStringLiteral("Serious problem in song_disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1034,7 +1034,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 
 	if (!victim)
 	{
-		logentry(QStringLiteral("No vict send to song whistle sharp!"), ANGEL, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(QStringLiteral("No vict send to song whistle sharp!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 

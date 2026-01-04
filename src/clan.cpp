@@ -523,7 +523,7 @@ void add_clan_member(clan_data *theClan, Character *ch)
 
   if (!ch || !theClan)
   {
-    logentry(QStringLiteral("add_clan_member(clan, ch) called with a null."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("add_clan_member(clan, ch) called with a null."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -541,13 +541,13 @@ void add_clan_member(clan_data *theClan, ClanMember *new_new_member)
 
   if (!new_new_member || !theClan)
   {
-    logentry(QStringLiteral("add_clan_member(clan, member) called with a null."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("add_clan_member(clan, member) called with a null."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (new_new_member->Name().isEmpty())
   {
-    logentry(QStringLiteral("Attempt to add a blank member name to a clan."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Attempt to add a blank member name to a clan."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -574,7 +574,7 @@ void add_clan_member(clan_data *theClan, ClanMember *new_new_member)
 
   if (member_found)
   { // found um, get out
-    logentry(QStringLiteral("Tried to add already existing clan member '%1'.").arg(new_new_member->Name()), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Tried to add already existing clan member '%1'.").arg(new_new_member->Name()), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1000,7 +1000,7 @@ int do_accept(Character *ch, char *arg, cmd_t cmd)
   victim->send(buf);
 
   sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), clan->name);
-  logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
+  DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
 
   add_totem_stats(victim);
 
@@ -1075,7 +1075,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
 
   if (victim == this)
   {
-    logentry(QStringLiteral("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, DC::LogChannel::LOG_CLAN);
+    DC::getInstance()->logentry(QStringLiteral("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, DC::LogChannel::LOG_CLAN);
     this->sendln("You quit your clan.");
     remove_totem_stats(victim);
     victim->clan = 0;
@@ -1097,7 +1097,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   sendln(QStringLiteral("You cast %1 out of your clan.").arg(victim->getName()));
   victim->sendln(QStringLiteral("You are cast out of %1.").arg(clanPtr->name));
 
-  logentry(QStringLiteral("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, DC::LogChannel::LOG_CLAN);
+  DC::getInstance()->logentry(QStringLiteral("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, DC::LogChannel::LOG_CLAN);
 
   victim->save(cmd_t::SAVE_SILENTLY);
   if (!victim_connected)
@@ -1165,7 +1165,7 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
   victim->send(buf);
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
-  logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
+  DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
   return eSUCCESS;
 }
 

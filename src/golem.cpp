@@ -159,7 +159,7 @@ void save_golem_data(Character *ch)
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
@@ -430,7 +430,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   }
   else
   {
-    logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
+    DC::getInstance()->logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
     return eFAILURE;
   }
 
@@ -444,7 +444,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
   if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
-    logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
+    DC::getInstance()->logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
     return eSUCCESS;

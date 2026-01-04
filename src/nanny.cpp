@@ -600,7 +600,7 @@ void Character::do_on_login_stuff(void)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
          {
-            logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, DC::LogChannel::LOG_PLAYER);
+            DC::getInstance()->logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, DC::LogChannel::LOG_PLAYER);
             // this->send(fmt::format("Removing skill {}\r\n", curr.first));
             skills_to_delete.push(curr.first);
          }
@@ -653,7 +653,7 @@ void Character::do_on_login_stuff(void)
 
    while (!todelete.empty())
    {
-      logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, DC::LogChannel::LOG_MORTAL);
+      DC::getInstance()->logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, DC::LogChannel::LOG_MORTAL);
       remove_vault_access(todelete.front(), vault);
       todelete.pop();
    }
@@ -837,7 +837,7 @@ void DC::nanny(class Connection *d, std::string arg)
    {
 
    default:
-      logentry(QStringLiteral("Nanny: invalid STATE(d) == %1").arg(STATE(d)), 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Nanny: invalid STATE(d) == %1").arg(STATE(d)), 0, DC::LogChannel::LOG_BUG);
       close_socket(d);
       return;
 
@@ -1023,7 +1023,7 @@ void DC::nanny(class Connection *d, std::string arg)
       {
          SEND_TO_Q("Wrong password.\r\n", d);
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
-         logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
+         DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
          if ((ch = get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
@@ -1036,7 +1036,7 @@ void DC::nanny(class Connection *d, std::string arg)
             if (d->character->player->bad_pw_tries > 100)
             {
                sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
-               logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
+               DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
             }
             else
             {
@@ -1055,9 +1055,9 @@ void DC::nanny(class Connection *d, std::string arg)
 
       buffer = QStringLiteral("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
       if (ch->getLevel() < ANGEL)
-         logentry(buffer, OVERSEER, DC::LogChannel::LOG_SOCKET);
+         DC::getInstance()->logentry(buffer, OVERSEER, DC::LogChannel::LOG_SOCKET);
       else
-         logentry(buffer, ch->getLevel(), DC::LogChannel::LOG_SOCKET);
+         DC::getInstance()->logentry(buffer, ch->getLevel(), DC::LogChannel::LOG_SOCKET);
 
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
@@ -1103,7 +1103,7 @@ void DC::nanny(class Connection *d, std::string arg)
          {
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
                     GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
-            logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
+            DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                       "Questions may be directed to imps@dcastle.org\n\r",
                       d);
@@ -1692,7 +1692,7 @@ void DC::nanny(class Connection *d, std::string arg)
       init_char(ch);
 
       sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
-      logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
+      DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
       SEND_TO_Q("\n\r", d);
       SEND_TO_Q(motd, d);
       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
@@ -1753,12 +1753,12 @@ void DC::nanny(class Connection *d, std::string arg)
          if (ch->getGold() > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
-            logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
+            DC::getInstance()->logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
          }
          if (GET_BANK(ch) > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
-            logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
+            DC::getInstance()->logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
          }
          ch->sendln("\n\rWelcome to Dark Castle.");
          character_list.insert(ch);
@@ -1870,7 +1870,7 @@ void DC::nanny(class Connection *d, std::string arg)
       if (arg == "ERASE ME")
       {
          sprintf(buf, "%s just deleted themself.", d->character->getNameC());
-         logentry(buf, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+         DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 
          DC::getInstance()->TheAuctionHouse.HandleDelete(d->character->getName());
          // To remove the vault from memory
@@ -1955,7 +1955,7 @@ void DC::nanny(class Connection *d, std::string arg)
          strcpy(ch->player->pwd, blah2);
          ch->save_char_obj();
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
-         logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
+         DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
       }
 
       break;
@@ -2018,7 +2018,7 @@ bool check_deny(class Connection *d, char *name)
 
    char log_buf[MAX_STRING_LENGTH] = {};
    sprintf(log_buf, "Denying access to player %s@%s.", name, d->getPeerOriginalAddress().toString().toStdString().c_str());
-   logentry(log_buf, ARCHANGEL, DC::LogChannel::LOG_MORTAL);
+   DC::getInstance()->logentry(log_buf, ARCHANGEL, DC::LogChannel::LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
    close_socket(d);
@@ -2065,11 +2065,11 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 
          if (tmp_ch->isMortalPlayer())
          {
-            logentry(log_buf, COORDINATOR, DC::LogChannel::LOG_SOCKET);
+            DC::getInstance()->logentry(log_buf, COORDINATOR, DC::LogChannel::LOG_SOCKET);
          }
          else
          {
-            logentry(log_buf, tmp_ch->getLevel(), DC::LogChannel::LOG_SOCKET);
+            DC::getInstance()->logentry(log_buf, tmp_ch->getLevel(), DC::LogChannel::LOG_SOCKET);
          }
 
          STATE(d) = Connection::states::PLAYING;

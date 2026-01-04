@@ -98,7 +98,7 @@ public:
          (ch_->player->multi && !DC::getInstance()->cf.allow_multi)))
     {
       command_duration_.start();
-      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\"").arg(ch_->getName()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
+      DC::getInstance()->logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\"").arg(ch_->getName()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
       logged_ = true;
     }
   }
@@ -110,7 +110,7 @@ public:
       command_duration_.stop();
       auto timediff = ((command_duration_.getDiff().tv_sec * 1000000.0) + command_duration_.getDiff().tv_usec) / 1000000.0;
       auto timediffStr = QString::number(timediff, 'f');
-      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6").arg(ch_->getName()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
+      DC::getInstance()->logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6").arg(ch_->getName()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
     }
   }
 
@@ -132,7 +132,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(QString::number(cstack.getDepth())).arg(QString::number(cstack.getMax())).arg(getName()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(QString::number(cstack.getDepth())).arg(QString::number(cstack.getMax())).arg(getName()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     return logcmd.setReturn(eFAILURE, "cstack exceeded");
   }

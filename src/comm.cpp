@@ -319,7 +319,7 @@ int DC::load_hotboot_descs(void)
       {
         if (write_to_descriptor(descriptor, str) == -1)
         {
-          logentry(QStringLiteral("Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot.").arg(address).arg(character_name).arg(descriptor));
+          DC::getInstance()->logentry(QStringLiteral("Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot.").arg(address).arg(character_name).arg(descriptor));
           CLOSE_SOCKET(descriptor);
           delete d;
           d = {};
@@ -921,7 +921,7 @@ void DC::game_loop_init(void)
 
                  QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
-                 logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
+                 DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
                  logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
 
                  for (const auto &ch : dc->character_list)
@@ -1619,7 +1619,7 @@ int new_descriptor(int s)
                               "imps@dcastle.org\n\r");
 
     CLOSE_SOCKET(desc);
-    logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
+    DC::getInstance()->logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
     delete newd;
     return 0;
   }
@@ -1921,11 +1921,11 @@ int process_input(class Connection *t)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        logentry(QStringLiteral("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(QStringLiteral("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
       else
       {
-        logentry(QStringLiteral("Connection broken by peer %1 not playing a character.").arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(QStringLiteral("Connection broken by peer %1 not playing a character.").arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
 
       return -1;
@@ -2250,19 +2250,19 @@ int close_socket(class Connection *d)
     {
       sprintf(buf, "Losing player: %s.",
               GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
-      logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
+      DC::getInstance()->logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
       if (d->isEditing())
       {
         //		sprintf(buf, "Suspicious: %s.",
         //			GET_NAME(d->character));
-        //		logentry(buf, 110, LOG_HMM);
+        //		DC::getInstance()->logentry(buf, 110, LOG_HMM);
       }
       free_char(d->character, Trace("close_socket"));
     }
   }
   //   Removed this log caues it's so fricken annoying
   //   else
-  //    logentry(QStringLiteral("Losing descriptor without char."), ANGEL, DC::LogChannel::LOG_SOCKET);
+  //    DC::getInstance()->logentry(QStringLiteral("Losing descriptor without char."), ANGEL, DC::LogChannel::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (d->original && d->original->desc)
@@ -2325,7 +2325,7 @@ void check_idle_passwords(void)
 
 void report_debug_logging()
 {
-  logentry(QStringLiteral("Name: [%1] Last cmd: [%2] Last room: [%3]").arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Name: [%1] Last cmd: [%2] Last room: [%3]").arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
 }
 
 void DC::crash_hotboot(void)
@@ -2350,10 +2350,10 @@ void DC::crash_hotboot(void)
     {
       write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
-    logentry(QStringLiteral("Attempting to hotboot from the crash."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Attempting to hotboot from the crash."), ANGEL, DC::LogChannel::LOG_BUG);
     write_hotboot_file();
     // we shouldn't return from there unless we failed
-    logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, DC::LogChannel::LOG_BUG);
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
@@ -2369,18 +2369,18 @@ void DC::crash_hotboot(void)
 void crashill(int sig)
 {
   report_debug_logging();
-  logentry(QStringLiteral("Recieved SIGFPE (Illegal Instruction)"), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Recieved SIGFPE (Illegal Instruction)"), ANGEL, DC::LogChannel::LOG_BUG);
   DC::getInstance()->crash_hotboot();
-  logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
 void crashfpe(int sig)
 {
   report_debug_logging();
-  logentry(QStringLiteral("Recieved SIGFPE (Arithmetic Error)"), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Recieved SIGFPE (Arithmetic Error)"), ANGEL, DC::LogChannel::LOG_BUG);
   DC::getInstance()->crash_hotboot();
-  logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
@@ -2394,13 +2394,13 @@ void crashsig(int sig)
   }
   if (died_from_sigsegv > 2)
   { // panic! try to log and get out
-    logentry(QStringLiteral("Hit 'died_from_sigsegv > 2'"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Hit 'died_from_sigsegv > 2'"), ANGEL, DC::LogChannel::LOG_BUG);
     exit(0);
   }
   report_debug_logging();
-  logentry(QStringLiteral("Recieved SIGSEGV (Segmentation fault)"), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Recieved SIGSEGV (Segmentation fault)"), ANGEL, DC::LogChannel::LOG_BUG);
   DC::getInstance()->crash_hotboot();
-  logentry(QStringLiteral("Mud exiting from SIGSEGV."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Mud exiting from SIGSEGV."), ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
@@ -2409,8 +2409,8 @@ void unrestrict_game(int sig)
   extern struct ban_list_element *ban_list;
   extern int num_invalid;
 
-  logentry(QStringLiteral("Received SIGUSR2 - completely unrestricting game (emergent)"),
-           ANGEL, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(QStringLiteral("Received SIGUSR2 - completely unrestricting game (emergent)"),
+                              ANGEL, DC::LogChannel::LOG_GOD);
   ban_list = nullptr;
   restrict = 0;
   num_invalid = 0;
@@ -2477,7 +2477,7 @@ void signal_handler(int signal, siginfo_t *si, void *)
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
-    logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
     logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
     if (!DC::getInstance()->write_hotboot_file())
     {

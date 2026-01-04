@@ -207,7 +207,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
 
   sprintf(buf, "%s has banned %s for %s players.", GET_NAME(ch), site,
           ban_types[ban_node->type]);
-  logentry(buf, POWER, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, POWER, DC::LogChannel::LOG_GOD);
   ch->sendln("Site banned.");
   write_ban_list();
   return eSUCCESS;
@@ -244,7 +244,7 @@ int do_unban(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("Site unbanned.");
   sprintf(buf, "%s removed the %s-player ban on %s.",
           GET_NAME(ch), ban_types[ban_node->type], ban_node->site);
-  logentry(buf, POWER, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, POWER, DC::LogChannel::LOG_GOD);
 
   delete ban_node;
   write_ban_list();

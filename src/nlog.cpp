@@ -100,7 +100,7 @@ char *str_hsh(const char *arg)
 
 void logf(int level, DC::LogChannel type, QString arg)
 {
-  logentry(arg, level, type);
+  DC::getInstance()->logentry(arg, level, type);
 }
 
 /* logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
@@ -113,7 +113,7 @@ void logf(int level, DC::LogChannel type, const char *arg, ...)
   vsnprintf(s, MAX_STRING_LENGTH, arg, args);
   va_end(args);
 
-  logentry(s, level, type);
+  DC::getInstance()->logentry(s, level, type);
 }
 
 int csendf(Character *ch, const char *arg, ...)

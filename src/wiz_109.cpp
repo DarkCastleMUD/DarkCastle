@@ -88,8 +88,8 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
-    logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
+                                DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
   if (fprintf(fl, "~\n") < 0)
@@ -103,8 +103,8 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
-    logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
+                                DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
   tmp = fread_string(fl, 0);
@@ -248,7 +248,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
           victim->getNameC(), new_newlevel);
-  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   if (victim->getLevel() == 0)
     do_start(victim);
@@ -333,7 +333,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, DC::LogChannel::LOG_GOD);
   }
 
   else
@@ -408,7 +408,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   {
     QString buffer = QStringLiteral("Shutdown by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
-    logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     _shutdown = 1;
     DC::getInstance()->quit();
   }
@@ -436,7 +436,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     do_not_save_corpses = 1;
     QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
-    logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
     do_force(this, "all save");
     if (!DC::getInstance()->write_hotboot_file())
@@ -470,7 +470,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   else if (arg1 == "core")
   {
     produce_coredump(this);
-    logentry(QStringLiteral("Corefile produced."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Corefile produced."), IMMORTAL, DC::LogChannel::LOG_BUG);
   }
   else if (arg1 == "die")
   {

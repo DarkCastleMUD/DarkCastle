@@ -137,7 +137,7 @@ void do_mload(Character *ch, int rnum, int cnt)
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
     }
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
@@ -147,7 +147,7 @@ void do_mload(Character *ch, int rnum, int cnt)
              DC::getInstance()->mob_index[rnum].virt,
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
   }
 }
@@ -196,7 +196,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
                     obj->short_description,
                     DC::getInstance()->world[ch->in_room].number,
                     DC::getInstance()->world[ch->in_room].name);
-  logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return obj_list;
 }
@@ -258,7 +258,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
   }
-  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 }
 
 //
@@ -1428,14 +1428,14 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
   {
     ch->sendln("Performing full zone reset!");
     std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln("Resetting this entire zone!");
     std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
 
@@ -1485,7 +1485,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
   }
   ch->sendln("You have just caused the destruction of countless creatures in ths area!");
   sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
-  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -1586,7 +1586,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
     }
 
     sprintf(buf, "%s restored %s.", GET_NAME(ch), victim->getNameC());
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     update_pos(victim);
     redo_hitpoints(victim);
@@ -1605,7 +1605,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("You don't have the ability to do that!");
       sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
       return eFAILURE;
     }
@@ -1636,7 +1636,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
         victim->save();
       }
     sprintf(buf, "%s did a restore all!", GET_NAME(ch));
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("Trying to be Mister Popularity?");
   }
   return eSUCCESS;
@@ -2149,13 +2149,13 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 
@@ -2220,13 +2220,13 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 

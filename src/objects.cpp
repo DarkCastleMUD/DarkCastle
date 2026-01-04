@@ -2152,7 +2152,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   default:
   {
-    logentry(QStringLiteral("Unknown type called in wear."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unknown type called in wear."), ANGEL, DC::LogChannel::LOG_BUG);
   }
   break;
   }
@@ -2620,7 +2620,7 @@ bool fullSave(Object *obj)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", qPrintable(obj->Name()));
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 

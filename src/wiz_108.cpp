@@ -362,7 +362,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       return eFAILURE;
     }
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set age of victim */
     vict->player->time.birth =
         time(0) - (int32_t)value * (int32_t)SECS_PER_MUD_YEAR;
@@ -375,7 +375,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Sex must be 'm','f' or 'n'.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set sex of victim */
     switch (*buf)
     {
@@ -406,7 +406,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
                    ch);
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set class of victim */
     switch (*buf)
     {
@@ -466,7 +466,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("That level is higher than you!");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set level of victim */
     vict->setLevel(value);
     DC::getInstance()->update_wizlist(vict);
@@ -475,7 +475,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 4: /* height */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set height of victim */
     vict->height = value;
   }
@@ -483,7 +483,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 5: /* weight */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set weight of victim */
     vict->weight = value;
   }
@@ -497,7 +497,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original strength of victim */
     vict->raw_str = value;
   }
@@ -516,7 +516,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original INT of victim */
     vict->raw_intel = value;
     redo_mana(vict);
@@ -532,7 +532,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original WIS of victim */
     vict->raw_wis = value;
   }
@@ -546,7 +546,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original DEX of victim */
     vict->raw_dex = value;
   }
@@ -560,7 +560,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original CON of victim */
     vict->raw_con = value;
     redo_hitpoints(vict);
@@ -569,7 +569,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 12: /* gold */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original gold of victim */
     vict->setGold(value);
   }
@@ -587,7 +587,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 14: /* mana */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original mana of victim */
     vict->raw_mana = value;
     redo_mana(vict);
@@ -596,7 +596,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 15: /* hit */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original hit of victim */
     vict->raw_hit = value;
     redo_hitpoints(vict);
@@ -605,7 +605,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 16: /* move */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original move of victim */
     vict->raw_move = value;
   }
@@ -618,7 +618,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       return eFAILURE;
     }
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original sessions of victim */
     vict->player->practices = value;
   }
@@ -632,7 +632,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 1000.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original alignment of victim */
     vict->alignment = value;
   }
@@ -646,7 +646,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 101.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original thirst of victim */
     vict->conditions[THIRST] = value;
   }
@@ -660,7 +660,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 101.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original drunk of victim */
     vict->conditions[DRUNK] = value;
   }
@@ -674,7 +674,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("and less than 101.");
       return eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original full of victim */
     vict->conditions[FULL] = value;
   }
@@ -697,13 +697,13 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
         break;
       }
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
   }
   break;
   case 23: /* bank */
   {
     GET_BANK(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 24: /* platinum */
@@ -720,13 +720,13 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 25: /* ki */
   {
     vict->raw_ki = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 26: /* clan number */
   {
     vict->clan = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_BUG);
   }
   break;
   case 27: // saves
@@ -761,25 +761,25 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   case 28:
   {
     GET_HP_METAS(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 29:
   {
     GET_MANA_METAS(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 30:
   {
     GET_MOVE_METAS(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 31:
   {
     vict->armor = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 32:
@@ -803,7 +803,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     }
 
     vict->player->profession = value;
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   }

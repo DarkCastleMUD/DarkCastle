@@ -905,7 +905,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (vict->isPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        DC::getInstance()->logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
@@ -939,7 +939,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (vict->isPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        DC::getInstance()->logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else

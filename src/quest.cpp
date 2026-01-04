@@ -386,7 +386,7 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
 
          if (!amount)
          {
-            logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
+            DC::getInstance()->logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
          }
 
          csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\n\r\n\r",
@@ -904,7 +904,7 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
       }
       break;
    default:
-      logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return eFAILURE;
    }
    return retval;
@@ -1450,7 +1450,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
       }
       break;
    default:
-      logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return eFAILURE;
    }
    return eSUCCESS;

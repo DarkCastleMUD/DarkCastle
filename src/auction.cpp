@@ -203,7 +203,7 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
     }
   }
 
-  logentry(QStringLiteral("VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n").arg(GET_NAME(ch)).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  DC::getInstance()->logentry(QStringLiteral("VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n").arg(GET_NAME(ch)).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   Item_it->price = new_price;
   Save();
   return;
@@ -258,7 +258,7 @@ void AuctionHouse::HandleDelete(QString name)
     plural = "s ";
   }
 
-  logentry(QStringLiteral("%1 auction%2 belonging to %3 have been deleted.").arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(QStringLiteral("%1 auction%2 belonging to %3 have been deleted.").arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
 
   while (!tickets_to_delete.isEmpty())
   {
@@ -303,7 +303,7 @@ void AuctionHouse::HandleRename(Character *ch, QString old_name, QString new_nam
   {
     plural = "s ";
   }
-  logentry(QStringLiteral("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(QStringLiteral("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
   Save();
   return;
 }
@@ -393,7 +393,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
   if (!obj)
   {
 
-    logentry(QStringLiteral("Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!").arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!").arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -771,7 +771,7 @@ void AuctionHouse::Save()
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Unable to open/create the save file \"%s\" for Auction files!!", file_name.toStdString().c_str());
-    logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1031,7 +1031,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(buy)! Item %s[VNum %d] belonging to %s could not be created!",
             Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1042,7 +1042,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(buy)! Item %s[RNum %d] belonging to %s could not be created!",
             Item_it->item_name.toStdString().c_str(), rnum, Item_it->seller.toStdString().c_str());
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1108,7 +1108,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n",
           GET_NAME(ch), Item_it->seller.toStdString().c_str(), Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->price);
-  logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   obj_to_char(obj, ch);
   ch->save();
 
@@ -1258,7 +1258,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\r\n",
             GET_NAME(ch), Item_it->price, Item_it->item_name.toStdString().c_str(), ticket);
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   }
   break;
   case AUC_EXPIRED: // intentional fallthrough
@@ -1274,7 +1274,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!",
               Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
-      logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
 
@@ -1290,7 +1290,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "Major screw up in auction(RemoveTicket)! Item %s[RNum %d] belonging to %s could not be created!",
               Item_it->item_name.toStdString().c_str(), rnum, Item_it->seller.toStdString().c_str());
-      logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
 
@@ -1298,7 +1298,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
             GET_NAME(ch), ticket, Item_it->item_name.toStdString().c_str(), Item_it->price);
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     obj_to_char(obj, ch);
   }
   break;
@@ -1306,7 +1306,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "%s just tried to cheat and collect ticket %u which didn't get erased properly!", GET_NAME(ch), ticket);
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     Items_For_Sale.remove(ticket);
 
     std::stringstream obj_filename;
@@ -1324,7 +1324,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   }
   break;
   default:
-    logentry(QStringLiteral("Default case reached in Removeticket, contact a coder!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Default case reached in Removeticket, contact a coder!"), IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -1336,7 +1336,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(cancel)! Ticket %d belonging to %s could not be removed!",
             ticket, Item_it->seller.toStdString().c_str());
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1666,7 +1666,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     else
     {
       ch->sendln("The Consignment Broker couldn't auction. Contact an imm.");
-      logentry(QStringLiteral("Character *Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+      DC::getInstance()->logentry(QStringLiteral("Character *Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
     }
   }
 
@@ -1679,7 +1679,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   {
     sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.toStdString().c_str());
   }
-  logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
   // If this is a custom item we need it to continue existing otherwise we remove the clone
   if (fullSave(obj))

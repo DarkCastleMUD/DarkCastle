@@ -1008,7 +1008,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
             sprintf(log_buf, "%s stole %s[%d] from %s",
                     GET_NAME(ch), obj->short_description,
                     DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
-            logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+            DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
@@ -1178,7 +1178,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         ch->send(buf);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, victim->getNameC());
-        logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+        DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (victim->isPlayer())
         {
           victim->save(cmd_t::SAVE_SILENTLY);
@@ -1712,7 +1712,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
       sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
               GET_NAME(vict));
-      logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
       if (IS_NPC(ch) || (ch->getLevel() < DEITY))
         ch->removeGold(amount);

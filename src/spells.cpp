@@ -1040,13 +1040,13 @@ void isr_set(Character *ch)
 
   if (!ch)
   {
-    logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
     return;
   }
 
   /*  why do we need this spamming the logs?
      sprintf(buf, "isr_set ch %s", GET_NAME(ch));
-     logentry(buf, 0, DC::LogChannel::LOG_BUG);
+     DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_BUG);
   */
   for (afisr = ch->affected; afisr; afisr = afisr->next)
   {
@@ -1128,7 +1128,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 
   if (ch->master == nullptr)
   {
-    logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   /*
@@ -2485,7 +2485,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           {
             sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
                     get_skill_name(spl), GET_NAME(tar_char));
-            logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
+            DC::getInstance()->logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
           }*/
 
           // Wizard's eye (88) is ok to cast

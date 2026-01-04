@@ -91,7 +91,7 @@ aliases_t read_char_aliases(FILE *fpsave)
     QString command = fread_alias_string(fpsave);
     if (keyword.isEmpty() || command.isEmpty())
     {
-      logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
+      DC::getInstance()->logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
       continue;
     }
 
@@ -107,7 +107,7 @@ QString fread_alias_string(FILE *fpsave)
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (read_count != 1)
   {
-    logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
+    DC::getInstance()->logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
     return QString();
   }
 
@@ -709,19 +709,19 @@ void read_skill(Character *ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -860,7 +860,7 @@ void save_char_obj_db(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -911,7 +911,7 @@ void Character::save_char_obj(void)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -956,7 +956,7 @@ void Character::save_char_obj(void)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -970,7 +970,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 {
   QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
   perror(log_buf.toStdString().c_str());
-  logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }

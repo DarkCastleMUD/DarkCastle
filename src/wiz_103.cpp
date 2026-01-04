@@ -79,7 +79,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
     sprintf(name, "%s has booted %s.", GET_NAME(ch), victim->getNameC());
-    logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     if (!strcmp(type, "boot"))
     {
@@ -233,7 +233,7 @@ int do_fsave(Character *ch, std::string argument, cmd_t cmd)
   }
   vict->save();
 
-  logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return eSUCCESS;
 }

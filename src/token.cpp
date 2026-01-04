@@ -508,7 +508,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             } /* if it's a code */
             else // It's unrecognized.  Shouldn't happen.
             {
-              logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, DC::LogChannel::LOG_BUG);
+              DC::getInstance()->logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, DC::LogChannel::LOG_BUG);
             }
 #ifdef DEBUG_TOKEN
     // std::cerr << "Output after this loop: " << interp << std::endl;

@@ -252,7 +252,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       else
       {
         sprintf(buf, "%s had %s, but no AFF_CHAMPION.", GET_NAME(ch), obj->short_description);
-        logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         return eFAILURE;
       }
     }
@@ -308,7 +308,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), qPrintable(obj->Name()), DC::getInstance()->obj_index[obj->item_number].virt);
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
@@ -1571,8 +1571,8 @@ void CVoteData::OutToFile()
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
+                                DC::LogChannel::LOG_BUG);
     return;
   }
 

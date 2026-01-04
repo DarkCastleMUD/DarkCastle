@@ -1793,7 +1793,7 @@ int handcompare(int hand1[5], int hand2[5])
       if (a == b)
          return 3; //
    }
-   logentry(QStringLiteral("Error in handcompare."), 110, DC::LogChannel::LOG_MORTAL);
+   DC::getInstance()->logentry(QStringLiteral("Error in handcompare."), 110, DC::LogChannel::LOG_MORTAL);
 
    return -1;
 }
@@ -2006,7 +2006,7 @@ void save_slot_machines()
 
    if (!curr)
    {
-      logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
    }
 

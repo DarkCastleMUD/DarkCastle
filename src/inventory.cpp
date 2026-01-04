@@ -92,7 +92,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
         char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->item_number].virt, qPrintable(sub_object->Name()));
-        logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+        DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
@@ -873,7 +873,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                           DC::getInstance()->obj_index[obj_object->item_number].virt,
                           qPrintable(sub_object->Name()),
                           DC::getInstance()->obj_index[sub_object->item_number].virt);
-                  logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+                  DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
                   fail = true;
@@ -1166,7 +1166,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
-            logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+            DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
@@ -1234,7 +1234,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
-            logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+            DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
@@ -2677,7 +2677,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   { // Logging gold gets from corpses would just be too much.
     //"%s palms %s[%d] from %s", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->item_number].virt, qPrintable(sub_object->Name()));
 
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].virt);
@@ -2686,7 +2686,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   {
     sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->item_number].virt,
             ch->in_room);
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].virt);

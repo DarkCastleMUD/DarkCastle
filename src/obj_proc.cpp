@@ -3931,7 +3931,7 @@ int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const c
 
   if (obj->in_room <= 0)
   {
-    logentry(QStringLiteral("Mortar round without a room?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Mortar round without a room?"), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_obj(obj);
     return eFAILURE;
   }

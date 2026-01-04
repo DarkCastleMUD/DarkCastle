@@ -66,7 +66,7 @@ void load_game_portals()
     QString portal_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_files[i]);
     if ((cur_file = fopen(portal_filename.toStdString().c_str(), "r")) == 0)
     {
-      logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
+      DC::getInstance()->logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
       break;
     }
     /* Now we have a readable file.  Here's the structure:
@@ -84,7 +84,7 @@ void load_game_portals()
                &(game_portals[i].obj_num),
                &(game_portals[i].max_timer)) != 3)
     {
-      logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
+      DC::getInstance()->logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
       break;
     }
     /* Store the current file value and count line feeds */
@@ -155,7 +155,7 @@ void process_portals()
         char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
                 game_portals[i].to_room);
-        logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }
       game_portals[i].cur_timer = game_portals[i].max_timer;
     }
@@ -181,14 +181,14 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   {
     sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
     delete from_portal;
-    logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
   if (from_room == to_room)
   {
     delete from_portal;
-    logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
@@ -214,7 +214,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
     {
       sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       delete from_portal;
-      logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       return 0;
     }
   }

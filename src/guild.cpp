@@ -1401,7 +1401,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
     oi -= int_app[GET_INT(this)].hard_bonus;
     break;
   default:
-    logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 

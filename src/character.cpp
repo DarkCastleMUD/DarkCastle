@@ -277,7 +277,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     Character *charmie = dc_->clone_mobile(real_mobile(8));
     if (charmie == nullptr)
     {
-        logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
+        DC::getInstance()->logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
         return false;
     }
     charmie->setLevel(1);
@@ -292,14 +292,14 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
     QString message = QStringLiteral("Restored charmie for player %1 with file '%2'.").arg(player_name).arg(fullpath);
     send(message);
-    logentry(message);
+    DC::getInstance()->logentry(message);
 
     if (!previous)
     {
         QFile file(fullpath);
         if (file.rename(fullpath + ".restored"))
         {
-            logentry(QStringLiteral("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
+            DC::getInstance()->logentry(QStringLiteral("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
         }
     }
 
@@ -792,7 +792,7 @@ level_t Character::getLevel(void) const
     if (level_ > 110)
     {
         produce_coredump();
-        logentry(QStringLiteral("Warning: getLevel returned %1.").arg(QString::number(level_)));
+        DC::getInstance()->logentry(QStringLiteral("Warning: getLevel returned %1.").arg(QString::number(level_)));
     }
 
     return level_;
@@ -805,7 +805,7 @@ void Character::setLevel(level_t level)
     if (level_ > 110)
     {
         produce_coredump();
-        logentry(QStringLiteral("Warning: setLevel(%1).").arg(QString::number(level_)));
+        DC::getInstance()->logentry(QStringLiteral("Warning: setLevel(%1).").arg(QString::number(level_)));
     }
 }
 

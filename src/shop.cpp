@@ -699,7 +699,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
 
@@ -709,7 +709,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
     if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
   return eFAILURE;
 
 LFound2:
@@ -1413,7 +1413,7 @@ int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *
 
   if (!(keeper = invoker))
   {
-    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
 
@@ -1794,7 +1794,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
           act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
 
           sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), qPrintable(obj->Name()), GET_NAME(owner));
-          logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+          DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         }
         else
         {
@@ -1817,7 +1817,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
         act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
 
         sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), qPrintable(item->Name()), GET_NAME(ch));
-        logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1949,7 +1949,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -1958,7 +1958,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
         act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -2008,7 +2008,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
@@ -2025,7 +2025,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
@@ -2043,7 +2043,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2071,7 +2071,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
       act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);

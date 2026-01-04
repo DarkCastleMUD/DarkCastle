@@ -225,7 +225,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
 	{
 	default:
 		ch->sendln("Problem...fuck up in do_load.");
-		logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
+		DC::getInstance()->logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE;
 	case 0: /* mobile */
 		if ((number = number_or_name(&c, &num)) == 0)

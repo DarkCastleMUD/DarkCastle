@@ -336,7 +336,7 @@ void DC::logverbose(QString str, uint64_t god_level, DC::LogChannel type, Charac
 {
 	if (cf.verbose_mode)
 	{
-		logentry(str, god_level, type, vict);
+		DC::getInstance()->logentry(str, god_level, type, vict);
 	}
 }
 

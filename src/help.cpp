@@ -216,7 +216,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
 
     sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
             upper_argument, GET_NAME(ch));
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_HELP);
 
     delete[] upper_argument;
     return eFAILURE;
@@ -300,7 +300,7 @@ int load_new_help(FILE *fl, int reload, Character *ch)
   {
     if (reload == 1)
     {
-      logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, DC::LogChannel::LOG_HELP);
+      DC::getInstance()->logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, DC::LogChannel::LOG_HELP);
       return eFAILURE;
     }
     else
@@ -383,7 +383,7 @@ int load_new_help(FILE *fl, int reload, Character *ch)
     {
       sprintf(buf, "%s just reloaded the help files.", GET_NAME(ch));
     }
-    logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
   }
   return eSUCCESS;
 }
@@ -685,7 +685,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
     return eFAILURE;
   }
 
@@ -694,7 +694,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
     return eFAILURE;
   }
 
@@ -769,7 +769,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     ch->send(buf);
     DC::getInstance()->new_top_of_helpt++;
     sprintf(buf, "%s just created a help file for '%s'.", GET_NAME(ch), buf2);
-    logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
   }
   else if ((help_id = atoi(buf)) || *buf == '0')
   { // Edit a specific help entry
@@ -943,7 +943,7 @@ void save_help(Character *ch)
 
   ch->sendln("Saved.");
   sprintf(buf, "%s just saved the help files.", GET_NAME(ch));
-  logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
+  DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
 
   sprintf(file, "%s", WEB_HELP_FILE);
   LegacyFile lf_web_help(".", file, "Unable to open '%1'");

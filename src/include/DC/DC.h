@@ -622,6 +622,7 @@ public:
   int oprog_rand_trigger(Object *item);
   int oprog_arand_trigger(Object *item);
 
+  void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
   ~DC(void)
   {
     /* TODO enable and fix all memory leaks
@@ -675,7 +676,6 @@ private:
   void nanny(class Connection *d, std::string arg = "");
   void object_activity(uint64_t pulse_type);
 };
-void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);
 void logf(int level, DC::LogChannel type, QString arg);
 int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type);
@@ -692,7 +692,7 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
   if (from > to)
   {
 
-    logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
+    DC::getInstance()->logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
     produce_coredump();
     return to;
   }

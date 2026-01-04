@@ -578,8 +578,8 @@ int save_boards()
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
+                                DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
 
@@ -885,8 +885,8 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
+                                DC::LogChannel::LOG_BUG);
     return;
   }
 
