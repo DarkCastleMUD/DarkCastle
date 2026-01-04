@@ -133,6 +133,7 @@ add_library(DC SHARED
     src/const.cpp
     src/corpse.cpp
     src/Database.cpp
+    src/DataSource.cpp
     src/db.cpp
     src/DC.cpp
     src/fight.cpp
@@ -215,6 +216,7 @@ add_library(DC SHARED
     src/include/DC/const.h
     src/include/DC/corpse.h
     src/include/DC/Database.h
+    src/include/DC/DataSource.h
     src/include/DC/db.h
     src/include/DC/DC.h
     src/include/DC/DC_global.h
