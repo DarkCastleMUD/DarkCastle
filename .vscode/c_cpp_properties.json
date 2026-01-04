@@ -12,12 +12,7 @@
                 "/usr/include/qt6/QtConcurrent",
                 "/usr/include/qt6/QtHttpServer",
                 "/usr/include/qt6/QtNetwork",
-                "${workspaceFolder}/build/default/benchmarkDC_autogen/include",
-                "${workspaceFolder}/build/default/dcastle_autogen/include",
-                "${workspaceFolder}/build/default/DC_autogen/include",
-                "${workspaceFolder}/build/default/debug_autogen/include",
-                "${workspaceFolder}/build/default/testDC_autogen/include",
-                "${workspaceFolder}/build/default/_deps/tracy-src/public"
+                "${workspaceFolder}/build/debug/_deps/tracy-src/public"
             ],
             "compilerPath": "/usr/bin/clang++-20",
             "compilerArgs": [
@@ -27,7 +22,9 @@
             "cStandard": "c23",
             "cppStandard": "c++23",
             "intelliSenseMode": "linux-clang-x64",
-            "compileCommands": "${workspaceFolder}/build/default/compile_commands.json"
+            "compileCommands": [
+                "${workspaceFolder}/build/default/compile_commands.json"
+            ]
         }
     ],
     "version": 4
