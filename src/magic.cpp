@@ -6628,12 +6628,6 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
 
   if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent)
   {
-    if (number(1, 100) < 6)
-    {
-      ch->sendln("You lost your concentration!");
-      return eFAILURE;
-    }
-
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
       ch->sendln("You don't posses the energy to portal that far.");
