@@ -1296,7 +1296,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
 
     ch->send(QStringLiteral("The Consignment Broker retrieves %1 and returns it to you.\r\n").arg(obj->short_description));
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
+    sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.",
             GET_NAME(ch), ticket, Item_it->item_name.toStdString().c_str(), Item_it->price);
     DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     obj_to_char(obj, ch);
@@ -1673,11 +1673,11 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   char log_buf[MAX_STRING_LENGTH] = {};
   if (NewTicket.buyer.isEmpty())
   {
-    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\r\n", GET_NAME(ch), obj->short_description, price);
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.", GET_NAME(ch), obj->short_description, price);
   }
   else
   {
-    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.toStdString().c_str());
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.toStdString().c_str());
   }
   DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
