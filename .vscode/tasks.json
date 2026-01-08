@@ -2,26 +2,28 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
-    {
-        "label": "rebuild",
-        "type": "shell",
-        "command": "cmake --build --preset debug",
-        "problemMatcher": {
-            "base": "$gcc",
-            "fileLocation": [
-                "absolute"
-            ],
-            "pattern": {
-                "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
-                "file": 1,
-                "line": 2,
-                "column": 3,
-                "message": 4
+    "tasks": [
+        {
+            "label": "rebuild",
+            "type": "shell",
+            "command": "cmake --build --preset debug",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "message": 4
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
             }
-        },
-        "group": {
-            "kind": "build",
-            "isDefault": true
         }
-    }
+    ]
 }
