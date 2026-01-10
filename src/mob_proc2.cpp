@@ -442,10 +442,10 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 			sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->short_description, cost);
 			ch->send(buf);
 		}
-		send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
-					 "list is therefore always changing.  If you purchase one, it will be\n\r"
+		send_to_char("$RIf any corpses were listed, they are still where you left them.  This\r\n"
+					 "list is therefore always changing.  If you purchase one, it will be\r\n"
 					 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\r\n"
-					 "Use 'value' to find how much your eq would cost with what you\n\r"
+					 "Use 'value' to find how much your eq would cost with what you\r\n"
 					 "have on you now.\r\n",
 					 ch);
 		return eSUCCESS;
@@ -495,7 +495,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 		}
 		move_obj(obj, ch->in_room);
 		REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
-		send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
+		send_to_char("The mortician goes into his freezer and returns with a corpse, which he\r\n"
 					 "places at your feet.\r\n",
 					 ch);
 		GET_PLATINUM(ch) -= cost;

@@ -1438,7 +1438,7 @@ QString Connection::createPrompt(void)
   else
   {
     if (!isSet(GET_TOGGLES(character), Player::PLR_COMPACT))
-      prompt += "\n\r";
+      prompt += "\r\n";
     if (character->getPrompt().isEmpty())
       prompt += "type 'help prompt'> ";
     else
@@ -1614,9 +1614,9 @@ int new_descriptor(int s)
   /* determine if the site is banned */
   if (isbanned(newd->getPeerOriginalAddress()) == BAN_ALL)
   {
-    write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\n\r"
-                              "Questions, please email us at:\n\r"
-                              "imps@dcastle.org\n\r");
+    write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\r\n"
+                              "Questions, please email us at:\r\n"
+                              "imps@dcastle.org\r\n");
 
     CLOSE_SOCKET(desc);
     DC::getInstance()->logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
@@ -2210,13 +2210,13 @@ int close_socket(class Connection *d)
   }
   if (d->hashstr)
   {
-    strcpy(idiotbuf, "\n\r~\n\r");
+    strcpy(idiotbuf, "\n\r~\r\n");
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
   if (d->strnew && (IS_NPC(d->character) || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
-    strcpy(idiotbuf, "/s\n\r");
+    strcpy(idiotbuf, "/s\r\n");
     strcat(idiotbuf, "\0");
     new_string_add(d, idiotbuf);
   }
@@ -2591,7 +2591,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
 
     if (++lines == 23)
     {
-      SEND_TO_Q("\n\rMore msgs available. Type awaymsgs to see them\n\r",
+      SEND_TO_Q("\n\rMore msgs available. Type awaymsgs to see them\r\n",
                 ch->desc);
       break;
     }
@@ -2865,7 +2865,7 @@ int do_editor(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  csendf(ch, "Current editor: %s\n\r\n\r", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
+  csendf(ch, "Current editor: %s\r\n\r\n", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
 
   one_argument(argument, arg1);
 

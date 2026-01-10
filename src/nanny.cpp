@@ -56,12 +56,12 @@
 bool is_bracing(Character *bracee, struct room_direction_data *exit);
 void show_question_race(Connection *d);
 
-const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
+const char menu[] = "\n\rWelcome to Dark Castle Mud\r\n\r\n"
                     "0) Exit Dark Castle.\r\n"
                     "1) Enter the game.\r\n"
                     "2) Enter your character's description.\r\n"
                     "3) Change your password.\r\n"
-                    "4) Delete this character.\n\r\n\r"
+                    "4) Delete this character.\r\n\r\n"
                     "   Make your choice: ";
 
 bool wizlock = false;
@@ -698,26 +698,26 @@ void Character::roll_and_display_stats(void)
    desc->stats->wis[0] = 14;
    */
 
-   SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", desc);
+   SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \r\n", desc);
 
-   SEND_TO_Q("Group: 1     2     3     4     5\n\r", desc);
-   sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+   SEND_TO_Q("Group: 1     2     3     4     5\r\n", desc);
+   sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
            desc->stats->str[0], desc->stats->str[1], desc->stats->str[2],
            desc->stats->str[3], desc->stats->str[4]);
    SEND_TO_Q(buf, desc);
-   sprintf(buf, "Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+   sprintf(buf, "Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
            desc->stats->dex[0], desc->stats->dex[1], desc->stats->dex[2],
            desc->stats->dex[3], desc->stats->dex[4]);
    SEND_TO_Q(buf, desc);
-   sprintf(buf, "Con:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+   sprintf(buf, "Con:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
            desc->stats->con[0], desc->stats->con[1], desc->stats->con[2],
            desc->stats->con[3], desc->stats->con[4]);
    SEND_TO_Q(buf, desc);
-   sprintf(buf, "Int:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+   sprintf(buf, "Int:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
            desc->stats->tel[0], desc->stats->tel[1], desc->stats->tel[2],
            desc->stats->tel[3], desc->stats->tel[4]);
    SEND_TO_Q(buf, desc);
-   sprintf(buf, "Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+   sprintf(buf, "Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
            desc->stats->wis[0], desc->stats->wis[1], desc->stats->wis[2],
            desc->stats->wis[3], desc->stats->wis[4]);
    SEND_TO_Q(buf, desc);
@@ -997,7 +997,7 @@ void DC::nanny(class Connection *d, std::string arg)
       break;
 
    case Connection::states::GET_OLD_PASSWORD:
-      SEND_TO_Q("\n\r", d);
+      SEND_TO_Q("\r\n", d);
 
       // Default is to authenticate against character password
       password = ch->player->pwd;
@@ -1074,7 +1074,7 @@ void DC::nanny(class Connection *d, std::string arg)
          ch->sendln("$B----------------------------------------------------------------------$R");
       }
 
-      SEND_TO_Q(QStringLiteral("\n\rIf you have read this motd, press Return.\n\rLast connected from:\n\r%1\n\r").arg(ch->player->last_site), d);
+      SEND_TO_Q(QStringLiteral("\n\rIf you have read this motd, press Return.\n\rLast connected from:\n\r%1\r\n").arg(ch->player->last_site), d);
       telnet_ga(d);
 
       if (d->character->player->bad_pw_tries)
@@ -1105,7 +1105,7 @@ void DC::nanny(class Connection *d, std::string arg)
                     GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
             DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
-                      "Questions may be directed to imps@dcastle.org\n\r",
+                      "Questions may be directed to imps@dcastle.org\r\n",
                       d);
             STATE(d) = Connection::states::CLOSE;
             return;
@@ -1157,7 +1157,7 @@ void DC::nanny(class Connection *d, std::string arg)
       break;
 
    case Connection::states::CONFIRM_NEW_PASSWORD:
-      SEND_TO_Q("\n\r", d);
+      SEND_TO_Q("\r\n", d);
 
       if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
@@ -1387,8 +1387,8 @@ void DC::nanny(class Connection *d, std::string arg)
          delete ch->desc->stats;
          ch->desc->stats = nullptr;
          SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\r\n", d);
-         sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\n\r"
-                      "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Ogre\n\r"
+         sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\r\n"
+                      "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Ogre\r\n"
                       "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
                       "\n\rSelect a race(Type help <race> for more information)-> ",
                  is_race_eligible(ch, 1) ? '*' : ' ', is_race_eligible(ch, 2) ? '*' : ' ', is_race_eligible(ch, 3) ? '*' : ' ', is_race_eligible(ch, 4) ? '*' : ' ', is_race_eligible(ch, 5) ? '*' : ' ', is_race_eligible(ch, 6) ? '*' : ' ',
@@ -1546,17 +1546,17 @@ void DC::nanny(class Connection *d, std::string arg)
 
       ch->set_hw();
       SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\r\n", d);
-      sprintf(buf, " %c 1: Warrior\n\r"
-                   " %c 2: Cleric\n\r"
-                   " %c 3: Mage\n\r"
-                   " %c 4: Thief\n\r"
-                   " %c 5: Anti-Paladin\n\r"
-                   " %c 6: Paladin\n\r"
-                   " %c 7: Barbarian \n\r"
-                   " %c 8: Monk\n\r"
-                   " %c 9: Ranger\n\r"
-                   " %c 10: Bard\n\r"
-                   " %c 11: Druid\n\r"
+      sprintf(buf, " %c 1: Warrior\r\n"
+                   " %c 2: Cleric\r\n"
+                   " %c 3: Mage\r\n"
+                   " %c 4: Thief\r\n"
+                   " %c 5: Anti-Paladin\r\n"
+                   " %c 6: Paladin\r\n"
+                   " %c 7: Barbarian \r\n"
+                   " %c 8: Monk\r\n"
+                   " %c 9: Ranger\r\n"
+                   " %c 10: Bard\r\n"
+                   " %c 11: Druid\r\n"
                    "\n\rSelect a class(Type help <class> for more information) > ",
               //           (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
               '*',
@@ -1620,7 +1620,7 @@ void DC::nanny(class Connection *d, std::string arg)
             SEND_TO_Q(badclssmsg, d);
             return;
          }
-         SEND_TO_Q("Pstealing is legal on this mud :)\n\r"
+         SEND_TO_Q("Pstealing is legal on this mud :)\r\n"
                    "Check 'help psteal' before you try though.",
                    d);
          GET_CLASS(ch) = CLASS_THIEF;
@@ -1693,7 +1693,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
       DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
-      SEND_TO_Q("\n\r", d);
+      SEND_TO_Q("\r\n", d);
       SEND_TO_Q(motd, d);
       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
       telnet_ga(d);
@@ -1793,7 +1793,7 @@ void DC::nanny(class Connection *d, std::string arg)
             if (ch->getLevel() >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
             {
                send_to_char("\n\rThere is an active vote in which you have not yet voted.\r\n"
-                            "Enter \"vote\" to see details\n\r\n\r",
+                            "Enter \"vote\" to see details\r\n\r\n",
                             ch);
             }
          }
@@ -1807,7 +1807,7 @@ void DC::nanny(class Connection *d, std::string arg)
                    d);
          if (ch->description)
          {
-            SEND_TO_Q("Old description:\n\r", d);
+            SEND_TO_Q("Old description:\r\n", d);
             SEND_TO_Q(ch->description, d);
             delete[] ch->description;
          }
@@ -1896,7 +1896,7 @@ void DC::nanny(class Connection *d, std::string arg)
       break;
 
    case Connection::states::CONFIRM_PASSWORD_CHANGE:
-      SEND_TO_Q("\n\r", d);
+      SEND_TO_Q("\r\n", d);
       if (std::string(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
       {
          SEND_TO_Q("Enter a new password: ", d);
@@ -1913,7 +1913,7 @@ void DC::nanny(class Connection *d, std::string arg)
       break;
 
    case Connection::states::RESET_PASSWORD:
-      SEND_TO_Q("\n\r", d);
+      SEND_TO_Q("\r\n", d);
 
       if (arg.length() < 6)
       {
@@ -1929,7 +1929,7 @@ void DC::nanny(class Connection *d, std::string arg)
       break;
 
    case Connection::states::CONFIRM_RESET_PASSWORD:
-      SEND_TO_Q("\n\r", d);
+      SEND_TO_Q("\r\n", d);
 
       if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
@@ -2411,7 +2411,7 @@ void checkConsecrate(int pulseType)
                         if (IS_PC(tmp_ch))
                         {
                            act("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
-                           tmp_ch->sendln("You have been KILLED!!\n\r");
+                           tmp_ch->sendln("You have been KILLED!!\r\n");
                         }
                         group_gain(ch, tmp_ch);
                         fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_DESECRATE);
@@ -2467,7 +2467,7 @@ void checkConsecrate(int pulseType)
                         if (IS_PC(tmp_ch))
                         {
                            act("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
-                           tmp_ch->sendln("You have been KILLED!!\n\r");
+                           tmp_ch->sendln("You have been KILLED!!\r\n");
                         }
                         group_gain(ch, tmp_ch);
                         fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_CONSECRATE);

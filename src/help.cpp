@@ -407,7 +407,7 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
     csendf(ch, "Usage: hindex <ID#>\r\n"
                "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
                "       hindex <start of a word(s)>\r\n"
-               "       hindex -<l|i|u|d>\n\r"
+               "       hindex -<l|i|u|d>\r\n"
                "              l = level, l <start> <end>\r\n"
                "              i = immortal\r\n"
                "              d = defunct, < level 0 OR > level %d\r\n"
@@ -628,7 +628,7 @@ int show_one_help_entry(int entry, Character *ch, int count)
 {
 
   csendf(ch, "$B$6%3d $7- $5%3d $7[$3%-20.20s$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] "
-             "[$3%-20.20s$B$7] [$3%-20.20s$B$7]\n\r",
+             "[$3%-20.20s$B$7] [$3%-20.20s$B$7]\r\n",
          entry,
          (new_help_table[entry].min_level >= 0 ? new_help_table[entry].min_level : 999),
          (*new_help_table[entry].keyword1 ? new_help_table[entry].keyword1 : "None"),

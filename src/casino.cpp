@@ -2115,7 +2115,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
    {
       stop1 = number(0, 19);
       send_to_room("You hear a loud clunk as the first stopper snaps into place.\r\n", machine->obj->in_room);
-      sprintf(buf, "%s    |      |\n\r", reel1[stop1]);
+      sprintf(buf, "%s    |      |\r\n", reel1[stop1]);
       machine->ch->send(buf);
       slot_timer(machine, stop1, -1, 2);
    }
@@ -2123,7 +2123,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
    {
       stop2 = number(0, 19);
       send_to_room("You hear a loud clunk as the second stopper snaps into place.\r\n", machine->obj->in_room);
-      sprintf(buf, "%s %s    |\n\r", reel1[stop1], reel2[stop2]);
+      sprintf(buf, "%s %s    |\r\n", reel1[stop1], reel2[stop2]);
       machine->ch->send(buf);
       slot_timer(machine, stop1, stop2, 2);
    }
@@ -2132,7 +2132,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       int payout = 0;
       int stop3 = number(0, 19);
       send_to_room("You hear a loud clunk as the final stopper snaps into place.\r\n", machine->obj->in_room);
-      sprintf(buf, "%s %s %s\n\r", reel1[stop1], reel2[stop2], reel3[stop3]);
+      sprintf(buf, "%s %s %s\r\n", reel1[stop1], reel2[stop2], reel3[stop3]);
       machine->ch->send(buf);
 
       if (stop1 == 6 && stop2 == 3 && stop3 == 14)
@@ -2175,8 +2175,8 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
 
       if (payout == 200 && machine->bet == 5)
       {
-         send_to_room("The jackpot lights flash and loud noises come from all around you!\n\r", machine->obj->in_room);
-         csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\n\r", (int)machine->jackpot, machine->gold ? "coins" : "plats");
+         send_to_room("The jackpot lights flash and loud noises come from all around you!\r\n", machine->obj->in_room);
+         csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\r\n", (int)machine->jackpot, machine->gold ? "coins" : "plats");
          sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", GET_NAME(machine->ch), (int)machine->jackpot, machine->gold ? "coins" : "plats");
          send_info(buf);
 
@@ -2207,9 +2207,9 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else if (payout)
       {
-         send_to_room("Lights flash and noises emanate from the slot machine!\n\r", machine->obj->in_room);
+         send_to_room("Lights flash and noises emanate from the slot machine!\r\n", machine->obj->in_room);
          machine->lastwin = machine->cost * payout * machine->bet;
-         sprintf(buf, "$BWinner!!$R  You win %d %s!\n\r", machine->lastwin, machine->gold ? "coins" : "plats");
+         sprintf(buf, "$BWinner!!$R  You win %d %s!\r\n", machine->lastwin, machine->gold ? "coins" : "plats");
          if (machine->gold)
             machine->ch->addGold(machine->lastwin);
          else
@@ -2341,7 +2341,7 @@ int slot_machine(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
    else
       GET_PLATINUM(ch) -= obj->slot->cost * obj->slot->bet;
    obj->slot->busy = true;
-   sprintf(buf, "You place %d %s into the slot and set the reels spinning!\n\r", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
+   sprintf(buf, "You place %d %s into the slot and set the reels spinning!\r\n", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
    ch->send(buf);
    act("$n reaches for the handle and pulls down.", ch, 0, 0, TO_ROOM, 0);
    ch->sendln("   |      |      |");
@@ -2452,7 +2452,7 @@ uint32_t check_roulette_wins(struct roulette_player *plr, int num)
                              num == 35))
    {
       tmp = 2 * plr->bet_array[0];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $0$BBLACK$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $0$BBLACK$R!\r\n").arg(tmp));
       winnings += tmp;
    }
 
@@ -2462,61 +2462,61 @@ uint32_t check_roulette_wins(struct roulette_player *plr, int num)
                               num == 35 || num == 0))
    {
       tmp = 2 * plr->bet_array[1];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $4$BRED$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $4$BRED$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[2] && num % 2 == 0 && num)
    {
       tmp = 2 * plr->bet_array[2];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BEVEN$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BEVEN$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[3] && num % 2 == 1)
    {
       tmp = 2 * plr->bet_array[3];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BODD$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BODD$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[4] && num > 0 && num < 13)
    {
       tmp = 3 * plr->bet_array[4];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-12$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-12$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[5] && num > 12 && num < 25)
    {
       tmp = 3 * plr->bet_array[5];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B13-24$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B13-24$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[6] && num > 24 && num < 37)
    {
       tmp = 3 * plr->bet_array[6];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B25-36$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B25-36$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[7] && num > 0 && num < 10)
    {
       tmp = 4 * plr->bet_array[7];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-9$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-9$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[8] && num > 9 && num < 19)
    {
       tmp = 4 * plr->bet_array[8];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B10-18$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B10-18$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[9] && num > 18 && num < 28)
    {
       tmp = 4 * plr->bet_array[9];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B19-27$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B19-27$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[10] && num > 27 && num < 37)
    {
       tmp = 4 * plr->bet_array[10];
-      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B28-36$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B28-36$R!\r\n").arg(tmp));
       winnings += tmp;
    }
    for (int i = 11; i < 48; i++)
@@ -2524,7 +2524,7 @@ uint32_t check_roulette_wins(struct roulette_player *plr, int num)
       if (plr->bet_array[i] && num == i - 11)
       {
          tmp = 36 * plr->bet_array[i];
-         csendf(plr->ch, "You WIN %u coins on your bet of %s!\n\r", tmp, roulette_display[num]);
+         csendf(plr->ch, "You WIN %u coins on your bet of %s!\r\n", tmp, roulette_display[num]);
          winnings += tmp;
       }
    }
@@ -2567,7 +2567,7 @@ void wheel_stop(wheel_data *wheel)
    uint32_t payout = 0;
    char buf[MAX_STRING_LENGTH];
 
-   sprintf(buf, "The ball lands on %s!\n\r", roulette_display[num]);
+   sprintf(buf, "The ball lands on %s!\r\n", roulette_display[num]);
    send_to_room(buf, wheel->obj->in_room);
 
    for (int i = 0; i < 6; i++)
@@ -2627,7 +2627,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
    {
       if (!number(0, 3))
       {
-         sprintf(buf, "$B$7The croupier says 'The wheel will be spun in about %d seconds!'$R\n\r", wheel->countdown * 2);
+         sprintf(buf, "$B$7The croupier says 'The wheel will be spun in about %d seconds!'$R\r\n", wheel->countdown * 2);
          send_to_room(buf, wheel->obj->in_room);
       }
       wheel->countdown -= 1;
@@ -3043,7 +3043,7 @@ int roulette_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       send_wheel_bets(ch, obj->wheel);
       if (obj->wheel->countdown == 11)
       {
-         send_to_room("$BThe croupier says 'The first bet has been placed!'$R\n\r", obj->in_room);
+         send_to_room("$BThe croupier says 'The first bet has been placed!'$R\r\n", obj->in_room);
          obj->wheel->countdown = 10;
          roulette_timer(obj->wheel, 0);
       }

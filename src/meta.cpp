@@ -463,7 +463,7 @@ void Character::meta_list_stats(void)
 	if (raw_str >= max_stat)
 		send(QStringLiteral("$B$31)$R Str:       Your strength is already %1.\r\n").arg(max_stat));
 	else
-		csendf(this, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
+		csendf(this, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n",
 			   (raw_str + 1), xp_price, plat_cost);
 
 	xp_price = meta_get_stat_exp_cost(attribute_t::DEXTERITY);
@@ -668,7 +668,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 	if (ch->getLevel() < 10)
 	{
 		send_to_char("$B$2The Meta-physician tells you, 'You're too low level for$R "
-					 "$B$2me to waste my time on you.$R\n\r"
+					 "$B$2me to waste my time on you.$R\r\n"
 					 "$B$2Prove to me you are gonna stick around first!'$R.",
 					 ch);
 		return eSUCCESS;
@@ -733,7 +733,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 			break;
 		}
 		expcost = platcost * 51523;
-		csendf(ch, "$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \n\r", platcost, expcost);
+		csendf(ch, "$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \r\n", platcost, expcost);
 		return eSUCCESS;
 	}
 	else if (cmd == cmd_t::LIST)

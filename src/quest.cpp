@@ -191,7 +191,7 @@ int do_add_quest(Character *ch, char *name)
 
    quest_list.push_back(quest);
 
-   ch->send(QStringLiteral("Quest number %1 added.\n\r\n\r").arg(quest->number));
+   ch->send(QStringLiteral("Quest number %1 added.\r\n\r\n").arg(quest->number));
    show_quest_info(ch, quest->number);
 
    return eSUCCESS;
@@ -210,7 +210,7 @@ void list_quests(Character *ch, int lownum, int highnum)
       {
          // Create a format std::string based on a space offset that takes color codes into account
          snprintf(buffer, MAX_STRING_LENGTH,
-                  "%%3d. $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n\r",
+                  "%%3d. $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\r\n",
                   35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
          csendf(ch, buffer, quest->number, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward, quest->level);
@@ -231,26 +231,26 @@ void show_quest_info(Character *ch, int num)
       if (quest->number == num)
       {
          csendf(ch,
-                "$3Quest Info for #$R%d\n\r"
-                "$3========================================$R\n\r"
-                "$3Name:$R   %s\n\r"
-                "$3Level:$R  %d\n\r"
-                "$3Cost:$R   %d plats\n\r"
-                "$3Brownie:$R%s\n\r"
-                "$3Reward:$R %d qpoints\n\r"
-                "$3Timer:$R  %d\n\r"
-                "$3----------------------------------------$R\n\r"
-                "$3Quest Mob Vnum:$R %d (%s)\n\r"
-                "$3----------------------------------------$R\n\r"
-                "$3Quest Object Vnum:$R %d\n\r"
-                "$3Keywords:$R          %s\n\r"
-                "$3Short description:$R %s\n\r"
-                "$3Long description:$R  %s\n\r"
-                "$3----------------------------------------$R\n\r"
-                "$3Hints:$R\n\r"
-                "$31.$R %s\n\r"
-                "$32.$R %s\n\r"
-                "$33.$R %s\n\r",
+                "$3Quest Info for #$R%d\r\n"
+                "$3========================================$R\r\n"
+                "$3Name:$R   %s\r\n"
+                "$3Level:$R  %d\r\n"
+                "$3Cost:$R   %d plats\r\n"
+                "$3Brownie:$R%s\r\n"
+                "$3Reward:$R %d qpoints\r\n"
+                "$3Timer:$R  %d\r\n"
+                "$3----------------------------------------$R\r\n"
+                "$3Quest Mob Vnum:$R %d (%s)\r\n"
+                "$3----------------------------------------$R\r\n"
+                "$3Quest Object Vnum:$R %d\r\n"
+                "$3Keywords:$R          %s\r\n"
+                "$3Short description:$R %s\r\n"
+                "$3Long description:$R  %s\r\n"
+                "$3----------------------------------------$R\r\n"
+                "$3Hints:$R\r\n"
+                "$31.$R %s\r\n"
+                "$32.$R %s\r\n"
+                "$33.$R %s\r\n",
                 quest->number, quest->name, quest->level, quest->cost,
                 quest->brownie ? "Required" : "Not Required",
                 quest->reward, quest->timer, quest->mobnum,
@@ -305,19 +305,19 @@ int get_quest_price(struct quest_info *quest)
 void show_quest_header(Character *ch)
 {
    csendf(ch, "  .-------------------------------------------------------------------------.\r\n"
-              " /.-.                                                                     .-.\\\n\r"
-              "[/   \\                                                                   /   \\]\n\r"
-              "[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]\n\r"
-              "[\\  ! /                                                                 \\ !  /]\n\r"
-              "[ `--'                                                                   `--' ]\n\r"
-              "[-----------------------------------------------------------------------------]\n\r\n\r");
+              " /.-.                                                                     .-.\\\r\n"
+              "[/   \\                                                                   /   \\]\r\n"
+              "[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]\r\n"
+              "[\\  ! /                                                                 \\ !  /]\r\n"
+              "[ `--'                                                                   `--' ]\r\n"
+              "[-----------------------------------------------------------------------------]\r\n\r\n");
    return;
 }
 
 void show_quest_amount(Character *ch, int remaining)
 {
    csendf(ch,
-          "\n\r $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n\r", quest_list.size() - remaining, remaining, quest_list.size());
+          "\n\r $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n", quest_list.size() - remaining, remaining, quest_list.size());
    return;
 }
 
@@ -357,7 +357,7 @@ void show_quest_footer(Character *ch)
    }
 
    csendf(ch,
-          "\n\r $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n\r",
+          "\n\r $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n",
           attempting, completed, total - completed - attempting, total);
 
    ch->sendln("[-----------------------------------------------------------------------------]");
@@ -368,13 +368,13 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
 {
    int i, amount = 0;
 
-   csendf(ch, " $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\n\r"
-              " $B$2Hint:$7 %-52s$R\n\r",
+   csendf(ch, " $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\r\n"
+              " $B$2Hint:$7 %-52s$R\r\n",
           quest->name, quest->number, quest->hint1);
    if (quest->hint2)
-      csendf(ch, " $B$7%-52s$R\n\r", quest->hint2);
+      csendf(ch, " $B$7%-52s$R\r\n", quest->hint2);
    if (quest->hint3)
-      csendf(ch, " $B$7%-52s$R\n\r", quest->hint3);
+      csendf(ch, " $B$7%-52s$R\r\n", quest->hint3);
    if (quest->timer)
    {
       for (i = 0; i < QUEST_MAX; i++)
@@ -389,13 +389,13 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
             DC::getInstance()->logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
          }
 
-         csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\n\r\n\r",
+         csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\r\n\r\n",
                 quest->level, amount, quest->reward);
       }
    }
    else
    {
-      csendf(ch, " $B$2Level:$7 %d  $2Reward:$7 %-5d$R\n\r\n\r",
+      csendf(ch, " $B$2Level:$7 %d  $2Reward:$7 %-5d$R\r\n\r\n",
              quest->level, quest->reward);
    }
    return ++count;
@@ -403,7 +403,7 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
 
 int show_one_complete_quest(Character *ch, struct quest_info *quest, int count)
 {
-   ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\n\r").arg(quest->name, -35).arg(quest->reward, -5));
+   ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\r\n").arg(quest->name, -35).arg(quest->reward, -5));
    return ++count;
 }
 
@@ -412,7 +412,7 @@ int show_one_available_quest(Character *ch, struct quest_info *quest, int count)
    char buffer[MAX_STRING_LENGTH];
    // Create a format std::string based on a space offset that takes color codes into account
    snprintf(buffer, MAX_STRING_LENGTH,
-            "$B$7%3d. $2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
+            "$B$7%3d. $2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\r\n",
             quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
    csendf(ch, buffer, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward);
@@ -543,7 +543,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    price = quest->cost;
    if (GET_PLATINUM(ch) < price)
    {
-      ch->send(QStringLiteral("You need %1 platinum coins to start this quest, which you don't have!\n\r").arg(price));
+      ch->send(QStringLiteral("You need %1 platinum coins to start this quest, which you don't have!\r\n").arg(price));
       return eEXTRA_VAL2;
    }
 
@@ -552,7 +552,7 @@ int start_quest(Character *ch, struct quest_info *quest)
       brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
       if (!brownie)
       {
-         csendf(ch, "You need a brownie point to start this quest!\n\r", price);
+         csendf(ch, "You need a brownie point to start this quest!\r\n", price);
          return eEXTRA_VAL2;
       }
    }
@@ -1094,16 +1094,16 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
    }
    else
    {
-      csendf(ch, "Usage: quest current            (lists current quests)\n\r"
-                 "       quest completed          (lists completed quests)\n\r"
-                 "       quest canceled           (lists canceled quests)\n\r\n\r"
+      csendf(ch, "Usage: quest current            (lists current quests)\r\n"
+                 "       quest completed          (lists completed quests)\r\n"
+                 "       quest canceled           (lists canceled quests)\r\n\r\n"
                  "The following commands may only be used at the Quest Master.\r\n"
-                 "       quest list               (lists available quests)\n\r"
-                 "       quest cancel <name or #> (cancel the current quest)\n\r"
-                 "       quest start <name or #>  (starts a new quest)\n\r"
-                 "       quest finish <name or #> (finishes a current quest)\n\r"
-                 "       quest reset              (reset all quests. costs 2k plats, 1 brownie)\n\r"
-                 "\n\r");
+                 "       quest list               (lists available quests)\r\n"
+                 "       quest cancel <name or #> (cancel the current quest)\r\n"
+                 "       quest start <name or #>  (starts a new quest)\r\n"
+                 "       quest finish <name or #> (finishes a current quest)\r\n"
+                 "       quest reset              (reset all quests. costs 2k plats, 1 brownie)\r\n"
+                 "\r\n");
       return eFAILURE;
    }
 
@@ -1126,17 +1126,17 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
 
    if (!*arg)
    {
-      csendf(ch, "Usage: qedit list                      (list all quest names and numbers)\n\r"
-                 "       qedit list <lownum> <highnum>   (lists names and numbers between)\n\r"
-                 "       qedit show <number>             (show detailed information)\n\r"
-                 "       qedit <number> <field> <value>  (edit a quest)\n\r"
-                 "       qedit new <name>                (add a quest)\n\r"
-                 "       qedit save                      (saves all quests)\n\r"
-                 "       qedit stat <playername>         (show player's current qpoints)\n\r"
-                 "       qedit set <playername> <value>  (alter player's current qpoints)\n\r"
+      csendf(ch, "Usage: qedit list                      (list all quest names and numbers)\r\n"
+                 "       qedit list <lownum> <highnum>   (lists names and numbers between)\r\n"
+                 "       qedit show <number>             (show detailed information)\r\n"
+                 "       qedit <number> <field> <value>  (edit a quest)\r\n"
+                 "       qedit new <name>                (add a quest)\r\n"
+                 "       qedit save                      (saves all quests)\r\n"
+                 "       qedit stat <playername>         (show player's current qpoints)\r\n"
+                 "       qedit set <playername> <value>  (alter player's current qpoints)\r\n"
                  "       qedut reset <playername>\r\n"
-                 "\n\r"
-                 "Valid qedit fields:\n\r");
+                 "\r\n"
+                 "Valid qedit fields:\r\n");
 
       // Display all of qedit's valid fields in rows of 4 columns
       //
@@ -1210,7 +1210,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
             return eFAILURE;
          }
 
-         csendf(ch, "%s's quest points: %d\n\r", GET_NAME(vict), vict->player->quest_points);
+         csendf(ch, "%s's quest points: %d\r\n", GET_NAME(vict), vict->player->quest_points);
       }
       return eSUCCESS;
    }

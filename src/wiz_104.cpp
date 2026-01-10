@@ -81,7 +81,7 @@ int do_thunder(Character *ch, char *argument, cmd_t cmd)
 
 				if (cmd == cmd_t::DEFAULT)
 				{
-					sprintf(buf1, "$B$4%s thunders '%s'$R\n\r", buf3, argument);
+					sprintf(buf1, "$B$4%s thunders '%s'$R\r\n", buf3, argument);
 				}
 				else
 				{
@@ -168,7 +168,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
 			if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
 			{
 				cnt++;
-				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
+				sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
 				ch->send(buf);
 			}
 
@@ -387,7 +387,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
 		act("$n gestures... the room is filled with scorching flames!",
 			ch, 0, 0, TO_ROOM, 0);
 		send_to_char("You gesture...the room is filled with scorching "
-					 "flames!\n\r",
+					 "flames!\r\n",
 					 ch);
 
 		for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_v)
@@ -444,8 +444,8 @@ int Zone::show_info(Character *ch)
 
 	ch->send(QString("$3Name:$R %1\r\n"
 					 "$3Filename:$R %2\r\n"
-					 "$3Starts:$R    %3 $3Ends:$R  %4     $3Continent:$R %5\n\r"
-					 "$3Starts:$R    %6 $3Ends:$R  %7\n\r"
+					 "$3Starts:$R    %3 $3Ends:$R  %4     $3Continent:$R %5\r\n"
+					 "$3Starts:$R    %6 $3Ends:$R  %7\r\n"
 					 "$3Lifetime:$R  %8 $3Age:$R   %9     $3Left:$R   %10\r\n"
 					 "$3PC'sInZone:$R  %11 $3Mode:$R %12 $3Last full reset:$R %13 %14\r\n"
 					 "$3Flags:$R ")
@@ -877,7 +877,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			{
 				if ((nr = real_mobile(begin)) >= 0)
 				{
-					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
+					sprintf(buf, "[  1] [%5d] [%2d] %s\r\n", begin,
 							((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 							((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 					ch->send(buf);
@@ -892,7 +892,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 						continue;
 
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
 							((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 							((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 					ch->send(buf);
@@ -918,7 +918,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 				if (isexact(name, ((Character *)(DC::getInstance()->mob_index[nr].item))->getNameC()))
 				{
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
 							((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 							((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 					ch->send(buf);
@@ -981,7 +981,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			{
 				if ((nr = real_object(begin)) >= 0)
 				{
-					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
+					sprintf(buf, "[  1] [%5d] [%2d] %s\r\n", begin,
 							((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
 							((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
 					ch->send(buf);
@@ -996,7 +996,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 						continue;
 
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
 							((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
 							((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
 					ch->send(buf);
@@ -1022,7 +1022,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 				if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[nr].item))->Name()))
 				{
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
 							((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
 							((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
 					ch->send(buf);
@@ -1076,7 +1076,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			{
 				if (DC::getInstance()->rooms.contains(begin))
 				{
-					sprintf(buf, "[  1] [%5d] %s\n\r", begin,
+					sprintf(buf, "[  1] [%5d] %s\r\n", begin,
 							DC::getInstance()->world[begin].name);
 					ch->send(buf);
 				}
@@ -1088,7 +1088,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 					if (!DC::getInstance()->rooms.contains(i))
 						continue;
 					count++;
-					sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, DC::getInstance()->world[i].name);
+					sprintf(buf, "[%3d] [%5d] %s\r\n", count, i, DC::getInstance()->world[i].name);
 					ch->send(buf);
 
 					if (count > 200)
@@ -1401,7 +1401,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 				ch->sendln("Limit reached.");
 				break;
 			}
-			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
+			sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, c,
 					((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 					((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 			ch->send(buf);
@@ -1723,7 +1723,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 				ch->sendln("Limit reached.");
 				break;
 			}
-			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
+			sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, c,
 					((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
 					((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
 			ch->send(buf);
@@ -2065,7 +2065,7 @@ void opstat(Character *ch, int vnum)
 		ch->send(buf);
 		send_to_char(oprog_type_to_name(mprg->type), ch);
 		ch->send("$R ");
-		sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
+		sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
 		ch->send(buf);
 		if (mprg->comlist != nullptr)
 		{
@@ -2163,7 +2163,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
 		prog = new mob_prog_data;
 		prog->type = ALL_GREET_PROG;
 		prog->arglist = str_dup("80");
-		prog->comlist = str_dup("say This is my new obj prog!\n\r");
+		prog->comlist = str_dup("say This is my new obj prog!\r\n");
 		prog->next = nullptr;
 
 		if ((currprog = DC::getInstance()->obj_index[num].mobprogs))

@@ -1833,7 +1833,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   if (ch->isPlayerObjectThief() && !vict->desc)
   {
     send_to_char("Now WHY would a thief slip something to a "
-                 "linkdead character?\n\r",
+                 "linkdead character?\r\n",
                  ch);
     return eFAILURE;
   }

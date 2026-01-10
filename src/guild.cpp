@@ -62,20 +62,20 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (arg1[0] == '\0')
   {
     // Show list of available professions based on player's class type
-    csendf(ch, "As a %s you can pick from the following professions:\n\r", pc_clss_types3[GET_CLASS(ch)]);
+    csendf(ch, "As a %s you can pick from the following professions:\r\n", pc_clss_types3[GET_CLASS(ch)]);
 
     for (std::vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i)
     {
       if ((*i).c_class == GET_CLASS(ch))
       {
-        csendf(ch, "%s\n\r", (*i).Name.c_str());
+        csendf(ch, "%s\r\n", (*i).Name.c_str());
       }
     }
 
-    csendf(ch, "\n\r"
-               "Syntax: profession [profession name]\n\r"
-               "        profession reset\n\r"
-               "\n\r"
+    csendf(ch, "\r\n"
+               "Syntax: profession [profession name]\r\n"
+               "        profession reset\r\n"
+               "\r\n"
                "Resetting your profession costs 10000 platinum.\r\n");
 
     return eSUCCESS;
@@ -508,7 +508,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(this, "\n\r$B%s Profession Skills:$R\n\r", find_profession(c_class, skilllist[i].group));
+        csendf(this, "\n\r$B%s Profession Skills:$R\r\n", find_profession(c_class, skilllist[i].group));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -639,7 +639,7 @@ int Character::skills_guild(const char *arg, Character *owner)
   {
     sprintf(buf, "You have %d practice sessions left.\r\n", player->practices);
     send(buf);
-    sendln("You can practice any of these skills:\n\r");
+    sendln("You can practice any of these skills:\r\n");
 
     sendln("$BUniversal skills:$R");
     sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
@@ -1109,14 +1109,14 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
 
     extern void prepare_character_for_sixty(Character * ch);
     prepare_character_for_sixty(ch);
-    snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl).toStdString().c_str());
+    snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", get_skill_name(skl).toStdString().c_str());
     ch->send(buf);
 
     switch (GET_CLASS(ch))
     {
     case CLASS_DRUID:
       ch->learn_skill(SPELL_RELEASE_ELEMENTAL, 1, 1);
-      snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\n\r", get_skill_name(SPELL_RELEASE_ELEMENTAL).toStdString().c_str());
+      snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", get_skill_name(SPELL_RELEASE_ELEMENTAL).toStdString().c_str());
       ch->send(buf);
       break;
     }

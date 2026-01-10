@@ -141,7 +141,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob,
  * Local function code and brief comments.
  */
 
-/* Used to get sequential lines of a multi line std::string (separated by "\n\r")
+/* Used to get sequential lines of a multi line std::string (separated by "\r\n")
  * Thus its like one_argument(), but a trifle different. It is destructive
  * to the multi line std::string argument, and thus clist must not be shared.
  */
@@ -238,7 +238,7 @@ int mprog_veval( int lhs, char *opr, int rhs )
   if ( !str_cmp( opr, "|" ) )
 	return ( lhs | rhs );
 
-  DC::getInstance()->logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  DC::getInstance()->logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\r\n", 0 );
   return 0;
 
 }
@@ -263,7 +263,7 @@ int mprog_veval(int64_t lhs, char *opr, int64_t rhs)
 	if (!str_cmp(opr, "|"))
 		return (lhs | rhs);
 
-	DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\r\n", 0);
 	return 0;
 }
 /*
@@ -286,7 +286,7 @@ int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs )
   if ( !str_cmp( opr, "|" ) )
 	return ( lhs | rhs );
 
-  DC::getInstance()->logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  DC::getInstance()->logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\r\n", 0 );
   return 0;
 
 }

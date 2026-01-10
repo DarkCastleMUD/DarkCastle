@@ -994,9 +994,9 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 					continue;
 				}
 				if (CAN_SEE(k->follower, ch))
-					sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));
+					sprintf(tmp, "You follow %s.\r\n\r\n", GET_SHORT(ch));
 				else
-					strcpy(tmp, "You follow someone.\n\r\n\r");
+					strcpy(tmp, "You follow someone.\r\n\r\n");
 				k->follower->send(tmp);
 				// do_move(k->follower, "", cmd + 1);
 				char tempcommand[32];

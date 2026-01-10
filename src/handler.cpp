@@ -1926,7 +1926,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 			act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n"
 					"$n is DEAD!!", ch, 0, 0, TO_ROOM, 0);
 			send_to_char("The water rushes into your lungs and the light fades with your oxygen.\r\n"
-					"You have been KILLED!!!\n\r", ch);
+					"You have been KILLED!!!\r\n", ch);
 			fight_kill(nullptr, ch, TYPE_RAW_KILL, 0);
 			char_died = true;
 #else

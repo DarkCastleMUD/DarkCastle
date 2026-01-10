@@ -2227,7 +2227,7 @@ int pet_shops(Character *ch, cmd_t cmd, char const *arg)
         ch->sendln("Available pets are:");
         for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
         {
-            sprintf(buf, "%8ld - %s\n\r",
+            sprintf(buf, "%8ld - %s\r\n",
                     3 * GET_EXP(pet), pet->short_desc);
             ch->send(buf);
         }
@@ -2273,7 +2273,7 @@ int pet_shops(Character *ch, cmd_t cmd, char const *arg)
             pet->setName(buf);
 
             sprintf(buf, "%sA small sign on a chain around the neck "
-                         "says 'My Name is %s'\n\r",
+                         "says 'My Name is %s'\r\n",
                     pet->description, pet_name);
             pet->description = str_hsh(buf);
         }

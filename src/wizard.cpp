@@ -115,7 +115,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     act("$n draws up a swirling column of dust and breathes life into it.",
         ch, 0, 0, TO_ROOM, 0);
     act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
-    sprintf(buf, "You create %i %s!\n\r", cnt, mob->short_desc);
+    sprintf(buf, "You create %i %s!\r\n", cnt, mob->short_desc);
     ch->send(buf);
     if (cnt > 1)
     {
@@ -467,7 +467,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   strcpy(buf, "$3Title$R: ");
   strcat(buf, (k->title ? k->title : "None"));
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   // Description
@@ -484,27 +484,27 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (k->isPlayer())
   {
-    sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
+    sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\r\n",
             k->player->time.birth,
             k->player->time.logon,
             (int32_t)(k->player->time.played));
     ch->send(buf);
 
-    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
+    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
             k->age().year, k->age().month, k->age().day, k->age().hours);
     ch->send(buf);
   }
 
   if (k->isPlayer())
   {
-    sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\n\r", k->getGold(),
+    sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\r\n", k->getGold(),
             k->player->bank);
     ch->send(buf);
   }
 
   if (IS_PC(k))
   {
-    sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\n\r",
+    sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\r\n",
             k->player->saves_mods[SAVE_TYPE_FIRE],
             k->player->saves_mods[SAVE_TYPE_COLD],
             k->player->saves_mods[SAVE_TYPE_ENERGY],
@@ -520,7 +520,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
     sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     ch->send(buf);
-    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->player->stealth) ? "ON" : "OFF"));
+    sprintf(buf, "$3Stealth$R:  %s\r\n", ((k->player->stealth) ? "ON" : "OFF"));
     ch->send(buf);
 
     if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
@@ -546,16 +546,16 @@ void boro_mob_stat(Character *ch, Character *k)
 
     for (aff = k->affected; aff; aff = aff->next)
     {
-      sprintf(buf, "Spell : '%s'\n\r",
+      sprintf(buf, "Spell : '%s'\r\n",
               aff->type < 300 ? spells[(int)aff->type - 1] : skills[(int)aff->type - 300]);
       ch->send(buf);
-      sprintf(buf, "     Modifies %s by %d points\n\r",
+      sprintf(buf, "     Modifies %s by %d points\r\n",
               apply_types[(int)aff->location], aff->modifier);
       ch->send(buf);
       sprintf(buf, "     Expires in %3d hours, Bits set ", aff->duration);
       ch->send(buf);
       sprintbit(aff->bitvector, affected_bits, buf);
-      strcat(buf, "\n\r");
+      strcat(buf, "\r\n");
       ch->send(buf);
     }
     ch->sendln("");
@@ -599,11 +599,11 @@ command_return_t mob_stat(Character *ch, Character *k)
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
     strcat(buf, buf2);
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
   }
   else
   {
-    sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\n\r",
+    sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\r\n",
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
   }
@@ -611,12 +611,12 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   strcpy(buf, "$3Short description$R: ");
   strcat(buf, (k->short_desc ? k->short_desc : "None"));
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   strcpy(buf, "$3Title$R: ");
   strcat(buf, (k->title ? k->title : "None"));
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Long description$R: ");
@@ -646,13 +646,13 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (k->isPlayer())
   {
-    sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
+    sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\r\n",
             k->player->time.birth,
             k->player->time.logon,
             (int32_t)(k->player->time.played));
     ch->send(buf);
 
-    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
+    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
             k->age().year, k->age().month, k->age().day, k->age().hours);
     ch->send(buf);
   }
@@ -692,14 +692,14 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (IS_PC(ch))
   {
-    sprintf(buf, "$3Hometown$R:[%d]\n\r", k->hometown);
+    sprintf(buf, "$3Hometown$R:[%d]\r\n", k->hometown);
     ch->send(buf);
   }
   else
     ch->sendln("");
 
   sprintf(buf, "$3Str$R:[%2d]+[%2d]=%2d $3Int$R:[%2d]+[%2d]=%2d $3Wis$R:[%2d]+[%2d]=%2d\r\n"
-               "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\n\r",
+               "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\r\n",
           GET_RAW_STR(k), GET_STR_BONUS(k), GET_STR(k),
           GET_RAW_INT(k), GET_INT_BONUS(k), GET_INT(k),
           GET_RAW_WIS(k), GET_WIS_BONUS(k), GET_WIS(k),
@@ -707,20 +707,20 @@ command_return_t mob_stat(Character *ch, Character *k)
           GET_RAW_CON(k), GET_CON_BONUS(k), GET_CON(k));
   ch->send(buf);
 
-  sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
+  sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\r\n",
           GET_MANA(k), mana_limit(k), k->mana_gain_lookup(),
           k->getHP(), hit_limit(k), k->hit_gain_lookup(),
           GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
           GET_KI(k), ki_limit(k));
   ch->send(buf);
 
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\n\r",
+  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\r\n",
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
   if (k->isPlayer())
   {
-    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
+    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\r\n",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
     ch->send(buf);
   }
@@ -743,7 +743,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  sprintf(buf, "  $3Timer$R:[%d] \n\r", k->timer);
+  sprintf(buf, "  $3Timer$R:[%d] \r\n", k->timer);
   ch->send(buf);
 
   if (IS_NPC(k))
@@ -779,7 +779,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\n\r",
+  sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\r\n",
           IS_CARRYING_W(k), IS_CARRYING_N(k));
   ch->send(buf);
 
@@ -791,11 +791,11 @@ command_return_t mob_stat(Character *ch, Character *k)
     if (k->equipment[i])
       i2++;
 
-  sprintf(buf2, "$3Items in equipment$R: %d\n\r", i2);
+  sprintf(buf2, "$3Items in equipment$R: %d\r\n", i2);
   strcat(buf, buf2);
   ch->send(buf);
 
-  sprintf(buf, "$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
+  sprintf(buf, "$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\r\n",
           k->saves[SAVE_TYPE_FIRE],
           k->saves[SAVE_TYPE_COLD],
           k->saves[SAVE_TYPE_ENERGY],
@@ -806,7 +806,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (IS_PC(k))
   {
-    sprintf(buf, "$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
+    sprintf(buf, "$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\r\n",
             k->player->saves_mods[SAVE_TYPE_FIRE],
             k->player->saves_mods[SAVE_TYPE_COLD],
             k->player->saves_mods[SAVE_TYPE_ENERGY],
@@ -816,7 +816,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Thirst$R: %d  $3Hunger$R: %d  $3Drunk$R: %d\n\r",
+  sprintf(buf, "$3Thirst$R: %d  $3Hunger$R: %d  $3Drunk$R: %d\r\n",
           k->conditions[THIRST],
           k->conditions[FULL],
           k->conditions[DRUNK]);
@@ -825,21 +825,21 @@ command_return_t mob_stat(Character *ch, Character *k)
           k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
   ch->send(buf);
 
-  sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting.isEmpty()) ? "NOBODY" : qPrintable(k->hunting)));
+  sprintf(buf, "$3Tracking$R: '%s'\r\n", ((k->hunting.isEmpty()) ? "NOBODY" : qPrintable(k->hunting)));
   ch->send(buf);
 
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3Hates$R: '%s'\n\r",
+    sprintf(buf, "$3Hates$R: '%s'\r\n",
             (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
     ch->send(buf);
 
-    sprintf(buf, "$3Fears$R: '%s'\n\r",
+    sprintf(buf, "$3Fears$R: '%s'\r\n",
             ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Master$R: '%s'\n\r",
+  sprintf(buf, "$3Master$R: '%s'\r\n",
           ((k->master) ? GET_NAME(k->master) : "NOBODY"));
   ch->send(buf);
   ch->sendln("$3Followers$R:");
@@ -848,7 +848,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   // Showing the bitvector
   sprintbit(k->combat, combat_bits, buf);
-  ch->send(QStringLiteral("$3Combat flags$R: %1\n\r").arg(buf));
+  ch->send(QStringLiteral("$3Combat flags$R: %1\r\n").arg(buf));
 
   if (k->isPlayer())
     display_punishes(ch, k);
@@ -857,13 +857,13 @@ command_return_t mob_stat(Character *ch, Character *k)
   csendf(ch, "$3Affected by$R: [%d %d] %s\r\n", k->affected_by[0], k->affected_by[1], buf);
 
   sprintbit(k->immune, isr_bits, buf);
-  csendf(ch, "$3Immune$R: [%d] %s\n\r", k->immune, buf);
+  csendf(ch, "$3Immune$R: [%d] %s\r\n", k->immune, buf);
 
   sprintbit(k->suscept, isr_bits, buf);
-  csendf(ch, "$3Susceptible$R: [%d] %s\n\r", k->suscept, buf);
+  csendf(ch, "$3Susceptible$R: [%d] %s\r\n", k->suscept, buf);
 
   sprintbit(k->resist, isr_bits, buf);
-  csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
+  csendf(ch, "$3Resistant$R: [%d] %s\r\n", k->resist, buf);
 
   if (k->isPlayer())
   {
@@ -871,7 +871,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->send(buf);
     sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     ch->send(buf);
-    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->player->stealth) ? "ON" : "OFF"));
+    sprintf(buf, "$3Stealth$R:  %s\r\n", ((k->player->stealth) ? "ON" : "OFF"));
     ch->send(buf);
     if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
         (k->player->buildHighVnum == k->player->buildMHighVnum) == k->player->buildOHighVnum)
@@ -895,7 +895,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (IS_PC(k))
   {
     csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n", GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k), GET_AC_METAS(k), GET_AGE_METAS(k));
-    csendf(ch, "$3Profession$R: %s (%d)\n\r", find_profession(k->c_class, k->player->profession), k->player->profession);
+    csendf(ch, "$3Profession$R: %s (%d)\r\n", find_profession(k->c_class, k->player->profession), k->player->profession);
   }
 
   if (k->affected)
@@ -916,14 +916,14 @@ command_return_t mob_stat(Character *ch, Character *k)
           aff_name = QStringLiteral("Unknown!!!");
       }
       ch->sendln(QStringLiteral("Spell : '%1' (%2)").arg(aff_name).arg(aff->type));
-      sprintf(buf, "     Modifies %s by %d points\n\r",
+      sprintf(buf, "     Modifies %s by %d points\r\n",
               apply_types[(int)aff->location], aff->modifier);
       ch->send(buf);
       sprintf(buf, "     Expires in %3d hours", aff->duration);
       //    strcat(buf,",Bits set ");
       //      ch->send(buf);
       //      sprintbit(aff->bitvector,affected_bits,buf);
-      strcat(buf, "\n\r");
+      strcat(buf, "\r\n");
       ch->send(buf);
     }
     ch->sendln("");
@@ -936,25 +936,25 @@ command_return_t mob_stat(Character *ch, Character *k)
     case mob_type_t::MOB_NORMAL:
       break;
     case mob_type_t::MOB_GUARD:
-      sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
-                   " $3Direction (v2)$R: [%d]\n\r"
-                   "    $3Unused (v3)$R: [%d]\n\r"
-                   "    $3Unused (v4)$R: [%d]\n\r",
+      sprintf(buf, "$3Guard room (v1)$R: [%d]\r\n"
+                   " $3Direction (v2)$R: [%d]\r\n"
+                   "    $3Unused (v3)$R: [%d]\r\n"
+                   "    $3Unused (v4)$R: [%d]\r\n",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
       break;
     case mob_type_t::MOB_CLAN_GUARD:
-      sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
-                   " $3Direction (v2)$R: [%d]\n\r"
-                   "  $3Clan num (v3)$R: [%d]\n\r"
-                   "    $3Unused (v4)$R: [%d]\n\r",
+      sprintf(buf, "$3Guard room (v1)$R: [%d]\r\n"
+                   " $3Direction (v2)$R: [%d]\r\n"
+                   "  $3Clan num (v3)$R: [%d]\r\n"
+                   "    $3Unused (v4)$R: [%d]\r\n",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
       break;
     default:
-      sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\n\r",
+      sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\r\n",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
@@ -992,51 +992,51 @@ void obj_stat(Character *ch, class Object *j)
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
   strcat(buf, buf2);
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
-  sprintf(buf, "$3Short description$R: %s\n\r$3Long description$R:\n\r%s\n\r",
+  sprintf(buf, "$3Short description$R: %s\n\r$3Long description$R:\n\r%s\r\n",
           ((j->short_description) ? j->short_description : "None"),
           ((j->long_description) ? j->long_description : "None"));
   ch->send(buf);
   if (j->ex_description)
   {
-    strcpy(buf, "$3Extra description keyword(s)$R:\n\r----------\n\r");
+    strcpy(buf, "$3Extra description keyword(s)$R:\n\r----------\r\n");
     for (desc = j->ex_description; desc; desc = desc->next)
     {
       strcat(buf, desc->keyword);
-      strcat(buf, "\n\r");
+      strcat(buf, "\r\n");
     }
-    strcat(buf, "----------\n\r");
+    strcat(buf, "----------\r\n");
     ch->send(buf);
   }
   else
   {
-    strcpy(buf, "$3Extra description keyword(s)$R: None\n\r");
+    strcpy(buf, "$3Extra description keyword(s)$R: None\r\n");
     ch->send(buf);
   }
   ch->send("$3Can be worn on$R:");
   sprintbit(j->obj_flags.wear_flags, QFlagsToStrings<ObjectPositions>(), buf);
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Can be worn by$R:");
   sprintbit(j->obj_flags.size, Object::size_bits, buf);
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Extra flags$R: ");
   sprintbit(j->obj_flags.extra_flags, Object::extra_bits, buf);
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3More flags$R: ");
   sprintbit(j->obj_flags.more_flags, Object::more_obj_bits, buf);
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   sprintf(buf,
-          "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %d\n\r",
+          "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %d\r\n",
           j->obj_flags.weight,
           j->obj_flags.cost,
           j->obj_flags.timer,
@@ -1055,15 +1055,15 @@ void obj_stat(Character *ch, class Object *j)
   strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->Name()).toStdString().c_str()));
   strcat(buf, "  $3Carried by$R: ");
   strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
   switch (j->obj_flags.type_flag)
   {
   case ITEM_LIGHT:
-    sprintf(buf, "$3Colour (v1)$R: %d\n\r"
-                 "$3Type   (v2)$R: %d\n\r"
-                 "$3Hours  (v3)$R: %d\n\r"
+    sprintf(buf, "$3Colour (v1)$R: %d\r\n"
+                 "$3Type   (v2)$R: %d\r\n"
+                 "$3Hours  (v3)$R: %d\r\n"
                  "$3Unused (v4)$R: %d",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
@@ -1074,7 +1074,7 @@ void obj_stat(Character *ch, class Object *j)
     sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
     sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
     sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
-    sprintf(buf, "$3Level(v1)$R  : %d\n\r"
+    sprintf(buf, "$3Level(v1)$R  : %d\r\n"
                  " $3Spells(v2)$R: %d (%s)\r\n"
                  " $3Spells(v3)$R: %d (%s)\r\n"
                  " $3Spells(v4)$R: %d (%s)",
@@ -1123,9 +1123,9 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[2]);
     break;
   case ITEM_ARMOR:
-    sprintf(buf, "$3AC-apply(v1)$R: [%d]\n\r"
-                 "$3Unused  (v2)$R: [%d] (make 0)\n\r"
-                 "$3Unused  (v3)$R: [%d] (make 0)\n\r"
+    sprintf(buf, "$3AC-apply(v1)$R: [%d]\r\n"
+                 "$3Unused  (v2)$R: [%d] (make 0)\r\n"
+                 "$3Unused  (v3)$R: [%d] (make 0)\r\n"
                  "$3Unused  (v4)$R: [%d] (make 0)",
             j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
     break;
@@ -1133,9 +1133,9 @@ void obj_stat(Character *ch, class Object *j)
     sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
     sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
     sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
-    sprintf(buf, "$3Level (v1)$R: %d\n\r"
-                 " $3Spell(v2)$R: %d (%s)\n\r"
-                 " $3Spell(v3)$R: %d (%s)\n\r"
+    sprintf(buf, "$3Level (v1)$R: %d\r\n"
+                 " $3Spell(v2)$R: %d (%s)\r\n"
+                 " $3Spell(v3)$R: %d (%s)\r\n"
                  " $3Spell(v4)$R: %d (%s)",
             j->obj_flags.value[0],
             j->obj_flags.value[1], buf2,
@@ -1143,16 +1143,16 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[3], buf4);
     break;
   case ITEM_TRAP:
-    sprintf(buf, "$3Spell(v1)$R    : %d\n\r"
+    sprintf(buf, "$3Spell(v1)$R    : %d\r\n"
                  "$3Hitpoints(v2)$R: %d",
             j->obj_flags.value[0],
             j->obj_flags.value[1]);
     break;
   case ITEM_CONTAINER:
     sprintf(buf,
-            "$3Max-contains(v1)$R : %d\n\r"
-            "$3Locktype(v2)$R     : %d\n\r"
-            "$3Key #$R            : %d\n\r"
+            "$3Max-contains(v1)$R : %d\r\n"
+            "$3Locktype(v2)$R     : %d\r\n"
+            "$3Key #$R            : %d\r\n"
             "$3Corpse(v4)$R       : %s",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
@@ -1163,9 +1163,9 @@ void obj_stat(Character *ch, class Object *j)
     sprinttype(j->obj_flags.value[2], drinks, buf2);
     //  strcpy(buf2,drinks[j->obj_flags.value[2]]);
     sprintf(buf,
-            "$3Max-contains(v1)$R: %d\n\r"
-            "$3Contains    (v2)$R: %d\n\r"
-            "$3Liquid      (v3)$R: %s (%d)\n\r"
+            "$3Max-contains(v1)$R: %d\r\n"
+            "$3Contains    (v2)$R: %d\r\n"
+            "$3Liquid      (v3)$R: %s (%d)\r\n"
             "$3Poisoned    (v4)$R: %d",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
@@ -1233,7 +1233,7 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[3]);
     break;
   case ITEM_FOOD:
-    sprintf(buf, "$3Makes full(v1)$R : %d\n\r"
+    sprintf(buf, "$3Makes full(v1)$R : %d\r\n"
                  "$3Poisoned  (v4)$R : %d",
             j->obj_flags.value[0],
             j->obj_flags.value[3]);
@@ -1309,26 +1309,26 @@ void obj_stat(Character *ch, class Object *j)
 
   strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\n\r" : "none\n\r"));
+    strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
   else
-    strcat(buf, "No\n\r");
+    strcat(buf, "No\r\n");
   ch->send(buf);
   strcpy(buf, "$3Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\n\r" : "none\n\r"));
+    strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\r\n" : "none\r\n"));
   else
-    strcat(buf, "No\n\r");
+    strcat(buf, "No\r\n");
   ch->send(buf);
-  strcpy(buf, "$3Contains$R :\n\r");
+  strcpy(buf, "$3Contains$R :\r\n");
   found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
   {
     strcat(buf, qPrintable(fname(j2->Name())));
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
     found = true;
   }
   if (!found)
-    strcpy(buf, "$3Contains$R : Nothing\n\r");
+    strcpy(buf, "$3Contains$R : Nothing\r\n");
   ch->send(buf);
 
   ch->sendln("$3Can affect char$R :");
@@ -1342,7 +1342,7 @@ void obj_stat(Character *ch, class Object *j)
     else
       strcpy(buf2, "Invalid");
 
-    sprintf(buf, "    $3Affects$R : %s By %d\n\r", buf2, j->affected[i].modifier);
+    sprintf(buf, "    $3Affects$R : %s By %d\r\n", buf2, j->affected[i].modifier);
     ch->send(buf);
   }
   return;
@@ -1503,10 +1503,10 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
     x++;
 
     if (i->player->possesing)
-      sprintf(buf, "%14s -- [%ld] %s  *possessing*\n\r", GET_NAME(i),
+      sprintf(buf, "%14s -- [%ld] %s  *possessing*\r\n", GET_NAME(i),
               (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     else
-      sprintf(buf, "%14s -- [%ld] %s\n\r", GET_NAME(i),
+      sprintf(buf, "%14s -- [%ld] %s\r\n", GET_NAME(i),
               (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     ch->send(buf);
   }
@@ -1533,7 +1533,7 @@ int do_echo(Character *ch, char *argument, cmd_t cmd)
 
   else
   {
-    sprintf(buf, "\n\r%s\n\r", argument + i);
+    sprintf(buf, "\n\r%s\r\n", argument + i);
     for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       vict->send(buf);
   }
@@ -1842,7 +1842,7 @@ char *last_hunt_time(char *last_hunt)
 
   if (!time_of_last_hunt)
   {
-    sprintf(buf, "There have been no hunts since the last reboot.       \n\r");
+    sprintf(buf, "There have been no hunts since the last reboot.       \r\n");
     time_of_last_hunt = str_dup(buf);
   }
 
@@ -1874,14 +1874,14 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   if (nullptr != pTime)
   {
 #ifdef __CYGWIN__
-    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\n\r",
+    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\r\n",
              pTime->tm_mon + 1,
              pTime->tm_mday,
              pTime->tm_year + 1900,
              pTime->tm_hour,
              pTime->tm_min);
 #else
-    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\n\r",
+    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\r\n",
              pTime->tm_mon + 1,
              pTime->tm_mday,
              pTime->tm_year + 1900,
@@ -2082,7 +2082,7 @@ int do_showhunt(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("There are no active hunts at the moment.");
 
-    ch->send(fmt::format("Last hunt was run: {}\n\r", last_hunt_time(nullptr)));
+    ch->send(fmt::format("Last hunt was run: {}\r\n", last_hunt_time(nullptr)));
 
     ch->send(buf);
   }

@@ -158,7 +158,7 @@ void mpstat(Character *ch, Character *victim)
     ch->send(buf);
     send_to_char(mprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
+    sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
     ch->send(buf);
     ch->sendRaw(std::string(mprg->comlist) + "\r\n");
   }
@@ -1173,7 +1173,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!skillname.isEmpty())
-    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\n\r", qPrintable(skillname));
+    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\r\n", qPrintable(skillname));
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");

@@ -2413,7 +2413,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         if (!ch->isImmortalPlayer() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
-          csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl - 1]);
+          csendf(ch, "You lost your concentration and are unable to cast %s!\r\n", spells[spl - 1]);
           if (rel > 1)
           {
             ch->sendln("The failed elemental filter drains you of additional mana.");
@@ -2907,10 +2907,10 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
       continue;
 
     strcat(buf, buf2);
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
   }
 
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
   return eSUCCESS;
@@ -2933,11 +2933,11 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
               UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
               song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
               "Brd", d_skills[i].levelavailable);
-      strcat(buf, "\n\r");
+      strcat(buf, "\r\n");
     }
   }
 
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
   return eSUCCESS;
@@ -3066,10 +3066,10 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
       continue;
 
     strcat(buf, buf2);
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
   }
 
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
   return eSUCCESS;

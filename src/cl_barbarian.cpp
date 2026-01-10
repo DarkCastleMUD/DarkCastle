@@ -286,7 +286,7 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
       {
         if (exit->bracee == ch)
         {
-          csendf(ch, "You are already bracing the %s shut!\n\r", qPrintable(fname(exit->keyword)));
+          csendf(ch, "You are already bracing the %s shut!\r\n", qPrintable(fname(exit->keyword)));
         }
         else
         {

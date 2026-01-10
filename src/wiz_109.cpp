@@ -362,7 +362,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("What message do you want to send to all players?");
   else
   {
-    sprintf(buf, "\n\r%s\n\r", argument + i);
+    sprintf(buf, "\n\r%s\r\n", argument + i);
     for (point = DC::getInstance()->descriptor_list; point; point = point->next)
       if (!point->connected && point->character)
         point->character->send(buf);
@@ -390,11 +390,11 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    send_to_char("Syntax:  shutdown [sub command] [options ...]\n\r"
-                 " Sub Commands:\n\r"
-                 "--------------\n\r"
+    send_to_char("Syntax:  shutdown [sub command] [options ...]\r\n"
+                 " Sub Commands:\r\n"
+                 "--------------\r\n"
                  "   hot - Rerun current DC filename and keep players' links active.\r\n"
-                 "         Options: [path/dc executable] [dc options ...]\n\r"
+                 "         Options: [path/dc executable] [dc options ...]\r\n"
                  "  cold - Go ahead and kill the links.\r\n"
                  " crash - Crash the mud by referencing an invalid pointer.\r\n"
                  "  core - Produce a core file.\r\n"
@@ -546,7 +546,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
 
   if (*arg1 == 0)
   {
-    ch->sendln("testport <start | stop>\n\r");
+    ch->sendln("testport <start | stop>\r\n");
     return eFAILURE;
   }
 
@@ -603,7 +603,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 
   if (*arg1 == 0 || *arg2 == 0)
   {
-    ch->sendln("testuser <user> <on|off>\n\r");
+    ch->sendln("testuser <user> <on|off>\r\n");
     return eFAILURE;
   }
 
@@ -659,7 +659,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 #ifdef BANDWIDTH
 int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
 {
-  csendf(ch, "Bytes sent in %ld seconds: %ld\n\r",
+  csendf(ch, "Bytes sent in %ld seconds: %ld\r\n",
          get_bandwidth_start(), get_bandwidth_amount());
   return eSUCCESS;
 }
@@ -674,8 +674,8 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
 
   if (!(*argument))
   {
-    send_to_char("Syntax:  skilledit <character> <action> <value>\n\r"
-                 "Possible actions are:  list, add, delete\n\r",
+    send_to_char("Syntax:  skilledit <character> <action> <value>\r\n"
+                 "Possible actions are:  list, add, delete\r\n",
                  ch);
     return eFAILURE;
   }

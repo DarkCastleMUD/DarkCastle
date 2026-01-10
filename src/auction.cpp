@@ -1018,7 +1018,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   if (ch->getGold() < Item_it->price)
   {
-    csendf(ch, "Ticket number %d costs %d coins, you can't afford that!\n\r",
+    csendf(ch, "Ticket number %d costs %d coins, you can't afford that!\r\n",
            ticket, Item_it->price);
     return;
   }
@@ -1096,7 +1096,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   Character *tmp;
   for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if (tmp != ch)
-      csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), qPrintable(Item_it->seller), obj->short_description);
+      csendf(tmp, "%s just purchased %s's %s\r\n", GET_NAME(ch), qPrintable(Item_it->seller), obj->short_description);
 
   Item_it->state = AUC_SOLD;
   Item_it->buyer = GET_NAME(ch);
@@ -1409,7 +1409,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
       std::stringstream ss;
       ss.imbue(std::locale("en_US"));
       ss << Item_it->price;
-      sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\n\r",
+      sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\r\n",
               Item_it.key(),
               (options == LIST_MINE) ? qPrintable(Item_it->buyer) : qPrintable(Item_it->seller),
               ss.str().c_str(),
@@ -1570,7 +1570,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), DC::getInstance()->obj_index[obj->item_number].virt))
   {
-    ch->send(QStringLiteral("You're selling %1 already and it's unique!\n\r").arg(obj->short_description));
+    ch->send(QStringLiteral("You're selling %1 already and it's unique!\r\n").arg(obj->short_description));
     return;
   }
 
@@ -1766,10 +1766,10 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        send_to_char("What slot do you want to search for?\n\r"
-                     "finger, neck, body, head, legs, feet, hands, arms, shield,\n\r"
-                     "about, waist, wrist, wield, hold, throw, light, face, ear\n\r"
-                     "\n\rSyntax: vend search slot <keyword>\n\r",
+        send_to_char("What slot do you want to search for?\r\n"
+                     "finger, neck, body, head, legs, feet, hands, arms, shield,\r\n"
+                     "about, waist, wrist, wield, hold, throw, light, face, ear\r\n"
+                     "\n\rSyntax: vend search slot <keyword>\r\n",
                      ch);
         return eSUCCESS;
       }
@@ -1784,9 +1784,9 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        send_to_char("What race do you want to search for?\n\r"
-                     "Human, Elf, Dwarf, Hobbit, Pixie, Gnome, Orc, Troll\n\r"
-                     "\n\rSyntax: vend search race <race>\n\r",
+        send_to_char("What race do you want to search for?\r\n"
+                     "Human, Elf, Dwarf, Hobbit, Pixie, Gnome, Orc, Troll\r\n"
+                     "\n\rSyntax: vend search race <race>\r\n",
                      ch);
         return eSUCCESS;
       }
@@ -1801,8 +1801,8 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        send_to_char("What class do you want to search for?\n\r"
-                     "\n\rSyntax: vend search class <class_name>\n\r",
+        send_to_char("What class do you want to search for?\r\n"
+                     "\n\rSyntax: vend search class <class_name>\r\n",
                      ch);
         return eSUCCESS;
       }
@@ -1822,8 +1822,8 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        send_to_char("What person are you looking for?\n\r"
-                     "\n\rSyntax: vend search seller <name>\n\r",
+        send_to_char("What person are you looking for?\r\n"
+                     "\n\rSyntax: vend search seller <name>\r\n",
                      ch);
         return eSUCCESS;
       }

@@ -141,7 +141,7 @@ auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
   if (move_char(ch, send_to) == 0)
     return eFAILURE;
   act("$n appears, preparing for battle.", ch, 0, 0, TO_ROOM, 0);
-  sprintf(buf, "## %s has joined the bloodbath!\n\r", GET_SHORT(ch));
+  sprintf(buf, "## %s has joined the bloodbath!\r\n", GET_SHORT(ch));
   send_info(buf);
   do_look(ch, "");
   return eSUCCESS;

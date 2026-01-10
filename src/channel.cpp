@@ -213,7 +213,7 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
     return eSUCCESS;
   }
 
-  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\n\r", GET_NAME(ch), arg);
+  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", GET_NAME(ch), arg);
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
@@ -268,7 +268,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
     if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\n\r",
+                   "you find yourself unable to!\r\n",
                    ch);
       return eSUCCESS;
     }
@@ -359,7 +359,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
   for (tmp_obj = DC::getInstance()->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
-      send("The magical silence prevents you from speaking!\n\r");
+      send("The magical silence prevents you from speaking!\r\n");
       return eFAILURE;
     }
 
@@ -374,7 +374,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     if (isPlayer() && isSet(player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\n\r",
+                   "you find yourself unable to!\r\n",
                    this);
       return eSUCCESS;
     }
@@ -468,7 +468,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
   if (IS_PC(ch) && isSet(ch->player->punish, PUNISH_SILENCED))
   {
     send_to_char("You must have somehow offended the gods, for you "
-                 "find yourself unable to!\n\r",
+                 "find yourself unable to!\r\n",
                  ch);
     return eSUCCESS;
   }
@@ -547,7 +547,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\n\r",
+                   "you find yourself unable to!\r\n",
                    ch);
       return eSUCCESS;
     }
@@ -640,7 +640,7 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\n\r",
+                   "you find yourself unable to!\r\n",
                    ch);
       return eSUCCESS;
     }
@@ -675,8 +675,8 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("It must not have been that great!!");
   else
   {
-    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\n\r", GET_SHORT(ch), argument);
-    sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\n\r", argument);
+    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\r\n", GET_SHORT(ch), argument);
+    sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\r\n", argument);
     send_to_char(buf2, ch);
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
@@ -1209,7 +1209,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\n\r",
+                   "you find yourself unable to!\r\n",
                    ch);
       return eSUCCESS;
     }

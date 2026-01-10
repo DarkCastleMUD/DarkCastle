@@ -384,7 +384,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
   if (ch->title) // this should always be true, but why not check anyway?
     delete[] ch->title;
   ch->title = str_dup(argument);
-  sprintf(buf, "Your title is now: %s\n\r", argument);
+  sprintf(buf, "Your title is now: %s\r\n", argument);
   ch->send(buf);
   return eSUCCESS;
 }
@@ -413,7 +413,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
       if (t.value_ != Player::PLR_GUIDE_TOG || (isSet(player->toggles, Player::PLR_GUIDE)))
       {
         send(QStringLiteral("%1 ").arg(t.name_, -11));
-        send(QStringLiteral("%1\n\r").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
+        send(QStringLiteral("%1\r\n").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
       }
     }
     return eSUCCESS;
@@ -1389,17 +1389,17 @@ void CVoteData::DisplayVote(Character *ch)
   int i = 1;
   if (vote_question.empty())
   {
-    ch->send("\n\rSorry! There are no active votes right now!\n\r\n\r");
+    ch->send("\n\rSorry! There are no active votes right now!\r\n\r\n");
     return;
   }
   ch->send("\n\r--Current Vote Infortmation--\n\rTo vote, type \"vote #\".\r\n"
-           "Enter \"vote results\" to see the current voting demographics.\n\r\n\r");
+           "Enter \"vote results\" to see the current voting demographics.\r\n\r\n");
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   ch->send(buf);
-  ch->send("\n\r");
+  ch->send("\r\n");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
     ch->send(QStringLiteral("%1: %2\r\n").arg(i++, 2).arg(answer_it->answer.c_str()));
-  ch->send("\n\r");
+  ch->send("\r\n");
 }
 
 void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
@@ -1443,7 +1443,7 @@ void CVoteData::StartVote(Character *ch)
   }
 
   ch->sendln("$4**MAKE SURE YOU VOTESET CLEAR IF THIS IS A NEW VOTE!**$R");
-  send_info("\n\r##Attention! There is now a vote in progress!\n\r##Type Vote for more information!\n\r");
+  send_info("\n\r##Attention! There is now a vote in progress!\n\r##Type Vote for more information!\r\n");
 
   active = true;
   OutToFile();
@@ -1460,7 +1460,7 @@ void CVoteData::EndVote(Character *ch)
 
   active = false;
   OutToFile();
-  send_info("\n\r##The vote has ended! Type \"Vote Results\" to see the results!\n\r");
+  send_info("\n\r##The vote has ended! Type \"Vote Results\" to see the results!\r\n");
 }
 
 void CVoteData::AddAnswer(Character *ch, std::string answer)
@@ -1536,10 +1536,10 @@ void CVoteData::DisplayResults(Character *ch)
     if (ch->isMortalPlayer())
     {
       percent = (answer_it->votes * 100) / total_votes;
-      csendf(ch, "%3d\%: %s\n\r", percent, answer_it->answer.c_str());
+      csendf(ch, "%3d\%: %s\r\n", percent, answer_it->answer.c_str());
     }
     else
-      csendf(ch, "%3d: %s\n\r", answer_it->votes, answer_it->answer.c_str());
+      csendf(ch, "%3d: %s\r\n", answer_it->votes, answer_it->answer.c_str());
   }
   ch->sendln("");
 }
@@ -1752,7 +1752,7 @@ int do_vote(Character *ch, char *arg, cmd_t cmd)
 
   vote = atoi(buf);
   if (true == DC::getInstance()->DCVote.Vote(ch, vote))
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\r\n", GET_NAME(ch), vote);
 
   return eSUCCESS;
 }

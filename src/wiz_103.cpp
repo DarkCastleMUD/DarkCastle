@@ -84,68 +84,68 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
     if (!strcmp(type, "boot"))
     {
       send_to_char(
-          "\n\r"
-          "                       $1/               /\n\r"
-          "                      $1/               /\n\r"
-          "                     $1/               /\n\r"
-          "                    $1/               /$R\n\r"
-          "                   $5/\\_             $1/$R\n\r"
-          "      $5____        /   \\_          $1/$R\n\r"
-          "     $5/    \\      /\\     \\_       $1/$R\n\r"
-          "    $5/      \\    /\\        \\_    $1/$R\n\r"
-          "   $5/        \\  /\\           \\_ $1/$R\n\r"
-          "  $5/          \\/\\              /\n\r"
-          "  |\\                         /\n\r"
-          "   \\\\                       /\n\r"
-          "    \\\\                     /\n\r"
-          "     \\\\                   /\n\r"
-          "      \\\\                 /\n\r"
-          "       \\\\               /\n\r"
-          "        \\\\             /\n\r"
-          "         \\\\           /\n\r"
-          "          \\\\         /\n\r"
-          "           \\\\       /\n\r"
-          "            \\\\     /\n\r"
-          "             \\\\   /\n\r"
-          "              \\__/$R\n\r",
+          "\r\n"
+          "                       $1/               /\r\n"
+          "                      $1/               /\r\n"
+          "                     $1/               /\r\n"
+          "                    $1/               /$R\r\n"
+          "                   $5/\\_             $1/$R\r\n"
+          "      $5____        /   \\_          $1/$R\r\n"
+          "     $5/    \\      /\\     \\_       $1/$R\r\n"
+          "    $5/      \\    /\\        \\_    $1/$R\r\n"
+          "   $5/        \\  /\\           \\_ $1/$R\r\n"
+          "  $5/          \\/\\              /\r\n"
+          "  |\\                         /\r\n"
+          "   \\\\                       /\r\n"
+          "    \\\\                     /\r\n"
+          "     \\\\                   /\r\n"
+          "      \\\\                 /\r\n"
+          "       \\\\               /\r\n"
+          "        \\\\             /\r\n"
+          "         \\\\           /\r\n"
+          "          \\\\         /\r\n"
+          "           \\\\       /\r\n"
+          "            \\\\     /\r\n"
+          "             \\\\   /\r\n"
+          "              \\__/$R\r\n",
           victim);
     }
     if (!strcmp(type, "kitty"))
     {
-      send_to_char("\n\r"
-                   "                __                             $6$B$I___$R            $6$B$I_yygL$R\n\r"
-                   "$B$6i wuv u!$R       #####gy_,                    $6$B$Iy#######g   __g########g$R\n\r"
-                   "    \\        g#F   `M##bg.                $6$B$Ig#\"'    ###g####~'    9##L$R\n\r"
-                   "             ##F       `###g____yyyyy_____$6$B$Ij#\"        ###          ##E$R\n\r"
-                   "            a#F           3##\"#~~~~~~~###$6$B$I##\"          ##g          ##$R\n\r"
-                   "           j#F                           $6$B$I5#      ____ _##y__       ##1$R\n\r"
-                   "           a#                           $6$B$Iy##    _g##~####\"#M##g     ##1$R\n\r"
-                   "           #E                           $6$B$IJ#L    ##$R  $6$B$Ig#\"'     `#########g_$R\n\r"
-                   "          o#1                           $6$B$I##     ##$R $6$B$Iy#E         ##L     9#,$R\n\r"
-                   "           #g                           $6$B$I##      ####F         3#g      ##$R\n\r"
-                   "          a#F                           $6$B$I3#L       ##L         ##M#.    ##!$R\n\r"
-                   "         g#F                             $6$B$I##_     _##g       _g#F$R $6$B$I#g   y##$R\n\r"
-                   "        _#F                               $6$B$I~###g###~M##g_   y###yg#'  y##'$R\n\r"
-                   "        ##                                           $6$B$I`?\"M###        g##F$R\n\r"
-                   "       ##'                                                $6$B$I?#,      ###L$R\n\r"
-                   "       #E                                                  $6$B$I##g___g#$R\"###\n\r"
-                   "      J#F                                                    $6$B$I`M##'$R   ##L\n\r"
-                   "      ##                                                              ##\n\r"
-                   "      ##                                                              ##\n\r"
-                   "      ##                                                              ##L\n\r"
-                   "   ___##y_.      a#o                                                __##1\n\r"
-                   "##\"\"F~5#F        ###L                                 __          #M#M###M##\n\r"
-                   "      J#K        ###L                                g##g             ##\n\r"
-                   "     _y##ga       ~           _amog                  ####            ##F\n\r"
+      send_to_char("\r\n"
+                   "                __                             $6$B$I___$R            $6$B$I_yygL$R\r\n"
+                   "$B$6i wuv u!$R       #####gy_,                    $6$B$Iy#######g   __g########g$R\r\n"
+                   "    \\        g#F   `M##bg.                $6$B$Ig#\"'    ###g####~'    9##L$R\r\n"
+                   "             ##F       `###g____yyyyy_____$6$B$Ij#\"        ###          ##E$R\r\n"
+                   "            a#F           3##\"#~~~~~~~###$6$B$I##\"          ##g          ##$R\r\n"
+                   "           j#F                           $6$B$I5#      ____ _##y__       ##1$R\r\n"
+                   "           a#                           $6$B$Iy##    _g##~####\"#M##g     ##1$R\r\n"
+                   "           #E                           $6$B$IJ#L    ##$R  $6$B$Ig#\"'     `#########g_$R\r\n"
+                   "          o#1                           $6$B$I##     ##$R $6$B$Iy#E         ##L     9#,$R\r\n"
+                   "           #g                           $6$B$I##      ####F         3#g      ##$R\r\n"
+                   "          a#F                           $6$B$I3#L       ##L         ##M#.    ##!$R\r\n"
+                   "         g#F                             $6$B$I##_     _##g       _g#F$R $6$B$I#g   y##$R\r\n"
+                   "        _#F                               $6$B$I~###g###~M##g_   y###yg#'  y##'$R\r\n"
+                   "        ##                                           $6$B$I`?\"M###        g##F$R\r\n"
+                   "       ##'                                                $6$B$I?#,      ###L$R\r\n"
+                   "       #E                                                  $6$B$I##g___g#$R\"###\r\n"
+                   "      J#F                                                    $6$B$I`M##'$R   ##L\r\n"
+                   "      ##                                                              ##\r\n"
+                   "      ##                                                              ##\r\n"
+                   "      ##                                                              ##L\r\n"
+                   "   ___##y_.      a#o                                                __##1\r\n"
+                   "##\"\"F~5#F        ###L                                 __          #M#M###M##\r\n"
+                   "      J#K        ###L                                g##g             ##\r\n"
+                   "     _y##ga       ~           _amog                  ####            ##F\r\n"
                    " a###~'\"#1                   d#   \"#                 \"##          #wy##L.\r\n"
-                   "        3#,                   #g__g\"                                ##\"\"5##g\n\r"
-                   "         ##g#                    ''                                a##    '~\n\r"
-                   "    __y#\"FH#_                                                  y_ g##\n\r"
-                   "   ##\"'     ##g                                                 \"###g_\n\r"
-                   "   ~         `9#g_                                            _g##'\"9##gg,\n\r"
-                   "                 ?##gy_.                                   _y##\"'      `##\n\r"
-                   "                     ~\"####ggy_____                  ___g###F'\n\r"
-                   "                             \"~~~~~##################~~~\"\n\r",
+                   "        3#,                   #g__g\"                                ##\"\"5##g\r\n"
+                   "         ##g#                    ''                                a##    '~\r\n"
+                   "    __y#\"FH#_                                                  y_ g##\r\n"
+                   "   ##\"'     ##g                                                 \"###g_\r\n"
+                   "   ~         `9#g_                                            _g##'\"9##gg,\r\n"
+                   "                 ?##gy_.                                   _y##\"'      `##\r\n"
+                   "                     ~\"####ggy_____                  ___g###F'\r\n"
+                   "                             \"~~~~~##################~~~\"\r\n",
                    victim);
     }
     move_char(victim, real_room(START_ROOM));
@@ -191,7 +191,7 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
       else
       {
         close_socket(d);
-        sprintf(buf, "Closing socket to descriptor #%d\n\r", sdesc);
+        sprintf(buf, "Closing socket to descriptor #%d\r\n", sdesc);
         ch->send(buf);
         return eFAILURE;
       }
@@ -278,7 +278,7 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
     if ((victim_clan = get_clan(i->fighting)))
       snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
 
-    snprintf(buf, 80, "%s %s fighting %s %s (%d)\n\r",
+    snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
              GET_NAME(i), ch_clan_name,
              GET_NAME(i->fighting), victim_clan_name,
              DC::getInstance()->world[i->in_room].number);
@@ -354,11 +354,11 @@ int lookupClass(Character *ch, char *str)
 
   if (ch != 0)
   {
-    ch->sendln("Invalid class.\n\r");
+    ch->sendln("Invalid class.\r\n");
     ch->sendln("Valid classes:");
     for (c_class = 1; c_class <= CLASS_MAX; c_class++)
     {
-      csendf(ch, "%s\n\r", pc_clss_types[c_class]);
+      csendf(ch, "%s\r\n", pc_clss_types[c_class]);
     }
   }
 
@@ -403,7 +403,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Syntax:");
     ch->sendln("guild <room #>           - List all classes allowed in room");
     ch->sendln("guild <class>            - List all rooms that allow that class");
-    ch->sendln("guild <class> <room #>   - Toggle allow/deny class in room\n\r");
+    ch->sendln("guild <class> <room #>   - Toggle allow/deny class in room\r\n");
     return eFAILURE;
   }
 
@@ -451,7 +451,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
       }
 
       int count = 0;
-      csendf(ch, "%s only rooms:\n\r", pc_clss_types[c_class]);
+      csendf(ch, "%s only rooms:\r\n", pc_clss_types[c_class]);
 
       int cols = 0;
       for (int r = 0; r < DC::getInstance()->top_of_world; r++)

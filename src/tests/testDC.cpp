@@ -931,9 +931,9 @@ private slots:
         QCOMPARE(conn2.output, "The Consignment Broker auctions 'Testvend is selling \"a reflecty test item\" for 1000000 gold.'\r\n");
 
         rc = do_vend(&ch, str_hsh("list mine"));
-        QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\n\r"
-                              "You are using 1 of your 1 available tickets.\r\n\n\r"
-                              "00002)              1,000,000  PUBLIC     a reflecty test item          \n\r\n\r"
+        QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\r\n"
+                              "You are using 1 of your 1 available tickets.\r\n\r\n"
+                              "00002)              1,000,000  PUBLIC     a reflecty test item          \r\n\r\n"
                               "'N' indicates an item is NO_TRADE and requires a Genuine Wendy Wingding to purchase.\r\n"
                               "'*' indicates you are unable to use this item.\r\n");
         conn.output = {};
@@ -945,8 +945,8 @@ private slots:
         QCOMPARE(rc, eSUCCESS);
 
         rc = do_vend(&ch, str_hsh("list mine"));
-        QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\n\r"
-                              "You do not have any tickets.\r\n\n\r"
+        QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\r\n"
+                              "You do not have any tickets.\r\n\r\n"
                               "You are using 0 of your 1 available tickets.\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
@@ -1131,7 +1131,7 @@ private slots:
                               "   People scurry about the blackjack area, searching for perhaps a lively\r\n"
                               "table, the bar, or possibly the ATM machine.  A cocktail waitress in a short\r\n"
                               "skirt rushes by, a tray of drinks on one hand.\r\n"
-                              "A table covered in deep purple felt stands here.\n\r"
+                              "A table covered in deep purple felt stands here.\r\n"
                               "A blackjack dealer stands here, smiling and waiting for the patrons.\r\n"
                               "-the blackjack dealer has: aura! \r\n"
                               "Exits: south \r\n");
@@ -1415,7 +1415,7 @@ private slots:
         }
 
         QCOMPARE(do_found(&p1, "."), eSUCCESS);
-        QCOMPARE(p1.desc->output, "You found: .\n\r");
+        QCOMPARE(p1.desc->output, "You found: .\r\n");
         p1.desc->output = {};
 
         QCOMPARE(do_look(&p1, ""), eSUCCESS);

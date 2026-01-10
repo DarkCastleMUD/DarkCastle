@@ -168,7 +168,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         break;
       case position_t::RESTING:
         send_to_char("You cannot harness that much energy while "
-                     "resting!\n\r",
+                     "resting!\r\n",
                      ch);
         break;
       case position_t::SITTING:
@@ -270,7 +270,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         DC::getInstance()->logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
                                     DC::LogChannel::LOG_BUG);
         send_to_char(
-            "If you triggered this message, you almost crashed the\n\r"
+            "If you triggered this message, you almost crashed the\r\n"
             "game.  Tell a god what you did immediately.\r\n",
             ch);
         return eFAILURE;

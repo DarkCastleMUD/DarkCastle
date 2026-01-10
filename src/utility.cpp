@@ -921,7 +921,7 @@ void util_archive(const char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful archive: %s", char_name);
     if (caller)
-      caller->send(QStringLiteral("%1\n\r").arg(buf));
+      caller->send(QStringLiteral("%1\r\n").arg(buf));
     else
       DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
@@ -931,7 +931,7 @@ void util_archive(const char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character archived: %s", char_name);
   if (caller)
-    caller->send(QStringLiteral("%1\n\r").arg(buf));
+    caller->send(QStringLiteral("%1\r\n").arg(buf));
   DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
@@ -975,7 +975,7 @@ void util_unarchive(char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful unarchive: %s", char_name);
     if (caller)
-      caller->send(QStringLiteral("%1\n\r").arg(buf));
+      caller->send(QStringLiteral("%1\r\n").arg(buf));
     else
       DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
@@ -985,7 +985,7 @@ void util_unarchive(char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
-    caller->send(QStringLiteral("%1\n\r").arg(buf));
+    caller->send(QStringLiteral("%1\r\n").arg(buf));
   DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
@@ -1643,7 +1643,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (getGold() < (uint32_t)cost)
     {
-      send(QStringLiteral("You don't have %1 gold!\n\r").arg(cost));
+      send(QStringLiteral("You don't have %1 gold!\r\n").arg(cost));
       return eFAILURE;
     }
 
@@ -1840,9 +1840,9 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af);
 
     if (obj && obj->short_description)
-      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for %2 to reappear!\n\r").arg(GET_NAME(ch)).arg(obj->short_description));
+      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for %2 to reappear!\r\n").arg(GET_NAME(ch)).arg(obj->short_description));
     else
-      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for the Champion flag to reappear!\n\r").arg(GET_NAME(ch)));
+      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(GET_NAME(ch)));
   }
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);

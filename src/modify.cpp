@@ -117,7 +117,7 @@ void string_hash_add(class Connection *d, char *str)
 		check_for_awaymsgs(ch);
 	}
 	else
-		strcat(*d->hashstr, "\n\r");
+		strcat(*d->hashstr, "\r\n");
 }
 
 // TODO - figure out what this is for...kill it if nothing

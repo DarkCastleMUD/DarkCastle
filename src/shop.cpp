@@ -62,7 +62,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   if (ISSET(ch->affected_by, AFF_KILLER))
   {
     do_say(keeper, "Go away before I call the guards!!");
-    sprintf(buf, "%s the KILLER is over here!\n\r", GET_SHORT(ch));
+    sprintf(buf, "%s the KILLER is over here!\r\n", GET_SHORT(ch));
     do_shout(keeper, buf);
     return false;
   }

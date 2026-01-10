@@ -227,7 +227,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
       {
          if (!object->ActionDescription().isEmpty())
          {
-            strncpy(buffer, "There is something written upon it:\n\r\n\r", sizeof(buffer) - 1);
+            strncpy(buffer, "There is something written upon it:\r\n\r\n", sizeof(buffer) - 1);
             strncat(buffer, object->ActionDescription().toStdString().c_str(), sizeof(buffer) - 1);
             page_string(desc, buffer, 1);
          }
@@ -385,7 +385,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
          strcat(buffer, "$B$1"); // setup color background
    }
 
-   strcat(buffer, "\n\r");
+   strcat(buffer, "\r\n");
    page_string(desc, buffer, 1);
 }
 
@@ -626,7 +626,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
          if (IS_AFFECTED(i, AFF_CHAMPION))
             buffer.append(" $B$4(Champion) ");
 
-         buffer.append("$R\n\r");
+         buffer.append("$R\r\n");
          send_to_char(buffer.c_str(), ch);
 
          show_spells(i, ch);
@@ -779,7 +779,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
    QString name = arguments.value(0);
    if (name.isEmpty())
    {
-      sendln("botcheck <player> or all\n\r");
+      sendln("botcheck <player> or all\r\n");
       return eFAILURE;
    }
 
@@ -858,7 +858,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
       if (nr >= 0)
       {
-         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].virt,
+         csendf(this, "[%4dms] [%5d] [%s]\r\n", ms, DC::getInstance()->mob_index[nr].virt,
                 ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
       }
    }
@@ -1058,7 +1058,7 @@ bool identify(Character *ch, Object *obj)
    sprintbit(obj->obj_flags.size, Object::size_bits, buf);
    ch->send(QStringLiteral("$3Worn by: $R%1\r\n").arg(buf));
 
-   ch->send(QStringLiteral("$3Level: $R%1\n\r").arg(obj->obj_flags.eq_level));
+   ch->send(QStringLiteral("$3Level: $R%1\r\n").arg(obj->obj_flags.eq_level));
    ch->send(QStringLiteral("$3Weight: $R%1\r\n").arg(obj->obj_flags.weight));
    ch->send(QStringLiteral("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
 
@@ -1094,37 +1094,37 @@ bool identify(Character *ch, Object *obj)
       if (obj->obj_flags.value[1] >= 1)
       {
          sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
-         strcat(buf, "\n\r");
+         strcat(buf, "\r\n");
          ch->send(buf);
       }
       if (obj->obj_flags.value[2] >= 1)
       {
          sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
-         strcat(buf, "\n\r");
+         strcat(buf, "\r\n");
          ch->send(buf);
       }
       if (obj->obj_flags.value[3] >= 1)
       {
          sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-         strcat(buf, "\n\r");
+         strcat(buf, "\r\n");
          ch->send(buf);
       }
       break;
 
    case ITEM_WAND:
    case ITEM_STAFF:
-      sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\n\r",
+      sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\r\n",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
       ch->send(buf);
 
-      sprintf(buf, "$3Level $R%d$3 spell of:$R\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "$3Level $R%d$3 spell of:$R\r\n", obj->obj_flags.value[0]);
       ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
       {
          sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-         strcat(buf, "\n\r");
+         strcat(buf, "\r\n");
          ch->send(buf);
       }
       break;
@@ -1194,7 +1194,7 @@ bool identify(Character *ch, Object *obj)
       {
          csendf(ch, "-%d", obj->obj_flags.value[1]);
       }
-      csendf(ch, ")$3     Resistance to damage is $R%d\n\r", obj->obj_flags.value[2]);
+      csendf(ch, ")$3     Resistance to damage is $R%d\r\n", obj->obj_flags.value[2]);
       break;
    }
 
@@ -1887,7 +1887,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
          continue;
 
       if (ch->isPlayer() && ch->player->holyLite)
-         sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
+         sprintf(buf + strlen(buf), "%s - %s [%d]\r\n", exits[door],
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name,
                  DC::getInstance()->world[EXIT(ch, door)->to_room].number);
       else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
@@ -1895,10 +1895,10 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
          if (isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
             continue;
          else
-            sprintf(buf + strlen(buf), "%s - (Closed)\n\r", exits[door]);
+            sprintf(buf + strlen(buf), "%s - (Closed)\r\n", exits[door]);
       }
       else if (IS_DARK(EXIT(ch, door)->to_room))
-         sprintf(buf + strlen(buf), "%s - Too dark to tell\n\r", exits[door]);
+         sprintf(buf + strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
       else
          sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name);
@@ -1946,21 +1946,21 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
 
    sprintf(buf,
            "$7($5:$7)================================================="
-           "========================($5:$7)\n\r"
-           "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\n\r"
+           "========================($5:$7)\r\n"
+           "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\r\n"
            "($5:$7)=============================($5:$7)================="
-           "========================($5:$7)\n\r",
+           "========================($5:$7)\r\n",
            GET_SHORT(ch));
 
    ch->send(buf);
 
    sprintf(buf,
-           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
-           "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-           "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3d        $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
-           "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
-           "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\n\r"
-           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
+           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
+           "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
+           "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3d        $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
+           "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
+           "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\r\n"
+           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
            GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
            GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
            GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
@@ -1984,15 +1984,15 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
 
       int instrument_combat{}, instrument_non_combat{};
       get_instrument_bonus(ch, instrument_combat, instrument_non_combat);
-      ch->sendln(QStringLiteral("($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
-                                "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
-                                "|o|  $3Armor$7:   %1   $3Pkills$7:  %2  |~|  $3Items Carried$7:  %3 |/|\n\r"
-                                "|\\|  $3BonusHit$7: %4   $3PDeaths$7: %5  |/|  $3Weight Carried$7: %6 |~|\n\r"
-                                "|~|  $3BonusDam$7: %7   $3SplDam$7:  %8  |o|  $3Experience$7:   %L9 |\\|\n\r"
+      ch->sendln(QStringLiteral("($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\r\n"
+                                "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\r\n"
+                                "|o|  $3Armor$7:   %1   $3Pkills$7:  %2  |~|  $3Items Carried$7:  %3 |/|\r\n"
+                                "|\\|  $3BonusHit$7: %4   $3PDeaths$7: %5  |/|  $3Weight Carried$7: %6 |~|\r\n"
+                                "|~|  $3BonusDam$7: %7   $3SplDam$7:  %8  |o|  $3Experience$7:   %L9 |\\|\r\n"
                                 "|/|  $3InstrCom$7: %10   $3InstrNon$7:%11  |\\|  $3ExpTillLevel$7: %L12 |/|\r\n"
-                                "|o|  $B$4FIRE$R[%13]  $B$3COLD$R[%14]  $B$5NRGY$R[%15]  |\\|  $3Gold$7: %L16 |o|\n\r"
-                                "|\\|  $B$2ACID$R[%17]  $B$7MAGK$R[%18]  $2POIS$7[%19]  |~|  $3Bank$7: %L20 |/|\n\r"
-                                "|-|  $3MELE$R[%21]  $3SPEL$R[%22]   $3KI$R [%23]  |/|  $3QPoints$7: %L24 $3Platinum$7: %L25 |-|\n\r"
+                                "|o|  $B$4FIRE$R[%13]  $B$3COLD$R[%14]  $B$5NRGY$R[%15]  |\\|  $3Gold$7: %L16 |o|\r\n"
+                                "|\\|  $B$2ACID$R[%17]  $B$7MAGK$R[%18]  $2POIS$7[%19]  |~|  $3Bank$7: %L20 |/|\r\n"
+                                "|-|  $3MELE$R[%21]  $3SPEL$R[%22]   $3KI$R [%23]  |/|  $3QPoints$7: %L24 $3Platinum$7: %L25 |-|\r\n"
                                 "|/|                                   |o|                                   |/|\r\n"
                                 "($5:$7)===================================($5:$7)===================================($5:$7)")
                      .arg(GET_ARMOR(ch), 5)
@@ -2033,7 +2033,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
          if (!isrString.empty())
          {
             scratch = frills[level];
-            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
                     scratch, "Immunity", isrString.c_str(), scratch);
             ch->send(buf);
             found = true;
@@ -2051,7 +2051,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
          if (!isrString.empty())
          {
             scratch = frills[level];
-            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
                     scratch, "Susceptibility", isrString.c_str(), scratch);
             ch->send(buf);
             found = true;
@@ -2069,7 +2069,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
          if (!isrString.empty())
          {
             scratch = frills[level];
-            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
                     scratch, "Resistibility", isrString.c_str(), scratch);
             ch->send(buf);
             found = true;
@@ -2227,7 +2227,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
    }
    /*  if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
        scratch = frills[level];
-       sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\n\r",
+       sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\r\n",
                scratch, scratch);
        ch->send(buf);
        found = true;
@@ -2258,10 +2258,10 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
          scratch = frills[level];
 
          if (aff_idx != AFF_REFLECT)
-            sprintf(buf, "|%c| Affected by %-25s          Modifier NONE            |%c|\n\r",
+            sprintf(buf, "|%c| Affected by %-25s          Modifier NONE            |%c|\r\n",
                     scratch, affected_bits[aff_idx - 1], scratch);
          else
-            sprintf(buf, "|%c| Affected by %-25s          Modifier (%3d)           |%c|\n\r",
+            sprintf(buf, "|%c| Affected by %-25s          Modifier (%3d)           |%c|\r\n",
                     scratch, affected_bits[aff_idx - 1], ch->spell_reflect, scratch);
          ch->send(buf);
       }
@@ -2277,16 +2277,16 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
          if (ch->player->buildLowVnum == ch->player->buildOLowVnum &&
              ch->player->buildLowVnum == ch->player->buildMLowVnum)
          {
-            sprintf(buf, "CREATION RANGE: %d-%d\n\r", ch->player->buildLowVnum, ch->player->buildHighVnum);
+            sprintf(buf, "CREATION RANGE: %d-%d\r\n", ch->player->buildLowVnum, ch->player->buildHighVnum);
             ch->send(buf);
          }
          else
          {
-            sprintf(buf, "ROOM RANGE: %d-%d\n\r", ch->player->buildLowVnum, ch->player->buildHighVnum);
+            sprintf(buf, "ROOM RANGE: %d-%d\r\n", ch->player->buildLowVnum, ch->player->buildHighVnum);
             ch->send(buf);
-            sprintf(buf, "MOB RANGE: %d-%d\n\r", ch->player->buildMLowVnum, ch->player->buildMHighVnum);
+            sprintf(buf, "MOB RANGE: %d-%d\r\n", ch->player->buildMLowVnum, ch->player->buildMHighVnum);
             ch->send(buf);
-            sprintf(buf, "OBJ RANGE: %d-%d\n\r", ch->player->buildOLowVnum, ch->player->buildOHighVnum);
+            sprintf(buf, "OBJ RANGE: %d-%d\r\n", ch->player->buildOLowVnum, ch->player->buildOHighVnum);
             ch->send(buf);
          }
       }
@@ -2336,7 +2336,7 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
    else
       suf = "th";
 
-   sprintf(buf, "The %d%s Day of the %s, Year %d.  (game time)\n\r",
+   sprintf(buf, "The %d%s Day of the %s, Year %d.  (game time)\r\n",
            day,
            suf,
            month_name[time_info.month],
@@ -2359,14 +2359,14 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
       return eFAILURE;
 
 #ifdef __CYGWIN__
-   sprintf(buf, "The system time is %d/%d/%d (%d:%02d)\n\r",
+   sprintf(buf, "The system time is %d/%d/%d (%d:%02d)\r\n",
            pTime->tm_mon + 1,
            pTime->tm_mday,
            pTime->tm_year + 1900,
            pTime->tm_hour,
            pTime->tm_min);
 #else
-   sprintf(buf, "The system time is %d/%d/%d (%d:%02d) %s\n\r",
+   sprintf(buf, "The system time is %d/%d/%d (%d:%02d) %s\r\n",
            pTime->tm_mon + 1,
            pTime->tm_mday,
            pTime->tm_year + 1900,
@@ -2380,9 +2380,9 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
    h = timep / 3600;
    m = (timep % 3600) / 60;
    // 	s = timep % 60;
-   // 	sprintf (buf, "The mud has been running for: %02li:%02li:%02li \n\r",
+   // 	sprintf (buf, "The mud has been running for: %02li:%02li:%02li \r\n",
    // 			h,m,s);
-   sprintf(buf, "The mud has been running for: %02li:%02li \n\r", h, m);
+   sprintf(buf, "The mud has been running for: %02li:%02li \r\n", h, m);
    ch->send(buf);
    return eSUCCESS;
 }
@@ -2510,10 +2510,10 @@ int do_count(Character *ch, char *arg, cmd_t cmd)
    }
 
    csendf(ch, "There are %d visible players connected, %d of which are immortals.\r\n", total, immortal);
-   csendf(ch, "%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\n\r", clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER], clss[CLASS_THIEF], clss[CLASS_BARBARIAN], clss[CLASS_MONK]);
+   csendf(ch, "%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\r\n", clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER], clss[CLASS_THIEF], clss[CLASS_BARBARIAN], clss[CLASS_MONK]);
    csendf(ch, "%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\r\n",
           clss[CLASS_PALADIN], clss[CLASS_ANTI_PAL], clss[CLASS_BARD], clss[CLASS_DRUID], clss[CLASS_RANGER]);
-   csendf(ch, "%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\n\r", race[RACE_HUMAN], race[RACE_ELVEN], race[RACE_DWARVEN], race[RACE_HOBBIT], race[RACE_PIXIE]);
+   csendf(ch, "%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\r\n", race[RACE_HUMAN], race[RACE_ELVEN], race[RACE_DWARVEN], race[RACE_HOBBIT], race[RACE_PIXIE]);
    csendf(ch, "%d ogres, %d gnomes, %d orcs, %d trolls.\r\n", race[RACE_GIANT], race[RACE_GNOME], race[RACE_ORC], race[RACE_TROLL]);
    csendf(ch, "The maximum number of players since "
               "last reboot was %d.\r\n",
@@ -2697,7 +2697,7 @@ int do_olocate(Character *ch, char *name, cmd_t cmd)
          break;
       }
       strcat(buf2, buf);
-      strcat(buf2, "\n\r");
+      strcat(buf2, "\r\n");
    }
 
    if (!*buf2)
@@ -2750,7 +2750,7 @@ int do_mlocate(Character *ch, char *name, cmd_t cmd)
 
       count++;
       *buf = '\0';
-      sprintf(buf, "[%2d] %-26s %d\n\r",
+      sprintf(buf, "[%2d] %-26s %d\r\n",
               count,
               i->short_desc,
               DC::getInstance()->world[i->in_room].number);
@@ -2783,7 +2783,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
        "%s is no match for you.\r\n",
        "%s looks like an easy kill.\r\n",
        "%s wouldn't be all that hard.\r\n",
-       "%s is perfect for you!\n\r",
+       "%s is perfect for you!\r\n",
        "You would need some luck and good equipment to kill %s.\r\n",
        "%s says 'Do you feel lucky, punk?'.\r\n",
        "%s laughs at you mercilessly.\r\n",
@@ -2909,7 +2909,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
          }
       }
 
-      csendf(ch, "As far as armor goes, %s %s\n\r",
+      csendf(ch, "As far as armor goes, %s %s\r\n",
              GET_SHORT(victim), ac_messages[x]);
    }
 
@@ -3100,7 +3100,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
             }
          }
 
-         csendf(ch, "Chances of stealing: %s\n\r", thief_messages[x]);
+         csendf(ch, "Chances of stealing: %s\r\n", thief_messages[x]);
       }
    }
    /* Level Comparison */
@@ -3182,13 +3182,13 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
 
    act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM,
        INVIS_NULL | STAYHIDE);
-   ch->sendln("You carefully search the surroundings...\n\r");
+   ch->sendln("You carefully search the surroundings...\r\n");
 
    for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
    {
       if (CAN_SEE(ch, vict) && ch != vict)
       {
-         csendf(ch, "%35s -- %s\n\r", GET_SHORT(vict), "Right Here");
+         csendf(ch, "%35s -- %s\r\n", GET_SHORT(vict), "Right Here");
       }
    }
 
@@ -3201,7 +3201,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
             continue;
          if (isSet(room->room_flags, NO_SCAN))
          {
-            csendf(ch, "%35s -- a little bit %s\n\r", "It's too hard to see!",
+            csendf(ch, "%35s -- a little bit %s\r\n", "It's too hard to see!",
                    possibilities[i]);
          }
          else
@@ -3217,7 +3217,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
 
                   if (skill_success(ch, nullptr, SKILL_SCAN))
                   {
-                     csendf(ch, "%35s -- a little bit %s\n\r", GET_SHORT(vict),
+                     csendf(ch, "%35s -- a little bit %s\r\n", GET_SHORT(vict),
                             possibilities[i]);
                   }
                }
@@ -3233,7 +3233,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
             room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
             if (isSet(room->room_flags, NO_SCAN))
             {
-               csendf(ch, "%35s -- a ways off %s\n\r", "It's too hard to see!",
+               csendf(ch, "%35s -- a ways off %s\r\n", "It's too hard to see!",
                       possibilities[i]);
             }
             else
@@ -3249,7 +3249,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
 
                      if (skill_success(ch, nullptr, SKILL_SCAN, -10))
                      {
-                        csendf(ch, "%35s -- a ways off %s\n\r",
+                        csendf(ch, "%35s -- a ways off %s\r\n",
                                GET_SHORT(vict),
                                possibilities[i]);
                      }
@@ -3264,7 +3264,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
                   room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
                   if (isSet(room->room_flags, NO_SCAN))
                   {
-                     csendf(ch, "%35s -- extremely far off %s\n\r", "It's too hard to see!",
+                     csendf(ch, "%35s -- extremely far off %s\r\n", "It's too hard to see!",
                             possibilities[i]);
                   }
                   else
@@ -3280,7 +3280,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
 
                            if (skill_success(ch, nullptr, SKILL_SCAN, -20))
                            {
-                              csendf(ch, "%35s -- extremely far off %s\n\r",
+                              csendf(ch, "%35s -- extremely far off %s\r\n",
                                      GET_SHORT(vict),
                                      possibilities[i]);
                            }

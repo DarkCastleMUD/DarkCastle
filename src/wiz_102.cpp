@@ -154,27 +154,27 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
     isr_set(vict);
   }
 
-  sprintf(buf, "$3Short Desc$R: %s\n\r", GET_SHORT(vict));
+  sprintf(buf, "$3Short Desc$R: %s\r\n", GET_SHORT(vict));
   ch->send(buf);
-  sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\n\r",
+  sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\r\n",
           races[(int)(GET_RACE(vict))].singular_name,
           pc_clss_types[(int)(GET_CLASS(vict))], vict->getLevel(),
           (connected ? DC::getInstance()->world[vict->in_room].number : -1));
   ch->send(buf);
-  sprintf(buf, "$3Exp$R: %-10ld $3Gold$R: %-10ld $3Bank$R: %-9d $3Align$R: %d\n\r",
+  sprintf(buf, "$3Exp$R: %-10ld $3Gold$R: %-10ld $3Bank$R: %-9d $3Align$R: %d\r\n",
           GET_EXP(vict), vict->getGold(), GET_BANK(vict), GET_ALIGNMENT(vict));
   ch->send(buf);
   if (ch->getLevel() >= SERAPH)
   {
-    sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d  $3Clan$R: %d\n\r",
+    sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d  $3Clan$R: %d\r\n",
             DC::getInstance()->world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict), GET_CLAN(vict));
     ch->send(buf);
   }
-  sprintf(buf, "$3Str$R: %-2d  $3Wis$R: %-2d  $3Int$R: %-2d  $3Dex$R: %-2d  $3Con$R: %d\n\r",
+  sprintf(buf, "$3Str$R: %-2d  $3Wis$R: %-2d  $3Int$R: %-2d  $3Dex$R: %-2d  $3Con$R: %d\r\n",
           GET_STR(vict), GET_WIS(vict), GET_INT(vict), GET_DEX(vict),
           GET_CON(vict));
   ch->send(buf);
-  sprintf(buf, "$3Hit Points$R: %d/%d $3Mana$R: %d/%d $3Move$R: %d/%d $3Ki$R: %d/%d\n\r",
+  sprintf(buf, "$3Hit Points$R: %d/%d $3Mana$R: %d/%d $3Move$R: %d/%d $3Ki$R: %d/%d\r\n",
           vict->getHP(), GET_MAX_HIT(vict), GET_MANA(vict),
           GET_MAX_MANA(vict), GET_MOVE(vict), GET_MAX_MOVE(vict),
           GET_KI(vict), GET_MAX_KI(vict));
@@ -197,7 +197,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
     {
       if (ch->getLevel() >= OVERSEER && ch->getLevel() >= vict->getLevel())
       {
-        sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->getPeerOriginalAddress().toString().toStdString().c_str());
+        sprintf(buf, "$3Connected from$R: %s\r\n", vict->desc->getPeerOriginalAddress().toString().toStdString().c_str());
         ch->send(buf);
       }
       else
@@ -279,7 +279,7 @@ int do_find(Character *ch, char *arg, cmd_t cmd)
     return eFAILURE;
   }
 
-  sprintf(type, "%30s -- %s [%d]\n\r", GET_SHORT(vict),
+  sprintf(type, "%30s -- %s [%d]\r\n", GET_SHORT(vict),
           DC::getInstance()->world[vict->in_room].name, DC::getInstance()->world[vict->in_room].number);
   ch->send(type);
   return eSUCCESS;
@@ -1101,7 +1101,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
                  "   P = put obj in obj    G = give item to mob\r\n"
                  "   E = equip item on mob D = set door\r\n"
                  "   * = comment           % = be true on x times out of y\r\n"
-                 "   X = set a true-false flag to an 'unsure' state\n\r"
+                 "   X = set a true-false flag to an 'unsure' state\r\n"
                  "   K = skip the next [arg1] number of commands.\r\n"
                  "\r\n"
                  "For comments, if you wish to remove a comment set the comment to 'none'.\r\n"
@@ -1323,7 +1323,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
       for (cont = NO_CONTINENT; cont != continent_names.size(); cont++)
       {
 
-        csendf(ch, "%d) %s\n\r", cont, continent_names.at(cont).c_str());
+        csendf(ch, "%d) %s\r\n", cont, continent_names.at(cont).c_str());
       }
       return eFAILURE;
     }
@@ -1335,7 +1335,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
       csendf(ch, "You much choose between 1 and %d.\r\n", continent_names.size());
       return eFAILURE;
     }
-    csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(cont).c_str());
+    csendf(ch, "Success. Continent changed to %s\r\n", continent_names.at(cont).c_str());
     zone.continent = cont;
     break;
 
@@ -1596,12 +1596,12 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
   if (!*buf)
   {
     send_to_char("$3Syntax$R:  oedit [item_num] exdesc <field> [values]\r\n"
-                 "The field must be one of the following:\n\r",
+                 "The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
     ch->sendln("\n\r$3Current Descs$R:");
     for (x = 1, curr = obj->ex_description; curr; x++, curr = curr->next)
-      csendf(ch, "$3%d$R) %s\n\r%s\n\r", x, curr->keyword, curr->description);
+      csendf(ch, "$3%d$R) %s\n\r%s\r\n", x, curr->keyword, curr->description);
     return eFAILURE;
   }
 
@@ -1734,7 +1734,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
     ch->sendln("        Write your obj's description.  (/s saves /h for help)");
 
     //        send_to_char("Enter your obj's description below."
-    //                   " Terminate with '~' on a new line.\n\r\n\r", ch);
+    //                   " Terminate with '~' on a new line.\r\n\r\n", ch);
     //        curr->description = 0;
 
     ch->desc->connected = Connection::states::EDITING;
@@ -1784,7 +1784,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
   if (!*buf)
   {
     send_to_char("$3Syntax$R:  oedit [item_num] affects [affectnumber] [value]\r\n"
-                 "The field must be one of the following:\n\r",
+                 "The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
     return eFAILURE;
@@ -2053,12 +2053,12 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 
   if (!*buf)
   {
-    send_to_char("$3Syntax$R:  oedit new [obj vnum]           -- Create new object\n\r"
-                 "         oedit [obj vnum]               -- Stat object\n\r"
-                 "         oedit [obj vnum] [field]       -- Help info for that field\n\r"
-                 "         oedit [obj vnum] [field] [arg] -- Change that field\n\r"
-                 "         oedit [field] [arg]            -- Change that field using last vnum\n\r\n\r"
-                 "The field must be one of the following:\n\r",
+    send_to_char("$3Syntax$R:  oedit new [obj vnum]           -- Create new object\r\n"
+                 "         oedit [obj vnum]               -- Stat object\r\n"
+                 "         oedit [obj vnum] [field]       -- Help info for that field\r\n"
+                 "         oedit [obj vnum] [field] [arg] -- Change that field\r\n"
+                 "         oedit [field] [arg]            -- Change that field using last vnum\r\n\r\n"
+                 "The field must be one of the following:\r\n",
                  this);
     display_string_list(fields);
     return eFAILURE;
@@ -2202,7 +2202,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] type <>\n\r"
+      send_to_char("$3Syntax$R: oedit [item_num] type <>\r\n"
                    "$3Current$R: ",
                    this);
       snprintf(buf, sizeof(buf), "%s\n", qPrintable(item_types[((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag]));
@@ -2239,7 +2239,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\n\r"
+      send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\r\n"
                    "$3Current$R: ",
                    this);
 
@@ -2261,7 +2261,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\n\r"
+      send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\r\n"
                    "$3Current$R: ",
                    this);
       sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.size,
@@ -2270,7 +2270,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("\r\n$3Valid types$R:");
       for (i = 0; *size_bitfields[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\n\r", size_bitfields[i]);
+        sprintf(buf, "  %s\r\n", size_bitfields[i]);
         send(buf);
       }
       return eFAILURE;
@@ -2285,7 +2285,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\n\r"
+      send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\r\n"
                    "$3Current$R: ",
                    this);
       sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.extra_flags, Object::extra_bits, buf);
@@ -2344,7 +2344,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\n\r"
+      send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\r\n"
                    "$3Current$R: ",
                    this);
       sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.more_flags, Object::more_obj_bits, buf);
@@ -2673,10 +2673,10 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
   {
     send_to_char("$3Syntax$R:  procedit [mob_vnum] [field] [arg]\r\n"
                  "  Edit a field with no args for help on that field.\r\n\r\n"
-                 "  The field must be one of the following:\n\r",
+                 "  The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
-    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\n\r", ch->player->last_mob_edit);
+    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\r\n", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return eFAILURE;
   }
@@ -2747,7 +2747,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: procedit [mob_num] add new\n\r"
+      send_to_char("$3Syntax$R: procedit [mob_num] add new\r\n"
                    "This creates a new mob prog and tacks it on the end.\r\n",
                    ch);
       return eFAILURE;
@@ -2755,7 +2755,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
     prog = new mob_prog_data;
     prog->type = GREET_PROG;
     prog->arglist = str_dup("80");
-    prog->comlist = str_dup("say This is my new mob prog!\n\r");
+    prog->comlist = str_dup("say This is my new mob prog!\r\n");
     prog->next = nullptr;
 
     int prog_num = 1;
@@ -2826,7 +2826,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
     half_chop(buf4, buf2, buf3);
     if (!*buf2 || !*buf3)
     {
-      send_to_char("$3Syntax$R: procedit [mob_num] type <prog> <newtype>\n\r"
+      send_to_char("$3Syntax$R: procedit [mob_num] type <prog> <newtype>\r\n"
                    "$3Valid types$R:\r\n"
                    "  1 -       act_prog\r\n"
                    "  2 -    speech_prog\r\n"
@@ -2969,7 +2969,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: procedit [mob_num] command <prog>\n\r"
+      send_to_char("$3Syntax$R: procedit [mob_num] command <prog>\r\n"
                    "This will put you into the editor which will replace the current\r\n"
                    "command for program number <prog>.\r\n",
                    ch);
@@ -3100,7 +3100,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     send_to_char("$3Syntax$R:  medit [mob_num] [field] [arg]\r\n"
                  "  Edit a mob_num with no field or arg to view the item.\r\n"
                  "  Edit a field with no args for help on that field.\r\n\r\n"
-                 "The field must be one of the following:\n\r",
+                 "The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
     return eFAILURE;
@@ -3217,14 +3217,14 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     if (!*buf4)
     {
       send_to_char(
-          "$3Syntax$R: medit [mob_num] description <anything>\n\r"
+          "$3Syntax$R: medit [mob_num] description <anything>\r\n"
           "This will put you into the editor which will replace the\r\n"
           "current description.\r\n",
           ch);
       return eFAILURE;
     }
     send_to_char("Enter the mob's description below."
-                 " Terminate with '/s' on a new line.\n\r\n\r",
+                 " Terminate with '/s' on a new line.\r\n\r\n",
                  ch);
     // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
     //        ((Character *)DC::getInstance()->mob_index[mob_num].item)->description = nullptr;
@@ -3269,7 +3269,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] class <class>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] class <class>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%s\n",
@@ -3278,7 +3278,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *pc_clss_types[i] != '\n'; i++)
       {
-        sprintf(buf, "  %d) %s\n\r", i, pc_clss_types[i]);
+        sprintf(buf, "  %d) %s\r\n", i, pc_clss_types[i]);
         ch->send(buf);
       }
       return eFAILURE;
@@ -3299,10 +3299,10 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] race <racetype>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] race <racetype>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%s\n\r\n\r"
+      sprintf(buf, "%s\r\n\r\n"
                    "Available types:\r\n",
               races[((Character *)DC::getInstance()->mob_index[mob_num].item)->race].singular_name);
       ch->send(buf);
@@ -3356,7 +3356,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3380,7 +3380,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] alignment <alignnum>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] alignment <alignnum>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3405,7 +3405,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     if (!*buf4)
     {
       send_to_char(
-          "$3Syntax$R: medit [mob_num] loadposition <position>\n\r"
+          "$3Syntax$R: medit [mob_num] loadposition <position>\r\n"
           "$3Current$R: ",
           ch);
       ch->sendln(QStringLiteral("%1").arg(((Character *)DC::getInstance()->mob_index[mob_num].item)->getPositionQString()));
@@ -3450,7 +3450,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     if (!*buf4)
     {
       send_to_char(
-          "$3Syntax$R: medit [mob_num] defaultposition <position>\n\r"
+          "$3Syntax$R: medit [mob_num] defaultposition <position>\r\n"
           "$3Current$R: ",
           ch);
       ch->sendln(QStringLiteral("%1").arg(Character::position_to_string(((Character *)DC::getInstance()->mob_index[mob_num].item)->mobdata->default_pos)));
@@ -3497,7 +3497,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     if (!*buf4)
     {
       send_to_char(
-          "$3Syntax$R: medit [mob_num] actflags <location[s]>\n\r"
+          "$3Syntax$R: medit [mob_num] actflags <location[s]>\r\n"
           "$3Current$R: ",
           ch);
       sprintbit(
@@ -3507,7 +3507,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *action_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\n\r", action_bits[i]);
+        sprintf(buf, "  %s\r\n", action_bits[i]);
         ch->send(buf);
       }
       return eFAILURE;
@@ -3544,7 +3544,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     if (!*buf4)
     {
       send_to_char(
-          "$3Syntax$R: medit [mob_num] affectflags <location[s]>\n\r"
+          "$3Syntax$R: medit [mob_num] affectflags <location[s]>\r\n"
           "$3Current$R: ",
           ch);
       sprintbit(((Character *)DC::getInstance()->mob_index[mob_num].item)->affected_by[0],
@@ -3553,7 +3553,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *affected_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\n\r", affected_bits[i]);
+        sprintf(buf, "  %s\r\n", affected_bits[i]);
         ch->send(buf);
       }
       return eFAILURE;
@@ -3569,7 +3569,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] numdamdice <amount>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] numdamdice <amount>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3594,7 +3594,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] sizedamdice <amount>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] sizedamdice <amount>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3619,7 +3619,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] damroll <damrollnum>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] damroll <damrollnum>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3644,7 +3644,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] hitroll <levelnum>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] hitroll <levelnum>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3669,7 +3669,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3695,7 +3695,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%lu\n",
@@ -3726,7 +3726,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     if (!*buf4)
     {
       send_to_char(
-          "$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\n\r"
+          "$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\r\n"
           "$3Current$R: ",
           ch);
       sprintf(buf, "%d\n",
@@ -3751,7 +3751,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] immune <location[s]>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] immune <location[s]>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintbit(((Character *)DC::getInstance()->mob_index[mob_num].item)->immune, isr_bits,
@@ -3760,7 +3760,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *isr_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\n\r", isr_bits[i]);
+        sprintf(buf, "  %s\r\n", isr_bits[i]);
         ch->send(buf);
       }
       return eFAILURE;
@@ -3775,7 +3775,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] suscept <location[s]>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] suscept <location[s]>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintbit(((Character *)DC::getInstance()->mob_index[mob_num].item)->suscept,
@@ -3784,7 +3784,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *isr_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\n\r", isr_bits[i]);
+        sprintf(buf, "  %s\r\n", isr_bits[i]);
         ch->send(buf);
       }
       return eFAILURE;
@@ -3799,7 +3799,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] resist <location[s]>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] resist <location[s]>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintbit(((Character *)DC::getInstance()->mob_index[mob_num].item)->resist, isr_bits,
@@ -3808,7 +3808,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *isr_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\n\r", isr_bits[i]);
+        sprintf(buf, "  %s\r\n", isr_bits[i]);
         ch->send(buf);
       }
       return eFAILURE;
@@ -3823,7 +3823,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3854,7 +3854,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] strength <str>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] strength <str>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3878,7 +3878,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3902,7 +3902,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] intelligence <int>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] intelligence <int>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3926,7 +3926,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -3950,7 +3950,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
@@ -4021,7 +4021,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_vnum] type <type id>\n\r"
+      send_to_char("$3Syntax$R: medit [mob_vnum] type <type id>\r\n"
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%s\n",
@@ -4030,7 +4030,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *mob_types[i] != '\n'; i++)
       {
-        sprintf(buf, "  %d) %s\n\r", i, mob_types[i]);
+        sprintf(buf, "  %d) %s\r\n", i, mob_types[i]);
         ch->send(buf);
       }
       return eFAILURE;
@@ -4172,7 +4172,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     {
       if (fields[x][0] == '\0')
         return eFAILURE;
-      csendf(ch, "  %s\n\r", fields[x]);
+      csendf(ch, "  %s\r\n", fields[x]);
     }
   }
 
@@ -4191,7 +4191,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       {
         if (fields[x][0] == '\0')
           return eFAILURE;
-        csendf(ch, "%s\n\r", fields[x]);
+        csendf(ch, "%s\r\n", fields[x]);
       }
     }
     if (is_abbrev(arg1.c_str(), fields[x]))
@@ -4220,7 +4220,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
   {
     if (!remainder_args.empty())
     {
-      std::string description = remainder_args + "\n\r";
+      std::string description = remainder_args + "\r\n";
       delete[] DC::getInstance()->world[ch->in_room].description;
       DC::getInstance()->world[ch->in_room].description = str_dup(description.c_str());
       ch->sendln("Ok.");
@@ -4596,7 +4596,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     }
 
     send_to_char("Enter the exit's description below. Terminate with "
-                 "'~' on a new line.\n\r\n\r",
+                 "'~' on a new line.\r\n\r\n",
                  ch);
     /*        if(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description) {
           delete DC::getInstance()->world[ch->in_room].dir_option[x]->general_description;
@@ -4625,7 +4625,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
           continue;
         if ((x + 1) % 4 == 0)
         {
-          csendf(ch, "%-18s\n\r", room_bits[x]);
+          csendf(ch, "%-18s\r\n", room_bits[x]);
         }
         else
         {
@@ -4652,7 +4652,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
           break;
         if ((x + 1) % 4 == 0)
         {
-          csendf(ch, "%-18s\n\r", sector_types[x]);
+          csendf(ch, "%-18s\r\n", sector_types[x]);
         }
         else
         {
@@ -4742,7 +4742,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
   if (!*buf)
   {
     send_to_char("$3Syntax$R:\n\rrdelete exit   <direction>\n\rrdelete "
-                 "exdesc <direction>\n\rrdelete extra  <keyword>\n\r",
+                 "exdesc <direction>\n\rrdelete extra  <keyword>\r\n",
                  ch);
     return eFAILURE;
   }
@@ -4851,7 +4851,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 
   else
     send_to_char("Syntax:\n\rrdelete exit   <direction>\n\rrdelete "
-                 "exdesc <direction>\n\rrdelete extra  <keyword>\n\r",
+                 "exdesc <direction>\n\rrdelete extra  <keyword>\r\n",
                  ch);
 
   DC::getInstance()->set_zone_modified_world(ch->in_room);
@@ -5435,7 +5435,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
   sprintf(buf,
-          "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\n\r",
+          "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\r\n",
           rm->name, rm->zone, rm->number, ch->in_room);
   ch->send(buf);
 
@@ -5444,7 +5444,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   ch->send(buf);
 
   strcpy(buf, "Special procedure : ");
-  strcat(buf, (rm->funct) ? "Exists\n\r" : "No\n\r");
+  strcat(buf, (rm->funct) ? "Exists\r\n" : "No\r\n");
   ch->send(buf);
 
   ch->send("Room flags: ");
@@ -5458,18 +5458,18 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   strcpy(buf, "Extra description keywords(s): ");
   if (rm->ex_description)
   {
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
     for (desc = rm->ex_description; desc; desc = desc->next)
     {
       strcat(buf, desc->keyword);
-      strcat(buf, "\n\r");
+      strcat(buf, "\r\n");
     }
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
     ch->send(buf);
   }
   else
   {
-    strcat(buf, "None\n\r");
+    strcat(buf, "None\r\n");
     ch->send(buf);
   }
   struct deny_data *d;
@@ -5485,29 +5485,29 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     a++;
   }
   ch->sendln("");
-  strcpy(buf, "------- Chars present -------\n\r");
+  strcpy(buf, "------- Chars present -------\r\n");
   for (k = rm->people; k; k = k->next_in_room)
   {
     if (CAN_SEE(ch, k))
     {
       strcat(buf, GET_NAME(k));
       strcat(buf,
-             (IS_PC(k) ? "(PC)\n\r" : (k->isPlayer() ? "(NPC)\n\r" : "(MOB)\n\r")));
+             (IS_PC(k) ? "(PC)\r\n" : (k->isPlayer() ? "(NPC)\r\n" : "(MOB)\r\n")));
     }
   }
-  strcat(buf, "\n\r");
+  strcat(buf, "\r\n");
   ch->send(buf);
 
-  buffer = "--------- Contents ---------\n\r";
+  buffer = "--------- Contents ---------\r\n";
   for (j = rm->contents; j; j = j->next_content)
   {
     if (CAN_SEE_OBJ(ch, j))
     {
       buffer += j->Name().toStdString();
-      buffer += "\n\r";
+      buffer += "\r\n";
     }
   }
-  buffer += "\n\r";
+  buffer += "\r\n";
   send_to_char(const_cast<char *>(buffer.c_str()), ch);
 
   ch->sendln("------- Exits defined -------");
@@ -5515,18 +5515,18 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   {
     if (rm->dir_option[i])
     {
-      sprintf(buf, "Direction %s . Keyword : %s\n\r",
+      sprintf(buf, "Direction %s . Keyword : %s\r\n",
               dirs[i], rm->dir_option[i]->keyword);
       ch->send(buf);
       strcpy(buf, "Description:\n\r  ");
       if (rm->dir_option[i]->general_description)
         strcat(buf, rm->dir_option[i]->general_description);
       else
-        strcat(buf, "UNDEFINED\n\r");
+        strcat(buf, "UNDEFINED\r\n");
       ch->send(buf);
       sprintbit(rm->dir_option[i]->exit_info, exit_bits, buf2);
       sprintf(buf,
-              "Exit flag: %s \n\rKey no: %d\n\rTo room (V-Number): %d\n\r",
+              "Exit flag: %s \n\rKey no: %d\n\rTo room (V-Number): %d\r\n",
               buf2, rm->dir_option[i]->key,
               rm->dir_option[i]->to_room);
       ch->send(buf);
@@ -5753,7 +5753,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("Punish who?");
     send_to_char("\n\rusage: punish <char> [stupid silence freeze noemote "
-                 "notell noname noarena notitle nopray]\n\r",
+                 "notell noname noarena notitle nopray]\r\n",
                  ch);
     return eFAILURE;
   }
@@ -5801,7 +5801,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     {
       vict->sendln("You suddenly feel dumb as a rock!");
       vict->sendln("You can't remember how to do basic things!");
-      sprintf(buf, "You have been lobotomized by %s!\n\r", GET_NAME(ch));
+      sprintf(buf, "You have been lobotomized by %s!\r\n", GET_NAME(ch));
       vict->send(buf);
       ch->sendln("STUPID set.");
       sprintf(buf, "%s lobotimized %s", GET_NAME(ch), GET_NAME(vict));
@@ -5824,7 +5824,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "You have been silenced by %s!\n\r", GET_NAME(ch));
+      sprintf(buf, "You have been silenced by %s!\r\n", GET_NAME(ch));
       vict->send(buf);
       ch->sendln("SILENCE set.");
       sprintf(buf, "%s silenced %s", GET_NAME(ch), GET_NAME(vict));
@@ -5860,7 +5860,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to join arenas!\n\r", GET_NAME(ch));
+      sprintf(buf, "%s takes away your ability to join arenas!\r\n", GET_NAME(ch));
       ch->sendln("NOARENA set.");
       vict->send(buf);
     }
@@ -5875,7 +5875,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to emote!\n\r", GET_NAME(ch));
+      sprintf(buf, "%s takes away your ability to emote!\r\n", GET_NAME(ch));
       vict->send(buf);
       ch->sendln("NOEMOTE set.");
     }
@@ -5890,7 +5890,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to use telepathic communication!\n\r", GET_NAME(ch));
+      sprintf(buf, "%s takes away your ability to use telepathic communication!\r\n", GET_NAME(ch));
       vict->send(buf);
       ch->sendln("NOTELL set.");
     }
@@ -5905,7 +5905,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s removes your ability to set your name!\n\r", GET_NAME(ch));
+      sprintf(buf, "%s removes your ability to set your name!\r\n", GET_NAME(ch));
       ch->sendln("NONAME set.");
       vict->send(buf);
     }
@@ -5921,7 +5921,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s removes your ability to set your title!\n\r", GET_NAME(ch));
+      sprintf(buf, "%s removes your ability to set your title!\r\n", GET_NAME(ch));
       ch->sendln("NOTITLE set.");
       vict->send(buf);
     }
@@ -5942,7 +5942,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     {
       if (!ch->player->stealth)
       {
-        sprintf(buf, "%s curses you with god-given bad luck!\n\r", GET_NAME(ch));
+        sprintf(buf, "%s curses you with god-given bad luck!\r\n", GET_NAME(ch));
         ch->sendln("UNLUCKY set.");
       }
       vict->send(buf);
@@ -5962,7 +5962,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
     }
     else
     {
-      csendf(vict, "%s has removed your ability to pray!\n\r", GET_NAME(ch));
+      csendf(vict, "%s has removed your ability to pray!\r\n", GET_NAME(ch));
       ch->sendln("NOPRAY (nemke) set.");
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_NOPRAY);

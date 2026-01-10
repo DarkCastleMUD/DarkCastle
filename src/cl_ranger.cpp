@@ -296,7 +296,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, TO_ROOM, INVIS_NULL);
-  sendln("You search for signs of your quarry...\n\r");
+  sendln("You search for signs of your quarry...\r\n");
 
   if (learned)
     skill_increase_check(SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
@@ -1473,7 +1473,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
     if (dir >= 0)
       send_to_room(
-          "An arrow flies into the room with incredible speed!\n\r",
+          "An arrow flies into the room with incredible speed!\r\n",
           victroom);
 
     retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY);

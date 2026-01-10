@@ -217,7 +217,7 @@ send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, vo
     return str;
   }
 
-  if (buf.endsWith("\r\n") || buf.endsWith("\n\r"))
+  if (buf.endsWith("\r\n") || buf.endsWith("\r\n"))
   {
     buf = buf.chopped(2);
   }

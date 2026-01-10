@@ -594,7 +594,7 @@ int do_boss(Character *ch, char *arg, cmd_t cmd)
   for (x = 0; x <= 60; x++)
   {
     sprintf(buf, "NUMBER-CRUNCHER: %d crunched to %d converted to black"
-                 "/white tree node %d\n\r",
+                 "/white tree node %d\r\n",
             x, 50 - x, x + x);
     ch->send(buf);
   }

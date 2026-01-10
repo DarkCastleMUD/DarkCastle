@@ -416,16 +416,16 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
 
   if (!*argument)
   {
-    send_to_char("Brew what?\n\r"
-                 "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
+    send_to_char("Brew what?\r\n"
+                 "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
                  ch);
     if (ch->getLevel() >= 106)
     {
-      send_to_char("        brew load\n\r"
-                   "        brew save\n\r"
-                   "        brew list\n\r"
-                   "        brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\n\r"
-                   "        brew remove [recipe_num]\n\r\n\r",
+      send_to_char("        brew load\r\n"
+                   "        brew save\r\n"
+                   "        brew list\r\n"
+                   "        brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\r\n"
+                   "        brew remove [recipe_num]\r\n\r\n",
                    ch);
     }
     return eFAILURE;
@@ -474,7 +474,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   if (!*liquid)
   {
     send_to_char("You'll need to choose a liquid type and container.\r\n"
-                 "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
+                 "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
                  ch);
     return eFAILURE;
   }
@@ -482,7 +482,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   if (!*container)
   {
     send_to_char("You'll need to select a container.\r\n"
-                 "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
+                 "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
                  ch);
     return eFAILURE;
   }
@@ -779,14 +779,14 @@ void Brew::list(Character *ch)
     return;
   }
 
-  ch->sendln("[# ] [herb #] [liquid] [container] Spell Name\n\r");
+  ch->sendln("[# ] [herb #] [liquid] [container] Spell Name\r\n");
   for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
     int spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    csendf(ch, "[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\n\r", ++i, r.herb, r.liquid, r.container, buffer, spell);
+    csendf(ch, "[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\r\n", ++i, r.herb, r.liquid, r.container, buffer, spell);
   }
 }
 
@@ -921,16 +921,16 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
 
   if (!*argument)
   {
-    send_to_char("Scribe what?\n\r"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
+    send_to_char("Scribe what?\r\n"
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
                  ch);
     if (ch->getLevel() >= 106)
     {
-      send_to_char("        scribe load\n\r"
-                   "        scribe save\n\r"
-                   "        scribe list\n\r"
-                   "        scribe add <ink_vnum> <dust_vnum> <pen_vnum> <paper_vnum> <spell_num>\n\r"
-                   "        scribe remove [recipe_num]\n\r\n\r",
+      send_to_char("        scribe load\r\n"
+                   "        scribe save\r\n"
+                   "        scribe list\r\n"
+                   "        scribe add <ink_vnum> <dust_vnum> <pen_vnum> <paper_vnum> <spell_num>\r\n"
+                   "        scribe remove [recipe_num]\r\n\r\n",
                    ch);
     }
     return eFAILURE;
@@ -980,7 +980,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
   if (!*dust)
   {
     send_to_char("You'll need to choose a dust, pen and paper.\r\n"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
                  ch);
     return eFAILURE;
   }
@@ -988,7 +988,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
   if (!*pen)
   {
     send_to_char("You'll need to choose a pen and paper.\r\n"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
                  ch);
     return eFAILURE;
   }
@@ -996,7 +996,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
   if (!*paper)
   {
     send_to_char("You'll need to select a paper.\r\n"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
                  ch);
     return eFAILURE;
   }
@@ -1231,14 +1231,14 @@ void Scribe::list(Character *ch)
     return;
   }
 
-  ch->sendln("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\n\r");
+  ch->sendln("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\r\n");
   for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
     int spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    csendf(ch, "[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\n\r", ++i, r.ink, r.dust, r.pen, r.paper, buffer, spell);
+    csendf(ch, "[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\r\n", ++i, r.ink, r.dust, r.pen, r.paper, buffer, spell);
   }
 }
 

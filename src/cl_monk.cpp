@@ -134,7 +134,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   if (ch->affected_by_spell(SKILL_QUIVERING_PALM))
   {
     send_to_char("You can't perform such an ancient power more than "
-                 "once a day!\n\r",
+                 "once a day!\r\n",
                  ch);
     return eFAILURE;
   }
