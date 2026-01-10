@@ -78,7 +78,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
         "by $N.",
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
-    sprintf(name, "%s has booted %s.", GET_NAME(ch), victim->getNameC());
+    sprintf(name, "%s has booted %s.", GET_NAME(ch), qPrintable(victim->getName()));
     DC::getInstance()->logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     if (!strcmp(type, "boot"))

@@ -1277,8 +1277,8 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
         spell_word_of_recall(level, ch, tmp_victim, obj, 110);
       else
       {
-        csendf(tmp_victim, "%s's group recall partially fails leaving you behind!\r\n", ch->getNameC());
-        csendf(ch, "Your group recall partially fails leaving %s behind!\r\n", tmp_victim->getNameC());
+        csendf(tmp_victim, "%s's group recall partially fails leaving you behind!\r\n", qPrintable(ch->getName()));
+        csendf(ch, "Your group recall partially fails leaving %s behind!\r\n", qPrintable(tmp_victim->getName()));
       }
     }
   }
@@ -1892,7 +1892,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
 
   if (IS_PC(victim))
   {
-    sprintf(buf, "%s was just paralyzed.", victim->getNameC());
+    sprintf(buf, "%s was just paralyzed.", qPrintable(victim->getName()));
     DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_MORTAL);
   }
 
@@ -12217,7 +12217,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
 
   // make sure it isn't already a golem
 
-  if (isexact("golem", victim->getNameC()))
+  if (isexact("golem", qPrintable(victim->getName())))
   {
     ch->sendln("Isn't that already a golem?");
     GET_MANA(ch) += 50;

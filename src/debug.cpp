@@ -231,7 +231,7 @@ int main(int argc, char **argv)
     if (!dclib.isEmpty())
     {
       orig_cwd = getcwd(nullptr, 0);
-      chdir(dclib.toStdString().c_str());
+      chdir(qPrintable(dclib));
     }
   }
 
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 
   debug.load_vaults();
 
-  chdir(orig_cwd.toStdString().c_str());
+  chdir(qPrintable(orig_cwd));
 
   // std::cerr << real_mobile(0) << " " << real_mobile(1) << std::endl;
 
@@ -461,7 +461,7 @@ int main(int argc, char **argv)
 
       if (c->isImmortalPlayer())
       {
-        qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
+        qWarning("%s", qPrintable(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel())));
       }
     }
 
@@ -478,7 +478,7 @@ int main(int argc, char **argv)
         {
           if (IS_PC(ch))
           {
-            hp_leaders.insert(std::pair<int32_t,QString>(ch->max_hit, ch->getNameC()));
+            hp_leaders.insert(std::pair<int32_t,QString>(ch->max_hit, qPrintable(ch->getName())));
           }
         }
 

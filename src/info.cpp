@@ -815,14 +815,14 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
    if (victim->getLevel() > getLevel())
    {
       sendln("Unable to show information.");
-      csendf(this, "%s is a higher level than you.\r\n", victim->getNameC());
+      csendf(this, "%s is a higher level than you.\r\n", qPrintable(victim->getName()));
       return eFAILURE;
    }
 
    if (IS_NPC(victim))
    {
       sendln("Unable to show information.");
-      csendf(this, "%s is a mob.\r\n", victim->getNameC());
+      csendf(this, "%s is a mob.\r\n", qPrintable(victim->getName()));
       return eFAILURE;
    }
 
@@ -831,7 +831,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
    if (victim->player->lastseen->size() == 0)
    {
-      csendf(this, "%s has not seen any mobs recently.\r\n", victim->getNameC());
+      csendf(this, "%s has not seen any mobs recently.\r\n", qPrintable(victim->getName()));
       return eFAILURE;
    }
 
@@ -1277,7 +1277,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
    else
    {
       Character *tmp_char;
-      int bits = generic_find(arg1.toStdString().c_str(), FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, this, &tmp_char, &obj, true);
+      int bits = generic_find(qPrintable(arg1), FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, this, &tmp_char, &obj, true);
       if (bits && obj)
       {
          if (identify(this, obj))
@@ -4303,7 +4303,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
          // search clan vault is able
 
          QString vault_name = QStringLiteral("clan%1").arg(clan);
-         auto vault = has_vault(vault_name.toStdString().c_str());
+         auto vault = has_vault(vault_name);
          // search vault if able
          if (vault)
          {

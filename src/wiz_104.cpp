@@ -670,8 +670,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 					zone.cmd[j]->arg3);
 			break;
 		case '*':
-			sprintf(buf, "%s %s\r\n", buf,
-					zone.cmd[j]->comment.toStdString().c_str() ? qPrintable(zone.cmd[j]->comment) : "Empty Comment");
+			sprintf(buf, "%s %s\r\n", buf, zone.cmd[j]->comment.isEmpty() ? "Empty Comment" : qPrintable(zone.cmd[j]->comment));
 			break;
 		case 'K':
 			sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
@@ -1469,9 +1468,9 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 					goto endy;
 				}
 			for (i = 0; i < Object::extra_bits.size(); i++)
-				if (!str_nosp_cmp(Object::extra_bits[i].toStdString().c_str(), arg1))
+				if (!str_nosp_cmp(qPrintable(Object::extra_bits[i]), arg1))
 				{
-					if (!str_cmp(Object::extra_bits[i].toStdString().c_str(), "ANY_CLASS"))
+					if (!str_cmp(qPrintable(Object::extra_bits[i]), "ANY_CLASS"))
 						any = i;
 					else
 						SET_BIT(extra, 1 << i);
@@ -1814,7 +1813,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
 			if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
 			{
 				act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-				ch->send(fmt::format("Moving {} from {} to {}.\r\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
+				ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->getName()), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
 				move_char(victim, destination_room);
 				act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 				act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1841,7 +1840,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
 	}
 
 	act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-	ch->send(fmt::format("Moving {} from {} to {}.\r\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
+	ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->getName()), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
 	move_char(victim, destination_room);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1935,7 +1934,7 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
 	}
 
 	act("$n disappears in a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-	csendf(ch, "Moving %s from %d to %d.\r\n", victim->getNameC(),
+	csendf(ch, "Moving %s from %d to %d.\r\n", qPrintable(victim->getName()),
 		   DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
 	move_char(victim, target);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
@@ -1974,7 +1973,7 @@ int do_gtrans(Character *ch, char *argument, cmd_t cmd)
 		act("$n disappears in a mushroom cloud.",
 			victim, 0, 0, TO_ROOM, 0);
 		target = ch->in_room;
-		csendf(ch, "Moving %s from %d to %d.\r\n", victim->getNameC(),
+		csendf(ch, "Moving %s from %d to %d.\r\n", qPrintable(victim->getName()),
 			   DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
 		move_char(victim, target);
 		act("$n arrives from a puff of smoke.",

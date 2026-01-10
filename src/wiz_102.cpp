@@ -2205,7 +2205,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       send_to_char("$3Syntax$R: oedit [item_num] type <>\n\r"
                    "$3Current$R: ",
                    this);
-      snprintf(buf, sizeof(buf), "%s\n", item_types[((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag].toStdString().c_str());
+      snprintf(buf, sizeof(buf), "%s\n", qPrintable(item_types[((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag]));
       send(buf);
       sendln("\r\n$3Valid types$R:");
 
@@ -4924,10 +4924,10 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
 
   QString filename = QStringLiteral("zonefiles/%1").arg(zone.getFilename());
   QString command = QStringLiteral("cp %1 %1.last").arg(filename);
-  system(command.toStdString().c_str());
+  system(qPrintable(command));
 
   FILE *f = nullptr;
-  if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
+  if ((f = fopen(qPrintable(filename), "w")) == nullptr)
   {
     DC::getInstance()->logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(getName()));
     return eFAILURE;
@@ -5153,7 +5153,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
   }
 
   fprintf(fl, "#%d\n", DC::getInstance()->world[room].zone);
-  sprintf(buf, "%s's Area.", ch->getNameC());
+  sprintf(buf, "%s's Area.", qPrintable(ch->getName()));
   string_to_file(fl, buf);
   fprintf(fl, "~\n");
   fprintf(fl, "%d 30 2\n", high);
@@ -5572,7 +5572,7 @@ int do_possess(Character *ch, char *argument, cmd_t cmd)
         if (ch->desc->snoop_by)
         {
           ch->desc->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
-          sprintf(buf, "Your victim is now trying to possess: %s\n", victim->getNameC());
+          sprintf(buf, "Your victim is now trying to possess: %s\n", qPrintable(victim->getName()));
           ch->desc->snoop_by->character->send(buf);
           ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->getName().split(' '));
         }
@@ -5591,7 +5591,7 @@ int do_possess(Character *ch, char *argument, cmd_t cmd)
       else
       {
         ch->sendln("Ok.");
-        sprintf(buf, "%s possessed %s", GET_NAME(ch), victim->getNameC());
+        sprintf(buf, "%s possessed %s", GET_NAME(ch), qPrintable(victim->getName()));
         DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
         ch->player->possesing = 1;
         ch->desc->character = victim;

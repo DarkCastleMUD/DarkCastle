@@ -1161,9 +1161,9 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 	}
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names.value((*i).song_number)));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names.value((*i).song_number)));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}
@@ -1266,9 +1266,9 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 	}
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*k).song_number).toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names.value((*k).song_number)));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*k).song_number).toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names.value((*k).song_number)));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}
@@ -1404,9 +1404,9 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names[(*i).song_number].toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names[(*i).song_number]));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names[(*i).song_number].toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names[(*i).song_number]));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}
@@ -1425,7 +1425,7 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 		if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))
 			continue;
 
-		sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(i).toStdString().c_str(), song_info[i].min_useski());
+		sprintf(buf, " %-50s    %d ki\r\n", qPrintable(Character::song_names.value(i)), song_info[i].min_useski());
 		ch->send(buf);
 	}
 	return eSUCCESS;
@@ -1501,9 +1501,9 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 	}
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names.value((*i).song_number)));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names.value((*i).song_number)));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}
@@ -1599,9 +1599,9 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 	}
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names.value((*i).song_number)));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names.value((*i).song_number)));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}
@@ -2355,9 +2355,9 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
 		(*i).song_timer = -1;
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names.value((*i).song_number)));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names.value((*i).song_number)));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}
@@ -2492,9 +2492,9 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
 		(*i).song_timer = -1;
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names.value((*i).song_number)));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names.value((*i).song_number)));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}
@@ -3122,9 +3122,9 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
 	if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 	{
 		(*i).song_timer = -1;
-		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+		csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", qPrintable(Character::song_names.value((*i).song_number)));
 		char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+		sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", qPrintable(Character::song_names.value((*i).song_number)));
 		act(buf, ch, 0, 0, TO_ROOM, 0);
 		return eSUCCESS;
 	}

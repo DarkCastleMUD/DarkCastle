@@ -41,8 +41,8 @@
 #include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/handler.h"
-#include "DC/interp.h"   // do_flee()
-#include "DC/fileinfo.h" // SAVE_DIR
+#include "DC/interp.h" // do_flee()
+#include "DC/fileinfo.h"
 #include "DC/db.h"       // fread_string()
 #include "DC/connect.h"  // Connection
 #include "DC/magic.h"    // weapon spells
@@ -92,7 +92,7 @@ void do_champ_flag_death(Character *victim)
   {
     obj_from_char(obj);
     obj_to_room(obj, CFLAG_HOME);
-    snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], victim->getNameC());
+    snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], qPrintable(victim->getName()));
     send_info(buf);
 
     if (obj && obj->short_description)
@@ -444,11 +444,11 @@ void perform_violence(void)
 void add_threat(Character *mob, Character *ch, int amt)
 {
   struct threat_struct *thr;
-  if (!mob || !ch || !amt || IS_PC(mob) || !ch->getNameC())
+  if (!mob || !ch || !amt || IS_PC(mob) || ch->getName().isEmpty())
     return;
   for (thr = mob->mobdata->threat; thr; thr = thr->next)
   {
-    if (!str_cmp(ch->getNameC(), thr->name))
+    if (!str_cmp(qPrintable(ch->getName()), thr->name))
     { // Already angry with player.
       thr->threat += amt;
       return;
@@ -1885,7 +1885,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_STR(victim) -= 1;
         victim->raw_str -= 1;
         victim->sendln("*** You lose one strength point ***");
-        sprintf(log_buf, "%s lost a str too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a str too. ouch.", qPrintable(victim->getName()));
       }
       break;
     case 2:
@@ -1894,14 +1894,14 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_WIS(victim) -= 1;
         victim->raw_wis -= 1;
         victim->sendln("*** You lose one wisdom point ***");
-        sprintf(log_buf, "%s lost a wis too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a wis too. ouch.", qPrintable(victim->getName()));
       }
       break;
     case 3:
       GET_CON(victim) -= 1;
       victim->raw_con -= 1;
       victim->sendln("*** You lose one constitution point ***");
-      sprintf(log_buf, "%s lost a con too. ouch.", victim->getNameC());
+      sprintf(log_buf, "%s lost a con too. ouch.", qPrintable(victim->getName()));
       break;
     case 4:
       if (GET_INT(victim) > 4)
@@ -1909,7 +1909,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_INT(victim) -= 1;
         victim->raw_intel -= 1;
         victim->sendln("*** You lose one intelligence point ***");
-        sprintf(log_buf, "%s lost a int too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a int too. ouch.", qPrintable(victim->getName()));
       }
       break;
     case 5:
@@ -1918,7 +1918,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_DEX(victim) -= 1;
         victim->raw_dex -= 1;
         victim->sendln("*** You lose one dexterity point ***");
-        sprintf(log_buf, "%s lost a dex too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a dex too. ouch.", qPrintable(victim->getName()));
       }
       break;
     } // of switch
@@ -5431,7 +5431,7 @@ void raw_kill(Character *ch, Character *victim)
       }
       else
       {
-        // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
+        // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), qPrintable(victim->getName()));
       }
       selfpurge = true;
       selfpurge.setOwner(ch, "raw_kill");
@@ -5453,7 +5453,7 @@ void raw_kill(Character *ch, Character *victim)
     if (number(0, 99) < (victim->getLevel() / 10 + victim->player->golem->getLevel() / 5))
     { /* rk */
       char buf[MAX_STRING_LENGTH];
-      sprintf(buf, "%s's golem lost a level!", victim->getNameC());
+      sprintf(buf, "%s's golem lost a level!", qPrintable(victim->getName()));
       DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
       shatter_message(victim->player->golem);
       extract_char(victim->player->golem, true);
@@ -5518,7 +5518,7 @@ void raw_kill(Character *ch, Character *victim)
 
     remove_memory(i, 'h', victim);
     if (IS_NPC(i) && (i->mobdata->fears))
-      if (!strcmp(i->mobdata->fears, victim->getNameC()))
+      if (!strcmp(i->mobdata->fears, qPrintable(victim->getName())))
         remove_memory(i, 'f');
     if (IS_NPC(i) && !i->hunting.isEmpty())
       if (i->hunting == victim->getName())
@@ -5532,17 +5532,17 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %d (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].virt,
+        sprintf(buf, "%s killed by %d (%s)", qPrintable(victim->getName()), DC::getInstance()->mob_index[ch->mobdata->nr].virt,
                 GET_NAME(ch));
       }
       else
       {
-        sprintf(buf, "%s killed by %s", victim->getNameC(), GET_NAME(ch));
+        sprintf(buf, "%s killed by %s", qPrintable(victim->getName()), GET_NAME(ch));
       }
     }
     else
     {
-      sprintf(buf, "%s killed by [null killer]", victim->getNameC());
+      sprintf(buf, "%s killed by [null killer]", qPrintable(victim->getName()));
     }
 
     // notify the clan members - clan_death checks for null ch/vict
@@ -5583,7 +5583,7 @@ void raw_kill(Character *ch, Character *victim)
             victim->sendln("*** You lose one constitution point ***");
             if (IS_PC(victim))
             {
-              sprintf(log_buf, "%s lost a con. ouch.", victim->getNameC());
+              sprintf(log_buf, "%s lost a con. ouch.", qPrintable(victim->getName()));
               DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
@@ -5595,7 +5595,7 @@ void raw_kill(Character *ch, Character *victim)
             victim->sendln("*** You lose one dexterity point ***");
             if (IS_PC(victim))
             {
-              sprintf(log_buf, "%s lost a dex. ouch.", victim->getNameC());
+              sprintf(log_buf, "%s lost a dex. ouch.", qPrintable(victim->getName()));
               DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
@@ -5620,7 +5620,7 @@ void raw_kill(Character *ch, Character *victim)
                      "           `-----------`\r\n",
                      victim);
         char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        strncpy(name, qPrintable(victim->getName()), 100);
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
@@ -5667,7 +5667,7 @@ void raw_kill(Character *ch, Character *victim)
                      victim);
 
         char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        strncpy(name, qPrintable(victim->getName()), 100);
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
@@ -5694,7 +5694,7 @@ void raw_kill(Character *ch, Character *victim)
                      victim);
 
         char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        strncpy(name, qPrintable(victim->getName()), 100);
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
@@ -5727,7 +5727,7 @@ void raw_kill(Character *ch, Character *victim)
                      "              |                       |\r\n",
                      victim);
         char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        strncpy(name, qPrintable(victim->getName()), 100);
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
@@ -5771,7 +5771,7 @@ void raw_kill(Character *ch, Character *victim)
                      victim);
 
         char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        strncpy(name, qPrintable(victim->getName()), 100);
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
@@ -6510,94 +6510,76 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   if (ch != nullptr)
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\n\r##%s just got POTATOED!!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##%s just got POTATOED!!\n\r", qPrintable(victim->getName()));
     else if (type == KILL_MORTAR)
-      sprintf(killer_message, "\n\r##%s just got a FIRE IN THE HOLE!!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##%s just got a FIRE IN THE HOLE!!\n\r", qPrintable(victim->getName()));
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\n\r##%s has perished from %s's POISON!\n\r", victim->getNameC(), GET_NAME(ch));
-    else if (!str_cmp(GET_NAME(ch), victim->getNameC()))
+      sprintf(killer_message, "\n\r##%s has perished from %s's POISON!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
+    else if (!str_cmp(GET_NAME(ch), qPrintable(victim->getName())))
       sprintf(killer_message, "");
-    //    sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", victim->getNameC());
+    //    sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", qPrintable(victim->getName()));
     else if (victim->getLevel() < PKILL_COUNT_LIMIT || ch == victim)
-      // sprintf(killer_message,"\n\r##%s just DIED!\n\r", victim->getNameC());
-      // sprintf(killer_message,"\n\r##%s was just introduced to the warm hospitality of Dark Castle!!\n\r", victim->getNameC());
+      // sprintf(killer_message,"\n\r##%s just DIED!\n\r", qPrintable(victim->getName()));
+      // sprintf(killer_message,"\n\r##%s was just introduced to the warm hospitality of Dark Castle!!\n\r", qPrintable(victim->getName()));
       sprintf(killer_message, "");
     else if (num == 1000)
-      sprintf(killer_message, "\n\r##%s was just ANALLY PROBED by %s!\n\r", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just ANALLY PROBED by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master)
-      sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
-              victim->getNameC(), GET_NAME(ch->master));
+      sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r", qPrintable(victim->getName()), GET_NAME(ch->master));
     else if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
-      sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s's charmie!\n\r",
-              victim->getNameC(), GET_NAME(ch->master));
+      sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s's charmie!\n\r", qPrintable(victim->getName()), GET_NAME(ch->master));
     else if (ch->in_room == real_room(START_ROOM))
-      sprintf(killer_message, "\n\r##%s was just PINGED by %s!\n\r",
-              victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just PINGED by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else if (ch->in_room == real_room(SECOND_START_ROOM))
-      sprintf(killer_message, "\n\r##%s was just PONGED by %s!\n\r",
-              victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just PONGED by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else if (IS_ANONYMOUS(ch))
-      sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s!\n\r",
-              victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else if (ch->getLevel() > MORTAL)
-      sprintf(killer_message, "\n\r##%s was just SMITED...er..SMOTED..err PKILLED by %s!\n\r", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just SMITED...er..SMOTED..err PKILLED by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else if (type == KILL_BINGO)
-      sprintf(killer_message, "\n\r##%s was just BINGOED by %s!\n\r",
-              victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just BINGOED by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else if (type == SPELL_CONSECRATE)
-      sprintf(killer_message, "\n\r##%s was just slain by %s's CONSECRATION!\n\r", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just slain by %s's CONSECRATION!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else if (type == SPELL_DESECRATE)
-      sprintf(killer_message, "\n\r##%s was just slain by %s's DESECRATION!\n\r", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n\r##%s was just slain by %s's DESECRATION!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
     else
       switch (GET_CLASS(ch))
       {
       case CLASS_MAGIC_USER:
-        sprintf(killer_message, "\n\r##%s was just FRIED by %s's magic!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just FRIED by %s's magic!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_CLERIC:
-        sprintf(killer_message, "\n\r##%s was just BANISHED by %s's holiness!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just BANISHED by %s's holiness!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_THIEF:
-        sprintf(killer_message, "\n\r##%s was just ASSASSINATED by %s!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just ASSASSINATED by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_WARRIOR:
-        sprintf(killer_message, "\n\r##%s was just SLAIN by %s's might!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just SLAIN by %s's might!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_ANTI_PAL:
-        sprintf(killer_message, "\n\r##%s was just CONSUMED by %s's darkness!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just CONSUMED by %s's darkness!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_PALADIN:
-        sprintf(killer_message, "\n\r##%s was just VANQUISHED by %s's goodness!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just VANQUISHED by %s's goodness!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_BARBARIAN:
-        sprintf(killer_message, "\n\r##%s was just SHREDDED by %s's crazed fury!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just SHREDDED by %s's crazed fury!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_MONK:
-        sprintf(killer_message, "\n\r##%s was just SHATTERED by %s's karma!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just SHATTERED by %s's karma!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_RANGER:
-        sprintf(killer_message, "\n\r##%s was just PENETRATED by %s's wood!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just PENETRATED by %s's wood!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_BARD:
-        sprintf(killer_message, "\n\r##%s was just MUTED by %s's snazzy rhythm!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just MUTED by %s's snazzy rhythm!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       case CLASS_DRUID:
-        sprintf(killer_message, "\n\r##%s was just VIOLATED by %s's woodland friends!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just VIOLATED by %s's woodland friends!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       default:
-        sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s!\n\r",
-                victim->getNameC(), GET_NAME(ch));
+        sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s!\n\r", qPrintable(victim->getName()), GET_NAME(ch));
         break;
       }
     level_diff_t level_spread;
@@ -6723,17 +6705,17 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   {
     // ch == nullptr
     if (type == KILL_DROWN)
-      sprintf(killer_message, "\n\r##%s just DROWNED!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##%s just DROWNED!\n\r", qPrintable(victim->getName()));
     else if (type == KILL_POTATO)
-      sprintf(killer_message, "\n\r##%s just got POTATOED!!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##%s just got POTATOED!!\n\r", qPrintable(victim->getName()));
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\n\r##%s has perished from POISON!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##%s has perished from POISON!\n\r", qPrintable(victim->getName()));
     else if (type == KILL_FALL)
-      sprintf(killer_message, "\n\r##%s has FALLEN to death!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##%s has FALLEN to death!\n\r", qPrintable(victim->getName()));
     else if (type == KILL_BATTER)
-      sprintf(killer_message, "\n\r##That's using your head! %s just died attempting to batter a door!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##That's using your head! %s just died attempting to batter a door!\n\r", qPrintable(victim->getName()));
     else
-      sprintf(killer_message, "\n\r##%s just DIED!\n\r", victim->getNameC());
+      sprintf(killer_message, "\n\r##%s just DIED!\n\r", qPrintable(victim->getName()));
   }
 
   send_info(killer_message);
@@ -6752,7 +6734,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
       if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || isSet(DC::getInstance()->world[ch->master->in_room].room_flags, CLAN_ROOM))
       {
         SETBIT(victim->affected_by, AFF_CHAMPION);
-        sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\n\r", GET_NAME(ch->master), victim->getNameC());
+        sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\n\r", GET_NAME(ch->master), qPrintable(victim->getName()));
       }
       else
       {
@@ -6819,20 +6801,14 @@ void arena_kill(Character *ch, Character *victim, int type)
 
     if (type == KILL_BINGO)
     {
-      sprintf(killer_message, "\n\r## %s [%s] just BINGOED %s [%s] in the arena!\n\r",
-              ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-              victim->getNameC(), get_clan_name(victim_clan));
+      sprintf(killer_message, "\n\r## %s [%s] just BINGOED %s [%s] in the arena!\n\r", ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan), qPrintable(victim->getName()), get_clan_name(victim_clan));
     }
     else
     {
-      sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r",
-              ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-              victim->getNameC(), get_clan_name(victim_clan));
+      sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r", ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan), qPrintable(victim->getName()), get_clan_name(victim_clan));
     }
 
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
-                            ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-                            victim->getNameC(), get_clan_name(victim_clan));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]", ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan), qPrintable(victim->getName()), get_clan_name(victim_clan));
   }
   else if (ch)
   {
@@ -6867,7 +6843,7 @@ void arena_kill(Character *ch, Character *victim, int type)
 
   if (ch && victim && (arena.isPrize() || arena.isChaos()))
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", GET_NAME(ch), victim->getNameC());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", GET_NAME(ch), qPrintable(victim->getName()));
   }
 
   // if it's a chaos, see if the clan was eliminated

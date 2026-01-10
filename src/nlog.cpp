@@ -252,7 +252,7 @@ char *handle_ansi_(char *s, Character *ch)
 
 QString handle_ansi(QString haystack, Character *ch)
 {
-  return handle_ansi(QByteArray(haystack.toStdString().c_str()), ch);
+  return handle_ansi(QByteArray(qPrintable(haystack)), ch);
 }
 
 QByteArray handle_ansi(QByteArray haystack, Character *ch)

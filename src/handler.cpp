@@ -153,12 +153,12 @@ int isexact(QString arg, QStringList namelist)
 
 int isexact(QString arg, QString namelist)
 {
-	return isexact(arg.toStdString().c_str(), qPrintable(namelist));
+	return isexact(qPrintable(arg), qPrintable(namelist));
 }
 
 int isexact(QString arg, const char *namelist)
 {
-	return isexact(arg.toStdString().c_str(), namelist);
+	return isexact(qPrintable(arg), namelist);
 }
 
 int isexact(std::string arg, std::string namelist)
@@ -1702,7 +1702,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		if (hjp->next != af)
 		{
 			DC::getInstance()->logentry(QStringLiteral("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"), ANGEL, DC::LogChannel::LOG_BUG);
-			sprintf(buf, "Problem With: %s    Affect type: %d", ch->getNameC(), af->type);
+			sprintf(buf, "Problem With: %s    Affect type: %d", qPrintable(ch->getName()), af->type);
 			DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
 			return;
 		}
@@ -2913,7 +2913,7 @@ Character *get_char(QString name)
 		{
 			if (isexact(tmp, GET_NAME(i)))
 			return true;
-			else if (isprefix(tmp.toStdString().c_str(), GET_NAME(i)))
+			else if (isprefix(qPrintable(tmp), GET_NAME(i)))
 			{
 				if (partial_match)
 				{
@@ -4415,7 +4415,7 @@ Character *get_active_pc(QString name)
 
 		if (isexact(name, i->getName()))
 			return (i);
-		else if (isprefix(name.toStdString().c_str(), i->getName().toStdString().c_str()))
+		else if (isprefix(qPrintable(name), qPrintable(i->getName())))
 		{
 			if (partial_match)
 			{

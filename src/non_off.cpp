@@ -1479,7 +1479,7 @@ void CVoteData::AddAnswer(Character *ch, std::string answer)
 
 bool CVoteData::HasVoted(Character *ch)
 {
-  return (ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] || char_voted[GET_NAME(ch)]);
+  return (ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString()] || char_voted[GET_NAME(ch)]);
 }
 
 bool CVoteData::Vote(Character *ch, unsigned int vote)

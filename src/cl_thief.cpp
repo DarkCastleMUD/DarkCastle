@@ -438,7 +438,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   char buffer[255];
-  sprintf(buffer, "%s", victim->getNameC());
+  sprintf(buffer, "%s", qPrintable(victim->getName()));
 
   if (AWAKE(victim) && !skill_success(ch, victim, SKILL_CIRCLE))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
@@ -1005,9 +1005,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           if (IS_PC(victim))
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s stole %s[%d] from %s",
-                    GET_NAME(ch), obj->short_description,
-                    DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
+            sprintf(log_buf, "%s stole %s[%d] from %s", GET_NAME(ch), obj->short_description, DC::getInstance()->obj_index[obj->item_number].virt, qPrintable(victim->getName()));
             DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
               DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
@@ -1177,7 +1175,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         sprintf(buf, "You receive %d exps.\r\n", _exp);
         ch->send(buf);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
-                GET_NAME(ch), obj->short_description, victim->getNameC());
+                GET_NAME(ch), obj->short_description, qPrintable(victim->getName()));
         DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (victim->isPlayer())
         {
@@ -1422,7 +1420,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
             affect_to_char(ch, &pthiefaf);
         }
       }
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, victim->getNameC(), GET_ROOM_VNUM(victim->in_room));
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, qPrintable(victim->getName()), GET_ROOM_VNUM(victim->in_room));
     }
     else
     {

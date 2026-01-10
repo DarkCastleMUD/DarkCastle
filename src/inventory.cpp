@@ -1462,7 +1462,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
-                                          ch->getNameC(),
+                                          qPrintable(ch->getName()),
                                           obj_object->short_description,
                                           DC::getInstance()->obj_index[obj_object->item_number].virt,
                                           sub_object->short_description,
@@ -1473,7 +1473,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
-                                          ch->getNameC(),
+                                          qPrintable(ch->getName()),
                                           obj_object->short_description,
                                           DC::getInstance()->obj_index[obj_object->item_number].virt,
                                           sub_object->short_description,

@@ -2363,10 +2363,10 @@ int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 // to assume some of these things will work.  If they don't, we got bigger problems anyway
 int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
-  if (cmd != cmd_t::PULL) // pull
+  if (cmd != cmd_t::PULL || !ch) // pull
     return eFAILURE;
 
-  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+  int obj_vnum = ch->getDC()->obj_index[obj->item_number].virt;
 
   switch (obj_vnum)
   {
@@ -2379,7 +2379,7 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     send_to_room("You hear a large clicking noise.\r\n", ch->in_room, true);
     break;
   case 29203:
-    if (DC::getInstance()->obj_index[real_object(29202)].qty > 0)
+    if (ch->getDC()->obj_index[real_object(29202)].qty > 0)
     {
       send_to_room("A compartment in the ceiling opens, but is it empty.\r\n", 29258, true);
       break;
@@ -2389,7 +2389,7 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     break;
   default:
     ch->sendln("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.");
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
+    ch->getDC()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
     break;
   }
 
@@ -2398,6 +2398,9 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 
 int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
+  if (!ch)
+    return eFAILURE;
+
   class Object *p;
   // 30097
   if (cmd != cmd_t::UNDEFINED && cmd == cmd_t::EXAMINE)
@@ -2463,7 +2466,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
         }
       }
 
-      DC::resetZone(DC::getInstance()->world[real_room(30000)].zone);
+      ch->getDC()->resetZone(ch->getDC()->world[real_room(30000)].zone);
     }
   }
 

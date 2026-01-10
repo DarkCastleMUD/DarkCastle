@@ -27,7 +27,7 @@
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/act.h"
-#include "DC/fileinfo.h" // SAVE_DIR
+#include "DC/fileinfo.h"
 #include "DC/returnvals.h"
 #include "DC/inventory.h"
 #include "DC/const.h"

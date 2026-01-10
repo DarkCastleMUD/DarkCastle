@@ -1427,16 +1427,16 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
   if (arg1 == "full")
   {
     ch->sendln("Performing full zone reset!");
-    std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
+    std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), ch->getDC()->world[ch->in_room].zone);
+    ch->getDC()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->getDC()->resetZone(ch->getDC()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln("Resetting this entire zone!");
-    std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
+    std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), ch->getDC()->world[ch->in_room].zone);
+    ch->getDC()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->getDC()->resetZone(ch->getDC()->world[ch->in_room].zone);
   }
 
   return eSUCCESS;
@@ -1585,7 +1585,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
       }
     }
 
-    sprintf(buf, "%s restored %s.", GET_NAME(ch), victim->getNameC());
+    sprintf(buf, "%s restored %s.", GET_NAME(ch), qPrintable(victim->getName()));
     DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     update_pos(victim);
@@ -1962,8 +1962,7 @@ void pick_up_item(Character *ch, class Object *obj)
       else
         hunt_items_list = in;
       int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
-      sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
-              obj->short_description, i->mobname, ch->getNameC());
+      sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n", obj->short_description, i->mobname, qPrintable(ch->getName()));
       send_info(buf);
       struct hunt_data *h = i->hunt;
       class Object *oitem = nullptr, *citem;

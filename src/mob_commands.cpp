@@ -137,8 +137,7 @@ void mpstat(Character *ch, Character *victim)
   mob_prog_data *mprg{};
   int i;
 
-  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
-          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].virt);
+  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n", qPrintable(victim->getName()), DC::getInstance()->mob_index[victim->mobdata->nr].virt);
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
@@ -671,7 +670,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
+    // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), qPrintable(victim->getName()));
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }
@@ -915,7 +914,7 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
       if (d->connected == Connection::states::PLAYING && d->character != ch && d->character->in_room == ch->in_room && CAN_SEE(ch, d->character))
       {
         char buf[MAX_STRING_LENGTH];
-        sprintf(buf, "%s %s", d->character->getNameC(), arg2);
+        sprintf(buf, "%s %s", qPrintable(d->character->getName()), arg2);
         do_mptransfer(ch, buf, cmd);
       }
     }

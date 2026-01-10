@@ -164,7 +164,7 @@ public:
     [[nodiscard]] inline char *NameC() const
     {
         char *str_hsh(const char *);
-        return str_hsh(name_.toStdString().c_str());
+        return str_hsh(qPrintable(name_));
     }
     inline void Name(const QString &name)
     {

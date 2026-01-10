@@ -645,7 +645,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 	}
 
 	buf += "\r\n";
-	return str_dup(buf.toStdString().c_str());
+	return str_dup(qPrintable(buf));
 }
 
 struct platsmith

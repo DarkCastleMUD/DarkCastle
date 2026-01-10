@@ -642,13 +642,11 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
       {
         if (d->original)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
-                 DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
+          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number, fname(qPrintable(d->character->getName())).toStdString().c_str());
         }
         else
         {
-          csendf(ch, "%-20s - %s$R [%d]\n\r",
-                 d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+          csendf(ch, "%-20s - %s$R [%d]\n\r", qPrintable(d->character->getName()), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
         }
       }
     } // for
@@ -670,10 +668,9 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
         }
         else
         {
-          if (is_abbrev(buf, d->character->getNameC()))
+          if (is_abbrev(buf, qPrintable(d->character->getName())))
           {
-            csendf(ch, "%-20s - %s$R [%d]\n\r",
-                   d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+            csendf(ch, "%-20s - %s$R [%d]\n\r", qPrintable(d->character->getName()), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
           }
         }
       }
@@ -692,8 +689,7 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
           CAN_SEE(ch, d->character) && !IS_NPC(d->character) /*Don't show snooped mobs*/)
       {
         if (DC::getInstance()->world[d->character->in_room].zone == zonenumber)
-          csendf(ch, "%-20s - %s$R\n\r", d->character->getNameC(),
-                 DC::getInstance()->world[d->character->in_room].name);
+          csendf(ch, "%-20s - %s$R\n\r", qPrintable(d->character->getName()), DC::getInstance()->world[d->character->in_room].name);
       }
     }
   }

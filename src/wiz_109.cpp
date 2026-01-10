@@ -136,14 +136,14 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    send(QStringLiteral("%1 is now a guide.\r\n").arg(victim->getNameC()));
+    send(QStringLiteral("%1 is now a guide.\r\n").arg(victim->getName()));
     victim->sendln("You have been selected to be a DC Guide!");
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send(QStringLiteral("%1 is no longer a guide.\r\n").arg(victim->getNameC()));
+    send(QStringLiteral("%1 is no longer a guide.\r\n").arg(victim->getName()));
     victim->sendln("You have been removed as a DC guide.");
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
@@ -247,7 +247,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
       ch, 0, victim, TO_VICT, 0);
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
-          victim->getNameC(), new_newlevel);
+          qPrintable(victim->getName()), new_newlevel);
   DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   if (victim->getLevel() == 0)
@@ -316,9 +316,9 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
                       .arg(GET_SHORT(victim))
                       .arg(GET_SHORT(this));
 
-    remove_familiars(victim->getNameC(), ZAPPED);
+    remove_familiars(qPrintable(victim->getName()), ZAPPED);
     if (cmd == cmd_t::DEFAULT) // cmd_t::DEFAULT = someone typed it. cmd_t::TRACK = rename.
-      remove_vault(victim->getNameC(), ZAPPED);
+      remove_vault(qPrintable(victim->getName()), ZAPPED);
 
     victim->setLevel(1);
     DC::getInstance()->update_wizlist(victim);
@@ -425,7 +425,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
           {
             if (follower->carrying != nullptr)
             {
-              send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+              send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getName()).arg(GET_NAME(follower)));
               return eFAILURE;
             }
           }
@@ -436,8 +436,8 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     do_not_save_corpses = 1;
     QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
-    DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
-    DC::getInstance()->logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
+    dc_->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_->logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
     do_force(this, "all save");
     if (!DC::getInstance()->write_hotboot_file())
     {
@@ -499,7 +499,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
             {
               if (follower->carrying != nullptr || follower->equipment != nullptr)
               {
-                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getName()).arg(GET_NAME(follower)));
                 return eFAILURE;
               }
             }
@@ -642,7 +642,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
+  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", qPrintable(ch->getName()), command);
 
   if (system(command))
   {
@@ -692,11 +692,11 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
   {
     if (victim->skills.empty())
     {
-      ch->send(fmt::format("{} has no skills.\r\n", victim->getNameC()));
+      ch->send(fmt::format("{} has no skills.\r\n", qPrintable(victim->getName())));
       return eSUCCESS;
     }
 
-    ch->send(fmt::format("Skills for {}:\r\n", victim->getNameC()));
+    ch->send(fmt::format("Skills for {}:\r\n", qPrintable(victim->getName())));
     for (const auto &curr : ch->skills)
     {
       ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\r\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));
