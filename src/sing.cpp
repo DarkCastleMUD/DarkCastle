@@ -1419,7 +1419,7 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 {
 	char buf[200];
 
-	ch->sendln("Available Songs\n\r---------------");
+	ch->sendln("Available Songs\r\n---------------");
 	for (qsizetype i = 0; i < Character::song_names.length(); i++)
 	{
 		if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))

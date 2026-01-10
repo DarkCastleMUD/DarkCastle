@@ -594,16 +594,16 @@ void advance_level(Character *ch, int is_conversion)
 	}
 
 	if (effective_level == 6)
-		ch->sendln("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.");
+		ch->sendln("You are now able to participate in pkilling!\r\nRead HELP PKILL for more information.");
 	if (effective_level == 10)
 	{
-		ch->sendln("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.");
+		ch->sendln("You have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information.");
 		add_new_vault(GET_NAME(ch), 0);
 	}
 	if (effective_level == 11)
 		ch->sendln("It now costs you $B$5gold$R every time you recall.");
 	if (effective_level == 20)
-		ch->sendln("You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.");
+		ch->sendln("You will no longer keep your equipment when you suffer a death to a mob.\r\nThere is now a chance you may lose attribute points when you die to a mob.\r\nRead HELP RDEATH and HELP STAT LOSS for more information.");
 	if (effective_level == 40)
 		ch->sendln("You are now able to use the Anonymous command. See \"HELP ANON\" for details.");
 	if (effective_level == 50)

@@ -237,13 +237,13 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->sendln("You feel generous.");
-  act("$n makes some strange gestures.\n\rA strange feeling comes upon you,"
-      "like a giant hand. Light comes\n\rdown from above, grabbing your "
-      "body, which begins to pulse\n\rwith coloured lights from inside.\n\rYo"
-      "ur head seems to be filled with deamons\n\rfrom another plane as your"
-      " body dissolves\n\rto the elements of time and space itself.\n\rSudde"
-      "nly a silent explosion of light snaps\n\ryou back to reality. You fee"
-      "l slightly\n\rdifferent.",
+  act("$n makes some strange gestures.\r\nA strange feeling comes upon you,"
+      "like a giant hand. Light comes\r\ndown from above, grabbing your "
+      "body, which begins to pulse\r\nwith coloured lights from inside.\r\nYo"
+      "ur head seems to be filled with deamons\r\nfrom another plane as your"
+      " body dissolves\r\nto the elements of time and space itself.\r\nSudde"
+      "nly a silent explosion of light snaps\r\nyou back to reality. You fee"
+      "l slightly\r\ndifferent.",
       ch, 0, victim, TO_VICT, 0);
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
@@ -274,7 +274,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
   if (name.isEmpty())
   {
-    send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
+    send_to_char("Zap who??\r\nOh, BTW this deletes anyone "
                  "lower than you.\r\n",
                  this);
     return eFAILURE;
@@ -302,7 +302,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     if (IS_PC(victim))
     {
       victim->sendln(QString("A massive bolt of lightning arcs down from the "
-                             "heavens, striking you\n\rbetween the eyes. You have "
+                             "heavens, striking you\r\nbetween the eyes. You have "
                              "been utterly destroyed by %1.")
                          .arg(GET_SHORT(this)));
     }
@@ -338,7 +338,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
   else
   {
-    send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
+    send_to_char("Zap who??\r\nOh, BTW this deletes anyone "
                  "lower than you.\r\n",
                  this);
   }
@@ -362,7 +362,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("What message do you want to send to all players?");
   else
   {
-    sprintf(buf, "\n\r%s\r\n", argument + i);
+    sprintf(buf, "\r\n%s\r\n", argument + i);
     for (point = DC::getInstance()->descriptor_list; point; point = point->next)
       if (!point->connected && point->character)
         point->character->send(buf);

@@ -315,7 +315,7 @@ int DC::load_hotboot_descs(void)
       d->setPeerAddress(QHostAddress(address));
       d->descriptor = descriptor;
 
-      for (const auto &str : {"Recovering...\r\n", "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n"})
+      for (const auto &str : {"Recovering...\r\n", "Link recovery successful.\r\nPlease wait while mud finishes rebooting...\r\n"})
       {
         if (write_to_descriptor(descriptor, str) == -1)
         {
@@ -2210,7 +2210,7 @@ int close_socket(class Connection *d)
   }
   if (d->hashstr)
   {
-    strcpy(idiotbuf, "\n\r~\r\n");
+    strcpy(idiotbuf, "\r\n~\r\n");
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
@@ -2591,7 +2591,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
 
     if (++lines == 23)
     {
-      SEND_TO_Q("\n\rMore msgs available. Type awaymsgs to see them\r\n",
+      SEND_TO_Q("\r\nMore msgs available. Type awaymsgs to see them\r\n",
                 ch->desc);
       break;
     }

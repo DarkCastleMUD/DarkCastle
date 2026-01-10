@@ -1630,7 +1630,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   if (cmd == cmd_t::LIST)
   {
-    csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n\r$R", GET_SHORT(owner));
+    csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\r\n$R", GET_SHORT(owner));
     ch->sendln("  | Item                              | Cost                                   |");
     ch->sendln("--------------------------------------------------------------------------------");
     int last_vnum = 0;

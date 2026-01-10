@@ -140,7 +140,7 @@ void mpstat(Character *ch, Character *victim)
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n", qPrintable(victim->getName()), DC::getInstance()->mob_index[victim->mobdata->nr].virt);
   ch->send(buf);
 
-  sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
+  sprintf(buf, "$3Short description$R: %s\r\n$3Long  description$R: %s\r\n",
           victim->short_desc,
           victim->long_desc ? victim->long_desc : "(nullptr)");
   ch->send(buf);

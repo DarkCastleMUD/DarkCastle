@@ -317,7 +317,7 @@ void show_quest_header(Character *ch)
 void show_quest_amount(Character *ch, int remaining)
 {
    csendf(ch,
-          "\n\r $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n", quest_list.size() - remaining, remaining, quest_list.size());
+          "\r\n $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n", quest_list.size() - remaining, remaining, quest_list.size());
    return;
 }
 
@@ -357,7 +357,7 @@ void show_quest_footer(Character *ch)
    }
 
    csendf(ch,
-          "\n\r $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n",
+          "\r\n $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n",
           attempting, completed, total - completed - attempting, total);
 
    ch->sendln("[-----------------------------------------------------------------------------]");

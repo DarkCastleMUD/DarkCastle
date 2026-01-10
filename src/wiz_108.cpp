@@ -292,9 +292,9 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, name);
   if (!*name) // no arguments. print an informative text
   {
-    ch->sendln("Usage:\n\rset <name> <field> <value>");
+    ch->sendln("Usage:\r\nset <name> <field> <value>");
 
-    strcpy(help, "\n\rField being one of the following:\r\n");
+    strcpy(help, "\r\nField being one of the following:\r\n");
     ch->display_string_list(values);
     /*        for (i = 1; *values[i] != '\n'; i++)
             {

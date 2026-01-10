@@ -377,11 +377,11 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
 
   if (!*inout)
   {
-    ch->sendln("Usage:\n\rpoof [i|o] <std::string>");
-    ch->sendln("\n\rCurrent poof in is:");
+    ch->sendln("Usage:\r\npoof [i|o] <std::string>");
+    ch->sendln("\r\nCurrent poof in is:");
     ch->send(ch->player->poofin);
     ch->sendln("");
-    ch->sendln("\n\rCurrent poof out is:");
+    ch->sendln("\r\nCurrent poof out is:");
     ch->send(ch->player->poofout);
     ch->sendln("");
     return eSUCCESS;
@@ -389,7 +389,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
 
   if (inout[0] != 'i' && inout[0] != 'o')
   {
-    ch->sendln("Usage:\n\rpoof [i|o] <std::string>");
+    ch->sendln("Usage:\r\npoof [i|o] <std::string>");
     return eFAILURE;
   }
 

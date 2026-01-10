@@ -2712,7 +2712,7 @@ int vault_search(Character *ch, const char *args)
         if (!owner_shown)
         {
           owner_shown = true;
-          ch->send(QStringLiteral("\n\r%1:\r\n").arg(vault->owner));
+          ch->send(QStringLiteral("\r\n%1:\r\n").arg(vault->owner));
         }
 
         const auto &count = o.second;
@@ -2745,7 +2745,7 @@ int vault_search(Character *ch, const char *args)
     } // if we have access to vault
   } // for loop of vaults
 
-  ch->send(QStringLiteral("\n\rSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
+  ch->send(QStringLiteral("\r\nSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
 
   return eSUCCESS;
 }

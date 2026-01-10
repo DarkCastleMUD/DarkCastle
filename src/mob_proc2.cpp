@@ -110,8 +110,8 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 
 	act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
 	if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
@@ -194,8 +194,8 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
 	act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
 	eqdam = eq_current_damage(obj);
 
@@ -295,8 +295,8 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
 
 	act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
 	eqdam = eq_current_damage(obj);
 
@@ -422,7 +422,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 	if (cmd == cmd_t::LIST) // list
 	{
 		sprintf(buf, "%s_consent", GET_NAME(ch));
-		ch->send("Available corpses (freshest first):\n\r$B");
+		ch->send("Available corpses (freshest first):\r\n$B");
 		for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
 		{
 			if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
@@ -822,8 +822,8 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
 	act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-	act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+	act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
 	eqdam = eq_current_damage(obj);
 

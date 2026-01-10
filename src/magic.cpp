@@ -409,7 +409,7 @@ int spell_energy_drain(uint8_t level, Character *ch, Character *victim, class Ob
 
   gain_exp(victim, 0 - mult);
   victim->removeHP(victim->getHP() / 20);
-  victim->sendln("Your knees buckle as life force is drained from your body!\n\rYou have lost some experience!");
+  victim->sendln("Your knees buckle as life force is drained from your body!\r\nYou have lost some experience!");
   act("You drain some of $N's experience!", ch, 0, victim, TO_CHAR, 0);
   return eSUCCESS;
 }
@@ -1493,7 +1493,7 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Obj
         csendf(pal, "You sense your desecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
     }
     ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!");
-    act("The runes upon the ground shatter with a burst of magic!\n\r$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act("The runes upon the ground shatter with a burst of magic!\r\n$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
     extract_obj(obj);
     return eSUCCESS;
   }
@@ -1542,7 +1542,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
         csendf(pal, "You sense your consecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
     }
     ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!");
-    act("Runes upon the ground glow brightly, then fade to nothing.\n\r$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act("Runes upon the ground glow brightly, then fade to nothing.\r\n$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
     extract_obj(obj);
     return eSUCCESS;
   }
@@ -4360,7 +4360,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
   target = victim->in_room;
 
   move_char(ch, target, false);
-  ch->sendln("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...");
+  ch->sendln("You summon a large eagle to scan the area.\r\nThrough the eagle's eyes you see...");
   do_look(ch, "");
   move_char(ch, original_loc);
   return eSUCCESS;
@@ -4709,7 +4709,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       break;
 
     case ITEM_MISSILE:
-      sprintf(buf, "Damage Dice are '%dD%d'\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
+      sprintf(buf, "Damage Dice are '%dD%d'\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
@@ -5311,19 +5311,19 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (GET_ALIGNMENT(ch) < 0)
   {
-    act("Calling upon your foul magic, you animate $p.\n\r$N slowly lifts "
+    act("Calling upon your foul magic, you animate $p.\r\n$N slowly lifts "
         "itself to its feet.",
         ch, corpse, mob, TO_CHAR, INVIS_NULL);
-    act("Calling upon $s foul magic, $n animates $p.\n\r$N slowly lifts "
+    act("Calling upon $s foul magic, $n animates $p.\r\n$N slowly lifts "
         "itself to its feet.",
         ch, corpse, mob, TO_ROOM, INVIS_NULL);
   }
   else
   {
-    act("Invoking your divine magic, you free $p's spirit.\n\r$N slowly rises "
+    act("Invoking your divine magic, you free $p's spirit.\r\n$N slowly rises "
         "out of the corpse and hovers a few feet above the ground.",
         ch, corpse, mob, TO_CHAR, INVIS_NULL);
-    act("Invoking $s divine magic, $n releases $p's spirit.\n\r$N slowly rises "
+    act("Invoking $s divine magic, $n releases $p's spirit.\r\n$N slowly rises "
         "out of the corpse and hovers a few feet above the ground.",
         ch, corpse, mob, TO_ROOM, INVIS_NULL);
   }

@@ -1599,9 +1599,9 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
                  "The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
-    ch->sendln("\n\r$3Current Descs$R:");
+    ch->sendln("\r\n$3Current Descs$R:");
     for (x = 1, curr = obj->ex_description; curr; x++, curr = curr->next)
-      csendf(ch, "$3%d$R) %s\n\r%s\r\n", x, curr->keyword, curr->description);
+      csendf(ch, "$3%d$R) %s\r\n%s\r\n", x, curr->keyword, curr->description);
     return eFAILURE;
   }
 
@@ -2676,7 +2676,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
                  "  The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
-    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\r\n", ch->player->last_mob_edit);
+    sprintf(buf2, "\r\n$3Current mob vnum set to$R: %d\r\n", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return eFAILURE;
   }
@@ -4741,8 +4741,8 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 
   if (!*buf)
   {
-    send_to_char("$3Syntax$R:\n\rrdelete exit   <direction>\n\rrdelete "
-                 "exdesc <direction>\n\rrdelete extra  <keyword>\r\n",
+    send_to_char("$3Syntax$R:\r\nrdelete exit   <direction>\r\nrdelete "
+                 "exdesc <direction>\r\nrdelete extra  <keyword>\r\n",
                  ch);
     return eFAILURE;
   }
@@ -4814,7 +4814,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
   {
     if (!*buf2)
     {
-      ch->sendln("Syntax:\n\rrdelete exdesc <direction>");
+      ch->sendln("Syntax:\r\nrdelete exdesc <direction>");
       return eFAILURE;
     }
     one_argument(buf2, buf);
@@ -4850,8 +4850,8 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
   }
 
   else
-    send_to_char("Syntax:\n\rrdelete exit   <direction>\n\rrdelete "
-                 "exdesc <direction>\n\rrdelete extra  <keyword>\r\n",
+    send_to_char("Syntax:\r\nrdelete exit   <direction>\r\nrdelete "
+                 "exdesc <direction>\r\nrdelete extra  <keyword>\r\n",
                  ch);
 
   DC::getInstance()->set_zone_modified_world(ch->in_room);
@@ -5518,7 +5518,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
       sprintf(buf, "Direction %s . Keyword : %s\r\n",
               dirs[i], rm->dir_option[i]->keyword);
       ch->send(buf);
-      strcpy(buf, "Description:\n\r  ");
+      strcpy(buf, "Description:\r\n  ");
       if (rm->dir_option[i]->general_description)
         strcat(buf, rm->dir_option[i]->general_description);
       else
@@ -5526,7 +5526,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
       ch->send(buf);
       sprintbit(rm->dir_option[i]->exit_info, exit_bits, buf2);
       sprintf(buf,
-              "Exit flag: %s \n\rKey no: %d\n\rTo room (V-Number): %d\r\n",
+              "Exit flag: %s \r\nKey no: %d\r\nTo room (V-Number): %d\r\n",
               buf2, rm->dir_option[i]->key,
               rm->dir_option[i]->to_room);
       ch->send(buf);
@@ -5752,7 +5752,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
   if (!*name)
   {
     ch->sendln("Punish who?");
-    send_to_char("\n\rusage: punish <char> [stupid silence freeze noemote "
+    send_to_char("\r\nusage: punish <char> [stupid silence freeze noemote "
                  "notell noname noarena notitle nopray]\r\n",
                  ch);
     return eFAILURE;

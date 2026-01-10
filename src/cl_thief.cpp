@@ -834,7 +834,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
+    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
     return eFAILURE;
   }
 
@@ -1288,7 +1288,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
+    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
     return eFAILURE;
   }
 

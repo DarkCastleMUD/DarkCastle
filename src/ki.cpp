@@ -560,7 +560,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
 
   dam = number(135, 165);
   //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
-  //  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
+  //  act("$n's eyes flash as $e pools the energy within $m!\r\nA burst of energy slams into you!\r\n",
   int32_t room = ch->in_room;
   for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
   {

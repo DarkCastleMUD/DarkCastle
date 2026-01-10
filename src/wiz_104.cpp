@@ -2428,7 +2428,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
 	  }
 	*/
 
-	csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\r\n",
+	csendf(ch, "Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).\r\n",
 		   v1, ((Object *)DC::getInstance()->obj_index[real_object(v1)].item)->short_description,
 		   v2, ((Object *)DC::getInstance()->obj_index[real_object(v2)].item)->short_description);
 
@@ -2519,7 +2519,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
 		}
 	}
 
-	csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\r\n",
+	csendf(ch, "Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n",
 		   vsrc, ((Character *)DC::getInstance()->mob_index[src].item)->short_desc,
 		   vdst, ((Character *)DC::getInstance()->mob_index[dst].item)->short_desc);
 

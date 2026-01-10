@@ -1840,9 +1840,9 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af);
 
     if (obj && obj->short_description)
-      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for %2 to reappear!\r\n").arg(GET_NAME(ch)).arg(obj->short_description));
+      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for %2 to reappear!\r\n").arg(GET_NAME(ch)).arg(obj->short_description));
     else
-      send_info(QStringLiteral("\n\r##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(GET_NAME(ch)));
+      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(GET_NAME(ch)));
   }
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);

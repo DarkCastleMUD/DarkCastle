@@ -2614,9 +2614,9 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item);
 
     if (o && o->short_description)
-      send_info(QStringLiteral("\n\r##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(o->short_description));
+      send_info(QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(o->short_description));
     else
-      send_info(QStringLiteral("\n\r##%1 has just picked up the Champion Flag!\r\n").arg(GET_NAME(ch)));
+      send_info(QStringLiteral("\r\n##%1 has just picked up the Champion Flag!\r\n").arg(GET_NAME(ch)));
   }
 
   if (sub_object)

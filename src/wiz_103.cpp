@@ -67,7 +67,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
     if (IS_PC(victim))
     {
       sprintf(buf, "A stream of fire arcs down from the heavens, striking "
-                   "you between the eyes.\n\rYou have been removed from the "
+                   "you between the eyes.\r\nYou have been removed from the "
                    "world by %s.\r\n",
               GET_SHORT(ch));
       victim->send(buf);

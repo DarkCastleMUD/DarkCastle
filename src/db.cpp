@@ -833,7 +833,7 @@ int do_wizlist(Character *ch, char *argument, cmd_t cmd)
 		sp = 79 - line_length;
 		sp /= 2;
 		space[sp + 1] = '\0';
-		sprintf(buf + strlen(buf), "\n\r%s%s\r\n", space,
+		sprintf(buf + strlen(buf), "\r\n%s%s\r\n", space,
 				names[current_level - IMMORTAL]);
 		space[sp + 1] = ' ';
 

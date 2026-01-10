@@ -56,7 +56,7 @@
 bool is_bracing(Character *bracee, struct room_direction_data *exit);
 void show_question_race(Connection *d);
 
-const char menu[] = "\n\rWelcome to Dark Castle Mud\r\n\r\n"
+const char menu[] = "\r\nWelcome to Dark Castle Mud\r\n\r\n"
                     "0) Exit Dark Castle.\r\n"
                     "1) Enter the game.\r\n"
                     "2) Enter your character's description.\r\n"
@@ -698,7 +698,7 @@ void Character::roll_and_display_stats(void)
    desc->stats->wis[0] = 14;
    */
 
-   SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \r\n", desc);
+   SEND_TO_Q("\r\n  Choose from any of the following groups of abilities...     \r\n", desc);
 
    SEND_TO_Q("Group: 1     2     3     4     5\r\n", desc);
    sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
@@ -810,7 +810,7 @@ void DC::nanny(class Connection *d, std::string arg)
    char *password;
    Character *ch;
    int y;
-   char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
+   char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> ";
    unsigned selection = 0;
    auto &character_list = DC::getInstance()->character_list;
    char log_buf[MAX_STRING_LENGTH] = {};
@@ -923,7 +923,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       if (_parse_name(arg.c_str(), tmp_name))
       {
-         SEND_TO_Q("Illegal name, try another.\n\rName: ", d);
+         SEND_TO_Q("Illegal name, try another.\r\nName: ", d);
          telnet_ga(d);
          return;
       }
@@ -942,7 +942,7 @@ void DC::nanny(class Connection *d, std::string arg)
          str_tmp << "../archive/" << tmp_name << ".gz";
          if (file_exists(str_tmp.str().c_str()))
          {
-            SEND_TO_Q("That character is archived.\n\rPlease mail "
+            SEND_TO_Q("That character is archived.\r\nPlease mail "
                       "imps@dcastle.org to request it be restored.\r\n",
                       d);
             close_socket(d);
@@ -1074,7 +1074,7 @@ void DC::nanny(class Connection *d, std::string arg)
          ch->sendln("$B----------------------------------------------------------------------$R");
       }
 
-      SEND_TO_Q(QStringLiteral("\n\rIf you have read this motd, press Return.\n\rLast connected from:\n\r%1\r\n").arg(ch->player->last_site), d);
+      SEND_TO_Q(QStringLiteral("\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n").arg(ch->player->last_site), d);
       telnet_ga(d);
 
       if (d->character->player->bad_pw_tries)
@@ -1110,7 +1110,7 @@ void DC::nanny(class Connection *d, std::string arg)
             STATE(d) = Connection::states::CLOSE;
             return;
          }
-         sprintf(buf, "New character.\n\rGive me a password for %s: ", GET_NAME(ch));
+         sprintf(buf, "New character.\r\nGive me a password for %s: ", GET_NAME(ch));
          SEND_TO_Q(buf, d);
          telnet_ga(d);
          STATE(d) = Connection::states::GET_NEW_PASSWORD;
@@ -1144,7 +1144,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       if (arg.length() < 6)
       {
-         SEND_TO_Q("Password must be at least six characters long.\n\rPassword: ", d);
+         SEND_TO_Q("Password must be at least six characters long.\r\nPassword: ", d);
          telnet_ga(d);
          return;
       }
@@ -1161,7 +1161,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
-         SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
+         SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
          telnet_ga(d);
          STATE(d) = Connection::states::GET_NEW_PASSWORD;
          return;
@@ -1386,11 +1386,11 @@ void DC::nanny(class Connection *d, std::string arg)
          GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
          delete ch->desc->stats;
          ch->desc->stats = nullptr;
-         SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\r\n", d);
-         sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\r\n"
-                      "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Ogre\r\n"
+         SEND_TO_Q("\r\nChoose a race(races you can select are marked with a *).\r\n", d);
+         sprintf(buf, "  %c1: Human\r\n  %c2: Elf\r\n  %c3: Dwarf\r\n"
+                      "  %c4: Hobbit\r\n  %c5: Pixie\r\n  %c6: Ogre\r\n"
                       "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
-                      "\n\rSelect a race(Type help <race> for more information)-> ",
+                      "\r\nSelect a race(Type help <race> for more information)-> ",
                  is_race_eligible(ch, 1) ? '*' : ' ', is_race_eligible(ch, 2) ? '*' : ' ', is_race_eligible(ch, 3) ? '*' : ' ', is_race_eligible(ch, 4) ? '*' : ' ', is_race_eligible(ch, 5) ? '*' : ' ', is_race_eligible(ch, 6) ? '*' : ' ',
                  is_race_eligible(ch, 7) ? '*' : ' ', is_race_eligible(ch, 8) ? '*' : ' ', is_race_eligible(ch, 9) ? '*' : ' ');
 
@@ -1415,7 +1415,7 @@ void DC::nanny(class Connection *d, std::string arg)
       switch (selection)
       {
       default:
-         SEND_TO_Q("That's not a race.\n\rWhat IS your race? ", d);
+         SEND_TO_Q("That's not a race.\r\nWhat IS your race? ", d);
          telnet_ga(d);
          return;
 
@@ -1545,7 +1545,7 @@ void DC::nanny(class Connection *d, std::string arg)
       }
 
       ch->set_hw();
-      SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\r\n", d);
+      SEND_TO_Q("\r\nA '*' denotes a class that fits your chosen stats.\r\n", d);
       sprintf(buf, " %c 1: Warrior\r\n"
                    " %c 2: Cleric\r\n"
                    " %c 3: Mage\r\n"
@@ -1557,7 +1557,7 @@ void DC::nanny(class Connection *d, std::string arg)
                    " %c 9: Ranger\r\n"
                    " %c 10: Bard\r\n"
                    " %c 11: Druid\r\n"
-                   "\n\rSelect a class(Type help <class> for more information) > ",
+                   "\r\nSelect a class(Type help <class> for more information) > ",
               //           (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
               '*',
               (is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' '),
@@ -1589,7 +1589,7 @@ void DC::nanny(class Connection *d, std::string arg)
       switch (selection)
       {
       default:
-         SEND_TO_Q("That's not a class.\n\rWhat IS your class? ", d);
+         SEND_TO_Q("That's not a class.\r\nWhat IS your class? ", d);
          telnet_ga(d);
          return;
 
@@ -1695,7 +1695,7 @@ void DC::nanny(class Connection *d, std::string arg)
       DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
       SEND_TO_Q("\r\n", d);
       SEND_TO_Q(motd, d);
-      SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
+      SEND_TO_Q("\r\nIf you have read this motd, press Return.", d);
       telnet_ga(d);
 
       STATE(d) = Connection::states::READ_MOTD;
@@ -1760,7 +1760,7 @@ void DC::nanny(class Connection *d, std::string arg)
             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
             DC::getInstance()->logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
          }
-         ch->sendln("\n\rWelcome to Dark Castle.");
+         ch->sendln("\r\nWelcome to Dark Castle.");
          character_list.insert(ch);
 
          if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
@@ -1792,7 +1792,7 @@ void DC::nanny(class Connection *d, std::string arg)
          {
             if (ch->getLevel() >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
             {
-               send_to_char("\n\rThere is an active vote in which you have not yet voted.\r\n"
+               send_to_char("\r\nThere is an active vote in which you have not yet voted.\r\n"
                             "Enter \"vote\" to see details\r\n\r\n",
                             ch);
             }
@@ -1837,7 +1837,7 @@ void DC::nanny(class Connection *d, std::string arg)
          }
          else
          {
-            SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
+            SEND_TO_Q("This will _permanently_ erase you.\r\nType ERASE ME if this is really what you want: ", d);
             telnet_ga(d);
             STATE(d) = Connection::states::DELETE_CHAR;
          }
@@ -1854,7 +1854,7 @@ void DC::nanny(class Connection *d, std::string arg)
       if (arg == "ARCHIVE ME")
       {
          str_tmp << GET_NAME(d->character);
-         SEND_TO_Q("\n\rCharacter Archived.\r\n", d);
+         SEND_TO_Q("\r\nCharacter Archived.\r\n", d);
          DC::getInstance()->update_wizlist(d->character);
          close_socket(d);
          util_archive(str_tmp.str().c_str(), 0);
@@ -1917,7 +1917,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       if (arg.length() < 6)
       {
-         SEND_TO_Q("Password must be at least six characters long.\n\rPassword: ", d);
+         SEND_TO_Q("Password must be at least six characters long.\r\nPassword: ", d);
          telnet_ga(d);
          return;
       }
@@ -1933,13 +1933,13 @@ void DC::nanny(class Connection *d, std::string arg)
 
       if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
-         SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
+         SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
          telnet_ga(d);
          STATE(d) = Connection::states::RESET_PASSWORD;
          return;
       }
 
-      SEND_TO_Q("\n\rDone.\r\n", d);
+      SEND_TO_Q("\r\nDone.\r\n", d);
       SEND_TO_Q(menu, d);
       STATE(d) = Connection::states::SELECT_MENU;
       if (ch->getLevel() > 1)

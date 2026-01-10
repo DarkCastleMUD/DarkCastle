@@ -1006,7 +1006,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   if (Item_it->state != AUC_FOR_SALE)
   {
-    ch->send(QStringLiteral("Ticket number %1 has already been sold\n\r.").arg(ticket));
+    ch->send(QStringLiteral("Ticket number %1 has already been sold\r\n.").arg(ticket));
     return;
   }
 
@@ -1409,7 +1409,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
       std::stringstream ss;
       ss.imbue(std::locale("en_US"));
       ss << Item_it->price;
-      sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\r\n",
+      sprintf(buf, "\r\n%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\r\n",
               Item_it.key(),
               (options == LIST_MINE) ? qPrintable(Item_it->buyer) : qPrintable(Item_it->seller),
               ss.str().c_str(),
@@ -1440,19 +1440,19 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
   if (i == 0)
   {
     if (options == LIST_BY_SLOT)
-      csendf(ch, "\n\rThere are no %s items currently posted.\r\n", qPrintable(name));
+      csendf(ch, "\r\nThere are no %s items currently posted.\r\n", qPrintable(name));
     else if (options == LIST_BY_SELLER)
-      csendf(ch, "\n\r\"%s\" doesn't seem to be selling any public items.\r\n"
-                 "\n\rTo view private items, use \"vend list private\".\r\n",
+      csendf(ch, "\r\n\"%s\" doesn't seem to be selling any public items.\r\n"
+                 "\r\nTo view private items, use \"vend list private\".\r\n",
              qPrintable(name));
     else if (options == LIST_BY_CLASS)
-      csendf(ch, "\n\rThere are no \"%s\" wearable public items for sale.\r\n", qPrintable(name));
+      csendf(ch, "\r\nThere are no \"%s\" wearable public items for sale.\r\n", qPrintable(name));
     else if (options == LIST_MINE)
-      ch->sendln("\n\rYou do not have any tickets.");
+      ch->sendln("\r\nYou do not have any tickets.");
     else if (options == LIST_BY_RACE)
-      csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\r\n", qPrintable(name));
+      csendf(ch, "\r\nThere is nothing for sale that would fit a \"%s\".\r\n", qPrintable(name));
     else
-      ch->sendln("\n\rThere is nothing for sale!");
+      ch->sendln("\r\nThere is nothing for sale!");
   }
 
   if (options == LIST_MINE)
@@ -1461,7 +1461,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
     if ((vault = has_vault(GET_NAME(ch))))
     {
       int max_items = vault->size / 100;
-      csendf(ch, "\n\rYou are using %d of your %d available tickets.\r\n", i, max_items);
+      csendf(ch, "\r\nYou are using %d of your %d available tickets.\r\n", i, max_items);
     }
   }
 
@@ -1470,7 +1470,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
     int nr = real_object(27909);
     if (nr >= 0)
     {
-      sprintf(buf, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n",
+      sprintf(buf, "\r\n'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n",
               ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
       output_buf += buf;
     }
@@ -1723,14 +1723,14 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Modify what ticket?\n\rSyntax: vend modify <ticket> <new_price>");
+      ch->sendln("Modify what ticket?\r\nSyntax: vend modify <ticket> <new_price>");
       return eSUCCESS;
     }
     ticket = atoi(buf);
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("What price do you want it?\n\rSyntax: vend modify <ticket> <new_price>");
+      ch->sendln("What price do you want it?\r\nSyntax: vend modify <ticket> <new_price>");
       return eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
@@ -1744,7 +1744,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>");
+      ch->sendln("Search by what?\r\nSyntax: vend search <name | level | slot | seller | race | class>");
       return eSUCCESS;
     }
     if (!strcmp(buf, "name"))
@@ -1752,7 +1752,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        ch->sendln("What name do you want to search for?\n\rSyntax: vend search name <keyword>");
+        ch->sendln("What name do you want to search for?\r\nSyntax: vend search name <keyword>");
         return eSUCCESS;
       }
       DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
@@ -1769,7 +1769,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
         send_to_char("What slot do you want to search for?\r\n"
                      "finger, neck, body, head, legs, feet, hands, arms, shield,\r\n"
                      "about, waist, wrist, wield, hold, throw, light, face, ear\r\n"
-                     "\n\rSyntax: vend search slot <keyword>\r\n",
+                     "\r\nSyntax: vend search slot <keyword>\r\n",
                      ch);
         return eSUCCESS;
       }
@@ -1786,7 +1786,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       {
         send_to_char("What race do you want to search for?\r\n"
                      "Human, Elf, Dwarf, Hobbit, Pixie, Gnome, Orc, Troll\r\n"
-                     "\n\rSyntax: vend search race <race>\r\n",
+                     "\r\nSyntax: vend search race <race>\r\n",
                      ch);
         return eSUCCESS;
       }
@@ -1802,7 +1802,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       if (!*buf)
       {
         send_to_char("What class do you want to search for?\r\n"
-                     "\n\rSyntax: vend search class <class_name>\r\n",
+                     "\r\nSyntax: vend search class <class_name>\r\n",
                      ch);
         return eSUCCESS;
       }
@@ -1823,7 +1823,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       if (!*buf)
       {
         send_to_char("What person are you looking for?\r\n"
-                     "\n\rSyntax: vend search seller <name>\r\n",
+                     "\r\nSyntax: vend search seller <name>\r\n",
                      ch);
         return eSUCCESS;
       }
@@ -1839,7 +1839,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        ch->sendln("What level?\n\rSyntax: vend search level <min_level> [max_level]");
+        ch->sendln("What level?\r\nSyntax: vend search level <min_level> [max_level]");
         return eSUCCESS;
       }
       level = atoi(buf);
@@ -1853,7 +1853,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       return eSUCCESS;
     }
 
-    ch->sendln("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>");
+    ch->sendln("Search by what?\r\nSyntax: vend search <name | level | slot | seller | race | class>");
     return eSUCCESS;
   }
 
@@ -1863,7 +1863,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Collect what?\n\rSyntax: vend collect <all | ticket#>");
+      ch->sendln("Collect what?\r\nSyntax: vend collect <all | ticket#>");
       return eSUCCESS;
     }
     if (!strcmp(buf, "all"))
@@ -1887,7 +1887,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Buy what?\n\rSyntax: vend buy <ticket #>");
+      ch->sendln("Buy what?\r\nSyntax: vend buy <ticket #>");
       return eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.BuyItem(ch, atoi(buf));
@@ -1900,7 +1900,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Cancel what?\n\rSyntax: vend cancel <all | ticket#>");
+      ch->sendln("Cancel what?\r\nSyntax: vend cancel <all | ticket#>");
       return eSUCCESS;
     }
     if (!strcmp(buf, "all")) // stupid cancel all didn't fit my design, but the boss wanted it
@@ -1918,7 +1918,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("List what?\n\rSyntax: vend list <all | mine | private | recent>");
+      ch->sendln("List what?\r\nSyntax: vend list <all | mine | private | recent>");
       return eSUCCESS;
     }
 
@@ -1940,7 +1940,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln("List what?\n\rSyntax: vend list <all | mine | private>");
+      ch->sendln("List what?\r\nSyntax: vend list <all | mine | private>");
     }
     return eSUCCESS;
   }
@@ -1951,19 +1951,19 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Sell what?\n\rSyntax: vend sell <item> <price> [person]");
+      ch->sendln("Sell what?\r\nSyntax: vend sell <item> <price> [person]");
       return eSUCCESS;
     }
     obj = get_obj_in_list_vis(ch, buf, ch->carrying);
     if (!obj)
     {
-      ch->sendln("You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person]");
+      ch->sendln("You don't seem to have that item.\r\nSyntax: vend sell <item> <price> [person]");
       return eSUCCESS;
     }
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person]");
+      ch->sendln("How much do you want to sell it for?\r\nSyntax: vend sell <item> <price> [person]");
       return eSUCCESS;
     }
     price = atoi(buf);
@@ -1984,7 +1984,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Identify what?\n\rSyntax: vend identify <ticket>");
+      ch->sendln("Identify what?\r\nSyntax: vend identify <ticket>");
       return eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.Identify(ch, atoi(buf));
@@ -2004,7 +2004,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Add what room?\n\rSyntax: vend addroom <vnum>");
+      ch->sendln("Add what room?\r\nSyntax: vend addroom <vnum>");
       return eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.AddRoom(ch, atoi(buf));
@@ -2017,7 +2017,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      ch->sendln("Remove what room?\n\rSyntax: vend removeroom <vnum>");
+      ch->sendln("Remove what room?\r\nSyntax: vend removeroom <vnum>");
       return eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.RemoveRoom(ch, atoi(buf));
@@ -2031,7 +2031,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     return eSUCCESS;
   }
 
-  ch->sendln("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>");
+  ch->sendln("Do what?\r\nSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>");
   if (ch->getLevel() >= 104)
     ch->sendln("Also: <addroom | removeroom | listroom | stats>");
   return eSUCCESS;

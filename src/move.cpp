@@ -1212,7 +1212,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
 	case 0:
 		do_look(ch, "");
 		WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-		ch->sendln("\n\rYou are momentarily dazed from the dimensional shift.");
+		ch->sendln("\r\nYou are momentarily dazed from the dimensional shift.");
 		act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
 		break;
 	case 1:

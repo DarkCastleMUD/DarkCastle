@@ -730,7 +730,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
       if (found)
       {
-         act("\n\r$n is using:", i, 0, ch, TO_VICT, 0);
+         act("\r\n$n is using:", i, 0, ch, TO_VICT, 0);
          act("<    worn     > Item Description     (Flags) [Item Condition]\r\n", i, 0, ch, TO_VICT, 0);
 
          for (j = 0; j < MAX_WEAR; j++)
@@ -749,7 +749,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       if ((GET_CLASS(ch) == CLASS_THIEF && ch != i) || ch->getLevel() > IMMORTAL)
       {
          found = false;
-         ch->sendln("\n\rYou attempt to peek at the inventory:");
+         ch->sendln("\r\nYou attempt to peek at the inventory:");
          for (tmp_obj = i->carrying; tmp_obj;
               tmp_obj = tmp_obj->next_content)
          {
@@ -799,7 +799,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
             i = d->character;
          if (!CAN_SEE(this, i))
             continue;
-         sendln(QStringLiteral("\n\r%1").arg(i->getName()));
+         sendln(QStringLiteral("\r\n%1").arg(i->getName()));
          sendln("----------");
          do_botcheck(i->getName().split(' '));
       }
@@ -1158,7 +1158,7 @@ bool identify(Character *ch, Object *obj)
       break;
 
    case ITEM_MISSILE:
-      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
+      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
@@ -2845,7 +2845,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
    char *thief_messages[] = {
        "At least they'll hang you quickly.",
        "Bards will sing of your bravery, rogues will snicker at"
-       "\n\ryour stupidity.",
+       "\r\nyour stupidity.",
        "Don't plan on sending your kids to college.",
        "I'd bet against you.",
        "The odds aren't quite in your favor.",

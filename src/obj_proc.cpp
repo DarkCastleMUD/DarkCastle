@@ -3873,13 +3873,13 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           i->character->sendln("You hear a large BOOM from somewhere in the distance.");
 
     act("The hot potato $n is carrying beeps one final time.\r\n"
-        "\n\r$B"
+        "\r\n$B"
         "BBBB     OOO     OOO    M   M   !!   !!\r\n"
         "B   B   O   O   O   O   MM MM   !!   !!\r\n"
         "BBBB    O   O   O   O   M M M   !!   !!\r\n"
         "B   B   O   O   O   O   M   M \r\n"
         "BBBB     OOO     OOO    M   M   !!   !!\r\n"
-        "\n\r$R"
+        "\r\n$R"
         "Small pieces of $n and mashed potato splatter everywhere!!!\r\n"
         "$n has been KILLED!!",
         vict, 0, 0, TO_ROOM, 0);
@@ -4533,8 +4533,8 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
   {
     if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch->getLevel() >= 50 && !ch->has_skill(SKILL_SPELLCRAFT))
     {
-      send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
-      ch->sendln("A beam of light hits you in the head!\n\rYou have learned spellcraft!");
+      send_to_room("The glyph receptacles glow an eerie pale white.\r\nThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
+      ch->sendln("A beam of light hits you in the head!\r\nYou have learned spellcraft!");
       ch->learn_skill(SKILL_SPELLCRAFT, 1, 1);
     }
   }

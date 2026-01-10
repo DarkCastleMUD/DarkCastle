@@ -410,7 +410,7 @@ private slots:
             ch.incrementLevel();
             advance_level(&ch, 0);
         }
-        QCOMPARE(conn.output, "Your gain is: 11/14 hp, 1/1 m, 1/21 mv, 0/0 prac, 1/1 ki.\r\nYour gain is: 12/26 hp, 1/2 m, 1/22 mv, 0/0 prac, 0/1 ki.\r\nYour gain is: 10/36 hp, 1/3 m, 1/23 mv, 0/0 prac, 1/2 ki.\r\nYour gain is: 14/50 hp, 1/4 m, 1/24 mv, 0/0 prac, 0/2 ki.\r\nYour gain is: 14/64 hp, 1/5 m, 1/25 mv, 0/0 prac, 1/3 ki.\r\nYour gain is: 13/77 hp, 1/6 m, 1/26 mv, 0/0 prac, 0/3 ki.\r\nYou are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\r\nYour gain is: 12/89 hp, 1/7 m, 1/27 mv, 0/0 prac, 1/4 ki.\r\nYour gain is: 11/100 hp, 1/8 m, 1/28 mv, 0/0 prac, 0/4 ki.\r\nYour gain is: 13/113 hp, 1/9 m, 1/29 mv, 0/0 prac, 1/5 ki.\r\nYour gain is: 13/126 hp, 1/10 m, 1/30 mv, 0/0 prac, 0/5 ki.\r\nYou have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\r\n");
+        QCOMPARE(conn.output, "Your gain is: 11/14 hp, 1/1 m, 1/21 mv, 0/0 prac, 1/1 ki.\r\nYour gain is: 12/26 hp, 1/2 m, 1/22 mv, 0/0 prac, 0/1 ki.\r\nYour gain is: 10/36 hp, 1/3 m, 1/23 mv, 0/0 prac, 1/2 ki.\r\nYour gain is: 14/50 hp, 1/4 m, 1/24 mv, 0/0 prac, 0/2 ki.\r\nYour gain is: 14/64 hp, 1/5 m, 1/25 mv, 0/0 prac, 1/3 ki.\r\nYour gain is: 13/77 hp, 1/6 m, 1/26 mv, 0/0 prac, 0/3 ki.\r\nYou are now able to participate in pkilling!\r\nRead HELP PKILL for more information.\r\nYour gain is: 12/89 hp, 1/7 m, 1/27 mv, 0/0 prac, 1/4 ki.\r\nYour gain is: 11/100 hp, 1/8 m, 1/28 mv, 0/0 prac, 0/4 ki.\r\nYour gain is: 13/113 hp, 1/9 m, 1/29 mv, 0/0 prac, 1/5 ki.\r\nYour gain is: 13/126 hp, 1/10 m, 1/30 mv, 0/0 prac, 0/5 ki.\r\nYou have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information.\r\n");
         conn.output = {};
 
         rc = do_vault(&ch, str_hsh("put all"));
@@ -899,7 +899,7 @@ private slots:
         QCOMPARE(rc, eSUCCESS);
 
         rc = do_vend(&ch, str_hsh("sell sword"));
-        QCOMPARE(conn.output, "You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person]\r\n");
+        QCOMPARE(conn.output, "You don't seem to have that item.\r\nSyntax: vend sell <item> <price> [person]\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
 
@@ -907,7 +907,7 @@ private slots:
         QVERIFY(status);
 
         rc = do_vend(&ch, str_hsh("sell sword"));
-        QCOMPARE(conn.output, "How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person]\r\n");
+        QCOMPARE(conn.output, "How much do you want to sell it for?\r\nSyntax: vend sell <item> <price> [person]\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
 
@@ -988,7 +988,7 @@ private slots:
         conn.output = {};
 
         auto rc = do_medit(&ch, str_hsh(""));
-        QCOMPARE(conn.output, "Syntax:  medit [mob_num] [field] [arg]\r\n  Edit a mob_num with no field or arg to view the item.\r\n  Edit a field with no args for help on that field.\r\n\r\nThe field must be one of the following:\n\r          keywords         shortdesc          longdesc       description\r\n               sex             class              race             level\r\n         alignment      loadposition   defaultposition          actflags\r\n       affectflags        numdamdice       sizedamdice           damroll\r\n           hitroll       hphitpoints              gold  experiencepoints\r\n            immune           suscept            resist        armorclass\r\n              stat          strength         dexterity      intelligence\r\n            wisdom      constitution               new            delete\r\n              type                v1                v2                v3\r\n                v4\r\n");
+        QCOMPARE(conn.output, "Syntax:  medit [mob_num] [field] [arg]\r\n  Edit a mob_num with no field or arg to view the item.\r\n  Edit a field with no args for help on that field.\r\n\r\nThe field must be one of the following:\r\n          keywords         shortdesc          longdesc       description\r\n               sex             class              race             level\r\n         alignment      loadposition   defaultposition          actflags\r\n       affectflags        numdamdice       sizedamdice           damroll\r\n           hitroll       hphitpoints              gold  experiencepoints\r\n            immune           suscept            resist        armorclass\r\n              stat          strength         dexterity      intelligence\r\n            wisdom      constitution               new            delete\r\n              type                v1                v2                v3\r\n                v4\r\n");
         conn.output = {};
         ch.player->last_mob_edit = {};
         QCOMPARE(rc, eFAILURE);
@@ -1006,7 +1006,7 @@ private slots:
         QCOMPARE(rc, eFAILURE);
 
         rc = do_medit(&ch, str_hsh("1"));
-        QCOMPARE(conn.output, "Changing last mob vnum from 0 to 1.\r\nMOB - Name: [chain]  VNum: 1  RNum: 0  In room: -1 Mobile type: NORMAL\n\rShort description: Chain\n\rTitle: None\n\rLong description: Chain is here, looking for ideas to steal.\r\nDetailed description:\r\nKevin looks like he's between the ages of 22-24.  He is picking his nose.\r\nEvery few seconds he types \"score\" then he jots down some notes.  He\r\nappears to be reading as many help files as he can find.  He also seems\r\ninterested in finding a copy of the DC code, and is keeping an eye out for\r\nany Imps that might be nearby.\r\n\r\nClass: Mage   Level:[105] Alignment:[0] Spelldamage:[30] Race: Rodent\r\nMobspec: exists  Progtypes: 25611\r\nHeight:[198]  Weight:[200]  Sex:[FEMALE]  Hometown:[3001]\n\rStr:[15]+[ 0]=15 Int:[15]+[ 0]=15 Wis:[10]+[ 0]=10\r\nDex:[20]+[ 0]=20 Con:[20]+[ 0]=20\n\rMana:[ 1150/ 1150+27  ]  Hit:[ 4000/ 4000+166]  Move:[ 1150/ 1150+105]  Ki:[175/175]\n\rAC:[-40]  Exp:[0]  Hitroll:[21]  Damroll:[33]  Gold: [0]\n\rPosition: Standing  Fighting: Nobody  Default position: Standing  Timer:[0] \n\rNPC flags: [134217731 0]SPEC SENTINEL NOMATRIX \n\rNon-Combat Special Proc: exists  Combat Special Proc: none  Mob Progs: exists\r\nNPC Bare Hand Damage: 0d0.\r\nCarried weight: 0   Carried items: 0\n\rItems in inventory: 0  Items in equipment: 0\n\rSave Vs: FIRE[35] COLD[35] ENERGY[35] ACID[35] MAGIC[35] POISON[-15]\n\rThirst: -1  Hunger: -1  Drunk: -1\n\rMelee: [0] Spell: [0] Song: [0] Reflect: [0]\r\nTracking: 'NOBODY'\n\rHates: 'NOBODY'\n\rFears: 'NOBODY'\n\rMaster: 'NOBODY'\n\rFollowers:\r\nCombat flags: NoBits \n\rAffected by: [35914280 0] DETECT-INVISIBLE SENSE-LIFE EAS true-SIGHT INFARED \r\nImmune: [3669751] PIERCE SLASH MAGIC FIRE ENERGY ACID POISON COLD PARA BLUDGEON WHIP CRUSH HIT BITE STING CLAW PHYSICAL KI SONG \n\rSusceptible: [128] POISON \n\rResistant: [0] NoBits \n\rLag Left:  0\r\n");
+        QCOMPARE(conn.output, "Changing last mob vnum from 0 to 1.\r\nMOB - Name: [chain]  VNum: 1  RNum: 0  In room: -1 Mobile type: NORMAL\r\nShort description: Chain\r\nTitle: None\r\nLong description: Chain is here, looking for ideas to steal.\r\nDetailed description:\r\nKevin looks like he's between the ages of 22-24.  He is picking his nose.\r\nEvery few seconds he types \"score\" then he jots down some notes.  He\r\nappears to be reading as many help files as he can find.  He also seems\r\ninterested in finding a copy of the DC code, and is keeping an eye out for\r\nany Imps that might be nearby.\r\n\r\nClass: Mage   Level:[105] Alignment:[0] Spelldamage:[30] Race: Rodent\r\nMobspec: exists  Progtypes: 25611\r\nHeight:[198]  Weight:[200]  Sex:[FEMALE]  Hometown:[3001]\r\nStr:[15]+[ 0]=15 Int:[15]+[ 0]=15 Wis:[10]+[ 0]=10\r\nDex:[20]+[ 0]=20 Con:[20]+[ 0]=20\r\nMana:[ 1150/ 1150+27  ]  Hit:[ 4000/ 4000+166]  Move:[ 1150/ 1150+105]  Ki:[175/175]\r\nAC:[-40]  Exp:[0]  Hitroll:[21]  Damroll:[33]  Gold: [0]\r\nPosition: Standing  Fighting: Nobody  Default position: Standing  Timer:[0] \r\nNPC flags: [134217731 0]SPEC SENTINEL NOMATRIX \r\nNon-Combat Special Proc: exists  Combat Special Proc: none  Mob Progs: exists\r\nNPC Bare Hand Damage: 0d0.\r\nCarried weight: 0   Carried items: 0\r\nItems in inventory: 0  Items in equipment: 0\r\nSave Vs: FIRE[35] COLD[35] ENERGY[35] ACID[35] MAGIC[35] POISON[-15]\r\nThirst: -1  Hunger: -1  Drunk: -1\r\nMelee: [0] Spell: [0] Song: [0] Reflect: [0]\r\nTracking: 'NOBODY'\r\nHates: 'NOBODY'\r\nFears: 'NOBODY'\r\nMaster: 'NOBODY'\r\nFollowers:\r\nCombat flags: NoBits \r\nAffected by: [35914280 0] DETECT-INVISIBLE SENSE-LIFE EAS true-SIGHT INFARED \r\nImmune: [3669751] PIERCE SLASH MAGIC FIRE ENERGY ACID POISON COLD PARA BLUDGEON WHIP CRUSH HIT BITE STING CLAW PHYSICAL KI SONG \r\nSusceptible: [128] POISON \r\nResistant: [0] NoBits \r\nLag Left:  0\r\n");
         conn.output = {};
         ch.player->last_mob_edit = {};
         QCOMPARE(rc, eSUCCESS);
@@ -1504,7 +1504,7 @@ private slots:
 
         g1.desc->output = {};
         QCOMPARE(do_abandon(&g1, str_hsh(qPrintable(names[0]))), eSUCCESS);
-        QCOMPARE(g1.desc->output, "You abandon: .\n\rYou stop following agis.\r\n");
+        QCOMPARE(g1.desc->output, "You abandon: .\r\nYou stop following agis.\r\n");
         g1.desc->output = {};
         QCOMPARE(p1.desc->output, "Thalanil abandons: .\r\nThalanil stops following you.\r\n");
         p1.desc->output = {};

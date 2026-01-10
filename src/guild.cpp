@@ -508,7 +508,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(this, "\n\r$B%s Profession Skills:$R\r\n", find_profession(c_class, skilllist[i].group));
+        csendf(this, "\r\n$B%s Profession Skills:$R\r\n", find_profession(c_class, skilllist[i].group));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }

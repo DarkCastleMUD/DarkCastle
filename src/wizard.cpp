@@ -542,7 +542,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (k->affected)
   {
-    ch->sendln("\n\r$3Affecting Spells$R:\n\r--------------");
+    ch->sendln("\r\n$3Affecting Spells$R:\r\n--------------");
 
     for (aff = k->affected; aff; aff = aff->next)
     {
@@ -761,7 +761,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (IS_NPC(k))
   {
-    strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
+    strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
     strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
     ch->send(buf);
     strcpy(buf, "$3Combat Special Proc$R: ");
@@ -900,7 +900,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (k->affected)
   {
-    ch->sendln("\n\r$3Affecting Spells$R:\n\r--------------");
+    ch->sendln("\r\n$3Affecting Spells$R:\r\n--------------");
     for (aff = k->affected; aff; aff = aff->next)
     {
 
@@ -995,13 +995,13 @@ void obj_stat(Character *ch, class Object *j)
   strcat(buf, "\r\n");
   ch->send(buf);
 
-  sprintf(buf, "$3Short description$R: %s\n\r$3Long description$R:\n\r%s\r\n",
+  sprintf(buf, "$3Short description$R: %s\r\n$3Long description$R:\r\n%s\r\n",
           ((j->short_description) ? j->short_description : "None"),
           ((j->long_description) ? j->long_description : "None"));
   ch->send(buf);
   if (j->ex_description)
   {
-    strcpy(buf, "$3Extra description keyword(s)$R:\n\r----------\r\n");
+    strcpy(buf, "$3Extra description keyword(s)$R:\r\n----------\r\n");
     for (desc = j->ex_description; desc; desc = desc->next)
     {
       strcat(buf, desc->keyword);
@@ -1098,7 +1098,7 @@ void obj_stat(Character *ch, class Object *j)
     int get_weapon_damage_type(class Object * wielded);
     its = get_weapon_damage_type(j) - 1000;
     extern char *strs_damage_types[];
-    sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d (%s)",
+    sprintf(buf, "$3Unused(v1)$R: %d (make 0)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
             j->obj_flags.value[2],
@@ -1109,14 +1109,14 @@ void obj_stat(Character *ch, class Object *j)
     sprintf(buf, "Interval(v1): %d\r\nInterval, again(v2): %d", j->obj_flags.value[0], j->obj_flags.value[1]);
     break;
   case ITEM_FIREWEAPON:
-    sprintf(buf, "$3Tohit(v1)$R: %d\n\r$3Todam(v2)d<v3)$R: %dD%d\n\r$3Type(v4)$R: %d",
+    sprintf(buf, "$3Tohit(v1)$R: %d\r\n$3Todam(v2)d<v3)$R: %dD%d\r\n$3Type(v4)$R: %d",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
             j->obj_flags.value[2],
             j->obj_flags.value[3]);
     break;
   case ITEM_MISSILE:
-    sprintf(buf, "$3Damage(v1dv2)$R: %d$3/$R%d\n\r$3Tohit(v3)$R: %d\n\r$3Todam(v4)$R: %d",
+    sprintf(buf, "$3Damage(v1dv2)$R: %d$3/$R%d\r\n$3Tohit(v3)$R: %d\r\n$3Todam(v4)$R: %d",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
             j->obj_flags.value[3],
@@ -1287,7 +1287,7 @@ void obj_stat(Character *ch, class Object *j)
   }
   ch->send(buf);
 
-  strcpy(buf, "\n\r$3Equipment Status$R: ");
+  strcpy(buf, "\r\n$3Equipment Status$R: ");
   if (!j->carried_by)
     strcat(buf, "NONE");
   else
@@ -1307,7 +1307,7 @@ void obj_stat(Character *ch, class Object *j)
   }
   ch->send(buf);
 
-  strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
+  strcpy(buf, "\r\n$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
     strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
   else
@@ -1533,7 +1533,7 @@ int do_echo(Character *ch, char *argument, cmd_t cmd)
 
   else
   {
-    sprintf(buf, "\n\r%s\r\n", argument + i);
+    sprintf(buf, "\r\n%s\r\n", argument + i);
     for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       vict->send(buf);
   }

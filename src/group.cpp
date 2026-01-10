@@ -482,12 +482,12 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
           GET_SHORT(new_new_leader));
   ch->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\n\r%s appoints YOU as "
+  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints YOU as "
                "the New Leader of: %s\r\n",
           GET_SHORT(ch), ch->group_name,
           GET_SHORT(ch), ch->group_name);
   new_new_leader->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\n\r%s appoints %s as "
+  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints %s as "
                "the New Leader of: %s",
           GET_SHORT(ch), ch->group_name,
           GET_SHORT(ch), GET_SHORT(new_new_leader), ch->group_name);

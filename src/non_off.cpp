@@ -223,7 +223,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       {
         REMBIT(ch->affected_by, AFF_CHAMPION);
 
-        sprintf(buf, "\n\r##%s has just yielded %s!\r\n", GET_NAME(ch), obj->short_description);
+        sprintf(buf, "\r\n##%s has just yielded %s!\r\n", GET_NAME(ch), obj->short_description);
         send_info(buf);
 
         struct affected_type af;
@@ -1389,10 +1389,10 @@ void CVoteData::DisplayVote(Character *ch)
   int i = 1;
   if (vote_question.empty())
   {
-    ch->send("\n\rSorry! There are no active votes right now!\r\n\r\n");
+    ch->send("\r\nSorry! There are no active votes right now!\r\n\r\n");
     return;
   }
-  ch->send("\n\r--Current Vote Infortmation--\n\rTo vote, type \"vote #\".\r\n"
+  ch->send("\r\n--Current Vote Infortmation--\r\nTo vote, type \"vote #\".\r\n"
            "Enter \"vote results\" to see the current voting demographics.\r\n\r\n");
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   ch->send(buf);
@@ -1443,7 +1443,7 @@ void CVoteData::StartVote(Character *ch)
   }
 
   ch->sendln("$4**MAKE SURE YOU VOTESET CLEAR IF THIS IS A NEW VOTE!**$R");
-  send_info("\n\r##Attention! There is now a vote in progress!\n\r##Type Vote for more information!\r\n");
+  send_info("\r\n##Attention! There is now a vote in progress!\r\n##Type Vote for more information!\r\n");
 
   active = true;
   OutToFile();
@@ -1460,7 +1460,7 @@ void CVoteData::EndVote(Character *ch)
 
   active = false;
   OutToFile();
-  send_info("\n\r##The vote has ended! Type \"Vote Results\" to see the results!\r\n");
+  send_info("\r\n##The vote has ended! Type \"Vote Results\" to see the results!\r\n");
 }
 
 void CVoteData::AddAnswer(Character *ch, std::string answer)

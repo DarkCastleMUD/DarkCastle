@@ -285,9 +285,9 @@ void save_clans(void)
 
     // BLAH TEMP CODE THIS BLOWS
     // What's happening is apparently fedora's fprintf doesn't strip out
-    // \r's like Redhat's does.  So we're writing \n\r to files.  This is
+    // \r's like Redhat's does.  So we're writing \r\n to files.  This is
     // bad because when we read it in, fread_string replaces \n with a
-    // \n\r.  So we get \n\r\r.   After a while, this is really bad.
+    // \r\n.  So we get \n\r\r.   After a while, this is really bad.
     // So this is some crap code to strip out \r's before we save
     // I just did this REALLY fast so please rewrite this
     // Does it for L X O too but C and D were the hardcore ones so i temp
@@ -1704,7 +1704,7 @@ void do_clan_rights(Character *ch, char *arg)
 
   if (!*last)
   { // diag
-    sprintf(buf, "Rights for %s:\n\r-------------\r\n", pmember->NameC());
+    sprintf(buf, "Rights for %s:\r\n-------------\r\n", pmember->NameC());
     ch->send(buf);
     for (bit = 0; *clan_rights[bit] != '\n'; bit++)
     {
@@ -2598,7 +2598,7 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
         return eSUCCESS;
       }
 
-      sprintf(buf, "Rights for %s:\n\r-------------\r\n", pmember->NameC());
+      sprintf(buf, "Rights for %s:\r\n-------------\r\n", pmember->NameC());
       ch->send(buf);
       for (bit = 0; *clan_rights[bit] != '\n'; bit++)
       {

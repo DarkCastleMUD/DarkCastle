@@ -173,7 +173,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 
 	if (type == TP_ERROR)
 	{
-		send_to_char("Syntax:\n\rstring ('obj'|'char') <name> <field>"
+		send_to_char("Syntax:\r\nstring ('obj'|'char') <name> <field>"
 					 " [<string>].\r\n",
 					 ch);
 		return 1;
