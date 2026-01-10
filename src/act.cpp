@@ -29,7 +29,7 @@ extern bool MOBtrigger;
 
 act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
-  return act(str.toStdString().c_str(), ch, obj, vict_obj, destination, flags);
+  return act(qPrintable(str), ch, obj, vict_obj, destination, flags);
 }
 
 act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)

@@ -272,7 +272,7 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
 	}
 
 	Connection d;
-	if (!load_char_obj(&d, username.toStdString().c_str()))
+	if (!load_char_obj(&d, qPrintable(username)))
 	{
 		return false;
 	}
@@ -283,7 +283,7 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
 	}
 
 	QString cipher = d.character->player->pwd;
-	if (crypt(password.toStdString().c_str(), cipher.toStdString().c_str()) == cipher)
+	if (crypt(password.toStdString().c_str(), qPrintable(cipher)) == cipher)
 	{
 		if (d.character->getLevel() >= level)
 		{

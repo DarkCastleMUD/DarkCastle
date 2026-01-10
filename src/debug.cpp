@@ -50,7 +50,7 @@ void test_handle_ansi(QString test)
   QString str1 = test;
   char *str2 = new char[1024];
   memset(str2, 1024, 0);
-  strncpy(str2, str1.toStdString().c_str(), 1024);
+  strncpy(str2, qPrintable(str1), 1024);
   QString result1 = handle_ansi(str1, ch);
   QString result2 = QString(handle_ansi_(str2, ch));
   // std::cerr <<  "Result1: [" << result1 << "]" << std::endl;
@@ -398,7 +398,7 @@ int main(int argc, char **argv)
               // std::cerr << pfile.path().c_str() << std::endl;
               ch->do_linkload(path.split(' '), cmd_t::DEFAULT);
               d->process_output();
-              do_fsave(ch, path.toStdString().c_str());
+              do_fsave(ch, qPrintable(path));
               d->process_output();
             }
             else

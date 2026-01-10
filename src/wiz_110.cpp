@@ -259,20 +259,20 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
-    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), DC::bestowable_god_commands[i].name.toStdString().c_str());
+    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
     ch->send(buf);
     return eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
   snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", GET_NAME(vict),
-           DC::bestowable_god_commands[i].name.toStdString().c_str());
+           qPrintable(DC::bestowable_god_commands[i].name));
   ch->send(buf);
   snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict),
-           DC::bestowable_god_commands[i].name.toStdString().c_str(), GET_NAME(ch));
+           qPrintable(DC::bestowable_god_commands[i].name), GET_NAME(ch));
   DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch),
-           DC::bestowable_god_commands[i].name.toStdString().c_str());
+           qPrintable(DC::bestowable_god_commands[i].name));
   vict->send(buf);
   return eSUCCESS;
 }
@@ -1024,7 +1024,7 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
         ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
         ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
 
-        if (rename(world->filename.toStdString().c_str(), potential_filename.toStdString().c_str()) == -1)
+        if (rename(world->filename.toStdString().c_str(), qPrintable(potential_filename)) == -1)
         {
           auto rename_errno = errno;
           char *errStr = strerror(rename_errno);

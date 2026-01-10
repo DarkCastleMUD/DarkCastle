@@ -23,6 +23,6 @@ void Trace::addTrack(QString source)
 
 std::ostream &operator<<(std::ostream &out, const QString &str)
 {
-    out << str.toStdString().c_str();
+    out << qPrintable(str);
     return out;
 }

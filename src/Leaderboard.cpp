@@ -2037,7 +2037,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 
 	if (DC::getInstance()->cf.leaderboard_check == "suspend")
 	{
-		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname.toStdString().c_str(), newname.toStdString().c_str());
+		DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", qPrintable(oldname), qPrintable(newname));
 	}
 	else
 	{
@@ -2049,7 +2049,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 
 		for (auto i = 0; i < lines; i++)
 		{
-			fprintf(fl, "%s~ %d\n", name[i].toStdString().c_str(), value[i]);
+			fprintf(fl, "%s~ %d\n", qPrintable(name[i]), value[i]);
 		}
 
 		fclose(fl);

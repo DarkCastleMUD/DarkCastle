@@ -146,7 +146,7 @@ void fwrite_var_string(const char *str, FILE *fpsave)
 
 void fwrite_var_string(QString str, FILE *fpsave)
 {
-  fwrite_var_string(str.toStdString().c_str(), fpsave);
+  fwrite_var_string(qPrintable(str), fpsave);
 }
 
 char *fread_var_string(FILE *fpsave)

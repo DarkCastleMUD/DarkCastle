@@ -12799,7 +12799,7 @@ int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Charac
   {
     sprintf(buf, "A %s called %s headed %s...\r\n",
             races[ptrack->race].singular_name,
-            ptrack->trackee.toStdString().c_str(),
+            qPrintable(ptrack->trackee),
             dirs[ptrack->direction]);
     ch->send(buf);
     ptrack = ptrack->next;

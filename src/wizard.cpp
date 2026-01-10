@@ -314,7 +314,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (IS_NPC(k))
   {
-    sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
+    sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
     sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
   }
   else
@@ -338,7 +338,7 @@ void boro_mob_stat(Character *ch, Character *k)
           GET_KI(k), ki_limit(k),
           /* end of second line */
 
-          (k->hunting.isEmpty() ? "NOBODY" : k->hunting.toStdString().c_str()),
+          (k->hunting.isEmpty() ? "NOBODY" : qPrintable(k->hunting)),
           GET_WEIGHT(k),
           k->alignment);
 
@@ -825,13 +825,13 @@ command_return_t mob_stat(Character *ch, Character *k)
           k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
   ch->send(buf);
 
-  sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting.isEmpty()) ? "NOBODY" : k->hunting.toStdString().c_str()));
+  sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting.isEmpty()) ? "NOBODY" : qPrintable(k->hunting)));
   ch->send(buf);
 
   if (IS_NPC(k))
   {
     sprintf(buf, "$3Hates$R: '%s'\n\r",
-            (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
+            (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
     ch->send(buf);
 
     sprintf(buf, "$3Fears$R: '%s'\n\r",

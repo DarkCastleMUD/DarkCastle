@@ -2941,7 +2941,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 
 	act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
 	auto new_hate = target->get_random_hate();
-	sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
+	sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), new_hate.isEmpty() ? "no one!" : qPrintable(new_hate));
 	ch->send(buf);
 
 	if (skill > 80)

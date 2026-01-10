@@ -2554,7 +2554,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
             void item_remove(Object * obj, struct vault_data * vault);
             item_remove(obj, vault);
             // items->obj = 0;
-            DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
+            DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, qPrintable(vault->owner));
           }
         }
       }

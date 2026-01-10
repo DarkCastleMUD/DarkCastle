@@ -610,14 +610,14 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
       if (aff->type == Character::PLAYER_CANTQUIT)
       {
         sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\n\r",
-                scratch, aff_name.toStdString().c_str(),
+                scratch, qPrintable(aff_name),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], aff->caster.c_str());
       }
       else
       {
         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
-                scratch, aff_name.toStdString().c_str(),
+                scratch, qPrintable(aff_name),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], scratch);
       }

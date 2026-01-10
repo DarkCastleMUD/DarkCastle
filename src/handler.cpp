@@ -135,7 +135,7 @@ int isprefix(const char *str, const char *namel)
 // we need it.  Neither of them are case-sensitive....
 int isprefix(QString str, QString namel)
 {
-	return isprefix(str.toStdString().c_str(), namel.toStdString().c_str());
+	return isprefix(qPrintable(str), qPrintable(namel));
 }
 
 int isexact(QString arg, QStringList namelist)
@@ -153,7 +153,7 @@ int isexact(QString arg, QStringList namelist)
 
 int isexact(QString arg, QString namelist)
 {
-	return isexact(arg.toStdString().c_str(), namelist.toStdString().c_str());
+	return isexact(arg.toStdString().c_str(), qPrintable(namelist));
 }
 
 int isexact(QString arg, const char *namelist)
@@ -4430,8 +4430,7 @@ Character *get_active_pc(QString name)
 	return (partial_match);
 }
 
-Character *
-get_active_pc(const char *name)
+Character *get_active_pc(const char *name)
 {
 	Character *i;
 	Character *partial_match;
@@ -4484,7 +4483,7 @@ Character *get_all_pc(char *name)
 
 Character *Character::getVisiblePlayer(QString name)
 {
-	return get_pc_vis(this, name.toStdString().c_str());
+	return get_pc_vis(this, qPrintable(name));
 }
 
 Character *Character::getVisibleCharacter(QString name)
@@ -4504,7 +4503,7 @@ Character *get_pc_vis(Character *ch, std::string name)
 
 Character *get_pc_vis(Character *ch, QString name)
 {
-	return get_pc_vis(ch, name.toStdString().c_str());
+	return get_pc_vis(ch, qPrintable(name));
 }
 
 Character *get_pc_vis(Character *ch, const char *name)

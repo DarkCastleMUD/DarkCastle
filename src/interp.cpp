@@ -1127,7 +1127,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   /* special in room? */
   if (DC::getInstance()->world[in_room].funct)
   {
-    if ((retval = (*DC::getInstance()->world[in_room].funct)(this, cmd, arguments.toStdString().c_str())) != eFAILURE)
+    if ((retval = (*DC::getInstance()->world[in_room].funct)(this, cmd, qPrintable(arguments))) != eFAILURE)
       return retval;
   }
 
@@ -1136,7 +1136,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
     if (equipment[j] && equipment[j]->item_number >= 0)
       if (DC::getInstance()->obj_index[equipment[j]->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[equipment[j]->item_number].non_combat_func)(this, equipment[j], cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[equipment[j]->item_number].non_combat_func)(this, equipment[j], cmd, qPrintable(arguments), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1146,7 +1146,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
     if (i->item_number >= 0)
       if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1158,14 +1158,14 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
     {
       if (((Character *)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
-        retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
+        retval = clan_guard(this, 0, cmd, qPrintable(arguments), k);
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
       else if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       {
         retval = ((*DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
-                                                                                  cmd, arguments.toStdString().c_str(), k));
+                                                                                  cmd, qPrintable(arguments), k));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1177,7 +1177,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
     if (i->item_number >= 0)
       if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }

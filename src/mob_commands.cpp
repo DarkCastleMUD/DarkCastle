@@ -1155,7 +1155,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
 
   if (victim->has_skill(skillnum))
   {
-    csendf(victim, "You already know the basics of %s!\r\n", skillname.isEmpty() ? "Unknown" : skillname.toStdString().c_str());
+    csendf(victim, "You already know the basics of %s!\r\n", skillname.isEmpty() ? "Unknown" : qPrintable(skillname));
     return eFAILURE;
   }
 
@@ -1174,7 +1174,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!skillname.isEmpty())
-    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\n\r", skillname.toStdString().c_str());
+    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\n\r", qPrintable(skillname));
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");
@@ -1188,7 +1188,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
 
   prepare_character_for_sixty(ch);
 
-  snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", skillname.toStdString().c_str());
+  snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", qPrintable(skillname));
   act(skill, ch, 0, victim, TO_ROOM, NOTVICT);
 
   return eSUCCESS;

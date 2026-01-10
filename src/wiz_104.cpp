@@ -671,7 +671,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			break;
 		case '*':
 			sprintf(buf, "%s %s\r\n", buf,
-					zone.cmd[j]->comment.toStdString().c_str() ? zone.cmd[j]->comment.toStdString().c_str() : "Empty Comment");
+					zone.cmd[j]->comment.toStdString().c_str() ? qPrintable(zone.cmd[j]->comment) : "Empty Comment");
 			break;
 		case 'K':
 			sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
@@ -721,7 +721,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 
 		if (!zone.cmd[j]->comment.isEmpty() && zone.cmd[j]->command != '*')
 		{
-			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j]->comment.toStdString().c_str());
+			sprintf(buf, "%s       %s\r\n", buf, qPrintable(zone.cmd[j]->comment));
 		}
 
 		ch->send(buf);

@@ -495,10 +495,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				buf[i - 3] = *(left + i);
 			}
 			for (; mobTempVar; mobTempVar = mobTempVar->next)
-				if (!str_cmp(buf, mobTempVar->name.toStdString().c_str()))
+				if (!str_cmp(buf, qPrintable(mobTempVar->name)))
 					break;
 			if (mobTempVar)
-				strcpy(buf, mobTempVar->data.toStdString().c_str());
+				strcpy(buf, qPrintable(mobTempVar->data));
 
 			if (buf[0] != '\0')
 			{
@@ -1644,7 +1644,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			if (eh->name == buf1)
 				break;
 		if (eh)
-			strcpy(arg, eh->data.toStdString().c_str());
+			strcpy(arg, qPrintable(eh->data));
 	}
 
 	if (!is_number(arg) && !(arg[0] == '$') && traditional)
@@ -3825,7 +3825,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 							break;
 					if (eh)
 					{
-						strcpy(tmp, eh->data.toStdString().c_str());
+						strcpy(tmp, qPrintable(eh->data));
 						if (!eh->data.isEmpty())
 							eh->data[0] = eh->data[0].toUpper();
 					}
@@ -4039,14 +4039,14 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 			if (!reverse)
 				strcpy(temp1, mprg->arglist);
 			else
-				strcpy(temp1, arg.toStdString().c_str());
+				strcpy(temp1, qPrintable(arg));
 
 			list = temp1;
 			for (i = 0; i < (signed)strlen(list); i++)
 				list[i] = LOWER(list[i]);
 
 			if (!reverse)
-				strcpy(temp2, arg.toStdString().c_str());
+				strcpy(temp2, qPrintable(arg));
 			else
 				strcpy(temp2, mprg->arglist);
 

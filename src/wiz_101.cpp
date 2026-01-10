@@ -814,7 +814,7 @@ int do_varstat(Character *ch, char *argument, cmd_t cmd)
   for (eh = vict->tempVariable; eh; eh = eh->next)
   {
     snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n",
-             eh->name.toStdString().c_str(), eh->data.toStdString().c_str());
+             qPrintable(eh->name), qPrintable(eh->data));
     ch->send(buf);
   }
   if (buf[0] == '\0')

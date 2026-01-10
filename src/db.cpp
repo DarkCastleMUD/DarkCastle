@@ -997,7 +997,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
 		 temp = read_next_worldfile_name(flMobIndex))
 	{
 		strcpy(endfile, "mobs/");
-		strcat(endfile, temp.toStdString().c_str());
+		strcat(endfile, qPrintable(temp));
 
 		DC::config &cf = DC::getInstance()->cf;
 
@@ -1305,7 +1305,7 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
 		 temp = read_next_worldfile_name(flObjIndex))
 	{
 		strcpy(endfile, "objects/");
-		strcat(endfile, temp.toStdString().c_str());
+		strcat(endfile, qPrintable(temp));
 		logverbose(temp);
 
 		if (!(fl = fopen(endfile, "r")))
@@ -1988,7 +1988,7 @@ void DC::boot_world(void)
 		 temp = read_next_worldfile_name(flWorldIndex))
 	{
 		strcpy(endfile, "world/");
-		strcat(endfile, temp.toStdString().c_str());
+		strcat(endfile, qPrintable(temp));
 
 		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
@@ -2272,24 +2272,24 @@ void Zone::write(FILE *fl)
 	for (int i = 0; i < cmd.size(); i++)
 	{
 		if (cmd[i]->command == '*')
-			fprintf(fl, "* %s\n", cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+			fprintf(fl, "* %s\n", qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
 		else if (cmd[i]->command == '%')
 			fprintf(fl, "%% %2d %3d %3d %s\n", cmd[i]->if_flag,
 					cmd[i]->arg1,
 					cmd[i]->arg2,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		else if (cmd[i]->command == 'X')
 			fprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i]->if_flag,
 					cmd[i]->arg1,
 					cmd[i]->arg2,
 					cmd[i]->arg3,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		else if (cmd[i]->command == 'K')
 			fprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i]->if_flag,
 					cmd[i]->arg1,
 					cmd[i]->arg2,
 					cmd[i]->arg3,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		else if (cmd[i]->command == 'M')
 		{
 			int virt = cmd[i]->active ? DC::getInstance()->mob_index[cmd[i]->arg1].virt : cmd[i]->arg1;
@@ -2297,7 +2297,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i]->arg2,
 					cmd[i]->arg3,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		}
 		else if (cmd[i]->command == 'P')
 		{
@@ -2307,7 +2307,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i]->arg2,
 					virt2,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		}
 		else if (cmd[i]->command == 'G')
 		{
@@ -2317,7 +2317,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i]->arg2,
 					cmd[i]->arg3,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		}
 		else if (cmd[i]->command == 'O')
 		{
@@ -2326,7 +2326,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i]->arg2,
 					cmd[i]->arg3,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		}
 		else if (cmd[i]->command == 'E')
 		{
@@ -2335,7 +2335,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i]->arg2,
 					cmd[i]->arg3,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 		}
 		else
 			fprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i]->command,
@@ -2343,7 +2343,7 @@ void Zone::write(FILE *fl)
 					cmd[i]->arg1,
 					cmd[i]->arg2,
 					cmd[i]->arg3,
-					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? qPrintable(cmd[i]->comment) : "");
 	}
 
 	fprintf(fl, "S\n$~\n");
@@ -2543,7 +2543,7 @@ void DC::boot_zones(void)
 		 temp = read_next_worldfile_name(flZoneIndex))
 	{
 		strcpy(endfile, "zonefiles/");
-		strcat(endfile, temp.toStdString().c_str());
+		strcat(endfile, qPrintable(temp));
 
 		if (cf.verbose_mode)
 		{

@@ -278,7 +278,7 @@ int str_nosp_cmp(const char *arg1, const char *arg2)
 // Tested in TestUtility::test_str_nosp_cmp_qtring
 int str_nosp_cmp(QString arg1, QString arg2)
 {
-  return str_nosp_cmp(arg1.toStdString().c_str(), arg2.toStdString().c_str());
+  return str_nosp_cmp(arg1.toStdString().c_str(), qPrintable(arg2));
 }
 
 // Tested in TestUtility::test_str_n_nosp_cmp_c_string
@@ -475,7 +475,7 @@ void DC::logentry(QString str, uint64_t god_level, DC::LogChannel type, Characte
 
   if (stream != STDIN_FILENO)
   {
-    fprintf(*f, "%s :: %s\n", tmstr, str.toStdString().c_str());
+    fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
     fclose(*f);
   }
 
@@ -2444,17 +2444,17 @@ void remove_character(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], qPrintable(name));
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], qPrintable(name));
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2472,11 +2472,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], qPrintable(name));
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], qPrintable(name));
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2521,13 +2521,13 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
   for (int i = 0; i < MAX_GOLEMS; i++)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, name.toStdString().c_str()[0], name.toStdString().c_str(), i);
+    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(name)[0], qPrintable(name), i);
 
     if (0 == stat(src_filename, &statbuf))
     {

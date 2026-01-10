@@ -977,7 +977,7 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
     ch->sendln("Reply what?");
     if ((vict = get_char(ch->player->last_tell)) && CAN_SEE(ch, vict))
     {
-      ch->send(fmt::format("Last tell was from {}.\r\n", ch->player->last_tell.toStdString().c_str()));
+      ch->send(fmt::format("Last tell was from {}.\r\n", qPrintable(ch->player->last_tell)));
     }
     else
     {
@@ -987,7 +987,7 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
     return eSUCCESS;
   }
 
-  buf = fmt::format("{} {}", ch->player->last_tell.toStdString().c_str(), argument);
+  buf = fmt::format("{} {}", qPrintable(ch->player->last_tell), argument);
   ch->do_tell(QString(buf.c_str()).split(' '), cmd_t::TELL_REPLY);
   return eSUCCESS;
 }
