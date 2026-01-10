@@ -2486,24 +2486,24 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 
 	if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && IS_PC(this))
 	{
-		if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || this->isPlayerObjectThief() || contains_no_trade_item(obj))
+		if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isPlayerObjectThief() || contains_no_trade_item(obj))
 		{
 			act("You are zapped by $p but it stays with you.", this, obj, 0, TO_CHAR, 0);
-			this->recheck_height_wears();
+			recheck_height_wears();
 			obj_to_char(obj, this);
-			if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
+			if (pos == WEAR_WIELD && equipment[WEAR_SECOND_WIELD])
 			{
 				equip_char(unequip_char(WEAR_SECOND_WIELD), WEAR_WIELD);
 			}
 			return 1;
 		}
-		if (this->in_room != DC::NOWHERE)
+		if (in_room != DC::NOWHERE)
 		{
 			act("You are zapped by $p and instantly drop it.", this, obj, 0, TO_CHAR, 0);
 			act("$n is zapped by $p and instantly drops it.", this, obj, 0, TO_ROOM, 0);
-			this->recheck_height_wears();
-			obj_to_room(obj, this->in_room);
-			if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
+			recheck_height_wears();
+			obj_to_room(obj, in_room);
+			if (pos == WEAR_WIELD && equipment[WEAR_SECOND_WIELD])
 			{
 				equip_char(unequip_char(WEAR_SECOND_WIELD), WEAR_WIELD);
 			}
@@ -2511,51 +2511,51 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 		}
 		else
 		{
-			DC::getInstance()->logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
+			DC::getInstance()->logentry(QStringLiteral("in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
 		}
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30010 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30010 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("$p binds to your skin and won't let go. It hurts!", this, obj, 0, TO_CHAR, 0);
 		act("$p binds to $n's skin!", this, obj, 0, TO_ROOM, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 5;
 	}
 
-	this->equipment[pos] = obj;
+	equipment[pos] = obj;
 	obj->equipped_by = this;
 	if (IS_PC(this))
 		for (qsizetype a = 0; a < obj->affected.size(); a++)
 		{
 			if (obj->affected[a].location >= 1000)
 			{
-				obj->next_skill = this->player->skillchange;
-				this->player->skillchange = obj;
+				obj->next_skill = player->skillchange;
+				player->skillchange = obj;
 				break;
 			}
 		}
 
 	if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
-		this->glow_factor++;
-		if (this->in_room > DC::NOWHERE)
-			DC::getInstance()->world[this->in_room].light++;
+		glow_factor++;
+		if (in_room > DC::NOWHERE)
+			DC::getInstance()->world[in_room].light++;
 		//  this crashes in a reconnect cause player isn't around yet
 		//  rather than fixing it, i'm leaving it out because it's annoying anyway cause
 		//  it tells you every time you save
@@ -2565,15 +2565,15 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 	}
 	if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
 	{
-		this->glow_factor++;
-		if (this->in_room > DC::NOWHERE)
-			DC::getInstance()->world[this->in_room].light++;
+		glow_factor++;
+		if (in_room > DC::NOWHERE)
+			DC::getInstance()->world[in_room].light++;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
 		GET_AC(this) -= apply_ac(this, pos);
 
-	for (j = 0; this->equipment[pos] && j < this->equipment[pos]->affected.size(); j++)
+	for (j = 0; equipment[pos] && j < equipment[pos]->affected.size(); j++)
 		affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, true, flag);
 
 	add_set_stats(this, obj, flag, pos);
@@ -5051,13 +5051,13 @@ void Character::add_memory(QString victim_name, char type)
 		else
 		{
 			// Don't put same name twice
-			if (isexact(victim_name, this->mobdata->hated))
+			if (isexact(victim_name, mobdata->hated))
 			{
 				return;
 			}
 
 			// name 1 + name 2 + a space + terminator
-			this->mobdata->hated = QStringLiteral("%1 %2").arg(mobdata->hated).arg(victim_name);
+			mobdata->hated = QStringLiteral("%1 %2").arg(mobdata->hated).arg(victim_name);
 		}
 	}
 	else if (type == 'f')

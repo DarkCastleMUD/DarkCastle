@@ -1573,7 +1573,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   if (is_number(obj_name))
   {
-    if (this->isPlayer() && isPlayerGoldThief())
+    if (isPlayer() && isPlayerGoldThief())
     {
       sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1729,7 +1729,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (this->isPlayer() && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (isPlayer() && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -1791,7 +1791,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (this->isPlayer() && isPlayerObjectThief() && !vict->desc)
+  if (isPlayer() && isPlayerObjectThief() && !vict->desc)
   {
     sendln("Now WHY would a thief give something to a linkdead char..?");
     return eFAILURE;

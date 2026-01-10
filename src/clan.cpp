@@ -1057,26 +1057,26 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
 
   if (!victim->clan)
   {
-    this->sendln("This person isn't in a clan in the first place...");
+    sendln("This person isn't in a clan in the first place...");
     return eFAILURE;
   }
 
   if (strcmp(clanPtr->leader, getNameC()) && victim != this && !has_right(this, CLAN_RIGHTS_OUTCAST))
   {
-    this->sendln("You don't have the right to outcast people from your clan!");
+    sendln("You don't have the right to outcast people from your clan!");
     return eFAILURE;
   }
 
   if (!strcmp(clanPtr->leader, victim->getNameC()))
   {
-    this->sendln("You can't outcast the clan leader!");
+    sendln("You can't outcast the clan leader!");
     return eFAILURE;
   }
 
   if (victim == this)
   {
     DC::getInstance()->logentry(QStringLiteral("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, DC::LogChannel::LOG_CLAN);
-    this->sendln("You quit your clan.");
+    sendln("You quit your clan.");
     remove_totem_stats(victim);
     victim->clan = 0;
     remove_clan_member(clan, this);
@@ -1084,9 +1084,9 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
     return eSUCCESS;
   }
 
-  if (victim->clan != this->clan)
+  if (victim->clan != clan)
   {
-    this->sendln("That person isn't in your clan!");
+    sendln("That person isn't in your clan!");
     return eFAILURE;
   }
 
@@ -2840,10 +2840,9 @@ command_return_t Character::do_cdeposit(QStringList arguments, cmd_t cmd)
 
   send(QStringLiteral("You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n").arg(dep).arg(coin));
   QString log_entry = QStringLiteral("%1 deposited %2 gold %3 in the clan bank account.\r\n").arg(name_).arg(dep).arg(coin);
-  clan_data *clan = get_clan(this->clan);
-  if (clan != nullptr)
+  if (get_clan(clan))
   {
-    clan->log(log_entry);
+    get_clan(clan)->log(log_entry);
   }
 
   return eSUCCESS;
@@ -3363,7 +3362,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
 
   if (!has_right(this, CLAN_RIGHTS_AREA) && !clanless_challenge)
   {
-    this->sendln("You have not been granted that right.");
+    sendln("You have not been granted that right.");
     return eFAILURE;
   }
 
@@ -3371,13 +3370,13 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
   {
     if (can_collect(DC::getInstance()->world[in_room].zone))
     {
-      this->sendln("There is no challenge to withdraw from.");
+      sendln("There is no challenge to withdraw from.");
       return eFAILURE;
     }
 
     if (!affected_by_spell(SKILL_CLANAREA_CHALLENGE))
     {
-      this->sendln("You did not issue the challenge, or you have waited too long to withdraw.");
+      sendln("You did not issue the challenge, or you have waited too long to withdraw.");
       return eFAILURE;
     }
 
@@ -3388,23 +3387,23 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       {
         take->clan1points += 20;
         check_victory(take);
-        this->sendln("You withdraw your challenge.");
+        sendln("You withdraw your challenge.");
         return eSUCCESS;
       }
-    this->sendln("Your did not issue this challenge.");
+    sendln("Your did not issue this challenge.");
     return eFAILURE;
   }
   else if (arg == "claim")
   {
     if (affected_by_spell(SKILL_CLANAREA_CLAIM))
     {
-      this->sendln("You need to wait before you can attempt to claim an area.");
+      sendln("You need to wait before you can attempt to claim an area.");
       return eFAILURE;
     }
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0 && !can_challenge(clan, DC::getInstance()->world[in_room].zone))
     {
-      this->sendln("You cannot claim this area right now.");
+      sendln("You cannot claim this area right now.");
       return eFAILURE;
     }
 
@@ -3417,12 +3416,12 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     }
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).isNoClaim())
     {
-      this->sendln("This area cannot be claimed.");
+      sendln("This area cannot be claimed.");
       return eFAILURE;
     }
     if (count_controlled_areas(clan) >= online_clan_members(clan))
     {
-      this->sendln("You cannot claim any more areas.");
+      sendln("You cannot claim any more areas.");
       return eFAILURE;
     }
 
@@ -3446,12 +3445,12 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
   {
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0)
     {
-      this->sendln("This zone is not under anyone's control.");
+      sendln("This zone is not under anyone's control.");
       return eFAILURE;
     }
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner != clan)
     {
-      this->sendln("This zone is not under your clan's control.");
+      sendln("This zone is not under your clan's control.");
       return eFAILURE;
     }
 
@@ -3464,7 +3463,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
         check_victory(take);
         return eSUCCESS;
       }
-    this->sendln("You yield the area on behalf of your clan.");
+    sendln("You yield the area on behalf of your clan.");
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n", get_clan(clan)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
     send_info(buf);
@@ -3476,24 +3475,24 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
   {
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0)
     {
-      this->sendln("This area is not under anyone's control.");
+      sendln("This area is not under anyone's control.");
       return eFAILURE;
     }
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner != clan)
     {
-      this->sendln("This area is not under your clan's control.");
+      sendln("This area is not under your clan's control.");
       return eFAILURE;
     }
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).gold == 0)
     {
-      this->sendln("There is no $B$5gold$R to collect.");
+      sendln("There is no $B$5gold$R to collect.");
       return eFAILURE;
     }
     if (!can_collect(DC::getInstance()->world[in_room].zone))
     {
-      this->sendln("There is currently an active challenge for this area, and collecting is not possible.");
+      sendln("There is currently an active challenge for this area, and collecting is not possible.");
       return eFAILURE;
     }
     get_clan(this)->cdeposit(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).gold);
@@ -3518,7 +3517,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
 
     if (z == 0)
     {
-      this->sendln("Your clan has not claimed any areas.");
+      sendln("Your clan has not claimed any areas.");
       return eFAILURE;
     }
     return eSUCCESS;
@@ -3527,35 +3526,35 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
   {
     if (affected_by_spell(SKILL_CLANAREA_CHALLENGE))
     {
-      this->sendln("You need to wait before you can attempt to challenge an area.");
+      sendln("You need to wait before you can attempt to challenge an area.");
       return eFAILURE;
     }
     if (level_ < 40)
     {
-      this->sendln("You must be level 40 to issue a challenge.");
+      sendln("You must be level 40 to issue a challenge.");
       return eFAILURE;
     }
 
     // most annoying one for last.
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0)
     {
-      this->sendln("This area is not under anyone's control, you could simply claim it.");
+      sendln("This area is not under anyone's control, you could simply claim it.");
       return eFAILURE;
     }
     if (!can_challenge(clan, DC::getInstance()->world[in_room].zone))
     {
-      this->sendln("You cannot issue a challenge for this area at the moment.");
+      sendln("You cannot issue a challenge for this area at the moment.");
       return eFAILURE;
     }
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == clan && !clanless_challenge)
     {
-      this->sendln("Your clan already controls this area!");
+      sendln("Your clan already controls this area!");
       return eFAILURE;
     }
 
     if (count_controlled_areas(clan) >= online_clan_members(clan) && !clanless_challenge)
     {
-      this->sendln("You cannot own any more areas.");
+      sendln("You cannot own any more areas.");
       return eFAILURE;
     }
 

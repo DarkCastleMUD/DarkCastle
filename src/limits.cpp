@@ -115,12 +115,12 @@ int Character::mana_gain_lookup(void)
 	int modifier;
 
 	if (IS_NPC(this))
-		gain = this->getLevel();
+		gain = getLevel();
 	else
 	{
 		//    gain = graf(age().year, 2,3,4,6,7,8,9);
 
-		gain = (int)(this->max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
+		gain = (int)(max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
 		switch (GET_POS(this))
 		{
 		case position_t::SLEEPING:
@@ -155,23 +155,23 @@ int Character::mana_gain_lookup(void)
 		gain += modifier;
 	}
 
-	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
+	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && getLevel() < 60)
 		gain >>= 2;
 	gain /= 4;
 	gain /= divisor;
 	gain += MIN(age().year, 100) / 5;
-	if (this->getLevel() < 50)
+	if (getLevel() < 50)
 
-		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+		gain = (int)((float)gain * (2.0 - (float)getLevel() / 50.0));
 
-	if (this->mana_regen > 0)
-		gain += this->mana_regen;
-	if (this->in_room >= 0)
-		if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+	if (mana_regen > 0)
+		gain += mana_regen;
+	if (in_room >= 0)
+		if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
 			gain = (int)(gain * 1.25);
 
-	if (this->mana_regen < 0)
-		gain += this->mana_regen;
+	if (mana_regen < 0)
+		gain += mana_regen;
 	return MAX(1, gain);
 }
 
@@ -186,7 +186,7 @@ int Character::hit_gain(position_t position, bool improve)
 	/* Neat and fast */
 	if (IS_NPC(this))
 	{
-		if (this->fighting)
+		if (fighting)
 			gain = (GET_MAX_HIT(this) / 24);
 		else
 			gain = (GET_MAX_HIT(this) / 6);
@@ -194,7 +194,7 @@ int Character::hit_gain(position_t position, bool improve)
 	/* PC's */
 	else
 	{
-		gain = (int)(this->max_hit * (float)hit_regens[GET_CLASS(this)] / 100);
+		gain = (int)(max_hit * (float)hit_regens[GET_CLASS(this)] / 100);
 
 		/* Position calculations    */
 
@@ -234,29 +234,29 @@ int Character::hit_gain(position_t position, bool improve)
 
 		gain += GET_CON(this);
 	}
-	if (ISSET(this->affected_by, AFF_REGENERATION))
+	if (ISSET(affected_by, AFF_REGENERATION))
 		gain += (gain / 2);
 
 	if (learned && (!improve || skill_success(nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 5;
 
-	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
+	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && getLevel() < 60)
 		gain >>= 2;
 
 	gain /= 4;
 	//  gain -= MIN(age().year,100) / 10;
 
 	gain /= divisor;
-	if (this->hit_regen > 0)
-		gain += this->hit_regen;
-	if (this->getLevel() < 50)
-		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+	if (hit_regen > 0)
+		gain += hit_regen;
+	if (getLevel() < 50)
+		gain = (int)((float)gain * (2.0 - (float)getLevel() / 50.0));
 
-	if (this->in_room >= 0)
-		if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+	if (in_room >= 0)
+		if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
 			gain = (int)(gain * 1.5);
-	if (this->hit_regen < 0)
-		gain += this->hit_regen;
+	if (hit_regen < 0)
+		gain += hit_regen;
 	return MAX(1, gain);
 }
 
@@ -303,25 +303,25 @@ int Character::move_gain_lookup(int extra)
 			gain += (int)(af->modifier * 1.5);
 	}
 
-	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
+	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && getLevel() < 60)
 		gain >>= 2;
 	gain /= divisor;
-	gain -= MIN(100, this->age().year) / 10;
+	gain -= MIN(100, age().year) / 10;
 
-	if (this->move_regen > 0)
-		gain += this->move_regen;
+	if (move_regen > 0)
+		gain += move_regen;
 
 	if (learned && (!improve || skill_success(nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 10;
 
-	if (this->getLevel() < 50)
-		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+	if (getLevel() < 50)
+		gain = (int)((float)gain * (2.0 - (float)getLevel() / 50.0));
 
-	if (this->in_room >= 0)
-		if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+	if (in_room >= 0)
+		if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
 			gain = (int)(gain * 1.5);
-	if (this->move_regen < 0)
-		gain += this->move_regen;
+	if (move_regen < 0)
+		gain += move_regen;
 
 	return MAX(1, gain);
 }

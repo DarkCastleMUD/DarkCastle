@@ -254,7 +254,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         return logcmd.setReturn(eFAILURE, "paralyzed");
       }
       // Character not in position for command?
-      if (GET_POS(this) == position_t::FIGHTING && !this->fighting)
+      if (GET_POS(this) == position_t::FIGHTING && !fighting)
       {
         setStanding();
       }
@@ -265,27 +265,27 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         switch (GET_POS(this))
         {
         case position_t::DEAD:
-          this->sendln("Lie still; you are DEAD.");
+          sendln("Lie still; you are DEAD.");
           return logcmd.setReturn(eFAILURE, QStringLiteral("dead < %1").arg(minimum_position_str));
           break;
         case position_t::STUNNED:
-          this->sendln("You are too stunned to do that.");
+          sendln("You are too stunned to do that.");
           return logcmd.setReturn(eFAILURE, QStringLiteral("stunned < %1").arg(minimum_position_str));
           break;
         case position_t::SLEEPING:
-          this->sendln("In your dreams, or what?");
+          sendln("In your dreams, or what?");
           return logcmd.setReturn(eFAILURE, QStringLiteral("sleeping < %1").arg(minimum_position_str));
           break;
         case position_t::RESTING:
-          this->sendln("Nah... You feel too relaxed...");
+          sendln("Nah... You feel too relaxed...");
           return logcmd.setReturn(eFAILURE, QStringLiteral("resting < %1").arg(minimum_position_str));
           break;
         case position_t::SITTING:
-          this->sendln("Maybe you should stand up first?");
+          sendln("Maybe you should stand up first?");
           return logcmd.setReturn(eFAILURE, QStringLiteral("sitting < %1").arg(minimum_position_str));
           break;
         case position_t::FIGHTING:
-          this->sendln("No way!  You are still fighting!");
+          sendln("No way!  You are still fighting!");
           return logcmd.setReturn(eFAILURE, QStringLiteral("fighting < %1").arg(minimum_position_str));
           break;
         }
@@ -302,20 +302,20 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         }
       }
 
-      if (IS_NPC(this) && this->desc && this->desc->original && this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
+      if (IS_NPC(this) && desc && desc->original && desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
       {
-        this->sendln("The spirit cannot perform that action.");
+        sendln("The spirit cannot perform that action.");
         return logcmd.setReturn(eFAILURE, QStringLiteral("spirit not allowed"));
       }
       /*
       if (IS_AFFECTED(this, AFF_HIDE)) {
         if (found->toggle_hide == 0) {
-          REMBIT(this->affected_by, AFF_HIDE);
+          REMBIT(affected_by, AFF_HIDE);
           sprintf(buf, "You emerge from your hidden position...\r\n");
           act(buf, this, 0, 0, TO_CHAR, 0);
           }
-        if ((found->toggle_hide > 1) && (number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
-          REMBIT(this->affected_by, AFF_HIDE);
+        if ((found->toggle_hide > 1) && (number(1, has_skill( SKILL_HIDE)) < found->toggle_hide)) {
+          REMBIT(affected_by, AFF_HIDE);
           sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
           act(buf, this, 0, 0, TO_CHAR, 0);
           }
@@ -324,7 +324,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       if (!can_use_command(found->getNumber()))
       {
-        this->sendln("You are still recovering from your last attempt.");
+        sendln("You are still recovering from your last attempt.");
         return logcmd.setReturn(eFAILURE, QStringLiteral("still recovering"));
       }
 
@@ -447,7 +447,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   // If we're at this point, Paralyze stops everything so get out.
   if (IS_AFFECTED(this, AFF_PARALYSIS))
   {
-    this->sendln("You've been paralyzed and are unable to move.");
+    sendln("You've been paralyzed and are unable to move.");
     return logcmd.setReturn(eFAILURE, QStringLiteral("paralyzed"));
   }
   // Check social table
@@ -460,7 +460,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   }
 
   // Unknown command (or char too low level)
-  this->sendln("Huh?");
+  sendln("Huh?");
   return logcmd.setReturn(eSUCCESS, QStringLiteral("eSUCCESS"));
 }
 
@@ -1133,10 +1133,10 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
 
   /* special in equipment list? */
   for (j = 0; j <= (MAX_WEAR - 1); j++)
-    if (equipment[j] && this->equipment[j]->item_number >= 0)
-      if (DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)
+    if (equipment[j] && equipment[j]->item_number >= 0)
+      if (DC::getInstance()->obj_index[equipment[j]->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[equipment[j]->item_number].non_combat_func)(this, equipment[j], cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1152,7 +1152,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       }
 
   /* special in mobile present? */
-  for (k = DC::getInstance()->world[this->in_room].people; k; k = k->next_in_room)
+  for (k = DC::getInstance()->world[in_room].people; k; k = k->next_in_room)
   {
     if (IS_NPC(k))
     {
@@ -1173,7 +1173,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   }
 
   /* special in object present? */
-  for (i = DC::getInstance()->world[this->in_room].contents; i; i = i->next_content)
+  for (i = DC::getInstance()->world[in_room].contents; i; i = i->next_content)
     if (i->item_number >= 0)
       if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {

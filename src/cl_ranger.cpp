@@ -260,7 +260,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
   learned = how_deep = ((has_skill(SKILL_TRACK) / 10) + 1);
 
-  if (this->getLevel() >= IMMORTAL)
+  if (getLevel() >= IMMORTAL)
     how_deep = 50;
 
   quarry = get_char_room_vis(victim);
@@ -271,7 +271,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      this->sendln("You have found your target!");
+      sendln("You have found your target!");
       ansi_color(NTEXT, this);
 
       //      remove_memory(this, 't');
@@ -281,14 +281,14 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
   else if (quarry)
   {
-    this->sendln("There's one right here ;)");
+    sendln("There's one right here ;)");
     //  remove_memory(this, 't');
     return eSUCCESS;
   }
 
-  if (!victim.isEmpty() && IS_PC(this) && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && this->getLevel() < ANGEL)
+  if (!victim.isEmpty() && IS_PC(this) && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && getLevel() < ANGEL)
   {
-    this->sendln("Only a ranger could track someone by name.");
+    sendln("Only a ranger could track someone by name.");
     return eFAILURE;
   }
 
@@ -296,7 +296,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, TO_ROOM, INVIS_NULL);
-  this->sendln("You search for signs of your quarry...\n\r");
+  sendln("You search for signs of your quarry...\n\r");
 
   if (learned)
     skill_increase_check(SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
@@ -304,24 +304,24 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
   // That way possessing imms can track.
-  if (IS_NPC(this) && ISSET(this->mobdata->actflags, ACT_STUPID))
+  if (IS_NPC(this) && ISSET(mobdata->actflags, ACT_STUPID))
   {
-    this->sendln("Being stupid, you cannot find any..");
+    sendln("Being stupid, you cannot find any..");
     return eFAILURE;
   }
 
-  if (DC::getInstance()->world[this->in_room].nTracks < 1)
+  if (DC::getInstance()->world[in_room].nTracks < 1)
   {
     if (!hunting.isEmpty())
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      this->sendln("You have lost the trail.");
+      sendln("You have lost the trail.");
       ansi_color(NTEXT, this);
       // remove_memory(this, 't');
     }
     else
-      this->sendln("There are no distinct scents here.");
+      sendln("There are no distinct scents here.");
     return eFAILURE;
   }
 
@@ -333,18 +333,18 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     for (x = 1; x <= how_deep; x++)
     {
 
-      if ((x > DC::getInstance()->world[this->in_room].nTracks) ||
-          !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
+      if ((x > DC::getInstance()->world[in_room].nTracks) ||
+          !(pScent = DC::getInstance()->world[in_room].TrackItem(x)))
       {
         if (!hunting.isEmpty())
         {
           ansi_color(RED, this);
           ansi_color(BOLD, this);
-          this->sendln("You have lost the trail.");
+          sendln("You have lost the trail.");
           ansi_color(NTEXT, this);
         }
         else
-          this->sendln("You can't find any traces of such a scent.");
+          sendln("You can't find any traces of such a scent.");
         //         remove_memory(this, 't');
         if (IS_NPC(this))
           swap_hate_memory();
@@ -354,7 +354,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
       if (isexact(victim, pScent->trackee))
       {
         y = pScent->direction;
-        this->add_memory(pScent->trackee, 't');
+        add_memory(pScent->trackee, 't');
         ansi_color(RED, this);
         ansi_color(BOLD, this);
         csendf(this, "You sense traces of your quarry to the %s.\r\n",
@@ -366,7 +366,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
           // temp disable tracking mobs into town
           if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
           {
-            this->mobdata->last_direction = y;
+            mobdata->last_direction = y;
             auto cmd_dir = getCommandFromDirection(y);
             if (cmd_dir)
             {
@@ -390,7 +390,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             return eFAILURE;
           if (!(get_char_room_vis(hunting)))
           {
-            if (tmp_ch->in_room == this->in_room)
+            if (tmp_ch->in_room == in_room)
             {
               // The mob can't see him
               act("$n says 'Damn, must have lost $M!'", this, 0, tmp_ch,
@@ -400,7 +400,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             return eFAILURE;
           }
 
-          if (!isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
+          if (!isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
           {
             act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
                 this, 0, 0, TO_ROOM, 0);
@@ -409,7 +409,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             {
               retval = mprog_attack_trigger(this, tmp_ch);
             }
-            if (SOMEONE_DIED(retval) || (this && this->fighting) || !!hunting.isEmpty())
+            if (SOMEONE_DIED(retval) || (this && fighting) || !!hunting.isEmpty())
               return retval;
             else
               return do_hit(hunting.split(' '));
@@ -427,11 +427,11 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      this->sendln("You have lost the trail.");
+      sendln("You have lost the trail.");
       ansi_color(NTEXT, this);
     }
     else
-      this->sendln("You can't find any traces of such a scent.");
+      sendln("You can't find any traces of such a scent.");
 
     //    remove_memory(this, 't');
     return eFAILURE;
@@ -439,10 +439,10 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
   for (x = 1; x <= how_deep; x++)
   {
-    if ((x > DC::getInstance()->world[this->in_room].nTracks) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
+    if ((x > DC::getInstance()->world[in_room].nTracks) || !(pScent = DC::getInstance()->world[in_room].TrackItem(x)))
     {
       if (x == 1)
-        this->sendln("There are no distinct smells here.");
+        sendln("There are no distinct smells here.");
       break;
     }
 
@@ -498,7 +498,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
       strcpy(sex, "");
 
     if (x == 1)
-      this->sendln("Freshest scents first...");
+      sendln("Freshest scents first...");
 
     sprintf(buf, "The scent of a%s%s%s%s leads %s.\r\n",
             weight,
@@ -506,7 +506,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             sex,
             race,
             dirs[y]);
-    this->send(buf);
+    send(buf);
   }
   return eSUCCESS;
 }

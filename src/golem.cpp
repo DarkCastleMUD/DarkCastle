@@ -261,22 +261,22 @@ void Character::load_golem_data(int golemtype)
   char file[200];
   FILE *fpfile = nullptr;
   Character *golem;
-  if (IS_NPC(this) || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
+  if (IS_NPC(this) || (GET_CLASS(this) != CLASS_MAGIC_USER && getLevel() < OVERSEER) || player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, this->getNameC()[0], this->getNameC(), golemtype);
+  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, getNameC()[0], getNameC(), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
     golem = dc_->clone_mobile(real_mobile(8));
     set_golem(golem, golemtype);
-    golem->alignment = this->alignment;
-    this->player->golem = golem;
+    golem->alignment = alignment;
+    player->golem = golem;
     return;
   }
   golem = dc_->clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
-  this->player->golem = golem;
+  player->golem = golem;
   uint8_t golem_level{};
   fread(&(golem_level), sizeof(golem_level), 1, fpfile);
   golem->setLevel(golem_level);

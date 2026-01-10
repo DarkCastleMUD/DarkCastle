@@ -91,18 +91,18 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 {
   Character *victim;
 
-  if (!this->desc)
+  if (!desc)
     return eFAILURE;
 
   if (IS_NPC(this))
   {
-    this->send("Did you ever try this before?");
+    send("Did you ever try this before?");
     return eFAILURE;
   }
 
   if (!has_skill(COMMAND_SNOOP))
   {
-    this->sendln("Huh?");
+    sendln("Huh?");
     return eFAILURE;
   }
 
@@ -110,7 +110,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    this->sendln("Snoop whom?");
+    sendln("Snoop whom?");
     return eFAILURE;
   }
 
@@ -119,25 +119,25 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
     send_to_char("Your victim is either not available or "
                  "linkdead.\r\n",
                  this);
-    this->sendln("(You can only snoop a link-active pc.)");
+    sendln("(You can only snoop a link-active pc.)");
     return eFAILURE;
   }
-  if ((victim->getLevel() > this->getLevel()) && (GET_NAME(this) != victim->getNameC()))
+  if ((victim->getLevel() > getLevel()) && (GET_NAME(this) != victim->getNameC()))
   {
-    this->sendln("Can't do that. That mob is higher than you!");
+    sendln("Can't do that. That mob is higher than you!");
     DC::getInstance()->logentry(QStringLiteral("%1 tried to snoop a higher mob\n\r").arg(GET_NAME(this)), OVERSEER, DC::LogChannel::LOG_GOD);
     return eFAILURE;
   }
 
   if (victim == this)
   {
-    this->sendln("Ok, you just snoop yourself.");
-    if (this->desc->snooping)
+    sendln("Ok, you just snoop yourself.");
+    if (desc->snooping)
     {
-      this->desc->snooping->snoop_by = 0;
-      this->desc->snooping = 0;
+      desc->snooping->snoop_by = 0;
+      desc->snooping = 0;
     }
-    DC::getInstance()->logentry(QStringLiteral("%1 snoops themself.").arg(getName()), this->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(QStringLiteral("%1 snoops themself.").arg(getName()), getLevel(), DC::LogChannel::LOG_GOD);
     return eSUCCESS;
   }
 
@@ -166,11 +166,11 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   sendln("Ok.");
 
-  if (this->desc->snooping)
-    this->desc->snooping->snoop_by = nullptr;
+  if (desc->snooping)
+    desc->snooping->snoop_by = nullptr;
 
-  this->desc->snooping = victim->desc;
-  victim->desc->snoop_by = this->desc;
+  desc->snooping = victim->desc;
+  victim->desc->snoop_by = desc;
   DC::getInstance()->logentry(QStringLiteral("%1 snoops %2.").arg(getName()).arg(victim->getName()), getLevel(), DC::LogChannel::LOG_GOD);
   return eSUCCESS;
 }

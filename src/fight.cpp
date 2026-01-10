@@ -7575,7 +7575,7 @@ command_return_t Character::check_pursuit(Character *victim, QString dircommand)
   if (victim == 0 || IS_NPC(this) || !affected_by_spell(SKILL_PURSUIT))
     return eFAILURE;
 
-  int pursuit = this->has_skill(SKILL_PURSUIT);
+  int pursuit = has_skill(SKILL_PURSUIT);
   if (number(1, 100) > pursuit)
   {
     // failure
@@ -7592,7 +7592,7 @@ command_return_t Character::check_pursuit(Character *victim, QString dircommand)
     act("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", this, 0, victim, TO_CHAR, 0);
     act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, TO_ROOM, NOTVICT);
 
-    int retval = this->command_interpreter(dircommand);
+    int retval = command_interpreter(dircommand);
     if (isSet(retval, eCH_DIED))
       return eSUCCESS;
 
@@ -7786,16 +7786,16 @@ void Character::send(QString buffer)
 
 void Character::sendRaw(std::string buffer)
 {
-  if (this->desc != nullptr)
+  if (desc != nullptr)
   {
-    this->desc->allowColor = 0;
+    desc->allowColor = 0;
   }
 
-  this->send(buffer);
+  send(buffer);
 
-  if (this->desc != nullptr)
+  if (desc != nullptr)
   {
-    this->desc->allowColor = 1;
+    desc->allowColor = 1;
   }
 }
 

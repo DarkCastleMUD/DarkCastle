@@ -86,12 +86,12 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
 
   if (!arg1.isEmpty())
   {
-    victim = this->get_char_room_vis(arg1);
+    victim = get_char_room_vis(arg1);
     if (victim)
     {
       if (victim == this)
       {
-        this->sendln("You hit yourself..OUCH!.");
+        sendln("You hit yourself..OUCH!.");
         act("$n hits $mself, and says OUCH!",
             this, 0, victim, TO_ROOM, 0);
       }
@@ -100,7 +100,7 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
         if (!can_attack(this) || !can_be_attacked(this, victim))
           return eFAILURE;
 
-        if (IS_AFFECTED(this, AFF_CHARM) && (this->master == victim))
+        if (IS_AFFECTED(this, AFF_CHARM) && (master == victim))
         {
           act("$N is just such a good friend, you simply can't hit $M.",
               this, 0, victim, TO_CHAR, 0);
@@ -108,7 +108,7 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
         }
 
         if ((GET_POS(this) == position_t::STANDING) &&
-            (victim != this->fighting))
+            (victim != fighting))
         {
 
           for (k = combat_list; k; k = next_char)
@@ -119,7 +119,7 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
           }
           /*
           if (count >= 6) {
-                  this->send("You can't get close enough to do anything.");
+                  send("You can't get close enough to do anything.");
             return eFAILURE;
           }
           */
@@ -127,14 +127,14 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
           return attack(this, victim, TYPE_UNDEFINED);
         }
         else
-          this->sendln("You do the best you can!");
+          sendln("You do the best you can!");
       }
     }
     else
-      this->sendln("They aren't here.");
+      sendln("They aren't here.");
   }
   else
-    this->sendln("Hit whom?");
+    sendln("Hit whom?");
   return eFAILURE;
 }
 
@@ -385,7 +385,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
 
   if (!victim->fighting)
   {
-    this->sendln("But they're not fighting anyone.");
+    sendln("But they're not fighting anyone.");
     return eFAILURE;
   }
 

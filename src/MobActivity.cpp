@@ -194,7 +194,7 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
       if (isPathConnected(pa->p))
       {
         struct path_data *t;
-        for (t = this->p; t; t = t->next)
+        for (t = p; t; t = t->next)
           if (t->p == pa->p)
             t->num++;
       }
@@ -508,7 +508,7 @@ int Path::connectRoom(class Path *z)
 {
   struct path_data *pa;
 
-  for (std::map<int, int>::iterator iter = this->begin(); iter != this->end(); iter++)
+  for (std::map<int, int>::iterator iter = begin(); iter != end(); iter++)
     for (pa = DC::getInstance()->world[(*iter).first].paths; pa; pa = pa->next)
       if (pa->p == z)
         return (*iter).first;

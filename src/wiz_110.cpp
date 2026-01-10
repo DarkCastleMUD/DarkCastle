@@ -149,7 +149,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
   Character *victim = get_pc_vis(this, name);
   if (!victim)
   {
-    this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
+    sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
     return eSUCCESS;
   }
 
@@ -162,11 +162,11 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (!bgc.testcmd)
       {
-        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
+        sendln(QStringLiteral("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
-    this->sendln("");
+    sendln("");
     send_to_char("Test Command           Has command?\r\n"
                  "-----------------------------------\r\n\r\n",
                  this);
@@ -174,7 +174,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (bgc.testcmd)
       {
-        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
+        sendln(QStringLiteral("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
@@ -185,22 +185,22 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 
   if (!bc.has_value())
   {
-    this->sendln(QStringLiteral("There is no god command named '%1'.").arg(command));
+    sendln(QStringLiteral("There is no god command named '%1'.").arg(command));
     return eSUCCESS;
   }
 
   // if has
   if (victim->has_skill(bc->num))
   {
-    this->sendln(QStringLiteral("%1 already has that command.").arg(victim->getName()));
+    sendln(QStringLiteral("%1 already has that command.").arg(victim->getName()));
     return eSUCCESS;
   }
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  DC::getInstance()->logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), DC::LogChannel::LOG_GOD);
-  this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
-  this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
+  DC::getInstance()->logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), getLevel(), DC::LogChannel::LOG_GOD);
+  sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
+  sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
   return eSUCCESS;
 }
 
@@ -573,7 +573,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   if (!(victim = get_pc(newname)))
   {
-    this->sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
+    sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
     return eFAILURE;
   }
   do_name(victim, " %");
@@ -585,7 +585,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     clan_data *tc = get_clan(clan);
     victim->clan = clan;
     add_clan_member(tc, victim);
-    if ((pmember = get_member(victim->getName(), this->clan)))
+    if ((pmember = get_member(victim->getName(), clan)))
       pmember->Rights(rights);
     add_totem_stats(victim);
   }

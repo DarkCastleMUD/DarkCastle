@@ -212,7 +212,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
 
    // Don't show NO_NOTICE items in a room with "look" unless they have holylite
    if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE) &&
-       (this->player && !this->player->holyLite))
+       (player && !player->holyLite))
       return;
 
    buffer[0] = '\0';
@@ -229,7 +229,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
          {
             strncpy(buffer, "There is something written upon it:\n\r\n\r", sizeof(buffer) - 1);
             strncat(buffer, object->ActionDescription().toStdString().c_str(), sizeof(buffer) - 1);
-            page_string(this->desc, buffer, 1);
+            page_string(desc, buffer, 1);
          }
          else
             act("It's blank.", this, 0, 0, TO_CHAR, 0);
@@ -386,7 +386,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
    }
 
    strcat(buffer, "\n\r");
-   page_string(this->desc, buffer, 1);
+   page_string(desc, buffer, 1);
 }
 
 void Character::list_obj_to_char(class Object *list, int mode, bool show)
@@ -410,7 +410,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
          if (number > 1)
          {
             sprintf(buf, "[%d] ", number);
-            this->send(buf);
+            send(buf);
          }
          show_obj_to_char(i, mode);
          found = true;
@@ -419,7 +419,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
    }
 
    if ((!found) && (show))
-      this->sendln("Nothing");
+      sendln("Nothing");
 }
 
 void show_spells(Character *i, Character *ch)
@@ -779,7 +779,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
    QString name = arguments.value(0);
    if (name.isEmpty())
    {
-      this->sendln("botcheck <player> or all\n\r");
+      sendln("botcheck <player> or all\n\r");
       return eFAILURE;
    }
 
@@ -812,16 +812,16 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
       return eFAILURE;
    }
 
-   if (victim->getLevel() > this->getLevel())
+   if (victim->getLevel() > getLevel())
    {
-      this->sendln("Unable to show information.");
+      sendln("Unable to show information.");
       csendf(this, "%s is a higher level than you.\r\n", victim->getNameC());
       return eFAILURE;
    }
 
    if (IS_NPC(victim))
    {
-      this->sendln("Unable to show information.");
+      sendln("Unable to show information.");
       csendf(this, "%s is a mob.\r\n", victim->getNameC());
       return eFAILURE;
    }
@@ -870,15 +870,15 @@ void Character::list_char_to_char(Character *list, int mode)
 {
    bool clear_lastseen = false;
    Character *i;
-   int known = this->has_skill(SKILL_BLINDFIGHTING);
+   int known = has_skill(SKILL_BLINDFIGHTING);
    timeval tv, tv_zero = {0, 0};
 
    for (i = list; i; i = i->next_in_room)
    {
       if (this == i)
          continue;
-      if (i->isPlayer() && (i->player->wizinvis > this->getLevel()))
-         if (!i->player->incognito || !(this->in_room == i->in_room))
+      if (i->isPlayer() && (i->player->wizinvis > getLevel()))
+         if (!i->player->incognito || !(in_room == i->in_room))
             continue;
       if (IS_AFFECTED(this, AFF_SENSE_LIFE) || CAN_SEE(this, i))
       {
@@ -886,25 +886,25 @@ void Character::list_char_to_char(Character *list, int mode)
 
          if (IS_PC(this) && IS_NPC(i))
          {
-            if (this->player->lastseen == 0)
-               this->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
+            if (player->lastseen == 0)
+               player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
 
             if (clear_lastseen == false)
             {
-               this->player->lastseen->clear();
+               player->lastseen->clear();
                clear_lastseen = true;
             }
 
             gettimeofday(&tv, nullptr);
-            this->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
+            player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
          }
       }
-      else if (IS_DARK(this->in_room))
+      else if (IS_DARK(in_room))
       {
          if (known && skill_success(nullptr, SKILL_BLINDFIGHTING))
-            this->sendln("Your blindfighting awareness alerts you to a presense in the area.");
+            sendln("Your blindfighting awareness alerts you to a presense in the area.");
          else if (number(1, 10) == 1)
-            this->sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
+            sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
       }
    }
 }
@@ -962,10 +962,10 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
    QString color_good = "$2";
    QString color_bad = "$4";
 
-   if (this->player)
+   if (player)
    {
-      color_good = this->getSettingAsColor("color.good");
-      color_bad = this->getSettingAsColor("color.bad");
+      color_good = getSettingAsColor("color.good");
+      color_bad = getSettingAsColor("color.bad");
    }
    else
    {

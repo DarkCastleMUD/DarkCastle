@@ -698,13 +698,13 @@ void Character::display_string_list(const char *list[])
         if (!(i % 4))
         {
             strlcat(buf, "\r\n", MAX_STRING_LENGTH);
-            this->send(buf);
+            send(buf);
             *buf = '\0';
         }
     }
     if (*buf)
-        this->send(buf);
-    this->sendln("");
+        send(buf);
+    sendln("");
 }
 
 const QStringList Player::toggle_txt = {

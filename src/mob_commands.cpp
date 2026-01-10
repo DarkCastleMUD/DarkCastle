@@ -1228,13 +1228,13 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   {
     if (IS_NPC(this))
     {
-      int num = DC::getInstance()->mob_index[this->mobdata->nr].virt;
+      int num = DC::getInstance()->mob_index[mobdata->nr].virt;
 
       DC::getInstance()->logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(QString::number(num)));
     }
     return eFAILURE;
   }
-  victim = get_char_room(arg, this->in_room);
+  victim = get_char_room(arg, in_room);
   int type = 0;
   if (!victim)
   {
@@ -1249,7 +1249,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   if (!victim && type == 0)
     return eFAILURE;
   if (!victim)
-    victim = DC::getInstance()->world[this->in_room].people;
+    victim = DC::getInstance()->world[in_room].people;
 
   for (; victim; victim = victim->next_in_room)
   {

@@ -122,39 +122,39 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   QString name = arguments.value(0);
 
-  if (!has_skill(SKILL_BACKSTAB) && this->isPlayer())
+  if (!has_skill(SKILL_BACKSTAB) && isPlayer())
   {
-    this->sendln("You don't know how to backstab people!");
+    sendln("You don't know how to backstab people!");
     return eFAILURE;
   }
 
   if (!(victim = get_char_room_vis(name)))
   {
-    this->sendln("Backstab whom?");
+    sendln("Backstab whom?");
     return eFAILURE;
   }
 
   if (victim == this)
   {
-    this->sendln("How can you sneak up on yourself?");
+    sendln("How can you sneak up on yourself?");
     return eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    this->sendln("You cannot backstab someone that HUGE!");
+    sendln("You cannot backstab someone that HUGE!");
     return eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    this->sendln("You cannot target just one to backstab!");
+    sendln("You cannot target just one to backstab!");
     return eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    this->sendln("You cannot target someone that tiny to backstab!");
+    sendln("You cannot target someone that tiny to backstab!");
     return eFAILURE;
   }
 
@@ -170,32 +170,32 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   int min_hp = (int)(GET_MAX_HIT(this) / 5);
   min_hp = MIN(min_hp, 25);
 
-  if (this->getHP() < min_hp)
+  if (getHP() < min_hp)
   {
-    this->sendln("You are feeling too weak right now to attempt such a bold maneuver.");
+    sendln("You are feeling too weak right now to attempt such a bold maneuver.");
     return eFAILURE;
   }
 
-  if (!this->equipment[WEAR_WIELD])
+  if (!equipment[WEAR_WIELD])
   {
-    this->sendln("You need to wield a weapon to make it a success.");
+    sendln("You need to wield a weapon to make it a success.");
     return eFAILURE;
   }
 
-  if (this->equipment[WEAR_WIELD]->obj_flags.value[3] != 11 && this->equipment[WEAR_WIELD]->obj_flags.value[3] != 9)
+  if (equipment[WEAR_WIELD]->obj_flags.value[3] != 11 && equipment[WEAR_WIELD]->obj_flags.value[3] != 9)
   {
-    this->sendln("You can't stab without a stabbing weapon...");
+    sendln("You can't stab without a stabbing weapon...");
     return eFAILURE;
   }
 
   if (victim->fighting)
   {
-    this->sendln("You can't backstab a fighting person, they are too alert!");
+    sendln("You can't backstab a fighting person, they are too alert!");
     return eFAILURE;
   }
 
   // Check the killer/victim
-  if ((this->getLevel() < G_POWER) || IS_NPC(this))
+  if ((getLevel() < G_POWER) || IS_NPC(this))
   {
     if (!can_attack(this) || !can_be_attacked(this, victim))
       return eFAILURE;
@@ -204,7 +204,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   int itemp = number(1, 100);
   if (IS_PC(this) && IS_PC(victim))
   {
-    if (victim->getLevel() > this->getLevel())
+    if (victim->getLevel() > getLevel())
       itemp = 0; // not gonna happen
     else if (GET_MAX_HIT(victim) > GET_MAX_HIT(this))
     {
@@ -220,11 +220,11 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   }
 
   // record the room I'm in.  Used to make sure a dual can go off.
-  was_in = this->in_room;
+  was_in = in_room;
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[WEAR_SECOND_WIELD]) && ((this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
+  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || getLevel() >= ARCHANGEL) || (IS_NPC(this) && getLevel() > 70)) && (equipment[WEAR_SECOND_WIELD]) && ((equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
     if (skill_success(victim, SKILL_DUAL_BACKSTAB) || IS_NPC(this))
     {
@@ -240,9 +240,9 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
     if (perform_dual_backstab && IS_PC(this))
     {
-      this->player->unjoinable = true;
+      player->unjoinable = true;
       retval = damage(this, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB);
-      this->player->unjoinable = false;
+      player->unjoinable = false;
     }
     else
     {
@@ -270,9 +270,9 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
     if (perform_dual_backstab && IS_PC(this))
     {
-      this->player->unjoinable = true;
+      player->unjoinable = true;
       retval = attack(this, victim, SKILL_BACKSTAB, FIRST);
-      this->player->unjoinable = false;
+      player->unjoinable = false;
     }
     else
     {
@@ -301,7 +301,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   // If we're intended to have a dual backstab AND we still can
   if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && GET_POS(victim) != position_t::DEAD && victim->in_room != DC::NOWHERE)
   {
-    if (was_in == this->in_room)
+    if (was_in == in_room)
     {
       if (AWAKE(victim) && !skill_success(victim, SKILL_BACKSTAB))
       {
@@ -325,7 +325,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
     // if (IS_AFFECTED(this, AFF_CHARM)) SET_BIT(retval, check_joincharmie(this,1));
     // if (SOMEONE_DIED(retval)) return retval;
-    if (this->c_class == CLASS_THIEF && IS_PC(victim))
+    if (c_class == CLASS_THIEF && IS_PC(victim))
     {
       WAIT_STATE(this, DC::PULSE_VIOLENCE * 2);
     }

@@ -1752,7 +1752,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   else
   {
     /* Check for skill improvement anyway */
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a);
     return false; // Failure
   }
@@ -3109,11 +3109,11 @@ int Character::has_skill(skill_t skill)
   else if (affected_by_spell(SPELL_HEROISM))
     bonus += affected_by_spell(SPELL_HEROISM)->modifier / 5;
 
-  if (this->skills.contains(skill))
+  if (skills.contains(skill))
   {
-    const auto &curr = this->skills[skill];
+    const auto &curr = skills[skill];
 
-    for (o = this->player->skillchange; o; o = o->next_skill)
+    for (o = player->skillchange; o; o = o->next_skill)
     {
       int a;
       for (a = 0; a < o->affected.size(); a++)

@@ -403,7 +403,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       continue;
     }
 
-    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != this->clan) && IS_ANONYMOUS(i) && i->getLevel() < MIN_GOD)
+    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != clan) && IS_ANONYMOUS(i) && i->getLevel() < MIN_GOD)
     {
       continue;
     }

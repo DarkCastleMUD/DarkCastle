@@ -363,7 +363,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
       return eFAILURE;
     }
 
-  if (IS_NPC(this) && this->master)
+  if (IS_NPC(this) && master)
   {
     do_say(this, "That's okay, I'll let you do all the auctioning, master.");
     return eSUCCESS;
@@ -371,21 +371,21 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 
   if (IS_PC(this))
   {
-    if (this->isPlayer() && isSet(this->player->punish, PUNISH_SILENCED))
+    if (isPlayer() && isSet(player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    this);
       return eSUCCESS;
     }
-    if (!(isSet(this->misc, DC::LogChannel::CHANNEL_AUCTION)))
+    if (!(isSet(misc, DC::LogChannel::CHANNEL_AUCTION)))
     {
-      this->sendln("You told yourself not to AUCTION!!");
+      sendln("You told yourself not to AUCTION!!");
       return eSUCCESS;
     }
     if (level_ < 3)
     {
-      this->sendln("You must be at least 3rd level to auction.");
+      sendln("You must be at least 3rd level to auction.");
       return eSUCCESS;
     }
   }
@@ -393,7 +393,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
   if (arguments.isEmpty())
   {
     std::queue<QString> tmp = auction_history;
-    this->sendln("Here are the last 10 auctions:");
+    sendln("Here are the last 10 auctions:");
     while (!tmp.empty())
     {
       act(tmp.front(), this, 0, this, TO_VICT, 0);
@@ -734,22 +734,22 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   QString name = {}, message = {}, buf = {}, log_buf = {};
   Object *tmp_obj = nullptr;
 
-  if (this->isPlayer() && isSet(this->player->punish, PUNISH_NOTELL))
+  if (isPlayer() && isSet(player->punish, PUNISH_NOTELL))
   {
-    this->sendln("Your message didn't get through!!");
+    sendln("Your message didn't get through!!");
     return eSUCCESS;
   }
 
-  for (tmp_obj = DC::getInstance()->world[this->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
-      this->sendln("The magical silence prevents you from speaking!");
+      sendln("The magical silence prevents you from speaking!");
       return eFAILURE;
     }
 
-  if (this->isPlayer() && !isSet(this->misc, DC::LogChannel::CHANNEL_TELL))
+  if (isPlayer() && !isSet(misc, DC::LogChannel::CHANNEL_TELL))
   {
-    this->sendln("You have tell channeled off!!");
+    sendln("You have tell channeled off!!");
     return eSUCCESS;
   }
 
@@ -762,9 +762,9 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 
   if (name.isEmpty() || message.isEmpty())
   {
-    if (this->player->tell_history.isEmpty())
+    if (player->tell_history.isEmpty())
     {
-      this->sendln("You have not sent or recieved any tell messages.");
+      sendln("You have not sent or recieved any tell messages.");
       return eSUCCESS;
     }
 
@@ -793,7 +793,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   {
     if (!(vict = get_active_pc(name)))
     {
-      this->sendln("They seem to have left!");
+      sendln("They seem to have left!");
       return eSUCCESS;
     }
     cmd = cmd_t::DEFAULT;
@@ -803,8 +803,8 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     vict = get_pc_vis(this, name);
     if ((vict != nullptr) && vict->getLevel() >= IMMORTAL)
     {
-      this->sendln("That person is busy right now.");
-      this->sendln("Your message has been saved.");
+      sendln("That person is busy right now.");
+      sendln("Your message has been saved.");
 
       buf = fmt::format("$2$B{} told you, '{}'$R\r\n", PERS(this, vict), message.toStdString()).c_str();
       record_msg(buf, vict);
@@ -813,11 +813,11 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       vict->tell_history(this, buf);
 
       buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), message.toStdString()).c_str();
-      this->tell_history(this, buf);
+      tell_history(this, buf);
     }
     else
     {
-      this->sendln("No-one by that name here.");
+      sendln("No-one by that name here.");
     }
 
     return eSUCCESS;
@@ -828,16 +828,16 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 
   if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
   {
-    this->sendln("The person is ignoring all tells right now.");
+    sendln("The person is ignoring all tells right now.");
     return eSUCCESS;
   }
   else if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL))
   {
     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
-    this->sendln("That player has tell channeled off btw...");
+    sendln("That player has tell channeled off btw...");
   }
   if (this == vict)
-    this->sendln("You try to tell yourself something.");
+    sendln("You try to tell yourself something.");
   else if ((GET_POS(vict) == position_t::SLEEPING || isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
     act("Sorry, $E cannot hear you.", this, 0, vict, TO_CHAR, STAYHIDE);
   else
@@ -879,7 +879,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       vict->tell_history(this, buf);
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
-      this->send(buf);
+      send(buf);
     }
     else if (!is_busy(vict) && GET_POS(vict) > position_t::SLEEPING)
     {
@@ -900,7 +900,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
       act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
-      this->tell_history(this, ar.str);
+      tell_history(this, ar.str);
 
       // Log what I told a logged player under their name
       if (vict->isPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
@@ -933,9 +933,9 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
       act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
-      this->tell_history(this, ar.str);
+      tell_history(this, ar.str);
 
-      this->sendln("They were sleeping btw...");
+      sendln("They were sleeping btw...");
       // Log what I told a logged player under their name
       if (vict->isPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
@@ -1283,24 +1283,24 @@ void Character::tell_history(Character *ch, QString message)
 
 void Character::gtell_history(Character *ch, QString message)
 {
-  if (this->player == nullptr)
+  if (player == nullptr)
   {
     return;
   }
 
   communication c(ch, message);
 
-  this->player->gtell_history.push_back(c);
-  if (this->player->gtell_history.size() > 10)
+  player->gtell_history.push_back(c);
+  if (player->gtell_history.size() > 10)
   {
-    this->player->gtell_history.pop_front();
+    player->gtell_history.pop_front();
   }
 }
 
 communication::communication(Character *ch, QString message)
 {
-  this->sender = GET_NAME(ch);
-  this->sender_ispc = IS_PC(ch);
-  this->message = message;
-  this->timestamp = time(nullptr);
+  sender = GET_NAME(ch);
+  sender_ispc = IS_PC(ch);
+  message = message;
+  timestamp = time(nullptr);
 }

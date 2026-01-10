@@ -641,7 +641,7 @@ void DC::game_loop(void)
   FD_ZERO(&exc_set);
 
   maxdesc = 0;
-  fd_set &input_set = this->input_set;
+  fd_set &input_set = input_set;
   for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set, &maxdesc](const int &fd)
            {
                FD_SET(fd, &input_set);

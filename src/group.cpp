@@ -774,9 +774,9 @@ std::vector<Character *> Character::getFollowers(void)
     return followers;
   }
 
-  if (this->master != nullptr)
+  if (master != nullptr)
   {
-    leader = this->master;
+    leader = master;
   }
   else
   {

@@ -37,7 +37,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    this->sendln("Linkload whom?");
+    sendln("Linkload whom?");
     return eFAILURE;
   }
 
@@ -45,13 +45,13 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 
   if (get_pc(arg1))
   {
-    this->sendln("That person is already on the game!");
+    sendln("That person is already on the game!");
     return eFAILURE;
   }
 
   if (!(dc_->load_char_obj(&d, arg1)))
   {
-    this->sendln("Unable to load! (Character might not exist...)");
+    sendln("Unable to load! (Character might not exist...)");
     return eFAILURE;
   }
 
@@ -124,13 +124,13 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
   {
     if (!(victim = get_pc_vis(this, name)))
     {
-      this->sendln("That player is not here.");
+      sendln("That player is not here.");
       return eFAILURE;
     }
   }
   else
   {
-    this->sendln("Who exactly would you like to be a guide?");
+    sendln("Who exactly would you like to be a guide?");
     return eFAILURE;
   }
 
@@ -284,7 +284,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
   if (victim)
   {
-    if (IS_PC(victim) && (this->getLevel() < victim->getLevel()))
+    if (IS_PC(victim) && (getLevel() < victim->getLevel()))
     {
       act("$n casts a massive lightning bolt at you.", this, 0, victim,
           TO_VICT, 0);
@@ -295,7 +295,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
     if (victim->getLevel() == IMPLEMENTER)
     { // Hehe..
-      this->sendln("Get stuffed.");
+      sendln("Get stuffed.");
       return eFAILURE;
     }
 
@@ -323,8 +323,8 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     victim->setLevel(1);
     DC::getInstance()->update_wizlist(victim);
 
-    if (this->clan)
-      remove_clan_member(this->clan, this);
+    if (clan)
+      remove_clan_member(clan, this);
 
     DC::getInstance()->TheAuctionHouse.HandleDelete(victim->getName());
 
@@ -382,7 +382,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    this->sendln("Huh?");
+    sendln("Huh?");
     return eFAILURE;
   }
 
@@ -442,19 +442,19 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     if (!DC::getInstance()->write_hotboot_file())
     {
       DC::getInstance()->logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
-      this->sendln("Hot reboot failed.");
+      sendln("Hot reboot failed.");
     }
   }
   else if (arg1 == "auto")
   {
     if (try_to_hotboot_on_crash)
     {
-      this->sendln("Mud will not try to hotboot when it crashes next.");
+      sendln("Mud will not try to hotboot when it crashes next.");
       try_to_hotboot_on_crash = 0;
     }
     else
     {
-      this->sendln("Mud will now TRY to hotboot when it crashes next.");
+      sendln("Mud will now TRY to hotboot when it crashes next.");
       try_to_hotboot_on_crash = 1;
     }
   }
@@ -517,11 +517,11 @@ command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
 {
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    this->sendln("Huh?");
+    sendln("Huh?");
     return eFAILURE;
   }
 
-  this->sendln("If you want to shut something down - say so!");
+  sendln("If you want to shut something down - say so!");
   return eSUCCESS;
 }
 

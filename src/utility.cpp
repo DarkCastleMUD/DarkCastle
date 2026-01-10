@@ -1484,20 +1484,20 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
   if (this->room().isArena())
   {
-    this->sendln("TYou can't recall while in the arena.");
+    sendln("TYou can't recall while in the arena.");
     return eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, NO_MAGIC))
+  if (isSet(DC::getInstance()->world[in_room].room_flags, NO_MAGIC))
   {
-    this->sendln("You can't use magic here.");
+    sendln("You can't use magic here.");
     return eFAILURE;
   }
 
-  if (isSet(this->combat, COMBAT_BASH1) ||
-      isSet(this->combat, COMBAT_BASH2))
+  if (isSet(combat, COMBAT_BASH1) ||
+      isSet(combat, COMBAT_BASH2))
   {
-    this->sendln("You can't, you're bashed!");
+    sendln("You can't, you're bashed!");
     return eFAILURE;
   }
 
@@ -1511,7 +1511,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     victim = get_char_room_vis(name);
     if (victim == nullptr)
     {
-      this->sendln("Whom do you want to recall?");
+      sendln("Whom do you want to recall?");
       return eFAILURE;
     }
 
@@ -1540,7 +1540,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (percent > 50)
     {
-      this->sendln("You failed in your recall!");
+      sendln("You failed in your recall!");
       return eFAILURE;
     }
   }
@@ -1574,7 +1574,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (location < 0)
     {
-      this->sendln("Failed.");
+      sendln("Failed.");
       return eFAILURE;
     }
 
@@ -1591,7 +1591,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
-        this->sendln("The gods frown on you, and reset your home.");
+        sendln("The gods frown on you, and reset your home.");
         location = real_room(START_ROOM);
         GET_HOME(victim) = START_ROOM;
       }
@@ -1603,7 +1603,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
         if (!found)
         {
-          this->sendln("The gods frown on you, and reset your home.");
+          sendln("The gods frown on you, and reset your home.");
           location = real_room(START_ROOM);
           GET_HOME(victim) = START_ROOM;
         }
@@ -1641,23 +1641,23 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
       cost *= 2;
     }
 
-    if (this->getGold() < (uint32_t)cost)
+    if (getGold() < (uint32_t)cost)
     {
-      this->send(QStringLiteral("You don't have %1 gold!\n\r").arg(cost));
+      send(QStringLiteral("You don't have %1 gold!\n\r").arg(cost));
       return eFAILURE;
     }
 
-    this->removeGold(cost);
+    removeGold(cost);
   }
 
   if (IS_AFFECTED(victim, AFF_CURSE))
   {
-    this->sendln("A curse affect prevents it.");
+    sendln("A curse affect prevents it.");
     return eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    this->sendln("A solidity affect prevents it.");
+    sendln("A solidity affect prevents it.");
     return eFAILURE;
   }
 
@@ -3097,15 +3097,15 @@ void Character::setPOSFighting(void)
 void Character::setPlayerLastMob(vnum_t mob_vnum)
 {
   std::string buffer;
-  if (this->player == nullptr)
+  if (player == nullptr)
   {
     return;
   }
 
-  if (mob_vnum != this->player->last_mob_edit)
+  if (mob_vnum != player->last_mob_edit)
   {
-    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", this->player->last_mob_edit, mob_vnum));
-    this->player->last_mob_edit = mob_vnum;
+    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", player->last_mob_edit, mob_vnum));
+    player->last_mob_edit = mob_vnum;
   }
 }
 

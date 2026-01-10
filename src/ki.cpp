@@ -361,8 +361,8 @@ int Character::ki_gain_lookup(void)
   int gain;
 
   /* gain 1 - 7 depedant on level */
-  gain = GET_CLASS(this) == CLASS_MONK ? (int)(this->max_ki * 0.04) : (int)(this->max_ki * 0.05); /*(this->getLevel() / 8) + 1;*/
-  gain += this->ki_regen;
+  gain = GET_CLASS(this) == CLASS_MONK ? (int)(max_ki * 0.04) : (int)(max_ki * 0.05); /*(getLevel() / 8) + 1;*/
+  gain += ki_regen;
 
   // Normalize these so we dont underun the array below
   int norm_wis = MAX(0, GET_WIS(this));
@@ -379,7 +379,7 @@ int Character::ki_gain_lookup(void)
 
   gain += age().year / 25;
 
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+  if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
     gain = (int)(gain * 1.25);
 
   int multiplyer = 1;

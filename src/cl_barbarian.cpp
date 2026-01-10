@@ -365,13 +365,13 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
 
   if (in_room != victim->in_room)
   {
-    this->sendln("That person seems to have left.");
+    sendln("That person seems to have left.");
     return eFAILURE;
   }
 
   if (victim == this)
   {
-    this->sendln("Aren't we funny today...");
+    sendln("Aren't we funny today...");
     return eFAILURE;
   }
 
@@ -395,8 +395,8 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
       return retval;
     }
 
-    this->setSitting();
-    SET_BIT(this->combat, COMBAT_BASH1);
+    setSitting();
+    SET_BIT(combat, COMBAT_BASH1);
   }
   else
   {
@@ -411,12 +411,12 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
       return retval;
     }
 
-    SET_BIT(this->combat, COMBAT_RAGE1);
+    SET_BIT(combat, COMBAT_RAGE1);
   }
 
   WAIT_STATE(this, DC::PULSE_VIOLENCE * 3);
 
-  if (!this->fighting)
+  if (!fighting)
     return attack(this, victim, TYPE_UNDEFINED);
 
   // chance of bonus round at high level of skill
