@@ -1567,7 +1567,7 @@ void write_to_output(QByteArray txt, class Connection *t)
   }
   if (t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == Connection::states::PLAYING)
   {
-    txt = scramble_text(txt.toStdString().c_str()).toStdString().c_str();
+    txt = scramble_text(txt).toLocal8Bit();
   }
   t->output.append(txt);
 }
@@ -2554,7 +2554,7 @@ void send_to_char_nosp(const char *messg, Character *ch)
 
 void send_to_char_nosp(QString messg, Character *ch)
 {
-  send_to_char_nosp(messg.toStdString().c_str(), ch);
+  send_to_char_nosp(qPrintable(messg), ch);
 }
 
 void record_msg(QString messg, Character *ch)
@@ -2656,7 +2656,7 @@ void send_to_all(QString message)
     {
       if (!i->connected)
       {
-        SEND_TO_Q(message.toStdString().c_str(), i);
+        SEND_TO_Q(qPrintable(message), i);
       }
     }
   }
@@ -2685,7 +2685,7 @@ void ansi_color(const char *txt, Character *ch)
 
 void send_info(QString messg)
 {
-  send_info(messg.toStdString().c_str());
+  send_info(qPrintable(messg));
 }
 
 void send_info(std::string messg)
@@ -2822,9 +2822,7 @@ void warn_if_duplicate_ip(Character *ch)
 
   for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
-    if (d->character &&
-        strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
-        !strcmp(d->getPeerOriginalAddress().toString().toStdString().c_str(), ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()))
+    if (d->character && ch->getName() != d->character->getName() && d->getPeerOriginalAddress().toString() == ch->desc->getPeerOriginalAddress().toString())
     {
       multiplayer m;
       m.host = d->getPeerAddress();
@@ -2852,7 +2850,7 @@ void warn_if_duplicate_ip(Character *ch)
 
   for (std::list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
-    DC::getInstance()->logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1.toStdString().c_str(), (*i).name2.toStdString().c_str());
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), qPrintable((*i).name1), qPrintable((*i).name2));
   }
 }
 

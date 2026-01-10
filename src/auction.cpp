@@ -430,7 +430,7 @@ bool AuctionHouse::IsSlot(QString slot, int vnum)
           "light",  // 16
           "\n"};
 
-  keyword = search_block(buf.toStdString().c_str(), keywords, false);
+  keyword = search_block(qPrintable(buf), keywords, false);
   if (keyword == -1)
     return false;
 
@@ -686,7 +686,7 @@ void AuctionHouse::Load()
   char *nl;
   char buf[MAX_STRING_LENGTH];
   AuctionTicket InTicket;
-  the_file = fopen(file_name.toStdString().c_str(), "r");
+  the_file = fopen(qPrintable(file_name), "r");
 
   if (!the_file)
   {
@@ -764,7 +764,7 @@ void AuctionHouse::Save()
     return;
   }
   QString temp_file_name = file_name + ".temp";
-  the_file = fopen(temp_file_name.toStdString().c_str(), "w");
+  the_file = fopen(qPrintable(temp_file_name), "w");
 
   if (!the_file)
   {
@@ -831,7 +831,7 @@ void AuctionHouse::Save()
   fprintf(the_file, "%u\n", UncollectedGold);
 
   fclose(the_file);
-  if (rename(temp_file_name.toStdString().c_str(), qPrintable(file_name)) != 0)
+  if (rename(qPrintable(temp_file_name), qPrintable(file_name)) != 0)
   {
     perror("AuctionHouse::save() rename");
     DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "AuctionHouse::Save() rename: %s", strerror(errno));
@@ -968,7 +968,7 @@ void AuctionHouse::CheckExpire()
     {
       ItemsActive -= 1;
       ItemsExpired += 1;
-      if ((ch = get_active_pc(Item_it->seller.toStdString().c_str())))
+      if ((ch = get_active_pc(qPrintable(Item_it->seller))))
         csendf(ch, "Your auction of %s has expired.\r\n", qPrintable(Item_it->item_name));
       Item_it->state = AUC_EXPIRED;
       something_expired = true;

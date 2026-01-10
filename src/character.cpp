@@ -268,7 +268,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
     QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
     QString fullpath = path + filename;
-    if (!(fpfile = fopen(fullpath.toStdString().c_str(), "r")))
+    if (!(fpfile = fopen(qPrintable(fullpath), "r")))
     {
         send(QStringLiteral("No charmie save file found at '%1'.").arg(fullpath));
         return false;
@@ -453,7 +453,7 @@ bool Character::validateName(QString name)
         }
     }
 
-    if (on_forbidden_name_list(name.toStdString().c_str()))
+    if (on_forbidden_name_list(qPrintable(name)))
     {
         return false;
     }
@@ -463,7 +463,7 @@ bool Character::validateName(QString name)
 
 const char *Character::getNameC(void) const
 {
-    return str_hsh(name_.toStdString().c_str());
+    return str_hsh(qPrintable(name_));
 }
 
 Connection::Connection(QObject *parent)
@@ -622,7 +622,7 @@ Sockets::Sockets(Character *ch, QString searchkey)
         {
             if (d->character == nullptr)
                 continue;
-            if (d->character->getNameC() == nullptr)
+            if (qPrintable(d->character->getName()) == nullptr)
                 continue;
         }
         if (d->character)
@@ -637,7 +637,7 @@ Sockets::Sockets(Character *ch, QString searchkey)
 
         if (!searchkey.isEmpty())
         {
-            if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && d->character->getNameC() != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
+            if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && qPrintable(d->character->getName()) != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
             {
                 continue;
             }
@@ -1281,7 +1281,7 @@ void ChannelMessage::set_name(const class Character *sender)
     else
     {
         sender_name_ = QStringLiteral("Unknown");
-        DC::getInstance()->logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
+        DC::getInstance()->logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(QString::number(type_)).arg(msg_));
     }
 }
 

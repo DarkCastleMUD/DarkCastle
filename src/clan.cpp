@@ -999,7 +999,7 @@ int do_accept(Character *ch, char *arg, cmd_t cmd)
   ch->sendln("Your clan now has a new member.");
   victim->send(buf);
 
-  sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), clan->name);
+  sprintf(buf, "%s just joined clan [%s].", qPrintable(victim->getName()), clan->name);
   DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
 
   add_totem_stats(victim);
@@ -1061,13 +1061,13 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (strcmp(clanPtr->leader, getNameC()) && victim != this && !has_right(this, CLAN_RIGHTS_OUTCAST))
+  if (getName() != clanPtr->leader && victim != this && !has_right(this, CLAN_RIGHTS_OUTCAST))
   {
     sendln("You don't have the right to outcast people from your clan!");
     return eFAILURE;
   }
 
-  if (!strcmp(clanPtr->leader, victim->getNameC()))
+  if (victim->getName() == clanPtr->leader)
   {
     sendln("You can't outcast the clan leader!");
     return eFAILURE;
@@ -1156,7 +1156,7 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
   }
   if (clan->leader)
     delete[] clan->leader;
-  clan->leader = str_dup(victim->getNameC());
+  clan->leader = str_dup(qPrintable(victim->getName()));
 
   save_clans();
 
@@ -1164,7 +1164,7 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
   ch->sendln("Your clan now has a new leader.");
   victim->send(buf);
 
-  sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
+  sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", qPrintable(victim->getName()), GET_NAME(ch), clan->name);
   DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
   return eSUCCESS;
 }
@@ -2592,7 +2592,7 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
       int bit = -1;
       ClanMember *pmember = nullptr;
 
-      if (!(pmember = get_member(ch->getNameC(), ch->clan)))
+      if (!(pmember = get_member(qPrintable(ch->getName()), ch->clan)))
       {
         ch->sendln("You don't seem to be in a clan.");
         return eSUCCESS;
@@ -2895,11 +2895,11 @@ int do_cwithdraw(Character *ch, char *arg, cmd_t cmd)
   char buf[MAX_INPUT_LENGTH];
   if (wdraw == 1)
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 $B$5gold$R coin from the clan bank account.\r\n", ch->getNameC());
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 $B$5gold$R coin from the clan bank account.\r\n", qPrintable(ch->getName()));
   }
   else
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %lu $B$5gold$R coins from the clan bank account.\r\n", ch->getNameC(), wdraw);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %lu $B$5gold$R coins from the clan bank account.\r\n", qPrintable(ch->getName()), wdraw);
   }
   clan_data *clan = get_clan(ch);
   if (clan != nullptr)
@@ -3124,7 +3124,7 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
   {
     if (clan)
       snprintf(buf, sizeof(buf), "\r\n##%s has been claimed by clan %s!\r\n",
-               DC::getInstance()->zones.value(zone).Name().toStdString().c_str(), get_clan(clan)->name);
+               qPrintable(DC::getInstance()->zones.value(zone).Name()), get_clan(clan)->name);
 
     //     DC::getInstance()->zones.value(zone).gold = 0;
   }
