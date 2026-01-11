@@ -2,7 +2,7 @@
 $R$0The Abyss$R~
 $R$0You don't think you are not floating in nothing.$R
 ~
-0 570485980 0
+1 570485980 0
 D3
 ~
 ~
@@ -19,7 +19,7 @@ matter, surrounded by swirling glowing light, which fades into the relative
 darkness around you without any trace of edges or shadow.
    There is a "No Tipping" notice pinned to the darkness.
 ~
-0 571081866 1
+1 571081866 1
 S
 #3
 A totally empty room~
@@ -27,7 +27,7 @@ A totally empty room~
   You feel very lonely in this totally empty room.  Obviously you should
 have thought twice before lipping off to the wrong person.
 ~
-0 8204 0
+1 8204 0
 D0
 ~
 ~
@@ -48,7 +48,7 @@ depravity.
    It is at these places where the barrier between their world and ours becomes
 breached, worn thin by the passage of innumerable feet.
 ~
-0 33596556 0
+1 33596556 0
 D0
 The TOP SECRET entrance to the Quest Headquarters rooms lies north.
 ~
