@@ -1887,12 +1887,12 @@ std::vector<std::string> ChainSayText =
         "If I was a robot, I'd name myself Hugh Mann so people would accept me more readily.",
         "I like to leave a legacy, even if it doesn't last that long.  Yeah, I fart in the elevator.",
         "Hey, does this rag smell like chloroform to you?",
-        "God made semen taste like bleach so she'd remember to do the laundry.",
         "If it's an \"eye for an eye and a tooth for a tooth\", why is there no Eye Fairy?",
         "Necrophilia - putting the fun back in funeral.",
         "Monopolies are like children on an airplane, you complain about them until you have one.",
         "Grannies are pernonin' noobs.",
-        "Why is he called Iron-man instead of Fe-male?"};
+        "Why is he called Iron-man instead of Fe-male?",
+        "Marriage is like burying a body... If you have to do it twice... It's not for you..."};
 
 // ENDOFCHAIN
 
