@@ -809,7 +809,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 			ch);
 		if (!IS_NPC(ch))
 		{
-			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max) (current -%d)\r\n", GET_AC_METAS(ch));
+			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\r\n", GET_AC_METAS(ch));
 			ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
 		}
 
@@ -1254,9 +1254,9 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 				ch->sendln("You can't buy AC, chode...");
 				return eSUCCESS;
 			}
-			if (GET_AC_METAS(ch) >= 50)
+			if (GET_AC_METAS(ch) >= 250)
 			{
-				ch->sendln("You've reached the -50 AC limit that can be purchased per character.");
+				ch->sendln("You've reached the -250 AC limit that can be purchased per character.");
 				return eSUCCESS;
 			}
 
