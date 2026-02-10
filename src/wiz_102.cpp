@@ -1989,7 +1989,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     ch->send(QStringLiteral("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
     break;
   default:
-    ch->sendln("Illegal value, tell pir.");
+    ch->sendln("Illegal value.");
     break;
   } // switch(x)
 
