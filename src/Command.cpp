@@ -281,6 +281,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("assemble"), do_assemble, position_t::RESTING, 0, cmd_t::ASSEMBLE, 0, 0, CommandType::players_only),
         Command(QStringLiteral("select"), do_natural_selection, position_t::RESTING, 0, cmd_t::DEFAULT, 0, 0, CommandType::players_only),
         Command(QStringLiteral("sector"), do_sector, position_t::RESTING, 0, cmd_t::DEFAULT, 0, 1, CommandType::players_only),
+        Command(QStringLiteral("pets"), &Character::do_pets, position_t::RESTING, 0, cmd_t::DEFAULT, 0, 1, CommandType::players_only),
 
         // Special procedure commands
         Command(QStringLiteral("gag"), &Character::generic_command, position_t::STANDING, 0, cmd_t::GAG, 0, 0, CommandType::players_only),

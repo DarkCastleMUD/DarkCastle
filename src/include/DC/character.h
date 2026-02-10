@@ -1096,6 +1096,7 @@ public:
     command_return_t do_mpsettemp(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_bestow(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_alias(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_pets(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_kick(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_givealldot(QString name, QString target, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_give(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
