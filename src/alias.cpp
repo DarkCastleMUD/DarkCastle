@@ -170,32 +170,108 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       continue;
 
     auto victim = (Character *)(DC::getInstance()->mob_index[nr].item);
-    if ((arg1_level_ok && arg1_level > victim->getLevel()) || (arg2_level_ok && arg2_level > victim->getLevel()))
+    if ((arg1_level_ok && victim->getLevel() < arg1_level) ||
+        (arg2_level_ok && victim->getLevel() < arg2_level))
       continue;
 
     auto victim_qty = DC::getInstance()->mob_index[nr].qty;
-    if (((!arg1.isEmpty() && QStringLiteral("bard").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == "all" || GET_CLASS(this) == CLASS_BARD) && ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
-      results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Bard"), victim_qty));
+    bool include_bard = false;
+    if (ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
+    {
+      if (arg1.isEmpty() && GET_CLASS(this) == CLASS_BARD)
+      {
+        include_bard = true;
+      }
+      else if (!arg1.isEmpty() && QStringLiteral("bard").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      {
+        include_bard = true;
+      }
+      if (include_bard)
+        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Bard"), victim_qty));
+    }
 
-    if (((!arg1.isEmpty() && QStringLiteral("ranger").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == "all" || GET_CLASS(this) == CLASS_RANGER) && ISSET(victim->mobdata->actflags, ACT_CHARM) && !isSet(victim->immune, ISR_CHARM))
-      results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Ranger"), victim_qty));
+    bool include_ranger = false;
+    if (ISSET(victim->mobdata->actflags, ACT_CHARM) && !isSet(victim->immune, ISR_CHARM))
+    {
+      if (arg1.isEmpty() && GET_CLASS(this) == CLASS_RANGER)
+      {
+        include_ranger = true;
+      }
+      else if (!arg1.isEmpty() && QStringLiteral("ranger").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      {
+        include_ranger = true;
+      }
+      if (include_ranger)
+        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Ranger"), victim_qty));
+    }
 
-    if (((!arg1.isEmpty() && QStringLiteral("antipal").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == "all" || GET_CLASS(this) == CLASS_ANTI_PAL) && (vnum >= 22389 && vnum <= 22398))
-      results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("AntiPal"), victim_qty));
+    bool include_antipaladin = false;
+    if (vnum >= 22389 && vnum <= 22398)
+    {
+      if (arg1.isEmpty() && GET_CLASS(this) == CLASS_ANTI_PAL)
+      {
+        include_antipaladin = true;
+      }
+      else if (!arg1.isEmpty() && (QStringLiteral("antipaladin").startsWith(arg1, Qt::CaseInsensitive) || QStringLiteral("anti-paladin").startsWith(arg1, Qt::CaseInsensitive) || QStringLiteral("anti_paladin").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == QStringLiteral("all"))
+      {
+        include_antipaladin = true;
+      }
+      if (include_antipaladin)
+        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("AntiPal"), victim_qty));
+    }
 
-    if (((!arg1.isEmpty() && QStringLiteral("cleric").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == "all" || GET_CLASS(this) == CLASS_CLERIC) && (vnum >= 22389 && vnum <= 22398))
-      results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Cleric"), victim_qty));
+    bool include_cleric = false;
+    if (vnum >= 22389 && vnum <= 22398)
+    {
+      if (arg1.isEmpty() && GET_CLASS(this) == CLASS_CLERIC)
+      {
+        include_cleric = true;
+      }
+      else if (!arg1.isEmpty() && QStringLiteral("cleric").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      {
+        include_cleric = true;
+      }
+      if (include_cleric)
+        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Cleric"), victim_qty));
+    }
 
-    if (((!arg1.isEmpty() && QStringLiteral("druid").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == "all" || GET_CLASS(this) == CLASS_DRUID) && (vnum >= 6 && vnum <= 7))
-      results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Druid"), victim_qty));
+    bool include_druid = false;
+    if ((vnum >= 6 && vnum <= 7) || (vnum >= 88 && vnum <= 91))
+    {
+      if (arg1.isEmpty() && GET_CLASS(this) == CLASS_DRUID)
+      {
+        include_druid = true;
+      }
+      else if (!arg1.isEmpty() && QStringLiteral("druid").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      {
+        include_druid = true;
+      }
+      if (include_druid)
+        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Druid"), victim_qty));
+    }
 
-    if (((!arg1.isEmpty() && QStringLiteral("mage").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == "all" || GET_CLASS(this) == CLASS_MAGE) && (vnum >= 4 && vnum <= 5))
-      results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Mage"), victim_qty));
+    bool include_mage = false;
+    if (vnum >= 4 && vnum <= 5)
+    {
+      if (arg1.isEmpty() && GET_CLASS(this) == CLASS_MAGE)
+      {
+        include_mage = true;
+      }
+      else if (!arg1.isEmpty() && QStringLiteral("mage").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      {
+        include_mage = true;
+      }
+      if (include_mage)
+        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Mage"), victim_qty));
+    }
   }
 
   if (results.isEmpty())
   {
-    sendln(QStringLiteral("No charmable pets found for a %1.").arg(classes[GET_CLASS(this)].name.c_str()));
+    if (arg1.isEmpty())
+      sendln(QStringLiteral("No charmable pets found for a %1.").arg(classes[GET_CLASS(this)].name.c_str()));
+    else
+      sendln(QStringLiteral("No charmable pets found for a %1.").arg(arg1));
     sendln("Type 'pets all' to see charmable pets for all classes.");
     sendln("Type 'pets bard' to see charmable pets for bards.");
     sendln("Type 'pets bard 50' or 'pets 50' to only see pets level 50 or above.");
