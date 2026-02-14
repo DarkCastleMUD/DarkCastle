@@ -5445,7 +5445,7 @@ void raw_kill(Character *ch, Character *victim)
   if (GET_RACE(victim) == RACE_UNDEAD ||
       GET_RACE(victim) == RACE_GHOST ||
       GET_RACE(victim) == RACE_ELEMENT ||
-      GET_RACE(victim) == RACE_ASTRAL ||
+      GET_RACE(victim) == RACE_PLANAR ||
       GET_RACE(victim) == RACE_SLIME ||
       (IS_NPC(victim) && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 8))
     make_dust(victim);
