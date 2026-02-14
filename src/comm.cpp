@@ -351,7 +351,7 @@ vnum_t DC::getObjectVNUM(Object *obj, bool *ok)
     {
       *ok = true;
     }
-    return obj_index[obj->item_number].virt;
+    return obj_index[obj->item_number].vnum();
   }
 
   if (ok)
@@ -369,7 +369,7 @@ vnum_t DC::getObjectVNUM(legacy_rnum_t nr, bool *ok)
     {
       *ok = true;
     }
-    return obj_index[nr].virt;
+    return obj_index[nr].vnum();
   }
 
   if (ok)
@@ -387,7 +387,7 @@ vnum_t DC::getObjectVNUM(rnum_t nr, bool *ok)
     {
       *ok = true;
     }
-    return obj_index[nr].virt;
+    return obj_index[nr].vnum();
   }
 
   if (ok)

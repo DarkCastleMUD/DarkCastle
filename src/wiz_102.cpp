@@ -450,7 +450,7 @@ int do_mpstat(Character *ch, char *arg, cmd_t cmd)
   /*
     if(!has_range)
     {
-      if(!can_modify_mobile(ch, DC::getInstance()->mob_index[x].virt)) {
+      if(!can_modify_mobile(ch, DC::getInstance()->mob_index[x].vnum())) {
         ch->sendln("You are unable to work creation outside of your range.");
         return eFAILURE;
       }
@@ -711,14 +711,14 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         {
         case 'M':
           j = real_mobile(i);
-          original_value = DC::getInstance()->mob_index[zone.cmd[cmd]->arg1].virt;
+          original_value = DC::getInstance()->mob_index[zone.cmd[cmd]->arg1].vnum();
           break;
         case 'P':
         case 'G':
         case 'O':
         case 'E':
           j = real_object(i);
-          original_value = DC::getInstance()->obj_index[zone.cmd[cmd]->arg1].virt;
+          original_value = DC::getInstance()->obj_index[zone.cmd[cmd]->arg1].vnum();
           break;
         case 'X':
         case 'K':
@@ -1832,7 +1832,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].virt);
+      sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return eFAILURE;
     }
@@ -1893,7 +1893,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].virt);
+      sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return eFAILURE;
     }
@@ -1931,7 +1931,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     if (!obj->affected)
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].virt);
+              DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return eFAILURE;
     }
@@ -1972,7 +1972,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     if (!obj->affected)
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].virt);
+              DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return eFAILURE;
     }
@@ -2711,7 +2711,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
 
   // a this point, mob_num is the index
   if (mobvnum == -1)
-    mobvnum = DC::getInstance()->mob_index[mob_num].virt;
+    mobvnum = DC::getInstance()->mob_index[mob_num].vnum();
 
   if (!can_modify_mobile(ch, mobvnum))
   {
@@ -3143,7 +3143,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (mobvnum == -1)
-    mobvnum = DC::getInstance()->mob_index[mob_num].virt;
+    mobvnum = DC::getInstance()->mob_index[mob_num].vnum();
   // MOVED
   for (x = 0;; x++)
   {
@@ -3526,7 +3526,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       uint64_t NPCs_changed = 0;
       for (auto const &c : DC::getInstance()->character_list)
       {
-        if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].virt == mobvnum)
+        if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].vnum() == mobvnum)
         {
           c->mobdata->actflags[0] = new_actflags[0];
           c->mobdata->actflags[1] = new_actflags[1];
@@ -5220,7 +5220,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
         if (!obj->in_obj)
         {
           fprintf(fl, "O 0 %d %d %d",
-                  DC::getInstance()->obj_index[obj->item_number].virt, count,
+                  DC::getInstance()->obj_index[obj->item_number].vnum(), count,
                   DC::getInstance()->world[room].number);
           sprintf(buf, "           %s\n", obj->short_description);
           string_to_file(fl, buf);
@@ -5240,8 +5240,8 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
               }
 
               fprintf(fl, "P 1 %d %d %d",
-                      DC::getInstance()->obj_index[tmp_obj->item_number].virt, count,
-                      DC::getInstance()->obj_index[obj->item_number].virt);
+                      DC::getInstance()->obj_index[tmp_obj->item_number].vnum(), count,
+                      DC::getInstance()->obj_index[obj->item_number].vnum());
               sprintf(buf, "     %s placed inside %s\n",
                       tmp_obj->short_description,
                       obj->short_description);
@@ -5282,7 +5282,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             count++;
         }
 
-        fprintf(fl, "M 0 %d %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].virt,
+        fprintf(fl, "M 0 %d %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].vnum(),
                 count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
@@ -5305,7 +5305,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             if (!obj->in_obj)
             {
               fprintf(fl, "E 1 %d %d %d",
-                      DC::getInstance()->obj_index[obj->item_number].virt, count,
+                      DC::getInstance()->obj_index[obj->item_number].vnum(), count,
                       pos);
               sprintf(buf, "      Equip %s with %s\n",
                       mob->short_desc, obj->short_description);
@@ -5326,9 +5326,9 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                   }
 
                   fprintf(fl, "P 1 %d %d %d",
-                          DC::getInstance()->obj_index[tmp_obj->item_number].virt,
+                          DC::getInstance()->obj_index[tmp_obj->item_number].vnum(),
                           count,
-                          DC::getInstance()->obj_index[obj->item_number].virt);
+                          DC::getInstance()->obj_index[obj->item_number].vnum());
                   sprintf(buf, "     %s placed inside %s\n",
                           tmp_obj->short_description,
                           obj->short_description);
@@ -5356,7 +5356,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             if (!obj->in_obj)
             {
               fprintf(fl, "G 1 %d %d",
-                      DC::getInstance()->obj_index[obj->item_number].virt, count);
+                      DC::getInstance()->obj_index[obj->item_number].vnum(), count);
               sprintf(buf, "      Give %s %s\n", mob->short_desc,
                       obj->short_description);
               string_to_file(fl, buf);
@@ -5376,9 +5376,9 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                   }
 
                   fprintf(fl, "P 1 %d %d %d",
-                          DC::getInstance()->obj_index[tmp_obj->item_number].virt,
+                          DC::getInstance()->obj_index[tmp_obj->item_number].vnum(),
                           count,
-                          DC::getInstance()->obj_index[obj->item_number].virt);
+                          DC::getInstance()->obj_index[obj->item_number].vnum());
                   sprintf(buf, "     %s placed inside %s\n",
                           tmp_obj->short_description,
                           obj->short_description);
@@ -5632,8 +5632,8 @@ int do_return(Character *ch, char *argument, cmd_t cmd)
 
     ch->desc->character->desc = ch->desc;
     ch->desc = 0;
-    if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt > 90 &&
-        DC::getInstance()->mob_index[ch->mobdata->nr].virt < 100 &&
+    if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() > 90 &&
+        DC::getInstance()->mob_index[ch->mobdata->nr].vnum() < 100 &&
         cmd != cmd_t::LOOK)
     {
       act("$n evaporates.", ch, 0, 0, TO_ROOM, 0);

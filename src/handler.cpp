@@ -529,7 +529,7 @@ const struct set_data set_list[] = {
 void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 {
 	// obj has just been worn
-	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
 	int i;
 	int z = 0, y;
 	// Quadruple nested for. Annoying, but it's gotta be done.
@@ -549,7 +549,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].vnum() == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -800,7 +800,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 void remove_set_stats(Character *ch, Object *obj, int flag)
 {
 	// obj has just been removed
-	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
 	int i;
 	int z = 0, y;
 	// Quadruply nested for. Annoying, but it's gotta be done.
@@ -818,7 +818,7 @@ void remove_set_stats(Character *ch, Object *obj, int flag)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].vnum() == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -2520,24 +2520,24 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 		}
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30010 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30010 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("$p binds to your skin and won't let go. It hurts!", this, obj, 0, TO_CHAR, 0);
 		act("$p binds to $n's skin!", this, obj, 0, TO_ROOM, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30036 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30033 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30008 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 5;
@@ -2600,17 +2600,17 @@ class Object *Character::unequip_char(int pos, bool flag)
 
 	obj = equipment[pos];
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", this, obj, 0, TO_CHAR, 0);
 		GET_MANA(this) = GET_MANA(this) / 2;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", this, obj, 0, TO_CHAR, 0);
 		setHP(getHP() / 2);
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The spring in your step has subsided.", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
@@ -2859,7 +2859,7 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 			continue;
 		if (number == 1 || number == 0)
 		{
-			if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && DC::getInstance()->mob_index[i->mobdata->nr].virt == 12))
+			if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && DC::getInstance()->mob_index[i->mobdata->nr].vnum() == 12))
 				return (i);
 			else if (isprefix(tmp, GET_NAME(i)))
 			{
@@ -3496,7 +3496,7 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 
 	// recursively upwards add the weight.  Since we only have 1 layer of containers,
 	// this loop only happens once, but it's good to leave later in case we change our mind
-	if (DC::getInstance()->obj_index[obj_to->item_number].virt != 536)
+	if (DC::getInstance()->obj_index[obj_to->item_number].vnum() != 536)
 	{
 		for (tobj = obj->in_obj; tobj;
 			 GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj), tobj = tobj->in_obj)
@@ -3540,7 +3540,7 @@ int obj_from_obj(class Object *obj)
 
 	// Subtract weight from containers container
 
-	if (!obj_from || DC::getInstance()->obj_index[obj_from->item_number].virt != 536)
+	if (!obj_from || DC::getInstance()->obj_index[obj_from->item_number].vnum() != 536)
 	{
 		for (tmp = obj->in_obj; tmp->in_obj; tmp = tmp->in_obj)
 			GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
@@ -3663,7 +3663,7 @@ void extract_obj(class Object *obj)
 
 void update_object(class Object *obj, int use)
 {
-	if (obj->obj_flags.timer > 0 && (DC::getInstance()->obj_index[obj->item_number].virt != 30010 && DC::getInstance()->obj_index[obj->item_number].virt != 30036 && DC::getInstance()->obj_index[obj->item_number].virt != 30033 && DC::getInstance()->obj_index[obj->item_number].virt != 30097 && DC::getInstance()->obj_index[obj->item_number].virt != 30019))
+	if (obj->obj_flags.timer > 0 && (DC::getInstance()->obj_index[obj->item_number].vnum() != 30010 && DC::getInstance()->obj_index[obj->item_number].vnum() != 30036 && DC::getInstance()->obj_index[obj->item_number].vnum() != 30033 && DC::getInstance()->obj_index[obj->item_number].vnum() != 30097 && DC::getInstance()->obj_index[obj->item_number].vnum() != 30019))
 		obj->obj_flags.timer -= use;
 	if (obj->contains)
 		update_object(obj->contains, use);
@@ -3693,7 +3693,7 @@ void update_char_objects(Character *ch)
 	{
 		if (ch->equipment[i])
 		{
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
 			{
 				update_object(ch->equipment[i], 1);
 
@@ -3756,7 +3756,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 			extract_char(ch->player->golem, false);
 		}
 	}
-	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt == 8)
+	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
 	{
 		isGolem = true;
 		if (pull)

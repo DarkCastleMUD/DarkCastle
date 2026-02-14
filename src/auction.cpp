@@ -1575,7 +1575,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     advertise = true;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), DC::getInstance()->obj_index[obj->item_number].virt))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), DC::getInstance()->obj_index[obj->item_number].vnum()))
   {
     ch->send(QStringLiteral("You're selling %1 already and it's unique!\n\r").arg(obj->short_description));
     return;
@@ -1616,7 +1616,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   ItemsActive += 1;
 
   AuctionTicket NewTicket;
-  NewTicket.vitem = DC::getInstance()->obj_index[obj->item_number].virt;
+  NewTicket.vitem = DC::getInstance()->obj_index[obj->item_number].vnum();
   NewTicket.price = price;
   NewTicket.state = AUC_FOR_SALE;
   NewTicket.end_time = time(0) + auction_duration;

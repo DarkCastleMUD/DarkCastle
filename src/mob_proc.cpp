@@ -1043,7 +1043,7 @@ int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     int clan_num = ch->clan;
     if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
     {
-        int b = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
+        int b = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
         switch (b)
         {
         case 8:     // golem
@@ -1978,7 +1978,7 @@ int janitor(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         if (isSet(i->obj_flags.wear_flags, TAKE) &&
             GET_OBJ_WEIGHT(i) < 20 &&
             !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
-            DC::getInstance()->obj_index[i->item_number].virt != CHAMPION_ITEM)
+            DC::getInstance()->obj_index[i->item_number].vnum() != CHAMPION_ITEM)
         {
             act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
             move_obj(i, ch);
@@ -3604,7 +3604,7 @@ int bodyguard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (cmd != cmd_t::UNDEFINED)
         return eFAILURE;
 
-    switch (DC::getInstance()->mob_index[ch->mobdata->nr].virt)
+    switch (DC::getInstance()->mob_index[ch->mobdata->nr].vnum())
     {
     case 9511:                    // sura mutant
         return protect(ch, 9510); // laiger

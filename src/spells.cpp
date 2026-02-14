@@ -1823,7 +1823,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
 
   Object *tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from casting!");
       return eFAILURE;
@@ -2046,8 +2046,8 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             return eFAILURE;
           }
 
-          if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->nr].virt >= 2300 &&
-              DC::getInstance()->mob_index[tar_char->mobdata->nr].virt <= 2399)
+          if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
+              DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);

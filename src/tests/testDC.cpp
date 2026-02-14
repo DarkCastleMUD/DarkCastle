@@ -1078,21 +1078,21 @@ private slots:
         DC dc(cf);
         dc.boot_db();
         auto obj = reinterpret_cast<Object *>(DC::getInstance()->obj_index[0].item);
-        QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[0].virt);
-        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[0].vnum());
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number), DC::getInstance()->obj_index[obj->item_number].vnum());
         QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
 
         bool ok = false;
         DC::getInstance()->getObjectVNUM(obj, &ok);
         QCOMPARE(ok, true);
         ok = false;
-        DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].virt;
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].vnum());
         QCOMPARE(ok, true);
         DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, &ok), DC::INVALID_VNUM;
         QCOMPARE(ok, false);
 
-        QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].virt);
-        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].vnum());
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].vnum());
         QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
     }
     void test_blackjack()
@@ -1645,11 +1645,11 @@ private slots:
         QCOMPARE(get_obj_vnum(QStringLiteral("v1")), nullptr);
         QCOMPARE_NE(get_obj_vnum(QStringLiteral("v99")), nullptr);
 
-        QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(QStringLiteral("v99"))->item_number].virt, 99);
+        QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(QStringLiteral("v99"))->item_number].vnum(), 99);
         QCOMPARE(get_obj_vnum(QStringLiteral("v99"))->carried_by, nullptr);
-        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v1"))->item_number].virt, 1);
+        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v1"))->item_number].vnum(), 1);
         QCOMPARE(get_objindex_vnum(QStringLiteral("v1"))->carried_by, nullptr);
-        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->item_number].virt, 99);
+        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->item_number].vnum(), 99);
         QCOMPARE(get_objindex_vnum(QStringLiteral("v99"))->carried_by, nullptr);
     }
 

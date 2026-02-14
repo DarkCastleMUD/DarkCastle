@@ -362,7 +362,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     class Object *curr;
     for (curr = ch->carrying; curr; curr = curr->next_content)
     {
-      if (DC::getInstance()->obj_index[curr->item_number].virt == 22427) // red dragon snout
+      if (DC::getInstance()->obj_index[curr->item_number].vnum() == 22427) // red dragon snout
       {
         obj->obj_flags.value[2] = 5;
         ch->sendln("The wand absorbs the dragon snout and pulses with energy.");
@@ -585,13 +585,13 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
 
   for (curr = ch->carrying; curr; curr = curr->next_content)
   {
-    if (DC::getInstance()->obj_index[curr->item_number].virt == 17399)
+    if (DC::getInstance()->obj_index[curr->item_number].vnum() == 17399)
       diamond = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].virt == 27903 && firstP != nullptr)
+    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27903 && firstP != nullptr)
       secondP = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].virt == 27903)
+    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27903)
       firstP = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].virt == 27904)
+    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27904)
       vial = curr;
   }
 
@@ -661,8 +661,8 @@ int holyavenger(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           if (chance > (2 * percent) && !isSet(vict->immune, ISR_SLASH))
           {
             if ((
-                    (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
-                    (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
+                    (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) ||
+                    (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
                 !number(0, 1))
             { // tarrasque's leash..
               act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
@@ -718,7 +718,7 @@ int hooktippedsteelhalberd(Character *ch, class Object *obj, cmd_t cmd,
     eq_destroyed(victim, victim->equipment[which], which);
   else
   {
-    if (DC::getInstance()->obj_index[obj->item_number].virt == 17904)
+    if (DC::getInstance()->obj_index[obj->item_number].vnum() == 17904)
     {
       act("$n's diamond war club cracks your $p!", ch, victim->equipment[which], victim, TO_VICT, 0);
       act("$n smashes $m diamond war club into $N's $p and cracks it!", ch, victim->equipment[which], victim, TO_ROOM, NOTVICT);
@@ -1187,7 +1187,7 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
       // if we can see it
       if (CAN_SEE_OBJ(ch, obj, false))
       {
-        vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+        vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
         item_index = search_assemble_items(vnum);
 
         // check if it's a component of an item to be assembled
@@ -1245,7 +1245,7 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
     return eFAILURE;
   }
 
-  vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+  vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
   item_index = search_assemble_items(vnum);
 
   // Object specified is not part of an item that can be assembled
@@ -1976,7 +1976,7 @@ int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (cmd != cmd_t::PUSH) // push
     return eFAILURE;
 
-  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
 
   switch (obj_vnum)
   {
@@ -2398,7 +2398,7 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   if (cmd != cmd_t::PULL) // pull
     return eFAILURE;
 
-  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
 
   switch (obj_vnum)
   {
@@ -2453,7 +2453,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     bool first = true;
     for (p = DC::getInstance()->object_list; p; p = p->next)
     {
-      if (DC::getInstance()->obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
+      if (DC::getInstance()->obj_index[p->item_number].vnum() == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
       {
         first = false;
         break;
@@ -2507,7 +2507,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     for (p = DC::getInstance()->object_list; p; p = n)
     {
       n = p->next;
-      if (DC::getInstance()->obj_index[p->item_number].virt == 30097)
+      if (DC::getInstance()->obj_index[p->item_number].vnum() == 30097)
       {
         Character *v = nullptr;
 
@@ -2616,7 +2616,7 @@ int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
   if (cmd != cmd_t::UNDEFINED)
     return eFAILURE;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].virt)
+  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
   case 11300:
   case 11301:
@@ -2701,7 +2701,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, cmd_t cmd, const char
 
   for (; vict; vict = vict->next_in_room)
   {
-    if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->nr].virt == 9544
+    if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == 9544
                          // to add a new mob to this list, just add || and the next check
                          ))
       break;
@@ -2761,13 +2761,13 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 
   // figure out which boat I am
   int *boat_list = nullptr;
-  switch (DC::getInstance()->obj_index[obj->item_number].virt)
+  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
   case 9531:
     boat_list = dk_boat;
     break;
   default:
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].virt);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     break;
   }
 
@@ -2798,7 +2798,7 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       if (obj->obj_flags.value[0] == -1) // at beginning
       {
         obj->obj_flags.value[0] = 1;
-        send_to_boat(DC::getInstance()->obj_index[obj->item_number].virt, "The ship docks at its destination.\r\n");
+        send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
       }
     }
     else
@@ -2808,11 +2808,11 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       if (obj->obj_flags.value[0] == boat_list[0]) // at beginning
       {
         obj->obj_flags.value[0] *= -1;
-        send_to_boat(DC::getInstance()->obj_index[obj->item_number].virt, "The ship docks at its destination.\r\n");
+        send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
       }
     }
     send_to_room("The ship sails away.\r\n", obj->in_room, true);
-    send_to_boat(DC::getInstance()->obj_index[obj->item_number].virt, "The ship sails onwards.\r\n");
+    send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship sails onwards.\r\n");
     obj_from_room(obj);
     obj_to_room(obj, move_to);
     send_to_room("A ship sails in.\r\n", obj->in_room, true);
@@ -2833,7 +2833,7 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     return eFAILURE; // someone loaded me
 
   // switch off depending on what item we are
-  switch (DC::getInstance()->obj_index[obj->item_number].virt)
+  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
   case 9532: // dk boat ramp
     // find the dk boat (9531)
@@ -2874,7 +2874,7 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     return eSUCCESS;
     break;
   default:
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].virt);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     break;
   }
 
@@ -3093,7 +3093,7 @@ int shield_combat_procs(Character *ch, class Object *obj, cmd_t cmd, const char 
   if (ch->equipment[WEAR_SHIELD] != obj)
     return eFAILURE;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].virt)
+  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
   case 2715: // shield of ares
     if (number(0, 3))
@@ -3146,7 +3146,7 @@ int generic_weapon_combat(Character *ch, class Object *obj, cmd_t cmd, char *arg
     return eFAILURE;
   }
 
-  switch (DC::getInstance()->obj_index[obj->item_number].virt)
+  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
   case 16903: // valhalla hammer
     if (number(1, 100) > GET_DEX(ch) / 4)
@@ -3307,7 +3307,7 @@ int glove_combat_procs(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
   int dam;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].virt)
+  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
   case 9806: // muddy gloves
     if (number(0, 17))
@@ -3742,7 +3742,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (rnd == unequip)
       {
 
-        if (vict->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_WIELD]->item_number].virt == 27997)
+        if (vict->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
         {
 
           act("Your $p unequips itself.",
@@ -3758,7 +3758,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
             vict->equip_char(weapon, WEAR_WIELD);
           }
         }
-        else if (vict->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_SECOND_WIELD]->item_number].virt == 27997)
+        else if (vict->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_SECOND_WIELD]->item_number].vnum() == 27997)
         {
 
           act("Your $p unequips itself.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, 0);
@@ -4428,9 +4428,9 @@ void destroy_spellcraft_glyphs(Character *ch)
   {
     if (GET_ITEM_TYPE(tmp_obj) == ITEM_CONTAINER)
       for (loop_obj = tmp_obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-        if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].virt == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].virt == 6353)
+        if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6353)
           move_obj(loop_obj, ch);
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].virt == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].virt == 6353)
+    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6353)
       obj_from_char(tmp_obj);
   }
   ch->spellcraftglyph = 0;

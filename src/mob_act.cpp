@@ -55,7 +55,7 @@ bool is_r_denied(Character *ch, int room)
   if (IS_PC(ch))
     return false;
   for (d = DC::getInstance()->world[room].denied; d; d = d->next)
-    if (DC::getInstance()->mob_index[ch->mobdata->nr].virt == d->vnum)
+    if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == d->vnum)
       return true;
   return false;
 }
@@ -683,7 +683,7 @@ void scavenge(Character *ch)
     if (!CAN_GET_OBJ(ch, obj))
       continue;
 
-    if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (DC::getInstance()->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
       continue;
 
     keyword = obj->keywordfind();

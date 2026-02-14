@@ -340,7 +340,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)
         {
-          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].virt == vnum)
+          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].vnum() == vnum)
           {
             if (!first_npc_found)
             {
@@ -818,7 +818,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = DC::getInstance()->obj_index[obj->item_number].virt;
+              last_vnum[0][o] = DC::getInstance()->obj_index[obj->item_number].vnum();
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -832,7 +832,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
               for (v = 0; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = DC::getInstance()->obj_index[obj->item_number].virt;
+                  last_vnum[v][o] = DC::getInstance()->obj_index[obj->item_number].vnum();
                   break;
                 }
             }

@@ -744,7 +744,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You can't seem to work it loose.");
       return eFAILURE;
     }
-    if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].virt == 27997)
+    if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n\r", ch->in_room);
       return eSUCCESS;
@@ -779,8 +779,8 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
 
     if (((isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
-        (IS_PC(victim) || DC::getInstance()->mob_index[victim->mobdata->nr].virt > 2400 ||
-         DC::getInstance()->mob_index[victim->mobdata->nr].virt < 2300))
+        (IS_PC(victim) || DC::getInstance()->mob_index[victim->mobdata->nr].vnum() > 2400 ||
+         DC::getInstance()->mob_index[victim->mobdata->nr].vnum() < 2300))
       ch->sendln("You can't seem to work it loose.");
     else
       disarm(ch, victim);

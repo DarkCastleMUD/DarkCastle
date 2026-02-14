@@ -325,9 +325,9 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  int virt = DC::getInstance()->obj_index[obj->item_number].virt;
+  int virt = DC::getInstance()->obj_index[obj->item_number].vnum();
   if (virt >= 13400 && virt <= 13707 &&
-      DC::getInstance()->mob_index[keeper->mobdata->nr].virt != 13416)
+      DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() != 13416)
   {
     keeper->do_tell(QStringLiteral("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
     return;
@@ -401,7 +401,7 @@ void shopping_value(const char *arg, Character *ch,
     }
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3003)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -450,7 +450,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3004)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -494,7 +494,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I deal with armor exclusively.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3000)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -551,7 +551,7 @@ void shopping_value(const char *arg, Character *ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
   { // if the leather worker in town
     act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
     act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
@@ -635,7 +635,7 @@ void shopping_list(const char *arg, Character *ch,
 
     cost = (int)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_buy);
 
-    int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+    int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
     bool loop = false;
     for (a = 0; a < i; a++)
       if (done[a] == vnum)
@@ -643,12 +643,12 @@ void shopping_list(const char *arg, Character *ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = DC::getInstance()->obj_index[obj->item_number].virt;
+      done[i++] = DC::getInstance()->obj_index[obj->item_number].vnum();
     else
       break;
     a = 0;
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (DC::getInstance()->obj_index[tobj->item_number].virt == DC::getInstance()->obj_index[obj->item_number].virt)
+      if (DC::getInstance()->obj_index[tobj->item_number].vnum() == DC::getInstance()->obj_index[obj->item_number].vnum())
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
@@ -1130,7 +1130,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
 
   // add it to list
   player_shop_item *newitem = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
-  newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+  newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
@@ -2199,7 +2199,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
           return eSUCCESS;
         }
 
-        ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].virt).split(' '));
+        ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].vnum()).split(' '));
 
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);

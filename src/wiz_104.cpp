@@ -160,7 +160,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
 		*buf = '\0';
 		ch->sendln("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n");
 
-		for (x = 0; (x < DC::getInstance()->obj_index[top_of_objt].virt); x++)
+		for (x = 0; (x < DC::getInstance()->obj_index[top_of_objt].vnum()); x++)
 		{
 			if ((num = real_object(x)) < 0)
 				continue;
@@ -581,7 +581,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 		switch (zone.cmd[j]->command)
 		{
 		case 'M':
-			virt = ZCMD->active ? DC::getInstance()->mob_index[ZCMD->arg1].virt : ZCMD->arg1;
+			virt = ZCMD->active ? DC::getInstance()->mob_index[ZCMD->arg1].vnum() : ZCMD->arg1;
 			sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
 			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) in room ");
@@ -594,7 +594,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			sprintf(buf, "%s\r\n", buf);
 			break;
 		case 'O':
-			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].virt : ZCMD->arg1;
+			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
 			sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
 			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) in room ");
@@ -605,17 +605,17 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
 			break;
 		case 'P':
-			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].virt : ZCMD->arg1;
+			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
 			sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
 			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) in objt ");
 			else
 				sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
-			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg3].virt : ZCMD->arg3;
+			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg3].vnum() : ZCMD->arg3;
 			sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
 			break;
 		case 'G':
-			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].virt : ZCMD->arg1;
+			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
 			sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
 			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) on last mob loaded.$R\r\n");
@@ -623,7 +623,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 				sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
 			break;
 		case 'E':
-			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].virt : ZCMD->arg1;
+			virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
 			sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
 			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) on last mob on ");
@@ -886,7 +886,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			}
 			else
 			{
-				for (i = begin; i <= DC::getInstance()->mob_index[top_of_mobt].virt && i <= end;
+				for (i = begin; i <= DC::getInstance()->mob_index[top_of_mobt].vnum() && i <= end;
 					 i++)
 				{
 					if ((nr = real_mobile(i)) < 0)
@@ -911,7 +911,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			*buf = '\0';
 			ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
-			for (i = 0; (i <= DC::getInstance()->mob_index[top_of_mobt].virt); i++)
+			for (i = 0; (i <= DC::getInstance()->mob_index[top_of_mobt].vnum()); i++)
 			{
 				if ((nr = real_mobile(i)) < 0)
 					continue;
@@ -990,7 +990,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			}
 			else
 			{
-				for (i = begin; i <= DC::getInstance()->obj_index[top_of_objt].virt && i <= end;
+				for (i = begin; i <= DC::getInstance()->obj_index[top_of_objt].vnum() && i <= end;
 					 i++)
 				{
 					if ((nr = real_object(i)) < 0)
@@ -1015,7 +1015,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			*buf = '\0';
 			ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
 
-			for (i = 0; (i <= DC::getInstance()->obj_index[top_of_objt].virt); i++)
+			for (i = 0; (i <= DC::getInstance()->obj_index[top_of_objt].vnum()); i++)
 			{
 				if ((nr = real_object(i)) < 0)
 					continue;
@@ -1353,7 +1353,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			ch->sendln("No valid search supplied.");
 			return eFAILURE;
 		}
-		for (c = 0; c < DC::getInstance()->mob_index[top_of_mobt].virt; c++)
+		for (c = 0; c < DC::getInstance()->mob_index[top_of_mobt].vnum(); c++)
 		{
 			if ((nr = real_mobile(c)) < 0)
 				continue;
@@ -1630,7 +1630,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 			return eSUCCESS;
 		}
 
-		for (c = 0; c < DC::getInstance()->obj_index[top_of_objt].virt; c++)
+		for (c = 0; c < DC::getInstance()->obj_index[top_of_objt].vnum(); c++)
 		{
 			found = false;
 			if ((nr = real_object(c)) < 0)
@@ -2441,7 +2441,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
 	DC::getInstance()->obj_index[r2].item = (void *)obj;
 	DC::getInstance()->obj_index[r2].non_combat_func = 0;
 	DC::getInstance()->obj_index[r2].qty = 0;
-	DC::getInstance()->obj_index[r2].virt = v2;
+	DC::getInstance()->obj_index[r2].vnum(v2);
 	DC::getInstance()->obj_index[r2].mobprogs = nullptr;
 	DC::getInstance()->obj_index[r2].combat_func = 0;
 	DC::getInstance()->obj_index[r2].mobspec = 0;
@@ -2534,7 +2534,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
 	DC::getInstance()->mob_index[dst].mobprogs = nullptr;
 	DC::getInstance()->mob_index[dst].mobspec = 0;
 	DC::getInstance()->mob_index[dst].progtypes = 0;
-	DC::getInstance()->mob_index[dst].virt = vdst;
+	DC::getInstance()->mob_index[dst].vnum(vdst);
 
 	add_mobspec(dst);
 

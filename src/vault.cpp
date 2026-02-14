@@ -2165,7 +2165,7 @@ void Character::vault_list(QString owner)
 
     if (getLevel() > IMMORTAL && obj->item_number > 0)
     {
-      send(QStringLiteral(" [%1]").arg(DC::getInstance()->obj_index[obj->item_number].virt));
+      send(QStringLiteral(" [%1]").arg(DC::getInstance()->obj_index[obj->item_number].vnum()));
     }
     send("\r\n");
   }
@@ -2738,7 +2738,7 @@ int vault_search(Character *ch, const char *args)
 
         if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
         {
-          ch->send(fmt::format(" [{}]", DC::getInstance()->obj_index[obj->item_number].virt));
+          ch->send(fmt::format(" [{}]", DC::getInstance()->obj_index[obj->item_number].vnum()));
         }
         ch->send("\r\n");
       } // for loop of objects

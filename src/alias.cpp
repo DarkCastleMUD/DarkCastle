@@ -163,7 +163,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   extern int top_of_mobt;
   QMultiMap<level_t, QString> results;
 
-  for (vnum_t vnum = 0; (vnum <= DC::getInstance()->mob_index[top_of_mobt].virt); ++vnum)
+  for (vnum_t vnum = 0; (vnum <= DC::getInstance()->mob_index[top_of_mobt].vnum()); ++vnum)
   {
     auto nr = real_mobile(vnum);
     if (nr < 0)

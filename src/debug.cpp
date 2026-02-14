@@ -142,7 +142,7 @@ QString showObjectAffects(Object *obj)
 
 QString showObjectVault(Object *obj)
 {
-  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].vnum() << ":";
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
   // std::cerr <<  buf << ":";
 
@@ -163,7 +163,7 @@ QString showObjectVault(Object *obj)
 
 void showObject(Character *ch, Object *obj)
 {
-  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].vnum() << ":";
   char buf[255];
 
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
@@ -416,7 +416,7 @@ int main(int argc, char **argv)
                   obj = ch->equipment[iWear];
                   if (obj)
                   {
-                    if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum)
                     {
                       showObject(ch, obj);
                     }
@@ -426,7 +426,7 @@ int main(int argc, char **argv)
 
               for (Object *obj = ch->carrying; obj; obj = obj->next_content)
               {
-                if (vnum == 0 || (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum))
+                if (vnum == 0 || (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum))
                 {
                   showObject(ch, obj);
                 }
@@ -435,7 +435,7 @@ int main(int argc, char **argv)
                 {
                   for (Object *container = obj->contains; container; container = container->next_content)
                   {
-                    if (vnum > 0 && DC::getInstance()->obj_index[container->item_number].virt == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[container->item_number].vnum() == vnum)
                     {
                       showObject(ch, container);
                     }
@@ -514,7 +514,7 @@ int main(int argc, char **argv)
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
         Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
-        if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
+        if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum)
         {
           ch->send(showObjectVault(obj));
         }

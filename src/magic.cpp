@@ -146,10 +146,10 @@ bool can_heal(Character *ch, Character *victim, int spellnum)
 
   // You cannot heal an elemental from "conjure elemental"
   if (IS_NPC(victim) &&
-      (DC::getInstance()->mob_index[victim->mobdata->nr].virt == 88 ||
-       DC::getInstance()->mob_index[victim->mobdata->nr].virt == 89 ||
-       DC::getInstance()->mob_index[victim->mobdata->nr].virt == 90 ||
-       DC::getInstance()->mob_index[victim->mobdata->nr].virt == 91))
+      (DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 88 ||
+       DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 89 ||
+       DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 90 ||
+       DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 91))
   {
     ch->sendln("The heavy magics surrounding this being prevent healing.");
     return false;
@@ -1163,8 +1163,8 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
-        if (IS_NPC(tmp_victim) && DC::getInstance()->mob_index[tmp_victim->mobdata->nr].virt >= 2300 &&
-            DC::getInstance()->mob_index[tmp_victim->mobdata->nr].virt <= 2399)
+        if (IS_NPC(tmp_victim) && DC::getInstance()->mob_index[tmp_victim->mobdata->nr].vnum() >= 2300 &&
+            DC::getInstance()->mob_index[tmp_victim->mobdata->nr].vnum() <= 2399)
         {
           ch->sendln("The clan hall's enchantments absorbs part of your spell.");
           continue;
@@ -3275,7 +3275,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     {
       act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
       REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-      if (DC::getInstance()->obj_index[obj->item_number].virt == 514)
+      if (DC::getInstance()->obj_index[obj->item_number].vnum() == 514)
       {
         int i = 0;
         for (i = 0; i < obj->num_affects; i++)
@@ -3326,7 +3326,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
       {
         if (curses_removed++)
           GET_MANA(victim) -= mana_cost;
-        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].vnum() == 514)
         {
           int i = 0;
           for (i = 0; i < obj->num_affects; i++)
@@ -3357,7 +3357,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
           GET_MANA(victim) -= mana_cost;
         act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
         act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
-        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].vnum() == 514)
         {
           int i = 0;
           for (i = 0; i < obj->num_affects; i++)
@@ -3504,7 +3504,7 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Obje
   char dammsg[30];
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
+    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       heal = (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       heal = number(heal - (heal / 10), heal + (heal / 10));
@@ -10155,7 +10155,7 @@ int elemental_damage_bonus(int spell, Character *ch)
     // if (IS_NPC(f->follower) && f->follower->height == 77)
     if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
     {
-      switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].virt)
+      switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].vnum())
       {
       case 88:
         fire = true;
@@ -10179,7 +10179,7 @@ int elemental_damage_bonus(int spell, Character *ch)
         // if (IS_NPC(t->follower) && t->follower->height == 77)
         if (IS_NPC(t->follower) && t->follower->mobdata->mob_flags.value[3] == 77)
         {
-          switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].virt)
+          switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].vnum())
           {
           case 88:
             fire = true;
@@ -10261,7 +10261,7 @@ bool elemental_score(Character *ch, int level)
     {
       // if (f->follower->height == 77) // improved
       if (f->follower->mobdata->mob_flags.value[3] == 77)
-        switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].virt)
+        switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].vnum())
         {
         case 88:
           fire = true;
@@ -10287,7 +10287,7 @@ bool elemental_score(Character *ch, int level)
         {
           if (t->follower->mobdata->mob_flags.value[3] == 77)
           {
-            switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].virt)
+            switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].vnum())
             {
             case 88:
               fire = true;
@@ -11514,7 +11514,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
       ch->sendln("You don't seem to be carrying any such root.");
       return eFAILURE;
     }
-    int virt = DC::getInstance()->obj_index[obj->item_number].virt;
+    int virt = DC::getInstance()->obj_index[obj->item_number].vnum();
     int aff = 0, spl = 0;
     switch (virt)
     {
@@ -14166,7 +14166,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
     return eFAILURE;
   }
 
-  switch (DC::getInstance()->mob_index[victim->mobdata->nr].virt)
+  switch (DC::getInstance()->mob_index[victim->mobdata->nr].vnum())
   {
   case FIRE_ELEMENTAL:
     act("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -15522,10 +15522,10 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[WEAR_HOLD];
-      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].vnum()))
       {
         component = ch->equipment[WEAR_HOLD2];
-        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].vnum()))
         {
           ch->sendln("You do not have the required components.");
           return eFAILURE;
@@ -15679,10 +15679,10 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[WEAR_HOLD];
-      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].vnum()))
       {
         component = ch->equipment[WEAR_HOLD2];
-        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].vnum()))
         {
           ch->sendln("You do not have the required components.");
           return eFAILURE;

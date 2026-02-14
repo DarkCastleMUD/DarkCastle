@@ -358,7 +358,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
       Character *possible_victim = DC::getInstance()->world[in_room].people;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
-        if (possible_victim->isNPC() && DC::getInstance()->mob_index[victim->mobdata->nr].virt == victim_vnum)
+        if (possible_victim->isNPC() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == victim_vnum)
         {
           victim = possible_victim;
           break;

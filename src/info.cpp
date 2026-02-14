@@ -858,7 +858,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
       if (nr >= 0)
       {
-         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].virt,
+         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].vnum(),
                 ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
       }
    }
@@ -1065,7 +1065,7 @@ bool identify(Character *ch, Object *obj)
    const Object *vobj = nullptr;
    if (obj->item_number >= 0)
    {
-      const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+      const int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
       if (vnum >= 0)
       {
          const int rn_of_vnum = real_object(vnum);
@@ -1431,7 +1431,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                      {
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                              "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
+                             DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
                              tmp_object->obj_flags.value[1],
                              tmp_object->obj_flags.value[0]);
                         tmp_object->obj_flags.value[1] =
@@ -1467,7 +1467,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                      {
 
                         int weight_in(class Object * obj);
-                        if (DC::getInstance()->obj_index[tmp_object->item_number].virt == 536)
+                        if (DC::getInstance()->obj_index[tmp_object->item_number].vnum() == 536)
                            temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                         else
                            temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
@@ -1486,7 +1486,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                         temp = 3;
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                              "Bug in object %d. Weight: %d v1: %d",
-                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
+                             DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
                              tmp_object->obj_flags.weight,
                              tmp_object->obj_flags.value[0]);
                      }
@@ -4395,7 +4395,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
    }
    else
    {
-      for (int vnum = 0; vnum < DC::getInstance()->obj_index[top_of_objt].virt; ++vnum)
+      for (int vnum = 0; vnum < DC::getInstance()->obj_index[top_of_objt].vnum(); ++vnum)
       {
          int rnum = 0;
          // real_object returns -1 for missing VNUMs
@@ -4601,7 +4601,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       const Object *vobj = nullptr;
       if (obj->item_number >= 0)
       {
-         const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+         const int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
          if (vnum >= 0)
          {
             const int rn_of_vnum = real_object(vnum);

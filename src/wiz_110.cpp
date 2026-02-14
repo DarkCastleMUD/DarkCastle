@@ -884,7 +884,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].virt, ac);
+            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)

@@ -1047,19 +1047,21 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
 						perror("Too many mob indexes");
 						abort();
 					}
-					sscanf(buf, "#%d", &index[i].virt);
+					vnum_t vnum{};
+					sscanf(buf, "#%d", &vnum);
+					index[i].vnum(vnum);
 					index[i].qty = 0;
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
 					index[i].mobprogs = nullptr;
 					index[i].mobspec = nullptr;
 					index[i].progtypes = 0;
-					DC::getInstance()->currentVNUM(index[i].virt);
+					DC::getInstance()->currentVNUM(index[i].vnum());
 					if (!(index[i].item = (Character *)read_mobile(i, fl)))
 					{
 
 						sprintf(log_buf, "Unable to load mobile %d!\n\r",
-								index[i].virt);
+								index[i].vnum());
 						logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
 					}
 					i++;
@@ -1348,14 +1350,16 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
 						perror("Too many obj indexes");
 						abort();
 					}
-					sscanf(buf, "#%d", &index[i].virt);
+					vnum_t vnum{};
+					sscanf(buf, "#%d", &vnum);
+					index[i].vnum(vnum);
 					index[i].qty = 0;
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
 					index[i].progtypes = 0;
 					if (!(index[i].item = (class Object *)read_object(i, fl, false)))
 					{
-						sprintf(log_buf, "Unable to load object %d!\n\r", index[i].virt);
+						sprintf(log_buf, "Unable to load object %d!\n\r", index[i].vnum());
 						logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
 					}
 					i++;
@@ -2332,7 +2336,7 @@ void Zone::write(FILE *fl)
 					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 		else if (cmd[i]->command == 'M')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->mob_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->mob_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
 			fprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2341,8 +2345,8 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'P')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
-			int virt2 = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg3].virt : cmd[i]->arg3;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
+			int virt2 = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg3].vnum() : cmd[i]->arg3;
 			fprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2351,7 +2355,7 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'G')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
 
 			fprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
@@ -2361,7 +2365,7 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'O')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
 			fprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2370,7 +2374,7 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'E')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
 			fprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2857,7 +2861,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
 	FILE *fl = lf.file_handle_;
 	int i = 0;
 
-	fprintf(fl, "#%d\n", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+	fprintf(fl, "#%d\n", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
 	string_to_file(fl, mob->getName());
 	string_to_file(fl, mob->short_desc);
 	string_to_file(fl, mob->long_desc);
@@ -3380,10 +3384,10 @@ auto DC::create_blank_item(int nr) -> std::expected<int, create_error>
 	// yes, i could check if the last item is smaller and then do a binary
 	// search to do this faster but if everything in life was optimized I wouldn't
 	// be playing solitaire at work on a windows machine. -pir
-	while (DC::getInstance()->obj_index[cur_index].virt < nr && cur_index < top_of_objt + 1)
+	while (DC::getInstance()->obj_index[cur_index].vnum() < nr && cur_index < top_of_objt + 1)
 		cur_index++;
 
-	if (DC::getInstance()->obj_index[cur_index].virt == nr) // item already exists
+	if (DC::getInstance()->obj_index[cur_index].vnum() == nr) // item already exists
 		return std::unexpected(create_error::entry_exists);
 
 	// theoretically if top_of_objt+1 wasn't initialized properly it could
@@ -3413,7 +3417,7 @@ auto DC::create_blank_item(int nr) -> std::expected<int, create_error>
 	top_of_objt++;
 
 	// insert
-	DC::getInstance()->obj_index[cur_index].virt = nr;
+	DC::getInstance()->obj_index[cur_index].vnum(nr);
 	DC::getInstance()->obj_index[cur_index].qty = 0;
 	DC::getInstance()->obj_index[cur_index].non_combat_func = 0;
 	DC::getInstance()->obj_index[cur_index].combat_func = 0;
@@ -3468,10 +3472,10 @@ int DC::create_blank_mobile(int nr)
 	// yes, i could check if the last mobile is smaller and then do a binary
 	// search to do this faster but if everything in life was optimized I wouldn't
 	// be playing solitaire at work on a windows machine. -pir
-	while (DC::getInstance()->mob_index[cur_index].virt < nr && cur_index < top_of_mobt + 1)
+	while (DC::getInstance()->mob_index[cur_index].vnum() < nr && cur_index < top_of_mobt + 1)
 		cur_index++;
 
-	if (DC::getInstance()->mob_index[cur_index].virt == nr) // item already exists
+	if (DC::getInstance()->mob_index[cur_index].vnum() == nr) // item already exists
 		return -1;
 
 	// theoretically if top_of_objt+1 wasn't initialized properly it could
@@ -3523,7 +3527,7 @@ int DC::create_blank_mobile(int nr)
 	top_of_mobt++;
 
 	// insert
-	DC::getInstance()->mob_index[cur_index].virt = nr;
+	DC::getInstance()->mob_index[cur_index].vnum(nr);
 	DC::getInstance()->mob_index[cur_index].qty = 0;
 	if (DC::getInstance()->mob_non_combat_functions.contains(nr))
 	{
@@ -3788,7 +3792,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	obj->short_description = fread_string(fl, 1);
 	if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].vnum());
 	}
 
 	obj->long_description = fread_string(fl, 1);
@@ -3797,7 +3801,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	fl.skipWhiteSpace();
 	if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
 	{
-		logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].virt).arg(obj->ActionDescription()));
+		logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].vnum()).arg(obj->ActionDescription()));
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
@@ -3945,7 +3949,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 		obj->short_description = str_dup(tmpptr);
 		free(tmpptr);
 
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].vnum());
 	}
 	else
 	{
@@ -3956,7 +3960,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	obj->ActionDescription(fread_string(fl, 1));
 	if ((!obj->ActionDescription().isEmpty() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~')) && !obj->ActionDescription()[0].isNull())
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].virt, obj->ActionDescription().toStdString().c_str());
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].vnum(), obj->ActionDescription().toStdString().c_str());
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
@@ -4194,7 +4198,7 @@ void write_object(LegacyFile &lf, Object *obj)
 	FILE *fl = lf.file_handle_;
 	struct extra_descr_data *currdesc;
 
-	fprintf(fl, "#%d\n", DC::getInstance()->obj_index[obj->item_number].virt);
+	fprintf(fl, "#%d\n", DC::getInstance()->obj_index[obj->item_number].vnum());
 	string_to_file(fl, obj->Name());
 	string_to_file(fl, obj->short_description);
 	string_to_file(fl, obj->long_description);
@@ -4244,7 +4248,7 @@ void write_object(LegacyFile &lf, Object *obj)
 
 std::ofstream &operator<<(std::ofstream &out, Object *obj)
 {
-	out << "#" << DC::getInstance()->obj_index[obj->item_number].virt << "\n";
+	out << "#" << DC::getInstance()->obj_index[obj->item_number].vnum() << "\n";
 	string_to_file(out, obj->Name());
 	string_to_file(out, obj->short_description);
 	string_to_file(out, obj->long_description);
@@ -4376,7 +4380,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 {
 	try
 	{
-		fout << DC::getInstance()->obj_index[obj->item_number].virt << ",";
+		fout << DC::getInstance()->obj_index[obj->item_number].vnum() << ",";
 		fout << "\"" << obj->Name().toStdString() << "\",";
 		fout << "\"" << quotequotes(obj->short_description) << "\",";
 		fout << "\"" << quotequotes(obj->long_description) << "\",";
@@ -4694,7 +4698,7 @@ uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
 	uint64_t count = {};
 	for (auto ch = DC::getInstance()->world[room_id].people; ch != nullptr; ch = ch->next_in_room)
 	{
-		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].virt == vnum)
+		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == vnum)
 		{
 			count++;
 		}
@@ -4707,7 +4711,7 @@ uint64_t countMobsInWorld(uint64_t vnum)
 	uint64_t count = {};
 	for (const auto ch : DC::getInstance()->character_list)
 	{
-		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].virt == vnum && ch->in_room != DC::NOWHERE)
+		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == vnum && ch->in_room != DC::NOWHERE)
 		{
 			count++;
 		}
@@ -4778,7 +4782,7 @@ void Zone::reset(ResetType reset_type)
 			{
 
 			case 'M': /* read a mobile */
-				if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[reset_cmd_index]->arg1].virt) < cmd[reset_cmd_index]->arg2 && (mob = DC::getInstance()->clone_mobile(cmd[reset_cmd_index]->arg1)))
+				if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[reset_cmd_index]->arg1].vnum()) < cmd[reset_cmd_index]->arg2 && (mob = DC::getInstance()->clone_mobile(cmd[reset_cmd_index]->arg1)))
 				{
 					char_to_room(mob, cmd[reset_cmd_index]->arg3);
 					cmd[reset_cmd_index]->lastPop = mob;
@@ -4831,7 +4835,7 @@ void Zone::reset(ResetType reset_type)
 						{
 							sprintf(buf,
 									"Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
-									DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].virt, id_, reset_cmd_index);
+									DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
 							logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 						}
 						last_cmd = 0;
@@ -6305,11 +6309,11 @@ int real_mobile(int virt)
 	{
 		mid = (bot + top) / 2;
 
-		if ((DC::getInstance()->mob_index + mid)->virt == virt)
+		if ((DC::getInstance()->mob_index + mid)->vnum() == virt)
 			return (mid);
 		if (bot >= top)
 			return (-1);
-		if ((DC::getInstance()->mob_index + mid)->virt > virt)
+		if ((DC::getInstance()->mob_index + mid)->vnum() > virt)
 			top = mid - 1;
 		else
 			bot = mid + 1;
@@ -6331,11 +6335,11 @@ int real_object(int virt)
 	{
 		mid = (bot + top) / 2;
 
-		if ((DC::getInstance()->obj_index + mid)->virt == virt)
+		if ((DC::getInstance()->obj_index + mid)->vnum() == virt)
 			return (mid);
 		if (bot >= top)
 			return (-1);
-		if ((DC::getInstance()->obj_index + mid)->virt > virt)
+		if ((DC::getInstance()->obj_index + mid)->vnum() > virt)
 			top = mid - 1;
 		else
 			bot = mid + 1;
@@ -6657,7 +6661,7 @@ void find_unordered_objects(void)
 
 	for (int rnum = 0; rnum <= top_of_objt; rnum++, last_vnum = cur_vnum)
 	{
-		cur_vnum = DC::getInstance()->obj_index[rnum].virt;
+		cur_vnum = DC::getInstance()->obj_index[rnum].vnum();
 
 		if (cur_vnum < last_vnum)
 		{
@@ -6672,7 +6676,7 @@ void find_unordered_mobiles(void)
 
 	for (int rnum = 0; rnum <= top_of_mobt; rnum++, last_vnum = cur_vnum)
 	{
-		cur_vnum = DC::getInstance()->mob_index[rnum].virt;
+		cur_vnum = DC::getInstance()->mob_index[rnum].vnum();
 
 		if (cur_vnum < last_vnum)
 		{

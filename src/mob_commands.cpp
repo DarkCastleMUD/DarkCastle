@@ -138,7 +138,7 @@ void mpstat(Character *ch, Character *victim)
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
-          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].virt);
+          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].vnum());
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
@@ -578,7 +578,7 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
   }
   obj = clone_object(realnum);
 
-  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
+  if (DC::getInstance()->obj_index[obj->item_number].vnum() == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {
     return eFAILURE;
   }
@@ -1228,7 +1228,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   {
     if (IS_NPC(this))
     {
-      int num = DC::getInstance()->mob_index[this->mobdata->nr].virt;
+      int num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
 
       logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
@@ -1791,7 +1791,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
 
   if (IS_NPC(ch))
   {
-    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
+    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -2234,19 +2234,19 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   {
     *lvali = i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalb)
   {
     *lvalb = (int8_t)i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
 
   /*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
@@ -2263,11 +2263,11 @@ void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->item_number].virt).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else if (IS_NPC(this))
   {
-    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(dc_->mob_index[mobdata->nr].virt).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else
   {
