@@ -2130,6 +2130,12 @@ int spell_cure_critic(uint8_t level, Character *ch, Character *victim, class Obj
     return eFAILURE;
   }
 
+  if (GET_RACE(victim) == RACE_PLANAR)
+  {
+    ch->sendln("Healing does not reach their plain of existance.");
+    return eFAILURE;
+  }
+
   if (!can_heal(ch, victim, SPELL_CURE_CRITIC))
     return eFAILURE;
   healpoints = dam_percent(skill, 100 + getRealSpellDamage(ch));
@@ -2191,6 +2197,12 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Obje
   if (GET_RACE(victim) == RACE_GOLEM)
   {
     ch->sendln("The heavy magics surrounding this being prevent healing.");
+    return eFAILURE;
+  }
+
+  if (GET_RACE(victim) == RACE_PLANAR)
+  {
+    ch->sendln("Healing does not reach their plain of existance.");
     return eFAILURE;
   }
 
@@ -2768,6 +2780,12 @@ int spell_heal(uint8_t level, Character *ch, Character *victim, class Object *ob
     return eFAILURE;
   }
 
+  if (GET_RACE(victim) == RACE_PLANAR)
+  {
+    ch->sendln("Healing does not reach their plain of existance.");
+    return eFAILURE;
+  }
+
   if (!can_heal(ch, victim, SPELL_HEAL))
     return eFAILURE;
   healy = dam_percent(skill, 250 + getRealSpellDamage(ch));
@@ -2827,6 +2845,12 @@ int spell_power_heal(uint8_t level, Character *ch, Character *victim, class Obje
     return eFAILURE;
   }
 
+  if (GET_RACE(victim) == RACE_PLANAR)
+  {
+    ch->sendln("Healing does not reach their plain of existance.");
+    return eFAILURE;
+  }
+
   if (!can_heal(ch, victim, SPELL_POWER_HEAL))
     return eFAILURE;
   healy = dam_percent(skill, 300 + getRealSpellDamage(ch));
@@ -2879,6 +2903,12 @@ int spell_full_heal(uint8_t level, Character *ch, Character *victim, class Objec
   if (GET_RACE(victim) == RACE_GOLEM)
   {
     ch->sendln("The heavy magics surrounding this being prevent healing.");
+    return eFAILURE;
+  }
+
+  if (GET_RACE(victim) == RACE_PLANAR)
+  {
+    ch->sendln("Healing does not reach their plain of existance.");
     return eFAILURE;
   }
 
@@ -5952,6 +5982,12 @@ int spell_cure_serious(uint8_t level, Character *ch, Character *victim, class Ob
   if (GET_RACE(victim) == RACE_GOLEM)
   {
     ch->sendln("The heavy magics surrounding this being prevent healing.");
+    return eFAILURE;
+  }
+
+  if (GET_RACE(victim) == RACE_PLANAR)
+  {
+    ch->sendln("Healing does not reach their plain of existance.");
     return eFAILURE;
   }
 
@@ -11457,6 +11493,12 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
   if (GET_RACE(victim) == RACE_GOLEM)
   {
     ch->sendln("The heavy magics surrounding this being prevent healing.");
+    return eFAILURE;
+  }
+
+  if (GET_RACE(victim) == RACE_PLANAR)
+  {
+    ch->sendln("Healing does not reach their plain of existance.");
     return eFAILURE;
   }
 
