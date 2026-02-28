@@ -59,31 +59,24 @@ int do_unarchive(Character *ch, char *argument, cmd_t cmd)
   return eSUCCESS;
 }
 
-int do_pview(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
 {
-  char name[200];
-  Character *victim;
-  std::string tprompt;
+  auto name = arguments.value(0);
+  auto victim = get_pc_vis(this, name);
 
-  argument = one_argument(argument, name);
-
-  if ((!*name) || (!(victim = get_pc_vis(ch, name))))
+  if (name.isEmpty() || !victim)
   {
-    ch->sendln("View the prompt of whom?");
+    sendln("View the prompt of whom?");
     return eFAILURE;
   }
 
   if (!victim->desc)
   {
-    ch->sendln("This can only be used on linkalive players.");
+    sendln("This can only be used on linkalive players.");
     return eFAILURE;
   }
 
-  make_prompt(victim->desc, tprompt);
-  ch->sendln("Target's prompt is:");
-  ch->send(tprompt);
-  ch->sendln("\r\n");
-
+  sendln(QStringLiteral("Target's prompt is: %1").arg(victim->getPrompt()));
   return eSUCCESS;
 }
 

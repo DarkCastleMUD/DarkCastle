@@ -1087,6 +1087,7 @@ public:
     command_return_t do_join(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_outcast(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_backstab(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+    command_return_t do_pview(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_snoop(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_zap(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
     command_return_t do_track(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);

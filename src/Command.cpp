@@ -366,7 +366,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("global"), do_global, position_t::DEAD, 108, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("log"), do_log, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("snoop"), &Character::do_snoop, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
-        Command(QStringLiteral("pview"), do_pview, position_t::DEAD, 104, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
+        Command(QStringLiteral("pview"), &Character::do_pview, position_t::DEAD, 104, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("load"), do_load, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("prize"), do_load, position_t::DEAD, GIFTED_COMMAND, cmd_t::PRIZE, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("test"), &Character::do_test, position_t::DEAD, 106, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
