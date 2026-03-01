@@ -5282,10 +5282,10 @@ QString fread_qstring(FILE *stream, bool *ok)
 /* read and allocate space for a '~'-terminated std::string from a given file */
 char *fread_string(FILE *fl, int hasher)
 {
-	char buf[MAX_STRING_LENGTH];
-	char *pAlloc;
-	char *pBufLast;
-	char *temp;
+	char buf[MAX_STRING_LENGTH]{};
+	char *pAlloc{};
+	char *pBufLast{};
+	char *temp{};
 
 	for (pBufLast = buf; pBufLast < &buf[MAX_STRING_LENGTH - 2];)
 	{
