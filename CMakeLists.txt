@@ -227,6 +227,7 @@ add_library(DC SHARED
     src/include/DC/guild.h
     src/include/DC/handler.h
     src/include/DC/help.h
+    src/include/DC/Index.h
     src/include/DC/innate.h
     src/include/DC/interp.h
     src/include/DC/inventory.h
