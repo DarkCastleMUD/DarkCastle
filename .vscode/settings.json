@@ -126,4 +126,11 @@
     "C_Cpp.refactoring.includeHeader": "never",
     "cmake.configureOnOpen": false,
     "debug.showVariableTypes": true,
+    "files.watcherExclude": {
+        "/build/": true
+    },
+    "clangd.arguments": [
+        "-j=64",
+        "--compile-commands-dir=build/debug/"
+    ],
 }
