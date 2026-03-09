@@ -4,9 +4,9 @@
 #include <QtCore/qglobal.h>
 
 #if defined(DC_LIBRARY)
-#  define DC_EXPORT Q_DECL_EXPORT
+#define DC_EXPORT Q_DECL_EXPORT
 #else
-#  define DC_EXPORT Q_DECL_IMPORT
+#define DC_EXPORT Q_DECL_IMPORT
 #endif
 
 #endif // DC_GLOBAL_H
