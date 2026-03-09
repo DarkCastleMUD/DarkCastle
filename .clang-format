@@ -6,3 +6,4 @@ ColumnLimit: 0
 IndentAccessModifiers: false
 NamespaceIndentation: All
 FixNamespaceComments: false
+SortIncludes: false
