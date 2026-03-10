@@ -497,7 +497,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
           {
             if (IS_AFFECTED(follower, AFF_CHARM))
             {
-              if (follower->carrying != nullptr || follower->equipment != nullptr)
+              if (follower->carrying != nullptr || follower->equipment[0] != nullptr)
               {
                 send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
                 return eFAILURE;
