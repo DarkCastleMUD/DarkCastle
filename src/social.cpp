@@ -4,16 +4,12 @@
 #include <cstring>
 #include <cstdlib> // qsort()
 
-#include "DC/fileinfo.h" // SOCIAL_FILE
-#include "DC/structs.h"  // MAX_INPUT_LENGTH
+#include "DC/structs.h" // MAX_INPUT_LENGTH
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/mobile.h"
-#include "DC/connect.h"
-#include "DC/player.h"
 #include "DC/social.h"
-#include "DC/handler.h"
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/interp.h" // len_cmp
@@ -58,6 +54,11 @@ command_return_t Character::check_social(QString pcomm)
   case position_t::SLEEPING:
     this->sendln("In your dreams, or what?");
     return SOCIAL_true;
+  case position_t::RESTING:
+  case position_t::SITTING:
+  case position_t::FIGHTING:
+  case position_t::STANDING:
+    break;
   }
 
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
