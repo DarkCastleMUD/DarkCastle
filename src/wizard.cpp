@@ -119,7 +119,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     ch->send(buf);
     if (cnt > 1)
     {
-      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d (%s) at room %d (%s).",
+      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
@@ -129,7 +129,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     }
     else
     {
-      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %d (%s) at room %d (%s).",
+      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
@@ -141,7 +141,7 @@ void do_mload(Character *ch, int rnum, int cnt)
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
              GET_NAME(ch),
              cnt,
              DC::getInstance()->mob_index[rnum].vnum(),
@@ -238,7 +238,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
   ch->send(buf);
   if (cnt > 1)
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %lu (%s) at room %d (%s).",
              GET_NAME(ch),
              cnt,
              random ? "randomized " : "",
@@ -249,7 +249,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %lu (%s) at room %d (%s).",
              GET_NAME(ch),
              cnt,
              random ? "randomized " : "",
@@ -280,8 +280,8 @@ void boro_mob_stat(Character *ch, Character *k)
   sprinttype(k->c_class, pc_clss_types, buf2);
   sprintf(buf,
           "$R(:)========================================================================(:)\r\n"
-          "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5d $3Room$R: %-5d |=|\r\n"
-          "|=|$3 Short$R: %-50s $3RNUM$R: %-6ld |=|\r\n"
+          "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5lu $3Room$R: %-5d |=|\r\n"
+          "|=|$3 Short$R: %-50s $3RNUM$R: %-6d |=|\r\n"
           "|=|$3 Long$R: %s"
           "(:)====================(:)=================================================(:)\r\n"
           "|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
@@ -324,7 +324,7 @@ void boro_mob_stat(Character *ch, Character *k)
   }
 
   sprintf(buf,
-          "|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9d  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
+          "|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9llu  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
           "|o|  $4Fears$R:    %-9s|~|  $1Height$R: %-9d  $1Ki$R:     %5d$1/$R(%5d)     |/|\r\n"
           "|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
 
@@ -484,7 +484,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (!IS_NPC(k))
   {
-    sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
+    sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs $3Played$R[%d]secs\n\r",
             k->player->time.birth,
             k->player->time.logon,
             (int32_t)(k->player->time.played));
@@ -516,7 +516,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (!IS_NPC(k))
   {
-    sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
+    sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
     ch->send(buf);
     sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     ch->send(buf);
@@ -591,7 +591,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (IS_NPC(k))
   {
     sprintf(buf,
-            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
+            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
             (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
             (IS_NPC(k) ? k->mobdata->nr : 0),
@@ -635,7 +635,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   strcat(buf, buf2);
 
-  sprintf(buf2, "   $3Level$R:[%d] $3Alignment$R:[%d] ", k->getLevel(),
+  sprintf(buf2, "   $3Level$R:[%llu] $3Alignment$R:[%d] ", k->getLevel(),
           k->alignment);
   strcat(buf, buf2);
   ch->send(buf);
@@ -646,7 +646,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (!IS_NPC(k))
   {
-    sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
+    sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs  $3Played$R[%d]secs\n\r",
             k->player->time.birth,
             k->player->time.logon,
             (int32_t)(k->player->time.played));
@@ -867,7 +867,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (!IS_NPC(k))
   {
-    sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
+    sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
     ch->send(buf);
     sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     ch->send(buf);
@@ -1036,7 +1036,7 @@ void obj_stat(Character *ch, class Object *j)
   ch->send(buf);
 
   sprintf(buf,
-          "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %d\n\r",
+          "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %llu\n\r",
           j->obj_flags.weight,
           j->obj_flags.cost,
           j->obj_flags.timer,
@@ -1244,7 +1244,7 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[1]);
     break;
   case ITEM_PORTAL:
-    sprintf(buf, "$3ToRoom (v1)$R : %d\r\n"
+    sprintf(buf, "$3ToRoom (v1)$R : %lu\r\n"
                  "$3Type   (v2)$R : ",
             j->getPortalDestinationRoom());
     switch (j->getPortalType())
@@ -1503,10 +1503,10 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
     x++;
 
     if (i->player->possesing)
-      sprintf(buf, "%14s -- [%ld] %s  *possessing*\n\r", GET_NAME(i),
+      sprintf(buf, "%14s -- [%d] %s  *possessing*\n\r", GET_NAME(i),
               (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     else
-      sprintf(buf, "%14s -- [%ld] %s\n\r", GET_NAME(i),
+      sprintf(buf, "%14s -- [%d] %s\n\r", GET_NAME(i),
               (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     ch->send(buf);
   }
@@ -2062,7 +2062,7 @@ void pulse_hunts()
 
   try
   {
-    if (&DC::getInstance()->world[6345] == nullptr)
+    if (DC::getInstance()->world[6345] == Room())
     {
       logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
