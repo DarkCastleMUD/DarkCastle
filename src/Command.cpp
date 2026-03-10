@@ -504,138 +504,138 @@ const QList<Command> Commands::commands_ =
 
 auto Commands::find(QString arg) -> std::expected<Command, search_error>
 {
-        if (qstring_command_map_.contains(arg))
-        {
-                return qstring_command_map_.value(arg);
-        }
+  if (qstring_command_map_.contains(arg))
+  {
+    return qstring_command_map_.value(arg);
+  }
 
-        return std::unexpected(search_error::not_found);
+  return std::unexpected(search_error::not_found);
 }
 
 auto Commands::find(cmd_t cmd) -> std::expected<Command, search_error>
 {
-        if (cmd_t_command_map_.contains(cmd))
-        {
-                return cmd_t_command_map_.value(cmd);
-        }
+  if (cmd_t_command_map_.contains(cmd))
+  {
+    return cmd_t_command_map_.value(cmd);
+  }
 
-        return std::unexpected(search_error::not_found);
+  return std::unexpected(search_error::not_found);
 }
 
 Commands::Commands(void)
 {
-        for (const auto &command : commands_)
-        {
-                qstring_command_map_[command.getName()] = command;
-                for (qsizetype position = 1; position < command.getName().length(); position++)
-                {
-                        auto keyword = command.getName();
-                        keyword.truncate(position);
-                        if (!qstring_command_map_.contains(keyword))
-                        {
-                                qstring_command_map_[keyword] = command;
-                        }
-                }
+  for (const auto &command : commands_)
+  {
+    qstring_command_map_[command.getName()] = command;
+    for (qsizetype position = 1; position < command.getName().length(); position++)
+    {
+      auto keyword = command.getName();
+      keyword.truncate(position);
+      if (!qstring_command_map_.contains(keyword))
+      {
+        qstring_command_map_[keyword] = command;
+      }
+    }
 
-                if (command.getNumber() != cmd_t::DEFAULT &&
-                    command.getNumber() != cmd_t::UNDEFINED)
-                {
-                        if (!cmd_t_command_map_.contains(command.getNumber()))
-                        {
-                                cmd_t_command_map_[command.getNumber()] = command;
-                        }
-                }
-        }
+    if (command.getNumber() != cmd_t::DEFAULT &&
+        command.getNumber() != cmd_t::UNDEFINED)
+    {
+      if (!cmd_t_command_map_.contains(command.getNumber()))
+      {
+        cmd_t_command_map_[command.getNumber()] = command;
+      }
+    }
+  }
 }
 
 bool isCommandTypeDirection(cmd_t cmd)
 {
-        switch (cmd)
-        {
-        case cmd_t::NORTH:
-        case cmd_t::EAST:
-        case cmd_t::SOUTH:
-        case cmd_t::WEST:
-        case cmd_t::UP:
-        case cmd_t::DOWN:
-                return true;
-        default:
-                break;
-        }
-        return false;
+  switch (cmd)
+  {
+  case cmd_t::NORTH:
+  case cmd_t::EAST:
+  case cmd_t::SOUTH:
+  case cmd_t::WEST:
+  case cmd_t::UP:
+  case cmd_t::DOWN:
+    return true;
+  default:
+    break;
+  }
+  return false;
 }
 
 bool isCommandTypeCasino(cmd_t cmd)
 {
 
-        switch (cmd)
-        {
-        case cmd_t::BET:
-        case cmd_t::INSURANCE:
-        case cmd_t::DOUBLE:
-        case cmd_t::STAY:
-        case cmd_t::SPLIT:
-        case cmd_t::HIT:
-                return true;
-                break;
-        default:
-                break;
-        }
-        return false;
+  switch (cmd)
+  {
+  case cmd_t::BET:
+  case cmd_t::INSURANCE:
+  case cmd_t::DOUBLE:
+  case cmd_t::STAY:
+  case cmd_t::SPLIT:
+  case cmd_t::HIT:
+    return true;
+    break;
+  default:
+    break;
+  }
+  return false;
 }
 
 auto getCommandFromDirection(int dir) -> std::expected<cmd_t, bool>
 {
-        switch (dir)
-        {
-        case NORTH:
-                return cmd_t::NORTH;
-                break;
-        case EAST:
-                return cmd_t::EAST;
-                break;
-        case SOUTH:
-                return cmd_t::SOUTH;
-                break;
-        case WEST:
-                return cmd_t::WEST;
-                break;
-        case UP:
-                return cmd_t::UP;
-                break;
-        case DOWN:
-                return cmd_t::DOWN;
-                break;
-        default:
-                break;
-        }
-        return std::unexpected(false);
+  switch (dir)
+  {
+  case NORTH:
+    return cmd_t::NORTH;
+    break;
+  case EAST:
+    return cmd_t::EAST;
+    break;
+  case SOUTH:
+    return cmd_t::SOUTH;
+    break;
+  case WEST:
+    return cmd_t::WEST;
+    break;
+  case UP:
+    return cmd_t::UP;
+    break;
+  case DOWN:
+    return cmd_t::DOWN;
+    break;
+  default:
+    break;
+  }
+  return std::unexpected(false);
 }
 
 auto getDirectionFromCommand(cmd_t cmd) -> std::expected<int, bool>
 {
-        switch (cmd)
-        {
-        case cmd_t::NORTH:
-                return NORTH;
-                break;
-        case cmd_t::EAST:
-                return EAST;
-                break;
-        case cmd_t::SOUTH:
-                return SOUTH;
-                break;
-        case cmd_t::WEST:
-                return WEST;
-                break;
-        case cmd_t::UP:
-                return UP;
-                break;
-        case cmd_t::DOWN:
-                return DOWN;
-                break;
-        default:
-                break;
-        }
-        return std::unexpected(false);
+  switch (cmd)
+  {
+  case cmd_t::NORTH:
+    return NORTH;
+    break;
+  case cmd_t::EAST:
+    return EAST;
+    break;
+  case cmd_t::SOUTH:
+    return SOUTH;
+    break;
+  case cmd_t::WEST:
+    return WEST;
+    break;
+  case cmd_t::UP:
+    return UP;
+    break;
+  case cmd_t::DOWN:
+    return DOWN;
+    break;
+  default:
+    break;
+  }
+  return std::unexpected(false);
 }

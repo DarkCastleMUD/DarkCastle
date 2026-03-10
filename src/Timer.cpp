@@ -13,98 +13,98 @@ std::map<std::string, Timer> PerfTimers;
 
 TimeVal::TimeVal(time_t sec, suseconds_t usec)
 {
-	tv_sec = sec;
-	tv_usec = usec;
+  tv_sec = sec;
+  tv_usec = usec;
 }
 
 TimeVal TimeVal::operator+(TimeVal t1)
 {
-	TimeVal t;
-	t.tv_sec = tv_sec + t1.tv_sec;
-	t.tv_usec = tv_usec + t1.tv_usec;
-	return t;
+  TimeVal t;
+  t.tv_sec = tv_sec + t1.tv_sec;
+  t.tv_usec = tv_usec + t1.tv_usec;
+  return t;
 }
 
 TimeVal TimeVal::operator-(TimeVal t1)
 {
-	TimeVal t;
-	assert(tv_sec >= t1.tv_sec);
-	t.tv_sec = tv_sec - t1.tv_sec;
+  TimeVal t;
+  assert(tv_sec >= t1.tv_sec);
+  t.tv_sec = tv_sec - t1.tv_sec;
 
-	if (tv_usec >= t1.tv_usec)
-	{
-		t.tv_usec = tv_usec - t1.tv_usec;
-	}
-	else
-	{
-		t.tv_sec--;
-		t.tv_usec = tv_usec + 1000000 - t1.tv_usec;
-	}
+  if (tv_usec >= t1.tv_usec)
+  {
+    t.tv_usec = tv_usec - t1.tv_usec;
+  }
+  else
+  {
+    t.tv_sec--;
+    t.tv_usec = tv_usec + 1000000 - t1.tv_usec;
+  }
 
-	return t;
+  return t;
 }
 
 TimeVal TimeVal::operator/(int value)
 {
-	TimeVal t;
-	t.tv_sec = tv_sec / value;
-	t.tv_usec = tv_usec / value;
-	return t;
+  TimeVal t;
+  t.tv_sec = tv_sec / value;
+  t.tv_usec = tv_usec / value;
+  return t;
 }
 
 bool TimeVal::operator<(TimeVal t1)
 {
-	if (tv_sec < t1.tv_sec)
-	{
-		return true;
-	}
-	else if (tv_sec == t1.tv_sec && tv_usec < t1.tv_usec)
-	{
-		return true;
-	}
-	return false;
+  if (tv_sec < t1.tv_sec)
+  {
+    return true;
+  }
+  else if (tv_sec == t1.tv_sec && tv_usec < t1.tv_usec)
+  {
+    return true;
+  }
+  return false;
 }
 
 bool TimeVal::operator>(TimeVal t1)
 {
-	if (tv_sec > t1.tv_sec)
-	{
-		return true;
-	}
-	else if (tv_sec == t1.tv_sec && tv_usec > t1.tv_usec)
-	{
-		return true;
-	}
-	return false;
+  if (tv_sec > t1.tv_sec)
+  {
+    return true;
+  }
+  else if (tv_sec == t1.tv_sec && tv_usec > t1.tv_usec)
+  {
+    return true;
+  }
+  return false;
 }
 
 bool TimeVal::operator>=(TimeVal t1)
 {
-	if (tv_sec > t1.tv_sec)
-	{
-		return true;
-	}
-	else if (tv_sec == t1.tv_sec && tv_usec > t1.tv_usec)
-	{
-		return true;
-	}
-	else if (tv_sec == t1.tv_sec && tv_usec == t1.tv_usec)
-	{
-		return true;
-	}
-	return false;
+  if (tv_sec > t1.tv_sec)
+  {
+    return true;
+  }
+  else if (tv_sec == t1.tv_sec && tv_usec > t1.tv_usec)
+  {
+    return true;
+  }
+  else if (tv_sec == t1.tv_sec && tv_usec == t1.tv_usec)
+  {
+    return true;
+  }
+  return false;
 }
 
 void TimeVal::gettime()
 {
-	timeval tv;
-	gettimeofday(&tv, nullptr);
-	tv_sec = tv.tv_sec;
-	tv_usec = tv.tv_usec;
+  timeval tv;
+  gettimeofday(&tv, nullptr);
+  tv_sec = tv.tv_sec;
+  tv_usec = tv.tv_usec;
 }
 
 Timer::Timer()
-	: stopCount(0), totalTime(0)
+    : stopCount(0), totalTime(0)
 {
 }
 
@@ -114,72 +114,72 @@ Timer::~Timer()
 
 void Timer::start()
 {
-	starttv.gettime();
+  starttv.gettime();
 }
 
 void Timer::stop()
 {
-	TimeVal stoptv;
-	stoptv.gettime();
+  TimeVal stoptv;
+  stoptv.gettime();
 
-	if (stoptv < starttv)
-	{
-		// std::cerr << "Timer::stop() time went backwards." << std::endl;
-		stoptv = starttv;
-	}
-	diff_cur = stoptv - starttv;
+  if (stoptv < starttv)
+  {
+    // std::cerr << "Timer::stop() time went backwards." << std::endl;
+    stoptv = starttv;
+  }
+  diff_cur = stoptv - starttv;
 
-	// Initialize minimum and average values on first run
-	if (stopCount++ == 0)
-	{
-		diff_min = diff_cur;
-		diff_avg = diff_cur;
-	}
+  // Initialize minimum and average values on first run
+  if (stopCount++ == 0)
+  {
+    diff_min = diff_cur;
+    diff_avg = diff_cur;
+  }
 
-	if (diff_cur < diff_min)
-	{
-		diff_min = diff_cur;
-	}
+  if (diff_cur < diff_min)
+  {
+    diff_min = diff_cur;
+  }
 
-	if (diff_cur > diff_max)
-	{
-		diff_max = diff_cur;
-	}
+  if (diff_cur > diff_max)
+  {
+    diff_max = diff_cur;
+  }
 
-	diff_avg = (diff_avg + diff_cur) / 2;
-	totalTime += (diff_cur.tv_usec / 1000);
+  diff_avg = (diff_avg + diff_cur) / 2;
+  totalTime += (diff_cur.tv_usec / 1000);
 }
 
 TimeVal Timer::getDiff()
 {
-	return diff_cur;
+  return diff_cur;
 }
 
 TimeVal Timer::getDiffMin()
 {
-	return diff_min;
+  return diff_min;
 }
 
 TimeVal Timer::getDiffMax()
 {
-	return diff_max;
+  return diff_max;
 }
 
 TimeVal Timer::getDiffAvg()
 {
-	return diff_avg;
+  return diff_avg;
 }
 
 std::ostream &operator<<(std::ostream &out, Timer t)
 {
-	out << "last=" << t.diff_cur << " min=" << t.diff_min
-		<< " max=" << t.diff_max << " avg=" << t.diff_avg
-		<< " count=" << t.stopCount << " total=" << t.totalTime << "ms";
-	return out;
+  out << "last=" << t.diff_cur << " min=" << t.diff_min
+      << " max=" << t.diff_max << " avg=" << t.diff_avg
+      << " count=" << t.stopCount << " total=" << t.totalTime << "ms";
+  return out;
 }
 std::ostream &operator<<(std::ostream &out, TimeVal tv)
 {
-	//	out << static_cast<unsigned __time_t>(tv.tv_sec) << "s " << static_cast<unsigned __suseconds_t>(tv.tv_usec) << "µ";
-	out << tv.tv_sec << "s " << tv.tv_usec << "µ";
-	return out;
+  //	out << static_cast<unsigned __time_t>(tv.tv_sec) << "s " << static_cast<unsigned __suseconds_t>(tv.tv_usec) << "µ";
+  out << tv.tv_sec << "s " << tv.tv_usec << "µ";
+  return out;
 }
