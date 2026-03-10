@@ -482,7 +482,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
 
   if (stream != STDIN_FILENO)
   {
-    fprintf(*f, "%s :: %s\n", tmstr, str.toStdString().c_str());
+    fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
     fclose(*f);
   }
 

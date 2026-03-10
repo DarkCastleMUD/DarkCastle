@@ -135,7 +135,7 @@ int isprefix(const char *str, const char *namel)
 // we need it.  Neither of them are case-sensitive....
 int isprefix(QString str, QString namel)
 {
-  return isprefix(str.toStdString().c_str(), namel.toStdString().c_str());
+  return isprefix(qPrintable(str), namel.toStdString().c_str());
 }
 
 int isexact(QString arg, QStringList namelist)
