@@ -9,13 +9,10 @@
 #include "DC/utility.h"
 #include "DC/character.h"
 #include "DC/mobile.h"
-#include "DC/terminal.h"
-#include "DC/player.h"
 #include "DC/clan.h"
 #include "DC/room.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
-#include "DC/db.h"
 #include "DC/returnvals.h"
 #include "DC/const.h"
 
