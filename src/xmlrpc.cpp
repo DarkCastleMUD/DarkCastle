@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstddef>
 #include <unistd.h>
 #include "DC/dc_xmlrpc.h"
 #include <cstring>
@@ -89,7 +89,7 @@ public:
     std::string &contents = params[2];
 
     // Remove \r characters from web input
-    unsigned int index = 0;
+    std::size_t index = 0;
     while ((index = contents.find('\r', index)) != std::string::npos)
     {
       contents.erase(index, 1);
