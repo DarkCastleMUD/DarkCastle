@@ -2726,7 +2726,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
+        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2931,7 +2931,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
   {
     if (d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX)
     {
-      sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%d)",
+      sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%llu)",
               UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
               song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
               "Brd", d_skills[i].levelavailable);
