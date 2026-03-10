@@ -38,7 +38,6 @@
 #include "DC/fight.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
-#include "DC/db.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/interp.h"
@@ -899,14 +898,13 @@ bool Character::canPerform(const int_fast32_t &skillType, QString failMessage)
 // Figures out how many % of max your damage does
 int dam_percent(int learned, int damage)
 {
-  float percent;
-  percent = 50;
+  auto percent = 50.0;
   if (!learned)
-    percent /= 2;
-  percent += learned / 2;
+    percent /= 2.0;
+  percent += learned / 2.0;
   //  else percent = 90 + ((learned - 90) *2);
 
-  return (int)((float)damage * (float)percent / 100.0);
+  return damage * percent / 100.0;
 }
 
 int use_mana(Character *ch, int sn)
@@ -2739,7 +2737,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
+        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2751,7 +2749,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         thief = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Thi(%d)", t_skills[j].levelavailable);
+        sprintf(buf3, "Thi(%llu)", t_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2763,7 +2761,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         warrior = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "War(%d)", w_skills[j].levelavailable);
+        sprintf(buf3, "War(%llu)", w_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2775,7 +2773,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
+        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2787,7 +2785,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
+        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2799,7 +2797,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         barb = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Bar(%d)", b_skills[j].levelavailable);
+        sprintf(buf3, "Bar(%llu)", b_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2811,7 +2809,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         monk = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Mon(%d)", k_skills[j].levelavailable);
+        sprintf(buf3, "Mon(%llu)", k_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2823,7 +2821,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
+        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2835,7 +2833,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         bard = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Brd(%d)", d_skills[j].levelavailable);
+        sprintf(buf3, "Brd(%llu)", d_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2847,7 +2845,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
+        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2972,7 +2970,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
+        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2983,7 +2981,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
+        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2995,7 +2993,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
+        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3007,7 +3005,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
+        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3019,7 +3017,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
+        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3031,7 +3029,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
+        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
