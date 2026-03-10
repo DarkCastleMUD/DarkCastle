@@ -3,20 +3,14 @@
 | Description:  This file contains the classes and methods used to make
 |  the act() function work.
 */
-#include <cctype>
-#include <cstring>
-#include <cctype>
 
 #include <string>
 
 #include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/comm.h"
-#include "DC/db.h"
 #include "DC/room.h"
 #include "DC/utility.h"
-#include "DC/player.h"
-#include "DC/terminal.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/act.h"
