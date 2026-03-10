@@ -32,7 +32,6 @@
 #include <QStringList>
 
 #include "DC/obj.h"
-#include "DC/magic.h"
 #include "DC/spells.h"
 #include "DC/room.h"
 #include "DC/DC.h"
@@ -3041,7 +3040,7 @@ int move_obj(Object *obj, int dest)
     if (obj_from_obj(obj) == 0)
     {
       // Couldn't move obj from its container
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", obj->Name(), GET_NAME(obj->carried_by));
+      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", qPrintable(obj->Name()), GET_NAME(obj->carried_by));
       return 0;
     }
   }
@@ -3066,7 +3065,7 @@ int move_obj(Object *obj, int dest)
       qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->Name())));
     }
 
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->Name(), DC::getInstance()->world[dest].number);
+    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", qPrintable(obj->Name()), DC::getInstance()->world[dest].number);
     return 0;
   }
 
@@ -3098,7 +3097,7 @@ int move_obj(Object *obj, Object *dest_obj)
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
+      logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->Name()), DC::getInstance()->world[obj_in_room].number);
       return 0;
     }
   }
@@ -3147,7 +3146,7 @@ int move_obj(Object *obj, Object *dest_obj)
       qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->Name())));
     }
 
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->Name(), dest_obj->Name());
+    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", qPrintable(obj->Name()), qPrintable(dest_obj->Name()));
     return 0;
   }
   add_totem(dest_obj, obj);
@@ -3181,7 +3180,7 @@ int move_obj(Object *obj, Character *ch)
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->Name(), DC::getInstance()->world[obj_in_room].number);
+      logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->Name()), DC::getInstance()->world[obj_in_room].number);
       return 0;
     }
   }
@@ -3246,7 +3245,7 @@ int move_obj(Object *obj, Character *ch)
       qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->Name())));
     }
 
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->Name(), GET_NAME(ch));
+    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", qPrintable(obj->Name()), GET_NAME(ch));
     return 0;
   }
 
