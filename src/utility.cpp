@@ -2457,11 +2457,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
   }
 
   if (0 == stat(src_filename, &statbuf))
