@@ -716,6 +716,51 @@ void DC::game_loop(void)
           close_socket(d);
         }
         break;
+      case Connection::PLAYING:
+      case Connection::GET_PROXY:
+      case Connection::CONFIRM_NEW_NAME:
+      case Connection::GET_NEW_PASSWORD:
+      case Connection::CONFIRM_NEW_PASSWORD:
+      case Connection::GET_NEW_SEX:
+      case Connection::OLD_GET_CLASS:
+      case Connection::READ_MOTD:
+      case Connection::SELECT_MENU:
+      case Connection::RESET_PASSWORD:
+      case Connection::CONFIRM_RESET_PASSWORD:
+      case Connection::EXDSCR:
+      case Connection::OLD_GET_RACE:
+      case Connection::WRITE_BOARD:
+      case Connection::EDITING:
+      case Connection::EDITING_V2:
+      case Connection::SEND_MAIL:
+      case Connection::DELETE_CHAR:
+      case Connection::OLD_CHOOSE_STATS:
+      case Connection::PFILE_WIPE:
+      case Connection::ARCHIVE_CHAR:
+      case Connection::CLOSE:
+      case Connection::CONFIRM_PASSWORD_CHANGE:
+      case Connection::EDIT_MPROG:
+      case Connection::DISPLAY_ENTRANCE:
+      case Connection::PRE_DISPLAY_ENTRANCE:
+      case Connection::SELECT_RECOVERY_MENU:
+      case Connection::GET_NEW_RECOVERY_QUESTION:
+      case Connection::GET_NEW_RECOVERY_ANSWER:
+      case Connection::GET_NEW_RECOVERY_EMAIL:
+      case Connection::QUESTION_ANSI:
+      case Connection::GET_ANSI:
+      case Connection::QUESTION_SEX:
+      case Connection::QUESTION_STAT_METHOD:
+      case Connection::GET_STAT_METHOD:
+      case Connection::OLD_STAT_METHOD:
+      case Connection::NEW_STAT_METHOD:
+      case Connection::NEW_PLAYER:
+      case Connection::QUESTION_RACE:
+      case Connection::GET_RACE:
+      case Connection::QUESTION_CLASS:
+      case Connection::GET_CLASS:
+      case Connection::QUESTION_STATS:
+      case Connection::GET_STATS:
+        break;
       }
     }
   }
@@ -2960,9 +3005,4 @@ Proxy::Proxy(QString h)
 
     active = true;
   }
-}
-
-const char *Connection::getPeerOriginalAddressC(void)
-{
-  return getPeerOriginalAddress().toString().toStdString().c_str();
 }
