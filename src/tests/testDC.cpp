@@ -1088,7 +1088,7 @@ private slots:
     ok = false;
     QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].vnum());
     QCOMPARE(ok, true);
-    DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, &ok), DC::INVALID_VNUM;
+    QCOMPARE(DC::getInstance()->getObjectVNUM(DC::INVALID_RNUM, &ok), DC::INVALID_VNUM);
     QCOMPARE(ok, false);
 
     QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].vnum());
