@@ -156,8 +156,6 @@ public:
 
   void send(QString txt);
 
-  const char *getPeerOriginalAddressC(void);
-
   QHostAddress getPeerAddress(void)
   {
     return peer_address_;
