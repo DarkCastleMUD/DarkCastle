@@ -2,7 +2,6 @@
 | Level 108 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "DC/wizard.h"
 #include "DC/interp.h"
 #include "DC/utility.h"
 
@@ -12,7 +11,6 @@
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include <string>
-#include "DC/game_portal.h"
 #include "DC/const.h"
 
 int get_number(char **name);
@@ -68,7 +66,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
       {
         if (curExits->to_room > 0 && DC::getInstance()->world[curExits->to_room].zone != curZone)
         {
-          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3d (%s)\r\n", i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
+          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3lu (%s)\r\n", i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
 
           output += buf;
         }
@@ -80,21 +78,21 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
       {
         if (portal->obj_flags.value[0] < 0)
         {
-          sprintf(buf, "Room %5d - climb to Room %5d (ERROR)\r\n",
+          sprintf(buf, "Room %5d - climb to Room %5lu (ERROR)\r\n",
                   i, real_room(portal->obj_flags.value[0]));
 
           output += buf;
         }
         else if (!DC::getInstance()->rooms.contains(portal->obj_flags.value[0]))
         {
-          sprintf(buf, "Room %5d - climb to Room %5d (DOES NOT EXIST)\r\n",
+          sprintf(buf, "Room %5d - climb to Room %5lu (DOES NOT EXIST)\r\n",
                   i, real_room(portal->obj_flags.value[0]));
 
           output += buf;
         }
         else if (DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone != curZone)
         {
-          sprintf(buf, "Room %5d - climb to Room %5d, zone %3d (%s)\r\n", i, real_room(portal->obj_flags.value[0]), DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).NameC());
+          sprintf(buf, "Room %5d - climb to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->obj_flags.value[0]), DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).NameC());
 
           output += buf;
         }
@@ -104,13 +102,13 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
       {
         if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
         {
-          sprintf(buf, "Room %5d - enter to Room %5d (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
+          sprintf(buf, "Room %5d - enter to Room %5lu (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
 
           output += buf;
         }
         else if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
         {
-          sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n", i, real_room(portal->getPortalDestinationRoom()), DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
+          sprintf(buf, "Room %5d - enter to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->getPortalDestinationRoom()), DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
 
           output += buf;
         }
@@ -125,7 +123,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
         {
           if (DC::getInstance()->world[real_room(portal->in_room)].zone != curZone)
           {
-            sprintf(buf, "Room %5d - leave to Room %5d, zone %3d (%s)\r\n", i, real_room(portal->in_room), DC::getInstance()->world[real_room(portal->in_room)].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).NameC());
+            sprintf(buf, "Room %5d - leave to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->in_room), DC::getInstance()->world[real_room(portal->in_room)].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).NameC());
 
             output += buf;
           }
