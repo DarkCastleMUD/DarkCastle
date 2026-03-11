@@ -110,188 +110,189 @@ const auto SECT_MAX_SECT = 15; // update this if you add more
 
 struct room_direction_data
 {
-    char *general_description; /* When look DIR.                  */
-    char *keyword;             /* for open/close                  */
-    int16_t exit_info;         /* Exit info                       */
-    Character *bracee;         /* This is who is bracing the door */
-    int16_t key;               /* Key's number (-1 for no key)    */
-    int16_t to_room;           /* Where direction leeds (NOWHERE) */
+  char *general_description; /* When look DIR.                  */
+  char *keyword;             /* for open/close                  */
+  int16_t exit_info;         /* Exit info                       */
+  Character *bracee;         /* This is who is bracing the door */
+  int16_t key;               /* Key's number (-1 for no key)    */
+  int16_t to_room;           /* Where direction leeds (NOWHERE) */
 };
 
 struct room_track_data
 {
-    int weight;
-    int race;
-    int direction;
-    int sex;
-    int condition;
-    QString trackee;
+  int weight;
+  int race;
+  int direction;
+  int sex;
+  int condition;
+  QString trackee;
 
-    room_track_data *next;
-    room_track_data *previous;
+  room_track_data *next;
+  room_track_data *previous;
 };
 
 struct deny_data
 {
-    struct deny_data *next;
-    int vnum;
+  struct deny_data *next;
+  int vnum;
 };
 
 // ========================= Structure for room ==========================
 class Room
 {
 public:
-    Room(void)
-    {
-    }
-    explicit Room(int16_t roomNumber, class DC *parent)
-        : number(roomNumber), dc_(parent)
-    {
-    }
-    int16_t number = {}; // Rooms number
-    zone_t zone = {};    // Room zone (for resetting)
-    QSharedPointer<Zone> zonePtr = {};
-    int sector_type = {}; // sector type (move/hide)
-    struct deny_data *denied = {};
-    char *name = {};                                // Rooms name 'You are ...'
-    char *description = {};                         // Shown when entered
-    struct extra_descr_data *ex_description = {};   // for examine/look
-    room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
-    uint32_t room_flags = {};                       // DEATH, DARK ... etc
-    constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }
-    constexpr auto isNoHome() const -> bool { return isSet(room_flags, NOHOME); }
-    constexpr auto isNoMob() const -> bool { return isSet(room_flags, NO_MOB); }
-    constexpr auto isIndoors() const -> bool { return isSet(room_flags, INDOORS); }
-    constexpr auto isTeleportBlocked() const -> bool { return isSet(room_flags, TELEPORT_BLOCK); }
-    constexpr auto isNoKi() const -> bool { return isSet(room_flags, NO_KI); }
-    constexpr auto isNoLearn() const -> bool { return isSet(room_flags, NOLEARN); }
-    constexpr auto isNoMagic() const -> bool { return isSet(room_flags, NO_MAGIC); }
-    constexpr auto isTunnel() const -> bool { return isSet(room_flags, TUNNEL); }
-    constexpr auto isPrivate() const -> bool { return isSet(room_flags, PRIVATE); }
-    constexpr auto isSafe() const -> bool { return isSet(room_flags, SAFE); }
-    constexpr auto isNoSummon() const -> bool { return isSet(room_flags, NO_SUMMON); }
-    constexpr auto isNoAstral() const -> bool { return isSet(room_flags, NO_ASTRAL); }
-    constexpr auto isNoPortal() const -> bool { return isSet(room_flags, NO_PORTAL); }
-    constexpr auto isImpOnly() const -> bool { return isSet(room_flags, IMP_ONLY); }
-    constexpr auto isFallDown() const -> bool { return isSet(room_flags, FALL_DOWN); }
-    constexpr auto isArena() const -> bool { return isSet(room_flags, ARENA); }
-    constexpr auto isQuiet() const -> bool { return isSet(room_flags, QUIET); }
-    constexpr auto isUnstable() const -> bool { return isSet(room_flags, UNSTABLE); }
-    constexpr auto isNoQuit() const -> bool { return isSet(room_flags, NO_QUIT); }
-    constexpr auto isFallUp() const -> bool { return isSet(room_flags, FALL_UP); }
-    constexpr auto isFallEast() const -> bool { return isSet(room_flags, FALL_EAST); }
-    constexpr auto isFallWest() const -> bool { return isSet(room_flags, FALL_WEST); }
-    constexpr auto isFallSouth() const -> bool { return isSet(room_flags, FALL_SOUTH); }
-    constexpr auto isFallNorth() const -> bool { return isSet(room_flags, FALL_NORTH); }
-    constexpr auto isNoTeleport() const -> bool { return isSet(room_flags, NO_TELEPORT); }
-    constexpr auto isNoTrack() const -> bool { return isSet(room_flags, NO_TRACK); }
-    constexpr auto isClanRoom() const -> bool { return isSet(room_flags, CLAN_ROOM); }
-    constexpr auto isNoScan() const -> bool { return isSet(room_flags, NO_SCAN); }
-    constexpr auto isNoWhere() const -> bool { return isSet(room_flags, NO_WHERE); }
-    constexpr auto isLightRoom() const -> bool { return isSet(room_flags, LIGHT_ROOM); }
+  Room(void)
+  {
+  }
+  explicit Room(int16_t roomNumber, class DC *parent)
+      : number(roomNumber), dc_(parent)
+  {
+  }
+  operator bool() const { return number > 0; }
+  int16_t number = {}; // Rooms number
+  zone_t zone = {};    // Room zone (for resetting)
+  QSharedPointer<Zone> zonePtr = {};
+  int sector_type = {}; // sector type (move/hide)
+  struct deny_data *denied = {};
+  char *name = {};                                // Rooms name 'You are ...'
+  char *description = {};                         // Shown when entered
+  struct extra_descr_data *ex_description = {};   // for examine/look
+  room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
+  uint32_t room_flags = {};                       // DEATH, DARK ... etc
+  constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }
+  constexpr auto isNoHome() const -> bool { return isSet(room_flags, NOHOME); }
+  constexpr auto isNoMob() const -> bool { return isSet(room_flags, NO_MOB); }
+  constexpr auto isIndoors() const -> bool { return isSet(room_flags, INDOORS); }
+  constexpr auto isTeleportBlocked() const -> bool { return isSet(room_flags, TELEPORT_BLOCK); }
+  constexpr auto isNoKi() const -> bool { return isSet(room_flags, NO_KI); }
+  constexpr auto isNoLearn() const -> bool { return isSet(room_flags, NOLEARN); }
+  constexpr auto isNoMagic() const -> bool { return isSet(room_flags, NO_MAGIC); }
+  constexpr auto isTunnel() const -> bool { return isSet(room_flags, TUNNEL); }
+  constexpr auto isPrivate() const -> bool { return isSet(room_flags, PRIVATE); }
+  constexpr auto isSafe() const -> bool { return isSet(room_flags, SAFE); }
+  constexpr auto isNoSummon() const -> bool { return isSet(room_flags, NO_SUMMON); }
+  constexpr auto isNoAstral() const -> bool { return isSet(room_flags, NO_ASTRAL); }
+  constexpr auto isNoPortal() const -> bool { return isSet(room_flags, NO_PORTAL); }
+  constexpr auto isImpOnly() const -> bool { return isSet(room_flags, IMP_ONLY); }
+  constexpr auto isFallDown() const -> bool { return isSet(room_flags, FALL_DOWN); }
+  constexpr auto isArena() const -> bool { return isSet(room_flags, ARENA); }
+  constexpr auto isQuiet() const -> bool { return isSet(room_flags, QUIET); }
+  constexpr auto isUnstable() const -> bool { return isSet(room_flags, UNSTABLE); }
+  constexpr auto isNoQuit() const -> bool { return isSet(room_flags, NO_QUIT); }
+  constexpr auto isFallUp() const -> bool { return isSet(room_flags, FALL_UP); }
+  constexpr auto isFallEast() const -> bool { return isSet(room_flags, FALL_EAST); }
+  constexpr auto isFallWest() const -> bool { return isSet(room_flags, FALL_WEST); }
+  constexpr auto isFallSouth() const -> bool { return isSet(room_flags, FALL_SOUTH); }
+  constexpr auto isFallNorth() const -> bool { return isSet(room_flags, FALL_NORTH); }
+  constexpr auto isNoTeleport() const -> bool { return isSet(room_flags, NO_TELEPORT); }
+  constexpr auto isNoTrack() const -> bool { return isSet(room_flags, NO_TRACK); }
+  constexpr auto isClanRoom() const -> bool { return isSet(room_flags, CLAN_ROOM); }
+  constexpr auto isNoScan() const -> bool { return isSet(room_flags, NO_SCAN); }
+  constexpr auto isNoWhere() const -> bool { return isSet(room_flags, NO_WHERE); }
+  constexpr auto isLightRoom() const -> bool { return isSet(room_flags, LIGHT_ROOM); }
 
-    auto arena() -> class Arena &;
+  auto arena() -> class Arena &;
 
-    uint32_t temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
-    int16_t light = {};            // Light factor of room
+  uint32_t temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
+  int16_t light = {};            // Light factor of room
 
-    int (*funct)(Character *, cmd_t, const char *) = {}; // special procedure
+  int (*funct)(Character *, cmd_t, const char *) = {}; // special procedure
 
-    class Object *contents = {}; // List of items in room
-    Character *people = nullptr; // List of NPC / PC in room
+  class Object *contents = {}; // List of items in room
+  Character *people = nullptr; // List of NPC / PC in room
 
-    int nTracks = {};                 // number of tracks in the room
-    room_track_data *tracks = {};     // beginning of the list of scents
-    room_track_data *last_track = {}; // last in the scent list
-    int iFlags = {};                  // Internal flags. These do NOT save.
-    struct path_data *paths = {};
-    bool allow_class[CLASS_MAX] = {};
+  int nTracks = {};                 // number of tracks in the room
+  room_track_data *tracks = {};     // beginning of the list of scents
+  room_track_data *last_track = {}; // last in the scent list
+  int iFlags = {};                  // Internal flags. These do NOT save.
+  struct path_data *paths = {};
+  bool allow_class[CLASS_MAX] = {};
 
-    void AddTrackItem(room_track_data *newTrack);
-    room_track_data *TrackItem(int nIndex);
-    void FreeTracks();
+  void AddTrackItem(room_track_data *newTrack);
+  room_track_data *TrackItem(int nIndex);
+  void FreeTracks();
 
-    enum class room_errors_t
-    {
-        direction,
-        number,
-        zone,
-        zonePtr,
-        sector_type,
-        denied,
-        name,
-        description,
-        ex_description,
-        room_flags,
-        temp_room_flags,
-        light,
-        funct,
-        alllow_class
-    };
-    /*
-            static auto compare(Room &r1, Room &r2) -> std::expected<bool, room_errors_t>
-            {
-                for (int direction = 0; direction < MAX_DIRS; ++direction)
-                {
-                    if (r1.dir_option[direction] == r2.dir_option[direction])
-                    {
-                        continue;
-                    }
-                    else if (r1.dir_option[direction] && r2.dir_option[direction] &&
-                             *r1.dir_option[direction] == *r2.dir_option[direction])
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        return std::unexpected(Room::room_errors_t::direction);
-                    }
-                }
-                if (r1.number != r2.number)
-                    return std::unexpected(Room::room_errors_t::number);
-                if (r1.zone != r2.zone)
-                    return std::unexpected(Room::room_errors_t::zone);
-                if (r1.zonePtr != r2.zonePtr)
-                    return std::unexpected(Room::room_errors_t::zonePtr);
-                if (r1.sector_type != r2.sector_type)
-                    return std::unexpected(Room::room_errors_t::sector_type);
-                if (r1.denied != r2.denied)
-                    return std::unexpected(Room::room_errors_t::denied);
-                if (QString(r1.name) != QString(r2.name))
-                    return std::unexpected(Room::room_errors_t::name);
-                if (QString(r1.description) != QString(r2.description))
-                    return std::unexpected(Room::room_errors_t::description);
-                if (r1.ex_description != r2.ex_description)
-                    return std::unexpected(Room::room_errors_t::ex_description);
-                if (r1.room_flags != r2.room_flags)
-                    return std::unexpected(Room::room_errors_t::room_flags);
-                if (r1.temp_room_flags != r2.temp_room_flags)
-                    return std::unexpected(Room::room_errors_t::temp_room_flags);
-                if (r1.light != r2.light)
-                    return std::unexpected(Room::room_errors_t::light);
-                if (r1.funct != r2.funct)
-                    return std::unexpected(Room::room_errors_t::funct);
-                // r1.contents == r2.contents &&
-                // r1.people == r2.people &&
-                // r1.nTracks == r2.nTracks &&
-                // r1.tracks == r2.tracks &&
-                // r1.iFlags == r2.iFlags &&
-                // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
-                if (memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)))
-                    return std::unexpected(Room::room_errors_t::alllow_class);
+  enum class room_errors_t
+  {
+    direction,
+    number,
+    zone,
+    zonePtr,
+    sector_type,
+    denied,
+    name,
+    description,
+    ex_description,
+    room_flags,
+    temp_room_flags,
+    light,
+    funct,
+    alllow_class
+  };
+  /*
+          static auto compare(Room &r1, Room &r2) -> std::expected<bool, room_errors_t>
+          {
+              for (int direction = 0; direction < MAX_DIRS; ++direction)
+              {
+                  if (r1.dir_option[direction] == r2.dir_option[direction])
+                  {
+                      continue;
+                  }
+                  else if (r1.dir_option[direction] && r2.dir_option[direction] &&
+                           *r1.dir_option[direction] == *r2.dir_option[direction])
+                  {
+                      continue;
+                  }
+                  else
+                  {
+                      return std::unexpected(Room::room_errors_t::direction);
+                  }
+              }
+              if (r1.number != r2.number)
+                  return std::unexpected(Room::room_errors_t::number);
+              if (r1.zone != r2.zone)
+                  return std::unexpected(Room::room_errors_t::zone);
+              if (r1.zonePtr != r2.zonePtr)
+                  return std::unexpected(Room::room_errors_t::zonePtr);
+              if (r1.sector_type != r2.sector_type)
+                  return std::unexpected(Room::room_errors_t::sector_type);
+              if (r1.denied != r2.denied)
+                  return std::unexpected(Room::room_errors_t::denied);
+              if (QString(r1.name) != QString(r2.name))
+                  return std::unexpected(Room::room_errors_t::name);
+              if (QString(r1.description) != QString(r2.description))
+                  return std::unexpected(Room::room_errors_t::description);
+              if (r1.ex_description != r2.ex_description)
+                  return std::unexpected(Room::room_errors_t::ex_description);
+              if (r1.room_flags != r2.room_flags)
+                  return std::unexpected(Room::room_errors_t::room_flags);
+              if (r1.temp_room_flags != r2.temp_room_flags)
+                  return std::unexpected(Room::room_errors_t::temp_room_flags);
+              if (r1.light != r2.light)
+                  return std::unexpected(Room::room_errors_t::light);
+              if (r1.funct != r2.funct)
+                  return std::unexpected(Room::room_errors_t::funct);
+              // r1.contents == r2.contents &&
+              // r1.people == r2.people &&
+              // r1.nTracks == r2.nTracks &&
+              // r1.tracks == r2.tracks &&
+              // r1.iFlags == r2.iFlags &&
+              // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
+              if (memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)))
+                  return std::unexpected(Room::room_errors_t::alllow_class);
 
-                return true;
-            }
-        */
+              return true;
+          }
+      */
 private:
-    class DC *dc_{};
+  class DC *dc_{};
 };
 
 bool operator==(const Room &r1, const Room &r2);
 struct Entity
 {
-    auto room(void) -> Room &;
-    room_t in_room = {};
+  auto room(void) -> Room &;
+  room_t in_room = {};
 };
 
 #endif // __ROOM_H__
