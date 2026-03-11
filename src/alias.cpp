@@ -25,7 +25,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
     if (player->aliases_.isEmpty())
     {
       sendln("No aliases defined.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     auto removed_count = player->aliases_.remove("");
@@ -40,7 +40,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
     {
       sendln(QStringLiteral("%2=%3").arg(alias).arg(command));
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   QString arg1 = arguments.value(0).trimmed();
@@ -86,7 +86,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
     }
     player->aliases_[alias] = command;
     save();
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (arg1 == "deleteall")
@@ -104,7 +104,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 
     player->aliases_.clear();
     save();
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!player->aliases_.contains(arg1))
@@ -275,7 +275,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
     sendln("Type 'pets all' to see charmable pets for all classes.");
     sendln("Type 'pets bard' to see charmable pets for bards.");
     sendln("Type 'pets bard 50' or 'pets 50' to only see pets level 50 or above.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   sendln("$B$7LVL,ATK,HIT,DAM,   HP, -AC, dice, class, description$R");
   for (const auto &line : results)

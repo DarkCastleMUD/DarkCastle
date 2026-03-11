@@ -44,13 +44,13 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
   if (ch->in_room == DC::NOWHERE)
   {
     logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_PC(ch) && argument != nullptr)
@@ -92,7 +92,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
       act(buf, ch, 0, 0, TO_ROOM, 0);
 
       ch->send(QStringLiteral("You report: %1\n\r").arg(report));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -116,7 +116,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
 
   ch->send(QStringLiteral("You report: %1\n\r").arg(report));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /************************************************************************
@@ -267,7 +267,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
       "\\@"};
 
   if (IS_NPC(ch))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (*arg)
     one_argument(arg, buf);
@@ -327,7 +327,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
       send_to_char(buf2, ch);
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (x = 0; x <= 27; x++)
@@ -335,7 +335,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
     if (x == 27)
     {
       ch->sendln("That type was not found.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (is_abbrev(buf, types[x]))
       break;
@@ -345,12 +345,12 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
       (x < 7 || (x > 14 && x < 22)))
   {
     ch->sendln("That type was not found.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (x > 19 && ch->getLevel() != 110 && x < 22)
   {
     ch->sendln("That type was not found.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (isSet(ch->misc, (1 << x)))
   {
@@ -364,7 +364,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
     ch->send(buf);
     SET_BIT(ch->misc, (1 << x));
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
@@ -385,7 +385,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
     if (ch->player->ignoring.empty())
     {
       ch->send("Ignore who?\r\n");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     // convert ignoring std::map into "char1 char2 char3" format
@@ -406,7 +406,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
     }
     ch->send(fmt::format("Ignoring: {}\r\n", ignoreString));
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   std::string arg1 = {}, remainder_args = {};
@@ -428,7 +428,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
     ch->player->ignoring.erase(arg1);
     ch->send(fmt::format("You stop ignoring {}.\r\n", arg1));
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int is_ignoring(const Character *const ch, const Character *const i)
@@ -477,17 +477,17 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
   argument_interpreter(argument, papername, penname);
 
   if (!ch->desc)
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   if (ch->getLevel() < 5)
   {
     ch->sendln("You need to be at least level 5 to write on the board.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!*papername) /* nothing was delivered */
   {
     ch->sendln("Write? with what? ON what? what are you trying to do??");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (*penname) /* there were two arguments */
@@ -496,13 +496,13 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     {
       sprintf(buf, "You have no %s.\r\n", papername);
       ch->send(buf);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!(pen = get_obj_in_list_vis(ch, penname, ch->carrying)))
     {
       sprintf(buf, "You have no %s.\r\n", papername);
       ch->send(buf);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   else /* there was one arg.let's see what we can find */
@@ -511,7 +511,7 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     {
       sprintf(buf, "There is no %s in your inventory.\r\n", papername);
       ch->send(buf);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (paper->obj_flags.type_flag == ITEM_PEN) /* oops, a pen.. */
     {
@@ -521,7 +521,7 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     else if (paper->obj_flags.type_flag != ITEM_NOTE)
     {
       ch->sendln("That thing has nothing to do with writing.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     /* one object was found. Now for the other one. */
@@ -529,12 +529,12 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     {
       sprintf(buf, "You can't write with a %s alone.\r\n", papername);
       ch->send(buf);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!CAN_SEE_OBJ(ch, ch->equipment[WEAR_HOLD]))
     {
       ch->sendln("The stuff in your hand is invisible! Yeech!!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (pen)
@@ -565,7 +565,7 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     // ch->desc->strnew = &paper->ActionDescription();
     ch->desc->max_str = MAX_NOTE_LENGTH;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
@@ -622,7 +622,7 @@ int do_insult(Character *ch, char *argument, cmd_t cmd)
   }
   else
     ch->sendln("Insult who?");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_emote(Character *ch, char *argument, cmd_t cmd)
@@ -633,7 +633,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
   if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
     ch->sendln("You can't show your emotions!!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (i = 0; *(argument + i) == ' '; i++)
@@ -650,7 +650,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
     csendf(ch, "%s %s\n\r", GET_SHORT(ch), argument + i);
     MOBtrigger = true;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void DC::load_hints(void)

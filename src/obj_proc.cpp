@@ -249,11 +249,11 @@ int barbweap(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   case 5:
     ch->sendln("You twist your wrists quickly causing sharp spikes to spring forth from your weapon!");
     obj->obj_flags.value[3] = 10;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   case 10:
     ch->sendln("You twist your wrists quickly, retracting the spikes from your weapon.");
     obj->obj_flags.value[3] = 5;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
 }
@@ -298,7 +298,7 @@ int souldrainer(Character *ch, class Object *obj, cmd_t cmd, char *arg,
             vict->setHP(-20, ch);
             group_gain(ch, vict);
             fight_kill(ch, vict, TYPE_CHOOSE, 0);
-            return eSUCCESS;
+            return ReturnValue::eSUCCESS;
           }
           else
           { // Missed the fucker
@@ -328,7 +328,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (GET_STR(ch) < 20)
     {
       ch->sendln("You try to separate the wand pieces, but you find yourself too weak to do so.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     int newspell;
     switch (obj->obj_flags.value[3])
@@ -351,7 +351,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
     obj->obj_flags.value[3] = newspell;
     ch->sendln("You push the ivory so that the ivory and ebony separate.\r\nReassembling them, you hear a \"click\" as they snap back into place.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::SAY)
   {
@@ -366,7 +366,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         ch->sendln("The wand absorbs the dragon snout and pulses with energy.");
         obj_from_char(curr);
         extract_obj(curr);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     return ReturnValue::eFAILURE;
@@ -384,17 +384,17 @@ int dawnsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   if (GET_ALIGNMENT(ch) < 350)
   {
     ch->sendln("Dawn refuses your impure prayer.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (isTimer(ch, OBJ_DAWNSWORD))
   {
     ch->send("Dawn needs more time to recharge and is not ready to hear your prayer yet.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!ch->in_room || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Something about this room blocks your command.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, OBJ_DAWNSWORD, 24);
 
@@ -424,7 +424,7 @@ int dawnsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     affect_to_char(v, &af);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
@@ -471,7 +471,7 @@ int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     tmp_char->incrementMove(heal);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void check_eq(Character *ch);
@@ -490,40 +490,40 @@ int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   if (!(victim = ch->get_char_room_vis(arg2)))
   {
     ch->sendln("Noone here by that name.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (IS_PC(victim))
   {
     ch->sendln("The Gods prohibit such evil.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (isTimer(ch, OBJ_LILITHRING))
   {
     ch->sendln("The ring remains dark and your command goes unheeded.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (circle_follow(victim, ch))
   {
     ch->sendln("Sorry, following in circles can not be allowed.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if ((!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) && !ISSET(victim->mobdata->actflags, ACT_CHARM)) || victim->getLevel() > 50)
   {
     act("$N's soul is too powerful for you to command.", ch, 0, victim, TO_CHAR, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (GET_ALIGNMENT(ch) > -350)
   {
     ch->sendln("Your soul is too pure for such an unclean act.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!ch->in_room || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("Something about this room blocks your command.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   act("You speak the command and $N must comply. Lilith's Ring of Command glows with mirthful malevolence.", ch, 0, victim, TO_CHAR, 0);
   act("$n whispers softly to $N. $N's eyes go blank and they now follow $n.", ch, 0, victim, TO_ROOM, 0);
@@ -547,7 +547,7 @@ int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   /* remove any !charmie eq the charmie is wearing */
   check_eq(victim);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
@@ -575,7 +575,7 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
   if (obj->obj_flags.value[2] >= 5)
   {
     ch->send("The wand cannot be recharged yet.\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   class Object *curr;
@@ -616,7 +616,7 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(17399)].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   obj_from_char(firstP);
   extract_obj(firstP);
@@ -628,7 +628,7 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
   extract_obj(diamond);
   obj->obj_flags.value[2] = 5;
   ch->sendln("The wand emits a soft \"beep\" and the display flashes \"Wand Recharged\"");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int holyavenger(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -666,14 +666,14 @@ int holyavenger(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
               act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
               act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
               act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
-              return eSUCCESS;
+              return ReturnValue::eSUCCESS;
             }
             if (IS_AFFECTED(vict, AFF_NO_BEHEAD))
             {
               act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
               act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
               act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
-              return eSUCCESS;
+              return ReturnValue::eSUCCESS;
             }
             act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
             act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
@@ -682,8 +682,8 @@ int holyavenger(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
             make_head(vict);
             group_gain(ch, vict);
             fight_kill(ch, vict, TYPE_CHOOSE, 0);
-            return eSUCCESS | eVICT_DIED; /* Zero means kill it! */
-                                          // it died..
+            return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED; /* Zero means kill it! */
+                                                                    // it died..
           }
           else
           { /* You MISS the fucker! */
@@ -711,7 +711,7 @@ int hooktippedsteelhalberd(Character *ch, class Object *obj, cmd_t cmd,
     return ReturnValue::eFAILURE; // Lucky
   int i = damage_eq_once(victim->equipment[which]);
   if (!victim->equipment[which])
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   if (i >= eq_max_damage(victim->equipment[which]))
     eq_destroyed(victim, victim->equipment[which], which);
   else
@@ -729,7 +729,7 @@ int hooktippedsteelhalberd(Character *ch, class Object *obj, cmd_t cmd,
       act("You latch your halberd into $N's $p, and manage to tear it!", ch, victim->equipment[which], victim, TO_CHAR, 0);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // TODO - I think we actually used this for a while but it was too powerful
@@ -777,7 +777,7 @@ int drainingstaff(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   {
     GET_MANA(ch) = GET_MAX_MANA(ch); // can't go above the MAX_MANA
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -793,7 +793,7 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd == cmd_t::BALANCE)
   {
     ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* deposit */
@@ -809,23 +809,23 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (!*buf || !(x = atoi(buf)) || x < 0)
     {
       ch->sendln("Deposit what?");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if ((uint32_t)x > ch->getGold())
     {
       ch->sendln("You don't have that much gold!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if ((uint32_t)x + GET_BANK(ch) > 2000000000)
     {
       ch->sendln("That would bring you over your account maximum!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     ch->removeGold(x);
     GET_BANK(ch) += x;
     ch->send(fmt::format(std::locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
     ch->save();
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* withdraw */
@@ -833,18 +833,18 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!*buf || !(x = atoi(buf)) || x < 0)
   {
     ch->sendln("Withdraw what?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if ((uint32_t)x > GET_BANK(ch))
   {
     ch->sendln("You don't have that much $B$5gold$R in the bank!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
   ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -860,14 +860,14 @@ int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd == cmd_t::BALANCE)
   {
     ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* deposit */
   if (cmd == cmd_t::DEPOSIT)
   {
     ch->sendln("You cannot use this for depositing money.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* withdraw */
@@ -875,18 +875,18 @@ int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!*buf || !(x = atoi(buf)) || x < 0)
   {
     ch->sendln("Withdraw what?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if ((uint32_t)x > GET_BANK(ch))
   {
     ch->sendln("You don't have that much $B$5gold$R in the bank!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
   ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // if you are in the room with this obj, and you try to go in any
@@ -924,7 +924,7 @@ int returner(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
   do_look(ch, "\0");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 #define MAX_GEM_ASSEMBLER_ITEM 10
@@ -1232,7 +1232,7 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
       }
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // if arguments are given, find object and see if it can be assembled.
@@ -1260,7 +1260,7 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int stupid_button(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -1282,7 +1282,7 @@ int stupid_button(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   ch->sendln("The floor drops out beneath you and you find yourself.. er.. somewhere.");
   move_char(ch, real_room(49));
   do_look(ch, "\0");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Fear gaze.
@@ -1301,7 +1301,7 @@ int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (ch->affected_by_spell(SKILL_FEARGAZE))
   {
     ch->sendln("You need to build up more hatred before you can unleash it again.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(victim = ch->get_char_room_vis(vict)))
@@ -1313,20 +1313,20 @@ int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     else
     {
       ch->sendln("Gaze on whom?");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("That action is impossible to perform in these restrictive confinements.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (victim->getLevel() > 70)
   {
     ch->sendln("Some great force prevents you.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   // All is good, set timer and perform it.
   struct affected_type af;
@@ -1340,7 +1340,7 @@ int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   act("$n's eyes glow with hatred, and $e directs it all at you. OoO, scary!", ch, 0, victim, TO_VICT, 0);
   while (number(0, 1))
     do_flee(victim, "");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -1382,7 +1382,7 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (ch->equipment[pos]->obj_flags.value[3])
     {
       ch->sendln("The item seems to be recharging.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     ch->equipment[pos]->obj_flags.value[3] = 600;
@@ -1413,7 +1413,7 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
 
     act("A pulsing aura springs to life around $n!", ch, 0, 0, TO_ROOM, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else // cmd=69 (remove)
   {
@@ -1474,7 +1474,7 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     ch->sendln("Huge fangs spring forth from your weapon!");
 
     ch->equipment[WEAR_WIELD]->obj_flags.value[3] = 8;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!str_cmp("pulsus", arg1))
   {
@@ -1482,14 +1482,14 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (ch->equipment[WEAR_WIELD]->obj_flags.value[3] == 7)
     {
       ch->sendln("Nothing happens.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     act("The fangs of $n's weapon retract magically into the metal.", ch, 0, 0, TO_ROOM, 0);
     ch->sendln("The fangs retract magically into the metal.");
 
     ch->equipment[WEAR_WIELD]->obj_flags.value[3] = 7;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   return ReturnValue::eFAILURE;
@@ -1522,7 +1522,7 @@ int dancevest(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (obj->obj_flags.timer > 0)
   {
     ch->sendln("The vest remains silent.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   char *command_list[] =
       {
@@ -1551,7 +1551,7 @@ int dancevest(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     v->command_interpreter(tmp_command);
   }
   obj->obj_flags.timer = 48;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -1573,7 +1573,7 @@ int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         act("The flames surrounding $n's weapon gutters and fade.", obj->equipped_by, 0, 0, TO_ROOM, 0);
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (cmd != cmd_t::SAY || !ch || !ch->in_room || str_cmp(arg, "Gods forgive me") || obj->equipped_by != ch)
@@ -1583,17 +1583,17 @@ int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (obj->obj_flags.timer > 0)
   {
     ch->sendln("Your plea goes unanswered. Durendal slumbers.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (GET_ALIGNMENT(ch) < 350)
   {
     ch->sendln("Your soul is impure. Durendel ignores your contrition.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("Something about this room prohibits your prayer from being heard.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   ch->sendln("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!");
   act("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, TO_ROOM, 0);
@@ -1611,7 +1611,7 @@ int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
   SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
   obj->obj_flags.timer = 360;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // When fighting an evil opponent, sancts PC
@@ -1638,14 +1638,14 @@ int eliara_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!IS_EVIL(vict))
     return ReturnValue::eFAILURE;
   if (IS_AFFECTED(ch, AFF_SANCTUARY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   act("Eliara glows brightly for a moment, its incandescent field of light surrounding $n in a glowing aura.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("Eliara glows brightly surrounding you in its protective aura!");
 
   SETBIT(ch->affected_by, AFF_SANCTUARY);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int eliara_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -1658,7 +1658,7 @@ int eliara_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (cmd == cmd_t::REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment && ch->equipment[WEAR_WIELD] && ch->equipment[WEAR_WIELD]->item_number == real_object(30627))
   {
     ch->sendln("Eliara refuses to allow you to remove equipment during battle!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (GET_POS(ch) < position_t::STANDING)
@@ -1691,7 +1691,7 @@ int carriage(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
   do_look(ch, "\0");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int arenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -1744,7 +1744,7 @@ int movingarenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
       room = number(17800, 17849);
 
     move_obj(obj, real_room(room));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!obj || !obj->in_room)
@@ -1767,7 +1767,7 @@ int movingarenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
   do_look(ch, "\0");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -1793,31 +1793,31 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
                  "'This will only work on Godload. *beep*'\r\n"
                  "'Be careful and type correctly.  No refunds.'\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(target_obj = get_obj_in_list_vis(ch, name, ch->carrying)))
   {
     ch->send("'Cannot find this item in your inventory.  *beep*'\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!isSet(target_obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     ch->send("'The item must be godload.  *beep*'\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (strlen(buf) > 80)
   {
     ch->send("'The description cannot be longer than 80 characters. *beep*'\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (GET_PLATINUM(ch) < (uint32_t)(ch->getLevel()))
   {
     ch->send("'Insufficient platinum.  *beep*'\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   GET_PLATINUM(ch) -= (ch->getLevel());
@@ -1836,7 +1836,7 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
                ch);
 
   ch->save();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int weenie_weedy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -1855,7 +1855,7 @@ int weenie_weedy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       send_to_room("a muffled 'BLARG!' comes from a weenie weedy doll somewhere nearby.\r\n", obj->in_obj->carried_by->in_room);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // this should really be a azrack megaphone, but i'm too lazy to figure out how they
@@ -1879,7 +1879,7 @@ int stupid_message(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  "and then fades away.\r\n",
                  obj->in_room, true);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // If there is a player in rooms 8695-8699 (the pillars), then they cause a
@@ -1949,20 +1949,20 @@ int phish_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eFAILURE;
 
   if (!strstr(arg, "button"))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   act("$n fiddles with a small fish-shaped device.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   if (!(victim = get_char("Pirahna")))
   {
     ch->sendln("The locator beeps angrily and smoke starts to come out.\r\nPirahna is unlocatable.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->sendln("Found him!");
 
   do_transfer(victim, GET_NAME(ch));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -1997,7 +1997,7 @@ int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *a
     break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -2041,7 +2041,7 @@ int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You quietly whisper 'magiskhal' into your hands.");
@@ -2057,7 +2057,7 @@ int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 600;
   }
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -2102,7 +2102,7 @@ int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You quietly whisper 'heltlaka' into your hands.");
@@ -2120,7 +2120,7 @@ int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 300;
   }
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int mana_box(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -2140,7 +2140,7 @@ int mana_box(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (0 == number(0, 10))
     ch->sendln("The box's magical power eases your mind.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -2184,7 +2184,7 @@ int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You quietly whisper 'feuerschild' into your hands.");
@@ -2194,7 +2194,7 @@ int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 900;
 
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -2239,12 +2239,12 @@ int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("The box doesn't respond.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
@@ -2261,7 +2261,7 @@ int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 1000;
   }
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -2307,7 +2307,7 @@ int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!strcmp("good", junk))
@@ -2323,7 +2323,7 @@ int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 500;
 
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -2385,7 +2385,7 @@ int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 1000;
 
   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Proc for handling any 'pull' actions.  Just put it on the object and put in an entry
@@ -2423,7 +2423,7 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
@@ -2439,7 +2439,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
       char buf[2000];
       sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
       ch->send(buf);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -2558,7 +2558,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int szrildor_pass_checks(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
@@ -2603,7 +2603,7 @@ int szrildor_pass_checks(Character *ch, class Object *obj, cmd_t cmd, const char
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
@@ -2681,7 +2681,7 @@ int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
     obj_from_room(obj);
     obj_to_room(obj, room);
     send_to_room(msg2, obj->in_room, true);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
 }
@@ -2717,7 +2717,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, cmd_t cmd, const char
       send_to_room("With a large popping noise, the flow of magic returns to the room.\r\n", obj->in_room);
     REMOVE_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Send a message to all rooms on a boat
@@ -2777,7 +2777,7 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     move_char(ch, obj->obj_flags.value[2]);
     act("$n climbs aboard.", ch, 0, 0, TO_ROOM, 0);
     do_look(ch, "");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // timer pulsed.  Update
@@ -2815,7 +2815,7 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     obj_to_room(obj, move_to);
     send_to_room("A ship sails in.\r\n", obj->in_room, true);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Depending on which boat we're on, exit the boat if we're not 'at sea'
@@ -2845,7 +2845,7 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     if (obj2 == nullptr)
     {
       ch->sendln("Cannot find your boat obj.  BUG.  Tell a god.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (obj2->in_room == dk_boat[1])
@@ -2855,7 +2855,7 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
       move_char(ch, obj2->in_room);
       act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
       do_look(ch, "");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (obj2->in_room == dk_boat[dk_boat[0]])
@@ -2865,18 +2865,18 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
       move_char(ch, obj2->in_room);
       act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
       do_look(ch, "");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     ch->sendln("You can't just leave the ship in the middle of the Blood Sea!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 #define BONEWRACK_ROOM 9597
@@ -2905,7 +2905,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   if (!vict)
   {
     obj->obj_flags.value[0] = 0;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   switch (obj->in_room)
@@ -2914,7 +2914,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
     // find bonewrack
     vict = get_mob_vnum(9535);
     if (!vict || vict->in_room == BONEWRACK_ROOM)
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
     switch (obj->obj_flags.value[0])
     {
@@ -2938,7 +2938,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
     // find avatar
     vict = get_mob_vnum(9526);
     if (!vict || vict->in_room == GAIOT_AVATAR)
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
     switch (obj->obj_flags.value[0])
     {
@@ -2964,7 +2964,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
 
   obj->obj_flags.value[0]++;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Takes care of lighting back up a room when globe of darkness wears off
@@ -2988,7 +2988,7 @@ int globe_of_darkness_proc(Character *ch, class Object *obj, cmd_t cmd, const ch
   else
     obj->obj_flags.value[0]--;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int hornoplenty(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
@@ -3013,7 +3013,7 @@ int hornoplenty(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   newobj = clone_object(objnum);
 
   obj_to_obj(newobj, obj);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int gl_dragon_fire(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -3058,7 +3058,7 @@ int dk_rend(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (GET_HIT(ch->fighting) < 1)
     ch->fighting->setHP(1);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int magic_missile_boots(Character *ch, class Object *obj, cmd_t cmd, char *arg,
@@ -3194,7 +3194,7 @@ int TOHS_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!victim || victim->in_room == DC::NOWHERE) // couldn't find it?!
   {
     ch->sendln("The tower seems to not be there!?!!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   searchnum = ch->in_room;
@@ -3202,7 +3202,7 @@ int TOHS_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   do_look(ch, "");
   move_char(ch, searchnum);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /*int no_magic_item(Character *ch, class Object *obj, cmd, char
@@ -3235,7 +3235,7 @@ int gotta_dance_boots(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (obj->equipped_by->getLevel() <= MORTAL)
     WAIT_STATE(obj->equipped_by, DC::PULSE_VIOLENCE * 3);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int random_dir_boots(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -3274,21 +3274,21 @@ int noremove_eq(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     obj->obj_flags.value[3]--;
     if (!obj->obj_flags.value[3])
       obj->equipped_by->send(QStringLiteral("The %1 loses it's grip on your body.\r\n").arg(obj->short_description));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (cmd == cmd_t::UNDEFINED && obj->obj_flags.value[3] <= 0)
   {
     if (number(0, 4))
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n",
            obj->short_description);
     obj->obj_flags.value[3] = 5;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (obj->obj_flags.value[3] > 0)
   {
     obj->equipped_by->send(QStringLiteral("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
 }
@@ -3484,7 +3484,7 @@ int chaosblade(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       obj->equipped_by->removeHP(dam);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int rubybrooch(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -3521,7 +3521,7 @@ int rubybrooch(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       obj->equipped_by->removeHP(dam);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int eternitystaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -3553,7 +3553,7 @@ int eternitystaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("$n is wracked by magical energies!", obj->equipped_by, 0, 0, TO_ROOM, 0);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -3580,7 +3580,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\n\r");
         send_to_room(buf2, obj->equipped_by->in_room, true);
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
     {
@@ -3798,17 +3798,17 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (obj->obj_flags.value[3] > 0)
     {
       vict->sendln("It's already been started!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) &&
         vict->room().isArena() && arena.isPotato() && arena.isOpened())
     {
       vict->sendln("Wait until the potato arena is open before you try blowing yourself up!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     vict->sendln("The potato starts getting really really hot and burns your hands!!");
     obj->obj_flags.value[3] = number(1, 100);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (obj->obj_flags.value[3] < 0) // not active yet:)
@@ -3819,32 +3819,32 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (cmd == cmd_t::SLIP)
     {
       vict->sendln("You can't slip anything when you have a hot potato! (sorry)");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (cmd == cmd_t::DROP)
     {
       vict->sendln("You can't drop anything when you have a hot potato!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (cmd == cmd_t::DONATE)
     {
       vict->sendln("You can't donate anything when you have a hot potato!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (cmd == cmd_t::QUIT)
     {
       vict->sendln("You can't quit when you have a hot potato!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (cmd == cmd_t::SACRIFICE)
     {
       vict->sendln("You can't junk stuff when you have a hot potato!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (cmd == cmd_t::PUT)
     {
       vict->sendln("You can't 'put' stuff when you have a hot potato!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -3860,13 +3860,13 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (IS_NPC(give_vict) && vict->isMortalPlayer())
     {
       vict->sendln("You can only give things to other players when you have a hot potato!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) &&
         vict->room().isArena() && arena.isPotato() && arena.isOpened() && vict->isMortalPlayer())
     {
       vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     // if it's a player, go ahead
@@ -3916,7 +3916,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("$n gets back up.", vict, 0, 0, TO_ROOM, 0);
       do_say(vict, "HA!  Fooled ya!");
       extract_obj(obj);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     vict->setHP(-1);
@@ -3939,11 +3939,11 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_MASHED);
     else
       fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_POTATO);
-    return eSUCCESS | eCH_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
   if (dropped == 1)
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   else
     return ReturnValue::eFAILURE;
 }
@@ -3990,7 +3990,7 @@ int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const c
   }
 
   extract_obj(obj);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // 565
@@ -4039,7 +4039,7 @@ int godload_defender(Character *ch, class Object *obj, cmd_t cmd,
   if (isTimer(ch, SPELL_PROTECT_FROM_EVIL))
   {
     ch->sendln("The defender flickers, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_PROTECT_FROM_EVIL, 24);
   return spell_protection_from_evil(50, ch, ch, 0, 150);
@@ -4061,7 +4061,7 @@ int godload_stargazer(Character *ch, class Object *obj, cmd_t cmd,
   if (isTimer(ch, SPELL_MANA))
   {
     ch->sendln("The robe glows, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_MANA, 6);
   ch->sendln("Your robes glow brightly!");
@@ -4084,7 +4084,7 @@ int godload_cassock(Character *ch, class Object *obj, cmd_t cmd,
   if (isTimer(ch, SPELL_GROUP_SANC))
   {
     ch->sendln("The cassock hums, but ends soon after it starts.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_GROUP_SANC, 36);
   ch->sendln("Your cassocks begin to hum loudly!");
@@ -4104,7 +4104,7 @@ int godload_armbands(Character *ch, class Object *obj, cmd_t cmd,
   if (isTimer(ch, SPELL_TELEPORT))
   {
     ch->sendln("The armbands crackle, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_TELEPORT, 24);
   ch->sendln("Your armbands crackle, and you phase out of existence.");
@@ -4126,7 +4126,7 @@ int godload_gaze(Character *ch, class Object *obj, cmd_t cmd,
   if (isTimer(ch, SPELL_KNOW_ALIGNMENT))
   {
     ch->sendln("The gaze gazes stoically, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_KNOW_ALIGNMENT, 24);
   ch->sendln("The gaze reacts to your words, and you feel ready to judge.");
@@ -4148,13 +4148,13 @@ int godload_wailka(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (isTimer(ch, SPELL_PARALYZE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("The ring hums, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   Character *vict;
   if ((vict = ch->get_char_room_vis(arg2)) == nullptr)
   {
     ch->sendln("You need to tell the item who.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_PARALYZE, 12);
   ch->sendln("Your ring radiates evil, and does your bidding.");
@@ -4175,7 +4175,7 @@ int godload_choker(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (isTimer(ch, SPELL_GLOBE_OF_DARKNESS))
   {
     ch->sendln("The choker glows black for a moment, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_GLOBE_OF_DARKNESS, 12);
   ch->sendln("Your choker glows black, and dampens all light in the room.");
@@ -4196,7 +4196,7 @@ int godload_lorne(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (isTimer(ch, SPELL_CONT_LIGHT))
   {
     ch->sendln("The necklace shines, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_CONT_LIGHT, 12);
   ch->sendln("The necklace shines brightly.");
@@ -4238,7 +4238,7 @@ int godload_quiver(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (isTimer(ch, SPELL_MISANRA_QUIVER))
   {
     ch->sendln("The quiver glitters, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_MISANRA_QUIVER, 24);
   class Object *obj2;
@@ -4253,18 +4253,18 @@ int godload_quiver(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       {
         ch->sendln("Some arrows appear in your quiver.");
         ch->sendln("The quiver flickers brightly, and ends unfinished.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else
     {
       ch->sendln("Some arrows appear in your quiver.");
       ch->sendln("The quiver flickers brightly, and ends unfinished.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   ch->sendln("Some arrows appear in your quiver.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_aligngood(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -4280,14 +4280,14 @@ int godload_aligngood(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (isTimer(ch, SPELL_ALIGN_GOOD))
   {
     ch->sendln("The fire burns, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_ALIGN_GOOD, 48);
   GET_ALIGNMENT(ch) += 400;
   if (GET_ALIGNMENT(ch) > 1000)
     GET_ALIGNMENT(ch) = 1000;
   ch->sendln("You are purified by the light of the fire.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_alignevil(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -4303,14 +4303,14 @@ int godload_alignevil(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (isTimer(ch, SPELL_ALIGN_EVIL))
   {
     ch->sendln("The blackened heart croaks, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_ALIGN_EVIL, 48);
   GET_ALIGNMENT(ch) -= 400;
   if (GET_ALIGNMENT(ch) < -1000)
     GET_ALIGNMENT(ch) = -1000;
   ch->sendln("You are burnt by the heart's darkness.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_tovmier(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -4329,15 +4329,15 @@ int godload_tovmier(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     if (obj->affected[i].location == WEP_DISPEL_EVIL)
     {
       obj->affected[i].location = WEP_DISPEL_GOOD;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (obj->affected[i].location == WEP_DISPEL_GOOD)
     {
       obj->affected[i].location = WEP_DISPEL_EVIL;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   ch->sendln("Something's bugged with this staff. Report it.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_hammer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -4351,7 +4351,7 @@ int godload_hammer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (isTimer(ch, SPELL_EARTHQUAKE))
   {
     ch->sendln("The hammer glows, but nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   act("$n smashes $s hammer into the ground causing a tectonic blast.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You smash your hammer into the ground, causing it to shake violently.");
@@ -4389,7 +4389,7 @@ int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 
   end_oproc(b);
   extract_obj(obj);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_phyraz(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
@@ -4405,14 +4405,14 @@ int godload_phyraz(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (isTimer(ch, SPELL_WIZARD_EYE))
   {
     ch->sendln("The ball stays murky.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_WIZARD_EYE, 24);
   Character *vict = get_char_vis(ch, arg2);
   if (!vict)
   {
     ch->sendln("The scrying ball stays murky.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   ch->sendln("You tell the scrying ball your bidding, and an image appears.");
   return spell_wizard_eye(100, ch, vict, 0, 100);
@@ -4571,7 +4571,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
         return ReturnValue::eFAILURE;
      }
   */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_grathelok(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -4603,7 +4603,7 @@ int godload_grathelok(Character *ch, class Object *obj, cmd_t cmd, const char *a
   vict->setHP(-20, ch);
   group_gain(ch, vict);
   fight_kill(ch, vict, TYPE_CHOOSE, 0);
-  return eSUCCESS | eVICT_DIED;
+  return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
 }
 int goldenbatleth(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                   Character *invoker)
@@ -4634,7 +4634,7 @@ int goldenbatleth(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   vict->setHP(-20, ch);
   group_gain(ch, vict);
   fight_kill(ch, vict, TYPE_CHOOSE, 0);
-  return eSUCCESS | eVICT_DIED;
+  return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
 }
 
 int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -4688,9 +4688,9 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
     if (IS_PC(victim))
       victim->sendln("You have been KILLED!!\n\r");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
-    return eSUCCESS | eVICT_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
@@ -4741,9 +4741,9 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
     if (IS_PC(victim))
       victim->sendln("You have been KILLED!!\n\r");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
-    return eSUCCESS | eVICT_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int godload_hydratail(Character *ch, class Object *obj, cmd_t cmd, const char *arg,

@@ -671,7 +671,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  "$B$2me to waste my time on you.$R\n\r"
                  "$B$2Prove to me you are gonna stick around first!'$R.",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   hit_exp = ch->meta_get_hps_exp_cost();
@@ -702,20 +702,20 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       ch->sendln("$B$31)$R Estimate hit point cost.$R ");
       ch->sendln("$B$32)$R Estimate mana cost.$R ");
       ch->sendln("$B$33)$R Estimate move cost.$R ");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     int choice = atoi(argument);
     if (choice < 1 || choice > 3)
     {
       ch->sendln("$B$2The Meta-physician tells you, 'I cannot estimate that. Type estimate by itself for a list.'$R ");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     int amount = atoi(arg2);
     if (amount < 5 || amount > 10000)
     {
       ch->sendln("$B$2The Meta-physician tells you, 'The amount cannot be over 10000 or less than 5.'$R ");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     int64_t platcost;
@@ -734,7 +734,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
     expcost = platcost * 51523;
     csendf(ch, "$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \n\r", platcost, expcost);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::LIST)
   { /* List */
@@ -813,7 +813,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::BUY)
   { /* buy  */
@@ -821,7 +821,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if ((choice = atoi(argument)) == 0 || choice < 0)
     {
       ch->sendln("The Meta-physician tells you, 'Pick a number.'");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     switch (choice)
     {
@@ -871,17 +871,17 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_PLATINUM(ch) < (unsigned)statplatprice)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services.  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_EXP(ch) < pprice)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (stat >= max_stat)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You're already as good at that as yer gonna get.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_EXP(ch) -= pprice;
@@ -904,7 +904,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       redo_hitpoints(ch);
       redo_mana(ch);
       redo_ki(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 6 && hit_exp && hit_cost)
@@ -912,12 +912,12 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_EXP(ch) < hit_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (uint32_t)hit_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_EXP(ch) -= hit_exp;
       GET_PLATINUM(ch) -= hit_cost;
@@ -929,7 +929,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 7 && hit_exp && hit_cost)
@@ -940,12 +940,12 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_EXP(ch) < hit_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (uint32_t)hit_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!$R'");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_EXP(ch) -= hit_exp;
       GET_PLATINUM(ch) -= hit_cost;
@@ -957,7 +957,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 8 && mana_exp && mana_cost)
@@ -966,12 +966,12 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_EXP(ch) < mana_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (uint32_t)mana_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_EXP(ch) -= mana_exp;
@@ -984,7 +984,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 9 && mana_exp && mana_cost)
@@ -995,12 +995,12 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_EXP(ch) < mana_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (uint32_t)mana_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_EXP(ch) -= mana_exp;
@@ -1013,7 +1013,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 10 && move_exp && move_cost)
@@ -1021,12 +1021,12 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_EXP(ch) < move_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (uint32_t)move_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_EXP(ch) -= move_exp;
@@ -1039,7 +1039,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 11 && move_exp && move_cost)
@@ -1050,12 +1050,12 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_EXP(ch) < move_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (uint32_t)move_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_EXP(ch) -= move_exp;
@@ -1068,24 +1068,24 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 12 && ki_exp && ki_cost)
     {
       if (IS_NPC(ch))
       {
         ch->sendln("Mobs cannot meta ki.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_EXP(ch) < ki_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (uint32_t)(ki_cost))
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_EXP(ch) -= ki_exp;
@@ -1097,7 +1097,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", ki_cost, GET_PLATINUM(ch)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 13)
@@ -1105,65 +1105,65 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (ch->isPlayerGoldThief())
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You cannot do ch because of your criminal actions!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (ch->getGold() < 20000)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       ch->removeGold(20000);
       GET_PLATINUM(ch) += 1;
       ch->sendln("Ok.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 14)
     {
       if (ch->isPlayerGoldThief())
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You cannot do ch because of your criminal actions!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (ch->getGold() < 100000)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       ch->removeGold(100000);
       GET_PLATINUM(ch) += 5;
       ch->sendln("Ok.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 15)
     {
       if (!IS_NPC(ch) && ch->isPlayerGoldThief())
       {
         ch->sendln("Your criminal acts prohibit it.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       if (ch->getGold() < 5000000)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) += 250;
       ch->removeGold(5000000);
       ch->sendln("Ok.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 16)
     {
       if (GET_PLATINUM(ch) < 5)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 5;
       ch->addGold(100000);
       ch->sendln("Ok.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (choice == 17)
@@ -1171,24 +1171,24 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (GET_PLATINUM(ch) < 250)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!  SCRAM$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 250;
       ch->addGold(5000000);
       ch->sendln("Ok.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 18)
     {
       if (GET_EXP(ch) < 100000000)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (IS_NPC(ch))
       {
         ch->sendln("What would you have to spend $B$5gold$R on chode?");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_EXP(ch) -= 100000000;
@@ -1196,68 +1196,68 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 19)
     {
       if (GET_PLATINUM(ch) < 25)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       class Object *obj = clone_object(real_object(10003));
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
         ch->sendln("You can't carry that many items.");
         extract_obj(obj);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
       {
         ch->sendln("You can't carry that much weight.");
         extract_obj(obj);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 25;
       obj_to_char(obj, ch);
       ch->sendln("$B$2The Meta-physician tells you, 'Here is your potion.'$R");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 20)
     {
       if (GET_PLATINUM(ch) < 25)
       {
         ch->sendln("Costs 25 plats...which you don't have.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (IS_NPC(ch))
       {
         ch->sendln("You can't buy practices chode...");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       ch->sendln("The Meta-Physician gives you a practice session.");
 
       GET_PLATINUM(ch) -= 25;
       ch->player->practices += 1;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 21)
     { // -2 AC
       if (GET_QPOINTS(ch) < 10)
       {
         ch->sendln("Costs 10 qpoints...which you don't have.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (IS_NPC(ch))
       {
         ch->sendln("You can't buy AC, chode...");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_AC_METAS(ch) >= 250)
       {
         ch->sendln("You've reached the -250 AC limit that can be purchased per character.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_QPOINTS(ch) -= 10;
@@ -1268,19 +1268,19 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
       ch->save();
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (choice == 22)
     { // 2,000,000 experience
       if (GET_QPOINTS(ch) < 1)
       {
         ch->sendln("Costs 1 qpoint...which you don't have.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (IS_NPC(ch))
       {
         ch->sendln("You can't buy experience, chode...");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_QPOINTS(ch) -= 1;
@@ -1290,11 +1290,11 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
       ch->save();
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   ch->sendln("$B$2The Meta-physician tells you, 'Buy what?!'$R");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /*
@@ -1627,7 +1627,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
     csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 7, "Increase your age by 1 (500 max)");
     csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 8, "Decrease your age by 1  (18 min)");
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::BUY) // buy
   {
@@ -1640,22 +1640,22 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       if (ch->would_die())
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'The process would kill you!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_RACE(ch) == choice)
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You are already a member of that race!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (!ch->is_race_applicable(choice))
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You do not qualify for becoming that race!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (unsigned)changecost(GET_RACE(ch), choice))
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       if (!str_cmp(arg2, "confirm"))
@@ -1703,7 +1703,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         ch->send(QStringLiteral("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\r\n").arg(choice));
         ch->sendln("$4NOTE$R$B: Your attributes will be adjusted to fit ch new race and then lowered by 2 points each.$R");
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (choice == MAX_PC_RACE + 1)
     {
@@ -1717,49 +1717,49 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       else
       {
         csendf(ch, "Syntax: buy %d m/f/n\r\n", MAX_PC_RACE + 1);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_SEX(ch) == newsex)
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'That wouldn't change much'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < 1000)
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 1000;
       GET_SEX(ch) = newsex;
       ch->sendln("The Cardinal prays loudly and summons the magic of the gods...");
       ch->sendln("After a brief moment of pain you are reborn!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (choice == MAX_PC_RACE + 2)
     {
       if (GET_PLATINUM(ch) < 50)
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       class Object *obj = clone_object(real_object(10004));
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
         ch->sendln("You can't carry that many items.");
         extract_obj(obj);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
       {
         ch->sendln("You can't carry that much weight.");
         extract_obj(obj);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 50;
       obj_to_char(obj, ch);
       ch->sendln("$B$2Cardinal Thelonius tells you, 'Here is your potion.'$R");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (choice >= MAX_PC_RACE + 3 && choice <= MAX_PC_RACE + 6)
     {
@@ -1770,32 +1770,32 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       {
         ch->sendln("You cannot increase your height any more.");
         ch->heightweight(true);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else if (choice == 4 && ch->height <= races[ch->race].min_height)
       {
         ch->sendln("You cannot decrease your height any more.");
         ch->heightweight(true);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else if (choice == 5 && ch->weight >= races[ch->race].max_weight)
       {
         ch->sendln("You cannot increase your weight any more.");
         ch->heightweight(true);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else if (choice == 6 && ch->weight <= races[ch->race].min_weight)
       {
         ch->sendln("You cannot decrease your weight any more.");
         ch->heightweight(true);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       ch->heightweight(true);
 
       if (GET_PLATINUM(ch) < 250)
       {
         ch->sendln("You cannot afford it.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 250;
       ch->sendln("Cardinal Thelonius gropes you.");
@@ -1819,24 +1819,24 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         ch->weight--;
         logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (choice == MAX_PC_RACE + 7)
     {
       if (GET_QPOINTS(ch) < 5)
       {
         ch->sendln("Costs 5 qpoints...which you don't have.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (IS_NPC(ch))
       {
         ch->sendln("You can't buy age, chode...");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_AGE(ch) >= 500)
       {
         ch->sendln("You've reached the 500 age limit that can be purchased per character.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_QPOINTS(ch) -= 5;
@@ -1846,24 +1846,24 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
       ch->save();
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (choice == MAX_PC_RACE + 8)
     {
       if (GET_QPOINTS(ch) < 5)
       {
         ch->sendln("Costs 5 qpoints...which you don't have.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (IS_NPC(ch))
       {
         ch->sendln("You can't buy age, chode...");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_AGE(ch) <= 18)
       {
         ch->sendln("You've reached the age 18 minimum limit that can be purchased per character.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       GET_QPOINTS(ch) -= 5;
@@ -1873,12 +1873,12 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
       ch->save();
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
     {
       ch->sendln("$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 

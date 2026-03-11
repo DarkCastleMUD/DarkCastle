@@ -127,7 +127,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
     if (!ban_list)
     {
       ch->sendln("No sites are banned.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     strcpy(format, "%-15.15s  %-8.8s  %-19s  %-16.16s\r\n");
     sprintf(buf, format,
@@ -156,13 +156,13 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
 
       csendf(ch, format, ban_node->site, ban_types[ban_node->type], buffer.c_str(), ban_node->name);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   half_chop(argument, flag, site);
   if (!*site || !*flag)
   {
     ch->sendln("Usage: ban {all | select | new} site_name");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   struct sockaddr_in sa;
@@ -175,14 +175,14 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
   if (!(!str_cmp(flag, "select") || !str_cmp(flag, "all") || !str_cmp(flag, "new")))
   {
     ch->sendln("Flag must be ALL, SELECT, or NEW.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
   {
     if (!str_cmp(ban_node->site, site))
     {
       ch->sendln("That site has already been banned -- unban it to change the ban type.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -207,7 +207,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
   logentry(buf, POWER, DC::LogChannel::LOG_GOD);
   ch->sendln("Site banned.");
   write_ban_list();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_unban(Character *ch, char *argument, cmd_t cmd)
@@ -221,7 +221,7 @@ int do_unban(Character *ch, char *argument, cmd_t cmd)
   if (!*site)
   {
     ch->sendln("A site to unban might help.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   ban_node = ban_list;
   while (ban_node && !found)
@@ -235,7 +235,7 @@ int do_unban(Character *ch, char *argument, cmd_t cmd)
   if (!found)
   {
     ch->sendln("That site is not currently banned.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   REMOVE_FROM_LIST(ban_node, ban_list, next);
   ch->sendln("Site unbanned.");
@@ -245,5 +245,5 @@ int do_unban(Character *ch, char *argument, cmd_t cmd)
 
   dc_free(ban_node);
   write_ban_list();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

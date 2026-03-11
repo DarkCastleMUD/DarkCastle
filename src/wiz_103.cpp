@@ -155,7 +155,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
   else
     ch->sendln("Boot Who?");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_disconnect(Character *ch, char *argument, cmd_t cmd)
@@ -198,7 +198,7 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
     }
   }
   ch->sendln("Descriptor not found!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_fsave(Character *ch, std::string argument, cmd_t cmd)
@@ -235,7 +235,7 @@ int do_fsave(Character *ch, std::string argument, cmd_t cmd)
 
   logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_fighting(Character *ch, char *argument, cmd_t cmd)
@@ -292,7 +292,7 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
     else
       ch->sendln("No fighting characters found.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_peace(Character *ch, char *argument, cmd_t cmd)
@@ -308,7 +308,7 @@ int do_peace(Character *ch, char *argument, cmd_t cmd)
   }
   act("$n makes a gesture and all fighting stops.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You stop all fighting in this room.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
@@ -333,7 +333,7 @@ int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
             buf, races[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
   }
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int lookupClass(Character *ch, char *str)
@@ -439,7 +439,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("All");
       }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
     {
@@ -479,7 +479,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("");
       }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -526,5 +526,5 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
   do_rsave(ch, "");
   ch->in_room = old_room;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

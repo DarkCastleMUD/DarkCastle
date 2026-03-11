@@ -257,7 +257,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
   save_corpses();
 }
 
-// return eSUCCESS if item was picked up
+// return ReturnValue::eSUCCESS if item was picked up
 // return ReturnValue::eFAILURE if not
 // TODO - currently this is designed with icky if-logic.  While it allows you to put
 // code at the end that would affect any attempted 'get' it looks really nasty and
@@ -957,7 +957,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
   if (fail)
     return ReturnValue::eFAILURE;
   ch->save(cmd_t::SAVE_SILENTLY);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_consent(Character *ch, char *arg, cmd_t cmd)
@@ -1024,7 +1024,7 @@ int do_consent(Character *ch, char *arg, cmd_t cmd)
   }
 
   ch->sendln(QStringLiteral("All corpses in the game which belong to you can now be molested by anyone named %1.").arg(arg1));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int contents_cause_unique_problem(Object *obj, Character *vict)
@@ -1107,7 +1107,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
     }
     ch->sendln("OK.");
     if (amount == 0)
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
     act("$n drops some gold.", ch, 0, 0, TO_ROOM, 0);
     tmp_object = create_money(amount);
@@ -1119,7 +1119,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
     }
 
     ch->save(cmd_t::SAVE_SILENTLY);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (*arg)
@@ -1243,7 +1243,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           }
 
           move_obj(tmp_object, ch->in_room);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         else
           ch->sendln("You can't drop it, it must be CURSED!");
@@ -1334,12 +1334,12 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
       if (!str_cmp(arg1, "all"))
       {
         do_putalldot(ch, 0, arg2, cmd);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else if (sscanf(arg1, "all.%s", allbuf) != 0)
       {
         do_putalldot(ch, allbuf, arg2, cmd);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
 
@@ -1480,7 +1480,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                        DC::getInstance()->obj_index[sub_object->item_number].vnum());
                 }
 
-                return eSUCCESS;
+                return ReturnValue::eSUCCESS;
               }
               else
               {
@@ -1546,7 +1546,7 @@ command_return_t Character::do_givealldot(QString name, QString target, cmd_t cm
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
@@ -1658,7 +1658,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     // bribe trigger automatically removes any gold given to mob
     mprog_bribe_trigger(vict, this, amount);
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   auto vict_name = arguments.value(0);
@@ -1709,13 +1709,13 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   if (obj_name == QStringLiteral("all"))
   {
     do_givealldot({}, vict_name, cmd);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (obj_name.startsWith(QStringLiteral("all.")))
   {
     auto allbuf = obj_name.split(".").value(1);
     do_givealldot(allbuf, vict_name, cmd);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(obj = get_obj_in_list_vis(this, obj_name, carrying)))
@@ -1887,17 +1887,17 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   retval = mprog_give_trigger(vict, this, obj);
   bool objExists(Object * obj);
-  if (!isSet(retval, eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) &&
+  if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) &&
       objExists(obj))
     extract_obj(obj);
 
   if (SOMEONE_DIED(retval))
   {
     retval = SWAP_CH_VICT(retval);
-    return eSUCCESS | retval;
+    return ReturnValue::eSUCCESS | retval;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Find an item on a character (in inv, or containers in inv (NOT WORN!))
@@ -2307,7 +2307,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
   // in case ch died or anything
   if (retval)
     return retval;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_close(Character *ch, char *argument, cmd_t cmd)
@@ -2383,7 +2383,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
     ch->send(QStringLiteral("I see no %1 here.\r\n").arg(type));
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 bool has_key(Character *ch, int key)
@@ -2489,7 +2489,7 @@ int do_lock(Character *ch, char *argument, cmd_t cmd)
   }
   else
     ch->sendln("You don't see anything like that.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_unlock(Character *ch, char *argument, cmd_t cmd)
@@ -2574,7 +2574,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
   }
   else
     ch->sendln("You don't see anything like that.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent)
@@ -2603,7 +2603,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   }
 
   if (!charge_moves(ch, SKILL_PALM))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
   {
@@ -2728,5 +2728,5 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     ch->addGold(obj_object->obj_flags.value[0]);
     extract_obj(obj_object);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

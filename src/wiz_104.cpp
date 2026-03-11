@@ -91,7 +91,7 @@ int do_thunder(Character *ch, char *argument, cmd_t cmd)
         send_to_char(buf1, i->character);
       }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_incognito(Character *ch, char *argument, cmd_t cmd)
@@ -111,7 +111,7 @@ int do_incognito(Character *ch, char *argument, cmd_t cmd)
                  ch);
     ch->player->incognito = true;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_load(Character *ch, char *arg, cmd_t cmd)
@@ -243,7 +243,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
       do_mload(ch, number, cnt);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if ((num = mob_in_index(c, number)) == -1)
     {
@@ -251,7 +251,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     do_mload(ch, num, cnt);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   case 1: /* object */
     if ((number = number_or_name(&c, &num)) == 0)
       return ReturnValue::eFAILURE;
@@ -300,7 +300,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       }
 
       do_oload(ch, number, cnt, (random[0] == 'r' ? true : false));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if ((num = obj_in_index(c, number)) == -1)
     {
@@ -321,9 +321,9 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
     }
 
     do_oload(ch, num, cnt, (random[0] == 'r' ? true : false));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_purge(Character *ch, char *argument, cmd_t cmd)
@@ -404,7 +404,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
     }
   }
   save_corpses();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 char *dirNumToChar(int dir)
@@ -478,7 +478,7 @@ int Zone::show_info(Character *ch)
   ch->send(buf);
   ch->sendln("");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t num_to_show, bool stats)
@@ -735,7 +735,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
   {
     ch->sendln("\r\nUse zedit to see the rest of the commands if they were truncated.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int show_zone_commands(Character *ch, zone_t zone_key, uint64_t start, uint64_t num_to_show, bool stats)
@@ -939,7 +939,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
   {
     csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n",
            DC::getInstance()->total_rooms, top_of_mobt, top_of_objt);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (is_abbrev(type, "object"))
   {
@@ -1128,7 +1128,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 
         ch->send(QStringLiteral("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.Name()));
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     bool ok = false;
@@ -1147,7 +1147,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (!is_number(arg1))
     {
       ch->sendln("Syntax: show rsearch <zone#> <sectorname/roomflag>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     zon = atoi(arg1);
     //     Room
@@ -1181,7 +1181,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (!bits && !sector)
     {
       ch->sendln("Syntax: show rsearch <zone number> <flags/sector type");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     room_t last_room = DC::getInstance()->zones.lastKey();
     if (zon > last_room)
@@ -1345,7 +1345,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       else
         ch->send(" ");
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     int c, nr;
     if (!*act && !clas && !levlow && !levhigh && !*affect && !immune && !race && !align)
@@ -1627,7 +1627,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       else
         ch->send(" ");
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     for (c = 0; c < DC::getInstance()->obj_index[top_of_objt].vnum(); c++)
@@ -1779,7 +1779,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
   }
   else
     ch->sendln("Illegal type.  Type just 'show' for legal types.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
@@ -1825,7 +1825,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
     }
 
     ch->sendln("Ok.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   victim = get_char_vis(ch, arg1);
@@ -1850,7 +1850,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
   do_look(victim, "");
   ch->sendln("Ok.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_teleport(Character *ch, char *argument, cmd_t cmd)
@@ -1945,7 +1945,7 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
   do_look(victim, "");
   ch->sendln("Teleport completed.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 } /* do_teleport */
 
 int do_gtrans(Character *ch, char *argument, cmd_t cmd)
@@ -2004,7 +2004,7 @@ int do_gtrans(Character *ch, char *argument, cmd_t cmd)
       } /* for */
     ch->sendln("Ok.");
   } /* else */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 char *oprog_type_to_name(int type)
@@ -2104,7 +2104,7 @@ int do_opstat(Character *ch, char *argument, cmd_t cmd)
   }
 
   opstat(ch, vnum);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void update_objprog_bits(int num)
@@ -2150,7 +2150,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
   /*  if (!*arg)
     {
           opstat(ch, vnum);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
     }*/
   mob_prog_data *prog{}, *currprog{};
   if (!str_cmp(arg, "add"))
@@ -2179,7 +2179,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       DC::getInstance()->obj_index[num].mobprogs = prog;
     update_objprog_bits(num);
     ch->sendln("New obj proc created.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "remove"))
   {
@@ -2216,7 +2216,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     update_objprog_bits(num);
 
     ch->sendln("Program deleted.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "type"))
   {
@@ -2287,7 +2287,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     currprog->type = a;
     update_objprog_bits(num);
     ch->sendln("Proc type changed.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "arglist"))
   {
@@ -2314,7 +2314,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     currprog->arglist = strdup(argument + 1);
 
     ch->sendln("Arglist changed.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "command"))
   {
@@ -2359,12 +2359,12 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       }
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "list"))
   {
     opstat(ch, vnum);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   send_to_char("$3Syntax$R: opedit [obj_num] [field] [arg]\r\n"
                "Edit a field with no args for help on that field.\r\n\r\n"
@@ -2374,7 +2374,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   sprintf(buf, "$3Current object set to: %lu\r\n", ch->player->last_obj_vnum);
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_oclone(Character *ch, char *argument, cmd_t cmd)
@@ -2406,7 +2406,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
   {
     QString buf = QStringLiteral("new %1").arg(v2);
     int retval = ch->do_oedit(buf.split(' '));
-    if (!isSet(retval, eSUCCESS))
+    if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;
     r1 = real_object(v1);
     r2 = real_object(v2);
@@ -2450,7 +2450,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
   ch->player->last_obj_vnum = v2;
   DC::getInstance()->set_zone_modified_obj(r2);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mclone(Character *ch, char *argument, cmd_t cmd)
@@ -2483,7 +2483,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
     char buf[30];
     sprintf(buf, "new %d", vdst);
     int retval = do_medit(ch, buf);
-    if (!isSet(retval, eSUCCESS))
+    if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;
     dst = real_mobile(vdst);
     src = real_mobile(vsrc);
@@ -2554,5 +2554,5 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   ch->player->last_mob_edit = dst;
   DC::getInstance()->set_zone_modified_mob(dst);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

@@ -334,5 +334,5 @@ int do_social(Character *ch, char *argument, cmd_t cmd)
 
   sprintf(buf, "\r\nCurrent Socials:  %d\r\n", i);
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

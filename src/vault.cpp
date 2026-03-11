@@ -255,7 +255,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
     ch->send(vault_usage);
     if (ch->getLevel() > IMMORTAL)
       ch->send(imm_vault_usage);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!str_cmp(arg1, "clan") && ch->clan)
@@ -355,7 +355,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
   else if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("You don't feel safe enough to manage your valuables.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (!strncmp(arg, "withdraw", strlen(arg)))
   {
@@ -413,7 +413,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
     if (!*argument)
     {
       ch->sendln("What item would you like to place in the vault?");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!*arg2)
       sprintf(arg2, "%s", GET_NAME(ch));
@@ -430,7 +430,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
     if (!*argument)
     {
       ch->sendln("What item would you like to get from the vault?");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!*arg2)
       sprintf(arg2, "%s", GET_NAME(ch));
@@ -442,7 +442,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
     if (ch->getLevel() > IMMORTAL)
       ch->send(imm_vault_usage);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void Character::vault_stats(QString name)
@@ -2401,7 +2401,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     if (!vault)
     {
       ch->sendln("You need to level up some before obtaining a vault.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (vault->size < VAULT_MAX_SIZE)
       sprintf(buf, "$B1)$R Increase the size of vault by 10 lbs: %d platinum.\r\n", VAULT_UPGRADE_COST);
@@ -2424,7 +2424,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     else
       sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size further.\r\n");
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
@@ -2435,44 +2435,44 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       if (!vault)
       {
         ch->sendln("You need to level up some before obtaining a vault.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (vault->size >= VAULT_MAX_SIZE)
       {
         ch->sendln("Your vault's size is already at its maximum capacity.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < VAULT_UPGRADE_COST)
       {
         ch->sendln("You do not have enough platinum.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= VAULT_UPGRADE_COST;
       vault->size += 10;
       ch->save_char_obj();
       save_vault(vault->owner);
       ch->sendln("$B$2Paul the sleazy vault salesman tells you, '10 lbs added to your vault.$R'");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     case 2:
       if (cvault)
       {
         ch->sendln("Your clan already has a vault.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (!ch->clan)
       {
         ch->sendln("You're not a member of any clan.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (!has_right(ch, CLAN_RIGHTS_VAULT))
       {
         ch->sendln("You are not authorized to make that purchase.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < 1000)
       {
         ch->sendln("You do not have enough platinum.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 1000;
       add_new_vault(clanVName(ch->clan).toStdString().c_str(), 0);
@@ -2481,34 +2481,34 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       cvault->size = 500;
       save_vault(clanVName(ch->clan));
       ch->sendln("You have purchased a vault for your clan's perusal.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     case 3:
       if (!cvault)
       {
         ch->sendln("Your clan does not have a vault.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (!has_right(ch, CLAN_RIGHTS_VAULT))
       {
         ch->sendln("You are not authorized to make that purchase.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (cvault->size >= VAULT_MAX_SIZE)
       {
         ch->sendln("The vault is already at its maximum capacity.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < 200)
       {
         ch->sendln("You do not have enough platinum.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 200;
       cvault->size += 10;
       ch->save_char_obj();
       save_vault(clanVName(ch->clan));
       ch->sendln("You have added 10 lbs capacity to your clan's vault.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   return ReturnValue::eFAILURE;
@@ -2745,5 +2745,5 @@ int vault_search(Character *ch, const char *args)
 
   ch->send(QStringLiteral("\n\rSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

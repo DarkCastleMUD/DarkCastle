@@ -68,7 +68,7 @@ int do_motd(Character *ch, char *arg, cmd_t cmd)
   extern char motd[];
 
   page_string(ch->desc, motd, 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_imotd(Character *ch, char *arg, cmd_t cmd)
@@ -76,7 +76,7 @@ int do_imotd(Character *ch, char *arg, cmd_t cmd)
   extern char imotd[];
 
   page_string(ch->desc, imotd, 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 class LogCommand
@@ -201,8 +201,8 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     retval = oprog_command_trigger(command, command_arguments);
     if (SOMEONE_DIED(retval))
       return logcmd.setReturn(retval, QStringLiteral("someone died"));
-    if (isSet(retval, eEXTRA_VALUE))
-      return logcmd.setReturn(retval, QStringLiteral("eEXTRA_VALUE"));
+    if (isSet(retval, ReturnValue::eEXTRA_VALUE))
+      return logcmd.setReturn(retval, QStringLiteral("ReturnValue::eEXTRA_VALUE"));
   }
 
   auto found = DC::getInstance()->CMD_.find(command);
@@ -331,18 +331,18 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       retval = special(command_arguments, found->getNumber());
 
       QString retval_description;
-      if (isSet(retval, eSUCCESS))
+      if (isSet(retval, ReturnValue::eSUCCESS))
       {
-        retval_description = QStringLiteral("eSUCCESS");
+        retval_description = QStringLiteral("ReturnValue::eSUCCESS");
       }
 
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
       {
         if (!retval_description.isEmpty())
         {
           retval_description += QStringLiteral(" ");
         }
-        retval_description += QStringLiteral("eSUCCESS");
+        retval_description += QStringLiteral("ReturnValue::eSUCCESS");
       }
 
       if (!retval_description.isEmpty())
@@ -455,12 +455,12 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     if (SOCIAL_true_WITH_NOISE == retval)
       return check_ethereal_focus(this, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
     else
-      return logcmd.setReturn(eSUCCESS, QStringLiteral("eSUCCESS"));
+      return logcmd.setReturn(ReturnValue::eSUCCESS, QStringLiteral("ReturnValue::eSUCCESS"));
   }
 
   // Unknown command (or char too low level)
   this->sendln("Huh?");
-  return logcmd.setReturn(eSUCCESS, QStringLiteral("eSUCCESS"));
+  return logcmd.setReturn(ReturnValue::eSUCCESS, QStringLiteral("ReturnValue::eSUCCESS"));
 }
 
 int old_search_block(const char *arg, const char **list, bool exact)
@@ -598,7 +598,7 @@ int do_boss(Character *ch, char *arg, cmd_t cmd)
     ch->send(buf);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int old_search_block(const char *argument, int begin, int length, const QStringList list, int mode)
@@ -1136,7 +1136,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       if (DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)
       {
         retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
-        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
+        if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
 
@@ -1146,7 +1146,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
         retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
-        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
+        if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
 
@@ -1158,14 +1158,14 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       if (((Character *)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
-        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
+        if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
       else if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       {
         retval = ((*DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
                                                                                   cmd, arguments.toStdString().c_str(), k));
-        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
+        if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
     }
@@ -1177,7 +1177,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
         retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
-        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
+        if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
 

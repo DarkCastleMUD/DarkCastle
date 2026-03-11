@@ -187,9 +187,9 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
     else
       ch->sendln("There's been no recent news. Type 'news all' to see all news.");
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_addnews(Character *ch, char *argument, cmd_t cmd)
@@ -216,7 +216,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   {
     savenews();
     ch->sendln("Saved!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (str_cmp(arg, "today"))
   {
@@ -272,5 +272,5 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   ch->desc->strnew = &(nnews->news);
   ch->desc->max_str = 2096;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

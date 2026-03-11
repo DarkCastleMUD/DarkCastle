@@ -72,7 +72,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_EYEGOUGE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   int retval = 0;
   if (!skill_success(ch, victim, SKILL_EYEGOUGE))
@@ -107,7 +107,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
 
   if (!SOMEONE_DIED(retval) || (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY)))
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return retval | eSUCCESS;
+  return retval | ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
@@ -162,7 +162,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   }
 
   if (!charge_moves(SKILL_BACKSTAB))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   int min_hp = (int)(GET_MAX_HIT(this) / 5);
   min_hp = MIN(min_hp, 25);
@@ -277,22 +277,22 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
+  if ((retval & ReturnValue::eVICT_DIED) && !(retval & ReturnValue::eCH_DIED))
   {
     return retval;
   }
 
-  if (retval & eCH_DIED)
+  if (retval & ReturnValue::eCH_DIED)
     return retval;
 
-  if (retval & eVICT_DIED)
+  if (retval & ReturnValue::eVICT_DIED)
   {
     return retval;
   }
 
   if (!charExists(victim)) // heh
   {
-    return eSUCCESS | eVICT_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }
 
   // If we're intended to have a dual backstab AND we still can
@@ -408,7 +408,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_CIRCLE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   bool stabbingCircle = false;
 
@@ -566,7 +566,7 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_TRIP))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   int modifier = ch->get_stat(attribute_t::DEXTERITY) - victim->get_stat(attribute_t::DEXTERITY);
   if (modifier > 10)
@@ -636,7 +636,7 @@ int do_sneak(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_SNEAK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   do_hide(ch, "", cmd_t::LOOK);
 
@@ -651,7 +651,7 @@ int do_sneak(Character *ch, char *argument, cmd_t cmd)
   af.location = APPLY_NONE;
   af.bitvector = AFF_SNEAK;
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_stalk(Character *ch, char *argument, cmd_t cmd)
@@ -699,7 +699,7 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_STALK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
@@ -711,7 +711,7 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
     do_follow(ch, argument, cmd_t::TRACK);
     do_sneak(ch, argument, cmd_t::TRACK);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_hide(Character *ch, const char *argument, cmd_t cmd)
@@ -744,7 +744,7 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
 
   if (!IS_AFFECTED(ch, AFF_HIDE))
     if (!charge_moves(ch, SKILL_HIDE))
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
   ch->sendln("You attempt to hide yourself.");
 
@@ -776,7 +776,7 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int max_level(Character *ch)
@@ -886,7 +886,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
     }*/
 
   if (!charge_moves(ch, SKILL_STEAL))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   WAIT_STATE(ch, 12); /* It takes TIME to steal */
 
@@ -1257,7 +1257,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       return retval;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Steal gold
@@ -1351,7 +1351,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_POCKET))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   WAIT_STATE(ch, 20); /* It takes TIME to steal */
 
@@ -1441,7 +1441,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
       return retval;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_pick(Character *ch, char *argument, cmd_t cmd)
@@ -1496,7 +1496,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
     else
     {
       if (!charge_moves(ch, SKILL_PICK_LOCK))
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
 
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
@@ -1538,7 +1538,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
     {
       if (!charge_moves(ch, SKILL_PICK_LOCK))
       {
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       // ch->skill_increase_check(SKILL_PICK_LOCK, ch->has_skill(SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
@@ -1591,7 +1591,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Pick what?");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_slip(Character *ch, char *argument, cmd_t cmd)
@@ -1667,7 +1667,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     }
 
     if (!charge_moves(ch, SKILL_SLIP))
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     // Failure
     if (!skill_success(ch, vict, SKILL_SLIP))
     {
@@ -1809,7 +1809,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!(vict = ch->get_char_room_vis(vict_name)))
   {
@@ -1902,7 +1902,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     ch->save();
     vict->save_char_obj();
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
@@ -1929,7 +1929,7 @@ int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
 
   // ch->skill_increase_check(SKILL_VITAL_STRIKE, ch->has_skill(SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
   if (!charge_moves(ch, SKILL_VITAL_STRIKE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_VITAL_STRIKE))
   {
@@ -1961,7 +1961,7 @@ int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_deceit(Character *ch, char *argument, cmd_t cmd)
@@ -1996,7 +1996,7 @@ int do_deceit(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_DECEIT, grpsize))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_DECEIT))
   {
@@ -2041,7 +2041,7 @@ int do_deceit(Character *ch, char *argument, cmd_t cmd)
 
   // ch->skill_increase_check(SKILL_DECEIT, ch->has_skill(SKILL_DECEIT), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_jab(Character *ch, char *argument, cmd_t cmd)
@@ -2118,7 +2118,7 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_JAB))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   set_cantquit(ch, victim);
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -2133,16 +2133,16 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   if (!skill_success(ch, victim, SKILL_JAB))
   {
     retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_JAB);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB);
 
   // if there wasn't a failure and not immune to attack
-  if (!(retval & ReturnValue::eFAILURE) && !(retval & eIMMUNE_VICTIM))
+  if (!(retval & ReturnValue::eFAILURE) && !(retval & ReturnValue::eIMMUNE_VICTIM))
   {
     // the victim didn't die then affect victim with jab effect
-    if (!(retval & eVICT_DIED))
+    if (!(retval & ReturnValue::eVICT_DIED))
     {
       if (number(0, 1))
       {
@@ -2165,7 +2165,7 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
     }
 
     // the character didn't die so affect it with jab wait effect
-    if (!(retval & eCH_DIED))
+    if (!(retval & ReturnValue::eCH_DIED))
     {
       af.type = SKILL_JAB;
       af.duration = 1;
@@ -2177,20 +2177,20 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   }
 
   // if the victim died and the character did not die
-  if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
+  if ((retval & ReturnValue::eVICT_DIED) && !(retval & ReturnValue::eCH_DIED))
   {
     if (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return retval;
   }
 
-  if ((retval & eCH_DIED) || (retval & eVICT_DIED))
+  if ((retval & ReturnValue::eCH_DIED) || (retval & ReturnValue::eVICT_DIED))
   {
     return retval;
   }
   else
   {
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 }
 
@@ -2228,7 +2228,7 @@ int do_appraise(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_APPRAISE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (obj)
   {
@@ -2264,7 +2264,7 @@ int do_appraise(Character *ch, char *argument, cmd_t cmd)
         if (number(0, 2) || !obj)
         {
           act("$N doesn't seem to be carrying anything like that.", ch, 0, victim, TO_CHAR, 0);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         else
         {
@@ -2334,7 +2334,7 @@ int do_appraise(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_cripple(Character *ch, char *argument, cmd_t cmd)
@@ -2392,7 +2392,7 @@ int do_cripple(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_CRIPPLE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   // Make 'em fight eachother
@@ -2432,5 +2432,5 @@ int do_cripple(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

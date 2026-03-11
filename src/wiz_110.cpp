@@ -121,7 +121,7 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
         csendf(ch, "%s: %d\n\r", classskill[i].skillname, (int)percent);
       }
       GET_RACE(ch) = orace;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   ch->sendln("No such race.");
@@ -140,14 +140,14 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
                  "Syntax:  bestow <god> <command>\r\n"
                  "Just 'bestow <god>' will list all available commands for that god.\r\n",
                  this);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   Character *victim = get_pc_vis(this, name);
   if (!victim)
   {
     this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (command.isEmpty())
@@ -175,7 +175,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
       }
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   auto bc = get_bestow_command(command);
@@ -183,14 +183,14 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
   if (!bc.has_value())
   {
     this->sendln(QStringLiteral("There is no god command named '%1'.").arg(command));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // if has
   if (victim->has_skill(bc->num))
   {
     this->sendln(QStringLiteral("%1 already has that command.").arg(victim->getName()));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // give it
@@ -198,7 +198,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
   logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), DC::LogChannel::LOG_GOD);
   this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
   this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // take away a command from a god
@@ -217,14 +217,14 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
                  "Syntax:  revoke <god> <command|all>\r\n"
                  "Use 'bestow <god>' to view what commands a god has.\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(vict = get_pc_vis(ch, arg)))
   {
     sprintf(buf, "You don't see anyone named '%s'.", arg);
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   struct char_skill_data *last = nullptr;
@@ -240,7 +240,7 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     sprintf(buf, "%s has revoked all commands from you.\r\n", GET_NAME(ch));
     vict->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (i = 0; i < DC::bestowable_god_commands.size(); i++)
@@ -251,14 +251,14 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
   {
     sprintf(buf, "There is no god command named '%s'.\r\n", command);
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
     snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
@@ -268,7 +268,7 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
   logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch), qPrintable(DC::bestowable_god_commands[i].name));
   vict->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* Thunder is currently in wiz_104.c */
@@ -291,7 +291,7 @@ int do_wizlock(Character *ch, char *argument, cmd_t cmd)
     logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game un-wizlocked.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /************************************************************************
@@ -337,7 +337,7 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
   victim->player->pwd[PASSWORD_LEN] = '\0';
 
   ch->sendln("Ok.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_fakelog(Character *ch, char *argument, cmd_t cmd)
@@ -368,7 +368,7 @@ int do_fakelog(Character *ch, char *argument, cmd_t cmd)
   }
 
   send_to_gods(command, lev_nr, DC::LogChannel::LOG_BUG);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
@@ -586,7 +586,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   rename_vault_owner(oldname, newname);
   leaderboard.rename(oldname, newname);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 int do_install(Character *ch, char *arg, cmd_t cmd)
 {
@@ -686,7 +686,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
             ret);
   }
   ch->send(err);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_range(Character *ch, char *arg, cmd_t cmd)
@@ -762,7 +762,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
       ch->send(message);
       sprintf(message, "Your M range has been set to %d-%d.\r\n", low, high);
       victim->send(message);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     case 'o':
       victim->player->buildOLowVnum = low;
       victim->player->buildOHighVnum = high;
@@ -770,7 +770,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
       ch->send(message);
       sprintf(message, "Your O range has been set to %d-%d.\r\n", low, high);
       victim->send(message);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     case 'r':
       victim->player->buildLowVnum = low;
       victim->player->buildHighVnum = high;
@@ -778,7 +778,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
       ch->send(message);
       sprintf(message, "Your R range has been set to %d-%d.\r\n", low, high);
       victim->send(message);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     default:
       ch->sendln("Invalid type. Valid ones are r/o/m.");
       return ReturnValue::eFAILURE;
@@ -793,7 +793,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
     sprintf(message, "Your range has been set to %d-%d.\r\n", low, high);
     victim->send(message);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_metastat(Character *ch, char *argument, cmd_t cmd)
@@ -839,7 +839,7 @@ int do_metastat(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "%s%d ", buf, Commands::commands_[i].getNumber());
   }
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_acfinder(Character *ch, char *argument, cmd_t cmd)
@@ -884,10 +884,10 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
     if (o == 150)
     {
       ch->sendln("Max number of items hit.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_testhit(Character *ch, char *argument, cmd_t cmd)
@@ -928,7 +928,7 @@ int do_testhit(Character *ch, char *argument, cmd_t cmd)
     csendf(ch, "%d AC - %f%% chance to hit\r\n", AC,
            percent);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void write_array_csv(const char *const *array, std::ofstream &fout)
@@ -1001,7 +1001,7 @@ int do_export(Character *ch, char *args, cmd_t cmd)
 
   logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
@@ -1032,5 +1032,5 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

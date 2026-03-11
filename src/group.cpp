@@ -69,7 +69,7 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
   }
 
   stop_follower(ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_found(Character *ch, char *argument, cmd_t cmd)
@@ -125,7 +125,7 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
 
   SETBIT(ch->affected_by, AFF_GROUP);
   REMOVE_BIT(ch->player->toggles, Player::PLR_LFG);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
@@ -161,7 +161,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if (amount == 0)
   {
     send("You hand out zero coins to everyone, but no one notices.\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (getGold() < amount)
@@ -242,7 +242,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
       f->follower->addGold(share - lost);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void setup_group_buf(char *report, Character *j, Character *i)
@@ -347,7 +347,7 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
       }
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -412,7 +412,7 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
         if (IS_PC(victim))
           REMOVE_BIT(victim->player->toggles, Player::PLR_LFG);
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       //    }
       //  else
       //	  act("$n is not of the right caliber to join this group.", victim, 0, 0, TO_ROOM, ASLEEP);
@@ -525,7 +525,7 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   }
 
   add_follower(ch, new_new_leader, follower_reasons_t::CHANGE_LEADER);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_disband(Character *ch, char *argument, cmd_t cmd)
@@ -593,7 +593,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
     }
 
     REMBIT(k->affected_by, AFF_GROUP);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(adios = ch->get_char_room_vis(name)))
@@ -629,7 +629,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
     adios->player->group_kills = 0;
   }
   stop_follower(adios);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_follow(Character *ch, char *argument, cmd_t cmd)
@@ -716,7 +716,7 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
                                   //	      }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd)
@@ -748,7 +748,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
   {
     ch->player->joining.clear();
     ch->send("Auto-join list cleared.\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   auto parts = arguments.toLower().split(' ');
@@ -758,7 +758,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
   }
 
   ch->send(QStringLiteral("You are now autojoining: %1\r\n").arg(ch->player->getJoining()));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 std::vector<Character *> Character::getFollowers(void)

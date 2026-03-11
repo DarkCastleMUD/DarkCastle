@@ -47,7 +47,7 @@ int do_archive(Character *ch, char *argument, cmd_t cmd)
   do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
   util_archive(name, ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_unarchive(Character *ch, char *argument, cmd_t cmd)
@@ -56,7 +56,7 @@ int do_unarchive(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, name);
   name[0] = toupper(name[0]);
   util_unarchive(name, ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
@@ -77,7 +77,7 @@ command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
   }
 
   sendln(QStringLiteral("Target's prompt is: %1").arg(victim->getPrompt()));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
@@ -131,7 +131,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
       this->desc->snooping = 0;
     }
     logentry(QStringLiteral("%1 snoops themself.").arg(getName()), this->getLevel(), DC::LogChannel::LOG_GOD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim->getLevel() == IMPLEMENTER)
@@ -165,7 +165,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   this->desc->snooping = victim->desc;
   victim->desc->snoop_by = this->desc;
   logentry(QStringLiteral("%1 snoops %2.").arg(getName()).arg(victim->getName()), getLevel(), DC::LogChannel::LOG_GOD);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_stealth(Character *ch, char *argument, cmd_t cmd)
@@ -188,7 +188,7 @@ int do_stealth(Character *ch, char *argument, cmd_t cmd)
     ch->player->stealth = true;
     ch->sendln("Stealth mode on.");
   } /* if */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_send(Character *ch, char *argument, cmd_t cmd)
@@ -223,5 +223,5 @@ int do_send(Character *ch, char *argument, cmd_t cmd)
   ch->send(buf);
   sprintf(buf, "%s\r\n", message);
   vict->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

@@ -141,7 +141,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   //   return ReturnValue::eFAILURE;
   //}
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_purloin(Character *ch, char *argument, cmd_t cmd)
@@ -247,13 +247,13 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
         ch->send(QStringLiteral("You purloin %1.\r\n").arg(k->short_description));
       }
       move_obj(k, ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     j++;
   }
 
   ch->sendln("Sorry, couldn't find it or something.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_set(Character *ch, char *argument, cmd_t cmd)
@@ -808,5 +808,5 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
 
   ch->sendln("Ok.");
   affect_total(vict);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

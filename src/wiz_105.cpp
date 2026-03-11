@@ -60,7 +60,7 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
 
     //    ch->sendln("Done.");
     //  victim->sendln("Your affects have been cleared.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
 }
@@ -79,7 +79,7 @@ int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
   }
   help_index = build_help_index(help_fl, &DC::getInstance()->top_of_helpt);
   ch->sendln("Reloaded.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_log(Character *ch, char *argument, cmd_t cmd)
@@ -121,7 +121,7 @@ int do_log(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf2, "%s just logged %s.", GET_NAME(ch), GET_NAME(vict));
     logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_showbits(Character *ch, char *argument, cmd_t cmd)
@@ -141,7 +141,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
       sprintf(buf, "0.%s", victim->getNameC());
       do_showbits(ch, buf, cmd);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!(victim = get_char(person)))
   {
@@ -228,7 +228,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
 
   ch->sendln("--------------------\n\r");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_debug(Character *ch, char *args, cmd_t cmd)
@@ -320,7 +320,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
     }
     victim->setDebug(!victim->getDebug());
     ch->sendln(QStringLiteral("Debug for %1 toggled %2").arg(GET_NAME(victim)).arg(victim->getDebug() ? "on" : "off"));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (arg1 == "mobile")
   {
@@ -354,7 +354,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
           }
         }
         ch->sendln(QStringLiteral("%1 mobiles changed.").arg(change_count));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
 
@@ -371,7 +371,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
     ch->sendln("      mobile <vnum>");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_pardon(Character *ch, char *argument, cmd_t cmd)
@@ -436,7 +436,7 @@ int do_pardon(Character *ch, char *argument, cmd_t cmd)
   sprintf(log_buf, "%s pardons %s for %s.",
           GET_NAME(ch), victim->getNameC(), flag);
   logentry(log_buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
@@ -470,7 +470,7 @@ int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
     act("$p carried by $n is damaged.", ch, obj_object, 0, TO_ROOM, 0);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 char *print_classes(int bitv)
@@ -628,7 +628,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Deleted.");
         dc_free(curren->message);
         dc_free(curren);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       last = curren;
     }
@@ -718,7 +718,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, DC::LogChannel::LOG_WORLD);
     return ReturnValue::eFAILURE;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 int max_aff(class Object *obj, int type)
 {
@@ -864,7 +864,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
   }
   sprintf(buf1, "Total %s: %d\r\n", arg, tot);
   send_to_char(buf1, ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_reload(Character *ch, char *argument, cmd_t cmd)
@@ -942,7 +942,7 @@ int do_reload(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_listproc(Character *ch, char *argument, cmd_t cmd)
@@ -981,5 +981,5 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
       ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Object *)DC::getInstance()->obj_index[real_object(i)].item)->Name()));
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

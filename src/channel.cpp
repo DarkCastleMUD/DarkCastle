@@ -43,13 +43,13 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
   if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("You try to speak but just look like an idiot!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   Object *tmp_obj;
@@ -99,7 +99,7 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
         return SWAP_CH_VICT(retval);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Psay works like 'say', just it's directed at a person
@@ -113,13 +113,13 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
   if (IS_PC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("You try to speak but just look like an idiot!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   Object *tmp_obj = nullptr;
@@ -135,13 +135,13 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
   if (vict.empty() || message.empty())
   {
     ch->sendln("Say what to whom?  psay <target> <message>");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(victim = ch->get_char_room_vis(vict.c_str())))
   {
     ch->send(QStringLiteral("You see noone that goes by '%1' here.\r\n").arg(vict.c_str()));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   std::string messageStr = message;
@@ -172,7 +172,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
   //       return SWAP_CH_VICT(retval);
   //   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_pray(Character *ch, char *arg, cmd_t cmd)
@@ -181,7 +181,7 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
   class Connection *i;
 
   if (IS_NPC(ch))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   while (*arg == ' ')
     arg++;
@@ -189,25 +189,25 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("You must have something to tell the immortals...");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->isImmortalPlayer())
   {
     ch->sendln("Why pray? You are a god!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("Duh...I'm too stupid!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOPRAY))
   {
     ch->sendln("The gods are deaf to your prayers.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\n\r", GET_NAME(ch), arg);
@@ -225,7 +225,7 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
   }
   ch->sendln("\a\aOk.");
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_gossip(Character *ch, char *argument, cmd_t cmd)
@@ -238,7 +238,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -251,13 +251,13 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch) && ch->master)
   {
     do_say(ch, "Why don't you just do that yourself!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (GET_POS(ch) == position_t::SLEEPING)
   {
     ch->sendln("You're asleep.  Dream or something....");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_PC(ch))
@@ -267,17 +267,17 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_GOSSIP)))
     {
       ch->sendln("You told yourself not to GOSSIP!!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (ch->getLevel() < 3)
     {
       ch->sendln("You must be at least 3rd level to gossip.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -290,7 +290,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
     if (msgs.isEmpty())
     {
       ch->sendln("There have not been any player gossips.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (msgs.count() == 1)
       ch->sendln(QStringLiteral("Here is the only gossip so far:"));
@@ -338,7 +338,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
@@ -350,7 +350,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
     send("SHHHHHH!! Can't you see people are trying to read?\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -363,7 +363,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
   if (IS_NPC(this) && this->master)
   {
     do_say(this, "That's okay, I'll let you do all the auctioning, master.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_PC(this))
@@ -373,17 +373,17 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    this);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!(isSet(this->misc, DC::LogChannel::CHANNEL_AUCTION)))
     {
       this->sendln("You told yourself not to AUCTION!!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (level_ < 3)
     {
       this->sendln("You must be at least 3rd level to auction.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -433,7 +433,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
           act(buf1, this, 0, i->character, TO_VICT, 0);
       }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_shout(Character *ch, char *argument, cmd_t cmd)
@@ -447,7 +447,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -467,19 +467,19 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You must have somehow offended the gods, for you "
                  "find yourself unable to!\n\r",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (IS_PC(ch) && !(isSet(ch->misc, DC::LogChannel::CHANNEL_SHOUT)))
   {
     ch->sendln("You told yourself not to SHOUT!!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (IS_PC(ch) && ch->getLevel() < 3)
   {
     send_to_char("Due to misuse, you must be of at least 3rd level "
                  "to shout.\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (; *argument == ' '; argument++)
@@ -510,7 +510,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
           act(buf1, ch, 0, i->character, TO_VICT, 0);
       }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_trivia(Character *ch, char *argument, cmd_t cmd)
@@ -524,7 +524,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -546,19 +546,19 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_TRIVIA)))
     {
       ch->sendln("You told yourself not to listen to Trivia!!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (ch->getLevel() < 3)
     {
       send_to_char("You must be at least 3rd level to participate in "
                    "trivia.\r\n",
                    ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -576,7 +576,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
         tmp.pop();
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->decrementMove(5);
@@ -612,7 +612,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
         act(buf1, ch, 0, i->character, TO_VICT, 0);
     }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_dream(Character *ch, char *argument, cmd_t cmd)
@@ -625,13 +625,13 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
   if ((GET_POS(ch) != position_t::SLEEPING) && (ch->getLevel() < MIN_GOD))
   {
     ch->sendln("How are you going to dream if you're awake?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_NPC(ch) && ch->master)
   {
     do_say(ch, "Why don't you just do that yourself!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (IS_PC(ch))
     if (isSet(ch->player->punish, PUNISH_SILENCED))
@@ -639,18 +639,18 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_DREAM)))
   {
     ch->sendln("You told yourself not to dream!!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->getLevel() < 3)
   {
     ch->sendln("You must be at least 3rd level to dream.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (ctr = 0; (unsigned)ctr <= strlen(argument); ctr++)
@@ -686,7 +686,7 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
         send_to_char(buf1, i->character);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
@@ -722,7 +722,7 @@ command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
     ch->save();
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
@@ -734,7 +734,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   if (!IS_NPC(this) && isSet(this->player->punish, PUNISH_NOTELL))
   {
     this->sendln("Your message didn't get through!!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[this->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -747,7 +747,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   if (!IS_NPC(this) && !isSet(this->misc, DC::LogChannel::CHANNEL_TELL))
   {
     this->sendln("You have tell channeled off!!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   name = arguments.value(0);
@@ -762,13 +762,13 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     if (this->player->tell_history.isEmpty())
     {
       this->sendln("You have not sent or recieved any tell messages.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (player->tell_history.isEmpty())
     {
       sendln("There have been no tell messages.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (player->tell_history.count() == 1)
     {
@@ -783,7 +783,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       sendln(c.getMessage(this));
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (cmd == cmd_t::TELL_REPLY)
@@ -791,7 +791,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     if (!(vict = get_active_pc(name)))
     {
       this->sendln("They seem to have left!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     cmd = cmd_t::DEFAULT;
   }
@@ -817,7 +817,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       this->sendln("No-one by that name here.");
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // vict guarantted to be a PC
@@ -826,7 +826,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
   {
     this->sendln("The person is ignoring all tells right now.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL))
   {
@@ -843,12 +843,12 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
       {
         act("$E cannot hear you right now.", this, 0, vict, TO_CHAR, STAYHIDE);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     if (is_ignoring(vict, this))
     {
       csendf(this, "%s is ignoring you right now.\r\n", GET_SHORT(vict));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (is_busy(vict) && level_ >= OVERSEER)
     {
@@ -945,7 +945,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
@@ -956,7 +956,7 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
   if (IS_NPC(ch) || ch->player->last_tell.isEmpty())
   {
     ch->sendln("You have noone to reply to.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   Object *tmp_obj;
@@ -981,12 +981,12 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
       ch->send("Last tell was from someone you cannot currently see.\r\n");
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   buf = fmt::format("{} {}", ch->player->last_tell.toStdString().c_str(), argument);
   ch->do_tell(QString(buf.c_str()).split(' '), cmd_t::TELL_REPLY);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_whisper(Character *ch, char *argument, cmd_t cmd)
@@ -1031,7 +1031,7 @@ int do_whisper(Character *ch, char *argument, cmd_t cmd)
     act("$n whispers something to $N.", ch, 0, vict, TO_ROOM,
         NOTVICT | STAYHIDE);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_ask(Character *ch, char *argument, cmd_t cmd)
@@ -1076,7 +1076,7 @@ int do_ask(Character *ch, char *argument, cmd_t cmd)
 
     act("$n asks $N a question.", ch, 0, vict, TO_ROOM, NOTVICT);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_grouptell(Character *ch, char *argument, cmd_t cmd)
@@ -1106,7 +1106,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
       ch->sendln(c.message);
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -1122,13 +1122,13 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
   if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOTELL))
   {
     ch->sendln("Your message didn't get through!!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You don't have a group to talk to!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   sprintf(buf, "$B$1You tell the group, $7'%s'$R", argument);
@@ -1172,7 +1172,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_newbie(Character *ch, char *argument, cmd_t cmd)
@@ -1186,7 +1186,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -1208,12 +1208,12 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_NEWBIE)))
     {
       ch->sendln("You told yourself not to use the newbie channel!!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -1259,7 +1259,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
           act(buf1, ch, 0, i->character, TO_VICT, 0);
       }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void Character::tell_history(Character *ch, QString message)

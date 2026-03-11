@@ -233,7 +233,7 @@ int do_switch(Character *ch, char *arg, cmd_t cmd)
   ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
   ch->equipment[WEAR_SECOND_WIELD] = between;
   ch->sendln("You switch your weapon positions.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_quaff(Character *ch, char *argument, cmd_t cmd)
@@ -242,7 +242,7 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
   class Object *temp;
   int i /*,j*/;
   bool equipped;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   int is_mob = IS_NPC(ch);
   int lvl;
 
@@ -292,7 +292,7 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
     if (equipped)
       ch->unequip_char(pos);
     extract_obj(temp);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!ch->fighting && isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -325,10 +325,10 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
         retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer2())((uint8_t)temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl, 0));
       }
     }
-    if (isSet(retval, eCH_DIED))
+    if (isSet(retval, ReturnValue::eCH_DIED))
       break;
   }
-  if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
+  if (!is_mob || !isSet(retval, ReturnValue::eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
       ch->unequip_char(pos, 1);
@@ -344,7 +344,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   int i, bits;
   bool equipped;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   int is_mob = IS_NPC(ch);
   int lvl;
 
@@ -463,13 +463,13 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
+  if (!is_mob || !isSet(retval, ReturnValue::eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
       ch->unequip_char(pos, 1);
     extract_obj(scroll);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 #define GOD_TRAP_ITEM 193
@@ -694,7 +694,7 @@ int do_mortal_set(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("You can't set that.");
     break;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_use(Character *ch, char *argument, cmd_t cmd)
@@ -896,7 +896,7 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
   else
     GET_SHORT_ONLY(ch) = str_dup(buf);
   ch->sendln("Ok.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
@@ -933,14 +933,14 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
     act("You are not thirsty anymore.", this, 0, 0, TO_CHAR, 0);
 
     if (isImmortalPlayer())
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
     if (GET_COND(this, FULL) != -1)
       GET_COND(this, FULL) = 22 + number(0, 5);
     if (GET_COND(this, THIRST) != -1)
       GET_COND(this, THIRST) = 22 + number(0, 5);
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (GET_COND(this, THIRST) > 20)
@@ -969,7 +969,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
       sendln(QStringLiteral("You drink the %1.").arg(drinks[temp->obj_flags.value[2]]));
 
       if (isImmortalPlayer())
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
 
       // TODO what is this for?  the statement immediatly afterwards wipes out value
       if (drink_aff[temp->obj_flags.value[2]][DRUNK] > 0)
@@ -1038,7 +1038,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
                 extract_obj(temp);
               }
       */
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -1107,7 +1107,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
   }
 
   extract_obj(temp);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_pour(Character *ch, char *argument, cmd_t cmd)
@@ -1165,7 +1165,7 @@ int do_pour(Character *ch, char *argument, cmd_t cmd)
     from_obj->obj_flags.value[1] = 0;
     from_obj->obj_flags.value[2] = 0;
     from_obj->obj_flags.value[3] = 0;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(to_obj = get_obj_in_list_vis(ch, arg2, ch->carrying)))
@@ -1225,7 +1225,7 @@ int do_pour(Character *ch, char *argument, cmd_t cmd)
   to_obj->obj_flags.value[3] =
       (to_obj->obj_flags.value[3] || from_obj->obj_flags.value[3]);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_sip(Character *ch, char *argument, cmd_t cmd)
@@ -1288,7 +1288,7 @@ int do_sip(Character *ch, char *argument, cmd_t cmd)
     temp->obj_flags.value[3] = 0;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_taste(Character *ch, char *argument, cmd_t cmd)
@@ -1337,7 +1337,7 @@ int do_taste(Character *ch, char *argument, cmd_t cmd)
     extract_obj(temp);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* functions related to wear */
@@ -2297,7 +2297,7 @@ int do_wear(Character *ch, char *argument, cmd_t cmd)
         wear(ch, tmp_object, keyword);
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
@@ -2334,7 +2334,7 @@ int do_wear(Character *ch, char *argument, cmd_t cmd)
     sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
     ch->send(buffer);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_wield(Character *ch, char *argument, cmd_t cmd)
@@ -2384,7 +2384,7 @@ int do_wield(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Wield what?");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_grab(Character *ch, char *argument, cmd_t cmd)
@@ -2430,7 +2430,7 @@ int do_grab(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Hold what?");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int Character::hands_are_free(int number)
@@ -2577,7 +2577,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);
-            return eSUCCESS;
+            return ReturnValue::eSUCCESS;
           }
           else
             obj_to_char(ch->unequip_char(j), ch);
@@ -2603,7 +2603,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Remove what?");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Urizen, hack of will_screwup_worn_sizes
@@ -2629,7 +2629,7 @@ int Character::recheck_height_wears(void)
       act("$p feels uncomfortable and you shift it into your inventory.", this, obj, nullptr, TO_CHAR, 0);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 bool fullSave(Object *obj)

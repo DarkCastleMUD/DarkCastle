@@ -596,7 +596,7 @@ int save_boards()
     fwrite_string((char *)board_it->first.c_str(), the_file);
   }
   fclose(the_file);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /*
@@ -650,33 +650,33 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to know how to write!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     board_write_msg(ch, arg, board);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   case cmd_t::READ: // read
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to know how to read!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     board_display_msg(ch, arg, board);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   case cmd_t::ERASE: /* erase */
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to read them!\r\nDon't erase them they might be important!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (
         ((obj->Name() == QStringLiteral("board uruk")) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
     {
       ch->sendln("You can't erase posts from this board.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       // added this for Uruk'hai board so only members can remove posts
     }
     board_remove_msg(ch, arg, board);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   default:
     return ReturnValue::eFAILURE;
   }
@@ -807,13 +807,13 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   if (board->second.msgs.empty())
   {
     ch->sendln("The board is empty!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
     ch->sendln("That message exists only in your imagination..");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ind = tmessage;
@@ -824,18 +824,18 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
     if (ch->clan != board->second.owner)
     {
       ch->sendln("You aren't in the right clan bucko.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[ind].author.compare(GET_NAME(ch)))
     {
       ch->sendln("You don't have the right!  Talk to your clan leader.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   else if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
   {
@@ -843,7 +843,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
                  "get a nasty\n\rshock. Maybe you'd better leave it "
                  "alone.\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   board->second.msgs.erase(board->second.msgs.begin() + ind);
@@ -855,7 +855,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   board_save_board(board);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 std::string remove_slashr(std::string unformatted)
@@ -995,18 +995,18 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
     if (ch->clan != board->second.owner)
     {
       ch->sendln("You aren't in the right clan bucko.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
       ch->sendln("You don't have the right!  Talk to your clan leader.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if ((ch->getLevel() < board->second.min_read_level))
@@ -1016,19 +1016,19 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (board->second.msgs.empty())
   {
     ch->sendln("The board is empty!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
     ch->sendln("That message doesn't exist, moron.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!IS_NPC(ch))
@@ -1055,7 +1055,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   board_msg += buf;
 
   page_string(ch->desc, board_msg.c_str(), 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
@@ -1068,18 +1068,18 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
     if (ch->clan != board->second.owner)
     {
       ch->sendln("You aren't in the right clan bucko.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
       ch->sendln("You don't have the right!  Talk to your clan leader.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if ((ch->getLevel() < board->second.min_read_level))
@@ -1089,7 +1089,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("$n studies the board.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1123,7 +1123,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   }
   board_save_board(board);
   page_string(ch->desc, board_msg.c_str(), 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int fwrite_string(char *buf, FILE *fl)

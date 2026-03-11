@@ -44,7 +44,7 @@ int do_mortal_help(Character *ch, char *argument, cmd_t cmd)
 {
   extern char new_help[MAX_STRING_LENGTH];
   ch->send(new_help);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 struct ltstr
@@ -258,7 +258,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
   else
     ch->send(entry);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 struct help_index_element_new *find_help(char *keyword)
@@ -380,7 +380,7 @@ int load_new_help(FILE *fl, int reload, Character *ch)
     }
     logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_areas(Character *ch, char *arg, cmd_t cmd)
@@ -533,7 +533,7 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
   ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
   ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_index(Character *ch, char *argument, cmd_t cmd)
@@ -616,7 +616,7 @@ int do_index(Character *ch, char *argument, cmd_t cmd)
   ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
   ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int show_one_help_entry(int entry, Character *ch, int count)
@@ -706,7 +706,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->sendln("Help files reloaded.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_hedit(Character *ch, char *argument, cmd_t cmd)
@@ -735,7 +735,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
   if (!str_cmp(buf, "save"))
   { // save all help entries
     save_help(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!*buf2)
@@ -885,7 +885,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void show_hedit_usage(Character *ch)

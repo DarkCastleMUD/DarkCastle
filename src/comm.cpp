@@ -1311,7 +1311,7 @@ int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
   else
     ch->sendln(QStringLiteral("Last prompt: %1").arg(ch->getLastPrompt()));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_prompt(Character *ch, char *arg, cmd_t cmd)
@@ -1344,13 +1344,13 @@ int do_prompt(Character *ch, char *arg, cmd_t cmd)
       }
       ch->sendln("");
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->setLastPrompt(ch->getPrompt());
   ch->setPrompt(arg);
   ch->sendln("Ok.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 char *calc_color_align(int align)
@@ -2626,7 +2626,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
   if (ch->player->away_msgs.isEmpty())
   {
     SEND_TO_Q("No messages have been recorded.\r\n", ch->desc);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // Show 23 lines of text, then stop
@@ -2644,7 +2644,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void check_for_awaymsgs(Character *ch)
@@ -2923,14 +2923,14 @@ int do_editor(Character *ch, char *argument, cmd_t cmd)
       SET_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
       ch->sendln("Changing to web editor.");
       ch->sendln("Ok.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!strcmp(arg1, "game"))
     {
       REMOVE_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
       ch->sendln("Changing to in game line editor.");
       ch->sendln("Ok.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -2939,7 +2939,7 @@ int do_editor(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("web    - use online web editor");
   ch->sendln("game   - use in game line editor");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 Proxy::Proxy(QString h)

@@ -76,7 +76,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
   {
     act("$n offers $mself to $s god, who graciously declines.", ch, 0, 0, TO_ROOM, 0);
     act("Your god appreciates your offer and may accept it later.", ch, 0, 0, TO_CHAR, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   obj = get_obj_in_list_vis(ch, name, ch->carrying);
@@ -146,7 +146,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
   ch->addGold(1);
   log_sacrifice(ch, obj);
   extract_obj(obj);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_visible(Character *ch, char *argument, cmd_t cmd)
@@ -159,7 +159,7 @@ int do_visible(Character *ch, char *argument, cmd_t cmd)
       act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
     else
       ch->sendln("You must remove the equipment making you invis to become visible.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
@@ -167,7 +167,7 @@ int do_visible(Character *ch, char *argument, cmd_t cmd)
   else
     ch->sendln("You aren't invisible.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_donate(Character *ch, char *argument, cmd_t cmd)
@@ -246,7 +246,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
         move_obj(obj, location);
 
         ch->save();
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else
       {
@@ -326,7 +326,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   move_obj(obj, location);
 
   ch->save();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
@@ -334,7 +334,7 @@ auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
   sendln("You now have no title.");
   title = str_hsh("");
   save(cmd_t::SAVE_SILENTLY);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_title(Character *ch, char *argument, cmd_t cmd)
@@ -385,7 +385,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
   ch->title = str_dup(argument);
   sprintf(buf, "Your title is now: %s\n\r", argument);
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
@@ -415,7 +415,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
         send(QStringLiteral("%1\n\r").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   bool txt_found = false;
@@ -446,7 +446,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
     return (this->*(found_toggle.function_))({}, cmd_t::DEFAULT);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int Character::do_config(QStringList arguments, cmd_t cmd)
@@ -462,7 +462,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
     {
       send(QStringLiteral("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   QMap<QString, QString> colors;
@@ -492,7 +492,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
     send("                               Use ? as color name to see valid colors.\r\n");
     send("config color.good=           - Unset color.good. Will use default \"good\" color.\r\n");
     send("config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   QString argument1 = arguments.at(0);
@@ -534,7 +534,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // config key=
@@ -545,7 +545,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
       sendln(QStringLiteral("%1 unset.").arg(key));
       player->config->insert(key, QString());
       save(cmd_t::SAVE_SILENTLY);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     send(QStringLiteral("%1 not found.\r\n").arg(key));
     return ReturnValue::eFAILURE;
@@ -611,14 +611,14 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
         if (value != QStringLiteral("?"))
         {
           sendln(QStringLiteral("'%1' is an invalid locale. Type config locale=? to see a list of valid locales.").arg(value));
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         sendln(QStringLiteral("Here's a list of valid locales:"));
         for (const auto &locale : locales)
         {
           sendln(locale.name());
         }
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else if (key == "timezone")
@@ -639,11 +639,11 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
         if (!found)
         {
           sendln(QStringLiteral("Invalid timezone '%1' specified. Type config timezone=? to see the full list.").arg(value));
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
       }
       else
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
     }
     else if (key == "dateformat")
     {
@@ -659,7 +659,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
         sendln(QStringLiteral("%1 %2").arg("ISODateWithMs", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODateWithMs)));
         sendln(QStringLiteral("%1 %2").arg("ISODate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODate)));
         sendln(QStringLiteral("%1 %2").arg("RFC2822Date", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::RFC2822Date)));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else if (!QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
@@ -678,7 +678,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
 
     send(QStringLiteral("Setting %1=%2\r\n").arg(key).arg(value));
     save(cmd_t::SAVE_SILENTLY);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   return ReturnValue::eFAILURE;
@@ -699,7 +699,7 @@ command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
     send("Brief mode $B$2on$R.\r\n");
     SET_BIT(player->toggles, Player::PLR_BRIEF);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
@@ -717,7 +717,7 @@ command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
     this->sendln("ANSI COLOR $B$2on$R.");
     SET_BIT(player->toggles, Player::PLR_ANSI);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
@@ -735,7 +735,7 @@ command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
     this->sendln("VT100 $B$2on$R.");
     SET_BIT(player->toggles, Player::PLR_VT100);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
@@ -753,7 +753,7 @@ command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
     this->sendln("Compact mode $B$2on$R.");
     SET_BIT(player->toggles, Player::PLR_COMPACT);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
@@ -773,7 +773,7 @@ command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
                  this);
     SET_BIT(player->toggles, Player::PLR_SUMMONABLE);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
@@ -791,7 +791,7 @@ command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
     this->sendln("You are now Looking For Group.");
     SET_BIT(player->toggles, Player::PLR_LFG);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
@@ -816,7 +816,7 @@ command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
     SET_BIT(player->toggles, Player::PLR_GUIDE_TOG);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 {
@@ -834,7 +834,7 @@ command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
     SET_BIT(player->toggles, Player::PLR_NEWS);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
@@ -853,7 +853,7 @@ command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
     SET_BIT(player->toggles, Player::PLR_ASCII);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
@@ -872,7 +872,7 @@ command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
     SET_BIT(player->toggles, Player::PLR_DAMAGE);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
@@ -891,7 +891,7 @@ command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
     SET_BIT(player->toggles, Player::PLR_NOTAX);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
@@ -910,7 +910,7 @@ command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t c
     SET_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_autoeat(QStringList arguments, cmd_t cmd)
@@ -928,7 +928,7 @@ command_return_t Character::do_autoeat(QStringList arguments, cmd_t cmd)
     this->sendln("You now automatically eat and drink when hungry and thirsty.");
     SET_BIT(player->toggles, Player::PLR_AUTOEAT);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_anonymous(QStringList arguments, cmd_t cmd)
@@ -936,7 +936,7 @@ command_return_t Character::do_anonymous(QStringList arguments, cmd_t cmd)
   if (level_ < 40)
   {
     this->sendln("You are too inexperienced to disguise your profession.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (isSet(player->toggles, Player::PLR_ANONYMOUS))
   {
@@ -948,7 +948,7 @@ command_return_t Character::do_anonymous(QStringList arguments, cmd_t cmd)
   }
 
   TOGGLE_BIT(player->toggles, Player::PLR_ANONYMOUS);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_wimpy(QStringList arguments, cmd_t cmd)
@@ -962,7 +962,7 @@ command_return_t Character::do_wimpy(QStringList arguments, cmd_t cmd)
 
   this->sendln("You are now an official wimp.");
   SET_BIT(player->toggles, Player::PLR_WIMPY);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Remember that his is "no-pager".  So if it's set, we don't page
@@ -978,7 +978,7 @@ command_return_t Character::do_pager(QStringList arguments, cmd_t cmd)
 
   this->sendln("You no longer page strings in 24 line chunks.");
   SET_BIT(player->toggles, Player::PLR_PAGER);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
@@ -992,7 +992,7 @@ command_return_t Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd
 
   this->sendln("Bard singing now in brief mode.");
   SET_BIT(player->toggles, Player::PLR_BARD_SONG);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
@@ -1006,7 +1006,7 @@ command_return_t Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cm
 
   this->sendln("You will not attach duplicate keys to keyrings.");
   SET_BIT(player->toggles, Player::PLR_NODUPEKEYS);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
@@ -1023,7 +1023,7 @@ command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
 
   SET_BIT(player->toggles, Player::PLR_BEEP);
   this->sendln("\r\nTell now beeps.\a");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_stand(Character *ch, char *argument, cmd_t cmd)
@@ -1075,7 +1075,7 @@ int do_stand(Character *ch, char *argument, cmd_t cmd)
   }
   break;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_sit(Character *ch, char *argument, cmd_t cmd)
@@ -1129,7 +1129,7 @@ int do_sit(Character *ch, char *argument, cmd_t cmd)
   }
   break;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_rest(Character *ch, char *argument, cmd_t cmd)
@@ -1181,7 +1181,7 @@ int do_rest(Character *ch, char *argument, cmd_t cmd)
   }
   break;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_sleep(Character *ch, char *argument, cmd_t cmd)
@@ -1249,7 +1249,7 @@ int do_sleep(Character *ch, char *argument, cmd_t cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::wake(Character *victim)
@@ -1270,7 +1270,7 @@ command_return_t Character::wake(Character *victim)
   sendln("You wake, and stand up.");
   act("$n awakens.", this, 0, 0, TO_ROOM, 0);
   setStanding();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
@@ -1334,7 +1334,7 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
     {
       act("You cannot meneuver yourself over to $M!", this, 0, tmp_char, TO_CHAR, 0);
       act("$n tries to move the flow of battle towards $N but is unable.", this, 0, tmp_char, TO_ROOM, 0);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     act("You manage to give $M a swift kick in the ribs.", this, 0, tmp_char, TO_CHAR, 0);
@@ -1342,7 +1342,7 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
     act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
     act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", this, 0, tmp_char, TO_VICT, 0);
     affect_from_char(tmp_char, INTERNAL_SLEEPING);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   tmp_char->setStanding();
@@ -1359,7 +1359,7 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
     act("$N awakens.", this, 0, tmp_char, TO_ROOM, NOTVICT);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // global tag var
@@ -1378,7 +1378,7 @@ int do_tag(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void CVoteData::DisplayVote(Character *ch)
@@ -1729,31 +1729,31 @@ int do_vote(Character *ch, char *arg, cmd_t cmd)
   if (!strcmp(buf, "results"))
   {
     DC::getInstance()->DCVote.DisplayResults(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!DC::getInstance()->DCVote.IsActive())
   {
     ch->sendln("Sorry, there is nothing to vote on right now.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!strlen(buf))
   {
     DC::getInstance()->DCVote.DisplayVote(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->getLevel() < 40)
   {
     ch->sendln("Sorry, you must be at least level 40 to vote.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   vote = atoi(buf);
   if (true == DC::getInstance()->DCVote.Vote(ch, vote))
     logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_random(Character *ch, char *argument, cmd_t cmd)
@@ -1771,5 +1771,5 @@ int do_random(Character *ch, char *argument, cmd_t cmd)
   ch->send(QStringLiteral("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
   sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
   act(buf, ch, 0, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

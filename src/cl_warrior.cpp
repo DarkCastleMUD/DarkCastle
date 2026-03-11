@@ -74,7 +74,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   }
 
   if (!charge_moves(SKILL_KICK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   WAIT_STATE(this, (int)(DC::PULSE_VIOLENCE * 1.5));
 
@@ -206,7 +206,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_DEATHSTROKE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   int i = ch->has_skill(SKILL_DEATHSTROKE);
   if (i > 40)
@@ -246,7 +246,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
     if (GET_POS(ch) == position_t::DEAD)
     {
       fight_kill(ch, ch, TYPE_CHOOSE, 0);
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
   }
   else
@@ -314,7 +314,7 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
     affect_from_char(ch, SKILL_SNEAK);
 
   if (!charge_moves(ch, SKILL_RETREAT))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   // failure
   if (!skill_success(ch, nullptr, SKILL_RETREAT))
@@ -338,12 +338,12 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
 
     // check for any spec procs
     retval = ch->special("", static_cast<cmd_t>(attempt + 1));
-    if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+    if (isSet(retval, ReturnValue::eSUCCESS) || isSet(retval, ReturnValue::eCH_DIED))
       return retval;
 
     auto dir_cmd = static_cast<cmd_t>(attempt + 1);
     retval = attempt_move(ch, dir_cmd, 1);
-    if (isSet(retval, eSUCCESS))
+    if (isSet(retval, ReturnValue::eSUCCESS))
     {
       // They got away.  Stop fighting for everyone not in the new room from fighting
       for (chTemp = combat_list; chTemp; chTemp = loop_ch)
@@ -358,7 +358,7 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      if (!isSet(retval, eCH_DIED))
+      if (!isSet(retval, ReturnValue::eCH_DIED))
         act("$n tries to retreat, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       return retval;
     }
@@ -387,7 +387,7 @@ int do_hitall(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_HITALL))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   // TODO - I'm pretty sure we can remove this check....don't feel like checking right now though
   if (isSet(ch->combat, COMBAT_HITALL))
@@ -420,7 +420,7 @@ int do_hitall(Character *ch, char *argument, cmd_t cmd)
              {
 			if (vict && vict != (Character *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
 				int retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
-				if (isSet(retval, eCH_DIED)) {
+				if (isSet(retval, ReturnValue::eCH_DIED)) {
 					REMOVE_BIT(ch->combat, COMBAT_HITALL);
 					return false;
 				}
@@ -428,7 +428,7 @@ int do_hitall(Character *ch, char *argument, cmd_t cmd)
 			return true; });
     REMOVE_BIT(ch->combat, COMBAT_HITALL);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_bash(Character *ch, char *argument, cmd_t cmd)
@@ -467,7 +467,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_BASH))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return ReturnValue::eFAILURE;
@@ -589,7 +589,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
       SET_BIT(victim->combat, COMBAT_BASH1);
       retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BASH);
     }
-    if (!(retval & eEXTRA_VALUE))
+    if (!(retval & ReturnValue::eEXTRA_VALUE))
     {
       hit = 1;
       // if they already have 2 rounds of wait, only tack on 1 instead of 2
@@ -659,7 +659,7 @@ int do_redirect(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_REDIRECT))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, victim, SKILL_REDIRECT))
   {
@@ -677,7 +677,7 @@ int do_redirect(Character *ch, char *argument, cmd_t cmd)
     set_fighting(ch, victim);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_disarm(Character *ch, char *argument, cmd_t cmd)
@@ -730,7 +730,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_DISARM))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   set_cantquit(ch, victim);
 
@@ -744,7 +744,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n\r", ch->in_room);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     ch->sendln("You disarm yourself!  Congratulations!  Try using 'remove' next-time.");
@@ -756,7 +756,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
       ch->equip_char(obj, WEAR_WIELD);
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   wielded = victim->equipment[WEAR_WIELD];
@@ -860,7 +860,7 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
   }
 
   if (!charge_moves(SKILL_RESCUE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(victim, SKILL_RESCUE))
   {
@@ -893,7 +893,7 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
 
   WAIT_STATE(this, MAX(DC::PULSE_VIOLENCE * 2, tempwait));
   WAIT_STATE(victim, MAX(DC::PULSE_VIOLENCE * 2, tempvictwait));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
@@ -920,7 +920,7 @@ int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_BLADESHIELD))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_BLADESHIELD))
   {
@@ -946,7 +946,7 @@ int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* BEGIN UTILITY FUNCTIONS FOR "Guard" */
@@ -1087,7 +1087,7 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("You stop guarding anyone.");
     stop_guarding(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim == ch->guarding)
@@ -1097,7 +1097,7 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_GUARD))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (ch->guarding)
   {
@@ -1109,7 +1109,7 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   start_guarding(ch, victim);
   sprintf(name, "You begin trying to guard %s.\r\n", GET_SHORT(victim));
   ch->send(name);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_tactics(Character *ch, char *argument, cmd_t cmd)
@@ -1144,7 +1144,7 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_TACTICS, grpsize))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_TACTICS))
   {
@@ -1186,7 +1186,7 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_make_camp(Character *ch, char *argument, cmd_t cmd)
@@ -1291,7 +1291,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_triage(Character *ch, char *argument, cmd_t cmd)
@@ -1335,7 +1335,7 @@ int do_triage(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("You pause to clean and bandage some of your more painful injuries but feel little improvement in your health.");
     act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   af.type = SKILL_TRIAGE;
@@ -1348,7 +1348,7 @@ int do_triage(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("You pause to clean and bandage some of your more painful injuries and speed the healing process.");
   act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_battlesense(Character *ch, char *argument, cmd_t cmd)
@@ -1388,7 +1388,7 @@ int do_battlesense(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_smite(Character *ch, char *argument, cmd_t cmd)
@@ -1474,7 +1474,7 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
 
-  return ch->fighting ? eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
+  return ch->fighting ? ReturnValue::eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
 }
 
 int do_leadership(Character *ch, char *argument, cmd_t cmd)
@@ -1533,7 +1533,7 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
     ch->curLeadBonus = get_leadership_bonus(ch);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_perseverance(Character *ch, char *argument, cmd_t cmd)
@@ -1573,7 +1573,7 @@ int do_perseverance(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
@@ -1618,7 +1618,7 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
 
     affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_onslaught(Character *ch, char *argument, cmd_t cmd)
@@ -1679,5 +1679,5 @@ int do_onslaught(Character *ch, char *argument, cmd_t cmd)
 
     affect_to_char(ch, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

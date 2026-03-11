@@ -1396,7 +1396,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
         logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
       }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (arg1 == "resume")
     {
@@ -1411,7 +1411,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
         logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
       }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (arg1 == "scan")
     {
@@ -1996,7 +1996,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     mvactivename[i] = nullptr;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void Leaderboard::rename(QString oldname, QString newname)
@@ -2065,7 +2065,7 @@ int Leaderboard::scan(Character *ch)
 {
   check_offline();
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 Leaderboard leaderboard;

@@ -72,7 +72,7 @@ int do_suicide(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("Looking out upon the world, you decide that it would be a better place without you.");
   act("Tired of life, $n decides to end $s.", ch, 0, 0, TO_ROOM, 0);
   fight_kill(ch, ch, TYPE_PKILL, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // TODO - check differences between hit, murder, and kill....I think we can
@@ -185,7 +185,7 @@ int do_murder(Character *ch, char *argument, cmd_t cmd)
   }
   else
     ch->sendln("Hit whom?");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_slay(Character *ch, char *argument, cmd_t cmd)
@@ -233,7 +233,7 @@ int do_slay(Character *ch, char *argument, cmd_t cmd)
         fight_kill(victim, ch, TYPE_RAW_KILL, 0);
         ch->sendln("Lunch.");
       }
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
 
     act("You chop $M to pieces! Ah! The blood!",
@@ -241,10 +241,10 @@ int do_slay(Character *ch, char *argument, cmd_t cmd)
     act("$N chops you to pieces!", victim, 0, ch, TO_CHAR, 0);
     act("$n brutally slays $N.", ch, 0, victim, TO_ROOM, NOTVICT);
     fight_kill(ch, victim, TYPE_RAW_KILL, 0);
-    return eSUCCESS | eVICT_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }
 
-  return eSUCCESS; // shouldn't get here
+  return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
 int do_kill(Character *ch, char *argument, cmd_t cmd)
@@ -300,17 +300,17 @@ int do_kill(Character *ch, char *argument, cmd_t cmd)
           fight_kill(victim, ch, TYPE_CHOOSE, 0);
           ch->sendln("Lunch.");
         }
-        return eSUCCESS | eCH_DIED;
+        return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
       }
       act("You chop $M to pieces! Ah! The blood!",
           ch, 0, victim, TO_CHAR, 0);
       act("$N chops you to pieces!", victim, 0, ch, TO_CHAR, 0);
       act("$n brutally slays $N.", ch, 0, victim, TO_ROOM, NOTVICT);
       fight_kill(ch, victim, TYPE_CHOOSE, 0);
-      return eSUCCESS | eVICT_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
     }
   }
-  return eSUCCESS; // shouldn't get here
+  return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
 /****************** JOIN IN THE FIGHT *******************************/

@@ -733,7 +733,7 @@ LFound2:
     break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void boot_the_shops()
@@ -1446,7 +1446,7 @@ int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 /*
 int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
@@ -1541,7 +1541,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
       break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 */
 void assign_the_player_shopkeepers()
@@ -1715,7 +1715,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
     ch->sendln("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.");
     */
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::BUY)
   {
@@ -1727,14 +1727,14 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     if (*arg1 == 0)
     {
       ch->sendln("Buy what?");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     int choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
       ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\r\n").arg(QString::number(MAX_EDDIE_ITEMS)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if ((eddie[choice - 1].cost_qty == 0 || eddie[choice - 1].cost_vnum < 1) && eddie[choice - 1].cost_exp > 0)
@@ -1747,7 +1747,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       else
       {
         ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else if (eddie[choice - 1].cost_plats > 0)
@@ -1760,7 +1760,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       else
       {
         ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else
@@ -1771,7 +1771,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       if (count < eddie[choice - 1].cost_qty)
       {
         ch->sendln("You don't have enough to trade.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
@@ -1799,7 +1799,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
         {
           ch->sendln("An error occured.");
           ch->save(cmd_t::SAVE_SILENTLY);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
       }
     }
@@ -1822,13 +1822,13 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       {
         ch->sendln("An error occured.");
         ch->save(cmd_t::SAVE_SILENTLY);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     ch->save();
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
@@ -1854,7 +1854,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     owner->tell(ch, "Type reroll <object keyword> to reroll that object.");
@@ -1862,25 +1862,25 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     owner->tell(ch, "The cost will be 1 Cloverleaf token.");
     owner->tell(ch, "You will get two re-rolled choices or the original to pick from.");
     owner->tell(ch, "Type choose 1, 2 or 3 to choose either one of the two rerolls or the original.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   case cmd_t::REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (r.state == reroll_t::reroll_states_t::REROLLED)
     {
       owner->tell(ch, "You need to choose 1, 2, 3 or type cancel before you can reroll again.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (arg1.empty())
     {
       owner->tell(ch, "You have to type reroll <object keyword> to reroll that object.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
     {
@@ -1888,7 +1888,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (obj == nullptr)
       {
         owner->tell(ch, QStringLiteral("I don't see anything on you matching \'%1\'").arg(arg1.c_str()));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else
       {
@@ -1900,25 +1900,25 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
             GET_OBJ_TYPE(obj) != ITEM_CONTAINER)
         {
           owner->tell(ch, "I can only reroll weapons, armor, instruments, wands, staffs and containers.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isGodload())
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isQuest())
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isCustom())
         {
           owner->tell(ch, "I can't reroll objects with the NO_CUSTOM flag set on them.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         r = {};
@@ -1938,7 +1938,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (search_char_for_item_count(ch, real_object(OBJ_CLOVERLEAF), false) < 1)
       {
         owner->tell(ch, "You don't have the required cloverleaf token.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       obj = search_char_for_item(ch, real_object(OBJ_CLOVERLEAF), false);
@@ -2057,7 +2057,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     else
     {
       owner->tell(ch, "Type choose 1, 2 or 3.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     reroll_sessions.erase(GET_NAME(ch));
     break;
@@ -2087,7 +2087,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
@@ -2129,7 +2129,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
                       "for the item with vnum v#. I will then ask you to confirm the item "
                       "you want redeemed. The cost will be 3 Apocalypse tokens for a level "
                       "50 or under item or 6 Apocalypse tokens for a level 51 to 59 item.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       break;
     default:
       return ReturnValue::eFAILURE;
@@ -2155,7 +2155,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (obj == nullptr)
       {
         owner->tell(ch, QStringLiteral("I can't find an object with vnum \'%1\'").arg(arg1));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else
       {
@@ -2165,37 +2165,37 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
             GET_OBJ_TYPE(obj) != ITEM_CONTAINER)
         {
           owner->tell(ch, "I can only redeem Apocalypse tokens for weapons, armor, instruments and containers.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isGodload())
         {
           owner->tell(ch, "I can't redeem for GL items.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isQuest())
         {
           owner->tell(ch, "I can't redeem for quest items.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isCustom() && r.random)
         {
           owner->tell(ch, "I can't redeem randomized versions of items with NO_CUSTOM flag set.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isTest())
         {
           owner->tell(ch, "You can't redeem for test items.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->getLevel() >= 60)
         {
           owner->tell(ch, "You can't redeem Apocalypse tokens for a level 60 item.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].vnum()).split(' '));
@@ -2215,7 +2215,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
                             .arg(QString::number(r.token_count))
                             .arg(random_str)
                             .arg(GET_OBJ_SHORT(obj)));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     break;
@@ -2225,17 +2225,17 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     case cmd_t::REDEEM:
     case cmd_t::LIST:
       owner->tell(ch, QStringLiteral("You need to confirm or cancel redeeming %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       break;
     case cmd_t::CONFIRM:
       break;
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   case redeem_t::state_t::REDEEM:
     owner->tell(ch, "You need to choose 1, 2, 3 or type cancel before you can reroll again.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   }
 

@@ -69,7 +69,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   act("$n gestures sharply and $N comes into existence!", this, 0, new_new, TO_ROOM, 0);
   act("You linkload $N.", this, 0, new_new, TO_CHAR, 0);
   logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_processes(Character *ch, char *arg, cmd_t cmd)
@@ -108,7 +108,7 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
 
   ch->send(tmp);
   FREE(tmp);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
@@ -145,7 +145,7 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_advance(Character *ch, char *argument, cmd_t cmd)
@@ -256,7 +256,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
       advance_level(victim, 0);
     }
   DC::getInstance()->update_wizlist(victim);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
@@ -363,7 +363,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
       if (!point->connected && point->character)
         point->character->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
@@ -504,9 +504,9 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
       }
     }
     send("Ok.\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
@@ -518,7 +518,7 @@ command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
   }
 
   this->sendln("If you want to shut something down - say so!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_testport(Character *ch, char *argument, cmd_t cmd)
@@ -571,7 +571,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Testport successfully shutdown.");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_testuser(Character *ch, char *argument, cmd_t cmd)
@@ -649,7 +649,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Ok.");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 #ifdef BANDWIDTH
@@ -657,7 +657,7 @@ int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
 {
   csendf(ch, "Bytes sent in %ld seconds: %ld\n\r",
          get_bandwidth_start(), get_bandwidth_amount());
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 #endif
 
@@ -689,7 +689,7 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
     if (victim->skills.empty())
     {
       ch->send(fmt::format("{} has no skills.\r\n", victim->getNameC()));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     ch->send(fmt::format("Skills for {}:\r\n", victim->getNameC()));
@@ -709,5 +709,5 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
     ch->send(fmt::format("Invalid action '{}'.  Must be 'list', 'add', or 'delete'.\r\n", type));
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

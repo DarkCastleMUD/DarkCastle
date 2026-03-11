@@ -95,11 +95,11 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
   if (!victim)
   {
     ch->sendln("They aren't even here!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!charge_moves(ch, SKILL_FREE_ANIMAL))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, victim, SKILL_FREE_ANIMAL))
   {
@@ -107,7 +107,7 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
         ch, nullptr, victim, TO_CHAR, 0);
     act("$n gives $N a gentle pat to the head, but $E seems unwilling to leave $s side.",
         ch, nullptr, victim, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("With a gentle pat to the head, you set $N free to roam the wilds again.",
@@ -117,7 +117,7 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
 
   stop_follower(victim);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_tame(Character *ch, char *arg, cmd_t cmd)
@@ -196,7 +196,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_TAME))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   act("$n holds out $s hand to $N and beckons softly.", ch, nullptr, victim, TO_ROOM, INVIS_NULL);
 
@@ -239,7 +239,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   check_eq(victim);
 
   act("Isn't $n just such a nice person?", ch, 0, victim, TO_VICT, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
@@ -275,7 +275,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
       ansi_color(NTEXT, this);
 
       //      remove_memory(this, 't');
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -283,7 +283,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   {
     this->sendln("There's one right here ;)");
     //  remove_memory(this, 't');
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!victim.isEmpty() && IS_PC(this) && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && this->getLevel() < ANGEL)
@@ -293,7 +293,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   }
 
   if (!charge_moves(SKILL_TRACK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, TO_ROOM, INVIS_NULL);
   this->sendln("You search for signs of your quarry...\n\r");
@@ -371,7 +371,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             if (cmd_dir)
             {
               retval = do_move(this, "", *cmd_dir);
-              if (isSet(retval, eCH_DIED))
+              if (isSet(retval, ReturnValue::eCH_DIED))
                 return retval;
             }
           }
@@ -404,7 +404,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
           {
             act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
                 this, 0, 0, TO_ROOM, 0);
-            retval = eSUCCESS;
+            retval = ReturnValue::eSUCCESS;
             if (tmp_ch)
             {
               retval = mprog_attack_trigger(this, tmp_ch);
@@ -419,7 +419,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
                 this, 0, 0, TO_ROOM, 0);
         } // if IS_NPC
 
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       } // if isname
     } // for
 
@@ -508,7 +508,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             dirs[y]);
     this->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
@@ -524,19 +524,19 @@ command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
   if (arg1.isEmpty())
   {
     sendln(QStringLiteral("You will ambush %1 on sight.").arg(ambush.isEmpty() ? "no one" : ambush));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ambush == arg1)
   {
     ambush.clear();
     sendln(QStringLiteral("You will no longer ambush %1 on sight.").arg(arg1));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ambush = arg1;
   sendln(QStringLiteral("You will now ambush %1 on sight.").arg(arg1));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int pick_one(int a, int b)
@@ -722,7 +722,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_FORAGE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   learned = ch->has_skill(SKILL_FORAGE);
   if (!learned)
@@ -806,7 +806,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
   act("You forage around, turning up $p.", ch, new_obj, 0, TO_CHAR, 0);
   obj_to_char(new_obj, ch);
   new_obj->obj_flags.timer = 4;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* this is sent the arrow char std::string, and return the arrow type.
@@ -943,7 +943,7 @@ int mob_arrow_response(Character *ch, Character *victim,
   {
     if (!number(0, 20))
       do_shout(victim, "Duh George, someone keeps shooting me!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* make mob hate the person, but _not_ track them, this should
@@ -955,10 +955,10 @@ int mob_arrow_response(Character *ch, Character *victim,
 
   /* don't want the mob leaving a fight its already in */
   if (victim->fighting)
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (dir < 0) // in the same room
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (number(0, 1))
   {
@@ -1025,7 +1025,7 @@ int mob_arrow_response(Character *ch, Character *victim,
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* no need anymore
@@ -1110,10 +1110,10 @@ int do_arrow_damage(Character *ch, Character *victim,
   {
     group_gain(ch, victim);
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
-    return (eSUCCESS | eVICT_DIED);
+    return (ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED);
   } // End of Hit < 0
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 */
 
@@ -1271,7 +1271,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_ARCHERY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   /* check if you can see your target */
   /* put ch in the targets room to check if they are visible */
@@ -1452,7 +1452,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_ARCHERY))
   {
-    retval = eSUCCESS;
+    retval = ReturnValue::eSUCCESS;
     do_arrow_miss(ch, victim, dir, found);
   }
   else
@@ -1478,7 +1478,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
     retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY);
 
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       switch (number(1, 3))
       {
@@ -1593,7 +1593,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       }
       retval = weapon_spells(ch, victim, ITEM_MISSILE);
       // just in case
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
       {
         Object *corpse, *next;
         for (corpse = DC::getInstance()->object_list; corpse; corpse = next)
@@ -1782,7 +1782,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
     sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
             "Noone!");
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void check_eq(Character *ch)
@@ -1856,5 +1856,5 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
 
   csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\r\n", races[i].singular_name);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

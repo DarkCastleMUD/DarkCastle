@@ -48,7 +48,7 @@ int do_plats(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "%15d - %s - %ld - %d\n\r", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
     ch->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_force(Character *ch, std::string argument, cmd_t cmd)
@@ -86,7 +86,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
       {
         ch->sendln("Now doing that would just tick off the IMPS!");
         logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, DC::LogChannel::LOG_GOD);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if ((ch->getLevel() <= vict->getLevel()) && IS_PC(vict))
       {
@@ -140,7 +140,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
     buf = fmt::format("{} just forced all to {}.", GET_NAME(ch), to_force);
     logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 typedef command_return_t (*test_function_t)(Character *ch);
@@ -186,7 +186,7 @@ command_return_t run_all_events(Character *ch = nullptr)
   {
     return ReturnValue::eFAILURE;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 QString rc_to_qstring(const command_return_t &rc)
@@ -196,37 +196,37 @@ QString rc_to_qstring(const command_return_t &rc)
   {
     strings += "ReturnValue::eFAILURE";
   }
-  if (isSet(rc, eSUCCESS))
+  if (isSet(rc, ReturnValue::eSUCCESS))
   {
-    strings += "eSUCCESS ";
+    strings += "ReturnValue::eSUCCESS ";
   }
-  if (isSet(rc, eCH_DIED))
+  if (isSet(rc, ReturnValue::eCH_DIED))
   {
-    strings += "eCH_DIED ";
+    strings += "ReturnValue::eCH_DIED ";
   }
-  if (isSet(rc, eDELAYED_EXEC))
+  if (isSet(rc, ReturnValue::eDELAYED_EXEC))
   {
-    strings += "eDELAYED_EXEC ";
+    strings += "ReturnValue::eDELAYED_EXEC ";
   }
-  if (isSet(rc, eEXTRA_VAL2))
+  if (isSet(rc, ReturnValue::eEXTRA_VAL2))
   {
-    strings += "eEXTRA_VAL2 ";
+    strings += "ReturnValue::eEXTRA_VAL2 ";
   }
-  if (isSet(rc, eEXTRA_VALUE))
+  if (isSet(rc, ReturnValue::eEXTRA_VALUE))
   {
-    strings += "eEXTRA_VALUE ";
+    strings += "ReturnValue::eEXTRA_VALUE ";
   }
-  if (isSet(rc, eIMMUNE_VICTIM))
+  if (isSet(rc, ReturnValue::eIMMUNE_VICTIM))
   {
-    strings += "eIMMUNE_VICTIM ";
+    strings += "ReturnValue::eIMMUNE_VICTIM ";
   }
-  if (isSet(rc, eINTERNAL_ERROR))
+  if (isSet(rc, ReturnValue::eINTERNAL_ERROR))
   {
-    strings += "eINTERNAL_ERROR ";
+    strings += "ReturnValue::eINTERNAL_ERROR ";
   }
-  if (isSet(rc, eVICT_DIED))
+  if (isSet(rc, ReturnValue::eVICT_DIED))
   {
-    strings += "eVICT_DIED ";
+    strings += "ReturnValue::eVICT_DIED ";
   }
 
   return strings.join(',');
@@ -434,7 +434,7 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
     {
       send(test.getName() + "\r\n");
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (arg1 == "all")
   {

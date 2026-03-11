@@ -252,7 +252,7 @@ int do_newPath(Character *ch, char *argument, cmd_t cmd)
   p->addRoom(ch, ch->in_room, true);
   p->next = mPathList;
   mPathList = p;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
@@ -284,7 +284,7 @@ int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
   if (!found)
     ch->sendln("No paths connecting to this zone has been found.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
@@ -303,7 +303,7 @@ int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
   if (!found)
     ch->sendln("No paths found.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_addRoom(Character *ch, char *argument, cmd_t cmd)
@@ -325,7 +325,7 @@ int do_addRoom(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   p->addRoom(ch, ch->in_room, false);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_findPath(Character *ch, char *argument, cmd_t cmd)
@@ -368,7 +368,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!path)
     return ReturnValue::eFAILURE;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int leastPathSteps(class Path *goal, class Path *at, int steps, int *beststeps)
@@ -464,7 +464,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln(QStringLiteral("%1 -- ").arg(p[z]->name));
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int find_closest_path(int from, int steps, char *buf, std::map<int, int> z)
@@ -591,14 +591,14 @@ int do_findpath(Character *ch, char *argument, cmd_t cmd)
   for (p = mPathList; p; p = p->next)
     for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
       csendf(ch, "Hmm: %d\r\n", (*iter).first);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
   /*  argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
     int i = atoi(arg1), z = atoi(arg2);
     if (!i || !z) { ch->sendln("BLeh!"); return ReturnValue::eFAILURE; }
     char *t =  findPath(i, z, ch);
     ch->send(QStringLiteral("Final Path: %1\r\n").arg(t));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   */
 }
 

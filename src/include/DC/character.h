@@ -949,7 +949,7 @@ public:
     if (command)
       sendln(QStringLiteral("$3Syntax$R: %1 [vnum] %2 <value>").arg(command->getName()).arg(fieldname));
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   command_return_t do_edit_generic(auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
@@ -959,7 +959,7 @@ public:
 
     setfnc(arguments.join(' '));
     sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(getfnc()));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   command_return_t do_edit_generic(auto *entity, auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
@@ -1032,7 +1032,7 @@ public:
       return ReturnValue::eFAILURE;
     }
     sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(arguments.join(' ').toLower()));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   command_return_t do_oedit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);

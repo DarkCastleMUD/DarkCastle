@@ -88,7 +88,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
 
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE))
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
     dam = number(100, 200) + 3 * (100 - skill);
 
@@ -212,7 +212,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
         ch->setSitting();
         update_pos(ch);
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   ch->sendln("You don't see anything like that to batter.");
@@ -251,7 +251,7 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
       if (ch->brace_exit != nullptr) // incase it's a weird exit area
         ch->brace_exit->bracee = nullptr;
       ch->brace_exit = nullptr;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     ch->sendln("Brace what??");
     ch->sendln("brace <door> <direction>");
@@ -301,7 +301,7 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
 
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5))
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
     csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", fname(exit->keyword).toStdString().c_str());
     act("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, TO_ROOM, 0);
@@ -326,7 +326,7 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
             back->bracee = ch;
           }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -379,7 +379,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   if (!charge_moves(SKILL_RAGE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   int retval = 0;
   if (!skill_success(victim, SKILL_RAGE))
@@ -390,7 +390,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
         this, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts advancing toward you, but trips over $s own feet!", this, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -406,7 +406,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
         this, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n advances confidently towards you, and flies into a rage!", this, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -423,7 +423,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
   if (has_skill(SKILL_RAGE) > 75 && !number(0, 9))
     return attack(this, victim, TYPE_UNDEFINED);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_battlecry(Character *ch, char *argument, cmd_t cmd)
@@ -448,7 +448,7 @@ int do_battlecry(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_BATTLECRY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_BATTLECRY))
   {
@@ -495,7 +495,7 @@ int do_battlecry(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   else
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_berserk(Character *ch, char *argument, cmd_t cmd)
@@ -552,7 +552,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_BERSERK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, victim, SKILL_BERSERK))
   {
@@ -560,7 +560,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     act("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -584,7 +584,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     act("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -600,9 +600,9 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
   if (!ch->fighting)
     retval = attack(ch, victim, TYPE_UNDEFINED);
 
-  if (!isSet(retval, eCH_DIED))
+  if (!isSet(retval, ReturnValue::eCH_DIED))
   {
-    if (!isSet(retval, eVICT_DIED) && IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY))
+    if (!isSet(retval, ReturnValue::eVICT_DIED) && IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
@@ -685,7 +685,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_HEADBUTT))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || victim->has_skill(SKILL_BERSERK) > 80))
   {
@@ -694,7 +694,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
     act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
 
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   int mod = 0;
@@ -719,7 +719,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
     // the damage call here takes care of starting combat and such
-    retval = eSUCCESS;
+    retval = ReturnValue::eSUCCESS;
   }
   else
   {
@@ -730,7 +730,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
       act_return ar = act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
       retval = ar.retval;
-      if (isSet(retval, eVICT_DIED))
+      if (isSet(retval, ReturnValue::eVICT_DIED))
       {
         return retval;
       }
@@ -738,7 +738,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
       retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
       // the damage call here takes care of starting combat and such
-      retval = eSUCCESS;
+      retval = ReturnValue::eSUCCESS;
     }
     else
     {
@@ -786,7 +786,7 @@ int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_BLOOD_FURY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_BLOOD_FURY))
   {
@@ -818,7 +818,7 @@ int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
 
   affect_to_char(ch, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
@@ -835,7 +835,7 @@ int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_CRAZED_ASSAULT))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_CRAZED_ASSAULT))
   {
@@ -862,7 +862,7 @@ int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void rush_reset(varg_t arg1, void *arg2, void *arg3)
@@ -927,7 +927,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_BULLRUSH))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   // before we move anyone, we need to check for any spec procs in the
   // room like guild guards
@@ -935,7 +935,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   if (cmd_dir)
   {
     retval = ch->special("", *cmd_dir);
-    if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+    if (isSet(retval, ReturnValue::eSUCCESS) || isSet(retval, ReturnValue::eCH_DIED))
       return retval;
   }
 
@@ -1013,7 +1013,7 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_FEROCITY, grpsize))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_FEROCITY))
   {
@@ -1056,7 +1056,7 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void barb_magic_resist(Character *ch, int old, int nw)
@@ -1117,7 +1117,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_KNOCKBACK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   bool victim_paralyzed = false;
   affected_type *af;
@@ -1202,7 +1202,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -1219,7 +1219,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -1260,7 +1260,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_VICT);
 
       if (selfpurge)
-        return eSUCCESS | eVICT_DIED;
+        return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
       sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
       sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
@@ -1282,7 +1282,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       move_char(victim, (DC::getInstance()->world[(ch)->in_room].dir_option[dir])->to_room);
     }
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
@@ -1310,7 +1310,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       return attack(victim, ch, TYPE_UNDEFINED);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_primalfury(Character *ch, char *argument, cmd_t cmd)
@@ -1320,25 +1320,25 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(SKILL_PRIMAL_FURY))
   {
     ch->sendln("You don't know how to.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (ch->affected_by_spell(SKILL_PRIMAL_FURY))
   {
     ch->sendln("You must wait before using this ability again.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!ch->fighting || GET_POS(ch) != position_t::FIGHTING)
   {
     ch->sendln("You must be in combat in order to use this ability.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!charge_moves(ch, SKILL_PRIMAL_FURY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (GET_RAW_STR(ch) < 16)
   {
     ch->sendln("You do not possess sufficient strength to attempt this feat.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // Timer applies to both success and failure, so it goes here.
@@ -1355,7 +1355,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!");
     act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, nullptr, nullptr, TO_ROOM, 0);
     ch->setMove(ch->getMove() / 2.0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // Success below.
@@ -1377,7 +1377,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
   act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, nullptr, nullptr, TO_ROOM, 0);
   ch->sendln("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_pursue(Character *ch, char *argument, cmd_t cmd)
@@ -1405,5 +1405,5 @@ int do_pursue(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

@@ -213,7 +213,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("(Not on game)");
     free_char(vict, Trace("do_check"));
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_find(Character *ch, char *arg, cmd_t cmd)
@@ -282,7 +282,7 @@ int do_find(Character *ch, char *arg, cmd_t cmd)
   sprintf(type, "%30s -- %s [%d]\n\r", GET_SHORT(vict),
           DC::getInstance()->world[vict->in_room].name, DC::getInstance()->world[vict->in_room].number);
   ch->send(type);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_stat(Character *ch, char *arg, cmd_t cmd)
@@ -388,12 +388,12 @@ int do_stat(Character *ch, char *arg, cmd_t cmd)
     mob_stat(ch, vict);
     char_from_room(vict);
     free_char(vict, Trace("do_stat"));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     ;
   }
 
   mob_stat(ch, vict);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mpstat(Character *ch, char *arg, cmd_t cmd)
@@ -457,7 +457,7 @@ int do_mpstat(Character *ch, char *arg, cmd_t cmd)
     }
   */
   mpstat(ch, (Character *)DC::getInstance()->mob_index[x].item);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t zedit_flags(Character *ch, QStringList arguments, Zone &zone)
@@ -537,7 +537,7 @@ command_return_t zedit_flags(Character *ch, QStringList arguments, Zone &zone)
     ch->send(QStringLiteral("'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n").arg(text));
     return ReturnValue::eFAILURE;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t zedit_lifetime(Character *ch, QStringList arguments, Zone &zone)
@@ -563,7 +563,7 @@ command_return_t zedit_lifetime(Character *ch, QStringList arguments, Zone &zone
   ch->send(QStringLiteral("Zone %1's lifetime changed from %2 to %3.\r\n").arg(zone.getID()).arg(zone.lifespan).arg(ticks));
   zone.lifespan = ticks;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
@@ -837,7 +837,7 @@ command_return_t zedit_remove(Character *ch, QStringList arguments, Zone &zone)
   zone.cmd.remove(zone_command_number);
 
   ch->send(QStringLiteral("Command %1 removed.\r\n").arg(zone_command_number + 1));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 qsizetype zone_get_last_command(const Zone &zone)
@@ -908,7 +908,7 @@ command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zo
 
   show_zone_commands(ch, zone, command_number, num_to_show, stats);
 
-  return eSUCCESS; // so we don't set_zone_modified_zone
+  return ReturnValue::eSUCCESS; // so we don't set_zone_modified_zone
 }
 
 command_return_t zedit_name(Character *ch, QStringList arguments, Zone &zone)
@@ -925,7 +925,7 @@ command_return_t zedit_name(Character *ch, QStringList arguments, Zone &zone)
 
   ch->send(QStringLiteral("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(zone.Name()));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
@@ -957,7 +957,7 @@ command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
   zone.reset_mode = k - 1;
 
   ch->send(QStringLiteral("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[k - 1]).arg(k));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 const QStringList zedit_subcommands = {
@@ -973,7 +973,7 @@ command_return_t zedit_help(Character *ch)
                "Subcommands:\r\n",
                ch);
   ch->display_string_list(zedit_subcommands);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_zedit(Character *ch, char *argument, cmd_t cmd)
@@ -1107,7 +1107,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
                  "For comments, if you wish to remove a comment set the comment to 'none'.\r\n"
                  "\r\n",
                  ch);
-    return eSUCCESS; // so we don't set modified
+    return ReturnValue::eSUCCESS; // so we don't set modified
     break;
   case 9: /* search */
 
@@ -1219,7 +1219,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
         }
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   case 10: // swap
@@ -1341,7 +1341,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
 
   case 13:
     zone.show_info(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   default:
@@ -1350,7 +1350,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
     break;
   }
   DC::getInstance()->set_zone_modified_zone(ch->in_room);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_sedit(Character *ch, char *argument, cmd_t cmd)
@@ -1548,7 +1548,7 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
     {
       ch->send("  (none)\r\n");
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   }
 
@@ -1560,7 +1560,7 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
   // make sure the changes stick
   vict->save(cmd_t::SAVE_SILENTLY);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int oedit_exdesc(Character *ch, int item_num, char *buf)
@@ -1750,7 +1750,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
   } // switch(x)
 
   DC::getInstance()->set_zone_modified_obj(item_num);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int oedit_affects(Character *ch, int item_num, char *buf)
@@ -1853,7 +1853,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     if (!obj->affected)
     {
       ch->sendln("The object has no affects.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     send_to_char("$3Character Affects$R:\r\n"
                  "------------------\r\n",
@@ -1871,7 +1871,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
               obj->affected[x].location, obj->affected[x].modifier);
       ch->send(buf);
     }
-    return eSUCCESS; // return so we don't mark as changed
+    return ReturnValue::eSUCCESS; // return so we don't mark as changed
     break;
   }
 
@@ -1994,7 +1994,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
   } // switch(x)
 
   DC::getInstance()->set_zone_modified_obj(item_num);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
@@ -2079,7 +2079,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     if (rnum < 0 || vnum < 1)
     {
       sendln("Invalid item number.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (player->last_obj_vnum != vnum)
@@ -2095,7 +2095,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     if (rnum < 0 || vnum < 1)
     {
       sendln("Invalid item number.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     // put the buffs where they should be
@@ -2115,7 +2115,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   if (!*buf3) // no field.  Stat the item.
   {
     obj_stat(this, (Object *)DC::getInstance()->obj_index[rnum].item);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // MOVED
@@ -2579,7 +2579,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   case 20:
   {
     obj_stat(this, (Object *)DC::getInstance()->obj_index[rnum].item);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   }
   case 21:
@@ -2623,7 +2623,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   }
 
   DC::getInstance()->set_zone_modified_obj(rnum);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void update_mobprog_bits(int mob_num)
@@ -2688,7 +2688,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
     if (((mob_num = real_mobile(mobvnum)) < 0) || (mobvnum == 0 && *buf != '0'))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     ch->setPlayerLastMob(mobvnum);
   }
@@ -2725,7 +2725,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
   if (!*buf3)
   {
     mpstat(ch, (Character *)DC::getInstance()->mob_index[mob_num].item);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (x = 0;; x++)
@@ -3024,7 +3024,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   DC::getInstance()->set_zone_modified_mob(mob_num);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mscore(Character *ch, char *argument, cmd_t cmd)
@@ -3049,11 +3049,11 @@ int do_mscore(Character *ch, char *argument, cmd_t cmd)
   if (((mob_num = real_mobile(mob_vnum)) < 0))
   {
     ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mob_vnum));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   boro_mob_stat(ch, (Character *)DC::getInstance()->mob_index[mob_num].item);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_medit(Character *ch, char *argument, cmd_t cmd)
@@ -4125,7 +4125,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   break;
   }
   DC::getInstance()->set_zone_modified_mob(mob_num);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_redit(Character *ch, char *argument, cmd_t cmd)
@@ -4290,7 +4290,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
                 csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[reverse_number[x]], destination_room, ch->in_room);
                 free(DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]);
                 DC::getInstance()->world[destination_room].dir_option[reverse_number[x]] = nullptr;
-                return eSUCCESS;
+                return ReturnValue::eSUCCESS;
               }
               else
               {
@@ -4298,7 +4298,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
                        dirs[reverse_number[x]],
                        destination_room,
                        ch->in_room);
-                return eSUCCESS;
+                return ReturnValue::eSUCCESS;
               }
             }
             else
@@ -4306,10 +4306,10 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
               csendf(ch, "Reverse %s exit in room %d does not exist.\r\n",
                      dirs[reverse_number[x]],
                      destination_room);
-              return eSUCCESS;
+              return ReturnValue::eSUCCESS;
             }
           } // end of check if Player::PLR_ONEWAY is toggled
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         } // end of is_abbred for dirs
       } // end of for loop through directions
 
@@ -4474,7 +4474,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("No extra description keywords found.");
       }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     std::string arg2;
@@ -4731,7 +4731,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     break;
   }
   DC::getInstance()->set_zone_modified_world(ch->in_room);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_rdelete(Character *ch, char *arg, cmd_t cmd)
@@ -4858,7 +4858,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
                  ch);
 
   DC::getInstance()->set_zone_modified_world(ch->in_room);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_oneway(Character *ch, char *arg, cmd_t cmd)
@@ -4878,7 +4878,7 @@ int do_oneway(Character *ch, char *arg, cmd_t cmd)
       REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
     ch->sendln("You generate two-way exits.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
@@ -4941,7 +4941,7 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
   fclose(f);
   sendln(QStringLiteral("Saved zone %1.").arg(zone_key));
   zone.setModified(false);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_rsave(Character *ch, char *arg, cmd_t cmd)
@@ -4984,7 +4984,7 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
 
   ch->sendln("Saved.");
   DC::getInstance()->set_zone_saved_world(ch->in_room);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_msave(Character *ch, char *arg, cmd_t cmd)
@@ -5039,7 +5039,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
 
   ch->sendln("Saved.");
   DC::getInstance()->set_zone_saved_mob(curr->firstnum);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_osave(Character *ch, char *arg, cmd_t cmd)
@@ -5091,7 +5091,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
 
   ch->sendln("Saved.");
   DC::getInstance()->set_zone_saved_obj(curr->firstnum);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_instazone(Character *ch, char *arg, cmd_t cmd)
@@ -5395,7 +5395,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
   fprintf(fl, "S\n");
   fclose(fl);
   ch->sendln("Zone File Created! Tell someone who can put it in!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_rstat(Character *ch, char *argument, cmd_t cmd)
@@ -5535,7 +5535,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
       ch->send(buf);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_possess(Character *ch, char *argument, cmd_t cmd)
@@ -5605,7 +5605,7 @@ int do_possess(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_return(Character *ch, char *argument, cmd_t cmd)
@@ -5638,10 +5638,10 @@ int do_return(Character *ch, char *argument, cmd_t cmd)
     {
       act("$n evaporates.", ch, 0, 0, TO_ROOM, 0);
       extract_char(ch, true);
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
@@ -5676,7 +5676,7 @@ command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
   const uint64_t num_can_see = connections.size();
   send(QStringLiteral("\r\nThere are %1 connections.\r\n").arg(num_can_see));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_setvote(Character *ch, char *arg, cmd_t cmd)
@@ -5696,19 +5696,19 @@ int do_setvote(Character *ch, char *arg, cmd_t cmd)
   if (!strcmp(buf, "start"))
   {
     dc->DCVote.StartVote(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!strcmp(buf, "clear"))
   {
     dc->DCVote.Reset(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!strcmp(buf, "end"))
   {
     dc->DCVote.EndVote(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!*buf2)
@@ -5720,17 +5720,17 @@ int do_setvote(Character *ch, char *arg, cmd_t cmd)
   if (!strcmp(buf, "question"))
   {
     dc->DCVote.SetQuestion(ch, buf2);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!strcmp(buf, "add"))
   {
     dc->DCVote.AddAnswer(ch, buf2);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!strcmp(buf, "remove"))
   {
     dc->DCVote.RemoveAnswer(ch, (unsigned int)atoi(buf2));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->send("Syntax: voteset <question|add|remove|clear|start|end> <std::string>");
@@ -5972,7 +5972,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
   }
 
   display_punishes(ch, vict);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void display_punishes(Character *ch, Character *vict)
@@ -6039,5 +6039,5 @@ int do_colors(Character *ch, char *argument, cmd_t cmd)
                "Example:  'This is $$Bbold and $$4bold $$R$$4red$R!' will print:\r\n"
                "           This is $Bbold and $4bold $R$4red$R!\r\n",
                ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

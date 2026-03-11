@@ -85,7 +85,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(arg, item);
@@ -93,7 +93,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   if (!*item)
   {
     ch->sendln("What item?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   obj = get_obj_in_list_vis(ch, item, ch->carrying);
@@ -101,7 +101,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   if (obj == nullptr)
   {
     ch->sendln("You don't have that item.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
@@ -114,7 +114,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
     do_say(owner, "I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   eqdam = eq_current_damage(obj);
@@ -124,7 +124,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
     do_say(owner, "Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   cost = obj->obj_flags.cost;
@@ -138,17 +138,17 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   if (cmd == cmd_t::PRICE)
   {
     repair_shop_price_check(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->getGold() < (uint32_t)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   repair_shop_fix_eq(ch, owner, price, obj);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
@@ -163,7 +163,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(arg, item);
@@ -171,7 +171,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   if (!*item)
   {
     ch->sendln("What item?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   obj = get_obj_in_list_vis(ch, item, ch->carrying);
@@ -179,13 +179,13 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   if (obj == nullptr)
   {
     ch->sendln("You don't have that item.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
     do_say(owner, "I can't repair this.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
@@ -200,7 +200,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     do_say(owner, "Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   cost = obj->obj_flags.cost;
@@ -225,7 +225,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     do_say(owner, "I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (price < 1000)
@@ -234,21 +234,21 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   if (cmd == cmd_t::PRICE)
   {
     repair_shop_price_check(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->getGold() < (uint32_t)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
     repair_shop_fix_eq(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Fingers
@@ -264,7 +264,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(arg, item);
@@ -272,7 +272,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   if (!*item)
   {
     ch->sendln("What item?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   obj = get_obj_in_list_vis(ch, item, ch->carrying);
@@ -280,13 +280,13 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   if (obj == nullptr)
   {
     ch->sendln("You don't have that item.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
     do_say(owner, "I can't repair this.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
@@ -301,7 +301,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
     do_say(owner, "Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   cost = obj->obj_flags.cost;
@@ -331,7 +331,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
     do_say(owner, "I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (price < 5000)
@@ -340,18 +340,18 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   if (cmd == cmd_t::PRICE)
   {
     repair_shop_price_check(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->getGold() < (uint32_t)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
     repair_shop_fix_eq(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 }
 
@@ -444,7 +444,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
                  "Use 'value' to find how much your eq would cost with what you\n\r"
                  "have on you now.\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (cmd == cmd_t::VALUE) // value
@@ -453,7 +453,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     cost /= 20000;
     cost = MAX(cost, 30);
     ch->send(QStringLiteral("The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n").arg(cost));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* buy */
@@ -462,7 +462,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     send_to_char("Try \"buy <number>\", or \"list\" for a list of "
                  "available corpses.\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
@@ -487,7 +487,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     if (GET_PLATINUM(ch) < (uint32_t)cost)
     {
       ch->sendln("You can't afford that!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     move_obj(obj, ch->in_room);
     REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
@@ -497,11 +497,11 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     GET_PLATINUM(ch) -= cost;
     ch->save();
     save_corpses();
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->sendln("No such corpse was found.  Try \"list\".");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
@@ -667,7 +667,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     if (!CAN_SEE(owner, ch))
     {
       do_say(owner, "I don't trade with people I can't see!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     for (o = 0; platsmith_list[o].vnum != 0; o++)
@@ -676,7 +676,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     if (platsmith_list[o].vnum == 0)
     {
       owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     owner->do_tell(QStringLiteral("%1 Here's what I can do for you, %2.").arg(GET_NAME(ch)).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
 
@@ -686,14 +686,14 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
       ch->send(tmp);
       dc_free(tmp);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::BUY)
   {
     if (!CAN_SEE(owner, ch))
     {
       do_say(owner, "I don't trade with people I can't see!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     for (o = 0; platsmith_list[o].vnum != 0; o++)
@@ -704,18 +704,18 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     if (platsmith_list[o].vnum == 0)
     {
       owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!is_number(arg2))
     {
       owner->do_tell(QStringLiteral("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     int k = atoi(arg2) - 1;
     if (k >= 13 || k < 0 || platsmith_list[o].sales[k] == 0)
     {
       owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     class Object *obj;
     obj = clone_object(real_object(platsmith_list[o].sales[k]));
@@ -724,20 +724,20 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     {
       owner->do_tell(QStringLiteral("%1 That item is not available to you.").arg(GET_NAME(ch)).split(' '));
       extract_obj(obj);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (GET_PLATINUM(ch) < (unsigned int)(obj->obj_flags.cost / 10))
     {
       owner->do_tell(QStringLiteral("%1 Come back when you've got the platinum.").arg(GET_NAME(ch)).split(' '));
       extract_obj(obj);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     GET_PLATINUM(ch) -= obj->obj_flags.cost / 10;
     sprintf(buf, "%s %s", qPrintable(obj->Name()), GET_NAME(ch));
     obj->Name(buf);
     obj_to_char(obj, ch);
     owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::SELL)
   {
@@ -748,24 +748,24 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     if (!CAN_SEE(owner, ch))
     {
       do_say(owner, "I don't trade with people I can't see!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!obj)
     {
       owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       owner->do_tell(QStringLiteral("%1 I don't deal in worthless junk.").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     // don't allow non-empty containers to be sold
     if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
     {
       owner->do_tell(QStringLiteral("%1 %2$B$2 needs to be emptied first.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     int cost = obj->obj_flags.cost / 10;
@@ -773,7 +773,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     owner->do_tell(QStringLiteral("%1 I'll give you %2 plats for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
     extract_obj(obj);
     GET_PLATINUM(ch) += cost;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
 }
@@ -791,7 +791,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(arg, item);
@@ -799,7 +799,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!*item)
   {
     ch->sendln("What item?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   obj = get_obj_in_list_vis(ch, item, ch->carrying);
@@ -807,13 +807,13 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (obj == nullptr)
   {
     ch->sendln("You don't have that item.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
     do_say(owner, "I can't repair this.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
@@ -828,7 +828,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     do_say(owner, "Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   cost = obj->obj_flags.cost;
@@ -840,7 +840,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     do_say(owner, "I don't repair this kind of junk.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_LIGHT)
   {
@@ -863,7 +863,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     do_say(owner, "I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (price < 50000)
@@ -872,17 +872,17 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd == cmd_t::PRICE)
   {
     repair_shop_price_check(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->getGold() < (uint32_t)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
     repair_shop_fix_eq(ch, owner, price, obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 }

@@ -34,7 +34,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
   // Character *tmp_ch;
   char victim_name[MAX_INPUT_LENGTH];
   struct affected_type af;
-  int retval = eSUCCESS, dam;
+  int retval = ReturnValue::eSUCCESS, dam;
 
   one_argument(argument, victim_name);
 
@@ -77,7 +77,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_HARM_TOUCH))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   int duration = 24;
   if (!skill_success(ch, victim, SKILL_HARM_TOUCH))
@@ -91,7 +91,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
     dam = 750;
     retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    if (isSet(retval, eVICT_DIED) && !isSet(retval, eCH_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED) && !isSet(retval, ReturnValue::eCH_DIED))
     {
       if (ch->has_skill(SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
       {
@@ -166,7 +166,7 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_LAY_HANDS))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, victim, SKILL_LAY_HANDS))
   {
@@ -195,7 +195,7 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_behead(Character *ch, char *argument, cmd_t cmd)
@@ -203,7 +203,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
   double modifier = 0.0;
   double enemy_hp = 0.0;
   int chance = 0;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   char buf[MAX_STRING_LENGTH];
   Character *vict;
 
@@ -241,7 +241,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_BEHEAD))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE));
 
@@ -292,7 +292,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
       act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
       act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
       retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
-      return eSUCCESS | retval;
+      return ReturnValue::eSUCCESS | retval;
     }
 
     if (IS_AFFECTED(vict, AFF_NO_BEHEAD))
@@ -301,7 +301,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
       act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
       retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
-      return eSUCCESS | retval;
+      return ReturnValue::eSUCCESS | retval;
     }
 
     act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
@@ -312,7 +312,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
     make_head(vict);
     group_gain(ch, vict);
     fight_kill(ch, vict, TYPE_CHOOSE, 0);
-    return eSUCCESS | eVICT_DIED; /* Zero means kill it! */
+    return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED; /* Zero means kill it! */
     // it died..
   }
   else

@@ -184,7 +184,7 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
   page_string(ch->desc, gWhoBuffer, 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_whosolo(Character *ch, char *argument, cmd_t cmd)
@@ -245,7 +245,7 @@ int do_whosolo(Character *ch, char *argument, cmd_t cmd)
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
   page_string(ch->desc, gWhoBuffer, 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
@@ -561,7 +561,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
            .arg(numImmort)
            .arg(max_who));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_whoarena(Character *ch, char *argument, cmd_t cmd)
@@ -592,7 +592,7 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
     if (count == 0)
       ch->sendln("\n\rThere are no visible players in the arena.");
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // If they're here that means they're a god
@@ -618,7 +618,7 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
 
   if (count == 0)
     ch->sendln("\n\rThere are no visible players in the arena.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_where(Character *ch, char *argument, cmd_t cmd)
@@ -694,5 +694,5 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

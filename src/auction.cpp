@@ -1720,7 +1720,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>");
     if (ch->getLevel() >= 104)
       ch->sendln("Also: <addroom | removeroom | listrooms | stats>");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*MODIFY*/
@@ -1731,18 +1731,18 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Modify what ticket?\n\rSyntax: vend modify <ticket> <new_price>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     ticket = atoi(buf);
     argument = one_argument(argument, buf);
     if (!*buf)
     {
       ch->sendln("What price do you want it?\n\rSyntax: vend modify <ticket> <new_price>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*SEARCH*/
@@ -1752,7 +1752,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!strcmp(buf, "name"))
     {
@@ -1760,12 +1760,12 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       if (!*buf)
       {
         ch->sendln("What name do you want to search for?\n\rSyntax: vend search name <keyword>");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (!strcmp(buf, "slot"))
@@ -1778,12 +1778,12 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
                      "about, waist, wrist, wield, hold, throw, light, face, ear\n\r"
                      "\n\rSyntax: vend search slot <keyword>\n\r",
                      ch);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (!strcmp(buf, "race"))
@@ -1795,12 +1795,12 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
                      "Human, Elf, Dwarf, Hobbit, Pixie, Gnome, Orc, Troll\n\r"
                      "\n\rSyntax: vend search race <race>\n\r",
                      ch);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (!strcmp(buf, "class"))
@@ -1811,17 +1811,17 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
         send_to_char("What class do you want to search for?\n\r"
                      "\n\rSyntax: vend search class <class_name>\n\r",
                      ch);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       if (strlen(buf) < 4)
       {
         ch->sendln("Class name needs to be at least 4 letters to search!");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (!strcmp(buf, "seller"))
@@ -1832,12 +1832,12 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
         send_to_char("What person are you looking for?\n\r"
                      "\n\rSyntax: vend search seller <name>\n\r",
                      ch);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (!strcmp(buf, "level"))
@@ -1847,7 +1847,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       if (!*buf)
       {
         ch->sendln("What level?\n\rSyntax: vend search level <min_level> [max_level]");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       level = atoi(buf);
       argument = one_argument(argument, buf);
@@ -1857,11 +1857,11 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
         DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     ch->sendln("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*COLLECT*/
@@ -1871,21 +1871,21 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Collect what?\n\rSyntax: vend collect <all | ticket#>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!strcmp(buf, "all"))
     {
       DC::getInstance()->TheAuctionHouse.CollectTickets(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (atoi(buf) > 0)
     {
       DC::getInstance()->TheAuctionHouse.CollectTickets(ch, atoi(buf));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     ch->sendln("Syntax: vend collect <all | ticket#>");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*BUY*/
@@ -1895,10 +1895,10 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Buy what?\n\rSyntax: vend buy <ticket #>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.BuyItem(ch, atoi(buf));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*CANCEL*/
@@ -1908,15 +1908,15 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Cancel what?\n\rSyntax: vend cancel <all | ticket#>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!strcmp(buf, "all")) // stupid cancel all didn't fit my design, but the boss wanted it
     {
       DC::getInstance()->TheAuctionHouse.CancelAll(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.RemoveTicket(ch, atoi(buf));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*LIST*/
@@ -1926,7 +1926,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("List what?\n\rSyntax: vend list <all | mine | private | recent>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (!strcmp(buf, "all"))
@@ -1949,7 +1949,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("List what?\n\rSyntax: vend list <all | mine | private>");
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*SELL*/
@@ -1959,30 +1959,30 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Sell what?\n\rSyntax: vend sell <item> <price> [person]");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     obj = get_obj_in_list_vis(ch, buf, ch->carrying);
     if (!obj)
     {
       ch->sendln("You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person]");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     argument = one_argument(argument, buf);
     if (!*buf)
     {
       ch->sendln("How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person]");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     price = atoi(buf);
     if (price < 1000)
     {
       ch->sendln("Minimum sell price is 1000 coins!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     argument = one_argument(argument, buf); // private name
     DC::getInstance()->TheAuctionHouse.AddItem(ch, obj, price, buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*IDENTIFY*/
@@ -1992,17 +1992,17 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Identify what?\n\rSyntax: vend identify <ticket>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.Identify(ch, atoi(buf));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*SHOW STATS*/
   if (ch->getLevel() >= 104 && !strcmp(buf, "stats"))
   {
     DC::getInstance()->TheAuctionHouse.ShowStats(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*ADD ROOM*/
@@ -2012,10 +2012,10 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Add what room?\n\rSyntax: vend addroom <vnum>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.AddRoom(ch, atoi(buf));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*REMOVE ROOM*/
@@ -2025,21 +2025,21 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("Remove what room?\n\rSyntax: vend removeroom <vnum>");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     DC::getInstance()->TheAuctionHouse.RemoveRoom(ch, atoi(buf));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*LIST ROOMS*/
   if (ch->getLevel() >= 104 && !strcmp(buf, "listrooms"))
   {
     DC::getInstance()->TheAuctionHouse.ListRooms(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->sendln("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>");
   if (ch->getLevel() >= 104)
     ch->sendln("Also: <addroom | removeroom | listroom | stats>");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

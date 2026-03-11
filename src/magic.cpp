@@ -210,7 +210,7 @@ int spell_magic_missile(uint8_t level, Character *ch, Character *victim, class O
 {
   int dam;
   int count = 1;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   int weap_spell = obj ? WEAR_WIELD : 0;
 
   set_cantquit(ch, victim);
@@ -253,9 +253,9 @@ int spell_chill_touch(uint8_t level, Character *ch, Character *victim, class Obj
 
   bool hasSpellcraft = spellcraft(ch, SPELL_CHILL_TOUCH);
 
-  if (isSet(retval, eEXTRA_VAL2))
+  if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     victim = ch;
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
 
   save = saves_spell(ch, victim, (level / 2), SAVE_TYPE_COLD);
@@ -340,9 +340,9 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (isSet(retval, eEXTRA_VAL2))
+  if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     victim = ch;
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
 
   /*  Dazzle Effect */
@@ -411,7 +411,7 @@ int spell_energy_drain(uint8_t level, Character *ch, Character *victim, class Ob
   victim->removeHP(victim->getHP() / 20);
   victim->sendln("Your knees buckle as life force is drained from your body!\n\rYou have lost some experience!");
   act("You drain some of $N's experience!", ch, 0, victim, TO_CHAR, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* SOULDRAIN */
@@ -470,7 +470,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
     retval = SWAP_CH_VICT(retval);
   }
   else
-    retval = eSUCCESS;
+    retval = ReturnValue::eSUCCESS;
   return retval;
 }
 
@@ -519,9 +519,9 @@ int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, class Ob
   /* Spellcraft Effect */
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM) && !number(0, 9))
   {
-    if (isSet(retval, eEXTRA_VAL2))
+    if (isSet(retval, ReturnValue::eEXTRA_VAL2))
       victim = ch;
-    if (isSet(retval, eEXTRA_VALUE))
+    if (isSet(retval, ReturnValue::eEXTRA_VALUE))
       return retval;
     act("The force of the spell knocks $N over!", ch, 0, victim, TO_CHAR, 0);
     victim->sendln("The force of the spell knocks you over!");
@@ -549,9 +549,9 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
     return retval;
   // Above: Fleeing now saves you from the second blast.
 
-  if (isSet(retval, eEXTRA_VAL2))
+  if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     victim = ch;
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
 
   /* Fireball Recombining Effect */
@@ -594,9 +594,9 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (isSet(retval, eEXTRA_VAL2))
+  if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     victim = ch;
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
 
   for (tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char;
@@ -656,7 +656,7 @@ int spell_aegis(uint8_t level, Character *ch, Character *victim, class Object *o
     ch->sendln("You invoke your protective aegis.");
   else
     ch->sendln("You invoke your unholy aegis.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ARMOUR */
@@ -680,7 +680,7 @@ int spell_armor(uint8_t level, Character *ch, Character *victim, class Object *o
 
   affect_to_char(victim, &af);
   victim->sendln("You feel a magical armour surround you.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* STONE SHIELD */
@@ -694,7 +694,7 @@ int spell_stone_shield(uint8_t level, Character *ch, Character *victim, class Ob
   {
     sprintf(buf, "%s is already surrounded by a greater stoneshield.\r\n", GET_SHORT(victim));
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim->affected_by_spell(SPELL_STONE_SHIELD))
@@ -713,7 +713,7 @@ int spell_stone_shield(uint8_t level, Character *ch, Character *victim, class Ob
   victim->sendln("A shield of ethereal stones begins to swirl around you.");
   act("Ethereal stones form out of nothing and begin to swirl around $n.",
       victim, 0, 0, TO_ROOM, INVIS_NULL);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_stone_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -833,7 +833,7 @@ int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, 
   {
     sprintf(buf, "%s is already surrounded by a stone shield.\r\n", GET_SHORT(victim));
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
@@ -852,7 +852,7 @@ int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, 
   victim->sendln("A shield of ethereal stones begins to swirl around you.");
   act("Ethereal stones form out of nothing and begin to swirl around $n.",
       victim, 0, 0, TO_ROOM, INVIS_NULL);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_greater_stone_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -896,7 +896,7 @@ int cast_greater_stone_shield(uint8_t level, Character *ch, char *arg, int type,
 int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   bool capsize = false, underwater = false;
-  int dam = 0, retval = eSUCCESS, weap_spell = obj ? WEAR_WIELD : 0, ch_zone = 0, tmp_vict_zone = 0;
+  int dam = 0, retval = ReturnValue::eSUCCESS, weap_spell = obj ? WEAR_WIELD : 0, ch_zone = 0, tmp_vict_zone = 0;
   Object *tmp_obj = 0, *obj_next = 0;
 
   switch (DC::getInstance()->world[ch->in_room].sector_type)
@@ -928,7 +928,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (isSet(retval, eCH_DIED))
+    if (isSet(retval, ReturnValue::eCH_DIED))
     {
       break;
     }
@@ -990,13 +990,13 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
         int retval2 = 0;
         retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
-        if (isSet(retval2, eVICT_DIED))
+        if (isSet(retval2, ReturnValue::eVICT_DIED))
         {
-          SET_BIT(retval, eVICT_DIED);
+          SET_BIT(retval, ReturnValue::eVICT_DIED);
         }
-        else if (isSet(retval2, eCH_DIED))
+        else if (isSet(retval2, ReturnValue::eCH_DIED))
         {
-          SET_BIT(retval, eCH_DIED);
+          SET_BIT(retval, ReturnValue::eCH_DIED);
           break;
         }
       } // if (dam > 0
@@ -1016,7 +1016,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
 
 int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  int dam, retval = eSUCCESS;
+  int dam, retval = ReturnValue::eSUCCESS;
   int weap_spell = obj ? WEAR_WIELD : 0;
   Character *tmp_victim, *temp;
 
@@ -1144,11 +1144,11 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
 
       dam = 660;
       retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
-      if (isSet(retval, eEXTRA_VALUE))
+      if (isSet(retval, ReturnValue::eEXTRA_VALUE))
         return retval;
-      if (!isSet(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE) && !isSet(retval, eEXTRA_VAL2))
+      if (!isSet(retval, ReturnValue::eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE) && !isSet(retval, ReturnValue::eEXTRA_VAL2))
         do_solar_blind(ch, tmp_victim, skill);
     } // if are grouped, etc
   } // for
@@ -1179,13 +1179,13 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
           act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
           retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
-          if (isSet(retval, eCH_DIED))
+          if (isSet(retval, ReturnValue::eCH_DIED))
             return retval;
 
-          if (isSet(retval, eVICT_DIED))
+          if (isSet(retval, ReturnValue::eVICT_DIED))
             if (ch->desc && ch->player && !isSet(ch->player->toggles, Player::PLR_WIMPY))
               ch->desc->wait = 0;
-          if (!isSet(retval, eVICT_DIED))
+          if (!isSet(retval, ReturnValue::eVICT_DIED))
           {
             // don't blind surrounding rooms
             // do_solar_blind(ch, tmp_victim);
@@ -1221,12 +1221,12 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
                     !tmp_victim->fighting)
                   do_move(tmp_victim, "", to_charge[i]);
               }
-          } // if ! eVICT_DIED
+          } // if ! ReturnValue::eVICT_DIED
         } // if are grouped, etc
       } // for tmp victim
     } // if can go
   } // for i 0 < 6
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* GROUP RECALL */
@@ -1271,7 +1271,7 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
       if (!tmp_victim)
       {
         logentry(QStringLiteral("Bad character in character_list in magic.c in group-recall!"), ANGEL, DC::LogChannel::LOG_BUG);
-        return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+        return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
       if (number(1, 101) > chance)
         spell_word_of_recall(level, ch, tmp_victim, obj, 110);
@@ -1309,7 +1309,7 @@ int spell_group_fly(uint8_t level, Character *ch, Character *victim, class Objec
       spell_fly(level, ch, tmp_victim, obj, skill);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* HEROES FEAST */
@@ -1343,7 +1343,7 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Ob
       tmp_victim->sendln("You partake in a magnificent feast!");
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* GROUP SANCTUARY */
@@ -1364,12 +1364,12 @@ int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Obje
       if (!tmp_victim)
       {
         logentry(QStringLiteral("Bad tmp_victim in character_list in group fly!"), ANGEL, DC::LogChannel::LOG_BUG);
-        return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+        return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
       spell_sanctuary(level, ch, tmp_victim, obj, skill);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* HEAL SPRAY */
@@ -1391,7 +1391,7 @@ int spell_heal_spray(uint8_t level, Character *ch, Character *victim, class Obje
       spell_heal(level, ch, tmp_victim, obj, skill);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FIRESTORM */
@@ -1399,7 +1399,7 @@ int spell_heal_spray(uint8_t level, Character *ch, Character *victim, class Obje
 int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam = 0;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   int retval2 = 0;
   Character *next_victim = 0;
 
@@ -1430,13 +1430,13 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
       retval2 = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIRESTORM);
     }
 
-    if (isSet(retval2, eVICT_DIED))
+    if (isSet(retval2, ReturnValue::eVICT_DIED))
     {
-      SET_BIT(retval, eVICT_DIED);
+      SET_BIT(retval, ReturnValue::eVICT_DIED);
     }
-    else if (isSet(retval2, eCH_DIED))
+    else if (isSet(retval2, ReturnValue::eCH_DIED))
     {
-      SET_BIT(retval, eCH_DIED);
+      SET_BIT(retval, ReturnValue::eCH_DIED);
       break;
     }
   }
@@ -1495,12 +1495,12 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Obj
     ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!");
     act("The runes upon the ground shatter with a burst of magic!\n\r$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
     extract_obj(obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (obj && !victim)
   { // targetting a random object
     ch->sendln("Nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   { // possible weapon spell
@@ -1544,12 +1544,12 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
     ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!");
     act("Runes upon the ground glow brightly, then fade to nothing.\n\r$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
     extract_obj(obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (obj && !victim)
   { // targetting a random object
     ch->sendln("Nothing happens.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   { // possible weapon spell
@@ -1721,7 +1721,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
 
   do_look(victim, "");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* BLESS */
@@ -1765,7 +1765,7 @@ int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *o
     af.modifier = 1 + skill / 18;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* PARALYZE */
@@ -1783,7 +1783,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   {
     act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim->affected_by_spell(SPELL_SLEEP))
@@ -1816,7 +1816,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     act("$N absorbs $n's puny spell and seems no different!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     if (IS_PC(victim))
       act("You absorb $n's puny spell and are no different!", ch, nullptr, victim, TO_VICT, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* save the newbies! */
@@ -1837,7 +1837,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
       retval = SWAP_CH_VICT(retval);
       return retval;
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (IS_NPC(victim) && (victim->getLevel() == 0))
@@ -1866,7 +1866,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
       retval = SWAP_CH_VICT(retval);
       return retval;
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* if they are too big - do a dice roll to see if they backfire */
@@ -1878,7 +1878,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     if (saves_spell(ch, ch, -100, SAVE_TYPE_MAGIC) >= 0)
     {
       act("Your magic misfires but you are saved!", ch, nullptr, victim, TO_CHAR, 0);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     act("Your cruel heart causes your magic to misfire!", ch, nullptr, victim, TO_CHAR, 0);
   }
@@ -1909,7 +1909,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   af.bitvector = AFF_PARALYSIS;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* BLINDNESS */
@@ -1924,7 +1924,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
   {
     act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (malediction_res(ch, victim, SPELL_BLINDNESS))
@@ -1959,7 +1959,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
       retval = SWAP_CH_VICT(retval);
       return retval;
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("$n seems to be blinded!", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1975,7 +1975,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
   af.location = APPLY_AC;
   af.modifier = victim->has_skill(SKILL_BLINDFIGHTING) ? skill_success(victim, 0, SKILL_BLINDFIGHTING) ? skill / 4 : skill / 2 : skill / 2;
   affect_to_char(victim, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CREATE FOOD */
@@ -1995,7 +1995,7 @@ int spell_create_food(uint8_t level, Character *ch, Character *victim, class Obj
 
   act("$p suddenly appears.", ch, tmp_obj, 0, TO_ROOM, INVIS_NULL);
   act("$p suddenly appears.", ch, tmp_obj, 0, TO_CHAR, INVIS_NULL);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CREATE WATER */
@@ -2006,7 +2006,7 @@ int spell_create_water(uint8_t level, Character *ch, Character *victim, class Ob
   if (!ch || !obj)
   {
     logentry(QStringLiteral("Null ch or obj in create_water."), ANGEL, DC::LogChannel::LOG_BUG);
-    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (GET_ITEM_TYPE(obj) == ITEM_DRINKCON)
@@ -2030,7 +2030,7 @@ int spell_create_water(uint8_t level, Character *ch, Character *victim, class Ob
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* REMOVE PARALYSIS */
@@ -2053,7 +2053,7 @@ int spell_remove_paralysis(uint8_t level, Character *ch, Character *victim, clas
   else
     ch->sendln("Your spell fails to return the victim's movement.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* REMOVE BLIND */
@@ -2102,7 +2102,7 @@ int spell_remove_blind(uint8_t level, Character *ch, Character *victim, class Ob
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CURE CRITIC */
@@ -2172,7 +2172,7 @@ int spell_cure_critic(uint8_t level, Character *ch, Character *victim, class Obj
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more critical wounds.", TO_ROOM);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CURE LIGHT */
@@ -2238,7 +2238,7 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Obje
     sprintf(buf, "$n heals | of $s small cuts and scratches.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s small cuts and scratches.", TO_ROOM);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CURSE */
@@ -2283,7 +2283,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
     {
       act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
       act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     int duration = 0, save = 0;
@@ -2321,7 +2321,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
     if (IS_PC(victim) && victim->getLevel() < 11)
     {
       ch->sendln("The curse fizzles!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (malediction_res(ch, victim, SPELL_CURSE) || (IS_PC(victim) && victim->getLevel() >= IMMORTAL))
@@ -2367,7 +2367,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       return retval;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DETECT EVIL */
@@ -2400,7 +2400,7 @@ int spell_detect_evil(uint8_t level, Character *ch, Character *victim, class Obj
   affect_to_char(victim, &af);
   victim->sendln("You become more conscious of the evil around you.");
   act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DETECT GOOD */
@@ -2433,7 +2433,7 @@ int spell_detect_good(uint8_t level, Character *ch, Character *victim, class Obj
   affect_to_char(victim, &af);
   victim->sendln("You are now able to truly recognize the good in others.");
   act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* true SIGHT */
@@ -2462,7 +2462,7 @@ int spell_true_sight(uint8_t level, Character *ch, Character *victim, class Obje
 
   affect_to_char(victim, &af);
   victim->sendln("You feel your vision enhanced with an incredibly keen perception.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DETECT INVISIBILITY */
@@ -2493,7 +2493,7 @@ int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, c
   victim->sendln("Your eyes tingle, allowing you to see the invisible.");
   if (ch != victim)
     csendf(ch, "%s's eyes tingle briefly.\r\n", GET_SHORT(victim));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* INFRAVISION */
@@ -2525,7 +2525,7 @@ int spell_infravision(uint8_t level, Character *ch, Character *victim, class Obj
   if (ch != victim)
     csendf(ch, "%s's eyes glow $B$4red$R.\r\n", GET_SHORT(victim));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DETECT MAGIC */
@@ -2553,7 +2553,7 @@ int spell_detect_magic(uint8_t level, Character *ch, Character *victim, class Ob
   victim->sendln("Your vision temporarily blurs, your focus shifting to the metaphysical realm.");
   if (ch != victim)
     csendf(ch, "%s's eyes appear to blur momentarily.\r\n", GET_SHORT(victim));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* HASTE */
@@ -2582,7 +2582,7 @@ int spell_haste(uint8_t level, Character *ch, Character *victim, class Object *o
   affect_to_char(victim, &af);
   victim->sendln("You feel fast!");
   act("$n begins to move faster.", victim, 0, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DETECT POISON */
@@ -2627,7 +2627,7 @@ int spell_detect_poison(uint8_t level, Character *ch, Character *victim, class O
       ch->sendln("There is nothing much that poison would do on this.");
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ENCHANT ARMOR - CURRENTLY INACTIVE */
@@ -2662,7 +2662,7 @@ int spell_enchant_armor(uint8_t level, Character *ch, Character *victim, class O
       act("$p glows $5yellow$R.", ch, obj, 0, TO_CHAR, 0);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ENCHANT WEAPON - CURRENTLY INACTIVE */
@@ -2724,7 +2724,7 @@ int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, class 
       obj->obj_flags.value[3] = obj->obj_flags.value[2];
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* MANA - Potion & Immortal Only */
@@ -2746,7 +2746,7 @@ int spell_mana(uint8_t level, Character *ch, Character *victim, class Object *ob
 
   update_pos(victim);
   victim->sendln("You feel magical energy fill your mind!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* HEAL */
@@ -2818,7 +2818,7 @@ int spell_heal(uint8_t level, Character *ch, Character *victim, class Object *ob
     sprintf(buf, "$n calls forth an incantation that heals $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* POWER HEAL */
@@ -2884,7 +2884,7 @@ int spell_power_heal(uint8_t level, Character *ch, Character *victim, class Obje
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FULL HEAL */
@@ -2951,7 +2951,7 @@ int spell_full_heal(uint8_t level, Character *ch, Character *victim, class Objec
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* INVISIBILITY */
@@ -2996,7 +2996,7 @@ int spell_invisibility(uint8_t level, Character *ch, Character *victim, class Ob
     af.bitvector = AFF_INVISIBLE;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* LOCATE OBJECT */
@@ -3148,7 +3148,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     ch->send(fmt::format("Skipped god:{} other:{} nolocate:{} nosee:{} DC::NOWHERE:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* POISON */
@@ -3156,7 +3156,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   bool endy = false;
 
   if (victim)
@@ -3256,7 +3256,7 @@ int spell_protection_from_evil(uint8_t level, Character *ch, Character *victim, 
   victim->sendln("You have a righteous, protected feeling!");
   act("A dark, $6pulsing$R aura surrounds $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* PROTECTION FROM GOOD */
@@ -3289,7 +3289,7 @@ int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, 
   victim->sendln("You feel yourself wrapped in a protective mantle of evil.");
   act("A light, $B$6pulsing$R aura surrounds $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* REMOVE CURSE */
@@ -3310,7 +3310,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         int i = 0;
         for (i = 0; i < obj->num_affects; i++)
           if (obj->affected[i].location == APPLY_MANA_REGEN)
-            return eSUCCESS; // only do it once
+            return ReturnValue::eSUCCESS; // only do it once
         SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
         Character *t = obj->equipped_by;
         int z = -1;
@@ -3333,7 +3333,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
             ch, obj, 0, TO_CHAR, 0);
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   quint64 curses_removed = 0;
@@ -3344,7 +3344,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     act("You feel better.", victim, 0, 0, TO_CHAR, 0);
     affect_from_char(victim, SPELL_CURSE);
     if (!mana_cost)
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     curses_removed++;
   }
 
@@ -3372,7 +3372,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
         if (!mana_cost)
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
       }
     }
   }
@@ -3400,7 +3400,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         }
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
         if (!mana_cost)
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
       }
     }
   }
@@ -3415,11 +3415,11 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
       act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
       affect_from_char(victim, SPELL_ATTRITION);
       if (!mana_cost)
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* REMOVE POISON */
@@ -3435,7 +3435,7 @@ int spell_remove_poison(uint8_t level, Character *ch, Character *victim, class O
       act("$n looks better.", victim, 0, 0, TO_ROOM, 0);
       act("You feel less debilitated.", victim, 0, 0, TO_CHAR, 0);
       affect_from_char(victim, SPELL_DEBILITY);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (victim->affected_by_spell(SPELL_POISON))
     {
@@ -3454,7 +3454,7 @@ int spell_remove_poison(uint8_t level, Character *ch, Character *victim, class O
       act("The $p steams briefly.", ch, obj, 0, TO_CHAR, 0);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 bool find_spell_shield(Character *ch, Character *victim)
@@ -3523,7 +3523,7 @@ int spell_fireshield(uint8_t level, Character *ch, Character *victim, class Obje
     af.bitvector = AFF_FIRESHIELD;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* MEND GOLEM */
@@ -3552,10 +3552,10 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Obje
                   dammsg, "$n focuses $s magical energy and many of the scratches on $s golem are fixed.", TO_ROOM);
       send_damage("You focus your magical energy and | of the scratches on your golem are fixed.", ch, 0, 0,
                   dammsg, "You focus your magical enery and many of the scratches on your golem are fixed.", TO_CHAR);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   ch->sendln("You don't have a golem.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CAMOUFLAGE (for items) */
@@ -3587,7 +3587,7 @@ int cast_camouflague(uint8_t level, Character *ch, char *arg, int type,
     for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_camouflague(level, ch, tar_ch, 0, skill);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in cast_camouflague!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -3625,13 +3625,13 @@ int cast_farsight(uint8_t level, Character *ch, char *arg, int type,
     for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_farsight(level, ch, tar_ch, 0, skill);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in cast_farsight!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FREEFLOAT (for items) */
@@ -3664,7 +3664,7 @@ int cast_freefloat(uint8_t level, Character *ch, char *arg, int type,
          tar_ch = tar_ch->next_in_room)
       ;
     spell_freefloat(level, ch, tar_ch, 0, skill);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in cast_freefloat!"), ANGEL, DC::LogChannel::LOG_MISC);
@@ -3701,7 +3701,7 @@ int cast_insomnia(uint8_t level, Character *ch, char *arg, int type,
     for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_insomnia(level, ch, tar_ch, 0, skill);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in cast_insomnia!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -3739,7 +3739,7 @@ int cast_shadowslip(uint8_t level, Character *ch, char *arg, int type,
     for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_shadowslip(level, ch, tar_ch, 0, skill);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serios screw-up in cast_shadowslip!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -3825,7 +3825,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
     for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_sanctuary(level, ch, tar_ch, 0, skill);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in sanctuary!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -3855,7 +3855,7 @@ int spell_camouflague(uint8_t level, Character *ch, Character *victim, class Obj
   af.bitvector = AFF_CAMOUFLAGUE;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FARSIGHT */
@@ -3878,7 +3878,7 @@ int spell_farsight(uint8_t level, Character *ch, Character *victim, class Object
   af.bitvector = AFF_FARSIGHT;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FREEFLOAT */
@@ -3901,7 +3901,7 @@ int spell_freefloat(uint8_t level, Character *ch, Character *victim, class Objec
   af.bitvector = AFF_FREEFLOAT;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* INSOMNIA */
@@ -3925,7 +3925,7 @@ int spell_insomnia(uint8_t level, Character *ch, Character *victim, class Object
   af.bitvector = AFF_INSOMNIA;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* SHADOWSLIP */
@@ -3948,7 +3948,7 @@ int spell_shadowslip(uint8_t level, Character *ch, Character *victim, class Obje
   af.bitvector = AFF_SHADOWSLIP;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* SANCTUARY */
@@ -3979,7 +3979,7 @@ int spell_sanctuary(uint8_t level, Character *ch, Character *victim, class Objec
     af.bitvector = AFF_SANCTUARY;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* SLEEP */
@@ -4081,7 +4081,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
         stop_fighting(victim);
         victim->setSleeping();
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
       act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
@@ -4124,7 +4124,7 @@ int spell_strength(uint8_t level, Character *ch, Character *victim, class Object
       victim->sendln("You feel the magical weakness leave your body.");
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if ((cur_af = victim->affected_by_spell(SPELL_STRENGTH)))
@@ -4147,7 +4147,7 @@ int spell_strength(uint8_t level, Character *ch, Character *victim, class Object
   af.location = APPLY_STR;
   af.bitvector = -1;
   affect_to_char(victim, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* VENTRILOQUATE */
@@ -4155,7 +4155,7 @@ int spell_strength(uint8_t level, Character *ch, Character *victim, class Object
 int spell_ventriloquate(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   /* Actual spell resides in cast_ventriloquate */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* WORD OF RECALL */
@@ -4308,7 +4308,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
   move_char(victim, location);
   act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   do_look(victim, "");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* WIZARD EYE */
@@ -4355,7 +4355,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
   ch->sendln("A vision forms in your mind... ");
   do_look(ch, "");
   move_char(ch, original_loc);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* EAGLE EYE */
@@ -4404,7 +4404,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
   ch->sendln("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...");
   do_look(ch, "");
   move_char(ch, original_loc);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* SUMMON */
@@ -4507,7 +4507,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
     victim->add_memory(GET_NAME(ch), 'f');
     do_flee(victim, "");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CHARM PERSON - no longer operational */
@@ -4590,7 +4590,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
     obj_to_room(tempobj, victim->in_room);
     act("$n's eyes dull and $s hands slacken dropping $s weapons.", victim, 0, 0, TO_ROOM, 0);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* SENSE LIFE */
@@ -4611,7 +4611,7 @@ int spell_sense_life(uint8_t level, Character *ch, Character *victim, class Obje
   af.location = APPLY_NONE;
   af.bitvector = AFF_SENSE_LIFE;
   affect_to_char(victim, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void show_obj_class_size_mini(Object *obj, Character *ch)
@@ -4641,7 +4641,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1)
       {
         ch->sendln("Your magical probing reveals nothing of interest.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       ch->sendln("You probe the contents of the corpse magically....");
       // it's a corpse
@@ -4658,7 +4658,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
         }
         ch->sendln("");
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
@@ -4842,7 +4842,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       ch->sendln("You learn nothing new.");
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ************************************************************************* *
@@ -4896,7 +4896,7 @@ int spell_frost_breath(uint8_t level, Character *ch, Character *victim, class Ob
     }
      }
   */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spell_acid_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
@@ -4947,7 +4947,7 @@ int spell_acid_breath(uint8_t level, Character *ch, Character *victim, class Obj
     }
      }
   */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
@@ -4987,7 +4987,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
     else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
       tmp_victim->sendln("You feel a HOT blast of air.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
@@ -5016,13 +5016,13 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
       //	dam >>= 1;
 
       retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
     else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
       tmp_victim->sendln("You wanna choke on the smell in the air.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spell_lightning_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
@@ -5145,7 +5145,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
   victim->sendln("You suddenly feel very frightened, and you attempt to flee!");
   do_flee(victim, "", cmd_t::FEAR);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* REFRESH */
@@ -5175,7 +5175,7 @@ int spell_refresh(uint8_t level, Character *ch, Character *victim, class Object 
 
   send_damage("You feel less tired by | fatigue points.", ch, 0, victim, buf, "You feel less tired.", TO_VICT);
   send_damage("$N feels less tired by | fatigue points.", ch, 0, victim, buf, "$N feels less tired.", TO_ROOM);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FLY */
@@ -5208,7 +5208,7 @@ int spell_fly(uint8_t level, Character *ch, Character *victim, class Object *obj
   af.location = 0;
   af.bitvector = AFF_FLYING;
   affect_to_char(victim, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CONTINUAL LIGHT */
@@ -5244,7 +5244,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
     SET_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
     act("$n twiddles $s thumbs and the $p $e is carrying begins to glow.", ch, obj, 0, TO_ROOM, INVIS_NULL);
     act("You twiddle your thumbs and the $p begins to glow.", ch, obj, 0, TO_CHAR, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   tmp_obj = clone_object(real_object(6));
@@ -5253,7 +5253,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
 
   act("$n twiddles $s thumbs and $p suddenly appears.", ch, tmp_obj, 0, TO_ROOM, INVIS_NULL);
   act("You twiddle your thumbs and $p suddenly appears.", ch, tmp_obj, 0, TO_CHAR, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ANIMATE DEAD */
@@ -5384,7 +5384,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
 
   extract_obj(corpse);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* KNOW ALIGNMENT */
@@ -5424,7 +5424,7 @@ int spell_know_alignment(uint8_t level, Character *ch, Character *victim, class 
   af.bitvector = AFF_KNOW_ALIGN;
   affect_to_char(ch, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DISPEL MINOR */
@@ -5449,13 +5449,13 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       {
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
         ch->sendln("You remove the item's invisibility.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
       {
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
         ch->sendln("You remove the item's $Bglowing$R aura.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else
       {
@@ -5478,7 +5478,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       obj->equipped_by = nullptr;
     }
     extract_obj(obj);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   int spell = (int64_t)obj;
   if (!ch || !victim)
@@ -5719,7 +5719,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
     SWAP_CH_VICT(retval);
     return retval;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DISPEL MAGIC */
@@ -5958,7 +5958,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     SWAP_CH_VICT(retval);
     return retval;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CURE SERIOUS */
@@ -6027,7 +6027,7 @@ int spell_cure_serious(uint8_t level, Character *ch, Character *victim, class Ob
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more serious wounds.", TO_ROOM);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CAUSE LIGHT */
@@ -6106,9 +6106,9 @@ int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (SOMEONE_DIED(retval))
     return retval;
-  if (isSet(retval, eEXTRA_VAL2))
+  if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     victim = ch;
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
   // Burns up ki and mana on victim if learned over skill level 70
 
@@ -6149,7 +6149,7 @@ int spell_iridescent_aura(uint8_t level, Character *ch, Character *victim, class
   af.location = APPLY_SAVES;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* RESIST COLD */
@@ -6178,7 +6178,7 @@ int spell_resist_cold(uint8_t level, Character *ch, Character *victim, class Obj
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* RESIST FIRE */
@@ -6207,7 +6207,7 @@ int spell_resist_fire(uint8_t level, Character *ch, Character *victim, class Obj
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* RESIST MAGIC */
@@ -6236,7 +6236,7 @@ int spell_resist_magic(uint8_t level, Character *ch, Character *victim, class Ob
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* STAUNCHBLOOD */
@@ -6264,7 +6264,7 @@ int spell_staunchblood(uint8_t level, Character *ch, Character *victim, class Ob
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* RESIST ENERGY */
@@ -6292,7 +6292,7 @@ int spell_resist_energy(uint8_t level, Character *ch, Character *victim, class O
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* STONE SKIN */
@@ -6324,7 +6324,7 @@ int spell_stone_skin(uint8_t level, Character *ch, Character *victim, class Obje
 
   SET_BIT(ch->resist, ISR_PIERCE);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* SHIELD */
@@ -6360,7 +6360,7 @@ int spell_shield(uint8_t level, Character *ch, Character *victim, class Object *
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* WEAKEN */
@@ -6385,14 +6385,14 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
   {
     act("$N's paralyzed muscles are too rigid to be affected by this enchantment!", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim->affected_by_spell(SPELL_HEROISM) && victim->affected_by_spell(SPELL_HEROISM)->modifier >= 50)
   {
     act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (skill < 40)
@@ -6444,7 +6444,7 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
         affect_from_char(victim, SPELL_STRENGTH); // this makes cur_af invalid
         if (af.modifier > 0)                      // it's not out yet
           affect_to_char(victim, &af);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       af.type = SPELL_WEAKEN;
@@ -6484,7 +6484,7 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
       return retval;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* MASS INVISIBILITY */
@@ -6520,7 +6520,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
         affect_to_char(tmp_victim, &af);
       }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ACID BLAST */
@@ -6733,7 +6733,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
   }
 
   make_portal(ch, victim);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* BURNING HANDS (scroll, wand) */
@@ -6816,11 +6816,11 @@ int cast_call_lightning(uint8_t level, Character *ch, char *arg, int type,
         if (!ARE_GROUPED(ch, victim))
         {
           retval = spell_call_lightning(level, ch, victim, 0, skill);
-          if (isSet(retval, eCH_DIED))
+          if (isSet(retval, ReturnValue::eCH_DIED))
             return retval;
         }
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     break;
   default:
@@ -7148,11 +7148,11 @@ int cast_energy_drain(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_energy_drain(level, ch, victim, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in energy drain!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -7195,11 +7195,11 @@ int cast_souldrain(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_souldrain(level, ch, victim, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in souldrain!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -7373,11 +7373,11 @@ int cast_harm(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_harm(level, ch, victim, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in harm!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -7421,11 +7421,11 @@ int cast_power_harm(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_power_harm(level, ch, victim, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in power_harm!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -7458,11 +7458,11 @@ int cast_divine_fury(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_divine_fury(level, ch, victim, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in divine fury!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -7688,7 +7688,7 @@ int cast_teleport(uint8_t level, Character *ch, char *arg, int type,
       next_v = tar_ch->next_in_room;
       targetted_teleport(level, ch, tar_ch, 0, skill);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   default:
@@ -7882,10 +7882,10 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
         if (!(IS_AFFECTED(tar_ch, AFF_PARALYSIS)))
         {
           retval = spell_paralyze(level, ch, tar_ch, 0, skill);
-          if (isSet(retval, eCH_DIED))
+          if (isSet(retval, ReturnValue::eCH_DIED))
             return retval;
         }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in paralyze!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -7949,11 +7949,11 @@ int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
       if (!IS_AFFECTED(tar_ch, AFF_BLIND))
       {
         retval = spell_blindness(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in blindness!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -8099,7 +8099,7 @@ int cast_remove_paralysis(uint8_t level, Character *ch, char *arg, int type,
     for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
     {
       retval = spell_remove_paralysis(level, ch, tar_ch, 0, skill);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
     break;
@@ -8338,7 +8338,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
       if (IS_NPC(tar_ch))
       {
         retval = spell_curse(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     break;
@@ -8728,7 +8728,7 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_dispel_evil(level, ch, tar_ch, tar_obj, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
@@ -8737,10 +8737,10 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
       next_o = tar_obj->next;
 
       retval = spell_dispel_evil(level, ch, 0, tar_obj, skill);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   default:
@@ -8785,7 +8785,7 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_dispel_good(level, ch, tar_ch, tar_obj, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
@@ -8794,10 +8794,10 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
       next_o = tar_obj->next;
 
       retval = spell_dispel_good(level, ch, 0, tar_obj, skill);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in dispel good!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -9085,11 +9085,11 @@ int cast_poison(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_poison(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   default:
@@ -9333,7 +9333,7 @@ int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
           continue;
 
         retval &= spell_remove_poison(level, ch, tmp_char, tar_obj, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
         {
           return retval;
         }
@@ -9448,11 +9448,11 @@ int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_sleep(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in sleep!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -9540,7 +9540,7 @@ int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
     }
     send_to_char(buf1, ch);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int targetted_word_of_recall(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
@@ -9663,11 +9663,11 @@ int cast_charm_person(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_charm_person(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   default:
@@ -9839,11 +9839,11 @@ int cast_fear(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_fear(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in fear!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -10498,11 +10498,11 @@ int cast_cause_light(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_cause_light(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   case SPELL_TYPE_POTION:
@@ -10549,11 +10549,11 @@ int cast_cause_critical(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_cause_critical(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   case SPELL_TYPE_POTION:
     return spell_cause_critical(level, ch, tar_ch, 0, skill);
@@ -10599,11 +10599,11 @@ int cast_cause_serious(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_cause_serious(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   case SPELL_TYPE_POTION:
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
@@ -10649,11 +10649,11 @@ int cast_flamestrike(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_flamestrike(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in flamestrike!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -10947,11 +10947,11 @@ int cast_weaken(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_weaken(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in weaken!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -11026,11 +11026,11 @@ int cast_acid_blast(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_acid_blast(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in acid blast!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -11075,11 +11075,11 @@ int cast_hellstream(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_hellstream(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in hell stream!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -11214,7 +11214,7 @@ int spell_bee_sting(uint8_t level, Character *ch, Character *victim, class Objec
         act("$N seems to be allergic to your bees!", ch, 0, victim,
             TO_CHAR, 0);
       }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_bee_sting(uint8_t level, Character *ch, char *arg, int type,
@@ -11300,7 +11300,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
       set_cantquit(ch, tmp_victim);
 
       retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
     else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
@@ -11308,7 +11308,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
       tmp_victim->sendln("You hear the buzzing of hundreds of bees.");
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CREEPING DEATH */
@@ -11363,9 +11363,9 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (isSet(retval, eEXTRA_VAL2))
+  if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     victim = ch;
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
 
   if (skill > 40 && skill <= 60)
@@ -11419,7 +11419,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
       return damage(ch, victim, dam, TYPE_UNDEFINED, SPELL_CREEPING_DEATH);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* BARKSKIN */
@@ -11475,7 +11475,7 @@ int spell_barkskin(uint8_t level, Character *ch, Character *victim, class Object
 
   victim->sendln("Your skin turns stiff and bark-like.");
   act("$N begins to look rather woody.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* HERB LORE */
@@ -11717,7 +11717,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     if (aff)
       affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CALL FOLLOWER */
@@ -11765,7 +11765,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
   }
 
   REM_WAIT_STATE(ch, skill / 10);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ENTANGLE */
@@ -11822,7 +11822,7 @@ int spell_entangle(uint8_t level, Character *ch, Character *victim, class Object
       SET_BIT(victim->combat, COMBAT_BASH2);
   }
   update_pos(victim);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* EYES OF THE OWL */
@@ -11878,7 +11878,7 @@ int spell_eyes_of_the_owl(uint8_t level, Character *ch, Character *victim, class
   affect_join(victim, &af, false, false);
   redo_mana(victim);
   victim->sendln("You feel your vision become much more acute.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FELINE AGILITY */
@@ -11937,7 +11937,7 @@ int spell_feline_agility(uint8_t level, Character *ch, Character *victim, class 
   af.location = APPLY_DEX;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* OAKEN FORTITUDE */
@@ -11997,7 +11997,7 @@ int spell_oaken_fortitude(uint8_t level, Character *ch, Character *victim, class
   af.location = APPLY_CON;
   affect_to_char(victim, &af);
   redo_hitpoints(victim);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* CLARITY */
@@ -12024,7 +12024,7 @@ int cast_clarity(uint8_t level, Character *ch, char *arg, int type, Character *v
   af.modifier = 3 + (skill / 20);
   af.location = APPLY_MANA_REGEN;
   affect_to_char(victim, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* FOREST MELD */
@@ -12061,7 +12061,7 @@ int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Characte
 
   // 	SETBIT(ch->affected_by, AFF_FOREST_MELD);
   SETBIT(ch->affected_by, AFF_HIDE);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* COMPANION (disabled) */
@@ -12162,7 +12162,7 @@ int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character 
   af.location = 0;
   af.bitvector = -1;
   affect_join(ch, &af, false, false);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Procedure for checking for/destroying spell components
@@ -12423,7 +12423,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
     // why won't this line work?
     //  WAIT_STATE(ch, (DC::PULSE_VIOLENCE * number(10, 15)));
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* OLD CREATE/RELEASE GOLEM (unused) */
@@ -12469,7 +12469,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
    }
 
    fight_kill(ch, temp->follower, TYPE_RAW_KILL, 0);
-   return eSUCCESS;
+   return ReturnValue::eSUCCESS;
 }
 */
 
@@ -12572,7 +12572,7 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
   do_look(ch, "");
 
   act("$n steps out from a dimensional rip.", ch, 0, 0, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_beacon(Character *ch, char *argument, cmd_t cmd)
@@ -12630,7 +12630,7 @@ int do_beacon(Character *ch, char *argument, cmd_t cmd)
   ch->beacon = new_obj;
 
   //   ch->beacon = DC::getInstance()->world[ch->in_room].number;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* REFLECT (non-castable atm) */
@@ -12801,7 +12801,7 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
   familiar_creation_message(ch, fam_type);
   add_follower(mob, ch);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_summon_familiar(uint8_t level, Character *ch, char *arg, int type,
@@ -12843,7 +12843,7 @@ int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Charac
   if (!ptrack)
   {
     ch->sendln("You detect no scents in this room.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   send_to_char("Your magic pulls the essence of scent from around you straining\r\n"
@@ -12861,7 +12861,7 @@ int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Charac
     ptrack = ptrack->next;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_lighted_path(uint8_t level, Character *ch, char *arg, int type,
@@ -12924,7 +12924,7 @@ int spell_resist_acid(uint8_t level, Character *ch, Character *victim, class Obj
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_resist_acid(uint8_t level, Character *ch, char *arg, int type,
@@ -13018,11 +13018,11 @@ int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
         if (!ARE_GROUPED(ch, victim))
         {
           retval = spell_sun_ray(level, ch, victim, 0, skill);
-          if (isSet(retval, eCH_DIED))
+          if (isSet(retval, ReturnValue::eCH_DIED))
             return retval;
         }
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       break;
     }
     break;
@@ -13081,7 +13081,7 @@ int spell_rapid_mend(uint8_t level, Character *ch, Character *victim, class Obje
   else
     act("$n is already mending quickly.", victim, 0, 0, TO_CHAR, 0);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_rapid_mend(uint8_t level, Character *ch, char *arg, int type,
@@ -13137,7 +13137,7 @@ int spell_iron_roots(uint8_t level, Character *ch, Character *victim, class Obje
     af.bitvector = -1;
     affect_to_char(ch, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* IRON ROOTS (potion, scroll, staff, wand) */
@@ -13195,7 +13195,7 @@ int spell_acid_shield(uint8_t level, Character *ch, Character *victim, class Obj
     af.bitvector = AFF_ACID_SHIELD;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* ACID SHIELD (potion, scroll, wand, staves) */
@@ -13257,7 +13257,7 @@ int spell_water_breathing(uint8_t level, Character *ch, Character *victim, class
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* WATERBREATHING (potions, scrolls, staves, wands) */
@@ -13351,7 +13351,7 @@ int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, cla
   obj_to_room(globe, ch->in_room);
   DC::getInstance()->world[ch->in_room].light -= globe->obj_flags.value[1];
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* GLOBE OF DARKNESS (potions, scrolls, staves, wands) */
@@ -13389,7 +13389,7 @@ int cast_globe_of_darkness(uint8_t level, Character *ch, char *arg, int type, Ch
 int spell_eyes_of_the_eagle(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   ch->sendln("This spell doesn't do anything right now.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_eyes_of_the_eagle(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -13417,7 +13417,7 @@ int cast_eyes_of_the_eagle(uint8_t level, Character *ch, char *arg, int type, Ch
 int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   int retval2;
   struct affected_type af;
   char buf[MAX_STRING_LENGTH];
@@ -13464,11 +13464,11 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
 
       retval2 = damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM);
 
-      if (isSet(retval2, eVICT_DIED))
-        SET_BIT(retval, eVICT_DIED);
-      else if (isSet(retval2, eCH_DIED))
+      if (isSet(retval2, ReturnValue::eVICT_DIED))
+        SET_BIT(retval, ReturnValue::eVICT_DIED);
+      else if (isSet(retval2, ReturnValue::eCH_DIED))
       {
-        SET_BIT(retval, eCH_DIED);
+        SET_BIT(retval, ReturnValue::eCH_DIED);
         break;
       }
     }
@@ -13512,11 +13512,11 @@ int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_icestorm(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in icestorm!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -13546,7 +13546,7 @@ int spell_lightning_shield(uint8_t level, Character *ch, Character *victim, clas
     af.bitvector = AFF_LIGHTNINGSHIELD;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* LIGHTNING SHIELD (potion, scroll, wand, staves) */
@@ -13586,7 +13586,7 @@ int spell_blue_bird(uint8_t level, Character *ch, Character *victim, class Objec
 {
   int dam;
   int count;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   int ch_level = ch->getLevel();
   if (ch_level < 5)
     ch_level = 5;
@@ -13664,11 +13664,11 @@ int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character 
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_blue_bird(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in blue_bird!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -13682,13 +13682,13 @@ int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character 
 int spell_debility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
-  int retval = eSUCCESS, duration = 0;
+  int retval = ReturnValue::eSUCCESS, duration = 0;
   double percent = 0;
 
   if (victim->affected_by_spell(SPELL_DEBILITY))
   {
     ch->sendln("Your victim has already been debilitized.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (skill < 40)
@@ -13787,11 +13787,11 @@ int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_debility(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in debility!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -13805,13 +13805,13 @@ int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *
 int spell_attrition(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   int acmod = 0, tohit = 0, duration = 0;
 
   if (victim->affected_by_spell(SPELL_ATTRITION))
   {
     ch->sendln("Your victim is already suffering from the affects of that spell.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   acmod = skill;
   if (skill < 40)
@@ -13909,11 +13909,11 @@ int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character 
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_attrition(level, ch, tar_ch, 0, skill);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in attrition!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -13953,7 +13953,7 @@ int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, class O
   af.duration = 20;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* VAMPIRIC AURA */
@@ -14006,7 +14006,7 @@ int spell_holy_aura(uint8_t level, Character *ch, Character *victim, class Objec
   af.duration = 20;
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -14097,7 +14097,7 @@ int spell_dismiss_familiar(uint8_t level, Character *ch, Character *victim, clas
   if (GET_MANA(ch) > GET_MAX_MANA(ch))
     GET_MANA(ch) = GET_MAX_MANA(ch);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DISMISS FAMILIAR (potions, wands, scrolls, staves) */
@@ -14154,7 +14154,7 @@ int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, class 
   act("$n begins to melt and dissolves into the ground... dust to dust.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   extract_char(victim, true);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* DISMISS CORPSE (wands, scrolls, potions, staves) */
@@ -14229,7 +14229,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
 
   extract_char(victim, true);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* RELEASE ELEMENTAL (wands, scrolls, potions, staves) */
@@ -14296,7 +14296,7 @@ int spell_visage_of_hate(uint8_t level, Character *ch, Character *victim, class 
   }
 
   ch->sendln("Your disdain and hate for all settles upon your peers.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_visage_of_hate(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -14347,7 +14347,7 @@ int spell_blessed_halo(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   ch->sendln("Your group members benefit from your blessing.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_blessed_halo(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -14433,7 +14433,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum);
     ch->sendln("\"Spirit\" for this sector not yet implented.");
-    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   Character *mob;
@@ -14448,7 +14448,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
   ch->desc->original = ch;
   mob->desc = ch->desc;
   ch->desc = 0;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_ghost_walk(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -14580,7 +14580,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
 
   add_follower(mob, ch);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* MEND GOLEM */
@@ -14630,7 +14630,7 @@ int spell_divine_intervention(uint8_t level, Character *ch, Character *victim, O
   af.modifier = 10 - skill / 10;
   affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_divine_intervention(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
@@ -14655,7 +14655,7 @@ int cast_divine_intervention(uint8_t level, Character *ch, char *arg, int type, 
 int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   int castcost = 0, dam = 0;
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   char buf[MAX_STRING_LENGTH];
   Character *next_vict;
 
@@ -14748,7 +14748,7 @@ int spell_atonement(uint8_t level, Character *ch, Character *victim, Object *obj
   ch->sendln("You pray fervently for the support of the gods and are rewarded restoration...at a price.");
   act("$n prays fervently for the support of the gods and is rewarded restoration...at a price.", ch, 0, 0, TO_ROOM, 0);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_atonement(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
@@ -14793,7 +14793,7 @@ int spell_silence(uint8_t level, Character *ch, Character *victim, Object *obj, 
 
   obj_to_room(silence_obj, ch->in_room);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_silence(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
@@ -14822,19 +14822,19 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj,
   if ((spell_info[spl].targets() & TAR_IGNORE))
   {
     ch->sendln("You find it impossible to immunize yourself against this type of spell.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->fighting)
   {
     ch->sendln("You cannot concentrate enough to immunize yourself.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->affected_by_spell(SPELL_IMMUNITY))
   {
     csendf(ch, "You are already immune to %s.\r\n", spells[ch->affected_by_spell(SPELL_IMMUNITY)->modifier]);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->send("You reach forth and etch a protective sigil in the air that briefly surrounds you in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.");
@@ -14848,7 +14848,7 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj,
 
   affect_to_char(ch, &af, DC::PULSE_REGEN);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_immunity(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
@@ -14890,7 +14890,7 @@ int spell_boneshield(uint8_t level, Character *ch, Character *victim, Object *ob
 
   affect_to_char(victim, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_boneshield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
@@ -14917,7 +14917,7 @@ int spell_channel(uint8_t level, Character *ch, Character *victim, Object *obj, 
   char buf[MAX_STRING_LENGTH];
 
   if (!can_heal(ch, victim, SPELL_CHANNEL))
-    return eSUCCESS; // to still use the mana of the loser botting channel
+    return ReturnValue::eSUCCESS; // to still use the mana of the loser botting channel
 
   if (heal <= 0)
     heal = GET_MAX_HIT(victim) - victim->getHP();
@@ -14931,7 +14931,7 @@ int spell_channel(uint8_t level, Character *ch, Character *victim, Object *obj, 
   send_damage("$n channels the power of the gods to heal you of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal you of your injuries.", TO_VICT);
   send_damage("$n channels the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal $N of $S injuries.", TO_ROOM);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_channel(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
@@ -15082,7 +15082,7 @@ int spell_solidity(uint8_t level, Character *ch, Character *victim, Object *obj,
   {
     act("You are already $6violet$R.", victim, 0, 0, TO_CHAR, 0);
     act("$n is already $6violet$R.", ch, 0, 0, TO_CHAR, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!victim->affected_by_spell(AFF_SOLIDITY))
@@ -15097,7 +15097,7 @@ int spell_solidity(uint8_t level, Character *ch, Character *victim, Object *obj,
     af.bitvector = AFF_SOLIDITY;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_stability(uint8_t level, Character *ch, char *arg,
@@ -15133,7 +15133,7 @@ int spell_stability(uint8_t level, Character *ch, Character *victim, Object *obj
   {
     act("You already have good balance.", victim, 0, 0, TO_CHAR, 0);
     act("$n already has good balance.", ch, 0, 0, TO_CHAR, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!victim->affected_by_spell(SPELL_STABILITY))
   {
@@ -15147,7 +15147,7 @@ int spell_stability(uint8_t level, Character *ch, Character *victim, Object *obj
     af.bitvector = AFF_STABILITY;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_frostshield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -15193,7 +15193,7 @@ int spell_frostshield(uint8_t level, Character *ch, Character *victim, Object *o
     af.bitvector = AFF_FROSTSHIELD;
     affect_to_char(victim, &af);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 SPELL_POINTER get_wild_magic_defensive(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
@@ -15424,7 +15424,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class O
 
   WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 2.5));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_spirit_shield(uint8_t level, Character *ch, char *arg, int type, Character *victim, Object *tar_obj, int skill)
@@ -15463,7 +15463,7 @@ int spell_villainy(uint8_t level, Character *ch, Character *victim, class Object
 
   victim->sendln("You call upon the gods to grant you the magic and skill to defeat all that is good!");
   act("$n calls upon the gods to grant $m magic and skill in $s fight for evil!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_villainy(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -15516,7 +15516,7 @@ int spell_heroism(uint8_t level, Character *ch, Character *victim, class Object 
 
   victim->sendln("You call upon the gods to grant you courage and skill in your fight for justice!");
   act("$n calls upon the gods to grant $m courage and skill in $s fight for justice!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_heroism(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -15603,7 +15603,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     if (IS_MORTAL(ch))
     {
       ch->sendln("Something about this room prohibits your incantation from being completed.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (IS_IMMORTAL(ch))
     {
@@ -15618,18 +15618,18 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     if (ch == ((Character *)(cItem->obj_flags.origin)) && spl == SPELL_CONSECRATE)
     {
       ch->sendln("You have already consecrated the ground here!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
     {
       ch->send("A foul taint prevents you from consecrating the ground here!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
     {
       ch->send("The ground here has already been consecrated!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -15649,7 +15649,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
   if (ch->cRooms >= 1 + skill / 25)
   {
     ch->sendln("You cannot keep up this many consecrated areas.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   send_to_room(
@@ -15674,7 +15674,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
 
   obj_to_room(cItem, ch->in_room);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_consecrate(uint8_t level, Character *ch, char *arg, int type,
@@ -15762,7 +15762,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     if (IS_MORTAL(ch))
     {
       ch->sendln("Something about this room prohibits your incantation from being completed.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (IS_IMMORTAL(ch))
     {
@@ -15773,7 +15773,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
   if (ch->cRooms >= 1 + skill / 25)
   {
     ch->sendln("You cannot keep up this many desecrated areas.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   Object *cItem = nullptr;
@@ -15782,18 +15782,18 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     if (ch == ((Character *)(cItem->obj_flags.origin)))
     {
       ch->sendln("You have already desecrated the ground here!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
     {
       ch->send("A powerful aura of goodness prevents you from desecrating the ground here!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
     {
       ch->send("The ground here has already been desecrated!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -15835,7 +15835,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
 
   obj_to_room(cItem, ch->in_room);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_desecrate(uint8_t level, Character *ch, char *arg, int type,
@@ -15933,7 +15933,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class 
   // NOTICE:  This is a TEMP_room_flag
   SET_BIT(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cast_ethereal_focus(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)

@@ -201,7 +201,7 @@ int do_areastats(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("$Bareastats area #$R");
     ch->sendln("$Bareastats topxps$R");
     ch->sendln("$Bareastats topgold$R");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!strcmp(buf, "area"))
   {
@@ -209,27 +209,27 @@ int do_areastats(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->sendln("You need to specify a zone number.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     areaData.DisplaySingleArea(ch, atoi(buf));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!strcmp(buf, "all"))
   {
     areaData.DisplayAreaData(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!strcmp(buf, "topxps"))
   {
     areaData.SortAreaData(ch, SORT_XP);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!strcmp(buf, "topgold"))
   {
     areaData.SortAreaData(ch, SORT_GOLD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void getAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold)

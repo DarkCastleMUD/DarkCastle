@@ -94,7 +94,7 @@ void mobile_activity(void)
         (isSet(ch->combat, COMBAT_BASH2)))
       continue;
 
-    retval = eSUCCESS;
+    retval = ReturnValue::eSUCCESS;
 
     // Examine call for special procedure
     // These are done BEFORE checks for awake and stuff, so the proc needs
@@ -139,14 +139,14 @@ void mobile_activity(void)
       if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).players)
       {
         retval = mprog_random_trigger(ch);
-        if (isSet(retval, eCH_DIED) || ch->isDead() || ch->isNowhere())
+        if (isSet(retval, ReturnValue::eCH_DIED) || ch->isDead() || ch->isNowhere())
         {
           continue;
         }
       }
 
       retval = mprog_arandom_trigger(ch);
-      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
+      if (isSet(retval, ReturnValue::eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
       {
         continue;
       }
@@ -169,10 +169,10 @@ void mobile_activity(void)
         PerfTimers["mprog_wordlist"].stop();
 
         retval = mprog_cur_result;
-        if (isSet(retval, eCH_DIED) || ch->isDead() || ch->isNowhere())
+        if (isSet(retval, ReturnValue::eCH_DIED) || ch->isDead() || ch->isNowhere())
           break; // break so we can continue with the next mob
       }
-      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
+      if (isSet(retval, ReturnValue::eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
         continue; // move on to next mob, this one is dead
 
       for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
@@ -254,7 +254,7 @@ void mobile_activity(void)
             if (cmd_dir)
             {
               retval = attempt_move(ch, *cmd_dir);
-              if (isSet(retval, eCH_DIED))
+              if (isSet(retval, ReturnValue::eCH_DIED))
                 continue;
             }
           }

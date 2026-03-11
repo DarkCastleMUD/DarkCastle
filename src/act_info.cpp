@@ -46,7 +46,7 @@ int do_levels(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch))
   {
     ch->sendln("You ain't nothin' but a hound-dog.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   buf[0] = '\0';
@@ -55,5 +55,5 @@ int do_levels(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf + strlen(buf), "[%2d] %9d\n\r", i, exp_table[i]);
 
   page_string(ch->desc, buf, 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

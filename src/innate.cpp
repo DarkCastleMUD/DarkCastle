@@ -115,7 +115,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
           return ReturnValue::eFAILURE;
         }
         int retval = (*(innates[i].func))(ch, arg, cmd);
-        if (retval & eSUCCESS)
+        if (retval & ReturnValue::eSUCCESS)
         {
           struct affected_type af;
           af.type = SKILL_INNATE_TIMER;
@@ -154,7 +154,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
   }
   else
   {
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 }
 
@@ -168,7 +168,7 @@ int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = AFF_REGENERATION;
   affect_to_char(ch, &af);
   ch->sendln("Your innate regenerative abilities allow you to heal quickly.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
@@ -182,7 +182,7 @@ int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
   affect_to_char(ch, &af);
   ch->sendln("You gather your energy in an effort to wield two mighty weapons.");
   act("$n gathers his strength in order to wield two mighty weapons.", ch, nullptr, nullptr, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_focus(Character *ch, char *arg, cmd_t cmd)
@@ -203,7 +203,7 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = AFF_FOCUS;
   affect_to_char(ch, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_illusion(Character *ch, char *arg, cmd_t cmd)
@@ -225,7 +225,7 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
   affect_to_char(ch, &af);
   ch->sendln("You use your race's innate illusion powers, and fade out of existence.");
   act("$n chants something incoherent and fades out of existence.", ch, nullptr, nullptr, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
@@ -238,7 +238,7 @@ int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
   ch->sendln("Your blood boils as you drive yourself into a war-like state.");
   act("$n's blood boils has $e drives $mself into warlike rage.", ch, nullptr, nullptr, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_repair(Character *ch, char *arg, cmd_t cmd)
@@ -271,7 +271,7 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
       {
         ch->sendln("You failed to repair it!");
         act("$n fails to repair $p.", ch, obj, obj, TO_ROOM, 0);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       found = true;
       obj->num_affects--;
@@ -285,7 +285,7 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
   {
     act("Your knowledge of weapons and armour allow you to quickly repair $p.", ch, obj, obj, TO_CHAR, 0);
     act("$n quickly repairs their $p.", ch, obj, obj, TO_ROOM, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
@@ -304,7 +304,7 @@ int innate_evasion(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
   ch->sendln("You bring up an aura, blocking all forms of scrying your location.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
@@ -317,7 +317,7 @@ int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = AFF_SHADOWSLIP;
   affect_to_char(ch, &af);
   ch->sendln("You blend with the shadows, preventing people from reaching you magically.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_fly(Character *ch, char *arg, cmd_t cmd)
@@ -347,5 +347,5 @@ int innate_fly(Character *ch, char *arg, cmd_t cmd)
     act("$n spreads $s delicate wings and lifts lightly into the air.", ch, nullptr, nullptr, TO_ROOM, 0);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

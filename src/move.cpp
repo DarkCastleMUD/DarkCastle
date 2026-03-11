@@ -38,10 +38,10 @@ int move_player(Character *ch, int room)
 
   retval = move_char(ch, room);
 
-  if (!isSet(retval, eSUCCESS))
+  if (!isSet(retval, ReturnValue::eSUCCESS))
   {
     retval = move_char(ch, real_room(START_ROOM));
-    if (!isSet(retval, eSUCCESS))
+    if (!isSet(retval, ReturnValue::eSUCCESS))
       logentry(QStringLiteral("Error in move_player(), Failure moving ch to start room. move_player_home_nofail"),
                IMMORTAL, DC::LogChannel::LOG_BUG);
   }
@@ -183,9 +183,9 @@ int do_unstable(Character *ch)
                             "$n's frail body snaps in half as $e is buffeted about the room.", death_log, KILL_FALL);
 
   if (SOMEONE_DIED(retval))
-    return eSUCCESS | eCH_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   else
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 }
 
 int do_fall(Character *ch, short dir)
@@ -293,7 +293,7 @@ int do_fall(Character *ch, short dir)
 
   retval = move_char(ch, target);
 
-  if (!isSet(retval, eSUCCESS))
+  if (!isSet(retval, ReturnValue::eSUCCESS))
   {
     ch->sendln("You are miraculously upheld by divine powers!");
     return retval;
@@ -306,7 +306,7 @@ int do_fall(Character *ch, short dir)
                             damage, KILL_FALL);
 
   if (SOMEONE_DIED(retval))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!SOMEONE_DIED(retval))
   {
@@ -319,7 +319,7 @@ int do_fall(Character *ch, short dir)
   }
 
   // We lived
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Assumes
@@ -339,7 +339,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
    -pir 7/25/01
    // Check for special routines (North is 1)
    retval = special(ch, cmd+1, "");
-   if(isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+   if(isSet(retval, ReturnValue::eSUCCESS) || isSet(retval, ReturnValue::eCH_DIED))
    return retval;
    */
 
@@ -559,7 +559,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
       ch->sendln("The ghost evaporates as you leave its habitat.");
       do_return(ch, "");
       // extract_char(ch,true);
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
   }
 
@@ -704,7 +704,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
 
   retval = move_char(ch, DC::getInstance()->world[was_in].dir_option[dir]->to_room);
 
-  if (isSet(retval, eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
+  if (isSet(retval, ReturnValue::eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
   {
     ch->sendln("Your crippled body responds slowly.");
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -719,7 +719,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
       ch->sendln("The noise around you returns as you leave the silenced area!");
 
-  if (!isSet(retval, eSUCCESS))
+  if (!isSet(retval, ReturnValue::eSUCCESS))
   {
     ch->sendln("You fail to move.");
     return retval;
@@ -780,25 +780,25 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     {
       act("Unable to survive underwater, $n returns to the elemental plane of fire.", ch, 0, 0, TO_ROOM, 0);
       extract_char(ch, true);
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
     if (a == 89 && DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
     {
       act("Unable to survive in the desert, $n returns to the elemental plane of water.", ch, 0, 0, TO_ROOM, 0);
       extract_char(ch, true);
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
     if (a == 90 && DC::getInstance()->world[ch->in_room].sector_type == SECT_SWAMP)
     {
       act("Unable to survive in the swamp, $n returns to the elemental plane of air.", ch, 0, 0, TO_ROOM, 0);
       extract_char(ch, true);
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
     if (a == 91 && DC::getInstance()->world[ch->in_room].sector_type == SECT_AIR)
     {
       act("Unable to survive in the air, $n returns to the elemental plane of earth.", ch, 0, 0, TO_ROOM, 0);
       extract_char(ch, true);
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
   }
   // Elemental stuff ends HERE
@@ -807,14 +807,14 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   {
     retval = do_fall(ch, dir);
     if (SOMEONE_DIED(retval))
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE))
   {
     retval = do_unstable(ch);
     if (SOMEONE_DIED(retval))
-      return eSUCCESS | eCH_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
   /*
@@ -852,15 +852,15 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   // let our mobs know they're here
   retval = mprog_entry_trigger(ch);
   if (SOMEONE_DIED(retval))
-    return retval | eSUCCESS;
+    return retval | ReturnValue::eSUCCESS;
   retval = ch->mprog_greet_trigger();
   if (SOMEONE_DIED(retval))
-    return retval | eSUCCESS;
+    return retval | ReturnValue::eSUCCESS;
   retval = ch->oprog_greet_trigger();
   if (SOMEONE_DIED(retval))
-    return retval | eSUCCESS;
+    return retval | ReturnValue::eSUCCESS;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
@@ -919,11 +919,11 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
       return_val = ReturnValue::eFAILURE;
     }
 
-    if (SOMEONE_DIED(return_val) || !isSet(return_val, eSUCCESS))
+    if (SOMEONE_DIED(return_val) || !isSet(return_val, ReturnValue::eSUCCESS))
       return return_val;
     if (!IS_AFFECTED(ch, AFF_SNEAK))
       return_val = ambush(ch);
-    if (SOMEONE_DIED(return_val) || !isSet(return_val, eSUCCESS))
+    if (SOMEONE_DIED(return_val) || !isSet(return_val, ReturnValue::eSUCCESS))
       return return_val;
     return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_MOVE);
   }
@@ -962,7 +962,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 
   // this may cause problems with leader being ambushed, dying, and group not moving
   // but we have to be careful in case leader was a mob (no longer valid memory)
-  if (SOMEONE_DIED(return_val) || !isSet(return_val, eSUCCESS))
+  if (SOMEONE_DIED(return_val) || !isSet(return_val, ReturnValue::eSUCCESS))
   {
     /*
      sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
@@ -1022,10 +1022,10 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
   if (was_in != ch->in_room && !IS_AFFECTED(ch, AFF_SNEAK))
     return_val = ambush(ch);
 
-  if (isSet(return_val, eCH_DIED))
-    return eSUCCESS | eCH_DIED;
+  if (isSet(return_val, ReturnValue::eCH_DIED))
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 //   Returns :
@@ -1056,7 +1056,7 @@ int do_leave(Character *ch, char *arguement, cmd_t cmd)
             ch->sendln("You exit the area.");
             act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
             retval = move_char(ch, real_room(DC::getInstance()->world[k->in_room].number));
-            if (!isSet(retval, eSUCCESS))
+            if (!isSet(retval, ReturnValue::eSUCCESS))
             {
               ch->sendln("You attempt to leave, but the door slams in your face!");
               act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
@@ -1119,7 +1119,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
     ch->sendln("You bravely attempt to plunge through the portal - let's hope you have gills!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
@@ -1203,7 +1203,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (!isSet(retval, eSUCCESS))
+  if (!isSet(retval, ReturnValue::eSUCCESS))
   {
     ch->sendln("You recoil in pain as the portal slams shut!");
     act("$n recoils in pain as the portal slams shut!", ch, 0, 0, TO_ROOM, 0);
@@ -1237,7 +1237,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
   if (!ch)
   {
     logentry(QStringLiteral("Error in move_char(), nullptr character"), OVERSEER, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   int origination = ch->in_room;
@@ -1249,7 +1249,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
     {
       logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
                OVERSEER, DC::LogChannel::LOG_BUG);
-      return eINTERNAL_ERROR;
+      return ReturnValue::eINTERNAL_ERROR;
     }
   }
 
@@ -1262,11 +1262,11 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
       qFatal(qUtf8Printable(QStringLiteral("Error in move_char(), character stuck in DC::NOWHERE: %1.\n").arg(GET_NAME(ch))));
     }
     logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", GET_NAME(ch), DC::getInstance()->world[dest].number);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   // At this point, the character is happily in the new room
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_climb(Character *ch, char *argument, cmd_t cmd)
@@ -1279,19 +1279,19 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
   if (!*buf)
   {
     ch->sendln("Climb what?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)))
   {
     ch->sendln("Climb what?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (obj->obj_flags.type_flag != ITEM_CLIMBABLE)
   {
     ch->sendln("You can't climb that.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   int dest = obj->obj_flags.value[0];
@@ -1300,7 +1300,7 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     ch->sendln("You can't climb that.");
-    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
@@ -1314,7 +1314,7 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
   act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
   do_look(ch, "");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // The End
@@ -1354,7 +1354,7 @@ int ambush(Character *ch)
       }
 
       if (!charge_moves(ch, SKILL_AMBUSH))
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
 
       if (skill_success(i, ch, SKILL_AMBUSH))
       {
@@ -1362,10 +1362,10 @@ int ambush(Character *ch)
         //         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
         //         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
         retval = damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH);
-        if (isSet(retval, eVICT_DIED))
-          return (eSUCCESS | eCH_DIED); // ch = damage vict
-        if (isSet(retval, eCH_DIED))
-          return (eSUCCESS); // doesn't matter, but don't lag vict
+        if (isSet(retval, ReturnValue::eVICT_DIED))
+          return (ReturnValue::eSUCCESS | ReturnValue::eCH_DIED); // ch = damage vict
+        if (isSet(retval, ReturnValue::eCH_DIED))
+          return (ReturnValue::eSUCCESS); // doesn't matter, but don't lag vict
         if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_WIMPY))
           WAIT_STATE(i, DC::PULSE_VIOLENCE * 3);
         else
@@ -1375,5 +1375,5 @@ int ambush(Character *ch)
       // we continue instead of breaking in case there are any OTHER rangers in the room
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

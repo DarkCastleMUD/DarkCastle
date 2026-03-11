@@ -471,7 +471,7 @@ int do_write_skillquest(Character *ch, char *argument, cmd_t cmd)
   fprintf(fl, "0\n");
   fclose(fl);
   ch->sendln("Skill quests saved.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void load_skillquests()
@@ -697,7 +697,7 @@ void DC::boot_db(void)
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
  ch->sendln("Motd and Imotd both reloaded.");
- return eSUCCESS;
+ return ReturnValue::eSUCCESS;
  }
  */
 void DC::do_godlist(void)

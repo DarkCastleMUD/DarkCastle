@@ -1405,7 +1405,7 @@ int say_spell(Character *ch, int si, int room)
         return retval;
       }
     }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Takes the spell_base (higher = harder to resist)
@@ -1489,7 +1489,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
   if (!ch->affected)
   {
     ch->sendln("You have no spell effects to release.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!*argument)
@@ -1515,7 +1515,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
         ch->sendln(get_skill_name(aff->type));
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
@@ -1570,7 +1570,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
       ch->sendln(QStringLiteral("No such spell effect '%1' found to be released.").arg(argument));
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int skill_value(Character *ch, int skillnum, int min = 33)
@@ -2367,7 +2367,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         // Someone died, most likely the mob due to an act_trigger program
         if (SOMEONE_DIED(retval))
         {
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
       }
 
@@ -2429,7 +2429,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_from_room(ch);
             char_to_room(ch, oldroom);
           }
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) && ch->affected_by_spell(SPELL_INVISIBLE))
@@ -2561,7 +2561,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           { // some idiot was shooting at himself
             // out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
             // for		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
-            // heals		  return eSUCCESS;
+            // heals		  return ReturnValue::eSUCCESS;
           }
           else
           {
@@ -2580,7 +2580,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
                 char_from_room(ch);
                 char_to_room(ch, oldroom);
               }
-              return eSUCCESS;
+              return ReturnValue::eSUCCESS;
             }
           }
         }
@@ -2600,7 +2600,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_VICT, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_ROOM, NOTVICT);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         else if (fil)
         {
@@ -2651,7 +2651,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           free(argument_ptr);
         }
 
-        if (oldroom && !isSet(retval, eCH_DIED))
+        if (oldroom && !isSet(retval, ReturnValue::eCH_DIED))
         {
           char_from_room(ch);
           char_to_room(ch, oldroom);
@@ -2916,7 +2916,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
   strcat(buf, "\n\r");
   page_string(ch->desc, buf, 1);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_songs(Character *ch, char *arg, cmd_t cmd)
@@ -2943,7 +2943,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
   strcat(buf, "\n\r");
   page_string(ch->desc, buf, 1);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_spells(Character *ch, char *arg, cmd_t cmd)
@@ -3075,7 +3075,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
   strcat(buf, "\n\r");
   page_string(ch->desc, buf, 1);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spl_lvl(int lev)

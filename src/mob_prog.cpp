@@ -3001,7 +3001,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 // -pir 11/18/01
 char null[1];
 // Mprog_cur_result holds the current status of the mob that is acting.
-// It will hold eCH_DIED if the mob died doing it's proc.  We need to
+// It will hold ReturnValue::eCH_DIED if the mob died doing it's proc.  We need to
 // make sure this is not true when returning from an if check or the
 // mob's pointer is no longer valid
 int mprog_cur_result;
@@ -3099,7 +3099,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
       if (!str_cmp(buf, "if"))
       {
         com_list = mprog_process_if(morebuf, com_list, mob, actor, obj, vo, rndm, thrw);
-        if (isSet(mprog_cur_result, eCH_DIED))
+        if (isSet(mprog_cur_result, ReturnValue::eCH_DIED))
           return null;
         while (*cmnd == ' ')
           cmnd++;
@@ -3168,27 +3168,27 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
         {
           if (isSet(mprog_cur_result, ReturnValue::eFAILURE))
             qDebug("ReturnValue::eFAILURE ");
-          if (isSet(mprog_cur_result, eSUCCESS))
-            qDebug("eSUCCESS ");
-          if (isSet(mprog_cur_result, eCH_DIED))
-            qDebug("eCH_DIED ");
-          if (isSet(mprog_cur_result, eVICT_DIED))
-            qDebug("eVICT_DIED ");
-          if (isSet(mprog_cur_result, eINTERNAL_ERROR))
-            qDebug("eINTERNAL_ERROR ");
-          if (isSet(mprog_cur_result, eEXTRA_VALUE))
-            qDebug("eEXTRA_VALUE ");
-          if (isSet(mprog_cur_result, eEXTRA_VAL2))
-            qDebug("eEXTRA_VAL2 ");
-          if (isSet(mprog_cur_result, eDELAYED_EXEC))
-            qDebug("eDELAYED_EXEC ");
+          if (isSet(mprog_cur_result, ReturnValue::eSUCCESS))
+            qDebug("ReturnValue::eSUCCESS ");
+          if (isSet(mprog_cur_result, ReturnValue::eCH_DIED))
+            qDebug("ReturnValue::eCH_DIED ");
+          if (isSet(mprog_cur_result, ReturnValue::eVICT_DIED))
+            qDebug("ReturnValue::eVICT_DIED ");
+          if (isSet(mprog_cur_result, ReturnValue::eINTERNAL_ERROR))
+            qDebug("ReturnValue::eINTERNAL_ERROR ");
+          if (isSet(mprog_cur_result, ReturnValue::eEXTRA_VALUE))
+            qDebug("ReturnValue::eEXTRA_VALUE ");
+          if (isSet(mprog_cur_result, ReturnValue::eEXTRA_VAL2))
+            qDebug("ReturnValue::eEXTRA_VAL2 ");
+          if (isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
+            qDebug("ReturnValue::eDELAYED_EXEC ");
 
           qDebug("\n");
         }
 #endif
-        if (isSet(mprog_cur_result, eCH_DIED) ||
-            isSet(mprog_cur_result, eDELAYED_EXEC) ||
-            isSet(mprog_cur_result, eVICT_DIED))
+        if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) ||
+            isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC) ||
+            isSet(mprog_cur_result, ReturnValue::eVICT_DIED))
           return null;
       }
       cmnd = com_list;
@@ -3252,7 +3252,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
       {
         com_list = mprog_process_if(morebuf, com_list, mob, actor,
                                     obj, vo, rndm, thrw);
-        if (isSet(mprog_cur_result, eCH_DIED))
+        if (isSet(mprog_cur_result, ReturnValue::eCH_DIED))
           return null;
         while (*cmnd == ' ')
           cmnd++;
@@ -3277,7 +3277,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
       if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
       {
         SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
-        if (isSet(mprog_cur_result, eCH_DIED) || isSet(mprog_cur_result, eDELAYED_EXEC))
+        if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
           return null;
       }
       cmnd = com_list;
@@ -3742,7 +3742,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
           sprintf(buf,"%sRight: %s\n",buf,right);
   //        if (actor)
   //	  actor->send(buf);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
            }
            str++;
     }*/
@@ -3875,7 +3875,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
   if (IS_AFFECTED(mob, AFF_CHARM))
     return;
   selfpurge = false;
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
   mprog_line_num = 0;
 
   activeProgs++;
@@ -3952,7 +3952,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
     {
       activePos = command_list = mprog_process_if(morebuf, command_list, mob,
                                                   actor, obj, vo, rndm, thrw);
-      if (isSet(mprog_cur_result, eCH_DIED) || isSet(mprog_cur_result, eDELAYED_EXEC))
+      if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
       {
         activeActor = activeRndm = nullptr;
         activeObj = nullptr;
@@ -3967,7 +3967,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
       if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
       {
         SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
-        if (isSet(mprog_cur_result, eCH_DIED) || selfpurge || isSet(mprog_cur_result, eDELAYED_EXEC))
+        if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || selfpurge || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
         {
           activeActor = activeRndm = nullptr;
           activeObj = nullptr;
@@ -4057,7 +4057,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
           {
             retval = 1;
             mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, nullptr);
-            if (selfpurge || isSet(mprog_cur_result, eCH_DIED))
+            if (selfpurge || isSet(mprog_cur_result, ReturnValue::eCH_DIED))
               return retval;
             break;
           }
@@ -4077,7 +4077,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
               retval = 1;
               mprog_driver(mprg->comlist, mob, actor, obj, vo,
                            nullptr, nullptr);
-              if (selfpurge || isSet(mprog_cur_result, eCH_DIED))
+              if (selfpurge || isSet(mprog_cur_result, ReturnValue::eCH_DIED))
                 return retval;
               break;
             }
@@ -4152,7 +4152,7 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
   //  mob_prog_act_list * tmp_act;
   // mob_prog_act_list * curr;
   //  mob_prog_data *mprg;
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (!MOBtrigger)
     return mprog_cur_result;
@@ -4360,11 +4360,11 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
   if (okay && !SOMEONE_DIED(mprog_cur_result))
   {
     Object *a;
-    SET_BIT(mprog_cur_result, eEXTRA_VALUE);
+    SET_BIT(mprog_cur_result, ReturnValue::eEXTRA_VALUE);
     for (a = mob->carrying; a; a = a->next_content)
       if (a == obj)
       {
-        REMOVE_BIT(mprog_cur_result, eEXTRA_VALUE);
+        REMOVE_BIT(mprog_cur_result, ReturnValue::eEXTRA_VALUE);
       }
   }
 
@@ -4373,7 +4373,7 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 
 int Character::mprog_greet_trigger(void)
 {
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
   for (auto vmob = dc_->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
     if (IS_NPC(vmob) && (vmob->fighting == nullptr) && AWAKE(vmob))
     {
@@ -4430,7 +4430,7 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
 
 int mprog_random_trigger(Character *mob)
 {
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   if ((DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & RAND_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob, nullptr, nullptr, nullptr, RAND_PROG);
@@ -4445,7 +4445,7 @@ int mprog_load_trigger(Character *mob)
     return ReturnValue::eFAILURE;
   }
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
   if ((DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & LOAD_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob, nullptr, nullptr, nullptr, LOAD_PROG);
   return mprog_cur_result;
@@ -4457,7 +4457,7 @@ int mprog_arandom_trigger(Character *mob)
   {
     return ReturnValue::eFAILURE;
   }
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
   if ((DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ARAND_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob, nullptr, nullptr, nullptr, ARAND_PROG);
   return mprog_cur_result;
@@ -4475,7 +4475,7 @@ int Character::mprog_can_see_trigger(Character *mob)
     return ReturnValue::eFAILURE;
   }
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
   if ((dc_->mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob, this, nullptr, nullptr, CAN_SEE_PROG);
 
@@ -4491,7 +4491,7 @@ int Character::mprog_speech_trigger(const char *txt)
 
   Character *vmob;
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   for (vmob = DC::getInstance()->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
     if (IS_NPC(vmob) && (DC::getInstance()->mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
@@ -4750,7 +4750,7 @@ int Character::oprog_can_see_trigger(Object *item)
   }
 
   Character *vmob;
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (dc_->obj_index[item->item_number].progtypes & CAN_SEE_PROG)
   {
@@ -4772,7 +4772,7 @@ int Character::oprog_speech_trigger(const char *txt)
   Character *vmob = nullptr;
   Object *item;
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   for (item = DC::getInstance()->world[in_room].contents; item; item = item->next_content)
     if (dc_->obj_index[item->item_number].progtypes & SPEECH_PROG)
@@ -4874,7 +4874,7 @@ int Character::oprog_act_trigger(QString txt)
   Character *vmob;
   Object *item;
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (in_room == DC::NOWHERE)
     return mprog_cur_result;
@@ -4924,7 +4924,7 @@ int Character::oprog_greet_trigger(void)
     return ReturnValue::eFAILURE;
   }
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   for (auto item = dc_->world[in_room].contents; item; item = item->next_content)
     if (dc_->obj_index[item->item_number].progtypes & ALL_GREET_PROG)
@@ -4942,7 +4942,7 @@ int DC::oprog_rand_trigger(Object *item)
   Character *vmob;
   //  Object *item;
   Character *ch;
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
   if (item->carried_by)
     ch = item->carried_by;
   else
@@ -4961,7 +4961,7 @@ int DC::oprog_arand_trigger(Object *item)
 {
   Character *vmob;
   Character *ch;
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (item->carried_by)
     ch = item->carried_by;
@@ -4982,7 +4982,7 @@ int Character::oprog_load_trigger(void)
   Character *vmob;
   Object *item;
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   for (item = dc_->world[in_room].contents; item; item = item->next_content)
     if (dc_->obj_index[item->item_number].progtypes & LOAD_PROG)
@@ -5022,7 +5022,7 @@ int Character::oprog_weapon_trigger(Object *item)
 
   Character *vmob;
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (dc_->obj_index[item->item_number].progtypes & WEAPON_PROG)
   {
@@ -5044,7 +5044,7 @@ int Character::oprog_armour_trigger(Object *item)
 
   Character *vmob;
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (dc_->obj_index[item->item_number].progtypes & ARMOUR_PROG)
   {

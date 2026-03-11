@@ -85,7 +85,7 @@ int load_quests(void)
 
   fclose(fl);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int save_quests(void)
@@ -117,7 +117,7 @@ int save_quests(void)
 
   fclose(fl);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 struct quest_info *get_quest_struct(int num)
@@ -198,7 +198,7 @@ int do_add_quest(Character *ch, char *name)
   ch->send(QStringLiteral("Quest number %1 added.\n\r\n\r").arg(quest->number));
   show_quest_info(ch, quest->number);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void list_quests(Character *ch, int lownum, int highnum)
@@ -540,7 +540,7 @@ int start_quest(Character *ch, struct quest_info *quest)
     if (count == QUEST_MAX)
     {
       ch->sendln("You've got too many quests started already.");
-      return eEXTRA_VALUE;
+      return ReturnValue::eEXTRA_VALUE;
     }
   }
 
@@ -548,7 +548,7 @@ int start_quest(Character *ch, struct quest_info *quest)
   if (GET_PLATINUM(ch) < price)
   {
     ch->send(QStringLiteral("You need %1 platinum coins to start this quest, which you don't have!\n\r").arg(price));
-    return eEXTRA_VAL2;
+    return ReturnValue::eEXTRA_VAL2;
   }
 
   if (quest->brownie)
@@ -557,7 +557,7 @@ int start_quest(Character *ch, struct quest_info *quest)
     if (!brownie)
     {
       csendf(ch, "You need a brownie point to start this quest!\n\r", price);
-      return eEXTRA_VAL2;
+      return ReturnValue::eEXTRA_VAL2;
     }
   }
 
@@ -621,7 +621,7 @@ int start_quest(Character *ch, struct quest_info *quest)
   csendf(ch, "%s takes %d platinum from you.\r\n", GET_SHORT(qmaster), price);
   GET_PLATINUM(ch) -= price;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int cancel_quest(Character *ch, struct quest_info *quest)
@@ -639,7 +639,7 @@ int cancel_quest(Character *ch, struct quest_info *quest)
       break;
     count++;
     if (count >= QUEST_MAX_CANCEL)
-      return eEXTRA_VALUE;
+      return ReturnValue::eEXTRA_VALUE;
   }
 
   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
@@ -656,7 +656,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
   char buf[MAX_STRING_LENGTH];
 
   if (!quest)
-    return eEXTRA_VALUE;
+    return ReturnValue::eEXTRA_VALUE;
 
   while (count < QUEST_MAX)
   {
@@ -665,7 +665,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
     count++;
     if (count >= QUEST_MAX)
     {
-      return eEXTRA_VALUE;
+      return ReturnValue::eEXTRA_VALUE;
     }
   }
   sprintf(buf, "q%d", quest->number);
@@ -687,7 +687,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
 
   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", GET_NAME(ch), quest->number, quest->name, quest->reward);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int stop_current_quest(Character *ch, struct quest_info *quest)
@@ -717,7 +717,7 @@ int stop_current_quest(Character *ch, struct quest_info *quest)
   if (obj)
     extract_obj(obj);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int stop_current_quest(Character *ch, int number)
@@ -827,12 +827,12 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
     break;
   case cmd_t::QUEST_CANCEL:
     retval = cancel_quest(ch, quest);
-    if (isSet(retval, eSUCCESS))
+    if (isSet(retval, ReturnValue::eSUCCESS))
     {
       sprintf(buf, "%s You may begin this quest again if you speak with me.", GET_NAME(ch));
       do_psay(qmaster, buf);
     }
-    else if (isSet(retval, eEXTRA_VALUE))
+    else if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     {
       sprintf(buf, "%s You cannot cancel up any more quests without completing some of them.", GET_NAME(ch));
       do_psay(qmaster, buf);
@@ -845,7 +845,7 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
     break;
   case cmd_t::QUEST_START:
     retval = start_quest(ch, quest);
-    if (isSet(retval, eSUCCESS))
+    if (isSet(retval, ReturnValue::eSUCCESS))
     {
       if (quest->number)
       {
@@ -867,12 +867,12 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
         show_quest_footer(ch);
       }
     }
-    else if (isSet(retval, eEXTRA_VALUE))
+    else if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     {
       sprintf(buf, "%s You cannot start any more quests without completing some first.", GET_NAME(ch));
       do_psay(qmaster, buf);
     }
-    else if (isSet(retval, eEXTRA_VAL2))
+    else if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     {
       sprintf(buf, "%s You do not have the required funds to get the clue from me, beggar!", GET_NAME(ch));
       do_psay(qmaster, buf);
@@ -890,13 +890,13 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
     break;
   case cmd_t::QUEST_FINISH:
     retval = complete_quest(ch, quest);
-    if (isSet(retval, eSUCCESS))
+    if (isSet(retval, ReturnValue::eSUCCESS))
     {
       sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", GET_NAME(ch));
       do_psay(qmaster, buf);
       ch->save(cmd_t::SAVE_SILENTLY);
     }
-    else if (isSet(retval, eEXTRA_VALUE))
+    else if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     {
       sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
       do_psay(qmaster, buf);
@@ -932,7 +932,7 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
   if (cmd == cmd_t::LIST)
   {
     show_available_quests(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (cmd == cmd_t::BUY)
@@ -941,7 +941,7 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
     {
       sprintf(buf, "%s Try a number from the list.", GET_NAME(ch));
       owner->do_tell(QString(buf).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     switch (atoi(arg))
     {
@@ -955,7 +955,7 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_quest(Character *ch, char *arg, cmd_t cmd)
@@ -1070,7 +1070,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
     if (GET_PLATINUM(ch) < 2000)
     {
       ch->sendln("You need 2000 platinum coins to reset all quests, which you don't have!");
-      return eEXTRA_VAL2;
+      return ReturnValue::eEXTRA_VAL2;
     }
 
     Object *brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
@@ -1111,7 +1111,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_qedit(Character *ch, char *argument, cmd_t cmd)
@@ -1184,7 +1184,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
       else
       {
         do_add_quest(ch, argument);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
   }
@@ -1196,7 +1196,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   if (*arg && is_number(arg) && !*field)
   {
     show_quest_info(ch, atoi(arg));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (is_abbrev(arg, "stat"))
@@ -1216,7 +1216,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
 
       csendf(ch, "%s's quest points: %d\n\r", GET_NAME(vict), vict->player->quest_points);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (is_abbrev(arg, "reset"))
@@ -1239,7 +1239,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
 
       ch->send(QStringLiteral("Reset quests for player %1\r\n").arg(GET_NAME(vict)));
       vict->save(cmd_t::SAVE_SILENTLY);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -1269,7 +1269,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
 
       vict->player->quest_points = atoi(value);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (is_abbrev(arg, "show"))
@@ -1278,7 +1278,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Usage: qedit show <number>");
     else
       show_quest_info(ch, atoi(field));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   half_chop(argument, value, argument);
@@ -1288,7 +1288,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   if (is_abbrev(arg, "list") && !*field)
   {
     list_quests(ch, 0, QUEST_TOTAL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (is_abbrev(arg, "list") && *field && is_number(field))
   {
@@ -1306,7 +1306,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     }
     else
       list_quests(ch, lownum, QUEST_TOTAL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!is_number(arg))
@@ -1457,7 +1457,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
@@ -1484,7 +1484,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
   if (!CAN_SEE(owner, ch))
   {
     do_say(owner, "I don't trade with people I can't see!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (cmd == cmd_t::LIST)
@@ -1542,7 +1542,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     if (!is_number(arg2))
     {
       owner->do_tell(QStringLiteral("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     bool FOUND = false;
@@ -1597,7 +1597,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     if (!FOUND)
     {
       owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     class Object *obj;
@@ -1607,26 +1607,26 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
          sprintf(buf, "%s That item is meant for another class.", GET_NAME(ch));
          do_tell(owner, buf);
          extract_obj(obj);
-         return eSUCCESS;
+         return ReturnValue::eSUCCESS;
           } else if (size_restricted(ch, obj)) {
          sprintf(buf, "%s That item would not fit you.", GET_NAME(ch));
          do_tell(owner, buf);
          extract_obj(obj);
-         return eSUCCESS;
+         return ReturnValue::eSUCCESS;
           } else */
     if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
         search_char_for_item(ch, obj->item_number, false))
     {
       owner->do_tell(QStringLiteral("%1 You already have one of those.").arg(GET_NAME(ch)).split(' '));
       extract_obj(obj);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (GET_QPOINTS(ch) < (unsigned int)(obj->obj_flags.cost / 10000))
     {
       owner->do_tell(QStringLiteral("%1 Come back when you've got the qpoints.").arg(GET_NAME(ch)).split(' '));
       extract_obj(obj);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     GET_QPOINTS(ch) -= (obj->obj_flags.cost / 10000);
@@ -1637,7 +1637,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
 
     obj_to_char(obj, ch);
     owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::SELL)
   { /* Sell */
@@ -1648,13 +1648,13 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     if (!obj)
     {
       owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (!obj->isQuest())
     {
       owner->do_tell(QStringLiteral("%1 I only buy quest equipment.").arg(GET_NAME(ch)).split(' '));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
@@ -1664,7 +1664,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
       if (now < expires)
       {
         owner->do_tell(QStringLiteral("%1 I won't buy that for another %2 seconds.").arg(GET_NAME(ch)).arg(expires - now).split(' '));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
 
@@ -1673,8 +1673,8 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     owner->do_tell(QStringLiteral("%1 I'll give you %2 qpoints for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
     extract_obj(obj);
     GET_QPOINTS(ch) += cost;
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

@@ -1088,22 +1088,22 @@ int SWAP_CH_VICT(int value)
 {
   int newretval = 0;
 
-  if (isSet(value, eCH_DIED))
-    SET_BIT(newretval, eVICT_DIED);
+  if (isSet(value, ReturnValue::eCH_DIED))
+    SET_BIT(newretval, ReturnValue::eVICT_DIED);
   else
-    REMOVE_BIT(newretval, eVICT_DIED);
+    REMOVE_BIT(newretval, ReturnValue::eVICT_DIED);
 
-  if (isSet(value, eVICT_DIED))
-    SET_BIT(newretval, eCH_DIED);
+  if (isSet(value, ReturnValue::eVICT_DIED))
+    SET_BIT(newretval, ReturnValue::eCH_DIED);
   else
-    REMOVE_BIT(newretval, eCH_DIED);
+    REMOVE_BIT(newretval, ReturnValue::eCH_DIED);
 
   return newretval;
 }
 
 bool SOMEONE_DIED(int value)
 {
-  if (isSet(value, eCH_DIED) || isSet(value, eVICT_DIED))
+  if (isSet(value, ReturnValue::eCH_DIED) || isSet(value, ReturnValue::eVICT_DIED))
     return true;
   return false;
 }
@@ -1143,9 +1143,9 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
   if (!noprog && IS_NPC(obj))
   {
     int prog = sub->mprog_can_see_trigger(obj);
-    if (isSet(prog, eEXTRA_VALUE))
+    if (isSet(prog, ReturnValue::eEXTRA_VALUE))
       return true;
-    else if (isSet(prog, eEXTRA_VAL2))
+    else if (isSet(prog, ReturnValue::eEXTRA_VAL2))
       return false;
   }
   if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && obj->isMortalPlayer())
@@ -1212,9 +1212,9 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
     return true;
 
   int prog = sub->oprog_can_see_trigger(obj);
-  if (isSet(prog, eEXTRA_VALUE))
+  if (isSet(prog, ReturnValue::eEXTRA_VALUE))
     return true;
-  else if (isSet(prog, eEXTRA_VAL2))
+  else if (isSet(prog, ReturnValue::eEXTRA_VAL2))
     return false;
 
   skill = 0;
@@ -1351,7 +1351,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
             {
               found = true;
               retval = k->follower->command_interpreter(message);
-              if (isSet(retval, eCH_DIED))
+              if (isSet(retval, ReturnValue::eCH_DIED))
                 break; // k is no longer valid if it was a mob(always), get out now
             }
         }
@@ -1362,7 +1362,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Nobody here are loyal subjects of yours!");
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_idea(Character *ch, char *argument, cmd_t cmd)
@@ -1397,7 +1397,7 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_typo(Character *ch, char *argument, cmd_t cmd)
@@ -1433,7 +1433,7 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_bug(Character *ch, char *argument, cmd_t cmd)
@@ -1468,7 +1468,7 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
@@ -1621,7 +1621,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if (location == -1)
   {
     victim->sendln("You are completely lost.");
-    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
@@ -1676,7 +1676,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   is_mob = IS_NPC(victim);
   retval = move_char(victim, location);
 
-  if (!is_mob && !isSet(retval, eCH_DIED))
+  if (!is_mob && !isSet(retval, ReturnValue::eCH_DIED))
   { // if it was a mob, we might have died moving
     act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     do_look(victim, "");
@@ -1687,7 +1687,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 int do_qui(Character *ch, char *argument, cmd_t cmd)
 {
   ch->sendln("You have to write quit - no less, to quit!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_quit(Character *ch, char *argument, cmd_t cmd)
@@ -1708,7 +1708,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   if (ch == 0)
   {
     logentry(QStringLiteral("do_quit received null char - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
-    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (IS_NPC(ch))
@@ -1869,7 +1869,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   {
     ch->save_char_obj();
     if (!close_socket(ch->desc)) // if returns 0, then it already quit us out
-      return ReturnValue::eFAILURE | eCH_DIED;
+      return ReturnValue::eFAILURE | ReturnValue::eCH_DIED;
   }
   else
   {
@@ -1886,7 +1886,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     extract_obj(ch->carrying);
 
   extract_char(ch, true, QStringLiteral("do_quit"));
-  return eSUCCESS | eCH_DIED;
+  return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
 }
 
 command_return_t Character::save(cmd_t cmd)
@@ -1923,7 +1923,7 @@ command_return_t Character::save(cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // TODO - make some sort of auto-save, or "save" flag, so player's
@@ -1940,7 +1940,7 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
       {
         send("Saving hints.\r\n");
         DC::getInstance()->save_hints();
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
   }
@@ -2000,7 +2000,7 @@ int do_home(Character *ch, char *argument, cmd_t cmd)
 
   ch->sendln("You now consider this place to be your home.");
   GET_HOME(ch) = DC::getInstance()->world[ch->in_room].number;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
@@ -2024,7 +2024,7 @@ command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
 int do_beep(Character *ch, char *argument, cmd_t cmd)
 {
   ch->sendln("Beep!\a");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // if a skill has a valid name, return it, else nullptr

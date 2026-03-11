@@ -803,7 +803,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
       sendln("----------");
       do_botcheck(i->getName().split(' '));
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim == nullptr)
@@ -863,7 +863,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void Character::list_char_to_char(Character *list, int mode)
@@ -1289,7 +1289,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
     {
       if (identify(this, obj))
       {
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else
@@ -1329,7 +1329,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
   else if (check_blind(ch))
   {
     ansi_color(GREY, ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (IS_DARK(ch->in_room) && (!IS_NPC(ch) && !ch->player->holyLite))
   {
@@ -1371,7 +1371,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
       if (tmp_desc)
       {
         page_string(ch->desc, tmp_desc, 0);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       if (EXIT(ch, keyword_no))
@@ -1535,7 +1535,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
           if (*arg3)
           {
             try_to_peek_into_container(tmp_char, ch, arg3);
-            return eSUCCESS;
+            return ReturnValue::eSUCCESS;
           }
           if (cmd == cmd_t::GLANCE)
             show_char_to_char(tmp_char, ch, 3);
@@ -1545,7 +1545,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
           {
             if (!IS_NPC(ch) && (tmp_char->getLevel() < ch->player->wizinvis))
             {
-              return eSUCCESS;
+              return ReturnValue::eSUCCESS;
             }
             if ((cmd == cmd_t::GLANCE) && !IS_AFFECTED(ch, AFF_HIDE))
             {
@@ -1562,7 +1562,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                   INVIS_NULL | NOTVICT);
             }
           }
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         /* Search for Extra Descriptions in room and items */
@@ -1575,8 +1575,8 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
           if (tmp_desc)
           {
             page_string(ch->desc, tmp_desc, 0);
-            return eSUCCESS; /* RETURN SINCE IT WAS ROOM DESCRIPTION */
-                             /* Old system was: found = true; */
+            return ReturnValue::eSUCCESS; /* RETURN SINCE IT WAS ROOM DESCRIPTION */
+                                          /* Old system was: found = true; */
           }
         }
 
@@ -1597,7 +1597,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                 if (tmp_desc)
                 {
                   page_string(ch->desc, tmp_desc, 1);
-                  return eSUCCESS;
+                  return ReturnValue::eSUCCESS;
                   //                              found = true;
                 }
               }
@@ -1619,7 +1619,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
               if (tmp_desc)
               {
                 page_string(ch->desc, tmp_desc, 1);
-                return eSUCCESS;
+                return ReturnValue::eSUCCESS;
                 //                           found = true;
               }
             }
@@ -1641,7 +1641,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
               if (tmp_desc)
               {
                 page_string(ch->desc, tmp_desc, 1);
-                return eSUCCESS;
+                return ReturnValue::eSUCCESS;
                 //                           found = true;
               }
             }
@@ -1823,7 +1823,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
     ansi_color(NTEXT, ch);
   }
   ansi_color(GREY, ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* end of look */
@@ -1837,7 +1837,7 @@ int do_read(Character *ch, char *arg, cmd_t cmd)
   // yeah right.  -Sadus
   sprintf(buf, "at %s", arg);
   do_look(ch, buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_examine(Character *ch, char *argument, cmd_t cmd)
@@ -1868,7 +1868,7 @@ int do_examine(Character *ch, char *argument, cmd_t cmd)
       do_look(ch, buf);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_exits(Character *ch, char *argument, cmd_t cmd)
@@ -1918,7 +1918,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
   else
     ch->sendln("None.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 char frills[] = {
@@ -2298,7 +2298,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_time(Character *ch, char *argument, cmd_t cmd)
@@ -2391,7 +2391,7 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
   // 			h,m,s);
   sprintf(buf, "The mud has been running for: %02li:%02li \n\r", h, m);
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_weather(Character *ch, char *argument, cmd_t cmd)
@@ -2402,7 +2402,7 @@ int do_weather(Character *ch, char *argument, cmd_t cmd)
   if (GET_POS(ch) <= position_t::SLEEPING)
   {
     ch->sendln("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (OUTSIDE(ch))
   {
@@ -2422,7 +2422,7 @@ int do_weather(Character *ch, char *argument, cmd_t cmd)
     csendf(ch, "Sky: %9s  Sunlight: %d\r\n",
            sky_look[weather_info.sky], weather_info.sunlight);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_help(Character *ch, char *argument, cmd_t cmd)
@@ -2445,7 +2445,7 @@ int do_help(Character *ch, char *argument, cmd_t cmd)
     if (!help_index)
     {
       ch->sendln("No help available.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     bot = 0;
     top = DC::getInstance()->top_of_helpt;
@@ -2470,7 +2470,7 @@ int do_help(Character *ch, char *argument, cmd_t cmd)
           strcat(buffer, "\r");
         }
         page_string(ch->desc, buffer, 1);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else if (bot >= top)
       {
@@ -2485,7 +2485,7 @@ int do_help(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->send(help);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_count(Character *ch, char *arg, cmd_t cmd)
@@ -2525,14 +2525,14 @@ int do_count(Character *ch, char *arg, cmd_t cmd)
   csendf(ch, "The maximum number of players since "
              "last reboot was %d.\r\n",
          max_who);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_inventory(Character *ch, char *argument, cmd_t cmd)
 {
   ch->sendln("You are carrying:");
   ch->list_obj_to_char(ch->carrying, 1, true);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_equipment(Character *ch, char *argument, cmd_t cmd)
@@ -2568,32 +2568,32 @@ int do_equipment(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Nothing.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_credits(Character *ch, char *argument, cmd_t cmd)
 {
   page_string(ch->desc, credits, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_story(Character *ch, char *argument, cmd_t cmd)
 {
   page_string(ch->desc, story, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 /*
 int do_news(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, news, 0);
-   return eSUCCESS;
+   return ReturnValue::eSUCCESS;
 }
 
 */
 int do_info(Character *ch, char *argument, cmd_t cmd)
 {
   page_string(ch->desc, info, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /*********------------ locate objects -----------------***************/
@@ -2711,7 +2711,7 @@ int do_olocate(Character *ch, char *name, cmd_t cmd)
     ch->sendln("Couldn't find any such OBJECT.");
   else
     page_string(ch->desc, buf2, 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 /*********--------- end of locate objects -----------------************/
 
@@ -2773,7 +2773,7 @@ int do_mlocate(Character *ch, char *name, cmd_t cmd)
     ch->sendln("Couldn't find any MOBS by that NAME.");
   else
     page_string(ch->desc, buf2, 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 /* --------------------- End of Mob locate function -------------------- */
 
@@ -3160,7 +3160,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You've seen stray dogs that were better trained.");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* Shows characters in adjacent rooms -- Sadus */
@@ -3300,7 +3300,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_tick(Character *ch, char *argument, cmd_t cmd)
@@ -3341,7 +3341,7 @@ int do_tick(Character *ch, char *argument, cmd_t cmd)
 
   // TODO - figure out if this ever had any purpose.  It's still fun though:)
   ch->desc->tick_wait = ntick;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
@@ -3349,7 +3349,7 @@ command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
   if (level_ >= IMMORTAL)
   {
     send("Immortals cannot gain levels by gaining experience.\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   level_t next_level = level_;
@@ -3372,7 +3372,7 @@ command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
     }
   } while (experience_remaining < 0);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void check_champion_and_website_who_list()
@@ -3461,7 +3461,7 @@ int do_sector(Character *ch, char *arg, cmd_t cmd)
     csendf(ch, "You are currently in %s %s area.\r\n", art.c_str(), sector_types[sector]);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_version(Character *ch, char *arg, cmd_t cmd)
@@ -3470,7 +3470,7 @@ int do_version(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln(QStringLiteral("Version: %1 Build time: %2").arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 class Search
@@ -3889,7 +3889,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       send("limit=10       limit output to only 10 results.\r\n");
       send("affects        shows affects.\r\n");
       send("details        shows certain details depending on object type.\r\n");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (arg1 == "world")
     {
@@ -4390,7 +4390,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     if (showed_ranges)
     {
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   else
@@ -4477,7 +4477,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     if (showed_ranges)
     {
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -4697,7 +4697,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   }
   send("\r\nIdentify a virtual object with the command: identify v####\r\n");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // search type = armor woodbey level = ?

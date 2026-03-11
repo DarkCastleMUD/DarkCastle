@@ -1009,7 +1009,7 @@ int do_accept(Character *ch, char *arg, cmd_t cmd)
 
   add_totem_stats(victim);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
@@ -1086,7 +1086,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
     victim->clan = 0;
     remove_clan_member(clan, this);
     save_clans();
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (victim->clan != this->clan)
@@ -1108,7 +1108,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   if (!victim_connected)
     free_char(victim, Trace("do_outcast"));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_cpromote(Character *ch, char *arg, cmd_t cmd)
@@ -1171,7 +1171,7 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
   logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int clan_desc(Character *ch, char *arg)
@@ -1597,7 +1597,7 @@ int do_ctell(Character *ch, char *arg, cmd_t cmd)
     get_clan(ch)->ctell_history.pop();
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void do_clan_list(Character *ch)
@@ -2604,7 +2604,7 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
       if (!(pmember = get_member(ch->getNameC(), ch->clan)))
       {
         ch->sendln("You don't seem to be in a clan.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->NameC());
@@ -2614,26 +2614,26 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
         sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->Rights(), 1 << bit) ? "on" : "off"));
         ch->send(buf);
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
   if (IS_PC(ch) && (ch->getLevel() >= COORDINATOR))
   {
     do_god_clans(ch, arg, cmd);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->clan && (clan = get_clan(ch)) &&
       (!strcmp(GET_NAME(ch), clan->leader) || needs_clan_command(ch)))
   {
     do_leader_clans(ch, arg, cmd);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   do_clan_list(ch);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_cinfo(Character *ch, char *arg, cmd_t cmd)
@@ -2645,7 +2645,7 @@ int do_cinfo(Character *ch, char *arg, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("$3Syntax$R:  cinfo <clannumber>");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   nClan = atoi(arg);
@@ -2689,7 +2689,7 @@ int do_cinfo(Character *ch, char *arg, cmd_t cmd)
     sprintf(buf, "$3Balance$R:         %lu coins\r\n", clan->getBalance());
     ch->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_whoclan(Character *ch, char *arg, cmd_t cmd)
@@ -2736,7 +2736,7 @@ int do_whoclan(Character *ch, char *arg, cmd_t cmd)
       found++;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_cmotd(Character *ch, char *arg, cmd_t cmd)
@@ -2752,11 +2752,11 @@ int do_cmotd(Character *ch, char *arg, cmd_t cmd)
   if (!clan->clanmotd)
   {
     ch->sendln("There is no motd for your clan currently.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->send(clan->clanmotd);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_ctax(Character *ch, char *arg, cmd_t cmd)
@@ -2788,7 +2788,7 @@ int do_ctax(Character *ch, char *arg, cmd_t cmd)
   get_clan(ch)->tax = tax;
   ch->sendln("Your clan's tax rate has been modified.");
   save_clans();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // This command deposits gold into a clan bank account
@@ -2855,7 +2855,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, cmd_t cmd)
     clan->log(log_entry);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_cwithdraw(Character *ch, char *arg, cmd_t cmd)
@@ -2917,7 +2917,7 @@ int do_cwithdraw(Character *ch, char *arg, cmd_t cmd)
     clan->log(buf);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_cbalance(Character *ch, char *arg, cmd_t cmd)
@@ -2942,7 +2942,7 @@ int do_cbalance(Character *ch, char *arg, cmd_t cmd)
   ss.imbue(std::locale("en_US"));
   ss << get_clan(ch)->getBalance();
   csendf(ch, "Your clan has %s $B$5gold$R coins in the bank.\r\n", ss.str().c_str());
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void remove_totem(Object *altar, Object *totem)
@@ -3403,7 +3403,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
         take->clan1points += 20;
         check_victory(take);
         this->sendln("You withdraw your challenge.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     this->sendln("Your did not issue this challenge.");
     return ReturnValue::eFAILURE;
@@ -3454,7 +3454,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     send("You claim the area on behalf of your clan.\r\n");
     send(QStringLiteral("\r\n##%1 has been claimed by %2!\r\n").arg(DC::getZoneName(zone_key)).arg(get_clan(clan)->name));
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (arg == "yield")
   {
@@ -3476,7 +3476,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       {
         take->clan2points += 20;
         check_victory(take);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     this->sendln("You yield the area on behalf of your clan.");
     char buf[MAX_STRING_LENGTH];
@@ -3484,7 +3484,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     send_info(buf);
     DC::setZoneClanOwner(DC::getInstance()->world[in_room].zone, 0);
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (arg == "collect")
   {
@@ -3516,7 +3516,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
 
     DC::setZoneClanGold(DC::getInstance()->world[in_room].zone, 0);
     save_clans();
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (arg == "list")
   {
@@ -3535,7 +3535,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       this->sendln("Your clan has not claimed any areas.");
       return ReturnValue::eFAILURE;
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (arg == "challenge")
   {
@@ -3601,7 +3601,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     else
       sprintf(buf, "\r\n##Clan %s's control of%s is being challenged!\r\n", get_clan(pl->clan1)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
     send_info(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   send_to_char("Clan Area Commands:\r\n"
                "--------------------\r\n"
@@ -3612,7 +3612,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
                "clanarea yield        (yield an area your clan controls that you are currently in)\r\n"
                "clanarea collect      (collect bounty from an area you are currently in that your clan controls)\r\n",
                this);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 bool others_clan_room(Character *ch, Room *room)

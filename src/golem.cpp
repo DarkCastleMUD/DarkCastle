@@ -90,8 +90,8 @@ int verify_existing_components(Character *ch, int golemtype)
   // OVERSEERS or higher don't need components
   if (ch->getLevel() >= OVERSEER)
   {
-    SET_BIT(retval, eSUCCESS);
-    SET_BIT(retval, eEXTRA_VALUE); // Special effect.
+    SET_BIT(retval, ReturnValue::eSUCCESS);
+    SET_BIT(retval, ReturnValue::eEXTRA_VALUE); // Special effect.
     return retval;
   }
 
@@ -99,7 +99,7 @@ int verify_existing_components(Character *ch, int golemtype)
   int i;
   class Object *curr, *next_content;
   char buf[MAX_STRING_LENGTH];
-  SET_BIT(retval, eSUCCESS);
+  SET_BIT(retval, ReturnValue::eSUCCESS);
   for (i = 0; i < 5; i++)
   {
     if (golem_list[golemtype].components[i] == 0)
@@ -113,7 +113,7 @@ int verify_existing_components(Character *ch, int golemtype)
       {
         found = true;
         if (i == 4)
-          SET_BIT(retval, eEXTRA_VALUE); // Special effect.
+          SET_BIT(retval, ReturnValue::eEXTRA_VALUE); // Special effect.
       }
     }
     if (!found && i != 4)
@@ -332,7 +332,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     ch->send("Something goes wrong, and you fail!");
     return ReturnValue::eFAILURE;
   }
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
   {
     ch->sendln("Adding in the final ingredient, your golem increases in strength!");
     SETBIT(golem->affected_by, golem_list[i].special_aff);
@@ -343,7 +343,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   SETBIT(golem->affected_by, AFF_CHARM);
   //  struct affected_type af;
   send_to_char(golem_list[i].creation_message, ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 extern char frills[];
@@ -447,7 +447,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
     logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   exp_needed = (int)(exp_table[(int)ch->getLevel() + 19] - (int64_t)GET_EXP(ch));
 
@@ -629,7 +629,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 
   master->sendln("($5:$7)=========================================================================($5:$7)");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
@@ -640,8 +640,8 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   ch->sendln("You don't have a golem.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

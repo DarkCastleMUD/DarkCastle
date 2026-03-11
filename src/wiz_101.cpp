@@ -111,7 +111,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
   sendln("Test commands:");
   sendln(test_buffer);
   sendln();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
@@ -356,7 +356,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         k->follower->do_goto(arguments, cmd_t::DEFAULT);
       }
     }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_poof(Character *ch, char *arg, cmd_t cmd)
@@ -382,7 +382,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("\n\rCurrent poof out is:");
     ch->send(ch->player->poofout);
     ch->sendln("");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (inout[0] != 'i' && inout[0] != 'o')
@@ -458,7 +458,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
   }
 
   ch->sendln("Ok.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_at(Character *ch, char *argument, cmd_t cmd)
@@ -564,7 +564,7 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "Time stops for a minute as %s and %s high-five!\n\r", GET_SHORT(ch), GET_SHORT(victim));
     send_to_all(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_holylite(Character *ch, char *argument, cmd_t cmd)
@@ -587,7 +587,7 @@ int do_holylite(Character *ch, char *argument, cmd_t cmd)
     ch->player->holyLite = true;
     ch->sendln("Holy light mode on.");
   } /* if */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
@@ -625,7 +625,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
   }
   sprintf(buf, "WizInvis Set to: %d \n\r", ch->player->wizinvis);
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_nohassle(Character *ch, char *argument, cmd_t cmd)
@@ -643,7 +643,7 @@ int do_nohassle(Character *ch, char *argument, cmd_t cmd)
     SET_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
     ch->sendln("Those pesky mobiles will leave you alone now.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // cmd == cmd_t::DEFAULT - imm
@@ -683,7 +683,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
     else
     {
       ch->sendln("What? How did you get here?? Contact a coder.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     while (!tmp.empty())
@@ -735,7 +735,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_findfix(Character *ch, char *argument, cmd_t cmd)
@@ -792,7 +792,7 @@ int do_findfix(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_varstat(Character *ch, char *argument, cmd_t cmd)
@@ -818,5 +818,5 @@ int do_varstat(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("No temporary variables found.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

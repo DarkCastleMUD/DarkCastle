@@ -963,7 +963,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void obj_stat(Character *ch, class Object *j)
@@ -1440,7 +1440,7 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_clear(Character *ch, char *argument, cmd_t cmd)
@@ -1487,7 +1487,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("You have just caused the destruction of countless creatures in ths area!");
   sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
   logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_linkdead(Character *ch, char *arg, cmd_t cmd)
@@ -1514,7 +1514,7 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
 
   if (!x)
     ch->sendln("No linkdead players found.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_echo(Character *ch, char *argument, cmd_t cmd)
@@ -1538,7 +1538,7 @@ int do_echo(Character *ch, char *argument, cmd_t cmd)
     for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       vict->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_restore(Character *ch, char *argument, cmd_t cmd)
@@ -1640,7 +1640,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("Trying to be Mister Popularity?");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Scavenger hunts..
@@ -1752,7 +1752,7 @@ int do_huntclear(Character *ch, char *arg, cmd_t cmd)
   if (str_cmp(arg1, "doit"))
   {
     ch->sendln("Syntax: huntclear doit\r\nClears all currently running treasure hunts.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
@@ -1764,7 +1764,7 @@ int do_huntclear(Character *ch, char *arg, cmd_t cmd)
       check_end_of_hunt(h, true);
     }
     ch->sendln("Done!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 }
 
@@ -2127,7 +2127,7 @@ int do_showhunt(Character *ch, char *arg, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_huntstart(Character *ch, char *argument, cmd_t cmd)
@@ -2175,30 +2175,30 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
   if (arg3[0] == '\0')
   {
     ch->sendln("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
   if (vnum <= 0 || real_object(vnum) < 0)
   {
     ch->sendln("Non-existent item.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (num <= 0 || num > 50)
   {
     ch->sendln("Invalid number of items. Maximum of 50 allowed.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (time <= 0)
   {
     ch->sendln("Invalid duration.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   struct hunt_data *h;
   for (h = hunt_list; h; h = h->next)
     if (h->itemnum == vnum)
     {
       ch->sendln("A hunt for that item is already ongoing!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   char huntname[200];
   if (argument && *argument)
@@ -2239,5 +2239,5 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
   }
 #endif
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

@@ -129,5 +129,5 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
   else if (!str_cmp(arg, "learn"))
   {
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

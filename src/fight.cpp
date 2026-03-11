@@ -155,7 +155,7 @@ int check_autojoiners(Character *ch, int skill = 0)
     if (SOMEONE_DIED(retval))
       return retval;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int check_joincharmie(Character *ch, int skill = 0)
@@ -265,7 +265,7 @@ void perform_violence(void)
           folnext = fol->next;
           if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
             retval = check_charmiejoin(fol->follower);
-          if (isSet(retval, eVICT_DIED))
+          if (isSet(retval, ReturnValue::eVICT_DIED))
             break;
         }
       }
@@ -310,7 +310,7 @@ void perform_violence(void)
       // DEBUG CODE
       if (last_class != GET_CLASS(ch))
       {
-        // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
+        // if this happened, most likely the mob died somehow during the proc and didn't return ReturnValue::eCH_DIED and is
         // now invalid memory.  report what class we were and return
         logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
         break;
@@ -544,7 +544,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     logentry(QStringLiteral("nullptr Victim or Ch sent to attack!  This crashes us!"), -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
 
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   if (GET_POS(ch) == position_t::DEAD)
@@ -553,7 +553,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     produce_coredump();
     stop_fighting(ch);
 
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   // victim could be dead if a skill like do_ki causes folowers to autojoin and kill
@@ -783,7 +783,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 } // of attack
 
 void update_flags(Character *vict)
@@ -948,7 +948,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
   if (!ch || !vict)
   {
     logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
-    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (GET_POS(vict) == position_t::DEAD)
@@ -1018,10 +1018,10 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
       ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
-    return eSUCCESS | eCH_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // standard retvals
@@ -1135,10 +1135,10 @@ int do_fireshield(Character *ch, Character *vict, int dam)
       ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
-    return eSUCCESS | eCH_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // standard retvals
@@ -1221,10 +1221,10 @@ int do_acidshield(Character *ch, Character *vict, int dam)
       ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
-    return eSUCCESS | eCH_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_boneshield(Character *ch, Character *vict, int dam)
@@ -1281,10 +1281,10 @@ int do_boneshield(Character *ch, Character *vict, int dam)
       ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
-    return eSUCCESS | eCH_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void check_weapon_skill_bonus(Character *ch, int type, Object *wielded,
@@ -1455,7 +1455,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   if (!vict || !ch)
   {
     logentry(QStringLiteral("Null victim or char in one_hit!  This Crashes us!"), -1, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   if (ch == vict)
@@ -1466,7 +1466,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   }
 
   if (GET_POS(vict) == position_t::DEAD)
-    return (eSUCCESS | eVICT_DIED);
+    return (ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED);
 
   // TODO - I'd like to remove these 3 cause they are checked in attack()
   /* This happens with multi-attacks */
@@ -1610,11 +1610,11 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   retval = damage(ch, vict, dam, weapon_type, w_type, weapon);
   if (SOMEONE_DIED(retval) || !ch->fighting)
   {
-    return debug_retval(ch, vict, retval) | eSUCCESS;
+    return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
   }
 
   // Was last hit a success?
-  if (isSet(retval, eSUCCESS))
+  if (isSet(retval, ReturnValue::eSUCCESS))
   {
     // If they're wielding a weapon check for weapon spells, otherwise check for hand spells
     if (wielded)
@@ -1622,7 +1622,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
       retval = weapon_spells(ch, vict, weapon);
       if (SOMEONE_DIED(retval) || !ch->fighting)
       {
-        return debug_retval(ch, vict, retval) | eSUCCESS;
+        return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
       }
 
       if (ch->equipment[weapon] && DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].combat_func)
@@ -1630,7 +1630,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         retval = ((*DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], cmd_t::UNDEFINED, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
-          return debug_retval(ch, vict, retval) | eSUCCESS;
+          return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
         }
       }
     }
@@ -1642,13 +1642,13 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         retval = weapon_spells(ch, vict, WEAR_HANDS);
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
-          return debug_retval(ch, vict, retval) | eSUCCESS;
+          return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
         }
         if (DC::getInstance()->obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)
           retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], cmd_t::UNDEFINED, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
-          return debug_retval(ch, vict, retval) | eSUCCESS;
+          return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
         }
       }
 
@@ -1657,7 +1657,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         retval = weapon_spells(ch, vict, WEAR_HOLD);
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
-          return debug_retval(ch, vict, retval) | eSUCCESS;
+          return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
         }
 
         if (ch->equipment[WEAR_HOLD]->item_number >= 0)
@@ -1666,7 +1666,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
             retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HOLD]->item_number].combat_func)(ch, ch->equipment[WEAR_HOLD], cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
-            return debug_retval(ch, vict, retval) | eSUCCESS;
+            return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
           }
         }
       }
@@ -1677,7 +1677,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         retval = weapon_spells(ch, vict, WEAR_HOLD2);
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
-          return debug_retval(ch, vict, retval) | eSUCCESS;
+          return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
         }
 
         if (ch->equipment[WEAR_HOLD2]->item_number >= 0)
@@ -1686,7 +1686,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
             retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HOLD2]->item_number].combat_func)(ch, ch->equipment[WEAR_HOLD2], cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
-            return debug_retval(ch, vict, retval) | eSUCCESS;
+            return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
           }
         }
       }
@@ -1697,7 +1697,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   {
     retval = cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, nullptr, ch->getLevel());
     if (SOMEONE_DIED(retval))
-      return debug_retval(ch, vict, retval) | eSUCCESS;
+      return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
   }
 
   if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
@@ -1708,7 +1708,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
     }
   }
 
-  return debug_retval(ch, vict, retval) | eSUCCESS;
+  return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
 } // one_hit
 
 // pos of -1 means inventory
@@ -1936,8 +1936,8 @@ int damage_retval(Character *ch, Character *vict, int value)
   // we need to make sure in the case of a reflect or something
   // that we are returning the death of the CH if he died
 
-  if (ch == vict && isSet(value, eVICT_DIED))
-    return (value | eCH_DIED);
+  if (ch == vict && isSet(value, ReturnValue::eVICT_DIED))
+    return (value | ReturnValue::eCH_DIED);
 
   return value;
 }
@@ -2067,7 +2067,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     bingo = false;
   }
 
-  SET_BIT(retval, eSUCCESS);
+  SET_BIT(retval, ReturnValue::eSUCCESS);
   weapon_bit = get_weapon_bit(weapon_type);
   typeofdamage = damage_type(weapon_type);
   struct follow_type *fol;
@@ -2075,7 +2075,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     weapon_bit = TYPE_FIRE;
 
   if (GET_POS(victim) == position_t::DEAD)
-    return (eSUCCESS | eVICT_DIED);
+    return (ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED);
   if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE ||
                                           attacktype == SKILL_ARCHERY || attacktype == SPELL_LIGHTNING_BOLT ||
                                           attacktype == SKILL_FIRE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
@@ -2376,7 +2376,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if (do_frostshield(ch, victim))
     {
-      return debug_retval(ch, victim, retval) | eEXTRA_VALUE;
+      return debug_retval(ch, victim, retval) | ReturnValue::eEXTRA_VALUE;
       ;
     }
 
@@ -2453,7 +2453,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       if (SOMEONE_DIED(retval2)) // Riposte
         return damage_retval(ch, victim, retval2);
 
-      if (isSet(retval2, eSUCCESS))
+      if (isSet(retval2, ReturnValue::eSUCCESS))
       {
         switch (type)
         {
@@ -2628,11 +2628,11 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   if (isSet(victim->immune, weapon_bit))
   {
     dam = 0;
-    SET_BIT(retval, eIMMUNE_VICTIM);
+    SET_BIT(retval, ReturnValue::eIMMUNE_VICTIM);
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
     {
       SET_BIT(modifier, COMBAT_MOD_IGNORE);
-      SET_BIT(retval, eEXTRA_VALUE);
+      SET_BIT(retval, ReturnValue::eEXTRA_VALUE);
     }
   }
   else if (isSet(victim->suscept, weapon_bit))
@@ -2827,7 +2827,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       else
         fight_kill(ch, victim, TYPE_CHOOSE, 0);
     }
-    return damage_retval(ch, victim, (eSUCCESS | eVICT_DIED));
+    return damage_retval(ch, victim, (ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED));
   }
   else
   {
@@ -2850,7 +2850,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
             folnext = fol->next;
             if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
               SET_BIT(retval, check_charmiejoin(fol->follower));
-            if (isSet(retval, eVICT_DIED))
+            if (isSet(retval, ReturnValue::eVICT_DIED))
               break;
           }
         }
@@ -2899,11 +2899,11 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
     if (type == KILL_BATTER)
       kill_type = TYPE_PKILL;
     fight_kill(nullptr, ch, kill_type, type);
-    return eSUCCESS | eCH_DIED;
+    return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
   else
   {
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 }
 
@@ -3505,11 +3505,11 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   { // Miss
     type = 3;
   }
-  debug_isHit(ch, victim, attacktype, type, reduce, toHit, "return eSUCCESS");
-  return eSUCCESS;
+  debug_isHit(ch, victim, attacktype, type, reduce, toHit, "return ReturnValue::eSUCCESS");
+  return ReturnValue::eSUCCESS;
 }
 
-// check counter strike never returns eSUCCESS because that would
+// check counter strike never returns ReturnValue::eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
 int checkCounterStrike(Character *ch, Character *victim)
@@ -3565,13 +3565,13 @@ int checkCounterStrike(Character *ch, Character *victim)
   retval = one_hit(victim, ch, TYPE_HIT, FIRST);
   retval = SWAP_CH_VICT(retval);
 
-  REMOVE_BIT(retval, eSUCCESS);
+  REMOVE_BIT(retval, ReturnValue::eSUCCESS);
   SET_BIT(retval, ReturnValue::eFAILURE);
 
   return debug_retval(ch, victim, retval);
 }
 
-// check counter strike never returns eSUCCESS because that would
+// check counter strike never returns ReturnValue::eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
 int doTumblingCounterStrike(Character *ch, Character *victim)
@@ -3609,13 +3609,13 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
   retval = one_hit(victim, ch, TYPE_HIT, FIRST);
   retval = SWAP_CH_VICT(retval);
 
-  REMOVE_BIT(retval, eSUCCESS);
+  REMOVE_BIT(retval, ReturnValue::eSUCCESS);
   SET_BIT(retval, ReturnValue::eFAILURE);
 
   return debug_retval(ch, victim, retval);
 }
 
-// check riposte never returns eSUCCESS because that would
+// check riposte never returns ReturnValue::eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
 int check_riposte(Character *ch, Character *victim, int attacktype)
@@ -3670,7 +3670,7 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
   retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
   retval = SWAP_CH_VICT(retval);
 
-  REMOVE_BIT(retval, eSUCCESS);
+  REMOVE_BIT(retval, ReturnValue::eSUCCESS);
   SET_BIT(retval, ReturnValue::eFAILURE);
 
   return debug_retval(ch, victim, retval);
@@ -5161,12 +5161,12 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
       vict->sendln("You have been SKEWERED!!\n\r");
       damage(ch, vict, 9999999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
       //      update_pos(vict);
-      return eSUCCESS | eVICT_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
     }
     return debug_retval(ch, vict, retval);
   }
   // if they're still here the skewer missed
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_behead_skill(Character *ch, Character *vict)
@@ -5194,14 +5194,14 @@ int do_behead_skill(Character *ch, Character *vict)
             act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
             act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
             act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
-            return eSUCCESS;
+            return ReturnValue::eSUCCESS;
           }
           if (IS_AFFECTED(vict, AFF_NO_BEHEAD))
           {
             act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
             act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
             act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
-            return eSUCCESS;
+            return ReturnValue::eSUCCESS;
           }
           act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
           act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
@@ -5210,7 +5210,7 @@ int do_behead_skill(Character *ch, Character *vict)
           make_head(vict);
           group_gain(ch, vict);
           fight_kill(ch, vict, TYPE_CHOOSE, 0);
-          return eSUCCESS | eVICT_DIED; /* Zero means kill it! */
+          return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED; /* Zero means kill it! */
           // it died..
         }
         else
@@ -5218,7 +5218,7 @@ int do_behead_skill(Character *ch, Character *vict)
           act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
           act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
           act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
       }
     }
@@ -5252,14 +5252,14 @@ int do_execute_skill(Character *ch, Character *vict, int w_type)
           act("$N deftly dodges your mortal strike!", ch, 0, vict, TO_CHAR, 0);
           act("$N deftly dodges $n's mortal strike!", ch, 0, vict, TO_ROOM, NOTVICT);
           act("You deftly avoid $n's mortal strike!", ch, 0, vict, TO_VICT, 0);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         else if (!skill_success(ch, vict, SKILL_EXECUTE))
         {
           act("$N narrowly avoids your lethal blow as you attempt to thrust aside $S defenses!", ch, 0, vict, TO_CHAR, 0);
           act("You narrowly avoid a lethal blow as $n attempts to thrust aside your defenses!", ch, 0, vict, TO_VICT, 0);
           act("$N narrowly avoids $n's lethal blow as $e attempts to thrust aside $S defenses! ", ch, 0, vict, TO_ROOM, NOTVICT);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         else
         {
@@ -5297,7 +5297,7 @@ int do_execute_skill(Character *ch, Character *vict, int w_type)
           }
           group_gain(ch, vict);
           fight_kill(ch, vict, TYPE_CHOOSE, 0);
-          return eSUCCESS | eVICT_DIED; /* Zero means kill it! */
+          return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED; /* Zero means kill it! */
         }
       }
     }
@@ -7152,7 +7152,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   if (!ch || !vict)
   {
     logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, DC::LogChannel::LOG_BUG);
-    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (!weapon)
     return ReturnValue::eFAILURE;
@@ -7182,7 +7182,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
     if (ch->in_room != vict->in_room)
       return ReturnValue::eFAILURE;
     if (GET_POS(vict) == position_t::DEAD)
-      return eSUCCESS | eVICT_DIED;
+      return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
     chance = number(1, 100);
     percent = weap->affected[i].modifier;
     current_affect = weap->affected[i].location;
@@ -7310,7 +7310,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
             break;
       */
     default:
-      retval = eSUCCESS;
+      retval = ReturnValue::eSUCCESS;
       // Don't want to log this since a non-spell affect is going to happen all
       // the time (like SAVE_VS_FIRE or HIT-N-DAM for example) -pir
       // logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
@@ -7325,7 +7325,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   if (DC::getInstance()->obj_index[weap->item_number].progtypes & WEAPON_PROG)
     ch->oprog_weapon_trigger(weap);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 } /* spell effects */
 
 int act_poisonous(Character *ch)
@@ -7568,10 +7568,10 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
         if (IS_PC(ch))
           REMOVE_BIT(ch->combat, COMBAT_FLEEING);
 
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
           return retval;
         REMOVE_BIT(ch->combat, COMBAT_FLEEING);
-        if (isSet(retval, eSUCCESS))
+        if (isSet(retval, ReturnValue::eSUCCESS))
         {
           stop_fighting(ch);
 
@@ -7594,11 +7594,11 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
             }
           } // for
 
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         else
         {
-          if (!isSet(retval, eCH_DIED))
+          if (!isSet(retval, ReturnValue::eCH_DIED))
             act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
           if (last_fighting)
@@ -7638,8 +7638,8 @@ command_return_t Character::check_pursuit(Character *victim, QString dircommand)
     act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, TO_ROOM, NOTVICT);
 
     int retval = this->command_interpreter(dircommand);
-    if (isSet(retval, eCH_DIED))
-      return eSUCCESS;
+    if (isSet(retval, ReturnValue::eCH_DIED))
+      return ReturnValue::eSUCCESS;
 
     act("Spotting $N nearby, you rush in towards $m and furiously attack!", this, 0, victim, TO_CHAR, 0);
     act("$n charges in with a bellow of rage, cutting of your escape and attacks you furiously!", this, 0, victim, TO_VICT, 0);
@@ -7648,7 +7648,7 @@ command_return_t Character::check_pursuit(Character *victim, QString dircommand)
     WAIT_STATE(this, DC::PULSE_VIOLENCE);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int32_t get_weapon_bit(int weapon_type)

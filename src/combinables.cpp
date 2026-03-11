@@ -184,7 +184,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   if (rewardnum < 0)
   {
     ch->sendln("That poison is broken.  Tell a god.");
-    return (ReturnValue::eFAILURE | eINTERNAL_ERROR);
+    return (ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR);
   }
 
   Object *reward = clone_object(rewardnum);
@@ -192,7 +192,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description));
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
@@ -262,7 +262,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   // remove vial
   extract_obj(vial);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -342,13 +342,13 @@ void determine_trade_skill_increase(Character *ch, int skillnum, int learned, in
 
 int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
 {
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   // unused   int dam;
 
   if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("In handle_poisoned_weapon_atack() with null wield.  Tell a god.");
-    return (ReturnValue::eFAILURE | eINTERNAL_ERROR);
+    return (ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR);
   }
 
   /*   switch(type)
@@ -439,18 +439,18 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     {
       b.load();
       logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d brew recipes.", b.size());
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "save"))
     {
       b.save();
       logf(108, DC::LogChannel::LOG_WORLD, "Saved %d brew recipes.", b.size());
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "list"))
     {
       b.list(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "add"))
     {
@@ -691,7 +691,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 Brew::Brew(void)
@@ -852,7 +852,7 @@ int Brew::add(Character *ch, char *argument)
 
   ch->sendln("New brew recipe added.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int Brew::remove(Character *ch, char *argument)
@@ -878,7 +878,7 @@ int Brew::remove(Character *ch, char *argument)
       recipes.erase((*iter).first);
       ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -944,18 +944,18 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     {
       s.load();
       logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d scribe recipes.", s.size());
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "save"))
     {
       s.save();
       logf(108, DC::LogChannel::LOG_WORLD, "Saved %d scribe recipes.", s.size());
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "list"))
     {
       s.list(ch);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "add"))
     {
@@ -1142,7 +1142,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     extract_obj(dustobj);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 Scribe::Scribe(void)
@@ -1305,7 +1305,7 @@ int Scribe::add(Character *ch, char *argument)
 
   ch->sendln("New scribe recipe added.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int Scribe::remove(Character *ch, char *argument)
@@ -1331,7 +1331,7 @@ int Scribe::remove(Character *ch, char *argument)
       recipes.erase((*iter).first);
       ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 

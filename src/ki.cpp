@@ -307,7 +307,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         GET_KI(ch) -= use_ki(ch, spl) / 2;
         WAIT_STATE(ch, ki_info[spl].beats() / 2);
 
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
@@ -414,7 +414,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   if (!vict)
   {
     logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   success += ch->getLevel();
@@ -435,7 +435,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     act("$n finds that you are hard to blast!", ch, 0, vict, TO_VICT, 0);
     if (!vict->fighting && IS_NPC(vict))
       return attack(vict, ch, TYPE_UNDEFINED);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (CAN_GO(vict, exit) &&
@@ -468,7 +468,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     move_char(vict, (DC::getInstance()->world[(ch)->in_room].dir_option[exit])->to_room);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else /* There is no exit there */
   {
@@ -484,7 +484,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     return retval;
   }
   /* still here?  It was unsuccessful */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -492,7 +492,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
   if (!vict)
   {
     logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   set_cantquit(ch, vict);
@@ -530,16 +530,16 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
       return attack(vict, ch, TYPE_UNDEFINED);
   }
 
-  return eSUCCESS; // shouldn't get here
+  return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
 int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   struct affected_type af;
   if (IS_AFFECTED(ch, AFF_INFRARED))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   if (ch->affected_by_spell(SPELL_INFRAVISION))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   af.type = SPELL_INFRAVISION;
   af.modifier = 0;
@@ -549,7 +549,7 @@ int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
   affect_to_char(vict, &af);
   vict->sendln("You feel your sense become more acute.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -570,7 +570,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     {
       retval = damage(ch, tmp_victim, dam, TYPE_KI,
                       KI_OFFSET + KI_STORM, 0);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
       act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
     } // else
@@ -599,7 +599,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     send_damage("The flash of energy surges within you for | life!", ch, 0, 0, dammsg, "The flash of energy surges within you!", TO_CHAR);
   }
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -609,11 +609,11 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
   if (!vict)
   {
     logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   if (vict->affected_by_spell(SPELL_HASTE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   af.type = SPELL_HASTE;
   af.duration = ch->has_skill(KI_OFFSET + KI_SPEED) / 15;
@@ -632,7 +632,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
   affect_to_char(vict, &af);
 
   vict->sendln("You feel a quickening in your limbs!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -640,7 +640,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   if (!vict)
   {
     logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
   if (!arg)
   {
@@ -695,7 +695,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   {
     ch->sendln("You cannot purge that.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
@@ -703,7 +703,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   if (!victim)
   {
     logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -1094,7 +1094,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     SWAP_CH_VICT(retval);
     return retval;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -1115,7 +1115,7 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
   if (number(1, 100) > (GET_DEX(ch) * 4))
   {
     ch->sendln("You accidently stub your toe and fall out of the defenseive stance.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   SET_BIT(ch->combat, COMBAT_MONK_STANCE);
@@ -1127,7 +1127,7 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -1188,7 +1188,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -1205,7 +1205,7 @@ int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
 
   ch->setHP(MIN(ch->getHP() + gain, hit_limit(ch)));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
@@ -1296,5 +1296,5 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
     return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

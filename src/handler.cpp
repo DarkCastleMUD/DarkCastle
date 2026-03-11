@@ -1736,7 +1736,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
     /* Fly wears off...you fall :) */
     if (((flags & SUPPRESS_CONSEQUENCES) == 0) && ((isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))))
     {
-      if (do_fall(ch, dir) & eCH_DIED)
+      if (do_fall(ch, dir) & ReturnValue::eCH_DIED)
         char_died = true;
     }
     break;
@@ -3727,7 +3727,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 
   class Object *i;
   Character *omast = nullptr;
-  int ret = eSUCCESS;
+  int ret = ReturnValue::eSUCCESS;
   if (IS_PC(ch) && !ch->desc)
     for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
       if (t_desc->original == ch)
