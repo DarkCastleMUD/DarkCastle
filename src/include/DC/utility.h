@@ -31,12 +31,13 @@
 
 #include "DC/common.h"
 #include "DC/DC.h"
-#include "DC/structs.h"
 #include "DC/weather.h"
-#include "DC/memory.h"
-#include "DC/player.h"
 #include "DC/character.h"
 #include "DC/Trace.h"
+#include "DC/spells.h"
+#include "DC/player.h"
+
+extern const struct str_app_type str_app[];
 
 extern struct weather_data weather_info;
 
@@ -47,26 +48,15 @@ static const int COREDUMP_MAX = 10;
 #ifdef WIN32
 inline int random()
 {
-   return (rand());
+  return (rand());
 }
 char *index(char *buf, char op);
 #endif
 
 #define MOB_WAIT_STATE(ch) ((ch)->deaths)
 
-#define GET_WAIT(ch) (IS_NPC((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
-
-// #define WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) : (IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
-static inline void WAIT_STATE(auto ch, auto cycle)
-{
-   if (ch->desc && !ch->isImmortalPlayer())
-   {
-      if (ch->desc->wait < cycle)
-         ch->desc->wait = cycle;
-   }
-   else if (ch->isNPC())
-      ch->deaths = cycle;
-}
+int GET_WAIT(Character *ch);
+void WAIT_STATE(Character *ch, int cycle);
 
 #define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
                                                                                                                                                        : 0)
@@ -89,17 +79,17 @@ bool is_hiding(Character *ch, Character *vict);
 #define CONSECRATE_COMP_OBJ_NUMBER 3094
 #define DESECRATE_COMP_OBJ_NUMBER 303
 
-#define REMOVE_FROM_LIST(item, head, next)   \
-   if ((item) == (head))                     \
-      head = (item)->next;                   \
-   else                                      \
-   {                                         \
-      temp = head;                           \
-      while (temp && (temp->next != (item))) \
-         temp = temp->next;                  \
-      if (temp)                              \
-         temp->next = (item)->next;          \
-   }
+#define REMOVE_FROM_LIST(item, head, next) \
+  if ((item) == (head))                    \
+    head = (item)->next;                   \
+  else                                     \
+  {                                        \
+    temp = head;                           \
+    while (temp && (temp->next != (item))) \
+      temp = temp->next;                   \
+    if (temp)                              \
+      temp->next = (item)->next;           \
+  }
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -114,46 +104,46 @@ bool is_hiding(Character *ch, Character *vict);
 #define CAP(st) (*(st) = UPPER(*(st)), st)
 
 #ifdef LEAK_CHECK
-#define CREATE(result, type, number)                            \
-   do                                                           \
-   {                                                            \
-      if (!((result) = (type *)calloc((number), sizeof(type)))) \
-      {                                                         \
-         perror("calloc failure in CREATE: ");                  \
-         abort();                                               \
-      }                                                         \
-   } while (0)
+#define CREATE(result, type, number)                          \
+  do                                                          \
+  {                                                           \
+    if (!((result) = (type *)calloc((number), sizeof(type)))) \
+    {                                                         \
+      perror("calloc failure in CREATE: ");                   \
+      abort();                                                \
+    }                                                         \
+  } while (0)
 #else
-#define CREATE(result, type, number)                              \
-   do                                                             \
-   {                                                              \
-      if (!((result) = (type *)dc_alloc((number), sizeof(type)))) \
-      {                                                           \
-         perror("calloc failure in CREATE: ");                    \
-         abort();                                                 \
-      }                                                           \
-   } while (0)
+#define CREATE(result, type, number)                            \
+  do                                                            \
+  {                                                             \
+    if (!((result) = (type *)dc_alloc((number), sizeof(type)))) \
+    {                                                           \
+      perror("calloc failure in CREATE: ");                     \
+      abort();                                                  \
+    }                                                           \
+  } while (0)
 #endif
 
-#define RECREATE(result, type, number)                                         \
-   do                                                                          \
-   {                                                                           \
-      if (!((result) = (type *)dc_realloc((result), sizeof(type) * (number)))) \
-      {                                                                        \
-         perror("realloc failure in RECREATE");                                \
-         abort();                                                              \
-      }                                                                        \
-   } while (0)
+#define RECREATE(result, type, number)                                       \
+  do                                                                         \
+  {                                                                          \
+    if (!((result) = (type *)dc_realloc((result), sizeof(type) * (number)))) \
+    {                                                                        \
+      perror("realloc failure in RECREATE");                                 \
+      abort();                                                               \
+    }                                                                        \
+  } while (0)
 
-#define FREE(p)           \
-   do                     \
-   {                      \
-      if ((p) != nullptr) \
-      {                   \
-         dc_free((p));    \
-         (p) = 0;         \
-      }                   \
-   } while (0)
+#define FREE(p)         \
+  do                    \
+  {                     \
+    if ((p) != nullptr) \
+    {                   \
+      dc_free((p));     \
+      (p) = 0;          \
+    }                   \
+  } while (0)
 
 #define ASIZE 32 // don't change unless you want to be screwed
 #define SETBIT(var, bit) ((var)[(bit) / ASIZE] |= (1 << (((bit) - (((bit) / ASIZE) * ASIZE) - 1))))
@@ -236,7 +226,7 @@ bool IS_DARK(int room);
 #define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? DC::getInstance()->obj_index[GET_OBJ_RNUM(obj)].vnum() : -1)
 #define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= DC::getInstance()->top_of_world)
 #define GET_ROOM_VNUM(rnum) \
-   ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
+  ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
 
 #define GET_TOGGLES(ch) ((ch)->player->toggles)
 
@@ -265,7 +255,7 @@ bool IS_DARK(int room);
 #define GET_POISON_AMOUNT(ch) ((ch)->poison_amount)
 
 #define STRENGTH_APPLY_INDEX(ch) \
-   (GET_STR(ch))
+  (GET_STR(ch))
 
 #define GET_AC(ch) ((ch)->armor)
 #define GET_ARMOR(ch) ((ch)->armor + dex_app[GET_DEX((ch))].ac_mod)
@@ -301,17 +291,17 @@ bool IS_DARK(int room);
 // #define GET_BITV(ch) ((ch)->race == 1 ? 1 : (1 << (((ch)->race) - 1)))
 auto getBitvector(auto value)
 {
-   if (value == 0)
-   {
-      return 0;
-   }
+  if (value == 0)
+  {
+    return 0;
+  }
 
-   if (value == 1)
-   {
-      return 1;
-   }
+  if (value == 1)
+  {
+    return 1;
+  }
 
-   return 1 << (value - 1);
+  return 1 << (value - 1);
 }
 #define IS_UNDEAD(ch) ((GET_RACE(ch) == RACE_UNDEAD) || (GET_RACE(ch) == RACE_GHOST))
 
@@ -343,12 +333,12 @@ inline const short IS_ANONYMOUS(Character *ch)
 #define IS_CARRYING_W(ch) ((ch)->carry_weight)
 #define IS_CARRYING_N(ch) ((ch)->carry_items)
 
-#define CAN_CARRY_OBJ(ch, obj)                                        \
-   (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) && \
-    ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)))
-#define CAN_GET_OBJ(ch, obj)                               \
-   (CAN_WEAR((obj), TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
-    CAN_SEE_OBJ((ch), (obj)))
+#define CAN_CARRY_OBJ(ch, obj)                                       \
+  (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) && \
+   ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)))
+#define CAN_GET_OBJ(ch, obj)                              \
+  (CAN_WEAR((obj), TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
+   CAN_SEE_OBJ((ch), (obj)))
 
 #define IS_OBJ_STAT(obj, stat) (isSet((obj)->obj_flags.extra_flags, stat))
 #define IS_SPECIAL(obj) (IS_OBJ_STAT(obj, ITEM_SPECIAL))
@@ -394,9 +384,9 @@ inline const short IS_ANONYMOUS(Character *ch)
 
 enum MatchType
 {
-   Failure,
-   Subset,
-   Exact
+  Failure,
+  Subset,
+  Exact
 };
 
 char *str_hsh(const char *);
@@ -404,77 +394,77 @@ bool ishashed(char *);
 template <typename T>
 T double_dollars(T source)
 {
-   T destination{};
+  T destination{};
 
-   for (const auto &c : source)
-   {
-      if (c == '$')
-      {
-         destination += "$$";
-      }
-      else
-      {
-         destination += c;
-      }
-   }
+  for (const auto &c : source)
+  {
+    if (c == '$')
+    {
+      destination += "$$";
+    }
+    else
+    {
+      destination += c;
+    }
+  }
 
-   return destination;
+  return destination;
 }
 
 // Tested in TestUtility::test_space_to_underscore
 template <typename T>
 T space_to_underscore(T str)
 {
-   for (auto &c : str)
-   {
-      if (c == ' ')
-      {
-         c = '_';
-      }
-   }
+  for (auto &c : str)
+  {
+    if (c == ' ')
+    {
+      c = '_';
+    }
+  }
 
-   return str;
+  return str;
 }
 
 // Tested in TestUtility::str_n_nosp_cmp_begin
 template <typename T>
 MatchType str_n_nosp_cmp_begin(T arg1, T arg2)
 {
-   auto tmp_arg1 = space_to_underscore(arg1);
-   auto tmp_arg1_len = tmp_arg1.length();
-   auto tmp_arg2 = space_to_underscore(arg2);
-   auto tmp_arg2_len = tmp_arg2.length();
+  auto tmp_arg1 = space_to_underscore(arg1);
+  auto tmp_arg1_len = tmp_arg1.length();
+  auto tmp_arg2 = space_to_underscore(arg2);
+  auto tmp_arg2_len = tmp_arg2.length();
 
-   int compare_result = -1;
-   if constexpr (std::convertible_to<T, std::string_view>)
-   {
-      compare_result = strncasecmp(tmp_arg1.c_str(), tmp_arg2.c_str(), tmp_arg1_len);
-   }
-   else if constexpr (std::convertible_to<T, QStringView>)
-   {
-      tmp_arg2.truncate(tmp_arg1_len);
-      compare_result = tmp_arg1.compare(tmp_arg2, Qt::CaseInsensitive);
-   }
-   else
-   {
-      static_assert(false, "Unhandled variable type passed to str_n_nosp_cmp_begin");
-   }
+  int compare_result = -1;
+  if constexpr (std::convertible_to<T, std::string_view>)
+  {
+    compare_result = strncasecmp(tmp_arg1.c_str(), tmp_arg2.c_str(), tmp_arg1_len);
+  }
+  else if constexpr (std::convertible_to<T, QStringView>)
+  {
+    tmp_arg2.truncate(tmp_arg1_len);
+    compare_result = tmp_arg1.compare(tmp_arg2, Qt::CaseInsensitive);
+  }
+  else
+  {
+    static_assert(false, "Unhandled variable type passed to str_n_nosp_cmp_begin");
+  }
 
-   if (compare_result == 0)
-   {
-      if (tmp_arg1_len == tmp_arg2_len)
-      {
-         return MatchType::Exact;
-      }
-      else
-      {
-         return MatchType::Subset;
-      }
-   }
-   else
-   {
-      return MatchType::Failure;
-   }
+  if (compare_result == 0)
+  {
+    if (tmp_arg1_len == tmp_arg2_len)
+    {
+      return MatchType::Exact;
+    }
+    else
+    {
+      return MatchType::Subset;
+    }
+  }
+  else
+  {
+    return MatchType::Failure;
+  }
 }
 
 void clan_death(char *b, Character *ch);
@@ -521,25 +511,25 @@ QString sprintbit(uint32_t vektor, QStringList names);
 template <typename T>
 void sprinttype(T type, const char *names[], char *result)
 {
-   if (!result)
-   {
-      return;
-   }
+  if (!result)
+  {
+    return;
+  }
 
-   qsizetype nr{};
-   for (; *names[nr] != '\n'; nr++)
-   {
-      ;
-   }
+  qsizetype nr{};
+  for (; *names[nr] != '\n'; nr++)
+  {
+    ;
+  }
 
-   if (type > -1 && type < nr)
-   {
-      strcpy(result, names[type]);
-   }
-   else
-   {
-      strcpy(result, "Undefined");
-   }
+  if (type > -1 && type < nr)
+  {
+    strcpy(result, names[type]);
+  }
+  else
+  {
+    strcpy(result, "Undefined");
+  }
 }
 
 std::string sprinttype(int type, const char *names[]);
@@ -552,11 +542,11 @@ QString sprinttype(uint64_t type, QStringList names);
 template <typename T>
 void sprinttype(T type, QStringList names, char *result)
 {
-   if (result == nullptr)
-   {
-      return;
-   }
-   strcpy(result, names.value(static_cast<qsizetype>(type), "Undefined").toStdString().c_str());
+  if (result == nullptr)
+  {
+    return;
+  }
+  strcpy(result, names.value(static_cast<qsizetype>(type), "Undefined").toStdString().c_str());
 }
 
 std::string sprinttype(int type, std::vector<const char *>);
@@ -629,11 +619,11 @@ void check_idling(Character *ch);
 
 enum class follower_reasons_t
 {
-   DEFAULT,           // 0
-   END_STALK,         // 1
-   CHANGE_LEADER,     // 2
-   BROKE_CHARM,       // 3
-   BROKE_CHARM_LILITH // 4
+  DEFAULT,           // 0
+  END_STALK,         // 1
+  CHANGE_LEADER,     // 2
+  BROKE_CHARM,       // 3
+  BROKE_CHARM_LILITH // 4
 };
 void stop_follower(Character *ch, follower_reasons_t reason = follower_reasons_t::DEFAULT);
 void add_follower(Character *ch, Character *leader, follower_reasons_t reason = follower_reasons_t::DEFAULT);
@@ -671,36 +661,36 @@ int csendf(Character *ch, const char *arg, ...);
 template <typename T>
 bool check_range_valid_and_convert(T &value, QString buf, T begin, T end)
 {
-   bool ok = false;
+  bool ok = false;
 
-   if (std::is_unsigned<T>::value)
-   {
-      value = buf.toULongLong(&ok);
-   }
-   else if (std::is_signed<T>::value)
-   {
-      value = buf.toLongLong(&ok);
-   }
+  if (std::is_unsigned<T>::value)
+  {
+    value = buf.toULongLong(&ok);
+  }
+  else if (std::is_signed<T>::value)
+  {
+    value = buf.toLongLong(&ok);
+  }
 
-   if (!ok)
-   {
-      value = 0;
-      return false;
-   }
+  if (!ok)
+  {
+    value = 0;
+    return false;
+  }
 
-   if (value < begin)
-   {
-      value = begin;
-      return false;
-   }
+  if (value < begin)
+  {
+    value = begin;
+    return false;
+  }
 
-   if (value > end)
-   {
-      value = end;
-      return false;
-   }
+  if (value > end)
+  {
+    value = end;
+    return false;
+  }
 
-   return true;
+  return true;
 }
 
 bool check_valid_and_convert(int &value, char *buf);
@@ -744,92 +734,92 @@ size_t nocolor_strlen(const QStringView str);
 
 qsizetype find(QString haystack, auto needle, qsizetype pos)
 {
-   return haystack.indexOf(needle, pos);
+  return haystack.indexOf(needle, pos);
 }
 
 std::string::size_type find(std::string haystack, auto needle, std::string::size_type pos)
 {
-   return haystack.find(needle, pos);
+  return haystack.find(needle, pos);
 }
 
 template <typename T>
 T remove_all_codes(T input)
 {
-   auto found_pos = find(input, "$", 0);
-   decltype(found_pos) pos{}, skip{};
+  auto found_pos = find(input, "$", 0);
+  decltype(found_pos) pos{}, skip{};
 
-   while (found_pos != -1)
-   {
-      skip = 1;
+  while (found_pos != -1)
+  {
+    skip = 1;
 
-      if (found_pos + 1 <= input.length())
+    if (found_pos + 1 <= input.length())
+    {
+      try
       {
-         try
-         {
-            input = input.replace(found_pos, 1, "$$");
-            skip = 2;
-         }
-         catch (...)
-         {
-         }
+        input = input.replace(found_pos, 1, "$$");
+        skip = 2;
       }
-      pos = found_pos + skip;
-      found_pos = find(input, "$", pos);
-   }
+      catch (...)
+      {
+      }
+    }
+    pos = found_pos + skip;
+    found_pos = find(input, "$", pos);
+  }
 
-   return input;
+  return input;
 }
 
 template <typename T>
 T remove_non_color_codes(T input)
 {
-   auto found_pos = find(input, "$", 0);
-   decltype(found_pos) pos{};
+  auto found_pos = find(input, "$", 0);
+  decltype(found_pos) pos{};
 
-   T output = {};
-   while (found_pos != -1)
-   {
-      if (found_pos + 1 == input.length())
-      {
-         output += input.sliced(0, found_pos + 1);
-         output += "$";
-         input = input.remove(0, found_pos + 1);
-         output += input;
-         return output;
-      }
+  T output = {};
+  while (found_pos != -1)
+  {
+    if (found_pos + 1 == input.length())
+    {
+      output += input.sliced(0, found_pos + 1);
+      output += "$";
+      input = input.remove(0, found_pos + 1);
+      output += input;
+      return output;
+    }
 
-      QChar code = input.at(found_pos + 1);
-      switch (code.toLatin1())
-      {
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-      case 'I':
-      case 'L':
-      case '*':
-      case 'R':
-      case 'B':
-         output += input.sliced(0, found_pos + 2);
-         input = input.remove(0, found_pos + 2);
-         break;
-      default:
-         output += input.sliced(0, found_pos + 1);
-         output += "$";
-         input = input.remove(0, found_pos + 1);
-         break;
-      }
-      found_pos = find(input, "$", 0);
-   }
-   output += input;
+    QChar code = input.at(found_pos + 1);
+    switch (code.toLatin1())
+    {
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case 'I':
+    case 'L':
+    case '*':
+    case 'R':
+    case 'B':
+      output += input.sliced(0, found_pos + 2);
+      input = input.remove(0, found_pos + 2);
+      break;
+    default:
+      output += input.sliced(0, found_pos + 1);
+      output += "$";
+      input = input.remove(0, found_pos + 1);
+      break;
+    }
+    found_pos = find(input, "$", 0);
+  }
+  output += input;
 
-   return output;
+  return output;
 }
 
 bool str_prefix(const char *astr, const char *bstr);
@@ -843,49 +833,49 @@ extern const char menu[];
 
 struct mprog_throw_type
 {
-   int target_mob_num;                   // num of mob to recieve
-   char target_mob_name[MAX_THROW_NAME]; // std::string used to find target name
+  int target_mob_num;                   // num of mob to recieve
+  char target_mob_name[MAX_THROW_NAME]; // std::string used to find target name
 
-   int data_num; // number of catch call to activate on target
-   int delay;    // how int32_t until the mob gets it
+  int data_num; // number of catch call to activate on target
+  int delay;    // how int32_t until the mob gets it
 
-   int pitcher; // vnum of mob that threw the call
-   int opt;
-   mprog_throw_type *next;
-   bool mob;  // Mob or object.
-   char *var; // temporary variable
-   Character *actor;
-   Object *obj;
-   void *vo;
-   Character *rndm; // $r
+  int pitcher; // vnum of mob that threw the call
+  int opt;
+  mprog_throw_type *next;
+  bool mob;  // Mob or object.
+  char *var; // temporary variable
+  Character *actor;
+  Object *obj;
+  void *vo;
+  Character *rndm; // $r
 
-   // new mppause crap below..
-   Character *tMob;   // it should NOT throw it to another similar mob :P
-   int ifchecks[256]; // Let's hope noone nests more ifs than that.
-   int startPos;
-   int cPos;
-   char *orig;
-   // end mppause crap
+  // new mppause crap below..
+  Character *tMob;   // it should NOT throw it to another similar mob :P
+  int ifchecks[256]; // Let's hope noone nests more ifs than that.
+  int startPos;
+  int cPos;
+  char *orig;
+  // end mppause crap
 };
 
 struct mprog_variable_data
 {
-   char *invoker;
-   char *object;
-   char *rndm;
-   char *voi;
-   int nested; // amount of nested ifs, at time of pause
-   char *program;
+  char *invoker;
+  char *object;
+  char *rndm;
+  char *voi;
+  int nested; // amount of nested ifs, at time of pause
+  char *program;
 };
 
 int handle_poisoned_weapon_attack(Character *ch, Character *vict, int percent);
 
 enum BACKUP_TYPE
 {
-   NONE,
-   SELFDELETED,
-   CONDEATH,
-   ZAPPED
+  NONE,
+  SELFDELETED,
+  CONDEATH,
+  ZAPPED
 };
 void remove_character(QString name, BACKUP_TYPE backup = NONE);
 void remove_familiars(QString name, BACKUP_TYPE backup = NONE);
