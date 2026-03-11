@@ -67,6 +67,7 @@
 #include "DC/CommandStack.h"
 #include "DC/SSH.h"
 #include "DC/character.h"
+#include "DC/memory.h"
 
 struct multiplayer
 {

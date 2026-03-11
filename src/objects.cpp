@@ -26,8 +26,9 @@
 #include "DC/mobile.h" // ACT_ISNPC
 #include "DC/race.h"
 #include "DC/returnvals.h"
-#include "DC/clan.h" // vault stuff
 #include "DC/const.h"
+#include "DC/memory.h"
+#include "DC/punish.h"
 
 extern const char *drinks[];
 extern const char *dirs[];

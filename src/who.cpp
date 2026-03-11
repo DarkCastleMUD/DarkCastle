@@ -15,6 +15,7 @@
 #include "DC/handler.h"
 #include "DC/returnvals.h"
 #include "DC/const.h"
+#include "DC/memory.h"
 
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is DC::NOWHERE near matching.

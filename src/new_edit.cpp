@@ -1,8 +1,6 @@
-#include <signal.h>
 #include <cstdio>
 #include <cctype>
 #include <cstring>
-#include <ctime>
 #include <cstdlib>
 
 #include "DC/connect.h" // Connection
@@ -10,11 +8,9 @@
 #include "DC/utility.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
-#include "DC/player.h"
 #include "DC/DC.h"
-#include "DC/handler.h"
-#include "DC/db.h"
 #include "DC/newedit.h"
+#include "DC/memory.h"
 
 #include <string>
 #include <fmt/format.h>

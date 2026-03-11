@@ -18,7 +18,6 @@
 #define SPELLS_H_
 
 #include "DC/structs.h" // uint8_t, int16_t
-#include "DC/handler.h"
 #include "DC/character.h"
 
 #include <map>

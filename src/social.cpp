@@ -14,6 +14,8 @@
 #include "DC/db.h"
 #include "DC/interp.h" // len_cmp
 #include "DC/returnvals.h"
+#include "DC/memory.h"
+#include "DC/punish.h"
 
 // storage of socials
 struct social_messg *soc_mess_list; // head of social array

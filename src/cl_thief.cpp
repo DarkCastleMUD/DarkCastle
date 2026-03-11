@@ -15,15 +15,12 @@
 #include "DC/handler.h"
 #include "DC/mobile.h"
 #include "DC/fight.h"
-#include "DC/connect.h"
 #include "DC/interp.h"
 #include "DC/act.h"
-#include "DC/db.h"
 #include <cstring>
 #include "DC/returnvals.h"
-#include "DC/clan.h"
-#include "DC/const.h"
 #include "DC/inventory.h"
+#include "DC/punish.h"
 
 extern int rev_dir[];
 

@@ -41,12 +41,10 @@
 #include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/handler.h"
-#include "DC/interp.h"   // do_flee()
-#include "DC/fileinfo.h" // SAVE_DIR
-#include "DC/db.h"       // fread_string()
-#include "DC/connect.h"  // Connection
-#include "DC/magic.h"    // weapon spells
-#include "DC/terminal.h" // YELLOW, etc..
+#include "DC/interp.h"  // do_flee()
+#include "DC/db.h"      // fread_string()
+#include "DC/connect.h" // Connection
+#include "DC/magic.h"   // weapon spells
 #include "DC/act.h"
 #include "DC/clan.h"
 #include "DC/returnvals.h"
@@ -58,6 +56,8 @@
 #include "DC/corpse.h"
 #include "DC/stat.h"
 #include "DC/obj.h"
+#include "DC/memory.h"
+#include "DC/punish.h"
 
 #define MAX_CHAMP_DEATH_MESSAGE 14
 

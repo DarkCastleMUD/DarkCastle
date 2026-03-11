@@ -7,8 +7,6 @@
 #include <cstring> //strstr()
 #include <cctype>
 #include <string>
-#include <sstream>
-#include <list>
 #include <queue>
 #include <tuple>
 #include <fmt/format.h>
@@ -17,7 +15,6 @@
 #include <QDateTime>
 
 #include "DC/structs.h"
-#include "DC/player.h"
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/utility.h"
@@ -27,9 +24,9 @@
 #include "DC/interp.h"
 #include "DC/terminal.h"
 #include "DC/act.h"
-#include "DC/db.h"
 #include "DC/returnvals.h"
 #include "DC/obj.h"
+#include "DC/punish.h"
 
 QQueue<ChannelMessage> gossip_history;
 std::queue<QString> auction_history;

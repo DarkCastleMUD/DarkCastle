@@ -5,26 +5,22 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <cerrno>
-#include <signal.h>
 
 #include <fmt/format.h>
 
 #include "DC/wizard.h"
 #include "DC/spells.h"
-#include "DC/fileinfo.h"
 #include "DC/connect.h"
 #include "DC/utility.h"
-#include "DC/player.h"
 
 #include "DC/mobile.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
-#include "DC/comm.h"
 #include "DC/vault.h"
 #include "DC/utility.h"
+#include "DC/memory.h"
 
 #ifdef BANDWIDTH
 #include "DC/bandwidth.h"

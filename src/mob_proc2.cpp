@@ -13,8 +13,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
-#include <cstring>
-#include <cstddef>
 
 #include <fmt/format.h>
 #include <QString>
@@ -23,8 +21,6 @@
 
 #include "DC/room.h"
 #include "DC/DC.h"
-#include "DC/connect.h"
-#include "DC/timeinfo.h"
 #include "DC/utility.h"
 #include "DC/character.h"
 #include "DC/handler.h"
@@ -33,10 +29,10 @@
 #include "DC/interp.h"
 #include "DC/act.h"
 #include "DC/returnvals.h"
-#include "DC/spells.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/corpse.h"
+#include "DC/memory.h"
 
 extern int class_restricted(Character *ch, class Object *obj);
 extern int size_restricted(Character *ch, class Object *obj);

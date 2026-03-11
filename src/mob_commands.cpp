@@ -32,12 +32,9 @@
 #include <sys/types.h>
 #include <cstdio>
 #include <cstdlib>
-#include <cstdarg>
 #include <QStringLiteral>
 
-#include "DC/fileinfo.h"
 #include "DC/act.h"
-#include "DC/player.h"
 #include "DC/room.h"
 #include "DC/structs.h"
 #include "DC/fight.h"
@@ -47,12 +44,12 @@
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"
-#include "DC/comm.h"
 #include "DC/returnvals.h"
 #include "DC/innate.h"
 #include "DC/race.h"
 #include "DC/const.h"
 #include "DC/guild.h"
+#include "DC/memory.h"
 
 // external vars
 

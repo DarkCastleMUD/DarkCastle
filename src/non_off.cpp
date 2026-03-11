@@ -24,16 +24,15 @@
 #include "DC/player.h"
 #include "DC/act.h"
 #include "DC/spells.h"
-#include "DC/fight.h"
 #include "DC/returnvals.h"
 #include "DC/comm.h"
 #include "DC/structs.h"
 #include "DC/utility.h"
-#include "DC/fileinfo.h"
 #include <string>
 #include <vector>
 #include <map>
-#include <set>
+#include "DC/memory.h"
+#include "DC/punish.h"
 
 // decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(Character *ch, Object *obj, bool decay = false)

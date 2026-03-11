@@ -46,6 +46,7 @@
 #include "DC/ki.h"
 #include "DC/sing.h"
 #include "DC/clan.h"
+#include "DC/memory.h"
 
 // Global data
 

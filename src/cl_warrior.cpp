@@ -15,20 +15,17 @@
 #include "DC/utility.h"
 #include "DC/spells.h"
 #include "DC/handler.h"
-#include "DC/connect.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/act.h"
-#include "DC/db.h"
 #include "DC/DC.h"
 #include "DC/returnvals.h"
-#include "DC/race.h"
-#include <iostream>
 #include "DC/interp.h"
 #include "DC/spells.h"
 #include "DC/const.h"
 #include "DC/move.h"
-
+#include "DC/memory.h"
+#include "DC/DC.h"
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.

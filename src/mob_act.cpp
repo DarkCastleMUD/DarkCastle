@@ -21,8 +21,6 @@
 /**************************************************************************/
 /* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstring>
-
 #include <cstdio>
 
 #include "DC/character.h"
@@ -30,20 +28,18 @@
 #include "DC/mobile.h"
 #include "DC/utility.h"
 #include "DC/fight.h"
-#include "DC/db.h" // index_data
-#include "DC/player.h"
 #include "DC/act.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/race.h" // Race defines used in align-aggro messages.
-#include "DC/comm.h"
 #include "DC/connect.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/Timer.h"
 #include "DC/move.h"
+#include "DC/memory.h"
 
 void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);

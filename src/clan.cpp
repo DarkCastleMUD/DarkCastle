@@ -24,7 +24,6 @@ uint64_t i = UINT64_MAX;
 #include <QFile>
 
 #include "DC/obj.h"
-#include "DC/fileinfo.h"
 #include "DC/db.h" // real_room
 #include "DC/player.h"
 #include "DC/utility.h"
@@ -41,6 +40,7 @@ uint64_t i = UINT64_MAX;
 #include "DC/DC.h"
 #include "DC/Trace.h"
 #include "DC/clan.h"
+#include "DC/memory.h"
 
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);

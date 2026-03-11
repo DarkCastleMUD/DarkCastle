@@ -13,7 +13,6 @@
  *   share your changes too.  What goes around, comes around.               *
  ****************************************************************************/
 
-#include <cctype>
 #include <cstring>
 #include <cstdlib>
 #include "DC/structs.h"
@@ -21,20 +20,15 @@
 #include "DC/character.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
-#include "DC/terminal.h"
-#include "DC/player.h"
 #include "DC/mobile.h"
-#include "DC/clan.h"
-#include "DC/handler.h"
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
 #include "DC/connect.h"
 #include "DC/spells.h"
-#include "DC/race.h"
-#include "DC/act.h"
 #include "DC/set.h"
 #include "DC/returnvals.h"
 #include "DC/news.h"
+#include "DC/memory.h"
 
 struct news_data *thenews = nullptr;
 void addnews(struct news_data *newnews)

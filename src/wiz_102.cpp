@@ -16,7 +16,6 @@
 
 #include <string>
 #include <vector>
-#include <limits>
 #include <type_traits>
 #include <tuple>
 #include <algorithm>
@@ -40,9 +39,10 @@
 #include "DC/vault.h"
 #include "DC/set.h"
 #include "DC/structs.h"
-#include "DC/guild.h"
 #include "DC/const.h"
 #include "DC/newedit.h"
+#include "DC/memory.h"
+#include "DC/punish.h"
 
 command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zone, bool stats = false);
 

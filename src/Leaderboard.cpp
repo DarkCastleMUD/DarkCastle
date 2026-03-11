@@ -11,12 +11,11 @@
 #include "DC/Leaderboard.h"
 #include "DC/utility.h"
 #include "DC/structs.h"
-#include "DC/fileinfo.h"
 #include "DC/connect.h"
-#include <climits>
 #include "DC/db.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
+#include "DC/memory.h"
 
 Leaderboard::Leaderboard()
 {

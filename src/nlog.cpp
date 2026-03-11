@@ -11,9 +11,8 @@
 #include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/terminal.h"
-#include "DC/player.h" // Player::PLR_ANSI
 #include "DC/utility.h"
-#include <iostream>
+#include "DC/memory.h"
 
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.

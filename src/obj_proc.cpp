@@ -14,7 +14,6 @@
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/connect.h"
-#include "DC/timeinfo.h"
 #include "DC/utility.h"
 #include "DC/character.h"
 #include "DC/handler.h"
@@ -31,8 +30,7 @@
 #include "DC/race.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
-#include "DC/guild.h"
-#include "DC/wizard.h"
+#include "DC/memory.h"
 
 #define EMOTING_FILE "emoting-objects.txt"
 

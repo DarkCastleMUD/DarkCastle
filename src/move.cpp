@@ -12,7 +12,6 @@
 #include "DC/affect.h"
 #include "DC/room.h"
 #include "DC/utility.h"
-#include "DC/player.h"
 #include "DC/fight.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
@@ -26,11 +25,10 @@
 #include "DC/clan.h" // clan_room_data
 #include <cstring>
 #include "DC/returnvals.h"
-#include "DC/game_portal.h"
 #include "DC/innate.h"
-#include "DC/weather.h"
 #include "DC/const.h"
 #include "DC/move.h"
+#include "DC/memory.h"
 
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 

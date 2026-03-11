@@ -10,7 +10,6 @@
 #include "DC/utility.h"
 #include "DC/connect.h"
 #include "DC/mobile.h"
-#include "DC/player.h"
 
 #include "DC/DC.h"
 #include "DC/handler.h"
@@ -22,6 +21,7 @@
 #include "DC/race.h"
 #include "DC/const.h"
 #include "DC/corpse.h"
+#include "DC/memory.h"
 
 int count_rooms(int start, int end)
 {

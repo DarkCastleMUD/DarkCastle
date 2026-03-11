@@ -14,7 +14,6 @@
  ***************************************************************************/
 /* $Id: modify.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <signal.h>
 #include <cstdio>
 #include <cctype>
 #include <cstring>
@@ -27,13 +26,11 @@
 #include "DC/character.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
-#include "DC/player.h"
 #include "DC/DC.h"
-#include "DC/spells.h"
 #include "DC/handler.h"
 #include "DC/db.h"
 #include <string>
-#include <iostream>
+#include "DC/memory.h"
 
 // TODO - what does this do?  Nothing that I can see....let's remove it....
 #define REBOOT_AT 10 /* 0-23, time of optional reboot if -e lib/reboot */

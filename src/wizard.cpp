@@ -21,6 +21,7 @@
 #include "DC/comm.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
+#include "DC/memory.h"
 
 #include <fmt/format.h>
 #include <QString>

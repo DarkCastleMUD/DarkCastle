@@ -2,6 +2,7 @@
 | Level 105 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+#include "DC/punish.h"
 #include "DC/wizard.h"
 #include "DC/spells.h" // Character::PLAYER_CANTQUIT
 #include "DC/mobile.h"
@@ -14,10 +15,10 @@
 #include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/innate.h"
-#include "DC/fileinfo.h"
 #include "DC/const.h"
 #include "DC/Timer.h"
 #include "DC/common.h"
+#include "DC/memory.h"
 
 int do_clearaff(Character *ch, char *argument, cmd_t cmd)
 {

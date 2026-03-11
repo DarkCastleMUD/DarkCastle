@@ -6,9 +6,7 @@
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
 */
-#include "DC/punish.h"  // punishment vectors
 #include "DC/structs.h" // uint8_t
-#include "DC/class.h"
 
 /************************************************************************
 | Thirst, FULL, etc..
@@ -180,52 +178,52 @@
 // Constructor commented out for const.C initialization purposes
 struct str_app_type
 {
-    int16_t todam;           /* Damage Bonus/Penalty                */
-    int16_t carry_w;         /* Maximum weight that can be carrried */
-    int16_t cold_resistance; /* Cold resistance */
+  int16_t todam;           /* Damage Bonus/Penalty                */
+  int16_t carry_w;         /* Maximum weight that can be carrried */
+  int16_t cold_resistance; /* Cold resistance */
 };
 
 struct dex_app_type
 {
-    int16_t tohit;
-    int16_t ac_mod;
-    int16_t move_gain;
-    int16_t fire_resistance;
+  int16_t tohit;
+  int16_t ac_mod;
+  int16_t move_gain;
+  int16_t fire_resistance;
 };
 
 // Constructor commented out for const.C initialization purposes
 struct wis_app_type
 {
-    int16_t mana_regen;
-    int16_t ki_regen;
-    int16_t bonus; /* how many bonus skills a player can */
-    /* practice pr. level                 */
-    int16_t energy_resistance;
-    int16_t conc_bonus;
-    int16_t spell_dam_bonus; // For Cleric/Druid/Paladins naturally
+  int16_t mana_regen;
+  int16_t ki_regen;
+  int16_t bonus; /* how many bonus skills a player can */
+  /* practice pr. level                 */
+  int16_t energy_resistance;
+  int16_t conc_bonus;
+  int16_t spell_dam_bonus; // For Cleric/Druid/Paladins naturally
 };
 
 // Constructor commented out for const.C initialization purposes
 struct int_app_type
 {
-    int16_t mana_regen;
-    int16_t ki_regen;
-    int16_t easy_bonus;
-    int16_t medium_bonus;
-    int16_t hard_bonus;
-    int16_t learn_bonus;
-    int16_t magic_resistance;
-    int16_t conc_bonus;
-    int16_t spell_dam_bonus; // For Mage/Anti/Bard
+  int16_t mana_regen;
+  int16_t ki_regen;
+  int16_t easy_bonus;
+  int16_t medium_bonus;
+  int16_t hard_bonus;
+  int16_t learn_bonus;
+  int16_t magic_resistance;
+  int16_t conc_bonus;
+  int16_t spell_dam_bonus; // For Mage/Anti/Bard
 };
 
 // Constructor commented out for const.C initialization purposes
 struct con_app_type
 {
-    int16_t hp_regen;
-    int16_t move_regen;
-    int16_t hp_gain;
-    int16_t poison_resistance;
+  int16_t hp_regen;
+  int16_t move_regen;
+  int16_t hp_gain;
+  int16_t poison_resistance;
 };
 
 /* Extern definitions. These are all in const.cpp. */

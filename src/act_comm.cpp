@@ -12,7 +12,6 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-#include <cstring>
 #include <cassert>
 #include <cstdint>
 
@@ -21,19 +20,17 @@
 
 #include "DC/DC.h"
 #include "DC/character.h"
+#include "DC/punish.h"
 #include "DC/terminal.h"
 #include "DC/connect.h"
 #include "DC/room.h"
 #include "DC/mobile.h"
-#include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/utility.h"
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
-#include "DC/fileinfo.h"
-#include "DC/const.h"
 #include "DC/obj.h"
 
 extern bool MOBtrigger;

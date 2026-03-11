@@ -6,7 +6,6 @@
 
 */
 
-#include <cctype>
 #include <cstring>
 #include "DC/structs.h"
 #include "DC/room.h"
@@ -14,15 +13,9 @@
 #include "DC/DC.h"
 #include "DC/utility.h"
 #include "DC/terminal.h"
-#include "DC/player.h"
 #include "DC/mobile.h"
-#include "DC/clan.h"
-#include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/interp.h"
-#include "DC/connect.h"
-#include "DC/spells.h"
-#include "DC/race.h"
 #include "DC/act.h"
 #include "DC/set.h"
 #include "DC/returnvals.h"
@@ -31,6 +24,7 @@
 #include "DC/obj.h"
 #include <algorithm>
 #include <fmt/format.h>
+#include "DC/memory.h"
 
 void pulse_table_bj(table_data *tbl, int recall = 0);
 void reset_table(table_data *tbl);

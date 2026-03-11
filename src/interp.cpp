@@ -34,20 +34,19 @@
 #include "DC/character.h"
 #include "DC/interp.h"
 #include "DC/utility.h"
-#include "DC/player.h"
 #include "DC/fight.h"
 #include "DC/spells.h" // ETHERAL consts
 #include "DC/mobile.h"
 #include "DC/connect.h" // Connection
 #include "DC/room.h"
-#include "DC/db.h"
 #include "DC/act.h"
 #include "DC/returnvals.h"
 #include "DC/terminal.h"
 #include "DC/CommandStack.h"
-#include "DC/const.h"
 #include "DC/DC.h"
 #include "DC/Timer.h"
+#include "DC/memory.h"
+#include "DC/punish.h"
 
 #define SKILL_HIDE 337
 

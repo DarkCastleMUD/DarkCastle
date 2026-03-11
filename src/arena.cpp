@@ -13,6 +13,7 @@
 #include "DC/db.h"     // get_mob_room_vis
 #include "DC/spells.h" // INTERNAL_SLEEPING
 #include "DC/act.h"    // TO_ROOM
+#include "DC/punish.h"
 
 auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 {

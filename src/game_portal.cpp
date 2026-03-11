@@ -7,17 +7,15 @@
 
 #include "DC/obj.h"
 #include "DC/game_portal.h"
-#include "DC/fileinfo.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/player.h"
 #include "DC/DC.h"
 #include "DC/room.h"
 #include "DC/db.h"
 #include "DC/handler.h"
 
-#include <cstring>
+#include "DC/memory.h"
 
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer);
 
