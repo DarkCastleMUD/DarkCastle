@@ -28,15 +28,14 @@
 #include "DC/handler.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
-#include "DC/fileinfo.h"
 #include "DC/db.h"
 #include "DC/act.h"
 #include "DC/returnvals.h"
 #include "DC/shop.h"
-#include "DC/spells.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/wizard.h"
+#include "DC/memory.h"
 
 struct player_shop *g_playershops;
 
