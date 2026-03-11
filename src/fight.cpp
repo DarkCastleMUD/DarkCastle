@@ -5838,7 +5838,7 @@ void raw_kill(Character *ch, Character *victim)
       penalty += ch->getLevel() * .05;
     penalty = MIN(penalty, 2);
     GET_EXP(victim) = (int64_t)(GET_EXP(victim) / penalty);
-  } // IS_PC
+  } // isPlayer()
 }
 
 void group_gain(Character *ch, Character *victim)

@@ -455,7 +455,7 @@ void mobile_activity(void)
           if ((tmp_ch->isPlayer() && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
                !isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
-              (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
+              (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked isPlayer() first
                ))
           {
             int i = 0;
