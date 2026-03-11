@@ -1,5 +1,4 @@
 
-#include <cctype>
 #include <cstring>
 #include <fstream>
 #include <sstream>
@@ -17,17 +16,16 @@
 #include "DC/utility.h"
 #include "DC/vault.h"
 #include "DC/room.h"
-#include "DC/player.h"
-#include "DC/fileinfo.h"
 #include "DC/DC.h"
 #include "DC/act.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"
-#include "DC/spells.h"
 #include "DC/clan.h" // clan right
 #include "DC/inventory.h"
+#include "DC/memory.h"
+#include "DC/player.h"
 
 class vault_search_parameter
 {
@@ -242,7 +240,7 @@ char *imm_vault_usage = "        vault <stats> [name]\r\n";
 
 int do_vault(Character *ch, char *argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  char arg[MAX_INPUT_LENGTH]{}, arg1[MAX_INPUT_LENGTH]{}, arg2[MAX_INPUT_LENGTH]{};
 
   half_chop(argument, arg, arg1);
 
@@ -363,7 +361,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
   {
     half_chop(arg1, argument, arg2);
 
-    if (arg2)
+    if (arg2[0])
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
@@ -387,7 +385,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
   {
     half_chop(arg1, argument, arg2);
 
-    if (arg2)
+    if (arg2[0])
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
@@ -624,11 +622,11 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     break;
   default:
     logf(108, DC::LogChannel::LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
-         name.toStdString().c_str());
+         qPrintable(name));
     break;
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault", VAULT_DIR, name.at(0), name.toStdString().c_str());
+  snprintf(src_filename, 256, "%s/%c/%s.vault", VAULT_DIR, name.at(0).toLatin1(), qPrintable(name));
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -643,7 +641,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     }
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault.backup", VAULT_DIR, name[0], name.toStdString().c_str());
+  snprintf(src_filename, 256, "%s/%c/%s.vault.backup", VAULT_DIR, name[0].toLatin1(), qPrintable(name));
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -658,7 +656,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     }
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault.log", VAULT_DIR, name[0], name.toStdString().c_str());
+  snprintf(src_filename, 256, "%s/%c/%s.vault.log", VAULT_DIR, name[0].toLatin1(), qPrintable(name));
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -673,7 +671,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     }
   }
 
-  remove_vault_accesses(name.toStdString().c_str());
+  remove_vault_accesses(qPrintable(name));
 
   struct vault_data *vault, *next_vault, *prev_vault = nullptr;
   struct vault_items_data *items, *titems;
@@ -682,11 +680,11 @@ void remove_vault(QString name, BACKUP_TYPE backup)
   char buf[MAX_INPUT_LENGTH];
   char h[MAX_INPUT_LENGTH];
 
-  snprintf(h, sizeof(h), "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, name.toStdString().c_str(), VAULT_INDEX_FILE_TMP);
+  snprintf(h, sizeof(h), "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, qPrintable(name), VAULT_INDEX_FILE_TMP);
   system(h);
   unlink(VAULT_INDEX_FILE);
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
-  snprintf(buf, sizeof(buf), "Deleting %s's vault.", name.toStdString().c_str());
+  snprintf(buf, sizeof(buf), "Deleting %s's vault.", qPrintable(name));
   logentry(buf, ANGEL, DC::LogChannel::LOG_VAULT);
 
   if (!(vault = has_vault(name)))
@@ -832,7 +830,7 @@ void DC::testing_load_vaults(void)
           {
             qDebug("3846");
           }
-          qDebug(vault->owner.toStdString().c_str());
+          qDebug("%s", qPrintable(vault->owner));
           obj = read_object(real_object(vnum), vault_file_stream, true);
           items->obj = obj;
         }
@@ -1134,7 +1132,7 @@ void DC::load_vaults(void)
           access->name = str_dup(value);
           access->next = vault->access;
           vault->access = access;
-          snprintf(buf, sizeof(buf), "boot_vaults: got access [%s] from file [%s].", access->name.toStdString().c_str(), filename);
+          snprintf(buf, sizeof(buf), "boot_vaults: got access [%s] from file [%s].", qPrintable(access->name), filename);
           //        logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         }
         else
@@ -2222,7 +2220,7 @@ void add_new_vault(const char *name, int indexonly)
   }
 
   if (ch)
-    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
+    fprintf(pvfl, "S %llu\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
   else
     fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
   fprintf(pvfl, "$\n");
@@ -2326,8 +2324,8 @@ void logvault(QString message, QString name)
 
   logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
 
-  sprintf(fname, "../vaults/%c/%s.vault.log", name[0], name.toStdString().c_str());
-  sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0], name.toStdString().c_str());
+  sprintf(fname, "../vaults/%c/%s.vault.log", name[0].toLatin1(), qPrintable(name));
+  sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0].toLatin1(), qPrintable(name));
 
   if (!(ofile = fopen(fname, "r")))
   {

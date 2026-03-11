@@ -21,6 +21,7 @@
 /* $Id: utility.cpp,v 1.129 2014/07/04 22:00:04 jhhudso Exp $ */
 
 #include <cassert>
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -32,7 +33,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -55,7 +55,6 @@
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/interp.h"
-#include "DC/fileinfo.h"
 #include "DC/mobile.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -67,6 +66,7 @@
 #include "DC/returnvals.h"
 #include "DC/set.h"
 #include "DC/const.h"
+#include "DC/memory.h"
 
 #ifndef GZIP
 #define GZIP "gzip"
@@ -2451,17 +2451,17 @@ void remove_character(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2479,11 +2479,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2528,13 +2528,13 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
   for (int i = 0; i < MAX_GOLEMS; i++)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, name.toStdString().c_str()[0], name.toStdString().c_str(), i);
+    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(name)[0], qPrintable(name), i);
 
     if (0 == stat(src_filename, &statbuf))
     {
@@ -2893,7 +2893,7 @@ splitstring("std::string  with 2 spaces", " ", true)
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty)
 {
   std::vector<std::string> result;
-  unsigned int splitter;
+  std::size_t splitter{};
   while ((splitter = splitme.find_first_of(delims)) != splitme.npos)
   {
     if (ignore_empty && splitter > 0)
@@ -3269,4 +3269,26 @@ int len_cmp(QString s1, QString s2)
 bool operator!(load_status_t ls)
 {
   return ls != load_status_t::success;
+}
+
+void WAIT_STATE(Character *ch, int cycle)
+{
+  if (ch->desc && !ch->isImmortalPlayer())
+  {
+    if (ch->desc->wait < cycle)
+      ch->desc->wait = cycle;
+  }
+  else if (ch->isNPC())
+    ch->deaths = cycle;
+}
+
+int GET_WAIT(Character *ch)
+{
+  if (IS_NPC(ch))
+    return ch->deaths;
+
+  if (ch->desc)
+    return ch->desc->wait;
+
+  return 0;
 }

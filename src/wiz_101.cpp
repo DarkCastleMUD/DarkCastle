@@ -8,7 +8,6 @@
 #include <fmt/format.h>
 #include <expected>
 
-#include "DC/wizard.h"
 #include "DC/utility.h"
 #include "DC/mobile.h"
 
@@ -18,11 +17,10 @@
 #include "DC/character.h"
 #include "DC/terminal.h"
 #include "DC/handler.h"
-#include "DC/player.h"
 #include "DC/connect.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
-#include "DC/const.h"
+#include "DC/db.h"
 
 std::queue<std::string> imm_history;
 std::queue<std::string> imp_history;
@@ -625,7 +623,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
       arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
-  sprintf(buf, "WizInvis Set to: %ld \n\r", ch->player->wizinvis);
+  sprintf(buf, "WizInvis Set to: %d \n\r", ch->player->wizinvis);
   ch->send(buf);
   return eSUCCESS;
 }
@@ -813,8 +811,7 @@ int do_varstat(Character *ch, char *argument, cmd_t cmd)
   struct tempvariable *eh;
   for (eh = vict->tempVariable; eh; eh = eh->next)
   {
-    snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n",
-             eh->name.toStdString().c_str(), eh->data.toStdString().c_str());
+    snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n", qPrintable(eh->name), qPrintable(eh->data));
     ch->send(buf);
   }
   if (buf[0] == '\0')

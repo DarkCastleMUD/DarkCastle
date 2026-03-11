@@ -1447,17 +1447,17 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
   if (i == 0)
   {
     if (options == LIST_BY_SLOT)
-      csendf(ch, "\n\rThere are no %s items currently posted.\r\n", name.toStdString().c_str());
+      csendf(ch, "\n\rThere are no %s items currently posted.\r\n", qPrintable(name));
     else if (options == LIST_BY_SELLER)
       csendf(ch, "\n\r\"%s\" doesn't seem to be selling any public items.\r\n"
                  "\n\rTo view private items, use \"vend list private\".\r\n",
-             name.toStdString().c_str());
+             qPrintable(name));
     else if (options == LIST_BY_CLASS)
-      csendf(ch, "\n\rThere are no \"%s\" wearable public items for sale.\r\n", name.toStdString().c_str());
+      csendf(ch, "\n\rThere are no \"%s\" wearable public items for sale.\r\n", qPrintable(name));
     else if (options == LIST_MINE)
       ch->sendln("\n\rYou do not have any tickets.");
     else if (options == LIST_BY_RACE)
-      csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\r\n", name.toStdString().c_str());
+      csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\r\n", qPrintable(name));
     else
       ch->sendln("\n\rThere is nothing for sale!");
   }

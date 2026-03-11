@@ -14,30 +14,20 @@
  ***********************************************************************/
 
 /* The standard includes */
-#include <cctype>
 #include <cstring>
 #include <cstdlib>
-#include "DC/returnvals.h"
 #include <cerrno>
 
 #include "DC/obj.h"
 #include "DC/DC.h"
-#include "DC/connect.h"
 #include "DC/utility.h"
 #include "DC/room.h"
-#include "DC/spells.h"
-#include "DC/player.h"
 #include "DC/handler.h"
-#include "DC/affect.h"
-#include "DC/interp.h"
-#include "DC/character.h"
-#include "DC/act.h"
 #include "DC/structs.h"
 #include "DC/db.h"
 #include <cassert>
-#include "DC/mobile.h" // ACT_ISNPC
-#include "DC/race.h"
 #include <cstddef>
+#include "DC/memory.h"
 
 /* Set this define to wherever you want to save your corpses */
 #define CORPSE_FILE "corpse.save"
@@ -137,7 +127,7 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
   else
     *buf1 = 0;
   fprintf(fp,
-          "#%d\n"
+          "#%lu\n"
           "%d %d %d %d %d %u %d %d\n",
           GET_OBJ_VNUM(obj),
           locate,
@@ -165,7 +155,7 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
           obj->long_description ? obj->long_description : "undefined",
           buf1,
           GET_OBJ_TYPE(obj),
-          GET_OBJ_WEAR(obj),
+          GET_OBJ_WEAR(obj).toInt(),
           (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
           GET_OBJ_COST(obj), obj->num_affects);
   /* Do we have affects? */

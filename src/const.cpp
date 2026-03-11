@@ -14,8 +14,6 @@
  ***************************************************************************/
 /* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
 
-#include <cstdio>
-
 #include <map>
 #include <string>
 
@@ -1873,7 +1871,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 
 const char *languages[] =
     {
-        "common"
+        "common",
         "human",
         "elvish",
         "dwarven",

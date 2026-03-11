@@ -14,6 +14,7 @@
  ***************************************************************************/
 /* $Id: handler.cpp,v 1.208 2013/03/27 03:32:58 jhhudso Exp $ */
 
+#include <qlogging.h>
 #include <sys/time.h>
 
 #include <cstdlib>
@@ -54,6 +55,7 @@
 #include "DC/const.h"
 #include "DC/corpse.h"
 #include "DC/shop.h"
+#include "DC/memory.h"
 
 void huntclear_item(class Object *obj);
 
@@ -2887,7 +2889,7 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 
 Character *get_char_room(QString name, room_t room, bool careful)
 {
-  auto nameC = strdup(name.toStdString().c_str());
+  auto nameC = strdup(qPrintable(name));
   if (!nameC)
   {
     return nullptr;
@@ -3109,7 +3111,7 @@ int move_obj(Object *obj, Object *dest_obj)
       // Couldn't move obj from the room
       logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
                                               "remove it!",
-           obj->Name(), GET_NAME(obj->carried_by));
+           qPrintable(obj->Name()), GET_NAME(obj->carried_by));
       return 0;
     }
   }
@@ -3121,7 +3123,7 @@ int move_obj(Object *obj, Object *dest_obj)
       // Couldn't move obj from its container
       logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
                                               "remove it!",
-           obj->Name(), GET_NAME(obj->carried_by));
+           qPrintable(obj->Name()), GET_NAME(obj->carried_by));
       return 0;
     }
   }
@@ -3192,7 +3194,7 @@ int move_obj(Object *obj, Character *ch)
       // Couldn't move obj from the room
       logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
                                               "remove it!",
-           obj->Name(), GET_NAME(obj->carried_by));
+           qPrintable(obj->Name()), GET_NAME(obj->carried_by));
       return 0;
     }
   }
@@ -3207,7 +3209,7 @@ int move_obj(Object *obj, Character *ch)
       // Couldn't move obj from its container
       logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
                                               "remove it!",
-           obj->Name(), GET_NAME(obj->carried_by));
+           qPrintable(obj->Name()), GET_NAME(obj->carried_by));
       return 0;
     }
   }
@@ -3350,7 +3352,7 @@ int obj_to_room(class Object *object, int room)
   if (!object)
     return 0;
 
-  if (&DC::getInstance()->world[room] == nullptr)
+  if (!DC::getInstance()->world[room])
   {
     logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
     produce_coredump();
@@ -4416,7 +4418,7 @@ Character *get_active_pc(QString name)
 
     if (isexact(name, i->getName()))
       return (i);
-    else if (isprefix(name.toStdString().c_str(), i->getName().toStdString().c_str()))
+    else if (isprefix(qPrintable(name), qPrintable(i->getName())))
     {
       if (partial_match)
       {
@@ -4485,7 +4487,7 @@ Character *get_all_pc(char *name)
 
 Character *Character::getVisiblePlayer(QString name)
 {
-  return get_pc_vis(this, name.toStdString().c_str());
+  return get_pc_vis(this, qPrintable(name));
 }
 
 Character *Character::getVisibleCharacter(QString name)
@@ -4505,7 +4507,7 @@ Character *get_pc_vis(Character *ch, std::string name)
 
 Character *get_pc_vis(Character *ch, QString name)
 {
-  return get_pc_vis(ch, name.toStdString().c_str());
+  return get_pc_vis(ch, qPrintable(name));
 }
 
 Character *get_pc_vis(Character *ch, const char *name)
@@ -4869,7 +4871,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
         }
         else if (!(*tar_obj)->Name().isEmpty())
         {
-          csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->Name());
+          csendf(ch, "You find %s among your equipment.\r\n", qPrintable((*tar_obj)->Name()));
         }
         else
         {

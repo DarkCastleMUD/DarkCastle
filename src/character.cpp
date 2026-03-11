@@ -321,7 +321,7 @@ bool Character::validateName(QString name)
     }
   }
 
-  if (on_forbidden_name_list(name.toStdString().c_str()))
+  if (on_forbidden_name_list(qPrintable(name)))
   {
     return false;
   }

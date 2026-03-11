@@ -26,7 +26,6 @@
 #include <math.h> // pow(double,double)
 
 #include <cstring>
-#include <map>
 
 #include <fmt/format.h>
 
@@ -54,6 +53,7 @@
 #include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
+#include "DC/memory.h"
 
 #define BEACON_OBJ_NUMBER 405
 
@@ -4687,7 +4687,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     strcat(buf, "\r\n");
     ch->send(buf);
 
-    sprintf(buf, "Weight: %d, Value: %d, Level: %d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
+    sprintf(buf, "Weight: %d, Value: %d, Level: %llu\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
     ch->send(buf);
 
     switch (GET_ITEM_TYPE(obj))
@@ -6504,7 +6504,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
   for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim;
        tmp_victim = tmp_victim->next_in_room)
   {
-    if ((ch->in_room == tmp_victim->in_room))
+    if (ch->in_room == tmp_victim->in_room)
       if (!tmp_victim->affected_by_spell(SPELL_INVISIBLE))
       {
 

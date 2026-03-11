@@ -17,13 +17,11 @@
 
 #include <fmt/format.h>
 
-#include "DC/wizard.h"
 #include "DC/utility.h"
 
 #include "DC/player.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
-#include "DC/fileinfo.h"
 #include "DC/clan.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
@@ -31,7 +29,6 @@
 #include "DC/const.h"
 #include "DC/db.h"
 #include "DC/Leaderboard.h"
-#include "DC/guild.h"
 #include "DC/const.h"
 #include "DC/vault.h"
 #include "DC/meta.h"
@@ -259,20 +256,17 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
-    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), DC::bestowable_god_commands[i].name.toStdString().c_str());
+    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
     ch->send(buf);
     return eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", GET_NAME(vict),
-           DC::bestowable_god_commands[i].name.toStdString().c_str());
+  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
   ch->send(buf);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict),
-           DC::bestowable_god_commands[i].name.toStdString().c_str(), GET_NAME(ch));
+  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name), GET_NAME(ch));
   logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch),
-           DC::bestowable_god_commands[i].name.toStdString().c_str());
+  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch), qPrintable(DC::bestowable_god_commands[i].name));
   vict->send(buf);
   return eSUCCESS;
 }
