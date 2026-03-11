@@ -3354,8 +3354,7 @@ int obj_to_room(class Object *object, int room)
 
   if (!DC::getInstance()->world[room])
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
-    produce_coredump();
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] is false", room);
     return 0;
   }
 
