@@ -318,7 +318,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   if (ch->getLevel() < vict->getLevel())
   {
     ch->sendln("Get real! You ain't that big.");
-    if (IS_PC(vict))
+    if (vict->isPlayer())
     {
       sprintf(buf2, "%s just tried to set: %s\r\n", GET_NAME(ch), buf);
       send_to_char(buf2, vict);
@@ -326,7 +326,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(vict) && (vict->getLevel() == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
+  if (vict->isPlayer() && (vict->getLevel() == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
   {
     ch->sendln("Forget it dweeb.");
     return ReturnValue::eFAILURE;
@@ -459,7 +459,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     /* why the fuck was ths missing? -Sadus */
-    if (IS_PC(vict) && value > ch->getLevel())
+    if (vict->isPlayer() && value > ch->getLevel())
     {
       ch->sendln("That level is higher than you!");
       return ReturnValue::eFAILURE;

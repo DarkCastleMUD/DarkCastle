@@ -287,7 +287,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
   int learned;
   std::vector<songInfo>::iterator i;
 
-  if (IS_PC(ch) && GET_CLASS(ch) != CLASS_BARD && !ch->isImmortalPlayer())
+  if (ch->isPlayer() && GET_CLASS(ch) != CLASS_BARD && !ch->isImmortalPlayer())
   {
     ch->check_social("sing");
     return ReturnValue::eSUCCESS;
@@ -371,7 +371,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 
   if (song_info[spl].song_pointer())
   {
-    if (GET_POS(ch) < song_info[spl].minimum_position() && IS_PC(ch) && spl != SPELL_TYPE_WAND)
+    if (GET_POS(ch) < song_info[spl].minimum_position() && ch->isPlayer() && spl != SPELL_TYPE_WAND)
     {
       switch (GET_POS(ch))
       {
@@ -598,7 +598,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 
       /* Stop abusing your betters  */
       if (!isSet(song_info[spl].targets(), TAR_IGNORE) && !tar_obj)
-        if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
+        if (tar_char->isPlayer() && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
           ch->sendln("That just might annoy them!");
           return ReturnValue::eFAILURE;
@@ -606,7 +606,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 
       /* Imps ignore safe flags  */
       if (!isSet(song_info[spl].targets(), TAR_IGNORE) && !tar_obj)
-        if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
+        if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
         {
           tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
         }
@@ -752,7 +752,7 @@ void update_character_singing(Character *ch)
         --j;
         continue;
       }
-      else if ((((GET_POS(ch) < song_info[(*j).song_number].minimum_position()) && IS_PC(ch)) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
+      else if ((((GET_POS(ch) < song_info[(*j).song_number].minimum_position()) && ch->isPlayer()) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
       {
         ch->sendln("You can't keep singing in this position!");
         (*j).song_timer = 0;
@@ -930,7 +930,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   (*i).song_data = 0;
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-  if (IS_PC(victim) || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
+  if (victim->isPlayer() || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
   {
     ch->sendln("They don't seem particularily interested.");
     victim->sendln("You manage to resist the entrancing lyrics.");
@@ -1132,7 +1132,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
     if (heal < 5)
       heal = 5;
 
-    if (IS_PC(tmp_char) && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
+    if (tmp_char->isPlayer() && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
     {
       if (tmp_char == ch)
       {
@@ -1475,7 +1475,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
     if (heal < 5)
       heal = 5;
 
-    if (IS_PC(tmp_char) && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
+    if (tmp_char->isPlayer() && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
     {
       if (tmp_char == ch)
         sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
@@ -1571,7 +1571,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
     if (heal < 5)
       heal = 5;
 
-    if (IS_PC(tmp_char) && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
+    if (tmp_char->isPlayer() && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
     {
       if (tmp_char == ch)
       {
@@ -1699,7 +1699,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
     return;
   }
 
-  if ((IS_PC(target)) && (target->getLevel() >= IMMORTAL))
+  if ((target->isPlayer()) && (target->getLevel() >= IMMORTAL))
   {
     victim->sendln("Just who do you think you are?");
     return;
@@ -1886,7 +1886,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 
   act("$n sings to $N about beautiful rainbows.", ch, 0, victim, TO_ROOM, NOTVICT);
 
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     ch->sendln("They seem to be looking at you really strangly.");
     victim->sendln("You are sung to about butterflies and bullfrogs.");
@@ -2784,7 +2784,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(target))
+  if (target->isPlayer())
   {
     csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\r\n", GET_NAME(target), HSHR(target));
     return ReturnValue::eFAILURE;
@@ -2931,7 +2931,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(target))
+  if (target->isPlayer())
   {
     ch->sendln("They don't hate anyone, but they are looking at you kinda funny...");
     return ReturnValue::eFAILURE;
@@ -3342,7 +3342,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
     }
   }
 
-  bool ispc = IS_PC(victim);
+  bool ispc = victim->isPlayer();
   char buf[MAX_STRING_LENGTH];
   strcpy(buf, victim->short_desc);
 

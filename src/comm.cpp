@@ -973,7 +973,7 @@ void DC::game_loop_init(void)
 
                  for (const auto &ch : dc->character_list)
                  {
-                   if (ch->player && IS_PC(ch))
+                   if (ch->player && ch->isPlayer())
                    {
                      ch->save();
                    }
@@ -1461,7 +1461,7 @@ QString Connection::createPrompt(void)
   }
   else if (strnew)
   {
-    if (IS_PC(character) && isSet(character->player->toggles, Player::PLR_EDITOR_WEB))
+    if (character->isPlayer() && isSet(character->player->toggles, Player::PLR_EDITOR_WEB))
     {
       return "Web Editor] ";
     }

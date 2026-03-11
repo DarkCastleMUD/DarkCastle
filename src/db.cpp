@@ -5900,7 +5900,7 @@ void free_char(Character *ch, Trace trace)
   while (ch->carrying)
     extract_obj(ch->carrying);
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     if (ch->short_desc)
       dc_free(ch->short_desc);

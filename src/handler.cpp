@@ -889,7 +889,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
   char log_buf[256];
   int i;
 
-  if (add && IS_PC(ch))
+  if (add && ch->isPlayer())
   {
     if (loc == APPLY_LIGHTNING_SHIELD)
     {
@@ -2292,7 +2292,7 @@ int char_from_room(Character *ch, bool stop_all_fighting)
     if (i->isNonPlayer() && ISSET(i->mobdata->actflags, ACT_NOKI))
       kimore = true;
   }
-  if (IS_PC(ch)) // player
+  if (ch->isPlayer()) // player
     DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).decrementPlayers();
   if (ch->isNonPlayer())
     ch->mobdata->last_room = ch->in_room;
@@ -2358,7 +2358,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
   DC::getInstance()->world[room].light += ch->glow_factor;
   int a, i;
-  if (IS_PC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = ch->has_skill(SKILL_HIDE)))
+  if (ch->isPlayer() && ISSET(ch->affected_by, AFF_HIDE) && (a = ch->has_skill(SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = nullptr;
@@ -2381,7 +2381,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
   }
   for (temp = ch->next_in_room; temp; temp = temp->next_in_room)
   {
-    if (ISSET(temp->affected_by, AFF_HIDE) && IS_PC(temp))
+    if (ISSET(temp->affected_by, AFF_HIDE) && temp->isPlayer())
       for (i = 0; i < MAX_HIDE; i++)
       {
         if (temp->player->hiding_from[i] == nullptr || temp->player->hiding_from[i] == ch)
@@ -2399,7 +2399,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
         }
       }
   }
-  if (IS_PC(ch)) // player
+  if (ch->isPlayer()) // player
     DC::getInstance()->zones.value(DC::getInstance()->world[room].zone).incrementPlayers();
   if (ch->isNonPlayer())
   {
@@ -2490,7 +2490,7 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
     return 0;
   }
 
-  if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && IS_PC(this))
+  if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && this->isPlayer())
   {
     if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || this->isPlayerObjectThief() || contains_no_trade_item(obj))
     {
@@ -2546,7 +2546,7 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
 
   this->equipment[pos] = obj;
   obj->equipped_by = this;
-  if (IS_PC(this))
+  if (this->isPlayer())
     for (int a = 0; a < obj->num_affects; a++)
     {
       if (obj->affected[a].location >= 1000)
@@ -2623,7 +2623,7 @@ class Object *Character::unequip_char(int pos, bool flag)
   remove_set_stats(this, obj, flag);
   class Object *a, *b = nullptr;
 b: // ew
-  if (IS_PC(this))
+  if (this->isPlayer())
     for (a = player->skillchange; a; a = a->next_skill)
     {
       if (a == (Object *)0x95959595)
@@ -3728,7 +3728,7 @@ void extract_char(Character *ch, bool pull, Trace t)
   class Object *i;
   Character *omast = nullptr;
   int ret = ReturnValue::eSUCCESS;
-  if (IS_PC(ch) && !ch->desc)
+  if (ch->isPlayer() && !ch->desc)
     for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
       if (t_desc->original == ch)
         ret = do_return(t_desc->character, "");
@@ -3746,7 +3746,7 @@ void extract_char(Character *ch, bool pull, Trace t)
     ch->mobdata->reset->lastPop = nullptr;
 
   remove_totem_stats(ch);
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     void shatter_message(Character * ch);
     void release_message(Character * ch);
@@ -3996,7 +3996,7 @@ void lastseen_targeted(Character *ch, Character *victim)
     last_victim = victim;
   }
 
-  if (ch == 0 || victim == 0 || IS_PC(victim) || ch->isNonPlayer())
+  if (ch == 0 || victim == 0 || victim->isPlayer() || ch->isNonPlayer())
     return;
 
   if (ch->player->lastseen == 0)
@@ -4159,7 +4159,7 @@ Character *get_pc_room_vis_exact(Character *ch, const char *name)
 
   for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
   {
-    if (isexact(name, GET_NAME(i)) && CAN_SEE(ch, i) && IS_PC(i))
+    if (isexact(name, GET_NAME(i)) && CAN_SEE(ch, i) && i->isPlayer())
       return (i);
   }
   return nullptr;
@@ -4390,7 +4390,7 @@ Character *get_pc(QString name)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
                         {
-		if(IS_PC(i) && isexact(name, GET_NAME(i)))
+		if(i->isPlayer() && isexact(name, GET_NAME(i)))
 		return true;
 
 		return false; });
@@ -4517,7 +4517,7 @@ Character *get_pc_vis(Character *ch, const char *name)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](Character *const &i)
                         {
-		if(IS_PC(i) && CAN_SEE(ch, i))
+		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
 			if (isexact(name, GET_NAME(i)))
 			return true;
@@ -4547,7 +4547,7 @@ Character *get_pc_vis_exact(Character *ch, const char *name)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](Character *const &i)
                         {
-		if(IS_PC(i) && CAN_SEE(ch, i))
+		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
 			if (!strcmp(name, GET_NAME(i)))
 			return true;

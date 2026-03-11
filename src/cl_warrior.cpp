@@ -371,7 +371,7 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
 
 int do_hitall(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch) && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
+  if (ch->isPlayer() && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
     ch->sendln("You better learn how to first...");
     return ReturnValue::eFAILURE;
@@ -448,7 +448,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  //    if (IS_PC(ch))
+  //    if (ch->isPlayer())
   if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("You need to wield a weapon, to make it a success.");
@@ -776,7 +776,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
 
     if (((isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
-        (IS_PC(victim) || DC::getInstance()->mob_index[victim->mobdata->nr].vnum() > 2400 ||
+        (victim->isPlayer() || DC::getInstance()->mob_index[victim->mobdata->nr].vnum() > 2400 ||
          DC::getInstance()->mob_index[victim->mobdata->nr].vnum() < 2300))
       ch->sendln("You can't seem to work it loose.");
     else
@@ -830,7 +830,7 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(this) && (victim->isNonPlayer() && !IS_AFFECTED(victim, AFF_CHARM)))
+  if (this->isPlayer() && (victim->isNonPlayer() && !IS_AFFECTED(victim, AFF_CHARM)))
   {
     sendln("Doesn't need your help!");
     return ReturnValue::eFAILURE;

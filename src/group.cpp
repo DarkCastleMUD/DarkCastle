@@ -61,7 +61,7 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf, "%s abandons: %s", GET_SHORT(ch), k->group_name);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->player->group_pkills = 0;
     ch->player->grpplvl = 0;
@@ -116,7 +116,7 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf, "%s founds: %s", GET_SHORT(ch), argument);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->player->group_pkills = 0;
     ch->player->grpplvl = 0;
@@ -267,7 +267,7 @@ void setup_group_buf(char *report, Character *j, Character *i)
   }
   else
   {
-    if (IS_PC(i) && isSet(i->player->toggles, Player::PLR_ANSI))
+    if (i->isPlayer() && isSet(i->player->toggles, Player::PLR_ANSI))
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
         sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
@@ -409,7 +409,7 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
         act("$n is now a group member.", victim, 0, 0, TO_ROOM, 0);
         act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
         SETBIT(victim->affected_by, AFF_GROUP);
-        if (IS_PC(victim))
+        if (victim->isPlayer())
           REMOVE_BIT(victim->player->toggles, Player::PLR_LFG);
       }
       return ReturnValue::eSUCCESS;
@@ -491,7 +491,7 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
           GET_SHORT(ch), GET_SHORT(new_new_leader), ch->group_name);
   act(buf, ch, 0, new_new_leader, TO_ROOM, NOTVICT);
 
-  if (IS_PC(ch) && IS_PC(new_new_leader))
+  if (ch->isPlayer() && new_new_leader->isPlayer())
   {
     new_new_leader->player->grpplvl = ch->player->grpplvl;
     new_new_leader->player->group_pkills = ch->player->group_pkills;
@@ -514,7 +514,7 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   for (f = ch->followers; f; f = next_f)
   {
     next_f = f->next;
-    if (IS_PC(f->follower))
+    if (f->follower->isPlayer())
     {
       k = f->follower;
       stop_follower(k, follower_reasons_t::CHANGE_LEADER);
@@ -573,7 +573,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
     dc_free(k->group_name);
     k->group_name = 0;
 
-    if (IS_PC(k))
+    if (k->isPlayer())
     {
       k->player->group_pkills = 0;
       k->player->grpplvl = 0;
@@ -583,7 +583,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
     for (f = k->followers; f; f = next_f)
     {
       next_f = f->next;
-      if (IS_PC(f->follower))
+      if (f->follower->isPlayer())
       {
         stop_grouped_bards(f->follower, 1);
         stop_follower(f->follower);
@@ -622,7 +622,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
   }
 
   stop_grouped_bards(adios, 1);
-  if (IS_PC(adios))
+  if (adios->isPlayer())
   {
     adios->player->grpplvl = 0;
     adios->player->group_pkills = 0;

@@ -476,7 +476,7 @@ int main(int argc, char **argv)
         std::multimap<int32_t, QString> hp_leaders;
         for (auto& ch : DC::getInstance()->character_list)
         {
-          if (IS_PC(ch))
+          if (ch->isPlayer())
           {
             hp_leaders.insert(std::pair<int32_t,QString>(ch->max_hit, ch->getNameC()));
           }

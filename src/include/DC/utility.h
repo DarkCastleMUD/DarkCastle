@@ -172,13 +172,11 @@ bool IS_DARK(int room);
 // #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
 // #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
-#define IS_PC(ch) (ch->getType() == Character::Type::Player && ch->player != nullptr)
-
 #define IS_OBJ(ch) (ch->getType() == Character::Type::ObjectProgram)
 #define IS_FAMILIAR(ch) (IS_AFFECTED(ch, AFF_FAMILIAR))
 
-#define IS_MINLEVEL_PC(ch, level) (ch->getLevel() >= level && IS_PC(ch))
-#define IS_MAXLEVEL_PC(ch, level) (ch->getLevel() <= level && IS_PC(ch))
+#define IS_MINLEVEL_PC(ch, level) (ch->getLevel() >= level && ch->isPlayer())
+#define IS_MAXLEVEL_PC(ch, level) (ch->getLevel() <= level && ch->isPlayer())
 #define IS_MINLEVEL_NPC(ch, level) (ch->getLevel() >= level && ch->isNonPlayer())
 #define IS_IMMORTAL(ch) (IS_MINLEVEL_PC(ch, IMMORTAL))
 #define IS_MORTAL(ch) (IS_MAXLEVEL_PC(ch, IMMORTAL - 1))

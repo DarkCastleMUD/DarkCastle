@@ -499,7 +499,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
     if (!known && getLevel() < skilllist[i].levelavailable)
       continue;
 
-    if (IS_PC(this) && skilllist[i].group > 0 && skilllist[i].group != player->profession)
+    if (this->isPlayer() && skilllist[i].group > 0 && skilllist[i].group != player->profession)
     {
       continue;
     }
@@ -725,7 +725,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     }
 
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
-    if (skilllist[skillnumber].group && IS_PC(this) && skilllist[skillnumber].group != player->profession)
+    if (skilllist[skillnumber].group && this->isPlayer() && skilllist[skillnumber].group != player->profession)
     {
       csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group));
       return ReturnValue::eSUCCESS;

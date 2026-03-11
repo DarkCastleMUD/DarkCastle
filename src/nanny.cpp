@@ -1007,7 +1007,7 @@ void DC::nanny(class Connection *d, std::string arg)
       {
         if (ad != d && d->getPeerOriginalAddress() == ad->getPeerOriginalAddress())
         {
-          if (ad->character && ad->character->getLevel() == IMPLEMENTER && IS_PC(ad->character))
+          if (ad->character && ad->character->getLevel() == IMPLEMENTER && ad->character->isPlayer())
           {
             password = ad->character->player->pwd;
             logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
@@ -2219,7 +2219,7 @@ void update_characters()
     }
 
     // handle drowning
-    if (IS_PC(i) && i->isMortalPlayer() && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
+    if (i->isPlayer() && i->isMortalPlayer() && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
     {
       tmp = GET_MAX_HIT(i) / 5;
       sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), DC::getInstance()->world[i->in_room].number);
@@ -2410,7 +2410,7 @@ void checkConsecrate(int pulseType)
               {
                 act("The strength of $N's desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
                 act("The strength of your desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
-                if (IS_PC(tmp_ch))
+                if (tmp_ch->isPlayer())
                 {
                   act("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
                   tmp_ch->sendln("You have been KILLED!!\r\n");
@@ -2466,7 +2466,7 @@ void checkConsecrate(int pulseType)
               {
                 act("The strength of $N's consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
                 act("The strength of your consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
-                if (IS_PC(tmp_ch))
+                if (tmp_ch->isPlayer())
                 {
                   act("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
                   tmp_ch->sendln("You have been KILLED!!\r\n");

@@ -1040,7 +1040,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
     return load_status_t::error;
   }
 
-  if (IS_PC(ch) && ch->player->time.logon < 1117527906)
+  if (ch->isPlayer() && ch->player->time.logon < 1117527906)
   {
     do_clearaff(ch, "");
     ch->affected_by[0] = ch->affected_by[1] = 0;

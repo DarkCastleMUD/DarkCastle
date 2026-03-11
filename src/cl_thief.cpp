@@ -105,7 +105,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
     retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE);
   }
 
-  if (!SOMEONE_DIED(retval) || (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY)))
+  if (!SOMEONE_DIED(retval) || (ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_WIMPY)))
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return retval | ReturnValue::eSUCCESS;
 }
@@ -199,7 +199,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   }
 
   int itemp = number(1, 100);
-  if (IS_PC(this) && IS_PC(victim))
+  if (this->isPlayer() && victim->isPlayer())
   {
     if (victim->getLevel() > this->getLevel())
       itemp = 0; // not gonna happen
@@ -221,7 +221,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (this->isNonPlayer() && this->getLevel() > 70)) && (this->equipment[WEAR_SECOND_WIELD]) && ((this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
+  if ((((this->isPlayer() && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (this->isNonPlayer() && this->getLevel() > 70)) && (this->equipment[WEAR_SECOND_WIELD]) && ((this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
     if (skill_success(victim, SKILL_DUAL_BACKSTAB) || this->isNonPlayer())
     {
@@ -235,7 +235,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   if (AWAKE(victim) && !skill_success(victim, SKILL_BACKSTAB))
   {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
-    if (perform_dual_backstab && IS_PC(this))
+    if (perform_dual_backstab && this->isPlayer())
     {
       this->player->unjoinable = true;
       retval = damage(this, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB);
@@ -265,7 +265,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   else
   {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
-    if (perform_dual_backstab && IS_PC(this))
+    if (perform_dual_backstab && this->isPlayer())
     {
       this->player->unjoinable = true;
       retval = attack(this, victim, SKILL_BACKSTAB, FIRST);
@@ -322,7 +322,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
     // if (IS_AFFECTED(this, AFF_CHARM)) SET_BIT(retval, check_joincharmie(this,1));
     // if (SOMEONE_DIED(retval)) return retval;
-    if (this->c_class == CLASS_THIEF && IS_PC(victim))
+    if (this->c_class == CLASS_THIEF && victim->isPlayer())
     {
       WAIT_STATE(this, DC::PULSE_VIOLENCE * 2);
     }
@@ -753,7 +753,7 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
   /* See how well it worked on those currently in the room. */
   int a, i;
   Character *temp;
-  if (IS_PC(ch) && (a = ch->has_skill(SKILL_HIDE)))
+  if (ch->isPlayer() && (a = ch->has_skill(SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = nullptr;
@@ -879,7 +879,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  /*  if(IS_PC(victim) &&
+  /*  if(victim->isPlayer() &&
       !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
       ch->sendln("That person is not really there.");
       return ReturnValue::eFAILURE;
@@ -949,7 +949,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         {
           move_obj(obj, ch);
 
-          if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
+          if (victim->isPlayer() || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
             _exp = GET_OBJ_WEIGHT(obj) * 1000;
           else
             _exp = (GET_OBJ_WEIGHT(obj) * 1000);
@@ -965,7 +965,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
             ch->send(buf);
           }
 
-          if (IS_PC(victim))
+          if (victim->isPlayer())
           {
             victim->save(cmd_t::SAVE_SILENTLY);
             ch->save(cmd_t::SAVE_SILENTLY);
@@ -999,7 +999,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
                 affect_to_char(ch, &pthiefaf);
             }
           }
-          if (IS_PC(victim))
+          if (victim->isPlayer())
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s stole %s[%d] from %s",
@@ -1164,7 +1164,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         act("You remove $p and steal it.", ch, obj, 0, TO_CHAR, 0);
         act("$n steals $p from $N.", ch, obj, victim, TO_ROOM, NOTVICT);
         obj_to_char(victim->unequip_char(eq_pos), ch);
-        if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
+        if (victim->isPlayer() || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
           _exp = (GET_OBJ_WEIGHT(obj) * victim->getLevel());
@@ -1303,7 +1303,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(victim) && ((victim->getLevel() + 20) < ch->getLevel()))
+  if (victim->isPlayer() && ((victim->getLevel() + 20) < ch->getLevel()))
   {
     ch->sendln("That person is too low level, you don't want to tarnish your reputation!");
     return ReturnValue::eFAILURE;
@@ -1338,13 +1338,13 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  /*if(IS_PC(victim) &&
+  /*if(victim->isPlayer() &&
     !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
     ch->sendln("That person is not really there.");
     return ReturnValue::eFAILURE;
   }
 */
-  if (!ch->has_skill(SKILL_POCKET) && IS_PC(ch))
+  if (!ch->has_skill(SKILL_POCKET) && ch->isPlayer())
   {
     ch->sendln("Well, you would, if you knew how.");
     return ReturnValue::eFAILURE;
@@ -1387,7 +1387,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
       ch->addGold(gold);
       victim->removeGold(gold);
       _exp = gold / 100 * victim->getLevel() / 5;
-      if (IS_PC(victim))
+      if (victim->isPlayer())
         _exp = 0;
       if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
         _exp = 1;
@@ -1403,7 +1403,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
         ch->send(buf);
       }
 
-      if (IS_PC(victim))
+      if (victim->isPlayer())
       {
         victim->save(cmd_t::SAVE_SILENTLY);
         ch->save(cmd_t::SAVE_SILENTLY);
@@ -2179,7 +2179,7 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   // if the victim died and the character did not die
   if ((retval & ReturnValue::eVICT_DIED) && !(retval & ReturnValue::eCH_DIED))
   {
-    if (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY))
+    if (ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return retval;
   }

@@ -195,7 +195,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
       return 1;
     }
 
-    if ((mob->getLevel() > ch->getLevel()) && IS_PC(mob))
+    if ((mob->getLevel() > ch->getLevel()) && mob->isPlayer())
     {
       sprintf(message, "%s can string himself, thank you.\r\n", GET_SHORT(mob));
       ch->send(message);
@@ -205,7 +205,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
     switch (field)
     {
     case 1:
-      if (IS_PC(mob) && ch->getLevel() < IMPLEMENTER)
+      if (mob->isPlayer() && ch->getLevel() < IMPLEMENTER)
       {
         ch->send("You can't change that field for players.");
         return 1;
@@ -221,7 +221,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
               ch->desc->strnew = mob->getNameCPtr();
       */
 
-      if (IS_PC(mob))
+      if (mob->isPlayer())
         ch->sendln("WARNING: You have changed the name of a player.");
       break;
     case 2:
@@ -238,7 +238,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
         ch->desc->strnew = &mob->short_desc;
       break;
     case 3:
-      if (IS_PC(mob))
+      if (mob->isPlayer())
       {
         ch->sendln("That field is for monsters only.");
         return 1;
@@ -394,7 +394,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
       ch->sendln("String too long - truncated.");
       *(string + length[field - 1]) = '\0';
     }
-    if (type == TP_MOB && IS_PC(mob))
+    if (type == TP_MOB && mob->isPlayer())
     {
       *ch->desc->strnew = str_dup(string);
       ch->desc->strnew = 0;
@@ -413,7 +413,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
     send_to_char("Enter string. Terminate with '~' at the beginning "
                  "of a line.\r\n",
                  ch);
-    if (type == TP_MOB && IS_PC(mob))
+    if (type == TP_MOB && mob->isPlayer())
 #ifdef LEAK_CHECK
       (*ch->desc->strnew) = (char *)calloc(length[field - 1], sizeof(char));
 #else
@@ -662,7 +662,7 @@ void page_string(class Connection *d, const char *str, int keep_internal)
     return;
   }
 
-  if (IS_PC(d->character) && !isSet(d->character->player->toggles, Player::PLR_PAGER))
+  if (d->character->isPlayer() && !isSet(d->character->player->toggles, Player::PLR_PAGER))
   {
     page_string_dep(d, str, keep_internal);
     return;

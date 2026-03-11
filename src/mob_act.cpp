@@ -48,7 +48,7 @@ void scavenge(Character *ch);
 bool is_r_denied(Character *ch, int room)
 {
   struct deny_data *d;
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     return false;
   for (d = DC::getInstance()->world[room].denied; d; d = d->next)
     if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == d->vnum)
@@ -288,7 +288,7 @@ void mobile_activity(void)
             act("$n growls at $N.", ch, 0, tmp_ch, TO_ROOM, NOTVICT);
             continue;
           }
-          else if (IS_PC(tmp_ch))
+          else if (tmp_ch->isPlayer())
           {
             act("$n screams, 'I am going to KILL YOU!'", ch, 0, 0, TO_ROOM, 0);
             PerfTimers["mprog_attack"].start();
@@ -452,7 +452,7 @@ void mobile_activity(void)
 
           //           continue;
 
-          if ((IS_PC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
+          if ((tmp_ch->isPlayer() && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
                !isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
               (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
@@ -578,7 +578,7 @@ void mobile_activity(void)
               }
               break;
             }
-          } // If IS_PC(tmp_ch)
+          } // If tmp_ch->isPlayer()
         } // for() for the RACIST, AGG_XXX and FRIENDLY flags
 
     // Note, if you add anything to this point, you need to put if(done) continue

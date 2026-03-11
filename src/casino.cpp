@@ -84,7 +84,7 @@ void free_player(player_data *plr)
     }
     prev = tmp;
   }
-  if (plr->ch && charExists(plr->ch) && IS_PC(plr->ch))
+  if (plr->ch && charExists(plr->ch) && plr->ch->isPlayer())
   {
     plr->ch->save(cmd_t::SAVE_SILENTLY);
   }
@@ -1221,7 +1221,7 @@ int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg
       int i = 0;
       for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
            tmpch = tmpch->next_in_room)
-        if (IS_PC(tmpch))
+        if (tmpch->isPlayer())
           i++;
       if (i <= players(obj->table))
         add_timer_bj_dealer2(obj->table, 2); // end bets in 1 secs
@@ -1235,7 +1235,7 @@ int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg
       int i = 0;
       for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
            tmpch = tmpch->next_in_room)
-        if (IS_PC(tmpch))
+        if (tmpch->isPlayer())
           i++;
       if (i <= players(obj->table))
       {

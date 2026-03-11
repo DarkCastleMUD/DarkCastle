@@ -80,7 +80,7 @@ public:
       return;
     }
 
-    if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
+    if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
       result = "plr_editor_dc";
       return;
@@ -175,7 +175,7 @@ public:
       return;
     }
 
-    if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
+    if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
       result = "plr_editor_dc";
       return;

@@ -280,7 +280,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
   if (victim)
   {
-    if (IS_PC(victim) && (this->getLevel() < victim->getLevel()))
+    if (victim->isPlayer() && (this->getLevel() < victim->getLevel()))
     {
       act("$n casts a massive lightning bolt at you.", this, 0, victim,
           TO_VICT, 0);
@@ -295,7 +295,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (IS_PC(victim))
+    if (victim->isPlayer())
     {
       victim->sendln(QString("A massive bolt of lightning arcs down from the "
                              "heavens, striking you\r\nbetween the eyes. You have "
@@ -412,7 +412,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   {
     for (const auto &victim : DC::getInstance()->character_list)
     {
-      if (IS_PC(victim))
+      if (victim->isPlayer())
       {
         std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
@@ -484,7 +484,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   {
     for (const auto &victim : DC::getInstance()->character_list)
     {
-      if (IS_PC(victim))
+      if (victim->isPlayer())
       {
         std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)

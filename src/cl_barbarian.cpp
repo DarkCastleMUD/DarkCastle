@@ -602,7 +602,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
 
   if (!isSet(retval, ReturnValue::eCH_DIED))
   {
-    if (!isSet(retval, ReturnValue::eVICT_DIED) && IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY))
+    if (!isSet(retval, ReturnValue::eVICT_DIED) && ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
@@ -613,7 +613,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     if (bSuccess)
     {
       SET_BIT(ch->combat, COMBAT_BERSERK);
-      if (IS_PC(ch))
+      if (ch->isPlayer())
         GET_AC(ch) += 30; // we do this here, so we know if someone dies with COMBAT_BERSERK to
                           // give them their AC back
     }

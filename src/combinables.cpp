@@ -433,7 +433,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
 
   argument = one_argument(argument, arg1);
 
-  if (IS_PC(ch) && ch->getLevel() >= 106)
+  if (ch->isPlayer() && ch->getLevel() >= 106)
   {
     if (!str_cmp(arg1, "load"))
     {
@@ -938,7 +938,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
 
   argument = one_argument(argument, arg1);
 
-  if (IS_PC(ch) && ch->getLevel() >= 106)
+  if (ch->isPlayer() && ch->getLevel() >= 106)
   {
     if (!str_cmp(arg1, "load"))
     {

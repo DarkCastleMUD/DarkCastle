@@ -452,7 +452,7 @@ int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     if (heal < 5)
       heal = 5;
 
-    if (IS_PC(tmp_char) && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
+    if (tmp_char->isPlayer() && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
     {
       if (tmp_char == ch)
       {
@@ -492,7 +492,7 @@ int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
     ch->sendln("Noone here by that name.");
     return ReturnValue::eSUCCESS;
   }
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     ch->sendln("The Gods prohibit such evil.");
     return ReturnValue::eSUCCESS;
@@ -2523,7 +2523,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
           v->sendln("The Szrildor daypass crumbles into dust.");
           extract_obj(p); // extract handles all variations of obj_from_char etc
 
-          if (IS_PC(v) && v->in_room && real_room(30000) > 0 && DC::getInstance()->world[v->in_room].zone == DC::getInstance()->world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
+          if (v->isPlayer() && v->in_room && real_room(30000) > 0 && DC::getInstance()->world[v->in_room].zone == DC::getInstance()->world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
           {
             if (v->getLevel() >= IMMORTAL)
             {
@@ -2898,7 +2898,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
 
   // see if we have any players in room
   for (vict = DC::getInstance()->world[obj->in_room].people; vict; vict = vict->next_in_room)
-    if (IS_PC(vict))
+    if (vict->isPlayer())
       break;
 
   // no?  reset pulse state and get out
@@ -3894,7 +3894,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       act("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, TO_ROOM, 0);
     }
 
-    if (IS_PC(vict))
+    if (vict->isPlayer())
       for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
           i->character->sendln("You hear a large BOOM from somewhere in the distance.");
@@ -4685,7 +4685,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
-    if (IS_PC(victim))
+    if (victim->isPlayer())
       victim->sendln("You have been KILLED!!\r\n");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
@@ -4738,7 +4738,7 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
-    if (IS_PC(victim))
+    if (victim->isPlayer())
       victim->sendln("You have been KILLED!!\r\n");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;

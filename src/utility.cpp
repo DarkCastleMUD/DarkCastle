@@ -998,7 +998,7 @@ void util_unarchive(char *char_name, Character *caller)
 
 bool ARE_CLANNED(Character *sub, Character *obj)
 {
-  if (IS_PC(sub) &&
+  if (sub->isPlayer() &&
       obj->isNonPlayer() &&
       obj->master &&
       ARE_CLANNED(sub, obj->master) &&
@@ -1060,7 +1060,7 @@ bool ARE_GROUPED(Character *sub, Character *obj)
   if (obj == nullptr || sub == nullptr)
     return false;
 
-  if (IS_PC(sub) &&
+  if (sub->isPlayer() &&
       obj->isNonPlayer() &&
       obj->master &&
       ARE_GROUPED(sub, obj->master) &&
@@ -1137,7 +1137,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     }
   }
 
-  if (sub && IS_PC(sub) && sub->player && sub->player->holyLite)
+  if (sub && sub->isPlayer() && sub->player && sub->player->holyLite)
     return true;
 
   if (!noprog && obj->isNonPlayer())
@@ -1275,7 +1275,7 @@ bool check_blind(Character *ch)
   //   if (IS_AFFECTED(ch, AFF_true_SIGHT))
   //    return false;
 
-  if (IS_PC(ch) && ch->player->holyLite)
+  if (ch->isPlayer() && ch->player->holyLite)
     return false;
 
   if (IS_AFFECTED(ch, AFF_BLIND) && number(0, 4)) // 20% chance of seeing
@@ -1529,7 +1529,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if (IS_PC(this))
+  if (this->isPlayer())
   {
     x = GET_WIS(this);
     uint64_t percent = number(1, 100);
@@ -1552,7 +1552,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if (victim->fighting && IS_PC(victim->fighting)) // PvP fight?
+  if (victim->fighting && victim->fighting->isPlayer()) // PvP fight?
   {
     victim->sendln("The gods refuse to answer your prayers while you're fighting!");
     return ReturnValue::eFAILURE;
@@ -1905,7 +1905,7 @@ command_return_t Character::save(cmd_t cmd)
     send(QStringLiteral("Saving %1.\r\n").arg(GET_NAME(this)));
   }
 
-  if (IS_PC(this))
+  if (this->isPlayer())
   {
     save_char_obj();
 #ifdef USE_SQL

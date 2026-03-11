@@ -154,7 +154,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     ch->sendln("You find yourself unable to tame this player.");
     return ReturnValue::eFAILURE;
@@ -286,7 +286,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!victim.isEmpty() && IS_PC(this) && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && this->getLevel() < ANGEL)
+  if (!victim.isEmpty() && this->isPlayer() && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && this->getLevel() < ANGEL)
   {
     this->sendln("Only a ranger could track someone by name.");
     return ReturnValue::eFAILURE;
@@ -1385,7 +1385,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   }
 
   /* Protect the newbies! */
-  if (IS_PC(victim) && victim->getLevel() < 6)
+  if (victim->isPlayer() && victim->getLevel() < 6)
   {
     ch->sendln("Don't shoot at a poor defenseless n00b! :(");
     return ReturnValue::eFAILURE;

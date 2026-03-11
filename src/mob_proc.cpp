@@ -161,7 +161,7 @@ Character *find_random_player_in_room(Character *ch)
 
   // Count the number of players in room
   for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
-    if (IS_PC(vict))
+    if (vict->isPlayer())
       count++;
 
   if (!count) // no players
@@ -172,7 +172,7 @@ Character *find_random_player_in_room(Character *ch)
 
   // Find the "count" player and return them
   for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
-    if (IS_PC(vict))
+    if (vict->isPlayer())
     {
       if (count > 1)
         count--;
@@ -324,7 +324,7 @@ int fighter(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
 
   if (ch->equipment[WEAR_WIELD] && vict->equipment[WEAR_WIELD])
-    if (IS_PC(ch) || IS_PC(vict))
+    if (ch->isPlayer() || vict->isPlayer())
     {
       wielded = vict->equipment[WEAR_WIELD];
       if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
@@ -646,7 +646,7 @@ int backstabber(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
-    if (IS_PC(tch))
+    if (tch->isPlayer())
       if (CAN_SEE(ch, tch))
       {
 
@@ -908,7 +908,7 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
   if (cmd == dir_cmd || cmd == cmd_t::UNDEFINED)
   {
-    if (IS_PC(ch))
+    if (ch->isPlayer())
     {
       if (IS_IMMORTAL(ch))
       {
@@ -2048,7 +2048,7 @@ int adept(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eFAILURE;
 
   for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
+    if (tch->isPlayer() && number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
   if (!tch)
@@ -2093,7 +2093,7 @@ int mud_school_adept(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     return ReturnValue::eFAILURE;
 
   for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
+    if (tch->isPlayer() && number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
   if (!tch)
@@ -2403,7 +2403,7 @@ int humaneater(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
-    if (IS_PC(tch))
+    if (tch->isPlayer())
       if (CAN_SEE(ch, tch))
       {
 
@@ -2786,7 +2786,7 @@ int marauder(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   wielded = vict->equipment[WEAR_WIELD];
 
   if (ch->equipment[WEAR_WIELD] && vict->equipment[WEAR_WIELD])
-    if (IS_PC(ch) || IS_PC(vict))
+    if (ch->isPlayer() || vict->isPlayer())
       if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
           (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
         if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
@@ -3334,7 +3334,7 @@ int gremlinthing(Character *ch)
   if (GET_POS(ch) < position_t::STANDING)
     return ReturnValue::eFAILURE;
 
-  if (ch->master && IS_PC(ch->master) && ch->master->player->golem &&
+  if (ch->master && ch->master->isPlayer() && ch->master->player->golem &&
       ch->master->player->golem->in_room == ch->in_room)
   {
     Character *gol = ch->master->player->golem;

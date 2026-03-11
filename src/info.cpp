@@ -516,7 +516,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
     if (!(i->long_desc) || (i->isNonPlayer() && (GET_POS(i) != i->mobdata->default_pos)))
     {
       /* A char without long descr, or not in default pos. */
-      if (IS_PC(i))
+      if (i->isPlayer())
       {
         buffer = "";
 
@@ -528,7 +528,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
         buffer.append(GET_SHORT(i));
         if ((i->getLevel() < OVERSEER) && i->clan && (clan = get_clan(i)))
         {
-          if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
+          if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
           {
             sprintf(buf, " %s [%s]", GET_TITLE(i), clan->name);
             buffer.append(buf);
@@ -884,7 +884,7 @@ void Character::list_char_to_char(Character *list, int mode)
     {
       show_char_to_char(i, this, 0);
 
-      if (IS_PC(this) && i->isNonPlayer())
+      if (this->isPlayer() && i->isNonPlayer())
       {
         if (this->player->lastseen == 0)
           this->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
@@ -1808,7 +1808,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
       else
         ch->send("None.");
       ch->sendln("");
-      if (IS_PC(ch) && !ch->hunting.isEmpty())
+      if (ch->isPlayer() && !ch->hunting.isEmpty())
         ch->do_track(QString(ch->hunting).split(' '), cmd_t::TRACK);
     }
       ch->in_room = original_loc;
@@ -1977,7 +1977,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
           GET_ALIGNMENT(ch));
   ch->send(buf);
 
-  if (IS_PC(ch)) // mobs can't view this part
+  if (ch->isPlayer()) // mobs can't view this part
   {
     QString experience_needed;
     if (ch->isImmortalPlayer())
@@ -2277,7 +2277,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
   if (found)
     ch->sendln("($5:$7)=========================================================================($5:$7)");
 
-  if (IS_PC(ch)) // mob can't view this part
+  if (ch->isPlayer()) // mob can't view this part
   {
     if (ch->getLevel() > IMMORTAL && ch->player->buildLowVnum && ch->player->buildHighVnum)
     {
@@ -2737,7 +2737,7 @@ int do_mlocate(Character *ch, char *name, cmd_t cmd)
   for (const auto &i : character_list)
   {
 
-    if ((IS_PC(i) &&
+    if ((i->isPlayer() &&
          (cmd != cmd_t::MLOCATE_CHARACTER || !CAN_SEE(ch, i))))
       continue;
 
@@ -2925,7 +2925,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
   if (Learned > 40)
   {
 
-    if (IS_PC(victim) && victim->getLevel() > IMMORTAL)
+    if (victim->isPlayer() && victim->getLevel() > IMMORTAL)
     {
       csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\r\n",
              GET_SHORT(victim));
@@ -3386,7 +3386,7 @@ void check_champion_and_website_who_list()
   for (const auto &ch : character_list)
   {
 
-    if (IS_PC(ch) && ch->desc && ch->player && ch->player->wizinvis <= 0)
+    if (ch->isPlayer() && ch->desc && ch->player && ch->player->wizinvis <= 0)
     {
       buf << GET_SHORT(ch) << std::endl;
     }

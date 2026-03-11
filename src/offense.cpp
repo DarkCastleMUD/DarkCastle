@@ -208,12 +208,12 @@ int do_slay(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  //  if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim)) {
+  //  if (IS_AFFECTED(ch, AFF_CHARM) && ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_ANTI_PAL && victim->isPlayer()) {
   //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
   //     return ReturnValue::eFAILURE;
   //  }
 
-  if (IS_AFFECTED(ch, AFF_FAMILIAR) && IS_PC(ch->master))
+  if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master->isPlayer())
   {
     act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
     return ReturnValue::eFAILURE;
@@ -267,12 +267,12 @@ int do_kill(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  //  if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim)) {
+  //  if (IS_AFFECTED(ch, AFF_CHARM) && ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_ANTI_PAL && victim->isPlayer()) {
   //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
   //     return ReturnValue::eFAILURE;
   //  }
 
-  if (IS_AFFECTED(ch, AFF_FAMILIAR) && IS_PC(ch->master))
+  if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master->isPlayer())
   {
     act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
     return ReturnValue::eFAILURE;
@@ -401,7 +401,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  // if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim->fighting)) {
+  // if (IS_AFFECTED(ch, AFF_CHARM) && ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_ANTI_PAL && victim->fighting->isPlayer()) {
   //    act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
   //    return ReturnValue::eFAILURE;
   // }

@@ -75,7 +75,7 @@ int32_t mana_limit(Character *ch)
 {
   int max;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     max = (ch->max_mana);
   else
     max = (ch->max_mana);
@@ -93,7 +93,7 @@ int32_t hit_limit(Character *ch)
 {
   int max;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     max = (ch->max_hit) + (graf(ch->age().year, 2, 4, 17, 14, 8, 4, 3));
   else
     max = (ch->max_hit);
@@ -634,7 +634,7 @@ void gain_exp(Character *ch, int64_t gain)
 
   void golem_gain_exp(Character * ch);
 
-  if (IS_PC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
+  if (ch->isPlayer() && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
 
   if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8) // it's a golem
@@ -787,7 +787,7 @@ void point_update(void)
 
     int a;
     Character *temp;
-    if (IS_PC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = i->has_skill(SKILL_HIDE)))
+    if (i->isPlayer() && ISSET(i->affected_by, AFF_HIDE) && (a = i->has_skill(SKILL_HIDE)))
     {
       int o;
       for (o = 0; o < MAX_HIDE; o++)
@@ -979,7 +979,7 @@ void update_corpses_and_portals(void)
 
 void prepare_character_for_sixty(Character *ch)
 {
-  if (IS_PC(ch) && DC::MAX_MORTAL_LEVEL == 60)
+  if (ch->isPlayer() && DC::MAX_MORTAL_LEVEL == 60)
   {
     int skl = -1;
     switch (GET_CLASS(ch))

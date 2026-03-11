@@ -186,7 +186,7 @@ void save_charmie_data(Character *ch)
   {
     Character *follower = followers->follower;
 
-    if (follower == nullptr || IS_PC(follower) || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
+    if (follower == nullptr || follower->isPlayer() || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
     {
       continue;
     }

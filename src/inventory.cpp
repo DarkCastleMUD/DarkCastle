@@ -1757,7 +1757,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     else
     {
       // You can give no_trade items to mobs for quest purposes.  It's taken care of later
-      if (IS_PC(vict) && (IS_PC(this) || IS_AFFECTED(this, AFF_CHARM)))
+      if (vict->isPlayer() && (this->isPlayer() || IS_AFFECTED(this, AFF_CHARM)))
       {
         if (getLevel() > IMMORTAL)
           sendln("That was a NO_TRADE item btw....");
@@ -2581,7 +2581,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 {
   char buffer[MAX_STRING_LENGTH];
 
-  if (!ch->has_skill(SKILL_PALM) && IS_PC(ch))
+  if (!ch->has_skill(SKILL_PALM) && ch->isPlayer())
   {
     ch->sendln("You aren't THAT slick there, pal.");
     return ReturnValue::eFAILURE;

@@ -38,7 +38,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
 
   if (victim)
   {
-    if (IS_PC(victim) && (ch->getLevel() <= victim->getLevel()))
+    if (victim->isPlayer() && (ch->getLevel() <= victim->getLevel()))
     {
       act("You cast a stream of fire at $N.", ch, 0, victim, TO_CHAR, 0);
       act("$n casts a stream of fire at you.", ch, 0, victim, TO_VICT, 0);
@@ -64,7 +64,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
     /* Still here? Ok, the boot continues */
     victim->sendln("You have been disconnected.");
     ch->sendln("Ok.");
-    if (IS_PC(victim))
+    if (victim->isPlayer())
     {
       sprintf(buf, "A stream of fire arcs down from the heavens, striking "
                    "you between the eyes.\r\nYou have been removed from the "

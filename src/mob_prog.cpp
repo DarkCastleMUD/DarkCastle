@@ -572,7 +572,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
     }
     else if (!str_cmp(right, "actflags1"))
     {
-      if (!target || IS_PC(target))
+      if (!target || target->isPlayer())
         tError = true;
       else
       {
@@ -582,7 +582,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
     }
     else if (!str_cmp(right, "actflags2"))
     {
-      if (!target || IS_PC(target))
+      if (!target || target->isPlayer())
         tError = true;
       else
       {
@@ -1652,7 +1652,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     int vnum = atoi(arg);
     for (te = DC::getInstance()->world[mob->in_room].people; te; te = te->next)
     {
-      if (IS_PC(te))
+      if (te->isPlayer())
         continue;
       if (DC::getInstance()->mob_index[te->mobdata->nr].vnum() == vnum)
       {
@@ -1755,7 +1755,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     Character *p;
     int count = 0;
     for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
-      if (IS_PC(p))
+      if (p->isPlayer())
         count++;
     return mprog_veval(count, opr, atoi(val));
   }
@@ -1816,7 +1816,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eISPC:
     if (fvict)
-      return IS_PC(fvict);
+      return fvict->isPlayer();
     if (ye)
       return false;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
@@ -1830,27 +1830,27 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
         return -1;
     case 'n':
       if (actor)
-        return (IS_PC(actor));
+        return (actor->isPlayer());
       else
         return 0;
     case 't':
       if (vict)
-        return (IS_PC(vict));
+        return (vict->isPlayer());
       else
         return 0;
     case 'r':
       if (rndm)
-        return (IS_PC(rndm));
+        return (rndm->isPlayer());
       else
         return 0;
     case 'f':
       if (actor && actor->fighting)
-        return (IS_PC(actor->fighting));
+        return (actor->fighting->isPlayer());
       else
         return 0;
     case 'g':
       if (mob && mob->fighting)
-        return (IS_PC(mob->fighting));
+        return (mob->fighting->isPlayer());
       else
         return 0;
     default:
@@ -2693,7 +2693,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     int lhsvl, rhsvl;
     if (fvict)
     {
-      if (IS_PC(fvict))
+      if (fvict->isPlayer())
         return 0;
       lhsvl = DC::getInstance()->mob_index[fvict->mobdata->nr].vnum();
       rhsvl = atoi(val);
@@ -3358,7 +3358,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
       // Mobs can see them no matter what.  Use "cansee()" if you don't want that
       //	   if ( CAN_SEE( mob,actor ) )
       one_argument(actor->getNameC(), t);
-      if (IS_PC(actor))
+      if (actor->isPlayer())
         *t = UPPER(*t);
     }
     else
@@ -3387,7 +3387,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       if (CAN_SEE(mob, vict))
         one_argument(vict->getNameC(), t);
-      if (IS_PC(vict))
+      if (vict->isPlayer())
         *t = UPPER(*t);
     }
     else
@@ -3416,7 +3416,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       if (CAN_SEE(mob, actor->fighting))
         one_argument(actor->fighting->getNameC(), t);
-      if (IS_PC(actor->fighting))
+      if (actor->fighting->isPlayer())
         *t = UPPER(*t);
     }
     break;
@@ -3441,7 +3441,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       if (CAN_SEE(mob, mob->fighting))
         one_argument(mob->fighting->getNameC(), t);
-      if (IS_PC(mob->fighting))
+      if (mob->fighting->isPlayer())
         *t = UPPER(*t);
     }
     break;
@@ -3466,7 +3466,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       if (CAN_SEE(mob, rndm))
         one_argument(rndm->getNameC(), t);
-      if (IS_PC(rndm))
+      if (rndm->isPlayer())
         *t = UPPER(*t);
     }
     break;
@@ -3915,7 +3915,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
   if (mob->in_room > 0)
   {
     for (vch = DC::getInstance()->world[mob->in_room].people; vch; vch = vch->next_in_room)
-      if (CAN_SEE(mob, vch, true) && IS_PC(vch))
+      if (CAN_SEE(mob, vch, true) && vch->isPlayer())
         count++;
 
     if (count)
@@ -3925,7 +3925,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
     {
       for (vch = DC::getInstance()->world[mob->in_room].people; vch && count;)
       {
-        if (CAN_SEE(mob, vch, true) && IS_PC(vch))
+        if (CAN_SEE(mob, vch, true) && vch->isPlayer())
           count--;
         if (count)
           vch = vch->next_in_room;

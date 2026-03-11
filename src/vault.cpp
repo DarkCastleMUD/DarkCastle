@@ -2257,7 +2257,7 @@ Character *find_owner(QString name)
     {
 		  produce_coredump(); //Trying to track down bug that causes mob->name to be nullptr
 	  }
-    else if (name == GET_NAME(ch) && IS_PC(ch))
+    else if (name == GET_NAME(ch) && ch->isPlayer())
     {
 			return true;
 	  }

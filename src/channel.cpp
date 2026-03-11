@@ -66,7 +66,7 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
     ch->sendln("Yes, but WHAT do you want to say?");
   else
   {
-    if (IS_PC(ch))
+    if (ch->isPlayer())
       MOBtrigger = false;
 
     if (IS_IMMORTAL(ch))
@@ -77,13 +77,13 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
     buf = fmt::format("$B$7$n says '{}$B$7'$R", argument.c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
 
-    if (IS_PC(ch))
+    if (ch->isPlayer())
       MOBtrigger = false;
 
     buf = fmt::format("$B$7You say '{}$B$7'$R", argument.c_str());
     act(buf, ch, 0, 0, TO_CHAR, 0);
 
-    if (IS_PC(ch))
+    if (ch->isPlayer())
     {
       MOBtrigger = true;
       retval = ch->mprog_speech_trigger(argument.c_str());
@@ -91,7 +91,7 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
         return SWAP_CH_VICT(retval);
     }
 
-    if (IS_PC(ch))
+    if (ch->isPlayer())
     {
       MOBtrigger = true;
       retval = ch->oprog_speech_trigger(argument.c_str());
@@ -110,7 +110,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
   Character *victim = nullptr;
   extern bool MOBtrigger;
 
-  if (IS_PC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("You try to speak but just look like an idiot!");
     return ReturnValue::eSUCCESS;
@@ -150,22 +150,22 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
     messageStr = remove_all_codes(messageStr);
   }
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     MOBtrigger = false;
   buf = fmt::format("$B$n says (to $N) '{}'$R", messageStr.c_str());
   act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     MOBtrigger = false;
   buf = fmt::format("$B$n says (to $3you$7) '{}'$R", messageStr.c_str());
   act(buf, ch, 0, victim, TO_VICT, 0);
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     MOBtrigger = false;
   buf = fmt::format("$BYou say (to $N) '{}'$R", messageStr.c_str());
   act(buf, ch, 0, victim, TO_CHAR, 0);
   MOBtrigger = true;
-  //   if(IS_PC(ch)) {
+  //   if(ch->isPlayer()) {
   //     retval = mprog_speech_trigger( message, ch );
   //     MOBtrigger = true;
   //     if(SOMEONE_DIED(retval))
@@ -260,7 +260,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_SILENCED))
     {
@@ -366,7 +366,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (IS_PC(this))
+  if (this->isPlayer())
   {
     if (!this->isNonPlayer() && isSet(this->player->punish, PUNISH_SILENCED))
     {
@@ -462,19 +462,19 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
     return do_say(ch, "Shouting makes my throat hoarse.");
   }
 
-  if (IS_PC(ch) && isSet(ch->player->punish, PUNISH_SILENCED))
+  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_SILENCED))
   {
     send_to_char("You must have somehow offended the gods, for you "
                  "find yourself unable to!\r\n",
                  ch);
     return ReturnValue::eSUCCESS;
   }
-  if (IS_PC(ch) && !(isSet(ch->misc, DC::LogChannel::CHANNEL_SHOUT)))
+  if (ch->isPlayer() && !(isSet(ch->misc, DC::LogChannel::CHANNEL_SHOUT)))
   {
     ch->sendln("You told yourself not to SHOUT!!");
     return ReturnValue::eSUCCESS;
   }
-  if (IS_PC(ch) && ch->getLevel() < 3)
+  if (ch->isPlayer() && ch->getLevel() < 3)
   {
     send_to_char("Due to misuse, you must be of at least 3rd level "
                  "to shout.\r\n",
@@ -539,7 +539,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
     return do_say(ch, "Why don't you just do that yourself!");
   }
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
@@ -633,7 +633,7 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
     do_say(ch, "Why don't you just do that yourself!");
     return ReturnValue::eSUCCESS;
   }
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
@@ -823,12 +823,12 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   // vict guarantted to be a PC
   // Re: Last comment. Switched immortals crash this.
 
-  if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
+  if (vict->isPlayer() && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
   {
     this->sendln("The person is ignoring all tells right now.");
     return ReturnValue::eSUCCESS;
   }
-  else if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL))
+  else if (vict->isPlayer() && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL))
   {
     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
     this->sendln("That player has tell channeled off btw...");
@@ -860,7 +860,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       {
         buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
 
-        if (IS_PC(this) && IS_PC(vict))
+        if (this->isPlayer() && vict->isPlayer())
         {
           vict->player->last_tell = GET_NAME(this);
         }
@@ -887,7 +887,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       else
       {
         buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
-        if (IS_PC(this) && IS_PC(vict))
+        if (this->isPlayer() && vict->isPlayer())
           vict->player->last_tell = GET_NAME(this);
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
@@ -917,7 +917,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       {
         buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
 
-        if (IS_PC(this) && IS_PC(vict))
+        if (this->isPlayer() && vict->isPlayer())
           vict->player->last_tell = GET_NAME(this);
       }
       ansi_color(GREEN, vict);
@@ -1201,7 +1201,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
     return do_say(ch, "Why don't you just do that yourself!");
   }
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
@@ -1297,7 +1297,7 @@ void Character::gtell_history(Character *ch, QString message)
 communication::communication(Character *ch, QString message)
 {
   this->sender = GET_NAME(ch);
-  this->sender_ispc = IS_PC(ch);
+  this->sender_ispc = ch->isPlayer();
   this->message = message;
   this->timestamp = time(nullptr);
 }

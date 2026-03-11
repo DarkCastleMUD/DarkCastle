@@ -88,7 +88,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
         logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, DC::LogChannel::LOG_GOD);
         return ReturnValue::eSUCCESS;
       }
-      if ((ch->getLevel() <= vict->getLevel()) && IS_PC(vict))
+      if ((ch->getLevel() <= vict->getLevel()) && vict->isPlayer())
       {
         ch->sendln("Why be forceful?");
         buf = fmt::format("$n has failed to force you to '{}'.", to_force);

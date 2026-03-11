@@ -237,7 +237,7 @@ int do_fall(Character *ch, short dir)
     int ppl = 0;
     Character *k;
     for (k = DC::getInstance()->world[target].people; k; k = k->next_in_room)
-      if (IS_PC(k))
+      if (k->isPlayer())
         ppl++;
     if (ppl > 2)
     {
@@ -251,7 +251,7 @@ int do_fall(Character *ch, short dir)
     int ppl = 0;
     Character *k;
     for (k = DC::getInstance()->world[target].people; k; k = k->next_in_room)
-      if (IS_PC(k))
+      if (k->isPlayer())
         ppl++;
     if (ppl > 4)
     {
@@ -568,7 +568,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     int ppl = 0;
     Character *k;
     for (k = rm->people; k; k = k->next_in_room)
-      if (IS_PC(k))
+      if (k->isPlayer())
         ppl++;
     if (ppl > 2)
     {
@@ -604,7 +604,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     int ppl = 0;
     Character *k;
     for (k = rm->people; k; k = k->next_in_room)
-      if (IS_PC(k))
+      if (k->isPlayer())
         ppl++;
     if (ppl > 4)
     {
@@ -613,7 +613,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     }
   }
 
-  if (IS_PC(ch) && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+  if (ch->isPlayer() && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
     ch->sendln("You feel air trying to explode from your lungs as you swim around.");
     // ch->sendln("Underwater?!");
@@ -628,7 +628,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   if ((a = ch->has_skill(SKILL_VIGOR)) && number(1, 101) < a / 10)
     need_movement /= 2; // No skill improvement here. Too easy.
 
-  if (GET_MOVE(ch) < need_movement && IS_PC(ch))
+  if (GET_MOVE(ch) < need_movement && ch->isPlayer())
   {
     if (!following)
       ch->sendln("You are too exhausted.");
@@ -826,7 +826,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   if ((GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
     for (Character *tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if (IS_PC(tmp_ch))
+      if (tmp_ch->isPlayer())
         continue;
       if (IS_AFFECTED(tmp_ch, AFF_CHARM))
         continue;
@@ -932,7 +932,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
   {
     ch->sendln("You are unable to abandon your master.");
     act("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, TO_ROOM, 0);
-    if (IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
+    if (ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_BARD)
     {
       ch->master->sendln("You struggle to maintain control.");
       /*

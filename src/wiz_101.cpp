@@ -719,7 +719,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
-      if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && IS_PC(i->character))
+      if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && i->character->isPlayer())
       {
         if (cmd == cmd_t::IMPCHAN && !i->character->has_skill(COMMAND_IMP_CHAN))
           continue;

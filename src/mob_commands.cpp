@@ -170,7 +170,7 @@ int do_mpasound(Character *ch, char *argument, cmd_t cmd)
   int32_t was_in_room;
   int door;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -208,7 +208,7 @@ int do_mpkill(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -254,7 +254,7 @@ int do_mphit(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -301,7 +301,7 @@ int do_mpaddlag(Character *ch, char *argument, cmd_t cmd)
   char arg1[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -341,7 +341,7 @@ int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
   int location;
   bool dot = false;
   char dotbuf[MAX_INPUT_LENGTH];
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -397,7 +397,7 @@ int do_mpechoaround(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -426,7 +426,7 @@ int do_mpechoaroundnotbad(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
   Character *victim, *victim2;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -463,7 +463,7 @@ int do_mpechoat(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -491,7 +491,7 @@ int do_mpechoat(Character *ch, char *argument, cmd_t cmd)
 
 int do_mpecho(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -517,7 +517,7 @@ int do_mpmload(Character *ch, char *argument, cmd_t cmd)
   int realnum;
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -553,7 +553,7 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
   Object *obj;
   int realnum;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -608,7 +608,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   Object *obj;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -659,7 +659,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     ch->prog_error(QStringLiteral("Mppurge - Purging a PC."));
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -692,7 +692,7 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   int32_t location = -1;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -779,7 +779,7 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   int32_t original;
   int result;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -847,7 +847,7 @@ int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
 
   Character *get_pc_room_vis_exact(Character * ch, const char *name);
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -891,7 +891,7 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
   Connection *d;
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -972,7 +972,7 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -1119,7 +1119,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   char skill[MAX_INPUT_LENGTH];
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -1252,7 +1252,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   {
     if (type == 1 && victim->isNonPlayer())
       continue;
-    else if (type == 2 && IS_PC(victim))
+    else if (type == 2 && victim->isPlayer())
       continue;
 
     struct tempvariable *eh;
@@ -1288,7 +1288,7 @@ int do_mpsetalign(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
@@ -1334,7 +1334,7 @@ void add_dmg(Character *ch, int dmg)
   for (c = dmg_list; c; c = c->next)
   {
     if ((ch->isNonPlayer() && !str_cmp(c->name, GET_SHORT(ch))) ||
-        (IS_PC(ch) && !str_cmp(c->name, GET_NAME(ch))))
+        (ch->isPlayer() && !str_cmp(c->name, GET_NAME(ch))))
     {
       c->damage += dmg;
       return;
@@ -1364,7 +1364,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
   int32_t hitpoints = 0;
 
   free_dmg_list();
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -1508,7 +1508,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
     for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
-      if ((IS_PC(victim) && victim->getLevel() > MORTAL) || victim == ch)
+      if ((victim->isPlayer() && victim->getLevel() > MORTAL) || victim == ch)
       {
         continue;
       }
@@ -1657,7 +1657,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
   Character *victim, *owner = nullptr;
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
@@ -1721,7 +1721,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
     {
       while ((victim = victim->next_in_room))
       {
-        if (IS_PC(victim))
+        if (victim->isPlayer())
           break;
       }
     }
@@ -1745,7 +1745,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
 int do_mppause(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
@@ -1835,7 +1835,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
   char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   room_t to_room = 0;
 
-  if (IS_PC(ch) && ch->getLevel() < 110)
+  if (ch->isPlayer() && ch->getLevel() < 110)
     return ReturnValue::eFAILURE;
 
   half_chop(argument, person, type);
@@ -1913,7 +1913,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
 
 int do_mppeace(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
@@ -1949,7 +1949,7 @@ int do_mppeace(Character *ch, char *argument, cmd_t cmd)
 
 int do_mpretval(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
@@ -2143,7 +2143,7 @@ char *allowedData[] = {
 
 int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;

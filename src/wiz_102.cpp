@@ -4279,7 +4279,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
           free(DC::getInstance()->world[ch->in_room].dir_option[x]);
           DC::getInstance()->world[ch->in_room].dir_option[x] = nullptr;
 
-          if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
+          if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
           {
             // if the destination room has a reverse exit
             if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]])
@@ -5270,7 +5270,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
       for (mob = DC::getInstance()->world[room].people; mob; mob = mob->next_in_room)
       {
-        if (IS_PC(mob))
+        if (mob->isPlayer())
           continue;
 
         count = 0;
@@ -5495,7 +5495,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     {
       strcat(buf, GET_NAME(k));
       strcat(buf,
-             (IS_PC(k) ? "(PC)\r\n" : (!k->isNonPlayer() ? "(NPC)\r\n" : "(MOB)\r\n")));
+             (k->isPlayer() ? "(PC)\r\n" : (!k->isNonPlayer() ? "(NPC)\r\n" : "(MOB)\r\n")));
     }
   }
   strcat(buf, "\r\n");
@@ -5586,7 +5586,7 @@ int do_possess(Character *ch, char *argument, cmd_t cmd)
         }
       }
 
-      else if (victim->desc || (IS_PC(victim)))
+      else if (victim->desc || (victim->isPlayer()))
       {
         ch->sendln("You can't do that, the body is already in use!");
         return ReturnValue::eFAILURE;

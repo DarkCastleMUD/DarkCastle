@@ -53,7 +53,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (IS_PC(ch) && argument != nullptr)
+  if (ch->isPlayer() && argument != nullptr)
   {
     std::string arg1, remainder_args;
     std::tie(arg1, remainder_args) = half_chop(std::string(argument));
@@ -433,7 +433,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
 
 int is_ignoring(const Character *const ch, const Character *const i)
 {
-  if (ch->isNonPlayer() || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
+  if (ch->isNonPlayer() || (i->getLevel() >= IMMORTAL && i->isPlayer()) || ch->player->ignoring.empty())
   {
     return false;
   }

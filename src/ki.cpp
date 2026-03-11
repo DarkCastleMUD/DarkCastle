@@ -319,7 +319,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
 
       /* Stop abusing your betters  */
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
-        if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
+        if (tar_char->isPlayer() && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
           ch->sendln("That just might annoy them!");
           return ReturnValue::eFAILURE;
@@ -327,7 +327,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
 
       /* Imps ignore safe flags  */
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
-        if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
+        if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
         {
           tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
         }
@@ -785,7 +785,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   }
 
   // Players are easier to disrupt
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     savebonus -= 10;
   }

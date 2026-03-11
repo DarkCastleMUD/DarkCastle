@@ -2618,7 +2618,7 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
     }
   }
 
-  if (IS_PC(ch) && (ch->getLevel() >= COORDINATOR))
+  if (ch->isPlayer() && (ch->getLevel() >= COORDINATOR))
   {
     do_god_clans(ch, arg, cmd);
     return ReturnValue::eSUCCESS;
@@ -2952,7 +2952,7 @@ void remove_totem(Object *altar, Object *totem)
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](Character *const &t)
            {
-             if (IS_PC(t) && t->altar == altar)
+             if (t->isPlayer() && t->altar == altar)
              {
                int j;
                for (j = 0; j < totem->num_affects; j++)
@@ -2972,7 +2972,7 @@ void add_totem(Object *altar, Object *totem)
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](Character *const &t)
            {
-             if (IS_PC(t) && t->altar == altar)
+             if (t->isPlayer() && t->altar == altar)
              {
                int j;
                for (j = 0; j < totem->num_affects; j++)
@@ -3049,7 +3049,7 @@ int count_plrs(int zone, int clan)
 
   int i = std::count_if(character_list.begin(), character_list.end(), [&zone, &clan](Character *const &tmpch)
                         {
-      if (IS_PC(tmpch) && DC::getInstance()->world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
+      if (tmpch->isPlayer() && DC::getInstance()->world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
 	  tmpch->getLevel() < 100 && tmpch->getLevel() > 10)
       return true;
       else
@@ -3195,7 +3195,7 @@ int online_clan_members(int clan)
   int i = std::count_if(character_list.begin(), character_list.end(),
                         [&clan](Character *const &Tmpch)
                         {
-                          if (IS_PC(Tmpch) && Tmpch->clan == clan && Tmpch->getLevel() < 100 && Tmpch->desc && Tmpch->getLevel() > 10)
+                          if (Tmpch->isPlayer() && Tmpch->clan == clan && Tmpch->getLevel() < 100 && Tmpch->desc && Tmpch->getLevel() > 10)
                             return true;
                           else
                             return false;
@@ -3297,7 +3297,7 @@ bool can_lose(struct takeover_pulse_data *take)
 
   auto result = find_if(character_list.begin(), character_list.end(), [&take](Character *const &ch)
                         {
-		if (IS_PC(ch) && DC::getInstance()->world[ch->in_room].zone == take->zone
+		if (ch->isPlayer() && DC::getInstance()->world[ch->in_room].zone == take->zone
 				&& (take->clan1 == ch->clan || take->clan2 == ch->clan)) {
 			return true;
 		} else {

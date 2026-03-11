@@ -957,7 +957,7 @@ void affect_update(int32_t duration_type)
   {
     // This doesn't really belong here, but it beats creating an "update" just for it.
     // That way we don't have to traverse the entire list all over again
-    if (duration_type == DC::PULSE_TIME && IS_PC(i))
+    if (duration_type == DC::PULSE_TIME && i->isPlayer())
       update_char_objects(i);
 
     for (af = i->affected; af; af = next_af_dude)
@@ -1834,7 +1834,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->getLevel() < ARCHANGEL && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  if (ch->getLevel() < ARCHANGEL && (ch->isPlayer() || IS_AFFECTED(ch, AFF_CHARM)))
   {
     if (GET_CLASS(ch) == CLASS_WARRIOR)
     {
@@ -2481,7 +2481,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           tar_char->sendln("Your sleep is restless.");
         ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty());
 
-        if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
+        if (tar_char && tar_char != ch && ch->isPlayer() && tar_char->isPlayer() && tar_char->desc && ch->desc)
         {
           /*
           if (!strcmp(tar_char->desc->getPeerOriginalAddress().toString().toStdString().c_str(), ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()))

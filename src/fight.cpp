@@ -160,7 +160,7 @@ int check_autojoiners(Character *ch, int skill = 0)
 
 int check_joincharmie(Character *ch, int skill = 0)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
     return ReturnValue::eFAILURE; // irrelevant
   if (!ch->fighting)
     return ReturnValue::eFAILURE;
@@ -256,7 +256,7 @@ void perform_violence(void)
       retval = check_joincharmie(ch);
     if (SOMEONE_DIED(retval))
       continue;
-    if (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_CHARMIEJOIN))
+    if (ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_CHARMIEJOIN))
     {
       if (ch->followers)
       {
@@ -444,7 +444,7 @@ void perform_violence(void)
 void add_threat(Character *mob, Character *ch, int amt)
 {
   struct threat_struct *thr;
-  if (!mob || !ch || !amt || IS_PC(mob) || !ch->getNameC())
+  if (!mob || !ch || !amt || mob->isPlayer() || !ch->getNameC())
     return;
   for (thr = mob->mobdata->threat; thr; thr = thr->next)
   {
@@ -475,7 +475,7 @@ void add_threat(Character *mob, Character *ch, int amt)
 
 void generate_skillthreat(Character *mob, int skill, int damage, Character *actor, Character *target)
 {
-  if (!actor || !mob || IS_PC(mob))
+  if (!actor || !mob || mob->isPlayer())
     return;
   struct threat_struct *thr;
   float v = (float)actor->has_skill(skill) / 100.0;
@@ -691,7 +691,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
       ch->sendln("Your body refuses to work properly and you miss an attack.");
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
     }
-    else if (IS_PC(ch) || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
+    else if (ch->isPlayer() || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
     {
       result = one_hit(ch, vict, type, FIRST);
       if (SOMEONE_DIED(result))
@@ -705,7 +705,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
       ch->sendln("Your body refuses to work properly and you miss an attack.");
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
     }
-    else if (IS_PC(ch) || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
+    else if (ch->isPlayer() || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
     {
       result = one_hit(ch, vict, type, FIRST); // everyone get's one hit (normally)
       if (SOMEONE_DIED(result))
@@ -1014,7 +1014,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
-    if (IS_PC(ch))
+    if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
@@ -1131,7 +1131,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
-    if (IS_PC(ch))
+    if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
@@ -1217,7 +1217,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
-    if (IS_PC(ch))
+    if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
@@ -1277,7 +1277,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
-    if (IS_PC(ch))
+    if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
@@ -1776,7 +1776,7 @@ void eq_damage(Character *ch, Character *victim,
 
   if (ch->room().isArena()) // Don't damage eq in arena
     return;
-  if (IS_PC(victim) && IS_PC(ch)) // Don't damage eq on pc->pc fights
+  if (victim->isPlayer() && ch->isPlayer()) // Don't damage eq on pc->pc fights
     return;
 
   chance = 10 + GET_DEX(ch);
@@ -1879,7 +1879,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
     return;
   chance /= 2;
   /* Pir's extra stat loss.  Bwahahah */
-  if ((heh || (number(0, 99) < chance)) && IS_PC(victim))
+  if ((heh || (number(0, 99) < chance)) && victim->isPlayer())
   {
     switch (number(1, 5))
     {
@@ -2090,7 +2090,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       l = 50;
     if (ch->isNonPlayer() && ch->master)
       l *= (ch->master->getLevel() / 50);
-    //   if (l || IS_PC(ch))
+    //   if (l || ch->isPlayer())
     if (weapon && attacktype <= MAX_SPL_LIST)
     {
       l = 70;
@@ -2309,7 +2309,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   }
 
   // Can't hurt god, but he likes to see the messages.
-  if (victim->getLevel() >= IMMORTAL && IS_PC(victim))
+  if (victim->getLevel() >= IMMORTAL && victim->isPlayer())
     dam = 0;
 
   if (victim != ch)
@@ -2517,7 +2517,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       int reduce = 0;
       if ((reduce = check_magic_block(ch, victim, attacktype)))
       {
-        if (GET_CLASS(victim) != CLASS_MONK && IS_PC(victim))
+        if (GET_CLASS(victim) != CLASS_MONK && victim->isPlayer())
         {
           if (number(1, 100) <= MAX(1, dam / 150))
           {
@@ -2728,7 +2728,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   else
   {
     affected_type *af;
-    if (dam >= 350 && (af = victim->affected_by_spell(SPELL_PARALYZE)) && IS_PC(victim))
+    if (dam >= 350 && (af = victim->affected_by_spell(SPELL_PARALYZE)) && victim->isPlayer())
     {
       act("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, TO_VICT, 0);
       act("The powerful magic from your spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_CHAR, 0);
@@ -2840,7 +2840,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
           SET_BIT(retval, check_joincharmie(ch));
       if (SOMEONE_DIED(retval))
         return debug_retval(ch, victim, retval);
-      if (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
+      if (ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
       {
         if (ch->followers)
         {
@@ -2918,13 +2918,13 @@ int is_pkill(Character *ch, Character *vict)
 
   for (tmp_ch = ch; tmp_ch; tmp_ch = tmp_ch->master)
   {
-    if (IS_PC(tmp_ch))
+    if (tmp_ch->isPlayer())
     {
       if (vict->isNonPlayer())
       {
         if (vict->master)
         { /* Attacking someone's charmie */
-          if (IS_PC(vict->master))
+          if (vict->master->isPlayer())
           {
             if (vict->master != ch)
             { /* Can't pkill your own charmie */
@@ -2989,7 +2989,7 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
     {
       if (tmpch == ch || tmpch == victim)
         continue;
-      if (IS_PC(tmpch) && isSet(tmpch->player->toggles, Player::PLR_DAMAGE))
+      if (tmpch->isPlayer() && isSet(tmpch->player->toggles, Player::PLR_DAMAGE))
         send_tokens(tokens, ch, obj, victim, 0, tmpch);
       else
         send_tokens(tokens2, ch, obj, victim, 0, tmpch);
@@ -2997,14 +2997,14 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
   }
   else if (to == TO_CHAR)
   {
-    if (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE))
+    if (ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, ch);
     else
       send_tokens(tokens2, ch, obj, victim, 0, ch);
   }
   else if (to == TO_VICT)
   {
-    if (IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE))
+    if (victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, victim);
     else
       send_tokens(tokens2, ch, obj, victim, 0, victim);
@@ -3079,7 +3079,7 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
       sprintf(dmgmsg, "$B%d$R", dam);
     if (!messages)
       return;
-    if (IS_PC(victim) && victim->getLevel() >= IMMORTAL)
+    if (victim->isPlayer() && victim->getLevel() >= IMMORTAL)
     {
       act(replaceString(messages->god_msg.attacker_msg, find, replace),
           ch, ch->equipment[weapon], victim, TO_CHAR, 0);
@@ -3206,7 +3206,7 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
 
   if (vict->fighting)
     stop_fighting(vict);
-  if (ch && ch->fighting && (IS_PC(ch) || ch->fighting == vict))
+  if (ch && ch->fighting && (ch->isPlayer() || ch->fighting == vict))
     stop_fighting(ch);
 
   // loop through world and stop anyone else that was fighting vict from fighting
@@ -4144,16 +4144,16 @@ void set_fighting(Character *ch, Character *vict)
   if (IS_AFFECTED(vict, AFF_HIDE))
     REMBIT(vict->affected_by, AFF_HIDE);
 
-  if (IS_PC(ch) && vict->isNonPlayer())
+  if (ch->isPlayer() && vict->isNonPlayer())
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID))
       vict->add_memory(GET_NAME(ch), 'h');
 
   if (ch->isNonPlayer() && vict->isNonPlayer() && IS_AFFECTED(ch, AFF_CHARM) &&
-      ch->master && IS_PC(ch->master))
+      ch->master && ch->master->isPlayer())
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID))
       vict->add_memory(GET_NAME(ch->master), 'h');
 
-  if (IS_PC(ch) && vict->isNonPlayer())
+  if (ch->isPlayer() && vict->isNonPlayer())
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID) && vict->hunting.isEmpty())
     {
       level_diff_t level_difference = ch->getLevel() - (vict->getLevel() / 2.0);
@@ -4168,7 +4168,7 @@ void set_fighting(Character *ch, Character *vict)
         timer_list = timer;
         timer->timeleft = (ch->getLevel() / 4) * 60;
       }
-      if (IS_PC(vict) && ch->isNonPlayer())
+      if (vict->isPlayer() && ch->isNonPlayer())
         if (!ISSET(ch->mobdata->actflags, ACT_STUPID) && ch->hunting.isEmpty())
         {
           level_diff_t level_difference = vict->getLevel() - (ch->getLevel() / 2);
@@ -4193,7 +4193,7 @@ void set_fighting(Character *ch, Character *vict)
       count++;
   }
 
-  /*(  if( ( IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM) )
+  /*(  if( ( ch->isPlayer() || IS_AFFECTED(ch, AFF_CHARM) )
         && count >= 6 )
     {
       ch->sendln("You can't get close enough to fight.");
@@ -4316,7 +4316,7 @@ void stop_fighting(Character *ch, int clearlag)
   update_pos(ch);
 
   // Remove ch's lag if he wasn't using wimpy.
-  if (IS_PC(ch) && ch->desc && !isSet(ch->player->toggles, Player::PLR_WIMPY) && clearlag)
+  if (ch->isPlayer() && ch->desc && !isSet(ch->player->toggles, Player::PLR_WIMPY) && clearlag)
     ch->desc->wait = 0;
 
   if (ch == combat_next_dude)
@@ -4421,7 +4421,7 @@ void make_corpse(Character *ch)
 
   corpse = new Object;
   clear_object(corpse);
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     corpse->setOwner(GET_NAME(ch));
   }
@@ -5099,7 +5099,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
 
   if ((GET_CLASS(ch) != CLASS_WARRIOR) && ch->getLevel() < ARCHANGEL)
     return 0;
-  if (IS_PC(vict) && vict->getLevel() >= IMMORTAL)
+  if (vict->isPlayer() && vict->getLevel() >= IMMORTAL)
     return 0;
   if (!ch->equipment[weapon])
     return 0;
@@ -5309,7 +5309,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
 {
   if ((GET_CLASS(ch) != CLASS_WARRIOR) && ch->getLevel() < ARCHANGEL)
     return;
-  if (IS_PC(vict) && vict->getLevel() >= IMMORTAL)
+  if (vict->isPlayer() && vict->getLevel() >= IMMORTAL)
     return;
   if (!ch->equipment[weapon])
     return;
@@ -5455,9 +5455,9 @@ void raw_kill(Character *ch, Character *victim)
   if (ch != nullptr && IS_AFFECTED(ch, AFF_GROUP))
   {
     Character *master = ch->master ? ch->master : ch;
-    if (IS_PC(master))
+    if (master->isPlayer())
     {
-      if (IS_PC(victim))
+      if (victim->isPlayer())
       {
         master->player->grpplvl += victim->getLevel();
         master->player->group_pkills += 1;
@@ -5571,7 +5571,7 @@ void raw_kill(Character *ch, Character *victim)
   }
 
   /* If we're still here we can thrash the victim */
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   { /* Only log player deaths */
     if (ch)
     {
@@ -5626,7 +5626,7 @@ void raw_kill(Character *ch, Character *victim)
             GET_CON(victim) -= 1;
             victim->raw_con -= 1;
             victim->sendln("*** You lose one constitution point ***");
-            if (IS_PC(victim))
+            if (victim->isPlayer())
             {
               sprintf(log_buf, "%s lost a con. ouch.", victim->getNameC());
               logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
@@ -5638,7 +5638,7 @@ void raw_kill(Character *ch, Character *victim)
             GET_DEX(victim) -= 1;
             victim->raw_dex -= 1;
             victim->sendln("*** You lose one dexterity point ***");
-            if (IS_PC(victim))
+            if (victim->isPlayer())
             {
               sprintf(log_buf, "%s lost a dex. ouch.", victim->getNameC());
               logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
@@ -5854,7 +5854,7 @@ void group_gain(Character *ch, Character *victim)
     return;
   if (ch == victim)
     return;
-  if (IS_PC(victim))
+  if (victim->isPlayer())
     return;
 
   if (ch->isNonPlayer() && !(IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED(ch, AFF_FAMILIAR)))
@@ -5886,7 +5886,7 @@ void group_gain(Character *ch, Character *victim)
     }
 
     level_diff_t level_difference = tmp_ch->getLevel() - highest->getLevel();
-    if (level_difference <= -51 && IS_PC(tmp_ch))
+    if (level_difference <= -51 && tmp_ch->isPlayer())
     {
       act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
 
@@ -6290,16 +6290,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
     else if (victim->has_skill(SKILL_TUMBLING))
@@ -6308,15 +6308,15 @@ void dam_message(int dam, Character *ch, Character *victim,
       {
         sprintf(buf1, "$N leaps away from $n's strike, managing to avoid all but a scratch|.");
         sprintf(dammsg, " for $B%d$R damage", dam);
-        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
       }
       else
       {
         sprintf(buf1, "$N's roll to the side comes a moment too late as $n still manages to land a glancing blow|.");
         sprintf(dammsg, ", dealing $B%d$R damage", dam);
-        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
       }
     }
     else
@@ -6326,16 +6326,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
   }
@@ -6349,16 +6349,16 @@ void dam_message(int dam, Character *ch, Character *victim,
       if (ch->isNonPlayer() && (a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum()) < 92 && a > 87)
         attack = elem_type[a - 88];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
     }
     else
     {
       if (!attack)
         attack = attack_table[w_type];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
     }
   }
   //   act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -6395,7 +6395,7 @@ void disarm(Character *ch, Character *victim)
   act("$n disarms $N and sends $S weapon flying!", ch, nullptr, victim, TO_ROOM, NOTVICT);
 
   // all disarms go to inventory right now -pir
-  //  if (IS_PC(ch)) {
+  //  if (ch->isPlayer()) {
   obj = victim->unequip_char(WEAR_WIELD);
   obj_to_char(obj, victim);
   if (victim->equipment[WEAR_SECOND_WIELD])
@@ -6672,9 +6672,9 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
         if (IS_AFFECTED(ch, AFF_GROUP))
         {
           Character *master = ch->master ? ch->master : ch;
-          if (IS_PC(master))
+          if (master->isPlayer())
           {
-            if (IS_PC(victim))
+            if (victim->isPlayer())
             {
               master->player->grpplvl += victim->getLevel();
               master->player->group_pkills += 1;
@@ -6710,9 +6710,9 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
           if (IS_AFFECTED(ch->master->master, AFF_GROUP))
           {
             Character *master = ch->master->master ? ch->master->master : ch->master;
-            if (IS_PC(master))
+            if (master->isPlayer())
             {
-              if (IS_PC(victim))
+              if (victim->isPlayer())
               {
                 master->player->grpplvl += victim->getLevel();
                 master->player->group_pkills += 1;
@@ -6749,9 +6749,9 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
           if (IS_AFFECTED(ch->master->master, AFF_GROUP))
           {
             Character *master = ch->master->master ? ch->master->master : ch->master;
-            if (IS_PC(master))
+            if (master->isPlayer())
             {
-              if (IS_PC(victim))
+              if (victim->isPlayer())
               {
                 master->player->grpplvl += victim->getLevel();
                 master->player->group_pkills += 1;
@@ -6996,7 +6996,7 @@ int can_be_attacked(Character *ch, Character *vict)
     return false;
 
   // Ch should not be able to attack a wizinvis immortal player
-  if (IS_PC(vict) && ch->getLevel() < vict->player->wizinvis)
+  if (vict->isPlayer() && ch->getLevel() < vict->player->wizinvis)
     return false;
 
   if (vict->isNonPlayer())
@@ -7008,7 +7008,7 @@ int can_be_attacked(Character *ch, Character *vict)
 
   // Prize Arena
   auto &arena = DC::getInstance()->arena_;
-  if (ch->room().isArena() && arena.isPrize() && IS_PC(ch) && IS_PC(vict))
+  if (ch->room().isArena() && arena.isPrize() && ch->isPlayer() && vict->isPlayer())
   {
 
     if (ch->fighting && ch->fighting != vict)
@@ -7028,7 +7028,7 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Clan Chaos Arena
-  if (ch->room().isArena() && arena.isChaos() && IS_PC(ch) && IS_PC(vict))
+  if (ch->room().isArena() && arena.isChaos() && ch->isPlayer() && vict->isPlayer())
   {
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
@@ -7047,7 +7047,7 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Golem cannot attack players
-  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8 && IS_PC(vict))
+  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8 && vict->isPlayer())
     return false;
 
   if (vict->isNonPlayer())
@@ -7065,7 +7065,7 @@ int can_be_attacked(Character *ch, Character *vict)
     return true;
   }
 
-  if (IS_PC(ch) && IS_PC(vict) && ch->getLevel() < 5)
+  if (ch->isPlayer() && vict->isPlayer() && ch->getLevel() < 5)
   {
     ch->sendln("You are too new in this realm to make enemies!");
     return false;
@@ -7074,13 +7074,13 @@ int can_be_attacked(Character *ch, Character *vict)
   if (IS_AFFECTED(vict, AFF_CANTQUIT) || vict->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || vict->isPlayerGoldThief() || IS_AFFECTED(vict, AFF_CHAMPION))
     return true;
 
-  if (IS_PC(ch) && vict->getLevel() < 5)
+  if (ch->isPlayer() && vict->getLevel() < 5)
   {
     act("The magic of the MUD school is protecting $M from harm.", ch, 0, vict, TO_CHAR, 0);
     return false;
   }
 
-  if (ch->isNonPlayer() && IS_PC(vict) && IS_AFFECTED(ch, AFF_CHARM))
+  if (ch->isNonPlayer() && vict->isPlayer() && IS_AFFECTED(ch, AFF_CHARM))
   { // New charmie stuff. No attacking pcs unless yer master's a ranger/cleric.
     // Those guys are soo convincing.
     if (!ch->master)
@@ -7111,7 +7111,7 @@ int can_be_attacked(Character *ch, Character *vict)
         return true;
     }
     /* Imps ignore safe flags  */
-    if (IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
+    if (ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
     {
       vict->sendln("There is no safe haven from an angry IMPLEMENTER!");
       return true;
@@ -7476,7 +7476,7 @@ int is_fighting_mob(Character *ch)
     return 0;
   if (is_pkill(ch, fighting))
     return 0;
-  if (fighting->isNonPlayer() && IS_PC(ch))
+  if (fighting->isNonPlayer() && ch->isPlayer())
     return 1;
   return 0;
 }
@@ -7491,7 +7491,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
 
   if (cmd == cmd_t::ESCAPE)
   {
-    if (IS_PC(ch) && !(escape = ch->has_skill(SKILL_ESCAPE)))
+    if (ch->isPlayer() && !(escape = ch->has_skill(SKILL_ESCAPE)))
     {
       ch->sendln("Huh?");
       return ReturnValue::eFAILURE;
@@ -7541,7 +7541,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
 
     // keep mobs from fleeing into a no_track room
     if (CAN_GO(ch, attempt))
-      if (IS_PC(ch) || !isSet(DC::getInstance()->world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
+      if (ch->isPlayer() || !isSet(DC::getInstance()->world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
       {
         if (!escape)
         {
@@ -7565,7 +7565,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
         SET_BIT(ch->combat, COMBAT_FLEEING);
         retval = ch->command_interpreter(tempcommand);
         // so that a player doesn't keep the flag afte rdying
-        if (IS_PC(ch))
+        if (ch->isPlayer())
           REMOVE_BIT(ch->combat, COMBAT_FLEEING);
 
         if (isSet(retval, ReturnValue::eCH_DIED))

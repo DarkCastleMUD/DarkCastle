@@ -1379,7 +1379,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   char *clss_types[] = {"mage", "cleric", "thief", "warrior", "antipaladin",
                         "paladin", "barbarian", "monk", "ranger", "bard", "druid", "\n"};
 
-  if (IS_PC(ch) && ch->getLevel() >= IMPLEMENTER)
+  if (ch->isPlayer() && ch->getLevel() >= IMPLEMENTER)
   {
     std::string arg1, remainder;
     std::tie(arg1, remainder) = half_chop(argument);
