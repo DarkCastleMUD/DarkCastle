@@ -340,7 +340,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     }
     else
     {
-      sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
+      sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
       do_say(i, buf);
       set_fighting(i, ch);
       set_fighting(ch, i);
@@ -380,7 +380,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         if (trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL)
         {
           // Get um!
-          sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
+          sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
           do_say(ally, buf);
           set_fighting(ally, ch);
           set_fighting(ch, ally);

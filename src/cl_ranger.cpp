@@ -86,7 +86,7 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
   arg = one_argument(arg, buf);
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
+    if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
     {
       victim = k->follower;
       break;
@@ -179,7 +179,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
     /*   Character * vict = nullptr;
        for(struct follow_type *k = ch->followers; k; k = k->next)
-         if(IS_NPC(k->follower) &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
+         if(k->follower->isNonPlayer() &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
             vict = k->follower;
             break;
@@ -304,7 +304,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
   // That way possessing imms can track.
-  if (IS_NPC(this) && ISSET(this->mobdata->actflags, ACT_STUPID))
+  if (this->isNonPlayer() && ISSET(this->mobdata->actflags, ACT_STUPID))
   {
     this->sendln("Being stupid, you cannot find any..");
     return ReturnValue::eFAILURE;
@@ -325,7 +325,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     how_deep = 10;
 
   if (!victim.isEmpty())
@@ -346,7 +346,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
         else
           this->sendln("You can't find any traces of such a scent.");
         //         remove_memory(this, 't');
-        if (IS_NPC(this))
+        if (this->isNonPlayer())
           swap_hate_memory();
         return ReturnValue::eFAILURE;
       }
@@ -361,7 +361,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
                dirs[y]);
         ansi_color(NTEXT, this);
 
-        if (IS_NPC(this))
+        if (this->isNonPlayer())
         {
           // temp disable tracking mobs into town
           if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
@@ -1090,7 +1090,7 @@ int do_arrow_damage(Character *ch, Character *victim,
               break;
       default: break;
     }
-    if(IS_NPC(victim))
+    if(victim->isNonPlayer())
       retval = mob_arrow_response(ch, victim, dir);
       if(SOMEONE_DIED(retval)) // mob died somehow while moving
          return retval;
@@ -1421,7 +1421,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() <= 2399)
+  if (victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() <= 2399)
   {
     ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
     extract_obj(found);
@@ -1572,7 +1572,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       }
       victim->setStanding();
 
-      if (IS_NPC(victim))
+      if (victim->isNonPlayer())
         retval = mob_arrow_response(ch, victim, dir);
       if (SOMEONE_DIED(retval))
       { // mob died somehow while moving
@@ -1746,7 +1746,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
   /*
     TODO - make this into a skill and put it in
 
-    if(IS_NPC(ch) || ch->getLevel() >= ARCHANGEL)
+    if(ch->isNonPlayer() || ch->getLevel() >= ARCHANGEL)
        learned = 75;
     else if(!(learned = ch->has_skill( SKILL_MIND_DELVE))) {
        ch->sendln("You try to think like a chipmunk and go nuts.");
@@ -1765,7 +1765,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!IS_NPC(target))
+  if (!target->isNonPlayer())
   {
     sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
     ch->send(buf);
@@ -1805,7 +1805,7 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
   one_argument(arg, buf);
 
   int learned = ch->has_skill(SKILL_NAT_SELECT);
-  if (IS_NPC(ch) || !learned)
+  if (ch->isNonPlayer() || !learned)
   {
     ch->sendln("You don't know how to use this to your advantage.");
     return ReturnValue::eFAILURE;

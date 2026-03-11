@@ -114,7 +114,7 @@ int Character::mana_gain_lookup(void)
   int divisor = 1;
   int modifier;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     gain = this->getLevel();
   else
   {
@@ -184,7 +184,7 @@ int Character::hit_gain(position_t position, bool improve)
   int divisor = 1;
   int learned = has_skill(SKILL_ENHANCED_REGEN);
   /* Neat and fast */
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     if (this->fighting)
       gain = (GET_MAX_HIT(this) / 24);
@@ -271,7 +271,7 @@ int Character::move_gain_lookup(int extra)
   if (extra == 777)
     improve = false;
 
-  if (isNPC())
+  if (isNonPlayer())
   {
     return getLevel();
   }
@@ -363,7 +363,7 @@ void redo_mana(Character *ch)
 {
   /*struct affected_type *af;*/
   int i, j, bonus = 0, stat = 0;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
   ch->max_mana = ch->raw_mana;
 
@@ -560,12 +560,12 @@ void advance_level(Character *ch, int is_conversion)
   ch->raw_ki += add_ki;
   ch->max_ki += add_ki;
   redo_ki(ch); // Ki gets level bonuses now
-  if (!IS_NPC(ch) && !is_conversion)
+  if (!ch->isNonPlayer() && !is_conversion)
     ch->player->practices += add_practices;
 
   sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
           GET_MAX_MOVE(ch),
-          IS_NPC(ch) ? 0 : add_practices, IS_NPC(ch) ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
+          ch->isNonPlayer() ? 0 : add_practices, ch->isNonPlayer() ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
   if (!is_conversion)
     ch->send(buf);
 
@@ -637,10 +637,10 @@ void gain_exp(Character *ch, int64_t gain)
   if (IS_PC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
 
-  if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8) // it's a golem
+  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8) // it's a golem
     golem_gain_exp(ch);
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
 
   if (!x && GET_EXP(ch) >= y)
@@ -661,7 +661,7 @@ void gain_exp_regardless(Character *ch, int gain)
   if (GET_EXP(ch) < 0)
     GET_EXP(ch) = 0;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
 
   while (GET_EXP(ch) >= (int32_t)exp_table[ch->getLevel() + 1])
@@ -740,9 +740,9 @@ void food_update(void)
     gain_condition(i, FULL, amt);
     if (!GET_COND(i, FULL) && i->getLevel() < 60)
     { // i'm hungry
-      if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+      if (!i->isNonPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
       {
-        if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+        if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
           i->sendln("It's too dark to see what's safe to eat!");
         else if (FOUNTAINisPresent(i))
           i->do_drink({QStringLiteral("fountain")});
@@ -756,9 +756,9 @@ void food_update(void)
     gain_condition(i, THIRST, amt);
     if (!GET_COND(i, THIRST) && i->getLevel() < 60)
     { // i'm thirsty
-      if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+      if (!i->isNonPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
       {
-        if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+        if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
           i->sendln("It's too dark to see if there's any potable liquid around!");
         else if (FOUNTAINisPresent(i))
           i->do_drink({QStringLiteral("fountain")});
@@ -813,7 +813,7 @@ void point_update(void)
     }
 
     // only heal linkalive's and mobs
-    if (GET_POS(i) > position_t::DEAD && (IS_NPC(i) || i->desc))
+    if (GET_POS(i) > position_t::DEAD && (i->isNonPlayer() || i->desc))
     {
       i->setHP(MIN(i->getHP() + i->hit_gain(), hit_limit(i)));
 
@@ -822,7 +822,7 @@ void point_update(void)
       i->setMove(MIN(GET_MOVE(i) + i->move_gain_lookup(), i->move_limit()));
       GET_KI(i) = MIN(GET_KI(i) + i->ki_gain_lookup(), ki_limit(i));
     }
-    else if (!IS_NPC(i) && i->getLevel() < 1 && !i->desc)
+    else if (!i->isNonPlayer() && i->getLevel() < 1 && !i->desc)
     {
       act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
       do_quit(i, "", cmd_t::SAVE_SILENTLY);

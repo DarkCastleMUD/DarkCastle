@@ -96,7 +96,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  if (IS_NPC(ch) || IS_ANONYMOUS(ch))
+  if (ch->isNonPlayer() || IS_ANONYMOUS(ch))
     snprintf(report, 200, "%d%% hps, %d%% mana, %d%% movement, and %d%% ki.",
              MAX(1, ch->getHP() * 100) / MAX(1, GET_MAX_HIT(ch)),
              MAX(1, GET_MANA(ch) * 100) / MAX(1, GET_MAX_MANA(ch)),
@@ -216,7 +216,7 @@ int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
       continue;
     if (!i->connected && i->character->getLevel() >= god_level)
     {
-      if (i->character->isNPC() || isSet(i->character->player->toggles, Player::PLR_ANSI))
+      if (i->character->isNonPlayer() || isSet(i->character->player->toggles, Player::PLR_ANSI))
         send_to_char(buf1, i->character);
       else
         i->character->send(buf);
@@ -266,7 +266,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
       "debug",
       "\\@"};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eSUCCESS;
 
   if (*arg)
@@ -374,7 +374,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->send("You're a mob! You can't ignore people.\r\n");
     return ReturnValue::eFAILURE;
@@ -433,7 +433,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
 
 int is_ignoring(const Character *const ch, const Character *const i)
 {
-  if (IS_NPC(ch) || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
+  if (ch->isNonPlayer() || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
   {
     return false;
   }
@@ -630,7 +630,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOEMOTE))
+  if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
     ch->sendln("You can't show your emotions!!");
     return ReturnValue::eSUCCESS;
@@ -747,7 +747,7 @@ void DC::send_hint(void)
 
   for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
-    if (i->connected || !i->character || !i->character->desc || is_busy(i->character) || IS_NPC(i->character))
+    if (i->connected || !i->character || !i->character->desc || is_busy(i->character) || i->character->isNonPlayer())
     {
       continue;
     }

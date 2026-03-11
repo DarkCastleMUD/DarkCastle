@@ -346,7 +346,7 @@ int do_fakelog(Character *ch, char *argument, cmd_t cmd)
   char lev_str[MAX_INPUT_LENGTH];
   uint64_t lev_nr = 110;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(argument, lev_str, command);

@@ -482,7 +482,7 @@ void show_spells(Character *i, Character *ch)
 
   if (!strbuf.empty())
   {
-    if (IS_NPC(i))
+    if (i->isNonPlayer())
       strbuf = std::string("$B$7-$1") + GET_SHORT(i) + " has: " + strbuf + "$R\r\n";
     else
       strbuf = std::string("$B$7-$1") + GET_NAME(i) + " has: " + strbuf + "$R\r\n";
@@ -513,7 +513,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
     }
     ch->send("$B$3");
 
-    if (!(i->long_desc) || (IS_NPC(i) && (GET_POS(i) != i->mobdata->default_pos)))
+    if (!(i->long_desc) || (i->isNonPlayer() && (GET_POS(i) != i->mobdata->default_pos)))
     {
       /* A char without long descr, or not in default pos. */
       if (IS_PC(i))
@@ -542,7 +542,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
         }
         else
         {
-          if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
+          if (!ch->isNonPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
           {
             buffer.append(" ");
             buffer.append(GET_TITLE(i));
@@ -556,7 +556,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
         }
       }
 
-      if (IS_NPC(i))
+      if (i->isNonPlayer())
       {
         buffer = i->short_desc;
         buffer[0] = toupper(buffer[0]);
@@ -819,7 +819,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
   {
     this->sendln("Unable to show information.");
     csendf(this, "%s is a mob.\r\n", victim->getNameC());
@@ -877,14 +877,14 @@ void Character::list_char_to_char(Character *list, int mode)
   {
     if (this == i)
       continue;
-    if (!IS_NPC(i) && (i->player->wizinvis > this->getLevel()))
+    if (!i->isNonPlayer() && (i->player->wizinvis > this->getLevel()))
       if (!i->player->incognito || !(this->in_room == i->in_room))
         continue;
     if (IS_AFFECTED(this, AFF_SENSE_LIFE) || CAN_SEE(this, i))
     {
       show_char_to_char(i, this, 0);
 
-      if (IS_PC(this) && IS_NPC(i))
+      if (IS_PC(this) && i->isNonPlayer())
       {
         if (this->player->lastseen == 0)
           this->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
@@ -1331,7 +1331,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
     ansi_color(GREY, ch);
     return ReturnValue::eSUCCESS;
   }
-  else if (IS_DARK(ch->in_room) && (!IS_NPC(ch) && !ch->player->holyLite))
+  else if (IS_DARK(ch->in_room) && (!ch->isNonPlayer() && !ch->player->holyLite))
   {
     ch->sendln("It is pitch black...");
     ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
@@ -1543,7 +1543,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
             show_char_to_char(tmp_char, ch, 1);
           if (ch != tmp_char)
           {
-            if (!IS_NPC(ch) && (tmp_char->getLevel() < ch->player->wizinvis))
+            if (!ch->isNonPlayer() && (tmp_char->getLevel() < ch->player->wizinvis))
             {
               return ReturnValue::eSUCCESS;
             }
@@ -1742,7 +1742,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
       ansi_color(GREY, ch);
 
       // PUT SECTOR AND ROOMFLAG STUFF HERE
-      if (!IS_NPC(ch) && ch->player->holyLite)
+      if (!ch->isNonPlayer() && ch->player->holyLite)
       {
         sprinttype(DC::getInstance()->world[ch->in_room].sector_type, sector_types,
                    sector_buf);
@@ -1759,7 +1759,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
 
       ch->sendln("");
 
-      if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
+      if (!ch->isNonPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
         send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
 
       ansi_color(BLUE, ch);
@@ -1788,7 +1788,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
         is_closed = isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
         is_hidden = isSet(EXIT(ch, door)->exit_info, EX_HIDDEN);
 
-        if (IS_NPC(ch) || ch->player->holyLite)
+        if (ch->isNonPlayer() || ch->player->holyLite)
         {
           if (is_closed && is_hidden)
             sprintf(buffer + strlen(buffer), "$B($R%s-closed$B)$R ",
@@ -1893,7 +1893,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
     if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
       continue;
 
-    if (!IS_NPC(ch) && ch->player->holyLite)
+    if (!ch->isNonPlayer() && ch->player->holyLite)
       sprintf(buf + strlen(buf), "%s - %s [%d]\r\n", exits[door],
               DC::getInstance()->world[EXIT(ch, door)->to_room].name,
               DC::getInstance()->world[EXIT(ch, door)->to_room].number);
@@ -1972,7 +1972,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
           GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
           GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
           GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
-          GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), IS_NPC(ch) ? 0 : GET_RDEATHS(ch), ch->hit_gain_lookup(),
+          GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), ch->isNonPlayer() ? 0 : GET_RDEATHS(ch), ch->hit_gain_lookup(),
           ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
           GET_ALIGNMENT(ch));
   ch->send(buf);
@@ -3002,7 +3002,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        if (IS_NPC(victim))
+        if (victim->isNonPlayer())
         {
           x = victim->mobdata->damnodice;
           y = victim->mobdata->damsizedice;
@@ -3314,7 +3314,7 @@ int do_tick(Character *ch, char *argument, cmd_t cmd)
     return 1;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Monsters don't wait for anything.");
     return ReturnValue::eFAILURE;
@@ -3391,7 +3391,7 @@ void check_champion_and_website_who_list()
       buf << GET_SHORT(ch) << std::endl;
     }
 
-    if ((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
+    if ((ch->isNonPlayer() || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
     {
       obj_from_char(obj);
       obj_to_room(obj, CFLAG_HOME);

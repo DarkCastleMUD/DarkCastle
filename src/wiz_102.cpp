@@ -180,7 +180,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
           GET_KI(vict), GET_MAX_KI(vict));
   ch->send(buf);
 
-  if (ch->getLevel() >= OVERSEER && !IS_NPC(vict) && ch->getLevel() >= vict->getLevel())
+  if (ch->getLevel() >= OVERSEER && !vict->isNonPlayer() && ch->getLevel() >= vict->getLevel())
   {
     ch->sendln(QStringLiteral("$3Last connected from$R: %1").arg(vict->player->last_site));
 
@@ -230,7 +230,7 @@ int do_find(Character *ch, char *arg, cmd_t cmd)
       "obj",
       "\n"};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   if (!ch->has_skill(COMMAND_FIND))
   {
@@ -305,7 +305,7 @@ int do_stat(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(arg, type, name);
@@ -404,7 +404,7 @@ int do_mpstat(Character *ch, char *arg, cmd_t cmd)
 
   void mpstat(Character * ch, Character * victim);
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!ch->has_skill(COMMAND_MPSTAT))
@@ -2035,7 +2035,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
           "description",
           "\n"};
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(qPrintable(arguments.join(' ')), buf, buf2);
@@ -2654,7 +2654,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
 
   const char *fields[] = {"add", "remove", "type", "arglist", "command", "list", "\n"};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(argument, buf, buf2);
@@ -3034,7 +3034,7 @@ int do_mscore(Character *ch, char *argument, cmd_t cmd)
 
   void boro_mob_stat(Character * ch, Character * k);
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, buf);
@@ -3526,7 +3526,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       uint64_t NPCs_changed = 0;
       for (auto const &c : DC::getInstance()->character_list)
       {
-        if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].vnum() == mobvnum)
+        if (c->isNonPlayer() && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].vnum() == mobvnum)
         {
           c->mobdata->actflags[0] = new_actflags[0];
           c->mobdata->actflags[1] = new_actflags[1];
@@ -4010,7 +4010,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &v : character_list)
     {
-      if (IS_NPC(v) && v->mobdata->nr == mob_num)
+      if (v->isNonPlayer() && v->mobdata->nr == mob_num)
         extract_char(v, true);
     }
     delete_mob_from_index(mob_num);
@@ -4160,7 +4160,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
           "denymob",
           ""};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   std::string arg1;
@@ -4423,7 +4423,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
 
     ch->sendln("Ok.");
 
-    if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
+    if (!ch->isNonPlayer() && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
@@ -4863,7 +4863,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 
 int do_oneway(Character *ch, char *arg, cmd_t cmd)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::ONEWAY)
@@ -5278,7 +5278,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
         for (mob_list = character_list; mob_list;
              mob_list = mob_list->next)
         {
-          if (IS_NPC(mob_list) && mob_list->mobdata->nr == mob->mobdata->nr)
+          if (mob_list->isNonPlayer() && mob_list->mobdata->nr == mob->mobdata->nr)
             count++;
         }
 
@@ -5409,7 +5409,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   struct extra_descr_data *desc;
   int i, x, loc;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   argument = one_argument(argument, arg1);
@@ -5495,7 +5495,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     {
       strcat(buf, GET_NAME(k));
       strcat(buf,
-             (IS_PC(k) ? "(PC)\r\n" : (!IS_NPC(k) ? "(NPC)\r\n" : "(MOB)\r\n")));
+             (IS_PC(k) ? "(PC)\r\n" : (!k->isNonPlayer() ? "(NPC)\r\n" : "(MOB)\r\n")));
     }
   }
   strcat(buf, "\r\n");
@@ -5544,7 +5544,7 @@ int do_possess(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   char buf[200];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, arg);
@@ -5611,7 +5611,7 @@ int do_possess(Character *ch, char *argument, cmd_t cmd)
 int do_return(Character *ch, char *argument, cmd_t cmd)
 {
 
-  //    if(IS_NPC(ch))
+  //    if(ch->isNonPlayer())
   //        return ReturnValue::eFAILURE;
 
   if (!ch->desc)
@@ -5632,7 +5632,7 @@ int do_return(Character *ch, char *argument, cmd_t cmd)
 
     ch->desc->character->desc = ch->desc;
     ch->desc = 0;
-    if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() > 90 &&
+    if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() > 90 &&
         DC::getInstance()->mob_index[ch->mobdata->nr].vnum() < 100 &&
         cmd != cmd_t::LOOK)
     {
@@ -5744,7 +5744,7 @@ int do_punish(Character *ch, char *arg, cmd_t cmd)
 
   int i;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Punish yourself!  Bad mob!");
     return ReturnValue::eFAILURE;

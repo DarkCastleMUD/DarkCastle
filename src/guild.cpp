@@ -450,7 +450,7 @@ char *attrname(int clss, int attr)
 
 int Character::skillmax(int skill, int eh)
 {
-  if (isNPC())
+  if (isNonPlayer())
   {
     return eh;
   }
@@ -627,7 +627,7 @@ int Character::skills_guild(const char *arg, Character *owner)
   int skillnumber;
   int percent;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   class_skill_defines *skilllist = get_skill_list();
@@ -842,7 +842,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   int64_t exp_needed;
   int x = 0;
 
-  if (cmd == cmd_t::GAIN && !IS_NPC(ch))
+  if (cmd == cmd_t::GAIN && !ch->isNonPlayer())
   { /*   gain crap...  */
 
     if (ch->isImmortalPlayer() || ch->getLevel() >= DC::MAX_MORTAL_LEVEL)
@@ -989,7 +989,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   if ((cmd != cmd_t::PRACTICE))
     return ReturnValue::eFAILURE;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
     return ReturnValue::eFAILURE;
@@ -1022,7 +1022,7 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   int learned = 0;
   class_skill_defines *skilllist = ch->get_skill_list();
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
     return ReturnValue::eFAILURE;
@@ -1261,7 +1261,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 {
   int chance, maximum;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     return;
   }

@@ -848,7 +848,7 @@ void check_weapon_weights(Character *ch)
   if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
     return;
   // make sure we're still strong enough to wield our weapons
-  if (!IS_NPC(ch) && ch->equipment[WEAR_WIELD] &&
+  if (!ch->isNonPlayer() && ch->equipment[WEAR_WIELD] &&
       GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_WIELD], 0, TO_CHAR, 0);
@@ -1037,7 +1037,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
     break;
 
   case APPLY_AGE:
-    if (!IS_NPC(ch))
+    if (!ch->isNonPlayer())
       ch->player->time.birth -= ((int32_t)SECS_PER_MUD_YEAR * (int32_t)mod);
     break;
 
@@ -2115,7 +2115,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
     }
     break;
   case OBJ_LILITHRING:
-    if (IS_NPC(ch))
+    if (ch->isNonPlayer())
     {
       remove_memory(ch, 'h');
       if (ch->master)
@@ -2281,34 +2281,34 @@ int char_from_room(Character *ch, bool stop_all_fighting)
       if (i->next_in_room == ch)
         i->next_in_room = ch->next_in_room;
     }
-  //  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
+  //  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
   //	debugpoint();
   for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
   {
-    if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
+    if (i->isNonPlayer() && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
       Other = true;
-    if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOTRACK))
+    if (i->isNonPlayer() && ISSET(i->mobdata->actflags, ACT_NOTRACK))
       More = true;
-    if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOKI))
+    if (i->isNonPlayer() && ISSET(i->mobdata->actflags, ACT_NOKI))
       kimore = true;
   }
   if (IS_PC(ch)) // player
     DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).decrementPlayers();
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     ch->mobdata->last_room = ch->in_room;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && isSet(DC::getInstance()->world[ch->in_room].iFlags, NO_TRACK))
     {
       REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_TRACK);
       REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_TRACK);
     }
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && isSet(DC::getInstance()->world[ch->in_room].iFlags, NO_KI))
     {
       REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_KI);
       REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_KI);
     }
-  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && isSet(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC))
+  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && isSet(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC))
   {
     REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC);
     REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC);
@@ -2323,7 +2323,7 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 
 bool is_hiding(Character *ch, Character *vict)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return (number(1, 101) > 70);
 
   if (!ch->has_skill(SKILL_HIDE))
@@ -2401,7 +2401,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
   }
   if (IS_PC(ch)) // player
     DC::getInstance()->zones.value(DC::getInstance()->world[room].zone).incrementPlayers();
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !isSet(DC::getInstance()->world[room].room_flags, NO_MAGIC))
     {
@@ -2856,11 +2856,11 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 
   for (i = DC::getInstance()->world[room].people, j = 0; i && (j <= number); i = i->next_in_room)
   {
-    if (number == 0 && IS_NPC(i))
+    if (number == 0 && i->isNonPlayer())
       continue;
     if (number == 1 || number == 0)
     {
-      if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && DC::getInstance()->mob_index[i->mobdata->nr].vnum() == 12))
+      if (isexact(tmp, GET_NAME(i)) && !(careful && i->isNonPlayer() && DC::getInstance()->mob_index[i->mobdata->nr].vnum() == 12))
         return (i);
       else if (isprefix(tmp, GET_NAME(i)))
       {
@@ -2914,7 +2914,7 @@ Character *get_char(QString name)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](Character *const &i)
                         {
-		if (number == 0 && IS_NPC(i)) return false;
+		if (number == 0 && i->isNonPlayer()) return false;
 		if (number == 1 || number == 0)
 		{
 			if (isexact(tmp, GET_NAME(i)))
@@ -2955,7 +2955,7 @@ Character *get_mob(char *name)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
                         {
-		if(!IS_NPC(i)) {
+		if(!i->isNonPlayer()) {
 			return false;
 		}
 		if (isexact(name, GET_NAME(i))) {
@@ -2977,7 +2977,7 @@ Character *get_char_num(int nr)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
                         {
- 		if (IS_NPC(i) && i->mobdata->nr == nr) {
+ 		if (i->isNonPlayer() && i->mobdata->nr == nr) {
  			return true;
  		}
  		return false; });
@@ -3742,7 +3742,7 @@ void extract_char(Character *ch, bool pull, Trace t)
     return;
   }
 
-  if (IS_NPC(ch) && ch->mobdata && ch->mobdata->reset && ch->mobdata->reset->lastPop)
+  if (ch->isNonPlayer() && ch->mobdata && ch->mobdata->reset && ch->mobdata->reset->lastPop)
     ch->mobdata->reset->lastPop = nullptr;
 
   remove_totem_stats(ch);
@@ -3757,7 +3757,7 @@ void extract_char(Character *ch, bool pull, Trace t)
       extract_char(ch->player->golem, false);
     }
   }
-  if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
   {
     isGolem = true;
     if (pull)
@@ -3912,7 +3912,7 @@ void extract_char(Character *ch, bool pull, Trace t)
   if (ch->desc && ch->desc->original)
     do_return(ch, "", cmd_t::LOOK);
 
-  if (IS_NPC(ch) && ch->mobdata->nr > -1)
+  if (ch->isNonPlayer() && ch->mobdata->nr > -1)
     DC::getInstance()->mob_index[ch->mobdata->nr].qty--;
 
   if (pull || isGolem)
@@ -3996,7 +3996,7 @@ void lastseen_targeted(Character *ch, Character *victim)
     last_victim = victim;
   }
 
-  if (ch == 0 || victim == 0 || IS_PC(victim) || IS_NPC(ch))
+  if (ch == 0 || victim == 0 || IS_PC(victim) || ch->isNonPlayer())
     return;
 
   if (ch->player->lastseen == 0)
@@ -4063,7 +4063,7 @@ Character *Character::get_char_room_vis(QString name)
 
   for (i = DC::getInstance()->world[in_room].people, j = 0; i && (j <= number); i = i->next_in_room)
   {
-    if (number == 0 && IS_NPC(i))
+    if (number == 0 && i->isNonPlayer())
       continue;
     if (number == 1 || number == 0)
     {
@@ -4122,7 +4122,7 @@ Character *get_mob_room_vis(Character *ch, const char *name)
 
   for (i = DC::getInstance()->world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
   {
-    if (!IS_NPC(i))
+    if (!i->isNonPlayer())
       continue;
 
     if (number == 1)
@@ -4189,9 +4189,9 @@ Character *get_mob_vis(Character *ch, char *name)
                         {
 		if (number == 1)
 		{
-			if (isexact(tmp, GET_NAME(i))&& IS_NPC(i) && CAN_SEE(ch,i))
+			if (isexact(tmp, GET_NAME(i))&& i->isNonPlayer() && CAN_SEE(ch,i))
 			return true;
-			else if (isprefix(tmp, GET_NAME(i))&& IS_NPC(i) && CAN_SEE(ch,i))
+			else if (isprefix(tmp, GET_NAME(i))&& i->isNonPlayer() && CAN_SEE(ch,i))
 			{
 				if (partial_match)
 				{
@@ -4204,7 +4204,7 @@ Character *get_mob_vis(Character *ch, char *name)
 		}
 		else
 		{
-			if(isexact(tmp, GET_NAME(i)) && IS_NPC(i) && CAN_SEE(ch, i))
+			if(isexact(tmp, GET_NAME(i)) && i->isNonPlayer() && CAN_SEE(ch, i))
 			{
 				if(j == number)
 				return true;
@@ -4273,7 +4273,7 @@ Character *get_random_mob_vnum(int vnum)
 
   auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](Character *const &i)
                         {
-		if(IS_NPC(i) && i->mobdata->nr == num)
+		if(i->isNonPlayer() && i->mobdata->nr == num)
 		{
 			if (total == which)
 			return true;
@@ -4298,7 +4298,7 @@ Character *get_mob_vnum(int vnum)
 
   auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)
                         {
-		if(IS_NPC(i) && i->mobdata->nr == number) {
+		if(i->isNonPlayer() && i->mobdata->nr == number) {
 			return true;
 		}
 		return false; });
@@ -4346,7 +4346,7 @@ Character *get_char_vis(Character *ch, const char *name)
 			return false;
 		}
 
-		if (number == 0 && IS_NPC(i))
+		if (number == 0 && i->isNonPlayer())
 		{
 			return false;
 		}
@@ -4946,7 +4946,7 @@ QString Character::get_random_hate(void)
 // Take the first name on the list, and swap it to the end.
 void Character::swap_hate_memory(void)
 {
-  if (!isNPC())
+  if (!isNonPlayer())
     return;
 
   if (!mobdata->hated.contains(' '))
@@ -4963,7 +4963,7 @@ void Character::swap_hate_memory(void)
 
 int hates_someone(Character *ch)
 {
-  if (!IS_NPC(ch))
+  if (!ch->isNonPlayer())
     return 0;
 
   return (ch->mobdata->hated != nullptr);
@@ -4971,7 +4971,7 @@ int hates_someone(Character *ch)
 
 int fears_someone(Character *ch)
 {
-  if (!IS_NPC(ch))
+  if (!ch->isNonPlayer())
     return 0;
 
   return (ch->mobdata->fears != nullptr);
@@ -4985,7 +4985,7 @@ void remove_memory(Character *ch, char type, Character *vict)
   if (type == 't')
     ch->hunting = 0;
 
-  if (!IS_NPC(ch))
+  if (!ch->isNonPlayer())
     return;
 
   if (type == 'h')
@@ -5026,7 +5026,7 @@ void remove_memory(Character *ch, char type)
   if (type == 't')
     ch->hunting = 0;
 
-  if (!IS_NPC(ch))
+  if (!ch->isNonPlayer())
     return;
 
   if (type == 'h' && !ch->mobdata->hated.isEmpty())
@@ -5042,7 +5042,7 @@ void remove_memory(Character *ch, char type)
 void Character::add_memory(QString victim_name, char type)
 {
   // pets don't know to hate people
-  if (!isNPC() || IS_AFFECTED(this, AFF_CHARM) || IS_AFFECTED(this, AFF_FAMILIAR))
+  if (!isNonPlayer() || IS_AFFECTED(this, AFF_CHARM) || IS_AFFECTED(this, AFF_FAMILIAR))
   {
     return;
   }

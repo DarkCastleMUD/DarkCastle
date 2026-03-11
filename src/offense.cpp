@@ -26,7 +26,7 @@
 
 int do_suicide(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE; // just in case
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
@@ -160,7 +160,7 @@ int do_murder(Character *ch, char *argument, cmd_t cmd)
         if (!can_attack(ch) || !can_be_attacked(ch, victim))
           return ReturnValue::eFAILURE;
 
-        if (IS_NPC(victim))
+        if (victim->isNonPlayer())
           return ReturnValue::eFAILURE;
 
         if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == victim))
@@ -278,7 +278,7 @@ int do_kill(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
+  if ((ch->getLevel() < G_POWER) || ch->isNonPlayer())
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return ReturnValue::eFAILURE;
@@ -349,7 +349,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   }
 
   bool victim_vnum_ok = false;
-  if (!victim && isNPC())
+  if (!victim && isNonPlayer())
   {
     bool ok = false;
     vnum_t victim_vnum = victim_name.toULongLong(&ok);
@@ -358,7 +358,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
       Character *possible_victim = DC::getInstance()->world[in_room].people;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
-        if (possible_victim->isNPC() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == victim_vnum)
+        if (possible_victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == victim_vnum)
         {
           victim = possible_victim;
           break;

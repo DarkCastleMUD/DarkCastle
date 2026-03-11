@@ -75,7 +75,7 @@ void mobile_activity(void)
       continue;
     }
 
-    if (!IS_NPC(ch))
+    if (!ch->isNonPlayer())
       continue;
 
     if (MOB_WAIT_STATE(ch) > 0)
@@ -276,7 +276,7 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
+        if (!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
@@ -358,12 +358,12 @@ void mobile_activity(void)
               continue;
             if (!CAN_SEE(ch, tmp_ch))
               continue;
-            if (IS_NPC(tmp_ch) && !IS_AFFECTED(tmp_ch, AFF_CHARM) && !tmp_ch->desc)
+            if (tmp_ch->isNonPlayer() && !IS_AFFECTED(tmp_ch, AFF_CHARM) && !tmp_ch->desc)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                              isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
+            if ((!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+                                                                                                     isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -425,7 +425,7 @@ void mobile_activity(void)
               (isSet(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
                (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
-              !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(int)GET_RACE(ch)].friendly, getBitvector(tmp_ch->fighting->race)) &&
+              !(tmp_ch->fighting->isNonPlayer() && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(int)GET_RACE(ch)].friendly, getBitvector(tmp_ch->fighting->race)) &&
               !tmp_ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF) && !tmp_ch->isPlayerGoldThief())
           {
             tmp_race = GET_RACE(tmp_ch);
@@ -455,7 +455,7 @@ void mobile_activity(void)
           if ((IS_PC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
                !isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
-              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
+              (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
                ))
           {
             int i = 0;

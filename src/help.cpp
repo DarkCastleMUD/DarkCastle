@@ -715,7 +715,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
   struct help_index_element_new new_help;
   int help_id = -1, i, key_id = -1, level = -1;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!ch->has_skill(COMMAND_HEDIT))

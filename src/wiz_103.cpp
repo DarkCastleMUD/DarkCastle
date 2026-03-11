@@ -45,7 +45,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
       act("$n casts a stream of fire at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
       return ReturnValue::eFAILURE;
     }
-    if (!IS_NPC(victim) && victim->player->possesing)
+    if (!victim->isNonPlayer() && victim->player->possesing)
     {
       ch->send("Oops! They ain't linkdead! Just possessing.");
       return ReturnValue::eFAILURE;
@@ -165,7 +165,7 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
   class Connection *d;
   unsigned sdesc;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, arg);
@@ -206,7 +206,7 @@ int do_fsave(Character *ch, std::string argument, cmd_t cmd)
   Character *vict = {};
   std::string name = {}, buf = {};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }
@@ -261,7 +261,7 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
   {
     // Don't show mobs fighting or people not in the arena when arena
     // keyword was specified.
-    if (IS_NPC(i) || (arenaONLY && !i->room().isArena()))
+    if (i->isNonPlayer() || (arenaONLY && !i->room().isArena()))
     {
       continue;
     }
@@ -301,7 +301,7 @@ int do_peace(Character *ch, char *argument, cmd_t cmd)
 
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_NPC(rch) && rch->mobdata->hated != nullptr)
+    if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);
@@ -391,7 +391,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
   char arg1[MAX_STRING_LENGTH] = {0};
   char arg2[MAX_STRING_LENGTH] = {0};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   argument = one_argument(argument, arg1);

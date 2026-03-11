@@ -774,7 +774,7 @@ void DC::update_wizlist(Character *ch)
 {
   int x;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
 
   for (auto &entry : wizlist)
@@ -1276,7 +1276,7 @@ void DC::remove_all_mobs_from_world(void)
   for_each(character_list.begin(), character_list.end(),
            [](Character *const &curr)
            {
-             if (IS_NPC(curr))
+             if (curr->isNonPlayer())
                extract_char(curr, true, QStringLiteral("DC::remove_all_mobs_from_world"));
              else
                do_quit(curr, "", cmd_t::SAVE_SILENTLY);
@@ -3558,7 +3558,7 @@ int DC::create_blank_mobile(int nr)
   for_each(character_list.begin(), character_list.end(),
            [&cur_index](Character *const &curr)
            {
-             if (IS_NPC(curr))
+             if (curr->isNonPlayer())
                if (curr->mobdata->nr >= cur_index)
                  curr->mobdata->nr++;
            });
@@ -3623,7 +3623,7 @@ void delete_mob_from_index(int nr)
   for_each(character_list.begin(), character_list.end(),
            [&nr](Character *const &curr)
            {
-             if (IS_NPC(curr) && curr->mobdata->nr >= nr)
+             if (curr->isNonPlayer() && curr->mobdata->nr >= nr)
                curr->mobdata->nr--;
            });
 
@@ -5152,7 +5152,7 @@ void Zone::reset(ResetType reset_type)
       {
         continue;
       }
-      if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && DC::getInstance()->world[tmp_victim->in_room].zone == id_)
+      if (tmp_victim->isNonPlayer() && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && DC::getInstance()->world[tmp_victim->in_room].zone == id_)
       {
         tmp_victim->multiplyGold(1.10);
         tmp_victim->exp *= 1.10;

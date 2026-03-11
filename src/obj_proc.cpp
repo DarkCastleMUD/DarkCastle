@@ -749,7 +749,7 @@ int drainingstaff(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   dam = dice(staff->obj_flags.value[1], staff->obj_flags.value[2]);
   dam += GET_DAMROLL(ch);
   dam = (dam * 2) / 10; // Mages usually have 2-3 attacks
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   { // NPC'S have no mana, so we'll drain hp instead
     if (dam >= vict->getHP())
     {
@@ -799,7 +799,7 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   /* deposit */
   if (cmd == cmd_t::DEPOSIT)
   {
-    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+    if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return ReturnValue::eFAILURE;
@@ -1898,7 +1898,7 @@ int pagoda_balance(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     // TODO - should probably check to make sure these are valid rooms before we
     // use them.  Proc isn't used yet though, so no biggy.
     for (vict = DC::getInstance()->world[real_room(i)].people; vict; vict = vict->next_in_room)
-      if (IS_NPC(vict))
+      if (vict->isNonPlayer())
         found = 0;
       else
       {
@@ -2475,7 +2475,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
         }
         if (DC::getInstance()->world[tmp_victim->in_room].zone == zone)
         {
-          if (IS_NPC(tmp_victim))
+          if (tmp_victim->isNonPlayer())
           {
             for (int l = 0; l < MAX_WEAR; l++)
             {
@@ -2571,7 +2571,7 @@ int szrildor_pass_checks(Character *ch, class Object *obj, cmd_t cmd, const char
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)
   {
-    if (IS_NPC(i))
+    if (i->isNonPlayer())
       continue;
     if (!i->in_room)
       continue;
@@ -2699,9 +2699,9 @@ int no_magic_while_alive(Character *ch, class Object *obj, cmd_t cmd, const char
 
   for (; vict; vict = vict->next_in_room)
   {
-    if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == 9544
-                         // to add a new mob to this list, just add || and the next check
-                         ))
+    if (vict->isNonPlayer() && (DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == 9544
+                                // to add a new mob to this list, just add || and the next check
+                                ))
       break;
   }
 
@@ -3622,13 +3622,13 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (GET_POS(vict) == position_t::FIGHTING)
     {
       tmp = sword_combat;
-      if (IS_NPC(vict->fighting) && vict->fighting->getLevel() > 99)
+      if (vict->fighting->isNonPlayer() && vict->fighting->getLevel() > 99)
       {
         buf = "Are you sure you can win this one? I mean.... I'll be ok, but I'm pretty sure you're screwed.";
         tmp.push_back(buf);
       }
       level_diff_t level_difference = vict->getLevel() - vict->fighting->getLevel();
-      if (IS_NPC(vict->fighting) && level_difference > 40)
+      if (vict->fighting->isNonPlayer() && level_difference > 40)
       {
         buf = "Oh come on... this is fuckin' embarrassing...";
         tmp.push_back(buf);
@@ -3857,7 +3857,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     Character *give_vict;
     if (!(give_vict = ch->get_char_room_vis(target)))
       return ReturnValue::eFAILURE; // Not giving to char/mob, so ok
-    if (IS_NPC(give_vict) && vict->isMortalPlayer())
+    if (give_vict->isNonPlayer() && vict->isMortalPlayer())
     {
       vict->sendln("You can only give things to other players when you have a hot potato!");
       return ReturnValue::eSUCCESS;
@@ -3911,7 +3911,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         "$n has been KILLED!!",
         vict, 0, 0, TO_ROOM, 0);
 
-    if (IS_NPC(vict))
+    if (vict->isNonPlayer())
     {
       act("$n gets back up.", vict, 0, 0, TO_ROOM, 0);
       do_say(vict, "HA!  Fooled ya!");
@@ -3975,7 +3975,7 @@ int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const c
   for (victim = DC::getInstance()->world[obj->in_room].people; victim; victim = next_v)
   {
     next_v = victim->next_in_room;
-    if (IS_NPC(victim)) // only hurts players
+    if (victim->isNonPlayer()) // only hurts players
       continue;
 
     dam = dice(obj->obj_flags.value[1], obj->obj_flags.value[2]);

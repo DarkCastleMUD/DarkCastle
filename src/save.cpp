@@ -584,7 +584,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
 
 bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
 {
-  if (isNPC())
+  if (isNonPlayer())
   {
     mobdata->save(fpsave);
     return true;
@@ -601,7 +601,7 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
 
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->player = nullptr;
 #ifdef LEAK_CHECK
@@ -815,7 +815,7 @@ void save_char_obj_db(Character *ch)
   if (ch == 0)
     return;
 
-  if (IS_NPC(ch) || ch->getLevel() < 2)
+  if (ch->isNonPlayer() || ch->getLevel() < 2)
     return;
 
   // so weapons stop falling off
@@ -889,7 +889,7 @@ void Character::save_char_obj(void)
 
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if (IS_NPC(this) || getLevel() < 1)
+  if (this->isNonPlayer() || getLevel() < 1)
   {
     return;
   }
@@ -1047,7 +1047,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   }
 
   // stored names only matter for mobs
-  if (!IS_NPC(ch))
+  if (!ch->isNonPlayer())
   {
     ch->setName(name);
   }
@@ -1738,7 +1738,7 @@ void Character::char_to_store(struct char_file_u4 *st, struct time_data &tmpage)
   for (x = 0; x < 3; x++)
     st->extra_ints[x] = 0;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     st->armor = armor;
     st->hitroll = hitroll;

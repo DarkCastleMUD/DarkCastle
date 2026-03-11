@@ -243,7 +243,7 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
   int i /*,j*/;
   bool equipped;
   int retval = ReturnValue::eSUCCESS;
-  int is_mob = IS_NPC(ch);
+  int is_mob = ch->isNonPlayer();
   int lvl;
 
   equipped = false;
@@ -345,7 +345,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
   int i, bits;
   bool equipped;
   int retval = ReturnValue::eSUCCESS;
-  int is_mob = IS_NPC(ch);
+  int is_mob = ch->isNonPlayer();
   int lvl;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
@@ -404,7 +404,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
   act("You recite $p which dissolves.", ch, scroll, 0, TO_CHAR, 0);
 
   int failmark = 35 - GET_INT(ch);
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     failmark -= 15;
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER ||
@@ -814,7 +814,7 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
   int ctr;
   int nope = 0;
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NONAME))
+  if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NONAME))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return ReturnValue::eFAILURE;
@@ -891,7 +891,7 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
   if (GET_SHORT_ONLY(ch) && IS_PC(ch))
     dc_free(GET_SHORT_ONLY(ch));
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     GET_SHORT_ONLY(ch) = str_hsh(buf);
   else
     GET_SHORT_ONLY(ch) = str_dup(buf);
@@ -1417,7 +1417,7 @@ void perform_wear(Character *ch, class Object *obj_object,
 
 int class_restricted(Character *ch, class Object *obj)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return false;
   if (IS_OBJ_STAT(obj, ITEM_ANY_CLASS))
     return false;
@@ -1440,7 +1440,7 @@ int class_restricted(Character *ch, class Object *obj)
 int charmie_restricted(Character *ch, class Object *obj, int wear_loc)
 {
   return false; // sigh, work for nohin'
-  if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
+  if (ch->isNonPlayer() && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
   {
     int vnum = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     if (vnum == 8 || (vnum > 22388 && vnum < 22399))
@@ -1494,7 +1494,7 @@ int size_restricted(Character *ch, class Object *obj)
   if (GET_RACE(ch) == RACE_HUMAN) // human can wear all sizes
     return false;
 
-  if (IS_NPC(ch)) // mobs (ie charmies) can wear all sizes
+  if (ch->isNonPlayer()) // mobs (ie charmies) can wear all sizes
     return false;
 
   if (GET_HEIGHT(ch) < 42)
@@ -1658,7 +1658,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         return;
       }
   }
-  /*  if (IS_NPC(ch) && (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() < 22394 &&
+  /*  if (ch->isNonPlayer() && (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() < 22394 &&
     DC::getInstance()->mob_index[ch->mobdata->nr].vnum() > 22388))
     {
        return;
@@ -2613,7 +2613,7 @@ int Character::recheck_height_wears(void)
 {
   int j;
   class Object *obj = nullptr;
-  if (!this || IS_NPC(this))
+  if (!this || this->isNonPlayer())
     return ReturnValue::eFAILURE; // NPCs get to wear the stuff.
 
   for (j = 0; j < MAX_WEAR; j++)

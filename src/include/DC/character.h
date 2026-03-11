@@ -1159,7 +1159,7 @@ public:
   bool isImmortalPlayer(void) const;
   bool isImplementerPlayer(void) const;
   bool isPlayer(void) const;
-  bool isNPC(void) const;
+  bool isNonPlayer(void) const;
   bool isObjectProgram(void) const;
 
   uint64_t getGold(void);

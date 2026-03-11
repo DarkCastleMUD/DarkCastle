@@ -43,7 +43,7 @@ int do_levels(Character *ch, char *argument, cmd_t cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("You ain't nothin' but a hound-dog.");
     return ReturnValue::eSUCCESS;

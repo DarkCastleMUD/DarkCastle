@@ -409,7 +409,7 @@ void Character::do_on_login_stuff(void)
   isr_set(this);
   this->altar = clan_altar();
 
-  if (!IS_NPC(this) && this->getLevel() >= IMMORTAL)
+  if (!this->isNonPlayer() && this->getLevel() >= IMMORTAL)
   {
     this->player->holyLite = true;
     GET_COND(this, THIRST) = -1;
@@ -2037,7 +2037,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_ch : character_list)
   {
-    if (IS_NPC(tmp_ch) || tmp_ch->desc != nullptr)
+    if (tmp_ch->isNonPlayer() || tmp_ch->desc != nullptr)
       continue;
 
     if (str_cmp(GET_NAME(d->character), GET_NAME(tmp_ch)))

@@ -46,7 +46,7 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((IS_NPC(ch)) && (IS_AFFECTED(ch, AFF_CHARM)))
+  if ((ch->isNonPlayer()) && (IS_AFFECTED(ch, AFF_CHARM)))
   {
     ch->sendln("You're in love. Forget it!");
     return ReturnValue::eFAILURE;
@@ -76,7 +76,7 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -190,7 +190,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
         (f->follower->in_room == in_room) &&
-        !IS_NPC(f->follower))
+        !f->follower->isNonPlayer())
       no_members++;
   }
 
@@ -227,7 +227,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
         f->follower->in_room == in_room &&
         f->follower != this &&
-        !IS_NPC(f->follower))
+        !f->follower->isNonPlayer())
     {
       f->follower->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
       int lost = 0;
@@ -247,7 +247,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 
 void setup_group_buf(char *report, Character *j, Character *i)
 {
-  if (IS_NPC(j) || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
+  if (j->isNonPlayer() || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
   {
     if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
       sprintf(report, "[-====-|      %3d%%    hp     %3d%%   k     %3d%%   mv]",
@@ -465,7 +465,7 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(new_new_leader))
+  if (new_new_leader->isNonPlayer())
   {
     ch->sendln("Yeah right!");
     return ReturnValue::eFAILURE;
@@ -615,7 +615,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((IS_NPC(adios)) && (IS_AFFECTED(adios, AFF_CHARM)))
+  if ((adios->isNonPlayer()) && (IS_AFFECTED(adios, AFF_CHARM)))
   {
     ch->sendln("Can't kick out a charmee.");
     return ReturnValue::eFAILURE;

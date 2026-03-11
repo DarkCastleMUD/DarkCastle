@@ -58,8 +58,8 @@ char *index(char *buf, char op);
 int GET_WAIT(Character *ch);
 void WAIT_STATE(Character *ch, int cycle);
 
-#define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
-                                                                                                                                                       : 0)
+#define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : czh->isNonPlayer() ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
+                                                                                                                                                            : 0)
 
 // Defines for gradual skill increase code
 // Usage is defined in guild.cpp
@@ -173,13 +173,13 @@ bool IS_DARK(int room);
 // #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
 #define IS_PC(ch) (ch->getType() == Character::Type::Player && ch->player != nullptr)
-#define IS_NPC(ch) (ch->getType() == Character::Type::NPC || ch->getType() == Character::Type::ObjectProgram)
+
 #define IS_OBJ(ch) (ch->getType() == Character::Type::ObjectProgram)
 #define IS_FAMILIAR(ch) (IS_AFFECTED(ch, AFF_FAMILIAR))
 
 #define IS_MINLEVEL_PC(ch, level) (ch->getLevel() >= level && IS_PC(ch))
 #define IS_MAXLEVEL_PC(ch, level) (ch->getLevel() <= level && IS_PC(ch))
-#define IS_MINLEVEL_NPC(ch, level) (ch->getLevel() >= level && IS_NPC(ch))
+#define IS_MINLEVEL_NPC(ch, level) (ch->getLevel() >= level && ch->isNonPlayer())
 #define IS_IMMORTAL(ch) (IS_MINLEVEL_PC(ch, IMMORTAL))
 #define IS_MORTAL(ch) (IS_MAXLEVEL_PC(ch, IMMORTAL - 1))
 
@@ -307,11 +307,11 @@ auto getBitvector(auto value)
 
 #define AWAKE(ch) (GET_POS(ch) != position_t::SLEEPING)
 
-#define IS_ANONYMOUS(ch) (IS_NPC(ch) ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (ch->isNonPlayer() ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
 /*
 inline const short IS_ANONYMOUS(Character *ch)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
      // this should really never be called on mobs
      return 1;
   else if (ch->getLevel() >= 101)

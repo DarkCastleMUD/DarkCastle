@@ -219,7 +219,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
     failchance -= 5;
 
   int to_dam = GET_DAMROLL(ch);
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
     to_dam = (int)((float)to_dam * .8);
 
   dam = dice(ch->equipment[WEAR_WIELD]->obj_flags.value[1],
@@ -472,19 +472,19 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return ReturnValue::eFAILURE;
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     ch->sendln("You cannot bash something that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one to bash!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     ch->sendln("You cannot target something that tiny!");
     return ReturnValue::eFAILURE;
@@ -782,7 +782,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     else
       disarm(ch, victim);
     WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
-    if (IS_NPC(victim) && !victim->fighting)
+    if (victim->isNonPlayer() && !victim->fighting)
     {
       retval = one_hit(victim, ch, TYPE_UNDEFINED, 0);
       retval = SWAP_CH_VICT(retval);
@@ -794,7 +794,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     act("You try to disarm $N and fail!", ch, nullptr, victim, TO_CHAR, 0);
     act("$n attempts to disarm $N, but fails!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-    if (IS_NPC(victim) && !victim->fighting)
+    if (victim->isNonPlayer() && !victim->fighting)
     {
       retval = one_hit(victim, ch, TYPE_UNDEFINED, 0);
       retval = SWAP_CH_VICT(retval);
@@ -830,7 +830,7 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(this) && (IS_NPC(victim) && !IS_AFFECTED(victim, AFF_CHARM)))
+  if (IS_PC(this) && (victim->isNonPlayer() && !IS_AFFECTED(victim, AFF_CHARM)))
   {
     sendln("Doesn't need your help!");
     return ReturnValue::eFAILURE;
@@ -1067,12 +1067,12 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   char name[MAX_INPUT_LENGTH];
   Character *victim = nullptr;
 
-  if (!IS_NPC(ch) && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
+  if (!ch->isNonPlayer() && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
     ch->sendln("You have no idea how to be a full time bodyguard.");
     return ReturnValue::eFAILURE;
   }
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, name);
@@ -1195,7 +1195,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_MAKE_CAMP);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to set up a safe camp.");
     return ReturnValue::eFAILURE;
@@ -1215,7 +1215,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
   {
     next_i = i->next_in_room;
 
-    if ((IS_NPC(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR)) || (i->fighting))
+    if ((i->isNonPlayer() && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR)) || (i->fighting))
     {
       ch->sendln("This area does not yet feel secure enough to rest.");
       return ReturnValue::eFAILURE;
@@ -1356,7 +1356,7 @@ int do_battlesense(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_BATTLESENSE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to heighten your battle awareness.");
     return ReturnValue::eFAILURE;
@@ -1398,7 +1398,7 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_SMITE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to smite your enemies effectively.");
     return ReturnValue::eFAILURE;
@@ -1482,7 +1482,7 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_LEADERSHIP);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know that ability.");
     return ReturnValue::eFAILURE;
@@ -1541,7 +1541,7 @@ int do_perseverance(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_PERSEVERANCE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("Your lack of fortitude is stunning.");
     return ReturnValue::eFAILURE;
@@ -1582,7 +1582,7 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
   int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 
-  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to use this to your advantage.");
     return ReturnValue::eFAILURE;

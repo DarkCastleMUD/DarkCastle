@@ -45,7 +45,7 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   if (!str_cmp(arg, "list"))
   {

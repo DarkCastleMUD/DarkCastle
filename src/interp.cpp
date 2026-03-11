@@ -231,7 +231,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
           logbug(str);
           return logcmd.setReturn(ReturnValue::eFAILURE, str);
         }
-        else if (IS_NPC(this))
+        else if (this->isNonPlayer())
         {
           sendln("Huh?");
           return logcmd.setReturn(ReturnValue::eFAILURE, "NPC attempting bestowed cmd");
@@ -301,7 +301,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         }
       }
 
-      if (IS_NPC(this) && this->desc && this->desc->original && this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
+      if (this->isNonPlayer() && this->desc && this->desc->original && this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
       {
         this->sendln("The spirit cannot perform that action.");
         return logcmd.setReturn(ReturnValue::eFAILURE, QStringLiteral("spirit not allowed"));
@@ -1153,7 +1153,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   /* special in mobile present? */
   for (k = DC::getInstance()->world[this->in_room].people; k; k = k->next_in_room)
   {
-    if (IS_NPC(k))
+    if (k->isNonPlayer())
     {
       if (((Character *)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {

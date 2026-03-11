@@ -123,7 +123,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   struct follow_type *k = {}, *next_dude = {};
   class Object *target_obj = {};
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }
@@ -300,7 +300,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   send("\r\n");
 
-  if (!IS_NPC(this))
+  if (!this->isNonPlayer())
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -322,7 +322,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   move_char(this, location);
 
-  if (!IS_NPC(this))
+  if (!this->isNonPlayer())
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -365,7 +365,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
   int ctr, nope;
   char _convert[2];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Mobs can't poof.");
     return ReturnValue::eFAILURE;
@@ -468,7 +468,7 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
   Character *target_mob;
   class Object *target_obj;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(argument, loc_str, command);
@@ -538,7 +538,7 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   char buf[200];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, buf);
@@ -569,7 +569,7 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
 
 int do_holylite(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (argument[0] != '\0')
@@ -596,7 +596,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
 
   int arg1;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }
@@ -630,7 +630,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
 
 int do_nohassle(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(ch->player->toggles, Player::PLR_NOHASSLE))
@@ -653,7 +653,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
   std::string buf1 = {};
   Connection *i = nullptr;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }

@@ -144,7 +144,7 @@ const char *newsify(char *string)
 int do_news(Character *ch, char *argument, cmd_t cmd)
 {
   bool up;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     up = true;
   else
     up = !isSet(ch->player->toggles, Player::PLR_NEWS);

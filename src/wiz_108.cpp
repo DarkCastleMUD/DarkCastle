@@ -261,7 +261,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   //   renamed the command "setup" so don't need this anymore
   //    void do_mortal_set(Character *ch, char *argument, cmd_t cmd);
   //
-  //    if(!ch->isImmortalPlayer() || IS_NPC(ch)) {
+  //    if(!ch->isImmortalPlayer() || ch->isNonPlayer()) {
   //      do_mortal_set(ch, argument, cmd);
   //      return;
   //    }
@@ -278,7 +278,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
   int skill, value, i, x;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!ch->has_skill(COMMAND_SET))
@@ -354,7 +354,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   {
   case 0: /* age */
   {
-    if (IS_NPC(vict))
+    if (vict->isNonPlayer())
     {
       ch->sendln("Can't set a mob's age.");
       return ReturnValue::eFAILURE;
@@ -610,7 +610,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   break;
   case 17: /* sessions */
   {
-    if (IS_NPC(vict))
+    if (vict->isNonPlayer())
     {
       ch->sendln("Can't set a mob's pracs...");
       return ReturnValue::eFAILURE;
@@ -736,7 +736,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (IS_NPC(vict))
+    if (vict->isNonPlayer())
     {
       ch->sendln("You cannot set saves_bases on mobs.");
       return ReturnValue::eFAILURE;
@@ -788,7 +788,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (IS_NPC(vict))
+    if (vict->isNonPlayer())
     {
       ch->sendln("You cannot set profession on mobs.");
       return ReturnValue::eFAILURE;

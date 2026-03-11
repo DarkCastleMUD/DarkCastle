@@ -89,7 +89,7 @@ int do_log(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
-  if (IS_NPC(ch) || !ch->has_skill(COMMAND_LOG))
+  if (ch->isNonPlayer() || !ch->has_skill(COMMAND_LOG))
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
@@ -103,7 +103,7 @@ int do_log(Character *ch, char *argument, cmd_t cmd)
   }
   else if (!(vict = get_pc_vis(ch, buf)))
     ch->sendln("Couldn't find any such creature.");
-  else if (IS_NPC(vict))
+  else if (vict->isNonPlayer())
     ch->sendln("Can't do that to a beast.");
   else if (vict->getLevel() > ch->getLevel())
     act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
@@ -136,7 +136,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &victim : character_list)
     {
-      if (IS_NPC(victim))
+      if (victim->isNonPlayer())
         continue;
       sprintf(buf, "0.%s", victim->getNameC());
       do_showbits(ch, buf, cmd);
@@ -341,7 +341,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)
         {
-          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].vnum() == vnum)
+          if (c->isNonPlayer() && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].vnum() == vnum)
           {
             if (!first_npc_found)
             {
@@ -380,7 +380,7 @@ int do_pardon(Character *ch, char *argument, cmd_t cmd)
   char flag[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(argument, person, flag);

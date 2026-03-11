@@ -175,7 +175,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+  if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -283,7 +283,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -690,7 +690,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( IS_NPC(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -860,7 +860,7 @@ void fix_shopkeepers_inventory()
     for (keeper = DC::getInstance()->world[DC::getInstance()->shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (IS_NPC(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
@@ -1267,7 +1267,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
   char text[MAX_INPUT_LENGTH];
   int16_t skill;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
 
   const char *pdesign_values[] = {
@@ -1416,7 +1416,7 @@ int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   switch (cmd)
@@ -1457,7 +1457,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
   int16_t skill, i;
   player_shop * shop;
 
-  if(IS_NPC(ch))
+  if(ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if(!ch->has_skill( COMMAND_PSHOPEDIT)) {
@@ -1624,7 +1624,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::LIST)
@@ -1833,7 +1833,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
 int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
-  if (ch == nullptr || IS_NPC(ch))
+  if (ch == nullptr || ch->isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }

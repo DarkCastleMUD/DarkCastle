@@ -2389,7 +2389,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
     return ReturnValue::eFAILURE;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   arg = one_argument(arg, arg1);

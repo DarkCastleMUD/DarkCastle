@@ -985,7 +985,7 @@ int do_accept(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) || victim->getLevel() >= IMMORTAL)
+  if (victim->isNonPlayer() || victim->getLevel() >= IMMORTAL)
   {
     ch->sendln("Yeah right.");
     return ReturnValue::eFAILURE;
@@ -1146,7 +1146,7 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
   {
     ch->sendln("Yeah right.");
     return ReturnValue::eFAILURE;

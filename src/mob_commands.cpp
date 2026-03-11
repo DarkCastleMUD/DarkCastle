@@ -625,7 +625,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
     for (victim = DC::getInstance()->world[ch->in_room].people; victim != nullptr; victim = vnext)
     {
       vnext = victim->next_in_room;
-      if (IS_NPC(victim) && victim != ch)
+      if (victim->isNonPlayer() && victim != ch)
       {
         extract_char(victim, true);
       }
@@ -1223,7 +1223,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   QString arg3 = arguments.value(3);
   if (arg.isEmpty() || temp.isEmpty() || arg2.isEmpty())
   {
-    if (IS_NPC(this))
+    if (this->isNonPlayer())
     {
       int num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
 
@@ -1250,7 +1250,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
 
   for (; victim; victim = victim->next_in_room)
   {
-    if (type == 1 && IS_NPC(victim))
+    if (type == 1 && victim->isNonPlayer())
       continue;
     else if (type == 2 && IS_PC(victim))
       continue;
@@ -1333,7 +1333,7 @@ void add_dmg(Character *ch, int dmg)
 
   for (c = dmg_list; c; c = c->next)
   {
-    if ((IS_NPC(ch) && !str_cmp(c->name, GET_SHORT(ch))) ||
+    if ((ch->isNonPlayer() && !str_cmp(c->name, GET_SHORT(ch))) ||
         (IS_PC(ch) && !str_cmp(c->name, GET_NAME(ch))))
     {
       c->damage += dmg;
@@ -1346,7 +1346,7 @@ void add_dmg(Character *ch, int dmg)
 #else
   c = (struct damage_list *)dc_alloc(1, sizeof(struct damage_list));
 #endif
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     strcpy(c->name, GET_SHORT(ch));
   else
     strcpy(c->name, GET_NAME(ch));
@@ -1384,7 +1384,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
   if (strcmp(arg, "all") && strcmp(arg, "allpc"))
   {
     victim = get_char_room(arg, ch->in_room);
-    if (victim && (victim->getLevel() > MORTAL || IS_NPC(victim))) // don't target immortals
+    if (victim && (victim->getLevel() > MORTAL || victim->isNonPlayer())) // don't target immortals
       victim = nullptr;
 
     if (!victim)
@@ -1513,7 +1513,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
         continue;
       }
 
-      if (!strcmp(arg, "allpc") && IS_NPC(victim))
+      if (!strcmp(arg, "allpc") && victim->isNonPlayer())
       {
         continue;
       }
@@ -1786,7 +1786,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
     throwitem->data_num = -999;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     throwitem->mob = true; // This is, suprisingly, a mob
@@ -1899,7 +1899,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
            isSet(DC::getInstance()->world[to_room].room_flags, ARENA) ||
            (DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
            DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
-           ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
+           ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
            (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
@@ -1931,7 +1931,7 @@ int do_mppeace(Character *ch, char *argument, cmd_t cmd)
       ch->prog_error(QStringLiteral("Mppeace - Vict not found."));
       return ReturnValue::eFAILURE;
     }
-    if (IS_NPC(vict) && vict->mobdata->hated != nullptr)
+    if (vict->isNonPlayer() && vict->mobdata->hated != nullptr)
       remove_memory(vict, 'h');
     if (vict->fighting != nullptr)
       stop_fighting(vict);
@@ -1939,7 +1939,7 @@ int do_mppeace(Character *ch, char *argument, cmd_t cmd)
   }
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_NPC(rch) && rch->mobdata->hated != nullptr)
+    if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);
@@ -2187,7 +2187,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
     // ch->prog_error( QStringLiteral("Mpsetmath - No target."));
     // return ReturnValue::eFAILURE;
   }
-  if (vict && IS_NPC(vict))
+  if (vict && vict->isNonPlayer())
     allowed = true;
   else if (vict)
     for (int i = 0; allowedData[i]; i++)
@@ -2262,7 +2262,7 @@ void Character::prog_error(QString error_message)
   {
     logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
-  else if (IS_NPC(this))
+  else if (this->isNonPlayer())
   {
     logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }

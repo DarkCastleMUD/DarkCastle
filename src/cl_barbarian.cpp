@@ -651,25 +651,25 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
   {
     ch->sendln("You are too puny to headbutt someone that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one to headbutt!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size makes it impossible to target just $S head!", ch, 0, victim, TO_CHAR, 0);
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
   {
     ch->sendln("That would be like smashing your head into a wall!");
     return ReturnValue::eFAILURE;
@@ -687,7 +687,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   if (!charge_moves(ch, SKILL_HEADBUTT))
     return ReturnValue::eSUCCESS;
 
-  if (isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || victim->has_skill(SKILL_BERSERK) > 80))
+  if (isSet(victim->combat, COMBAT_BERSERK) && (victim->isNonPlayer() || victim->has_skill(SKILL_BERSERK) > 80))
   {
     act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, NOTVICT);
@@ -698,7 +698,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   }
 
   int mod = 0;
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
     mod = -25;
 
   if (victim->equipment[WEAR_HEAD])
@@ -1129,19 +1129,19 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   }
   else
   {
-    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+    if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
     {
       ch->sendln("You are too tiny to knock someone that HUGE anywhere!");
       return ReturnValue::eFAILURE;
     }
 
-    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+    if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
     {
       ch->sendln("You cannot pick just one to knockback!");
       return ReturnValue::eFAILURE;
     }
 
-    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+    if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
     {
       act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
       return ReturnValue::eFAILURE;
@@ -1267,7 +1267,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
 
       if (victim->fighting)
       {
-        if (IS_NPC(victim))
+        if (victim->isNonPlayer())
         {
           victim->add_memory(GET_NAME(ch), 'h');
           remove_memory(victim, 'f');

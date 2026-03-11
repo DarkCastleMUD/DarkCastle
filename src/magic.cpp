@@ -68,7 +68,7 @@ bool player_resist_reallocation(Character *victim, int skill)
 {
   int savebonus = 0;
   // only PC get a resist check for reallocation
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
     return false;
 
   if (skill < 41)
@@ -145,7 +145,7 @@ bool can_heal(Character *ch, Character *victim, int spellnum)
   bool can_cast = true;
 
   // You cannot heal an elemental from "conjure elemental"
-  if (IS_NPC(victim) &&
+  if (victim->isNonPlayer() &&
       (DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 88 ||
        DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 89 ||
        DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 90 ||
@@ -328,7 +328,7 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
   set_cantquit(ch, victim);
   dam = 370;
 
-  if (number(1, 100) > get_saves(victim, SAVE_TYPE_MAGIC) + 40 && (skill > 50 || IS_NPC(ch)))
+  if (number(1, 100) > get_saves(victim, SAVE_TYPE_MAGIC) + 40 && (skill > 50 || ch->isNonPlayer()))
   {
     SET_BIT(victim->combat, COMBAT_SHOCKED2);
     victim_dazzled = true;
@@ -442,7 +442,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
     act("$N resists $n's attempt to souldrain $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to souldrain you!", ch, nullptr, victim, TO_VICT, 0);
     int retval;
-    if (IS_NPC(victim) && !victim->fighting)
+    if (victim->isNonPlayer() && !victim->fighting)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED, FIRST);
       retval = SWAP_CH_VICT(retval);
@@ -464,7 +464,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
     GET_MANA(ch) = GET_MAX_MANA(ch);
 
   int retval;
-  if (IS_NPC(victim) && !victim->fighting)
+  if (victim->isNonPlayer() && !victim->fighting)
   {
     retval = attack(victim, ch, TYPE_UNDEFINED, FIRST);
     retval = SWAP_CH_VICT(retval);
@@ -952,7 +952,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) && (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim))
     {
 
-      if (IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
+      if (ch->isNonPlayer() && tmp_victim->isNonPlayer()) // mobs don't earthquake each other
         continue;
 
       dam = 150;
@@ -1163,7 +1163,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
-        if (IS_NPC(tmp_victim) && DC::getInstance()->mob_index[tmp_victim->mobdata->nr].vnum() >= 2300 &&
+        if (tmp_victim->isNonPlayer() && DC::getInstance()->mob_index[tmp_victim->mobdata->nr].vnum() >= 2300 &&
             DC::getInstance()->mob_index[tmp_victim->mobdata->nr].vnum() <= 2399)
         {
           ch->sendln("The clan hall's enchantments absorbs part of your spell.");
@@ -1190,10 +1190,10 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
             // don't blind surrounding rooms
             // do_solar_blind(ch, tmp_victim);
             if (tmp_victim->getLevel())
-              if (IS_NPC(tmp_victim))
+              if (tmp_victim->isNonPlayer())
               {
                 tmp_victim->add_memory(GET_NAME(ch), 'h');
-                if (IS_PC(ch) && IS_NPC(tmp_victim))
+                if (IS_PC(ch) && tmp_victim->isNonPlayer())
                   if (!ISSET(tmp_victim->mobdata->actflags, ACT_STUPID) && tmp_victim->hunting.isEmpty())
                   {
                     level_diff_t level_difference = ch->getLevel() - tmp_victim->getLevel() / 2;
@@ -1705,15 +1705,15 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
              isSet(DC::getInstance()->world[to_room].room_flags, ARENA) ||
              DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER ||
              DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
-             ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
+             ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
              (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                     (to_room >= 1900 && to_room <= 1999))) ||
              // NPCs can only teleport within the same continent
-             (IS_NPC(victim) &&
+             (victim->isNonPlayer() &&
               DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).continent));
   }
 
-  if ((IS_NPC(victim)) && (!IS_NPC(ch)))
+  if ((victim->isNonPlayer()) && (!ch->isNonPlayer()))
     victim->add_memory(GET_NAME(ch), 'h');
 
   act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
@@ -1840,7 +1840,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     return ReturnValue::eSUCCESS;
   }
 
-  if (IS_NPC(victim) && (victim->getLevel() == 0))
+  if (victim->isNonPlayer() && (victim->getLevel() == 0))
   {
     logentry(QStringLiteral("Null victim level in spell_paralyze."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
@@ -1860,7 +1860,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     {
       act("$n tried to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1932,7 +1932,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
     act("$N resists your attempt to blind $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to blind $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to blind you!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1953,7 +1953,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
     {
       act("$n tried to blind you!", ch, nullptr, victim, TO_VICT, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -2349,7 +2349,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       act("You feel very uncomfortable as a curse takes hold of you.", victim, 0, 0, TO_CHAR, 0);
     }
 
-    if (IS_NPC(victim) && !victim->fighting)
+    if (victim->isNonPlayer() && !victim->fighting)
     {
       mob_suprised_sayings(victim, ch);
       retval = attack(victim, ch, 0);
@@ -3180,7 +3180,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
     {
       af.type = SPELL_POISON;
       af.duration = skill / 10;
-      if (IS_NPC(ch))
+      if (ch->isNonPlayer())
       {
         af.modifier = -123;
         af.origin = {};
@@ -3196,7 +3196,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
       victim->sendln("You feel very sick.");
       act("$N looks very sick.", ch, 0, victim, TO_CHAR, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -3534,7 +3534,7 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Obje
   char dammsg[30];
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       heal = (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       heal = number(heal - (heal / 10), heal + (heal / 10));
@@ -3992,7 +3992,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
 
   set_cantquit(ch, victim);
 
-  if (!IS_NPC(victim) && victim->getLevel() <= 15)
+  if (!victim->isNonPlayer() && victim->getLevel() <= 15)
   {
     ch->sendln("Oh come on....at least wait till $e's high enough level to have decent gear.");
     return ReturnValue::eFAILURE;
@@ -4041,7 +4041,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
     act("$N resists your attempt to sleep $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to sleep $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to sleep you!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -4062,7 +4062,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
     return retval;
   }
 
-  if (IS_NPC(victim) || number(1, 2) == 1)
+  if (victim->isNonPlayer() || number(1, 2) == 1)
   {
     if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0)
     {
@@ -4211,7 +4211,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
     location = real_room(GET_HOME(victim));
   else
   {
@@ -4428,16 +4428,16 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   }
 
   if (IS_PC(ch))
-    if (IS_NPC(victim) || !isSet(victim->player->toggles, Player::PLR_SUMMONABLE))
+    if (victim->isNonPlayer() || !isSet(victim->player->toggles, Player::PLR_SUMMONABLE))
     {
       victim->sendln("Someone has tried to summon you!");
       ch->sendln("Something strange about that person prevents your summoning.");
       return ReturnValue::eFAILURE;
     }
-  if (IS_NPC(ch) && IS_NPC(victim))
+  if (ch->isNonPlayer() && victim->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  if ((IS_NPC(victim) && ch->getLevel() < IMPLEMENTER) ||
+  if ((victim->isNonPlayer() && ch->getLevel() < IMPLEMENTER) ||
       isSet(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
       isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_SUMMON))
   {
@@ -4494,14 +4494,14 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
   do_look(victim, "");
 
-  if (IS_NPC(victim) && victim->getLevel() >= ch->getLevel())
+  if (victim->isNonPlayer() && victim->getLevel() >= ch->getLevel())
   {
     act("$n growls.", victim, 0, 0, TO_ROOM, 0);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
     retval = SWAP_CH_VICT(retval);
     return retval;
   }
-  else if (IS_NPC(victim))
+  else if (victim->isNonPlayer())
   {
     act("$n freaks shit.", victim, 0, 0, TO_ROOM, 0);
     victim->add_memory(GET_NAME(ch), 'f');
@@ -4548,7 +4548,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   if (isSet(victim->immune, ISR_CHARM) ||
-      (IS_NPC(victim) && !ISSET(victim->mobdata->actflags, ACT_CHARM)))
+      (victim->isNonPlayer() && !ISSET(victim->mobdata->actflags, ACT_CHARM)))
   {
     act("$N laughs at your feeble charm attempt.", ch, nullptr, victim,
         TO_CHAR, 0);
@@ -4966,7 +4966,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
     }
 
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-        (IS_NPC(ch) ? IS_PC(tmp_victim) : true)) // if i'm a mob, don't hurt other mobs
+        (ch->isNonPlayer() ? IS_PC(tmp_victim) : true)) // if i'm a mob, don't hurt other mobs
     {
       if (GET_DEX(tmp_victim) > number(1, 100)) // roll vs dex dodged
       {
@@ -5007,7 +5007,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
     }
 
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-        (IS_NPC(tmp_victim) || IS_NPC(ch)))
+        (tmp_victim->isNonPlayer() || ch->isNonPlayer()))
     {
 
       dam = dice(level, 6);
@@ -5055,7 +5055,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
   if (!victim || !ch)
     return ReturnValue::eFAILURE;
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STUPID))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
     csendf(ch, "%s doesn't understand your psychological tactics.\r\n",
            GET_SHORT(victim));
@@ -5112,9 +5112,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
         NOTVICT);
     act("You resist $n's attempt to scare you!", ch, nullptr, victim, TO_VICT,
         0);
-    if (IS_NPC(
-            victim) &&
-        (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -5130,7 +5128,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
     act("$N doesnt seem to be the yellow-bellied slug you thought!", ch,
         nullptr, victim, TO_CHAR, 0);
 
-    if (IS_NPC(victim) && !victim->fighting)
+    if (victim->isNonPlayer() && !victim->fighting)
     {
       mob_suprised_sayings(victim, ch);
       retval = attack(victim, ch, 0);
@@ -5488,7 +5486,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   if (IS_PC(ch) && IS_PC(victim) && victim->fighting &&
-      IS_NPC(victim->fighting))
+      victim->fighting->isNonPlayer())
   {
     ch->sendln("You misfire!");
     victim = ch;
@@ -5514,7 +5512,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
 
   set_cantquit(ch, victim);
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
@@ -5527,7 +5525,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
     act("$N resists your attempt to dispel minor!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to dispel minor!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to dispel minor!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -5712,7 +5710,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
     } // of switch
   } // of while
 
-  if (IS_NPC(victim) && !victim->fighting)
+  if (victim->isNonPlayer() && !victim->fighting)
   {
     mob_suprised_sayings(victim, ch);
     retval = attack(victim, ch, 0);
@@ -5738,7 +5736,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
 
   set_cantquit(ch, victim);
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
@@ -5753,14 +5751,14 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
   }
   /*
   if(IS_PC(ch) && IS_PC(victim) && victim->fighting &&
-      IS_NPC(victim->fighting) &&
+      victim->fighting->isNonPlayer() &&
      !IS_AFFECTED(victim->fighting, AFF_CHARM))
   {
      ch->sendln("Your dispelling magic misfires!");
      victim = ch;
   }*/
   int savebonus = 0;
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
   {
     if (skill < 41)
       savebonus = 15;
@@ -5798,7 +5796,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     act("$N resists your attempt to dispel magic!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to dispel magic!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to dispel magic!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -5951,7 +5949,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     } // end of switch
   } // end of while
 
-  if (IS_NPC(victim) && !victim->fighting)
+  if (victim->isNonPlayer() && !victim->fighting)
   {
     mob_suprised_sayings(victim, ch);
     retval = attack(victim, ch, 0);
@@ -6474,7 +6472,7 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
     }
   }
 
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
   {
 
     if (!victim->fighting)
@@ -7878,7 +7876,7 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_STAFF:
     for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
-      if (IS_NPC(tar_ch))
+      if (tar_ch->isNonPlayer())
         if (!(IS_AFFECTED(tar_ch, AFF_PARALYSIS)))
         {
           retval = spell_paralyze(level, ch, tar_ch, 0, skill);
@@ -8335,7 +8333,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_STAFF:
     for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
-      if (IS_NPC(tar_ch))
+      if (tar_ch->isNonPlayer())
       {
         retval = spell_curse(level, ch, tar_ch, 0, skill);
         if (isSet(retval, ReturnValue::eCH_DIED))
@@ -10188,8 +10186,8 @@ int elemental_damage_bonus(int spell, Character *ch)
   fire = ice = earth = energy = false;
   for (f = mst->followers; f; f = f->next)
   {
-    // if (IS_NPC(f->follower) && f->follower->height == 77)
-    if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
+    // if (f->follower->isNonPlayer() && f->follower->height == 77)
+    if (f->follower->isNonPlayer() && f->follower->mobdata->mob_flags.value[3] == 77)
     {
       switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].vnum())
       {
@@ -10212,8 +10210,8 @@ int elemental_damage_bonus(int spell, Character *ch)
     else
     {
       for (t = f->follower->followers; t; t = t->next)
-        // if (IS_NPC(t->follower) && t->follower->height == 77)
-        if (IS_NPC(t->follower) && t->follower->mobdata->mob_flags.value[3] == 77)
+        // if (t->follower->isNonPlayer() && t->follower->height == 77)
+        if (t->follower->isNonPlayer() && t->follower->mobdata->mob_flags.value[3] == 77)
         {
           switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].vnum())
           {
@@ -10293,7 +10291,7 @@ bool elemental_score(Character *ch, int level)
   // reuse of elemental damage function
   for (f = mst->followers; f; f = f->next)
   {
-    if (IS_NPC(f->follower))
+    if (f->follower->isNonPlayer())
     {
       // if (f->follower->height == 77) // improved
       if (f->follower->mobdata->mob_flags.value[3] == 77)
@@ -10319,7 +10317,7 @@ bool elemental_score(Character *ch, int level)
     {
       for (t = f->follower->followers; t; t = t->next)
       {
-        if (IS_NPC(t->follower))
+        if (t->follower->isNonPlayer())
         {
           if (t->follower->mobdata->mob_flags.value[3] == 77)
           {
@@ -11095,7 +11093,7 @@ int cast_portal(uint8_t level, Character *ch, char *arg,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!IS_NPC(ch) && GET_CLASS(ch) == CLASS_CLERIC)
+    if (!ch->isNonPlayer() && GET_CLASS(ch) == CLASS_CLERIC)
     {
       if ((GET_MANA(ch) - 90) < 0)
       {
@@ -11388,7 +11386,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
     {
       af.type = SPELL_POISON;
       af.duration = skill / 27;
-      if (IS_NPC(ch))
+      if (ch->isNonPlayer())
       {
         af.modifier = -123;
       }
@@ -11735,7 +11733,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
   victim = nullptr;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
+    if (k->follower->isNonPlayer() && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
         k->follower->in_room != ch->in_room)
     {
       victim = k->follower;
@@ -12578,7 +12576,7 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
 int do_beacon(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *new_obj = nullptr;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   if (GET_CLASS(ch) != CLASS_ANTI_PAL && ch->getLevel() < ARCHANGEL)
   {
@@ -13746,7 +13744,7 @@ int spell_debility(uint8_t level, Character *ch, Character *victim, class Object
     act("$N takes on an unhealthy pallor as $n's magic takes hold.", ch, 0, victim, TO_ROOM, NOTVICT);
     act("Your magic $6debilitizes$R $N!", ch, 0, victim, TO_CHAR, 0);
   }
-  if (IS_NPC(victim) && !victim->fighting)
+  if (victim->isNonPlayer() && !victim->fighting)
   {
     mob_suprised_sayings(victim, ch);
     retval = attack(victim, ch, 0);
@@ -13866,7 +13864,7 @@ int spell_attrition(uint8_t level, Character *ch, Character *victim, class Objec
     act("$N pales as your devitalizing magic courses through $S veins!", ch, 0, victim, TO_CHAR, 0);
   }
 
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
   {
     if (!victim->fighting)
     {
@@ -14078,7 +14076,7 @@ int spell_dismiss_familiar(uint8_t level, Character *ch, Character *victim, clas
   victim = nullptr;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
+    if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
       break;
@@ -14139,7 +14137,7 @@ int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, class 
   // return ReturnValue::eFAILURE;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON))
+    if (k->follower->isNonPlayer() && k->follower->affected_by_spell(SPELL_CHARM_PERSON))
     {
       victim = k->follower;
       break;
@@ -14196,7 +14194,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
   // return ReturnValue::eFAILURE;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM))
+    if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM))
     {
       victim = k->follower;
       break;
@@ -14376,7 +14374,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
     ch->sendln("You're a bit too distracted by the battle.");
     return ReturnValue::eFAILURE;
   }
-  if (!ch->desc || ch->desc->snooping || IS_NPC(ch) || !ch->in_room)
+  if (!ch->desc || ch->desc->snooping || ch->isNonPlayer() || !ch->in_room)
   {
     ch->sendln("You can't do that at the moment.");
     return ReturnValue::eFAILURE;

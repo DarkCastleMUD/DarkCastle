@@ -398,7 +398,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       if (ch->getLevel() < ARCHANGEL && spl != 0 && spl != SPELL_TYPE_WAND)
         if (!(learned = ch->has_skill(song_info[spl].skill_num())))
         {
-          if (IS_NPC(ch) && !ch->master)
+          if (ch->isNonPlayer() && !ch->master)
             learned = 50;
           else
           {
@@ -554,7 +554,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch) &&
+    if (ch->getLevel() < ARCHANGEL && !ch->isNonPlayer() &&
         GET_KI(ch) < use_song(ch, spl))
     {
       ch->sendln("You do not have enough ki!");
@@ -2265,7 +2265,7 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
   if (ch->followers)
     for (fvictim = ch->followers; fvictim; fvictim = fvictim->next)
     {
-      if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_NPC(fvictim->follower) && ch->in_room != fvictim->follower->in_room)
+      if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && fvictim->follower->isNonPlayer() && ch->in_room != fvictim->follower->in_room)
       {
         summoned = true;
         do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n");

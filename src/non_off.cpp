@@ -121,7 +121,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit() && !IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && !ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return ReturnValue::eFAILURE;
@@ -207,7 +207,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit() && !IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && !ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return ReturnValue::eFAILURE;
@@ -348,7 +348,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOTITLE))
+  if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOTITLE))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return ReturnValue::eFAILURE;
@@ -390,7 +390,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
 
 command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     send("You can't toggle anything, you're a mob!\r\n");
     return ReturnValue::eFAILURE;
@@ -686,7 +686,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_BRIEF))
@@ -704,7 +704,7 @@ command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_ANSI))
@@ -722,7 +722,7 @@ command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_VT100))
@@ -740,7 +740,7 @@ command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_COMPACT))
@@ -758,7 +758,7 @@ command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_SUMMONABLE))
@@ -778,7 +778,7 @@ command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_LFG))
@@ -796,7 +796,7 @@ command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!isSet(player->toggles, Player::PLR_GUIDE))
@@ -820,7 +820,7 @@ command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 }
 command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_NEWS))
@@ -839,7 +839,7 @@ command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_ASCII))
@@ -858,7 +858,7 @@ command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_DAMAGE))
@@ -877,7 +877,7 @@ command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_NOTAX))
@@ -896,7 +896,7 @@ command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_CHARMIEJOIN))
@@ -915,7 +915,7 @@ command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t c
 
 command_return_t Character::do_autoeat(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_AUTOEAT))
@@ -1011,7 +1011,7 @@ command_return_t Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cm
 
 command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
 {
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_BEEP))

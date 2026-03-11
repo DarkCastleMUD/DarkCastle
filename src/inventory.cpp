@@ -43,7 +43,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
   {
     if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
     {
-      if (IS_NPC(ch))
+      if (ch->isNonPlayer())
       {
         ch->sendln("You cannot get that item.");
         return;
@@ -72,7 +72,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
   }
 
-  if ((IS_NPC(ch) || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER)) && DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+  if ((ch->isNonPlayer() || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER)) && DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
   {
     ch->sendln("No champion flag for you, two years!");
     return;
@@ -185,7 +185,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     obj_from_char(obj_object);
 
     buffer = QStringLiteral("There was %1 coins.").arg(obj_object->obj_flags.value[0]);
-    if (IS_NPC(ch) || !isSet(ch->player->toggles, Player::PLR_BRIEF))
+    if (ch->isNonPlayer() || !isSet(ch->player->toggles, Player::PLR_BRIEF))
     {
       ch->send(buffer);
       ch->sendln("");
@@ -198,7 +198,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
-      if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+      if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer += QStringLiteral("Bounty: %2").arg(cgold);
@@ -219,7 +219,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       obj_object->obj_flags.value[0] -= cgold;
       ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
-      if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+      if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer += QStringLiteral("ClanTax: %2").arg(cgold);
@@ -235,7 +235,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     // If a mob gets gold, we disable its ability to receive a gold bonus. This keeps
     // the mob from turning into an interest bearing savings account. :)
-    if (IS_NPC(ch))
+    if (ch->isNonPlayer())
     {
       SETBIT(ch->mobdata->actflags, ACT_NO_GOLD_BONUS);
     }
@@ -249,7 +249,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       buffer += QStringLiteral("\r\n");
     }
 
-    if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+    if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       ch->send(buffer);
     extract_obj(obj_object);
   }
@@ -992,7 +992,7 @@ int do_consent(Character *ch, char *arg, cmd_t cmd)
   }
 
   // prevent consenting of NPCs
-  if (IS_NPC(vict))
+  if (vict->isNonPlayer())
   {
     ch->sendln("Now what business would THAT thing have with your mortal remains?");
     return ReturnValue::eFAILURE;
@@ -1082,7 +1082,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
 
   if (is_number(arg))
   {
-    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+    if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return ReturnValue::eFAILURE;
@@ -1136,7 +1136,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
         if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
           continue;
 
-        if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+        if (!ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return ReturnValue::eFAILURE;
@@ -1202,7 +1202,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
       if (tmp_object)
       {
 
-        if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+        if (!ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return ReturnValue::eFAILURE;
@@ -1573,7 +1573,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_NPC(this) && isPlayerGoldThief())
+    if (!this->isNonPlayer() && isPlayerGoldThief())
     {
       sendln("Your criminal acts prohibit it.");
       return ReturnValue::eFAILURE;
@@ -1630,7 +1630,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
     removeGold(amount);
 
-    if (IS_NPC(this) && (!IS_AFFECTED(this, AFF_CHARM) || getLevel() > 50))
+    if (this->isNonPlayer() && (!IS_AFFECTED(this, AFF_CHARM) || getLevel() > 50))
     {
       special_log(QString(QStringLiteral("%1 (mob) giving %2 gold to %3 in room %4.")).arg(getName()).arg(amount).arg(vict->getName()).arg(in_room));
     }
@@ -1648,7 +1648,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
     // If a mob is given gold, we disable its ability to receive a gold bonus. This keeps
     // the mob from turning into an interest bearing savings account. :)
-    if (IS_NPC(vict))
+    if (vict->isNonPlayer())
     {
       SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
     }
@@ -1729,7 +1729,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!IS_NPC(this) && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!this->isNonPlayer() && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     sendln("Your criminal acts prohibit it.");
     return ReturnValue::eFAILURE;
@@ -1780,18 +1780,18 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == QUEST_MASTER))
+  if (vict->isNonPlayer() && (DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == QUEST_MASTER))
   {
     act("$N graciously refuses your gift.", this, 0, vict, TO_CHAR, 0);
     return ReturnValue::eFAILURE;
   }
-  if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM) && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
+  if (vict->isNonPlayer() && IS_AFFECTED(vict, AFF_CHARM) && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
   {
     sendln("The creature doesn't understand what you're trying to do.");
     return ReturnValue::eFAILURE;
   }
 
-  if (!IS_NPC(this) && isPlayerObjectThief() && !vict->desc)
+  if (!this->isNonPlayer() && isPlayerObjectThief() && !vict->desc)
   {
     sendln("Now WHY would a thief give something to a linkdead char..?");
     return ReturnValue::eFAILURE;
@@ -1887,7 +1887,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   retval = mprog_give_trigger(vict, this, obj);
   bool objExists(Object * obj);
-  if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) &&
+  if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && vict->isNonPlayer() &&
       objExists(obj))
     extract_obj(obj);
 
@@ -2264,7 +2264,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
         for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
         {
           next_vict = victim->next_in_room;
-          if (IS_NPC(victim) || IS_AFFECTED(victim, AFF_FLYING))
+          if (victim->isNonPlayer() || IS_AFFECTED(victim, AFF_FLYING))
             continue;
           if (!success)
           {
@@ -2607,7 +2607,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
   if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
   {
-    if (IS_NPC(ch) || ch->getLevel() <= 5)
+    if (ch->isNonPlayer() || ch->getLevel() <= 5)
       return ReturnValue::eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
 

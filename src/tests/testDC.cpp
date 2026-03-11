@@ -234,7 +234,7 @@ private slots:
     QVERIFY(ch.isPlayer());
     QVERIFY(ch.isMortalPlayer());
     QVERIFY(!ch.isImmortalPlayer());
-    QVERIFY(!ch.isNPC());
+    QVERIFY(!ch.isNonPlayer());
     QVERIFY(!dc.character_list.empty());
 
     do_sing(&ch, str_hsh("'flight of the bumblebee'"));

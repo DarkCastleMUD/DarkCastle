@@ -156,7 +156,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
 
   void gain_exp(Character * ch, int gain);
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(argument, name, buf);
@@ -176,7 +176,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
   {
     ch->sendln("NO! Not on NPC's.");
     return ReturnValue::eFAILURE;
@@ -348,7 +348,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   class Connection *point;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   for (i = 0; *(argument + i) == ' '; i++)
@@ -373,7 +373,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   extern int do_not_save_corpses;
   char **new_argv = 0;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!has_skill(COMMAND_SHUTDOWN))
@@ -417,7 +417,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
         std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
-          if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
+          if (follower->isNonPlayer() && IS_AFFECTED(follower, AFF_CHARM))
           {
             if (follower->carrying != nullptr)
             {
@@ -489,7 +489,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
         std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
-          if (IS_NPC(follower))
+          if (follower->isNonPlayer())
           {
             if (IS_AFFECTED(follower, AFF_CHARM))
             {
@@ -532,7 +532,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTPORT))
+  if (ch->isNonPlayer() || !ch->has_skill(COMMAND_TESTPORT))
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
@@ -588,7 +588,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTUSER))
+  if (ch->isNonPlayer() || !ch->has_skill(COMMAND_TESTUSER))
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;

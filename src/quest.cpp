@@ -755,7 +755,7 @@ void quest_update()
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)
   {
-    if (!i->desc || IS_NPC(i))
+    if (!i->desc || i->isNonPlayer())
       continue;
 
     for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
@@ -926,7 +926,7 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
   if (IS_AFFECTED(ch, AFF_BLIND))
     return ReturnValue::eFAILURE;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::LIST)
@@ -1208,7 +1208,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
+      if (!(vict = get_char_vis(ch, field)) || vict->isNonPlayer())
       {
         ch->sendln("No living thing by that name.");
         return ReturnValue::eFAILURE;
@@ -1228,7 +1228,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
+      if (!(vict = get_char_vis(ch, field)) || vict->isNonPlayer())
       {
         ch->sendln("No living thing by that name.");
         return ReturnValue::eFAILURE;
@@ -1256,7 +1256,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
+      if (!(vict = get_char_vis(ch, field)) || vict->isNonPlayer())
       {
         ch->sendln("No living thing by that name.");
         return ReturnValue::eFAILURE;
@@ -1476,7 +1476,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }

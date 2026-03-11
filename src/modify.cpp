@@ -167,7 +167,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
   class Object *obj;
   struct extra_descr_data *ed, *tmp;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return 1;
 
   quad_arg(arg, &type, name, &field, string);
@@ -215,7 +215,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
       logentry(QStringLiteral("do_string: broken"));
       /*
       TODO
-      if (IS_NPC(mob))
+      if (mob->isNonPlayer())
               ch->desc->hashstr = mob->getNameCPtr();
       else
               ch->desc->strnew = mob->getNameCPtr();
@@ -232,7 +232,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
       }
       sprintf(message, "%s just restrung short on %s", GET_NAME(ch), GET_NAME(mob));
       logentry(message, IMPLEMENTER, DC::LogChannel::LOG_GOD);
-      if (IS_NPC(mob))
+      if (mob->isNonPlayer())
         ch->desc->hashstr = &mob->short_desc;
       else
         ch->desc->strnew = &mob->short_desc;
@@ -246,13 +246,13 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
       ch->desc->hashstr = &mob->long_desc;
       break;
     case 4:
-      if (IS_NPC(mob))
+      if (mob->isNonPlayer())
         ch->desc->hashstr = &mob->description;
       else
         ch->desc->strnew = &mob->description;
       break;
     case 5:
-      if (IS_NPC(mob))
+      if (mob->isNonPlayer())
       {
         ch->sendln("Monsters have no titles.");
         return 1;

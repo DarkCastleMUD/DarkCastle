@@ -856,7 +856,7 @@ struct time_info_data Character::age(void)
   struct time_info_data player_age;
 
   // TODO - make this return some sensible value for mobs
-  if (isNPC())
+  if (isNonPlayer())
   {
     player_age.year = 5;
     return player_age;
@@ -999,7 +999,7 @@ void util_unarchive(char *char_name, Character *caller)
 bool ARE_CLANNED(Character *sub, Character *obj)
 {
   if (IS_PC(sub) &&
-      IS_NPC(obj) &&
+      obj->isNonPlayer() &&
       obj->master &&
       ARE_CLANNED(sub, obj->master) &&
       (IS_AFFECTED(obj, AFF_CHARM) || IS_AFFECTED(obj, AFF_FAMILIAR)))
@@ -1061,7 +1061,7 @@ bool ARE_GROUPED(Character *sub, Character *obj)
     return false;
 
   if (IS_PC(sub) &&
-      IS_NPC(obj) &&
+      obj->isNonPlayer() &&
       obj->master &&
       ARE_GROUPED(sub, obj->master) &&
       (IS_AFFECTED(obj, AFF_CHARM) || IS_AFFECTED(obj, AFF_FAMILIAR)))
@@ -1119,7 +1119,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     return false;
   }
 
-  if (!IS_NPC(obj))
+  if (!obj->isNonPlayer())
   {
     if (!obj->player) // noncreated char
       return true;
@@ -1140,7 +1140,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
   if (sub && IS_PC(sub) && sub->player && sub->player->holyLite)
     return true;
 
-  if (!noprog && IS_NPC(obj))
+  if (!noprog && obj->isNonPlayer())
   {
     int prog = sub->mprog_can_see_trigger(obj);
     if (isSet(prog, ReturnValue::eEXTRA_VALUE))
@@ -1208,7 +1208,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   int skill = 0;
   struct affected_type *cur_af;
 
-  if (!IS_NPC(sub) && sub->player->holyLite)
+  if (!sub->isNonPlayer() && sub->player->holyLite)
     return true;
 
   int prog = sub->oprog_can_see_trigger(obj);
@@ -1370,7 +1370,7 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
   FILE *fl;
   char str[MAX_STRING_LENGTH];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Monsters can't have ideas - Go away.");
     return ReturnValue::eFAILURE;
@@ -1405,7 +1405,7 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
   FILE *fl;
   char str[MAX_STRING_LENGTH];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Monsters can't spell - leave me alone.");
     return ReturnValue::eFAILURE;
@@ -1441,7 +1441,7 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
   FILE *fl;
   char str[MAX_STRING_LENGTH];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("You are a monster! Bug off!");
     return ReturnValue::eFAILURE;
@@ -1564,7 +1564,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     location = real_room(GET_HOME(this));
   }
@@ -1673,7 +1673,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
       stop_fighting(loop_ch);
 
   act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  is_mob = IS_NPC(victim);
+  is_mob = victim->isNonPlayer();
   retval = move_char(victim, location);
 
   if (!is_mob && !isSet(retval, ReturnValue::eCH_DIED))
@@ -1711,7 +1711,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
@@ -1806,7 +1806,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   for (fol = ch->followers; fol; fol = fol_next)
   {
     fol_next = fol->next;
-    if (IS_NPC(fol->follower) &&
+    if (fol->follower->isNonPlayer() &&
         DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       release_message(fol->follower);
@@ -1897,7 +1897,7 @@ command_return_t Character::save(cmd_t cmd)
   // 9 = save with a round of lag
   // -pir 3/15/1999
 
-  if (IS_NPC(this) || level_ > IMPLEMENTER)
+  if (this->isNonPlayer() || level_ > IMPLEMENTER)
     return ReturnValue::eFAILURE;
 
   if (cmd != cmd_t::SAVE_SILENTLY)
@@ -2361,7 +2361,7 @@ bool is_in_game(Character *ch)
   }
 
   // ch is a mob
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     return false;
   }
@@ -2562,7 +2562,7 @@ bool check_make_camp(int room)
 
     if (i->fighting)
       return false;
-    if (IS_NPC(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR))
+    if (i->isNonPlayer() && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR))
       return false;
     if (i->affected_by_spell(SKILL_MAKE_CAMP) && i->affected_by_spell(SKILL_MAKE_CAMP)->modifier == room)
       campok = true;
@@ -2582,7 +2582,7 @@ int get_leadership_bonus(Character *ch)
   else
     leader = ch;
 
-  if (IS_NPC(ch) || ch->in_room != leader->in_room)
+  if (ch->isNonPlayer() || ch->in_room != leader->in_room)
     return 0;
   if (!leader->affected_by_spell(SKILL_LEADERSHIP))
     return 0;
@@ -2602,7 +2602,7 @@ int get_leadership_bonus(Character *ch)
   {
     next_f = f->next;
 
-    if (IS_NPC(f->follower))
+    if (f->follower->isNonPlayer())
       continue;
     if (leader->in_room != f->follower->in_room)
       continue;
@@ -3278,13 +3278,13 @@ void WAIT_STATE(Character *ch, int cycle)
     if (ch->desc->wait < cycle)
       ch->desc->wait = cycle;
   }
-  else if (ch->isNPC())
+  else if (ch->isNonPlayer())
     ch->deaths = cycle;
 }
 
 int GET_WAIT(Character *ch)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ch->deaths;
 
   if (ch->desc)

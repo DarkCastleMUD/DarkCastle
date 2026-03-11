@@ -96,7 +96,7 @@ int do_thunder(Character *ch, char *argument, cmd_t cmd)
 
 int do_incognito(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (ch->player->incognito == true)
@@ -132,7 +132,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       "object",
   };
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!ch->has_skill(COMMAND_LOAD) && cmd == cmd_t::DEFAULT)
@@ -333,7 +333,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
 
   char name[100], buf[300];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, name);
@@ -378,7 +378,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
   }
   else
   { /* no argument. clean out the room */
-    if (IS_NPC(ch))
+    if (ch->isNonPlayer())
     {
       ch->sendln("Don't... You would kill yourself too.");
       return ReturnValue::eFAILURE;
@@ -393,7 +393,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
     for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_v)
     {
       next_v = vict->next_in_room;
-      if (IS_NPC(vict))
+      if (vict->isNonPlayer())
         extract_char(vict, true);
     }
 
@@ -1784,7 +1784,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 
 command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
 {
-  if (IS_NPC(ch) || ch == nullptr)
+  if (ch->isNonPlayer() || ch == nullptr)
   {
     return ReturnValue::eFAILURE;
   }
@@ -1860,7 +1860,7 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
   int target;
   int loop;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(argument, person, room);
@@ -1956,7 +1956,7 @@ int do_gtrans(Character *ch, char *argument, cmd_t cmd)
   int target;
   struct follow_type *k, *next_dude;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, buf);
@@ -2124,7 +2124,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
   int num = -1, vnum = -1, i = -1, a = -1;
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   if (isdigit(*arg))
   {

@@ -153,7 +153,7 @@ void save_golem_data(Character *ch)
   char file[200];
   FILE *fpfile = nullptr;
   int golemtype = 0;
-  if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
+  if (ch->isNonPlayer() || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
   golemtype = !IS_AFFECTED(ch->player->golem, AFF_GOLEM); // 0 or 1
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
@@ -177,7 +177,7 @@ void save_charmie_data(Character *ch)
   char file[200];
   FILE *fpfile = nullptr;
 
-  if (IS_NPC(ch) || ch->followers == nullptr)
+  if (ch->isNonPlayer() || ch->followers == nullptr)
   {
     return;
   }
@@ -261,7 +261,7 @@ void Character::load_golem_data(int golemtype)
   char file[200];
   FILE *fpfile = nullptr;
   Character *golem;
-  if (IS_NPC(this) || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
+  if (this->isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
@@ -301,7 +301,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   int i;
   char buf[MAX_INPUT_LENGTH];
   arg = one_argument(arg, buf);
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   if (ch->player->golem)
   {
@@ -355,7 +355,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   int level = 0;
   int to_dam, to_hit;
   Character *master = ch;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::GOLEMSCORE)
@@ -636,7 +636,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);

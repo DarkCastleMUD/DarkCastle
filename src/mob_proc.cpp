@@ -65,7 +65,7 @@ int call_for_help_in_room(Character *ch, int iFriendId)
   // Any friends in the room?  Call for help!   int friends = 0;
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_NPC(ally))
+    if (!ally->isNonPlayer())
       continue;
     if (ally == ch)
       continue;
@@ -110,7 +110,7 @@ int protect(Character *ch, int iFriendId)
   // Any one I need to protect in the room?
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_NPC(ally))
+    if (!ally->isNonPlayer())
       continue;
     if (!ally->fighting) // if they arne't fighting, they're safe
       continue;
@@ -198,7 +198,7 @@ void damage_all_players_in_room(Character *ch, int damage)
     // we need this here in case fight_kill moves our victim
     next_vict = vict->next_in_room;
 
-    if (IS_NPC(vict))
+    if (vict->isNonPlayer())
       continue;
     if (ch == vict)
       continue;
@@ -227,7 +227,7 @@ void summon_all_of_mob_to_room(Character *ch, int iFriendId)
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &victim : character_list)
   {
-    if (!IS_NPC(victim))
+    if (!victim->isNonPlayer())
       continue;
     if (real_mobile(iFriendId) == victim->mobdata->nr)
     {
@@ -250,7 +250,7 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
   // Is my friend in the room?
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_NPC(ally))
+    if (!ally->isNonPlayer())
       continue;
     if (real_mobile(iFriendId) == ally->mobdata->nr)
       return ally;
@@ -653,7 +653,7 @@ int backstabber(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           return ReturnValue::eFAILURE;
 
-        if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+        if (!tch->isNonPlayer() && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -1004,7 +1004,7 @@ int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   // 1 = north, 4  = west, 6 = down
 
   // If the mob is of type MOB_CLAN_GUARD then we look at v1-v4 to know how to guard
-  if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+  if (owner->isNonPlayer() && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
   {
     guard_room = owner->mobdata->mob_flags.value[0];
     guard_direction = owner->mobdata->mob_flags.value[1];
@@ -1041,7 +1041,7 @@ int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
 
   int clan_num = ch->clan;
-  if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
+  if (ch->isNonPlayer() && IS_AFFECTED(ch, AFF_CHARM))
   {
     int b = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     switch (b)
@@ -1069,7 +1069,7 @@ int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
   }
 
-  if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+  if (owner->isNonPlayer() && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
   {
     if (clan_num != guard_clan && in_room == real_room(guard_room))
     {
@@ -2012,7 +2012,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, cmd_t cmd, const char
   for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
-    if ((IS_NPC(tmp_victim) || IS_NPC(ch)) && (tmp_victim != ch))
+    if ((tmp_victim->isNonPlayer() || ch->isNonPlayer()) && (tmp_victim != ch))
     {
       tmp_victim->sendln("You choke and gag as noxious gases fill the air.");
       dam = dice(ch->getLevel(), 8);
@@ -2301,7 +2301,7 @@ int newbie_zone_guard(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (!isCommandTypeDirection(cmd))
     return ReturnValue::eFAILURE;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if ((ch->getLevel() > 10                                      /* mud school */
@@ -2410,7 +2410,7 @@ int humaneater(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           continue;
 
-        if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+        if (!tch->isNonPlayer() && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -3183,7 +3183,7 @@ int hiryushi_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     act("$n leaps back and readies a wand...", ch, 0, 0, TO_ROOM, INVIS_NULL);
     for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
     {
-      if (IS_NPC(victim))
+      if (victim->isNonPlayer())
         continue;
       act("$n points a wand at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
       return cast_drown(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, victim, 0, ch->getLevel());
@@ -3323,7 +3323,7 @@ int mage_golem(Character *ch, class Object *obj, cmd_t cmd,
   if (cmd != cmd_t::UNDEFINED || !ch->master || ch->fighting || ch->in_room != ch->master->in_room)
     return ReturnValue::eFAILURE;
 
-  if (ch->master->fighting && IS_NPC(ch->master->fighting))
+  if (ch->master->fighting && ch->master->fighting->isNonPlayer())
     ch->do_join(ch->master->getName().split(' '));
 
   return ReturnValue::eFAILURE;

@@ -173,7 +173,7 @@ char *handle_ansi_(char *s, Character *ch)
     }
     else
     {
-      if (IS_NPC(ch) || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
+      if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
       {
         switch (*++sp)
         {

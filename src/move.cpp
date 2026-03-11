@@ -143,7 +143,7 @@ void record_track_data(Character *ch, cmd_t cmd)
 //{
 //   short chance = number(0,30);
 //
-//   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || ch->isImmortalPlayer() || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
+//   if(ch->isNonPlayer() || IS_AFFECTED(ch, AFF_FLYING) || ch->isImmortalPlayer() || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
 //     ; //poop on a stick!
 //   } else if(GET_DEX(ch) > chance) {
 //      act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
@@ -159,7 +159,7 @@ int do_unstable(Character *ch)
   char death_log[MAX_STRING_LENGTH];
   int retval;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   short chance = number(0, 30);
@@ -218,7 +218,7 @@ int do_fall(Character *ch, short dir)
   }
 
   // Don't effect mobs
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     act("$n clings to the terrain around $m and avoids falling.", ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eFAILURE;
@@ -621,7 +621,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   }
 
   // if I'm STAY_NO_TOWN, don't enter a Zone::Flag::IS_TOWN zone no matter what
-  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].zone).isTown())
+  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].zone).isTown())
     return ReturnValue::eFAILURE;
 
   int a = 0;
@@ -729,12 +729,12 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   if (ch->fighting)
   {
     Character *chaser = ch->fighting;
-    if (IS_NPC(ch))
+    if (ch->isNonPlayer())
     {
       ch->add_memory(GET_NAME(chaser), 'f');
       remove_memory(ch, 'h');
     }
-    if (IS_NPC(chaser) && chaser->hunting.isEmpty())
+    if (chaser->isNonPlayer() && chaser->hunting.isEmpty())
     {
       level_diff_t level_difference = ch->getLevel() - chaser->getLevel() / 2;
       if (level_difference >= 0 || ch->getLevel() >= 50)
@@ -753,7 +753,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
       stop_fighting(chaser);
     stop_fighting(ch);
     // This might be a bad idea...cause track calls move, which calls track, which...
-    if (IS_NPC(chaser))
+    if (chaser->isNonPlayer())
     {
       retval = chaser->do_track(chaser->mobdata->hated.split(' '));
       if (SOMEONE_DIED(retval))
@@ -772,7 +772,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   do_look(ch, "\0");
 
   // Elemental stuff goes HERE
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     int a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     // code a bit repeaty, but whatever ;)
@@ -987,7 +987,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
             k->follower->sendln("Your legs are too tired for running away!");
           continue; // keep going through the groupies
         }
-        if (is_retreat && k->follower->fighting && (number(1, 100) < 4) && IS_NPC(k->follower->fighting))
+        if (is_retreat && k->follower->fighting && (number(1, 100) < 4) && k->follower->fighting->isNonPlayer())
         {
 
           act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, nullptr, k->follower, TO_VICT, 0);
@@ -1128,7 +1128,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch) && ch->master && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && ch->master && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
   {
     sesame = ch->master;
     if (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
@@ -1163,7 +1163,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!IS_NPC(ch) && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+  if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
   {
     ch->sendln("The portal's destination rebels against you.");
     act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
@@ -1337,7 +1337,7 @@ int ambush(Character *ch)
         (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) &&
          !IS_AFFECTED(ch, AFF_CANTQUIT)))
       continue;
-    if (!IS_NPC(i) && !i->desc) // don't work if I'm linkdead
+    if (!i->isNonPlayer() && !i->desc) // don't work if I'm linkdead
       continue;
     if (isexact(i->ambush, GET_NAME(ch)))
     {
@@ -1366,7 +1366,7 @@ int ambush(Character *ch)
           return (ReturnValue::eSUCCESS | ReturnValue::eCH_DIED); // ch = damage vict
         if (isSet(retval, ReturnValue::eCH_DIED))
           return (ReturnValue::eSUCCESS); // doesn't matter, but don't lag vict
-        if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_WIMPY))
+        if (!i->isNonPlayer() && isSet(i->player->toggles, Player::PLR_WIMPY))
           WAIT_STATE(i, DC::PULSE_VIOLENCE * 3);
         else
           WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);

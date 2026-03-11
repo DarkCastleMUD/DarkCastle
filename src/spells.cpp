@@ -1072,7 +1072,7 @@ void extractFamiliar(Character *ch)
 {
   Character *victim = nullptr;
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
+    if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
       break;
@@ -1692,7 +1692,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   }
   int i = 0, learned = 0;
 
-  if (!isNPC())
+  if (!isNonPlayer())
   {
     i = learned = has_skill(skillnum);
     if (affected_by_spell(SKILL_DEFENDERS_STANCE) && skillnum == SKILL_DODGE)
@@ -1742,7 +1742,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
 
   int a = get_difficulty(skillnum);
   /*  int o = ch->getLevel()*2+1;
-    if (o > 101 || IS_NPC(ch)) o = 101;
+    if (o > 101 || ch->isNonPlayer()) o = 101;
     if (i > o) o = i+1;
   */
 
@@ -1804,11 +1804,11 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   int qend, spl, i, learned;
   bool target_ok;
 
-  //  if (IS_NPC(ch))
+  //  if (ch->isNonPlayer())
   //    return ReturnValue::eFAILURE;
   // Need to allow mob_progs to use cast without allowing charmies to
 
-  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
+  if (ch->isNonPlayer() && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
   {
     ch->sendln("You cannot cast in this form.");
     return ReturnValue::eFAILURE;
@@ -1941,7 +1941,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      if (!IS_NPC(ch))
+      if (!ch->isNonPlayer())
       {
         if (!(learned = ch->has_skill(spl)))
         {
@@ -2045,7 +2045,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             return ReturnValue::eFAILURE;
           }
 
-          if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
+          if (tar_char->isNonPlayer() && DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
               DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() <= 2399)
           {
             char_from_room(ch);
@@ -2333,7 +2333,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         }
       }
 
-      if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch))
+      if (ch->getLevel() < ARCHANGEL && !ch->isNonPlayer())
       {
         if (GET_MANA(ch) < use_mana(ch, spl) * rel)
         {
@@ -2387,7 +2387,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
       {
         int chance = 50;
 
-        if (IS_NPC(ch))
+        if (ch->isNonPlayer())
         {
           learned = ch->getLevel();
         }
@@ -2703,7 +2703,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   int mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
@@ -2923,7 +2923,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
@@ -2952,7 +2952,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   int mage, cleric, anti, pal, ranger, druid;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
@@ -3093,7 +3093,7 @@ int Character::has_skill(skill_t skill)
   class Object *o;
   int bonus = 0;
 
-  if (isNPC() || !isPlayer())
+  if (isNonPlayer() || !isPlayer())
     return 0;
 
   if (affected_by_spell(SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)

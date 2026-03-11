@@ -942,7 +942,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       }
       else
       {
-        if (IS_NPC(target))
+        if (target->isNonPlayer())
           sbval = reinterpret_cast<decltype(sbval)>(target->getLevelPtr());
         else
           sbval = reinterpret_cast<decltype(sbval)>(target->getLevelPtr());
@@ -1770,7 +1770,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     count = std::count_if(character_list.begin(), character_list.end(),
                           [&target](Character *vch)
                           {
-                            if (IS_NPC(vch) && vch->in_room != DC::NOWHERE && DC::getInstance()->mob_index[vch->mobdata->nr].vnum() == target)
+                            if (vch->isNonPlayer() && vch->in_room != DC::NOWHERE && DC::getInstance()->mob_index[vch->mobdata->nr].vnum() == target)
                             {
                               return true;
                             }
@@ -1807,7 +1807,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     Character *p;
     int count = 0;
     for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
-      if (IS_NPC(p) && DC::getInstance()->mob_index[p->mobdata->nr].vnum() == target)
+      if (p->isNonPlayer() && DC::getInstance()->mob_index[p->mobdata->nr].vnum() == target)
         count++;
 
     return mprog_veval(count, opr, atoi(val));
@@ -1825,7 +1825,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return 0;
     case 'z':
       if (mob->beacon)
-        return IS_NPC(reinterpret_cast<Character *>(mob->beacon));
+        return reinterpret_cast<Character *>(mob->beacon)->isNonPlayer();
       else
         return -1;
     case 'n':
@@ -1983,7 +1983,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eISNPC:
     if (fvict)
-      return IS_NPC(fvict);
+      return fvict->isNonPlayer();
     if (ye)
       return false;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
@@ -1992,23 +1992,23 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return true;
     case 'z':
       if (mob->beacon)
-        return IS_NPC(((Character *)mob->beacon));
+        return ((Character *)mob->beacon)->isNonPlayer();
       else
         return false;
 
     case 'n':
       if (actor)
-        return IS_NPC(actor);
+        return actor->isNonPlayer();
       else
         return false;
     case 't':
       if (vict)
-        return IS_NPC(vict);
+        return vict->isNonPlayer();
       else
         return false;
     case 'r':
       if (rndm)
-        return IS_NPC(rndm);
+        return rndm->isNonPlayer();
       else
         return false;
     default:
@@ -2711,7 +2711,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     case 'z':
       if (mob->beacon)
       {
-        if (IS_NPC(((Character *)mob->beacon)))
+        if (((Character *)mob->beacon)->isNonPlayer())
         {
           lhsvl = DC::getInstance()->mob_index[((Character *)mob->beacon)->mobdata->nr].vnum();
           rhsvl = atoi(val);
@@ -2726,7 +2726,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     case 'n':
       if (actor)
       {
-        if IS_NPC (actor)
+        if (actor->isNonPlayer())
         {
           lhsvl = DC::getInstance()->mob_index[actor->mobdata->nr].vnum();
           rhsvl = atoi(val);
@@ -2738,7 +2738,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     case 't':
       if (vict)
       {
-        if IS_NPC (actor)
+        if (actor->isNonPlayer())
         {
           lhsvl = DC::getInstance()->mob_index[vict->mobdata->nr].vnum();
           rhsvl = atoi(val);
@@ -2750,7 +2750,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     case 'r':
       if (rndm)
       {
-        if IS_NPC (actor)
+        if (actor->isNonPlayer())
         {
           lhsvl = DC::getInstance()->mob_index[rndm->mobdata->nr].vnum();
           rhsvl = atoi(val);
@@ -2856,7 +2856,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
          vch;
          vch = vch->next_in_room)
     {
-      if (IS_NPC(vch) &&
+      if (vch->isNonPlayer() &&
           vch != mob &&
           DC::getInstance()->mob_index[vch->mobdata->nr].vnum() == target)
         return 1;
@@ -3368,7 +3368,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
   case 'N':
     if (actor)
       if (CAN_SEE(mob, actor))
-        if (IS_NPC(actor))
+        if (actor->isNonPlayer())
           strcpy(t, actor->short_desc);
         else
         {
@@ -3397,7 +3397,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
   case 'T':
     if (vict)
       if (CAN_SEE(mob, vict))
-        if (IS_NPC(vict))
+        if (vict->isNonPlayer())
           strcpy(t, vict->short_desc);
         else
         {
@@ -3425,7 +3425,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       if (CAN_SEE(mob, actor->fighting))
       {
-        if (IS_NPC(actor->fighting))
+        if (actor->fighting->isNonPlayer())
           strcpy(t, actor->fighting->short_desc);
         else
         {
@@ -3450,7 +3450,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       if (CAN_SEE(mob, mob->fighting))
       {
-        if (IS_NPC(mob->fighting))
+        if (mob->fighting->isNonPlayer())
           strcpy(t, mob->fighting->short_desc);
         else
         {
@@ -3476,7 +3476,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       if (CAN_SEE(mob, rndm))
       {
-        if (IS_NPC(rndm))
+        if (rndm->isNonPlayer())
         {
           strcpy(t, rndm->short_desc);
         }
@@ -4157,7 +4157,7 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
   if (!MOBtrigger)
     return mprog_cur_result;
 
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ACT_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ACT_PROG) && isPaused(mob) == false)
     mprog_wordlist_check(buf.c_str(), mob, ch,
                          obj, vo, ACT_PROG);
 
@@ -4201,7 +4201,7 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
   Object *obj = 0;
   bool done = false;
 
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG) && isPaused(mob) == false)
   {
     mob->removeGold(amount);
 
@@ -4244,7 +4244,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
   mob_prog_data *next = 0;
   Object *obj = 0;
   bool done = false;
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
   {
     mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
 
@@ -4281,7 +4281,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
 int mprog_death_trigger(Character *mob, Character *killer)
 {
 
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DEATH_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DEATH_PROG) && isPaused(mob) == false)
   {
     mprog_percent_check(mob, killer, nullptr, nullptr, DEATH_PROG);
   }
@@ -4293,7 +4293,7 @@ int mprog_death_trigger(Character *mob, Character *killer)
 int mprog_entry_trigger(Character *mob)
 {
 
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob, nullptr, nullptr, nullptr, ENTRY_PROG);
 
   return mprog_cur_result;
@@ -4302,7 +4302,7 @@ int mprog_entry_trigger(Character *mob)
 int mprog_fight_trigger(Character *mob, Character *ch)
 {
 
-  if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob, ch, nullptr, nullptr, FIGHT_PROG);
 
   return mprog_cur_result;
@@ -4311,7 +4311,7 @@ int mprog_fight_trigger(Character *mob, Character *ch)
 int mprog_attack_trigger(Character *mob, Character *ch)
 {
 
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob, ch, nullptr, nullptr, ATTACK_PROG);
 
   return mprog_cur_result;
@@ -4324,7 +4324,7 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
   mob_prog_data *mprg{};
   mob_prog_data *next{};
   bool done = false, okay = false;
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
   {
     mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
     if (!mprg)
@@ -4375,7 +4375,7 @@ int Character::mprog_greet_trigger(void)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
   for (auto vmob = dc_->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
-    if (IS_NPC(vmob) && (vmob->fighting == nullptr) && AWAKE(vmob))
+    if (vmob->isNonPlayer() && (vmob->fighting == nullptr) && AWAKE(vmob))
     {
       if (this != vmob && CAN_SEE(vmob, this) && (dc_->mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
         mprog_percent_check(vmob, this, nullptr, nullptr, GREET_PROG);
@@ -4394,7 +4394,7 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
   mob_prog_data *next{};
   bool done = false;
 
-  if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
   {
     mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
     if (!mprg)
@@ -4494,7 +4494,7 @@ int Character::mprog_speech_trigger(const char *txt)
   mprog_cur_result = ReturnValue::eSUCCESS;
 
   for (vmob = DC::getInstance()->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
-    if (IS_NPC(vmob) && (DC::getInstance()->mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
+    if (vmob->isNonPlayer() && (DC::getInstance()->mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
     {
       if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
         break;
@@ -4516,7 +4516,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
   bool done = false;
   mprog_cur_result = ReturnValue::eFAILURE;
 
-  if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & CATCH_PROG) && isPaused(mob) == false)
+  if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & CATCH_PROG) && isPaused(mob) == false)
   {
     mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
     if (!mprg || (opt & 1))

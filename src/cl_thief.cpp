@@ -35,7 +35,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
   char name[256];
   int level = ch->has_skill(SKILL_EYEGOUGE);
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     level = 50 + ch->getLevel() / 2;
 
   argument = one_argument(argument, name);
@@ -119,7 +119,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   QString name = arguments.value(0);
 
-  if (!has_skill(SKILL_BACKSTAB) && !IS_NPC(this))
+  if (!has_skill(SKILL_BACKSTAB) && !this->isNonPlayer())
   {
     this->sendln("You don't know how to backstab people!");
     return ReturnValue::eFAILURE;
@@ -137,19 +137,19 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     this->sendln("You cannot backstab someone that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     this->sendln("You cannot target just one to backstab!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     this->sendln("You cannot target someone that tiny to backstab!");
     return ReturnValue::eFAILURE;
@@ -192,7 +192,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   }
 
   // Check the killer/victim
-  if ((this->getLevel() < G_POWER) || IS_NPC(this))
+  if ((this->getLevel() < G_POWER) || this->isNonPlayer())
   {
     if (!can_attack(this) || !can_be_attacked(this, victim))
       return ReturnValue::eFAILURE;
@@ -221,9 +221,9 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[WEAR_SECOND_WIELD]) && ((this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
+  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (this->isNonPlayer() && this->getLevel() > 70)) && (this->equipment[WEAR_SECOND_WIELD]) && ((this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
-    if (skill_success(victim, SKILL_DUAL_BACKSTAB) || IS_NPC(this))
+    if (skill_success(victim, SKILL_DUAL_BACKSTAB) || this->isNonPlayer())
     {
       perform_dual_backstab = true;
     }
@@ -359,21 +359,21 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot circle behind someone that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot pick just one to circle behind!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot target something that tiny to circle behind!");
@@ -401,7 +401,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
   }
 
   // Check the killer/victim
-  if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
+  if ((ch->getLevel() < G_POWER) || ch->isNonPlayer())
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return ReturnValue::eFAILURE;
@@ -841,7 +841,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
@@ -912,7 +912,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       ch->send("You must earn that flag, no stealing allowed!");
       return ReturnValue::eFAILURE;
     }
-    if (IS_NPC(victim) && isexact("prize", obj->Name()))
+    if (victim->isNonPlayer() && isexact("prize", obj->Name()))
     {
       ch->sendln("You have to HUNT the targets...its not a Treasture Steal!");
       return ReturnValue::eFAILURE;
@@ -1176,7 +1176,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, victim->getNameC());
         logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
-        if (!IS_NPC(victim))
+        if (!victim->isNonPlayer())
         {
           victim->save(cmd_t::SAVE_SILENTLY);
           ch->save(cmd_t::SAVE_SILENTLY);
@@ -1243,7 +1243,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
     }
   } // of else, not in inventory
 
-  if (ohoh && IS_NPC(victim) && AWAKE(victim) && ch->getLevel() < ANGEL)
+  if (ohoh && victim->isNonPlayer() && AWAKE(victim) && ch->getLevel() < ANGEL)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
@@ -1389,7 +1389,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
       _exp = gold / 100 * victim->getLevel() / 5;
       if (IS_PC(victim))
         _exp = 0;
-      if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
+      if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
         _exp = 1;
       if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = 0;
@@ -1427,7 +1427,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  if (ohoh && IS_NPC(victim) && AWAKE(victim) && ch->getLevel() < ANGEL)
+  if (ohoh && victim->isNonPlayer() && AWAKE(victim) && ch->getLevel() < ANGEL)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
@@ -1604,7 +1604,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
   extern int weight_in(Object *);
 
-  if (!IS_NPC(ch) && ch->isPlayerObjectThief())
+  if (!ch->isNonPlayer() && ch->isPlayerObjectThief())
   {
     ch->sendln("Your criminal acts prohibit this action.");
     return ReturnValue::eFAILURE;
@@ -1618,7 +1618,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
+    if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit this action.");
       return ReturnValue::eFAILURE;
@@ -1684,7 +1684,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
           "them.\r\n",
           ch, 0, vict, TO_ROOM, NOTVICT);
 
-      if (IS_NPC(ch) || (ch->getLevel() < DEITY))
+      if (ch->isNonPlayer() || (ch->getLevel() < DEITY))
         ch->removeGold(amount);
 
       tmp_object = create_money(amount);
@@ -1711,14 +1711,14 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
               GET_NAME(vict));
       logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
-      if (IS_NPC(ch) || (ch->getLevel() < DEITY))
+      if (ch->isNonPlayer() || (ch->getLevel() < DEITY))
         ch->removeGold(amount);
 
       vict->addGold(amount);
 
       // If a mob is given gold, we disable its ability to receive a gold bonus. This keeps
       // the mob from turning into an interest bearing savings account. :)
-      if (IS_NPC(vict))
+      if (vict->isNonPlayer())
       {
         SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
       }
@@ -1817,7 +1817,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(vict) && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
+  if (vict->isNonPlayer() && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
   {
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
     return ReturnValue::eFAILURE;
@@ -2093,25 +2093,25 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
+  if (victim->isNonPlayer() && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
   {
     ch->sendln("You cannot jab someone that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
   {
     ch->sendln("You cannot target just one to jab!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
   {
     ch->sendln("You cannot target someone that tiny to jab!");
     return ReturnValue::eFAILURE;
   }
 
-  if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
+  if ((ch->getLevel() < G_POWER) || ch->isNonPlayer())
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return ReturnValue::eFAILURE;
@@ -2363,19 +2363,19 @@ int do_cripple(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
+  if (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
   {
     ch->sendln("You cannot cripple someone that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
+  if (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
   {
     ch->sendln("You cannot pick just one to cripple!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
+  if (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
   {
     ch->sendln("You cannot target someone that tiny to cripple!");
     return ReturnValue::eFAILURE;

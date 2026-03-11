@@ -87,7 +87,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   if (!this->desc)
     return ReturnValue::eFAILURE;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     this->send("Did you ever try this before?");
     return ReturnValue::eFAILURE;
@@ -170,7 +170,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
 int do_stealth(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (argument[0] != '\0')

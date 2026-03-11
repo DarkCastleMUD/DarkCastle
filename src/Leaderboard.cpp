@@ -68,7 +68,7 @@ void Leaderboard::check(void)
 
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
-    if (!d->character || d->character->getLevel() >= IMMORTAL || IS_NPC(d->character))
+    if (!d->character || d->character->getLevel() >= IMMORTAL || d->character->isNonPlayer())
       continue;
     if (!d->connected == Connection::states::PLAYING)
       continue;

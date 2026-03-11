@@ -251,7 +251,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
   FILE *fpfile = nullptr;
 
-  if (IS_NPC(this) || level_ < IMMORTAL)
+  if (this->isNonPlayer() || level_ < IMMORTAL)
   {
     return false;
   }
@@ -677,7 +677,7 @@ bool Character::isPlayer(void) const
   return getType() == Type::Player && player;
 }
 
-bool Character::isNPC(void) const
+bool Character::isNonPlayer(void) const
 {
   return (getType() == Type::NPC || getType() == Type::ObjectProgram) && mobdata;
 }
@@ -1049,7 +1049,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
 QString Character::createPrompt(void)
 {
   QString source{};
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     source = QStringLiteral("HP: %i/%H %f >");
   }

@@ -310,19 +310,19 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     ch->sendln("You cannot stun something that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one of them to stun!");
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, TO_CHAR, 0);
     return ReturnValue::eFAILURE;
@@ -334,7 +334,7 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
   if (!charge_moves(ch, SKILL_STUN))
     return ReturnValue::eSUCCESS;
 
-  if (isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || victim->has_skill(SKILL_BERSERK) > 80))
+  if (isSet(victim->combat, COMBAT_BERSERK) && (victim->isNonPlayer() || victim->has_skill(SKILL_BERSERK) > 80))
   {
     act_return ar = act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
     retval = ar.retval;

@@ -433,7 +433,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     act("$n fails to blast $N!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You fail to blast $N!", ch, 0, vict, TO_CHAR, 0);
     act("$n finds that you are hard to blast!", ch, 0, vict, TO_VICT, 0);
-    if (!vict->fighting && IS_NPC(vict))
+    if (!vict->fighting && vict->isNonPlayer())
       return attack(vict, ch, TYPE_UNDEFINED);
     return ReturnValue::eSUCCESS;
   }
@@ -453,7 +453,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
     if (vict->fighting)
     {
-      if (IS_NPC(vict))
+      if (vict->isNonPlayer())
       {
         vict->add_memory(GET_NAME(ch), 'h');
         remove_memory(vict, 'f');
@@ -479,7 +479,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     int retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
-    if (!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
+    if (!SOMEONE_DIED(retval) && !vict->fighting && vict->isNonPlayer())
       return attack(vict, ch, TYPE_UNDEFINED);
     return retval;
   }
@@ -759,7 +759,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eFAILURE;
   }
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's disrupting energy!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your disrupting energy!", ch, 0, victim, TO_CHAR, 0);
@@ -838,7 +838,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("You resist $n's attempt to disrupt magic!", ch, nullptr, victim, TO_VICT,
         0);
 
-    if (IS_NPC(victim) && (!victim->fighting) &&
+    if (victim->isNonPlayer() && (!victim->fighting) &&
         GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -929,7 +929,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (IS_NPC(victim) && !victim->fighting)
+    if (victim->isNonPlayer() && !victim->fighting)
     {
       retval = attack(victim, ch, 0);
       SWAP_CH_VICT(retval);
@@ -1088,7 +1088,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
   }
 
-  if (IS_NPC(victim) && !victim->fighting)
+  if (victim->isNonPlayer() && !victim->fighting)
   {
     retval = attack(victim, ch, 0);
     SWAP_CH_VICT(retval);
@@ -1135,7 +1135,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   int learned, chance, percent;
   struct affected_type af;
 
-  if (IS_NPC(ch) || ch->getLevel() >= ARCHANGEL)
+  if (ch->isNonPlayer() || ch->getLevel() >= ARCHANGEL)
     learned = 75;
   else if (!(learned = ch->has_skill(KI_AGILITY + KI_OFFSET)))
   {
@@ -1195,7 +1195,7 @@ int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   int gain;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   act("You enter a brief meditative state and focus your ki to heal your injuries.", ch, 0, vict, TO_CHAR, 0);

@@ -58,7 +58,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
   Character *vict = {};
   std::string name = {}, to_force = {}, buf = {};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }
@@ -82,7 +82,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
       ch->sendln("No one by that name here..");
     else
     {
-      if (ch->getLevel() < vict->getLevel() && IS_NPC(vict))
+      if (ch->getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
         ch->sendln("Now doing that would just tick off the IMPS!");
         logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, DC::LogChannel::LOG_GOD);

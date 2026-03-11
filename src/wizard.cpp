@@ -290,12 +290,12 @@ void boro_mob_stat(Character *ch, Character *k)
 
           (IS_PC(k) ? "PC" : "MOB"),
           GET_NAME(k),
-          (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
+          (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
           (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
           /* end of first line */
 
           (k->short_desc ? k->short_desc : "None"),
-          (int32_t)(IS_NPC(k) ? k->mobdata->nr : 0),
+          (int32_t)(k->isNonPlayer() ? k->mobdata->nr : 0),
           /* end of second line */
 
           (k->long_desc ? k->long_desc : "None"),
@@ -313,7 +313,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   ch->send(buf); // this sends to char, now we can overwrite buf
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
     sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
@@ -370,7 +370,7 @@ void boro_mob_stat(Character *ch, Character *k)
           buf2); /* buf is the sex... */
   ch->send(buf); /* THIRD sprintf */
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       strcpy(buf2, "Exists");
@@ -398,7 +398,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   sprinttype(GET_POS(k), Character::position_types, buf2);
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
     sprinttype((k->mobdata->default_pos), Character::position_types, buf3);
   else
     strcpy(buf3, "PC");
@@ -448,7 +448,7 @@ void boro_mob_stat(Character *ch, Character *k)
           "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
   ch->send(buf);
 
-  if (IS_NPC(k)) // AND THIS
+  if (k->isNonPlayer()) // AND THIS
     sprintbit(k->mobdata->actflags, action_bits, buf2);
   else
     strcpy(buf2, "Not a mob");
@@ -483,7 +483,7 @@ void boro_mob_stat(Character *ch, Character *k)
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
   {
     sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs $3Played$R[%d]secs\r\n",
             k->player->time.birth,
@@ -496,7 +496,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
   {
     sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\r\n", k->getGold(),
             k->player->bank);
@@ -515,7 +515,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
   {
     sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
     ch->send(buf);
@@ -562,7 +562,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->sendln("");
   }
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
     display_punishes(ch, k);
 
   if (k->desc)
@@ -589,13 +589,13 @@ command_return_t mob_stat(Character *ch, Character *k)
   class Object *j = 0;
   struct affected_type *aff;
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
-            (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
-            (IS_NPC(k) ? k->mobdata->nr : 0),
+            (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
+            (k->isNonPlayer() ? k->mobdata->nr : 0),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
@@ -645,7 +645,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   ch->send(buf);
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
   {
     sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs  $3Played$R[%d]secs\r\n",
             k->player->time.birth,
@@ -657,7 +657,7 @@ command_return_t mob_stat(Character *ch, Character *k)
             k->age().year, k->age().month, k->age().day, k->age().hours);
     ch->send(buf);
   }
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     QString mobspec_status;
 
@@ -719,7 +719,7 @@ command_return_t mob_stat(Character *ch, Character *k)
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
   {
     sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\r\n",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
@@ -737,7 +737,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   }
   ch->send(buf);
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     strcpy(buf, "$3Default position$R: ");
     strcat(buf, Character::position_to_string(k->mobdata->default_pos).toStdString().c_str());
@@ -747,7 +747,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "  $3Timer$R:[%d] \r\n", k->timer);
   ch->send(buf);
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobdata->actflags[0], k->mobdata->actflags[1]);
     sprintbit(k->mobdata->actflags, action_bits, buf2);
@@ -760,7 +760,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   strcat(buf, buf2);
   ch->send(buf);
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
     strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
@@ -773,7 +773,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n",
             k->mobdata->damnodice, k->mobdata->damsizedice);
@@ -829,7 +829,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Tracking$R: '%s'\r\n", ((k->hunting.isEmpty()) ? "NOBODY" : k->hunting.toStdString().c_str()));
   ch->send(buf);
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     sprintf(buf, "$3Hates$R: '%s'\r\n",
             (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
@@ -851,7 +851,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->combat, combat_bits, buf);
   ch->send(QStringLiteral("$3Combat flags$R: %1\r\n").arg(buf));
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
     display_punishes(ch, k);
 
   sprintbit(k->affected_by, affected_bits, buf);
@@ -866,7 +866,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->resist, isr_bits, buf);
   csendf(ch, "$3Resistant$R: [%d] %s\r\n", k->resist, buf);
 
-  if (!IS_NPC(k))
+  if (!k->isNonPlayer())
   {
     sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
     ch->send(buf);
@@ -930,7 +930,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->sendln("");
   }
 
-  if (IS_NPC(k))
+  if (k->isNonPlayer())
   {
     switch (k->mobdata->mob_flags.type)
     {
@@ -1355,7 +1355,7 @@ void do_start(Character *ch)
 
   ch->sendln("This is now your character in Dark Castle MUD");
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
 
   ch->setLevel(1);
@@ -1469,7 +1469,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
     }
     if (DC::getInstance()->world[tmp_victim->in_room].zone == zone)
     {
-      if (IS_NPC(tmp_victim))
+      if (tmp_victim->isNonPlayer())
       {
         for (int l = 0; l < MAX_WEAR; l++)
         {
@@ -1499,7 +1499,7 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
   for (const auto &i : character_list)
   {
 
-    if (IS_NPC(i) || i->desc || !CAN_SEE(ch, i))
+    if (i->isNonPlayer() || i->desc || !CAN_SEE(ch, i))
       continue;
     x++;
 
@@ -1523,7 +1523,7 @@ int do_echo(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   Character *vict;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   for (i = 0; *(argument + i) == ' '; i++)

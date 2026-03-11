@@ -813,7 +813,7 @@ void DC::game_loop(void)
         new_string_add(d, comm.data());
       else if (d->hashstr)
         string_hash_add(d, comm.data());
-      else if (d->strnew && (IS_NPC(d->character) || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
+      else if (d->strnew && (d->character->isNonPlayer() || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
         new_string_add(d, comm.data());
       else if (d->connected != Connection::states::PLAYING) /* in menus, etc. */
         nanny(d, comm);
@@ -1319,7 +1319,7 @@ int do_prompt(Character *ch, char *arg, cmd_t cmd)
   while (*arg == ' ')
     arg++;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("You're a mob!  You can't set your prompt.");
     return ReturnValue::eFAILURE;
@@ -1478,7 +1478,7 @@ QString Connection::createPrompt(void)
   {
     return {};
   }
-  else if (IS_NPC(character))
+  else if (character->isNonPlayer())
   {
     return character->createPrompt();
   }
@@ -2261,7 +2261,7 @@ int close_socket(class Connection *d)
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
-  if (d->strnew && (IS_NPC(d->character) || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
+  if (d->strnew && (d->character->isNonPlayer() || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
     strcpy(idiotbuf, "/s\r\n");
     strcat(idiotbuf, "\0");
@@ -2338,7 +2338,7 @@ int close_socket(class Connection *d)
     Character * next_i;
     for(Character * i = character_list; i; i = next_i) {
        next_i = i->next;
-       if(IS_NPC(i))
+       if(i->isNonPlayer())
          continue;
        do_quit(i, "", cmd_t::SAVE_SILENTLY);
     }
@@ -2620,7 +2620,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
   int lines = 0;
   QString tmp;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (ch->player->away_msgs.isEmpty())
@@ -2652,7 +2652,7 @@ void check_for_awaymsgs(Character *ch)
   if (!ch)
     return;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
 
   if (ch->player->away_msgs.isEmpty())
@@ -2666,9 +2666,9 @@ void check_for_awaymsgs(Character *ch)
 
 void send_to_char(QString messg, Character *ch)
 {
-  if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.isEmpty())
+  if (ch->isNonPlayer() && !ch->desc && MOBtrigger && !messg.isEmpty())
     mprog_act_trigger(messg.toStdString(), ch, 0, 0, 0);
-  if (IS_NPC(ch) && !ch->desc && !selfpurge && MOBtrigger && !messg.isEmpty())
+  if (ch->isNonPlayer() && !ch->desc && !selfpurge && MOBtrigger && !messg.isEmpty())
     ch->oprog_act_trigger(messg);
 
   if (!selfpurge && (ch->desc && !messg.isEmpty()) && (!is_busy(ch)))
@@ -2714,11 +2714,11 @@ void ansi_color(const char *txt, Character *ch)
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
   {
-    if (!IS_NPC(ch) &&
+    if (!ch->isNonPlayer() &&
         !isSet(GET_TOGGLES(ch), Player::PLR_ANSI) &&
         !isSet(GET_TOGGLES(ch), Player::PLR_VT100))
       return;
-    else if (!IS_NPC(ch) &&
+    else if (!ch->isNonPlayer() &&
              isSet(GET_TOGGLES(ch), Player::PLR_VT100) &&
              !isSet(GET_TOGGLES(ch), Player::PLR_ANSI))
     {
@@ -2909,7 +2909,7 @@ int do_editor(Character *ch, char *argument, cmd_t cmd)
   if (argument == 0)
     return ReturnValue::eFAILURE;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   csendf(ch, "Current editor: %s\r\n\r\n", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
