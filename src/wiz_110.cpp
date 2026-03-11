@@ -118,7 +118,7 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
         }
         percent = MIN(max, percent);
         percent = MAX(max * 0.75, percent);
-        csendf(ch, "%s: %d\n\r", classskill[i].skillname, (int)percent);
+        csendf(ch, "%s: %d\r\n", classskill[i].skillname, (int)percent);
       }
       GET_RACE(ch) = orace;
       return ReturnValue::eSUCCESS;
@@ -375,7 +375,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 {
   if (arguments.size() < 2)
   {
-    send("Usage: rename <oldname> <newname> [takeplats]\n\r");
+    send("Usage: rename <oldname> <newname> [takeplats]\r\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -604,7 +604,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
 
   if (!*arg1 || !*type || !*arg2)
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
@@ -612,7 +612,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
 
   if (!(range = atoi(arg1)))
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
@@ -626,7 +626,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
 
   if (!(numrooms = atoi(arg2)))
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
@@ -659,7 +659,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
 
   if (type_ok != 1)
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
@@ -681,7 +681,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
   else
   {
     sprintf(err, "Error Code: %d\r\n"
-                 "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+                 "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n",
             ret);
   }
@@ -960,7 +960,7 @@ int do_export(Character *ch, char *args, cmd_t cmd)
 
   if (*export_type == 0 || *filename == 0)
   {
-    ch->sendln("Syntax: export obj <filename>\n\r");
+    ch->sendln("Syntax: export obj <filename>\r\n");
     return ReturnValue::eFAILURE;
   }
 

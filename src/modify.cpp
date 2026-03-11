@@ -118,7 +118,7 @@ void string_hash_add(class Connection *d, char *str)
     check_for_awaymsgs(ch);
   }
   else
-    strcat(*d->hashstr, "\n\r");
+    strcat(*d->hashstr, "\r\n");
 }
 
 // TODO - figure out what this is for...kill it if nothing
@@ -174,7 +174,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 
   if (type == TP_ERROR)
   {
-    send_to_char("Syntax:\n\rstring ('obj'|'char') <name> <field>"
+    send_to_char("Syntax:\r\nstring ('obj'|'char') <name> <field>"
                  " [<string>].\r\n",
                  ch);
     return 1;

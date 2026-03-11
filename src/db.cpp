@@ -418,7 +418,7 @@ char *funnybootmessages[] =
         "Removing crash bugs...\r\n",
         "Cooking Swedish meatballs...\r\n",
         "Brewing Canadian beer...\r\n",
-        "Searching for intelligent players....searching....searching....searching\n\r",
+        "Searching for intelligent players....searching....searching....searching\r\n",
         "Coding bug...\r\n",
         "Uploading Urizen's ABBA mp3s...\r\n",
         "09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\r\n",
@@ -731,7 +731,7 @@ void DC::do_godlist(void)
     assert(wizlist.length() < 1000);
   } while (true);
 
-  logverbose(QStringLiteral("Done!\n\r"));
+  logverbose(QStringLiteral("Done!\r\n"));
   wizlist_file.close();
 }
 
@@ -853,7 +853,7 @@ int do_wizlist(Character *ch, char *argument, cmd_t cmd)
     sp = 79 - line_length;
     sp /= 2;
     space[sp + 1] = '\0';
-    sprintf(buf + strlen(buf), "\n\r%s%s\n\r", space,
+    sprintf(buf + strlen(buf), "\r\n%s%s\r\n", space,
             names[current_level - IMMORTAL]);
     space[sp + 1] = ' ';
 
@@ -885,7 +885,7 @@ int do_wizlist(Character *ch, char *argument, cmd_t cmd)
         sprintf(lines + strlen(lines), "%s, ", qPrintable(DC::getInstance()->wizlist[x].getName()));
       else
       {
-        sprintf(lines + strlen(lines), "%s\n\r", qPrintable(DC::getInstance()->wizlist[x].getName()));
+        sprintf(lines + strlen(lines), "%s\r\n", qPrintable(DC::getInstance()->wizlist[x].getName()));
         line_length = strlen(lines) - 2;
         sp = 79 - line_length;
         sp /= 2;
@@ -1060,7 +1060,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
           if (!(index[i].item = (Character *)read_mobile(i, fl)))
           {
 
-            sprintf(log_buf, "Unable to load mobile %d!\n\r",
+            sprintf(log_buf, "Unable to load mobile %d!\r\n",
                     index[i].vnum());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
           }
@@ -1359,7 +1359,7 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
           index[i].progtypes = 0;
           if (!(index[i].item = (class Object *)read_object(i, fl, false)))
           {
-            sprintf(log_buf, "Unable to load object %d!\n\r", index[i].vnum());
+            sprintf(log_buf, "Unable to load object %d!\r\n", index[i].vnum());
             logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
           }
           i++;

@@ -831,7 +831,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
+    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
     return ReturnValue::eFAILURE;
   }
 
@@ -1287,7 +1287,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
+    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
     return ReturnValue::eFAILURE;
   }
 
@@ -1832,7 +1832,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   if (ch->isPlayerObjectThief() && !vict->desc)
   {
     send_to_char("Now WHY would a thief slip something to a "
-                 "linkdead character?\n\r",
+                 "linkdead character?\r\n",
                  ch);
     return ReturnValue::eFAILURE;
   }

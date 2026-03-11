@@ -594,16 +594,16 @@ void advance_level(Character *ch, int is_conversion)
   }
 
   if (effective_level == 6)
-    ch->sendln("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.");
+    ch->sendln("You are now able to participate in pkilling!\r\nRead HELP PKILL for more information.");
   if (effective_level == 10)
   {
-    ch->sendln("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.");
+    ch->sendln("You have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information.");
     add_new_vault(GET_NAME(ch), 0);
   }
   if (effective_level == 11)
     ch->sendln("It now costs you $B$5gold$R every time you recall.");
   if (effective_level == 20)
-    ch->sendln("You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.");
+    ch->sendln("You will no longer keep your equipment when you suffer a death to a mob.\r\nThere is now a chance you may lose attribute points when you die to a mob.\r\nRead HELP RDEATH and HELP STAT LOSS for more information.");
   if (effective_level == 40)
     ch->sendln("You are now able to use the Anonymous command. See \"HELP ANON\" for details.");
   if (effective_level == 50)
@@ -647,7 +647,7 @@ void gain_exp(Character *ch, int64_t gain)
   {
     ch->sendln("You now have enough experience to level!");
     if (ch->getLevel() == 1)
-      csendf(ch, "$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\n\r",
+      csendf(ch, "$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\r\n",
              pc_clss_types[GET_CLASS(ch)]);
   }
 
@@ -1024,7 +1024,7 @@ void prepare_character_for_sixty(Character *ch)
       int i = (ch->exp / 100000000) * 500000;
       if (i > 0)
       {
-        csendf(ch, "$B$3You have been credited %d $B$5gold$R coins for your %ld experience.$R\n\r", i, ch->exp);
+        csendf(ch, "$B$3You have been credited %d $B$5gold$R coins for your %ld experience.$R\r\n", i, ch->exp);
         ch->addGold(i);
       }
       else if (ch->exp > 0)

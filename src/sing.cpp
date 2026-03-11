@@ -542,7 +542,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       if (!tar_char && !tar_obj)
       {
         logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
-        send_to_char("If you triggered this message, you almost crashed the\n\r"
+        send_to_char("If you triggered this message, you almost crashed the\r\n"
                      "game.  Tell a god what you did immediately.\r\n",
                      ch);
         return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -670,7 +670,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         }
         else
         {
-          csendf(ch, "You seamlessly orchestrate a %s melody with your current song, playing them in perfect concert!\n\r",
+          csendf(ch, "You seamlessly orchestrate a %s melody with your current song, playing them in perfect concert!\r\n",
                  numToStringTH(ch->songs.size() + 1));
           act("$n seamlessly orchestrates another melody with $s current song, playing them in perfect concert!", ch, 0, 0, TO_ROOM, 0);
         }
@@ -1417,7 +1417,7 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 {
   char buf[200];
 
-  ch->sendln("Available Songs\n\r---------------");
+  ch->sendln("Available Songs\r\n---------------");
   for (qsizetype i = 0; i < Character::song_names.length(); i++)
   {
     if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))
@@ -2950,7 +2950,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is resistant to: %s\n\r", GET_SHORT(target), buf);
+    csendf(ch, "%s is resistant to: %s\r\n", GET_SHORT(target), buf);
   }
   if (skill > 85)
   {
@@ -2960,7 +2960,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is immune to: %s\n\r", GET_SHORT(target), buf);
+    csendf(ch, "%s is immune to: %s\r\n", GET_SHORT(target), buf);
   }
   if (skill > 90)
   {
@@ -2970,7 +2970,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is susceptible to: %s\n\r", GET_SHORT(target), buf);
+    csendf(ch, "%s is susceptible to: %s\r\n", GET_SHORT(target), buf);
   }
 
   return ReturnValue::eSUCCESS;

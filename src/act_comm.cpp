@@ -91,7 +91,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
       sprintf(buf, "$n reports '%s'", report);
       act(buf, ch, 0, 0, TO_ROOM, 0);
 
-      ch->send(QStringLiteral("You report: %1\n\r").arg(report));
+      ch->send(QStringLiteral("You report: %1\r\n").arg(report));
       return ReturnValue::eSUCCESS;
     }
   }
@@ -114,7 +114,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf, "$n reports '%s'", report);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
-  ch->send(QStringLiteral("You report: %1\n\r").arg(report));
+  ch->send(QStringLiteral("You report: %1\r\n").arg(report));
 
   return ReturnValue::eSUCCESS;
 }
@@ -203,8 +203,8 @@ int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
     break;
   }
 
-  buf = QStringLiteral("//(%1) %2\n\r").arg(typestr).arg(message);
-  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\n\r").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
+  buf = QStringLiteral("//(%1) %2\r\n").arg(typestr).arg(message);
+  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\r\n").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
@@ -284,7 +284,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
           y = 1;
         else
           y = 0;
-        sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]);
+        sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
     }
@@ -297,7 +297,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
           y = 1;
         else
           y = 0;
-        sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]);
+        sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
     }
@@ -306,14 +306,14 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
       y = 1;
     else
       y = 0;
-    sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]);
+    sprintf(buf2, "%-9s%s\r\n", types[22], on_off[y]);
     send_to_char(buf2, ch);
 
     if (isSet(ch->misc, 1 << 23))
       y = 1;
     else
       y = 0;
-    sprintf(buf2, "%-9s%s\n\r", types[23], on_off[y]);
+    sprintf(buf2, "%-9s%s\r\n", types[23], on_off[y]);
     send_to_char(buf2, ch);
 
     int o = ch->getLevel() == 110 ? 26 : 0;
@@ -323,7 +323,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
         y = 1;
       else
         y = 0;
-      sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]);
+      sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
       send_to_char(buf2, ch);
     }
 
@@ -647,7 +647,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
     // don't want players triggering mobs with emotes
     MOBtrigger = false;
     act(buf, ch, 0, 0, TO_ROOM, 0);
-    csendf(ch, "%s %s\n\r", GET_SHORT(ch), argument + i);
+    csendf(ch, "%s %s\r\n", GET_SHORT(ch), argument + i);
     MOBtrigger = true;
   }
   return ReturnValue::eSUCCESS;

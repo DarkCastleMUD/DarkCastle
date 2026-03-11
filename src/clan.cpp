@@ -289,9 +289,9 @@ void save_clans(void)
 
     // BLAH TEMP CODE THIS BLOWS
     // What's happening is apparently fedora's fprintf doesn't strip out
-    // \r's like Redhat's does.  So we're writing \n\r to files.  This is
+    // \r's like Redhat's does.  So we're writing \r\n to files.  This is
     // bad because when we read it in, fread_string replaces \n with a
-    // \n\r.  So we get \n\r\r.   After a while, this is really bad.
+    // \r\n.  So we get \n\r\r.   After a while, this is really bad.
     // So this is some crap code to strip out \r's before we save
     // I just did this REALLY fast so please rewrite this
     // Does it for L X O too but C and D were the hardcore ones so i temp
@@ -1557,12 +1557,12 @@ int do_ctell(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You tell the clan, '%s'\n\r", arg);
+  sprintf(buf, "You tell the clan, '%s'\r\n", arg);
   ansi_color(GREEN, ch);
   ch->send(buf);
   ansi_color(NTEXT, ch);
 
-  sprintf(buf, "%s tells the clan, '%s'\n\r", GET_SHORT(ch), arg);
+  sprintf(buf, "%s tells the clan, '%s'\r\n", GET_SHORT(ch), arg);
   bool yes;
   for (desc = DC::getInstance()->descriptor_list; desc; desc = desc->next)
   {
@@ -1590,7 +1590,7 @@ int do_ctell(Character *ch, char *arg, cmd_t cmd)
     ansi_color(NTEXT, pch);
   }
 
-  sprintf(buf, "$2%s tells the clan, '%s'$R\n\r", GET_SHORT(ch), arg);
+  sprintf(buf, "$2%s tells the clan, '%s'$R\r\n", GET_SHORT(ch), arg);
   get_clan(ch)->ctell_history.push(buf);
   if (get_clan(ch)->ctell_history.size() > 10)
   {
@@ -1709,11 +1709,11 @@ void do_clan_rights(Character *ch, char *arg)
 
   if (!*last)
   { // diag
-    sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->NameC());
+    sprintf(buf, "Rights for %s:\r\n-------------\r\n", pmember->NameC());
     ch->send(buf);
     for (bit = 0; *clan_rights[bit] != '\n'; bit++)
     {
-      sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->Rights(), 1 << bit) ? "on" : "off"));
+      sprintf(buf, "  %-15s %s\r\n", clan_rights[bit], (isSet(pmember->Rights(), 1 << bit) ? "on" : "off"));
       ch->send(buf);
     }
     return;
@@ -2557,11 +2557,11 @@ void show_clan_log(Character *ch)
   fin.close();
 
   std::stringstream buffer;
-  buffer << "The following are your clan's most recent 5 pages of log entries:\n\r";
+  buffer << "The following are your clan's most recent 5 pages of log entries:\r\n";
   int line = 1;
   while (logstack.size())
   {
-    buffer << logstack.top() << "\n\r";
+    buffer << logstack.top() << "\r\n";
     logstack.pop();
 
     // 5 pages, 21 lines each
@@ -2607,11 +2607,11 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
         return ReturnValue::eSUCCESS;
       }
 
-      sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->NameC());
+      sprintf(buf, "Rights for %s:\r\n-------------\r\n", pmember->NameC());
       ch->send(buf);
       for (bit = 0; *clan_rights[bit] != '\n'; bit++)
       {
-        sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->Rights(), 1 << bit) ? "on" : "off"));
+        sprintf(buf, "  %-15s %s\r\n", clan_rights[bit], (isSet(pmember->Rights(), 1 << bit) ? "on" : "off"));
         ch->send(buf);
       }
       return ReturnValue::eSUCCESS;
@@ -2701,7 +2701,7 @@ int do_whoclan(Character *ch, char *arg, cmd_t cmd)
   int found;
 
   send_to_char("                  O N L I N E   C L A N   "
-               "M E M B E R S\n\r\n\r",
+               "M E M B E R S\r\n\r\n",
                ch);
 
   char buf2[MAX_INPUT_LENGTH];
@@ -2725,13 +2725,13 @@ int do_whoclan(Character *ch, char *arg, cmd_t cmd)
         continue;
       if (found == 0)
       {
-        sprintf(buf, "$3Clan %s$R:\n\r", clan->name);
+        sprintf(buf, "$3Clan %s$R:\r\n", clan->name);
         ch->send(buf);
       }
       if (clan->number == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
-        sprintf(buf, "  %s %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""), isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
+        sprintf(buf, "  %s %s %s\r\n", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""), isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
       else
-        sprintf(buf, "  %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""));
+        sprintf(buf, "  %s %s\r\n", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""));
       ch->send(buf);
       found++;
     }

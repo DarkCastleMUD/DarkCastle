@@ -78,9 +78,9 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
   hasholylight = IS_NPC(ch) ? 0 : ch->player->holyLite;
 
   send_to_char(
-      "$B$7($4:$7)=======================================================================($4:$7)\n\r"
-      "$7|$5/$7|                     $5Current Grouped Adventurers                       $7|$5/$7|\n\r"
-      "$7($4:$7)=======================================================================($4:$7)$R\n\r",
+      "$B$7($4:$7)=======================================================================($4:$7)\r\n"
+      "$7|$5/$7|                     $5Current Grouped Adventurers                       $7|$5/$7|\r\n"
+      "$7($4:$7)=======================================================================($4:$7)$R\r\n",
       ch);
 
   if (*target)
@@ -110,9 +110,9 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
     {
       foundgroup = 1; // we found someone!
       k = i;
-      sprintf(tempbuffer, "\n\r"
-                          "   $B$7[$4: $5%s $4:$7]$R\n\r"
-                          "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\n\r",
+      sprintf(tempbuffer, "\r\n"
+                          "   $B$7[$4: $5%s $4:$7]$R\r\n"
+                          "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\r\n",
               k->group_name,
               IS_NPC(k) ? 0 : k->player->group_pkills,
               IS_NPC(k) ? 0 : (k->player->group_pkills ? (k->player->grpplvl / k->player->group_pkills) : 0),
@@ -127,14 +127,14 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
       if ((!IS_NPC(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
         sprintf(tempbuffer,
-                "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
+                "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \r\n",
                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
                 pc_clss_types[(int)GET_CLASS(k)], k->getLevel());
       }
       else
       {
         sprintf(tempbuffer,
-                "   $B%-18s %-10s Anonymous                      $1($7Leader$1)$R \n\r",
+                "   $B%-18s %-10s Anonymous                      $1($7Leader$1)$R \r\n",
                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name);
       }
       add_to_who(tempbuffer);
@@ -150,12 +150,12 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
               foundtarget = 1;
             // First if they're not anonymous
             if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
-              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\n\r",
+              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\r\n",
                       GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
                       pc_clss_types[(int)GET_CLASS(f->follower)], f->follower->getLevel());
             else
               sprintf(tempbuffer,
-                      "   %-18s %-10s Anonymous            \n\r",
+                      "   %-18s %-10s Anonymous            \r\n",
                       GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name);
             add_to_who(tempbuffer);
           }
@@ -180,7 +180,7 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
   } // End for(d).
 
   if (0 == foundgroup)
-    add_to_who("\n\rNo groups found.\r\n");
+    add_to_who("\r\nNo groups found.\r\n");
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
   page_string(ch->desc, gWhoBuffer, 1);
@@ -198,10 +198,10 @@ int do_whosolo(Character *ch, char *argument, cmd_t cmd)
   one_argument(argument, buf);
 
   send_to_char(
-      "$B$7($4:$7)=======================================================================($4:$7)\n\r"
-      "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\n\r"
-      "$7($4:$7)=======================================================================($4:$7)$R\n\r"
-      "   $BName            Race      Class        Level  PKs Deaths Avg-vict-level$R\n\r",
+      "$B$7($4:$7)=======================================================================($4:$7)\r\n"
+      "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\r\n"
+      "$7($4:$7)=======================================================================($4:$7)$R\r\n"
+      "   $BName            Race      Class        Level  PKs Deaths Avg-vict-level$R\r\n",
       ch);
 
   clear_who_buffer();
@@ -224,7 +224,7 @@ int do_whosolo(Character *ch, char *argument, cmd_t cmd)
       {
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
           sprintf(tempbuffer,
-                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
+                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\r\n",
                   i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),
@@ -233,7 +233,7 @@ int do_whosolo(Character *ch, char *argument, cmd_t cmd)
                   IS_NPC(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         else
           sprintf(tempbuffer,
-                  "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
+                  "   %-15s %-9s Anonymous            %-4d%-7d%d\r\n",
                   i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   IS_NPC(i) ? 0 : i->player->totalpkills,
@@ -344,9 +344,9 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   } // end of for loop
 
   // Display the actual stuff
-  send("[$4:$R]===================================[$4:$R]\n\r"
-       "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\n\r"
-       "[$4:$R]===================================[$4:$R]\n\r\n\r");
+  send("[$4:$R]===================================[$4:$R]\r\n"
+       "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\r\n"
+       "[$4:$R]===================================[$4:$R]\r\n\r\n");
 
   QString buf;
   QString immbuf;
@@ -525,12 +525,12 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     if (i->clan && clanPtr && i->getLevel() < OVERSEER)
     {
       buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
-      buf += QStringLiteral("%5 $2[%6$R$2] %7$R\n\r").arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
+      buf += QStringLiteral("%5 $2[%6$R$2] %7$R\r\n").arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
     }
     else
     {
       buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
-      buf += QStringLiteral("%5 %6$R\n\r").arg(extraBuf).arg(tailBuf);
+      buf += QStringLiteral("%5 %6$R\r\n").arg(extraBuf).arg(tailBuf);
     }
 
     if (addimmbuf)
@@ -545,7 +545,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
 
   if (numPC && numImmort)
   {
-    send("\n\r");
+    send("\r\n");
   }
 
   if (numImmort)
@@ -553,10 +553,10 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     send(immbuf);
   }
 
-  send(QString("\n\r"
-               "    Visible Players Connected:   %1\n\r"
-               "    Visible Immortals Connected: %2\n\r"
-               "    (Max this boot is %3)\n\r")
+  send(QString("\r\n"
+               "    Visible Players Connected:   %1\r\n"
+               "    Visible Immortals Connected: %2\r\n"
+               "    (Max this boot is %3)\r\n")
            .arg(numPC)
            .arg(numImmort)
            .arg(max_who));
@@ -569,7 +569,7 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
   int count = 0;
   clan_data *clan;
 
-  ch->sendln("\n\rPlayers in the Arena:\n\r--------------------------");
+  ch->sendln("\r\nPlayers in the Arena:\r\n--------------------------");
 
   if (ch->getLevel() <= MORTAL)
   {
@@ -581,16 +581,16 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
         if (tmp->room().isArena() && !isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
         {
           if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
-            csendf(ch, "%-20s - [%s$R]\n\r", GET_NAME(tmp), clan->name);
+            csendf(ch, "%-20s - [%s$R]\r\n", GET_NAME(tmp), clan->name);
           else
-            csendf(ch, "%-20s\n\r", GET_NAME(tmp));
+            csendf(ch, "%-20s\r\n", GET_NAME(tmp));
           count++;
         }
       }
     }
 
     if (count == 0)
-      ch->sendln("\n\rThere are no visible players in the arena.");
+      ch->sendln("\r\nThere are no visible players in the arena.");
 
     return ReturnValue::eSUCCESS;
   }
@@ -604,11 +604,11 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
       if (tmp->room().isArena())
       {
         if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
-          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
+          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\r\n",
                  GET_NAME(tmp),
                  tmp->getLevel(), tmp->getHP(), tmp->in_room, clan->name);
         else
-          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\n\r",
+          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\r\n",
                  GET_NAME(tmp),
                  tmp->getLevel(), tmp->getHP(), tmp->in_room);
         count++;
@@ -617,7 +617,7 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (count == 0)
-    ch->sendln("\n\rThere are no visible players in the arena.");
+    ch->sendln("\r\nThere are no visible players in the arena.");
   return ReturnValue::eSUCCESS;
 }
 
@@ -631,19 +631,19 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isImmortalPlayer() && *buf && !strcmp(buf, "all"))
   { //  immortal noly, shows all
-    ch->sendln("All Players:\n\r--------");
+    ch->sendln("All Players:\r\n--------");
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
       {
         if (d->original)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+          csendf(ch, "%-20s - %s$R [%d] In body of %s\r\n", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
                  DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
         }
         else
         {
-          csendf(ch, "%-20s - %s$R [%d]\n\r",
+          csendf(ch, "%-20s - %s$R [%d]\r\n",
                  d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
         }
       }
@@ -651,7 +651,7 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
   }
   else if (ch->isImmortalPlayer() && *buf)
   { // immortal only, shows ONE person
-    ch->sendln("Search of Players:\n\r--------");
+    ch->sendln("Search of Players:\r\n--------");
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
@@ -660,7 +660,7 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
         { // If switched
           if (is_abbrev(buf, d->original->getName()))
           {
-            csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+            csendf(ch, "%-20s - %s$R [%d] In body of %s\r\n", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
                    DC::getInstance()->world[d->character->in_room].number, fname(d->character->getName()).toStdString().c_str());
           }
         }
@@ -668,7 +668,7 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
         {
           if (is_abbrev(buf, d->character->getNameC()))
           {
-            csendf(ch, "%-20s - %s$R [%d]\n\r",
+            csendf(ch, "%-20s - %s$R [%d]\r\n",
                    d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
           }
         }
@@ -678,7 +678,7 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
   else
   { // normal, mortal where
     zonenumber = DC::getInstance()->world[ch->in_room].zone;
-    ch->sendln("Players in your vicinity:\n\r-------------------------");
+    ch->sendln("Players in your vicinity:\r\n-------------------------");
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_WHERE))
       return ReturnValue::eFAILURE;
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
@@ -688,7 +688,7 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
           CAN_SEE(ch, d->character) && !IS_NPC(d->character) /*Don't show snooped mobs*/)
       {
         if (DC::getInstance()->world[d->character->in_room].zone == zonenumber)
-          csendf(ch, "%-20s - %s$R\n\r", d->character->getNameC(),
+          csendf(ch, "%-20s - %s$R\r\n", d->character->getNameC(),
                  DC::getInstance()->world[d->character->in_room].name);
       }
     }

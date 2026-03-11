@@ -61,7 +61,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   if (ISSET(ch->affected_by, AFF_KILLER))
   {
     do_say(keeper, "Go away before I call the guards!!");
-    sprintf(buf, "%s the KILLER is over here!\n\r", GET_SHORT(ch));
+    sprintf(buf, "%s the KILLER is over here!\r\n", GET_SHORT(ch));
     do_shout(keeper, buf);
     return false;
   }
@@ -1629,7 +1629,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   if (cmd == cmd_t::LIST)
   {
-    csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n\r$R", GET_SHORT(owner));
+    csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\r\n$R", GET_SHORT(owner));
     ch->sendln("  | Item                              | Cost                                   |");
     ch->sendln("--------------------------------------------------------------------------------");
     int last_vnum = 0;

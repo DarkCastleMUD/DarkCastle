@@ -233,13 +233,13 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->sendln("You feel generous.");
-  act("$n makes some strange gestures.\n\rA strange feeling comes upon you,"
-      "like a giant hand. Light comes\n\rdown from above, grabbing your "
-      "body, which begins to pulse\n\rwith coloured lights from inside.\n\rYo"
-      "ur head seems to be filled with deamons\n\rfrom another plane as your"
-      " body dissolves\n\rto the elements of time and space itself.\n\rSudde"
-      "nly a silent explosion of light snaps\n\ryou back to reality. You fee"
-      "l slightly\n\rdifferent.",
+  act("$n makes some strange gestures.\r\nA strange feeling comes upon you,"
+      "like a giant hand. Light comes\r\ndown from above, grabbing your "
+      "body, which begins to pulse\r\nwith coloured lights from inside.\r\nYo"
+      "ur head seems to be filled with deamons\r\nfrom another plane as your"
+      " body dissolves\r\nto the elements of time and space itself.\r\nSudde"
+      "nly a silent explosion of light snaps\r\nyou back to reality. You fee"
+      "l slightly\r\ndifferent.",
       ch, 0, victim, TO_VICT, 0);
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
@@ -270,7 +270,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
   if (name.isEmpty())
   {
-    send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
+    send_to_char("Zap who??\r\nOh, BTW this deletes anyone "
                  "lower than you.\r\n",
                  this);
     return ReturnValue::eFAILURE;
@@ -298,7 +298,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     if (IS_PC(victim))
     {
       victim->sendln(QString("A massive bolt of lightning arcs down from the "
-                             "heavens, striking you\n\rbetween the eyes. You have "
+                             "heavens, striking you\r\nbetween the eyes. You have "
                              "been utterly destroyed by %1.")
                          .arg(GET_SHORT(this)));
     }
@@ -334,7 +334,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
   else
   {
-    send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
+    send_to_char("Zap who??\r\nOh, BTW this deletes anyone "
                  "lower than you.\r\n",
                  this);
   }
@@ -358,7 +358,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("What message do you want to send to all players?");
   else
   {
-    sprintf(buf, "\n\r%s\n\r", argument + i);
+    sprintf(buf, "\r\n%s\r\n", argument + i);
     for (point = DC::getInstance()->descriptor_list; point; point = point->next)
       if (!point->connected && point->character)
         point->character->send(buf);
@@ -386,11 +386,11 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    send_to_char("Syntax:  shutdown [sub command] [options ...]\n\r"
-                 " Sub Commands:\n\r"
-                 "--------------\n\r"
+    send_to_char("Syntax:  shutdown [sub command] [options ...]\r\n"
+                 " Sub Commands:\r\n"
+                 "--------------\r\n"
                  "   hot - Rerun current DC filename and keep players' links active.\r\n"
-                 "         Options: [path/dc executable] [dc options ...]\n\r"
+                 "         Options: [path/dc executable] [dc options ...]\r\n"
                  "  cold - Go ahead and kill the links.\r\n"
                  " crash - Crash the mud by referencing an invalid pointer.\r\n"
                  "  core - Produce a core file.\r\n"
@@ -542,7 +542,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
 
   if (*arg1 == 0)
   {
-    ch->sendln("testport <start | stop>\n\r");
+    ch->sendln("testport <start | stop>\r\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -599,7 +599,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 
   if (*arg1 == 0 || *arg2 == 0)
   {
-    ch->sendln("testuser <user> <on|off>\n\r");
+    ch->sendln("testuser <user> <on|off>\r\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -655,7 +655,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 #ifdef BANDWIDTH
 int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
 {
-  csendf(ch, "Bytes sent in %ld seconds: %ld\n\r",
+  csendf(ch, "Bytes sent in %ld seconds: %ld\r\n",
          get_bandwidth_start(), get_bandwidth_amount());
   return ReturnValue::eSUCCESS;
 }
@@ -670,8 +670,8 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
 
   if (!(*argument))
   {
-    send_to_char("Syntax:  skilledit <character> <action> <value>\n\r"
-                 "Possible actions are:  list, add, delete\n\r",
+    send_to_char("Syntax:  skilledit <character> <action> <value>\r\n"
+                 "Possible actions are:  list, add, delete\r\n",
                  ch);
     return ReturnValue::eFAILURE;
   }

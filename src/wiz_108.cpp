@@ -163,7 +163,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
   {
     send_to_char("Retrieves any item in the game and puts it in your inventory.\r\n"
                  "Works well in combination with the 'find obj' command.\r\n"
-                 "Usage: purloin [number.]name\n\r",
+                 "Usage: purloin [number.]name\r\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -290,16 +290,16 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, name);
   if (!*name) // no arguments. print an informative text
   {
-    ch->sendln("Usage:\n\rset <name> <field> <value>");
+    ch->sendln("Usage:\r\nset <name> <field> <value>");
 
-    strcpy(help, "\n\rField being one of the following:\n\r");
+    strcpy(help, "\r\nField being one of the following:\r\n");
     ch->display_string_list(values);
     /*        for (i = 1; *values[i] != '\n'; i++)
             {
                 sprintf(help + strlen(help), "%18s", values[i]);
                 if (!(i % 4))
                 {
-                    strcat(help, "\n\r");
+                    strcat(help, "\r\n");
                     ch->send(help);
                     *help = '\0';
                 }
@@ -320,7 +320,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Get real! You ain't that big.");
     if (IS_PC(vict))
     {
-      sprintf(buf2, "%s just tried to set: %s\n\r", GET_NAME(ch), buf);
+      sprintf(buf2, "%s just tried to set: %s\r\n", GET_NAME(ch), buf);
       send_to_char(buf2, vict);
     }
     return ReturnValue::eFAILURE;
@@ -400,7 +400,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
 
     {
       send_to_char("Class must be 'm','c','w','t','a','p','b',"
-                   "'r', 'k'(monk), 'd'(bard), or 'u'(druid). \n\r",
+                   "'r', 'k'(monk), 'd'(bard), or 'u'(druid). \r\n",
                    ch);
       return ReturnValue::eFAILURE;
     }

@@ -994,7 +994,7 @@ struct assemble_item assemble_items[] = {
 
     // Item 7, a curiously notched medallion
     {"With a blinding flash, the gem makes the medallion whole.\r\n",
-     "As $n fiddles with the medallion pieces, you are dazed by a bright flash!\n\r",
+     "As $n fiddles with the medallion pieces, you are dazed by a bright flash!\r\n",
      "You attempt to assemble the family medallion but something is missing.\r\n",
      {30084, 30085, 30086, 30087, 30088, -1, -1, -1, -1, -1},
      30083},
@@ -1052,7 +1052,7 @@ int search_assemble_items(int vnum)
   // This should never happen
   if (vnum < 1)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\n\r", vnum);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\r\n", vnum);
     produce_coredump();
     return -1;
   }
@@ -1078,7 +1078,7 @@ bool assemble_item_index(Character *ch, int item_index)
   // This should never happen
   if (item_index < 0)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\n\r", item_index);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\r\n", item_index);
     produce_coredump();
     return false;
   }
@@ -2925,7 +2925,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
       send_to_zone("A loud roar echos audibly through the entire kingdom.\r\n", DC::getInstance()->world[obj->in_room].zone);
       break;
     case 2:
-      send_to_room("The dragon $B$2Bonewrack$R flies in from above!\n\r", BONEWRACK_ROOM, true);
+      send_to_room("The dragon $B$2Bonewrack$R flies in from above!\r\n", BONEWRACK_ROOM, true);
       move_char(vict, BONEWRACK_ROOM);
       obj->obj_flags.value[0] = 0;
       break;
@@ -2949,7 +2949,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
       send_to_room("The winged creature flies closer and closer.\r\n", GAIOT_AVATAR, true);
       break;
     case 2:
-      send_to_room("The creature shatters in illusion!\n\r", GAIOT_AVATAR, true);
+      send_to_room("The creature shatters in illusion!\r\n", GAIOT_AVATAR, true);
       move_char(vict, GAIOT_AVATAR);
       obj->obj_flags.value[0] = 0;
       break;
@@ -3571,13 +3571,13 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (isSet(obj->obj_flags.more_flags, ITEM_TOGGLE))
       {
         REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
-        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\n\r");
+        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\r\n");
         send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       else
       {
         SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
-        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\n\r");
+        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\r\n");
         send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       return ReturnValue::eSUCCESS;
@@ -3734,7 +3734,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       int rnd = number((quint64)0, (quint64)tmp.size() - 1);
       char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
       strcat(buf2, tmp[rnd].c_str());
-      strcat(buf2, "'$R\n\r");
+      strcat(buf2, "'$R\r\n");
       send_to_room(buf2, vict->in_room, true);
 
       if (rnd == unequip)
@@ -3900,14 +3900,14 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           i->character->sendln("You hear a large BOOM from somewhere in the distance.");
 
     act("The hot potato $n is carrying beeps one final time.\r\n"
-        "\n\r$B"
-        "BBBB     OOO     OOO    M   M   !!   !!\n\r"
-        "B   B   O   O   O   O   MM MM   !!   !!\n\r"
-        "BBBB    O   O   O   O   M M M   !!   !!\n\r"
-        "B   B   O   O   O   O   M   M \n\r"
-        "BBBB     OOO     OOO    M   M   !!   !!\n\r"
-        "\n\r$R"
-        "Small pieces of $n and mashed potato splatter everywhere!!!\n\r"
+        "\r\n$B"
+        "BBBB     OOO     OOO    M   M   !!   !!\r\n"
+        "B   B   O   O   O   O   MM MM   !!   !!\r\n"
+        "BBBB    O   O   O   O   M M M   !!   !!\r\n"
+        "B   B   O   O   O   O   M   M \r\n"
+        "BBBB     OOO     OOO    M   M   !!   !!\r\n"
+        "\r\n$R"
+        "Small pieces of $n and mashed potato splatter everywhere!!!\r\n"
         "$n has been KILLED!!",
         vict, 0, 0, TO_ROOM, 0);
 
@@ -3922,15 +3922,15 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     vict->setHP(-1);
     update_pos(vict);
     send_to_char("$B"
-                 "BBBB     OOO     OOO    M   M !!   !!\n\r"
-                 "B   B   O   O   O   O   MM MM !!   !!\n\r"
-                 "BBBB    O   O   O   O   M M M !!   !!\n\r"
-                 "B   B   O   O   O   O   M   M \n\r"
-                 "BBBB     OOO     OOO    M   M !!   !!\n\r\n\r"
+                 "BBBB     OOO     OOO    M   M !!   !!\r\n"
+                 "B   B   O   O   O   O   MM MM !!   !!\r\n"
+                 "BBBB    O   O   O   O   M M M !!   !!\r\n"
+                 "B   B   O   O   O   O   M   M \r\n"
+                 "BBBB     OOO     OOO    M   M !!   !!\r\n\r\n"
                  "$R",
                  vict);
-    send_to_char("The baked potato you are carrying EXPLODES!!!\n\r"
-                 "You have been KILLED!\n\r",
+    send_to_char("The baked potato you are carrying EXPLODES!!!\r\n"
+                 "You have been KILLED!\r\n",
                  vict);
     extract_obj(obj);
     if (!vict->room().isArena())
@@ -4470,12 +4470,12 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
     }
     else if (!str_cmp(target, "book"))
     {
-      send_to_room("The sun glows a bright red and shatters the glyphs!\n\r", ch->in_room);
+      send_to_room("The sun glows a bright red and shatters the glyphs!\r\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "heart"))
     {
-      send_to_room("The sun glows a bright red and shatters the glyphs!\n\r", ch->in_room);
+      send_to_room("The sun glows a bright red and shatters the glyphs!\r\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else
@@ -4498,7 +4498,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
     }
     if (!str_cmp(target, "sun"))
     {
-      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\n\r", ch->in_room);
+      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\r\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "book"))
@@ -4509,7 +4509,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
     }
     else if (!str_cmp(target, "heart"))
     {
-      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\n\r", ch->in_room);
+      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\r\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else
@@ -4533,12 +4533,12 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
     }
     if (!str_cmp(target, "sun"))
     {
-      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\n\r", ch->in_room);
+      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\r\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "book"))
     {
-      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\n\r", ch->in_room);
+      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\r\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "heart"))
@@ -4560,8 +4560,8 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
   {
     if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch->getLevel() >= 50 && !ch->has_skill(SKILL_SPELLCRAFT))
     {
-      send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
-      ch->sendln("A beam of light hits you in the head!\n\rYou have learned spellcraft!");
+      send_to_room("The glyph receptacles glow an eerie pale white.\r\nThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
+      ch->sendln("A beam of light hits you in the head!\r\nYou have learned spellcraft!");
       ch->learn_skill(SKILL_SPELLCRAFT, 1, 1);
     }
   }
@@ -4686,7 +4686,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
     if (IS_PC(victim))
-      victim->sendln("You have been KILLED!!\n\r");
+      victim->sendln("You have been KILLED!!\r\n");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }
@@ -4739,7 +4739,7 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
     if (IS_PC(victim))
-      victim->sendln("You have been KILLED!!\n\r");
+      victim->sendln("You have been KILLED!!\r\n");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }

@@ -740,7 +740,7 @@ void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   if ((ch->getLevel() < board->second.min_write_level))
   {
     send_to_char("You pick up a quill to write, but realize "
-                 "you're not powerful enough\n\rto submit "
+                 "you're not powerful enough\r\nto submit "
                  "intelligent material to this board.\r\n",
                  ch);
     return;
@@ -840,7 +840,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
   {
     send_to_char("You try and grab one of the notes of the board but "
-                 "get a nasty\n\rshock. Maybe you'd better leave it "
+                 "get a nasty\r\nshock. Maybe you'd better leave it "
                  "alone.\r\n",
                  ch);
     return ReturnValue::eSUCCESS;
@@ -1012,7 +1012,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   if ((ch->getLevel() < board->second.min_read_level))
   {
     send_to_char("You try and look at the messages on the board but"
-                 " you\n\rcannot comprehend their meaning.\n\r\n\r",
+                 " you\r\ncannot comprehend their meaning.\r\n\r\n",
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
@@ -1051,7 +1051,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
     board_msg += buf;
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "\n\r----------\n\r" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
+  snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
   board_msg += buf;
 
   page_string(ch->desc, board_msg.c_str(), 1);
@@ -1085,7 +1085,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   if ((ch->getLevel() < board->second.min_read_level))
   {
     send_to_char("You try and look at the messages on the board "
-                 "but you\n\rcannot comprehend their meaning.\r\n",
+                 "but you\r\ncannot comprehend their meaning.\r\n",
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
@@ -1102,21 +1102,21 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
     csendf(ch, "There are %d messages on the board.\r\n", board->second.msgs.size());
     ;
 
-    csendf(ch, "Board Topic:\n\r%s------------\n\r", board->second.msgs[0].text.c_str());
+    csendf(ch, "Board Topic:\r\n%s------------\r\n", board->second.msgs[0].text.c_str());
     std::vector<message>::reverse_iterator msg_it;
     i = board->second.msgs.size() - 1;
     for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
       if (IS_NPC(ch) || isSet(ch->player->toggles, Player::PLR_ANSI))
       {
-        snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\n\r",
+        snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
                  msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
         board_msg += buf;
-        //         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", msg_it->date.c_str(),
+        //         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n", msg_it->date.c_str(),
         //                    msg_it->author.c_str(),i--, msg_it->title.c_str());
       }
       else
       {
-        snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\n\r", msg_it->date.c_str(),
+        snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\r\n", msg_it->date.c_str(),
                  msg_it->author.c_str(), i--, msg_it->title.c_str());
         board_msg += buf;
       }

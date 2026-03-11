@@ -138,7 +138,7 @@ void mpstat(Character *ch, Character *victim)
           victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].vnum());
   ch->send(buf);
 
-  sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
+  sprintf(buf, "$3Short description$R: %s\r\n$3Long  description$R: %s\r\n",
           victim->short_desc,
           victim->long_desc ? victim->long_desc : "(nullptr)");
   ch->send(buf);
@@ -156,7 +156,7 @@ void mpstat(Character *ch, Character *victim)
     ch->send(buf);
     send_to_char(mprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
+    sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
     ch->send(buf);
     ch->sendRaw(std::string(mprg->comlist) + "\r\n");
   }
@@ -1171,7 +1171,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!skillname.isEmpty())
-    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\n\r", skillname.toStdString().c_str());
+    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\r\n", skillname.toStdString().c_str());
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");

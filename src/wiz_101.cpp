@@ -68,7 +68,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
           test_buffer.append(QStringLiteral("[TST]%1").arg(command.getName(), -11));
           if (++test_column % 5 == 0)
           {
-            test_buffer.append("\n\r");
+            test_buffer.append("\r\n");
           }
         }
 
@@ -352,7 +352,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if (start_room == k->follower->in_room && CAN_SEE(k->follower, this) &&
           k->follower->getLevel() >= IMMORTAL)
       {
-        csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(this));
+        csendf(k->follower, "You follow %s.\r\n\r\n", GET_SHORT(this));
         k->follower->do_goto(arguments, cmd_t::DEFAULT);
       }
     }
@@ -375,11 +375,11 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
 
   if (!*inout)
   {
-    ch->sendln("Usage:\n\rpoof [i|o] <std::string>");
-    ch->sendln("\n\rCurrent poof in is:");
+    ch->sendln("Usage:\r\npoof [i|o] <std::string>");
+    ch->sendln("\r\nCurrent poof in is:");
     ch->send(ch->player->poofin);
     ch->sendln("");
-    ch->sendln("\n\rCurrent poof out is:");
+    ch->sendln("\r\nCurrent poof out is:");
     ch->send(ch->player->poofout);
     ch->sendln("");
     return ReturnValue::eSUCCESS;
@@ -387,7 +387,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
 
   if (inout[0] != 'i' && inout[0] != 'o')
   {
-    ch->sendln("Usage:\n\rpoof [i|o] <std::string>");
+    ch->sendln("Usage:\r\npoof [i|o] <std::string>");
     return ReturnValue::eFAILURE;
   }
 
@@ -556,12 +556,12 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
 
   if (ch == victim)
   {
-    sprintf(buf, "%s conjures a clap of thunder to resound the land!\n\r", GET_SHORT(ch));
+    sprintf(buf, "%s conjures a clap of thunder to resound the land!\r\n", GET_SHORT(ch));
     send_to_all(buf);
   }
   else
   {
-    sprintf(buf, "Time stops for a minute as %s and %s high-five!\n\r", GET_SHORT(ch), GET_SHORT(victim));
+    sprintf(buf, "Time stops for a minute as %s and %s high-five!\r\n", GET_SHORT(ch), GET_SHORT(victim));
     send_to_all(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -623,7 +623,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
       arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
-  sprintf(buf, "WizInvis Set to: %d \n\r", ch->player->wizinvis);
+  sprintf(buf, "WizInvis Set to: %d \r\n", ch->player->wizinvis);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }

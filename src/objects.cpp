@@ -2509,7 +2509,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
             obj_object = ch->equipment[j];
             if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
             {
-              sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
+              sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", obj_object->short_description);
               send_to_char(arg1, ch);
               continue;
             }
@@ -2552,7 +2552,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
         {
           if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
           {
-            sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
+            sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", obj_object->short_description);
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }

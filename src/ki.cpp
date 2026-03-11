@@ -168,7 +168,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         break;
       case position_t::RESTING:
         send_to_char("You cannot harness that much energy while "
-                     "resting!\n\r",
+                     "resting!\r\n",
                      ch);
         break;
       case position_t::SITTING:
@@ -270,7 +270,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
                  DC::LogChannel::LOG_BUG);
         send_to_char(
-            "If you triggered this message, you almost crashed the\n\r"
+            "If you triggered this message, you almost crashed the\r\n"
             "game.  Tell a god what you did immediately.\r\n",
             ch);
         return ReturnValue::eFAILURE;
@@ -560,7 +560,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
 
   dam = number(135, 165);
   //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
-  //  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
+  //  act("$n's eyes flash as $e pools the energy within $m!\r\nA burst of energy slams into you!\r\n",
   int32_t room = ch->in_room;
   for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
   {

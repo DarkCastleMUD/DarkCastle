@@ -56,7 +56,7 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
 
   k = ch->master;
 
-  sprintf(buf, "You abandon: %s\n\r", k->group_name);
+  sprintf(buf, "You abandon: %s\r\n", k->group_name);
   ch->send(buf);
   sprintf(buf, "%s abandons: %s", GET_SHORT(ch), k->group_name);
   act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -111,7 +111,7 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->group_name = str_dup(argument);
-  sprintf(buf, "You found: %s\n\r", argument);
+  sprintf(buf, "You found: %s\r\n", argument);
   ch->send(buf);
   sprintf(buf, "%s founds: %s", GET_SHORT(ch), argument);
   act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -460,7 +460,7 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("You truly must have an EGO the size of the Tarrasque!");
     send_to_char("You are already the group leader! Maybe you SHOULD "
-                 "step down?\n\r",
+                 "step down?\r\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -480,12 +480,12 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
           GET_SHORT(new_new_leader));
   ch->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\n\r%s appoints YOU as "
-               "the New Leader of: %s\n\r",
+  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints YOU as "
+               "the New Leader of: %s\r\n",
           GET_SHORT(ch), ch->group_name,
           GET_SHORT(ch), ch->group_name);
   new_new_leader->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\n\r%s appoints %s as "
+  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints %s as "
                "the New Leader of: %s",
           GET_SHORT(ch), ch->group_name,
           GET_SHORT(ch), GET_SHORT(new_new_leader), ch->group_name);

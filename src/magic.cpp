@@ -409,7 +409,7 @@ int spell_energy_drain(uint8_t level, Character *ch, Character *victim, class Ob
 
   gain_exp(victim, 0 - mult);
   victim->removeHP(victim->getHP() / 20);
-  victim->sendln("Your knees buckle as life force is drained from your body!\n\rYou have lost some experience!");
+  victim->sendln("Your knees buckle as life force is drained from your body!\r\nYou have lost some experience!");
   act("You drain some of $N's experience!", ch, 0, victim, TO_CHAR, 0);
   return ReturnValue::eSUCCESS;
 }
@@ -1493,7 +1493,7 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Obj
         csendf(pal, "You sense your desecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
     }
     ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!");
-    act("The runes upon the ground shatter with a burst of magic!\n\r$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act("The runes upon the ground shatter with a burst of magic!\r\n$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
   }
@@ -1542,7 +1542,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
         csendf(pal, "You sense your consecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
     }
     ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!");
-    act("Runes upon the ground glow brightly, then fade to nothing.\n\r$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act("Runes upon the ground glow brightly, then fade to nothing.\r\n$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
   }
@@ -4401,7 +4401,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
   target = victim->in_room;
 
   move_char(ch, target, false);
-  ch->sendln("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...");
+  ch->sendln("You summon a large eagle to scan the area.\r\nThrough the eagle's eyes you see...");
   do_look(ch, "");
   move_char(ch, original_loc);
   return ReturnValue::eSUCCESS;
@@ -4671,7 +4671,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     sprintf(buf, "Object '%s', Item type: ", qPrintable(obj->Name()));
     sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
     strcat(buf, buf2);
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
     ch->send(buf);
 
     ch->send("Item is: ");
@@ -4679,7 +4679,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
     strcat(buf, " ");
     strcat(buf, buf2);
-    strcat(buf, "\n\r");
+    strcat(buf, "\r\n");
     ch->send(buf);
 
     ch->send("Worn by: ");
@@ -4687,7 +4687,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     strcat(buf, "\r\n");
     ch->send(buf);
 
-    sprintf(buf, "Weight: %d, Value: %d, Level: %llu\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
+    sprintf(buf, "Weight: %d, Value: %d, Level: %llu\r\n", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
     ch->send(buf);
 
     switch (GET_ITEM_TYPE(obj))
@@ -4695,24 +4695,24 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     case ITEM_SCROLL:
     case ITEM_POTION:
-      sprintf(buf, "Level %d spells of:\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "Level %d spells of:\r\n", obj->obj_flags.value[0]);
       ch->send(buf);
       if (obj->obj_flags.value[1] >= 1)
       {
         sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
-        strcat(buf, "\n\r");
+        strcat(buf, "\r\n");
         ch->send(buf);
       }
       if (obj->obj_flags.value[2] >= 1)
       {
         sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
-        strcat(buf, "\n\r");
+        strcat(buf, "\r\n");
         ch->send(buf);
       }
       if (obj->obj_flags.value[3] >= 1)
       {
         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-        strcat(buf, "\n\r");
+        strcat(buf, "\r\n");
         ch->send(buf);
       }
       break;
@@ -4724,19 +4724,19 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
               obj->obj_flags.value[2]);
       ch->send(buf);
 
-      sprintf(buf, "Level %d spell of:\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "Level %d spell of:\r\n", obj->obj_flags.value[0]);
       ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
       {
         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-        strcat(buf, "\n\r");
+        strcat(buf, "\r\n");
         ch->send(buf);
       }
       break;
 
     case ITEM_WEAPON:
-      sprintf(buf, "Damage Dice are '%dD%d'\n\r",
+      sprintf(buf, "Damage Dice are '%dD%d'\r\n",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
       ch->send(buf);
@@ -4750,7 +4750,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       break;
 
     case ITEM_MISSILE:
-      sprintf(buf, "Damage Dice are '%dD%d'\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
+      sprintf(buf, "Damage Dice are '%dD%d'\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
@@ -4776,7 +4776,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
         value = obj->obj_flags.value[0];
       }
 
-      sprintf(buf, "AC-apply is %d     Resistance to damage is %d\n\r",
+      sprintf(buf, "AC-apply is %d     Resistance to damage is %d\r\n",
               value, obj->obj_flags.value[2]);
       ch->send(buf);
       break;
@@ -4801,7 +4801,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
           strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
         else
           strcpy(buf2, "Invalid");
-        sprintf(buf, "    Affects : %s By %d\n\r", buf2, obj->affected[i].modifier);
+        sprintf(buf, "    Affects : %s By %d\r\n", buf2, obj->affected[i].modifier);
         ch->send(buf);
       }
     }
@@ -4821,14 +4821,14 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       strcat(buf, buf2);
       ch->send(buf);
 
-      sprintf(buf, "   Height %dcm  Weight %dpounds \n\r",
+      sprintf(buf, "   Height %dcm  Weight %dpounds \r\n",
               GET_HEIGHT(victim), GET_WEIGHT(victim));
       ch->send(buf);
 
       if (victim->getLevel() > 9)
       {
 
-        sprintf(buf, "Str%d,  Int %d,  Wis %d,  Dex %d,  Con %d\n\r",
+        sprintf(buf, "Str%d,  Int %d,  Wis %d,  Dex %d,  Con %d\r\n",
                 GET_STR(victim),
                 GET_INT(victim),
                 GET_WIS(victim),
@@ -5352,19 +5352,19 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (GET_ALIGNMENT(ch) < 0)
   {
-    act("Calling upon your foul magic, you animate $p.\n\r$N slowly lifts "
+    act("Calling upon your foul magic, you animate $p.\r\n$N slowly lifts "
         "itself to its feet.",
         ch, corpse, mob, TO_CHAR, INVIS_NULL);
-    act("Calling upon $s foul magic, $n animates $p.\n\r$N slowly lifts "
+    act("Calling upon $s foul magic, $n animates $p.\r\n$N slowly lifts "
         "itself to its feet.",
         ch, corpse, mob, TO_ROOM, INVIS_NULL);
   }
   else
   {
-    act("Invoking your divine magic, you free $p's spirit.\n\r$N slowly rises "
+    act("Invoking your divine magic, you free $p's spirit.\r\n$N slowly rises "
         "out of the corpse and hovers a few feet above the ground.",
         ch, corpse, mob, TO_CHAR, INVIS_NULL);
-    act("Invoking $s divine magic, $n releases $p's spirit.\n\r$N slowly rises "
+    act("Invoking $s divine magic, $n releases $p's spirit.\r\n$N slowly rises "
         "out of the corpse and hovers a few feet above the ground.",
         ch, corpse, mob, TO_ROOM, INVIS_NULL);
   }
@@ -9510,17 +9510,17 @@ int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
     ;
   if (tar_obj)
   {
-    sprintf(buf1, "The %s says '%s'\n\r", qPrintable(fname(tar_obj->Name())), arg);
+    sprintf(buf1, "The %s says '%s'\r\n", qPrintable(fname(tar_obj->Name())), arg);
     sprintf(buf2, "Someone makes it sound like the %s says '%s'.\r\n", qPrintable(fname(tar_obj->Name())), arg);
   }
   else
   {
-    sprintf(buf1, "%s says '%s'\n\r", GET_SHORT(tar_ch), arg);
-    sprintf(buf2, "Someone makes it sound like %s says '%s'\n\r",
+    sprintf(buf1, "%s says '%s'\r\n", GET_SHORT(tar_ch), arg);
+    sprintf(buf2, "Someone makes it sound like %s says '%s'\r\n",
             GET_SHORT(tar_ch), arg);
   }
 
-  sprintf(buf3, "Someone says, '%s'\n\r", arg);
+  sprintf(buf3, "Someone says, '%s'\r\n", arg);
 
   for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch;
        tmp_ch = tmp_ch->next_in_room)
@@ -10349,7 +10349,7 @@ bool elemental_score(Character *ch, int level)
   extern char frills[];
   if (fire)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
             frills[level], "Enhanced Fire Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
@@ -10357,7 +10357,7 @@ bool elemental_score(Character *ch, int level)
   }
   if (ice)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
             frills[level], "Enhanced Cold Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
@@ -10365,7 +10365,7 @@ bool elemental_score(Character *ch, int level)
   }
   if (energy)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
             frills[level], "Enhanced Energy Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
@@ -10373,7 +10373,7 @@ bool elemental_score(Character *ch, int level)
   }
   if (earth)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
             frills[level], "Enhanced Physical Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
@@ -11283,7 +11283,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
 
   dam = 175;
 
-  act("$n calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act("$n calls upon the insect world!\r\n", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
@@ -11412,7 +11412,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
     {
       dam = 9999999;
       send_to_char("The insects are crawling in your mouth, out of your eyes, "
-                   "through your stomach!\n\r",
+                   "through your stomach!\r\n",
                    victim);
       act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("$N is completely consumed by your insects!", ch, 0, victim, TO_CHAR, 0);
@@ -12039,7 +12039,7 @@ int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Characte
   //	if(victim != ch)
   //	{
   //		send_to_char("Why would the forest like anyone but
-  // you?\n\r", ch);
+  // you?\r\n", ch);
   //		return ReturnValue::eFAILURE;
   //	}
   if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
@@ -14880,7 +14880,7 @@ int spell_boneshield(uint8_t level, Character *ch, Character *victim, Object *ob
     return ReturnValue::eFAILURE;
   }
 
-  send_to_room("Deadly spikes of bone burst forth from the limbs and torso of the revenant forming a deadly shield!\n\r", ch->in_room);
+  send_to_room("Deadly spikes of bone burst forth from the limbs and torso of the revenant forming a deadly shield!\r\n", ch->in_room);
 
   af.type = SPELL_BONESHIELD;
   af.location = 0;

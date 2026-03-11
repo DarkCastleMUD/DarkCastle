@@ -743,7 +743,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     }
     if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
     {
-      send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n\r", ch->in_room);
+      send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\r\n", ch->in_room);
       return ReturnValue::eSUCCESS;
     }
     act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);

@@ -2278,7 +2278,7 @@ void vault_log(Character *ch, char *owner)
 
   if (!strcmp(owner, clanVName(ch->clan).toStdString().c_str()))
   {
-    strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\n\r", MAX_STRING_LENGTH);
+    strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
   }
   else
   {
@@ -2710,7 +2710,7 @@ int vault_search(Character *ch, const char *args)
         if (!owner_shown)
         {
           owner_shown = true;
-          ch->send(QStringLiteral("\n\r%1:\n\r").arg(vault->owner));
+          ch->send(QStringLiteral("\r\n%1:\r\n").arg(vault->owner));
         }
 
         const auto &count = o.second;
@@ -2743,7 +2743,7 @@ int vault_search(Character *ch, const char *args)
     } // if we have access to vault
   } // for loop of vaults
 
-  ch->send(QStringLiteral("\n\rSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
+  ch->send(QStringLiteral("\r\nSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
 
   return ReturnValue::eSUCCESS;
 }

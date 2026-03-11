@@ -106,8 +106,8 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
@@ -190,8 +190,8 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 
@@ -291,8 +291,8 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 
@@ -418,7 +418,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   if (cmd == cmd_t::LIST) // list
   {
     sprintf(buf, "%s_consent", GET_NAME(ch));
-    ch->send("Available corpses (freshest first):\n\r$B");
+    ch->send("Available corpses (freshest first):\r\n$B");
     for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
     {
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
@@ -438,10 +438,10 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->short_description, cost);
       ch->send(buf);
     }
-    send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
-                 "list is therefore always changing.  If you purchase one, it will be\n\r"
+    send_to_char("$RIf any corpses were listed, they are still where you left them.  This\r\n"
+                 "list is therefore always changing.  If you purchase one, it will be\r\n"
                  "placed at your feet. Use \"buy <number>\" to purchase a corpse.\r\n"
-                 "Use 'value' to find how much your eq would cost with what you\n\r"
+                 "Use 'value' to find how much your eq would cost with what you\r\n"
                  "have on you now.\r\n",
                  ch);
     return ReturnValue::eSUCCESS;
@@ -491,7 +491,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     }
     move_obj(obj, ch->in_room);
     REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
-    send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
+    send_to_char("The mortician goes into his freezer and returns with a corpse, which he\r\n"
                  "places at your feet.\r\n",
                  ch);
     GET_PLATINUM(ch) -= cost;
@@ -818,8 +818,8 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 

@@ -996,9 +996,9 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
           continue;
         }
         if (CAN_SEE(k->follower, ch))
-          sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));
+          sprintf(tmp, "You follow %s.\r\n\r\n", GET_SHORT(ch));
         else
-          strcpy(tmp, "You follow someone.\n\r\n\r");
+          strcpy(tmp, "You follow someone.\r\n\r\n");
         k->follower->send(tmp);
         // do_move(k->follower, "", cmd + 1);
         char tempcommand[32];
@@ -1214,7 +1214,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   case 0:
     do_look(ch, "");
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    ch->sendln("\n\rYou are momentarily dazed from the dimensional shift.");
+    ch->sendln("\r\nYou are momentarily dazed from the dimensional shift.");
     act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
     break;
   case 1:

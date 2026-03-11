@@ -125,7 +125,7 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
     ch->send("Area number is outside the limits\r\n");
     return;
   }
-  snprintf(buf, MAX_STRING_LENGTH, "%lu)%30s -- $5%12ld$R xps -- $5%12ld$R gold\n\r", area, DC::getInstance()->zones.value(area).NameC(), areaStats[area].xps, areaStats[area].gold);
+  snprintf(buf, MAX_STRING_LENGTH, "%lu)%30s -- $5%12ld$R xps -- $5%12ld$R gold\r\n", area, DC::getInstance()->zones.value(area).NameC(), areaStats[area].xps, areaStats[area].gold);
   csendf(ch, buf);
   snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5s\r\n", "Mob Name", "Killed");
   csendf(ch, buf);
@@ -151,7 +151,7 @@ void AreaData::DisplayAreaData(Character *ch)
   {
     if (areaStats[zone_key].xps == 0)
       continue;
-    buf = QStringLiteral("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\n\r").arg(35 + zone.Name().length() - nocolor_strlen(zone.Name()));
+    buf = QStringLiteral("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\r\n").arg(35 + zone.Name().length() - nocolor_strlen(zone.Name()));
     ch->send(buf.arg(zone_key).arg(zone.Name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
   }
   return;

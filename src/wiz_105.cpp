@@ -149,7 +149,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  csendf(ch, "Player: %s\n\r", victim->getNameC());
+  csendf(ch, "Player: %s\r\n", victim->getNameC());
 
   if (isSet(victim->combat, COMBAT_SHOCKED))
     ch->sendln("COMBAT_SHOCKED");
@@ -226,7 +226,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
   if (isSet(victim->combat, COMBAT_ATTACKER))
     ch->sendln("COMBAT_ATTACKER");
 
-  ch->sendln("--------------------\n\r");
+  ch->sendln("--------------------\r\n");
 
   return ReturnValue::eSUCCESS;
 }
@@ -244,7 +244,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
     {
       for (const auto &pt : PerfTimers)
       {
-        csendf(ch, "%s\n\r", pt.first.c_str());
+        csendf(ch, "%s\r\n", pt.first.c_str());
       }
     }
     else if (arg2 == "show")
@@ -260,7 +260,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
                      "cur:%lus %luμs"
                      "\tmin:%lus %luμs"
                      "\tmax:%lus %luμs"
-                     "\tavg:%lus %luμs\n\r",
+                     "\tavg:%lus %luμs\r\n",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
@@ -279,7 +279,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
                      "cur:%lus %luμs"
                      "\tmin:%lus %luμs"
                      "\tmax:%lus %luμs"
-                     "\tavg:%lus %luμs\n\r",
+                     "\tavg:%lus %luμs\r\n",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
