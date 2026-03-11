@@ -17,7 +17,6 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include <cctype>
 #include <cstring>
 
 #include <fmt/format.h>
@@ -29,15 +28,12 @@
 #include "DC/mobile.h"
 #include "DC/utility.h"
 #include "DC/spells.h"
-#include "DC/fileinfo.h" // SAVE_DIR
 #include "DC/player.h"
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/handler.h"
-#include "DC/race.h"
 #include "DC/vault.h"
-#include "DC/const.h"
-#include "DC/guild.h"
+#include "DC/memory.h"
 
 #ifdef USE_SQL
 #include <iostream>
