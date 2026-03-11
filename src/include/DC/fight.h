@@ -83,7 +83,7 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
 int act_poisonous(Character *ch);
 int isHit(Character *ch, Character *victim, int attacktype, int &type, int &reduce);
 void inform_victim(Character *ch, Character *victim, int dam);
-Character *loop_followers(struct follow_type **f);
+Character *loop_followers(follow_type **f);
 Character *get_highest_level_killer(Character *leader, Character *killer);
 int32_t count_xp_eligibles(Character *leader, Character *killer, int32_t highest_level, int32_t *total_levels);
 int64_t scale_char_xp(Character *ch, Character *killer, Character *victim, int32_t no_killers, int32_t total_levels, int32_t highest_level, int64_t base_xp, int64_t *bonus_xp);
@@ -138,9 +138,10 @@ void remove_active_potato(Character *vict);
 #define DAMAGE_TYPE_MAGIC 1
 #define DAMAGE_TYPE_SONG 2
 
-struct threat_struct
+class threat_data
 {
-  struct threat_struct *next;
+public:
+  threat_data *next;
   int threat;
   char *name;
 };

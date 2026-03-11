@@ -216,8 +216,8 @@ void perform_violence(void)
   Character *ch;
   int is_mob = 0;
   int retval;
-  static struct affected_type *af, *next_af_dude;
-  struct follow_type *fol, *folnext;
+  static affected_type *af, *next_af_dude;
+  follow_type *fol, *folnext;
   extern char *spell_wear_off_msg[];
 
   if (!combat_list)
@@ -443,7 +443,7 @@ void perform_violence(void)
 
 void add_threat(Character *mob, Character *ch, int amt)
 {
-  struct threat_struct *thr;
+  threat_data *thr;
   if (!mob || !ch || !amt || mob->isPlayer() || !ch->getNameC())
     return;
   for (thr = mob->mobdata->threat; thr; thr = thr->next)
@@ -455,9 +455,9 @@ void add_threat(Character *mob, Character *ch, int amt)
     }
   }
 #ifdef LEAK_CHECK
-  thr = (struct threat_struct *)calloc(1, sizeof(struct threat_struct));
+  thr = (threat_data *)calloc(1, sizeof(threat_data));
 #else
-  thr = (struct threat_struct *)dc_alloc(1, sizeof(struct threat_struct));
+  thr = (threat_data *)dc_alloc(1, sizeof(threat_data));
 #endif
   thr->next = mob->mobdata->threat;
   thr->threat = amt;
@@ -477,7 +477,7 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
 {
   if (!actor || !mob || mob->isPlayer())
     return;
-  struct threat_struct *thr;
+  threat_data *thr;
   float v = (float)actor->has_skill(skill) / 100.0;
   if (!v)
     v = 0.4; // like weapons
@@ -861,7 +861,7 @@ void update_flags(Character *vict)
   if (isSet(vict->combat, COMBAT_MONK_STANCE))
   {
     // stance lasts 'modifier' rounds.  Remove bit once used up
-    struct affected_type *pspell;
+    affected_type *pspell;
     pspell = vict->affected_by_spell(KI_STANCE + KI_OFFSET);
     if (!pspell)
     {
@@ -942,7 +942,7 @@ bool do_frostshield(Character *ch, Character *vict)
 
 int do_lightning_shield(Character *ch, Character *vict, int dam)
 {
-  struct affected_type *cur_af;
+  affected_type *cur_af;
   int learned = 0;
 
   if (!ch || !vict)
@@ -1036,7 +1036,7 @@ int do_vampiric_aura(Character *ch, Character *vict)
   if (GET_POS(vict) == position_t::DEAD)
     return ReturnValue::eFAILURE;
 
-  struct affected_type *af;
+  affected_type *af;
 
   if (nullptr == (af = vict->affected_by_spell(SPELL_VAMPIRIC_AURA)))
     return ReturnValue::eFAILURE;
@@ -1057,7 +1057,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
-  struct affected_type *cur_af;
+  affected_type *cur_af;
   int learned = 0;
 
   if (!ch || !vict || ch == vict)
@@ -1146,7 +1146,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
-  struct affected_type *cur_af;
+  affected_type *cur_af;
   int learned = 0;
 
   if (!ch || !vict || ch == vict)
@@ -1231,7 +1231,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
-  struct affected_type *cur_af;
+  affected_type *cur_af;
   int learned = 0;
 
   if (!ch || !vict || ch == vict)
@@ -2070,7 +2070,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   SET_BIT(retval, ReturnValue::eSUCCESS);
   weapon_bit = get_weapon_bit(weapon_type);
   typeofdamage = damage_type(weapon_type);
-  struct follow_type *fol;
+  follow_type *fol;
   if (attacktype == SKILL_FLAMESLASH)
     weapon_bit = TYPE_FIRE;
 
@@ -2544,7 +2544,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
 
   int pre_stoneshield_dam = 0;
   std::stringstream string1;
-  struct affected_type *pspell = nullptr;
+  affected_type *pspell = nullptr;
   if (!victim->isImmortalPlayer() && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = victim->affected_by_spell(SPELL_STONE_SHIELD)) ||
        (pspell = victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))))
@@ -2844,7 +2844,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       {
         if (ch->followers)
         {
-          struct follow_type *folnext;
+          follow_type *folnext;
           for (fol = ch->followers; fol; fol = folnext)
           {
             folnext = fol->next;
@@ -3015,8 +3015,8 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
 
 void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int weapon, int filter)
 {
-  extern struct message_list fight_messages[MAX_MESSAGES];
-  struct message_type *messages, *messages2;
+  extern message_list fight_messages[MAX_MESSAGES];
+  message_type *messages, *messages2;
   int i, j, nr;
   QString find, replace;
 
@@ -3128,7 +3128,7 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
 
 void set_cantquit(Character *ch, Character *vict, bool forced)
 {
-  struct affected_type af, *paf;
+  affected_type af, *paf;
   Character *realch;
   Character *realvict;
   int ch_vnum = -1;
@@ -4024,8 +4024,8 @@ void load_messages(char *file, int base)
 {
   FILE *fl;
   int i, type;
-  extern struct message_list fight_messages[MAX_MESSAGES];
-  struct message_type *messages;
+  extern message_list fight_messages[MAX_MESSAGES];
+  message_type *messages;
   char chk[100];
 
   if (!(fl = fopen(file, "r")))
@@ -4061,11 +4061,11 @@ void load_messages(char *file, int base)
     }
 
 #ifdef LEAK_CHECK
-    messages = (struct message_type *)
-        calloc(1, sizeof(struct message_type));
+    messages = (message_type *)
+        calloc(1, sizeof(message_type));
 #else
-    messages = (struct message_type *)
-        dc_alloc(1, sizeof(struct message_type));
+    messages = (message_type *)
+        dc_alloc(1, sizeof(message_type));
 #endif
     if (!base)
       fight_messages[i].number_of_attacks++;
@@ -4100,8 +4100,8 @@ void load_messages(char *file, int base)
 
 void DC::free_messages_from_memory(void)
 {
-  extern struct message_list fight_messages[MAX_MESSAGES];
-  struct message_type *next_message = nullptr;
+  extern message_list fight_messages[MAX_MESSAGES];
+  message_type *next_message = nullptr;
   int i;
 
   for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type); i++)
@@ -4160,7 +4160,7 @@ void set_fighting(Character *ch, Character *vict)
       if (level_difference > 0 || ch->getLevel() == 60)
       {
         vict->add_memory(GET_NAME(ch), 't');
-        struct timer_data *timer = new timer_data;
+        timer_data *timer = new timer_data;
         timer->var_arg1 = vict->hunting;
         timer->arg2 = (void *)vict;
         timer->function = clear_hunt;
@@ -4175,7 +4175,7 @@ void set_fighting(Character *ch, Character *vict)
           if (level_difference > 0 || vict->getLevel() == 60)
           {
             ch->add_memory(vict->getName(), 't');
-            struct timer_data *timer = new timer_data;
+            timer_data *timer = new timer_data;
             timer->var_arg1 = ch->hunting;
             timer->arg2 = (void *)ch;
             timer->function = clear_hunt;
@@ -4253,7 +4253,7 @@ void stop_fighting(Character *ch, int clearlag)
 
   if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
   {
-    struct affected_type *af;
+    affected_type *af;
 
     for (af = ch->affected; af; af = af->next)
     {
@@ -4604,14 +4604,14 @@ void make_corpse(Character *ch)
       }
       else // 1-40 40%
       {
-        switch (itemtype)
+        if (itemtype == 1)
         {
-        case 0: // bottle
-          recipeitem = clone_object(real_object(6320));
-          break;
-        case 1:
           recipeitem = clone_object(real_object(6342));
-          break;
+        }
+        else if (itemtype == 0)
+        {
+
+          recipeitem = clone_object(real_object(6320));
         }
       }
       if (recipeitem > (Object *)0)
@@ -5332,7 +5332,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
   {
     if (!IS_AFFECTED(vict, AFF_BLIND))
     {
-      struct affected_type af;
+      affected_type af;
       af.type = SKILL_COMBAT_MASTERY;
       af.location = APPLY_HITROLL;
       af.modifier = vict->has_skill(SKILL_BLINDFIGHTING) ? skill_success(vict, 0, SKILL_BLINDFIGHTING) ? -10 : -20 : -20;
@@ -5391,7 +5391,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
       act("$n's whipping attack trips you up, causing you to stumble and fall!", ch, 0, vict, TO_VICT, 0);
       act("$n's whipping attack trips up $N causing $M to stumble and fall!", ch, 0, vict, TO_ROOM, NOTVICT);
 
-      struct affected_type af;
+      affected_type af;
       af.type = SKILL_CM_TIMER;
       af.location = 0;
       af.modifier = 0;
@@ -5848,7 +5848,7 @@ void group_gain(Character *ch, Character *victim)
   int64_t share, total_share = 0;
   int64_t base_xp = 0, bonus_xp = 0;
   Character *leader, *highest, *tmp_ch;
-  struct follow_type *f;
+  follow_type *f;
 
   if (is_pkill(ch, victim))
     return;
@@ -5932,7 +5932,7 @@ void group_gain(Character *ch, Character *victim)
 /* find the highest level present at the kill */
 Character *get_highest_level_killer(Character *leader, Character *killer)
 {
-  struct follow_type *f;
+  follow_type *f;
   Character *highest = killer;
 
   /* check to see if the group leader was involved and outranks the killer */
@@ -5957,7 +5957,7 @@ Character *get_highest_level_killer(Character *leader, Character *killer)
 int32_t count_xp_eligibles(Character *leader, Character *killer,
                            int32_t highest_level, int32_t *total_levels)
 {
-  struct follow_type *f;
+  follow_type *f;
   int32_t num_eligibles = 0;
 
   *total_levels = 0;
@@ -6001,7 +6001,7 @@ int64_t scale_char_xp(Character *ch, Character *killer, Character *victim,
 }
 
 /* advance to the next follower in the list */
-Character *loop_followers(struct follow_type **f)
+Character *loop_followers(follow_type **f)
 {
   Character *tmp_ch;
 
@@ -6458,7 +6458,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   int num;
   char killer_message[MAX_STRING_LENGTH];
   //  Character *i = 0;
-  struct affected_type *af, *afpk;
+  affected_type *af, *afpk;
 
   void move_player_home(Character * victim);
   num = number(1, 1000);

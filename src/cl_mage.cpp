@@ -94,7 +94,7 @@ int spellcraft(Character *ch, int spell)
 int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
 {
   // uint8_t percent;
-  struct affected_type af;
+  affected_type af;
   int duration = 40;
 
   if (!ch->canPerform(SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n"))
@@ -144,7 +144,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   int lvl = ch->has_skill(SKILL_IMBUE);
   int charges = 0, manacost = 0;
   Object *wand;
-  struct affected_type af;
+  affected_type af;
 
   *buf = '\0';
 

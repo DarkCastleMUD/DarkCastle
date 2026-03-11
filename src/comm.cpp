@@ -69,8 +69,9 @@
 #include "DC/character.h"
 #include "DC/memory.h"
 
-struct multiplayer
+class multiplayer
 {
+public:
   QHostAddress host;
   QString name1;
   QString name2;
@@ -106,11 +107,11 @@ void save_slot_machines(void);
 void check_silence_beacons(void);
 
 /* local globals */
-struct txt_block *bufpool = 0; /* pool of large output buffers */
-int buf_largecount = 0;        /* # of large buffers which exist */
-int buf_overflows = 0;         /* # of overflows of output */
-int buf_switches = 0;          /* # of switches from small to large buf */
-int _shutdown = 0;             /* clean shutdown */
+txt_block *bufpool = 0; /* pool of large output buffers */
+int buf_largecount = 0; /* # of large buffers which exist */
+int buf_overflows = 0;  /* # of overflows of output */
+int buf_switches = 0;   /* # of switches from small to large buf */
+int _shutdown = 0;      /* clean shutdown */
 // int nameserver_is_slow = 0;	/* see config.c */
 // extern int auto_save;		/* see config.c */
 // extern int autosave_time;	/* see config.c */
@@ -170,15 +171,6 @@ void checkConsecrate(int);
 // extern char greetings2[MAX_STRING_LENGTH];
 // extern char greetings3[MAX_STRING_LENGTH];
 // extern char greetings4[MAX_STRING_LENGTH];
-
-#ifdef WIN32
-void gettimeofday(struct timeval *t, struct timezone *dummy)
-{
-  DWORD millisec = GetTickCount();
-  t->tv_sec = (int)(millisec / 1000);
-  t->tv_usec = (millisec % 1000) * 1000;
-}
-#endif
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
@@ -1499,7 +1491,7 @@ Character *get_charmie(Character *ch)
   if (!ch)
     return 0;
 
-  struct follow_type *k;
+  follow_type *k;
   if (ch->followers)
     for (k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next)
       if (IS_AFFECTED(k->follower, AFF_CHARM))
@@ -1542,7 +1534,7 @@ void flush_queues(class Connection *d)
 
 void DC::free_buff_pool_from_memory(void)
 {
-  struct txt_block *curr = nullptr;
+  txt_block *curr = nullptr;
 
   while (bufpool)
   {
@@ -2453,7 +2445,7 @@ void crashsig(int sig)
 
 void unrestrict_game(int sig)
 {
-  extern struct ban_list_element *ban_list;
+  extern ban_list_element *ban_list;
   extern int num_invalid;
 
   logentry(QStringLiteral("Received SIGUSR2 - completely unrestricting game (emergent)"),

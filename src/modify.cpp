@@ -165,7 +165,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
   int field, type, ctr;
   Character *mob = nullptr;
   class Object *obj;
-  struct extra_descr_data *ed, *tmp;
+  extra_descr_data *ed, *tmp;
 
   if (ch->isNonPlayer())
     return 1;
@@ -318,10 +318,10 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
         if (!ed)
         { /* the field was not found. create a new_new one. */
 #ifdef LEAK_CHECK
-          ed = (struct extra_descr_data *)
-              calloc(1, sizeof(struct extra_descr_data));
+          ed = (extra_descr_data *)
+              calloc(1, sizeof(extra_descr_data));
 #else
-          ed = (struct extra_descr_data *)dc_alloc(1, sizeof(struct extra_descr_data));
+          ed = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
 #endif
           ed->next = obj->ex_description;
           obj->ex_description = ed;
@@ -476,7 +476,7 @@ char *one_word(char *argument, char *first_arg)
 
 void DC::free_help_from_memory(void)
 {
-  extern struct help_index_element *help_index;
+  extern help_index_element *help_index;
 
   if (!help_index)
   {
@@ -491,18 +491,18 @@ void DC::free_help_from_memory(void)
   help_index = nullptr;
 }
 
-struct help_index_element *build_help_index(FILE *fl, int *num)
+help_index_element *build_help_index(FILE *fl, int *num)
 {
   int nr = -1, issorted, i;
-  struct help_index_element *list = 0, mem;
+  help_index_element *list = 0, mem;
   char buf[81], tmp[81], *scan;
   int32_t pos;
 
 #ifdef LEAK_CHECK
-  list = (struct help_index_element *)
-      calloc(MAX_HELP, sizeof(struct help_index_element));
+  list = (help_index_element *)
+      calloc(MAX_HELP, sizeof(help_index_element));
 #else
-  list = (struct help_index_element *)dc_alloc(MAX_HELP, sizeof(struct help_index_element));
+  list = (help_index_element *)dc_alloc(MAX_HELP, sizeof(help_index_element));
 #endif
 
   for (;;)

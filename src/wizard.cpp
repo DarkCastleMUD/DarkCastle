@@ -274,9 +274,9 @@ void boro_mob_stat(Character *ch, Character *k)
   int i, i2;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
-  struct follow_type *fol;
+  follow_type *fol;
   class Object *j = 0;
-  struct affected_type *aff;
+  affected_type *aff;
 
   sprinttype(k->c_class, pc_clss_types, buf2);
   sprintf(buf,
@@ -583,11 +583,11 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct follow_type *fol;
+  follow_type *fol;
   int i2;
   char buf2[MAX_STRING_LENGTH];
   class Object *j = 0;
-  struct affected_type *aff;
+  affected_type *aff;
 
   if (k->isNonPlayer())
   {
@@ -896,7 +896,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (k->isPlayer())
   {
     csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n", GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k), GET_AC_METAS(k), GET_AGE_METAS(k));
-    csendf(ch, "$3Profession$R: %s (%d)\r\n", find_profession(k->c_class, k->player->profession), k->player->profession);
+    csendf(ch, "$3Profession$R: %s (%d)\r\n", qPrintable(find_profession(k->c_class, k->player->profession)), k->player->profession);
   }
 
   if (k->affected)
@@ -973,7 +973,7 @@ void obj_stat(Character *ch, class Object *j)
   char buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
   char buf4[MAX_STRING_LENGTH];
-  struct extra_descr_data *desc;
+  extra_descr_data *desc;
   bool found;
   int i, virt;
 
@@ -1484,7 +1484,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
         tmp_victim->sendln("You hear unmatched screams of terror as all mobs are summarily executed!");
     }
   }
-  ch->sendln("You have just caused the destruction of countless creatures in ths area!");
+  ch->sendln("You have just caused the deion of countless creatures in ths area!");
   sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
   logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
@@ -1645,29 +1645,31 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
 
 // Scavenger hunts..
 
-struct hunt_data
+class hunt_data
 {
-  struct hunt_data *next;
+public:
+  hunt_data *next;
   char *huntname;
   int itemnum;
   int time;
   int itemsAvail[50];
 };
 
-struct hunt_items
+class hunt_items
 { // Bleh, don't wanna make it go through every item in the game everytime someone checks the list
-  struct hunt_items *next;
-  struct hunt_data *hunt;
+public:
+  hunt_items *next;
+  hunt_data *hunt;
   class Object *obj;
   char *mobname;
 };
 
-struct hunt_data *hunt_list = nullptr;
-struct hunt_items *hunt_items_list = nullptr;
+hunt_data *hunt_list = nullptr;
+hunt_items *hunt_items_list = nullptr;
 
-void check_end_of_hunt(struct hunt_data *h, bool forced = false)
+void check_end_of_hunt(hunt_data *h, bool forced = false)
 {
-  struct hunt_items *i, *p = nullptr, *in;
+  hunt_items *i, *p = nullptr, *in;
   int items = 0;
 
   for (i = hunt_items_list; i; i = in)
@@ -1726,7 +1728,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
     }
     send_info(buf);
 
-    struct hunt_data *hl, *p = nullptr;
+    hunt_data *hl, *p = nullptr;
     for (hl = hunt_list; hl; hl = hl->next)
     {
       if (hl == h)
@@ -1756,7 +1758,7 @@ int do_huntclear(Character *ch, char *arg, cmd_t cmd)
   }
   else
   {
-    struct hunt_data *h, *hn;
+    hunt_data *h, *hn;
     for (h = hunt_list; h; h = hn)
     {
       hn = h->next;
@@ -1770,7 +1772,7 @@ int do_huntclear(Character *ch, char *arg, cmd_t cmd)
 
 void huntclear_item(class Object *obj)
 {
-  struct hunt_items *hi, *hin, *hip = nullptr;
+  hunt_items *hi, *hin, *hip = nullptr;
   for (hi = hunt_items_list; hi; hi = hin)
   {
     hin = hi->next;
@@ -1788,7 +1790,7 @@ void huntclear_item(class Object *obj)
   }
 }
 
-int get_rand_obj(struct hunt_data *h)
+int get_rand_obj(hunt_data *h)
 {
   int i, v;
 
@@ -1807,7 +1809,7 @@ int get_rand_obj(struct hunt_data *h)
   return c;
 }
 
-void init_random_hunt_items(struct hunt_data *h)
+void init_random_hunt_items(hunt_data *h)
 {
   FILE *f;
   if ((f = fopen("huntitems.txt", "r")) == nullptr)
@@ -1855,15 +1857,15 @@ char *last_hunt_time(char *last_hunt)
 
 void begin_hunt(int item, int duration, int amount, char *huntname)
 { // time, itme, item
-  struct hunt_data *n;
+  hunt_data *n;
   char *tmp;
-  struct tm *pTime = nullptr;
+  tm *pTime = nullptr;
   time_t ct;
 
 #ifdef LEAK_CHECK
-  n = (struct hunt_data *)calloc(1, sizeof(struct hunt_data));
+  n = (hunt_data *)calloc(1, sizeof(hunt_data));
 #else
-  n = (struct hunt_data *)dc_alloc(1, sizeof(struct hunt_data));
+  n = (hunt_data *)dc_alloc(1, sizeof(hunt_data));
 #endif
   n->next = hunt_list;
   hunt_list = n;
@@ -1942,11 +1944,11 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
     }
     class Object *obj = clone_object(rnum);
     obj_to_char(obj, vict);
-    struct hunt_items *ni;
+    hunt_items *ni;
 #ifdef LEAK_CHECK
-    ni = (struct hunt_items *)calloc(1, sizeof(struct hunt_items));
+    ni = (hunt_items *)calloc(1, sizeof(hunt_items));
 #else
-    ni = (struct hunt_items *)dc_alloc(1, sizeof(struct hunt_items));
+    ni = (hunt_items *)dc_alloc(1, sizeof(hunt_items));
 #endif
     ni->hunt = n;
     ni->obj = obj;
@@ -1958,7 +1960,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
 void pick_up_item(Character *ch, class Object *obj)
 {
-  struct hunt_items *i, *p = nullptr, *in;
+  hunt_items *i, *p = nullptr, *in;
   char buf[MAX_STRING_LENGTH];
   int gold = 0;
   for (i = hunt_items_list; i; i = in)
@@ -1974,7 +1976,7 @@ void pick_up_item(Character *ch, class Object *obj)
       sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
               obj->short_description, i->mobname, ch->getNameC());
       send_info(buf);
-      struct hunt_data *h = i->hunt;
+      hunt_data *h = i->hunt;
       class Object *oitem = nullptr, *citem;
       int r1 = 0;
       switch (vnum)
@@ -2052,7 +2054,7 @@ void pick_up_item(Character *ch, class Object *obj)
 
 void pulse_hunts()
 {
-  struct hunt_data *h, *hn;
+  hunt_data *h, *hn;
 
   for (h = hunt_list; h; h = hn)
   {
@@ -2085,8 +2087,8 @@ void pulse_hunts()
 int do_showhunt(Character *ch, char *arg, cmd_t cmd)
 {
   std::string buf;
-  struct hunt_data *h;
-  struct hunt_items *hi;
+  hunt_data *h;
+  hunt_items *hi;
 
   if (!hunt_list)
   {
@@ -2193,7 +2195,7 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Invalid duration.");
     return ReturnValue::eSUCCESS;
   }
-  struct hunt_data *h;
+  hunt_data *h;
   for (h = hunt_list; h; h = h->next)
     if (h->itemnum == vnum)
     {

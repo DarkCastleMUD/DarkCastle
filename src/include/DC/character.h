@@ -38,16 +38,18 @@ typedef uint64_t gold_t;
 bool on_forbidden_name_list(const char *name);
 QString color_to_code(QString color);
 
-struct strcasecmp_compare
+class strcasecmp_compare
 {
+public:
   bool operator()(const std::string &l, const std::string &r) const
   {
     return strcasecmp(l.c_str(), r.c_str()) < 0;
   }
 };
 
-struct ignore_entry
+class ignore_entry
 {
+public:
   bool ignore;
   uint64_t ignored_count;
 };
@@ -183,18 +185,19 @@ private:
 // * ------- Begin MOBProg stuff ----------- *
 
 typedef int16_t skill_t;
-typedef std::map<skill_t, struct char_skill_data> skill_list_t;
 
-struct tempvariable
+class tempvariable
 {
-  struct tempvariable *next{};
+public:
+  tempvariable *next{};
   QString name;
   QString data;
   int16_t save{}; // save or not
 };
 
-struct mob_prog_act_list
+class mob_prog_act_list
 {
+public:
   mob_prog_act_list *next{};
   char *buf{};
   Character *ch{};
@@ -202,8 +205,9 @@ struct mob_prog_act_list
   void *vo{};
 };
 
-struct mob_prog_data
+class mob_prog_data
 {
+public:
   mob_prog_data *next{};
   int type{};
   char *arglist{};
@@ -236,15 +240,18 @@ struct mob_prog_data
 
 // * ------- End MOBProg stuff ----------- *
 
-struct char_skill_data
+class char_skill_data
 {
+public:
   skill_t skillnum;  // ID # of skill.
   int16_t learned;   // % chance for success must be > 0
   int32_t unused[5]; // for future use
 };
+typedef std::map<skill_t, char_skill_data> skill_list_t;
 
-struct class_skill_defines
+class class_skill_defines
 {
+public:
   char *skillname;        // name of skill
   int16_t skillnum;       // ID # of skill
   level_t levelavailable; // what level class can get it
@@ -254,8 +261,9 @@ struct class_skill_defines
 };
 
 /* Used in CHAR_FILE_U *DO*NOT*CHANGE* */
-struct affected_type
+class affected_type
 {
+public:
   uint32_t type = {};    /* The type of spell that caused ths      */
   int16_t duration = {}; /* For how long its effects will last      */
   int32_t duration_type = {};
@@ -263,15 +271,16 @@ struct affected_type
   int32_t location = {};  /* Tells which ability to change(APPLY_XXX)*/
   int32_t bitvector = {}; /* Tells which bits to set (AFF_XXX)       */
   std::string caster = {};
-  struct affected_type *next = {};
+  affected_type *next = {};
   Character *origin = {};
   Character *victim = {};
 };
 
-struct follow_type
+class follow_type
 {
+public:
   Character *follower;
-  struct follow_type *next;
+  follow_type *next;
 };
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
 class Toggle
@@ -407,7 +416,7 @@ public:
   uint32_t grpplvl = {};      // sum of levels of group pkill victims
   uint32_t group_kills = {};  // # of kills for group
 
-  struct time_data time = {}; // PC time data.  logon, played, birth
+  time_data time = {}; // PC time data.  logon, played, birth
 
   uint32_t bad_pw_tries = {}; // How many times people have entered bad pws
 
@@ -482,8 +491,9 @@ enum mob_type_t
 };
 const int MAX_MOB_VALUES = 4;
 
-struct mob_flag_data
+class mob_flag_data
 {
+public:
   int32_t value[MAX_MOB_VALUES]; /* Mob type-specific value numbers */
   mob_type_t type;               /* Type of mobile                     */
 };
@@ -507,7 +517,7 @@ public:
   int16_t mpactnum = {};         // num
   int32_t last_room = {};        // Room rnum the mob was last in. Used
                                  // For !magic,!track changing flags.
-  struct threat_struct *threat = {};
+  class threat_data *threat = {};
   QSharedPointer<ResetCommand> reset = {};
   mob_flag_data mob_flags = {}; /* Mobile information               */
   bool paused = {};
@@ -838,16 +848,16 @@ public:
 
   Object *beacon = nullptr; /* pointer to my beacon */
 
-  std::vector<struct songInfo> songs = {}; // Song list
-                                           //     int16_t song_timer = {};       /* status for songs being sung */
-                                           //     int16_t song_number = {};      /* number of song being sung */
-                                           //     char * song_data = {};        /* args for the songs */
+  std::vector<songInfo> songs = {}; // Song list
+                                    //     int16_t song_timer = {};       /* status for songs being sung */
+                                    //     int16_t song_number = {};      /* number of song being sung */
+                                    //     char * song_data = {};        /* args for the songs */
 
   class Object *equipment[MAX_WEAR] = {}; // Equipment List
 
-  skill_list_t skills = {};                 // Skills List
-  struct affected_type *affected = nullptr; // Affected by list
-  class Object *carrying = nullptr;         // Inventory List
+  skill_list_t skills = {};          // Skills List
+  affected_type *affected = nullptr; // Affected by list
+  class Object *carrying = nullptr;  // Inventory List
 
   int16_t poison_amount = {}; // How much poison damage I'm taking every few seconds
 
@@ -869,9 +879,9 @@ public:
   Character *next_in_room = {};  /* Next in room */
   Character *next_fighting = {}; /* Next fighting */
   Object *altar = {};
-  struct follow_type *followers = {}; /* List of followers */
-  Character *master = {};             /* Who is char following? */
-  char *group_name = {};              /* Name of group */
+  follow_type *followers = {}; /* List of followers */
+  Character *master = {};      /* Who is char following? */
+  char *group_name = {};       /* Name of group */
 
   int32_t timer = {};           // Timer for update
   int32_t shotsthisround = {};  // Arrows fired this round
@@ -888,8 +898,8 @@ public:
 
   int cID = {}; // character ID
 
-  struct timer_data *timerAttached = {};
-  struct tempvariable *tempVariable = {};
+  timer_data *timerAttached = {};
+  tempvariable *tempVariable = {};
   int spelldamage = {};
 #ifdef USE_SQL
   int player_id = {};
@@ -905,7 +915,7 @@ public:
     debug_ = state;
   }
 
-  struct room_direction_data *brace_at{}, *brace_exit{}; // exits affected by brace
+  room_direction_data *brace_at{}, *brace_exit{}; // exits affected by brace
   time_t first_damage = {};
   uint64_t damage_done = {};
   uint64_t damages = {};
@@ -922,7 +932,7 @@ public:
   bool charge_moves(int skill, double modifier = 1);
   void check_maxes(void);
   int check_charmiejoin(void);
-  struct time_info_data age(void);
+  time_info_data age(void);
   void add_memory(QString victim_name, char type);
   bool can_use_command(cmd_t cmd);
   Object *clan_altar(void);
@@ -1292,8 +1302,8 @@ public:
   void vault_myaccess(QString owner);
   void vault_balance(QString owner);
   void vault_stats(QString owner);
-  void add_vault_access(QString name, vault_data *vault);
-  void remove_vault_access(QString name, vault_data *vault);
+  void add_vault_access(QString name, class vault_data *vault);
+  void remove_vault_access(QString name, class vault_data *vault);
   void vault_list(QString owner);
   void load_golem_data(int golemtype);
   int mprog_greet_trigger(void);
@@ -1309,7 +1319,7 @@ public:
   bool mprog_seval(const char *lhs, const char *opr, const char *rhs);
   bool isTank(void);
   void save_char_obj(void);
-  void char_to_store(struct char_file_u4 *st, time_data &tmpage);
+  void char_to_store(class char_file_u4 *st, time_data &tmpage);
   bool equip_char(Object *obj, int pos, bool flag = false);
   Object *unequip_char(int pos, bool flag = false);
 
@@ -1377,8 +1387,9 @@ public:
 
 // This structure was created as a replacement for char_file_u so that it
 // would be portable between 32-bit and 64-bit code.
-struct char_file_u4
+class char_file_u4
 {
+public:
   char_file_u4();
   Character::sex_t sex = {}; /* Sex */
   int8_t c_class = {};       /* Class */
@@ -1437,10 +1448,12 @@ struct char_file_u4
   uint32_t acmetas = {};
   int32_t agemetas = {};
   int32_t extra_ints[3] = {}; // available just in case
-} __attribute__((packed));
+}
+__attribute__((packed));
 
-struct char_file_u
+class char_file_u
 {
+public:
   int8_t sex;     /* Sex */
   int8_t c_class; /* Class */
   int8_t race;    /* Race */
@@ -1493,8 +1506,9 @@ struct char_file_u
   int32_t extra_ints[3]; // available just in case
 };
 
-struct profession
+class profession
 {
+public:
   std::string name;
   std::string Name;
   uint16_t skillno;

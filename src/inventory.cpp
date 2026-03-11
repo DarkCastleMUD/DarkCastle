@@ -87,7 +87,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
-        struct affected_type pthiefaf;
+        affected_type pthiefaf;
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
         char log_buf[MAX_STRING_LENGTH] = {};
@@ -115,7 +115,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     {
       if (cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name()))
       {
-        struct affected_type pthiefaf;
+        affected_type pthiefaf;
 
         pthiefaf.type = Character::PLAYER_GOLD_THIEF;
         pthiefaf.duration = 10;
@@ -882,7 +882,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())) && !isexact(buffer, sub_object->Name()))
                   {
                     SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
-                    struct affected_type pthiefaf;
+                    affected_type pthiefaf;
 
                     pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
                     pthiefaf.duration = 10;
@@ -1672,7 +1672,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   if (vict_name == QStringLiteral("follower"))
   {
     bool found = false;
-    struct follow_type *k;
+    follow_type *k;
     int org_room = in_room;
     if (followers)
       for (k = followers; k && k != (follow_type *)0x95959595; k = k->next)
@@ -2121,7 +2121,7 @@ int find_door(Character *ch, char *type, char *dir)
 in_room == exit->in_room
 
 */
-bool is_bracing(Character *bracee, struct room_direction_data *exit)
+bool is_bracing(Character *bracee, room_direction_data *exit)
 {
   // this could happen on a repop of the zone
   if (!isSet(exit->exit_info, EX_CLOSED))
@@ -2157,7 +2157,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
   bool found = false;
   int door, other_room, retval;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-  struct room_direction_data *back;
+  room_direction_data *back;
   class Object *obj;
   Character *victim;
   Character *next_vict;
@@ -2315,7 +2315,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
   bool found = false;
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-  struct room_direction_data *back;
+  room_direction_data *back;
   class Object *obj;
   Character *victim;
 
@@ -2423,7 +2423,7 @@ int do_lock(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-  struct room_direction_data *back;
+  room_direction_data *back;
   class Object *obj;
   Character *victim;
 
@@ -2496,7 +2496,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-  struct room_direction_data *back;
+  room_direction_data *back;
   class Object *obj;
   Character *victim;
 
@@ -2628,7 +2628,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
-        struct affected_type pthiefaf;
+        affected_type pthiefaf;
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
@@ -2651,7 +2651,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     {
       if (isexact("lootable", sub_object->Name()))
       {
-        struct affected_type pthiefaf;
+        affected_type pthiefaf;
 
         pthiefaf.type = Character::PLAYER_GOLD_THIEF;
         pthiefaf.duration = 10;

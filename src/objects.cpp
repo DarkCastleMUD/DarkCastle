@@ -902,7 +902,7 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
 command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 {
   class Object *temp{};
-  struct affected_type af{};
+  affected_type af{};
   int amount{};
 
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
@@ -1049,7 +1049,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
 {
   class Object *temp{};
-  struct affected_type af{};
+  affected_type af{};
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {

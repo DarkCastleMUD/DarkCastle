@@ -25,7 +25,7 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
   bool found = false;
   char buf[MAX_INPUT_LENGTH];
   Character *victim;
-  struct affected_type *af, *afpk;
+  affected_type *af, *afpk;
   class Object *dummy;
 
   one_argument(argument, buf);
@@ -68,8 +68,8 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
 int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
 {
   extern FILE *help_fl;
-  extern struct help_index_element *help_index;
-  extern struct help_index_element *build_help_index(FILE * fl, int *num);
+  extern help_index_element *help_index;
+  extern help_index_element *build_help_index(FILE * fl, int *num);
   DC::getInstance()->free_help_from_memory();
   fclose(help_fl);
   if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
@@ -490,18 +490,18 @@ char *print_classes(int bitv)
 
 // do_string is in modify.C
 
-struct skill_quest *find_sq(char *testa)
+skill_quest *find_sq(char *testa)
 {
-  struct skill_quest *curr;
+  skill_quest *curr;
   for (curr = skill_list; curr; curr = curr->next)
     if (!str_nosp_cmp(get_skill_name(curr->num), testa))
       return curr;
   return nullptr;
 }
 
-struct skill_quest *find_sq(int sq)
+skill_quest *find_sq(int sq)
 {
-  struct skill_quest *curr;
+  skill_quest *curr;
   for (curr = skill_list; curr; curr = curr->next)
     if (sq == curr->num)
       return curr;
@@ -559,7 +559,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
   bool done = false;
   argument = one_argument(argument, arg1);
-  struct skill_quest *skill = nullptr;
+  skill_quest *skill = nullptr;
 
   if (argument && *argument)
   {
@@ -575,11 +575,11 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Unknown skill.");
     return ReturnValue::eFAILURE;
   }
-  struct skill_quest *curren, *last = nullptr;
+  skill_quest *curren, *last = nullptr;
   switch (i)
   {
   case 0:
-    struct skill_quest *newOne;
+    skill_quest *newOne;
     ///	int i;
     if (arg3[0] != '\0')
       i = find_skill_num(arg3);
@@ -604,9 +604,9 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
       }
 
 #ifdef LEAK_CHECK
-    newOne = (struct skill_quest *)calloc(1, sizeof(struct skill_quest));
+    newOne = (skill_quest *)calloc(1, sizeof(skill_quest));
 #else
-    newOne = (struct skill_quest *)dc_alloc(1, sizeof(struct skill_quest));
+    newOne = (skill_quest *)dc_alloc(1, sizeof(skill_quest));
 #endif
     newOne->num = i;
     newOne->level = 1;

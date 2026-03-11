@@ -58,9 +58,9 @@ int load_quests(void)
   {
 
 #ifdef LEAK_CHECK
-    quest = (struct quest_info *)calloc(1, sizeof(struct quest_info));
+    quest = (quest_info *)calloc(1, sizeof(quest_info));
 #else
-    quest = (struct quest_info *)dc_alloc(1, sizeof(struct quest_info));
+    quest = (quest_info *)dc_alloc(1, sizeof(quest_info));
 #endif
 
     quest->number = fread_int(fl, 0, 32768);
@@ -120,7 +120,7 @@ int save_quests(void)
   return ReturnValue::eSUCCESS;
 }
 
-struct quest_info *get_quest_struct(int num)
+quest_info *get_quest_(int num)
 {
   quest_info *quest;
   if (!num)
@@ -137,14 +137,14 @@ struct quest_info *get_quest_struct(int num)
   return 0;
 }
 
-struct quest_info *get_quest_struct(char *name)
+quest_info *get_quest_(char *name)
 {
   if (name == nullptr || !*name)
     return 0;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
-    struct quest_info *quest = *node;
+    quest_info *quest = *node;
 
     if (!str_nosp_cmp(name, quest->name))
       return quest;
@@ -165,12 +165,12 @@ struct quest_info *get_quest_struct(char *name)
 
 int do_add_quest(Character *ch, char *name)
 {
-  struct quest_info *quest; // new quest
+  quest_info *quest; // new quest
 
 #ifdef LEAK_CHECK
-  quest = (struct quest_info *)calloc(1, sizeof(struct quest_info));
+  quest = (quest_info *)calloc(1, sizeof(quest_info));
 #else
-  quest = (struct quest_info *)dc_alloc(1, sizeof(struct quest_info));
+  quest = (quest_info *)dc_alloc(1, sizeof(quest_info));
 #endif
 
   quest->name = str_hsh(name);
@@ -204,7 +204,7 @@ int do_add_quest(Character *ch, char *name)
 void list_quests(Character *ch, int lownum, int highnum)
 {
   char buffer[MAX_STRING_LENGTH];
-  struct quest_info *quest;
+  quest_info *quest;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
@@ -213,9 +213,7 @@ void list_quests(Character *ch, int lownum, int highnum)
     if (quest->number <= highnum && quest->number >= lownum)
     {
       // Create a format std::string based on a space offset that takes color codes into account
-      snprintf(buffer, MAX_STRING_LENGTH,
-               "%%3d. $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\r\n",
-               35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
+      snprintf(buffer, MAX_STRING_LENGTH, "%%3d. $B$2Name:$7 %%-%zus$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\r\n", 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
       csendf(ch, buffer, quest->number, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward, quest->level);
     }
@@ -226,7 +224,7 @@ void list_quests(Character *ch, int lownum, int highnum)
 
 void show_quest_info(Character *ch, int num)
 {
-  struct quest_info *quest;
+  quest_info *quest;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
@@ -267,7 +265,7 @@ void show_quest_info(Character *ch, int num)
   ch->sendln("That quest doesn't exist.");
 }
 
-bool check_available_quest(Character *ch, struct quest_info *quest)
+bool check_available_quest(Character *ch, quest_info *quest)
 {
   if (!quest)
     return false;
@@ -301,7 +299,7 @@ bool check_quest_complete(Character *ch, int number)
   return false;
 }
 
-int get_quest_price(struct quest_info *quest)
+int get_quest_price(quest_info *quest)
 {
   return MIN(500, (int)(3.76 * pow(2.71828, quest->level * 0.0976) + 1));
 }
@@ -368,7 +366,7 @@ void show_quest_footer(Character *ch)
   return;
 }
 
-int show_one_quest(Character *ch, struct quest_info *quest, int count)
+int show_one_quest(Character *ch, quest_info *quest, int count)
 {
   int i, amount = 0;
 
@@ -405,19 +403,17 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
   return ++count;
 }
 
-int show_one_complete_quest(Character *ch, struct quest_info *quest, int count)
+int show_one_complete_quest(Character *ch, quest_info *quest, int count)
 {
   ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\r\n").arg(quest->name, -35).arg(quest->reward, -5));
   return ++count;
 }
 
-int show_one_available_quest(Character *ch, struct quest_info *quest, int count)
+int show_one_available_quest(Character *ch, quest_info *quest, int count)
 {
   char buffer[MAX_STRING_LENGTH];
   // Create a format std::string based on a space offset that takes color codes into account
-  snprintf(buffer, MAX_STRING_LENGTH,
-           "$B$7%3d. $2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\r\n",
-           quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
+  snprintf(buffer, MAX_STRING_LENGTH, "$B$7%3d. $2Name:$7 %%-%zus$R Cost: %%-4d%%1s Reward: %%-4d\r\n", quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
   csendf(ch, buffer, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward);
   return ++count;
@@ -426,7 +422,7 @@ int show_one_available_quest(Character *ch, struct quest_info *quest, int count)
 void show_available_quests(Character *ch)
 {
   int count = 0;
-  struct quest_info *quest;
+  quest_info *quest;
 
   show_quest_header(ch);
 
@@ -453,7 +449,7 @@ void show_available_quests(Character *ch)
 void show_canceled_quests(Character *ch)
 {
   int count = 0;
-  struct quest_info *quest;
+  quest_info *quest;
 
   show_quest_header(ch);
 
@@ -473,7 +469,7 @@ void show_canceled_quests(Character *ch)
 void show_current_quests(Character *ch)
 {
   int num_attempting = 0;
-  struct quest_info *quest;
+  quest_info *quest;
 
   show_quest_header(ch);
 
@@ -492,7 +488,7 @@ void show_current_quests(Character *ch)
 void show_complete_quests(Character *ch)
 {
   int count = 0;
-  struct quest_info *quest;
+  quest_info *quest;
 
   show_quest_header(ch);
 
@@ -509,7 +505,7 @@ void show_complete_quests(Character *ch)
   return;
 }
 
-int start_quest(Character *ch, struct quest_info *quest)
+int start_quest(Character *ch, quest_info *quest)
 {
   int count = 0;
   uint16_t price;
@@ -624,7 +620,7 @@ int start_quest(Character *ch, struct quest_info *quest)
   return ReturnValue::eSUCCESS;
 }
 
-int cancel_quest(Character *ch, struct quest_info *quest)
+int cancel_quest(Character *ch, quest_info *quest)
 {
   int count = 0;
 
@@ -649,7 +645,7 @@ int cancel_quest(Character *ch, struct quest_info *quest)
   return stop_current_quest(ch, quest);
 }
 
-int complete_quest(Character *ch, struct quest_info *quest)
+int complete_quest(Character *ch, quest_info *quest)
 {
   int count = 0;
   Object *obj;
@@ -690,7 +686,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
   return ReturnValue::eSUCCESS;
 }
 
-int stop_current_quest(Character *ch, struct quest_info *quest)
+int stop_current_quest(Character *ch, quest_info *quest)
 {
   int count = 0;
   Object *obj;
@@ -725,7 +721,7 @@ int stop_current_quest(Character *ch, int number)
   if (!number)
     return ReturnValue::eFAILURE;
 
-  struct quest_info *quest = get_quest_struct(number);
+  quest_info *quest = get_quest_(number);
   return stop_current_quest(ch, quest);
 }
 
@@ -750,7 +746,7 @@ void quest_update()
   char buf[MAX_STRING_LENGTH];
   Character *mob;
   Object *obj;
-  struct quest_info *quest;
+  quest_info *quest;
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)
@@ -805,11 +801,11 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
 {
   int retval = 0;
   char buf[MAX_STRING_LENGTH];
-  struct quest_info *quest;
+  quest_info *quest;
 
   if (cmd != cmd_t::QUEST_LIST)
   {
-    quest = get_quest_struct(name);
+    quest = get_quest_(name);
     if (quest == 0)
     {
       ch->sendln("That is not a valid quest name or number.");
@@ -1121,7 +1117,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   char value[MAX_STRING_LENGTH];
   int holdernum;
   int i, lownum, highnum;
-  struct quest_info *quest = nullptr;
+  quest_info *quest = nullptr;
   Character *vict = nullptr;
 
   half_chop(argument, arg, argument);
@@ -1175,7 +1171,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      quest = get_quest_struct(argument);
+      quest = get_quest_(argument);
       if (quest)
       {
         ch->sendln("A quest by this name already exists.");
@@ -1323,7 +1319,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(quest = get_quest_struct(holdernum)))
+  if (!(quest = get_quest_(holdernum)))
   {
     ch->sendln("That quest doesn't exist.");
     return ReturnValue::eFAILURE;
@@ -1356,13 +1352,13 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  struct quest_info *oldquest;
+  quest_info *oldquest;
 
   switch (i)
   {
   case 0: // name
     sprintf(field, "%s %s", value, argument);
-    oldquest = get_quest_struct(field);
+    oldquest = get_quest_(field);
     if (oldquest)
     {
       ch->sendln("A quest by this name already exists.");

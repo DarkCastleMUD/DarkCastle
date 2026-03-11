@@ -33,7 +33,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
   bool batterwins = false;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], dammsg[20];
-  struct room_direction_data *exit, *back;
+  room_direction_data *exit, *back;
   int other_room, door, dam, skill, retval;
 
   if (!(skill = ch->has_skill(SKILL_BATTERBRACE)))
@@ -222,7 +222,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
 int do_brace(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
-  struct room_direction_data *back, *exit;
+  room_direction_data *back, *exit;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
 
   argument_interpreter(argument, type, dir);
@@ -428,7 +428,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
 
 int do_battlecry(Character *ch, char *argument, cmd_t cmd)
 {
-  struct follow_type *f = 0;
+  follow_type *f = 0;
 
   if (!ch->canPerform(SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n"))
   {
@@ -769,7 +769,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
 
 int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   float modifier;
   int duration = 42;
 
@@ -823,7 +823,7 @@ int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
 
 int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   int duration = 20;
   if (ch->affected_by_spell(SKILL_CRAZED_ASSAULT) && !ch->isImmortalPlayer())
   {
@@ -940,10 +940,10 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   }
 
   SETBIT(ch->affected_by, AFF_RUSH_CD);
-  extern void addtimer(struct timer_data * add);
+  extern void addtimer(timer_data * add);
 
   // Reset bullrush AFF in 5 seconds
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.ch = ch;
   timer->function = rush_reset;
   timer->timeleft = 5;
@@ -985,7 +985,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
 
 int do_ferocity(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->canPerform(SKILL_FEROCITY, "You're just not angry enough!\r\n"))
   {
@@ -1315,7 +1315,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
 
 int do_primalfury(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->has_skill(SKILL_PRIMAL_FURY))
   {

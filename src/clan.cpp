@@ -42,7 +42,7 @@ uint64_t i = UINT64_MAX;
 #include "DC/clan.h"
 #include "DC/memory.h"
 
-void addtimer(struct timer_data *timer);
+void addtimer(timer_data *timer);
 void delete_clan(const clan_data *currclan);
 
 #define MAX_CLAN_DESC_LENGTH 1022
@@ -110,7 +110,7 @@ void boot_clans(void)
     new_new_clan->founder = fread_word(fl, 1);
     new_new_clan->name = fread_word(fl, 1);
     new_new_clan->number = fread_int(fl, 0, 2147483467);
-    if (new_new_clan->number < 1 || new_new_clan->number >= 2147483467)
+    if (new_new_clan->number < 1 || new_new_clan->number == UINT16_MAX)
     {
       logf(0, DC::LogChannel::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
       skip_clan = true;
@@ -131,10 +131,9 @@ void boot_clans(void)
       if (b != 'R')
         continue;
 #ifdef LEAK_CHECK
-      new_new_room = (struct clan_room_data *)calloc(1, sizeof(struct clan_room_data));
+      new_new_room = (clan_room_data *)calloc(1, sizeof(clan_room_data));
 #else
-      new_new_room = (struct clan_room_data *)dc_alloc(1,
-                                                       sizeof(struct clan_room_data));
+      new_new_room = (clan_room_data *)dc_alloc(1, sizeof(clan_room_data));
 #endif
       new_new_room->next = new_new_clan->rooms;
       tempint = fread_int(fl, 0, 50000);
@@ -255,7 +254,7 @@ void save_clans(void)
 {
   FILE *fl;
   clan_data *pclan = nullptr;
-  struct clan_room_data *proom = nullptr;
+  clan_room_data *proom = nullptr;
   ClanMember *pmember = nullptr;
   char buf[MAX_STRING_LENGTH];
   char *x;
@@ -358,9 +357,7 @@ void save_clans(void)
     for (pmember = pclan->members; pmember; pmember = pmember->next)
     {
       fprintf(fl, "M\n%s~\n", pmember->NameC());
-      fprintf(fl, "%d %d %d %d %d %d\n", pmember->Rights(),
-              pmember->Rank(), pmember->Unused1(), pmember->Unused2(),
-              pmember->Unused3(), pmember->TimeJoined());
+      fprintf(fl, "%d %d %lld %lld %llu %d\n", pmember->Rights(), pmember->Rank(), pmember->Unused1(), pmember->Unused2(), pmember->Unused3(), pmember->TimeJoined());
       fprintf(fl, "%s~\n", pmember->Unused4C());
     }
 
@@ -402,8 +399,8 @@ void save_clans(void)
 
 void delete_clan(const clan_data *currclan)
 {
-  struct clan_room_data *curr_room = nullptr;
-  struct clan_room_data *next_room = nullptr;
+  clan_room_data *curr_room = nullptr;
+  clan_room_data *next_room = nullptr;
   ClanMember *curr_member = nullptr;
   ClanMember *next_member = nullptr;
 
@@ -447,7 +444,7 @@ void DC::free_clans_from_memory(void)
 void assign_clan_rooms()
 {
   clan_data *clan = 0;
-  struct clan_room_data *room = 0;
+  clan_room_data *room = 0;
 
   for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
     for (room = clan->rooms; room; room = room->next)
@@ -521,7 +518,7 @@ void remove_clan_member(clan_data *theClan, Character *ch)
   free_member(pcurr);
 }
 
-// Add someone.  Just makes the struct, fills it, then calls the other add_clan_member
+// Add someone.  Just makes the class, fills it, then calls the other add_clan_member
 void add_clan_member(clan_data *theClan, Character *ch)
 {
   ClanMember *pmember = nullptr;
@@ -643,8 +640,8 @@ void delete_clan(clan_data *dead_clan)
 {
   clan_data *last = 0;
   clan_data *curr = 0;
-  struct clan_room_data *room = 0;
-  struct clan_room_data *nextroom = 0;
+  clan_room_data *room = 0;
+  clan_room_data *nextroom = 0;
 
   if (!DC::getInstance()->clan_list)
     return;
@@ -1762,8 +1759,8 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
 {
   clan_data *clan = 0;
   clan_data *tarclan = 0;
-  struct clan_room_data *newroom = 0;
-  struct clan_room_data *lastroom = 0;
+  clan_room_data *newroom = 0;
+  clan_room_data *lastroom = 0;
 
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -1972,9 +1969,9 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
 
     SET_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
 #ifdef LEAK_CHECK
-    newroom = (struct clan_room_data *)calloc(1, sizeof(clan_room_data));
+    newroom = (clan_room_data *)calloc(1, sizeof(clan_room_data));
 #else
-    newroom = (struct clan_room_data *)dc_alloc(1, sizeof(clan_room_data));
+    newroom = (clan_room_data *)dc_alloc(1, sizeof(clan_room_data));
 #endif
     newroom->room_number = skill;
     newroom->next = tarclan->rooms;
@@ -2329,8 +2326,8 @@ void do_leader_clans(Character *ch, char *arg, cmd_t cmd)
 {
   ClanMember *pmember = 0;
   //  clan_data * tarclan = 0;
-  //  struct clan_room_data * newroom = 0;
-  //  struct clan_room_data * lastroom = 0;
+  //  clan_room_data * newroom = 0;
+  //  clan_room_data * lastroom = 0;
 
   char buf[MAX_STRING_LENGTH];
   char select[MAX_STRING_LENGTH];
@@ -3041,8 +3038,6 @@ void add_totem_stats(Character *ch, int stat)
 
 */
 
-struct takeover_pulse_data *pulse_list = nullptr;
-
 int count_plrs(int zone, int clan)
 {
   const auto &character_list = DC::getInstance()->character_list;
@@ -3058,9 +3053,10 @@ int count_plrs(int zone, int clan)
   return i;
 }
 
-struct takeover_pulse_data
+class takeover_pulse_data
 {
-  struct takeover_pulse_data *next;
+public:
+  takeover_pulse_data *next;
   int clan1; // defending clan
   int clan1points;
   int clan2; // challenging clan
@@ -3068,10 +3064,11 @@ struct takeover_pulse_data
   int zone;
   int pulse;
 };
+takeover_pulse_data *pulse_list = nullptr;
 
 bool can_collect(int zone)
 {
-  struct takeover_pulse_data *take;
+  takeover_pulse_data *take;
   for (take = pulse_list; take; take = take->next)
     if (zone == take->zone && take->clan2 != -2)
       return false;
@@ -3080,7 +3077,7 @@ bool can_collect(int zone)
 
 bool can_challenge(int clan, int zone)
 {
-  struct takeover_pulse_data *take;
+  takeover_pulse_data *take;
   for (take = pulse_list; take; take = take->next)
     if (take->clan2 == -2 &&
         take->clan1 == clan && zone == take->zone)
@@ -3092,11 +3089,11 @@ bool can_challenge(int clan, int zone)
 
 void takeover_pause(int clan, int zone)
 {
-  struct takeover_pulse_data *pl;
+  takeover_pulse_data *pl;
 #ifdef LEAK_CHECK
-  pl = (struct takeover_pulse_data *)calloc(1, sizeof(struct takeover_pulse_data));
+  pl = (takeover_pulse_data *)calloc(1, sizeof(takeover_pulse_data));
 #else
-  pl = (struct takeover_pulse_data *)dc_alloc(1, sizeof(struct takeover_pulse_data));
+  pl = (takeover_pulse_data *)dc_alloc(1, sizeof(takeover_pulse_data));
 #endif
   pl->next = pulse_list;
   pl->clan1 = clan;
@@ -3159,7 +3156,7 @@ int count_controlled_areas(int clan)
     }
   }
 
-  for (struct takeover_pulse_data *plc = pulse_list; plc; plc = plc->next)
+  for (takeover_pulse_data *plc = pulse_list; plc; plc = plc->next)
   {
     if ((plc->clan1 == clan || plc->clan2 == clan) && plc->clan2 != -2)
     {
@@ -3170,9 +3167,9 @@ int count_controlled_areas(int clan)
   return zones;
 }
 
-void recycle_pulse_data(struct takeover_pulse_data *pl)
+void recycle_pulse_data(takeover_pulse_data *pl)
 {
-  struct takeover_pulse_data *plc, *plp = nullptr;
+  takeover_pulse_data *plc, *plp = nullptr;
   for (plc = pulse_list; plc; plc = plc->next)
   {
     if (plc == pl)
@@ -3204,7 +3201,7 @@ int online_clan_members(int clan)
   return i;
 }
 
-void check_victory(struct takeover_pulse_data *take)
+void check_victory(takeover_pulse_data *take)
 {
   if (take->clan2 == -2)
     return;
@@ -3241,7 +3238,7 @@ void check_quitter(varg_t arg1, void *arg2, void *arg3)
         }
     }
 
-    struct takeover_pulse_data *pl;
+    takeover_pulse_data *pl;
     for (pl = pulse_list; pl; pl = pl->next)
     {
       if (pl->clan1 == clan && pl->clan2 != -2)
@@ -3267,7 +3264,7 @@ void check_quitter(Character *ch)
   if (!ch->clan || ch->getLevel() >= 100)
     return;
 
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.clan = ch->clan;
   timer->function = check_quitter;
   timer->timeleft = 30;
@@ -3279,7 +3276,7 @@ void pk_check(Character *ch, Character *victim)
   if (!ch || !victim)
     return;
   // if (!ch->clan || !victim->clan) return; // No point;
-  struct takeover_pulse_data *plc, *pln;
+  takeover_pulse_data *plc, *pln;
   for (plc = pulse_list; plc; plc = pln)
   {
     pln = plc->next;
@@ -3291,7 +3288,7 @@ void pk_check(Character *ch, Character *victim)
   }
 }
 
-bool can_lose(struct takeover_pulse_data *take)
+bool can_lose(takeover_pulse_data *take)
 {
   const auto &character_list = DC::getInstance()->character_list;
 
@@ -3316,7 +3313,7 @@ bool can_lose(struct takeover_pulse_data *take)
 
 void pulse_takeover()
 {
-  struct takeover_pulse_data *take, *next;
+  takeover_pulse_data *take, *next;
   for (take = pulse_list; take; take = next)
   {
     next = take->next;
@@ -3395,7 +3392,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    struct takeover_pulse_data *take;
+    takeover_pulse_data *take;
     for (take = pulse_list; take; take = take->next)
       if (take->zone == DC::getInstance()->world[in_room].zone &&
           take->clan2 == clan)
@@ -3440,7 +3437,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    struct affected_type af;
+    affected_type af;
     af.type = SKILL_CLANAREA_CLAIM;
     af.duration = 30;
     af.modifier = 0;
@@ -3469,7 +3466,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    struct takeover_pulse_data *take;
+    takeover_pulse_data *take;
     for (take = pulse_list; take; take = take->next)
       if (take->zone == DC::getInstance()->world[in_room].zone &&
           take->clan1 == clan && take->clan2 != -2)
@@ -3573,7 +3570,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    struct affected_type af;
+    affected_type af;
     af.type = SKILL_CLANAREA_CHALLENGE;
     af.duration = 60;
     af.modifier = 0;
@@ -3582,11 +3579,11 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     affect_to_char(this, &af, DC::PULSE_TIMER);
 
     // no point checking for noclaim flag, at this point it already IS under someone's control
-    struct takeover_pulse_data *pl;
+    takeover_pulse_data *pl;
 #ifdef LEAK_CHECK
-    pl = (struct takeover_pulse_data *)calloc(1, sizeof(struct takeover_pulse_data));
+    pl = (takeover_pulse_data *)calloc(1, sizeof(takeover_pulse_data));
 #else
-    pl = (struct takeover_pulse_data *)dc_alloc(1, sizeof(struct takeover_pulse_data));
+    pl = (takeover_pulse_data *)dc_alloc(1, sizeof(takeover_pulse_data));
 #endif
     pl->next = pulse_list;
     pl->clan1 = DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner;

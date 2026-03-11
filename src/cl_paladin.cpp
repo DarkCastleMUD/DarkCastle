@@ -33,7 +33,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   // Character *tmp_ch;
   char victim_name[MAX_INPUT_LENGTH];
-  struct affected_type af;
+  affected_type af;
   int retval = ReturnValue::eSUCCESS, dam;
 
   one_argument(argument, victim_name);
@@ -127,7 +127,7 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   // Character *tmp_ch;
   char victim_name[240];
-  struct affected_type af;
+  affected_type af;
   int duration = 24;
   one_argument(argument, victim_name);
 

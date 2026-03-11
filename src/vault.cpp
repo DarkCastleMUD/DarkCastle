@@ -55,9 +55,9 @@ void vault_log(Character *ch, char *owner);
 QString clanVName(uint64_t clan_id);
 void vault_search_usage(Character *ch);
 
-struct vault_data *has_vault(QString name)
+vault_data *has_vault(QString name)
 {
-  struct vault_data *vault;
+  vault_data *vault;
 
   for (vault = vault_table; vault; vault = vault->next)
     if (vault && !name.compare(vault->owner, Qt::CaseInsensitive))
@@ -96,9 +96,9 @@ void remove_from_object_list(Object *obj)
 
 void save_vault(QString name)
 {
-  struct vault_data *vault;
-  struct vault_access_data *access;
-  struct vault_items_data *items;
+  vault_data *vault;
+  vault_access_data *access;
+  vault_items_data *items;
 
   if (name.isEmpty())
   {
@@ -147,8 +147,8 @@ void save_vault(QString name)
 
 void Character::vault_access(QString who)
 {
-  struct vault_access_data *access;
-  struct vault_data *vault = nullptr;
+  vault_access_data *access;
+  vault_data *vault = nullptr;
 
   if (!vault && !(vault = has_vault(getName())))
   {
@@ -172,7 +172,7 @@ void Character::vault_access(QString who)
 
 void Character::vault_myaccess(QString arg)
 {
-  struct vault_data *vault;
+  vault_data *vault;
 
   if (arg[0] != '\0')
   {
@@ -447,9 +447,9 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
 
 void Character::vault_stats(QString name)
 {
-  struct vault_data *vault = nullptr;
-  struct vault_items_data *item;
-  struct vault_access_data *access;
+  vault_data *vault = nullptr;
+  vault_items_data *item;
+  vault_access_data *access;
   class Object *obj;
   int items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = 0;
   char buf[MAX_STRING_LENGTH * 4], buf1[MAX_STRING_LENGTH];
@@ -498,9 +498,9 @@ void Character::vault_stats(QString name)
 
 void DC::reload_vaults(void)
 {
-  struct vault_data *vault, *tvault;
-  struct vault_access_data *access, *taccess;
-  struct vault_items_data *items, *titems;
+  vault_data *vault, *tvault;
+  vault_access_data *access, *taccess;
+  vault_items_data *items, *titems;
   int num = 0;
 
   for (vault = vault_table; vault; vault = tvault, num++)
@@ -673,9 +673,9 @@ void remove_vault(QString name, BACKUP_TYPE backup)
 
   remove_vault_accesses(qPrintable(name));
 
-  struct vault_data *vault, *next_vault, *prev_vault = nullptr;
-  struct vault_items_data *items, *titems;
-  struct vault_access_data *access, *taccess;
+  vault_data *vault, *next_vault, *prev_vault = nullptr;
+  vault_items_data *items, *titems;
+  vault_access_data *access, *taccess;
 
   char buf[MAX_INPUT_LENGTH];
   char h[MAX_INPUT_LENGTH];
@@ -733,9 +733,9 @@ void remove_vault(QString name, BACKUP_TYPE backup)
 
 void DC::testing_load_vaults(void)
 {
-  struct vault_data *vault;
-  struct vault_access_data *access;
-  struct vault_items_data *items;
+  vault_data *vault;
+  vault_access_data *access;
+  vault_items_data *items;
   class Object *obj = nullptr;
   struct stat statbuf = {};
   int vnum = 0, full = 0, count = 0;
@@ -759,7 +759,7 @@ void DC::testing_load_vaults(void)
   logentry(QStringLiteral("load_vaults: found [%1] player vaults to read.").arg(total_vaults));
   if (total_vaults)
   {
-    CREATE(vault_table, struct vault_data, total_vaults);
+    CREATE(vault_table, vault_data, total_vaults);
   }
 
   QString line = vault_index_stream.readLine();
@@ -786,7 +786,7 @@ void DC::testing_load_vaults(void)
       //       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     QTextStream vault_file_stream(&vault_file);
-    CREATE(vault, struct vault_data, 1);
+    CREATE(vault, vault_data, 1);
 
     vault->owner = line;
     vault->size = VAULT_BASE_SIZE;
@@ -815,7 +815,7 @@ void DC::testing_load_vaults(void)
       case 'O':
         vault_file_stream >> vnum >> count >> full >> Qt::ws;
 
-        CREATE(items, struct vault_items_data, 1);
+        CREATE(items, vault_items_data, 1);
 
         if (!full)
         {
@@ -876,7 +876,7 @@ void DC::testing_load_vaults(void)
 
         if (!value.isEmpty() && !stat(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(value[0]).arg(value).toStdString().c_str(), &statbuf))
         {
-          CREATE(access, struct vault_access_data, 1);
+          CREATE(access, vault_access_data, 1);
           access->name = value;
           access->next = vault->access;
           vault->access = access;
@@ -911,9 +911,9 @@ void DC::testing_load_vaults(void)
   }
 }
 
-void Character::add_vault_access(QString name, struct vault_data *vault)
+void Character::add_vault_access(QString name, vault_data *vault)
 {
-  struct vault_access_data *access;
+  vault_access_data *access;
   class Connection d;
 
   if (!name.isEmpty())
@@ -943,7 +943,7 @@ void Character::add_vault_access(QString name, struct vault_data *vault)
   }
 
   send(QStringLiteral("%1 now has access to your vault.\r\n").arg(name));
-  CREATE(access, struct vault_access_data, 1);
+  CREATE(access, vault_access_data, 1);
   access->name = name;
   access->next = vault->access;
   vault->access = access;
@@ -955,9 +955,9 @@ void Character::add_vault_access(QString name, struct vault_data *vault)
 
 void DC::load_vaults(void)
 {
-  struct vault_data *vault;
-  struct vault_access_data *access;
-  struct vault_items_data *items;
+  vault_data *vault;
+  vault_access_data *access;
+  vault_items_data *items;
   class Object *obj = nullptr;
   struct stat statbuf = {};
   FILE *fl = nullptr, *index = nullptr;
@@ -983,7 +983,7 @@ void DC::load_vaults(void)
   logverbose(QStringLiteral("boot_vaults: found [%1] player vaults to read.").arg(total_vaults));
 
   if (total_vaults)
-    CREATE(vault_table, struct vault_data, total_vaults);
+    CREATE(vault_table, vault_data, total_vaults);
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
@@ -1011,7 +1011,7 @@ void DC::load_vaults(void)
       //      logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     }
 
-    CREATE(vault, struct vault_data, 1);
+    CREATE(vault, vault_data, 1);
 
     vault->owner = str_dup(line);
     vault->size = VAULT_BASE_SIZE;
@@ -1074,7 +1074,7 @@ void DC::load_vaults(void)
           break;
         }
 
-        CREATE(items, struct vault_items_data, 1);
+        CREATE(items, vault_items_data, 1);
 
         if (!full)
         {
@@ -1128,7 +1128,7 @@ void DC::load_vaults(void)
 
         if (0 == stat(src_filename, &statbuf))
         {
-          CREATE(access, struct vault_access_data, 1);
+          CREATE(access, vault_access_data, 1);
           access->name = str_dup(value);
           access->next = vault->access;
           vault->access = access;
@@ -1166,7 +1166,7 @@ void DC::load_vaults(void)
   fclose(index);
 }
 
-void Character::remove_vault_access(QString name, struct vault_data *vault)
+void Character::remove_vault_access(QString name, vault_data *vault)
 {
   name = name.toLower();
   if (!name.isEmpty())
@@ -1193,8 +1193,8 @@ void Character::remove_vault_access(QString name, struct vault_data *vault)
 
 void remove_vault_accesses(QString name)
 {
-  struct vault_data *vault;
-  struct vault_access_data *access, *next_access;
+  vault_data *vault;
+  vault_access_data *access, *next_access;
   int num = 0;
 
   for (vault = vault_table; vault; vault = vault->next, num++)
@@ -1215,9 +1215,9 @@ void remove_vault_accesses(QString name)
   }
 }
 
-void access_remove(QString name, struct vault_data *vault)
+void access_remove(QString name, vault_data *vault)
 {
-  struct vault_access_data *access, *next_access, *prev_access = nullptr;
+  vault_access_data *access, *next_access, *prev_access = nullptr;
 
   for (access = vault->access; access; access = next_access)
   {
@@ -1245,7 +1245,7 @@ QString clanVName(uint64_t clan_id)
   return QStringLiteral("Clan%1").arg(clan_id);
 }
 
-bool DC::has_vault_access(Character *ch, struct vault_data *vault)
+bool DC::has_vault_access(Character *ch, vault_data *vault)
 {
   if (ch == nullptr)
   {
@@ -1268,7 +1268,7 @@ bool DC::has_vault_access(Character *ch, struct vault_data *vault)
   }
 
   // its not their vault so check all the access lines
-  for (struct vault_access_data *access = vault->access; access; access = access->next)
+  for (vault_access_data *access = vault->access; access; access = access->next)
   {
     if (ch->getName() == access->name)
     {
@@ -1279,7 +1279,7 @@ bool DC::has_vault_access(Character *ch, struct vault_data *vault)
   return false;
 }
 
-bool DC::has_vault_access(QString name, struct vault_data *vault)
+bool DC::has_vault_access(QString name, vault_data *vault)
 {
   Connection d{};
   Character *ch = get_pc(name);
@@ -1301,9 +1301,9 @@ bool DC::has_vault_access(QString name, struct vault_data *vault)
   return ch_has_vault_access;
 }
 
-struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char *object, int num)
+vault_items_data *get_unique_item_in_vault(vault_data *vault, char *object, int num)
 {
-  struct vault_items_data *items;
+  vault_items_data *items;
   class Object *obj;
   int i = 1;
 
@@ -1322,9 +1322,9 @@ struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char
   return 0;
 }
 
-class Object *get_unique_obj_in_vault(struct vault_data *vault, char *object, int num)
+class Object *get_unique_obj_in_vault(vault_data *vault, char *object, int num)
 {
-  struct vault_items_data *items;
+  vault_items_data *items;
   class Object *obj;
   int i = 1;
 
@@ -1344,9 +1344,9 @@ class Object *get_unique_obj_in_vault(struct vault_data *vault, char *object, in
   return 0;
 }
 
-struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *object, int num)
+vault_items_data *get_item_in_vault(vault_data *vault, char *object, int num)
 {
-  struct vault_items_data *items;
+  vault_items_data *items;
   class Object *obj;
   int i = 1, j;
 
@@ -1375,9 +1375,9 @@ struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *objec
   return 0;
 }
 
-class Object *get_obj_in_vault(struct vault_data *vault, QString object, int num)
+class Object *get_obj_in_vault(vault_data *vault, QString object, int num)
 {
-  struct vault_items_data *items;
+  vault_items_data *items;
   class Object *obj;
   int i = 1, j;
 
@@ -1403,9 +1403,9 @@ class Object *get_obj_in_vault(struct vault_data *vault, QString object, int num
   return 0;
 }
 
-class Object *exists_in_vault(struct vault_data *vault, Object *obj)
+class Object *exists_in_vault(vault_data *vault, Object *obj)
 {
-  struct vault_items_data *items;
+  vault_items_data *items;
   if (!obj)
     return 0;
   for (items = vault->items; items; items = items->next)
@@ -1422,8 +1422,8 @@ void vault_get(Character *ch, QString object, QString owner)
   QString sbuf;
   char obj_list[50][100];
   class Object *obj, *tmp_obj;
-  struct vault_items_data *items;
-  struct vault_data *vault;
+  vault_items_data *items;
+  vault_data *vault;
   int self = 0, i;
 
   if (!owner.isEmpty())
@@ -1597,7 +1597,7 @@ void vault_get(Character *ch, QString object, QString owner)
   ch->save_char_obj();
 }
 
-void item_add(int vnum, struct vault_data *vault)
+void item_add(int vnum, vault_data *vault)
 {
   if (vnum == -1)
   {
@@ -1605,7 +1605,7 @@ void item_add(int vnum, struct vault_data *vault)
     return;
   }
 
-  struct vault_items_data *item;
+  vault_items_data *item;
 
   for (item = vault->items; item; item = item->next)
   {
@@ -1617,7 +1617,7 @@ void item_add(int vnum, struct vault_data *vault)
     }
   }
 
-  CREATE(item, struct vault_items_data, 1);
+  CREATE(item, vault_items_data, 1);
   item->item_vnum = vnum;
   item->count = 1;
   item->next = vault->items;
@@ -1626,9 +1626,9 @@ void item_add(int vnum, struct vault_data *vault)
   vault->weight += GET_OBJ_WEIGHT(get_obj(vnum));
 }
 
-void item_add(Object *obj, struct vault_data *vault)
+void item_add(Object *obj, vault_data *vault)
 {
-  struct vault_items_data *item;
+  vault_items_data *item;
   int vnum = GET_OBJ_VNUM(obj);
 
   remove_from_object_list(obj);
@@ -1642,7 +1642,7 @@ void item_add(Object *obj, struct vault_data *vault)
     }
   }
 
-  CREATE(item, struct vault_items_data, 1);
+  CREATE(item, vault_items_data, 1);
   item->obj = obj;
   item->item_vnum = vnum;
   item->count = 1;
@@ -1652,9 +1652,9 @@ void item_add(Object *obj, struct vault_data *vault)
   vault->weight += GET_OBJ_WEIGHT(obj);
 }
 
-void item_remove(Object *obj, struct vault_data *vault)
+void item_remove(Object *obj, vault_data *vault)
 {
-  struct vault_items_data *item, *next_item, *prev_item = nullptr;
+  vault_items_data *item, *next_item, *prev_item = nullptr;
   int vnum = GET_OBJ_VNUM(obj);
 
   for (item = vault->items; item; item = next_item)
@@ -1685,9 +1685,9 @@ void item_remove(Object *obj, struct vault_data *vault)
   }
 }
 
-int search_vault_by_vnum(int vnum, struct vault_data *vault)
+int search_vault_by_vnum(int vnum, vault_data *vault)
 {
-  struct vault_items_data *items;
+  vault_items_data *items;
 
   for (items = vault->items; items; items = items->next)
     if (items && items->item_vnum && items->item_vnum == vnum)
@@ -1700,7 +1700,7 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
 {
   if (!ch)
     return;
-  struct vault_data *vault;
+  vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
   int self = 0;
 
@@ -1756,7 +1756,7 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
 {
   if (!ch)
     return;
-  struct vault_data *vault;
+  vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
   int self = 0;
 
@@ -1805,7 +1805,7 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
   }
 }
 
-int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Character *ch)
+int can_put_in_vault(class Object *obj, int self, vault_data *vault, Character *ch)
 {
   //  class Object *tmp_obj;
 
@@ -1877,7 +1877,7 @@ void vault_put(Character *ch, QString object, QString owner)
     return;
 
   class Object *obj, *tmp_obj;
-  struct vault_data *vault;
+  vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
   int self = 0;
 
@@ -2068,8 +2068,8 @@ void sort_vault(const vault_data &vault, sorted_vault &sv)
 
 void Character::vault_list(QString owner)
 {
-  struct vault_items_data *items;
-  struct vault_data *vault;
+  vault_items_data *items;
+  vault_data *vault;
   class Object *obj;
   int objects = 0, self = 0;
   int diff_len = 0;
@@ -2172,7 +2172,7 @@ void Character::vault_list(QString owner)
 void add_new_vault(const char *name, int indexonly)
 {
   FILE *vfl, *tvfl, *pvfl;
-  struct vault_data *vault;
+  vault_data *vault;
   char filename[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
@@ -2231,8 +2231,8 @@ void add_new_vault(const char *name, int indexonly)
 
   // files all done, now add it in game
   total_vaults++;
-  RECREATE(vault_table, struct vault_data, total_vaults);
-  CREATE(vault, struct vault_data, 1);
+  RECREATE(vault_table, vault_data, total_vaults);
+  CREATE(vault, vault_data, 1);
 
   vault->owner = str_dup(name);
   if (ch)
@@ -2299,7 +2299,7 @@ void vault_log(Character *ch, char *owner)
 
 void logvault(QString message, QString name)
 {
-  struct tm *tm = nullptr;
+  tm *tm = nullptr;
   time_t ct;
   FILE *ofile, *nfile;
   char buf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
@@ -2394,8 +2394,8 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   arg = one_argument(arg, arg1);
 
-  struct vault_data *vault = has_vault(GET_NAME(ch));
-  struct vault_data *cvault = ch->clan ? has_vault(clanVName(ch->clan).toStdString().c_str()) : 0;
+  vault_data *vault = has_vault(GET_NAME(ch));
+  vault_data *cvault = ch->clan ? has_vault(clanVName(ch->clan).toStdString().c_str()) : 0;
   if (cmd == cmd_t::LIST)
   {
     if (!vault)

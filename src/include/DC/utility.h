@@ -37,9 +37,9 @@
 #include "DC/spells.h"
 #include "DC/player.h"
 
-extern const struct str_app_type str_app[];
+extern const str_app_type str_app[];
 
-extern struct weather_data weather_info;
+extern weather_data weather_info;
 
 void check_timer();
 
@@ -551,7 +551,7 @@ std::string sprinttype(int type, std::vector<const char *>);
 
 int consttype(char *search_str, const char *names[]);
 QString constindex(const qsizetype index, const QStringList names);
-struct time_info_data mud_time_passed(time_t t2, time_t t1);
+time_info_data mud_time_passed(time_t t2, time_t t1);
 bool circle_follow(Character *ch, Character *victim);
 bool ARE_GROUPED(Character *sub, Character *obj);
 bool ARE_CLANNED(Character *sub, Character *obj);
@@ -611,7 +611,7 @@ void save_char_obj_db(Character *ch);
 #endif
 
 void unique_scan(Character *victim);
-void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmpage);
+void char_to_store(Character *ch, class char_file_u4 *st, time_data &tmpage);
 bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void check_idling(Character *ch);
 
@@ -829,8 +829,9 @@ extern const char menu[];
 #define MPROG_CATCH_MIN 1
 #define MPROG_CATCH_MAX 100
 
-struct mprog_throw_type
+class mprog_throw_type
 {
+public:
   int target_mob_num;                   // num of mob to recieve
   char target_mob_name[MAX_THROW_NAME]; // std::string used to find target name
 
@@ -856,8 +857,9 @@ struct mprog_throw_type
   // end mppause crap
 };
 
-struct mprog_variable_data
+class mprog_variable_data
 {
+public:
   char *invoker;
   char *object;
   char *rndm;
@@ -884,7 +886,7 @@ char *numToStringTH(int);
 bool champion_can_go(int room);
 bool class_can_go(int ch_class, int room);
 
-const char *find_profession(int c_class, uint8_t profession);
+QString find_profession(int c_class, uint8_t profession);
 
 std::string get_isr_string(uint32_t, int8_t);
 

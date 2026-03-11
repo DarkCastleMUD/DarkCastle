@@ -27,15 +27,16 @@
 #include "DC/returnvals.h"
 #include "DC/timeinfo.h"
 
-struct spec_data
+class spec_data
 {
+public:
   char *name;
   char *description;
   int pcclass;
   int skills[10];
 };
 
-const struct spec_data spec_list[] =
+const spec_data spec_list[] =
     {
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};

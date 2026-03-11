@@ -1326,7 +1326,7 @@ const char *class_tree_name[11][3] = {
 // Begin abilities listings for each class.
 
 // skills master 10011 - done and checked, Apoc
-struct class_skill_defines g_skills[] = { // all-class skills
+class_skill_defines g_skills[] = { // all-class skills
 
     //   Ability Name       Ability File          Level     Max  Group  Requisites
     //   ------------       ------------          -----     ---  -----  ----------
@@ -1338,7 +1338,7 @@ struct class_skill_defines g_skills[] = { // all-class skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // warrior 3023 guildmaster - done and checked, Apoc
-struct class_skill_defines w_skills[] = { // warrior skills
+class_skill_defines w_skills[] = { // warrior skills
 
     //   Ability Name       Ability File            Level  Max  Group  Requisite
     //   ------------       ------------            -----  ---  -----  ---------
@@ -1385,7 +1385,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // thief 3022 guildmaster - done and checked, Apoc
-struct class_skill_defines t_skills[] = { // thief skills
+class_skill_defines t_skills[] = { // thief skills
 
     //   Ability Name       Ability File          Level    Max  Group  Requisites
     //   ------------       ------------          -----    ---  -----  ----------
@@ -1421,7 +1421,7 @@ struct class_skill_defines t_skills[] = { // thief skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // anti-paladin 10005 guildmaster - done and checked, Apoc
-struct class_skill_defines a_skills[] = { // anti-paladin skills
+class_skill_defines a_skills[] = { // anti-paladin skills
 
     //   Ability Name            Ability File           Level     Max  Group   Requisites
     //   ------------            ------------           -----     ---  -----   ----------
@@ -1468,7 +1468,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // paladin 10006 guildmaster - done and checked, Apoc
-struct class_skill_defines p_skills[] = { // paladin skills
+class_skill_defines p_skills[] = { // paladin skills
 
     //   Ability Name            Ability File            Level     Max  Group   Requisites
     //   ------------            ------------            -----     ---  -----   ----------
@@ -1515,7 +1515,7 @@ struct class_skill_defines p_skills[] = { // paladin skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // barbarian 10007 guildmaster - done and checked, Apoc
-struct class_skill_defines b_skills[] = { // barbarian skills
+class_skill_defines b_skills[] = { // barbarian skills
 
     //   Ability Name       Ability File            Level  Max  Group  Requisites
     //   ------------       ------------            -----  ---  -----  ----------
@@ -1553,7 +1553,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // monk 10008 guildmaster - done and checked, Apoc
-struct class_skill_defines k_skills[] = { // monk skills
+class_skill_defines k_skills[] = { // monk skills
 
     //   Ability Name       Ability File          Level    Max   Group   Requisites
     //   ------------       ------------          -----    ---   -----   ----------
@@ -1585,7 +1585,7 @@ struct class_skill_defines k_skills[] = { // monk skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // ranger 10013 guildmaster - done and checked, Apoc
-struct class_skill_defines r_skills[] = { // ranger skills
+class_skill_defines r_skills[] = { // ranger skills
 
     //   Ability Name       Ability File           Level     Max  Group   Requisites
     //   ------------       ------------           -----     ---  -----   ----------
@@ -1634,7 +1634,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // bard 3204 guildmaster - done and checked, Apoc
-struct class_skill_defines d_skills[] = { // bard skills
+class_skill_defines d_skills[] = { // bard skills
 
     // Ability Name            Ability File                  Level    Max   Group   Requisites
     // ------------            ------------                  -----    ---   -----   ----------
@@ -1682,7 +1682,7 @@ struct class_skill_defines d_skills[] = { // bard skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // druid 3203 guildmaster - done and checked, Apoc
-struct class_skill_defines u_skills[] = { // druid skills
+class_skill_defines u_skills[] = { // druid skills
 
     //   Ability Name            Ability File              Level     Max  Group   Requisites
     //   ------------            ------------              -----     ---  -----   ----------
@@ -1743,7 +1743,7 @@ struct class_skill_defines u_skills[] = { // druid skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // cleric 3021 guildmaster - done and checked, Apoc
-struct class_skill_defines c_skills[] = { // cleric skills
+class_skill_defines c_skills[] = { // cleric skills
 
     //   Ability Name            Ability File           Level     Max  Group   Requisites
     //   ------------            ------------           -----     ---  -----   ----------
@@ -1809,7 +1809,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // mage 3020 guildmaster - done and checked, Apoc
-struct class_skill_defines m_skills[] = { // mage skills
+class_skill_defines m_skills[] = { // mage skills
 
     //   Ability Name           Ability File           Level     Max  Group   Requisites
     //   ------------           ------------           -----     ---  -----   ----------
@@ -1940,8 +1940,9 @@ const char *race_abbrev[] =
 };
 
 /*
-struct race_shit
+class race_shit
 {
+public:
   char *singular_name;  // dwarf, elf, etc.
   char *plural_name;     // dwarves, elves, etc.
 
@@ -1956,7 +1957,7 @@ struct race_shit
 };
 */
 
-struct race_data races[] =
+race_data races[] =
     {
         // Name,        Lowercase    Plural,       Playable Parts, Immun,    Res,  Sus,  Hates/Fears,  Frnd, MinWt, MaxWt, MinHt, MaxHt,    Str      Dex         Con      Int    Wis,   Mob Affects, UnarmedHitType
         {"NPC", "npc", "NPC", false, 63, 0, 0, 0, 0, 0, 150, 150, 72, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "hit"},
@@ -2240,7 +2241,7 @@ const char *connected_types[] =
         "\n"};
 
 // Constitution Attribute Modifiers
-const struct con_app_type con_app[] = {
+const con_app_type con_app[] = {
     /*STAT#  { HP_REGEN/TICK, MOVE_REGEN/TICK, HP_GAIN/LEVEL, POSION_RES	},*/
     /*  0 */ {
         -20,
@@ -2431,7 +2432,7 @@ const struct con_app_type con_app[] = {
 };
 
 // Intelligence Attribute Modifiers
-const struct int_app_type int_app[] = {
+const int_app_type int_app[] = {
     /* STAT# { MANA_REGEN/TICK, KI_REGEN/TICK, EASY_BONUS,   MEDIUM_BONUS, HARD_BONUS, PRAC_BONUS, MAGIC_RES, CONC_BONUS,	SPELL_DAM
     },*/
     /*  0 */ {
@@ -2758,7 +2759,7 @@ const struct int_app_type int_app[] = {
 };
 
 // Wisdom Attribute Modifiers
-const struct wis_app_type wis_app[] = {
+const wis_app_type wis_app[] = {
     /* STAT# { MANA_REGEN/TICK, KI_REGEN/TICK, PRACS/LEVEL BONUS, ENERGY_RES, CONC_BONUS,	SPELL_DAM 	},*/
     /*  0 */ {
         -10,
@@ -3011,7 +3012,7 @@ const struct wis_app_type wis_app[] = {
 };
 
 // Dexterity Attribute Modifiers
-const struct dex_app_type dex_app[] = {
+const dex_app_type dex_app[] = {
     /* STAT# { TO_HIT_ BONUS, AC_BONUS, MOVE_GAIN/LEVEL, FIRE_RES	},*/
     /*  0 */ {
         -5,
@@ -3202,7 +3203,7 @@ const struct dex_app_type dex_app[] = {
 };
 
 // Strength Attribute Modifiers
-const struct str_app_type str_app[] = {
+const str_app_type str_app[] = {
     /* STAT# { TO_DAMAGE_BONUS, MAX_CARRIED, COLD RES	},*/
     /*  0 */ {
         -7,
@@ -3471,7 +3472,7 @@ int mana_bonus[31] =
         160 /* 30 */
 };
 
-struct mob_matrix_data mob_matrix[] =
+mob_matrix_data mob_matrix[] =
     {
         /* LVL       EXP    HP   HIT DAM   AC    GOLD */
         /*  0 */ {5, 1, 1, 1, 100, 0},

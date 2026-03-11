@@ -70,7 +70,7 @@ char *activeProgTmpBuf;
 // Global defined here
 
 bool MOBtrigger;
-struct mprog_throw_type *g_mprog_throw_list = 0; // holds all pending mprog throws
+mprog_throw_type *g_mprog_throw_list = 0; // holds all pending mprog throws
 
 SelfPurge::SelfPurge()
 {
@@ -123,7 +123,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob,
 char *mprog_process_if(char *ifchck, char *com_list,
                        Character *mob, Character *actor,
                        Object *obj, void *vo,
-                       Character *rndm, struct mprog_throw_type *thrw = nullptr);
+                       Character *rndm, mprog_throw_type *thrw = nullptr);
 void mprog_translate(char ch, char *t, Character *mob,
                      Character *actor, Object *obj,
                      void *vo, Character *rndm);
@@ -136,7 +136,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob,
  */
 
 /* Used to get sequential lines of a multi line std::string (separated by "\r\n")
- * Thus its like one_argument(), but a trifle different. It is destructive
+ * Thus its like one_argument(), but a trifle different. It is deive
  * to the multi line std::string argument, and thus clist must not be shared.
  */
 char *mprog_next_command(char *clist)
@@ -316,7 +316,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
   Object *otarget = nullptr;
   int rtarget = -1, ztarget = -1;
   bool valset = false; // done like that to determine if value is set, since it can be 0
-  struct tempvariable *mobTempVar = nullptr;
+  tempvariable *mobTempVar = nullptr;
   if (mob)
   {
     mobTempVar = mob->tempVariable;
@@ -1619,7 +1619,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   bool ye = false;
   if (arg[0] == '$' && arg[1] == 'v')
   {
-    struct tempvariable *eh = mob->tempVariable;
+    tempvariable *eh = mob->tempVariable;
     char buf1[MAX_STRING_LENGTH];
     buf1[0] = '\0';
     int i;
@@ -3009,7 +3009,7 @@ int mprog_cur_result;
 
 char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
                        Character *actor, Object *obj, void *vo,
-                       Character *rndm, struct mprog_throw_type *thrw)
+                       Character *rndm, mprog_throw_type *thrw)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -3813,7 +3813,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
           who = rndm;
         if (who)
         {
-          struct tempvariable *eh = who->tempVariable;
+          tempvariable *eh = who->tempVariable;
           for (; eh; eh = eh->next)
             if (eh->name == tmp)
               break;
@@ -3860,10 +3860,8 @@ bool objExists(Object *obj)
  *  the command list and figuring out what to do. However, like all
  *  complex procedures, everything is farmed out to the other guys.
  */
-void mprog_driver(char *com_list, Character *mob, Character *actor,
-                  Object *obj, void *vo, struct mprog_throw_type *thrw, Character *rndm)
+void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj, void *vo, mprog_throw_type *thrw, Character *rndm)
 {
-
   char tmpcmndlst[MAX_STRING_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   char *morebuf;
@@ -4542,7 +4540,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
         {
           if (var)
           {
-            struct tempvariable *eh;
+            tempvariable *eh;
             for (eh = mob->tempVariable; eh; eh = eh->next)
             {
               if (eh->name == "throw")
@@ -4555,11 +4553,11 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
             else
             {
 #ifdef LEAK_CHECK
-              eh = (struct tempvariable *)
-                  calloc(1, sizeof(struct tempvariable));
+              eh = (tempvariable *)
+                  calloc(1, sizeof(tempvariable));
 #else
-              eh = (struct tempvariable *)
-                  dc_alloc(1, sizeof(struct tempvariable));
+              eh = (tempvariable *)
+                  dc_alloc(1, sizeof(tempvariable));
 #endif
 
               eh->data = var;
@@ -4587,9 +4585,9 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 
 void DC::update_mprog_throws(void)
 {
-  struct mprog_throw_type *curr;
-  struct mprog_throw_type *action;
-  struct mprog_throw_type *last = nullptr;
+  mprog_throw_type *curr;
+  mprog_throw_type *action;
+  mprog_throw_type *last = nullptr;
   Character *vict;
   Object *vobj;
   for (curr = g_mprog_throw_list; curr;)
@@ -4838,12 +4836,12 @@ int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Char
           vmob = initiate_oproc(nullptr, obj);
           if (var)
           {
-            struct tempvariable *eh;
+            tempvariable *eh;
 
 #ifdef LEAK_CHECK
-            eh = (struct tempvariable *)calloc(1, sizeof(struct tempvariable));
+            eh = (tempvariable *)calloc(1, sizeof(tempvariable));
 #else
-            eh = (struct tempvariable *)dc_alloc(1, sizeof(struct tempvariable));
+            eh = (tempvariable *)dc_alloc(1, sizeof(tempvariable));
 #endif
 
             eh->data = var;

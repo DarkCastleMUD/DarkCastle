@@ -1,7 +1,8 @@
-/* Set eq stuff. Struct, defines. */
+/* Set eq stuff. defines. */
 
-struct set_data
+class set_data
 {
+public:
   char *SetName;
   int amount;
   int vnum[19];
@@ -32,4 +33,4 @@ struct set_data
 #define SET_FINERY 19
 #define SET_MAX 1419
 
-extern const struct set_data set_list[];
+extern const set_data set_list[];

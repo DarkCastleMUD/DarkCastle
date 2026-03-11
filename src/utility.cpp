@@ -77,7 +77,7 @@ extern std::map<int, std::map<uint8_t, std::string>> professions;
 // extern funcs
 clan_data *get_clan(Character *);
 void release_message(Character *ch);
-struct timer_data *timer_list = nullptr;
+timer_data *timer_list = nullptr;
 
 // tested in TestUtility::test_nocolor_strlen_qstring
 std::size_t nocolor_strlen(const QStringView str)
@@ -830,10 +830,10 @@ QString constindex(const qsizetype index, const QStringList names)
 }
 
 // Calculate the MUD time passed over the last t2-t1 centuries (secs)
-struct time_info_data mud_time_passed(time_t t2, time_t t1)
+time_info_data mud_time_passed(time_t t2, time_t t1)
 {
   int32_t secs;
-  struct time_info_data now;
+  time_info_data now;
 
   secs = (int32_t)(t2 - t1);
 
@@ -851,9 +851,9 @@ struct time_info_data mud_time_passed(time_t t2, time_t t1)
   return now;
 }
 
-struct time_info_data Character::age(void)
+time_info_data Character::age(void)
 {
-  struct time_info_data player_age;
+  time_info_data player_age;
 
   // TODO - make this return some sensible value for mobs
   if (isNonPlayer())
@@ -1051,7 +1051,7 @@ bool IS_DARK(int room)
 
 bool ARE_GROUPED(Character *sub, Character *obj)
 {
-  struct follow_type *f;
+  follow_type *f;
   Character *k;
 
   if (obj == sub)
@@ -1206,7 +1206,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
 {
   int skill = 0;
-  struct affected_type *cur_af;
+  affected_type *cur_af;
 
   if (!sub->isNonPlayer() && sub->player->holyLite)
     return true;
@@ -1295,7 +1295,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
   int org_room;
   int retval;
   Character *victim;
-  struct follow_type *k;
+  follow_type *k;
 
   half_chop(argument, name, message);
 
@@ -1479,7 +1479,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   float cf = {};
   QString name;
   clan_data *clan = {};
-  struct clan_room_data *room;
+  clan_room_data *room;
   int found = {};
   int retval = {};
   int is_mob = {};
@@ -1693,9 +1693,9 @@ int do_qui(Character *ch, char *argument, cmd_t cmd)
 int do_quit(Character *ch, char *argument, cmd_t cmd)
 {
   int iWear;
-  struct follow_type *k;
+  follow_type *k;
   clan_data *clan;
-  struct clan_room_data *room;
+  clan_room_data *room;
   int found = 0;
   char buf[MAX_STRING_LENGTH];
   Object *obj, *tmp_obj;
@@ -1801,7 +1801,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     do_sing(ch, "stop");
 
   extractFamiliar(ch);
-  struct follow_type *fol, *fol_next;
+  follow_type *fol, *fol_next;
 
   for (fol = ch->followers; fol; fol = fol_next)
   {
@@ -1838,7 +1838,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   if (IS_AFFECTED(ch, AFF_CHAMPION))
   {
     REMBIT(ch->affected_by, AFF_CHAMPION);
-    struct affected_type af;
+    affected_type af;
     af.type = OBJ_CHAMPFLAG_TIMER;
     af.duration = 5;
     af.modifier = 0;
@@ -1951,7 +1951,7 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
 int do_home(Character *ch, char *argument, cmd_t cmd)
 {
   clan_data *clan;
-  struct clan_room_data *room;
+  clan_room_data *room;
   int found = 0;
 
   if (!ch->isImmortalPlayer())
@@ -2269,7 +2269,7 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, C
 
 void check_timer()
 { // Called once/sec
-  struct timer_data *curr, *nex, *las;
+  timer_data *curr, *nex, *las;
   las = nullptr;
   for (curr = timer_list; curr; curr = nex)
   {
@@ -2574,7 +2574,7 @@ bool check_make_camp(int room)
 int get_leadership_bonus(Character *ch)
 {
   Character *leader;
-  struct follow_type *f, *next_f;
+  follow_type *f, *next_f;
   int highlevel = 0, bonus = 0;
 
   if (ch->master)
@@ -2619,7 +2619,7 @@ int get_leadership_bonus(Character *ch)
 
 void update_make_camp_and_leadership(void)
 {
-  struct affected_type af;
+  affected_type af;
   int bonus = 0;
   const auto &character_list = DC::getInstance()->character_list;
 
@@ -2966,7 +2966,7 @@ bool class_can_go(int ch_class, int room)
   return true;
 }
 
-const char *find_profession(int c_class, uint8_t profession)
+QString find_profession(int c_class, uint8_t profession)
 {
   // TODO Fix
   return "Unknown";

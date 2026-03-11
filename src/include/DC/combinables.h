@@ -52,7 +52,7 @@ namespace Combinables
 
   private:
     static std::map<recipe, int32_t> recipes;
-    struct loadError
+    class loadError
     {
     };
     static const char RECIPES_FILENAME[];
@@ -121,7 +121,7 @@ namespace Combinables
 
   private:
     static std::map<recipe, int32_t> recipes;
-    struct loadError
+    class loadError
     {
     };
     static const char RECIPES_FILENAME[];

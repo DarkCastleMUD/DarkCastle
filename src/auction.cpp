@@ -360,9 +360,8 @@ Identify an item.
 void AuctionHouse::Identify(Character *ch, unsigned int ticket)
 {
   int spell_identify(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill);
-  QMap<unsigned int, AuctionTicket>::iterator Item_it;
-
-  if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
+  auto Item_it = Items_For_Sale.find(ticket);
+  if (Item_it == Items_For_Sale.end())
   {
     ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
     return;
@@ -1464,7 +1463,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
 
   if (options == LIST_MINE)
   {
-    struct vault_data *vault;
+    vault_data *vault;
     if ((vault = has_vault(GET_NAME(ch))))
     {
       int max_items = vault->size / 100;

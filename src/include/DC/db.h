@@ -33,19 +33,19 @@
 #include "DC/DC.h"
 #include "DC/utility.h"
 
-struct error_eof
+class error_eof
 {
 };
-struct error_negative_int
+class error_negative_int
 {
 };
-struct error_range_int
+class error_range_int
 {
 };
-struct error_range_under
+class error_range_under
 {
 };
-struct error_range_over
+class error_range_over
 {
 };
 
@@ -67,13 +67,14 @@ const int VERSION_NUMBER = 2; /* used for changing pfile format */
 
 #define BANNED_SITE_LENGTH 100
 
-struct ban_list_element
+class ban_list_element
 {
+public:
   char site[BANNED_SITE_LENGTH + 1];
   int type;
   time_t date;
   char name[100];
-  struct ban_list_element *next;
+  ban_list_element *next;
 };
 
 extern std::vector<std::string> continent_names;
@@ -254,7 +255,7 @@ auto &operator<<(auto &out, const Room &room)
     REMOVE_BIT(temp_room_flags, room.iFlags);
   }
 
-  struct extra_descr_data *extra;
+  extra_descr_data *extra;
   if (!DC::getInstance()->rooms.contains(room.number))
     return out;
 
@@ -297,7 +298,7 @@ auto &operator<<(auto &out, const Room &room)
       out << "~\n"; // print blank
   } /* extra descriptions */
 
-  struct deny_data *deni;
+  deny_data *deni;
   for (deni = room.denied; deni; deni = deni->next)
   {
     out << "B\n"
@@ -367,7 +368,7 @@ T fread_bitvector(auto &in)
 
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
-extern struct skill_quest *skill_list;
+extern skill_quest *skill_list;
 extern index_data mob_index_array[MAX_INDEX];
 #define REAL 0
 #define VIRTUAL 1
@@ -396,14 +397,16 @@ void find_unordered_objects(void);
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */
 
-struct pulse_data
+class pulse_data
 { /* list for keeping tract of 'pulsing' chars */
+public:
   Character *thechar;
   pulse_data *next;
 };
 
-struct help_index_element
+class help_index_element
 {
+public:
   char *keyword;
   int32_t pos;
 };

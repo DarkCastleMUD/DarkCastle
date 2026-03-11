@@ -23,20 +23,21 @@
 #define CLASS_NECROMANCER 13
 #define CLASS_MAX 13
 
-struct class_data
+class class_data
 {
-    std::string name;
-    std::string lname;
-    std::string abbrev;
-    bool playable;
-    int8_t min_str;
-    int8_t min_dex;
-    int8_t min_con;
-    int8_t min_int;
-    int8_t min_wis;
+public:
+  std::string name;
+  std::string lname;
+  std::string abbrev;
+  bool playable;
+  int8_t min_str;
+  int8_t min_dex;
+  int8_t min_con;
+  int8_t min_int;
+  int8_t min_wis;
 };
 
-typedef std::vector<struct class_data> classes_t;
+typedef std::vector<class_data> classes_t;
 
 extern classes_t classes;
 

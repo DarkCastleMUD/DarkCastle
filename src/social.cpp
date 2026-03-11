@@ -18,16 +18,16 @@
 #include "DC/punish.h"
 
 // storage of socials
-struct social_messg *soc_mess_list; // head of social array
-int32_t num_socials;                // number of actual socials (50 = 0-49)
-int32_t social_array_size;          // size of actual array (since we allocate in chunks)
+social_messg *soc_mess_list; // head of social array
+int32_t num_socials;         // number of actual socials (50 = 0-49)
+int32_t social_array_size;   // size of actual array (since we allocate in chunks)
 
-struct social_messg *find_social(QString arg);
+social_messg *find_social(QString arg);
 
 command_return_t Character::check_social(QString pcomm)
 {
   QString arg = {}, buf = {};
-  struct social_messg *action = {};
+  social_messg *action = {};
   Character *vict = {};
 
   std::tie(pcomm, arg) = half_chop(pcomm);
@@ -228,9 +228,9 @@ void boot_social_messages(void)
                            // going over saves on memory and boot up speed since we won't
                            // have to realloc as often.
 #ifdef LEAK_CHECK
-  soc_mess_list = (struct social_messg *)calloc(social_array_size, sizeof(struct social_messg));
+  soc_mess_list = (social_messg *)calloc(social_array_size, sizeof(social_messg));
 #else
-  soc_mess_list = (struct social_messg *)dc_alloc(social_array_size, sizeof(struct social_messg));
+  soc_mess_list = (social_messg *)dc_alloc(social_array_size, sizeof(social_messg));
 #endif
 
   if (!(fl = fopen(SOCIAL_FILE, "r")))
@@ -247,14 +247,14 @@ void boot_social_messages(void)
       social_array_size += 10;
       // realloc the list to have enough memory for the new array size
 #ifdef LEAK_CHECK
-      soc_mess_list = (struct social_messg *)realloc(soc_mess_list,
-                                                     (sizeof(struct social_messg) * social_array_size));
+      soc_mess_list = (social_messg *)realloc(soc_mess_list,
+                                              (sizeof(social_messg) * social_array_size));
 #else
-      soc_mess_list = (struct social_messg *)dc_realloc(soc_mess_list,
-                                                        (sizeof(struct social_messg) * social_array_size));
+      soc_mess_list = (social_messg *)dc_realloc(soc_mess_list,
+                                                 (sizeof(social_messg) * social_array_size));
 #endif
       // clear the memory we just alloc'd
-      memset((soc_mess_list + num_socials), 0, (sizeof(struct social_messg) * 10));
+      memset((soc_mess_list + num_socials), 0, (sizeof(social_messg) * 10));
     }
     if (!read_social_from_file(num_socials, fl))
       break;
@@ -267,7 +267,7 @@ void boot_social_messages(void)
   fclose(fl);
 }
 
-struct social_messg *find_social(QString arg)
+social_messg *find_social(QString arg)
 {
   // now uses a linear search
   int i;
@@ -279,7 +279,7 @@ struct social_messg *find_social(QString arg)
   return nullptr;
   //    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
 
-  //  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof(struct social_messg), compare_social_search);
+  //  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof( social_messg), compare_social_search);
 }
 
 void DC::clean_socials_from_memory()

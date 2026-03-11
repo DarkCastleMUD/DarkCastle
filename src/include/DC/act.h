@@ -14,8 +14,9 @@
 // Function interface
 //--
 
-struct act_return
+class act_return
 {
+public:
   QString str;
   int retval;
 };
@@ -24,8 +25,9 @@ act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int1
 act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
 act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
 
-struct send_tokens_return
+class send_tokens_return
 {
+public:
   QString str;
   int retval;
 };

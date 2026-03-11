@@ -35,12 +35,6 @@
 using namespace Combinables;
 
 ////////////////////////////////////////////////////////////////////////////
-// local function declarations
-void determine_trade_skill_increase(Character *ch, int skillnum, int learned, int trivial);
-int determine_trade_skill_chance(int learned, int trivial);
-int valid_trade_skill_combine(class Object *container, struct trade_data_type *data, Character *ch);
-
-////////////////////////////////////////////////////////////////////////////
 // local definitions
 
 #define TRADE_SKILL_POISON_CONT 698 // mortar & pestle
@@ -52,15 +46,19 @@ char *tradeskills[] =
 
 #define MAX_INGREDIANTS 10
 
-struct trade_data_type
+class trade_data_type
 {
+public:
   int pieces[MAX_INGREDIANTS];
   int result; // last item in array must be -1 for this
   int trivial;
 };
+void determine_trade_skill_increase(Character *ch, int skillnum, int learned, int trivial);
+int determine_trade_skill_chance(int learned, int trivial);
+int valid_trade_skill_combine(class Object *container, class trade_data_type *data, Character *ch);
 
 // POISON DEFINES
-struct trade_data_type poison_vial_data[] =
+trade_data_type poison_vial_data[] =
     {
         {
             {600, 697, -1, -1, -1, -1, -1, -1, -1, -1}, // bee stinger
@@ -97,12 +95,13 @@ struct trade_data_type poison_vial_data[] =
          -1,
          -1}};
 
-struct thief_poison_data
+class thief_poison_data
 {
+public:
   char *poison_type;
 };
 
-struct thief_poison_data poison_vial_combat_data[] =
+thief_poison_data poison_vial_combat_data[] =
     {
         {"bee stinger poison"},
 

@@ -51,7 +51,7 @@
 
 #define STATE(d) ((d)->connected)
 
-bool is_bracing(Character *bracee, struct room_direction_data *exit);
+bool is_bracing(Character *bracee, room_direction_data *exit);
 void show_question_race(Connection *d);
 
 const char menu[] = "\r\nWelcome to Dark Castle Mud\r\n\r\n"
@@ -434,7 +434,7 @@ void Character::do_on_login_stuff(void)
     this->player->quest_current[i] = -1;
     this->player->quest_current_ticksleft[i] = 0;
   }
-  struct vault_data *vault = has_vault(GET_NAME(this));
+  vault_data *vault = has_vault(GET_NAME(this));
   if (this->player->time.logon < 1172204700)
   {
     if (vault)
@@ -2171,7 +2171,7 @@ void update_characters()
 {
   int tmp, retval;
   char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
-  struct affected_type af;
+  affected_type af;
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)

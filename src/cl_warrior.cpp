@@ -898,7 +898,7 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
 
 int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   int duration = 12;
 
   if (!ch->canPerform(SKILL_BLADESHIELD))
@@ -1032,7 +1032,7 @@ void stop_guarding(Character *guard)
 
 void start_guarding(Character *guard, Character *victim)
 {
-  follow_type *curr = (struct follow_type *)dc_alloc(1, sizeof(struct follow_type));
+  follow_type *curr = (follow_type *)dc_alloc(1, sizeof(follow_type));
 
   curr->follower = guard;
   curr->next = victim->guarded_by;
@@ -1114,7 +1114,7 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
 
 int do_tactics(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->canPerform(SKILL_TACTICS))
   {
@@ -1193,7 +1193,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
 {
   Character *i, *next_i;
   int learned = ch->has_skill(SKILL_MAKE_CAMP);
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
@@ -1297,7 +1297,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
 int do_triage(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_TRIAGE);
-  struct affected_type af;
+  affected_type af;
 
   if (ch->isMortalPlayer() && !learned)
   {
@@ -1354,7 +1354,7 @@ int do_triage(Character *ch, char *argument, cmd_t cmd)
 int do_battlesense(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_BATTLESENSE);
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
@@ -1396,7 +1396,7 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
   Character *vict = nullptr;
   char name[MAX_STRING_LENGTH];
   int learned = ch->has_skill(SKILL_SMITE);
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
@@ -1480,7 +1480,7 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
 int do_leadership(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_LEADERSHIP);
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
@@ -1539,7 +1539,7 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
 int do_perseverance(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_PERSEVERANCE);
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
@@ -1580,7 +1580,7 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict = nullptr;
   int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
@@ -1624,7 +1624,7 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
 int do_onslaught(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_ONSLAUGHT);
-  struct affected_type af;
+  affected_type af;
 
   if (ch->isMortalPlayer() && !learned)
   {

@@ -225,7 +225,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
         sprintf(buf, "\r\n##%s has just yielded %s!\r\n", GET_NAME(ch), obj->short_description);
         send_info(buf);
 
-        struct affected_type af;
+        affected_type af;
         af.type = OBJ_CHAMPFLAG_TIMER;
         af.duration = 5;
         af.modifier = 0;
@@ -1186,7 +1186,7 @@ int do_rest(Character *ch, char *argument, cmd_t cmd)
 
 int do_sleep(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type *paf;
+  affected_type *paf;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
@@ -1241,7 +1241,7 @@ int do_sleep(Character *ch, char *argument, cmd_t cmd)
   break;
   }
 
-  struct affected_type af;
+  affected_type af;
   af.type = INTERNAL_SLEEPING;
   af.duration = 0;
   af.modifier = 0;

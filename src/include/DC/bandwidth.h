@@ -4,7 +4,7 @@
 
 void setup_bandwidth();
 void add_bandwidth(int amount);
-struct bandwidth_type read_bandwidth(const char *file);
+bandwidth_type read_bandwidth(const char *file);
 int write_bandwidth();
 
 int32_t get_bandwidth_start();

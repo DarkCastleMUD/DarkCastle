@@ -8,17 +8,14 @@
 */
 
 #include <string>
-#include <ostream>
-
+#include <QString>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
 class Character;
 
 void rebuild_rnum_references(int startAt, int type);
-void mprog_driver(char *com_list, Character *mob,
-                  Character *actor, class Object *obj,
-                  void *vo, struct mprog_throw_type *thrw, Character *rndm);
+void mprog_driver(char *com_list, Character *mob, Character *actor, class Object *obj, void *vo, class mprog_throw_type *thrw, Character *rndm);
 char *mprog_next_command(char *clist);
 
 bool charExists(Character *ch);
@@ -111,8 +108,9 @@ struct fmt::formatter<SelfPurge>
 typedef class SelfPurge selfpurge_t;
 extern selfpurge_t selfpurge;
 
-struct race_data
+class race_data
 {
+public:
   char *singular_name;        /* Dwarf, Elf, etc.     */
   std::string lowercase_name; /* dwarf, elf, etc.     */
   char *plural_name;          /* dwarves, elves, etc. */
@@ -153,8 +151,9 @@ struct race_data
   const char *unarmed; // unarmed attack message
 };
 
-struct mob_matrix_data
+class mob_matrix_data
 {
+public:
   int64_t experience;
   int hitpoints;
   int tohit;

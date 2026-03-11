@@ -21,7 +21,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   // {
   char buf[MAX_STRING_LENGTH];
   std::string output = "";
-  struct room_direction_data *curExits;
+  room_direction_data *curExits;
   int curZone = GET_ZONE(ch);
   int curRoom = ch->in_room;
   Object *portal;

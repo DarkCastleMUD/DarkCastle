@@ -330,7 +330,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   QString victim_name = arguments.value(0);
   if (victim_name == "follower")
   {
-    for (struct follow_type *j = followers; j; j = j->next)
+    for (follow_type *j = followers; j; j = j->next)
     {
       if (in_room == j->follower->in_room && j->follower->fighting)
       {

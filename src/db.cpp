@@ -29,7 +29,6 @@ int load_debug = 0;
 #include <cstdlib>
 
 #include <sstream>
-#include <limits>
 #include <typeinfo>
 
 #include <QDebug>
@@ -39,10 +38,9 @@ int load_debug = 0;
 #include "DC/db.h"
 #include "DC/memory.h"
 #include "DC/structs.h"  // MAX_STRING_LENGTH
-#include "DC/weather.h"  // structs
-#include "DC/timeinfo.h" // structs
+#include "DC/weather.h"  // s
+#include "DC/timeinfo.h" // s
 #include "DC/player.h"   // log info
-#include "DC/fileinfo.h" // file names
 #include "DC/utility.h"  // assign..
 #include "DC/character.h"
 #include "DC/mobile.h"
@@ -78,8 +76,8 @@ Room &World::operator[](room_t room_key)
 #ifndef SEEK_CUR
 #define SEEK_CUR 1
 #endif
-struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
-struct skill_quest *skill_list;                   // List of skill quests.
+message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
+skill_quest *skill_list;                   // List of skill quests.
 
 char webpage[MAX_STRING_LENGTH];    /* the webbrowser connect screen*/
 char greetings1[MAX_STRING_LENGTH]; /* the greeting screen          */
@@ -98,16 +96,16 @@ char info[MAX_STRING_LENGTH];      /* the info text                 */
 FILE *help_fl;     /* file for help texts (HELP <kwd>)*/
 FILE *new_help_fl; /* file for help texts (HELP <kwd>)*/
 
-struct help_index_element *help_index = 0;
-struct help_index_element_new *new_help_table = 0;
+help_index_element *help_index = 0;
+help_index_element_new *new_help_table = 0;
 
 int top_of_mobt = 0; /* top of mobile index table       */
 int top_of_objt = 0; /* top of object index table       */
 
-struct time_info_data time_info;  /* the infomation about the time   */
-struct weather_data weather_info; /* the infomation about the weather */
+time_info_data time_info;  /* the infomation about the time   */
+weather_data weather_info; /* the infomation about the weather */
 
-struct vault_data *vault_table = 0;
+vault_data *vault_table = 0;
 
 /* local procedures */
 void setup_dir(FILE *fl, int room, int dir);
@@ -135,7 +133,7 @@ extern bool MOBtrigger;
 
 /* external refs */
 
-struct help_index_element *build_help_index(FILE *fl, int *num);
+help_index_element *build_help_index(FILE *fl, int *num);
 // The Room implementation
 // -Sadus 9/1/96
 
@@ -196,45 +194,45 @@ void Room::AddTrackItem(room_track_data *newTrack)
   }
 }
 
-bool operator==(const struct deny_data &dd1, const struct deny_data &dd2)
+bool operator==(const deny_data &dd1, const deny_data &dd2)
 {
   QList<decltype(dd1.vnum)> denies1;
-  const struct deny_data *curr1 = &dd1;
+  const deny_data *curr1 = &dd1;
   do
   {
     denies1.push_back(curr1->vnum);
-  } while (curr1 = curr1->next);
+  } while ((curr1 = curr1->next));
 
   QList<decltype(dd2.vnum)> denies2;
-  const struct deny_data *curr2 = &dd2;
+  const deny_data *curr2 = &dd2;
   do
   {
     denies2.push_back(curr2->vnum);
-  } while (curr2 = curr2->next);
+  } while ((curr2 = curr2->next));
 
   return denies1 == denies2;
 }
 
-bool operator==(struct extra_descr_data &edd1, struct extra_descr_data &edd2)
+bool operator==(extra_descr_data &edd1, extra_descr_data &edd2)
 {
   QMap<QString, QString> extra_descriptions1;
-  struct extra_descr_data *curr1 = &edd1;
+  extra_descr_data *curr1 = &edd1;
   do
   {
     extra_descriptions1.insert(curr1->keyword, curr1->description);
-  } while (curr1 = curr1->next);
+  } while ((curr1 = curr1->next));
 
   QMap<QString, QString> extra_descriptions2;
-  struct extra_descr_data *curr2 = &edd2;
+  extra_descr_data *curr2 = &edd2;
   do
   {
     extra_descriptions2.insert(curr2->keyword, curr2->description);
-  } while (curr2 = curr2->next);
+  } while ((curr2 = curr2->next));
 
   return extra_descriptions1 == extra_descriptions2;
 }
 
-bool operator==(const struct room_direction_data &rdd1, const struct room_direction_data &rdd2)
+bool operator==(const room_direction_data &rdd1, const room_direction_data &rdd2)
 {
   return (rdd1.bracee == rdd2.bracee &&
           rdd1.exit_info == rdd2.exit_info &&
@@ -304,11 +302,11 @@ void Character::add_to_bard_list(void)
     return;
 
 #ifdef LEAK_CHECK
-  curr = (struct pulse_data *)
-      calloc(1, sizeof(struct pulse_data));
+  curr = (pulse_data *)
+      calloc(1, sizeof(pulse_data));
 #else
-  curr = (struct pulse_data *)
-      dc_alloc(1, sizeof(struct pulse_data));
+  curr = (pulse_data *)
+      dc_alloc(1, sizeof(pulse_data));
 #endif
 
   curr->thechar = this;
@@ -454,7 +452,7 @@ void funny_boot_message()
  a character attached. */
 int do_write_skillquest(Character *ch, char *argument, cmd_t cmd)
 {
-  struct skill_quest *curr;
+  skill_quest *curr;
   FILE *fl;
 
   if (!(fl = fopen(SKILL_QUEST_FILE, "w")))
@@ -476,7 +474,7 @@ int do_write_skillquest(Character *ch, char *argument, cmd_t cmd)
 
 void load_skillquests()
 {
-  struct skill_quest *newsq, *last = 0;
+  skill_quest *newsq, *last = 0;
   skill_list = nullptr;
   int i;
   FILE *fl;
@@ -490,9 +488,9 @@ void load_skillquests()
   while ((i = fread_int(fl, 0, 1000)) != 0)
   {
 #ifdef LEAK_CHECK
-    newsq = (struct skill_quest *)calloc(1, sizeof(struct skill_quest));
+    newsq = (skill_quest *)calloc(1, sizeof(skill_quest));
 #else
-    newsq = (struct skill_quest *)dc_alloc(1, sizeof(struct skill_quest));
+    newsq = (skill_quest *)dc_alloc(1, sizeof(skill_quest));
 #endif
 
     newsq->num = i;
@@ -574,7 +572,7 @@ void DC::boot_db(void)
     perror(NEW_HELP_FILE);
     abort();
   }
-  CREATE(new_help_table, struct help_index_element_new, help_rec_count);
+  CREATE(new_help_table, help_index_element_new, help_rec_count);
   load_new_help(new_help_fl);
   fclose(new_help_fl);
   // end new help files
@@ -906,7 +904,7 @@ void reset_time(void)
 {
   int32_t beginning_of_time = 650336715;
 
-  struct time_info_data mud_time_passed(time_t t2, time_t t1);
+  time_info_data mud_time_passed(time_t t2, time_t t1);
 
   time_info = mud_time_passed(time(0), beginning_of_time);
 
@@ -988,7 +986,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
   FILE *fl;
   QString temp;
   char endfile[180];
-  struct world_file_list_item *pItem = nullptr;
+  world_file_list_item *pItem = nullptr;
   //  extern short code_testing_mode;
 
   DC::getInstance()->logverbose(QStringLiteral("Opening mobile file index."));
@@ -1048,7 +1046,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
             abort();
           }
           vnum_t vnum{};
-          sscanf(buf, "#%d", &vnum);
+          sscanf(buf, "#%ld", &vnum);
           index[i].vnum(vnum);
           index[i].qty = 0;
           index[i].non_combat_func = 0;
@@ -1060,8 +1058,7 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
           if (!(index[i].item = (Character *)read_mobile(i, fl)))
           {
 
-            sprintf(log_buf, "Unable to load mobile %d!\r\n",
-                    index[i].vnum());
+            sprintf(log_buf, "Unable to load mobile %lu!\r\n", index[i].vnum());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
           }
           i++;
@@ -1302,7 +1299,7 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
   FILE *flObjIndex;
   QString temp;
   char endfile[180];
-  struct world_file_list_item *pItem = nullptr;
+  world_file_list_item *pItem = nullptr;
 
   //  if (!bport) {
 
@@ -1359,7 +1356,7 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
           index[i].progtypes = 0;
           if (!(index[i].item = (class Object *)read_object(i, fl, false)))
           {
-            sprintf(log_buf, "Unable to load object %d!\r\n", index[i].vnum());
+            sprintf(log_buf, "Unable to load object %lu!\r\n", index[i].vnum());
             logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
           }
           i++;
@@ -1386,7 +1383,7 @@ index_data *DC::generate_obj_indices(int *top, index_data *index)
 void write_one_room(LegacyFile &lf, int a)
 {
   FILE *f = lf.file_handle_;
-  struct extra_descr_data *extra;
+  extra_descr_data *extra;
 
   if (!DC::getInstance()->rooms.contains(a))
     return;
@@ -1397,10 +1394,7 @@ void write_one_room(LegacyFile &lf, int a)
 
   if (DC::getInstance()->world[a].iFlags)
     REMOVE_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
-  fprintf(f, "%d %d %d\n",
-          DC::getInstance()->world[a].zone,
-          DC::getInstance()->world[a].room_flags,
-          DC::getInstance()->world[a].sector_type);
+  fprintf(f, "%lu %d %d\n", DC::getInstance()->world[a].zone, DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].sector_type);
   if (DC::getInstance()->world[a].iFlags)
     SET_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
 
@@ -1448,7 +1442,7 @@ void write_one_room(LegacyFile &lf, int a)
       fprintf(f, "~\n"); // print blank
   } /* extra descriptions */
 
-  struct deny_data *deni;
+  deny_data *deni;
   for (deni = DC::getInstance()->world[a].denied; deni; deni = deni->next)
     fprintf(f, "B\n%d\n", deni->vnum);
 
@@ -1469,7 +1463,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
   char *temp = nullptr;
   char ch = 0;
   int dir = 0;
-  struct extra_descr_data *new_new_descr{};
+  extra_descr_data *new_new_descr{};
   zone_t zone_nr = {};
 
   ch = fread_char(fl);
@@ -1581,8 +1575,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
       if (load_debug)
       {
-        printf("Flags are %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags,
-               DC::getInstance()->world[room_nr].sector_type);
+        printf("Flags are %lu %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags, DC::getInstance()->world[room_nr].sector_type);
         fflush(stdout);
       }
 
@@ -1614,11 +1607,11 @@ int DC::read_one_room(FILE *fl, int &room_nr)
         if (fread_char(fl) != '\n')
           fseek(fl, -1, SEEK_CUR);
 #ifdef LEAK_CHECK
-        new_new_descr = (struct extra_descr_data *)
-            calloc(1, sizeof(struct extra_descr_data));
+        new_new_descr = (extra_descr_data *)
+            calloc(1, sizeof(extra_descr_data));
 #else
-        new_new_descr = (struct extra_descr_data *)
-            dc_alloc(1, sizeof(struct extra_descr_data));
+        new_new_descr = (extra_descr_data *)
+            dc_alloc(1, sizeof(extra_descr_data));
 #endif
         new_new_descr->keyword = fread_string(fl, 0);
         new_new_descr->description = fread_string(fl, 0);
@@ -1635,11 +1628,11 @@ int DC::read_one_room(FILE *fl, int &room_nr)
       }
       else if (ch == 'B')
       {
-        struct deny_data *deni;
+        deny_data *deni;
 #ifdef LEAK_CHECK
-        deni = (struct deny_data *)calloc(1, sizeof(struct deny_data));
+        deni = (deny_data *)calloc(1, sizeof(deny_data));
 #else
-        deni = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
+        deni = (deny_data *)dc_alloc(1, sizeof(deny_data));
 #endif
         deni->vnum = fread_int(fl, -1, 2147483467);
 
@@ -1767,14 +1760,14 @@ void DC::set_zone_modified_zone(int32_t room)
   setZoneModified(world[room].zone);
 }
 
-auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_list_item *, search_error>
+auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>
 {
-  struct world_file_list_item *world_entry = {};
+  world_file_list_item *world_entry = {};
 
   for (quint8 i = 1; i < 4; ++i)
   {
     vnum_t generation = pow(10, i);
-    qDebug("searching for vnum %lu. %lu %lu %lu", vnum, i, generation, vnum - (vnum % generation));
+    qDebug("searching for vnum %lu. %hhu %lu %lu", vnum, i, generation, vnum - (vnum % generation));
   }
 
   return std::unexpected(search_error::not_found);
@@ -1857,11 +1850,11 @@ void DC::set_zone_saved_obj(int32_t obj)
   set_zone_saved(obj, DC::getInstance()->obj_file_list);
 }
 
-/* destruct the world */
+/* de the world */
 void DC::free_world_from_memory(void)
 {
-  struct extra_descr_data *curr_extra = nullptr;
-  struct world_file_list_item *curr_wfli = nullptr;
+  extra_descr_data *curr_extra = nullptr;
+  world_file_list_item *curr_wfli = nullptr;
 
   for (int i = 0; i <= DC::getInstance()->top_of_world; i++)
   {
@@ -1925,7 +1918,7 @@ void DC::free_mobs_from_memory(void)
 void DC::free_objs_from_memory(void)
 {
   class Object *curr = nullptr;
-  // struct extra_descr_data * curr_extra = nullptr;
+  // extra_descr_data * curr_extra = nullptr;
 
   for (int i = 0; i <= top_of_objt; i++)
     if ((curr = (class Object *)obj_index[i].item))
@@ -1993,7 +1986,7 @@ void DC::boot_world(void)
   int room_nr = 0;
   QString temp;
   char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
-  struct world_file_list_item *pItem = nullptr;
+  world_file_list_item *pItem = nullptr;
 
   DC::getInstance()->object_list = 0;
 
@@ -2086,11 +2079,11 @@ void setup_dir(FILE *fl, int room, int dir)
   if (room)
   {
 #ifdef LEAK_CHECK
-    DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
-        calloc(1, sizeof(struct room_direction_data));
+    DC::getInstance()->world[room].dir_option[dir] = (room_direction_data *)
+        calloc(1, sizeof(room_direction_data));
 #else
-    DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
-        dc_alloc(1, sizeof(struct room_direction_data));
+    DC::getInstance()->world[room].dir_option[dir] = (room_direction_data *)
+        dc_alloc(1, sizeof(room_direction_data));
 #endif
   }
   char *general_description = fread_string(fl, 0);
@@ -2305,13 +2298,9 @@ void DC::free_zones_from_memory()
 void Zone::write(FILE *fl)
 {
   fprintf(fl, "V2\n");
-  fprintf(fl, "#%d\n", (id_ ? (bottom / 100) : 0));
+  fprintf(fl, "#%lu\n", (id_ ? (bottom / 100) : 0));
   fprintf(fl, "%s~\n", NameC());
-  fprintf(fl, "%d %d %d %ld %d\n", top,
-          lifespan,
-          reset_mode,
-          zone_flags,
-          continent);
+  fprintf(fl, "%lu %lu %d %ld %d\n", top, lifespan, reset_mode, zone_flags, continent);
 
   for (int i = 0; i < cmd.size(); i++)
   {
@@ -2861,7 +2850,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
   FILE *fl = lf.file_handle_;
   int i = 0;
 
-  fprintf(fl, "#%d\n", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
+  fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
   string_to_file(fl, mob->getName());
   string_to_file(fl, mob->short_desc);
   string_to_file(fl, mob->long_desc);
@@ -3144,7 +3133,7 @@ void handle_automatic_mob_hitdamroll(Character *mob)
 
 void handle_automatic_mob_settings(Character *mob)
 {
-  extern struct mob_matrix_data mob_matrix[];
+  extern mob_matrix_data mob_matrix[];
   // New matrix is handled here.
   if (ISSET(mob->mobdata->actflags, ACT_NOMATRIX))
     return;
@@ -3315,7 +3304,7 @@ Character *DC::clone_mobile(int nr)
 
   mob->mobdata = new Mobile;
 
-  memcpy(mob->mobdata, old->mobdata, sizeof(Mobile));
+  mob->mobdata = old->mobdata;
 
   for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
     mob->equipment[i] = 0;
@@ -3673,7 +3662,7 @@ void delete_mob_from_index(int nr)
 }
 
 // Delete an item from the index and update everything to continue working
-// without causing mass destruction and chaos.
+// without causing mass deion and chaos.
 //
 // Note:  ALL copies of this item must have been removed from the game
 // before calling this function.  Otherwise these old items will think
@@ -3839,7 +3828,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
   fl >> chk >> Qt::ws;
   qDebugQTextStreamLine(fl, "read_object(), after fl >> chk >> Qt::ws");
   qDebug() << "First chk " << chk;
-  struct extra_descr_data *new_new_descr{};
+  extra_descr_data *new_new_descr{};
   qint64 current_pos{};
   QString current_line{};
   while (!chk.isEmpty() && chk != "S")
@@ -3849,7 +3838,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
     {
     case 'E':
       qDebugQTextStreamLine(fl, "Type E before first fread_string");
-      new_new_descr = new struct extra_descr_data;
+      new_new_descr = new extra_descr_data;
 
       new_new_descr->keyword = fread_string(fl, 1);
 
@@ -3922,7 +3911,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
   int loc, mod;
 
   char chk;
-  struct extra_descr_data *new_new_descr;
+  extra_descr_data *new_new_descr;
 
   if (nr < 0)
   {
@@ -4004,9 +3993,9 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
       break;
     case 'E':
 #ifdef LEAK_CHECK
-      new_new_descr = (struct extra_descr_data *)calloc(1, sizeof(struct extra_descr_data));
+      new_new_descr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
 #else
-      new_new_descr = (struct extra_descr_data *)dc_alloc(1, sizeof(struct extra_descr_data));
+      new_new_descr = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
 #endif
       new_new_descr->keyword = fread_string(fl, 1);
       new_new_descr->description = fread_string(fl, 1);
@@ -4070,7 +4059,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
   int loc, mod, nr;
 
   char chk, c;
-  struct extra_descr_data *new_new_descr;
+  extra_descr_data *new_new_descr;
 
   if (obj == nullptr)
   {
@@ -4148,9 +4137,9 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
       break;
     case 'E':
 #ifdef LEAK_CHECK
-      new_new_descr = (struct extra_descr_data *)calloc(1, sizeof(struct extra_descr_data));
+      new_new_descr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
 #else
-      new_new_descr = (struct extra_descr_data *)dc_alloc(1, sizeof(struct extra_descr_data));
+      new_new_descr = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
 #endif
       new_new_descr->keyword = fread_string(in, 1);
       new_new_descr->description = fread_string(in, 1);
@@ -4196,9 +4185,9 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 void write_object(LegacyFile &lf, Object *obj)
 {
   FILE *fl = lf.file_handle_;
-  struct extra_descr_data *currdesc;
+  extra_descr_data *currdesc;
 
-  fprintf(fl, "#%d\n", DC::getInstance()->obj_index[obj->item_number].vnum());
+  fprintf(fl, "#%lu\n", DC::getInstance()->obj_index[obj->item_number].vnum());
   string_to_file(fl, obj->Name());
   string_to_file(fl, obj->short_description);
   string_to_file(fl, obj->long_description);
@@ -4209,7 +4198,7 @@ void write_object(LegacyFile &lf, Object *obj)
               "%d %d %d\n",
           obj->obj_flags.type_flag,
           obj->obj_flags.extra_flags,
-          obj->obj_flags.wear_flags,
+          obj->obj_flags.wear_flags.toInt(),
           obj->obj_flags.size,
 
           obj->obj_flags.value[0],
@@ -4438,7 +4427,7 @@ bool has_random(Object *obj)
 class Object *clone_object(int nr)
 {
   class Object *obj, *old;
-  struct extra_descr_data *new_new_descr, *descr;
+  extra_descr_data *new_new_descr, *descr;
 
   if (nr < 0)
     return 0;
@@ -4463,11 +4452,11 @@ class Object *clone_object(int nr)
   for (descr = old->ex_description; descr; descr = descr->next)
   {
 #ifdef LEAK_CHECK
-    new_new_descr = (struct extra_descr_data *)
-        calloc(1, sizeof(struct extra_descr_data));
+    new_new_descr = (extra_descr_data *)
+        calloc(1, sizeof(extra_descr_data));
 #else
-    new_new_descr = (struct extra_descr_data *)
-        dc_alloc(1, sizeof(struct extra_descr_data));
+    new_new_descr = (extra_descr_data *)
+        dc_alloc(1, sizeof(extra_descr_data));
 #endif
     new_new_descr->keyword = str_hsh(descr->keyword);
     new_new_descr->description = str_hsh(descr->description);
@@ -4754,7 +4743,7 @@ void Zone::reset(ResetType reset_type)
     if (reset_cmd_index < 0 || reset_cmd_index > cmd.size())
     {
       sprintf(buf,
-              "Trapped zone error, Command is null, zone: %d reset_cmd_index: %d",
+              "Trapped zone error, Command is null, zone: %lu reset_cmd_index: %d",
               id_, reset_cmd_index);
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
       break;
@@ -4833,9 +4822,7 @@ void Zone::reset(ResetType reset_type)
 
             if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
             {
-              sprintf(buf,
-                      "Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
-                      DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
+              sprintf(buf, "Obj %lu loaded to DC::NOWHERE. Zone %lu Cmd %d", DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
               logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
             }
             last_cmd = 0;
@@ -4968,7 +4955,7 @@ void Zone::reset(ResetType reset_type)
           {
             if (!mob->equip_char(obj, cmd[reset_cmd_index]->arg3))
             {
-              sprintf(buf, "Bad equip_char zone %d cmd %d", id_, reset_cmd_index + 1);
+              sprintf(buf, "Bad equip_char zone %lu cmd %d", id_, reset_cmd_index + 1);
               logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
             }
           }
@@ -4996,19 +4983,19 @@ void Zone::reset(ResetType reset_type)
       case 'D': /* set state of door */
         if (cmd[reset_cmd_index]->arg1 < 0 || cmd[reset_cmd_index]->arg1 > DC::getInstance()->top_of_world)
         {
-          sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_, reset_cmd_index + 1);
+          sprintf(log_buf, "Illegal room number Z: %lu cmd %d", id_, reset_cmd_index + 1);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
         if (cmd[reset_cmd_index]->arg2 < 0 || cmd[reset_cmd_index]->arg2 >= 6)
         {
-          sprintf(log_buf, "Illegal direction %d doesn't exist Z: %d cmd %d", cmd[reset_cmd_index]->arg2, id_, reset_cmd_index + 1);
+          sprintf(log_buf, "Illegal direction %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg2, id_, reset_cmd_index + 1);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
         if (!DC::getInstance()->rooms.contains(cmd[reset_cmd_index]->arg1))
         {
-          sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d", cmd[reset_cmd_index]->arg1, id_, reset_cmd_index + 1);
+          sprintf(log_buf, "Room %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg1, id_, reset_cmd_index + 1);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
@@ -5017,7 +5004,7 @@ void Zone::reset(ResetType reset_type)
         {
           sprintf(
               log_buf,
-              "Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
+              "Attempt to reset direction %d on room %d that doesn't exist Z: %lu cmd %d",
               cmd[reset_cmd_index]->arg2, DC::getInstance()->world[cmd[reset_cmd_index]->arg1].number, id_, reset_cmd_index);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
@@ -5098,7 +5085,7 @@ void Zone::reset(ResetType reset_type)
         break;
 
       default:
-        sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .", id_, reset_cmd_index + 1, cmd[reset_cmd_index]->command);
+        sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %lu cmd %d: '%c' Skipping .", id_, reset_cmd_index + 1, cmd[reset_cmd_index]->command);
         logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
         age = 0;
         return;
@@ -5842,13 +5829,13 @@ char fread_char(FILE *fl)
   return ch;
 }
 
-/* release memory allocated for a char struct */
+/* release memory allocated for a char  */
 void free_char(Character *ch, Trace trace)
 {
   int iWear;
-  //  struct affected_type *af;
-  struct char_player_alias *x;
-  struct char_player_alias *next;
+  //  affected_type *af;
+  class char_player_alias *x;
+  char_player_alias *next;
   mob_prog_act_list *currmprog;
   auto &character_list = DC::getInstance()->character_list;
   auto &free_list = DC::getInstance()->free_list;
@@ -5883,7 +5870,7 @@ void free_char(Character *ch, Trace trace)
 
   if (ch->tempVariable)
   {
-    struct tempvariable *temp, *tmp;
+    tempvariable *temp, *tmp;
     for (temp = ch->tempVariable; temp; temp = tmp)
     {
       tmp = temp->next;
@@ -5965,10 +5952,10 @@ void free_char(Character *ch, Trace trace)
   delete ch;
 }
 
-/* release memory allocated for an obj struct */
+/* release memory allocated for an obj  */
 void free_obj(class Object *obj)
 {
-  struct extra_descr_data *ths, *next_one;
+  extra_descr_data *ths, *next_one;
 
   for (ths = obj->ex_description; ths; ths = next_one)
   {

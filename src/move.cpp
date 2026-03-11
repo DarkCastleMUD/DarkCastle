@@ -115,9 +115,9 @@ void record_track_data(Character *ch, cmd_t cmd)
     return;
 
 #ifdef LEAK_CHECK
-  newScent = (room_track_data *)calloc(1, sizeof(struct room_track_data));
+  newScent = (room_track_data *)calloc(1, sizeof(room_track_data));
 #else
-  newScent = (room_track_data *)dc_alloc(1, sizeof(struct room_track_data));
+  newScent = (room_track_data *)dc_alloc(1, sizeof(room_track_data));
 #endif
   auto valid_dir = getDirectionFromCommand(cmd);
   if (valid_dir)
@@ -740,7 +740,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
       if (level_difference >= 0 || ch->getLevel() >= 50)
       {
         chaser->add_memory(GET_NAME(ch), 't');
-        struct timer_data *timer = new timer_data;
+        timer_data *timer = new timer_data;
         timer->var_arg1 = chaser->hunting;
         timer->arg2 = (void *)chaser;
         timer->function = clear_hunt;
@@ -868,7 +868,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
   char tmp[80];
   int return_val;
   int was_in = ch->in_room;
-  struct follow_type *k, *next_dude;
+  follow_type *k, *next_dude;
 
   if (ch->brace_at)
   {

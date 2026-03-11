@@ -34,25 +34,27 @@
 
 #define EMOTING_FILE "emoting-objects.txt"
 
-extern struct mprog_throw_type *g_mprog_throw_list;
+extern mprog_throw_type *g_mprog_throw_list;
 
 // TODO - go over emoting object stuff and make sure it's as efficient as we can get it
 
-struct obj_emote_data
+class obj_emote_data
 {
+public:
   char *emote_text;
   obj_emote_data *next;
 };
 
-struct obj_emote_index
+class obj_emote_index
 {
+public:
   obj_emote_data *data;
   obj_emote_index *next;
   short room_number;
   short emote_index_length;
   short frequency;
 };
-struct obj_emote_index obj_emote_head = {
+obj_emote_index obj_emote_head = {
     nullptr,
     nullptr,
     -1,
@@ -101,11 +103,11 @@ void load_emoting_objects()
 
   fl = fopen(EMOTING_FILE, "r");
 #ifdef LEAK_CHECK
-  obj_emote_head.next = (struct obj_emote_index *)
-      calloc(1, sizeof(struct obj_emote_index));
+  obj_emote_head.next = (obj_emote_index *)
+      calloc(1, sizeof(obj_emote_index));
 #else
-  obj_emote_head.next = (struct obj_emote_index *)
-      dc_alloc(1, sizeof(struct obj_emote_index));
+  obj_emote_head.next = (obj_emote_index *)
+      dc_alloc(1, sizeof(obj_emote_index));
 #endif
   index_cursor = obj_emote_head.next;
   index_cursor->next = nullptr;
@@ -114,11 +116,11 @@ void load_emoting_objects()
   index_cursor->emote_index_length = -1;
   index_cursor->frequency = 0;
 #ifdef LEAK_CHECK
-  data_cursor = (struct obj_emote_data *)
-      calloc(1, sizeof(struct obj_emote_index));
+  data_cursor = (obj_emote_data *)
+      calloc(1, sizeof(obj_emote_index));
 #else
-  data_cursor = (struct obj_emote_data *)
-      dc_alloc(1, sizeof(struct obj_emote_index));
+  data_cursor = (obj_emote_data *)
+      dc_alloc(1, sizeof(obj_emote_index));
 #endif
   index_cursor->data = data_cursor;
   data_cursor->next = nullptr;
@@ -142,11 +144,11 @@ void load_emoting_objects()
       else
       {
 #ifdef LEAK_CHECK
-        data_cursor->next = (struct obj_emote_data *)
-            calloc(1, sizeof(struct obj_emote_data));
+        data_cursor->next = (obj_emote_data *)
+            calloc(1, sizeof(obj_emote_data));
 #else
-        data_cursor->next = (struct obj_emote_data *)
-            dc_alloc(1, sizeof(struct obj_emote_data));
+        data_cursor->next = (obj_emote_data *)
+            dc_alloc(1, sizeof(obj_emote_data));
 #endif
         data_cursor = data_cursor->next;
         data_cursor->next = nullptr;
@@ -163,20 +165,20 @@ void load_emoting_objects()
     {
       fseek(fl, (1 * sizeof(char)), SEEK_CUR);
 #ifdef LEAK_CHECK
-      index_cursor->next = (struct obj_emote_index *)
-          calloc(1, sizeof(struct obj_emote_index));
+      index_cursor->next = (obj_emote_index *)
+          calloc(1, sizeof(obj_emote_index));
 #else
-      index_cursor->next = (struct obj_emote_index *)
-          dc_alloc(1, sizeof(struct obj_emote_index));
+      index_cursor->next = (obj_emote_index *)
+          dc_alloc(1, sizeof(obj_emote_index));
 #endif
       index_cursor = index_cursor->next;
       index_cursor->next = nullptr;
 #ifdef LEAK_CHECK
-      index_cursor->data = (struct obj_emote_data *)
-          calloc(1, sizeof(struct obj_emote_data));
+      index_cursor->data = (obj_emote_data *)
+          calloc(1, sizeof(obj_emote_data));
 #else
-      index_cursor->data = (struct obj_emote_data *)
-          dc_alloc(1, sizeof(struct obj_emote_data));
+      index_cursor->data = (obj_emote_data *)
+          dc_alloc(1, sizeof(obj_emote_data));
 #endif
       index_cursor->room_number = DC::NOWHERE;
       index_cursor->emote_index_length = -1;
@@ -400,7 +402,7 @@ int dawnsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 
   ch->sendln("You whisper a prayer to Dawn and it responds in a brilliant flash of light!");
   Character *v;
-  struct affected_type af;
+  affected_type af;
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
   {
     if (v == ch)
@@ -535,7 +537,7 @@ int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   remove_memory(victim, 'h');
 
   add_follower(victim, ch);
-  struct affected_type af;
+  affected_type af;
 
   af.type = OBJ_LILITHRING;
   af.duration = 3;
@@ -929,8 +931,9 @@ int returner(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
 #define MAX_GEM_ASSEMBLER_ITEM 10
 
-struct assemble_item
+class assemble_item
 {
+public:
   char *finish_to_char;
   char *finish_to_room;
   char *missing_to_char;
@@ -938,7 +941,7 @@ struct assemble_item
   int item;
 };
 
-struct assemble_item assemble_items[] = {
+assemble_item assemble_items[] = {
     // Item 0, the crystalline tir stuff
     {"A brilliant flash of light erupts from your hands as the gems mold themselves together and form a cohesive and flawless gem.\r\n",
      "A brilliant flash of light erupts from $n's hands as the gems $e holds form a new cohesive and flawless gem.",
@@ -1329,7 +1332,7 @@ int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eSUCCESS;
   }
   // All is good, set timer and perform it.
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_FEARGAZE;
   af.duration = 30;
   af.modifier = 0;
@@ -1400,7 +1403,7 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       return ReturnValue::eFAILURE;
     }
 
-    struct affected_type af;
+    affected_type af;
     if (!ch->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
     {
       af.type = SPELL_PROTECT_FROM_EVIL;
@@ -1450,7 +1453,7 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd != cmd_t::SAY)
     return ReturnValue::eFAILURE;
 
-  if (!ch || !ch->equipment || !ch->equipment[WEAR_WIELD])
+  if (!ch || !ch->equipment[0] || !ch->equipment[WEAR_WIELD])
     return ReturnValue::eFAILURE;
 
   if (real_object(185) != ch->equipment[WEAR_WIELD]->item_number)
@@ -1624,7 +1627,7 @@ int eliara_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  if (!ch || !ch->equipment || !ch->equipment[WEAR_WIELD])
+  if (!ch || !ch->equipment[0] || !ch->equipment[WEAR_WIELD])
     return ReturnValue::eFAILURE;
 
   if (real_object(30627) != ch->equipment[WEAR_WIELD]->item_number)
@@ -1655,7 +1658,7 @@ int eliara_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (!ch)
     return ReturnValue::eFAILURE;
 
-  if (cmd == cmd_t::REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment && ch->equipment[WEAR_WIELD] && ch->equipment[WEAR_WIELD]->item_number == real_object(30627))
+  if (cmd == cmd_t::REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment[0] && ch->equipment[WEAR_WIELD] && ch->equipment[WEAR_WIELD]->item_number == real_object(30627))
   {
     ch->sendln("Eliara refuses to allow you to remove equipment during battle!");
     return ReturnValue::eSUCCESS;
@@ -1753,7 +1756,7 @@ int movingarenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->in_room != obj->in_room)
     return ReturnValue::eFAILURE;
 
-  if (!move_char(ch, real_room(number(17800, 17949))) == 0)
+  if (!move_char(ch, real_room(number(17800, 17949))))
     return ReturnValue::eFAILURE;
 
   ch->sendln("A dimensional hole swallows you.\r\nYou reappear elsewhere.");
@@ -2537,8 +2540,8 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
               move_char(v, real_room(30000));
               do_look(v, "");
 
-              struct mprog_throw_type *throwitem = nullptr;
-              throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+              mprog_throw_type *throwitem = nullptr;
+              throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
               throwitem->target_mob_num = 30033;
               strcpy(throwitem->target_mob_name, "");
               throwitem->data_num = 99;

@@ -30,14 +30,14 @@
 #include "DC/news.h"
 #include "DC/memory.h"
 
-struct news_data *thenews = nullptr;
-void addnews(struct news_data *newnews)
+news_data *thenews = nullptr;
+void addnews(news_data *newnews)
 {
   if (!thenews)
     thenews = newnews;
   else
   {
-    struct news_data *tmpnews, *tmpnews2 = nullptr;
+    news_data *tmpnews, *tmpnews2 = nullptr;
     for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
     {
       if (tmpnews->time < newnews->time)
@@ -70,7 +70,7 @@ void savenews()
     logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
     abort();
   }
-  struct news_data *tmpnews;
+  news_data *tmpnews;
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
     // This should be %ld but we need to through the existing news files 1st
@@ -96,13 +96,13 @@ void loadnews()
   int i;
   while ((i = fread_int(fl, 0, 2147483467)) != 0)
   {
-    struct news_data *nnews;
+    news_data *nnews;
 #ifdef LEAK_CHECK
-    nnews = (struct news_data *)
-        calloc(1, sizeof(struct news_data));
+    nnews = (news_data *)
+        calloc(1, sizeof(news_data));
 #else
-    nnews = (struct news_data *)
-        dc_alloc(1, sizeof(struct news_data));
+    nnews = (news_data *)
+        dc_alloc(1, sizeof(news_data));
 #endif
     nnews->time = i;
     nnews->addedby = fread_string(fl, 0);
@@ -148,7 +148,7 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
     up = true;
   else
     up = !isSet(ch->player->toggles, Player::PLR_NEWS);
-  struct news_data *tnews;
+  news_data *tnews;
   char buf[MAX_STRING_LENGTH * 2], old[MAX_STRING_LENGTH * 2];
   char timez[15];
   buf[0] = '\0';
@@ -220,7 +220,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   }
   if (str_cmp(arg, "today"))
   {
-    struct tm tmptime;
+    tm tmptime;
     if (strptime(arg, "%d/%m/%y", &tmptime) == nullptr)
     {
       do_addnews(ch, "");
@@ -235,7 +235,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   else
   {
     thetime = time(nullptr);
-    struct tm *tmptime = localtime(&thetime);
+    tm *tmptime = localtime(&thetime);
     tmptime->tm_sec = 0;
     tmptime->tm_hour = 0;
     tmptime->tm_min = 0;
@@ -244,7 +244,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   }
   // Time acquired. Whoppin'.
 
-  struct news_data *nnews;
+  news_data *nnews;
   for (nnews = thenews; nnews; nnews = nnews->next)
   {
     if (nnews->time == thetime)
@@ -253,11 +253,11 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   if (!nnews)
   {
 #ifdef LEAK_CHECK
-    nnews = (struct news_data *)
-        calloc(1, sizeof(struct news_data));
+    nnews = (news_data *)
+        calloc(1, sizeof(news_data));
 #else
-    nnews = (struct news_data *)
-        dc_alloc(1, sizeof(struct news_data));
+    nnews = (news_data *)
+        dc_alloc(1, sizeof(news_data));
 #endif
     nnews->addedby = str_dup(GET_NAME(ch));
     nnews->time = thetime;

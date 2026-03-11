@@ -23,13 +23,13 @@
 
 // Externs
 extern void skip_spaces(char **string);
-extern struct help_index_element_new *new_help_table;
+extern help_index_element_new *new_help_table;
 int get_line(FILE *fl, char *buf);
 int is_abbrev(const char *arg1, const char *arg2);
 void help_string_to_file(FILE *f, char *string);
 
 // locals
-struct help_index_element_new *find_help(char *keyword);
+help_index_element_new *find_help(char *keyword);
 int strn_cmp(char *arg1, char *arg2, int n);
 int count_hash_records(FILE *fl);
 void show_hedit_usage(Character *ch);
@@ -47,8 +47,9 @@ int do_mortal_help(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-struct ltstr
+class ltstr
 {
+public:
   bool operator()(int a, int b) const
   {
     return a < b;
@@ -94,7 +95,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
   char buf[256];
   extern char new_help[MAX_STRING_LENGTH];
   extern char new_ihelp[MAX_STRING_LENGTH];
-  struct help_index_element_new *this_help;
+  help_index_element_new *this_help;
   char entry[MAX_STRING_LENGTH];
   char key1[256], key2[256], key3[256], key4[256], key5[256], rec_level[256];
 
@@ -261,7 +262,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-struct help_index_element_new *find_help(char *keyword)
+help_index_element_new *find_help(char *keyword)
 {
   int i;
 
@@ -287,7 +288,7 @@ struct help_index_element_new *find_help(char *keyword)
 int load_new_help(FILE *fl, int reload, Character *ch)
 {
   char entry[ENTRY_MAX], line[READ_SIZE + 1], tmpentry[ENTRY_MAX], buf[256], tmpbuffer[ENTRY_MAX];
-  struct help_index_element_new new_help;
+  help_index_element_new new_help;
   int version = 0, level = -1, linenum = 0;
 
   linenum += get_line(fl, line);
@@ -695,7 +696,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
 
   FREE(new_help_table);
   DC::getInstance()->new_top_of_helpt = 0;
-  CREATE(new_help_table, struct help_index_element_new, help_rec_count);
+  CREATE(new_help_table, help_index_element_new, help_rec_count);
   ret = load_new_help(new_help_fl, 1, ch);
   fclose(new_help_fl);
 
@@ -712,7 +713,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
 int do_hedit(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[200], buf2[200], field[200], buf3[200], value[200];
-  struct help_index_element_new new_help;
+  help_index_element_new new_help;
   int help_id = -1, i, key_id = -1, level = -1;
 
   if (ch->isNonPlayer())
@@ -757,7 +758,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     new_help.min_level = 75;
     new_help.entry = str_hsh("Blank help file!\r\n");
 
-    RECREATE(new_help_table, struct help_index_element_new, DC::getInstance()->new_top_of_helpt + 1);
+    RECREATE(new_help_table, help_index_element_new, DC::getInstance()->new_top_of_helpt + 1);
     new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
     sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", DC::getInstance()->new_top_of_helpt, buf2);
     ch->send(buf);

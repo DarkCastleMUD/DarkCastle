@@ -1083,7 +1083,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   Character *k;
-  struct follow_type *f;
+  follow_type *f;
   Object *tmp_obj;
   bool silence = false;
 

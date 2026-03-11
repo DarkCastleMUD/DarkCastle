@@ -133,7 +133,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   quint64 share = 0, extra = 0;
   quint64 no_members = 0;
   Character *k = nullptr;
-  struct follow_type *f = nullptr;
+  follow_type *f = nullptr;
 
   if (arguments.isEmpty())
   {
@@ -312,7 +312,7 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
   char name[256];
   char buf[256], report[256];
   Character *victim, *k, *j;
-  struct follow_type *f;
+  follow_type *f;
   bool found;
 
   one_argument(argument, name);
@@ -428,7 +428,7 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   char name[MAX_INPUT_LENGTH + 1];
   char buf[250];
   Character *new_new_leader, *k;
-  struct follow_type *f, *next_f;
+  follow_type *f, *next_f;
 
   one_argument(argument, name);
 
@@ -533,7 +533,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
   char name[MAX_INPUT_LENGTH + 1];
   char buf[200];
   Character *adios, *k;
-  struct follow_type *f, *next_f;
+  follow_type *f, *next_f;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {

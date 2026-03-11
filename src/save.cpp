@@ -46,7 +46,7 @@ extern Database db;
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void restore_weight(class Object *obj);
-void store_to_char(struct char_file_u4 *st, Character *ch);
+void store_to_char(char_file_u4 *st, Character *ch);
 QString fread_alias_string(FILE *fpsave);
 
 // return 1 on success
@@ -207,7 +207,7 @@ void Mobile::read(FILE *fpsave)
   // at this point, typeflag should = "STP", and we're done reading mob data
 }
 
-// TODO - make sure I go back and update the time_data structs everywhere when
+// TODO - make sure I go back and update the time_data s everywhere when
 // we lose link, or logout, etc so that the 'played' variable is correct
 
 void fwrite_string_tilde(FILE *fpsave)
@@ -216,7 +216,7 @@ void fwrite_string_tilde(FILE *fpsave)
   strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
   fwrite(&buf, 37, 1, fpsave);
 }
-void Player::save(FILE *fpsave, struct time_data tmpage)
+void Player::save(FILE *fpsave, time_data tmpage)
 {
   fwrite(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
   save_char_aliases(fpsave);
@@ -582,7 +582,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   return true;
 }
 
-bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
+bool Character::save_pc_or_mob_data(FILE *fpsave, time_data tmpage)
 {
   if (isNonPlayer())
   {
@@ -663,7 +663,7 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   }
   fwrite("END", sizeof(char), 3, fpsave);
 
-  struct affected_type *af;
+  affected_type *af;
   int16_t aff_count = 0; // do not change from int16_t
 
   for (af = this->affected; af; af = af->next)
@@ -683,7 +683,7 @@ int Character::char_to_store_variable_data(FILE *fpsave)
     }
   }
 
-  struct tempvariable *mpv;
+  tempvariable *mpv;
   for (mpv = this->tempVariable; mpv; mpv = mpv->next)
   {
     if (!mpv->save)
@@ -780,11 +780,11 @@ int Character::store_to_char_variable_data(FILE *fpsave)
 
   while (!strcmp(typeflag, "MPV"))
   { // MobProgVars6
-    struct tempvariable *mpv;
+    tempvariable *mpv;
 #ifdef LEAK_CHECK
-    mpv = (struct tempvariable *)calloc(1, sizeof(struct tempvariable));
+    mpv = (tempvariable *)calloc(1, sizeof(tempvariable));
 #else
-    mpv = (struct tempvariable *)dc_alloc(1, sizeof(struct tempvariable));
+    mpv = (tempvariable *)dc_alloc(1, sizeof(tempvariable));
 #endif
     mpv->name = fread_var_string(fpsave);
     mpv->data = fread_var_string(fpsave);
@@ -870,7 +870,7 @@ void save_char_obj_db(Character *ch)
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  struct vault_data *vault;
+  vault_data *vault;
   if ((vault = has_vault(GET_NAME(ch))))
     save_vault(vault->owner);
   */
@@ -966,7 +966,7 @@ void Character::save_char_obj(void)
   }
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  struct vault_data *vault;
+  vault_data *vault;
   if ((vault = has_vault(getName())))
     save_vault(vault->owner);
 }
@@ -981,12 +981,12 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
     fclose(fpsave);
 }
 
-// Load a char and inventory into a new_new ch structure.
+// Load a char and inventory into a new_new ch ure.
 load_status_t DC::load_char_obj(class Connection *d, QString name)
 {
   FILE *fpsave = nullptr;
   QString strsave;
-  struct char_file_u4 uchar;
+  char_file_u4 uchar;
   class Object *last_cont = nullptr;
   Character *ch;
 
@@ -1016,7 +1016,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
     strsave = QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(name[0]).arg(name);
   }
 
-  //  struct stat mystats;
+  //   stat mystats;
   //  stat(strsave, &mystats);
   //  TODO - Eventually, i'm going to just slurp in the whole file
   //  then parse the memory instead of reading each item from file seperately
@@ -1066,8 +1066,8 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont)
 {
   class Object *obj;
-  //  struct extra_descr_data *new_new_descr;
-  //  struct extra_descr_data *ed, *next_ed;
+  //  extra_descr_data *new_new_descr;
+  //  extra_descr_data *ed, *next_ed;
 
   int j;
   int nr;
@@ -1077,7 +1077,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   char buf[MAX_STRING_LENGTH];
 
   // read in the standard file data
-  struct obj_file_elem object;
+  obj_file_elem object;
   fread(&object, sizeof(object), 1, fpsave);
 
   if (feof(fpsave))
@@ -1181,7 +1181,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   }
   if (!strcmp("RPR", mod_type))
   {
-    struct obj_affected_type *a;
+    obj_affected_type *a;
 #ifdef LEAK_CHECK
     a = (obj_affected_type *)calloc(obj->num_affects + 1, sizeof(obj_affected_type));
 #else
@@ -1584,7 +1584,7 @@ void restore_weight(class Object *obj)
 
 void donothin() {}
 // Read shared data from pfile
-void store_to_char(struct char_file_u4 *st, Character *ch)
+void store_to_char(char_file_u4 *st, Character *ch)
 {
   int i;
 
@@ -1665,13 +1665,13 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
   }
 }
 
-// copy vital data from a players char-structure to the file structure
+// copy vital data from a players char-ure to the file ure
 // return 'age' of character unmodified
-void Character::char_to_store(struct char_file_u4 *st, struct time_data &tmpage)
+void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 {
   int i;
   int x;
-  struct affected_type *af;
+  affected_type *af;
   class Object *char_eq[MAX_WEAR];
 
   // Remove all the eq and store it in temp storage

@@ -50,17 +50,17 @@
 
 // Global data
 
-extern struct class_skill_defines w_skills[];
-extern struct class_skill_defines t_skills[];
-extern struct class_skill_defines d_skills[];
-extern struct class_skill_defines b_skills[];
-extern struct class_skill_defines a_skills[];
-extern struct class_skill_defines p_skills[];
-extern struct class_skill_defines r_skills[];
-extern struct class_skill_defines k_skills[];
-extern struct class_skill_defines u_skills[];
-extern struct class_skill_defines c_skills[];
-extern struct class_skill_defines m_skills[];
+extern class_skill_defines w_skills[];
+extern class_skill_defines t_skills[];
+extern class_skill_defines d_skills[];
+extern class_skill_defines b_skills[];
+extern class_skill_defines a_skills[];
+extern class_skill_defines p_skills[];
+extern class_skill_defines r_skills[];
+extern class_skill_defines k_skills[];
+extern class_skill_defines u_skills[];
+extern class_skill_defines c_skills[];
+extern class_skill_defines m_skills[];
 extern char *spell_wear_off_msg[];
 
 // Functions used in spells.C
@@ -946,7 +946,7 @@ int use_mana(Character *ch, int sn)
 
 void affect_update(int32_t duration_type)
 {
-  static struct affected_type *af, *next_af_dude;
+  static affected_type *af, *next_af_dude;
   void update_char_objects(Character * ch); /* handler.c */
 
   if (duration_type != DC::PULSE_REGEN && duration_type != DC::PULSE_TIMER && duration_type != DC::PULSE_VIOLENCE && duration_type != DC::PULSE_TIME) // Default
@@ -1035,7 +1035,7 @@ void affect_update(int32_t duration_type)
 void isr_set(Character *ch)
 {
   // char buf[100];
-  static struct affected_type *afisr;
+  static affected_type *afisr;
 
   if (!ch)
   {
@@ -1058,7 +1058,7 @@ void isr_set(Character *ch)
 
 bool many_charms(Character *ch)
 {
-  struct follow_type *k;
+  follow_type *k;
   for (k = ch->followers; k; k = k->next)
   {
     if (IS_AFFECTED(k->follower, AFF_CHARM))
@@ -1071,7 +1071,7 @@ bool many_charms(Character *ch)
 void extractFamiliar(Character *ch)
 {
   Character *victim = nullptr;
-  for (struct follow_type *k = ch->followers; k; k = k->next)
+  for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
@@ -1089,7 +1089,7 @@ bool any_charms(Character *ch)
 {
   return many_charms(ch);
   /*
-    struct follow_type *k;
+    follow_type *k;
     int counter = 0;
 
     for(k = ch->followers; k; k = k->next) {
@@ -1123,7 +1123,7 @@ bool circle_follow(Character *ch, Character *victim)
 // This will NOT do if a character quits/dies!!
 void stop_follower(Character *ch, follower_reasons_t reason)
 {
-  struct follow_type *j, *k;
+  follow_type *j, *k;
 
   if (ch->master == nullptr)
   {
@@ -1222,7 +1222,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 /* Called when a character that follows/is followed dies */
 void die_follower(Character *ch)
 {
-  struct follow_type *j, *k;
+  follow_type *j, *k;
   Character *zombie;
 
   if (ch->master)
@@ -1256,7 +1256,7 @@ void die_follower(Character *ch)
 /* will arise. CH will follow leader                               */
 void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
 {
-  struct follow_type *k;
+  follow_type *k;
 
   if (reason != follower_reasons_t::CHANGE_LEADER)
     REMBIT(ch->affected_by, AFF_GROUP);
@@ -1266,9 +1266,9 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
   ch->master = leader;
 
 #ifdef LEAK_CHECK
-  k = (struct follow_type *)calloc(1, sizeof(struct follow_type));
+  k = (follow_type *)calloc(1, sizeof(follow_type));
 #else
-  k = (struct follow_type *)dc_alloc(1, sizeof(struct follow_type));
+  k = (follow_type *)dc_alloc(1, sizeof(follow_type));
 #endif
 
   k->follower = ch;
@@ -1295,13 +1295,14 @@ int say_spell(Character *ch, int si, int room)
   int j, offs, retval = 0;
   Character *temp_char;
 
-  struct syllable
+  class syllable
   {
+  public:
     char org[10];
     char new_new[10];
   };
 
-  struct syllable syls[] = {
+  syllable syls[] = {
       {" ", " "},
       {"ar", "andoa"},
       {"au", "hana"},
@@ -1479,7 +1480,7 @@ char *skip_spaces(char *string)
 */
 int do_release(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type *aff, *aff_next;
+  affected_type *aff, *aff_next;
   bool printed = false;
   argument = skip_spaces(argument);
 
@@ -1605,7 +1606,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
 {
   //  extern int stat_mod[];
   //  int modifier = 0;
-  // struct class_skill_defines *t;
+  // class_skill_defines *t;
   attribute_t stat{};
 
   switch (skillnum)
@@ -1768,7 +1769,7 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
 
 void set_conc_loss(Character *ch, int spl)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = CONC_LOSS_FIXER;
   af.duration = 1;
   af.modifier = spl;
@@ -1780,7 +1781,7 @@ void set_conc_loss(Character *ch, int spl)
 }
 bool check_conc_loss(Character *ch, int spl)
 {
-  struct affected_type *af;
+  affected_type *af;
   int afspl;
   if (!(af = ch->affected_by_spell(CONC_LOSS_FIXER)))
     return false;
@@ -2449,7 +2450,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           else
             leader = ch;
 
-          struct follow_type *k;
+          follow_type *k;
           int counter = 0;
 
           for (k = leader->followers; k; k = k->next)

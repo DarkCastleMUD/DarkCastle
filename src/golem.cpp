@@ -14,8 +14,6 @@
 #include "DC/db.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
-#include "DC/ki.h"
-#include "DC/fileinfo.h"
 #include "DC/mobile.h"
 #include "DC/race.h"
 #include "DC/act.h"
@@ -33,8 +31,9 @@ void advance_golem_level(Character *golem);
 int store_worn_eq(Character *ch, FILE *fpsave);
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 
-struct golem_data
+class golem_data
 { // This is how a golem looks.
+public:
   char *keyword;
   char *name;
   char *short_desc;
@@ -52,7 +51,7 @@ struct golem_data
   char *release_message;
 };
 
-const struct golem_data golem_list[] = {
+const golem_data golem_list[] = {
     {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\r\n", "The iron golem is bound by its master's magics.  A mindless automaton,\r\nthe iron golem is one of the most powerful forces available in \r\na wizard's arsenal.  Nearly a full 8 feet tall and weighing several\r\ntons, this behemoth of pure iron is absolutely loyal to its master and\r\nsilently follows commands without fail.\r\n", 1400, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100, "There is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n", "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.", "As the magic binding it is released, the iron golem rusts to pieces."},
     {"stone", "stone enchanted golem", "an enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\r\n", "The stone golem is bound by its caster's magics.  A mindless automaton,\r\nthe stone golem is one of the sturdiest and most resilliant creatures\r\nknown in the realms.  Nearly a full 8 feet tall and weighing several\r\ntons, this mountain of rock is absolutely loyal to its master and\r\nsilently follows orders without fail.\r\n", 2000, 5, 5, 25, 50, {104, 105, 106, 0, 7003}, -1, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\r\n", "Unable to sustain further damage, the stone golem shatters to pieces.", "As the magic binding it is released, the golem crumbles to dust."}};
 
@@ -341,7 +340,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   char_to_room(golem, ch->in_room);
   add_follower(golem, ch);
   SETBIT(golem->affected_by, AFF_CHARM);
-  //  struct affected_type af;
+  //  affected_type af;
   send_to_char(golem_list[i].creation_message, ch);
   return ReturnValue::eSUCCESS;
 }
@@ -434,7 +433,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  struct affected_type *aff;
+  affected_type *aff;
 
   int64_t exp_needed;
 
@@ -467,7 +466,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf,
           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
           "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
-          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6d     $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
+          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
           "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
           "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\r\n"
           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
@@ -495,7 +494,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
           to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
           to_dam, 0, GET_EXP(ch),
           get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
-          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)ch->getGold(), (int)GET_PLATINUM(ch),
+          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), ch->getGold(), (int)GET_PLATINUM(ch),
           ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
   master->send(buf);
 
@@ -609,8 +608,8 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 
       if (aff->type == Character::PLAYER_CANTQUIT)
       {
-        sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\r\n",
-                scratch, aff_name.toStdString().c_str(),
+        sprintf(buf, "|%c| Affected by %-25s (%s) |%s%s|\r\n",
+                scratch, qPrintable(aff_name),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], aff->caster.c_str());
       }
@@ -634,7 +633,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 
 int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
-  struct follow_type *fol;
+  follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
     if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {

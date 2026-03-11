@@ -59,7 +59,7 @@ auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
 {
   char buf[256];
   int send_to = DC::NOWHERE;
-  struct affected_type *af, *next_af;
+  affected_type *af, *next_af;
   int pot_low = 6362;
   int pot_hi = 6379;
 

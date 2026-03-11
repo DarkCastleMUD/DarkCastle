@@ -54,7 +54,7 @@
 // external vars
 
 extern bool MOBtrigger;
-extern struct mprog_throw_type *g_mprog_throw_list;
+extern mprog_throw_type *g_mprog_throw_list;
 
 extern Character *activeActor;
 extern Character *activeRndm;
@@ -1039,7 +1039,7 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
 // argument should be <mob> <catchnum> <delay>
 int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
 {
-  struct mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = nullptr;
   int mob_num;
   int catch_num;
   int delay;
@@ -1090,8 +1090,8 @@ int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
   if (!check_range_valid_and_convert(opt, fifth, 0, 50000))
     opt = 0;
 
-  // create struct
-  throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+  // create
+  throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
   throwitem->target_mob_num = mob_num;
   strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
@@ -1207,7 +1207,7 @@ int determine_attack_type(char *attacktype)
 
 QString Character::getTemp(QString name)
 {
-  struct tempvariable *eh;
+  tempvariable *eh;
   for (eh = tempVariable; eh; eh = eh->next)
     if (eh->name == name)
       return eh->data;
@@ -1255,7 +1255,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
     else if (type == 2 && victim->isPlayer())
       continue;
 
-    struct tempvariable *eh;
+    tempvariable *eh;
     for (eh = victim->tempVariable; eh; eh = eh->next)
     {
       if (eh->name == temp)
@@ -1307,18 +1307,19 @@ int do_mpsetalign(Character *ch, char *argument, cmd_t cmd)
 
 // List of people who have been recently damaged by mpdamage
 // Used for connecting mpdamage with messaging
-struct damage_list
+class damage_list
 {
-  struct damage_list *next;
+public:
+  damage_list *next;
   char name[512];
   int damage; // Damage #
 };
 
-struct damage_list *dmg_list = nullptr;
+damage_list *dmg_list = nullptr;
 
 void free_dmg_list()
 {
-  struct damage_list *c, *n;
+  damage_list *c, *n;
   for (c = dmg_list; c; c = n)
   {
     n = c->next;
@@ -1329,7 +1330,7 @@ void free_dmg_list()
 
 void add_dmg(Character *ch, int dmg)
 {
-  struct damage_list *c;
+  damage_list *c;
 
   for (c = dmg_list; c; c = c->next)
   {
@@ -1342,9 +1343,9 @@ void add_dmg(Character *ch, int dmg)
   }
 
 #ifdef LEAK_CHECK
-  c = (struct damage_list *)calloc(1, sizeof(struct damage_list));
+  c = (damage_list *)calloc(1, sizeof(damage_list));
 #else
-  c = (struct damage_list *)dc_alloc(1, sizeof(struct damage_list));
+  c = (damage_list *)dc_alloc(1, sizeof(damage_list));
 #endif
   if (ch->isNonPlayer())
     strcpy(c->name, GET_SHORT(ch));
@@ -1569,7 +1570,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
 
 int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
 {
-  struct mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = nullptr;
   int mob_num;
   int catch_num;
   int delay;
@@ -1616,9 +1617,9 @@ int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  // create struct
-  throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct
-                                                            mprog_throw_type));
+  // create
+  throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(
+                                                  mprog_throw_type));
   throwitem->target_mob_num = mob_num;
   strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
@@ -1692,7 +1693,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
       if (!str_cmp(affected_bits[a], arg1))
       {
         // debugpoint();
-        struct affected_type af;
+        affected_type af;
         af.type = z = skill_aff[a];
         if (victim->affected_by_spell(z + BASE_TIMERS))
         {
@@ -1730,7 +1731,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
   }
   if (z && o && owner) // Timer on it
   {
-    struct affected_type af;
+    affected_type af;
     af.type = BASE_TIMERS + z;
     af.duration = o;
     af.bitvector = -1;
@@ -1751,7 +1752,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  struct mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = nullptr;
   int delay;
 
   char first[MAX_INPUT_LENGTH];
@@ -1767,7 +1768,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
       ch->prog_error(QStringLiteral("mpppause all - Invalid delay."));
       return ReturnValue::eFAILURE;
     }
-    throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+    throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
 
     if (ch && ch->mobdata)
     {
@@ -1782,7 +1783,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
       ch->prog_error(QStringLiteral("mppause - Invalid delay."));
       return ReturnValue::eFAILURE;
     }
-    throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+    throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
     throwitem->data_num = -999;
   }
 

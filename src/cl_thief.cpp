@@ -93,7 +93,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
     {
       SETBIT(victim->affected_by, AFF_BLIND);
       SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
-      struct affected_type af;
+      affected_type af;
       af.type = SKILL_EYEGOUGE;
       af.location = APPLY_AC;
       af.modifier = level / 2;
@@ -796,7 +796,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   class Object *obj, *loop_obj, *next_obj;
-  struct affected_type pthiefaf, *paf;
+  affected_type pthiefaf, *paf;
   char victim_name[240];
   char obj_name[240];
   char buf[240];
@@ -1264,7 +1264,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
 int do_pocket(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
-  struct affected_type pthiefaf;
+  affected_type pthiefaf;
   char victim_name[240];
   char buf[240];
   int gold;
@@ -1448,7 +1448,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room, j;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-  struct room_direction_data *back;
+  room_direction_data *back;
   class Object *obj;
   Character *victim;
   bool has_lockpicks = false;
@@ -1907,7 +1907,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
 int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && !ch->isImmortalPlayer())
   {
@@ -1966,7 +1966,7 @@ int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
 
 int do_deceit(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->canPerform(SKILL_DECEIT))
   {
@@ -2123,7 +2123,7 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   set_cantquit(ch, victim);
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_JAB;
   af.duration = 2;
   af.duration_type = DC::PULSE_VIOLENCE;
@@ -2421,7 +2421,7 @@ int do_cripple(Character *ch, char *argument, cmd_t cmd)
       act("You quickly lash out and strike a crippling blow to $N!", ch, 0, vict, TO_CHAR, 0);
       act("$n lashes out quickly and cripples you with a painful blow!", ch, 0, vict, TO_VICT, 0);
       act("$n quickly lashes out and strikes a crippling blow to $N!", ch, 0, vict, TO_ROOM, NOTVICT);
-      struct affected_type af;
+      affected_type af;
       af.type = SKILL_CRIPPLE;
       af.duration = skill / 20;
       af.duration_type = DC::PULSE_VIOLENCE;

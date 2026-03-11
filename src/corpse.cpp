@@ -115,7 +115,7 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
   /* It can handle regular obj's and XAP objects.                     */
 
   int counter;
-  struct extra_descr_data *ex_desc;
+  extra_descr_data *ex_desc;
   char buf1[MAX_STRING_LENGTH + 1]{};
   // char buf2[256];
 
@@ -250,7 +250,7 @@ void DC::load_corpses(void)
   int t[15], zwei = 0;
   int nr, num_objs = 0;
   class Object *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
-  struct extra_descr_data *new_descr;
+  extra_descr_data *new_descr;
   char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
   bool end = false;
   int number = -1;
@@ -433,7 +433,7 @@ void DC::load_corpses(void)
           switch (*line)
           {
           case 'E':
-            CREATE(new_descr, struct extra_descr_data, 1);
+            CREATE(new_descr, extra_descr_data, 1);
             new_descr->keyword = fread_string_new(fp, buf2);
             new_descr->description = fread_string_new(fp, buf2);
             new_descr->next = temp->ex_description;

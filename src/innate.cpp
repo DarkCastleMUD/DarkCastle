@@ -43,14 +43,15 @@ int innate_fly(Character *ch, char *argument, cmd_t cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
-struct in_skills
+class in_skills
 {
+public:
   char *name;
   int race;
   DO_FUN *func;
 };
 
-const struct in_skills innates[] = {
+const in_skills innates[] = {
     {"powerwield", RACE_GIANT, innate_powerwield},
     {"regeneration", RACE_TROLL, innate_regeneration},
     {"illusion", RACE_GNOME, innate_illusion},
@@ -117,7 +118,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
         int retval = (*(innates[i].func))(ch, arg, cmd);
         if (retval & ReturnValue::eSUCCESS)
         {
-          struct affected_type af;
+          affected_type af;
           af.type = SKILL_INNATE_TIMER;
 
           if (!str_cmp(buf, "fly"))
@@ -160,7 +161,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
 
 int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_REGENERATION;
   af.duration = 6;
   af.modifier = 0;
@@ -173,7 +174,7 @@ int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
 
 int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_POWERWIELD;
   af.duration = 3;
   af.modifier = 0;
@@ -195,7 +196,7 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
 
   ch->sendln("You enter a trance and find yourself able to concentrate much better.");
 
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_FOCUS;
   af.duration = 4;
   af.modifier = 0;
@@ -213,7 +214,7 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("But you're already invisible!");
     return ReturnValue::eFAILURE;
   }
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_ILLUSION;
   af.duration = 4;
   af.modifier = 0;
@@ -296,7 +297,7 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
 
 int innate_evasion(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_EVASION;
   af.duration = 4;
   af.modifier = 0;
@@ -309,7 +310,7 @@ int innate_evasion(Character *ch, char *arg, cmd_t cmd)
 
 int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_SHADOWSLIP;
   af.duration = 4;
   af.modifier = 0;
@@ -336,7 +337,7 @@ int innate_fly(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    struct affected_type af;
+    affected_type af;
     af.type = SKILL_INNATE_FLY;
     af.duration = -1;
     af.modifier = 0;

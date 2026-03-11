@@ -237,7 +237,7 @@ int spell_magic_missile(uint8_t level, Character *ch, Character *victim, class O
 
 int spell_chill_touch(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   int dam = 300;
   int save;
   int weap_spell = obj ? WEAR_WIELD : 0;
@@ -635,7 +635,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
 
 int spell_aegis(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   int spl = GET_CLASS(ch) == CLASS_ANTI_PAL ? SPELL_U_AEGIS : SPELL_AEGIS;
   if (ch->affected_by_spell(spl))
     affect_from_char(ch, spl);
@@ -663,7 +663,7 @@ int spell_aegis(uint8_t level, Character *ch, Character *victim, class Object *o
 
 int spell_armor(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (victim->affected_by_spell(SPELL_ARMOR))
     affect_from_char(victim, SPELL_ARMOR);
   if (victim->affected_by_spell(SPELL_AEGIS) || victim->affected_by_spell(SPELL_U_AEGIS))
@@ -687,7 +687,7 @@ int spell_armor(uint8_t level, Character *ch, Character *victim, class Object *o
 
 int spell_stone_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   char buf[160];
   int duration, modifier;
   if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
@@ -766,7 +766,7 @@ int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Char
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -826,7 +826,7 @@ int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Char
 
 int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   char buf[160];
   int duration, modifier;
   if (victim->affected_by_spell(SPELL_STONE_SHIELD))
@@ -1065,7 +1065,7 @@ int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Obje
 
 void do_solar_blind(Character *ch, Character *tmp_victim, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (!ch || !tmp_victim)
   {
     logentry(QStringLiteral("Null ch or vict in solar_blind"), IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -1200,7 +1200,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
                     if (level_difference > 0)
                     {
                       tmp_victim->add_memory(GET_NAME(ch), 't');
-                      struct timer_data *timer = new timer_data;
+                      timer_data *timer = new timer_data;
                       timer->var_arg1 = tmp_victim->hunting;
                       timer->arg2 = (void *)tmp_victim;
                       timer->function = clear_hunt;
@@ -1577,7 +1577,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
 int spell_call_lightning(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  extern struct weather_data weather_info;
+  extern weather_data weather_info;
   set_cantquit(ch, victim);
 
   if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
@@ -1728,7 +1728,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
 
 int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (!ch && (!victim || !obj))
   {
     logentry(QStringLiteral("Null ch or victim and obj in bless."), ANGEL, DC::LogChannel::LOG_BUG);
@@ -1772,7 +1772,7 @@ int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *o
 
 int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   char buf[180];
   int retval;
 
@@ -1916,7 +1916,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
 
 int spell_blindness(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   int retval;
   set_cantquit(ch, victim);
 
@@ -2246,7 +2246,7 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Obje
 int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   auto &arena = DC::getInstance()->arena_;
-  struct affected_type af;
+  affected_type af;
   int retval;
 
   if (obj && obj != ch->equipment[WEAR_WIELD] && obj != ch->equipment[WEAR_SECOND_WIELD])
@@ -2374,7 +2374,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
 
 int spell_detect_evil(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!victim)
   {
@@ -2407,7 +2407,7 @@ int spell_detect_evil(uint8_t level, Character *ch, Character *victim, class Obj
 
 int spell_detect_good(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!victim)
   {
@@ -2440,7 +2440,7 @@ int spell_detect_good(uint8_t level, Character *ch, Character *victim, class Obj
 
 int spell_true_sight(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!victim)
   {
@@ -2469,7 +2469,7 @@ int spell_true_sight(uint8_t level, Character *ch, Character *victim, class Obje
 
 int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!victim)
   {
@@ -2500,7 +2500,7 @@ int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, c
 
 int spell_infravision(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!victim)
   {
@@ -2532,7 +2532,7 @@ int spell_infravision(uint8_t level, Character *ch, Character *victim, class Obj
 
 int spell_detect_magic(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!victim)
   {
@@ -2560,7 +2560,7 @@ int spell_detect_magic(uint8_t level, Character *ch, Character *victim, class Ob
 
 int spell_haste(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!victim)
   {
@@ -2958,7 +2958,7 @@ int spell_full_heal(uint8_t level, Character *ch, Character *victim, class Objec
 
 int spell_invisibility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   assert((ch && obj) || victim);
 
   if (obj)
@@ -3155,7 +3155,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
 int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   int retval = ReturnValue::eSUCCESS;
   bool endy = false;
 
@@ -3223,7 +3223,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
 
 int spell_protection_from_evil(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   assert(victim);
   int duration = skill ? skill / 3 : level / 3;
   int modifier = level + 10;
@@ -3263,7 +3263,7 @@ int spell_protection_from_evil(uint8_t level, Character *ch, Character *victim, 
 
 int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   assert(victim);
 
   int duration = skill ? skill / 3 : level / 3;
@@ -3506,7 +3506,7 @@ bool find_spell_shield(Character *ch, Character *victim)
 
 int spell_fireshield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (find_spell_shield(ch, victim) && victim->isPlayer())
     return ReturnValue::eFAILURE;
@@ -3532,7 +3532,7 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Obje
 {
   int heal;
   char dammsg[30];
-  struct follow_type *fol;
+  follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
     if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
@@ -3775,7 +3775,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -3839,7 +3839,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
 // TODO - make this have effects based on skill
 int spell_camouflague(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (victim->affected_by_spell(SPELL_CAMOUFLAGE))
   {
     act("$N is already hidden within the plant life.", ch, 0, victim, TO_CHAR, 0);
@@ -3863,7 +3863,7 @@ int spell_camouflague(uint8_t level, Character *ch, Character *victim, class Obj
 // TODO - make this gain effects based on skill
 int spell_farsight(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (victim->affected_by_spell(SPELL_FARSIGHT))
   {
     act("$N can already see far enough.", ch, 0, victim, TO_CHAR, 0);
@@ -3886,7 +3886,7 @@ int spell_farsight(uint8_t level, Character *ch, Character *victim, class Object
 // TODO - make this gain effects based on skill
 int spell_freefloat(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (victim->affected_by_spell(SPELL_FREEFLOAT))
   {
     act("$N is already stable enough.", ch, 0, victim, TO_CHAR, 0);
@@ -3909,7 +3909,7 @@ int spell_freefloat(uint8_t level, Character *ch, Character *victim, class Objec
 // TODO - make this use skill
 int spell_insomnia(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (victim->affected_by_spell(SPELL_INSOMNIA))
   {
@@ -3933,7 +3933,7 @@ int spell_insomnia(uint8_t level, Character *ch, Character *victim, class Object
 // TODO - make this use skill
 int spell_shadowslip(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (victim->affected_by_spell(SPELL_SHADOWSLIP))
   {
     act("$N is already hidden amongst the shadows.", ch, 0, victim, TO_CHAR, 0);
@@ -3955,7 +3955,7 @@ int spell_shadowslip(uint8_t level, Character *ch, Character *victim, class Obje
 
 int spell_sanctuary(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (IS_AFFECTED(victim, AFF_SANCTUARY))
   {
@@ -3986,7 +3986,7 @@ int spell_sanctuary(uint8_t level, Character *ch, Character *victim, class Objec
 
 int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   char buf[100];
   int retval;
 
@@ -4098,8 +4098,8 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
 
 int spell_strength(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
-  struct affected_type *cur_af;
+  affected_type af;
+  affected_type *cur_af;
 
   assert(victim);
 
@@ -4165,7 +4165,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
   int location;
   char buf[200];
   clan_data *clan;
-  struct clan_room_data *room;
+  clan_room_data *room;
   int found = 0;
 
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
@@ -4514,7 +4514,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
 
 int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   class Object *tempobj;
 
   ch->sendln("Disabled currently.");
@@ -4597,7 +4597,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
 
 int spell_sense_life(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   assert(victim);
 
   if (victim->affected_by_spell(SPELL_SENSE_LIFE))
@@ -5180,8 +5180,8 @@ int spell_refresh(uint8_t level, Character *ch, Character *victim, class Object 
 
 int spell_fly(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
-  struct affected_type *cur_af;
+  affected_type af;
+  affected_type *cur_af;
 
   if (!ch || !victim)
   {
@@ -5261,7 +5261,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
 {
   Character *mob;
   class Object *obj_object, *next_obj;
-  struct affected_type af;
+  affected_type af;
   int number, r_num;
 
   if (!IS_EVIL(ch) && ch->getLevel() < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL)
@@ -5390,7 +5390,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
 int spell_know_alignment(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int duration = 0;
-  struct affected_type af, *cur_af;
+  affected_type af, *cur_af;
 
   if (!ch)
   {
@@ -6130,7 +6130,7 @@ int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Obj
 /* IRIDESCENT AURA */
 int spell_iridescent_aura(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (victim->affected_by_spell(SPELL_IRIDESCENT_AURA))
   {
@@ -6154,7 +6154,7 @@ int spell_iridescent_aura(uint8_t level, Character *ch, Character *victim, class
 
 int spell_resist_cold(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (GET_CLASS(ch) == CLASS_PALADIN && ch != victim)
   {
     ch->sendln("You can only cast this on yourself.");
@@ -6183,7 +6183,7 @@ int spell_resist_cold(uint8_t level, Character *ch, Character *victim, class Obj
 
 int spell_resist_fire(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch != victim)
   {
@@ -6212,7 +6212,7 @@ int spell_resist_fire(uint8_t level, Character *ch, Character *victim, class Obj
 
 int spell_resist_magic(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch != victim)
   {
@@ -6241,7 +6241,7 @@ int spell_resist_magic(uint8_t level, Character *ch, Character *victim, class Ob
 
 int spell_staunchblood(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (GET_CLASS(ch) == CLASS_RANGER && ch != victim)
   {
@@ -6269,7 +6269,7 @@ int spell_staunchblood(uint8_t level, Character *ch, Character *victim, class Ob
 
 int spell_resist_energy(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (GET_CLASS(ch) != CLASS_DRUID && ch != victim)
   {
@@ -6297,7 +6297,7 @@ int spell_resist_energy(uint8_t level, Character *ch, Character *victim, class O
 
 int spell_stone_skin(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch)
   {
@@ -6329,7 +6329,7 @@ int spell_stone_skin(uint8_t level, Character *ch, Character *victim, class Obje
 
 int spell_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch || !victim)
   {
@@ -6365,8 +6365,8 @@ int spell_shield(uint8_t level, Character *ch, Character *victim, class Object *
 
 int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
-  struct affected_type *cur_af;
+  affected_type af;
+  affected_type *cur_af;
   int retval;
   int duration = 0, str = 0, con = 0;
   void check_weapon_weights(Character * ch);
@@ -6491,7 +6491,7 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
 int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   Character *tmp_victim;
-  struct affected_type af;
+  affected_type af;
 
   if (!ch)
   {
@@ -6779,7 +6779,7 @@ int cast_burning_hands(uint8_t level, Character *ch, char *arg, int type,
 int cast_call_lightning(uint8_t level, Character *ch, char *arg, int type,
                         Character *victim, class Object *tar_obj, int skill)
 {
-  extern struct weather_data weather_info;
+  extern weather_data weather_info;
   int retval;
   Character *next_v;
 
@@ -7540,7 +7540,7 @@ int cast_armor(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -7726,7 +7726,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
         else
           leader = ch;
 
-        struct follow_type *k;
+        follow_type *k;
         for (k = leader->followers; k; k = k->next)
         {
           tar_ch = k->follower;
@@ -7966,7 +7966,7 @@ int cast_control_weather(uint8_t level, Character *ch, char *arg, int type,
                          Character *tar_ch, class Object *tar_obj, int skill)
 {
   char buffer[MAX_STRING_LENGTH];
-  extern struct weather_data weather_info;
+  extern weather_data weather_info;
 
   switch (type)
   {
@@ -8158,7 +8158,7 @@ int cast_cure_critic(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8228,7 +8228,7 @@ int cast_cure_light(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8458,7 +8458,7 @@ int cast_detect_invisibility(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8531,7 +8531,7 @@ int cast_detect_magic(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8640,7 +8640,7 @@ int cast_detect_poison(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -9126,7 +9126,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
         else
           leader = ch;
 
-        struct follow_type *k;
+        follow_type *k;
         for (k = leader->followers; k; k = k->next)
         {
           tar_ch = k->follower;
@@ -9214,7 +9214,7 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
         else
           leader = ch;
 
-        struct follow_type *k;
+        follow_type *k;
         for (k = leader->followers; k; k = k->next)
         {
           tar_ch = k->follower;
@@ -9865,7 +9865,7 @@ int cast_refresh(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -9942,7 +9942,7 @@ int cast_fly(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -10181,7 +10181,7 @@ int cast_dispel_minor(uint8_t level, Character *ch, char *arg, int type,
 int elemental_damage_bonus(int spell, Character *ch)
 {
   Character *mst = ch->master ? ch->master : ch;
-  struct follow_type *f, *t;
+  follow_type *f, *t;
   bool fire, ice, earth, energy;
   fire = ice = earth = energy = false;
   for (f = mst->followers; f; f = f->next)
@@ -10285,7 +10285,7 @@ int elemental_damage_bonus(int spell, Character *ch)
 bool elemental_score(Character *ch, int level)
 {
   Character *mst = ch->master ? ch->master : ch;
-  struct follow_type *f, *t;
+  follow_type *f, *t;
   bool fire, ice, earth, energy;
   fire = ice = earth = energy = false;
   // reuse of elemental damage function
@@ -10402,7 +10402,7 @@ int cast_cure_serious(uint8_t level, Character *ch, char *arg, int type,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -10783,7 +10783,7 @@ int cast_resist_magic(uint8_t level, Character *ch, char *arg,
       else
         leader = ch;
 
-      struct follow_type *k;
+      follow_type *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -11453,7 +11453,7 @@ int cast_barkskin(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_barkskin(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (victim->affected_by_spell(SPELL_BARKSKIN))
   {
@@ -11706,7 +11706,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
       return ReturnValue::eFAILURE;
     }
     extract_obj(obj);
-    struct affected_type af;
+    affected_type af;
     af.type = spl;
     af.duration = 3;
     af.modifier = 0;
@@ -11732,7 +11732,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
 
   victim = nullptr;
 
-  for (struct follow_type *k = ch->followers; k; k = k->next)
+  for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
         k->follower->in_room != ch->in_room)
     {
@@ -11857,7 +11857,7 @@ int cast_eyes_of_the_owl(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_eyes_of_the_owl(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (victim->affected_by_spell(SPELL_INFRAVISION))
     affect_from_char(victim, SPELL_INFRAVISION);
@@ -11911,7 +11911,7 @@ int cast_feline_agility(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_feline_agility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (ch != victim)
   {
@@ -11971,7 +11971,7 @@ int cast_oaken_fortitude(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_oaken_fortitude(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 { // Feline agility rip
-  struct affected_type af;
+  affected_type af;
 
   if (ch != victim)
   {
@@ -12002,7 +12002,7 @@ int spell_oaken_fortitude(uint8_t level, Character *ch, Character *victim, class
 
 int cast_clarity(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 { // Feline agility rip
-  struct affected_type af;
+  affected_type af;
 
   if (victim->affected_by_spell(SPELL_CLARITY))
   {
@@ -12048,7 +12048,7 @@ int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Characte
   act("$n melts into the forest and is gone.", ch, 0, 0,
       TO_ROOM, INVIS_NULL);
   ch->sendln("You feel yourself slowly become a temporary part of the living forest.");
-  struct affected_type af;
+  affected_type af;
   int skil = ch->has_skill(SPELL_FOREST_MELD);
   af.type = SPELL_FOREST_MELD;
   af.duration = 2 + (skil > 40) + (skil > 60) + (skil > 80);
@@ -12067,7 +12067,7 @@ int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Characte
 int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   Character *mob;
-  struct affected_type af;
+  affected_type af;
   char name[MAX_STRING_LENGTH];
   char desc[MAX_STRING_LENGTH];
   int number = 19309; // Mob number
@@ -12257,7 +12257,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
   Character *mob;
   follow_type *k;
 
-  struct affected_type af;
+  affected_type af;
 
   ch->sendln("Disabled currently,");
 
@@ -12445,7 +12445,7 @@ int cast_create_golem( uint8_t level, Character *ch, char *arg, int type,
 int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object * tar_obj, int skill)
 {
    // Character *tmp_vict;
-   struct follow_type * temp;
+   follow_type * temp;
    int done = 0;
 
    temp = ch->followers;
@@ -12757,7 +12757,7 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
 {
   Character *mob = nullptr;
   int r_num;
-  struct affected_type af;
+  affected_type af;
   follow_type *k = nullptr;
   int fam_type;
 
@@ -12833,7 +12833,7 @@ int cast_summon_familiar(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
-  struct room_track_data *ptrack;
+  room_track_data *ptrack;
   char buf[180];
 
   ptrack = DC::getInstance()->world[ch->in_room].tracks;
@@ -12900,7 +12900,7 @@ int cast_lighted_path(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_resist_acid(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch != victim)
   {
     ch->sendln("You can only cast this on yourself.");
@@ -12958,7 +12958,7 @@ int cast_resist_acid(uint8_t level, Character *ch, char *arg, int type,
 int spell_sun_ray(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
-  extern struct weather_data weather_info;
+  extern weather_data weather_info;
 
   set_cantquit(ch, victim);
 
@@ -12981,7 +12981,7 @@ int spell_sun_ray(uint8_t level, Character *ch, Character *victim, class Object 
 int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
                  Character *victim, class Object *tar_obj, int skill)
 {
-  extern struct weather_data weather_info;
+  extern weather_data weather_info;
   int retval;
   Character *next_v;
 
@@ -13035,7 +13035,7 @@ int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_rapid_mend(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   int regen = 0, duration = 0;
 
   if (!victim->affected_by_spell(SPELL_RAPID_MEND))
@@ -13112,7 +13112,7 @@ int cast_rapid_mend(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_iron_roots(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (ch->affected_by_spell(SPELL_IRON_ROOTS))
   {
@@ -13176,7 +13176,7 @@ int cast_iron_roots(uint8_t level, Character *ch, char *arg, int type,
 
 int spell_acid_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (find_spell_shield(ch, victim) && victim->isPlayer())
     return ReturnValue::eFAILURE;
@@ -13239,8 +13239,8 @@ int cast_acid_shield(uint8_t level, Character *ch, char *arg, int type, Characte
 
 int spell_water_breathing(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
-  struct affected_type *cur_af;
+  affected_type af;
+  affected_type *cur_af;
 
   if ((cur_af = victim->affected_by_spell(SPELL_WATER_BREATHING)))
     affect_remove(victim, cur_af, SUPPRESS_ALL);
@@ -13417,7 +13417,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
   int dam;
   int retval = ReturnValue::eSUCCESS;
   int retval2;
-  struct affected_type af;
+  affected_type af;
   char buf[MAX_STRING_LENGTH];
 
   int learned = ch->has_skill(SPELL_ICESTORM);
@@ -13527,7 +13527,7 @@ int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *
 
 int spell_lightning_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (find_spell_shield(ch, victim) && victim->isPlayer())
     return ReturnValue::eFAILURE;
@@ -13679,7 +13679,7 @@ int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character 
 
 int spell_debility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   int retval = ReturnValue::eSUCCESS, duration = 0;
   double percent = 0;
 
@@ -13802,7 +13802,7 @@ int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *
 
 int spell_attrition(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   int retval = ReturnValue::eSUCCESS;
   int acmod = 0, tohit = 0, duration = 0;
 
@@ -13924,7 +13924,7 @@ int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character 
 
 int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   /*
   if (victim->affected_by_spell(SPELL_ACID_SHIELD)){
      act("A film of $B$0shadow$R begins to rise around $n but fades around $s ankles.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -13979,7 +13979,7 @@ int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Charac
 
 int spell_holy_aura(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (ch->affected_by_spell(SPELL_HOLY_AURA_TIMER))
   {
@@ -14010,7 +14010,7 @@ int spell_holy_aura(uint8_t level, Character *ch, Character *victim, class Objec
 int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
 
-  struct affected_type af;
+  affected_type af;
   switch (type)
   {
   case SPELL_TYPE_SPELL:
@@ -14075,7 +14075,7 @@ int spell_dismiss_familiar(uint8_t level, Character *ch, Character *victim, clas
 {
   victim = nullptr;
 
-  for (struct follow_type *k = ch->followers; k; k = k->next)
+  for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
@@ -14136,7 +14136,7 @@ int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, class 
   // ch->sendln("Disabled.");
   // return ReturnValue::eFAILURE;
 
-  for (struct follow_type *k = ch->followers; k; k = k->next)
+  for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && k->follower->affected_by_spell(SPELL_CHARM_PERSON))
     {
       victim = k->follower;
@@ -14193,7 +14193,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
   // ch->sendln("Disabled.");
   // return ReturnValue::eFAILURE;
 
-  for (struct follow_type *k = ch->followers; k; k = k->next)
+  for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM))
     {
       victim = k->follower;
@@ -14264,7 +14264,7 @@ int cast_release_elemental(uint8_t level, Character *ch, char *arg, int type, Ch
 
 int spell_visage_of_hate(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
@@ -14315,7 +14315,7 @@ int cast_visage_of_hate(uint8_t level, Character *ch, char *arg, int type, Chara
 
 int spell_blessed_halo(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
@@ -14604,7 +14604,7 @@ int cast_mend_golem(uint8_t level, Character *ch, char *arg, int type, Character
 
 int spell_divine_intervention(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   act("Light pours down from above bathing you in a shell of divine protection.", ch, 0, 0, TO_CHAR, 0);
   act("Light pours down from above and surrounds $n in a shell of divine protection.", ch, 0, 0, TO_ROOM, 0);
@@ -14815,7 +14815,7 @@ int cast_silence(uint8_t level, Character *ch, char *arg, int type, Character *t
 
 int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj, int skill, int spl = 0)
 {
-  struct affected_type af;
+  affected_type af;
 
   if ((spell_info[spl].targets() & TAR_IGNORE))
   {
@@ -14870,7 +14870,7 @@ int cast_immunity(uint8_t level, Character *ch, char *arg, int type, Character *
 
 int spell_boneshield(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (victim->isPlayer() || victim->master != ch)
   {
@@ -15075,7 +15075,7 @@ int cast_solidity(uint8_t level, Character *ch, char *arg,
 
 int spell_solidity(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     act("You are already $6violet$R.", victim, 0, 0, TO_CHAR, 0);
@@ -15126,7 +15126,7 @@ int cast_stability(uint8_t level, Character *ch, char *arg,
 
 int spell_stability(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   if (IS_AFFECTED(victim, AFF_STABILITY))
   {
     act("You already have good balance.", victim, 0, 0, TO_CHAR, 0);
@@ -15175,7 +15175,7 @@ int cast_frostshield(uint8_t level, Character *ch, char *arg, int type, Characte
 
 int spell_frostshield(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (find_spell_shield(ch, victim) && victim->isPlayer())
     return ReturnValue::eFAILURE;
@@ -15446,7 +15446,7 @@ int cast_spirit_shield(uint8_t level, Character *ch, char *arg, int type, Charac
 
 int spell_villainy(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (victim->affected_by_spell(SPELL_VILLAINY))
     affect_from_char(victim, SPELL_VILLAINY);
@@ -15499,7 +15499,7 @@ int cast_villainy(uint8_t level, Character *ch, char *arg, int type, Character *
 
 int spell_heroism(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (victim->affected_by_spell(SPELL_HEROISM))
     affect_from_char(victim, SPELL_HEROISM);
@@ -15894,7 +15894,7 @@ int cast_elemental_wall(uint8_t level, Character *ch, char *arg, int type, Chara
 
 int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   Character *ally, *next_ally;
 
   // Set the spell on the caster to mark that they have the spell running

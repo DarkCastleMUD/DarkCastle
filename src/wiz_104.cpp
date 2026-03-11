@@ -1954,7 +1954,7 @@ int do_gtrans(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   char buf[100];
   int target;
-  struct follow_type *k, *next_dude;
+  follow_type *k, *next_dude;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;

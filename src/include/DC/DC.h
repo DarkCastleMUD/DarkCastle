@@ -227,8 +227,7 @@ private:
 #define AUC_MIN_PRICE 1000
 #define AUC_MAX_PRICE 2000000000
 
-struct AuctionTicket;
-Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
+Object *ticket_object_load(QMap<unsigned int, class AuctionTicket>::iterator Item_it, int ticket);
 
 enum ListOptions
 {
@@ -252,11 +251,9 @@ enum AuctionStates
   AUC_DELETED
 };
 
-/*
-TICKET STRUCT
-*/
-struct AuctionTicket
+class AuctionTicket
 {
+public:
   int vitem;
   QString item_name;
   unsigned int price;
@@ -333,8 +330,9 @@ public:
   level_t getLevel(void) const { return level_; }
   void setLevel(level_t level) { level_ = level; }
 };
-struct world_file_list_item
+class world_file_list_item
 {
+public:
   QString filename;
   vnum_t firstnum;
   vnum_t lastnum;
@@ -352,8 +350,9 @@ class DC_EXPORT DC : public QCoreApplication
   Q_OBJECT
   // Favor reference semantics over pointer semantics
 public:
-  struct config
+  class config
   {
+  public:
     config(int argc = {}, char **argv = {})
         : argc_(argc), argv_(argv) {}
     int argc_{};
@@ -458,14 +457,14 @@ public:
 
   class index_data mob_index_array[MAX_INDEX] = {};
   class index_data *mob_index = mob_index_array;
-  struct world_file_list_item *world_file_list = 0; // List of the world files
-  struct world_file_list_item *mob_file_list = 0;   // List of the mob files
-  struct world_file_list_item *obj_file_list = 0;   // List of the obj files
-  class Object *object_list = 0;                    // the global linked list of obj's
-  struct pulse_data *bard_list = 0;                 // global l-list of bards
-  int top_of_helpt = 0;                             // top of help index table
-  int new_top_of_helpt = 0;                         // top of help index table
-  room_t top_of_world_alloc = 0;                    // index of last alloc'd memory in world
+  world_file_list_item *world_file_list = 0; // List of the world files
+  world_file_list_item *mob_file_list = 0;   // List of the mob files
+  world_file_list_item *obj_file_list = 0;   // List of the obj files
+  class Object *object_list = 0;             // the global linked list of obj's
+  class pulse_data *bard_list = 0;           // global l-list of bards
+  int top_of_helpt = 0;                      // top of help index table
+  int new_top_of_helpt = 0;                  // top of help index table
+  room_t top_of_world_alloc = 0;             // index of last alloc'd memory in world
   room_t top_of_world = 0;
   int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
@@ -559,7 +558,7 @@ public:
   void free_clans_from_memory(void);
   void set_zone_saved_zone(int32_t room);
   void set_zone_modified_zone(int32_t room);
-  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_list_item *, search_error>;
+  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>;
   void set_zone_modified(int32_t modnum, world_file_list_item *list);
   void set_zone_modified_world(int32_t room);
   void set_zone_modified_mob(int32_t mob);
@@ -597,8 +596,8 @@ public:
   void heartbeat(void);
   void finish_hotboot(void);
   load_status_t load_char_obj(Connection *d, QString name);
-  bool has_vault_access(QString owner, struct vault_data *vault);
-  bool has_vault_access(Character *ch, struct vault_data *vault);
+  bool has_vault_access(QString owner, class vault_data *vault);
+  bool has_vault_access(Character *ch, class vault_data *vault);
   void update_mprog_throws(void);
   Character *initiate_oproc(Character *ch, Object *obj);
   int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
@@ -640,7 +639,7 @@ public:
   Arena arena_;
 
 private:
-  struct timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
+  timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
   hints_t hints_;
   Shops shops_;
   QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
@@ -707,10 +706,11 @@ union varg_t
 
 typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);
 
-struct timer_data
+class timer_data
 {
+public:
   int timeleft{};
-  struct timer_data *next{};
+  timer_data *next{};
   varg_t arg1{};
   QVariant var_arg1{};
   void *arg2{};
@@ -730,7 +730,7 @@ auto &operator>>(auto &in, Room &room)
   char *temp = nullptr;
   char ch = 0;
   int dir = 0;
-  struct extra_descr_data *new_new_descr{};
+  extra_descr_data *new_new_descr{};
   zone_t zone_nr = {};
 
   ch = fread_char(in);
@@ -862,7 +862,7 @@ auto &operator>>(auto &in, Room &room)
           fseek(in, -1, SEEK_CUR);
         }
 
-        new_new_descr = new struct extra_descr_data;
+        new_new_descr = new extra_descr_data;
         new_new_descr->keyword = fread_string(in, 0);
         new_new_descr->description = fread_string(in, 0);
 
@@ -878,9 +878,9 @@ auto &operator>>(auto &in, Room &room)
       }
       else if (ch == 'B')
       {
-        struct deny_data *deni;
+        deny_data *deni;
 
-        deni = new struct deny_data;
+        deni = new deny_data;
         deni->vnum = fread_int(in, -1, 2147483467);
 
         if (room_nr)

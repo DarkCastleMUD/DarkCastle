@@ -1992,7 +1992,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, cmd_t cmd, const char
                          Character *owner)
 {
   Character *temp, *tmp_victim;
-  struct affected_type af;
+  affected_type af;
   int dam;
   int retval;
 

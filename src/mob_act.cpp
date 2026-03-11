@@ -47,7 +47,7 @@ bool is_protected(Character *vict, Character *ch);
 void scavenge(Character *ch);
 bool is_r_denied(Character *ch, int room)
 {
-  struct deny_data *d;
+  deny_data *d;
   if (ch->isPlayer())
     return false;
   for (d = DC::getInstance()->world[room].denied; d; d = d->next)
@@ -626,7 +626,7 @@ void mob_suprised_sayings(Character *ch, Character *aggressor)
 // protected from.  PAL's ANTI's take spell/level whichever higher
 bool is_protected(Character *vict, Character *ch)
 {
-  struct affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
+  affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
   int level_protected = aff ? aff->modifier : 0;
   if (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && vict->getLevel() > level_protected)
     level_protected = vict->getLevel();

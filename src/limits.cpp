@@ -180,7 +180,7 @@ const int hit_regens[] = {0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0};
 int Character::hit_gain(position_t position, bool improve)
 {
   int gain = 1;
-  struct affected_type *af;
+  affected_type *af;
   int divisor = 1;
   int learned = has_skill(SKILL_ENHANCED_REGEN);
   /* Neat and fast */
@@ -266,7 +266,7 @@ int Character::move_gain_lookup(int extra)
   int gain;
   int divisor = 100000;
   int learned = has_skill(SKILL_ENHANCED_REGEN);
-  struct affected_type *af;
+  affected_type *af;
   bool improve = true;
   if (extra == 777)
     improve = false;
@@ -328,7 +328,7 @@ int Character::move_gain_lookup(int extra)
 
 void redo_hitpoints(Character *ch)
 {
-  /*struct affected_type *af;*/
+  /*affected_type *af;*/
   int i, j, bonus = 0;
 
   ch->max_hit = ch->raw_hit;
@@ -337,7 +337,7 @@ void redo_hitpoints(Character *ch)
   //  bonus = (GET_CON(ch) * GET_CON(ch)) / 30;
 
   ch->max_hit += bonus;
-  struct affected_type *af = ch->affected;
+  affected_type *af = ch->affected;
 
   while (af)
   {
@@ -361,7 +361,7 @@ void redo_hitpoints(Character *ch)
 void redo_mana(Character *ch)
 
 {
-  /*struct affected_type *af;*/
+  /*affected_type *af;*/
   int i, j, bonus = 0, stat = 0;
   if (ch->isNonPlayer())
     return;
@@ -380,7 +380,7 @@ void redo_mana(Character *ch)
 
   ch->max_mana += bonus;
 
-  struct affected_type *af;
+  affected_type *af;
   af = ch->affected;
   while (af)
   {
@@ -409,7 +409,7 @@ void redo_ki(Character *ch)
   else if (GET_CLASS(ch) == CLASS_BARD)
     ch->max_ki += GET_INT(ch) > 15 ? GET_INT(ch) - 15 : 0;
 
-  struct affected_type *af;
+  affected_type *af;
   af = ch->affected;
   while (af)
   {
@@ -584,7 +584,7 @@ void advance_level(Character *ch, int is_conversion)
 
   if (effective_level > 10 && !isSet(ch->player->toggles, Player::PLR_REMORTED))
   {
-    struct vault_data *vault = has_vault(GET_NAME(ch));
+    vault_data *vault = has_vault(GET_NAME(ch));
     if (vault)
     {
       ch->sendln("10 lbs has been added to your vault!");

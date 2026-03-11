@@ -2528,8 +2528,8 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    struct vault_data *vault, *tvault;
-    struct vault_items_data *items, *titems;
+    vault_data *vault, *tvault;
+    vault_items_data *items, *titems;
     class Object *obj;
     int num = 0, real_num = 0;
 
@@ -2551,7 +2551,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
           if (obj->item_number == rnum)
           {
 
-            void item_remove(Object * obj, struct vault_data * vault);
+            void item_remove(Object * obj, vault_data * vault);
             item_remove(obj, vault);
             // items->obj = 0;
             logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
@@ -4132,8 +4132,8 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
 {
   std::string buf, remainder_args;
   int x, a, b, c, d = 0;
-  struct extra_descr_data *extra;
-  struct extra_descr_data *ext;
+  extra_descr_data *extra;
+  extra_descr_data *ext;
 
   const char *return_directions[] =
       {
@@ -4406,7 +4406,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("Creating new exit.");
-      CREATE(DC::getInstance()->world[ch->in_room].dir_option[x], struct room_direction_data, 1);
+      CREATE(DC::getInstance()->world[ch->in_room].dir_option[x], room_direction_data, 1);
       DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
       DC::getInstance()->world[ch->in_room].dir_option[x]->keyword = 0;
     }
@@ -4520,7 +4520,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       {
         // No matching extra description found so make a new one
         csendf(ch, "Creating new extra description for keyword '%s'.\r\n", arg2.c_str());
-        CREATE(extra, struct extra_descr_data, 1);
+        CREATE(extra, extra_descr_data, 1);
         extra->next = nullptr;
 
         if (!(DC::getInstance()->world[ch->in_room].ex_description))
@@ -4693,7 +4693,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     {
       mob = 0;
     }
-    struct deny_data *nd, *pd = nullptr;
+    deny_data *nd, *pd = nullptr;
     for (nd = DC::getInstance()->world[ch->in_room].denied; nd; nd = nd->next)
     {
       if (nd->vnum == mob)
@@ -4712,9 +4712,9 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     if (done)
       break;
 #ifdef LEAK_CHECK
-    nd = (struct deny_data *)calloc(1, sizeof(struct deny_data));
+    nd = (deny_data *)calloc(1, sizeof(deny_data));
 #else
-    nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
+    nd = (deny_data *)dc_alloc(1, sizeof(deny_data));
 #endif
     nd->next = DC::getInstance()->world[ch->in_room].denied;
     try
@@ -4738,7 +4738,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 {
   int x;
   char buf[50], buf2[50];
-  struct extra_descr_data *i, *extra;
+  extra_descr_data *i, *extra;
 
   half_chop(arg, buf, buf2);
 
@@ -5406,7 +5406,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   Room *rm = 0;
   Character *k = 0;
   class Object *j = 0;
-  struct extra_descr_data *desc;
+  extra_descr_data *desc;
   int i, x, loc;
 
   if (ch->isNonPlayer())
@@ -5475,7 +5475,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     strcat(buf, "None\r\n");
     ch->send(buf);
   }
-  struct deny_data *d;
+  deny_data *d;
   int a = 0;
   for (d = rm->denied; d; d = d->next)
   {

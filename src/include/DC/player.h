@@ -176,15 +176,17 @@
 #define MAX_PROFESSIONS 2
 
 // Constructor commented out for const.C initialization purposes
-struct str_app_type
+class str_app_type
 {
+public:
   int16_t todam;           /* Damage Bonus/Penalty                */
   int16_t carry_w;         /* Maximum weight that can be carrried */
   int16_t cold_resistance; /* Cold resistance */
 };
 
-struct dex_app_type
+class dex_app_type
 {
+public:
   int16_t tohit;
   int16_t ac_mod;
   int16_t move_gain;
@@ -192,8 +194,9 @@ struct dex_app_type
 };
 
 // Constructor commented out for const.C initialization purposes
-struct wis_app_type
+class wis_app_type
 {
+public:
   int16_t mana_regen;
   int16_t ki_regen;
   int16_t bonus; /* how many bonus skills a player can */
@@ -204,8 +207,9 @@ struct wis_app_type
 };
 
 // Constructor commented out for const.C initialization purposes
-struct int_app_type
+class int_app_type
 {
+public:
   int16_t mana_regen;
   int16_t ki_regen;
   int16_t easy_bonus;
@@ -218,8 +222,9 @@ struct int_app_type
 };
 
 // Constructor commented out for const.C initialization purposes
-struct con_app_type
+class con_app_type
 {
+public:
   int16_t hp_regen;
   int16_t move_regen;
   int16_t hp_gain;
@@ -227,11 +232,11 @@ struct con_app_type
 };
 
 /* Extern definitions. These are all in const.cpp. */
-extern const struct dex_app_type dex_app[];
-extern const struct con_app_type con_app[];
-extern const struct int_app_type int_app[];
-extern const struct str_app_type str_app[];
-extern const struct wis_app_type wis_app[];
+extern const dex_app_type dex_app[];
+extern const con_app_type con_app[];
+extern const int_app_type int_app[];
+extern const str_app_type str_app[];
+extern const wis_app_type wis_app[];
 
 /* Various function declarations */
 int get_saves(Character *ch, int savetype);

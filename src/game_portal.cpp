@@ -19,7 +19,7 @@
 
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer);
 
-struct game_portal game_portals[MAX_GAME_PORTALS];
+game_portal game_portals[MAX_GAME_PORTALS];
 
 /************************************************************************
 | load_game_portals
@@ -50,7 +50,7 @@ void load_game_portals()
           "portal/portal.ship6",
           "portal/portal.arcana"};
 
-  extern struct game_portal game_portals[MAX_GAME_PORTALS];
+  extern game_portal game_portals[MAX_GAME_PORTALS];
   int i, j;
   int num_lines = 0; /* Temporary to count lines */
   int32_t file_pos;  /* Used to store position before counting length */
@@ -67,7 +67,7 @@ void load_game_portals()
       logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
       break;
     }
-    /* Now we have a readable file.  Here's the structure:
+    /* Now we have a readable file.  Here's the ure:
     |  First Line:  to_room -- the room the portal goes to
     |  Second Line: object -- Object to duplicate for portal (-1 for none)
     |  Third Line:  timer  -- Length object sticks around (-1 for FOREVER)
@@ -129,7 +129,7 @@ void DC::free_game_portals_from_memory(void)
 void process_portals()
 {
   int i;
-  //  extern struct game_portal game_portals[];
+  //  extern  game_portal game_portals[];
 
   for (i = 0; i < MAX_GAME_PORTALS; i++)
   {

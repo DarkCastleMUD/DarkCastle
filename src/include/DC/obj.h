@@ -16,7 +16,6 @@
 #ifndef OBJ_H_
 #define OBJ_H_
 
-#include <vector>
 #include <QStringList>
 #include <QMetaEnum>
 
@@ -174,8 +173,8 @@ typedef uint64_t room_t;
 
 class active_object
 {
-    class Object *obj = {};
-    active_object *next = {};
+  class Object *obj = {};
+  active_object *next = {};
 };
 
 #define OBJ_NOTIMER -7000000
@@ -189,410 +188,412 @@ typedef int32_t object_value_t;
 
 namespace DCNS
 {
-    Q_NAMESPACE
+  Q_NAMESPACE
 
-    enum ObjectPosition
-    {
-        TAKE = 1 << 0,
-        FINGER = 1 << 1,
-        NECK = 1 << 2,
-        BODY = 1 << 3,
-        HEAD = 1 << 4,
-        LEGS = 1 << 5,
-        FEET = 1 << 6,
-        HANDS = 1 << 7,
-        ARMS = 1 << 8,
-        SHIELD = 1 << 9,
-        ABOUT = 1 << 10,
-        WAISTE = 1 << 11,
-        WRIST = 1 << 12,
-        WIELD = 1 << 13,
-        HOLD = 1 << 14,
-        THROW = 1 << 15,
-        LIGHT_SOURCE = 1 << 16,
-        FACE = 1 << 17,
-        EAR = 1 << 18
-    };
-    Q_DECLARE_FLAGS(ObjectPositions, ObjectPosition)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ObjectPositions)
-    Q_FLAG_NS(ObjectPositions)
+  enum ObjectPosition
+  {
+    TAKE = 1 << 0,
+    FINGER = 1 << 1,
+    NECK = 1 << 2,
+    BODY = 1 << 3,
+    HEAD = 1 << 4,
+    LEGS = 1 << 5,
+    FEET = 1 << 6,
+    HANDS = 1 << 7,
+    ARMS = 1 << 8,
+    SHIELD = 1 << 9,
+    ABOUT = 1 << 10,
+    WAISTE = 1 << 11,
+    WRIST = 1 << 12,
+    WIELD = 1 << 13,
+    HOLD = 1 << 14,
+    THROW = 1 << 15,
+    LIGHT_SOURCE = 1 << 16,
+    FACE = 1 << 17,
+    EAR = 1 << 18
+  };
+  Q_DECLARE_FLAGS(ObjectPositions, ObjectPosition)
+  Q_DECLARE_OPERATORS_FOR_FLAGS(ObjectPositions)
+  Q_FLAG_NS(ObjectPositions)
 
-    template <typename T>
-    QStringList QFlagsToStrings(void)
+  template <typename T>
+  QStringList QFlagsToStrings(void)
+  {
+    QStringList list;
+    auto metaEnum = QMetaEnum::fromType<T>();
+    for (auto i = 0; i < metaEnum.keyCount(); ++i)
     {
-        QStringList list;
-        auto metaEnum = QMetaEnum::fromType<T>();
-        for (auto i = 0; i < metaEnum.keyCount(); ++i)
-        {
-            if (metaEnum.key(i))
-                list.push_back(QString(metaEnum.key(i)).replace('_', '-'));
-        }
-        return list;
+      if (metaEnum.key(i))
+        list.push_back(QString(metaEnum.key(i)).replace('_', '-'));
     }
-    template <typename T>
-    QString QFlagsToStrings(T flags)
-    {
-        return QMetaEnum::fromType<T>().valueToKeys(flags).replace('_', '-').replace('|', ' ');
-    }
+    return list;
+  }
+  template <typename T>
+  QString QFlagsToStrings(T flags)
+  {
+    return QMetaEnum::fromType<T>().valueToKeys(flags).replace('_', '-').replace('|', ' ');
+  }
 }
 using namespace DCNS;
-struct obj_flag_data
+class obj_flag_data
 {
-    object_value_t value[4] = {}; /* Values of the item (see list)    */
-    object_type_t type_flag = {}; /* Type of item                     */
-    ObjectPositions wear_flags = {};
-    uint16_t size = {};        /* Race restrictions                */
-    uint32_t extra_flags = {}; /* If it hums, glows etc            */
-    int16_t weight = {};       /* Weight what else                 */
-    int32_t cost = {};         /* Value when sold (gp.)            */
-    uint32_t more_flags = {};  /* A second bitvector (extra_flags2)*/
-    level_t eq_level = {};     /* Min level to use it for eq       */
-    int16_t timer = {};        /* Timer for object                 */
-    Character *origin = {};    /* Creator of object, previously was stored at value[3] */
-    bool Value(qsizetype i, object_value_t v)
+public:
+  object_value_t value[4] = {}; /* Values of the item (see list)    */
+  object_type_t type_flag = {}; /* Type of item                     */
+  ObjectPositions wear_flags = {};
+  uint16_t size = {};        /* Race restrictions                */
+  uint32_t extra_flags = {}; /* If it hums, glows etc            */
+  int16_t weight = {};       /* Weight what else                 */
+  int32_t cost = {};         /* Value when sold (gp.)            */
+  uint32_t more_flags = {};  /* A second bitvector (extra_flags2)*/
+  level_t eq_level = {};     /* Min level to use it for eq       */
+  int16_t timer = {};        /* Timer for object                 */
+  Character *origin = {};    /* Creator of object, previously was stored at value[3] */
+  bool Value(qsizetype i, object_value_t v)
+  {
+    if (i >= 0 && i < 4)
     {
-        if (i >= 0 && i < 4)
-        {
-            value[i] = v;
-            return true;
-        }
-        return false;
+      value[i] = v;
+      return true;
     }
-    object_value_t Value(qsizetype i)
+    return false;
+  }
+  object_value_t Value(qsizetype i)
+  {
+    if (i >= 0 && i < 4)
     {
-        if (i >= 0 && i < 4)
-        {
-            return value[i];
-        }
-        return {};
+      return value[i];
     }
+    return {};
+  }
 };
 
 typedef int32_t location_t;
 typedef int32_t modifier_t;
-struct obj_affected_type
+class obj_affected_type
 {
-    int32_t location = {}; /* Which ability to change (APPLY_XXX) */
-    int32_t modifier = {}; /* How much it changes by              */
+public:
+  int32_t location = {}; /* Which ability to change (APPLY_XXX) */
+  int32_t modifier = {}; /* How much it changes by              */
 };
 
 /* ======================== Structure for object ========================= */
 class Object : public Entity
 {
 public:
-    enum class portal_types_t
-    {
-        Player = 0,
-        Permanent = 1,
-        Temp = 2,
-        LookOnly = 3,
-        PermanentNoLook = 4
-    };
+  enum class portal_types_t
+  {
+    Player = 0,
+    Permanent = 1,
+    Temp = 2,
+    LookOnly = 3,
+    PermanentNoLook = 4
+  };
 
-    enum portal_flags_t
-    {
-        No_Leave = 1 << 0,
-        No_Enter = 1 << 1
-    };
+  enum portal_flags_t
+  {
+    No_Leave = 1 << 0,
+    No_Enter = 1 << 1
+  };
 
-    typedef QString (Object::*getter_t)(void);
-    typedef bool (Object::*setter_t)(QString);
+  typedef QString (Object::*getter_t)(void);
+  typedef bool (Object::*setter_t)(QString);
 
-    static const QStringList size_bits;
-    static const QStringList more_obj_bits;
-    static const QStringList extra_bits;
-    static const QStringList apply_types;
+  static const QStringList size_bits;
+  static const QStringList more_obj_bits;
+  static const QStringList extra_bits;
+  static const QStringList apply_types;
 
-    int32_t item_number = {};     /* Where in data-base               */
-    int vroom = {};               /* for corpse saving */
-    obj_flag_data obj_flags = {}; /* Object information               */
-    int16_t num_affects = {};
-    obj_affected_type *affected = {}; /* Which abilities in PC to change  */
+  int32_t item_number = {};     /* Where in data-base               */
+  int vroom = {};               /* for corpse saving */
+  obj_flag_data obj_flags = {}; /* Object information               */
+  int16_t num_affects = {};
+  obj_affected_type *affected = {}; /* Which abilities in PC to change  */
 
-    [[nodiscard]] inline QString Name(void) const
-    {
-        return name_;
-    }
-    inline bool Name(QString name)
-    {
-        name_ = name;
-        return true;
-    }
+  [[nodiscard]] inline QString Name(void) const
+  {
+    return name_;
+  }
+  inline bool Name(QString name)
+  {
+    name_ = name;
+    return true;
+  }
 
-    char *long_description = {};                  /* When in room                     */
-    char *short_description = {};                 /* when worn/carry/in cont.         */
-    struct extra_descr_data *ex_description = {}; /* extra descriptions     */
-    Character *carried_by = {};                   /* Carried by :NULL in room/conta   */
-    Character *equipped_by = {};                  /* so I can access the player :)    */
+  char *long_description = {};           /* When in room                     */
+  char *short_description = {};          /* when worn/carry/in cont.         */
+  extra_descr_data *ex_description = {}; /* extra descriptions     */
+  Character *carried_by = {};            /* Carried by :NULL in room/conta   */
+  Character *equipped_by = {};           /* so I can access the player :)    */
 
-    Object *in_obj = {};   /* In what object NULL when none    */
-    Object *contains = {}; /* Contains objects                 */
+  Object *in_obj = {};   /* In what object NULL when none    */
+  Object *contains = {}; /* Contains objects                 */
 
-    Object *next_content = {}; /* For 'contains' lists             */
-    Object *next = {};         /* For the object list              */
-    Object *next_skill = {};
-    table_data *table = {};
-    class machine_data *slot = {};
-    class wheel_data *wheel = {};
-    time_t save_expiration = {};
-    time_t no_sell_expiration = {};
+  Object *next_content = {}; /* For 'contains' lists             */
+  Object *next = {};         /* For the object list              */
+  Object *next_skill = {};
+  table_data *table = {};
+  class machine_data *slot = {};
+  class wheel_data *wheel = {};
+  time_t save_expiration = {};
+  time_t no_sell_expiration = {};
 
-    bool isDark(void);
-    bool isPortal(void)
-    {
-        return obj_flags.type_flag == ITEM_PORTAL;
-    }
-    bool isTotem(void)
-    {
-        return obj_flags.type_flag == ITEM_TOTEM;
-    }
-    bool isWeapon(void)
-    {
-        return obj_flags.type_flag == ITEM_WEAPON;
-    }
-    bool isArmor(void)
-    {
-        return obj_flags.type_flag == ITEM_ARMOR;
-    }
-    bool isInstrument(void)
-    {
-        return obj_flags.type_flag == ITEM_INSTRUMENT;
-    }
-    bool isContainer(void)
-    {
-        return obj_flags.type_flag == ITEM_CONTAINER;
-    }
-    bool isLight(void)
-    {
-        return obj_flags.type_flag == ITEM_LIGHT;
-    }
-    bool isScroll(void)
-    {
-        return obj_flags.type_flag == ITEM_SCROLL;
-    }
-    bool isWand(void)
-    {
-        return obj_flags.type_flag == ITEM_WAND;
-    }
-    bool isStaff(void)
-    {
-        return obj_flags.type_flag == ITEM_STAFF;
-    }
-    bool isFireWeapon(void)
-    {
-        return obj_flags.type_flag == ITEM_FIREWEAPON;
-    }
-    bool isMissle(void)
-    {
-        return obj_flags.type_flag == ITEM_MISSILE;
-    }
-    bool isTreasure(void)
-    {
-        return obj_flags.type_flag == ITEM_TREASURE;
-    }
-    bool isPotion(void)
-    {
-        return obj_flags.type_flag == ITEM_POTION;
-    }
-    bool isWorn(void)
-    {
-        return obj_flags.type_flag == ITEM_WORN;
-    }
-    bool isOther(void)
-    {
-        return obj_flags.type_flag == ITEM_OTHER;
-    }
-    bool isTrash(void)
-    {
-        return obj_flags.type_flag == ITEM_TRASH;
-    }
-    bool isTrap(void)
-    {
-        return obj_flags.type_flag == ITEM_TRAP;
-    }
-    bool isNote(void)
-    {
-        return obj_flags.type_flag == ITEM_NOTE;
-    }
-    bool isDrinkContainer(void)
-    {
-        return obj_flags.type_flag == ITEM_DRINKCON;
-    }
-    bool isKey(void)
-    {
-        return obj_flags.type_flag == ITEM_KEY;
-    }
-    bool isFood(void)
-    {
-        return obj_flags.type_flag == ITEM_FOOD;
-    }
-    bool isMoney(void)
-    {
-        return obj_flags.type_flag == ITEM_MONEY;
-    }
-    bool isPen(void)
-    {
-        return obj_flags.type_flag == ITEM_PEN;
-    }
-    bool isBoat(void)
-    {
-        return obj_flags.type_flag == ITEM_BOAT;
-    }
-    bool isBoard(void)
-    {
-        return obj_flags.type_flag == ITEM_BOARD;
-    }
-    bool isFountain(void)
-    {
-        return obj_flags.type_flag == ITEM_FOUNTAIN;
-    }
-    bool isUtility(void)
-    {
-        return obj_flags.type_flag == ITEM_UTILITY;
-    }
-    bool isBeacon(void)
-    {
-        return obj_flags.type_flag == ITEM_BEACON;
-    }
-    bool isLockpick(void)
-    {
-        return obj_flags.type_flag == ITEM_LOCKPICK;
-    }
-    bool isClimbable(void)
-    {
-        return obj_flags.type_flag == ITEM_CLIMBABLE;
-    }
-    bool isMegaphone(void)
-    {
-        return obj_flags.type_flag == ITEM_MEGAPHONE;
-    }
-    bool isAltar(void)
-    {
-        return obj_flags.type_flag == ITEM_ALTAR;
-    }
-    bool isKeyring(void)
-    {
-        return obj_flags.type_flag == ITEM_KEYRING;
-    }
+  bool isDark(void);
+  bool isPortal(void)
+  {
+    return obj_flags.type_flag == ITEM_PORTAL;
+  }
+  bool isTotem(void)
+  {
+    return obj_flags.type_flag == ITEM_TOTEM;
+  }
+  bool isWeapon(void)
+  {
+    return obj_flags.type_flag == ITEM_WEAPON;
+  }
+  bool isArmor(void)
+  {
+    return obj_flags.type_flag == ITEM_ARMOR;
+  }
+  bool isInstrument(void)
+  {
+    return obj_flags.type_flag == ITEM_INSTRUMENT;
+  }
+  bool isContainer(void)
+  {
+    return obj_flags.type_flag == ITEM_CONTAINER;
+  }
+  bool isLight(void)
+  {
+    return obj_flags.type_flag == ITEM_LIGHT;
+  }
+  bool isScroll(void)
+  {
+    return obj_flags.type_flag == ITEM_SCROLL;
+  }
+  bool isWand(void)
+  {
+    return obj_flags.type_flag == ITEM_WAND;
+  }
+  bool isStaff(void)
+  {
+    return obj_flags.type_flag == ITEM_STAFF;
+  }
+  bool isFireWeapon(void)
+  {
+    return obj_flags.type_flag == ITEM_FIREWEAPON;
+  }
+  bool isMissle(void)
+  {
+    return obj_flags.type_flag == ITEM_MISSILE;
+  }
+  bool isTreasure(void)
+  {
+    return obj_flags.type_flag == ITEM_TREASURE;
+  }
+  bool isPotion(void)
+  {
+    return obj_flags.type_flag == ITEM_POTION;
+  }
+  bool isWorn(void)
+  {
+    return obj_flags.type_flag == ITEM_WORN;
+  }
+  bool isOther(void)
+  {
+    return obj_flags.type_flag == ITEM_OTHER;
+  }
+  bool isTrash(void)
+  {
+    return obj_flags.type_flag == ITEM_TRASH;
+  }
+  bool isTrap(void)
+  {
+    return obj_flags.type_flag == ITEM_TRAP;
+  }
+  bool isNote(void)
+  {
+    return obj_flags.type_flag == ITEM_NOTE;
+  }
+  bool isDrinkContainer(void)
+  {
+    return obj_flags.type_flag == ITEM_DRINKCON;
+  }
+  bool isKey(void)
+  {
+    return obj_flags.type_flag == ITEM_KEY;
+  }
+  bool isFood(void)
+  {
+    return obj_flags.type_flag == ITEM_FOOD;
+  }
+  bool isMoney(void)
+  {
+    return obj_flags.type_flag == ITEM_MONEY;
+  }
+  bool isPen(void)
+  {
+    return obj_flags.type_flag == ITEM_PEN;
+  }
+  bool isBoat(void)
+  {
+    return obj_flags.type_flag == ITEM_BOAT;
+  }
+  bool isBoard(void)
+  {
+    return obj_flags.type_flag == ITEM_BOARD;
+  }
+  bool isFountain(void)
+  {
+    return obj_flags.type_flag == ITEM_FOUNTAIN;
+  }
+  bool isUtility(void)
+  {
+    return obj_flags.type_flag == ITEM_UTILITY;
+  }
+  bool isBeacon(void)
+  {
+    return obj_flags.type_flag == ITEM_BEACON;
+  }
+  bool isLockpick(void)
+  {
+    return obj_flags.type_flag == ITEM_LOCKPICK;
+  }
+  bool isClimbable(void)
+  {
+    return obj_flags.type_flag == ITEM_CLIMBABLE;
+  }
+  bool isMegaphone(void)
+  {
+    return obj_flags.type_flag == ITEM_MEGAPHONE;
+  }
+  bool isAltar(void)
+  {
+    return obj_flags.type_flag == ITEM_ALTAR;
+  }
+  bool isKeyring(void)
+  {
+    return obj_flags.type_flag == ITEM_KEYRING;
+  }
 
-    room_t getPortalDestinationRoom(void)
+  room_t getPortalDestinationRoom(void)
+  {
+    if (!isPortal())
     {
-        if (!isPortal())
-        {
-            return 0;
-        }
-        return obj_flags.value[0];
+      return 0;
     }
-    void setPortalDestinationRoom(room_t room)
+    return obj_flags.value[0];
+  }
+  void setPortalDestinationRoom(room_t room)
+  {
+    if (!isPortal())
     {
-        if (!isPortal())
-        {
-            return;
-        }
-        obj_flags.value[0] = room;
+      return;
     }
+    obj_flags.value[0] = room;
+  }
 
-    portal_types_t getPortalType(void)
+  portal_types_t getPortalType(void)
+  {
+    if (!isPortal())
     {
-        if (!isPortal())
-        {
-            return portal_types_t::Player;
-        }
-        return static_cast<portal_types_t>(obj_flags.value[1]);
+      return portal_types_t::Player;
     }
-    bool isPortalTypePlayer(void)
-    {
-        return getPortalType() == portal_types_t::Player;
-    }
-    bool isPortalTypePermanent(void)
-    {
-        return getPortalType() == portal_types_t::Permanent;
-    }
-    bool isPortalTypeTemp(void)
-    {
-        return getPortalType() == portal_types_t::Temp;
-    }
-    bool isPortalTypeLookOnly(void)
-    {
-        return getPortalType() == portal_types_t::LookOnly;
-    }
-    bool isPortalTypePermanentNoLook(void)
-    {
-        return getPortalType() == portal_types_t::PermanentNoLook;
-    }
-    bool isQuest(void);
-    bool isTest(void);
-    bool isGodload(void);
-    bool isCustom(void)
-    {
-        return isSet(obj_flags.more_flags, ITEM_NO_CUSTOM);
-    }
+    return static_cast<portal_types_t>(obj_flags.value[1]);
+  }
+  bool isPortalTypePlayer(void)
+  {
+    return getPortalType() == portal_types_t::Player;
+  }
+  bool isPortalTypePermanent(void)
+  {
+    return getPortalType() == portal_types_t::Permanent;
+  }
+  bool isPortalTypeTemp(void)
+  {
+    return getPortalType() == portal_types_t::Temp;
+  }
+  bool isPortalTypeLookOnly(void)
+  {
+    return getPortalType() == portal_types_t::LookOnly;
+  }
+  bool isPortalTypePermanentNoLook(void)
+  {
+    return getPortalType() == portal_types_t::PermanentNoLook;
+  }
+  bool isQuest(void);
+  bool isTest(void);
+  bool isGodload(void);
+  bool isCustom(void)
+  {
+    return isSet(obj_flags.more_flags, ITEM_NO_CUSTOM);
+  }
 
-    int32_t getPortalLeaveZone(void)
+  int32_t getPortalLeaveZone(void)
+  {
+    if (!isPortal())
     {
-        if (!isPortal())
-        {
-            return -1;
-        }
-        return obj_flags.value[2];
+      return -1;
     }
-    int32_t getPortalFlags(void)
+    return obj_flags.value[2];
+  }
+  int32_t getPortalFlags(void)
+  {
+    if (!isPortal())
     {
-        if (!isPortal())
-        {
-            return 0;
-        }
-        return obj_flags.value[3];
+      return 0;
     }
-    bool hasPortalFlagNoLeave(void);
-    bool hasPortalFlagNoEnter(void);
+    return obj_flags.value[3];
+  }
+  bool hasPortalFlagNoLeave(void);
+  bool hasPortalFlagNoEnter(void);
 
-    uint64_t getLevel(void);
+  uint64_t getLevel(void);
 
-    int keywordfind(void);
-    void setOwner(QString owner) { owner_ = owner; }
-    QString getOwner(void) { return owner_; }
+  int keywordfind(void);
+  void setOwner(QString owner) { owner_ = owner; }
+  QString getOwner(void) { return owner_; }
 
-    [[nodiscard]] inline bool isCorpse(void) const
+  [[nodiscard]] inline bool isCorpse(void) const
+  {
+    return isSet(obj_flags.extra_flags, ITEM_PC_CORPSE) || isSet(obj_flags.extra_flags, ITEM_PC_CORPSE_LOOTED);
+  }
+  [[nodiscard]] inline bool isTradable(void) const
+  {
+    return !isSet(obj_flags.more_flags, ITEM_NO_TRADE);
+  }
+  bool ActionDescription(QString action_description)
+  {
+    action_description_ = action_description;
+    if (action_description.isEmpty())
+      return false;
+    else
+      return true;
+  }
+  QString ActionDescription(void) const { return action_description_; }
+  object_type_t Type(void) { return obj_flags.type_flag; }
+  QString TypeString(void);
+  bool Type(object_type_t type)
+  {
+    if (type >= ITEM_TYPE_MAX)
     {
-        return isSet(obj_flags.extra_flags, ITEM_PC_CORPSE) || isSet(obj_flags.extra_flags, ITEM_PC_CORPSE_LOOTED);
+      type = 0;
+      obj_flags.Value(2, 0);
+      return false;
     }
-    [[nodiscard]] inline bool isTradable(void) const
-    {
-        return !isSet(obj_flags.more_flags, ITEM_NO_TRADE);
-    }
-    bool ActionDescription(QString action_description)
-    {
-        action_description_ = action_description;
-        if (action_description.isEmpty())
-            return false;
-        else
-            return true;
-    }
-    QString ActionDescription(void) const { return action_description_; }
-    object_type_t Type(void) { return obj_flags.type_flag; }
-    QString TypeString(void);
-    bool Type(object_type_t type)
-    {
-        if (type >= ITEM_TYPE_MAX)
-        {
-            type = 0;
-            obj_flags.Value(2, 0);
-            return false;
-        }
-        obj_flags.type_flag = type;
-        if (obj_flags.type_flag == 24)
-            obj_flags.Value(2, -1);
-        else
-            obj_flags.Value(2, 0);
-        return true;
-    }
-    bool TypeString(QString type);
+    obj_flags.type_flag = type;
+    if (obj_flags.type_flag == 24)
+      obj_flags.Value(2, -1);
+    else
+      obj_flags.Value(2, 0);
+    return true;
+  }
+  bool TypeString(QString type);
 
 private:
-    QString owner_;
-    QString name_;                    /* Title of object :get etc.        */
-    QString action_description_ = {}; /* What to write when used          */
+  QString owner_;
+  QString name_;                    /* Title of object :get etc.        */
+  QString action_description_ = {}; /* What to write when used          */
 };
 
 /* For 'equipment' */
@@ -628,14 +629,15 @@ private:
 
 #define CURRENT_OBJ_VERSION 1
 
-struct obj_file_elem
+class obj_file_elem
 {
-    int16_t version = {};
-    int32_t item_number = {};
-    int16_t timer = {};
-    int16_t wear_pos = {};
-    int16_t container_depth = {};
-    int32_t other[5] = {}; // unused
+public:
+  int16_t version = {};
+  int32_t item_number = {};
+  int16_t timer = {};
+  int16_t wear_pos = {};
+  int16_t container_depth = {};
+  int32_t other[5] = {}; // unused
 };
 
 // functions from objects.cpp

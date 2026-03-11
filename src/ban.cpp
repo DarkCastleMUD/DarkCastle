@@ -11,7 +11,7 @@
 #include "DC/returnvals.h"
 #include "DC/memory.h"
 
-struct ban_list_element *ban_list = nullptr;
+ban_list_element *ban_list = nullptr;
 
 const char *ban_types[] = {
     "no",
@@ -26,7 +26,7 @@ void load_banned(void)
   int i, date;
   char site_name[BANNED_SITE_LENGTH + 1], ban_type[100];
   char name[100 + 1];
-  struct ban_list_element *next_node;
+  ban_list_element *next_node;
 
   ban_list = 0;
 
@@ -37,7 +37,7 @@ void load_banned(void)
   }
   while (fscanf(fl, " %s %s %d %s ", ban_type, site_name, &date, name) == 4)
   {
-    CREATE(next_node, struct ban_list_element, 1);
+    CREATE(next_node, ban_list_element, 1);
     strncpy(next_node->site, site_name, BANNED_SITE_LENGTH);
     next_node->site[BANNED_SITE_LENGTH] = '\0';
     strncpy(next_node->name, name, 100);
@@ -78,7 +78,7 @@ int isbanned(QHostAddress address)
   hostname = hostname.trimmed().toLower();
 
   int i = 0;
-  for (struct ban_list_element *banned_node = ban_list; banned_node; banned_node = banned_node->next)
+  for (ban_list_element *banned_node = ban_list; banned_node; banned_node = banned_node->next)
   {
     if (hostname == banned_node->site) /* if hostname is a substring */
     {
@@ -89,7 +89,7 @@ int isbanned(QHostAddress address)
   return i;
 }
 
-void _write_one_node(FILE *fp, struct ban_list_element *node)
+void _write_one_node(FILE *fp, ban_list_element *node)
 {
   if (node)
   {
@@ -117,7 +117,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
   char flag[MAX_INPUT_LENGTH], format[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct ban_list_element *ban_node;
+  ban_list_element *ban_node;
   std::string buffer;
 
   *buf = '\0';
@@ -186,7 +186,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  CREATE(ban_node, struct ban_list_element, 1);
+  CREATE(ban_node, ban_list_element, 1);
   strncpy(ban_node->site, site, BANNED_SITE_LENGTH);
   for (nextchar = ban_node->site; *nextchar; nextchar++)
     *nextchar = LOWER(*nextchar);
@@ -213,7 +213,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
 int do_unban(Character *ch, char *argument, cmd_t cmd)
 {
   char site[MAX_INPUT_LENGTH + 1];
-  struct ban_list_element *ban_node, *temp;
+  ban_list_element *ban_node, *temp;
   int found = 0;
   char buf[MAX_STRING_LENGTH];
 

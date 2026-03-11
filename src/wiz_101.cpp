@@ -120,7 +120,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   zone_t zone_nr = {};
   Character *target_mob = {}, *pers = {};
   Character *tmp_ch = {};
-  struct follow_type *k = {}, *next_dude = {};
+  follow_type *k = {}, *next_dude = {};
   class Object *target_obj = {};
 
   if (this->isNonPlayer())
@@ -808,7 +808,7 @@ int do_varstat(Character *ch, char *argument, cmd_t cmd)
   }
   char buf[MAX_STRING_LENGTH];
   buf[0] = '\0';
-  struct tempvariable *eh;
+  tempvariable *eh;
   for (eh = vict->tempVariable; eh; eh = eh->next)
   {
     snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n", qPrintable(eh->name), qPrintable(eh->data));

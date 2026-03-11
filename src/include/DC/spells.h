@@ -33,9 +33,10 @@ void extractFamiliar(Character *ch);
 bool skill_success(Character *ch, Character *victim, int skillnum, int mod = 0);
 
 /* New skill quest thingy. */
-struct skill_quest
+class skill_quest
 {
-  struct skill_quest *next;
+public:
+  skill_quest *next;
   char *message;
   int num;
   int clas;
@@ -54,8 +55,8 @@ public:
 };
 
 void barb_magic_resist(Character *ch, int old, int nw);
-struct skill_quest *find_sq(int sq);
-struct skill_quest *find_sq(char *);
+skill_quest *find_sq(int sq);
+skill_quest *find_sq(char *);
 int dam_percent(int learned, int damage);
 
 /*
@@ -701,8 +702,9 @@ extern const QList<spell_info_type> spell_info;
 /*
  * Attack types with grammar.
  */
-struct attack_hit_type
+class attack_hit_type
 {
+public:
   char *singular;
   char *plural;
 };

@@ -67,16 +67,18 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 #define MAX_MESSAGE_LENGTH 2048
 
-struct message
+class message
 {
+public:
   std::string date;
   std::string title;
   std::string author;
   std::string text;
 };
 
-struct BOARD_INFO
+class BOARD_INFO
 {
+public:
   Character *locked_for = {};
   bool lock = {};
   int min_read_level = {};
@@ -138,8 +140,9 @@ void new_edit_board_unlock_board(Character *ch, int abort);
 #define CLASS_BARD 10
 #define CLASS_DRUID 11
 
-struct RESERVATION_DATA
+class RESERVATION_DATA
 {
+public:
   char *buf;
   message new_post;
   std::map<std::string, BOARD_INFO>::iterator board;
@@ -915,7 +918,7 @@ void board_load_board()
 
   FILE *the_file;
   int ind;
-  struct message curr_msg;
+  message curr_msg;
   int number;
 
   std::map<std::string, BOARD_INFO>::iterator map_it;

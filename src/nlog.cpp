@@ -18,17 +18,18 @@
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.
  */
 
-struct hash_info
+class hash_info
 {
+public:
   char *name;
-  struct hash_info *left;
-  struct hash_info *right;
+  hash_info *left;
+  hash_info *right;
 };
 
-struct hash_info tree = {"m", 0, 0};
-// struct hash_info nulltree = {"", 0, 0};
+hash_info tree = {"m", 0, 0};
+//  hash_info nulltree = {"", 0, 0};
 
-void kill_hsh_tree_func(struct hash_info *leaf)
+void kill_hsh_tree_func(hash_info *leaf)
 {
   if (leaf->left)
     kill_hsh_tree_func(leaf->left);
@@ -51,7 +52,7 @@ void DC::free_hsh_tree_from_memory()
 
 bool ishashed(char *arg)
 {
-  struct hash_info *current = &tree;
+  hash_info *current = &tree;
   for (; current; current = current->right)
   {
     if (current->name == arg)
@@ -63,9 +64,9 @@ bool ishashed(char *arg)
 char *str_hsh(const char *arg)
 {
   int scratch;
-  struct hash_info *current = &tree;
-  struct hash_info *next;
-  struct hash_info *temp;
+  hash_info *current = &tree;
+  hash_info *next;
+  hash_info *temp;
 
   // Second spot for "" args so we don't leak them all over the place
   // if(*arg == '\0')
@@ -86,9 +87,9 @@ char *str_hsh(const char *arg)
   }
 
 #ifdef LEAK_CHECK
-  current = (struct hash_info *)calloc(1, sizeof(struct hash_info));
+  current = (hash_info *)calloc(1, sizeof(hash_info));
 #else
-  current = (struct hash_info *)dc_alloc(1, sizeof(struct hash_info));
+  current = (hash_info *)dc_alloc(1, sizeof(hash_info));
 #endif
 
   current->right = current->left = nullptr;

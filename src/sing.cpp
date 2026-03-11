@@ -684,7 +684,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       // like stop, whistle sharp or listsongs
       if (song_info[spl].rating() > 0 && spl != SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE)
       {
-        struct songInfo data;
+        songInfo data;
         data.song_number = spl;
         data.song_timer = 0;
         data.song_data = 0;
@@ -904,7 +904,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
 
 int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Character *victim, int skill)
 {
-  struct affected_type af;
+  affected_type af;
   std::vector<songInfo>::iterator i;
 
   if (!ch || ch->songs.empty())
@@ -1533,7 +1533,7 @@ int song_traveling_march(uint8_t level, Character *ch, char *arg, Character *vic
 int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
   int heal;
-  struct affected_type af;
+  affected_type af;
   char buf[MAX_STRING_LENGTH];
 
   int combat, non_combat;
@@ -2037,7 +2037,7 @@ int song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim
 
 int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   af.type = SKILL_INSANE_CHANT;
   af.duration = 1;
@@ -2091,7 +2091,7 @@ int song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victi
 
 int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
-  struct affected_type af;
+  affected_type af;
 
   af.type = SKILL_SONG_FLIGHT_OF_BEE;
   af.duration = 1 + skill / 10;
@@ -2369,7 +2369,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
 
 int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
-  struct affected_type af1, af2, af3;
+  affected_type af1, af2, af3;
 
   af1.type = SKILL_SONG_FANATICAL_FANFARE;
   af1.duration = skill / 30;
@@ -2439,7 +2439,7 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
     return intrp_mking_charge(level, ch, arg, victim, -1);
   }
 
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_SONG_MKING_CHARGE;
   af.duration = 1;
   af.modifier = 0;
@@ -2637,8 +2637,8 @@ int song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim
 
 int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
-  struct affected_type af;
-  struct affected_type af2;
+  affected_type af;
+  affected_type af2;
 
   af.type = SKILL_GLITTER_DUST;
   af.duration = (ch->getLevel() > 25) ? 2 : 1;
@@ -3068,7 +3068,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
       break;
   }
 
-  struct affected_type af1, af2, af3;
+  affected_type af1, af2, af3;
 
   af1.type = SKILL_SONG_VIGILANT_SIREN;
   af1.duration = 1;
@@ -3406,7 +3406,7 @@ int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Cha
 {
   Character *master = nullptr;
   follow_type *fvictim = nullptr;
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_SONG_SUBMARINERS_ANTHEM;
   af.duration = 1 + (skill / 10);
   af.modifier = 0;

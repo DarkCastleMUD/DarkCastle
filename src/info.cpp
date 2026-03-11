@@ -172,9 +172,9 @@ class Object *Character::get_object_in_equip_vis(char *arg, class Object *equipm
   return (0);
 }
 
-char *find_ex_description(char *word, struct extra_descr_data *list)
+char *find_ex_description(char *word, extra_descr_data *list)
 {
-  struct extra_descr_data *i;
+  extra_descr_data *i;
 
   for (i = list; i; i = i->next)
     if (isexact(word, i->keyword))
@@ -1937,7 +1937,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
   bool affect_found[AFF_MAX + 1] = {false};
   bool modifyOutput;
 
-  struct affected_type *aff;
+  affected_type *aff;
 
   int64_t exp_needed;
   uint32_t immune = 0, suscept = 0, resist = 0;
@@ -2309,10 +2309,10 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
   time_t timep;
   int32_t h, m;
   // int32_t s;
-  extern struct time_info_data time_info;
+  extern time_info_data time_info;
   extern char *weekdays[];
   extern char *month_name[];
-  struct tm *pTime = nullptr;
+  tm *pTime = nullptr;
 
   /* 35 days in a month */
   weekday = ((35 * time_info.month) + time_info.day + 1) % 7;
@@ -2396,7 +2396,7 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
 
 int do_weather(Character *ch, char *argument, cmd_t cmd)
 {
-  extern struct weather_data weather_info;
+  extern weather_data weather_info;
   char buf[256];
 
   if (GET_POS(ch) <= position_t::SLEEPING)
@@ -2427,7 +2427,7 @@ int do_weather(Character *ch, char *argument, cmd_t cmd)
 
 int do_help(Character *ch, char *argument, cmd_t cmd)
 {
-  extern struct help_index_element *help_index;
+  extern help_index_element *help_index;
   extern FILE *help_fl;
   extern char help[MAX_STRING_LENGTH];
 
@@ -3583,10 +3583,10 @@ private:
 
   uint64_t o_value[4] = {};
 
-  uint64_t o_item_number_ = {};         /* Where in data-base               */
-  uint64_t o_in_room_ = {};             /* In what room -1 when conta/carr  */
-  uint64_t o_vroo_ = {};                /* for corpse saving */
-  struct obj_flag_data obj_flags_ = {}; /* Object information               */
+  uint64_t o_item_number_ = {};  /* Where in data-base               */
+  uint64_t o_in_room_ = {};      /* In what room -1 when conta/carr  */
+  uint64_t o_vroo_ = {};         /* for corpse saving */
+  obj_flag_data obj_flags_ = {}; /* Object information               */
   int16_t o_num_affects_ = {};
   obj_affected_type o_affected_ = {}; /* Which abilities in PC to change  */
 
@@ -4252,8 +4252,8 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(GET_NAME(this), vault))
       {
         vaults_searched++;
-        struct vault_items_data *items;
-        struct sorted_vault sv;
+        vault_items_data *items;
+        sorted_vault sv;
         sort_vault(*vault, sv);
         if (!sv.vault_contents.empty())
         {
@@ -4315,8 +4315,8 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       // search vault if able
       if (vault)
       {
-        struct vault_items_data *items;
-        struct sorted_vault sv;
+        vault_items_data *items;
+        sorted_vault sv;
         sort_vault(*vault, sv);
         if (!sv.vault_contents.empty())
         {

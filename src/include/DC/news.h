@@ -1,9 +1,10 @@
 
 
-struct news_data
+class news_data
 {
-   struct news_data *next;
-   time_t time;
-   char *news;
-   char *addedby;
+public:
+  news_data *next;
+  time_t time;
+  char *news;
+  char *addedby;
 };

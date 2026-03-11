@@ -37,9 +37,9 @@
 #include "DC/wizard.h"
 #include "DC/memory.h"
 
-struct player_shop *g_playershops;
+player_shop *g_playershops;
 
-extern struct time_info_data time_info;
+extern time_info_data time_info;
 
 int max_shop;
 
@@ -425,7 +425,7 @@ void shopping_value(const char *arg, Character *ch,
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
         sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
         do_say(keeper, buf);
@@ -474,7 +474,7 @@ void shopping_value(const char *arg, Character *ch,
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
@@ -566,7 +566,7 @@ void shopping_value(const char *arg, Character *ch,
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
@@ -1187,7 +1187,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   ch->removeGold(item->price);
   shop->money_on_hand += item->price;
 
-  if (!shop->sell_message || !*shop->sell_message)
+  if (!*shop->sell_message)
   {
     keeper->do_tell(QStringLiteral("%1 Thank you, come again!").arg(GET_NAME(ch)).split(' '));
   }
@@ -1577,8 +1577,9 @@ void redo_shop_profit()
   }
 }
 
-struct obj_exchange
+class obj_exchange
 {
+public:
   int item_qty;
   int item_vnum;
   int cost_qty;
@@ -1675,23 +1676,17 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       // setup format specifier based length of item short descriptions
       if (cost_qty > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|%%2d x %%-%ds|\r\n",
-                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
-                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus|%%2d x %%-%zus|\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_qty, cost_buf);
       }
       else if (cost_plats > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| $B%%-%ds$R    |\r\n",
-                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
-                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| $B%%-%zus$R    |\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
       else
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| %%-%ds    |\r\n",
-                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
-                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| %%-%zus    |\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
     }
@@ -2229,6 +2224,112 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       break;
     case cmd_t::CONFIRM:
       break;
+    case cmd_t::UNDEFINED:
+    case cmd_t::NORTH:
+    case cmd_t::EAST:
+    case cmd_t::SOUTH:
+    case cmd_t::WEST:
+    case cmd_t::UP:
+    case cmd_t::DOWN:
+    case cmd_t::BELLOW:
+    case cmd_t::DEFAULT:
+    case cmd_t::TRACK:
+    case cmd_t::PALM:
+    case cmd_t::SAY:
+    case cmd_t::LOOK:
+    case cmd_t::BACKSTAB:
+    case cmd_t::SBS:
+    case cmd_t::ORCHESTRATE:
+    case cmd_t::REPLY:
+    case cmd_t::WHISPER:
+    case cmd_t::GLANCE:
+    case cmd_t::FLEE:
+    case cmd_t::ESCAPE:
+    case cmd_t::PICK:
+    case cmd_t::STOCK:
+    case cmd_t::BUY:
+    case cmd_t::SELL:
+    case cmd_t::VALUE:
+    case cmd_t::ENTER:
+    case cmd_t::CLIMB:
+    case cmd_t::DESIGN:
+    case cmd_t::PRICE:
+    case cmd_t::REPAIR:
+    case cmd_t::READ:
+    case cmd_t::REMOVE:
+    case cmd_t::ERASE:
+    case cmd_t::ESTIMATE:
+    case cmd_t::REMORT:
+    case cmd_t::REROLL:
+    case cmd_t::CHOOSE:
+    case cmd_t::CANCEL:
+    case cmd_t::SLIP:
+    case cmd_t::GIVE:
+    case cmd_t::DROP:
+    case cmd_t::DONATE:
+    case cmd_t::QUIT:
+    case cmd_t::SACRIFICE:
+    case cmd_t::PUT:
+    case cmd_t::OPEN:
+    case cmd_t::EDITOR:
+    case cmd_t::FORCE:
+    case cmd_t::WRITE:
+    case cmd_t::WATCH:
+    case cmd_t::PRACTICE:
+    case cmd_t::TRAIN:
+    case cmd_t::PROFESSION:
+    case cmd_t::GAIN:
+    case cmd_t::BALANCE:
+    case cmd_t::DEPOSIT:
+    case cmd_t::WITHDRAW:
+    case cmd_t::CLEAN:
+    case cmd_t::PLAY:
+    case cmd_t::FINISH:
+    case cmd_t::VETERNARIAN:
+    case cmd_t::FEED:
+    case cmd_t::ASSEMBLE:
+    case cmd_t::PAY:
+    case cmd_t::RESTRING:
+    case cmd_t::PUSH:
+    case cmd_t::PULL:
+    case cmd_t::LEAVE:
+    case cmd_t::TREMOR:
+    case cmd_t::BET:
+    case cmd_t::INSURANCE:
+    case cmd_t::DOUBLE:
+    case cmd_t::STAY:
+    case cmd_t::SPLIT:
+    case cmd_t::HIT:
+    case cmd_t::LOOT:
+    case cmd_t::GTELL:
+    case cmd_t::CTELL:
+    case cmd_t::SETVOTE:
+    case cmd_t::VOTE:
+    case cmd_t::VEND:
+    case cmd_t::FILTER:
+    case cmd_t::EXAMINE:
+    case cmd_t::GAG:
+    case cmd_t::IMMORT:
+    case cmd_t::IMPCHAN:
+    case cmd_t::TELL:
+    case cmd_t::TELLH:
+    case cmd_t::PRIZE:
+    case cmd_t::OTHER:
+    case cmd_t::TELL_REPLY:
+    case cmd_t::GAZE:
+    case cmd_t::SAVE_SILENTLY:
+    case cmd_t::ONEWAY:
+    case cmd_t::TWOWAY:
+    case cmd_t::MLOCATE_CHARACTER:
+    case cmd_t::FEAR:
+    case cmd_t::PAGING_HELP:
+    case cmd_t::QUEST_CANCEL:
+    case cmd_t::QUEST_START:
+    case cmd_t::QUEST_FINISH:
+    case cmd_t::QUEST_LIST:
+    case cmd_t::GOLEMSCORE:
+    case cmd_t::FSCORE:
+      break;
     }
 
     return ReturnValue::eSUCCESS;
@@ -2236,6 +2337,8 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
   case redeem_t::state_t::REDEEM:
     owner->tell(ch, "You need to choose 1, 2, 3 or type cancel before you can reroll again.");
     return ReturnValue::eSUCCESS;
+    break;
+  case redeem_t::CHOSEN:
     break;
   }
 

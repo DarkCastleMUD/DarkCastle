@@ -227,7 +227,7 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  struct char_skill_data *last = nullptr;
+  char_skill_data *last = nullptr;
 
   if (!strcmp(command, "all"))
   {

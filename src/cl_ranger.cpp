@@ -60,7 +60,7 @@ int charm_levels(Character *ch)
 {
   int i = ch->getLevel() / 5;
   int z = 3;
-  struct follow_type *f;
+  follow_type *f;
   for (f = ch->followers; f; f = f->next)
     if (IS_AFFECTED(f->follower, AFF_CHARM))
     {
@@ -85,7 +85,7 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
 
   arg = one_argument(arg, buf);
 
-  for (struct follow_type *k = ch->followers; k; k = k->next)
+  for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
     {
       victim = k->follower;
@@ -122,7 +122,7 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
 
 int do_tame(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   Character *victim;
   char buf[MAX_INPUT_LENGTH];
 
@@ -178,7 +178,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("How you plan on controlling so many followers?");
     return ReturnValue::eFAILURE;
     /*   Character * vict = nullptr;
-       for(struct follow_type *k = ch->followers; k; k = k->next)
+       for(follow_type *k = ch->followers; k; k = k->next)
          if(k->follower->isNonPlayer() &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
             vict = k->follower;
@@ -409,7 +409,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             {
               retval = mprog_attack_trigger(this, tmp_ch);
             }
-            if (SOMEONE_DIED(retval) || (this && this->fighting) || !!hunting.isEmpty())
+            if (SOMEONE_DIED(retval) || fighting || hunting.isEmpty())
               return retval;
             else
               return do_hit(hunting.split(' '));
@@ -570,13 +570,14 @@ int pick_one(int a, int b, int c, int d)
     return d;
 }
 
-struct forage_lookup
+class forage_lookup
 {
+public:
   int ovnum;
   int rate[4];
 };
 
-struct forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
+forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
     // SECT_INSIDE
     {{0, {0, 0, 0, 0}},
      {0, {0, 0, 0, 0}},
@@ -710,7 +711,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
 {
   int learned;
   class Object *new_obj = 0;
-  struct affected_type af;
+  affected_type af;
 
   if (ch->affected_by_spell(SKILL_FORAGE))
   {
@@ -1800,7 +1801,7 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct affected_type af, *cur;
+  affected_type af, *cur;
 
   one_argument(arg, buf);
 

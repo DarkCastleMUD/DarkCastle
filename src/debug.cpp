@@ -25,14 +25,14 @@
 #include "DC/Database.h"
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
-void store_to_char(struct char_file_u4 *st, Character *ch);
+void store_to_char(char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
 class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 qsizetype fread_to_tilde(FILE *fpsave, QString filename);
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename);
 void load_vaults();
 
-extern struct vault_data *vault_table;
+extern vault_data *vault_table;
 extern Leaderboard leaderboard;
 
 bool verbose_mode = false;
@@ -507,7 +507,7 @@ int main(int argc, char **argv)
     // do_leaderboard(ch, "");
     // d->process_output();
 
-    struct vault_data *vault;
+    vault_data *vault;
 
     for (vault = vault_table; vault; vault = vault->next)
     {

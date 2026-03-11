@@ -508,7 +508,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(this, "\r\n$B%s Profession Skills:$R\r\n", find_profession(c_class, skilllist[i].group));
+        csendf(this, "\r\n$B%s Profession Skills:$R\r\n", qPrintable(find_profession(c_class, skilllist[i].group)));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -697,7 +697,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     }
     else
     {
-      struct skill_quest *sq;
+      skill_quest *sq;
       if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && sq->message && isSet(sq->clas, 1 << (GET_CLASS(this) - 1)))
       {
         mprog_driver(sq->message, owner, this, nullptr, nullptr, nullptr, nullptr);
@@ -727,7 +727,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
     if (skilllist[skillnumber].group && this->isPlayer() && skilllist[skillnumber].group != player->profession)
     {
-      csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group));
+      csendf(this, "You must join the %s profession in order to learn that.\r\n", qPrintable(find_profession(c_class, skilllist[skillnumber].group)));
       return ReturnValue::eSUCCESS;
     }
   }
@@ -802,7 +802,7 @@ int Character::skills_guild(const char *arg, Character *owner)
       do_say(owner, "My woodland lore is more than sufficient to teach you this myself young apprentice!");
       break;
     case CLASS_ANTI_PAL:
-      do_say(owner, "Ahh, young dark lord, it is but a simple matter to learn this ability.  Follow my instruction.");
+      do_say(owner, "Ahh, young dark lord, it is but a simple matter to learn this ability.  Follow my inion.");
       break;
     case CLASS_PALADIN:
       do_say(owner, "This ability is one that I am capable of teaching you myself young novice.  Observe closely.");
@@ -964,8 +964,8 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     }
 
     ch->sendln("Your profession skills have been reset.");
-    struct class_skill_defines *class_skills = ch->get_skill_list();
-    struct char_skill_data *skill;
+    class_skill_defines *class_skills = ch->get_skill_list();
+    char_skill_data *skill;
 
     for (int i = 0; *class_skills[i].skillname != '\n'; i++)
       if (class_skills[i].group == groupnumber)

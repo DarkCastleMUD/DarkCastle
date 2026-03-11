@@ -535,7 +535,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 
 int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
 {
-  struct affected_type af;
+  affected_type af;
   if (IS_AFFECTED(ch, AFF_INFRARED))
     return ReturnValue::eSUCCESS;
   if (ch->affected_by_spell(SPELL_INFRAVISION))
@@ -604,7 +604,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
 
 int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!vict)
   {
@@ -1099,7 +1099,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 
 int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (ch->affected_by_spell(KI_STANCE + KI_OFFSET))
   {
@@ -1133,7 +1133,7 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
 int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   int learned, chance, percent;
-  struct affected_type af;
+  affected_type af;
 
   if (ch->isNonPlayer() || ch->getLevel() >= ARCHANGEL)
     learned = 75;
@@ -1212,7 +1212,7 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
 {
   char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
   int amount, temp = 0;
-  struct affected_type af;
+  affected_type af;
 
   argument_interpreter(arg, amt, type);
   // arg = one_argument(arg, amt);

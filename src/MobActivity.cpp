@@ -21,20 +21,20 @@ class Path *mPathList = nullptr;
 
 /* PATHFINDING */
 
-struct path_data *newPath()
+path_data *newPath()
 {
-  struct path_data *p;
+  path_data *p;
 #ifdef LEAK_CHECK
-  p = (struct path_data *)calloc(1, sizeof(struct path_data));
+  p = (path_data *)calloc(1, sizeof(path_data));
 #else
-  p = (struct path_data *)dc_alloc(1, sizeof(struct path_data));
+  p = (path_data *)dc_alloc(1, sizeof(path_data));
 #endif
   return p;
 }
 
 bool Path::isRoomConnected(int room)
 {
-  struct path_data *p;
+  path_data *p;
   int i;
 
   for (i = 0; i < MAX_DIRS; i++)
@@ -48,7 +48,7 @@ bool Path::isRoomConnected(int room)
 
 bool Path::isRoomPathed(int room)
 {
-  struct path_data *p;
+  path_data *p;
 
   for (p = DC::getInstance()->world[room].paths; p; p = p->next)
     if (p->p == this)
@@ -151,7 +151,7 @@ int Path::leastSteps(int from, int to, int val, int *bestval)
 
 bool Path::isPathConnected(class Path *pa)
 {
-  struct path_data *t;
+  path_data *t;
   for (t = p; t; t = t->next)
     if (t->p == pa)
       return true;
@@ -179,16 +179,16 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
       ch->sendln("This room is already connected to that path.");
     return;
   }
-  struct path_data *pa;
+  path_data *pa;
 
   if (DC::getInstance()->world[room].paths)
   {
-    struct path_data *t;
+    path_data *t;
     for (pa = DC::getInstance()->world[room].paths; pa; pa = pa->next)
     {
       if (isPathConnected(pa->p))
       {
-        struct path_data *t;
+        path_data *t;
         for (t = this->p; t; t = t->next)
           if (t->p == pa->p)
             t->num++;
@@ -204,7 +204,7 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
 
       if (pa->p->isPathConnected(this))
       {
-        struct path_data *t;
+        path_data *t;
         for (t = pa->p->p; t; t = t->next)
           if (t->p == this)
             t->num++;
@@ -274,7 +274,7 @@ int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
       if ((*iter).first >= low && (*iter).first <= high)
       {
         ch->send(QStringLiteral("Path '%1' connects to this zone.\r\n").arg(p->name));
-        struct path_data *pa;
+        path_data *pa;
         for (pa = p->p; pa; pa = pa->next)
           csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
                  pa->p->name, pa->num);
@@ -294,7 +294,7 @@ int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
   for (p = mPathList; p; p = p->next)
   {
     ch->send(QStringLiteral("Path '%1'.\r\n").arg(p->name));
-    struct path_data *pa;
+    path_data *pa;
     for (pa = p->p; pa; pa = pa->next)
       csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
              pa->p->name, pa->num);
@@ -379,7 +379,7 @@ int leastPathSteps(class Path *goal, class Path *at, int steps, int *beststeps)
     return *beststeps;
   // Determine path
   at->s = steps;
-  struct path_data *pt;
+  path_data *pt;
   for (pt = at->p; pt; pt = pt->next)
   {
     if (pt->p == goal)
@@ -401,7 +401,7 @@ bool determinePath(class Path *goal, class Path *at, int beststeps, int steps, c
     return false;
   // Determine path
   at->s = steps;
-  struct path_data *pt;
+  path_data *pt;
   for (pt = at->p; pt; pt = pt->next)
   {
     if (pt->p == goal)
@@ -501,7 +501,7 @@ int find_closest_path(int from, int steps, char *buf, std::map<int, int> z)
 
 int Path::connectRoom(class Path *z)
 {
-  struct path_data *pa;
+  path_data *pa;
 
   for (std::map<int, int>::iterator iter = this->begin(); iter != this->end(); iter++)
     for (pa = DC::getInstance()->world[(*iter).first].paths; pa; pa = pa->next)

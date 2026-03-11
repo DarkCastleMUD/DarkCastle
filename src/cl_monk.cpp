@@ -120,7 +120,7 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
 int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
 {
 
-  struct affected_type af;
+  affected_type af;
   Character *victim;
   char name[256];
   int dam, retval;

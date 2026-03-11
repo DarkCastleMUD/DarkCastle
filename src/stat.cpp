@@ -22,14 +22,16 @@ enum SortState
   SORT_MOB
 };
 
-struct MobKills
+class MobKills
 {
+public:
   unsigned int howmany;
   int name;
 };
 
-struct AreaStats
+class AreaStats
 {
+public:
   zone_t area;
   int64_t xps;
   int64_t gold;

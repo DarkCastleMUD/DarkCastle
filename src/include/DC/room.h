@@ -108,8 +108,9 @@ const auto SECT_ARCTIC = 15;
 const auto SECT_MAX_SECT = 15; // update this if you add more
                                // and; const.c stuff for sectors
 
-struct room_direction_data
+class room_direction_data
 {
+public:
   char *general_description; /* When look DIR.                  */
   char *keyword;             /* for open/close                  */
   int16_t exit_info;         /* Exit info                       */
@@ -118,8 +119,9 @@ struct room_direction_data
   int16_t to_room;           /* Where direction leeds (NOWHERE) */
 };
 
-struct room_track_data
+class room_track_data
 {
+public:
   int weight;
   int race;
   int direction;
@@ -131,9 +133,10 @@ struct room_track_data
   room_track_data *previous;
 };
 
-struct deny_data
+class deny_data
 {
-  struct deny_data *next;
+public:
+  deny_data *next;
   int vnum;
 };
 
@@ -153,10 +156,10 @@ public:
   zone_t zone = {};    // Room zone (for resetting)
   QSharedPointer<Zone> zonePtr = {};
   int sector_type = {}; // sector type (move/hide)
-  struct deny_data *denied = {};
+  deny_data *denied = {};
   char *name = {};                                // Rooms name 'You are ...'
   char *description = {};                         // Shown when entered
-  struct extra_descr_data *ex_description = {};   // for examine/look
+  extra_descr_data *ex_description = {};          // for examine/look
   room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
   uint32_t room_flags = {};                       // DEATH, DARK ... etc
   constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }
@@ -205,7 +208,7 @@ public:
   room_track_data *tracks = {};     // beginning of the list of scents
   room_track_data *last_track = {}; // last in the scent list
   int iFlags = {};                  // Internal flags. These do NOT save.
-  struct path_data *paths = {};
+  class path_data *paths = {};
   bool allow_class[CLASS_MAX] = {};
 
   void AddTrackItem(room_track_data *newTrack);
@@ -289,8 +292,9 @@ private:
 };
 
 bool operator==(const Room &r1, const Room &r2);
-struct Entity
+class Entity
 {
+public:
   auto room(void) -> Room &;
   room_t in_room = {};
 };

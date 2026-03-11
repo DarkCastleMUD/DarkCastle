@@ -74,7 +74,7 @@ bool isTimer(Character *ch, int spell)
 }
 int timerLeft(Character *ch, int spell)
 {
-  struct affected_type *af = ch->affected_by_spell(BASE_TIMERS + spell);
+  affected_type *af = ch->affected_by_spell(BASE_TIMERS + spell);
   if (af == nullptr)
     return 0;
   else
@@ -83,7 +83,7 @@ int timerLeft(Character *ch, int spell)
 void addTimer(Character *ch, int spell, int ticks)
 {
 
-  struct affected_type af;
+  affected_type af;
   af.duration = ticks;
   af.type = spell + BASE_TIMERS;
   af.location = 0;
@@ -409,7 +409,7 @@ int get_max_stat(Character *ch, attribute_t stat)
 
 bool still_affected_by_poison(Character *ch)
 {
-  struct affected_type *af = ch->affected;
+  affected_type *af = ch->affected;
 
   while (af)
   {
@@ -420,7 +420,7 @@ bool still_affected_by_poison(Character *ch)
   return 0;
 }
 
-const struct set_data set_list[] = {
+const set_data set_list[] = {
     {"Ascetic's Focus",
      19,
      {2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 21718, 22302, 22314, 22600, 22601, 22602, 24815, 24815, 24816, 26237},
@@ -566,7 +566,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
             return;
           } // Nope.
         }
-        struct affected_type af;
+        affected_type af;
         af.duration = -1;
         af.bitvector = -1;
         af.type = BASE_SETS + z;
@@ -1607,8 +1607,8 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 
 void affect_total(Character *ch)
 {
-  struct affected_type *af;
-  struct affected_type *tmp_af;
+  affected_type *af;
+  affected_type *tmp_af;
   int i, j;
   bool already = ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 
@@ -1652,17 +1652,17 @@ void affect_total(Character *ch)
 
 /* Insert an affect_type in a Character structure
  Automatically sets apropriate bits and apply's */
-void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_type)
+void affect_to_char(Character *ch, affected_type *af, int32_t duration_type)
 {
   //    bool secFix;
-  struct affected_type *affected_alloc;
+  affected_type *affected_alloc;
   if (af->location >= 1000)
     return; // Skill aff;
 #ifdef LEAK_CHECK
   affected_alloc = new (std::nothrow) affected_type;
 #else
   affected_alloc = new (std::nothrow) affected_type;
-  // affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
+  // affected_alloc = (affected_type *) dc_alloc(1, sizeof(affected_type));
 #endif
 
   *affected_alloc = *af;
@@ -1676,13 +1676,13 @@ void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_ty
 /* Remove an affected_type structure from a char (called when duration
  reaches zero). Pointer *af must never be NIL! Frees mem and calls
  affect_location_apply                                                */
-void affect_remove(Character *ch, struct affected_type *af, int flags)
+void affect_remove(Character *ch, affected_type *af, int flags)
 {
-  struct affected_type *hjp;
+  affected_type *hjp;
   char buf[200];
   short dir;
   bool char_died = false;
-  struct follow_type *f, *next_f;
+  follow_type *f, *next_f;
 
   if (!ch->affected)
     return;
@@ -2145,7 +2145,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 /* Call affect_remove with every spell of spelltype "skill" */
 void affect_from_char(Character *ch, int skill, int flags)
 {
-  struct affected_type *hjp, *afc, *recheck;
+  affected_type *hjp, *afc, *recheck;
   //    bool aff2Fix;
 
   if (skill < 0) // affect types are unsigned, so no negatives are possible
@@ -2170,7 +2170,7 @@ void affect_from_char(Character *ch, int skill, int flags)
  */
 affected_type *Character::affected_by_spell(uint32_t skill)
 {
-  struct affected_type *curr;
+  affected_type *curr;
 
   if (skill < 0) // all affect types are unsigned
     return nullptr;
@@ -2210,9 +2210,9 @@ affected_type *affected_by_random(Character *ch)
   return 0;
 }
 
-void affect_join(Character *ch, struct affected_type *af, bool avg_dur, bool avg_mod)
+void affect_join(Character *ch, affected_type *af, bool avg_dur, bool avg_mod)
 {
-  struct affected_type *hjp;
+  affected_type *hjp;
   bool found = false;
 
   for (hjp = ch->affected; !found && hjp; hjp = hjp->next)
@@ -4030,7 +4030,7 @@ Character *Character::get_char_room_vis(QString name)
 
   if (IS_AFFECTED(this, AFF_BLACKJACK))
   {
-    struct affected_type *af = affected_by_spell(SKILL_JAB);
+    affected_type *af = affected_by_spell(SKILL_JAB);
     if (af)
     {
       if (af->modifier == 1)
@@ -4686,7 +4686,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 class Object *create_money(int amount)
 {
   class Object *obj;
-  struct extra_descr_data *new_new_descr;
+  extra_descr_data *new_new_descr;
 
   if (amount <= 0)
   {

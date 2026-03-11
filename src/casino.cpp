@@ -31,7 +31,7 @@ void reset_table(table_data *tbl);
 void nextturn(table_data *tbl);
 void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3);
 void add_timer_bj_dealer(table_data *tbl);
-void addtimer(struct timer_data *add);
+void addtimer(timer_data *add);
 int hand_number(player_data *plr);
 int hands(player_data *plr);
 bool charExists(Character *ch);
@@ -422,7 +422,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
 
   if ((int64_t)arg2 == plr->table->handnr || (int64_t)arg2 == (plr->table->handnr + 100) * 2)
   {
-    struct timer_data *timer = new timer_data;
+    timer_data *timer = new timer_data;
     timer->arg1.player = plr;
     timer->arg2 = (void *)(((int64_t)arg2 + 100) * 2);
     timer->arg3 = (void *)plr->table;
@@ -455,9 +455,9 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
   }
 }
 
-void addtimer(struct timer_data *add)
+void addtimer(timer_data *add)
 {
-  struct timer_data *timer;
+  timer_data *timer;
   for (timer = timer_list; timer; timer = timer->next)
   {
     if (timer->next == nullptr)
@@ -491,7 +491,7 @@ void bj_dealer_aiz(varg_t arg1, void *arg2, void *arg3)
 
 void add_timer_bj_dealer(table_data *tbl)
 {
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.table = tbl;
   timer->arg2 = 0;
   if (tbl->state != 3)
@@ -504,7 +504,7 @@ void add_timer_bj_dealer(table_data *tbl)
 
 void add_timer_bj_dealer2(table_data *tbl, int time = 10)
 {
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.table = tbl;
   timer->arg2 = (void *)(int64_t)(++tbl->handnr);
   if (tbl->handnr == 0) // not plausible, but possible
@@ -522,7 +522,7 @@ void bj_finish(varg_t arg1, void *arg2, void *arg3)
 
 void add_new_bets(table_data *tbl)
 {
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.table = tbl;
   timer->function = bj_finish;
   timer->timeleft = 2;
@@ -763,7 +763,7 @@ void check_insurance(table_data *tbl)
   { // ace showing
     tbl->state = 1;
     send_to_table("$B$7The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'$R\r\n", tbl);
-    struct timer_data *timer = new timer_data;
+    timer_data *timer = new timer_data;
     timer->arg1.table = tbl;
     timer->arg2 = 0;
     timer->function = check_insurance2;
@@ -1239,7 +1239,7 @@ int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg
           i++;
       if (i <= players(obj->table))
       {
-        struct timer_data *tmr;
+        timer_data *tmr;
         for (tmr = timer_list; tmr; tmr = tmr->next)
           if ((table_data *)tmr->arg1.table == obj->table)
             tmr->timeleft = 1;
@@ -1451,22 +1451,25 @@ int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg
 /* End Blackjack */
 
 /* Texas Hold'em! */
-struct tplayer;
-struct ttable;
-
 int hand[5][2];
 // cycles between using two spaces for temporary data
 // as comparisons need to be made
 
-struct pot
+class ttable
 {
-  struct pot *next;
-  struct tplayer *player[6];
+public:
+  cDeck *deck;
+  class pot *pots;
+  class tplayer *player[6];
+  int cards[5]; // cards on the table
+  int bet;
+  int crPlayer;
+  int state;
 };
-
-struct tplayer
+class tplayer
 {
-  struct ttable *table;
+public:
+  ttable *table;
   int hand[5]; // 0-1 playercards, 2-4 = top table cards
   int chips;
   int pos;
@@ -1474,19 +1477,14 @@ struct tplayer
   bool nw;
   bool dealer;
 };
-
-struct ttable
+class pot
 {
-  cDeck *deck;
-  struct pot *pots;
-  struct tplayer *player[6];
-  int cards[5]; // cards on the table
-  int bet;
-  int crPlayer;
-  int state;
+public:
+  pot *next;
+  tplayer *player[6];
 };
 
-int has_seat(struct ttable *ttbl)
+int has_seat(ttable *ttbl)
 {
   for (int i = 0; i < 6; i++)
     if (ttbl->player[i] == nullptr)
@@ -1712,11 +1710,11 @@ char *hand_name(int hand[5])
   return str_dup(buf);
 }
 
-int get_hand(struct tplayer *tplr, int which)
+int get_hand(tplayer *tplr, int which)
 {
   static int i = 0;
 
-  struct ttable *ttbl = tplr->table;
+  ttable *ttbl = tplr->table;
   TOGGLE_BIT(i, 1); // if it's 1, set to 0, if 0, set to 1. Gooo toggle!
   int z;
   for (z = 0; z < 5; z++)
@@ -1761,12 +1759,13 @@ int get_hand(struct tplayer *tplr, int which)
 }
 
 typedef int HAND_FUNC(int hand[5]);
-struct hand_function
+class hand_function
 {
+public:
   HAND_FUNC *func;
 };
 
-const struct hand_function funcs[] = {
+const hand_function funcs[] = {
     {has_rsf},
     {has_sf},
     {has_4kind},
@@ -1812,7 +1811,7 @@ int do_testhand(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int find_highhand(struct tplayer *tplr)
+int find_highhand(tplayer *tplr)
 {
   int handnr = 0;
   for (int i = 1; i < 21; i++)
@@ -1824,17 +1823,17 @@ int find_highhand(struct tplayer *tplr)
   return handnr;
 }
 
-struct tplayer *createTplayer(struct ttable *ttbl)
+tplayer *createTplayer(ttable *ttbl)
 {
   int seat = has_seat(ttbl);
   if (seat < 0)
     return nullptr;
-  struct tplayer *tplr;
+  tplayer *tplr;
 
 #ifdef LEAK_CHECK
-  tplr = (struct tplayer *)calloc(1, sizeof(struct tplayer));
+  tplr = (tplayer *)calloc(1, sizeof(tplayer));
 #else
-  tplr = (struct tplayer *)dc_alloc(1, sizeof(struct tplayer));
+  tplr = (tplayer *)dc_alloc(1, sizeof(tplayer));
 #endif
   ttbl->player[seat] = tplr;
   tplr->nw = true;
@@ -1848,7 +1847,7 @@ struct tplayer *createTplayer(struct ttable *ttbl)
   return tplr;
 }
 
-int first_to_act(int state, struct tplayer *player[6])
+int first_to_act(int state, tplayer *player[6])
 {
   int plrs = 0, dlr = 0;
   for (int i = 0; i < 6; i++)
@@ -1876,7 +1875,7 @@ int first_to_act(int state, struct tplayer *player[6])
   return dlr; // shouldn't happen
 }
 
-int find_winner(struct ttable *ttbl)
+int find_winner(ttable *ttbl)
 {
   int i, win = -1, winhand = 0;
   for (i = 0; i < 6; i++)
@@ -1902,7 +1901,7 @@ int find_winner(struct ttable *ttbl)
   return win;
 }
 
-void pulse_holdem(struct ttbl *tbl)
+void pulse_holdem(class ttbl *tbl)
 {
 }
 
@@ -2102,7 +2101,7 @@ void update_linked_slots(machine_data *machine)
 
 void slot_timer(machine_data *machine, int stop1, int stop2, int delay)
 {
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.machine = machine;
   timer->arg2 = (void *)(int64_t)stop1;
   timer->arg3 = (void *)(int64_t)stop2;
@@ -2367,8 +2366,9 @@ char *roulette_display[] = {
     "$4$B25$R", "$0$B26$R", "$4$B27$R", "$0$B28$R", "$0$B29$R", "$4$B30$R", "$0$B31$R", "$4$B32$R",
     "$0$B33$R", "$4$B34$R", "$0$B35$R", "$4$B36$R"};
 
-struct roulette_player
+class roulette_player
 {
+public:
   Character *ch;
   uint32_t bet_array[48];
 };
@@ -2377,7 +2377,7 @@ class wheel_data
 {
 public:
   Object *obj;
-  struct roulette_player *plr[6];
+  roulette_player *plr[6];
   int countdown;
   bool spinning;
 };
@@ -2394,9 +2394,9 @@ void create_wheel(Object *obj)
   for (int i = 0; i < 6; i++)
   {
 #ifdef LEAK_CHECK
-    wheel->plr[i] = (struct roulette_player *)calloc(1, sizeof(struct roulette_player));
+    wheel->plr[i] = (roulette_player *)calloc(1, sizeof(roulette_player));
 #else
-    wheel->plr[i] = (struct roulette_player *)dc_alloc(1, sizeof(struct roulette_player));
+    wheel->plr[i] = (roulette_player *)dc_alloc(1, sizeof(roulette_player));
 #endif
     wheel->plr[i]->ch = nullptr;
     for (int j = 0; j < 48; j++)
@@ -2454,7 +2454,7 @@ void send_wheel_bets(Character *ch, wheel_data *wheel)
   ch->sendln(".");
 }
 
-uint32_t check_roulette_wins(struct roulette_player *plr, int num)
+uint32_t check_roulette_wins(roulette_player *plr, int num)
 {
   uint32_t tmp;
   uint32_t winnings = 0;
@@ -2615,7 +2615,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3);
 
 void roulette_timer(wheel_data *wheel, int spin)
 {
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.wheel = wheel;
   timer->arg2 = (void *)(int64_t)spin;
   timer->function = pulse_countdown;

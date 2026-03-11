@@ -33,8 +33,8 @@
 
 /* uses */
 
-extern struct time_info_data time_info;
-extern struct weather_data weather_info;
+extern time_info_data time_info;
+extern weather_data weather_info;
 
 /* In ths part. */
 
