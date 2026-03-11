@@ -43,32 +43,32 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
   if (!(victim = ch->get_char_room_vis(name)) && !(victim = ch->fighting))
   {
     ch->sendln("There is no one like that here to gouge.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_BLIND))
   {
     ch->sendln("They are already blinded!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (victim == ch)
   {
     ch->sendln("That sounds...stupid.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!level)
   {
     ch->sendln("You would...if you knew how.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_be_attacked(ch, victim) || !can_attack(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Trying to eyegouge a bladeshielded opponent would be suicide!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_EYEGOUGE))
@@ -122,43 +122,43 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   if (!has_skill(SKILL_BACKSTAB) && !IS_NPC(this))
   {
     this->sendln("You don't know how to backstab people!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_room_vis(name)))
   {
     this->sendln("Backstab whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
     this->sendln("How can you sneak up on yourself?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     this->sendln("You cannot backstab someone that HUGE!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     this->sendln("You cannot target just one to backstab!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     this->sendln("You cannot target someone that tiny to backstab!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_ALERT))
   {
     act("$E is too alert and nervous looking; you are unable to sneak behind!", this, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(SKILL_BACKSTAB))
@@ -170,32 +170,32 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   if (this->getHP() < min_hp)
   {
     this->sendln("You are feeling too weak right now to attempt such a bold maneuver.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!this->equipment[WEAR_WIELD])
   {
     this->sendln("You need to wield a weapon to make it a success.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (this->equipment[WEAR_WIELD]->obj_flags.value[3] != 11 && this->equipment[WEAR_WIELD]->obj_flags.value[3] != 9)
   {
     this->sendln("You can't stab without a stabbing weapon...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->fighting)
   {
     this->sendln("You can't backstab a fighting person, they are too alert!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // Check the killer/victim
   if ((this->getLevel() < G_POWER) || IS_NPC(this))
   {
     if (!can_attack(this) || !can_be_attacked(this, victim))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
   }
 
   int itemp = number(1, 100);
@@ -339,7 +339,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
   if (!ch->canPerform(SKILL_CIRCLE))
   {
     ch->sendln("You do not know how to circle!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int min_hp = (int)(GET_MAX_HIT(ch) / 5);
@@ -348,7 +348,7 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
   if (ch->getHP() < min_hp)
   {
     ch->send("You are feeling too weak right now to attempt such a bold maneuver.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->fighting)
@@ -356,28 +356,28 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
   else
   {
     ch->sendln("You have be in combat to perform this action.  Try using 'backstab' instead.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot circle behind someone that HUGE!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot pick just one to circle behind!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot target something that tiny to circle behind!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_NO_CIRCLE))
@@ -385,26 +385,26 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
     act("$N notices your attempt and turns $S back away from you!", ch, 0, victim, TO_CHAR, 0);
     act("$N notices $n's attempt to circle behind $M and backs away quickly!", ch, 0, victim, TO_ROOM, NOTVICT);
     act("You see $n try to circle around you and move quickly to block $s access!", ch, 0, victim, TO_VICT, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("How can you sneak up on yourself?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("You need to wield a weapon to make it a success.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // Check the killer/victim
   if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_CIRCLE))
@@ -420,14 +420,14 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
     break;
   default:
     //     ch->sendln("Only certain weapons can be used for backstabbing, this is not one of them.");
-    //     return eFAILURE;
+    //     return ReturnValue::eFAILURE;
     break;
   }
 
   if (ch == victim->fighting && !IS_AFFECTED(victim, AFF_BLACKJACK))
   {
     ch->sendln("You can't break away while that person is hitting you!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("You circle around your target...", ch, 0, 0, TO_CHAR, 0);
@@ -504,7 +504,7 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
   if (!ch->canPerform(SKILL_TRIP))
   {
     ch->sendln("You should learn how to trip first!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -516,7 +516,7 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
       for(i = ch->songs.begin(); i != ch->songs.end(); ++i) {
        if((*i).song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE) {
          ch->sendln("You are too distracted by your song to do this.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
        }
       }
     }
@@ -532,28 +532,28 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
   if (!victim)
   {
     ch->sendln("Trip whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->in_room != victim->in_room)
   {
     ch->sendln("That person seems to have left.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("(You would look pretty silly trying to trip yourself.)");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_be_attacked(ch, victim) || !can_attack(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Tripping a bladeshielded opponent would be impossible!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->affected_by_spell(SPELL_IRON_ROOTS))
@@ -562,7 +562,7 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
     act("$n trips you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
     act("The tree roots support $N keeping $M from falling after $n's trip.", ch, 0, victim, TO_ROOM, NOTVICT);
     WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_TRIP))
@@ -616,13 +616,13 @@ int do_sneak(Character *ch, char *argument, cmd_t cmd)
   if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) && ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_SNEAK))
   {
     ch->sendln("You just don't seem like the sneaky type.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_SNEAK))
@@ -631,7 +631,7 @@ int do_sneak(Character *ch, char *argument, cmd_t cmd)
     if (cmd != cmd_t::PALM)
     {
       ch->sendln("You won't be so sneaky anymore.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -662,7 +662,7 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
   if (!ch->canPerform(SKILL_STALK))
   {
     ch->sendln("I bet you think you're a thief. ;)");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(*argument))
@@ -671,7 +671,7 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
       csendf(ch, "You are currently stalking %s.\r\n", GET_SHORT(ch->master));
     else
       ch->sendln("Pick a name, any name.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -679,7 +679,7 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
   if (!(leader = ch->get_char_room_vis(name)))
   {
     ch->sendln("I see no person by that name here!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (leader == ch)
@@ -690,12 +690,12 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You must first abandon your group.");
     else
       stop_follower(ch, follower_reasons_t::END_STALK);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You must first abandon your group.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_STALK))
@@ -721,14 +721,14 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
   {
     if (cmd != cmd_t::LOOK)
       ch->sendln("You don't know how to hide. What do you think you are, a thief?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) &&
       ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (Character *curr = DC::getInstance()->world[ch->in_room].people;
@@ -738,7 +738,7 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
     if (curr->fighting == ch)
     {
       ch->sendln("In the middle of combat?!  Impossible!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -812,11 +812,11 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
   if (ch->c_class != CLASS_THIEF || !ch->has_skill(SKILL_STEAL))
   {
     ch->sendln("You are not experienced within that field.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   //  if (ch->isPlayerObjectThief()){
   //     ch->sendln("You're too busy watching your back to steal anything right now!");
-  //     return eFAILURE;
+  //     return ReturnValue::eFAILURE;
   //  }
   pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
   pthiefaf.duration = 10;
@@ -827,45 +827,45 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
   if (!(victim = ch->get_char_room_vis(victim_name)))
   {
     ch->sendln("Steal what from who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (victim == ch)
   {
     ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
     ch->sendln("Don't steal from dead people!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
     ch->sendln("That person is far too experienced for you to steal from.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("No stealing permitted in safe areas!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (check_make_camp(ch->in_room))
   {
     ch->sendln("You can't steal inside of a camp!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->room().isArena())
   {
     ch->sendln("Do what!? This is an Arena, go kill someone!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_CHARM))
@@ -876,13 +876,13 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
   if (victim->fighting)
   {
     ch->sendln("You can't get close enough because of the fight.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /*  if(IS_PC(victim) &&
       !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
       ch->sendln("That person is not really there.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }*/
 
   if (!charge_moves(ch, SKILL_STEAL))
@@ -900,27 +900,27 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
     if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       ch->sendln("That item is protected by the gods.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (isSet(obj->obj_flags.extra_flags, ITEM_NEWBIE))
     {
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (DC::getInstance()->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
     {
       ch->send("You must earn that flag, no stealing allowed!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (IS_NPC(victim) && isexact("prize", obj->Name()))
     {
       ch->sendln("You have to HUNT the targets...its not a Treasture Steal!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (GET_OBJ_WEIGHT(obj) > 50)
     {
       ch->sendln("That item is too heavy to steal.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     int mod = ch->has_skill(SKILL_STEAL) - chance;
@@ -938,7 +938,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       else
       {
         act("You managed to keep $N unaware of your failed attempt.", ch, 0, victim, TO_CHAR, 0);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else
@@ -1065,14 +1065,14 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       /*    if (max_level(ch) < obj->obj_flags.eq_level)
           {
         ch->sendln("You find yourself unable to steal that.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
           }*/
 
       chance -= GET_OBJ_WEIGHT(obj);
       if (GET_OBJ_WEIGHT(obj) > 50)
       {
         ch->sendln("That item is too heavy to steal.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       int wakey = 100;
@@ -1109,18 +1109,18 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         break;
       default:
         ch->sendln("Something just screwed up. Tell an imm what you did.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       };
       wakey -= GET_DEX(ch) / 2;
       if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
       {
         ch->sendln("That item is protected by the gods.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (!ch->has_skill(SKILL_STEAL))
       {
         ch->sendln("You don't know how to steal.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       int mod = ch->has_skill(SKILL_STEAL) - chance;
 
@@ -1128,7 +1128,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           GET_POS(victim) == position_t::STUNNED)
       {
         ch->sendln("Steal the equipment now? Impossible!");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else if (!skill_success(ch, victim, SKILL_STEAL, 0 - mod))
       {
@@ -1239,7 +1239,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
     else
     { // they don't got it
       act("$N does not seem to possess that item.", ch, 0, victim, TO_CHAR, 0);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   } // of else, not in inventory
 
@@ -1283,48 +1283,48 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
   if (!(victim = ch->get_char_room_vis(victim_name)))
   {
     ch->sendln("Steal what from who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (victim == ch)
   {
     ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
     ch->sendln("Don't steal from dead people.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
     ch->sendln("That person is far too experienced to steal from.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_PC(victim) && ((victim->getLevel() + 20) < ch->getLevel()))
   {
     ch->sendln("That person is too low level, you don't want to tarnish your reputation!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("No stealing permitted in safe areas!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (check_make_camp(ch->in_room))
   {
     ch->sendln("You can't pocket $B$5gold$R while inside of a camp!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->room().isArena())
   {
     ch->sendln("Do what!? This is an Arena, go kill someone!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_CHARM))
@@ -1335,19 +1335,19 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
   if (victim->fighting)
   {
     ch->sendln("You can't get close enough because of the fight.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /*if(IS_PC(victim) &&
     !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
     ch->sendln("That person is not really there.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 */
   if (!ch->has_skill(SKILL_POCKET) && IS_PC(ch))
   {
     ch->sendln("Well, you would, if you knew how.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_POCKET))
@@ -1371,7 +1371,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
     else
     {
       act("You manage to keep $N unaware of your botched attempt.", ch, 0, victim, TO_CHAR, 0);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -1458,7 +1458,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(SKILL_PICK_LOCK))
   {
     ch->sendln("You don't know how to pick locks!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // for (obj = ch->carrying; obj; obj = obj->next_content)
@@ -1472,7 +1472,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
   if (!has_lockpicks)
   {
     ch->sendln("But...you don't have a lockpick!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*type)
@@ -1502,7 +1502,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
       {
         ch->sendln("You failed to pick the lock.");
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
@@ -1547,7 +1547,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("You failed to pick the lock.");
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
@@ -1607,12 +1607,12 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   if (!IS_NPC(ch) && ch->isPlayerObjectThief())
   {
     ch->sendln("Your criminal acts prohibit this action.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!ch->has_skill(SKILL_SLIP))
   {
     ch->sendln("You don't know how to slip.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, obj_name);
 
@@ -1621,12 +1621,12 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit this action.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (strlen(obj_name) > 7)
     {
       ch->sendln("Number field too large.  Try something smaller.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     amount = atoi(obj_name);
@@ -1635,17 +1635,17 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     if (str_cmp("coins", arg) && str_cmp("coin", arg))
     {
       ch->sendln("Sorry, you can't do that (yet)...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (amount <= 0)
     {
       ch->sendln("Sorry, you can't do that!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if ((ch->getGold() < (uint32_t)amount) && (ch->getLevel() < DEITY))
     {
       ch->sendln("You haven't got that many coins!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     argument = one_argument(argument, vict_name);
@@ -1653,17 +1653,17 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     if (!*vict_name)
     {
       ch->sendln("To who?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (!(vict = ch->get_char_room_vis(vict_name)))
     {
       ch->sendln("To who?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (ch == vict)
     {
       ch->sendln("To yourself?!  Very cute...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!charge_moves(ch, SKILL_SLIP))
@@ -1727,7 +1727,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
       vict->save_char_obj();
     }
 
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   } // if (is_number)
 
   argument = one_argument(argument, vict_name);
@@ -1735,25 +1735,25 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   if (!*obj_name || !*vict_name)
   {
     ch->sendln("Slip what to who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
   {
     ch->sendln("You do not seem to have anything like that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("That sure would be a stupid thing to do.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     ch->sendln("You can't seem to get the item to leave you.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
@@ -1761,7 +1761,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     if (ch->getLevel() < DEITY)
     {
       ch->sendln("You can't let go of it! Yeech!!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -1772,7 +1772,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
   {
     ch->sendln("That would ruin it!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // We're going to slip the item into our container instead
@@ -1781,12 +1781,12 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     if (GET_ITEM_TYPE(container) != ITEM_CONTAINER)
     {
       ch->sendln("That's not a container.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (isSet(container->obj_flags.value[1], CONT_CLOSED))
     {
       ch->sendln("It seems to be closed.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
          container->obj_flags.value[0]) &&
@@ -1794,7 +1794,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
       ch->sendln("It won't fit...cheater.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (!skill_success(ch, nullptr, SKILL_SLIP))
     { // fail
@@ -1814,19 +1814,19 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   if (!(vict = ch->get_char_room_vis(vict_name)))
   {
     ch->sendln("No one by that name around here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(vict) && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
   {
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch == vict)
   {
     ch->sendln("To yourself?!  Very cute...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->isPlayerObjectThief() && !vict->desc)
@@ -1834,19 +1834,19 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     send_to_char("Now WHY would a thief slip something to a "
                  "linkdead character?\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((1 + IS_CARRYING_N(vict)) > CAN_CARRY_N(vict))
   {
     act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
     act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
@@ -1854,7 +1854,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     if (search_char_for_item(vict, obj->item_number, false))
     {
       ch->sendln("The item's uniqueness prevents it!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1865,7 +1865,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[obj->item_number].vnum() == 393)
     {
       ch->sendln("Whoa, you almost dropped your hot potato!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (ch->isImmortalPlayer())
@@ -1912,19 +1912,19 @@ int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
   if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your body is still recovering from your last vitalstrike technique.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_VITAL_STRIKE))
   {
     ch->sendln("You'd cut yourself to ribbons just trying!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(ch->fighting))
   {
     ch->sendln("But you aren't fighting anyone!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // ch->skill_increase_check(SKILL_VITAL_STRIKE, ch->has_skill(SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
@@ -1971,18 +1971,18 @@ int do_deceit(Character *ch, char *argument, cmd_t cmd)
   if (!ch->canPerform(SKILL_DECEIT))
   {
     ch->sendln("You do not yet understand enough of the workings of your marks.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_DECEIT_TIMER))
   {
     ch->sendln("You have to wait to be more deceitful!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You have no group to instruct!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int grpsize = 0;
@@ -2046,24 +2046,24 @@ int do_deceit(Character *ch, char *argument, cmd_t cmd)
 
 int do_jab(Character *ch, char *argument, cmd_t cmd)
 {
-  int retval = eFAILURE, learned;
+  int retval = ReturnValue::eFAILURE, learned;
 
   if (ch->affected_by_spell(SKILL_JAB) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your arm is still sore from your last attempt.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(learned = ch->has_skill(SKILL_JAB)))
   {
     ch->sendln("You don't know how to jab.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("Your must be wielding a weapon to make it a success.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   char arg[MAX_INPUT_LENGTH];
@@ -2078,43 +2078,43 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   if (!victim)
   {
     ch->sendln("Jab whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->in_room != victim->in_room)
   {
     ch->sendln("That person seems to have left.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Why are you trying to hit yourself on the head???.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
   {
     ch->sendln("You cannot jab someone that HUGE!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
   {
     ch->sendln("You cannot target just one to jab!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
   {
     ch->sendln("You cannot target someone that tiny to jab!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_JAB))
@@ -2139,7 +2139,7 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB);
 
   // if there wasn't a failure and not immune to attack
-  if (!(retval & eFAILURE) && !(retval & eIMMUNE_VICTIM))
+  if (!(retval & ReturnValue::eFAILURE) && !(retval & eIMMUNE_VICTIM))
   {
     // the victim didn't die then affect victim with jab effect
     if (!(retval & eVICT_DIED))
@@ -2209,13 +2209,13 @@ int do_appraise(Character *ch, char *argument, cmd_t cmd)
   if (!(learned = ch->has_skill(SKILL_APPRAISE)))
   {
     ch->sendln("Your estimate would be baseless.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (name[0] == '\0')
   {
     ch->sendln("Appraise whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   bits = generic_find(name, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM,
@@ -2224,7 +2224,7 @@ int do_appraise(Character *ch, char *argument, cmd_t cmd)
   if (!bits)
   {
     ch->sendln("Appraise whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_APPRAISE))
@@ -2241,7 +2241,7 @@ int do_appraise(Character *ch, char *argument, cmd_t cmd)
     if (victim == ch && !*item)
     {
       ch->sendln("You're worth a million bucks, baby.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (*item)
@@ -2348,48 +2348,48 @@ int do_cripple(Character *ch, char *argument, cmd_t cmd)
   if (!(skill = ch->has_skill(SKILL_CRIPPLE)))
   {
     ch->sendln("You don't know how to cripple anybody.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(vict = ch->get_char_room_vis(name)) && !(vict = ch->fighting))
   {
     ch->sendln("Cripple whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (vict == ch)
   {
     ch->sendln("You turn your head and grimace as you break your ankles with a sledgehammer.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
   {
     ch->sendln("You cannot cripple someone that HUGE!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
   {
     ch->sendln("You cannot pick just one to cripple!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
   {
     ch->sendln("You cannot target someone that tiny to cripple!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(vict, AFF_CRIPPLE))
   {
     act("$N has already been crippled!", ch, 0, vict, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->isImmortalPlayer())
     if (!can_attack(ch) || !can_be_attacked(ch, vict))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_CRIPPLE))
     return eSUCCESS;

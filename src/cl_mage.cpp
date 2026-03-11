@@ -99,13 +99,13 @@ int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_FOCUSED_REPELANCE))
   {
     ch->sendln("Your mind can not yet take the strain of another repelance.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!skill_success(ch, nullptr, SKILL_FOCUSED_REPELANCE))
@@ -153,25 +153,25 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   if (!lvl)
   {
     ch->sendln("The best you can do to a wand is polish it.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_IMBUE))
   {
     ch->sendln("Your mind has not yet recovered from the previous imbuement.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (*buf == '\0')
   {
     ch->sendln("Imbue what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->in_room && (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)))
   {
     ch->sendln("Something about this room prohibits your magical imbuement.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(wand = get_obj_in_list_vis(ch, buf, ch->carrying)))
@@ -183,7 +183,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
       if ((wand == 0) || !isexact(buf, wand->Name()))
       {
         ch->sendln("You do not have that wand.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -191,13 +191,13 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   if (GET_ITEM_TYPE(wand) != ITEM_WAND)
   {
     ch->sendln("That \"wand\" doesn't seem very wand-like.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < wand->obj_flags.value[0])
   {
     ch->sendln("This wand is too powerful for you to imbue.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   manacost = 4 + (11 - lvl / 10) * spell_info[wand->obj_flags.value[3]].min_usesmana();
@@ -205,11 +205,11 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   if (GET_MANA(ch) < manacost)
   {
     ch->sendln("You do not have enough magical energy to imbue this wand.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_IMBUE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   GET_MANA(ch) -= manacost;
 
@@ -288,7 +288,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
 // This is to check if ethereal focus should fire and handle the ramifications
 // Remember that ch is the person triggering the call, meaning they are actually the victim
 // eSUCCESS means the character is unaffected and can keep doing whatever.
-// eFAILURE means the character was interrupted
+// ReturnValue::eFAILURE means the character was interrupted
 int check_ethereal_focus(Character *ch, int trigger_type)
 {
   Character *i, *next_i, *ally, *next_ally;
@@ -346,10 +346,10 @@ int check_ethereal_focus(Character *ch, int trigger_type)
       set_fighting(ch, i);
       retval = attack(i, ch, TYPE_UNDEFINED);
       if (isSet(retval, eVICT_DIED))
-        return (eFAILURE | eCH_DIED); // dead target, so spell ends
+        return (ReturnValue::eFAILURE | eCH_DIED); // dead target, so spell ends
       if (isSet(retval, eCH_DIED))
         return (eSUCCESS); // caster died, so spell ends, target gets no lag and can keep going
-      retval = eFAILURE;
+      retval = ReturnValue::eFAILURE;
     }
     WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
@@ -386,7 +386,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
           set_fighting(ch, ally);
           retval = attack(ally, ch, TYPE_UNDEFINED);
           if (isSet(retval, eVICT_DIED))
-            return (eFAILURE | eCH_DIED); // ch = damage vict, return since they are dead
+            return (ReturnValue::eFAILURE | eCH_DIED); // ch = damage vict, return since they are dead
         }
         else
         { // trigger_type == ETHEREAL_FOCUS_TRIGGER_ACT
@@ -402,7 +402,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
   } // loop looking for caster
 
   if (ch->fighting)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   // If I made it through and no one was able to attack me for whatever reason, I'm good
   return eSUCCESS;

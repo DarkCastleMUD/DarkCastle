@@ -94,11 +94,11 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
   if (pc_clss_types2[i][0] == '\n')
   {
     ch->sendln("No such class.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   GET_CLASS(ch) = i;
   if ((classskill = ch->get_skill_list()) == nullptr)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   GET_CLASS(ch) = oclass;
   // Same problem with races... get_max_stat(ch, attribute_t::STRENGTH
   for (i = 1; race_types[i][0] != '\n'; i++)
@@ -125,7 +125,7 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
     }
   }
   ch->sendln("No such race.");
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 // give a command to a god
@@ -309,20 +309,20 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
   /* Verify preconditions */
   assert(ch != 0);
   if (arg == 0)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   half_chop(arg, name, buf);
 
   if (!*name)
   {
     ch->sendln("Change whose password?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, name)))
   {
     ch->sendln("That player was not found.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(buf, name);
@@ -330,7 +330,7 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
   if (!*name || strlen(name) > 10)
   {
     ch->sendln("Password must be 10 characters or less.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)victim->getNameC()), PASSWORD_LEN);
@@ -347,14 +347,14 @@ int do_fakelog(Character *ch, char *argument, cmd_t cmd)
   uint64_t lev_nr = 110;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, lev_str, command);
 
   if (!*lev_str)
   {
     ch->sendln("Also, you must supply a level.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isdigit(*lev_str))
@@ -363,7 +363,7 @@ int do_fakelog(Character *ch, char *argument, cmd_t cmd)
     if (lev_nr < IMMORTAL || lev_nr > IMPLEMENTER)
     {
       ch->sendln("You must use a valid level from 100-110.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -376,7 +376,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (arguments.size() < 2)
   {
     send("Usage: rename <oldname> <newname> [takeplats]\n\r");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString oldname = arguments.value(0);
@@ -395,21 +395,21 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (!victim)
   {
     send(QStringLiteral("%1 is not in the game.\r\n").arg(oldname));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (level_ <= victim->getLevel())
   {
     send("You can't rename someone your level or higher.\r\n");
     send(QStringLiteral("%1 just tried to rename you.\r\n").arg(GET_NAME(this)));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // +1 cause you can actually have 13 char names
   if (newname.length() > (MAX_NAME_LENGTH + 1))
   {
     send(QStringLiteral("New name too long. Maximum allowed length is %1 characters.\r\n").arg(MAX_NAME_LENGTH + 1));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg3 = arguments.value(2);
@@ -418,7 +418,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     if (GET_PLATINUM(victim) < 500)
     {
       send(QStringLiteral("They don't have enough plats. They need 500 but have %1\r\n").arg(GET_PLATINUM(victim)));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -442,7 +442,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (QFile(strsave).exists())
   {
     send(QStringLiteral("The name '%1' is already in use at %2.\r\n").arg(newname).arg(strsave));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (unsigned iWear = 0; iWear < MAX_WEAR; iWear++)
@@ -568,7 +568,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (!(victim = get_pc(newname)))
   {
     this->sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   do_name(victim, " %");
 
@@ -596,7 +596,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
 
   /*  if(!ch->has_skill( COMMAND_INSTALL)) {
           ch->sendln("Huh?");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
     }
   */
   half_chop(arg, arg1, buf);
@@ -607,7 +607,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(range = atoi(arg1)))
@@ -615,13 +615,13 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (range <= 0)
   {
     ch->sendln("Range number must be greater than 0");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(numrooms = atoi(arg2)))
@@ -629,13 +629,13 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (numrooms <= 0)
   {
     ch->sendln("Number of rooms must be greater than 0.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   switch (*type)
@@ -662,7 +662,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::getInstance()->cf.bport == true ? "b" : "n");
@@ -705,7 +705,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   if (!ch->has_skill(COMMAND_RANGE))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   arg = one_argument(arg, name);
@@ -717,13 +717,13 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("Syntax: range <god> <low vnum> <high vnum>");
     ch->sendln("Syntax: range <god> <r/m/o> <low vnum> <high vnum>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, name)))
   {
     ch->sendln("Set whose range?!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int low, high;
   if (trail[0] != '\0')
@@ -731,7 +731,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
     if (!isdigit(*buf) || !isdigit(*trail))
     {
       ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     low = atoi(buf);
     high = atoi(trail);
@@ -741,7 +741,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
     if (!isdigit(*buf) || !isdigit(*kind))
     {
       ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     low = atoi(kind);
     high = atoi(buf);
@@ -749,7 +749,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   if (low < 0 || high < 0)
   {
     ch->sendln("The number needs to be positive.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (trail[0])
   {
@@ -781,7 +781,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
       return eSUCCESS;
     default:
       ch->sendln("Invalid type. Valid ones are r/o/m.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -804,7 +804,7 @@ int do_metastat(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
     ch->sendln("metastat who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   char buf[MAX_STRING_LENGTH];
 
@@ -850,7 +850,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   if (!arg[0])
   {
     ch->sendln("Syntax: acfinder <wear slot>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int i = 1;
@@ -860,7 +860,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   if (i >= QFlagsToStrings<ObjectPositions>().size())
   {
     ch->sendln("Syntax: acfinder <wear slot>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   i = 1 << i;
   int r, o = 1;
@@ -900,7 +900,7 @@ int do_testhit(Character *ch, char *argument, cmd_t cmd)
   if (!arg3[0])
   {
     ch->sendln("Syntax: <tohit> <level> <target level>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
   float lvldiff = level - tlevel;
@@ -961,7 +961,7 @@ int do_export(Character *ch, char *args, cmd_t cmd)
   if (*export_type == 0 || *filename == 0)
   {
     ch->sendln("Syntax: export obj <filename>\n\r");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::ofstream fout;

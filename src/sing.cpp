@@ -302,7 +302,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
   if (!(*argument))
   {
     ch->sendln("Yes, but WHAT would you like to sing?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (*argument == '\'') // song is in 's
@@ -313,7 +313,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
     if (*(argument + qend) != '\'')
     {
       ch->sendln("If you start with a ' you have to end with a ' too.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -327,19 +327,19 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
   if (spl < 0)
   {
     ch->sendln("You know not of that song.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (cmd == cmd_t::ORCHESTRATE)
   {
     if (!IS_SINGING(ch))
     {
       ch->sendln("You must be singing a song to orchestrate another melody.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
     {
       ch->sendln("You must be holding an instrument to orchestrate songs.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else if (song_info[spl].rating() > 0 && IS_SINGING(ch))
@@ -348,25 +348,25 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       ch->sendln("You are already in the middle of another song!  Try using orchestrate.");
     else
       ch->sendln("You are already in the middle of another song!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (spl == 2 && !IS_SINGING(ch))
   {
     ch->sendln("You are not even singing a song to stop!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
     if ((*i).song_number == spl)
     {
       ch->sendln("You are already singing this song!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (ch->getLevel() < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
   {
     ch->sendln("This room feels too safe to sing an offensive song such as this.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (song_info[spl].song_pointer())
@@ -391,7 +391,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         ch->sendln("It seems like you're in a pretty bad shape!");
         break;
       }
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -403,7 +403,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
           else
           {
             ch->sendln("You haven't learned that song.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
         }
     }
@@ -411,7 +411,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
     if (getTotalRating(ch) + song_info[spl].rating() > BARD_MAX_RATING)
     {
       ch->sendln("You are unable to orchestrate such a complicated melody!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     argument += qend;      /* Point to the space after the last ' */
@@ -516,7 +516,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       else
         /* No arguments were given */
         ch->sendln("Whom should you sing to?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     else if (target_ok)
@@ -524,17 +524,17 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       if ((tar_char == ch) && isSet(song_info[spl].targets(), TAR_SELF_NONO))
       {
         ch->sendln("You cannot sing this to yourself!");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else if ((tar_char != ch) && isSet(song_info[spl].targets(), TAR_SELF_ONLY))
       {
         ch->sendln("You can only sing this song to yourself.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
       {
         ch->sendln("You are afraid that it might harm your master.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
 
@@ -545,20 +545,20 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         send_to_char("If you triggered this message, you almost crashed the\n\r"
                      "game.  Tell a god what you did immediately.\r\n",
                      ch);
-        return eFAILURE | eINTERNAL_ERROR;
+        return ReturnValue::eFAILURE | eINTERNAL_ERROR;
       }
 
     if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
     {
       ch->sendln("You find yourself unable to use energy based chants here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch) &&
         GET_KI(ch) < use_song(ch, spl))
     {
       ch->sendln("You do not have enough ki!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     // WAIT_STATE(ch, song_info[spl].beats());
@@ -570,7 +570,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
     if ((song_info[spl].song_pointer() == nullptr) && spl > 0)
     {
       ch->sendln("Sorry, this power has not yet been implemented.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -582,7 +582,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
         {
           ch->sendln("You can't even begin this song without an instrument.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
 
@@ -601,7 +601,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
           ch->sendln("That just might annoy them!");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
       /* Imps ignore safe flags  */
@@ -624,7 +624,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
             if (--hold < 0)
             {
               ch->sendln("You do not know of that song.");
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
             for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
               if ((*i).song_number == hold)
@@ -635,7 +635,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
             if (!found)
             {
               ch->sendln("You are not singing that song.");
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
             else
             {
@@ -666,7 +666,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         if (!skill_success(ch, nullptr, SKILL_ORCHESTRATE))
         {
           ch->sendln("You failed to orchestrate your music!");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else
         {
@@ -694,7 +694,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       return ((*song_info[spl].song_pointer())(ch->getLevel(), ch, argument, tar_char, learned));
     }
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 void update_character_singing(Character *ch)
@@ -884,7 +884,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
   if (!victim || !ch)
   {
     logentry(QStringLiteral("Serious problem in song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
   act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, TO_VICT, 0);
   act("$n sings an entrancing hymn to $N!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -910,7 +910,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   if (!ch || ch->songs.empty())
   {
     logentry(QStringLiteral("Serious problem in execute_song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -924,7 +924,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
     dc_free((*i).song_data);
     (*i).song_data = 0;
     ch->sendln("They seem to have left.\r\nIn the middle of your performance too!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   dc_free((*i).song_data);
   (*i).song_data = 0;
@@ -934,13 +934,13 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   {
     ch->sendln("They don't seem particularily interested.");
     victim->sendln("You manage to resist the entrancing lyrics.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (circle_follow(victim, ch))
   {
     ch->sendln("Sorry, following in circles can not be allowed.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int charm_levels(Character * ch);
@@ -949,7 +949,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   if (charm_levels(ch) - charm_space(victim->getLevel()) < 0 && victim->master != ch)
   {
     ch->sendln("How you plan on controlling so many followers?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->master)
@@ -980,7 +980,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
   if (!victim || !ch)
   {
     logentry(QStringLiteral("Serious problem in song_disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
 
   int learned = ch->has_skill(song_info[SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE].skill_num());
@@ -995,7 +995,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
     act("$N resists your disarming limerick!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's disarming limerick!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's disarming limerick!", ch, nullptr, victim, TO_VICT, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (learned > 90)
@@ -1033,11 +1033,11 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
   if (!victim)
   {
     logentry(QStringLiteral("No vict send to song whistle sharp!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   set_cantquit(ch, victim);
 
@@ -1614,11 +1614,11 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
   if (origsing)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (ch->songs.empty())
   {
     ch->sendln("Might wanna start the performance first...Hope this isn't indicative of your love life...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::vector<songInfo>::iterator i;
@@ -1757,19 +1757,19 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
   if (!victim)
   {
     ch->sendln("You cannot seem to accurately focus your song.");
-    status = eFAILURE;
+    status = ReturnValue::eFAILURE;
   }
   else if (victim->getLevel() > ch->getLevel())
   {
     ch->sendln("Your target resists the song's draw.");
-    status = eFAILURE;
+    status = ReturnValue::eFAILURE;
   }
   else if (isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL) ||
            DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).isNoTeleport() ||
            victim->room().isArena())
   {
     ch->sendln("A mystical force seems to be keeping you out.");
-    status = eFAILURE;
+    status = ReturnValue::eFAILURE;
   }
   else
   {
@@ -1780,11 +1780,11 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
       if (search_char_for_item(tmpch, real_object(51), false))
       {
         ch->sendln("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R");
-        status = eFAILURE;
+        status = ReturnValue::eFAILURE;
         break;
       }
 
-    if (status != eFAILURE)
+    if (status != ReturnValue::eFAILURE)
     {
       // Additional costs for astral chanty across continents
       if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent)
@@ -1801,7 +1801,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
             (*i).song_data = 0;
           }
 
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else
         {
@@ -1879,7 +1879,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
     ch->sendln("You don't see that person here.");
     dc_free((*i).song_data);
     (*i).song_data = 0;
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   dc_free((*i).song_data);
   (*i).song_data = 0;
@@ -1953,7 +1953,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
     ch->sendln("You don't see that object here.");
     dc_free((*i).song_data);
     (*i).song_data = 0;
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   dc_free((*i).song_data);
   (*i).song_data = 0;
@@ -1984,12 +1984,12 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
   if (!obj->isPortal())
   {
     ch->sendln("You can't shatter that!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!isexact("pcportal", obj->Name()))
   {
     ch->sendln("The portal resists your song.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n's song fades to an end.", ch, 0, 0, TO_ROOM, 0);
@@ -1998,7 +1998,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
   if (number(0, 1)) // 50/50 for now
   {
     ch->sendln("The portal resists your song.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   send_to_room("You hear a loud shattering sound of magic discharging and the portal fades away.\r\n", obj->in_room);
@@ -2010,7 +2010,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
   if (!(tobj = get_obj_in_list("pcportal", DC::getInstance()->world[real_room(obj->obj_flags.value[0])].contents)))
   {
     ch->sendln("Could not find matching exit portal? Tell an Immortal.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // destroy it
@@ -2165,12 +2165,12 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
   if (!target || ch->getLevel() < target->getLevel())
   {
     ch->sendln("Your song fades away, its search unfinished.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (target->affected_by_spell(SKILL_INNATE_EVASION) || isSet(DC::getInstance()->world[target->in_room].room_flags, NO_KI))
   {
     ch->sendln("Something blocks your vision.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   snprintf(buf, 200, "Your song finds %s ", GET_SHORT(target));
@@ -2775,24 +2775,24 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
   if (!target || ch->getLevel() < target->getLevel())
   {
     ch->sendln("Your dirge fades, its effect neutralized.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch == target)
   {
     ch->sendln("Your loyalties have been broken, what did you think?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_PC(target))
   {
     csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\r\n", GET_NAME(target), HSHR(target));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!target->affected_by_spell(SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
   {
     ch->sendln("As far as you can tell, they are not loyal to anyone.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int type = 0;
   if (DC::getInstance()->mob_index[target->mobdata->nr].vnum() == 8)
@@ -2816,7 +2816,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
    if (real_mobile(i) == target->mobdata->nr)
    {
    ch->sendln("The undead being is unaffected by your song.");
-   return eFAILURE;
+   return ReturnValue::eFAILURE;
    }*/
   if (IS_AFFECTED(target, AFF_FAMILIAR))
   {
@@ -2922,19 +2922,19 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
   if (!target)
   {
     ch->sendln("Your song fades away, its target unknown.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch == target)
   {
     ch->sendln("You hate yourself, you self-loathing bastard.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_PC(target))
   {
     ch->sendln("They don't hate anyone, but they are looking at you kinda funny...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
@@ -3017,7 +3017,7 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
       ch->sendln("You don't see that person here.");
       dc_free((*i).song_data);
       (*i).song_data = 0;
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   dc_free((*i).song_data);
@@ -3027,7 +3027,7 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
     act("$N resists your sticky lullaby!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's sticky lullaby!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's sticky lullaby!", ch, nullptr, victim, TO_VICT, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, TO_ROOM, NOTVICT);

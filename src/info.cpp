@@ -780,7 +780,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
   if (name.isEmpty())
   {
     this->sendln("botcheck <player> or all\n\r");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString name2 = "0." + name;
@@ -809,21 +809,21 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
   if (victim == nullptr)
   {
     sendln(QStringLiteral("Unable to find %1.").arg(name));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->getLevel() > this->getLevel())
   {
     this->sendln("Unable to show information.");
     csendf(this, "%s is a higher level than you.\r\n", victim->getNameC());
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim))
   {
     this->sendln("Unable to show information.");
     csendf(this, "%s is a mob.\r\n", victim->getNameC());
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->player->lastseen == 0)
@@ -832,7 +832,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
   if (victim->player->lastseen->size() == 0)
   {
     csendf(this, "%s has not seen any mobs recently.\r\n", victim->getNameC());
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int nr, ms;
@@ -1254,7 +1254,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
   if (arguments.isEmpty())
   {
     send("What object do you want to identify?\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   QString arg1 = arguments.at(0);
 
@@ -1270,14 +1270,14 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
     if (rnum == -1)
     {
       send("Invalid VNUM.\r\n");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     obj = (Object *)DC::getInstance()->obj_index[rnum].item;
 
     if (obj->isDark() && !isImmortalPlayer())
     {
       send("This object cannot be identified by mortals.\r\n");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     return identify(this, obj);
   }
@@ -1298,7 +1298,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
     }
   }
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_look(Character *ch, const char *argument, cmd_t cmd)
@@ -1685,7 +1685,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
       if (found != true)
       {
         ch->sendln("Nothing much to see there.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
       /* no break */
@@ -1705,7 +1705,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                         "You look through %s but it seems to be opaque.\r\n",
                         tmp_object->short_description);
                 ch->send(tmpbuf);
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
               if ((ch->in_room = real_room(tmp_object->getPortalDestinationRoom())) == DC::NOWHERE)
                 ch->in_room = original_loc;
@@ -1716,7 +1716,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
           else
           {
             ch->sendln("Look through what?");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
         }
       }
@@ -1724,7 +1724,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
       if (found != true)
       {
         ch->sendln("You can't seem to look through that.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       /* no break */
       /* no break */
@@ -1854,7 +1854,7 @@ int do_examine(Character *ch, char *argument, cmd_t cmd)
   if (!*name)
   {
     ch->sendln("Examine what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   generic_find(name, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &tmp_char, &tmp_object, true);
@@ -1886,7 +1886,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
   *buf = '\0';
 
   if (check_blind(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   for (door = 0; door <= 5; door++)
   {
@@ -2363,7 +2363,7 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
 
   pTime = localtime(&timep);
   if (!pTime)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
 #ifdef __CYGWIN__
   sprintf(buf, "The system time is %d/%d/%d (%d:%02d)\n\r",
@@ -2435,7 +2435,7 @@ int do_help(Character *ch, char *argument, cmd_t cmd)
   char buf[90], buffer[MAX_STRING_LENGTH];
 
   if (!ch->desc)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   for (; isspace(*argument); argument++)
     ;
@@ -2868,24 +2868,24 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
   if (!(victim = ch->get_char_room_vis(name)))
   {
     ch->sendln("Who was that you're scoping out?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Looks like a WIMP! (Used to be \"Looks like a PUSSY!\" but we got complaints.)");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->decrementMove(5, "You are too tired to consider much of anything at the moment."))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!skill_success(ch, nullptr, SKILL_CONSIDER))
   {
     ch->sendln("You try really hard, but you really have no idea about their capabilties!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Learned = ch->has_skill(SKILL_CONSIDER);
@@ -3184,7 +3184,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->decrementMove(2, "You are to tired to scan right now."))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM,
@@ -3317,11 +3317,11 @@ int do_tick(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch))
   {
     ch->sendln("Monsters don't wait for anything.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->desc == nullptr)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   while (*argument == ' ')
     argument++;
@@ -3977,7 +3977,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       if (arg2.isEmpty())
       {
         send("What name are you searching for? You can use name=value multiple times.\r\n");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       {
@@ -4021,7 +4021,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         {
           send(i + "\r\n");
         }
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else if (arg1 == "wear")
@@ -4046,7 +4046,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         {
           send(w + "\r\n");
         }
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else if (arg1 == "size")
@@ -4072,7 +4072,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         {
           send(s + "\r\n");
         }
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else if (arg1 == "more")
@@ -4098,7 +4098,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         {
           send(s + "\r\n");
         }
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else if (arg1 == "extra")
@@ -4124,7 +4124,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         {
           send(s + "\r\n");
         }
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else if (arg1 == "limit")
@@ -4443,7 +4443,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     if (obj_results.empty())
     {
       send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     bool showed_ranges = false;

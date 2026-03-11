@@ -169,7 +169,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
   if (inet_pton(AF_INET, site, &(sa.sin_addr)) == 0)
   {
     ch->sendln("Invalid IP address.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(!str_cmp(flag, "select") || !str_cmp(flag, "all") || !str_cmp(flag, "new")))

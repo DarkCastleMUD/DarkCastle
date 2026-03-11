@@ -1704,13 +1704,13 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
   if (!DC::getInstance()->TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
   {
     ch->sendln("You must be in an auction house to do this!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->isPlayerObjectThief() || (ch->isPlayerGoldThief()))
   {
     ch->sendln("You're too busy running from the law!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, buf);

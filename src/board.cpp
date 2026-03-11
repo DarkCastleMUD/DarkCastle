@@ -581,7 +581,7 @@ int save_boards()
   {
     logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
              DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (board_it = board_db.begin(); board_it != board_db.end(); board_it++)
@@ -611,14 +611,14 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
 
   if (cmd != cmd_t::LOOK && cmd != cmd_t::READ && cmd != cmd_t::WRITE && cmd != cmd_t::ERASE)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!arg)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->desc)
-    return eFAILURE; /* By MS or all NPC's will be trapped at the board */
+    return ReturnValue::eFAILURE; /* By MS or all NPC's will be trapped at the board */
 
   if (!has_loaded)
   {
@@ -629,18 +629,18 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   // Identify which board we're dealing with
 
   if (!obj)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   board = board_db.find(qPrintable(obj->Name()));
 
   if (board == board_db.end())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
 
   if (!isexact(arg1, obj->Name()) && cmd == cmd_t::LOOK)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   switch (cmd)
   {
@@ -678,7 +678,7 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     board_remove_msg(ch, arg, board);
     return eSUCCESS;
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 }
 
@@ -799,10 +799,10 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   one_argument(arg, number);
 
   if (!*number || !isdigit(*number))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!(tmessage = atoi(number)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (board->second.msgs.empty())
   {
@@ -970,7 +970,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
     if (!*number)
     {
       ch->sendln("Sorry, mobs have to specify the number of the post they want to read.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -985,10 +985,10 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   if (!*number || !isdigit(*number))
   {
     ch->sendln("Read what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!(tmessage = atoi(number)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {

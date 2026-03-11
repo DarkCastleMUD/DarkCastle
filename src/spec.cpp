@@ -46,7 +46,7 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!str_cmp(arg, "list"))
   {
     /*
@@ -67,17 +67,17 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
     {
       // messagemoose, couple below too
       ch->sendln("You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (ch->spec == 0)
     {
       ch->sendln("You do not have a specialization.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (GET_PLATINUM(ch) < 10000)
     {
       ch->sendln("You do not have the required 10000 platinum.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     for (int i = 0; i < 10; i++)
     { // Free up skills tied to the specilization.

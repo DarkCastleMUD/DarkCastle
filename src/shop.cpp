@@ -699,7 +699,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   if (!(keeper = invoker))
   {
     logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // LFound1:
@@ -709,16 +709,16 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
       goto LFound2;
   }
   logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 
 LFound2:
   //    if ( ch->in_room != DC::getInstance()->shop_index[shop_nr].in_room )
-  //      return eFAILURE;
+  //      return ReturnValue::eFAILURE;
 
   switch (cmd)
   {
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   case cmd_t::BUY:
     shopping_buy(arg, ch, keeper, shop_nr);
     break;
@@ -1413,11 +1413,11 @@ int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *
   if (!(keeper = invoker))
   {
     logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   switch (cmd)
   {
@@ -1443,7 +1443,7 @@ int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *
     player_shopping_list(arg, ch, keeper);
     break;
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   return eSUCCESS;
@@ -1458,11 +1458,11 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
   player_shop * shop;
 
   if(IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if(!ch->has_skill( COMMAND_PSHOPEDIT)) {
         ch->sendln("Huh?");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
   }
 
   char * pshopedit_values [] = {
@@ -1479,7 +1479,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
                  "Fields are the following.\r\n"
                  , ch);
     display_string_list(pshopedit_values, ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for(skill = 0 ;; skill++)
@@ -1487,7 +1487,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
     if(pshopedit_values[skill][0] == '\n')
     {
       ch->sendln("Invalid field.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if(is_abbrev(select, pshopedit_values[skill]))
       break;
@@ -1500,12 +1500,12 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
          send_to_char("$3Syntax$R: pshopedit new <Playername> <roomnum>\r\n"
                       "  Make sure that your CAPITALIZE the player name or\r\n"
                       "  they won't be able to use it.\r\n", ch);
-         return eFAILURE;
+         return ReturnValue::eFAILURE;
       }
       i = atoi(text);
       if(i < 1 || i > DC::getInstance()->top_of_world || !DC::getInstance()->rooms[i]) {
          ch->sendln("You must choose a valid room number.");
-         return eFAILURE;
+         return ReturnValue::eFAILURE;
       }
       shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
       strcpy(shop->owner, buf);
@@ -1616,16 +1616,16 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
 int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
     ch->send("You're too blind to do that!\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::LIST)
   {
@@ -1835,7 +1835,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
 {
   if (ch == nullptr || IS_NPC(ch))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::string arg1, remainder_args;
@@ -1991,7 +1991,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     }
     else
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     break;
@@ -1999,7 +1999,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
   case cmd_t::CHOOSE:
     if (r.state != reroll_t::reroll_states_t::REROLLED)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (arg1 == "1")
@@ -2083,7 +2083,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     break;
 
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
     break;
   }
 
@@ -2100,12 +2100,12 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
   case cmd_t::CONFIRM:
     break;
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch || !ch->isPlayer() || !arg)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QStringList arguments = QString(arg).split(' ');
@@ -2132,7 +2132,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       return eSUCCESS;
       break;
     default:
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
       break;
     }
 
@@ -2251,5 +2251,5 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
 
   */
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }

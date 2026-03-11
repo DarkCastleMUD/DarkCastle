@@ -160,18 +160,18 @@ int do_unstable(Character *ch)
   int retval;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   short chance = number(0, 30);
 
   if (IS_AFFECTED(ch, AFF_FLYING) || IS_AFFECTED(ch, AFF_FREEFLOAT) ||
       ch->isImmortalPlayer())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (GET_DEX(ch) > chance)
   {
     act("You dextrously maintain your footing.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n looses his footing on the unstable ground.", ch, 0, 0, TO_ROOM, 0);
@@ -196,7 +196,7 @@ int do_fall(Character *ch, short dir)
   int dam = number(50, 100);
 
   if (IS_AFFECTED(ch, AFF_FLYING))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (ch->getLevel() == 50)
     dam = number(100, 200);
@@ -208,7 +208,7 @@ int do_fall(Character *ch, short dir)
 
   if (ch->isImmortalPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_FREEFLOAT))
@@ -221,16 +221,16 @@ int do_fall(Character *ch, short dir)
   if (IS_NPC(ch))
   {
     act("$n clings to the terrain around $m and avoids falling.", ch, 0, 0, TO_ROOM, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!CAN_GO(ch, dir))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   target = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
 
   if (isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(DC::getInstance()->world[target].room_flags, TUNNEL))
   {
@@ -242,7 +242,7 @@ int do_fall(Character *ch, short dir)
     if (ppl > 2)
     {
       ch->sendln("There isn't enough space for you to follow.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -256,7 +256,7 @@ int do_fall(Character *ch, short dir)
     if (ppl > 4)
     {
       ch->sendln("There isn't enough space for you to follow.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -352,7 +352,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
     ch->send("There was an error performing that movement.\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_FLYING))
@@ -505,7 +505,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
                                          cmd_to_dir && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[*cmd_to_dir]->to_room].sector_type == SECT_AIR))
     {
       ch->sendln("You would need to fly to go there!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     // fly doesn't work over water
@@ -526,7 +526,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
           GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
       {
         ch->sendln("You need a boat to go there.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
 
@@ -537,7 +537,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
       {
         ch->sendln("You can't swim around outside water without being able to fly!");
         act("$n flops around in a futile attempt to move out of water.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   } // else if !FLYING
@@ -546,7 +546,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
       ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln("No.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Room *rm = &(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room]);
@@ -573,7 +573,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     if (ppl > 2)
     {
       ch->sendln("There's no room.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -594,7 +594,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
       if (rm->allow_class[GET_CLASS(ch)] != true)
       {
         ch->sendln("Your class is not allowed there.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -609,7 +609,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     if (ppl > 4)
     {
       ch->sendln("There's no room.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -617,12 +617,12 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   {
     ch->sendln("You feel air trying to explode from your lungs as you swim around.");
     // ch->sendln("Underwater?!");
-    // return eFAILURE;
+    // return ReturnValue::eFAILURE;
   }
 
   // if I'm STAY_NO_TOWN, don't enter a Zone::Flag::IS_TOWN zone no matter what
   if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].zone).isTown())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   int a = 0;
   if ((a = ch->has_skill(SKILL_VIGOR)) && number(1, 101) < a / 10)
@@ -634,7 +634,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
       ch->sendln("You are too exhausted.");
     else
       ch->sendln("You are too exhausted to follow.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // If they were hit with a lullaby, go ahead and clear it out
@@ -643,7 +643,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     if (ch->affected_by_spell(SPELL_IRON_ROOTS))
     {
       ch->sendln("The roots bracing your legs keep you from moving!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -696,7 +696,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
 
   // at this point we messaged that we are moving, but we haven't actually moved yet.  Check if ethereal focus keeps us from moving.
   retval = check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_MOVE);
-  if (isSet(retval, eFAILURE))
+  if (isSet(retval, ReturnValue::eFAILURE))
     return retval;
 
   was_in = ch->in_room;
@@ -873,21 +873,21 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
   if (ch->brace_at)
   {
     csendf(ch, "You can't move and brace the %s at the same time!\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   auto opt_dir = getDirectionFromCommand(cmd);
   if (!opt_dir)
   {
     ch->sendln("Error. Tell an immortal.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   auto dir = *opt_dir;
 
   if (!DC::getInstance()->world[ch->in_room].dir_option[dir])
   {
     ch->sendln("You can't go that way.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(EXIT(ch, dir)->exit_info, EX_CLOSED))
@@ -898,13 +898,13 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
       csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, dir)->keyword).toStdString().c_str());
     else
       ch->sendln("It seems to be closed.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (EXIT(ch, dir)->to_room == DC::NOWHERE)
   {
     ch->sendln("Alas, you can't go that way.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->followers && !ch->master)
@@ -916,7 +916,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
     catch (...)
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
-      return_val = eFAILURE;
+      return_val = ReturnValue::eFAILURE;
     }
 
     if (SOMEONE_DIED(return_val) || !isSet(return_val, eSUCCESS))
@@ -947,7 +947,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
        GET_KI(ch->master) -= 5;
        */
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   try
@@ -957,7 +957,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
   catch (...)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
-    return_val = eFAILURE;
+    return_val = ReturnValue::eFAILURE;
   }
 
   // this may cause problems with leader being ambushed, dying, and group not moving
@@ -1060,7 +1060,7 @@ int do_leave(Character *ch, char *arguement, cmd_t cmd)
             {
               ch->sendln("You attempt to leave, but the door slams in your face!");
               act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
             do_look(ch, "");
             sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->short_description);
@@ -1074,7 +1074,7 @@ int do_leave(Character *ch, char *arguement, cmd_t cmd)
 
   ch->sendln("There are no exits around!");
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_enter(Character *ch, char *argument, cmd_t cmd)
@@ -1093,19 +1093,19 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   if (!*buf)
   {
     ch->sendln("Enter what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((portal = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)) == nullptr)
   {
     ch->sendln("Nothing here by that name.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!portal->isPortal())
   {
     ch->sendln("You can't enter that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
@@ -1113,7 +1113,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
     logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
     ch->sendln("You can't enter that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
@@ -1125,7 +1125,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
   {
     ch->sendln("You may not enter a clanhall at your level.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch) && ch->master && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
@@ -1139,7 +1139,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Your master is not from that clan.");
         act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
         do_say(ch, "I may not enter.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -1153,27 +1153,27 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("The portal's destination rebels against you.");
     act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // Thieves arent allowed through cleric portals
   if (ch->isPlayerObjectThief() && portal->isPortalTypePlayer())
   {
     ch->sendln("Your attempt to transport stolen goods through planes of magic fails!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!IS_NPC(ch) && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
   {
     ch->sendln("The portal's destination rebels against you.");
     act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isexact("only", portal->Name()) && !isexact(GET_NAME(sesame), portal->Name()))
   {
     ch->sendln("The portal fades when you draw near, then shimmers as you withdraw.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   switch (portal->obj_flags.value[1])
@@ -1191,11 +1191,11 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     break;
   case 3:
     ch->sendln("You cannot enter that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   default:
     sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
     logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   retval = move_char(ch, real_room(portal->obj_flags.value[0]));
@@ -1300,7 +1300,7 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     ch->sendln("You can't climb that.");
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
 
   act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);

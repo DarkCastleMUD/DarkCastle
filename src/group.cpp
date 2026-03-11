@@ -30,26 +30,26 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((!ch->master) && (IS_AFFECTED(ch, AFF_GROUP)))
   {
     ch->sendln("You can't abandon a group you're leading.");
     ch->sendln("You must disband the group.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((!ch->master) || (!IS_AFFECTED(ch, AFF_GROUP)))
   {
     ch->sendln("Who you gonna abandon?!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((IS_NPC(ch)) && (IS_AFFECTED(ch, AFF_CHARM)))
   {
     ch->sendln("You're in love. Forget it!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   stop_grouped_bards(ch, 1);
@@ -77,28 +77,28 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_INPUT_LENGTH + 1];
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*argument)
   {
     ch->sendln("Found what?!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if ((ch->master) && (!IS_AFFECTED(ch, AFF_GROUP)))
   {
     ch->sendln("You can't found your own group while following someone around!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You can't found a group if you're already in one!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (; isspace(*argument); argument++)
@@ -107,7 +107,7 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
   if (strlen(argument) > 50)
   {
     ch->sendln("You gonna name your party? Or write a book?!  50 characters max.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   ch->group_name = str_dup(argument);
@@ -138,13 +138,13 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if (arguments.isEmpty())
   {
     send("Split what?\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isPlayerGoldThief())
   {
     send("Nobody wants any part of your stolen booty!\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString number = arguments.at(0);
@@ -155,7 +155,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   {
     send("Invalid value.\r\n");
     send(QStringLiteral("Valid values are %1 to %2.\r\n").arg(1).arg(static_cast<quint64>(-1)));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (amount == 0)
@@ -167,7 +167,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if (getGold() < amount)
   {
     send("You don't have that much gold!\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (master)
@@ -178,7 +178,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if ((!IS_AFFECTED(k, AFF_GROUP)) || (!IS_AFFECTED(this, AFF_GROUP)))
   {
     send("You are not grouped. You must be grouped to split your money!\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (k->in_room == in_room)
@@ -197,7 +197,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if (no_members == 0) // should be impossible
   {
     send("You got a divide by 0.  Tell a god how.\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   share = amount / no_members;
@@ -353,7 +353,7 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis(name)))
@@ -364,13 +364,13 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
     if (!IS_AFFECTED(ch, AFF_GROUP))
     {
       ch->sendln("You must first found a group!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (ch->master)
     {
       act("You can not enroll group members without being head of a group.", ch, 0, 0, TO_CHAR, 0);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     found = false;
@@ -394,7 +394,7 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
       if (ch == victim)
       {
         ch->sendln("You must found a group, or Disband a group.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       if (IS_AFFECTED(victim, AFF_GROUP))
@@ -420,7 +420,7 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
     else
       act("$N must follow you, to enter the group.", ch, 0, victim, TO_CHAR, ASLEEP);
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_promote(Character *ch, char *argument, cmd_t cmd)
@@ -435,25 +435,25 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   if (ch->master)
   {
     ch->sendln("You aren't running the show here, pal.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((!ch->master) && !IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You don't even have a group to promote anyone.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*name)
   {
     ch->sendln("Who do you wish to promote to group leader? ");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(new_new_leader = ch->get_char_room_vis(name)))
   {
     ch->sendln("I see no person by that name here!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (new_new_leader == ch)
@@ -462,19 +462,19 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You are already the group leader! Maybe you SHOULD "
                  "step down?\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(new_new_leader))
   {
     ch->sendln("Yeah right!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ARE_GROUPED(ch, new_new_leader))
   {
     ch->sendln("But you aren't even in the same group!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
@@ -538,7 +538,7 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -546,20 +546,20 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
   if (ch->master)
   {
     ch->sendln("You aren't running the show here pal!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((!ch->master) && (!IS_AFFECTED(ch, AFF_GROUP)))
   {
     ch->sendln("You don't even have a group to disband.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*name)
   {
     ch->sendln("Who do you wish to disband? ");
     ch->sendln("Disband 'all' will disband the group.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isexact(name, "all"))
@@ -599,26 +599,26 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
   if (!(adios = ch->get_char_room_vis(name)))
   {
     ch->sendln("I see no person by that name here!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (adios == ch)
   {
     ch->sendln("You can't disband yourself from a group you're leading!");
     ch->sendln("Either Promote someone to Group Leader, or Disband All.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (adios->master != ch)
   {
     ch->sendln("Try someone in YOUR group, fartknocker.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((IS_NPC(adios)) && (IS_AFFECTED(adios, AFF_CHARM)))
   {
     ch->sendln("Can't kick out a charmee.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   stop_grouped_bards(adios, 1);
@@ -640,7 +640,7 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -650,24 +650,24 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
     if (!(leader = get_char_room(name, ch->in_room)))
     {
       ch->sendln("I see no person by that name here!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     ch->sendln("Who do you wish to follow?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (cmd == cmd_t::DEFAULT && !CAN_SEE(ch, leader))
   { // check it like this instead o' get_char_room_vis 'cause stalk checks.
     ch->sendln("I see no person by that name here!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You must first abandon your group.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master))
@@ -682,7 +682,7 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
       if (!ch->master)
       {
         ch->sendln("You are already following yourself.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       stop_follower(ch);
     }
@@ -692,7 +692,7 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
       {
         act("Sorry, but following in 'loops' is not allowed.",
             ch, 0, 0, TO_CHAR, 0);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (ch->master)
       {
@@ -712,7 +712,7 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
                                   //	      {
                                   //		act("Sorry, but you are not of the right caliber to follow.",
                                   //		ch, 0, 0, TO_CHAR, 0);
-                                  //		return eFAILURE;
+                                  //		return ReturnValue::eFAILURE;
                                   //	      }
     }
   }
@@ -723,7 +723,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
 {
   if (ch->player == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arguments = QString::fromStdString(str_arguments).trimmed().toLower();
@@ -741,7 +741,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
 
     ch->send("Syntax: autojoin <player1> <player2> <player3> ...\r\n");
 
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   else if (arguments == "clear")

@@ -62,7 +62,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("report       - Reports hps, mana, moves and ki. (default)");
       ch->sendln("report xp    - Reports current xp, xp till next level and levels to be gained.");
       ch->sendln("report help  - Shows different ways report can be used.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (arg1 == "xp")
@@ -371,13 +371,13 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
 {
   if (ch == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch))
   {
     ch->send("You're a mob! You can't ignore people.\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (args.empty())
@@ -414,7 +414,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
   if (arg1.empty())
   {
     ch->send("Ignore who?\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   arg1[0] = toupper(arg1[0]);
 

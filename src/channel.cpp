@@ -57,7 +57,7 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   argument = ltrim(argument);
@@ -127,7 +127,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
     if (tmp_obj && tmp_obj->item_number >= 0 && DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   std::tie(vict, message) = half_chop(argument);
@@ -245,7 +245,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (IS_NPC(ch) && ch->master)
@@ -357,7 +357,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       send("The magical silence prevents you from speaking!\n\r");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (IS_NPC(this) && this->master)
@@ -454,7 +454,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (IS_NPC(ch) && ch->master)
@@ -531,7 +531,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (IS_NPC(ch) && ch->master)
@@ -693,12 +693,12 @@ command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
 {
   if (ch == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::string arg1, remainder;
@@ -741,7 +741,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       this->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (!IS_NPC(this) && !isSet(this->misc, DC::LogChannel::CHANNEL_TELL))
@@ -964,7 +964,7 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   argument = ltrim(argument);
@@ -1000,7 +1000,7 @@ int do_whisper(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   half_chop(argument, name, message);
@@ -1044,7 +1044,7 @@ int do_ask(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   half_chop(argument, name, message);
@@ -1089,7 +1089,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
 
   if (ch == nullptr || ch->player == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*argument)
@@ -1097,7 +1097,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
     if (ch->player->gtell_history.isEmpty())
     {
       ch->sendln("No one has said anything.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     ch->sendln("Here are the last 10 group tells:");
@@ -1113,7 +1113,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   for (; isspace(*argument); argument++)
@@ -1193,7 +1193,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (IS_NPC(ch) && ch->master)
@@ -1234,7 +1234,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
   {
     if (!ch->decrementMove(5))
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
     sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);

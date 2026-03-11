@@ -99,7 +99,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
   char key1[256], key2[256], key3[256], key4[256], key5[256], rec_level[256];
 
   if (!ch->desc)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   skip_spaces(&argument);
 
@@ -109,13 +109,13 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
       ch->send(new_help);
     else
       ch->send(new_ihelp);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!new_help_table)
   {
     ch->sendln("No help available.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   char *upper_argument = str_dup(argument);
@@ -214,7 +214,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_HELP);
 
     dc_free(upper_argument);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   dc_free(upper_argument);
@@ -222,7 +222,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
   if (this_help->min_level > a)
   {
     ch->sendln("There is no help on that word.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(key1, "'%s'", this_help->keyword1);
@@ -296,7 +296,7 @@ int load_new_help(FILE *fl, int reload, Character *ch)
     if (reload == 1)
     {
       logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, DC::LogChannel::LOG_HELP);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -409,7 +409,7 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
                "              u = unfinished, level 75\r\n"
                "\r\n",
            IMPLEMENTER);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int start = 0;
   if (*argument == '-')
@@ -431,7 +431,7 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
         if (atoi(argument) > atoi(arg))
         {
           ch->sendln("Usage: hindex -l <low level> <high level>");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (!*arg)
           sprintf(arg, "%s", argument); // if they left off the second arg, copy the first, show only one level
@@ -480,17 +480,17 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
     if (atoi(argument) > atoi(arg))
     {
       ch->sendln("Usage: hindex <low ID#> <high ID#>"); // wrong order, first > second
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if ((atoi(arg) - atoi(argument)) >= 30)
     { // too many listed, only 30 at a time or we get too much spam
       ch->sendln("You can only list 30 help entries at a time.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (atoi(argument) >= DC::getInstance()->new_top_of_helpt || atoi(arg) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     show_help_header(ch);
@@ -505,7 +505,7 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
     if (atoi(argument) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     show_help_header(ch);
@@ -548,7 +548,7 @@ int do_index(Character *ch, char *argument, cmd_t cmd)
                "       index <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
                "       index <start of a word(s)>\r\n"
                "\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0))
@@ -556,12 +556,12 @@ int do_index(Character *ch, char *argument, cmd_t cmd)
     if (atoi(argument) > atoi(arg))
     {
       ch->sendln("Usage: index <low ID#> <high ID#>"); // wrong order, first > second
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (atoi(argument) >= DC::getInstance()->new_top_of_helpt || atoi(arg) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     show_help_header(ch);
     for (i = atoi(argument); i <= atoi(arg); i++)
@@ -579,7 +579,7 @@ int do_index(Character *ch, char *argument, cmd_t cmd)
     if (atoi(argument) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (new_help_table[atoi(argument)].min_level > 1)
@@ -676,12 +676,12 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
   int help_rec_count = 0, ret = 0;
 
   // ch->sendln("Command disabled!");
-  // return eFAILURE;
+  // return ReturnValue::eFAILURE;
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
     logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   help_rec_count = count_hash_records(new_help_fl);
@@ -690,7 +690,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
     logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   FREE(new_help_table);
@@ -699,10 +699,10 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
   ret = load_new_help(new_help_fl, 1, ch);
   fclose(new_help_fl);
 
-  if (ret == eFAILURE)
+  if (ret == ReturnValue::eFAILURE)
   {
     ch->sendln("Error reloading help files!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   ch->sendln("Help files reloaded.");
@@ -716,12 +716,12 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
   int help_id = -1, i, key_id = -1, level = -1;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->has_skill(COMMAND_HEDIT))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   half_chop(argument, buf, buf2);
@@ -729,7 +729,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
   if (!*buf)
   {
     show_hedit_usage(ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(buf, "save"))
@@ -741,7 +741,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
   if (!*buf2)
   {
     show_hedit_usage(ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(buf, "new"))
@@ -772,7 +772,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     if (help_id < 0 || help_id >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Not a valid help ID number.  Try using 'hindex'");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     half_chop(buf2, field, buf2);
     if (is_abbrev(field, "key"))
@@ -781,7 +781,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
       if (!*buf3 || !*value)
       {
         ch->sendln("Not a valid key # or no value specified.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if ((key_id = atoi(buf3)))
       {
@@ -810,7 +810,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
           break;
         default:
           ch->sendln("Not a valid key #.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
           break;
         }
         sprintf(buf, "Keyword %d changed to '%s' for ID# %d.\r\n", key_id, value, help_id);
@@ -819,7 +819,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
       else
       {
         ch->sendln("Not a valid key #.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else if (is_abbrev(field, "level"))
@@ -854,7 +854,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
       else
       {
         show_hedit_usage(ch);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else if (is_abbrev(field, "entry"))
@@ -876,13 +876,13 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     else
     { // no idea wtf they are doing
       show_hedit_usage(ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     show_hedit_usage(ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   return eSUCCESS;

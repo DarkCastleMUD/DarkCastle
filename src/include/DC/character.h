@@ -965,7 +965,7 @@ public:
   command_return_t do_edit_generic(auto *entity, auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
   {
     if (!entity)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
 
     auto getter = [entity, getfnc]()
     {
@@ -982,7 +982,7 @@ public:
   command_return_t do_edit_generic(auto **field, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
   {
     if (!field)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
 
     auto getter = [field]()
     {
@@ -1000,7 +1000,7 @@ public:
   command_return_t do_edit_generic_numeric(auto *entity, auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
   {
     if (!entity)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
 
     if (arguments.isEmpty())
     {
@@ -1023,13 +1023,13 @@ public:
           send("   ");
       }
       sendln();
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if ((!(*entity.*(setfnc))(arguments.join(' ').toLower())))
     {
       sendln(QStringLiteral("Invalid input."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(arguments.join(' ').toLower()));
     return eSUCCESS;

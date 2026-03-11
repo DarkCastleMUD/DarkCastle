@@ -129,7 +129,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   if (!learned)
   {
     ch->sendln("You do not know how to make poisons.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // TODO search for mortar and pestle
@@ -138,14 +138,14 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   if (!container)
   {
     ch->sendln("You have nothing to make poisons in.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // search if the items in mortar and pestle match any poison vial types
   int index = valid_trade_skill_combine(container, poison_vial_data, ch);
 
   if (index == -2)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   ch->sendln("You mix the ingrediants together in an attempt to make a poison..");
 
@@ -176,7 +176,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Ahh crap, something got screwed up.  You are forced to throw away this attempt.");
     act("$n fiddles with a mortar and pestle and looks unhappy.", ch, 0, 0, TO_ROOM, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // give poison to player
@@ -184,7 +184,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   if (rewardnum < 0)
   {
     ch->sendln("That poison is broken.  Tell a god.");
-    return (eFAILURE | eINTERNAL_ERROR);
+    return (ReturnValue::eFAILURE | eINTERNAL_ERROR);
   }
 
   Object *reward = clone_object(rewardnum);
@@ -200,7 +200,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
     ch->sendln("Only thieves are trained enough to poison their weapons.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   char vialarg[MAX_INPUT_LENGTH];
@@ -210,13 +210,13 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   if (!*vialarg)
   {
     ch->sendln("Poison your weapon with what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->fighting)
   {
     ch->sendln("You can't do that while fighting!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // find weapon
@@ -224,7 +224,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   if (!weapon)
   {
     ch->sendln("You aren't wielding a weapon to poison.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // find vial and verify it's a valid poison vial
@@ -232,7 +232,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   if (!vial)
   {
     ch->send(QStringLiteral("You don't seem to have any %1.\r\n").arg(vialarg));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int found = -1;
@@ -246,14 +246,14 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   if (found < 0)
   {
     ch->send(QStringLiteral("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (int j = 0; j < weapon->num_affects; j++)
     if (weapon->affected[j].location == WEP_THIEF_POISON)
     {
       ch->sendln("Your weapon is already poisoned.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   // poison weapon
@@ -348,7 +348,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
   if (!ch->equipment[WEAR_WIELD])
   {
     ch->sendln("In handle_poisoned_weapon_atack() with null wield.  Tell a god.");
-    return (eFAILURE | eINTERNAL_ERROR);
+    return (ReturnValue::eFAILURE | eINTERNAL_ERROR);
   }
 
   /*   switch(type)
@@ -411,7 +411,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   if (ch->isMortalPlayer() && !learned)
   {
     ch->sendln("You just don't have the mind for potion brewing.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*argument)
@@ -428,7 +428,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
                    "        brew remove [recipe_num]\n\r\n\r",
                    ch);
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -465,7 +465,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   if (ch->affected_by_spell(SKILL_BREW_TIMER))
   {
     ch->sendln("You aren't ready to brew anything again.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, liquid);
@@ -476,7 +476,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You'll need to choose a liquid type and container.\r\n"
                  "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*container)
@@ -484,7 +484,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You'll need to select a container.\r\n"
                  "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   herbobj = get_obj_in_list_vis(ch, arg1, ch->carrying);
@@ -494,58 +494,58 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   if (!herbobj)
   {
     ch->sendln("You do not have that type of herb.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (herbobj->obj_flags.type_flag != ITEM_OTHER)
   {
     ch->sendln("That is not an herb.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!liquidobj)
   {
     ch->sendln("You do not have that type of liquid.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (liquidobj->obj_flags.type_flag != ITEM_DRINKCON)
   {
     ch->sendln("That is not a liquid container.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!containerobj)
   {
     ch->sendln("You do not have that type of container.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (containerobj->obj_flags.type_flag != ITEM_POTION && containerobj->obj_flags.type_flag != ITEM_DRINKCON)
   {
     ch->sendln("That is not a target container.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(containerobj->obj_flags.more_flags, ITEM_CUSTOM))
   {
     ch->sendln("That container is already a brewed potion.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (containerobj == liquidobj)
   {
     ch->sendln("Your liquid and target container cannot be the same object!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (liquidobj->obj_flags.value[1] < 1)
   {
     ch->sendln("There is no liquid left in that container.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_BREW))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
@@ -798,7 +798,7 @@ int Brew::add(Character *ch, char *argument)
 
   if (!ch)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -809,7 +809,7 @@ int Brew::add(Character *ch, char *argument)
   if (!*arg1 || !*arg2 || !*arg3 || !*arg4)
   {
     ch->sendln("Syntax: brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   herb_vnum = atoll(arg1);
@@ -819,7 +819,7 @@ int Brew::add(Character *ch, char *argument)
   if (herb_vnum < 6301 || herb_vnum > 6312)
   {
     ch->sendln("Only vnums 6301-6312 are valid herbs.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   switch (liquid_type)
@@ -831,20 +831,20 @@ int Brew::add(Character *ch, char *argument)
   default:
     csendf(ch, "Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\r\n",
            LIQ_MILK, LIQ_WINE, LIQ_SALTWATER);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
     break;
   }
 
   if (container_vnum < 6320 || container_vnum > 6324)
   {
     ch->sendln("Only vnums 6320-6324 are valid containers.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((spell = find_skill_num(arg4)) < 0)
   {
     csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   recipe r = {herb_vnum, liquid_type, container_vnum};
@@ -859,13 +859,13 @@ int Brew::remove(Character *ch, char *argument)
 {
   if (!ch)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*argument)
   {
     ch->sendln("Syntax: brew remove [recipe_num]");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int i = 0;
@@ -883,7 +883,7 @@ int Brew::remove(Character *ch, char *argument)
   }
 
   ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int Brew::size(void)
@@ -916,7 +916,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
   if (ch->isMortalPlayer() && !learned)
   {
     ch->sendln("You just don't have the mind for scribing.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*argument)
@@ -933,7 +933,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
                    "        scribe remove [recipe_num]\n\r\n\r",
                    ch);
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -970,7 +970,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
   if (ch->affected_by_spell(SKILL_SCRIBE_TIMER))
   {
     ch->sendln("You aren't ready to scribe anything again.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, dust);
@@ -982,7 +982,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You'll need to choose a dust, pen and paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*pen)
@@ -990,7 +990,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You'll need to choose a pen and paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*paper)
@@ -998,7 +998,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You'll need to select a paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   inkobj = get_obj_in_list_vis(ch, arg1, ch->carrying);
@@ -1009,56 +1009,56 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
   if (!inkobj)
   {
     ch->sendln("You do not have that type of ink.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (inkobj->obj_flags.type_flag != ITEM_DRINKCON || inkobj->obj_flags.value[2] != LIQ_INK)
   {
     ch->sendln("That is not ink.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!dustobj)
   {
     ch->sendln("You do not have that type of dust.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (dustobj->obj_flags.type_flag != ITEM_OTHER)
   {
     ch->sendln("That is not dust.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!penobj)
   {
     ch->sendln("You do not have that type of pen.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (penobj->obj_flags.type_flag != ITEM_PEN)
   {
     ch->sendln("That is not a pen.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!paperobj)
   {
     ch->sendln("You do not have that type of paper.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (paperobj->obj_flags.type_flag != ITEM_SCROLL)
   {
     ch->sendln("That is not paper.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (inkobj->obj_flags.value[1] < 1)
   {
     ch->sendln("There is no liquid left in that ink container.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_SCRIBE))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
@@ -1250,7 +1250,7 @@ int Scribe::add(Character *ch, char *argument)
 
   if (!ch)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -1262,7 +1262,7 @@ int Scribe::add(Character *ch, char *argument)
   if (!*arg1 || !*arg2 || !*arg3 || !*arg4 || !*arg5)
   {
     ch->sendln("Syntax: scribe add [ink_vnum] [dust_vnum] [pen_vnum] [paper_vnum] [spell_num]");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   ink_vnum = atoi(arg1);
@@ -1273,31 +1273,31 @@ int Scribe::add(Character *ch, char *argument)
   if (ink_vnum < 6326 || ink_vnum > 6328)
   {
     ch->sendln("Only vnums 6326-6328 are valid inks.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (dust_vnum < 6335 || dust_vnum > 6337)
   {
     ch->sendln("Only vnums 6335-6337 are valid dusts.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (pen_vnum < 6329 || pen_vnum > 6334)
   {
     ch->sendln("Only vnums 6329-6334 are valid pens.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (paper_vnum < 6338 || paper_vnum > 6342)
   {
     ch->sendln("Only vnums 6338-6342 are valid papers.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((spell = find_skill_num(arg5)) < 0)
   {
     csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   recipe r = {ink_vnum, dust_vnum, pen_vnum, paper_vnum};
@@ -1312,13 +1312,13 @@ int Scribe::remove(Character *ch, char *argument)
 {
   if (!ch)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*argument)
   {
     ch->sendln("Syntax: scribe remove [recipe_num]");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int i = 0;
@@ -1336,7 +1336,7 @@ int Scribe::remove(Character *ch, char *argument)
   }
 
   ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int Scribe::size(void)

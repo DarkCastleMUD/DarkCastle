@@ -116,7 +116,7 @@ void mobile_activity(void)
       retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
       PerfTimers["mprog"].stop();
 
-      if (!isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())
+      if (!isSet(retval, ReturnValue::eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())
         continue;
     }
 

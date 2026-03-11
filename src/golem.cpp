@@ -118,7 +118,7 @@ int verify_existing_components(Character *ch, int golemtype)
     }
     if (!found && i != 4)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   for (i = 0; i < 5; i++)
@@ -302,11 +302,11 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   char buf[MAX_INPUT_LENGTH];
   arg = one_argument(arg, buf);
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (ch->player->golem)
   {
     ch->sendln("You already have a golem.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   for (i = 0; i < MAX_GOLEMS; i++)
   {
@@ -316,13 +316,13 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   if (i >= MAX_GOLEMS)
   {
     ch->sendln("You cannot create any such golem.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int retval = verify_existing_components(ch, i);
-  if (isSet(retval, eFAILURE))
+  if (isSet(retval, ReturnValue::eFAILURE))
   {
     ch->sendln("Since you do not have the required spell components, the magic fades into nothingness.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   ch->load_golem_data(i); // Load the golem up;
   ch->skill_increase_check(SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
@@ -330,7 +330,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   if (!golem)
   { // Returns false if something goes wrong. (Not a mage, etc).
     ch->send("Something goes wrong, and you fail!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (isSet(retval, eEXTRA_VALUE))
   {
@@ -356,14 +356,14 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   int to_dam, to_hit;
   Character *master = ch;
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::GOLEMSCORE)
   {
     if (!ch->player->golem)
     {
       ch->sendln("But you don't have a golem!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -386,7 +386,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
       if (QString(argument).isEmpty())
       {
         ch->sendln(QStringLiteral("Specify which non-player follower you want to fscore."));
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       {
@@ -394,17 +394,17 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
         if (!vict)
         {
           ch->sendln("No mob by that name here.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (!IS_AFFECTED(vict, AFF_CHARM))
         {
           ch->sendln(QStringLiteral("%1 is not a charmie.").arg(GET_SHORT(vict)));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (vict->master != ch)
         {
           ch->sendln(QStringLiteral("%1 is not your charmie.").arg(GET_SHORT(vict)));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         ch = vict;
       }
@@ -425,13 +425,13 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
     if (ch == master)
     {
       ch->sendln("But you don't have any non-player followers!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   struct affected_type *aff;

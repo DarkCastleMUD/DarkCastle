@@ -34,7 +34,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   if (arguments.isEmpty())
   {
     this->sendln("Linkload whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.value(0).trimmed();
@@ -42,13 +42,13 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   if (get_pc(arg1))
   {
     this->sendln("That person is already on the game!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(dc_->load_char_obj(&d, arg1)))
   {
     this->sendln("Unable to load! (Character might not exist...)");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   new_new = d.character;
@@ -86,13 +86,13 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
   {
     logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
              DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (fprintf(fl, "~\n") < 0)
   {
     fclose(fl);
     ch->sendln("Failure writing to transition file.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   fclose(fl);
@@ -101,7 +101,7 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
   {
     logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
              DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   tmp = fread_string(fl, 0);
   fclose(fl);
@@ -121,13 +121,13 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
     if (!(victim = get_pc_vis(this, name)))
     {
       this->sendln("That player is not here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     this->sendln("Who exactly would you like to be a guide?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
@@ -157,7 +157,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
   void gain_exp(Character * ch, int gain);
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, name, buf);
   argument_interpreter(buf, level, passwd);
@@ -167,45 +167,45 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
     if (!(victim = get_char_vis(ch, name)))
     {
       ch->sendln("That player is not here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     ch->sendln("Advance whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim))
   {
     ch->sendln("NO! Not on NPC's.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*level ||
       (new_newlevel = atoi(level)) <= 0 || new_newlevel > IMPLEMENTER)
   {
     ch->sendln("Level must be 1 to 110.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((new_newlevel > DC::MAX_MORTAL_LEVEL) && (new_newlevel < MIN_GOD))
   {
     ch->sendln("That level doesn't exist!!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < OVERSEER && new_newlevel >= IMMORTAL)
   {
     ch->sendln("Limited to levels lower than Titan.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Who the fuck took ths out in the first place? -Sadus */
   if (new_newlevel > ch->getLevel())
   {
     ch->sendln("Yeah right.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Lower level:  First reset the player to level 1. Remove all special
@@ -273,7 +273,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
                  "lower than you.\r\n",
                  this);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   victim = get_pc_vis(this, name);
@@ -286,13 +286,13 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
           TO_VICT, 0);
       act("$n casts a massive lightning bolt at $N.", this, 0, victim,
           TO_ROOM, NOTVICT);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (victim->getLevel() == IMPLEMENTER)
     { // Hehe..
       this->sendln("Get stuffed.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (IS_PC(victim))
@@ -339,7 +339,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
                  this);
   }
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_global(Character *ch, char *argument, cmd_t cmd)
@@ -349,7 +349,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
   class Connection *point;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   for (i = 0; *(argument + i) == ' '; i++)
     ;
@@ -374,12 +374,12 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   char **new_argv = 0;
 
   if (IS_NPC(this))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!has_skill(COMMAND_SHUTDOWN))
   {
     this->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.value(0);
@@ -397,7 +397,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
                  "  auto - Toggle auto-hotboot on crash setting.\r\n"
                  "   die - Kill boot script and crash mud so it won't reboot.\r\n",
                  this);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (arg1 == "cold")
@@ -422,7 +422,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
             if (follower->carrying != nullptr)
             {
               send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
           }
         }
@@ -460,7 +460,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     Character *crashus = nullptr;
     if (crashus->in_room == DC::NOWHERE)
     {
-      return eFAILURE; // this should never be reached
+      return ReturnValue::eFAILURE; // this should never be reached
     }
   }
   else if (arg1 == "core")
@@ -477,7 +477,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     Character *crashus = nullptr;
     if (crashus->in_room == DC::NOWHERE)
     {
-      return eFAILURE; // this should never be reached
+      return ReturnValue::eFAILURE; // this should never be reached
     }
   }
   else if (arg1 == "check")
@@ -496,7 +496,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
               if (follower->carrying != nullptr || follower->equipment[0] != nullptr)
               {
                 send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
             }
           }
@@ -514,7 +514,7 @@ command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
   if (!has_skill(COMMAND_SHUTDOWN))
   {
     this->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   this->sendln("If you want to shut something down - say so!");
@@ -529,13 +529,13 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
 
   if (ch == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTPORT))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -543,7 +543,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
   if (*arg1 == 0)
   {
     ch->sendln("testport <start | stop>\n\r");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(arg1, "start"))
@@ -585,13 +585,13 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 
   if (ch == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTUSER))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -600,13 +600,13 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
   if (*arg1 == 0 || *arg2 == 0)
   {
     ch->sendln("testuser <user> <on|off>\n\r");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (strlen(arg1) > 19 || _parse_name(arg1, username))
   {
     ch->sendln("Invalid username passed.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   username[0] = UPPER(username[0]);
@@ -621,7 +621,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
   if (!file_exists(savefile))
   {
     ch->sendln("Player file not found.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(arg2, "on"))
@@ -635,7 +635,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
   else
   {
     ch->sendln("Only on or off are valid second arguments to this command.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
@@ -673,7 +673,7 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
     send_to_char("Syntax:  skilledit <character> <action> <value>\n\r"
                  "Possible actions are:  list, add, delete\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   half_chop(argument, name, argument);
   half_chop(argument, type, value);
@@ -681,7 +681,7 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
   if (!(victim = get_pc_vis(ch, name)))
   {
     ch->sendln("Edit the skills of whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isexact(type, "list"))

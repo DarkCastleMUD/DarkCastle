@@ -1136,12 +1136,12 @@ int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg
   arg = one_argument(arg, arg1);
   if (!isCommandTypeCasino(cmd))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!ch || IS_NPC(ch))
-    return eFAILURE; // craziness
+    return ReturnValue::eFAILURE; // craziness
   if (obj->in_room <= 0)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!obj->table)
     create_table(obj);
   if (ch->isPlayerCantQuit() || ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
@@ -2238,9 +2238,9 @@ int slot_machine(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
   char buf[MAX_STRING_LENGTH];
 
   if (cmd != cmd_t::PULL && cmd != cmd_t::BET && cmd != cmd_t::PUSH) // pull or bet or push
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!ch || IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (ch->isPlayerCantQuit() || ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
@@ -2667,11 +2667,11 @@ int roulette_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   arg = one_argument(arg, arg1);
   arg = one_argument(arg, arg2);
   if (cmd != cmd_t::BET)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!ch || IS_NPC(ch))
-    return eFAILURE; // craziness
+    return ReturnValue::eFAILURE; // craziness
   if (obj->in_room <= 0)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!obj->wheel)
     create_wheel(obj);
   if (ch->isPlayerCantQuit() ||

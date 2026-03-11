@@ -200,7 +200,7 @@ int do_switch(Character *ch, char *arg, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_WIELD] || !ch->equipment[WEAR_SECOND_WIELD])
@@ -208,13 +208,13 @@ int do_switch(Character *ch, char *arg, cmd_t cmd)
     send_to_char("You must be wielding two weapons to switch their "
                  "positions.\r\n",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_MOVE(ch) < 4)
   {
     ch->send("You are too tired to switch your weapons!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   ch->decrementMove(4);
 
@@ -222,12 +222,12 @@ int do_switch(Character *ch, char *arg, cmd_t cmd)
   {
     act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
     act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
   {
     ch->sendln("Your primary wield is too heavy to wield as secondary.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   between = ch->equipment[WEAR_WIELD];
   ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
@@ -266,7 +266,7 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
         if (!(temp = get_obj_in_list_vis(ch, buf, ch->carrying, true)))
         {
           act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
     }
@@ -275,13 +275,13 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
   if (temp->obj_flags.type_flag != ITEM_POTION)
   {
     act("You can only quaff potions.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((GET_COND(ch, FULL) >= 24) && (GET_COND(ch, THIRST) >= 24) && IS_PC(ch))
   {
     act("Your stomach is too full to quaff that!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
@@ -298,7 +298,7 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
   if (!ch->fighting && isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (pos == -2)
@@ -351,7 +351,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Your magic is muffled by greater beings.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   equipped = false;
   obj = 0;
@@ -371,19 +371,19 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
       if ((scroll == 0) || !isexact(buf, scroll->Name()))
       {
         act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     act("Your magic is muffled by greater beings.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (scroll->obj_flags.type_flag != ITEM_SCROLL)
   {
     act("Recite is normally used for scrolls.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (*argument)
@@ -392,7 +392,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
     if (bits == 0)
     {
       ch->sendln("No such thing around to recite the scroll on.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -672,14 +672,14 @@ int do_mortal_set(Character *ch, char *argument, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("Set what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
     sprintf(buf, "You do not seem to have a '%s'.\r\n", arg);
     ch->send(buf);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   switch (obj->obj_flags.type_flag)
@@ -710,13 +710,13 @@ int do_use(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Your magic is muffled by greater beings.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, buf);
@@ -725,7 +725,7 @@ int do_use(Character *ch, char *argument, cmd_t cmd)
       (ch->equipment[WEAR_HOLD2] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD2]->Name())))
   {
     act("You must be holding an item in order to to use it.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->equipment[WEAR_HOLD] && isexact(buf, ch->equipment[WEAR_HOLD]->Name()))
     stick = ch->equipment[WEAR_HOLD];
@@ -749,7 +749,7 @@ int do_use(Character *ch, char *argument, cmd_t cmd)
       else if (spell_info[stick->obj_flags.value[3]].spell_pointer2())
         retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer2())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl, 0));
       else
-        retval = eFAILURE;
+        retval = ReturnValue::eFAILURE;
       return retval;
     }
     else
@@ -786,7 +786,7 @@ int do_use(Character *ch, char *argument, cmd_t cmd)
         else if (spell_info[stick->obj_flags.value[3]].spell_pointer2())
           retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer2())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl, 0));
         else
-          retval = eFAILURE;
+          retval = ReturnValue::eFAILURE;
         return retval;
       }
       else
@@ -803,7 +803,7 @@ int do_use(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Use is normally only for wands and staves.");
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 // Allows a player to change his "name" (short_desc) (Sadus)
@@ -817,12 +817,12 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
   if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NONAME))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->getLevel() < 5)
   {
     ch->sendln("You cannot use the \"name\" command until you have reached level 5.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   while (*arg == ' ') /* get rid of white space */
     arg++;
@@ -830,13 +830,13 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("Set your name to what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (strlen(arg) > 30)
   {
     ch->sendln("Name too long, must be under 30 characters long.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   *buf = '\0';
@@ -858,14 +858,14 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
       else if (nope == 1)
       {
         ch->sendln("You can only include one % in your name ;)");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
   if (nope == 0)
   {
     ch->sendln("You MUST include your real name. Use % to indicate where you want it.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (ctr = 0; (unsigned)ctr < strlen(arg); ctr++)
@@ -908,20 +908,20 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
   {
     sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((GET_COND(this, DRUNK) > 10) && (GET_COND(this, THIRST) > 0)) /* The pig is drunk */
   {
     act("You simply fail to reach your mouth!", this, 0, 0, TO_CHAR, 0);
     act("$n tried to drink but missed $s mouth!", this, 0, 0, TO_ROOM, INVIS_NULL);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_COND(this, FULL) > 20 && GET_COND(this, THIRST) > 20) /* Stomach full */
   {
     act("Your stomach cannot contain anymore!", this, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   auto arg1 = arguments.value(0);
@@ -946,19 +946,19 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   if (GET_COND(this, THIRST) > 20)
   {
     sendln("Your stomach cannot contain anymore liquid!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(temp = get_obj_in_list_vis(this, arg1, this->carrying)))
   {
     act("You cannot find it!", this, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (temp->obj_flags.type_flag != ITEM_DRINKCON)
   {
     act("You can't drink from that!", this, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (temp->obj_flags.type_flag == ITEM_DRINKCON)
@@ -1043,7 +1043,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   }
 
   act("It's empty already.", this, 0, 0, TO_CHAR, 0);
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
@@ -1054,7 +1054,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
     sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   auto arg1 = arguments.value(0);
@@ -1062,19 +1062,19 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
   if (!(temp = get_obj_in_list_vis(this, arg1, carrying)))
   {
     act("You can't find it!", this, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((temp->obj_flags.type_flag != ITEM_FOOD) && (!isImmortalPlayer()))
   {
     act("Your stomach refuses to eat that!?!", this, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_COND(this, FULL) > 20) /* Stomach full */
   {
     act("You are too full to eat more!", this, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n eats $p.", this, temp, 0, TO_ROOM, INVIS_NULL);
@@ -1122,7 +1122,7 @@ int do_pour(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument_interpreter(argument, arg1, arg2);
@@ -1130,31 +1130,31 @@ int do_pour(Character *ch, char *argument, cmd_t cmd)
   if (!*arg1) /* No arguments */
   {
     act("What do you want to pour from?", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(from_obj = get_obj_in_list_vis(ch, arg1, ch->carrying)))
   {
     act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (from_obj->obj_flags.type_flag != ITEM_DRINKCON)
   {
     act("You can't pour from that!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (from_obj->obj_flags.value[1] == 0)
   {
     act("The $p is empty.", ch, from_obj, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*arg2)
   {
     act("Where do you want it? Out or in what?", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(arg2, "out"))
@@ -1171,32 +1171,32 @@ int do_pour(Character *ch, char *argument, cmd_t cmd)
   if (!(to_obj = get_obj_in_list_vis(ch, arg2, ch->carrying)))
   {
     act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (to_obj->obj_flags.type_flag != ITEM_DRINKCON)
   {
     act("You can't pour anything into that.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (to_obj == from_obj)
   {
     act("A most unproductive effort.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((to_obj->obj_flags.value[1] != 0) &&
       (to_obj->obj_flags.value[2] != from_obj->obj_flags.value[2]))
   {
     act("There is already a different liquid in it!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(to_obj->obj_flags.value[1] < to_obj->obj_flags.value[0]))
   {
     act("There is no room for more.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(buf, "You pour the %s into the %s.\r\n",
@@ -1237,7 +1237,7 @@ int do_sip(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, arg);
@@ -1245,26 +1245,26 @@ int do_sip(Character *ch, char *argument, cmd_t cmd)
   if (!(temp = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
     act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (temp->obj_flags.type_flag != ITEM_DRINKCON)
   {
     act("You can't sip from that!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_COND(ch, DRUNK) > 10) /* The pig is drunk ! */
   {
     act("You simply fail to reach your mouth!", ch, 0, 0, TO_CHAR, 0);
     act("$n tries to sip, but fails!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!temp->obj_flags.value[1]) /* Empty */
   {
     act("But there is nothing in it?", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n sips from the $o", ch, temp, 0, TO_ROOM, INVIS_NULL);
@@ -1299,7 +1299,7 @@ int do_taste(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, arg);
@@ -1307,7 +1307,7 @@ int do_taste(Character *ch, char *argument, cmd_t cmd)
   if (!(temp = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
     act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (temp->obj_flags.type_flag == ITEM_DRINKCON)
@@ -1318,7 +1318,7 @@ int do_taste(Character *ch, char *argument, cmd_t cmd)
   if (!(temp->obj_flags.type_flag == ITEM_FOOD))
   {
     act("Taste that?!? Your stomach refuses!", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n tastes the $o.", ch, temp, 0, TO_ROOM, INVIS_NULL);
@@ -2273,7 +2273,7 @@ int do_wear(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument_interpreter(argument, arg1, arg2);
@@ -2281,7 +2281,7 @@ int do_wear(Character *ch, char *argument, cmd_t cmd)
   if (!(*arg1))
   {
     ch->sendln("Wear what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(arg1, "all"))
@@ -2349,7 +2349,7 @@ int do_wield(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument_interpreter(argument, arg1, arg2);
@@ -2398,7 +2398,7 @@ int do_grab(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument_interpreter(argument, arg1, arg2);
@@ -2491,7 +2491,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, arg1);
@@ -2554,18 +2554,18 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
           {
             sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
             send_to_char(arg1, ch);
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
           {
             ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           if (will_screwup_worn_sizes(ch, obj_object, 0))
           {
             // will_screwup_worn_sizes() takes care of the messages
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (j == WEAR_WIELD)
           {
@@ -2614,7 +2614,7 @@ int Character::recheck_height_wears(void)
   int j;
   class Object *obj = nullptr;
   if (!this || IS_NPC(this))
-    return eFAILURE; // NPCs get to wear the stuff.
+    return ReturnValue::eFAILURE; // NPCs get to wear the stuff.
 
   for (j = 0; j < MAX_WEAR; j++)
   {

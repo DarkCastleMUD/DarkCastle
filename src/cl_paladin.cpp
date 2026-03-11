@@ -40,7 +40,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_HARM_TOUCH, "You dunno even HOW to harm touch.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis(victim_name)))
@@ -49,7 +49,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
     if (!victim)
     {
       ch->sendln("Whom do you want to harmtouch?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -61,19 +61,19 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You naughty naughty girl...at least wait until someone's filming.");
     else
       ch->sendln("Looks like you've already harm touched yourself...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_HARM_TOUCH) && ch->getLevel() <= IMMORTAL)
   {
     ch->sendln("You have not spend enough time in devotion to your god to warrant such a favor yet.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getHP() < GET_MAX_HIT(ch) / 4)
   {
     ch->sendln("You don't posess the energy to do it!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_HARM_TOUCH))
@@ -133,36 +133,36 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_LAY_HANDS, "You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis(victim_name)))
   {
     ch->sendln("Whom do you want to layhands on?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Oh yeah...that's really holy....pervert...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   //   if (ch->fighting == victim) {
   //     ch->sendln("Aren't you a little busy trying to KILL them right now?");
-  //     return eFAILURE;
+  //     return ReturnValue::eFAILURE;
   //   }
 
   if (ch->affected_by_spell(SKILL_LAY_HANDS))
   {
     ch->sendln("You have not spent enough time in devotion to your god to warrant such a favor yet.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getHP() < GET_MAX_HIT(ch) / 4)
   {
     ch->sendln("You don't posess the energy to do it!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_LAY_HANDS))
@@ -211,13 +211,13 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_BEHEAD, "The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_WIELD] || !isSet(ch->equipment[WEAR_WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WEAR_WIELD]->obj_flags.value[3] != 3)) // TYPE_SLASH
   {
     ch->sendln("You need to be wielding a two handed sword to behead!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(vict = ch->get_char_room_vis(buf)))
@@ -227,17 +227,17 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("Whom do you want behead?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, vict))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(vict->combat, COMBAT_BLADESHIELD1) || isSet(vict->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("You can't behead a bladeshielded opponent!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_BEHEAD))

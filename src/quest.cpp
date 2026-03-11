@@ -51,7 +51,7 @@ int load_quests(void)
   if (!(fl = fopen(QUEST_FILE, "r")))
   {
     logentry(QStringLiteral("Failed to open quest file for reading!"), 0, DC::LogChannel::LOG_MISC);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   while (fgetc(fl) != '$')
@@ -96,7 +96,7 @@ int save_quests(void)
   if (!(fl = fopen(QUEST_FILE, "w")))
   {
     logentry(QStringLiteral("Failed to open quest file for writing!"), 0, DC::LogChannel::LOG_MISC);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
@@ -529,7 +529,7 @@ int start_quest(Character *ch, struct quest_info *quest)
   if (!check_available_quest(ch, quest))
   {
     ch->sendln("That quest is not available to you.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   while (count < QUEST_MAX)
@@ -579,7 +579,7 @@ int start_quest(Character *ch, struct quest_info *quest)
   if (!mob)
   {
     ch->sendln("This quest is temporarily unavailable.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   obj = clone_object(real_object(quest->objnum));
@@ -629,9 +629,9 @@ int cancel_quest(Character *ch, struct quest_info *quest)
   int count = 0;
 
   if (!quest)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!check_quest_current(ch, quest->number))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   while (count < QUEST_MAX_CANCEL)
   {
@@ -674,7 +674,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
   if (!obj)
   {
     ch->sendln("You do not appear to have the quest object yet.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   obj_from_char(obj);
@@ -697,7 +697,7 @@ int stop_current_quest(Character *ch, struct quest_info *quest)
   char buf[MAX_STRING_LENGTH];
 
   if (!quest)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   while (count < QUEST_MAX)
   {
@@ -706,7 +706,7 @@ int stop_current_quest(Character *ch, struct quest_info *quest)
     count++;
     if (count >= QUEST_MAX)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   ch->player->quest_current[count] = -1;
@@ -723,7 +723,7 @@ int stop_current_quest(Character *ch, struct quest_info *quest)
 int stop_current_quest(Character *ch, int number)
 {
   if (!number)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   struct quest_info *quest = get_quest_struct(number);
   return stop_current_quest(ch, quest);
@@ -733,7 +733,7 @@ int stop_all_quests(Character *ch)
 {
   if (!ch->player)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int retval = 0;
@@ -813,7 +813,7 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
     if (quest == 0)
     {
       ch->sendln("That is not a valid quest name or number.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -909,7 +909,7 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
     break;
   default:
     logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   return retval;
 }
@@ -921,13 +921,13 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
   char buf[MAX_STRING_LENGTH];
 
   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_AFFECTED(ch, AFF_BLIND))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::LIST)
   {
@@ -982,7 +982,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
   else if (is_abbrev(arg, "list"))
   {
     if (!qmaster)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
       ch->sendln("You must ask the Quest Master for available quests.");
     else
@@ -991,7 +991,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
   else if (is_abbrev(arg, "cancel") && *name)
   {
     if (!qmaster)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
       ch->sendln("You must let the Quest Master know of your intentions.");
     else
@@ -1001,7 +1001,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
   else if (is_abbrev(arg, "start") && *name)
   {
     if (!qmaster)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
       ch->sendln("You may only begin quests given from the Quest Master.");
     else
@@ -1011,7 +1011,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
   else if (is_abbrev(arg, "finish") && *name)
   {
     if (!qmaster)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
       ch->sendln("You may only finish quests in the presence of the Quest Master.");
     else
@@ -1022,13 +1022,13 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
   {
     if (!qmaster)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (ch->in_room != qmaster->in_room)
     {
       ch->sendln("You may only reset all quests in the presence of the Quest Master.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     quest_info *quest;
@@ -1064,7 +1064,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
     if (completed < 100)
     {
       ch->sendln("You will need to complete at least 100 quests before you can reset.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (GET_PLATINUM(ch) < 2000)
@@ -1077,7 +1077,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
     if (!brownie)
     {
       ch->sendln("You need a brownie point to reset all quests!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     csendf(ch, "%s takes 2000 platinum from you.\r\n", GET_SHORT(qmaster));
@@ -1108,7 +1108,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
                "       quest finish <name or #> (finishes a current quest)\n\r"
                "       quest reset              (reset all quests. costs 2k plats, 1 brownie)\n\r"
                "\n\r");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   return eSUCCESS;
@@ -1157,7 +1157,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     }
     ch->sendln("");
 
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (is_abbrev(arg, "save"))
@@ -1171,7 +1171,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     if (!*argument)
     {
       ch->sendln("Usage: qedit new <name>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -1179,7 +1179,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
       if (quest)
       {
         ch->sendln("A quest by this name already exists.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       {
@@ -1204,14 +1204,14 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     if (!*field)
     {
       ch->sendln("Usage: qedit stat <playername>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
       if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
       {
         ch->sendln("No living thing by that name.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       csendf(ch, "%s's quest points: %d\n\r", GET_NAME(vict), vict->player->quest_points);
@@ -1224,14 +1224,14 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     if (!*field)
     {
       ch->sendln("Usage: qedit reset <playername>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
       if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
       {
         ch->sendln("No living thing by that name.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       memset(vict->player->quest_cancel, 0, sizeof(vict->player->quest_cancel));
@@ -1252,14 +1252,14 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     if (!*field || !*value || !is_number(value))
     {
       ch->sendln("Usage: qedit set <playername> <value>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
       if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
       {
         ch->sendln("No living thing by that name.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
@@ -1312,7 +1312,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   if (!is_number(arg))
   {
     ch->sendln("Usage: qedit <number> <field> <value>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   holdernum = atoi(arg);
@@ -1320,25 +1320,25 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   if (holdernum <= 0 || holdernum > QUEST_TOTAL)
   {
     ch->sendln("Invalid quest number.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(quest = get_quest_struct(holdernum)))
   {
     ch->sendln("That quest doesn't exist.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*field)
   {
     ch->sendln("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(*value))
   {
     ch->sendln("You must enter a value.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   i = 0;
@@ -1353,7 +1353,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   if (valid_fields[i] == nullptr)
   {
     ch->sendln("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   struct quest_info *oldquest;
@@ -1366,7 +1366,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     if (oldquest)
     {
       ch->sendln("A quest by this name already exists.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -1455,7 +1455,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     break;
   default:
     logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   return eSUCCESS;
 }
@@ -1468,17 +1468,17 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
   // list & buy & sell
   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY) && (cmd != cmd_t::SELL))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!CAN_SEE(ch, owner))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(ch))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!CAN_SEE(owner, ch))

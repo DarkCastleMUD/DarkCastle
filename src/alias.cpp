@@ -17,7 +17,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 {
   if (!player)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (arguments.isEmpty())
@@ -56,25 +56,25 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
     if (alias == "alias" || alias == "deleteall")
     {
       sendln("You cannot create a command alias named 'alias' or 'deleteall'.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (alias.isEmpty())
     {
       sendln("You need to specify an alias.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (command.isEmpty())
     {
       sendln("You need to specify a command for your alias.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (player->aliases_.contains(alias) && player->aliases_[alias] == command)
     {
       sendln(QStringLiteral("Alias '%1' with command '%2' already set.").arg(alias).arg(command));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (player->aliases_.contains(alias))
     {
@@ -94,7 +94,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
     if (player->aliases_.isEmpty())
     {
       sendln("No aliases defined.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
@@ -110,13 +110,13 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
   if (!player->aliases_.contains(arg1))
   {
     sendln(QStringLiteral("Alias '%1' not found to delete.").arg(arg1));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   player->aliases_.remove(arg1);
   sendln(QStringLiteral("Alias '%1' deleted.").arg(arg1));
   save();
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 QString pet_info(Character *ch, QString type, unsigned victim_count)

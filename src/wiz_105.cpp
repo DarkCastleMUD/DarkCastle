@@ -62,7 +62,7 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
     //  victim->sendln("Your affects have been cleared.");
     return eSUCCESS;
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
@@ -92,7 +92,7 @@ int do_log(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch) || !ch->has_skill(COMMAND_LOG))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, buf);
@@ -146,7 +146,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
   if (!(victim = get_char(person)))
   {
     ch->sendln("They aren't here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   csendf(ch, "Player: %s\n\r", victim->getNameC());
@@ -316,7 +316,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
     if (!victim)
     {
       ch->sendln("Player not found.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     victim->setDebug(!victim->getDebug());
     ch->sendln(QStringLiteral("Debug for %1 toggled %2").arg(GET_NAME(victim)).arg(victim->getDebug() ? "on" : "off"));
@@ -359,7 +359,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
     }
 
     ch->sendln("Invalid vnum. Valid example: 1 or v1");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else
   {
@@ -381,20 +381,20 @@ int do_pardon(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, person, flag);
 
   if (!*person)
   {
     ch->sendln("Pardon whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, person)))
   {
     ch->sendln("They aren't here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp("thief", flag))
@@ -408,7 +408,7 @@ int do_pardon(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("That character is not a thief!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else if (!str_cmp("killer", flag))
@@ -422,13 +422,13 @@ int do_pardon(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("That player has no CANTQUIT flag!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     ch->sendln("No flag specified! (Flags are 'thief' & 'killer')");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   ch->sendln("Done.");
@@ -450,7 +450,7 @@ int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
   if (!*buf)
   {
     ch->sendln("Syntax: damage <item>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   obj_object = get_obj_in_list_vis(ch, buf, ch->carrying);
@@ -458,7 +458,7 @@ int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
   if (!obj_object)
   {
     ch->sendln("You don't seem to have that item.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   eqdam = damage_eq_once(obj_object);
 
@@ -527,7 +527,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(COMMAND_SQEDIT))
   {
     ch->sendln("You are unable to do so.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   //  if (argument && *argument && !is_number(argument))
   //   argument = one_argument(argument, skill+strlen(skill));
@@ -536,7 +536,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
        send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
                     "$3Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
        ch->sendln("$3Syntax:$R sqedit list.");
-       return eFAILURE;
+       return ReturnValue::eFAILURE;
     }*/
   int i;
   for (i = 0;; i++)
@@ -554,7 +554,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
                  ch);
     ch->sendln("$3Syntax:$R sqedit list <class>.");
     ch->sendln("$3Syntax:$R sqedit save.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
   bool done = false;
@@ -573,7 +573,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   if (skill == nullptr && (skill = find_sq(arg1)) == nullptr && i != 0 && i != 6 && i != 7)
   {
     ch->sendln("Unknown skill.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   struct skill_quest *curren, *last = nullptr;
   switch (i)
@@ -588,12 +588,12 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     if (i <= 0 || arg2[0] == '\0')
     {
       ch->sendln("Skill not found.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (find_sq(i))
     {
       ch->sendln("Skill quest already exists. Stop duping the damn sqs ;)");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     //	argument = one_argument(argument,arg3);
     if (arg3[0] != '\0')
@@ -650,7 +650,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("Invalid level.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     break;
   case 4:
@@ -665,7 +665,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
       /*	if (*pc_clss_types[i] == '\n')
         {
           ch->sendln("Invalid class.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }*/
     }
     else
@@ -675,7 +675,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     if (i < 1 || i > 11)
     {
       ch->sendln("Invalid class.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (isSet(skill->clas, 1 << (i - 1)))
       REMOVE_BIT(skill->clas, 1 << (i - 1));
@@ -697,7 +697,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     if (*pc_clss_types2[l] == '\n')
     {
       ch->send("Unknown class.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     ch->sendln("These are the current sqs:");
     csendf(ch, "$3%s skillquests.$R\r\n", pc_clss_types2[l]);
@@ -716,7 +716,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     break;
   default:
     logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, DC::LogChannel::LOG_WORLD);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   return eSUCCESS;
 }
@@ -762,7 +762,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
   if ((vict = get_pc_vis(ch, arg)) == nullptr)
   {
     ch->sendln("Who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, arg);
   int type;
@@ -791,7 +791,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
   else
   {
     ch->sendln("$3Syntax$R: eqmax <character> <damage/hp/mana> <optional: nodouble>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, arg);
   bool nodouble = false;
@@ -939,7 +939,7 @@ int do_reload(Character *ch, char *argument, cmd_t cmd)
   else
   {
     ch->sendln("Unknown reload option. Try 'help reload'.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   return eSUCCESS;
@@ -959,7 +959,7 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
       start > end)
   {
     ch->sendln("$3Syntax:$n listproc <obj/mob> <low vnum> <high vnum>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   mob = !str_cmp(arg, "mob"); // typoed mob means obj. who cares.
   char buf[MAX_STRING_LENGTH];

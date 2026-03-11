@@ -680,7 +680,7 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
     zonenumber = DC::getInstance()->world[ch->in_room].zone;
     ch->sendln("Players in your vicinity:\n\r-------------------------");
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_WHERE))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != DC::NOWHERE) &&

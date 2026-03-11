@@ -23,19 +23,19 @@ int do_archive(Character *ch, char *argument, cmd_t cmd)
   if (!*name)
   {
     ch->sendln("Archive whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   name[0] = toupper(name[0]);
 
   if (!(victim = get_pc(name)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (victim->getLevel() >= MIN_GOD)
   {
     act("I think $N can archive $Mself, thank you.", ch, 0, victim,
         TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   send_to_char("Suddenly someone reaches down and packs you into a "
@@ -67,13 +67,13 @@ command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
   if (name.isEmpty() || !victim)
   {
     sendln("View the prompt of whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!victim->desc)
   {
     sendln("This can only be used on linkalive players.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sendln(QStringLiteral("Target's prompt is: %1").arg(victim->getPrompt()));
@@ -85,18 +85,18 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   Character *victim;
 
   if (!this->desc)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_NPC(this))
   {
     this->send("Did you ever try this before?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!has_skill(COMMAND_SNOOP))
   {
     this->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.value(0);
@@ -104,7 +104,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   if (arg1.isEmpty())
   {
     this->sendln("Snoop whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_active_pc_vis(arg1)))
@@ -113,13 +113,13 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
                  "linkdead.\r\n",
                  this);
     this->sendln("(You can only snoop a link-active pc.)");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if ((victim->getLevel() > this->getLevel()) && (GET_NAME(this) != victim->getNameC()))
   {
     this->sendln("Can't do that. That mob is higher than you!");
     logentry(QStringLiteral("%1 tried to snoop a higher mob\n\r").arg(GET_NAME(this)), OVERSEER, DC::LogChannel::LOG_GOD);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
@@ -138,7 +138,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   {
     sendln("What are you!? Crazy! You can't snoop an Imp.");
     victim->sendln(QStringLiteral("%1 failed snooping you.").arg(getName()));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->desc->snoop_by)
@@ -152,7 +152,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
       sendln(QStringLiteral("Descriptor #%1 is snooping them already.").arg(victim->desc->snoop_by->descriptor));
     }
 
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* It's power trip time again, eh? */
@@ -171,7 +171,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 int do_stealth(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (argument[0] != '\0')
   {
@@ -204,19 +204,19 @@ int do_send(Character *ch, char *argument, cmd_t cmd)
   if (!*name || !*message)
   {
     ch->sendln("Send what to who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(vict = ch->get_active_pc_vis(name)))
   {
     ch->sendln("Noone by that name here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch == vict)
   {
     ch->sendln("That's you, ya moron.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(buf, "You send '%s' to %s.\r\n", message, GET_NAME(vict));

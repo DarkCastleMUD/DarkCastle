@@ -236,7 +236,7 @@ int do_newPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0])
   {
     ch->sendln("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *p;
   for (p = mPathList; p; p = p->next)
@@ -245,7 +245,7 @@ int do_newPath(Character *ch, char *argument, cmd_t cmd)
   if (p)
   {
     ch->sendln("That path already exists.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   p = new Path;
   p->name = str_dup(arg1);
@@ -261,7 +261,7 @@ int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
   int i = DC::getInstance()->world[ch->in_room].zone;
   if (zones.contains(i) == false)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   auto &zone = DC::getInstance()->zones[i];
@@ -313,7 +313,7 @@ int do_addRoom(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0])
   {
     ch->sendln("Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *p;
   for (p = mPathList; p; p = p->next)
@@ -322,7 +322,7 @@ int do_addRoom(Character *ch, char *argument, cmd_t cmd)
   if (!p)
   {
     ch->sendln("No such path exists.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   p->addRoom(ch, ch->in_room, false);
   return eSUCCESS;
@@ -335,7 +335,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0])
   {
     ch->sendln("Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *p;
   for (p = mPathList; p; p = p->next)
@@ -344,7 +344,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!p)
   {
     ch->sendln("No such path exists.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int start, end;
   argument = one_argument(argument, arg1);
@@ -352,7 +352,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0] || !is_number(arg1))
   {
     do_findPath(ch, "");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   start = atoi(arg1);
   argument = one_argument(argument, arg1);
@@ -360,13 +360,13 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0] || !is_number(arg1))
   {
     do_findPath(ch, "");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   end = atoi(arg1);
   char *path = p->determineRoute(ch, start, end);
 
   if (!path)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   return eSUCCESS;
 }
@@ -435,7 +435,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   if (!pt || !pt2)
   {
     ch->sendln("Missing path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *pa;
   for (pa = mPathList; pa; pa = pa->next)
@@ -450,7 +450,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   if (i >= 50)
   {
     ch->sendln("Crazy #. Stopping.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   class Path *p[50]; // Maximum of 50 pathsteps atm
@@ -595,7 +595,7 @@ int do_findpath(Character *ch, char *argument, cmd_t cmd)
   /*  argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
     int i = atoi(arg1), z = atoi(arg2);
-    if (!i || !z) { ch->sendln("BLeh!"); return eFAILURE; }
+    if (!i || !z) { ch->sendln("BLeh!"); return ReturnValue::eFAILURE; }
     char *t =  findPath(i, z, ch);
     ch->send(QStringLiteral("Final Path: %1\r\n").arg(t));
     return eSUCCESS;

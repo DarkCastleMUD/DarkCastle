@@ -80,7 +80,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   int percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
@@ -158,7 +158,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   int percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
@@ -259,7 +259,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   int percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
@@ -410,7 +410,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   char buf[100];
 
   if (cmd != cmd_t::BUY && cmd != cmd_t::LIST && cmd != cmd_t::VALUE)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   // TODO - when determining price, it WILL NOT work if we ever institute
   // containers being inside other containers.
@@ -661,7 +661,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
   int mobvnum = DC::getInstance()->mob_index[owner->mobdata->nr].vnum();
   int o;
   char buf[MAX_STRING_LENGTH];
-  //  return eFAILURE; //disabled for now
+  //  return ReturnValue::eFAILURE; //disabled for now
   if (cmd == cmd_t::LIST)
   {
     if (!CAN_SEE(owner, ch))
@@ -775,7 +775,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     GET_PLATINUM(ch) += cost;
     return eSUCCESS;
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 // gl_repair_guy
@@ -786,7 +786,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   int percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {

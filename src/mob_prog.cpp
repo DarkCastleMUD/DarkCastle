@@ -3166,8 +3166,8 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 #ifdef DEBUG_MPROG
         if (mob && mob->mobdata != (Mobile *)0x95959595 && DC::getInstance()->mob_index[mob->mobdata->nr].vnum() == 4821)
         {
-          if (isSet(mprog_cur_result, eFAILURE))
-            qDebug("eFAILURE ");
+          if (isSet(mprog_cur_result, ReturnValue::eFAILURE))
+            qDebug("ReturnValue::eFAILURE ");
           if (isSet(mprog_cur_result, eSUCCESS))
             qDebug("eSUCCESS ");
           if (isSet(mprog_cur_result, eCH_DIED))
@@ -4442,7 +4442,7 @@ int mprog_load_trigger(Character *mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   mprog_cur_result = eSUCCESS;
@@ -4455,7 +4455,7 @@ int mprog_arandom_trigger(Character *mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   mprog_cur_result = eSUCCESS;
   if ((DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ARAND_PROG) && isPaused(mob) == false)
@@ -4467,12 +4467,12 @@ int Character::mprog_can_see_trigger(Character *mob)
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!mob || mob->isDead() || mob->isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   mprog_cur_result = eSUCCESS;
@@ -4486,7 +4486,7 @@ int Character::mprog_speech_trigger(const char *txt)
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vmob;
@@ -4507,14 +4507,14 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   mob_prog_data *mprg{};
   mob_prog_data *next{};
   int curr_catch;
   bool done = false;
-  mprog_cur_result = eFAILURE;
+  mprog_cur_result = ReturnValue::eFAILURE;
 
   if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & CATCH_PROG) && isPaused(mob) == false)
   {
@@ -4536,7 +4536,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
         {
           logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d",
                DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (curr_catch == catch_num)
         {
@@ -4746,7 +4746,7 @@ int Character::oprog_can_see_trigger(Object *item)
 {
   if (!isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vmob;
@@ -4766,7 +4766,7 @@ int Character::oprog_speech_trigger(const char *txt)
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vmob = nullptr;
@@ -4815,7 +4815,7 @@ int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Char
 {
   mob_prog_data *mprg{};
   int curr_catch;
-  mprog_cur_result = eFAILURE;
+  mprog_cur_result = ReturnValue::eFAILURE;
   Character *vmob;
 
   if (obj_index[obj->item_number].progtypes & CATCH_PROG)
@@ -4831,7 +4831,7 @@ int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Char
         if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
         {
           logf(IMMORTAL, LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d", obj_index[obj->item_number].vnum());
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (curr_catch == catch_num)
         {
@@ -4868,7 +4868,7 @@ int Character::oprog_act_trigger(QString txt)
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vmob;
@@ -4921,7 +4921,7 @@ int Character::oprog_greet_trigger(void)
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   mprog_cur_result = eSUCCESS;
@@ -5017,7 +5017,7 @@ int Character::oprog_weapon_trigger(Object *item)
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vmob;
@@ -5039,7 +5039,7 @@ int Character::oprog_armour_trigger(Object *item)
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vmob;
@@ -5061,12 +5061,12 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 {
   if (isDead() || isNowhere())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vmob = nullptr;
   Object *item = nullptr;
-  mprog_cur_result = eFAILURE;
+  mprog_cur_result = ReturnValue::eFAILURE;
   QString buf;
   if (in_room >= 0)
   {

@@ -44,7 +44,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (!ch->has_skill(SKILL_PROFESSION))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // You can only use the command in the same room of a mob named guildmaster
@@ -52,7 +52,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (victim == nullptr)
   {
     ch->sendln("You can't pick a profession here. You need to find a Guild Master.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   char arg1[MAX_INPUT_LENGTH];
@@ -94,7 +94,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
       else
       {
         ch->sendln("That profession is not available to your class.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -102,7 +102,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (found == false)
   {
     csendf(ch, "%s not a valid profession.\r\n", arg1);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   return eSUCCESS;
@@ -628,12 +628,12 @@ int Character::skills_guild(const char *arg, Character *owner)
   int percent;
 
   if (IS_NPC(this))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   class_skill_defines *skilllist = get_skill_list();
 
   if (!skilllist)
-    return eFAILURE; // no skills to train
+    return ReturnValue::eFAILURE; // no skills to train
 
   if (!*arg) // display skills that can be learned
   {
@@ -675,7 +675,7 @@ int Character::skills_guild(const char *arg, Character *owner)
 
   if (skillnumber == -1)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (getLevel() < skilllist[skillnumber].levelavailable)
@@ -716,7 +716,7 @@ int Character::skills_guild(const char *arg, Character *owner)
         case SKILL_NAT_SELECT:
           do_say(owner, "Alternately, should you feel that you are not up to the task of an exciting quest, you can seek the Skills Master west of town.");
           do_say(owner, "Rumour has it he will teach certain skills for a hefty fee.  He will give you a LIST of what he has to offer.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         default:
           break;
         }
@@ -778,7 +778,7 @@ int Character::skills_guild(const char *arg, Character *owner)
   case SKILL_NAT_SELECT:
     do_say(owner, "I cannot teach you that. You need to learn it by yourself.");
 
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   default:
     break;
   }
@@ -987,12 +987,12 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   }
 
   if ((cmd != cmd_t::PRACTICE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_NPC(ch))
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (; *arg == ' '; arg++)
@@ -1025,11 +1025,11 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   if (IS_NPC(ch))
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (cmd != cmd_t::PRACTICE && cmd != cmd_t::BUY && cmd != cmd_t::LIST)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   for (; *arg == ' '; arg++)
     ;
@@ -1144,7 +1144,7 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   if (number == -1)
   {
     if (!skilllist)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (search_skills(arg, skilllist) != -1)
       do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.");
     else

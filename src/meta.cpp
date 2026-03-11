@@ -657,13 +657,13 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   int pprice = 0;
 
   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY) && (cmd != cmd_t::ESTIMATE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_AFFECTED(ch, AFF_BLIND))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (ch->getLevel() < 10)
   {
@@ -1882,7 +1882,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
     }
   }
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 /*

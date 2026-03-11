@@ -27,36 +27,36 @@
 int do_suicide(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
-    return eFAILURE; // just in case
+    return ReturnValue::eFAILURE; // just in case
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("This place is too peaceful for that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->room().isArena())
   {
     ch->sendln("You can't do that in the arena.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->isPlayerObjectThief() || (ch->isPlayerGoldThief()))
   {
     ch->sendln("You're too busy running from the law!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_CHAMPION))
   {
     ch->sendln("You have no reason to feel sad, oh great Champion!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_CURSE) || IS_AFFECTED(ch, AFF_SOLIDITY))
   {
     ch->sendln("Something blocks your attempted suicide, be happy!  You have a new lease on life!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (GET_POS(ch) == position_t::FIGHTING || ch->fighting)
   {
     ch->sendln("You are too busy trying to kill somebody else!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int percent = number(1, 100);
@@ -67,7 +67,7 @@ int do_suicide(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("You miss your wrists with the blade and knick your kneecap!");
     act("$n tries to suicide, but fails miserably.", ch, 0, 0, TO_ROOM, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   ch->sendln("Looking out upon the world, you decide that it would be a better place without you.");
   act("Tired of life, $n decides to end $s.", ch, 0, 0, TO_ROOM, 0);
@@ -98,13 +98,13 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
       else
       {
         if (!can_attack(this) || !can_be_attacked(this, victim))
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
 
         if (IS_AFFECTED(this, AFF_CHARM) && (this->master == victim))
         {
           act("$N is just such a good friend, you simply can't hit $M.",
               this, 0, victim, TO_CHAR, 0);
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
         if ((GET_POS(this) == position_t::STANDING) &&
@@ -120,7 +120,7 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
           /*
           if (count >= 6) {
                   this->send("You can't get close enough to do anything.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           */
           WAIT_STATE(this, DC::PULSE_VIOLENCE);
@@ -135,7 +135,7 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
   }
   else
     this->sendln("Hit whom?");
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_murder(Character *ch, char *argument, cmd_t cmd)
@@ -158,16 +158,16 @@ int do_murder(Character *ch, char *argument, cmd_t cmd)
       else
       {
         if (!can_attack(ch) || !can_be_attacked(ch, victim))
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
 
         if (IS_NPC(victim))
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
 
         if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == victim))
         {
           act("$N is just such a good friend, you simply can't murder $M.",
               ch, 0, victim, TO_CHAR, 0);
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
         if ((GET_POS(ch) == position_t::STANDING) &&
@@ -199,24 +199,24 @@ int do_slay(Character *ch, char *argument, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("Slay whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis(arg)))
   {
     ch->sendln("They aren't here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   //  if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim)) {
   //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
-  //     return eFAILURE;
+  //     return ReturnValue::eFAILURE;
   //  }
 
   if (IS_AFFECTED(ch, AFF_FAMILIAR) && IS_PC(ch->master))
   {
     act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch == victim)
@@ -258,30 +258,30 @@ int do_kill(Character *ch, char *argument, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("Slay whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis(arg)))
   {
     ch->sendln("They aren't here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   //  if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim)) {
   //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
-  //     return eFAILURE;
+  //     return ReturnValue::eFAILURE;
   //  }
 
   if (IS_AFFECTED(ch, AFF_FAMILIAR) && IS_PC(ch->master))
   {
     act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     return ch->do_hit(QString(argument).split(' '));
   }
   else
@@ -323,7 +323,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   if (fighting)
   {
     sendln("Aren't you helping enough as it is?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *victim{};
@@ -344,7 +344,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
     if (!victim)
     {
       sendln("You have no loyal subjects engaged in combat!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -367,7 +367,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
 
       if (!victim)
       {
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -380,30 +380,30 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   if (!victim)
   {
     sendln("Join whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!victim->fighting)
   {
     this->sendln("But they're not fighting anyone.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
     sendln("You can't join yourself.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->fighting == this)
   {
     sendln("But why join someone who is trying to kill YOU?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim->fighting)) {
   //    act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
-  //    return eFAILURE;
+  //    return ReturnValue::eFAILURE;
   // }
 
   Character *tmp_ch = victim->fighting;
@@ -411,12 +411,12 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   if (!tmp_ch)
   {
     act("But $N is not fighting!!!", this, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(this) || (victim->fighting && !can_be_attacked(this, victim->fighting)))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sendln("ARGGGGG!!!! *** K I L L ***!!!!.");

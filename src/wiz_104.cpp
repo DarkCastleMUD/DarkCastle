@@ -97,7 +97,7 @@ int do_thunder(Character *ch, char *argument, cmd_t cmd)
 int do_incognito(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (ch->player->incognito == true)
   {
@@ -133,17 +133,17 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
   };
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->has_skill(COMMAND_LOAD) && cmd == cmd_t::DEFAULT)
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!ch->has_skill(COMMAND_PRIZE) && cmd == cmd_t::PRIZE)
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   half_chop(arg, type, arg2);
@@ -152,7 +152,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("Usage:  load <mob> <name|vnum> [qty]");
     ch->sendln("        load <obj> <name|vnum> [qty] [random]");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (cmd == cmd_t::PRIZE && !*type)
   {
@@ -180,7 +180,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
     }
 
     ch->sendln("To load: prize <name|vnum>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (cmd == cmd_t::DEFAULT)
@@ -196,7 +196,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
     if (cnt > 50)
     {
       ch->sendln("Sorry, you can only load at most 50 of something at a time.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -212,7 +212,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       if (x == 2)
       {
         ch->sendln("Type must mobile or object.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (is_abbrev(type, types[x]))
         break;
@@ -226,21 +226,21 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
   default:
     ch->sendln("Problem...fuck up in do_load.");
     logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   case 0: /* mobile */
     if ((number = number_or_name(&c, &num)) == 0)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     else if (number == -1)
     {
       if ((number = real_mobile(num)) < 0)
       {
         ch->sendln("No such mobile.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (ch->getLevel() < DEITY && !can_modify_mobile(ch, num))
       {
         ch->sendln("You may only load mobs inside of your range.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       do_mload(ch, number, cnt);
       return eSUCCESS;
@@ -248,35 +248,35 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
     if ((num = mob_in_index(c, number)) == -1)
     {
       ch->sendln("No such mobile.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     do_mload(ch, num, cnt);
     return eSUCCESS;
   case 1: /* object */
     if ((number = number_or_name(&c, &num)) == 0)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     else if (number == -1)
     {
       if ((number = real_object(num)) < 0)
       {
         ch->sendln("No such object.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if ((ch->getLevel() < 108) &&
           isSet(((class Object *)(DC::getInstance()->obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
       {
         ch->sendln("Why would you want to load that?");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[number].item))->Name()))
       {
         ch->sendln("This command can only load prize items.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else if (cmd != cmd_t::PRIZE && ch->getLevel() < DEITY && !can_modify_object(ch, num))
       {
         ch->sendln("You may only load objects inside of your range.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       if (random[0] == 'r')
@@ -285,17 +285,17 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else if (isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
         {
           ch->send(QStringLiteral("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
         {
           ch->send(QStringLiteral("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
 
@@ -305,19 +305,19 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
     if ((num = obj_in_index(c, number)) == -1)
     {
       ch->sendln("No such object.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if ((ch->getLevel() < IMPLEMENTER) &&
         isSet(((class Object *)(DC::getInstance()->obj_index[num].item))->obj_flags.extra_flags,
               ITEM_SPECIAL))
     {
       ch->sendln("Why would you want to load that?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
     {
       ch->sendln("This command can only load prize items.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     do_oload(ch, num, cnt, (random[0] == 'r' ? true : false));
@@ -334,7 +334,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
   char name[100], buf[300];
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   one_argument(argument, name);
 
@@ -349,7 +349,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
                 GET_SHORT(vict));
         ch->send(buf);
         act("$n tried to purge you.", ch, 0, vict, TO_VICT, 0);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       act("$n disintegrates $N.", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -373,7 +373,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("You can't find it to purge!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -381,7 +381,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
     if (IS_NPC(ch))
     {
       ch->sendln("Don't... You would kill yourself too.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     act("$n gestures... the room is filled with scorching flames!",
@@ -495,7 +495,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
   {
     sprintf(buf, "Last command in this zone is %d.\r\n", k);
     ch->send(buf);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!num_to_show)
@@ -742,7 +742,7 @@ int show_zone_commands(Character *ch, zone_t zone_key, uint64_t start, uint64_t 
 {
   if (!isValidZoneKey(ch, zone_key))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   auto &zone = DC::getInstance()->zones[zone_key];
@@ -834,7 +834,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
                    " rsearch\r\n"
                    " counts\r\n",
                    ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (is_abbrev(type, "mobile"))
@@ -846,7 +846,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
                    "                  <number>\r\n"
                    "                  <beginrange> <endrange>\r\n",
                    ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isdigit(*name))
@@ -862,7 +862,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
                                                                                                          100000))
       {
         ch->sendln("The begin and end ranges must be valid numbers.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (end != -1 && end < begin)
       { // swap um
@@ -950,7 +950,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
                    "                  <number>\r\n"
                    "                  <beginrange> <endrange>\r\n",
                    ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isdigit(*name))
@@ -966,7 +966,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
                                                                                                          100000))
       {
         ch->sendln("The begin and end ranges must be valid numbers.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (end != -1 && end < begin)
       { // swap um
@@ -1045,7 +1045,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (!*name)
     {
       ch->sendln("Format:  show room <beginrange> <endrange>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isdigit(*name))
@@ -1061,7 +1061,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
                                                                                                          100000))
       {
         ch->sendln("The begin and end ranges must be valid numbers.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (end != -1 && end < begin)
       { // swap um
@@ -1109,7 +1109,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (!*name)
     {
       ch->sendln("Show which zone? (# or 'all')");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (QString(name) == "all")
@@ -1135,7 +1135,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     zone_t zone_key = getZoneKey(ch, name, &ok);
     if (!ok)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     DC::getInstance()->zones.value(zone_key).show_info(ch);
   } // zone
@@ -1188,7 +1188,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     {
 
       ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     char buf[MAX_INPUT_LENGTH];
     for (i = DC::getInstance()->zones.value(zon).getRealBottom(); i < DC::getInstance()->zones.value(zon).getRealTop();
@@ -1269,7 +1269,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (levhigh == -555 || levlow == -555)
         {
           ch->sendln("Incorrect level requirement.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
     thisLoop:
@@ -1351,7 +1351,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (!*act && !clas && !levlow && !levhigh && !*affect && !immune && !race && !align)
     {
       ch->sendln("No valid search supplied.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     for (c = 0; c < DC::getInstance()->mob_index[top_of_mobt].vnum(); c++)
     {
@@ -1522,7 +1522,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (levhigh == -555 || levlow == -555)
         {
           ch->sendln("Incorrect level requirement.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       if (!str_cmp(arg1, "oweight"))
@@ -1538,7 +1538,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (lweight == -555 || hweight == -555)
         {
           ch->sendln("Incorrect weight requirement.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       csendf(ch, "Unknown type: %s.\r\n", arg1);
@@ -1751,14 +1751,14 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (!*name)
     {
       ch->sendln("Show which key? (# of key)");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     count = atoi(name);
     if ((!count && *name != '0') || count < 0)
     {
       ch->sendln("Which key was that?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     ch->send(QStringLiteral("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
@@ -1786,13 +1786,13 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
 {
   if (IS_NPC(ch) || ch == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   room_t destination_room = ch->in_room;
   if (destination_room == 0)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::string arg1;
@@ -1801,7 +1801,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
   {
     ch->send("Usage: transfer <name>\r\n");
     ch->send("       transfer all\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *victim = nullptr;
@@ -1832,14 +1832,14 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
   if (victim == nullptr)
   {
     ch->send("No-one by that name around.\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   source_room = victim->in_room;
 
   if (DC::getInstance()->world[destination_room].number == IMM_PIRAHNA_ROOM && !isexact(GET_NAME(ch), "Pirahna"))
   {
     ch->sendln("Damn! That is rude! This ain't your place. :P");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
@@ -1861,26 +1861,26 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
   int loop;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, person, room);
 
   if (!*person)
   {
     ch->sendln("Who do you wish to teleport?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   } /* if */
 
   if (!*room)
   {
     ch->sendln("Where do you wish to send ths person?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   } /* if */
 
   if (!(victim = get_char_vis(ch, person)))
   {
     ch->sendln("No-one by that name around.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   } /* if */
 
   if (isdigit(*room))
@@ -1889,7 +1889,7 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
     if ((*room != '0' && target == 0) || !DC::getInstance()->rooms.contains(target))
     {
       ch->sendln("No room exists with that number.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     //      for (loop = 0; loop <= DC::getInstance()->top_of_world; loop++) {
     //         if (DC::getInstance()->world[loop].number == target) {
@@ -1897,7 +1897,7 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
     //            break;
     //      } else if (loop == DC::getInstance()->top_of_world) {
     //            ch->sendln("No room exists with that number.");
-    //            return eFAILURE;
+    //            return ReturnValue::eFAILURE;
     //      } /* if */
     //       } /* for */
   }
@@ -1908,7 +1908,7 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
   else
   {
     ch->sendln("No such target (person) can be found.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   } /* if */
 
   if (isSet(DC::getInstance()->world[target].room_flags, PRIVATE))
@@ -1919,21 +1919,21 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
     if (loop > 1)
     {
       ch->sendln("There's a private conversation going on in that room");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     } /* if */
   } /* if */
 
   if (isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln("No.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(DC::getInstance()->world[target].room_flags, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
     ch->sendln("No.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n disappears in a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
@@ -1957,19 +1957,19 @@ int do_gtrans(Character *ch, char *argument, cmd_t cmd)
   struct follow_type *k, *next_dude;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   one_argument(argument, buf);
   if (!*buf)
   {
     ch->sendln("Whom is the group leader you wish to transfer?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_vis(ch, buf)))
   {
     ch->sendln("No-one by that name around.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else
   {
@@ -2085,14 +2085,14 @@ int do_opstat(Character *ch, char *argument, cmd_t cmd)
   if (!*argument)
   {
     ch->send("Usage: opstat <vnum>\r\n ");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   one_argument(argument, buf);
 
   if (!ch->has_skill(COMMAND_OPSTAT))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (isdigit(*buf))
   {
@@ -2125,7 +2125,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (isdigit(*arg))
   {
     vnum = atoi(arg);
@@ -2139,12 +2139,12 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
   if ((num = real_object(vnum)) < 0)
   {
     ch->sendln("No such object.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!can_modify_object(ch, vnum))
   {
     ch->sendln("You are unable to work creation outside your range.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   ch->player->last_obj_vnum = vnum;
   /*  if (!*arg)
@@ -2161,7 +2161,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       send_to_char("$3Syntax$R: opedit [num] add new\r\n"
                    "This creates a new object proc.\r\n",
                    ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     prog = new mob_prog_data;
     prog->type = ALL_GREET_PROG;
@@ -2190,7 +2190,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       send_to_char("$3Syntax$R: opedit [obj_num] remove <prog>\r\n"
                    "This removes an object procedure completly\r\n",
                    ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     a = atoi(arg);
     prog = nullptr;
@@ -2201,7 +2201,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     if (!currprog)
     {
       ch->sendln("Invalid proc number.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (prog)
       prog->next = currprog->next;
@@ -2232,7 +2232,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
                 i + 1, obj_types[i]);
         ch->send(buf);
       }
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     int a = atoi(arg);
     for (i = 1, currprog = DC::getInstance()->obj_index[num].mobprogs;
@@ -2243,7 +2243,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     if (!currprog)
     {
       ch->sendln("Invalid prog number.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     switch (atoi(argument + 1))
     {
@@ -2282,7 +2282,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       break;
     default:
       ch->sendln("Invalid progtype.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     currprog->type = a;
     update_objprog_bits(num);
@@ -2297,7 +2297,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     if (!*arg || !argument || !*argument || !isdigit(*arg))
     {
       ch->sendln("$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     a = atoi(arg);
     for (i = 1, currprog = DC::getInstance()->obj_index[num].mobprogs;
@@ -2308,7 +2308,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     if (!currprog)
     {
       ch->sendln("Invalid prog number.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     dc_free(currprog->arglist);
     currprog->arglist = strdup(argument + 1);
@@ -2322,7 +2322,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     if (!*arg || !isdigit(*arg))
     {
       ch->sendln("$3Syntax$R: opedit [obj_num] command <prog>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     a = atoi(arg);
     for (i = 1, currprog = DC::getInstance()->obj_index[num].mobprogs;
@@ -2333,7 +2333,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     if (!currprog)
     { // intval was too high
       ch->sendln("Invalid prog number.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     ch->desc->backstr = nullptr;
@@ -2385,7 +2385,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
     ch->sendln("Syntax: oclone <source vnum> <destination vnum>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   Object *obj, *otmp;
   int v1 = atoi(arg1), v2 = atoi(arg2);
@@ -2393,13 +2393,13 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
   if (r1 < 0)
   {
     ch->sendln("Source vnum does not exist.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_modify_object(ch, v2))
   {
     ch->sendln("You are unable to work creation outside of your range.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (r2 < 0)
@@ -2407,20 +2407,20 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
     QString buf = QStringLiteral("new %1").arg(v2);
     int retval = ch->do_oedit(buf.split(' '));
     if (!isSet(retval, eSUCCESS))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     r1 = real_object(v1);
     r2 = real_object(v2);
     if (r2 == -1)
     {
       ch->sendln("Something failed. Possibly your destination vnum was too high.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   obj = clone_object(r1);
   if (!obj)
   {
     ch->sendln("Failure. Unable to clone item.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /*
@@ -2461,7 +2461,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
     ch->sendln("Syntax: mclone <source vnum> <destination vnum>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   Character *mob;
   int vdst = atoi(arg2), vsrc = atoi(arg1);
@@ -2469,13 +2469,13 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   if (src < 0)
   {
     ch->sendln("Source vnum does not exist.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_modify_mobile(ch, vdst))
   {
     ch->sendln("You are unable to work creation outside of your range.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (dst < 0)
@@ -2484,20 +2484,20 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "new %d", vdst);
     int retval = do_medit(ch, buf);
     if (!isSet(retval, eSUCCESS))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     dst = real_mobile(vdst);
     src = real_mobile(vsrc);
     if (dst == -1)
     {
       ch->sendln("Something failed. Possibly your destination vnum was too high.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   mob = ch->getDC()->clone_mobile(src);
   if (!mob)
   {
     ch->sendln("Failure. Unable to copy mobile.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // clone_mobile assigns the start of character_list to be mob

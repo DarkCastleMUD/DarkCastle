@@ -33,7 +33,7 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int hands = 0;
@@ -53,7 +53,7 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
   if (hands > 1)
   {
     ch->sendln("You need a free hand to eagleclaw someone.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -65,24 +65,24 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("You raise your hand in a claw and make strange bird noises.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   if (victim == ch)
   {
     ch->sendln("You lower your claw-shaped hand and scratch yourself gently.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Clawing a bladeshielded opponent would be suicide!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_EAGLE_CLAW))
     return eSUCCESS;
@@ -128,7 +128,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_QUIVERING_PALM, "Stick to palming yourself for now bucko.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_QUIVERING_PALM))
@@ -136,7 +136,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You can't perform such an ancient power more than "
                  "once a day!\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int hands = 0;
@@ -150,7 +150,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   if (hands > 1)
   {
     ch->sendln("You need at least one hand free to perform this!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -162,36 +162,36 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("Quivering palm whom?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   if (victim == ch)
   {
     ch->sendln("Masturbate on your own time.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Palming a bladeshielded opponent would be suicide!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
   {
     ch->sendln("You find yourself unable to focus your energy here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_KI(ch) < 40 && ch->getLevel() < ARCHANGEL)
   {
     ch->sendln("You don't possess enough ki!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_QUIVERING_PALM))
     return eSUCCESS;
@@ -232,12 +232,12 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_STUN, "Your lack of knowledge is stunning...\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->getHP() < 25)
   {
     ch->sendln("You can't muster the energy for such an attack.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   one_argument(argument, name);
 
@@ -249,19 +249,19 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
   if (victim == nullptr)
   {
     ch->sendln("Stun whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Aren't we funny today...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Stunning a bladeshielded opponent would be suicide!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->isImmortalPlayer() && victim->isImmortalPlayer())
@@ -307,29 +307,29 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
   if (victim->getLevel() == IMPLEMENTER)
   {
     ch->sendln("You gotta be kidding!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     ch->sendln("You cannot stun something that HUGE!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one of them to stun!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_STUN))
     return eSUCCESS;

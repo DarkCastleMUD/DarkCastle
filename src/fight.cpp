@@ -122,13 +122,13 @@ bool someone_fighting(Character *ch)
 int check_autojoiners(Character *ch, int skill = 0)
 {
   if (IS_NPC(ch))
-    return eFAILURE; // irrelevant
+    return ReturnValue::eFAILURE; // irrelevant
   if (!ch->fighting)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (ch->player && ch->player->unjoinable == true)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   Character *tmp;
   for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
@@ -161,30 +161,30 @@ int check_autojoiners(Character *ch, int skill = 0)
 int check_joincharmie(Character *ch, int skill = 0)
 {
   if (IS_PC(ch))
-    return eFAILURE; // irrelevant
+    return ReturnValue::eFAILURE; // irrelevant
   if (!ch->fighting)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   Character *tmp = ch->master;
   if (!tmp)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (tmp == ch || tmp == ch->fighting)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!tmp->desc)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (IS_NPC(tmp))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (tmp->fighting)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (GET_POS(tmp) != position_t::STANDING)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!tmp->player || tmp->player->joining.empty())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!isexact("follower", tmp->player->joining) &&
       !isexact("followers", tmp->player->joining))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   return tmp->do_join({"follower"});
 }
 
@@ -192,7 +192,7 @@ int Character::check_charmiejoin(void)
 {
   if (fighting || !master || master == this || !isStanding())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   return do_join(QStringLiteral("0.%1").arg(master->getName()).split(' '));
@@ -206,7 +206,7 @@ int check_charmiejoin(Character *ch)
   }
   else
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 }
 
@@ -561,13 +561,13 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   if (GET_POS(vict) == position_t::DEAD)
   {
     stop_fighting(ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!can_be_attacked(ch, vict))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   // TODO - until I can make sure that area effects don't attack other mobs
   // when cast by mobs, I need to make sure mobs aren't killing each other
@@ -589,7 +589,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     }
     do_say(ch, std::string("I'm sorry my fellow mob, I have seen the error of my ways."));
     do_say(vict, std::string("It is okay my friend, let's go have a beer."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   set_cantquit(ch, vict); // This sets the flag if necessary
@@ -604,7 +604,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     if (handle_any_guard(vict))
     {
       if ((vict = ch->fighting) == nullptr)
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
     }
   assert(vict);
 
@@ -948,15 +948,15 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
   if (!ch || !vict)
   {
     logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
 
   if (GET_POS(vict) == position_t::DEAD)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (ch->isImmortalPlayer())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (isSet(races[(int)GET_RACE(ch)].immune, ISR_ENERGY) || isSet(ch->immune, ISR_ENERGY))
   {
     dam = 0;
@@ -1002,7 +1002,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
         act("$n deftly blocks your burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
         act("You defly block $N's burst of $B$5lightning$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
         act("$n deftly blocks $N's burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     */
@@ -1034,12 +1034,12 @@ int do_vampiric_aura(Character *ch, Character *vict)
   }
 
   if (GET_POS(vict) == position_t::DEAD)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   struct affected_type *af;
 
   if (nullptr == (af = vict->affected_by_spell(SPELL_VAMPIRIC_AURA)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   // ch just hit vict...vict has Vampiric aura up
   if (number(0, 101) < ((af->modifier) / 1.7))
@@ -1049,7 +1049,7 @@ int do_vampiric_aura(Character *ch, Character *vict)
     retval = SWAP_CH_VICT(retval);
     return debug_retval(ch, vict, retval);
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 // standard retvals
@@ -1067,11 +1067,11 @@ int do_fireshield(Character *ch, Character *vict, int dam)
   }
 
   if (GET_POS(vict) == position_t::DEAD)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (ch->isImmortalPlayer())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!IS_AFFECTED(vict, AFF_FIRESHIELD))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(races[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
       isSet(ch->immune, ISR_FIRE))
@@ -1119,7 +1119,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
         act("$n deftly blocks your burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
         act("You defly block $N's burst of $B$4flame$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
         act("$n deftly blocks $N's burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   */
@@ -1156,11 +1156,11 @@ int do_acidshield(Character *ch, Character *vict, int dam)
   }
 
   if (GET_POS(vict) == position_t::DEAD)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (ch->isImmortalPlayer())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!IS_AFFECTED(vict, AFF_ACID_SHIELD))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(races[(int)GET_RACE(ch)].immune, ISR_ACID) || isSet(ch->immune, ISR_ACID))
     dam = 0;
@@ -1205,7 +1205,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
         act("$n deftly blocks your burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
         act("You defly block $N's burst of $B$2acid$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
         act("$n deftly blocks $N's burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     */
@@ -1241,11 +1241,11 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   }
 
   if (GET_POS(vict) == position_t::DEAD)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (ch->isImmortalPlayer())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!vict->affected_by_spell(SPELL_BONESHIELD))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(races[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
       isSet(ch->immune, ISR_PHYSICAL))
@@ -1462,7 +1462,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   {
     do_say(ch, "What the hell am I DOING?!?!");
     stop_fighting(ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_POS(vict) == position_t::DEAD)
@@ -1471,18 +1471,18 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   // TODO - I'd like to remove these 3 cause they are checked in attack()
   /* This happens with multi-attacks */
   if (ch->in_room != vict->in_room)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!can_be_attacked(ch, vict))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!can_attack(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   // Figure out the correct weapon
   wielded = ch->equipment[weapon];
 
   // Second got called without a secondary wield
   if (weapon == SECOND && wielded == nullptr)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   set_cantquit(ch, vict); /* This sets the flag if necessary */
 
@@ -2315,7 +2315,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   if (victim != ch)
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     set_cantquit(ch, victim);
   }
 
@@ -2458,7 +2458,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
         switch (type)
         {
         case 0:
-          return eFAILURE; // Dodge or parry
+          return ReturnValue::eFAILURE; // Dodge or parry
 
         case 4:
         case 1:
@@ -2472,7 +2472,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
           dam = 0; // Miss!
           break;
         default:
-          return eFAILURE; // Shouldn't happen
+          return ReturnValue::eFAILURE; // Shouldn't happen
         }
       }
 
@@ -2484,7 +2484,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       }
     }
     if (check_dodge(ch, victim, attacktype))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
 
     if((reduce = check_shieldblock(ch, victim, attacktype)))
      {
@@ -2508,9 +2508,9 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   {
     // Physical Magic can be dodged or blocked with a shield, but not parried
     if(check_shieldblock(ch, victim,attacktype))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (check_dodge(ch, victim,attacktype))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
   }*/
     if (attacktype <= MAX_SPL_LIST && attacktype != TYPE_UNDEFINED)
     {
@@ -3290,8 +3290,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
       (!AWAKE(victim)))
   {
-    debug_isHit(ch, victim, attacktype, type, reduce, 0, "stunned,bash,shocked return eFAILURE");
-    return eFAILURE; // always hit
+    debug_isHit(ch, victim, attacktype, type, reduce, 0, "stunned,bash,shocked return ReturnValue::eFAILURE");
+    return ReturnValue::eFAILURE; // always hit
   }
 
   level_diff_t level_difference = ch->getLevel() - victim->getLevel();
@@ -3428,7 +3428,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   if (number(1, 100) < (int)percent && !isSet(victim->combat, COMBAT_BLADESHIELD1) && !isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     debug_isHit(ch, victim, attacktype, type, reduce, toHit, QStringLiteral("Ze random stuff percent=%1").arg(percent));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // Miss, determine a message
@@ -3526,14 +3526,14 @@ int checkCounterStrike(Character *ch, Character *victim)
       (isSet(victim->combat, COMBAT_BLADESHIELD2)) ||
       (isSet(ch->combat, COMBAT_BLADESHIELD1)) ||
       (isSet(ch->combat, COMBAT_BLADESHIELD2)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   int p = lvl / 2 - (100 - victim->has_skill(SKILL_DEFENSE)) - GET_DEX(ch) + victim->getHP() * 10 / GET_MAX_HIT(victim);
 
   victim->skill_increase_check(SKILL_COUNTER_STRIKE, lvl, SKILL_INCREASE_HARD);
 
   if (number(1, 100) > p)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   switch (number(1, 4))
   {
@@ -3566,7 +3566,7 @@ int checkCounterStrike(Character *ch, Character *victim)
   retval = SWAP_CH_VICT(retval);
 
   REMOVE_BIT(retval, eSUCCESS);
-  SET_BIT(retval, eFAILURE);
+  SET_BIT(retval, ReturnValue::eFAILURE);
 
   return debug_retval(ch, victim, retval);
 }
@@ -3587,7 +3587,7 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
       (isSet(victim->combat, COMBAT_BLADESHIELD2)) ||
       (isSet(ch->combat, COMBAT_BLADESHIELD1)) ||
       (isSet(ch->combat, COMBAT_BLADESHIELD2)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   switch (number(1, 2))
   {
@@ -3610,7 +3610,7 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
   retval = SWAP_CH_VICT(retval);
 
   REMOVE_BIT(retval, eSUCCESS);
-  SET_BIT(retval, eFAILURE);
+  SET_BIT(retval, ReturnValue::eFAILURE);
 
   return debug_retval(ch, victim, retval);
 }
@@ -3632,21 +3632,21 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
       (isSet(victim->combat, COMBAT_BLADESHIELD2)) ||
       (isSet(ch->combat, COMBAT_BLADESHIELD1)) ||
       (isSet(ch->combat, COMBAT_BLADESHIELD2)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   // 25% chance of success for mobs
   if (IS_NPC(victim))
   {
     if (number(0, 3) > 0)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     if (!victim->has_skill(SKILL_RIPOSTE))
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -3658,7 +3658,7 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
 
       if (!skill_success(victim, ch, SKILL_RIPOSTE, modifier))
       {
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -3671,7 +3671,7 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
   retval = SWAP_CH_VICT(retval);
 
   REMOVE_BIT(retval, eSUCCESS);
-  SET_BIT(retval, eFAILURE);
+  SET_BIT(retval, ReturnValue::eFAILURE);
 
   return debug_retval(ch, victim, retval);
 }
@@ -5223,7 +5223,7 @@ int do_behead_skill(Character *ch, Character *vict)
       }
     }
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_execute_skill(Character *ch, Character *vict, int w_type)
@@ -5302,7 +5302,7 @@ int do_execute_skill(Character *ch, Character *vict, int w_type)
       }
     }
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 void do_combatmastery(Character *ch, Character *vict, int weapon)
@@ -7092,7 +7092,7 @@ int can_be_attacked(Character *ch, Character *vict)
     if (vict->getLevel() < 5)
     {
       do_say(ch, "I'm sorry master, I cannot do that.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -7152,19 +7152,19 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   if (!ch || !vict)
   {
     logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, DC::LogChannel::LOG_BUG);
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
   if (!weapon)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!can_attack(ch) || !can_be_attacked(ch, vict))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if ((ch->in_room != vict->in_room && weapon != ITEM_MISSILE) || GET_POS(vict) == position_t::DEAD)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->equipment[weapon] && weapon != ITEM_MISSILE)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   int wep_skill = 40;
 
@@ -7174,13 +7174,13 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
     weap = ch->equipment[weapon];
 
   if (!weap)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   for (i = 0; i < weap->num_affects; i++)
   {
     /* It's possible the victim has fled or died */
     if (ch->in_room != vict->in_room)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (GET_POS(vict) == position_t::DEAD)
       return eSUCCESS | eVICT_DIED;
     chance = number(1, 100);
@@ -7487,14 +7487,14 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
   Character *chTemp, *loop_ch, *vict = nullptr;
 
   if (is_stunned(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::ESCAPE)
   {
     if (IS_PC(ch) && !(escape = ch->has_skill(SKILL_ESCAPE)))
     {
       ch->sendln("Huh?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (IS_NPC(ch))
       escape = 50 + ch->getLevel() / 3;
@@ -7502,7 +7502,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
     if (!ch->fighting)
     {
       ch->sendln("But there is nobody from whom to escape!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -7510,7 +7510,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
     }
 
     if (!charge_moves(ch, SKILL_ESCAPE))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
 
     ch->skill_increase_check(SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
     if (number(1, 101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape / 1.5 - GET_INT(vict) / 2 - GET_WIS(vict) / 2), 100))
@@ -7532,7 +7532,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("The roots bracing your legs make it impossible to run!");
     else
       ch->sendln("Your legs are too tired for running away!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (i = 0; i < 3; i++)
@@ -7611,14 +7611,14 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
 
   // No exits were found
   ch->sendln("PANIC! You couldn't escape!");
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 command_return_t Character::check_pursuit(Character *victim, QString dircommand)
 {
   // Handle pursuit skill
   if (victim == 0 || IS_NPC(this) || !affected_by_spell(SKILL_PURSUIT))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   int pursuit = this->has_skill(SKILL_PURSUIT);
   if (number(1, 100) > pursuit)
@@ -7632,7 +7632,7 @@ command_return_t Character::check_pursuit(Character *victim, QString dircommand)
     // succeeded
     stop_fighting(victim);
     if (!charge_moves(SKILL_PURSUIT))
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
 
     act("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", this, 0, victim, TO_CHAR, 0);
     act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, TO_ROOM, NOTVICT);
@@ -7850,5 +7850,5 @@ command_return_t Character::tell(Character *victim, QString message)
   {
     return do_tell((victim->getName() + " " + message).split(' '), cmd_t::TELL);
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }

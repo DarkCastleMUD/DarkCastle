@@ -1484,7 +1484,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
   argument = skip_spaces(argument);
 
   if (!ch->canPerform(SKILL_RELEASE, "You don't know how!"))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->affected)
   {
@@ -1538,7 +1538,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
       if (ch->getMove() < 25)
       {
         ch->sendln(QStringLiteral("You don't have enough movement points to release the spell effect '%1'.").arg(get_skill_name(aff->type)));
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       if (aff->type > 0 && aff->type <= MAX_SPL_LIST && !skill_success(ch, nullptr, SKILL_RELEASE))
@@ -1547,7 +1547,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
         act("$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, TO_ROOM, INVIS_NULL);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
         ch->decrementMove(10);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       ch->decrementMove(25);
@@ -1805,19 +1805,19 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   bool target_ok;
 
   //  if (IS_NPC(ch))
-  //    return eFAILURE;
+  //    return ReturnValue::eFAILURE;
   // Need to allow mob_progs to use cast without allowing charmies to
 
   if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
   {
     ch->sendln("You cannot cast in this form.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SPELL_NO_CAST_TIMER))
   {
     ch->sendln("You seem unable to concentrate enough to cast any spells.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Object *tmp_obj;
@@ -1825,13 +1825,13 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from casting!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
     ch->sendln("You cannot cast while charmed!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < ARCHANGEL && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
@@ -1839,42 +1839,42 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
     if (GET_CLASS(ch) == CLASS_WARRIOR)
     {
       ch->sendln("Think you had better stick to fighting...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_THIEF)
     {
       ch->sendln("Think you should stick to robbing and killing...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_BARBARIAN)
     {
       ch->sendln("Think you should stick to berserking...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_MONK)
     {
       ch->sendln("Think you should stick with meditating...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if ((GET_CLASS(ch) == CLASS_ANTI_PAL) && (!IS_EVIL(ch)))
     {
       ch->sendln("You're not evil enough!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if ((GET_CLASS(ch) == CLASS_PALADIN) && (!IS_GOOD(ch)))
     {
       ch->sendln("You're not pure enough!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_BARD)
     {
       ch->send("Stick to singing bucko.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
     {
       ch->sendln("You find yourself unable to weave magic here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1884,13 +1884,13 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   if (!(*argument))
   {
     ch->sendln("Cast which what where?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (*argument != '\'')
   {
     ch->sendln("Magic must always be enclosed by the holy magic symbols : '");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Locate the last quote && lowercase the magic words (if any) */
@@ -1901,19 +1901,19 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   if (*(argument + qend) != '\'')
   {
     ch->sendln("Magic must always be enclosed by the holy magic symbols : '");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   spl = old_search_block(argument, 1, qend - 1, spells, 0);
   if (spl <= 0)
   {
     ch->sendln("Your lips do not move, no magic appears.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (spl == SPELL_DIVINE_INTER && ch->affected_by_spell(SPELL_DIV_INT_TIMER))
   {
     ch->sendln("The gods are unwilling to intervene on your behalf again so soon.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (spell_info[spl].spell_pointer() || spell_info[spl].spell_pointer2())
@@ -1948,7 +1948,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           if (ch->getLevel() < 101)
           {
             ch->sendln("You do not know how to cast that spell!");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           else
           {
@@ -1996,28 +1996,28 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           if (dir == -1)
           {
             ch->sendln("Fire a lightning bolt where?");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!DC::getInstance()->world[ch->in_room].dir_option[dir])
           {
             ch->sendln("The wall blocks your attempt.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!CAN_GO(ch, dir))
           {
             ch->sendln("You cannot do that.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (ch->fighting)
           {
             ch->sendln("You cannot concentrate enough to fire a bolt of lightning into another room!");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           int new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
           if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE) || isSet(DC::getInstance()->world[new_room].room_flags, NO_MAGIC))
           {
             ch->sendln("That room is protected from this harmful magic.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           // can't use spellcraft(ch, SPELL_LIGHTNING_BOLT) here because it
@@ -2026,7 +2026,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               (ch->has_skill(SKILL_SPELLCRAFT) < 21))
           {
             ch->sendln("You don't know how.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           oldroom = ch->in_room;
@@ -2035,14 +2035,14 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           {
             char_to_room(ch, oldroom);
             ch->sendln("Error code: 57A. Report this to an immortal, along with what you typed and where.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!(tar_char = ch->get_char_room_vis(name)))
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
             ch->sendln("You don't see anyone like that there.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
@@ -2088,7 +2088,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         if (!target_ok)
         {
           ch->sendln("There is no such known spell in the realms to protect yourself against.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       } // end spell immunity
       int fil = 0;
@@ -2118,7 +2118,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             if (!fil)
             {
               ch->sendln("You do not know how to filter your spell through that.");
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
 
             if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM)
@@ -2169,7 +2169,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           else
           {
             ch->sendln("You need to specify a filter type.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
         } // end if filterable spell
@@ -2196,7 +2196,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               else
               {
                 ch->sendln("You cannot cast this spell on your entire group at once.");
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
             }
           }
@@ -2307,7 +2307,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           else
             ch->sendln("What should the spell be cast upon?");
         }
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       { /* TARGET IS OK */
@@ -2319,17 +2319,17 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_to_room(ch, oldroom);
           }
           ch->sendln("You can not cast this spell upon yourself.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else if ((tar_char != ch) && isSet(spell_info[spl].targets(), TAR_SELF_ONLY))
         {
           ch->sendln("You can only cast this spell upon yourself.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
         {
           ch->sendln("You are afraid that it could harm your master.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
 
@@ -2343,7 +2343,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_to_room(ch, oldroom);
           }
           ch->sendln("You can't summon enough energy to cast the spell.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       if (tar_char && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
@@ -2355,7 +2355,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_from_room(ch);
             char_to_room(ch, oldroom);
           }
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
 
@@ -2467,7 +2467,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           if (GET_MANA(ch) < counter)
           {
             ch->sendln("You do not have enough mana to cast this group spell.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           mana_cost = counter;
           GET_MANA(ch) -= mana_cost;
@@ -2501,7 +2501,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               ch->sendln("You can't cast that spell on someone in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
                    GET_NAME(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char)
@@ -2509,14 +2509,14 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               ch->sendln("You can't cast that because you're in a fight with someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
                    GET_NAME(ch->fighting), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
                    get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
           }
 
@@ -2529,7 +2529,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
                    GET_NAME(ch), get_clan_name(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), get_clan_name(tar_char));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
@@ -2540,7 +2540,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
                    GET_NAME(ch->fighting), get_clan_name(ch->fighting),
                    get_skill_name(spl).toStdString().c_str(),
                    GET_NAME(tar_char), get_clan_name(tar_char));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
@@ -2550,7 +2550,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
                    get_skill_name(spl).toStdString().c_str(),
                    GET_NAME(tar_char), get_clan_name(tar_char),
                    GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
           }
         }
@@ -2689,13 +2689,13 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         return retval;
       }
     } /* if GET_POS < min_pos */
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else
   {
     ch->sendln("Your lips do not move, no magic appears.");
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_skills(Character *ch, char *arg, cmd_t cmd)
@@ -2704,7 +2704,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   int mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 
@@ -2924,7 +2924,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
   char buf[16384];
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 
@@ -2953,7 +2953,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
   int mage, cleric, anti, pal, ranger, druid;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 

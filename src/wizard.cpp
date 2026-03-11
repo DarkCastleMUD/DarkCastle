@@ -578,7 +578,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 {
   if (!ch || !k)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int i;
@@ -1419,7 +1419,7 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
     ch->sendln("You may only repop inside of your room range.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::string arg1;
@@ -1451,7 +1451,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
     ch->sendln("You may only repop inside of your R range.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   const auto &character_list = DC::getInstance()->character_list;
@@ -1524,7 +1524,7 @@ int do_echo(Character *ch, char *argument, cmd_t cmd)
   Character *vict;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   for (i = 0; *(argument + i) == ' '; i++)
     ;
@@ -1552,7 +1552,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(COMMAND_RESTORE))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, buf);
@@ -1564,7 +1564,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
     if (!(victim = get_char(buf)))
     {
       ch->sendln("No-one by that name in the world.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     GET_MANA(victim) = GET_MAX_MANA(victim);
@@ -1608,7 +1608,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
       sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
       logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected)

@@ -60,13 +60,13 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
 
   if (IS_NPC(ch))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
   {
     ch->send("Huh?\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::tie(name, to_force) = half_chop(argument);
@@ -74,7 +74,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
   if (name.empty() || to_force.empty())
   {
     ch->send("Who do you wish to force to do what?\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (name != "all")
   {
@@ -115,7 +115,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
     if (ch->getLevel() < OVERSEER)
     {
       ch->sendln("Not gonna happen.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     for (i = DC::getInstance()->descriptor_list; i; i = next_i)
     {
@@ -159,7 +159,7 @@ public:
     {
       return function_(ch);
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   QString getName(void) const { return name_; }
 
@@ -184,7 +184,7 @@ command_return_t run_all_events(Character *ch = nullptr)
   }
   if (counter >= 1000)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   return eSUCCESS;
 }
@@ -192,9 +192,9 @@ command_return_t run_all_events(Character *ch = nullptr)
 QString rc_to_qstring(const command_return_t &rc)
 {
   QStringList strings;
-  if (isSet(rc, eFAILURE))
+  if (isSet(rc, ReturnValue::eFAILURE))
   {
-    strings += "eFAILURE";
+    strings += "ReturnValue::eFAILURE";
   }
   if (isSet(rc, eSUCCESS))
   {
@@ -324,7 +324,7 @@ command_return_t test_casino(Character *ch)
 {
   if (!ch || !ch->player)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int max_rc{};
@@ -411,7 +411,7 @@ command_return_t test_casino(Character *ch)
   if (ch->getGold() > 2000000)
   {
     ch->send(QStringLiteral("Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n").arg(ch->getGold()));
-    max_rc = max_rc | eFAILURE;
+    max_rc = max_rc | ReturnValue::eFAILURE;
   }
 
   ch->player->bank = original_bank;
@@ -455,5 +455,5 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
     return rc;
   }
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }

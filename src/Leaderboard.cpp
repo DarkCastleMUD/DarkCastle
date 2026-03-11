@@ -1451,7 +1451,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
     logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   for (i = 0; i < 5; i++)
   {

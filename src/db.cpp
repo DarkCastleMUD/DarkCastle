@@ -461,7 +461,7 @@ int do_write_skillquest(Character *ch, char *argument, cmd_t cmd)
   {
     if (ch)
       ch->sendln("Can't open the skill quest file.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   for (curr = skill_list; curr; curr = curr->next)
   {

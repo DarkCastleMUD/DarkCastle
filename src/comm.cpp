@@ -1322,7 +1322,7 @@ int do_prompt(Character *ch, char *arg, cmd_t cmd)
   if (IS_NPC(ch))
   {
     ch->sendln("You're a mob!  You can't set your prompt.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*arg)
@@ -2621,7 +2621,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
   QString tmp;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (ch->player->away_msgs.isEmpty())
   {
@@ -2907,10 +2907,10 @@ int do_editor(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   csendf(ch, "Current editor: %s\n\r\n\r", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
 

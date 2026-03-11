@@ -198,7 +198,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(COMMAND_ADDNEWS))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!argument || !*argument || !ch->desc)
@@ -207,7 +207,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
                  "Date is either TODAY or in the following format: day/month/year\r\n"
                  "such as 23/02/06 for 23rd february 2006\r\n",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   char arg[MAX_INPUT_LENGTH];
   time_t thetime;
@@ -224,7 +224,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
     if (strptime(arg, "%d/%m/%y", &tmptime) == nullptr)
     {
       do_addnews(ch, "");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     tmptime.tm_sec = 0;
     tmptime.tm_hour = 0;

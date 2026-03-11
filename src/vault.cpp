@@ -247,7 +247,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
   if (ch->isPlayerObjectThief() || (ch->isPlayerGoldThief()))
   {
     ch->sendln("You're too busy running from the law!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*arg)
@@ -304,7 +304,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
         if (clan == nullptr)
         {
           ch->sendln("You are not a member of any clan.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
         // Clan leader or a clan member with the vaultlog right can view log.
@@ -320,7 +320,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
         else
         {
           ch->sendln("You don't have access to view the clan's vault log.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       else if (ch->isImmortalPlayer())
@@ -330,7 +330,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
       else
       {
         ch->sendln("Syntax: vault log <clan>");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else
@@ -348,7 +348,7 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
     else
     {
       vault_search_usage(ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     // putting this here so that anything below it requires you to be in a safe room.
   }
@@ -2388,9 +2388,9 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
                      Character *owner)
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   arg = one_argument(arg, arg1);
 
@@ -2511,7 +2511,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       return eSUCCESS;
     }
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 void vault_search_usage(Character *ch)
@@ -2542,7 +2542,7 @@ int vault_search(Character *ch, const char *args)
   if (arg1.isEmpty())
   {
     vault_search_usage(ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::list<vault_search_parameter> search;
@@ -2558,7 +2558,7 @@ int vault_search(Character *ch, const char *args)
       {
         ch->sendln("Missing keyword parameter.\r\n");
         vault_search_usage(ch);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       {
@@ -2576,7 +2576,7 @@ int vault_search(Character *ch, const char *args)
       {
         ch->sendln("Missing level parameter.\r\n");
         vault_search_usage(ch);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       {
@@ -2594,7 +2594,7 @@ int vault_search(Character *ch, const char *args)
           {
             ch->sendln("Invalid level specified.\r\n");
             vault_search_usage(ch);
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           parameter.type = vault_search_type::LEVEL;
@@ -2611,7 +2611,7 @@ int vault_search(Character *ch, const char *args)
           {
             ch->sendln("Invalid minimum level specified.\r\n");
             vault_search_usage(ch);
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           parameter.type = vault_search_type::MIN_LEVEL;
@@ -2626,7 +2626,7 @@ int vault_search(Character *ch, const char *args)
           {
             ch->sendln("Invalid maximum level specified.\r\n");
             vault_search_usage(ch);
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           parameter.type = vault_search_type::MAX_LEVEL;
@@ -2638,7 +2638,7 @@ int vault_search(Character *ch, const char *args)
     {
       ch->sendln("Invalid argument.\r\n");
       vault_search_usage(ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     std::tie(arg1, arguments) = half_chop(arguments);
   } while (!arg1.isEmpty());

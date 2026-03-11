@@ -85,7 +85,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
       ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("Cannot use innate skills within a potato arena.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   bool found = false;
@@ -106,13 +106,13 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
         if (str_cmp(buf, "fly") && ch->affected_by_spell(SKILL_INNATE_TIMER))
         {
           ch->sendln("You cannot use that yet.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (GET_POS(ch) == position_t::SLEEPING &&
             i != 1)
         {
           ch->sendln("In your dreams, or what?");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         int retval = (*(innates[i].func))(ch, arg, cmd);
         if (retval & eSUCCESS)
@@ -150,7 +150,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
     {
       ch->sendln("You do not have access to any such ability.");
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else
   {
@@ -190,7 +190,7 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
   if (IS_AFFECTED(ch, AFF_FOCUS))
   {
     ch->sendln("But you are already focusing!  Why waste it?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   ch->sendln("You enter a trance and find yourself able to concentrate much better.");
@@ -211,7 +211,7 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
   {
     ch->sendln("But you're already invisible!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   struct affected_type af;
   af.type = SKILL_INNATE_ILLUSION;
@@ -233,7 +233,7 @@ int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
   if (!ch->fighting)
   {
     ch->sendln("You need to be fighting to use that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
   ch->sendln("Your blood boils as you drive yourself into a war-like state.");
@@ -251,17 +251,17 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
   if ((obj = get_obj_in_list_vis(ch, buf, ch->carrying)) == nullptr)
   {
     ch->sendln("You are not carrying anything like that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->getLevel() < obj->obj_flags.eq_level)
   {
     ch->sendln("This item is beyond your skill.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
     ch->sendln("This item is unrepairable.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   for (i = 0; i < obj->num_affects; i++)
   {
@@ -290,7 +290,7 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
   else
   {
     ch->sendln("That item is already in excellent condition!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 }
 
@@ -333,7 +333,7 @@ int innate_fly(Character *ch, char *arg, cmd_t cmd)
     if (ISSET(ch->affected_by, AFF_FLYING))
     {
       ch->sendln("You are already flying.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     struct affected_type af;

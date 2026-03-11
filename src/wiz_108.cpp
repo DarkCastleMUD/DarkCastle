@@ -32,7 +32,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   if (!can_modify_room(ch, ch->in_room))
   {
     ch->sendln("You are unable to do this outside of your range.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   ch->send(QStringLiteral("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
@@ -138,7 +138,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   // {
   //   ch->send(QStringLiteral("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
   //   ch->sendln("Ask Rubicon if it needs fixed...");
-  //   return eFAILURE;
+  //   return ReturnValue::eFAILURE;
   //}
 
   return eSUCCESS;
@@ -153,7 +153,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(COMMAND_PURLOIN))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, bufName);
@@ -165,7 +165,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
                  "Works well in combination with the 'find obj' command.\r\n"
                  "Usage: purloin [number.]name\n\r",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // pass pBuf's address to get_number.  It returns the index
@@ -174,7 +174,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
   if ((nIndex = get_number(&pBuf)) == 0)
   {
     ch->sendln("get_number failed.  bad input?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (k = DC::getInstance()->object_list, j = 1; k && (j <= nIndex); k = k->next)
@@ -279,12 +279,12 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   int skill, value, i, x;
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->has_skill(COMMAND_SET))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, name);
@@ -307,12 +307,12 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
             if (*help)
                 ch->send(help);
             ch->sendln("");*/
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!(vict = get_char_vis(ch, name)))
   {
     ch->sendln("No living thing by that name.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < vict->getLevel())
@@ -323,27 +323,27 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       sprintf(buf2, "%s just tried to set: %s\n\r", GET_NAME(ch), buf);
       send_to_char(buf2, vict);
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_PC(vict) && (vict->getLevel() == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
   {
     ch->sendln("Forget it dweeb.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, buf);
   if (!*buf)
   {
     ch->sendln("A field was expected.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   skill = old_search_block(buf, 0, strlen(buf), values, 1);
   if (skill < 0)
   {
     ch->sendln("That value not recognized.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, buf); /* update argument */
   skill--;
@@ -357,7 +357,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     if (IS_NPC(vict))
     {
       ch->sendln("Can't set a mob's age.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     value = atoi(buf);
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -371,7 +371,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     if (str_cmp(buf, "m") && str_cmp(buf, "f") && str_cmp(buf, "n"))
     {
       ch->sendln("Sex must be 'm','f' or 'n'.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set sex of victim */
@@ -402,7 +402,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       send_to_char("Class must be 'm','c','w','t','a','p','b',"
                    "'r', 'k'(monk), 'd'(bard), or 'u'(druid). \n\r",
                    ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set class of victim */
@@ -451,18 +451,18 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     if (value > DC::MAX_MORTAL_LEVEL && value < MIN_GOD)
     {
       ch->sendln("That level doesn't exist!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (((value < 0) || (value > DC::MAX_MORTAL_LEVEL)) && ch->getLevel() < OVERSEER)
     {
       ch->sendln("Level must be between 0 and 101.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     /* why the fuck was ths missing? -Sadus */
     if (IS_PC(vict) && value > ch->getLevel())
     {
       ch->sendln("That level is higher than you!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set level of victim */
@@ -493,7 +493,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Strength must be more than 0");
       ch->sendln("and less than 26.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original strength of victim */
@@ -512,7 +512,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Intelligence must be more than 0");
       ch->sendln("and less than 26.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original INT of victim */
@@ -528,7 +528,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Wisdom must be more than 0");
       ch->sendln("and less than 26.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original WIS of victim */
@@ -542,7 +542,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Dexterity must be more than 0");
       ch->sendln("and less than 26.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original DEX of victim */
@@ -556,7 +556,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Constitution must be more than 0");
       ch->sendln("and less than 26.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original CON of victim */
@@ -613,7 +613,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     if (IS_NPC(vict))
     {
       ch->sendln("Can't set a mob's pracs...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     value = atoi(buf);
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -628,7 +628,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Alignment must be more than -1000");
       ch->sendln("and less than 1000.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original alignment of victim */
@@ -642,7 +642,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Thirst must be more than -2");
       ch->sendln("and less than 101.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original thirst of victim */
@@ -656,7 +656,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Drunk must be more than -2");
       ch->sendln("and less than 101.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original drunk of victim */
@@ -670,7 +670,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     {
       ch->sendln("Full must be more than -2");
       ch->sendln("and less than 101.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original full of victim */
@@ -684,7 +684,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       if (x == 31)
       {
         ch->sendln("No such race.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       if (isexact(races[x].singular_name, buf))
       {
@@ -733,25 +733,25 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     if (!*buf || !*buf2)
     {
       ch->sendln("Syntax: set <vict> saves <0-5> <num>");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (IS_NPC(vict))
     {
       ch->sendln("You cannot set saves_bases on mobs.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!check_range_valid_and_convert(i, buf, 0, 5))
     {
       ch->sendln("Save type be from 0 to 5.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!check_range_valid_and_convert(value, buf2, 0, 5))
     {
       ch->sendln("Value must be from -10 to 100.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     vict->player->saves_mods[i] = value;
   }
@@ -785,19 +785,19 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     if (!*buf)
     {
       ch->send(QStringLiteral("Syntax: set <vict> profession <0-%1>\r\n").arg(MAX_PROFESSIONS));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (IS_NPC(vict))
     {
       ch->sendln("You cannot set profession on mobs.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!check_range_valid_and_convert(value, buf, 0, MAX_PROFESSIONS))
     {
       ch->send(QStringLiteral("Save type be from 0 to %1.\r\n").arg(MAX_PROFESSIONS));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     vict->player->profession = value;

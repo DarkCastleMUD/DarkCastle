@@ -1302,7 +1302,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*name || !*message)
@@ -1317,7 +1317,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
     if (IS_AFFECTED(ch, AFF_CHARM))
     {
       ch->sendln("Your superior would not aprove of you giving orders.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (victim)
@@ -1373,7 +1373,7 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch))
   {
     ch->sendln("Monsters can't have ideas - Go away.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* skip whites */
@@ -1383,14 +1383,14 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
   if (!*argument)
   {
     ch->sendln("That doesn't sound like a good idea to me.  Sorry.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(fl = fopen(IDEA_LOG, "a")))
   {
     perror("do_idea");
     ch->sendln("Could not open the idea log.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
@@ -1408,7 +1408,7 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch))
   {
     ch->sendln("Monsters can't spell - leave me alone.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* skip whites */
@@ -1418,14 +1418,14 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
   if (!*argument)
   {
     ch->sendln("I beg your pardon?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(fl = fopen(TYPO_LOG, "a")))
   {
     perror("do_typo");
     ch->sendln("Could not open the typo log.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(str, "**%s[%d]: %s\n",
@@ -1444,7 +1444,7 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
   if (IS_NPC(ch))
   {
     ch->sendln("You are a monster! Bug off!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* skip whites */
@@ -1454,14 +1454,14 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
   if (!*argument)
   {
     ch->sendln("Pardon?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(fl = fopen(BUG_LOG, "a")))
   {
     perror("do_bug");
     ch->sendln("Could not open the bug log.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
@@ -1487,25 +1487,25 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   act("$n prays to $s God for transportation!", this, 0, 0, TO_ROOM, INVIS_NULL);
 
   if (IS_AFFECTED(this, AFF_CHARM))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (this->room().isArena())
   {
     this->sendln("TYou can't recall while in the arena.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, NO_MAGIC))
   {
     this->sendln("You can't use magic here.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(this->combat, COMBAT_BASH1) ||
       isSet(this->combat, COMBAT_BASH2))
   {
     this->sendln("You can't, you're bashed!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (arguments.isEmpty())
@@ -1519,13 +1519,13 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     if (victim == nullptr)
     {
       this->sendln("Whom do you want to recall?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
     {
       send(QStringLiteral("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(victim->getNameC()));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1548,20 +1548,20 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     if (percent > 50)
     {
       this->sendln("You failed in your recall!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   if (victim->fighting && IS_PC(victim->fighting)) // PvP fight?
   {
     victim->sendln("The gods refuse to answer your prayers while you're fighting!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || victim->isPlayerGoldThief())
   {
     victim->sendln("The gods frown upon your thieving ways and refuse to aid your escape.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_NPC(this))
@@ -1582,7 +1582,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     if (location < 0)
     {
       this->sendln("Failed.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isSet(DC::getInstance()->world[location].room_flags, NOHOME))
@@ -1621,7 +1621,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if (location == -1)
   {
     victim->sendln("You are completely lost.");
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
 
   if ((isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
@@ -1651,7 +1651,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     if (this->getGold() < (uint32_t)cost)
     {
       this->send(QStringLiteral("You don't have %1 gold!\n\r").arg(cost));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     this->removeGold(cost);
@@ -1660,12 +1660,12 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if (IS_AFFECTED(victim, AFF_CURSE))
   {
     this->sendln("A curse affect prevents it.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     this->sendln("A solidity affect prevents it.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (loop_ch = DC::getInstance()->world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
@@ -1708,16 +1708,16 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   if (ch == 0)
   {
     logentry(QStringLiteral("do_quit received null char - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | eINTERNAL_ERROR;
   }
 
   if (IS_NPC(ch))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
   {
     ch->sendln("This room doesn't feel...SAFE enough to do that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // If ch has follower, cant quit
@@ -1733,26 +1733,26 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
       if (IS_AFFECTED(k->follower, AFF_CHARM))
       {
         ch->sendln("But you wouldn't want to just abandon your followers!");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
 
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
     {
       ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (GET_POS(ch) == position_t::FIGHTING && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln("No way! You are fighting.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (GET_POS(ch) < position_t::STUNNED)
     {
       ch->sendln("You're not DEAD yet.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if ((ch->isPlayerCantQuit() && cmd != cmd_t::SAVE_SILENTLY) ||
@@ -1760,19 +1760,19 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
         ch->isPlayerGoldThief())
     {
       ch->sendln("You can't quit, because you are still wanted!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln("Something about this room makes it seem like a bad place to quit.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (ch->room().isArena())
     {
       ch->sendln("Don't make me zap you.....");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
@@ -1780,7 +1780,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
       if (!ch->clan || !(clan = get_clan(ch)))
       {
         ch->sendln("This is a clan room dork.  Try joining one first.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       for (room = clan->rooms; room; room = room->next)
@@ -1790,7 +1790,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
       if (!found)
       {
         ch->sendln("Chode! You can't quit in another clan's hall!");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     act("$n has left the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1869,7 +1869,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   {
     ch->save_char_obj();
     if (!close_socket(ch->desc)) // if returns 0, then it already quit us out
-      return eFAILURE | eCH_DIED;
+      return ReturnValue::eFAILURE | eCH_DIED;
   }
   else
   {
@@ -1898,7 +1898,7 @@ command_return_t Character::save(cmd_t cmd)
   // -pir 3/15/1999
 
   if (IS_NPC(this) || level_ > IMPLEMENTER)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (cmd != cmd_t::SAVE_SILENTLY)
   {
@@ -1962,20 +1962,20 @@ int do_home(Character *ch, char *argument, cmd_t cmd)
       send_to_char("This place doesn't sit right with you...not enough "
                    "security.\r\n",
                    ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
     {
       ch->sendln("Something prevents it.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (ch->getLevel() < 11)
     {
       ch->sendln("You must grow a bit before you can leave the nursery.");
       GET_HOME(ch) = START_ROOM;
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
@@ -1983,7 +1983,7 @@ int do_home(Character *ch, char *argument, cmd_t cmd)
       if (!ch->clan || !(clan = get_clan(ch)))
       {
         ch->sendln("This is a clan room dork.  Try joining one first.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       for (room = clan->rooms; room; room = room->next)
@@ -1993,7 +1993,7 @@ int do_home(Character *ch, char *argument, cmd_t cmd)
       if (!found)
       {
         ch->sendln("Chode! You can't set home in another clan's hall!");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -2018,7 +2018,7 @@ command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
     break;
   }
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_beep(Character *ch, char *argument, cmd_t cmd)

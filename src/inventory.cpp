@@ -258,7 +258,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 }
 
 // return eSUCCESS if item was picked up
-// return eFAILURE if not
+// return ReturnValue::eFAILURE if not
 // TODO - currently this is designed with icky if-logic.  While it allows you to put
 // code at the end that would affect any attempted 'get' it looks really nasty and
 // is never utilized.  Restructure it so it is clear.  Pay proper attention to 'saving'
@@ -343,7 +343,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       (!ch->isImmortalPlayer()))
   {
     ch->sendln("I bet you think you're a thief.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (cmd == cmd_t::PALM && type != 2 && type != 6 && type != 0)
@@ -351,13 +351,13 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You can only palm objects that are in the same room, "
                  "one at a time.\r\n",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (cmd == cmd_t::LOOT && type != 0 && type != 6)
   {
     ch->sendln("You can only loot 1 item from a non-consented corpse.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   switch (type)
@@ -384,7 +384,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     if (ch->in_room == real_room(3099))
     {
       ch->sendln("Not in the donation room.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     sub_object = 0;
     found = false;
@@ -528,7 +528,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           send_to_char("You don't have consent to take the "
                        "corpse.\r\n",
                        ch);
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         has_consent = false; // reset it
       }
@@ -631,7 +631,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         if (!has_consent && !isexact(GET_NAME(ch), sub_object->Name()))
         {
           ch->sendln("You don't have consent to touch the corpse.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       if (ARE_CONTAINERS(sub_object))
@@ -640,7 +640,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         {
           sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->Name())));
           ch->send(buffer);
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         for (obj_object = sub_object->contains;
              obj_object;
@@ -787,7 +787,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       if (cmd == cmd_t::LOOT)
       {
         ch->sendln("You can only loot 1 item from a non-consented corpse.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying, true);
@@ -811,7 +811,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           send_to_char("You don't have consent to touch the "
                        "corpse.\r\n",
                        ch);
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       if (ARE_CONTAINERS(sub_object))
@@ -820,7 +820,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         {
           sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->Name())));
           ch->send(buffer);
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
         if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill(SKILL_BLINDFIGHTING))
@@ -955,7 +955,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
   break;
   }
   if (fail)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   ch->save(cmd_t::SAVE_SILENTLY);
   return eSUCCESS;
 }
@@ -971,31 +971,31 @@ int do_consent(Character *ch, char *arg, cmd_t cmd)
   if (arg1.isEmpty())
   {
     ch->sendln("Give WHO consent to touch your rotting carcass?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(vict = get_char_vis(ch, arg1)))
   {
     ch->send(QStringLiteral("Consent whom?  You can't see any %1.\r\n").arg(arg1));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (vict == ch)
   {
     ch->sendln("Silly, you don't need to consent yourself!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (vict->getLevel() < 10)
   {
     ch->sendln("That person is too low level to be consented.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // prevent consenting of NPCs
   if (IS_NPC(vict))
   {
     ch->sendln("Now what business would THAT thing have with your mortal remains?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
@@ -1017,7 +1017,7 @@ int do_consent(Character *ch, char *arg, cmd_t cmd)
     {
       ch->sendln("Don't you think there are enough perverts molesting your");
       ch->sendln("maggot-ridden corpse already?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     auto buf2 = QStringLiteral("%1 %1_consent").arg(obj->Name()).arg(arg1);
     obj->Name(buf2);
@@ -1075,7 +1075,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg);
@@ -1085,7 +1085,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
     if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     amount = atoi(arg);
@@ -1093,17 +1093,17 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
     if (str_cmp("coins", arg) && str_cmp("coin", arg) && str_cmp("gold", arg))
     {
       ch->sendln("Sorry, you can't do that (yet)...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (amount < 0)
     {
       ch->sendln("Sorry, you can't do that!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (ch->getGold() < (uint32_t)amount)
     {
       ch->sendln("You haven't got that many coins!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     ch->sendln("OK.");
     if (amount == 0)
@@ -1139,7 +1139,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
         if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE))
           continue;
@@ -1205,23 +1205,23 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
         if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
         {
           ch->sendln("It seems magically attached to you.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (contains_no_trade_item(tmp_object))
         {
           ch->sendln("Something inside it seems magically attached to you.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
         if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           ch->sendln("You can't drop godload items.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else if (!isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
                  ch->isImmortalPlayer())
@@ -1255,7 +1255,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
   }
   else
     ch->sendln("Drop what?");
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 void do_putalldot(Character *ch, char *name, char *target, cmd_t cmd)
@@ -1315,7 +1315,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument_interpreter(argument, arg1, arg2);
@@ -1350,7 +1350,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
           if (!ch->isImmortalPlayer())
           {
             ch->sendln("You are unable to! That item must be CURSED!");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           else
             ch->sendln("(This item is cursed, BTW.)");
@@ -1358,17 +1358,17 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
         if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
         {
           ch->sendln("You must display this flag for all to see!");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (isSet(obj_object->obj_flags.extra_flags, ITEM_NEWBIE))
         {
           ch->sendln("The protective enchantment this item holds cannot be held within this container.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (ARE_CONTAINERS(obj_object))
         {
           ch->sendln("You can't put that in there.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
         bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM,
@@ -1381,14 +1381,14 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
             if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING && GET_ITEM_TYPE(obj_object) != ITEM_KEY)
             {
               csendf(ch, "You can't put %s on a keyring.\r\n", GET_OBJ_SHORT(obj_object));
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
 
             // Altars can only hold totems
             if (GET_ITEM_TYPE(sub_object) == ITEM_ALTAR && GET_ITEM_TYPE(obj_object) != ITEM_TOTEM)
             {
               ch->sendln("You cannot put that in an altar.");
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
 
             if (!isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
@@ -1397,14 +1397,14 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
               if (obj_object == sub_object)
               {
                 ch->sendln("You attempt to fold it into itself, but fail.");
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
 
               // Can't put godload in non-godload
               if (IS_SPECIAL(obj_object) && NOT_SPECIAL(sub_object))
               {
                 ch->sendln("Are you crazy?!  Someone could steal it!");
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
 
               // Can't put NO_TRADE item in someone else's container/altar/totem
@@ -1412,13 +1412,13 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   sub_object->carried_by != ch)
               {
                 ch->sendln("You can't trade that item.");
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
 
               if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && search_container_for_item(sub_object, obj_object->item_number))
               {
                 ch->sendln("The object's uniqueness prevents it!");
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
 
               bool duplicate_key = search_container_for_item(sub_object, obj_object->item_number);
@@ -1429,7 +1429,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   if (ch && ch->player && isSet(ch->player->toggles, Player::PLR_NODUPEKEYS))
                   {
                     csendf(ch, "A duplicate of %s is already on your keyring so you will not attach another one.\r\n", GET_OBJ_SHORT(obj_object));
-                    return eFAILURE;
+                    return ReturnValue::eFAILURE;
                   }
                   else
                   {
@@ -1518,7 +1518,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Put what in what?");
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 command_return_t Character::do_givealldot(QString name, QString target, cmd_t cmd)
@@ -1543,7 +1543,7 @@ command_return_t Character::do_givealldot(QString name, QString target, cmd_t cm
   if (!found)
   {
     sendln("You don't have one.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   return eSUCCESS;
@@ -1559,13 +1559,13 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
     sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isPlayerObjectThief())
   {
     sendln("Your criminal actions prohibit it.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   auto obj_name = arguments.value(0);
   if (!arguments.isEmpty())
@@ -1576,7 +1576,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     if (!IS_NPC(this) && isPlayerGoldThief())
     {
       sendln("Your criminal acts prohibit it.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     bool ok = false;
     auto amount = obj_name.toULongLong(&ok);
@@ -1587,40 +1587,40 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     if (arg != QStringLiteral("gold") && arg != QStringLiteral("coins") && arg != QStringLiteral("coin"))
     {
       sendln("Sorry, you can't do that (yet)...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (!amount || !ok)
     {
       sendln("Sorry, you can't do that!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (getGold() < amount && getLevel() < DEITY)
     {
       sendln("You haven't got that many coins!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     auto vict_name = arguments.value(0);
     if (vict_name.isEmpty())
     {
       sendln("To whom?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!(vict = get_char_room_vis(vict_name)))
     {
       sendln("To whom?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (this == vict)
     {
       sendln("Umm okay, you give it to yourself.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     /*
           if(vict->getGold() > 2000000000) {
              sendln("They can't hold that much gold!");
-             return eFAILURE;
+             return ReturnValue::eFAILURE;
           }
     */
     sendln(QStringLiteral("You give %1 coin%2 to %3.").arg(amount).arg(amount == 1 ? "" : "s").arg(GET_SHORT(vict)));
@@ -1666,7 +1666,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   if (obj_name.isEmpty() || vict_name.isEmpty())
   {
     sendln("Give what to whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (vict_name == QStringLiteral("follower"))
@@ -1688,7 +1688,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     if (!found)
     {
       sendln("Nobody here are loyal subjects of yours!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -1696,14 +1696,14 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     if (!(vict = get_char_room_vis(vict_name)))
     {
       sendln("No one by that name around here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   if (this == vict)
   {
     sendln("Why give yourself stuff?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (obj_name == QStringLiteral("all"))
@@ -1721,18 +1721,18 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   if (!(obj = get_obj_in_list_vis(this, obj_name, carrying)))
   {
     sendln("You do not seem to have anything like that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && getLevel() < OVERSEER)
   {
     sendln("That sure would be a fucking stupid thing to do.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!IS_NPC(this) && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     sendln("Your criminal acts prohibit it.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
@@ -1740,7 +1740,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     if (getLevel() < DEITY)
     {
       sendln("You can't let go of it! Yeech!!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
       sendln("This item is NODROP btw.");
@@ -1764,7 +1764,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
         else
         {
           sendln("It seems magically attached to you.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       if (contains_no_trade_item(obj))
@@ -1774,7 +1774,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
         else
         {
           sendln("Something inside it seems magically attached to you.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
     }
@@ -1783,18 +1783,18 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == QUEST_MASTER))
   {
     act("$N graciously refuses your gift.", this, 0, vict, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM) && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
   {
     sendln("The creature doesn't understand what you're trying to do.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!IS_NPC(this) && isPlayerObjectThief() && !vict->desc)
   {
     sendln("Now WHY would a thief give something to a linkdead char..?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // Check if mortal this is trying to give more items to vict than they can carry
@@ -1815,7 +1815,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
           !arena.isPotato())
       {
         act("$N seems to have $S hands full.", this, 0, vict, TO_CHAR, 0);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -1838,7 +1838,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
           !arena.isPotato())
       {
         act("$E can't carry that much weight.", this, 0, vict, TO_CHAR, 0);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -1849,14 +1849,14 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     {
       sendln("The item's uniqueness prevents it.");
       csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(this));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   if (contents_cause_unique_problem(obj, vict))
   {
     sendln("The uniqueness of something inside it prevents it.");
     csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(this));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   move_obj(obj, vict);
@@ -2171,7 +2171,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
   if (!*type)
   {
     ch->sendln("Open what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if ((door = find_door(ch, type, dir)) >= 0)
   {
@@ -2324,7 +2324,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
   if (!*type)
   {
     ch->sendln("Close what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if ((door = find_door(ch, type, dir)) >= 0)
   {
@@ -2432,7 +2432,7 @@ int do_lock(Character *ch, char *argument, cmd_t cmd)
   if (!*type)
   {
     ch->sendln("Lock what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &victim, &obj, true))
   {
@@ -2505,7 +2505,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
   if (!*type)
   {
     ch->sendln("Unlock what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM,
                         ch, &victim, &obj, true))
@@ -2584,7 +2584,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   if (!ch->has_skill(SKILL_PALM) && IS_PC(ch))
   {
     ch->sendln("You aren't THAT slick there, pal.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!sub_object || sub_object->carried_by != ch)
@@ -2593,12 +2593,12 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       if (search_char_for_item(ch, obj_object->item_number, false))
       {
         ch->sendln("The item's uniqueness prevents it!");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     if (contents_cause_unique_problem(obj_object, ch))
     {
       ch->sendln("Something inside the item is unique and prevents it!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -2608,7 +2608,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
   {
     if (IS_NPC(ch) || ch->getLevel() <= 5)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
 
     Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item);

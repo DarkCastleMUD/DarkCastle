@@ -59,7 +59,7 @@ act_return act(
   {
     logentry(QStringLiteral("Error in act(), character equal to 0"), OVERSEER, DC::LogChannel::LOG_BUG);
     delete tokens;
-    ar.retval = eFAILURE;
+    ar.retval = ReturnValue::eFAILURE;
     return ar;
   }
 
@@ -124,7 +124,7 @@ act_return act(
     {
       logentry(QStringLiteral("Error in act(), invalid value sent as 'destination'"), OVERSEER, DC::LogChannel::LOG_BUG);
       delete tokens;
-      ar.retval = eFAILURE;
+      ar.retval = ReturnValue::eFAILURE;
       return ar;
     }
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
