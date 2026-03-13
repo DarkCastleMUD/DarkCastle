@@ -130,7 +130,11 @@
         "/build/": true
     },
     "clangd.arguments": [
+        "--compile-commands-dir=build/debug",
         "-j=64",
-        "--compile-commands-dir=build/debug/"
+        "--pch-storage=memory",
+        "--experimental-modules-support",
+        "--clang-tidy",
+        "--background-index"
     ],
 }
