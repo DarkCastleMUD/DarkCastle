@@ -5,34 +5,31 @@
  *      Author: Jared H. Hudson
  */
 
-#ifndef COMMANDSTACK_H_
-#define COMMANDSTACK_H_
+#pragma once
 
 #include <cstdint>
 
 class CommandStack
 {
 public:
-	CommandStack(void);
-	CommandStack(uint32_t initial);
-	CommandStack(uint32_t initial, uint32_t max);
-	~CommandStack();
-	bool setDepth(uint32_t value);
-	uint32_t getDepth(void);
-	bool setMax(uint32_t value);
-	uint32_t getMax(void);
-	bool isOverflow(void);
-	uint32_t getOverflowCount(void);
+  CommandStack(void);
+  CommandStack(quint32 initial);
+  CommandStack(quint32 initial, quint32 max);
+  ~CommandStack();
+  bool setDepth(quint32 value);
+  quint32 getDepth(void);
+  bool setMax(quint32 value);
+  quint32 getMax(void);
+  bool isOverflow(void);
+  quint32 getOverflowCount(void);
 
 private:
-	// Current depth in Command stack
-	static uint32_t depth;
+  // Current depth in Command stack
+  static quint32 depth;
 
-	// Maximum depth before it's considered an overflow
-	static uint32_t max_depth;
+  // Maximum depth before it's considered an overflow
+  static quint32 max_depth;
 
-	// How many times have we overflowed since last reset
-	static uint32_t overflow_count;
+  // How many times have we overflowed since last reset
+  static quint32 overflow_count;
 };
-
-#endif /* SRC_COMMANDSTACK_H_ */

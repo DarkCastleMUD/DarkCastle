@@ -1,6 +1,3 @@
-#ifndef STAT_H
-#define STAT_H
+#pragma once
 
-void getAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold);
-
-#endif
+void getAreaData(quint32 zone, qint32 mob, quint32 xps, quint32 gold);

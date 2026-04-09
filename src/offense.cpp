@@ -6,25 +6,21 @@
 |   in class/
 */
 
-#include <cctype>
-#include <cstring>
-
+#include "DC/levels.h"
 #include "DC/structs.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/handler.h"
+#include "DC/DC.h"
+
 #include "DC/spells.h"
 #include "DC/fight.h"
-#include "DC/connect.h"
-#include "DC/mobile.h"
+
 #include "DC/act.h"
 #include "DC/returnvals.h"
-#include "DC/room.h"
-#include "DC/db.h"
+
 #include "DC/interp.h"
 #include "DC/const.h"
+#include "DC/utility.h"
 
-int do_suicide(Character *ch, char *argument, cmd_t cmd)
+qint32 do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE; // just in case
@@ -59,7 +55,7 @@ int do_suicide(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int percent = number(1, 100);
+  qint32 percent = number(1, 100);
   if (percent > GET_WIS(ch))
     percent -= GET_WIS(ch);
 
@@ -79,8 +75,8 @@ int do_suicide(Character *ch, char *argument, cmd_t cmd)
 // just pull out alot of the code into a function.
 command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
 {
-  Character *victim, *k, *next_char;
-  int count = 0;
+  CharacterPtr victim, k, next_char;
+  qint32 count = {};
 
   QString arg1 = arguments.value(0);
 
@@ -138,10 +134,10 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_murder(Character *ch, char *argument, cmd_t cmd)
+qint32 do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   one_argument(argument, arg);
 
@@ -188,11 +184,11 @@ int do_murder(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_slay(Character *ch, char *argument, cmd_t cmd)
+qint32 do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   one_argument(argument, arg);
 
@@ -223,12 +219,12 @@ int do_slay(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Your mother would be so sad.. :(");
   else
   {
-    if (victim->getLevel() >= IMPLEMENTER)
+    if (victim->isImplementerPlayer())
     {
       ch->sendln("You no make ME into chop suey!");
-      sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
+      sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
       victim->send(buf);
-      if (ch->getLevel() > IMMORTAL)
+      if (ch->isImmortalPlayer())
       {
         fight_kill(victim, ch, TYPE_RAW_KILL, 0);
         ch->sendln("Lunch.");
@@ -247,11 +243,11 @@ int do_slay(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
-int do_kill(Character *ch, char *argument, cmd_t cmd)
+qint32 do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   one_argument(argument, arg);
 
@@ -278,7 +274,7 @@ int do_kill(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((ch->getLevel() < G_POWER) || ch->isNonPlayer())
+  if ((ch->getLevel() < DEITY) || ch->isNonPlayer())
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return ReturnValue::eFAILURE;
@@ -293,7 +289,7 @@ int do_kill(Character *ch, char *argument, cmd_t cmd)
       if (victim->getLevel() >= IMPLEMENTER)
       {
         ch->sendln("You no make ME into chop suey!");
-        sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
+        sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
         victim->send(buf);
         if (ch->getLevel() > IMMORTAL)
         {
@@ -326,7 +322,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  Character *victim{};
+  CharacterPtr victim = {};
   QString victim_name = arguments.value(0);
   if (victim_name == "follower")
   {
@@ -355,7 +351,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
     vnum_t victim_vnum = victim_name.toULongLong(&ok);
     if (ok)
     {
-      Character *possible_victim = DC::getInstance()->world[in_room].people;
+      CharacterPtr possible_victim = DC::getInstance()->world[in_room].people;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
         if (possible_victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == victim_vnum)
@@ -406,7 +402,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   //    return ReturnValue::eFAILURE;
   // }
 
-  Character *tmp_ch = victim->fighting;
+  CharacterPtr tmp_ch = victim->fighting;
 
   if (!tmp_ch)
   {

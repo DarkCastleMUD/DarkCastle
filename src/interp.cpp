@@ -24,35 +24,32 @@
 #include <cstdio>
 #include <cassert>
 
-#include <string>
+#include <QString>
+#include <qnamespace.h>
 #include <tuple>
 
 #include <fmt/format.h>
 #include <QStringList>
 
 #include "DC/structs.h" // MAX_STRING_LENGTH
-#include "DC/character.h"
+#include "DC/DC.h"
 #include "DC/interp.h"
-#include "DC/utility.h"
+
 #include "DC/fight.h"
 #include "DC/spells.h" // ETHERAL consts
-#include "DC/mobile.h"
-#include "DC/connect.h" // Connection
-#include "DC/room.h"
+
 #include "DC/act.h"
 #include "DC/returnvals.h"
 #include "DC/terminal.h"
 #include "DC/CommandStack.h"
-#include "DC/DC.h"
 #include "DC/Timer.h"
-#include "DC/memory.h"
+
 #include "DC/punish.h"
+#include "DC/utility.h"
 
-#define SKILL_HIDE 337
-
-int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner);
-int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
-const char *fillwords[] =
+qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner);
+qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type); // class/cl_mage.cpp
+const QStringList fillwords =
     {
         "in",
         "from",
@@ -60,10 +57,9 @@ const char *fillwords[] =
         "the",
         "on",
         "at",
-        "to",
-        "\n"};
+        "to"};
 
-int do_motd(Character *ch, char *arg, cmd_t cmd)
+qint32 do_motd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   extern char motd[];
 
@@ -71,7 +67,7 @@ int do_motd(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_imotd(Character *ch, char *arg, cmd_t cmd)
+qint32 do_imotd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   extern char imotd[];
 
@@ -81,15 +77,15 @@ int do_imotd(Character *ch, char *arg, cmd_t cmd)
 
 class LogCommand
 {
-  bool logged_{};
-  Character *ch_{};
-  QString command_{};
-  command_return_t rc_{};
-  QString rc_reason_{};
-  Timer command_duration_{};
+  bool logged_ = {};
+  CharacterPtr ch_ = {};
+  QString command_ = {};
+  command_return_t rc_ = {};
+  QString rc_reason_ = {};
+  Timer command_duration_ = {};
 
 public:
-  explicit LogCommand(QString command, Character *ch) : command_(command), ch_(ch)
+  explicit LogCommand(QString command, CharacterPtr ch) : command_(command), ch_(ch)
   {
     if (ch_ && ch_->isPlayer() &&
         (isSet(ch_->player->punish, PUNISH_LOG) ||
@@ -97,7 +93,7 @@ public:
          (ch_->player->multi && !DC::getInstance()->cf.allow_multi)))
     {
       command_duration_.start();
-      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\"").arg(ch_->getName()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
+      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\"").arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
       logged_ = true;
     }
   }
@@ -109,7 +105,7 @@ public:
       command_duration_.stop();
       auto timediff = ((command_duration_.getDiff().tv_sec * 1000000.0) + command_duration_.getDiff().tv_usec) / 1000000.0;
       auto timediffStr = QString::number(timediff, 'f');
-      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6").arg(ch_->getName()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
+      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6").arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
     }
   }
 
@@ -131,12 +127,12 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(getName()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(name()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     return logcmd.setReturn(ReturnValue::eFAILURE, "cstack exceeded");
   }
 
-  int retval{};
+  qint32 retval = {};
   QString buf;
 
   // Implement freeze command.
@@ -193,7 +189,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   // if we got this far, we're going to play with the command, so put
   // it into the debugging globals
   DC::getInstance()->last_processed_cmd = pcomm;
-  DC::getInstance()->last_char_name = getName();
+  DC::getInstance()->last_char_name = name();
   DC::getInstance()->last_char_room = in_room;
 
   if (!pcomm.isEmpty())
@@ -214,10 +210,10 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       {
 
         // search DC::bestowable_god_commands for the command skill number to lookup with has_skill
-        int command_skill = 0;
-        for (int i = 0; DC::bestowable_god_commands[i].num != -1; i++)
+        qint32 command_skill = {};
+        for (qint32 i = {}; DC::bestowable_god_commands[i].num != -1; i++)
         {
-          if (DC::bestowable_god_commands[i].name == found->getName())
+          if (DC::bestowable_god_commands[i].name == found->name())
           {
             command_skill = DC::bestowable_god_commands[i].num;
             break;
@@ -227,7 +223,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         if (command_skill == 0)
         {
           sendln("Huh?");
-          auto str = QStringLiteral("command_interpreter: Unable to find command [%1].").arg(found->getName());
+          auto str = QStringLiteral("command_interpreter: Unable to find command [%1].").arg(found->name());
           logbug(str);
           return logcmd.setReturn(ReturnValue::eFAILURE, str);
         }
@@ -260,7 +256,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       // fix for thin air thing
       if (GET_POS(this) < found->getMinimumPosition())
       {
-        auto minimum_position_str = QString::number(static_cast<uint_fast8_t>(found->getMinimumPosition()));
+        auto minimum_position_str = QString::number(static_cast<quint8>(found->getMinimumPosition()));
         switch (GET_POS(this))
         {
         case position_t::DEAD:
@@ -286,6 +282,8 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         case position_t::FIGHTING:
           this->sendln("No way!  You are still fighting!");
           return logcmd.setReturn(ReturnValue::eFAILURE, QStringLiteral("fighting < %1").arg(minimum_position_str));
+          break;
+        case position_t::STANDING:
           break;
         }
         return logcmd.setReturn(ReturnValue::eFAILURE, QStringLiteral("wrong position for cmd < %1").arg(minimum_position_str));
@@ -388,13 +386,13 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       // Normal dispatch
       if (found->getFunction1())
       {
-        auto c = strdup(command_arguments.toStdString().c_str());
+        auto c = strdup(qPrintable(command_arguments));
         retval = (*(found->getFunction1()))(this, c, found->getNumber());
         free(c);
       }
       else if (found->getFunction1b())
       {
-        auto c = strdup(command_arguments.toStdString().c_str());
+        auto c = strdup(qPrintable(command_arguments));
         retval = (*(found->getFunction1b()))(this, c, found->getNumber());
         free(c);
       }
@@ -463,134 +461,25 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   return logcmd.setReturn(ReturnValue::eSUCCESS, QStringLiteral("ReturnValue::eSUCCESS"));
 }
 
-int old_search_block(const char *arg, const char **list, bool exact)
+// case-insensitive search of a QList of QStrings for an entry starting with search string
+qsizetype search_list(QString arg, const QStringList list)
 {
-  if (arg == nullptr)
-  {
+  if (arg.isEmpty())
     return -1;
-  }
 
-  int i = 0;
-  int l = strlen(arg);
+  for (qsizetype index = 0; index < list.length(); ++index)
+    if (list.at(index).startsWith(arg, Qt::CaseInsensitive))
+      return index;
 
-  if (exact)
-  {
-    for (i = 0; **(list + i) != '\n'; i++)
-      if (!strcasecmp(arg, *(list + i)))
-        return (i);
-  }
-  else
-  {
-    if (!l)
-      // Avoid "" to match the first available std::string
-      l = 1;
-    for (i = 0; **(list + i) != '\n'; i++)
-      if (!strncasecmp(arg, *(list + i), l))
-        return (i);
-  }
-
-  return (-1);
+  return -1;
 }
 
-int old_search_block(const char *arg, const QStringList list, bool exact)
-{
-  if (arg == nullptr)
-  {
-    return -1;
-  }
-
-  int i = 0;
-  int l = strlen(arg);
-
-  if (exact)
-  {
-    for (i = 0; i < list.length(); i++)
-      if (!strcasecmp(arg, list.value(i).toStdString().c_str()))
-        return (i);
-  }
-  else
-  {
-    if (!l)
-      // Avoid "" to match the first available std::string
-      l = 1;
-    for (i = 0; list.length(); i++)
-      if (!strncasecmp(arg, list.value(i).toStdString().c_str(), l))
-        return (i);
-  }
-
-  return (-1);
-}
-
-int search_block(const char *orig_arg, const char **list, bool exact)
-{
-  int i;
-
-  std::string needle = std::string(orig_arg);
-
-  // Make into lower case and get length of std::string
-  transform(needle.begin(), needle.end(), needle.begin(), ::tolower);
-
-  if (exact)
-  {
-    for (i = 0; **(list + i) != '\n'; i++)
-    {
-      std::string haystack = *(list + i);
-      if (needle == haystack)
-      {
-        return (i);
-      }
-    }
-  }
-  else
-  {
-    for (i = 0; **(list + i) != '\n'; i++)
-    {
-      std::string haystack = *(list + i);
-      if (haystack.size() == 0 && needle.size() == 0)
-      {
-        return i;
-      }
-
-      if (needle.size() > 0 && haystack.compare(0, needle.size(), needle) == 0)
-      {
-        return i;
-      }
-    }
-  }
-
-  return (-1);
-}
-
-int search_blocknolow(char *arg, const char **list, bool exact)
-{
-  int i;
-  unsigned int l = strlen(arg);
-
-  if (exact)
-  {
-    for (i = 0; **(list + i) != '\n'; i++)
-      if (!strcmp(arg, *(list + i)))
-        return (i);
-  }
-  else
-  {
-    if (!l)
-      // Avoid "" to match the first available std::string
-      l = 1;
-    for (i = 0; **(list + i) != '\n'; i++)
-      if (!strncmp(arg, *(list + i), l))
-        return (i);
-  }
-
-  return (-1);
-}
-
-int do_boss(Character *ch, char *arg, cmd_t cmd)
+qint32 do_boss(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf[200];
-  int x;
+  qint32 x;
 
-  for (x = 0; x <= 60; x++)
+  for (x = {}; x <= 60; x++)
   {
     sprintf(buf, "NUMBER-CRUNCHER: %d crunched to %d converted to black"
                  "/white tree node %d\r\n",
@@ -601,33 +490,33 @@ int do_boss(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int old_search_block(const char *argument, int begin, int length, const QStringList list, int mode)
+qint32 old_search_block(const QString argument, qint32 begin, qint32 length, const QStringList list, qint32 mode)
 {
-  int guess, found, search;
+  qint32 guess, found, search;
 
   // If the word contains 0 letters, a match is already found
   found = (length < 1);
-  guess = 0;
+  guess = {};
 
   // Search for a match
   if (mode)
-    while (!found && *(list.value(guess).toStdString().c_str()) != '\n')
+    while (!found && *(list.value(qPrintable(guess))) != '\n')
     {
-      found = ((unsigned)length == strlen(list.value(guess).toStdString().c_str()));
-      for (search = 0; search < length && found; search++)
+      found = ((quint32)length == strlen(list.value(qPrintable(guess))));
+      for (search = {}; search < length && found; search++)
       {
-        found = (*(argument + begin + search) == *(list.value(guess).toStdString().c_str() + search));
+        found = (*(argument + begin + search) == *(list.value(qPrintable(guess)) + search));
       }
       guess++;
     }
   else
   {
-    while (!found && *(list.value(guess).toStdString().c_str()) != '\n')
+    while (!found && *(list.value(qPrintable(guess))) != '\n')
     {
       found = 1;
-      for (search = 0; (search < length && found); search++)
+      for (search = {}; (search < length && found); search++)
       {
-        found = (*(argument + begin + search) == *(list.value(guess).toStdString().c_str() + search));
+        found = (*(argument + begin + search) == *(list.value(qPrintable(guess)) + search));
       }
       guess++;
     }
@@ -636,20 +525,20 @@ int old_search_block(const char *argument, int begin, int length, const QStringL
   return (found ? guess : -1);
 }
 
-int old_search_block(const char *argument, int begin, int length, const char **list, int mode)
+qint32 old_search_block(const QString argument, qint32 begin, qint32 length, const char **list, qint32 mode)
 {
-  int guess, found, search;
+  qint32 guess, found, search;
 
   // If the word contains 0 letters, a match is already found
   found = (length < 1);
-  guess = 0;
+  guess = {};
 
   // Search for a match
   if (mode)
     while (!found && *(list[guess]) != '\n')
     {
-      found = ((unsigned)length == strlen(list[guess]));
-      for (search = 0; search < length && found; search++)
+      found = ((quint32)length == strlen(list[guess]));
+      for (search = {}; search < length && found; search++)
       {
         found = (*(argument + begin + search) == *(list[guess] + search));
       }
@@ -660,7 +549,7 @@ int old_search_block(const char *argument, int begin, int length, const char **l
     while (!found && *(list[guess]) != '\n')
     {
       found = 1;
-      for (search = 0; (search < length && found); search++)
+      for (search = {}; (search < length && found); search++)
       {
         found = (*(argument + begin + search) == *(list[guess] + search));
       }
@@ -671,11 +560,11 @@ int old_search_block(const char *argument, int begin, int length, const char **l
   return (found ? guess : -1);
 }
 
-void argument_interpreter(const char *argument, char *first_arg, char *second_arg)
+void argument_interpreter(const QString argument, char *first_arg, char *second_arg)
 {
-  int look_at, begin;
+  qint32 look_at, begin;
 
-  begin = 0;
+  begin = {};
 
   do
   {
@@ -683,12 +572,12 @@ void argument_interpreter(const char *argument, char *first_arg, char *second_ar
     for (; *(argument + begin) == ' '; begin++)
       ;
     /* Find length of first word */
-    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+    for (look_at = {}; *(argument + begin + look_at) > ' '; look_at++)
       /* Make all letters lower case, and copy them to first_arg */
       *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
     *(first_arg + look_at) = '\0';
     begin += look_at;
-  } while (fill_word(first_arg));
+  } while (fillwords.contains(QString(first_arg), Qt::CaseInsensitive);
 
   do
   {
@@ -696,24 +585,24 @@ void argument_interpreter(const char *argument, char *first_arg, char *second_ar
     for (; *(argument + begin) == ' '; begin++)
       ;
     /* Find length of first word */
-    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+    for (look_at = {}; *(argument + begin + look_at) > ' '; look_at++)
       /* Make all letters lower case, and copy them to second_arg */
       *(second_arg + look_at) = LOWER(*(argument + begin + look_at));
     *(second_arg + look_at) = '\0';
     begin += look_at;
-  } while (fill_word(second_arg));
+  } while (fillwords.contains(QString(second_arg), Qt::CaseInsensitive);
 }
 
-// If the std::string is ALL numbers, return true
-// If there is a non-numeric in std::string, return false
+// If the QString is ALL numbers, return true
+// If there is a non-numeric in QString, return false
 bool is_number(const char *str)
 {
-  int look_at;
+  qint32 look_at;
 
   if (*str == '\0')
     return false;
 
-  for (look_at = 0; *(str + look_at) != '\0'; look_at++)
+  for (look_at = {}; *(str + look_at) != '\0'; look_at++)
     if ((*(str + look_at) < '0') || (*(str + look_at) > '9'))
       return false;
 
@@ -738,134 +627,24 @@ bool is_number(QString str)
   return false;
 }
 
-// Multiline arguments, used for mobprogs
-char *one_argument_long(char *argument, char *first_arg)
+QString one_argument(QString arguments, QString &arg1)
 {
-  int begin, look_at;
-  bool end = false;
-  begin = 0;
+  auto arguments_list = arguments.trimmed().split(' ');
 
-  /* Find first non blank */
-  for (; isspace(*(argument + begin)); begin++)
-    ;
-  if (*(argument + begin) == '{')
+  if (!arguments_list.isEmpty())
   {
-    end = true;
-    begin++;
+    arg1 = arguments_list.first().toLower();
+    arguments_list.removeFirst();
+    return arguments_list.join(' ');
   }
-
-  if (*(argument + begin) == '{')
-  {
-    end = true;
-    begin++;
-  }
-  /* Find length of first word */
-  for (look_at = 0;; look_at++)
-    if (!end && *(argument + begin + look_at) <= ' ')
-      break;
-    else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0'))
-    {
-      begin++;
-      break;
-    }
-    else
-    {
-      if (!end)
-        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-      else
-        *(first_arg + look_at) = *(argument + begin + look_at);
-    }
-
-  /* Make all letters lower case, and copy them to first_arg */
-  *(first_arg + look_at) = '\0';
-  begin += look_at;
-
-  return argument + begin;
-}
-
-const char *one_argument_long(const char *argument, char *first_arg)
-{
-  int begin, look_at;
-  bool end = false;
-  begin = 0;
-
-  /* Find first non blank */
-  for (; isspace(*(argument + begin)); begin++)
-    ;
-  if (*(argument + begin) == '{')
-  {
-    end = true;
-    begin++;
-  }
-
-  if (*(argument + begin) == '{')
-  {
-    end = true;
-    begin++;
-  }
-  /* Find length of first word */
-  for (look_at = 0;; look_at++)
-    if (!end && *(argument + begin + look_at) <= ' ')
-      break;
-    else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0'))
-    {
-      begin++;
-      break;
-    }
-    else
-    {
-      if (!end)
-        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-      else
-        *(first_arg + look_at) = *(argument + begin + look_at);
-    }
-
-  /* Make all letters lower case, and copy them to first_arg */
-  *(first_arg + look_at) = '\0';
-  begin += look_at;
-
-  return argument + begin;
-}
-
-/* find the first sub-argument of a std::string, return pointer to first char in
-   primary argument, following the sub-arg                      */
-char *one_argument(char *argument, char *first_arg)
-{
-  return one_argument_long(argument, first_arg);
-  int begin, look_at;
-
-  begin = 0;
-
-  do
-  {
-    /* Find first non blank */
-    for (; isspace(*(argument + begin)); begin++)
-      ;
-    /* Find length of first word */
-    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
-      /* Make all letters lower case, and copy them to first_arg */
-      *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-    *(first_arg + look_at) = '\0';
-    begin += look_at;
-  } while (fill_word(first_arg));
-
-  return (argument + begin);
-}
-
-const char *one_argument(const char *argument, char *first_arg)
-{
-  return one_argument_long(argument, first_arg);
-}
-
-int fill_wordnolow(char *argument)
-{
-  return (search_blocknolow(argument, fillwords, true) >= 0);
+  arg1 = {};
+  return {};
 }
 
 char *one_argumentnolow(char *argument, char *first_arg)
 {
-  int begin, look_at;
-  begin = 0;
+  qint32 begin, look_at;
+  begin = {};
 
   do
   {
@@ -873,19 +652,14 @@ char *one_argumentnolow(char *argument, char *first_arg)
     for (; isspace(*(argument + begin)); begin++)
       ;
     /* Find length of first word */
-    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+    for (look_at = {}; *(argument + begin + look_at) > ' '; look_at++)
       /* copy to first_arg */
       *(first_arg + look_at) = *(argument + begin + look_at);
     *(first_arg + look_at) = '\0';
     begin += look_at;
-  } while (fill_wordnolow(first_arg));
+  } while (fillwords.contains(first_arg, Qt::CaseInsensitive);
 
   return (argument + begin);
-}
-
-int fill_word(char *argument)
-{
-  return (search_block(argument, fillwords, true) >= 0);
 }
 
 void automail(char *name)
@@ -894,13 +668,13 @@ void automail(char *name)
   char buf[100];
 
   blah = fopen("../lib/whassup.txt", "w");
-  fprintf(blah, name);
+  qfprintf(blah, "%s", name);
   fclose(blah);
   sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
 }
 
-bool is_abbrev(const std::string &aabrev, const std::string &word)
+bool is_abbrev(const QString &aabrev, const QString &word)
 {
   if (aabrev.empty())
   {
@@ -924,7 +698,7 @@ bool is_abbrev(QString aabrev, QString word)
   return word.startsWith(aabrev, Qt::CaseInsensitive);
 }
 
-/* determine if a given std::string is an abbreviation of another */
+/* determine if a given QString is an abbreviation of another */
 bool is_abbrev(const char *arg1, const char *arg2) /* arg1 is short, arg2 is long */
 {
   if (!*arg1)
@@ -937,7 +711,7 @@ bool is_abbrev(const char *arg1, const char *arg2) /* arg1 is short, arg2 is lon
   return true;
 }
 
-std::string ltrim(std::string str)
+QString ltrim(QString str)
 {
   // remove leading spaces
   try
@@ -959,7 +733,7 @@ std::string ltrim(std::string str)
   return str;
 }
 
-std::string rtrim(std::string str)
+QString rtrim(QString str)
 {
   // remove leading spaces
   try
@@ -996,24 +770,9 @@ std::tuple<QString, QString> half_chop(QString arguments, const char token)
   return std::tuple<QString, QString>(arg1, remainder);
 }
 
-std::tuple<std::string, std::string> half_chop(std::string arguments, const char token)
+std::tuple<QString, QString> half_chop(const char *c_arg, const char token)
 {
-  arguments = ltrim(arguments);
-
-  auto space_after_arg1 = arguments.find_first_of(token);
-  auto arg1 = arguments.substr(0, space_after_arg1);
-
-  // remove arg1 from arguments
-  arguments.erase(0, space_after_arg1);
-
-  arguments = ltrim(arguments);
-
-  return std::tuple<std::string, std::string>(arg1, arguments);
-}
-
-std::tuple<std::string, std::string> half_chop(const char *c_arg, const char token)
-{
-  std::string arguments;
+  QString arguments;
   if (c_arg)
   {
     arguments = c_arg;
@@ -1022,7 +781,7 @@ std::tuple<std::string, std::string> half_chop(const char *c_arg, const char tok
   return half_chop(arguments, token);
 }
 
-std::tuple<std::string, std::string> last_argument(std::string arguments)
+std::tuple<QString, QString> last_argument(QString arguments)
 {
   try
   {
@@ -1043,7 +802,7 @@ std::tuple<std::string, std::string> last_argument(std::string arguments)
     last_non_space = arguments.find_last_not_of(' ');
     arguments.erase(last_non_space + 1, arguments.length() + 1);
 
-    return std::tuple<std::string, std::string>(last_arg, arguments);
+    return std::tuple<QString, QString>(last_arg, arguments);
   }
   catch (...)
   {
@@ -1051,10 +810,10 @@ std::tuple<std::string, std::string> last_argument(std::string arguments)
          arguments.c_str());
   }
 
-  return std::tuple<std::string, std::string>(std::string(), std::string());
+  return std::tuple<QString, QString>(QString(), QString());
 }
 
-/* return first 'word' plus trailing substring of input std::string */
+/* return first 'word' plus trailing substring of input QString */
 void half_chop(const char *str, char *arg1, char *arg2)
 {
   // strip leading whitespace from original
@@ -1080,11 +839,11 @@ void half_chop(const char *str, char *arg1, char *arg2)
 /* return last 'word' plus leading substring of input str */
 void chop_half(char *str, char *arg1, char *arg2)
 {
-  int32_t i, j;
+  qint32 i, j;
 
   // skip over trailing space
   i = strlen(str) - 1;
-  j = 0;
+  j = {};
   while (isspace(str[i]))
     i--;
 
@@ -1118,24 +877,24 @@ void chop_half(char *str, char *arg1, char *arg2)
 
 command_return_t Character::special(QString arguments, cmd_t cmd)
 {
-  class Object *i;
-  Character *k;
-  int j;
-  int retval;
+  ObjectPtr i;
+  CharacterPtr k;
+  qint32 j;
+  qint32 retval;
 
   /* special in room? */
   if (DC::getInstance()->world[in_room].funct)
   {
-    if ((retval = (*DC::getInstance()->world[in_room].funct)(this, cmd, arguments.toStdString().c_str())) != ReturnValue::eFAILURE)
+    if ((retval = (*DC::getInstance()->world[in_room].funct)(this, cmd, qPrintable(arguments))) != ReturnValue::eFAILURE)
       return retval;
   }
 
   /* special in equipment list? */
-  for (j = 0; j <= (MAX_WEAR - 1); j++)
+  for (j = {}; j <= (MAX_WEAR - 1); j++)
     if (equipment[j] && this->equipment[j]->item_number >= 0)
       if (DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, qPrintable(arguments), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -1145,7 +904,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
     if (i->item_number >= 0)
       if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -1155,16 +914,16 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   {
     if (k->isNonPlayer())
     {
-      if (((Character *)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if (((CharacterPtr)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
-        retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
+        retval = clan_guard(this, 0, cmd, qPrintable(arguments), k);
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
       else if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       {
         retval = ((*DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
-                                                                                  cmd, arguments.toStdString().c_str(), k));
+                                                                                  cmd, qPrintable(arguments), k));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -1176,7 +935,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
     if (i->item_number >= 0)
       if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -1184,16 +943,10 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-void Character::add_command_lag(cmd_t cmd, int lag)
+void Character::add_command_lag(cmd_t cmd, qint32 lag)
 {
   command_lag *cmdl;
-#ifdef LEAK_CHECK
-  cmdl = (command_lag *)
-      calloc(1, sizeof(command_lag));
-#else
-  cmdl = (command_lag *)
-      dc_alloc(1, sizeof(command_lag));
-#endif
+  cmdl = new command_lag;
   cmdl->next = DC::getInstance()->getCommandLag();
   DC::getInstance()->setCommandLag(cmdl);
   cmdl->ch = this;
@@ -1215,7 +968,7 @@ bool Character::can_use_command(cmd_t cmd)
 
 void pulse_command_lag()
 {
-  command_lag *cmdl{}, *cmdlp = nullptr, *cmdlnext = nullptr;
+  command_lag *cmdl{}, *cmdlp = {}, *cmdlnext = {};
 
   for (cmdl = DC::getInstance()->getCommandLag(); cmdl; cmdl = cmdlnext)
   {
@@ -1227,30 +980,15 @@ void pulse_command_lag()
       else
         DC::getInstance()->setCommandLag(cmdl->next);
 
-      cmdl->ch = 0;
-      dc_free(cmdl);
+      cmdl->ch = {};
+      cmdl = {};
     }
     else
       cmdlp = cmdl;
   }
 }
 
-char *remove_trailing_spaces(char *arg)
+QString remove_trailing_spaces(QString arg)
 {
-  int len = strlen(arg) - 1;
-
-  if (len < 1)
-    return arg;
-
-  for (; len > 0; len--)
-  {
-    if (arg[len] != ' ')
-    {
-      arg[len + 1] = '\0';
-      return arg;
-    }
-  }
-  return arg;
+  return arg.trimmed();
 }
-
-// The End

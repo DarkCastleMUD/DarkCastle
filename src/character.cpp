@@ -1,16 +1,17 @@
+#include "DC/DC.h"
+#include "DC/comm.h"
+#include "DC/db.h"
+#include "DC/handler.h"
+#include "DC/terminal.h"
+#include "DC/const.h"
+#include "DC/comm.h"
+
 #include <QStringTokenizer>
 #include <QFile>
 #include <QMetaEnum>
 
-#include "DC/character.h"
-#include "DC/db.h"
-#include "DC/connect.h"
-#include "DC/obj.h"
-#include "DC/terminal.h"
-#include "DC/const.h"
-
-void set_golem(Character *golem, int golemtype);
-class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
+void set_golem(CharacterPtr golem, qint32 golemtype);
+ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
 
 char_file_u4::char_file_u4()
 {
@@ -56,12 +57,12 @@ QString Character::getSetting(QString key, QString defaultValue)
   return defaultValue;
 }
 
-void Mobile::setObject(Object *o)
+void Mobile::setObject(ObjectPtr o)
 {
   object = o;
 }
 
-Object *Mobile::getObject(void)
+ObjectPtr Mobile::getObject(void)
 {
   return object;
 }
@@ -76,15 +77,15 @@ QString Player::getJoining(void)
   QString buffer;
   for (joining_t::const_iterator i = joining.begin(); i != joining.end(); ++i)
   {
-    if (i.value())
+    if (conn->value())
     {
       if (buffer.isEmpty())
       {
-        buffer = i.key();
+        buffer = conn->key();
       }
       else
       {
-        buffer += " " + i.key();
+        buffer += " " + conn->key();
       }
     }
   }
@@ -111,7 +112,7 @@ void Player::toggleJoining(QString key)
   }
   else
   {
-    joining.insert(key, !i.value());
+    joining.insert(key, !conn->value());
   }
 }
 
@@ -192,17 +193,17 @@ bool Character::isImplementerPlayer(void) const
   return isPlayer() && level_ == IMPLEMENTER;
 }
 
-uint64_t Character::getGold(void)
+quint64 Character::getGold(void)
 {
   return gold_;
 }
 
-void Character::setGold(uint64_t gold)
+void Character::setGold(quint64 gold)
 {
   gold_ = gold;
 }
 
-bool Character::addGold(uint64_t gold)
+bool Character::addGold(quint64 gold)
 {
   if (gold_ + gold < gold)
   {
@@ -213,7 +214,7 @@ bool Character::addGold(uint64_t gold)
   return true;
 }
 
-bool Character::removeGold(uint64_t gold)
+bool Character::removeGold(quint64 gold)
 {
   if (gold > gold_)
   {
@@ -235,21 +236,21 @@ bool Character::multiplyGold(double mult)
   return true;
 }
 
-uint64_t &Character::getGoldReference(void)
+quint64 &Character::getGoldReference(void)
 {
   return gold_;
 }
 
 bool Character::load_charmie_equipment(QString player_name, bool previous)
 {
-  int golemtype = 0;
+  qint32 golemtype = {};
 
   if (player_name.isEmpty())
   {
     return false;
   }
 
-  FILE *fpfile = nullptr;
+  FILE *fpfile = {};
 
   if (this->isNonPlayer() || level_ < IMMORTAL)
   {
@@ -268,20 +269,20 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
   QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
   QString fullpath = path + filename;
-  if (!(fpfile = fopen(fullpath.toStdString().c_str(), "r")))
+  if (!(fpfile = fopen(qPrintable(fullpath), "r")))
   {
     send(QStringLiteral("No charmie save file found at '%1'.").arg(fullpath));
     return false;
   }
 
-  Character *charmie = dc_->clone_mobile(real_mobile(8));
+  CharacterPtr charmie = dc_->clone_mobile(real_mobile(8));
   if (charmie == nullptr)
   {
     logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
     return false;
   }
   charmie->setLevel(1);
-  class Object *last_cont = nullptr; // Last container.
+  ObjectPtr last_cont = {}; // Last container.
   while (!feof(fpfile))
   {
     last_cont = obj_store_to_char(charmie, fpfile, last_cont);
@@ -329,11 +330,6 @@ bool Character::validateName(QString name)
   return true;
 }
 
-const char *Character::getNameC(void) const
-{
-  return str_hsh(name_.toStdString().c_str());
-}
-
 void Connection::send(QString txt)
 {
   /* if there's no descriptor, don't worry about output */
@@ -359,7 +355,7 @@ QString Connection::getName(void)
 {
   if (character)
   {
-    return character->getName();
+    return character->name();
   }
   return {};
 }
@@ -477,60 +473,60 @@ const QStringList Object::apply_types =
         "DETECT MAGIC",
         "WILD MAGIC"};
 
-Sockets::Sockets(Character *ch, QString searchkey)
+Sockets::Sockets(CharacterPtr ch, QString searchkey)
 {
-  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto &d : DC::getInstance()->connections_)
   {
     if (ch->getLevel() < OVERSEER)
     {
-      if (d->character == nullptr)
+      if (conn->character == nullptr)
         continue;
-      if (d->character->getNameC() == nullptr)
+      if (conn->character->name().isEmpty())
         continue;
     }
-    if (d->character)
+    if (conn->character)
     {
-      if (!CAN_SEE(ch, d->character))
+      if (!CAN_SEE(ch, conn->character))
         continue;
-      if (ch->getLevel() < d->character->getLevel())
+      if (ch->getLevel() < conn->character->getLevel())
         continue;
-      if ((d->connected != Connection::states::PLAYING) && (ch->getLevel() < d->character->getLevel()))
+      if ((conn->connected != Connection::states::PLAYING) && (ch->getLevel() < conn->character->getLevel()))
         continue;
     }
 
     if (!searchkey.isEmpty())
     {
-      if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && d->character->getNameC() != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
+      if (!d.getPeerOriginalAddress().toString().contains(searchkey) && conn->character != nullptr && !conn->character->name().isEmpty() && QString(qPrintable(conn->character->name())).contains(searchkey, Qt::CaseInsensitive) == false)
       {
         continue;
       }
     }
 
-    const QString name = d->getName();
+    const QString name = conn->name();
     if (name.size() > longest_name_size_)
     {
       longest_name_size_ = name.size();
     }
 
-    const QString IPstr = d->getPeerFullAddressString();
+    const QString IPstr = d.getPeerFullAddressString();
     if (IPstr.size() > longest_IP_size_)
     {
       longest_IP_size_ = IPstr.size();
     }
 
-    const QString state = constindex(d->connected, DC::connected_states);
+    const QString state = constindex(conn->connected, DC::connected_states);
     if (state.size() > longest_connection_state_size_)
     {
       longest_connection_state_size_ = state.size();
     }
 
-    const QString idle = QString::number(d->idle_time / DC::PASSES_PER_SEC);
+    const QString idle = QString::number(d.idle_time / DC::PASSES_PER_SEC);
     if (idle.size() > longest_idle_size_)
     {
       longest_idle_size_ = idle.size();
     }
 
-    IPs_[d->getPeerAddress().toString()]++;
+    IPs_[d.getPeerAddress().toString()]++;
     connections_.push_back(d);
   }
 }
@@ -538,7 +534,7 @@ Sockets::Sockets(Character *ch, QString searchkey)
 void Character::display_string_list(QStringList list)
 {
   QString buf;
-  uint64_t count{};
+  quint64 count = {};
   for (const auto &item : list)
   {
     send(QStringLiteral("%1").arg(item, 18));
@@ -550,12 +546,12 @@ void Character::display_string_list(QStringList list)
   send("\r\n");
 }
 
-void Character::display_string_list(const char *list[])
+void Character::display_string_list(const QStringList list)
 {
-  char buf[MAX_STRING_LENGTH]{};
+  char buf[MAX_STRING_LENGTH] = {};
   *buf = '\0';
 
-  for (int i = 1; *list[i - 1] != '\n'; i++)
+  for (qint32 i = 1; *list[i - 1] != '\n'; i++)
   {
     sprintf(buf + strlen(buf), "%18s", list[i - 1]);
     if (!(i % 4))
@@ -645,7 +641,7 @@ const QList<Toggle> Player::togglables = {
     {"damage", PLR_DAMAGE_BIT, &Character::do_damage_toggle},
     {"nodupekeys", PLR_NODUPEKEYS_BIT, &Character::do_nodupekeys_toggle}};
 
-Toggle::Toggle(QString name, uint64_t shift, command_return_t (Character::*function)(QStringList arguments, cmd_t cmd), uint64_t dependency_shift, QString on_message, QString off_message)
+Toggle::Toggle(QString name, quint64 shift, command_return_t (Character::*function)(QStringList arguments, cmd_t cmd), quint64 dependency_shift, QString on_message, QString off_message)
     : name_(name), valid_(true), shift_(shift), dependency_shift_(dependency_shift), value_(1U << shift), on_message_(on_message), off_message_(off_message), function_(function)
 {
 }
@@ -697,7 +693,7 @@ void Character::setType(const Type type)
   type_ = type;
 }
 
-auto Entity::room(void) -> Room &
+Room &Entity::room(void)
 {
   return DC::getInstance()->world[in_room];
 }
@@ -733,7 +729,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
     GrouptMember
   } target_is = targets::Self;
 
-  QString color{}, value{};
+  QString color{}, value = {};
 
   const static QMap<QString, QString> legacy_to_modern{
       {"h", "hp"},
@@ -937,9 +933,9 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
       color = calc_color(GET_KI(target), GET_MAX_KI(target));
   }
   else if (variable == "xp")
-    value = QString::number(GET_EXP(target));
+    value = QString::number(target->exp);
   else if (variable == "xptnl")
-    value = QString::number(exp_table[getLevel() + 1] - GET_EXP(this));
+    value = QString::number(exp_table[getLevel() + 1] - this->exp);
   else if (variable == "align" || variable == "alignment")
   {
     value = QString::number(GET_ALIGNMENT(this));
@@ -1048,7 +1044,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
 
 QString Character::createPrompt(void)
 {
-  QString source{};
+  QString source = {};
   if (this->isNonPlayer())
   {
     source = QStringLiteral("HP: %i/%H %f >");
@@ -1084,46 +1080,46 @@ QString Character::createPrompt(void)
 
 QString Character::calc_name(bool use_color)
 {
-  uint_fast8_t percent{};
-  QString name;
+  quint8 percent = {};
+  QString namebuffer;
 
   if (getHP() == 0 || GET_MAX_HIT(this) == 0)
-    percent = 0;
+    percent = {};
   else
     percent = getHP() * 100 / GET_MAX_HIT(this);
 
   if (use_color)
   {
     if (percent >= 100)
-      name = cond_colorcodes.value(0);
+      namebuffer = cond_colorcodes.value(0);
     else if (percent >= 90)
-      name = cond_colorcodes.value(1);
+      namebuffer = cond_colorcodes.value(1);
     else if (percent >= 75)
-      name = cond_colorcodes.value(2);
+      namebuffer = cond_colorcodes.value(2);
     else if (percent >= 50)
-      name = cond_colorcodes.value(3);
+      namebuffer = cond_colorcodes.value(3);
     else if (percent >= 30)
-      name = cond_colorcodes.value(4);
+      namebuffer = cond_colorcodes.value(4);
     else if (percent >= 15)
-      name = cond_colorcodes.value(5);
+      namebuffer = cond_colorcodes.value(5);
     else if (percent >= 0)
-      name = cond_colorcodes.value(6);
+      namebuffer = cond_colorcodes.value(6);
   }
 
   if (isPlayer())
-    name += getName();
-  else if (short_desc)
-    name += short_desc;
+    namebuffer += name();
+  else if (!short_description().isEmpty())
+    namebuffer += short_description();
   else
-    name += QStringLiteral("unknown");
+    namebuffer += QStringLiteral("unknown");
 
   if (use_color)
-    name += NTEXT;
+    namebuffer += NTEXT;
 
-  return name;
+  return namebuffer;
 }
 
-void ChannelMessage::set_wizinvis(const class Character *sender)
+void ChannelMessage::set_wizinvis(const CharacterPtr sender)
 {
   if (sender && sender->isPlayer())
   {
@@ -1131,15 +1127,15 @@ void ChannelMessage::set_wizinvis(const class Character *sender)
   }
   else
   {
-    wizinvis_ = 0;
+    wizinvis_ = {};
   }
 }
 
-void ChannelMessage::set_name(const class Character *sender)
+void ChannelMessage::set_name(const CharacterPtr sender)
 {
   if (sender)
   {
-    sender_name_ = GET_SHORT(sender);
+    sender_name_ = qPrintable(sender->shortdesc_or_name());
   }
   else
   {
@@ -1148,7 +1144,7 @@ void ChannelMessage::set_name(const class Character *sender)
   }
 }
 
-QString ChannelMessage::getMessage(Character *ch) const
+QString ChannelMessage::getMessage(CharacterPtr ch) const
 {
   if (!ch)
     return {};

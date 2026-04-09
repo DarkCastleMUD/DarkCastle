@@ -1,6 +1,7 @@
-#include <QTest>
 #include "DC/utility.h"
-#include <string>
+#include <QTest>
+
+#include <QString>
 #include <memory>
 
 using namespace std::literals;
@@ -30,7 +31,7 @@ private slots:
   void benchmark_nocolor_strlen()
   {
     QFETCH(VariableType, type);
-    size_t result{};
+    size_t result = {};
 
     if (type == VariableType::C_STRING)
     {
@@ -49,25 +50,25 @@ private slots:
     Q_UNUSED(result);
   }
 
-  void benchmark_str_dup0()
+  void benchmark_0()
   {
     QBENCHMARK
     {
-      std::unique_ptr<char, decltype(std::free) *> result = {str_dup0(STRING_LITERAL1), std::free};
+      std::unique_ptr<char, decltype(std::free) *> result = {0(STRING_LITERAL1), std::free};
     }
   }
 
-  void benchmark_str_dup()
+  void benchmark_()
   {
     QBENCHMARK
     {
-      std::unique_ptr<char, decltype(std::free) *> result = {str_dup(STRING_LITERAL1), std::free};
+      std::unique_ptr<char, decltype(std::free) *> result = {(STRING_LITERAL1), std::free};
     }
   }
 
   void benchmark_str_cmp()
   {
-    int result{};
+    qint32 result = {};
     QBENCHMARK
     {
       result = str_cmp("ABC123", "abc123");
@@ -78,7 +79,7 @@ private slots:
   void benchmark_space_to_underscore_data()
   {
     QTest::addColumn<VariableType>("type");
-    QTest::newRow("std::string") << VariableType::STD_STRING;
+    QTest::newRow("QString") << VariableType::STD_STRING;
     QTest::newRow("QString") << VariableType::QSTRING;
   }
 
@@ -87,10 +88,10 @@ private slots:
     QFETCH(VariableType, type);
     if (type == VariableType::STD_STRING)
     {
-      std::string result;
+      QString result;
       QBENCHMARK
       {
-        result = space_to_underscore(std::string("  this is a test  "));
+        result = space_to_underscore(QString("  this is a test  "));
       }
       Q_UNUSED(result);
     }
@@ -109,25 +110,25 @@ private slots:
   {
     QBENCHMARK
     {
-      std::unique_ptr<char, decltype(std::free) *> result = {str_nospace("  this is a test  "), std::free};
+      str_nospace("  this is a test  ");
     }
   }
 
   void benchmark_str_n_nosp_cmp_begin_data()
   {
     QTest::addColumn<VariableType>("type");
-    QTest::newRow("std::string") << VariableType::STD_STRING;
+    QTest::newRow("QString") << VariableType::STD_STRING;
     QTest::newRow("QString") << VariableType::QSTRING;
   }
   void benchmark_str_n_nosp_cmp_begin()
   {
     QFETCH(VariableType, type);
-    int result{};
+    qint32 result = {};
     if (type == VariableType::STD_STRING)
     {
       QBENCHMARK
       {
-        result = str_n_nosp_cmp_begin(std::string("  this is a test  "), std::string("__THIS_IS_A_test__"));
+        result = str_n_nosp_cmp_begin(QString("  this is a test  "), QString("__THIS_IS_A_test__"));
       }
     }
     else if (type == VariableType::QSTRING)

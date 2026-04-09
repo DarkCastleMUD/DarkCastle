@@ -1,5 +1,4 @@
-#ifndef DC_GLOBAL_H
-#define DC_GLOBAL_H
+#pragma once
 
 #include <QtCore/qglobal.h>
 
@@ -8,5 +7,3 @@
 #else
 #define DC_EXPORT Q_DECL_IMPORT
 #endif
-
-#endif // DC_GLOBAL_H

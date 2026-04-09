@@ -5,36 +5,35 @@
  *************************************************************************/
 #include "DC/structs.h"
 #include "DC/player.h"
-#include "DC/character.h"
+#include "DC/DC.h"
 #include "DC/spells.h"
-#include "DC/utility.h"
+
 #include "DC/fight.h"
-#include "DC/mobile.h"
+
 #include "DC/magic.h"
-#include "DC/connect.h"
 #include "DC/handler.h"
 #include "DC/act.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
-#include "DC/room.h"
-#include "DC/db.h"
+
 #include "DC/clan.h"
-#include "DC/utility.h"
+
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/move.h"
 #include "DC/obj.h"
+#include "DC/levels.h"
 
-extern int rev_dir[];
+extern qint32 rev_dir[];
 
-int do_batter(Character *ch, char *argument, cmd_t cmd)
+qint32 do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool battervbrace = false;
   bool batterwins = false;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], dammsg[20];
   room_direction_data *exit, *back;
-  int other_room, door, dam, skill, retval;
+  qint32 other_room, door, dam, skill, retval;
 
   if (!(skill = ch->has_skill(SKILL_BATTERBRACE)))
   {
@@ -92,21 +91,21 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
 
     dam = number(100, 200) + 3 * (100 - skill);
 
-    csendf(ch, "You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n", fname(exit->keyword).toStdString().c_str());
+    ch->send(QStringLiteral("You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n").arg(qPrintable(fname(exit->keyword))));
     act("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, TO_ROOM, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
 
       sprintf(dammsg, "$B%d$R", dam);
-      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", fname(exit->keyword).toStdString().c_str());
-      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", qPrintable(fname(exit->keyword)));
+      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", qPrintable(fname(exit->keyword)));
       send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", qPrintable(fname(exit->keyword)));
       send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
 
-      sprintf(buf, "The %s survived, but you didn't...\r\n", fname(exit->keyword).toStdString().c_str());
-      sprintf(buf2, "The %s survived, but $n didn't...", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf, "The %s survived, but you didn't...\r\n", qPrintable(fname(exit->keyword)));
+      sprintf(buf2, "The %s survived, but $n didn't...", qPrintable(fname(exit->keyword)));
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 
       if (SOMEONE_DIED(retval))
@@ -124,8 +123,8 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
       if (exit->bracee != nullptr)
       {
         battervbrace = true;
-        int batterer = GET_STR(ch) + GET_CON(ch) + GET_DEX(ch) + number(1, 10);
-        int bracee = GET_STR(exit->bracee) + GET_CON(exit->bracee) + GET_DEX(exit->bracee) + number(1, 10);
+        qint32 batterer = GET_STR(ch) + GET_CON(ch) + GET_DEX(ch) + number(1, 10);
+        qint32 bracee = GET_STR(exit->bracee) + GET_CON(exit->bracee) + GET_DEX(exit->bracee) + number(1, 10);
         if (batterer < bracee) // batterer fails (ch fails)
         {
           ch->decrementMove(100);
@@ -152,7 +151,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
       {
         if (batterwins)
         {
-          csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", fname(exit->keyword).toStdString().c_str());
+          exit->bracee->send(QStringLiteral("The %s bursts open with a resounding crash and you are hurld to the ground!\r\n").arg(qPrintable(fname(exit->keyword))));
           act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
           exit->bracee->setSitting();
           update_pos(exit->bracee);
@@ -160,21 +159,21 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
         }
         else
         { // brace wins
-          csendf(exit->bracee, "The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n", fname(exit->keyword).toStdString().c_str());
+          exit->bracee->send(QStringLiteral("The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n").arg(qPrintable(fname(exit->keyword))));
         }
       }
       else
       {
         sprintf(dammsg, "$B%d$R", dam);
-        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword).toStdString().c_str());
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", fname(exit->keyword).toStdString().c_str());
+        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", qPrintable(fname(exit->keyword)));
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", qPrintable(fname(exit->keyword)));
         send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword).toStdString().c_str());
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", qPrintable(fname(exit->keyword)));
         send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
       }
 
-      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", fname(exit->keyword).toStdString().c_str());
-      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", qPrintable(fname(exit->keyword)));
+      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", qPrintable(fname(exit->keyword)));
 
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 
@@ -219,9 +218,9 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_brace(Character *ch, char *argument, cmd_t cmd)
+qint32 do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  int door, other_room;
+  qint32 door, other_room;
   room_direction_data *back, *exit;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
 
@@ -239,18 +238,18 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
     {
       if (cmd == cmd_t::UNDEFINED)
       {
-        csendf(ch, "You are no longer able to brace the %s.\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
+        ch->send(QStringLiteral("You are no longer able to brace the %s.\r\n").arg(qPrintable(fname(ch->brace_at->keyword))));
       }
       else
       {
-        csendf(ch, "You stop holding the %s shut.\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
+        ch->send(QStringLiteral("You stop holding the %s shut.\r\n").arg(qPrintable(fname(ch->brace_at->keyword))));
         act("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, TO_ROOM, 0);
       }
-      ch->brace_at->bracee = nullptr;
-      ch->brace_at = nullptr;
+      ch->brace_at->bracee = {};
+      ch->brace_at = {};
       if (ch->brace_exit != nullptr) // incase it's a weird exit area
-        ch->brace_exit->bracee = nullptr;
-      ch->brace_exit = nullptr;
+        ch->brace_exit->bracee = {};
+      ch->brace_exit = {};
       return ReturnValue::eSUCCESS;
     }
     ch->sendln("Brace what??");
@@ -286,15 +285,15 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
       {
         if (exit->bracee == ch)
         {
-          csendf(ch, "You are already bracing the %s shut!\r\n", fname(exit->keyword).toStdString().c_str());
+          ch->send(QStringLiteral("You are already bracing the %s shut!\r\n").arg(qPrintable(fname(exit->keyword))));
         }
         else
         {
-          csendf(ch, "%s is already holding the %s shut!\r\n", GET_NAME(exit->bracee), fname(exit->keyword).toStdString().c_str());
+          ch->send(QStringLiteral("%s is already holding the %s shut!\r\n").arg(qPrintable(exit->bracee->name())).arg(qPrintable(fname(exit->keyword))));
         }
       }
       else
-        csendf(ch, "The %s is already being braced from the other side!\r\n", fname(exit->keyword).toStdString().c_str());
+        ch->send(QStringLiteral("The %s is already being braced from the other side!\r\n").arg(qPrintable(fname(exit->keyword))));
 
       return ReturnValue::eFAILURE;
     }
@@ -303,7 +302,7 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
     if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5))
       return ReturnValue::eSUCCESS;
 
-    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", fname(exit->keyword).toStdString().c_str());
+    ch->send(QStringLiteral("You lean heavily on the %s, bracing your shoulder solidly against it...\r\n").arg(qPrintable(fname(exit->keyword))));
     act("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, TO_ROOM, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
@@ -349,7 +348,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
 
   QString name = arguments.value(0);
 
-  Character *victim = get_char_room_vis(name);
+  CharacterPtr victim = get_char_room_vis(name);
   if (!victim)
   {
     if (fighting)
@@ -381,7 +380,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
   if (!charge_moves(SKILL_RAGE))
     return ReturnValue::eSUCCESS;
 
-  int retval = 0;
+  qint32 retval = {};
   if (!skill_success(victim, SKILL_RAGE))
   {
     act("You start advancing towards $N, but trip over your own feet!",
@@ -426,9 +425,9 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_battlecry(Character *ch, char *argument, cmd_t cmd)
+qint32 do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  follow_type *f = 0;
+  follow_type *f = {};
 
   if (!ch->canPerform(SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n"))
   {
@@ -498,12 +497,12 @@ int do_battlecry(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_berserk(Character *ch, char *argument, cmd_t cmd)
+qint32 do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
-  int bSuccess = 0;
-  int retval = 0;
+  qint32 bSuccess = {};
+  qint32 retval = {};
 
   if (!ch->canPerform(SKILL_BERSERK, "You aren't crazy enough for that yet... try rage maybe...\r\n"))
   {
@@ -621,11 +620,11 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_headbutt(Character *ch, char *argument, cmd_t cmd)
+qint32 do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
-  int retval = 0;
+  qint32 retval = {};
 
   if (!ch->canPerform(SKILL_HEADBUTT,
                       "You'd bonk yourself silly without proper training.\r\n"))
@@ -697,7 +696,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  int mod = 0;
+  qint32 mod = {};
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
     mod = -25;
 
@@ -708,10 +707,10 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   mod += (GET_STR(ch) / 2);
 
   if (mod > 0)
-    mod = 0;
+    mod = {};
 
-  int32_t get_weapon_bit(int weapon_type);
-  int32_t weapon_bit;
+  qint32 get_weapon_bit(qint32 weapon_type);
+  qint32 weapon_bit;
   weapon_bit = get_weapon_bit(TYPE_CRUSH);
 
   if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) || isSet(victim->immune, weapon_bit) || do_frostshield(ch, victim))
@@ -767,11 +766,11 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
+qint32 do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
   float modifier;
-  int duration = 42;
+  qint32 duration = 42;
 
   if (!ch->canPerform(SKILL_BLOOD_FURY,
                       "You've no idea how to raise such bloodlust.\r\n"))
@@ -812,8 +811,8 @@ int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
 
   af.type = SKILL_BLOOD_FURY;
   af.duration = duration;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
@@ -821,10 +820,10 @@ int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
+qint32 do_crazedassault(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
-  int duration = 20;
+  qint32 duration = 20;
   if (ch->affected_by_spell(SKILL_CRAZED_ASSAULT) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your body is still recovering from your last crazed assault technique.");
@@ -858,7 +857,7 @@ int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
 
   af.type = SKILL_CRAZED_ASSAULT;
   af.duration = duration;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
@@ -867,20 +866,20 @@ int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
 
 void rush_reset(varg_t arg1, void *arg2, void *arg3)
 {
-  Character *ch = arg1.ch;
-  extern bool charExists(Character * ch);
+  CharacterPtr ch = arg1.ch;
+  extern bool charExists(CharacterPtr ch);
   if (!charExists(ch))
     return;
   REMBIT(ch->affected_by, AFF_RUSH_CD);
 }
 
-int do_bullrush(Character *ch, char *argument, cmd_t cmd)
+qint32 do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char direction[MAX_INPUT_LENGTH];
   char who[MAX_INPUT_LENGTH];
-  int dir = 0;
-  int retval;
-  Character *victim;
+  qint32 dir = {};
+  qint32 retval;
+  CharacterPtr victim;
 
   if (ch->getHP() == 1)
   {
@@ -911,7 +910,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (int i = 0; i < 6; i++)
+  for (qint32 i = {}; i < 6; i++)
   {
     if (!str_prefix(direction, dirs[i]))
     {
@@ -983,7 +982,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-int do_ferocity(Character *ch, char *argument, cmd_t cmd)
+qint32 do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1002,8 +1001,8 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int grpsize = 0;
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  qint32 grpsize = {};
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1027,12 +1026,12 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
 
     af.type = SKILL_FEROCITY_TIMER;
     af.duration = 1 + ch->has_skill(SKILL_FEROCITY) / 10;
-    af.location = 0;
+    af.location = {};
     af.bitvector = -1;
-    af.modifier = 0;
+    af.modifier = {};
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1059,22 +1058,22 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void barb_magic_resist(Character *ch, int old, int nw)
+void barb_magic_resist(CharacterPtr ch, qint32 old, qint32 nw)
 {
-  int bonus = 0, i;
-  int oldbonus = (old / 10) + 1;
+  qint32 bonus = 0, i;
+  qint32 oldbonus = (old / 10) + 1;
   bonus = (nw / 10 + 1) - oldbonus;
   if (bonus)
-    for (i = 0; i <= SAVE_TYPE_MAX; i++)
+    for (i = {}; i <= SAVE_TYPE_MAX; i++)
       ch->saves[i] += bonus;
 }
 
-int do_knockback(Character *ch, char *argument, cmd_t cmd)
+qint32 do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
-  int dir = 0;
-  int retval, dam, dampercent, learned;
+  qint32 dir = {};
+  qint32 retval, dam, dampercent, learned;
 
   if (ch->getHP() == 1)
   {
@@ -1166,7 +1165,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You're not good enough to direct your smashes, so you just let it fly!");
     else
     {
-      for (int i = 0; i < 6; i++)
+      for (qint32 i = {}; i < 6; i++)
       {
         if (!str_prefix(where, dirs[i]))
         {
@@ -1181,7 +1180,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   if (!dir)
     dir = number(1, 6);
   dir--;
-  dampercent = 0;
+  dampercent = {};
   if (ch->height > 102)
     dampercent += 15;
   else if (ch->height > 42)
@@ -1191,10 +1190,10 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   else if (victim->height < 102)
     dampercent += 15;
 
-  dam = (int)(dam * (1.0 + dampercent / 100.0));
+  dam = (qint32)(dam * (1.0 + dampercent / 100.0));
 
   char buf2[MAX_STRING_LENGTH], dammsg[20];
-  int prevhps = victim->getHP();
+  qint32 prevhps = victim->getHP();
 
   if (!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0 - (learned / 4 * 3)))
   {
@@ -1238,7 +1237,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     // need to do more checks on if the victim can actually be knocked into
     // the room?
     char temp[256]; // what did my innocent bugfix ever do to you?
-    sprintf(temp, "%s", GET_SHORT(victim));
+    sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
     retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
@@ -1252,28 +1251,28 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     else
     {
       sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
-      sprintf(buf2, "Your smash for | damage sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
-      sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
+      sprintf(buf2, "Your smash for | damage sends %s reeling %s.", qPrintable(victim->shortdesc_or_name()), dirs[dir]);
+      sprintf(buf, "Your smash sends %s reeling %s.", qPrintable(victim->shortdesc_or_name()), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_CHAR);
-      sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
-      sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
+      sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", qPrintable(ch->name()), dirs[dir]);
+      sprintf(buf, "%s smashes into you, sending you reeling %s.", qPrintable(ch->name()), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_VICT);
 
       if (selfpurge)
         return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
-      sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
-      sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
+      sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", qPrintable(ch->name()), qPrintable(victim->shortdesc_or_name()), dirs[dir]);
+      sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", qPrintable(ch->name()), qPrintable(victim->shortdesc_or_name()), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
 
       if (victim->fighting)
       {
         if (victim->isNonPlayer())
         {
-          victim->add_memory(GET_NAME(ch), 'h');
+          victim->add_memory(qPrintable(ch->name()), 'h');
           remove_memory(victim, 'f');
         }
 
-        Character *tmp;
+        CharacterPtr tmp;
         for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
           if (tmp->fighting == victim)
             stop_fighting(tmp);
@@ -1287,7 +1286,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   else
   {
     char temp[256];
-    sprintf(temp, "%s", GET_SHORT(victim));
+    sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
     retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
@@ -1313,7 +1312,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_primalfury(Character *ch, char *argument, cmd_t cmd)
+qint32 do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1344,8 +1343,8 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
   // Timer applies to both success and failure, so it goes here.
   af.type = SKILL_PRIMAL_FURY;
   af.duration = 40;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
@@ -1366,7 +1365,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
     ch->send("You lose one point of strength.");
-    logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
+    logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", qPrintable(ch->name()));
   }
 
   // rest already set
@@ -1380,7 +1379,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_pursue(Character *ch, char *argument, cmd_t cmd)
+qint32 do_pursue(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (!ch->has_skill(SKILL_PURSUIT))
   {
@@ -1399,8 +1398,8 @@ int do_pursue(Character *ch, char *argument, cmd_t cmd)
     affected_type af;
     af.type = SKILL_PURSUIT;
     af.duration = -1;
-    af.modifier = 0;
-    af.location = 0;
+    af.modifier = {};
+    af.location = {};
     af.bitvector = -1;
     affect_to_char(ch, &af);
   }

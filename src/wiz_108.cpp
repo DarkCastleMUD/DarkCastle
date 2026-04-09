@@ -3,31 +3,29 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/interp.h"
-#include "DC/utility.h"
 
-#include "DC/mobile.h"
 #include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
-#include <string>
+#include <QString>
 #include "DC/const.h"
 
-int get_number(char **name);
+qint32 get_number(char **name);
 
-int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
+qint32 do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //  try
   // {
   char buf[MAX_STRING_LENGTH];
-  std::string output = "";
+  QString output = "";
   room_direction_data *curExits;
-  int curZone = GET_ZONE(ch);
-  int curRoom = ch->in_room;
-  Object *portal;
-  int i, dir;
-  int low, high;
-  int last_good = curRoom;
+  qint32 curZone = DC::getInstance()->world[(ch)->in_room].zone;
+  qint32 curRoom = ch->in_room;
+  ObjectPtr portal;
+  qint32 i, dir;
+  qint32 low, high;
+  qint32 last_good = curRoom;
 
   if (!can_modify_room(ch, ch->in_room))
   {
@@ -60,7 +58,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   {
     if (!DC::getInstance()->rooms.contains(i))
       continue;
-    for (dir = 0; dir < 6; dir++)
+    for (dir = {}; dir < 6; dir++)
     {
       if ((curExits = DC::getInstance()->world[i].dir_option[dir]) != 0)
       {
@@ -144,11 +142,11 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_purloin(Character *ch, char *argument, cmd_t cmd)
+qint32 do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char bufName[200], *pBuf;
-  class Object *k;
-  int j, nIndex = 0;
+  ObjectPtr k;
+  qint32 j, nIndex = {};
 
   if (!ch->has_skill(COMMAND_PURLOIN))
   {
@@ -158,7 +156,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
 
   one_argument(argument, bufName);
 
-  // if the std::string is nullptr, return.  Else assign pBuf to point to it.
+  // if the QString is nullptr, return.  Else assign pBuf to point to it.
   if (*(pBuf = bufName) == '\0')
   {
     send_to_char("Retrieves any item in the game and puts it in your inventory.\r\n"
@@ -179,7 +177,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
 
   for (k = DC::getInstance()->object_list, j = 1; k && (j <= nIndex); k = k->next)
   {
-    if (!(isexact(pBuf, k->Name())))
+    if (!(isexact(pBuf, k->name())))
       continue;
     if (!CAN_SEE_OBJ(ch, k))
       continue;
@@ -206,16 +204,16 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
 
     if (j == nIndex)
     {
-      Character *vict = nullptr;
+      CharacterPtr vict = {};
       if (k->carried_by)
       {
         vict = k->carried_by;
       }
       else if (k->equipped_by)
       {
-        int iEq;
+        qint32 iEq;
         vict = k->equipped_by;
-        for (iEq = 0; iEq < MAX_WEAR; iEq++)
+        for (iEq = {}; iEq < MAX_WEAR; iEq++)
         {
           if (vict->equipment[iEq] == k)
           {
@@ -237,14 +235,13 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
       }
       if (vict != nullptr)
       {
-        csendf(ch, "You purloin %s from %s.\r\n",
-               k->short_description, GET_NAME(vict));
+        ch->send(QStringLiteral("You purloin %s from %s.\r\n").arg(k->short_description).arg(qPrintable(vict->name())));
         logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s",
-             GET_NAME(ch), k->short_description, GET_NAME(vict));
+             qPrintable(ch->name()), k->short_description, qPrintable(vict->name()));
       }
       else
       {
-        ch->send(QStringLiteral("You purloin %1.\r\n").arg(k->short_description));
+        ch->send(QStringLiteral("You purloin %1.\r\n").arg(k->short_description()));
       }
       move_obj(k, ch);
       return ReturnValue::eSUCCESS;
@@ -256,10 +253,10 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_set(Character *ch, char *argument, cmd_t cmd)
+qint32 do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //   renamed the command "setup" so don't need this anymore
-  //    void do_mortal_set(Character *ch, char *argument, cmd_t cmd);
+  //    void do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd);
   //
   //    if(!ch->isImmortalPlayer() || ch->isNonPlayer()) {
   //      do_mortal_set(ch, argument, cmd);
@@ -268,15 +265,15 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
 
   /* from spell_parser.c */
 
-  const char *values[] = {
+  const QStringList values = {
       "age", "sex", "class", "level", "height", "weight", "str", "stradd",
-      "int", "wis", "dex", "con", "gold", "exp", "mana", "hit", "move",
+      "qint32", "wis", "dex", "con", "gold", "exp", "mana", "hit", "move",
       "sessions", "alignment", "thirst", "drunk", "full", "race",
       "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
       "manameta", "movemeta", "armor", "profession", "\n"};
-  Character *vict;
+  CharacterPtr vict;
   char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
-  int skill, value, i, x;
+  qint32 skill, value, i, x;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -320,13 +317,13 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Get real! You ain't that big.");
     if (vict->isPlayer())
     {
-      sprintf(buf2, "%s just tried to set: %s\r\n", GET_NAME(ch), buf);
+      sprintf(buf2, "%s just tried to set: %s\r\n", qPrintable(ch->name()), buf);
       send_to_char(buf2, vict);
     }
     return ReturnValue::eFAILURE;
   }
 
-  if (vict->isPlayer() && (vict->getLevel() == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
+  if (vict->isPlayer() && (vict->getLevel() == IMPLEMENTER) && (qPrintable(vict->name()) != qPrintable(ch->name())))
   {
     ch->sendln("Forget it dweeb.");
     return ReturnValue::eFAILURE;
@@ -339,17 +336,15 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  skill = old_search_block(buf, 0, strlen(buf), values, 1);
+  skill = values.indexOf(buf, Qt::CaseInsensitive);
   if (skill < 0)
   {
     ch->sendln("That value not recognized.");
     return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, buf); /* update argument */
-  skill--;
-  sprintf(buf2,
-          "%s sets %s's %s to %s.",
-          GET_NAME(ch), GET_NAME(vict), values[skill], buf);
+
+  sprintf(buf2, "%s sets %s's %s to %s.", qPrintable(ch->name()), qPrintable(vict->name()), values[skill], buf);
   switch (skill)
   {
   case 0: /* age */
@@ -363,7 +358,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set age of victim */
     vict->player->time.birth =
-        time(0) - (int32_t)value * (int32_t)SECS_PER_MUD_YEAR;
+        time(0) - (qint32)value * (qint32)SECS_PER_MUD_YEAR;
   };
   break;
   case 1: /* sex */
@@ -505,7 +500,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Strength addition not supported.");
   }
   break;
-  case 8: /* int */
+  case 8: /* qint32 */
   {
     value = atoi(buf);
     if ((value <= 0) || (value > 30))
@@ -574,12 +569,12 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   break;
   case 13: /* exp */
   {
-    int64_t val;
+    qint64 val;
     val = atoll(buf);
-    int64_t before_exp = vict->exp;
+    qint64 before_exp = vict->exp;
     vict->exp = val;
     logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
-         GET_NAME(ch), GET_NAME(vict), before_exp, vict->exp);
+         qPrintable(ch->name()), qPrintable(vict->name()), before_exp, vict->exp);
   }
   break;
   case 14: /* mana */
@@ -679,7 +674,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   break;
   case 22: /* race */
   {
-    for (x = 0; x <= 31; x++)
+    for (x = {}; x <= 31; x++)
     {
       if (x == 31)
       {
@@ -688,10 +683,10 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       }
       if (isexact(races[x].singular_name, buf))
       {
-        GET_RACE(vict) = x;
-        vict->immune = races[(int)GET_RACE(vict)].immune;
-        vict->suscept = races[(int)GET_RACE(vict)].suscept;
-        vict->resist = races[(int)GET_RACE(vict)].resist;
+        vict->race = x;
+        vict->immune = races[(qint32)vict->race].immune;
+        vict->suscept = races[(qint32)vict->race].suscept;
+        vict->resist = races[(qint32)vict->race].resist;
         break;
       }
     }
@@ -708,10 +703,10 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   {
     if (ch->getLevel() == IMPLEMENTER)
     {
-      uint32_t before_plat = GET_PLATINUM(vict);
+      quint32 before_plat = GET_PLATINUM(vict);
       GET_PLATINUM(vict) = atoi(buf);
       logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
-           GET_NAME(ch), GET_NAME(vict), before_plat, GET_PLATINUM(vict));
+           qPrintable(ch->name()), qPrintable(vict->name()), before_plat, GET_PLATINUM(vict));
     }
   }
   break;

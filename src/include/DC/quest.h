@@ -1,21 +1,12 @@
 /************************************
 one liner quest shit
 ************************************/
-#ifndef QUEST_H_
-#define QUEST_H_
-
-#include "DC/character.h"
-
-#define QUEST_MAX 1         // max quests at a time
-#define QUEST_SHOW 10       // max quests shown at a time
-#define QUEST_MAX_CANCEL 15 // max quests canceled at a time
-#define QUEST_TOTAL 500     // max total quests in file
-#define QUEST_MASTER 10027  // vnum of questmaster
-
+#pragma once
+#include <QtTypes>
 class quest_info
 {
 public:
-  int number;
+  qint32 number;
   char *name;
   char *hint1;
   char *hint2;
@@ -23,48 +14,19 @@ public:
   char *objshort;
   char *objlong;
   char *objkey;
-  int level;
-  int objnum;
-  int mobnum;
-  int timer;
-  int reward;
-  int cost;
-  int brownie;
+  qint32 level;
+  qint32 objnum;
+  qint32 mobnum;
+  qint32 timer;
+  qint32 reward;
+  qint32 cost;
+  qint32 brownie;
   bool active;
   quest_info *next;
 };
 
-int load_quests();
-int save_quests();
-quest_info *get_quest_struct(int);
+qint32 load_quests();
+qint32 save_quests();
+quest_info *get_quest_struct(qint32);
 quest_info *get_quest_struct(char *);
-int do_add_quest(Character *, char *);
-void list_quests(Character *);
-void show_quest_info(Character *, int);
-bool check_available_quest(Character *, quest_info *);
-bool check_quest_current(Character *, int);
-bool check_quest_pass(Character *, int);
-bool check_quest_complete(Character *, int);
-int get_quest_price(quest_info *);
-void show_quest_header(Character *);
-void show_quest_amount(Character *);
-void show_quest_closer(Character *);
-int show_one_quest(Character *, quest_info *, int);
-int show_one_complete_quest(Character *, quest_info *, int);
-int show_one_available_quest(Character *, quest_info *, int);
-void show_available_quests(Character *);
-void show_pass_quests(Character *);
-void show_current_quests(Character *);
-void show_complete_quests(Character *);
-int start_quest(Character *, quest_info *);
-int pass_quest(Character *, quest_info *);
-int complete_quest(Character *, quest_info *);
-int stop_current_quest(Character *, quest_info *);
-int stop_current_quest(Character *, int);
-int stop_all_quests(Character *);
 void quest_update();
-int quest_handler(Character *, Character *, int, char *);
-int quest_master(Character *, Object *, int, char *, Character *);
-int do_quest(Character *, char *, int);
-
-#endif

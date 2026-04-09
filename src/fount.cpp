@@ -10,17 +10,11 @@
  ***************************************************************************/
 /* $Id: fount.cpp,v 1.6 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstring>
-#include <cstdio>
-#include <cctype>
-
 #include "DC/obj.h"
-#include "DC/room.h"
+
 #include "DC/DC.h"
-#include "DC/character.h"
-#include "DC/utility.h"
+
 #include "DC/act.h"
-#include "DC/db.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 
@@ -28,9 +22,9 @@
  * Figures out if a fountain is present in the room                       *
  *************************************************************************/
 
-int FOUNTAINisPresent(Character *ch)
+qint32 FOUNTAINisPresent(CharacterPtr ch)
 {
-  class Object *tmp;
+  ObjectPtr tmp;
   bool found = false;
 
   for (tmp = DC::getInstance()->world[ch->in_room].contents;
@@ -49,10 +43,10 @@ int FOUNTAINisPresent(Character *ch)
  *  Fill skins and any other drink containers.                           *
  ************************************************************************/
 
-int do_fill(Character *ch, char *argument, cmd_t cmd)
+qint32 do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  class Object *to_obj;
+  ObjectPtr to_obj;
   one_argument(argument, buf);
 
   if (!*buf) /* No arguments */
@@ -92,7 +86,7 @@ int do_fill(Character *ch, char *argument, cmd_t cmd)
     act("You fill $p!", ch, to_obj, 0, TO_CHAR, 0);
 
     /* First same type liq. */
-    to_obj->obj_flags.value[2] = 0;
+    to_obj->obj_flags.value[2] = {};
 
     /* Then how much to pour */
     to_obj->obj_flags.value[1] = to_obj->obj_flags.value[0];

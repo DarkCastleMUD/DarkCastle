@@ -14,21 +14,22 @@
  ***************************************************************************/
 /* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
 
-#include <map>
-#include <string>
+#include <QMap>
+#include <QString>
 
+#include "DC/affect.h"
+#include "DC/character.h"
+#include "DC/class.h"
 #include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/player.h" // *app_type
-#include "DC/character.h"
 #include "DC/spells.h"
-#include "DC/mobile.h"
 
 room_t IMM_PIRAHNA_ROOM = 25;
 
-std::map<int, int> fill_skill_cost()
+QMap<qint32, qint32> fill_skill_cost()
 {
-  std::map<int, int> skill_cost_map;
+  QMap<qint32, qint32> skill_cost_map;
   skill_cost_map[SKILL_KICK] = 5;
   skill_cost_map[SKILL_TRIP] = 7;
   skill_cost_map[SKILL_RESCUE] = 10;
@@ -92,9 +93,9 @@ std::map<int, int> fill_skill_cost()
   return skill_cost_map;
 }
 
-std::map<int, int> fill_scribe_recipes()
+QMap<qint32, qint32> fill_scribe_recipes()
 {
-  std::map<int, int> tmp_scribe_recipes;
+  QMap<qint32, qint32> tmp_scribe_recipes;
   tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | FIRE_INK | GENERIC_DUST] = SPELL_CREATE_FOOD;
   tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_CREATE_WATER;
   tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_CONT_LIGHT;
@@ -150,11 +151,11 @@ std::map<int, int> fill_scribe_recipes()
   return tmp_scribe_recipes;
 }
 
-std::map<int, int> scribe_recipes = fill_scribe_recipes();
+QMap<qint32, qint32> scribe_recipes = fill_scribe_recipes();
 
-std::map<int, int> fill_scribe_ingredients()
+QMap<qint32, qint32> fill_scribe_ingredients()
 {
-  std::map<int, int> tmp_scribe_ingredients;
+  QMap<qint32, qint32> tmp_scribe_ingredients;
   tmp_scribe_ingredients[0] = RARE1_PAPER;
   tmp_scribe_ingredients[0] = RARE2_PAPER;
   tmp_scribe_ingredients[0] = RARE3_PAPER;
@@ -179,141 +180,141 @@ std::map<int, int> fill_scribe_ingredients()
   return tmp_scribe_ingredients;
 }
 
-std::map<int, int> scribe_ingredients = fill_scribe_ingredients();
+QMap<qint32, qint32> scribe_ingredients = fill_scribe_ingredients();
 
-std::vector<profession> fill_professions(void)
+QList<profession> fill_professions(void)
 {
-  std::vector<profession> tmp_professions;
+  QList<profession> tmp_professions;
 
   profession p;
-  p.name = std::string("legionnaire");
-  p.Name = std::string("Legionnaire");
+  p.name = QString("legionnaire");
+  p.Name = QString("Legionnaire");
   p.c_class = CLASS_WARRIOR;
   p.skillno = SKILL_LEGIONNAIRE;
   tmp_professions.push_back(p);
 
-  p.name = std::string("gladiator");
-  p.Name = std::string("Gladiator");
+  p.name = QString("gladiator");
+  p.Name = QString("Gladiator");
   p.c_class = CLASS_WARRIOR;
   p.skillno = SKILL_GLADIATOR;
   tmp_professions.push_back(p);
 
-  p.name = std::string("battlerager");
-  p.Name = std::string("Battlerager");
+  p.name = QString("battlerager");
+  p.Name = QString("Battlerager");
   p.c_class = CLASS_BARBARIAN;
   p.skillno = SKILL_BATTLERAGER;
   tmp_professions.push_back(p);
 
-  p.name = std::string("chieftan");
-  p.Name = std::string("Chieftan");
+  p.name = QString("chieftan");
+  p.Name = QString("Chieftan");
   p.c_class = CLASS_BARBARIAN;
   p.skillno = SKILL_CHIEFTAN;
   tmp_professions.push_back(p);
 
-  p.name = std::string("pilferer");
-  p.Name = std::string("Pilferer");
+  p.name = QString("pilferer");
+  p.Name = QString("Pilferer");
   p.c_class = CLASS_THIEF;
   p.skillno = SKILL_PILFERER;
   tmp_professions.push_back(p);
 
-  p.name = std::string("assassin");
-  p.Name = std::string("Assassin");
+  p.name = QString("assassin");
+  p.Name = QString("Assassin");
   p.c_class = CLASS_THIEF;
   p.skillno = SKILL_ASSASSIN;
   tmp_professions.push_back(p);
 
-  p.name = std::string("warmage");
-  p.Name = std::string("Warmage");
+  p.name = QString("warmage");
+  p.Name = QString("Warmage");
   p.c_class = CLASS_MAGE;
   p.skillno = SKILL_WARMAGE;
   tmp_professions.push_back(p);
 
-  p.name = std::string("spellbinder");
-  p.Name = std::string("Spellbinder");
+  p.name = QString("spellbinder");
+  p.Name = QString("Spellbinder");
   p.c_class = CLASS_MAGE;
   p.skillno = SKILL_SPELLBINDER;
   tmp_professions.push_back(p);
 
-  p.name = std::string("zealot");
-  p.Name = std::string("Zealot");
+  p.name = QString("zealot");
+  p.Name = QString("Zealot");
   p.c_class = CLASS_CLERIC;
   p.skillno = SKILL_ZEALOT;
   tmp_professions.push_back(p);
 
-  p.name = std::string("ritualist");
-  p.Name = std::string("Ritualist");
+  p.name = QString("ritualist");
+  p.Name = QString("Ritualist");
   p.c_class = CLASS_CLERIC;
   p.skillno = SKILL_RITUALIST;
   tmp_professions.push_back(p);
 
-  p.name = std::string("elementalist");
-  p.Name = std::string("Elementalist");
+  p.name = QString("elementalist");
+  p.Name = QString("Elementalist");
   p.c_class = CLASS_DRUID;
   p.skillno = SKILL_ELEMENTALIST;
   tmp_professions.push_back(p);
 
-  p.name = std::string("shapeshifter");
-  p.Name = std::string("Shapeshifter");
+  p.name = QString("shapeshifter");
+  p.Name = QString("Shapeshifter");
   p.c_class = CLASS_DRUID;
   p.skillno = SKILL_SHAPESHIFTER;
   tmp_professions.push_back(p);
 
-  p.name = std::string("cultist");
-  p.Name = std::string("Cultist");
+  p.name = QString("cultist");
+  p.Name = QString("Cultist");
   p.c_class = CLASS_ANTI_PAL;
   p.skillno = SKILL_CULTIST;
   tmp_professions.push_back(p);
 
-  p.name = std::string("reaver");
-  p.Name = std::string("Reaver");
+  p.name = QString("reaver");
+  p.Name = QString("Reaver");
   p.c_class = CLASS_ANTI_PAL;
   p.skillno = SKILL_REAVER;
   tmp_professions.push_back(p);
 
-  p.name = std::string("templar");
-  p.Name = std::string("Templar");
+  p.name = QString("templar");
+  p.Name = QString("Templar");
   p.c_class = CLASS_PALADIN;
   p.skillno = SKILL_TEMPLAR;
   tmp_professions.push_back(p);
 
-  p.name = std::string("inquisitor");
-  p.Name = std::string("Inquisitor");
+  p.name = QString("inquisitor");
+  p.Name = QString("Inquisitor");
   p.c_class = CLASS_PALADIN;
   p.skillno = SKILL_INQUISITOR;
   tmp_professions.push_back(p);
 
-  p.name = std::string("scout");
-  p.Name = std::string("Scout");
+  p.name = QString("scout");
+  p.Name = QString("Scout");
   p.c_class = CLASS_RANGER;
   p.skillno = SKILL_SCOUT;
   tmp_professions.push_back(p);
 
-  p.name = std::string("tracker");
-  p.Name = std::string("Tracker");
+  p.name = QString("tracker");
+  p.Name = QString("Tracker");
   p.c_class = CLASS_RANGER;
   p.skillno = SKILL_TRACKER;
   tmp_professions.push_back(p);
 
-  p.name = std::string("sensei");
-  p.Name = std::string("Sensei");
+  p.name = QString("sensei");
+  p.Name = QString("Sensei");
   p.c_class = CLASS_MONK;
   p.skillno = SKILL_SENSEI;
   tmp_professions.push_back(p);
 
-  p.name = std::string("spiritualist");
-  p.Name = std::string("Spiritualist");
+  p.name = QString("spiritualist");
+  p.Name = QString("Spiritualist");
   p.c_class = CLASS_MONK;
   p.skillno = SKILL_SPIRITUALIST;
   tmp_professions.push_back(p);
 
-  p.name = std::string("troubadour");
-  p.Name = std::string("Troubadour");
+  p.name = QString("troubadour");
+  p.Name = QString("Troubadour");
   p.c_class = CLASS_BARD;
   p.skillno = SKILL_TROUBADOUR;
   tmp_professions.push_back(p);
 
-  p.name = std::string("minstrel");
-  p.Name = std::string("Minstrel");
+  p.name = QString("minstrel");
+  p.Name = QString("Minstrel");
   p.c_class = CLASS_BARD;
   p.skillno = SKILL_MINISTREL;
   tmp_professions.push_back(p);
@@ -321,10 +322,10 @@ std::vector<profession> fill_professions(void)
   return tmp_professions;
 }
 
-std::vector<profession> professions = fill_professions();
+QList<profession> professions = fill_professions();
 
 // Obj proc types
-char *obj_types[] = {
+const char *obj_types[] = {
     "act_prog",
     "speech_prog",
     "rand_prog",
@@ -529,7 +530,7 @@ const char *spell_wear_off_msg[] =
         "You cannot hold your ethereal focus any longer.",
         "BUG DETECTED: Tell an Imm. (Spell Wear Off Message)"};
 
-int rev_dir[] =
+qint32 rev_dir[] =
     {
         2,
         3,
@@ -538,7 +539,7 @@ int rev_dir[] =
         5,
         4};
 
-int movement_loss[] =
+qint32 movement_loss[] =
     {
         1, /* Inside     */
         1, /* City       */
@@ -558,7 +559,7 @@ int movement_loss[] =
         6  /* Arctic */
 };
 
-const char *dirs[] =
+const QStringList dirs =
     {
         "north",
         "east",
@@ -568,7 +569,7 @@ const char *dirs[] =
         "down",
         "\n"};
 
-const char *dirswards[] =
+const QStringList dirswards =
     {
         "northward",
         "eastward",
@@ -608,7 +609,7 @@ const char *month_name[17] =
         "Month of the Bare Trees",
         "Month of Thin Shadows"};
 
-const char *where[] =
+const QStringList where =
     {
         "<used as light> ",
         "<right finger>  ",
@@ -662,7 +663,7 @@ const char *strs_damage_types[] =
         "water",
         "\n"};
 
-const char *drinks[] =
+const QStringList drinks =
     {
         "water",
         "beer",
@@ -685,7 +686,7 @@ const char *drinks[] =
         "ink",
         "\n"};
 
-const char *drinknames[] =
+const QStringList drinknames =
     {
         "water",
         "beer",
@@ -707,7 +708,7 @@ const char *drinknames[] =
         "water",
         "\n"};
 
-int drink_aff[][3] =
+qint32 drink_aff[][3] =
     {
         {0, 1, 10}, /* water    */
         {3, 2, 5},  /* beer     */
@@ -749,33 +750,79 @@ const char *color_liquid[] =
         "neon green",
         "clear"};
 
-const char *fullness[] =
+const QStringList fullness =
     {
         "less than half ",
         "about half ",
         "more than half ",
         ""};
 
-#define K *1000
-#define M K K
-#define L (int32_t)
+#define L (qint32)
 
-int exp_table[] =
+qint32 exp_table[] =
     {
         0,
-        1, L(1 K), L(2.5 K), L(5 K), L(10 K),                  // level 5
-        L(20 K), L(40 K), L(60 K), L(80 K), L(100 K),          // level 10
-        L(200 K), L(300 K), L(500 K), L(750 K), L(1 M),        // level 15
-        L(1.5 M), L(2 M), L(3 M), L(4 M), L(5 M),              // level 20
-        L(6 M), L(7 M), L(8 M), L(9 M), L(10 M),               // level 25
-        L(12 M), L(14 M), L(16 M), L(18 M), L(20 M),           // level 30
-        L(22 M), L(24 M), L(26 M), L(28 M), L(31 M),           // level 35
-        L(34 M), L(37 M), L(40 M), L(45 M), L(50 M),           // level 40
-        L(60 M), L(70 M), L(80 M), L(90 M), L(100 M),          // level 45
-        L(120 M), L(140 M), L(160 M), L(180 M), L(200 M),      // level 50
-        L(400 M), L(550 M), L(700 M), L(850 M), L(1000 M),     // level 55
-        L(1200 M), L(1400 M), L(1600 M), L(1800 M), L(2000 M), // level 60
-        L(0x7FFFFFFF)};
+        1,
+        1'000,
+        2'500,
+        5'000,
+        10'000,
+        20'000,
+        40'000,
+        60'000,
+        80'000,
+        100'000,
+        200'000,
+        300'000,
+        500'000,
+        750'000,
+        1'000'000,
+        1'500'000,
+        2'000'000,
+        3'000'000,
+        4'000'000,
+        5'000'000,
+        6'000'000,
+        7'000'000,
+        8'000'000,
+        9'000'000,
+        10'000'000,
+        12'000'000,
+        14'000'000,
+        16'000'000,
+        18'000'000,
+        20'000'000,
+        22'000'000,
+        24'000'000,
+        26'000'000,
+        28'000'000,
+        31'000'000,
+        34'000'000,
+        37'000'000,
+        40'000'000,
+        45'000'000,
+        50'000'000,
+        60'000'000,
+        70'000'000,
+        80'000'000,
+        90'000'000,
+        100'000'000,
+        120'000'000,
+        140'000'000,
+        160'000'000,
+        180'000'000,
+        200'000'000,
+        400'000'000,
+        550'000'000,
+        700'000'000,
+        850'000'000,
+        1000'000'000,
+        1200'000'000,
+        1400'000'000,
+        1600'000'000,
+        1800'000'000,
+        2000'000'000,
+        0x7FFFFFFF};
 
 #undef M
 #undef K
@@ -834,9 +881,9 @@ const char *zone_modes[] =
         "Always_Repop",
         "\n"};
 
-std::vector<std::string> get_cont_names()
+QList<QString> get_cont_names()
 {
-  std::vector<std::string> tmp;
+  QList<QString> tmp;
   tmp.push_back("");
   tmp.push_back("Undefined");
   tmp.push_back("Sorpigal");
@@ -850,7 +897,7 @@ std::vector<std::string> get_cont_names()
   return tmp;
 }
 
-std::vector<std::string> continent_names = get_cont_names();
+QList<QString> continent_names = get_cont_names();
 
 // new obj flags
 const QStringList Object::extra_bits =
@@ -1326,7 +1373,7 @@ const char *class_tree_name[11][3] = {
 // Begin abilities listings for each class.
 
 // skills master 10011 - done and checked, Apoc
-class_skill_defines g_skills[] = { // all-class skills
+CharacterClassSkill g_skills[] = { // all-class skills
 
     //   Ability Name       Ability File          Level     Max  Group  Requisites
     //   ------------       ------------          -----     ---  -----  ----------
@@ -1338,7 +1385,7 @@ class_skill_defines g_skills[] = { // all-class skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // warrior 3023 guildmaster - done and checked, Apoc
-class_skill_defines w_skills[] = { // warrior skills
+CharacterClassSkill w_skills[] = { // warrior skills
 
     //   Ability Name       Ability File            Level  Max  Group  Requisite
     //   ------------       ------------            -----  ---  -----  ---------
@@ -1385,7 +1432,7 @@ class_skill_defines w_skills[] = { // warrior skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // thief 3022 guildmaster - done and checked, Apoc
-class_skill_defines t_skills[] = { // thief skills
+CharacterClassSkill t_skills[] = { // thief skills
 
     //   Ability Name       Ability File          Level    Max  Group  Requisites
     //   ------------       ------------          -----    ---  -----  ----------
@@ -1421,7 +1468,7 @@ class_skill_defines t_skills[] = { // thief skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // anti-paladin 10005 guildmaster - done and checked, Apoc
-class_skill_defines a_skills[] = { // anti-paladin skills
+CharacterClassSkill a_skills[] = { // anti-paladin skills
 
     //   Ability Name            Ability File           Level     Max  Group   Requisites
     //   ------------            ------------           -----     ---  -----   ----------
@@ -1468,7 +1515,7 @@ class_skill_defines a_skills[] = { // anti-paladin skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // paladin 10006 guildmaster - done and checked, Apoc
-class_skill_defines p_skills[] = { // paladin skills
+CharacterClassSkill p_skills[] = { // paladin skills
 
     //   Ability Name            Ability File            Level     Max  Group   Requisites
     //   ------------            ------------            -----     ---  -----   ----------
@@ -1515,7 +1562,7 @@ class_skill_defines p_skills[] = { // paladin skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // barbarian 10007 guildmaster - done and checked, Apoc
-class_skill_defines b_skills[] = { // barbarian skills
+CharacterClassSkill b_skills[] = { // barbarian skills
 
     //   Ability Name       Ability File            Level  Max  Group  Requisites
     //   ------------       ------------            -----  ---  -----  ----------
@@ -1553,7 +1600,7 @@ class_skill_defines b_skills[] = { // barbarian skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // monk 10008 guildmaster - done and checked, Apoc
-class_skill_defines k_skills[] = { // monk skills
+CharacterClassSkill k_skills[] = { // monk skills
 
     //   Ability Name       Ability File          Level    Max   Group   Requisites
     //   ------------       ------------          -----    ---   -----   ----------
@@ -1585,7 +1632,7 @@ class_skill_defines k_skills[] = { // monk skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // ranger 10013 guildmaster - done and checked, Apoc
-class_skill_defines r_skills[] = { // ranger skills
+CharacterClassSkill r_skills[] = { // ranger skills
 
     //   Ability Name       Ability File           Level     Max  Group   Requisites
     //   ------------       ------------           -----     ---  -----   ----------
@@ -1634,7 +1681,7 @@ class_skill_defines r_skills[] = { // ranger skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // bard 3204 guildmaster - done and checked, Apoc
-class_skill_defines d_skills[] = { // bard skills
+CharacterClassSkill d_skills[] = { // bard skills
 
     // Ability Name            Ability File                  Level    Max   Group   Requisites
     // ------------            ------------                  -----    ---   -----   ----------
@@ -1682,7 +1729,7 @@ class_skill_defines d_skills[] = { // bard skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // druid 3203 guildmaster - done and checked, Apoc
-class_skill_defines u_skills[] = { // druid skills
+CharacterClassSkill u_skills[] = { // druid skills
 
     //   Ability Name            Ability File              Level     Max  Group   Requisites
     //   ------------            ------------              -----     ---  -----   ----------
@@ -1743,7 +1790,7 @@ class_skill_defines u_skills[] = { // druid skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // cleric 3021 guildmaster - done and checked, Apoc
-class_skill_defines c_skills[] = { // cleric skills
+CharacterClassSkill c_skills[] = { // cleric skills
 
     //   Ability Name            Ability File           Level     Max  Group   Requisites
     //   ------------            ------------           -----     ---  -----   ----------
@@ -1787,7 +1834,7 @@ class_skill_defines c_skills[] = { // cleric skills
     {"protection from evil", SPELL_PROTECT_FROM_EVIL, 36, 90, 0, CONWIS},
     {"protection from good", SPELL_PROTECT_FROM_GOOD, 37, 90, 0, CONWIS},
     {"portal", SPELL_PORTAL, 38, 90, 0, DEXWIS},
-    {"true sight", SPELL_true_SIGHT, 39, 90, 0, DEXINT},
+    {"true sight", SPELL_TRUE_SIGHT, 39, 90, 0, DEXINT},
     {"full heal", SPELL_FULL_HEAL, 40, 100, 0, INTWIS},
     {"power harm", SPELL_POWER_HARM, 41, 100, 0, STRINT},
     {"resist magic", SPELL_RESIST_MAGIC, 43, 85, 0, CONWIS},
@@ -1809,7 +1856,7 @@ class_skill_defines c_skills[] = { // cleric skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // mage 3020 guildmaster - done and checked, Apoc
-class_skill_defines m_skills[] = { // mage skills
+CharacterClassSkill m_skills[] = { // mage skills
 
     //   Ability Name           Ability File           Level     Max  Group   Requisites
     //   ------------           ------------           -----     ---  -----   ----------
@@ -1846,7 +1893,7 @@ class_skill_defines m_skills[] = { // mage skills
     {"bludgeoning", SKILL_BLUDGEON_WEAPONS, 30, 50, 0, DEXINT},
     {"resist magic", SPELL_RESIST_MAGIC, 31, 90, 0, CONWIS},
     {"haste", SPELL_HASTE, 33, 100, 0, DEXINT},
-    {"true sight", SPELL_true_SIGHT, 34, 90, 0, INTWIS},
+    {"true sight", SPELL_TRUE_SIGHT, 34, 90, 0, INTWIS},
     {"dispel magic", SPELL_DISPEL_MAGIC, 35, 90, 0, CONWIS},
     {"resist fire", SPELL_RESIST_FIRE, 36, 70, 0, CONWIS},
     {"wizard eye", SPELL_WIZARD_EYE, 37, 100, 0, INTWIS},
@@ -1869,7 +1916,7 @@ class_skill_defines m_skills[] = { // mage skills
 
 // End of abilities listings for each class.
 
-const char *languages[] =
+const QStringList languages =
     {
         "common",
         "human",
@@ -1946,14 +1993,14 @@ public:
   char *singular_name;  // dwarf, elf, etc.
   char *plural_name;     // dwarves, elves, etc.
 
-  int32_t body_parts;  // bitvector for body parts
-  int32_t immune;      // bitvector for immunities
-  int32_t resist;      // bitvector for resistances
-  int32_t suscept;     // bitvector for susceptibilities
-  int32_t hate_fear;   // bitvector for hate/fear
-  int32_t friendly;    // bitvector for friendliness
-  int  weight;      // average weight of ths race
-  int  height;      // average height for ths race
+  qint32 body_parts;  // bitvector for body parts
+  qint32 immune;      // bitvector for immunities
+  qint32 resist;      // bitvector for resistances
+  qint32 suscept;     // bitvector for susceptibilities
+  qint32 hate_fear;   // bitvector for hate/fear
+  qint32 friendly;    // bitvector for friendliness
+  qint32  weight;      // average weight of ths race
+  qint32  height;      // average height for ths race
 };
 */
 
@@ -1997,8 +2044,8 @@ race_data races[] =
         {"Immortal", "immortal", "Immortals", false, 127, 1288, 1048576, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_DETECT_INVISIBLE | AFF_FLYING | AFF_true_SIGHT | AFF_SOLIDITY | AFF_SANCTUARY, "ethereal strike"},
         {"Feline", "feline", "Felines", false, 27, 0, 0, 128, 8388608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_SNEAK, "claw"}};
 
-int mob_race_mod[][5] =
-    /* str, dex, con, int, wis */
+qint32 mob_race_mod[][5] =
+    /* str, dex, con, qint32, wis */
     {
         {15, 15, 15, 15, 15}, // NPC
         {18, 18, 18, 18, 18}, // human
@@ -3363,7 +3410,7 @@ const str_app_type str_app[] = {
 };
 
 /* [level] backstab multiplyer (thieves / antis only) */
-uint8_t backstab_mult[71] =
+quint8 backstab_mult[71] =
     {
         1, /* 0 */
         6, /* 1 */
@@ -3437,7 +3484,7 @@ uint8_t backstab_mult[71] =
         19, /* 70 */
         20};
 
-int mana_bonus[31] =
+qint32 mana_bonus[31] =
     {
         0,
         0, /* 1 */
@@ -3591,7 +3638,7 @@ mob_matrix_data mob_matrix[] =
         /*109 */ {10750000, 29000, 79, 99, -775, 6250000},
         /*110 */ {11000000, 30000, 80, 100, -800, 6500000}};
 
-const char *reserved[] = {
+const QStringList reserved = {
     "holy aura timer",
     "natural select timer",
     "divine intervention timer",
@@ -3665,7 +3712,7 @@ QList<bestowable_god_commands_type> DC::bestowable_god_commands =
         {"\n", -1}};
 
 // WEAR, ITEM_WEAR correspondances
-const QList<int> Character::wear_to_item_wear =
+const QList<qint32> Character::wear_to_item_wear =
     {
         LIGHT_SOURCE, // 0
         FINGER,

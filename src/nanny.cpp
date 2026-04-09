@@ -22,45 +22,36 @@
 #include <cctype>
 #include <unistd.h>
 #include <cstring>
-#include <queue>
+#include <QString>
 #include <fmt/format.h>
 
-#include "DC/character.h"
+#include "DC/DC.h"
 #include "DC/comm.h"
 #include "DC/connect.h"
+#include "DC/guild.h"
 #include "DC/race.h"
 #include "DC/player.h"
 #include "DC/structs.h" // true
-#include "DC/utility.h"
+
 #include "DC/clan.h"
 #include "DC/db.h" // init_char..
-#include "DC/mobile.h"
+
 #include "DC/interp.h"
-#include "DC/room.h"
+
 #include "DC/act.h"
 #include "DC/clan.h"
 #include "DC/spells.h"
 #include "DC/fight.h"
 #include "DC/handler.h"
-#include "DC/vault.h"
+#include "DC/DC.h"
 #include "DC/const.h"
-#include "DC/guild.h"
 #include "DC/meta.h"
-#include <string>
-#include "DC/memory.h"
+#include "DC/levels.h"
+#include "DC/utility.h"
+#define d ->connected((d)->connected)
 
-#define STATE(d) ((d)->connected)
-
-bool is_bracing(Character *bracee, room_direction_data *exit);
+bool is_bracing(CharacterPtr bracee, room_direction_data *exit);
 void show_question_race(Connection *d);
-
-const char menu[] = "\r\nWelcome to Dark Castle Mud\r\n\r\n"
-                    "0) Exit Dark Castle.\r\n"
-                    "1) Enter the game.\r\n"
-                    "2) Enter your character's description.\r\n"
-                    "3) Change your password.\r\n"
-                    "4) Delete this character.\r\n\r\n"
-                    "   Make your choice: ";
 
 bool wizlock = false;
 
@@ -72,25 +63,25 @@ extern char webpage[MAX_STRING_LENGTH];
 extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
 
-extern Object *object_list;
+extern ObjectPtr object_list;
 
-int _parse_email(char *arg);
+qint32 _parse_email(char *arg);
 bool check_deny(class Connection *d, char *name);
-void isr_set(Character *ch);
+void isr_set(CharacterPtr ch);
 bool check_reconnect(class Connection *d, QString name, bool fReconnect);
 bool check_playing(class Connection *d, QString name);
 char *str_str(char *first, char *second);
-bool apply_race_attributes(Character *ch, int race = 0);
-bool check_race_attributes(Character *ch, int race = 0);
-bool handle_get_race(Connection *d, std::string arg);
+bool apply_race_attributes(CharacterPtr ch, qint32 race = 0);
+bool check_race_attributes(CharacterPtr ch, qint32 race = 0);
+bool handle_get_race(Connection *d, QString arg);
 void show_question_race(Connection *d);
 void show_question_class(Connection *d);
-bool handle_get_class(Connection *d, std::string arg);
-int is_clss_race_compat(Character *ch, int clss);
+bool handle_get_class(Connection *d, QString arg);
+qint32 is_clss_race_compat(CharacterPtr ch, qint32 clss);
 void show_question_stats(Connection *d);
-bool handle_get_stats(Connection *d, std::string arg);
+bool handle_get_stats(Connection *d, QString arg);
 
-int is_race_eligible(Character *ch, int race)
+qint32 is_race_eligible(CharacterPtr ch, qint32 race)
 {
   if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
     return false;
@@ -111,7 +102,7 @@ int is_race_eligible(Character *ch, int race)
   return true;
 }
 
-int is_clss_race_compat(const Character *ch, int clss, int race)
+qint32 is_clss_race_compat(const CharacterPtr ch, qint32 clss, qint32 race)
 {
   bool compat = false;
 
@@ -166,9 +157,9 @@ int is_clss_race_compat(const Character *ch, int clss, int race)
   return (compat);
 }
 
-int is_clss_eligible(Character *ch, int clss)
+qint32 is_clss_eligible(CharacterPtr ch, qint32 clss)
 {
-  int x = 0;
+  qint32 x = {};
 
   switch (clss)
   {
@@ -182,7 +173,7 @@ int is_clss_eligible(Character *ch, int clss)
       x = 1;
     break;
   case CLASS_THIEF:
-    if (GET_RAW_DEX(ch) >= 15 && GET_RACE(ch) != RACE_GIANT)
+    if (GET_RAW_DEX(ch) >= 15 && ch->race != RACE_GIANT)
       x = 1;
     break;
   case CLASS_WARRIOR:
@@ -191,16 +182,16 @@ int is_clss_eligible(Character *ch, int clss)
     break;
   case CLASS_ANTI_PAL:
     if (GET_RAW_INT(ch) >= 14 && GET_RAW_DEX(ch) >= 14 &&
-        (GET_RACE(ch) == RACE_HUMAN || GET_RACE(ch) == RACE_ORC || GET_RACE(ch) == RACE_DWARVEN))
+        (ch->race == RACE_HUMAN || ch->race == RACE_ORC || ch->race == RACE_DWARVEN))
       x = 1;
     break;
   case CLASS_PALADIN:
     if (GET_RAW_WIS(ch) >= 14 && GET_RAW_STR(ch) >= 14 &&
-        (GET_RACE(ch) == RACE_HUMAN || GET_RACE(ch) == RACE_ELVEN || GET_RACE(ch) == RACE_DWARVEN))
+        (ch->race == RACE_HUMAN || ch->race == RACE_ELVEN || ch->race == RACE_DWARVEN))
       x = 1;
     break;
   case CLASS_BARBARIAN:
-    if (GET_RAW_STR(ch) >= 14 && GET_RAW_CON(ch) >= 14 && GET_RACE(ch) != RACE_PIXIE)
+    if (GET_RAW_STR(ch) >= 14 && GET_RAW_CON(ch) >= 14 && ch->race != RACE_PIXIE)
       x = 1;
     break;
   case CLASS_MONK:
@@ -228,7 +219,7 @@ void Character::do_inate_race_abilities(void)
   // Add race base saving throw mods
   // Yes, I could combine this 'switch' with the next one, but this is
   // alot more readable
-  switch (GET_RACE(this))
+  switch (this->race)
   {
   case RACE_HUMAN:
     this->saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
@@ -315,7 +306,7 @@ void Character::do_inate_race_abilities(void)
   }
 }
 
-Object *Character::clan_altar(void)
+ObjectPtr Character::clan_altar(void)
 {
   if (clan)
     for (auto c = DC::getInstance()->clan_list; c; c = c->next)
@@ -325,7 +316,7 @@ Object *Character::clan_altar(void)
         {
           if (real_room(room->room_number) == DC::NOWHERE)
             continue;
-          Object *t = DC::getInstance()->world[real_room(room->room_number)].contents;
+          ObjectPtr t = DC::getInstance()->world[real_room(room->room_number)].contents;
           for (; t; t = t->next_content)
           {
             if (t->obj_flags.type_flag == ITEM_ALTAR)
@@ -333,15 +324,15 @@ Object *Character::clan_altar(void)
           }
         }
       }
-  return nullptr;
+  return {};
 }
 
 void update_max_who(void)
 {
-  uint64_t players = 0;
-  for (auto d = DC::getInstance()->descriptor_list; d != nullptr; d = d->next)
+  quint64 players = {};
+  for (auto d = DC::getInstance()->connections_; d != nullptr; d = conn->next)
   {
-    if (d->isPlaying() || d->isEditing())
+    if (conn->isPlaying() || conn->isEditing())
     {
       players++;
     }
@@ -358,39 +349,39 @@ void update_max_who(void)
 void Character::do_on_login_stuff(void)
 {
   add_to_bard_list();
-  this->player->bad_pw_tries = 0;
+  this->player->bad_pw_tries = {};
   redo_hitpoints(this);
   redo_mana(this);
   redo_ki(this);
   do_inate_race_abilities();
   check_hw();
   /* Add a character's skill item's to the list. */
-  this->player->skillchange = nullptr;
-  this->spellcraftglyph = 0;
-  for (int i = 0; i < MAX_WEAR; i++)
+  this->player->skillchange = {};
+  this->spellcraftglyph = {};
+  for (qint32 i = {}; i < MAX_WEAR; i++)
   {
     if (!this->equipment[i])
       continue;
-    for (int a = 0; a < this->equipment[i]->num_affects; a++)
+    for (qint32 a = {}; a < this->equipment[i]->num_affects; a++)
     {
       if (this->equipment[i]->affected[a].location >= 1000)
       {
         this->equipment[i]->next_skill = this->player->skillchange;
         this->player->skillchange = this->equipment[i];
-        this->equipment[i]->next_skill = nullptr;
+        this->equipment[i]->next_skill = {};
       }
     }
   }
   // add character base saves to saving throws
-  for (int i = 0; i <= SAVE_TYPE_MAX; i++)
+  for (qint32 i = {}; i <= SAVE_TYPE_MAX; i++)
   {
     this->saves[i] += this->getLevel() / 4;
     this->saves[i] += this->player->saves_mods[i];
   }
 
-  if (GET_TITLE(this) == nullptr)
+  if (this->title == nullptr)
   {
-    GET_TITLE(this) = str_dup("is a virgin.");
+    this->title = QStringLiteral("is a virgin.");
   }
 
   if (GET_CLASS(this) == CLASS_MONK)
@@ -425,48 +416,48 @@ void Character::do_on_login_stuff(void)
   else
     char_to_room(this, real_room(START_ROOM));
 
-  this->curLeadBonus = 0;
+  this->curLeadBonus = {};
   this->changeLeadBonus = false;
-  this->cRooms = 0;
+  this->cRooms = {};
   REMBIT(this->affected_by, AFF_BLACKJACK_ALERT);
-  for (int i = 0; i < QUEST_MAX; i++)
+  for (qint32 i = {}; i < QUEST_MAX; i++)
   {
     this->player->quest_current[i] = -1;
-    this->player->quest_current_ticksleft[i] = 0;
+    this->player->quest_current_ticksleft[i] = {};
   }
-  vault_data *vault = has_vault(GET_NAME(this));
-  if (this->player->time.logon < 1172204700)
+  auto &vault = DC::getInstance()->vaults_.has_vault(name());
+  if (player->time.logon < 1172204700)
   {
     if (vault)
     {
-      int adder = this->getLevel() - 50;
+      qint32 adder = this->getLevel() - 50;
       if (adder < 0)
-        adder = 0; // Heh :P
-      vault->size += adder * 10;
-      if (vault->size < 100)
-        vault->size = 100;
-      save_vault(vault->owner);
+        adder = {}; // Heh :P
+      vault.size_ += adder * 10;
+      if (vault.size_ < 100)
+        vault.size_ = 100;
+      DC::getInstance()->vaults_.save(vault.owner_);
     }
   }
 
   if (vault)
   {
-    if (vault->size < (unsigned)(this->getLevel() * 10))
+    if (vault.size_ < getLevel() * 10)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(this), vault->size, this->getLevel() * 10);
-      vault->size = this->getLevel() * 10;
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", qPrintable(this->name()), vault.size_, this->getLevel() * 10);
+      vault.size_ = this->getLevel() * 10;
     }
 
-    save_vault(vault->owner);
+    DC::getInstance()->vaults_.save(vault.owner_);
   }
 
   if (this->player->time.logon < 1151506181)
   {
-    this->player->quest_points = 0;
-    for (int i = 0; i < QUEST_MAX_CANCEL; i++)
-      this->player->quest_cancel[i] = 0;
-    for (int i = 0; i < QUEST_TOTAL / ASIZE; i++)
-      this->player->quest_complete[i] = 0;
+    this->player->quest_points = {};
+    for (qint32 i = {}; i < QUEST_MAX_CANCEL; i++)
+      this->player->quest_cancel[i] = {};
+    for (qint32 i = {}; i < QUEST_TOTAL / ASIZE; i++)
+      this->player->quest_complete[i] = {};
   }
   if (this->player->time.logon < 1151504181)
     SET_BIT(this->misc, DC::LogChannel::CHANNEL_TELL);
@@ -589,16 +580,16 @@ void Character::do_on_login_stuff(void)
     this->swapSkill(SPELL_FIRESTORM, SPELL_LIFE_LEECH);
   }
 
-  class_skill_defines *c_skills = this->get_skill_list();
+  CharacterClassSkill *c_skills = this->get_skill_list();
 
   if (IS_MORTAL(this))
   {
-    std::queue<skill_t> skills_to_delete = {};
+    QQueue<skill_t> skills_to_delete = {};
     for (const auto &curr : this->skills)
     {
       if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
       {
-        logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, DC::LogChannel::LOG_PLAYER);
+        logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(qPrintable(this->name())), IMMORTAL, DC::LogChannel::LOG_PLAYER);
         // this->send(fmt::format("Removing skill {}\r\n", curr.first));
         skills_to_delete.push(curr.first);
       }
@@ -615,8 +606,8 @@ void Character::do_on_login_stuff(void)
   if (!this->has_skill(META_REIMB))
   {
     learn_skill(META_REIMB, 1, 100);
-    int new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent()), r_new_meta_exp_cost(0, hps_exp_spent()));
-    int ometa = GET_HP_METAS(this);
+    qint32 new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent()), r_new_meta_exp_cost(0, hps_exp_spent()));
+    qint32 ometa = GET_HP_METAS(this);
     GET_HP_METAS(this) = new_;
     GET_RAW_HIT(this) += new_ - ometa;
     new_ = MIN(r_new_meta_platinum_cost(0, mana_plats_spent()), r_new_meta_exp_cost(0, mana_exp_spent()));
@@ -633,17 +624,17 @@ void Character::do_on_login_stuff(void)
   prepare_character_for_sixty(this);
 
   // Check for deleted characters listed in access list
-  std::queue<QString> todelete;
-  vault = has_vault(GET_NAME(this));
+  QQueue<QString> todelete;
+  vault = DC::getInstance()->vaults_.has_vault(qPrintable(this->name()));
   if (vault)
   {
-    for (vault_access_data *access = vault->access; access && access != (vault_access_data *)0x95959595; access = access->next)
+    for (const auto &access : vault.access)
     {
-      if (!access->name.isEmpty())
+      if (!access.name.isEmpty())
       {
-        if (!file_exists(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(access->name[0].toUpper()).arg(access->name)))
+        if (!file_exists(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(access.name[0].toUpper()).arg(access.name)))
         {
-          todelete.push(access->name);
+          todelete.push(access.name);
         }
       }
     }
@@ -651,7 +642,7 @@ void Character::do_on_login_stuff(void)
 
   while (!todelete.empty())
   {
-    logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, DC::LogChannel::LOG_MORTAL);
+    logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(qPrintable(this->name())), 0, DC::LogChannel::LOG_MORTAL);
     remove_vault_access(todelete.front(), vault);
     todelete.pop();
   }
@@ -665,26 +656,23 @@ void Character::do_on_login_stuff(void)
 
 void Character::roll_and_display_stats(void)
 {
-  int x, a, b;
-  char buf[MAX_STRING_LENGTH];
-
-  for (x = 0; x <= 4; x++)
+  for (auto x = 0; x <= 4; x++)
   {
+    auto a = dice(3, 6);
+    auto b = dice(6, 3);
+    desc->stats->str[x] = MAX(12 + number(0, 1), MAX(a, b));
     a = dice(3, 6);
     b = dice(6, 3);
-    this->desc->stats->str[x] = MAX(12 + number(0, 1), MAX(a, b));
+    desc->stats->dex[x] = MAX(12 + number(0, 1), MAX(a, b));
     a = dice(3, 6);
     b = dice(6, 3);
-    this->desc->stats->dex[x] = MAX(12 + number(0, 1), MAX(a, b));
+    desc->stats->con[x] = MAX(12 + number(0, 1), MAX(a, b));
     a = dice(3, 6);
     b = dice(6, 3);
-    this->desc->stats->con[x] = MAX(12 + number(0, 1), MAX(a, b));
+    desc->stats->tel[x] = MAX(12 + number(0, 1), MAX(a, b));
     a = dice(3, 6);
     b = dice(6, 3);
-    this->desc->stats->tel[x] = MAX(12 + number(0, 1), MAX(a, b));
-    a = dice(3, 6);
-    b = dice(6, 3);
-    this->desc->stats->wis[x] = MAX(12 + number(0, 1), MAX(a, b));
+    desc->stats->wis[x] = MAX(12 + number(0, 1), MAX(a, b));
   }
 
   /*
@@ -696,47 +684,31 @@ void Character::roll_and_display_stats(void)
   this->desc->stats->wis[0] = 14;
   */
 
-  SEND_TO_Q("\r\n  Choose from any of the following groups of abilities...     \r\n", this->desc);
-
-  SEND_TO_Q("Group: 1     2     3     4     5\r\n", this->desc);
-  sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
-          this->desc->stats->str[0], this->desc->stats->str[1], this->desc->stats->str[2],
-          this->desc->stats->str[3], this->desc->stats->str[4]);
-  SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
-          this->desc->stats->dex[0], this->desc->stats->dex[1], this->desc->stats->dex[2],
-          this->desc->stats->dex[3], this->desc->stats->dex[4]);
-  SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Con:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
-          this->desc->stats->con[0], this->desc->stats->con[1], this->desc->stats->con[2],
-          this->desc->stats->con[3], this->desc->stats->con[4]);
-  SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Int:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
-          this->desc->stats->tel[0], this->desc->stats->tel[1], this->desc->stats->tel[2],
-          this->desc->stats->tel[3], this->desc->stats->tel[4]);
-  SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
-          this->desc->stats->wis[0], this->desc->stats->wis[1], this->desc->stats->wis[2],
-          this->desc->stats->wis[3], this->desc->stats->wis[4]);
-  SEND_TO_Q(buf, this->desc);
-  SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", this->desc);
-  telnet_ga(this->desc);
+  write_to_output("\r\n  Choose from any of the following groups of abilities...     \r\n", desc);
+  write_to_output("Group: 1     2     3     4     5\r\n", this->desc);
+  write_to_output(QStringLiteral("Str:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->str[0], -2).arg(desc->stats->str[1], -2).arg(desc->stats->str[2], -2).arg(desc->stats->str[3], -2).arg(desc->stats->str[4], -2), desc);
+  write_to_output(QStringLiteral("Dex:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->dex[0], -2).arg(desc->stats->dex[1], -2).arg(desc->stats->dex[2], -2).arg(desc->stats->dex[3], -2).arg(desc->stats->dex[4], -2), desc);
+  write_to_output(QStringLiteral("Con:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->con[0], -2).arg(desc->stats->con[1], -2).arg(desc->stats->con[2], -2).arg(desc->stats->con[3], -2).arg(desc->stats->con[4], -2), desc);
+  write_to_output(QStringLiteral("Int:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->tel[0], -2).arg(desc->stats->tel[1], -2).arg(desc->stats->tel[2], -2).arg(desc->stats->tel[3], -2).arg(desc->stats->tel[4], -2), desc);
+  write_to_output(QStringLiteral("Wis:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->wis[0], -2).arg(desc->stats->str[1], -2).arg(desc->stats->wis[2], -2).arg(desc->stats->wis[3], -2).arg(desc->stats->wis[4], -2), desc);
+  write_to_output("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", desc);
+  telnet_ga(desc);
 
   WAIT_STATE(this, DC::PULSE_TIMER / 10);
 }
 
-int DC::exceeded_connection_limit(class Connection *new_conn)
+qint32 DC::exceeded_connection_limit(class Connection *new_conn)
 {
   if (new_conn->getPeerOriginalAddress().isNull() || new_conn->getPeerAddress().isLoopback())
   {
     return false;
   }
 
-  quint64 count = 0;
+  quint64 count = {};
   QSet<Connection *> to_close_list;
-  for (auto d = descriptor_list; d; d = d->next)
+  for (auto d = connections_; d; d = conn->next)
   {
-    if (new_conn->getPeerOriginalAddress() == d->getPeerOriginalAddress())
+    if (new_conn->getPeerOriginalAddress() == conn->getPeerOriginalAddress())
     {
       count++;
       to_close_list.insert(d);
@@ -745,17 +717,17 @@ int DC::exceeded_connection_limit(class Connection *new_conn)
 
   if (count > getConnectionLimit())
   {
-    SEND_TO_Q(QStringLiteral("Sorry, there are more than %1 connections from IP %2\r\n"
-                             "already logged into Dark Castle.  If you have a valid reason\r\n"
-                             "for having this many connections from one IP please let an imm\r\n"
-                             "know and they will speak with you. Assuming this is an error and closing all connections.\r\n")
-                  .arg(getConnectionLimit())
-                  .arg(new_conn->getPeerOriginalAddress().toString()),
-              new_conn);
+    write_to_output(QStringLiteral("Sorry, there are more than %1 connections from IP %2\r\n"
+                                   "already logged into Dark Castle.  If you have a valid reason\r\n"
+                                   "for having this many connections from one IP please let an imm\r\n"
+                                   "know and they will speak with you. Assuming this is an error and closing all connections.\r\n")
+                        .arg(getConnectionLimit())
+                        .arg(new_conn->getPeerOriginalAddress().toString()),
+                    new_conn);
 
     for (const auto &d : to_close_list)
     {
-      logsocket(QStringLiteral("Closing socket %1 from IP %2 due to > %3 connections.").arg(d->desc_num).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
+      logsocket(QStringLiteral("Closing socket %1 from IP %2 due to > %3 connections.").arg(conn->desc_num).arg(conn->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
       close_socket(d);
     }
     return true;
@@ -769,23 +741,23 @@ void Character::check_hw(void)
   heightweight(false);
   if (this->height > races[this->race].max_height)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(this), GET_HEIGHT(this), races[this->race].max_height);
+    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].max_height);
     this->height = races[this->race].max_height;
   }
   if (this->height < races[this->race].min_height)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(this), GET_HEIGHT(this), races[this->race].min_height);
+    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].min_height);
     this->height = races[this->race].min_height;
   }
 
   if (this->weight > races[this->race].max_weight)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(this), GET_WEIGHT(this), races[this->race].max_weight);
+    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].max_weight);
     this->weight = races[this->race].max_weight;
   }
   if (this->weight < races[this->race].min_weight)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(this), GET_WEIGHT(this), races[this->race].min_weight);
+    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].min_weight);
     this->weight = races[this->race].min_weight;
   }
   heightweight(true);
@@ -794,48 +766,48 @@ void Character::check_hw(void)
 void Character::set_hw(void)
 {
   this->height = number(races[this->race].min_height, races[this->race].max_height);
-  // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
+  // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
   this->weight = number(races[this->race].min_weight, races[this->race].max_weight);
-  // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
+  // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
 }
 
 // Deal with sockets that haven't logged in yet.
-void DC::nanny(class Connection *d, std::string arg)
+void DC::nanny(class Connection *d, QString arg)
 {
   char buf[MAX_STRING_LENGTH];
   std::stringstream str_tmp;
   char tmp_name[20];
   char *password;
-  Character *ch;
-  int y;
+  CharacterPtr ch;
+  qint32 y;
   char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> ";
-  unsigned selection = 0;
+  quint32 selection = {};
   auto &character_list = DC::getInstance()->character_list;
   char log_buf[MAX_STRING_LENGTH] = {};
   QString buffer;
 
-  ch = d->character;
+  ch = conn->character;
   arg.erase(0, arg.find_first_not_of(' '));
 
   if (!str_prefix("help", arg.c_str()) &&
-      (STATE(d) == Connection::states::OLD_GET_CLASS ||
-       STATE(d) == Connection::states::OLD_GET_RACE ||
-       STATE(d) == Connection::states::OLD_CHOOSE_STATS ||
-       STATE(d) == Connection::states::GET_CLASS ||
-       STATE(d) == Connection::states::GET_RACE ||
-       STATE(d) == Connection::states::GET_STATS))
+      (conn->connected == Connection::states::OLD_GET_CLASS ||
+       conn->connected == Connection::states::OLD_GET_RACE ||
+       conn->connected == Connection::states::OLD_CHOOSE_STATS ||
+       conn->connected == Connection::states::GET_CLASS ||
+       conn->connected == Connection::states::GET_RACE ||
+       conn->connected == Connection::states::GET_STATS))
   {
     arg.erase(0, 4);
-    do_new_help(d->character, arg.data(), cmd_t::PAGING_HELP);
+    do_new_help(conn->character, arg.data(), cmd_t::PAGING_HELP);
     return;
   }
 
-  load_status_t ls{};
-  switch (STATE(d))
+  load_status_t ls = {};
+  switch (conn->connected)
   {
 
   default:
-    logentry(QStringLiteral("Nanny: invalid STATE(d) == %1").arg(STATE(d)), 0, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Nanny: invalid conn->connected == %1").arg(conn->connected), 0, DC::LogChannel::LOG_BUG);
     close_socket(d);
     return;
 
@@ -851,7 +823,7 @@ void DC::nanny(class Connection *d, std::string arg)
     if (arg == "GET" || arg == "POST")
     {
       // send webpage
-      SEND_TO_Q(webpage, d);
+      write_to_output(webpage, d);
       close_socket(d);
       return;
     }
@@ -861,19 +833,19 @@ void DC::nanny(class Connection *d, std::string arg)
     {
     default:
     case 1:
-      SEND_TO_Q(greetings1, d);
+      write_to_output(greetings1, d);
       break;
 
     case 2:
-      SEND_TO_Q(greetings2, d);
+      write_to_output(greetings2, d);
       break;
 
     case 3:
-      SEND_TO_Q(greetings3, d);
+      write_to_output(greetings3, d);
       break;
 
     case 4:
-      SEND_TO_Q(greetings4, d);
+      write_to_output(greetings4, d);
       break;
     }
 
@@ -882,11 +854,11 @@ void DC::nanny(class Connection *d, std::string arg)
 
     if (wizlock)
     {
-      SEND_TO_Q("The game is currently WIZLOCKED. Only immortals can connect at this time.\r\n", d);
+      write_to_output("The game is currently WIZLOCKED. Only immortals can connect at this time.\r\n", d);
     }
-    SEND_TO_Q("What name for the roster? ", d);
+    write_to_output("What name for the roster? ", d);
     telnet_ga(d);
-    STATE(d) = Connection::states::GET_NAME;
+    conn->connected = Connection::states::GET_NAME;
 
     // if they have already entered their name, drop through.  Otherwise stop and wait for input
     if (arg.empty())
@@ -896,20 +868,20 @@ void DC::nanny(class Connection *d, std::string arg)
     /* no break */
 
   case Connection::states::GET_PROXY:
-    STATE(d) = Connection::states::GET_NAME;
+    conn->connected = Connection::states::GET_NAME;
 
     // If first line of text is a proxy header then construct Proxy
     // otherwise assume it's a name.
     if (QString(arg.c_str()).indexOf("PROXY ") == 0)
     {
-      d->proxy = Proxy(arg.c_str());
+      conn->proxy = Proxy(arg.c_str());
       return;
     }
   case Connection::states::GET_NAME:
 
     if (arg.empty())
     {
-      SEND_TO_Q("Empty name.  Disconnecting...", d);
+      write_to_output("Empty name.  Disconnecting...", d);
       close_socket(d);
       return;
     }
@@ -921,7 +893,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
     if (_parse_name(arg.c_str(), tmp_name))
     {
-      SEND_TO_Q("Illegal name, try another.\r\nName: ", d);
+      write_to_output("Illegal name, try another.\r\nName: ", d);
       telnet_ga(d);
       return;
     }
@@ -940,26 +912,26 @@ void DC::nanny(class Connection *d, std::string arg)
       str_tmp << "../archive/" << tmp_name << ".gz";
       if (file_exists(str_tmp.str().c_str()))
       {
-        SEND_TO_Q("That character is archived.\r\nPlease mail "
-                  "imps@dcastle.org to request it be restored.\r\n",
-                  d);
+        write_to_output("That character is archived.\r\nPlease mail "
+                        "imps@dcastle.org to request it be restored.\r\n",
+                        d);
         close_socket(d);
         return;
       }
     }
-    ch = d->character;
+    ch = conn->character;
 
     // This is needed for "check_reconnect"  we free it later during load_char_obj
-    // TODO - this is memoryleaking ch->getNameC().  Check if ch->getNameC() is not there before
+    // TODO - this is memoryleaking qPrintable(ch->name()).  Check if qPrintable(ch->name()) is not there before
     // doing it to fix it.  (No time to verify this now, so i'll do it later)
-    ch->setName(str_dup(tmp_name));
+    ch->name((tmp_name));
 
-    // if (isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()))
-    // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
+    // if (isAllowedHost(conn->getPeerOriginalAddress().toString(qPrintable())))
+    // write_to_output("You are logging in from an ALLOWED host.\r\n", d);
 
-    if (!check_reconnect(d, tmp_name, false) && wizlock && !DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
+    if (!check_reconnect(d, tmp_name, false) && wizlock && !DC::getInstance()->isAllowedHost(conn->getPeerOriginalAddress()))
     {
-      SEND_TO_Q("The game is wizlocked.\r\n", d);
+      write_to_output("The game is wizlocked.\r\n", d);
       close_socket(d);
       return;
     }
@@ -967,62 +939,62 @@ void DC::nanny(class Connection *d, std::string arg)
     if (ls == load_status_t::success)
     {
       /* Old player */
-      SEND_TO_Q("Password: ", d);
+      write_to_output("Password: ", d);
       telnet_ga(d);
-      STATE(d) = Connection::states::GET_OLD_PASSWORD;
+      conn->connected = Connection::states::GET_OLD_PASSWORD;
       return;
     }
     else if (ls == load_status_t::missing)
     {
       if (DC::getInstance()->cf.bport)
       {
-        SEND_TO_Q("New chars not allowed on this port.\r\nEnter a new name: ", d);
+        write_to_output("New chars not allowed on this port.\r\nEnter a new name: ", d);
         return;
       }
       /* New player */
       sprintf(buf, "Did I get that right, %s (y/n)? ", tmp_name);
-      SEND_TO_Q(buf, d);
+      write_to_output(buf, d);
       telnet_ga(d);
-      STATE(d) = Connection::states::CONFIRM_NEW_NAME;
+      conn->connected = Connection::states::CONFIRM_NEW_NAME;
       return;
     }
     else
     {
-      SEND_TO_Q(QStringLiteral("There was an error loading %1").arg(tmp_name), d);
+      write_to_output(QStringLiteral("There was an error loading %1").arg(tmp_name), d);
       close_socket(d);
       return;
     }
     break;
 
   case Connection::states::GET_OLD_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    write_to_output("\r\n", d);
 
     // Default is to authenticate against character password
     password = ch->player->pwd;
 
     // If -P option passed and one of your other characters is an imp, allow this char with that imp's password
-    if (DC::getInstance()->cf.allow_imp_password && DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
+    if (DC::getInstance()->cf.allow_imp_password && DC::getInstance()->isAllowedHost(conn->getPeerOriginalAddress()))
     {
-      for (Connection *ad = DC::getInstance()->descriptor_list; ad && ad != (Connection *)0x95959595; ad = ad->next)
+      for (Connection *ad = DC::getInstance()->connections_; ad && ad != (Connection *)0x95959595; ad = ad->next)
       {
-        if (ad != d && d->getPeerOriginalAddress() == ad->getPeerOriginalAddress())
+        if (ad != d && conn->getPeerOriginalAddress() == ad->getPeerOriginalAddress())
         {
           if (ad->character && ad->character->getLevel() == IMPLEMENTER && ad->character->isPlayer())
           {
             password = ad->character->player->pwd;
-            logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
+            logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", qPrintable(ad->character->name()));
             break;
           }
         }
       }
     }
 
-    if (std::string(crypt(arg.c_str(), password)) != password)
+    if (QString(crypt(arg.c_str(), password)) != password)
     {
-      SEND_TO_Q("Wrong password.\r\n", d);
-      sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
+      write_to_output("Wrong password.\r\n", d);
+      sprintf(log_buf, "%s wrong password: %s", qPrintable(ch->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
       logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
-      if ((ch = get_pc(GET_NAME(d->character))))
+      if ((ch = get_pc(qPrintable(conn->character->name()))))
       {
         sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
                          //           "Attempt was from %s.$R\r\n"
@@ -1031,40 +1003,40 @@ void DC::nanny(class Connection *d, std::string arg)
       }
       else
       {
-        if (d->character->player->bad_pw_tries > 100)
+        if (conn->character->player->bad_pw_tries > 100)
         {
-          sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
+          sprintf(log_buf, "%s has 100+ bad pw tries...", qPrintable(conn->character->name()));
           logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
         }
         else
         {
-          d->character->player->bad_pw_tries++;
-          d->character->save_char_obj();
+          conn->character->player->bad_pw_tries++;
+          conn->character->save_char_obj();
         }
       }
       close_socket(d);
       return;
     }
 
-    check_playing(d, ch->getName());
+    check_playing(d, ch->name());
 
-    if (check_reconnect(d, ch->getName(), true))
+    if (check_reconnect(d, ch->name(), true))
       return;
 
-    buffer = QStringLiteral("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
+    buffer = QStringLiteral("%1@%2 has connected.").arg(qPrintable(ch->name())).arg(conn->getPeerOriginalAddress().toString());
     if (ch->getLevel() < ANGEL)
       logentry(buffer, OVERSEER, DC::LogChannel::LOG_SOCKET);
     else
       logentry(buffer, ch->getLevel(), DC::LogChannel::LOG_SOCKET);
 
     warn_if_duplicate_ip(ch);
-    //    SEND_TO_Q(motd, d);
+    //    write_to_output(motd, d);
     if (ch->isMortalPlayer())
-      d->character->send(motd);
+      conn->character->send(motd);
     else
-      d->character->send(imotd);
+      conn->character->send(imotd);
 
-    clan_data *clan;
+    Clan *clan;
     if ((clan = get_clan(ch->clan)) && clan->clanmotd)
     {
       ch->sendln("$B----------------------------------------------------------------------$R");
@@ -1072,22 +1044,22 @@ void DC::nanny(class Connection *d, std::string arg)
       ch->sendln("$B----------------------------------------------------------------------$R");
     }
 
-    SEND_TO_Q(QStringLiteral("\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n").arg(ch->player->last_site), d);
+    write_to_output(QStringLiteral("\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n").arg(ch->player->last_site), d);
     telnet_ga(d);
 
-    if (d->character->player->bad_pw_tries)
+    if (conn->character->player->bad_pw_tries)
     {
-      sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->player->bad_pw_tries);
-      SEND_TO_Q(buf, d);
+      sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", conn->character->player->bad_pw_tries);
+      write_to_output(buf, d);
     }
-    DC::getInstance()->TheAuctionHouse.CheckForSoldItems(d->character);
-    STATE(d) = Connection::states::READ_MOTD;
+    DC::getInstance()->TheAuctionHouse.CheckForSoldItems(conn->character);
+    conn->connected = Connection::states::READ_MOTD;
     break;
 
   case Connection::states::CONFIRM_NEW_NAME:
     if (arg.empty())
     {
-      SEND_TO_Q("Please type y or n: ", d);
+      write_to_output("Please type y or n: ", d);
       telnet_ga(d);
       break;
     }
@@ -1097,21 +1069,20 @@ void DC::nanny(class Connection *d, std::string arg)
     case 'y':
     case 'Y':
 
-      if (isbanned(d->getPeerOriginalAddress()) >= BAN_NEW)
+      if (DC::getInstance()->bans_.is_banned(conn->getPeerOriginalAddress()) >= Ban::NEW)
       {
-        sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
-                GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
+        sprintf(buf, "Request for new character %s denied from [%s] (siteban)", qPrintable(conn->character->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
         logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
-        SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
-                  "Questions may be directed to imps@dcastle.org\r\n",
-                  d);
-        STATE(d) = Connection::states::CLOSE;
+        write_to_output("Sorry, new chars are not allowed from your site.\r\n"
+                        "Questions may be directed to imps@dcastle.org\r\n",
+                        d);
+        conn->connected = Connection::states::CLOSE;
         return;
       }
-      sprintf(buf, "New character.\r\nGive me a password for %s: ", GET_NAME(ch));
-      SEND_TO_Q(buf, d);
+      sprintf(buf, "New character.\r\nGive me a password for %s: ", qPrintable(ch->name()));
+      write_to_output(buf, d);
       telnet_ga(d);
-      STATE(d) = Connection::states::GET_NEW_PASSWORD;
+      conn->connected = Connection::states::GET_NEW_PASSWORD;
       // at this point, player hasn't yet been created.  So we're going to go ahead and
       // allocate it since a new character is obviously a PC
       ch->player = new Player;
@@ -1121,60 +1092,60 @@ void DC::nanny(class Connection *d, std::string arg)
 
     case 'n':
     case 'N':
-      SEND_TO_Q("Ok, what IS it, then? ", d);
+      write_to_output("Ok, what IS it, then? ", d);
       telnet_ga(d);
       // TODO - double check this to make sure we're free'ing properly
-      ch->setName("");
-      delete d->character;
-      d->character = nullptr;
-      STATE(d) = Connection::states::GET_NAME;
+      ch->name("");
+      conn->character = {};
+      conn->character = {};
+      conn->connected = Connection::states::GET_NAME;
       break;
 
     default:
-      SEND_TO_Q("Please type y or n: ", d);
+      write_to_output("Please type y or n: ", d);
       telnet_ga(d);
       break;
     }
     break;
 
   case Connection::states::GET_NEW_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    write_to_output("\r\n", d);
 
     if (arg.length() < 6)
     {
-      SEND_TO_Q("Password must be at least six characters long.\r\nPassword: ", d);
+      write_to_output("Password must be at least six characters long.\r\nPassword: ", d);
       telnet_ga(d);
       return;
     }
 
-    strncpy(ch->player->pwd, crypt(arg.c_str(), ch->getNameC()), PASSWORD_LEN);
+    strncpy(ch->player->pwd, crypt(arg.c_str(), qPrintable(ch->name())), PASSWORD_LEN);
     ch->player->pwd[PASSWORD_LEN] = '\0';
-    SEND_TO_Q("Please retype password: ", d);
+    write_to_output("Please retype password: ", d);
     telnet_ga(d);
-    STATE(d) = Connection::states::CONFIRM_NEW_PASSWORD;
+    conn->connected = Connection::states::CONFIRM_NEW_PASSWORD;
     break;
 
   case Connection::states::CONFIRM_NEW_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    write_to_output("\r\n", d);
 
-    if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+    if (QString(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
     {
-      SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
+      write_to_output("Passwords don't match.\r\nRetype password: ", d);
       telnet_ga(d);
-      STATE(d) = Connection::states::GET_NEW_PASSWORD;
+      conn->connected = Connection::states::GET_NEW_PASSWORD;
       return;
     }
 
   case Connection::states::QUESTION_ANSI:
-    SEND_TO_Q("Do you want ANSI color (y/n)? ", d);
+    write_to_output("Do you want ANSI color (y/n)? ", d);
     telnet_ga(d);
-    STATE(d) = Connection::states::GET_ANSI;
+    conn->connected = Connection::states::GET_ANSI;
     break;
 
   case Connection::states::GET_ANSI:
     if (arg.empty())
     {
-      STATE(d) = Connection::states::QUESTION_ANSI;
+      conn->connected = Connection::states::QUESTION_ANSI;
       return;
     }
 
@@ -1182,31 +1153,31 @@ void DC::nanny(class Connection *d, std::string arg)
     {
     case 'y':
     case 'Y':
-      d->color = true;
+      conn->color = true;
       break;
     case 'n':
     case 'N':
-      d->color = false;
+      conn->color = false;
       break;
     default:
-      STATE(d) = Connection::states::QUESTION_ANSI;
+      conn->connected = Connection::states::QUESTION_ANSI;
       return;
     }
 
-    STATE(d) = Connection::states::QUESTION_SEX;
+    conn->connected = Connection::states::QUESTION_SEX;
     break;
 
   case Connection::states::QUESTION_SEX:
-    SEND_TO_Q("What is your sex (m/f)? ", d);
+    write_to_output("What is your sex (m/f)? ", d);
     telnet_ga(d);
-    STATE(d) = Connection::states::GET_NEW_SEX;
+    conn->connected = Connection::states::GET_NEW_SEX;
     break;
 
   case Connection::states::GET_NEW_SEX:
     if (arg.empty())
     {
-      SEND_TO_Q("That's not a sex.\r\n", d);
-      STATE(d) = Connection::states::QUESTION_SEX;
+      write_to_output("That's not a sex.\r\n", d);
+      conn->connected = Connection::states::QUESTION_SEX;
       break;
     }
 
@@ -1221,47 +1192,47 @@ void DC::nanny(class Connection *d, std::string arg)
       ch->sex = SEX_FEMALE;
       break;
     default:
-      SEND_TO_Q("That's not a sex.\r\n", d);
-      STATE(d) = Connection::states::QUESTION_SEX;
+      write_to_output("That's not a sex.\r\n", d);
+      conn->connected = Connection::states::QUESTION_SEX;
       return;
     }
 
     /*
-          if (!isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()) && DC::getInstance()->cf.allow_newstatsys == false)
+          if (!isAllowedHost(conn->getPeerOriginalAddress().toString(qPrintable())) && DC::getInstance()->cf.allow_newstatsys == false)
           {
-             STATE(d) = Connection::states::OLD_STAT_METHOD;
+             conn->connected = Connection::states::OLD_STAT_METHOD;
              break;
           }
     */
 
-    SEND_TO_Q("\r\n", d);
-    SEND_TO_Q("$R$7Note: If you see a word that is entirely CAPITALIZED and $Bbold$R then there\r\n", d);
-    SEND_TO_Q("exists a helpfile for that word which you can lookup with the command\r\n", d);
-    SEND_TO_Q("help keyword.\r\n", d);
-    SEND_TO_Q("\r\n", d);
-    SEND_TO_Q("Dark Castle supports two ways of picking your race, class and initial\r\n", d);
-    SEND_TO_Q("$BATTRIBUTES$R such as $BSTRENGTH$R, $BDEXTERITY$R, $BCONSTITUION$R, $BINTELLIGENCE$R\r\n", d);
-    SEND_TO_Q("or $BWISDOM$R.\r\n\r\n", d);
-    SEND_TO_Q("The newest method is you first pick a race, a class then you get 12 points\r\n", d);
-    SEND_TO_Q("in each attribute and 23 points you can divide among those five\r\n", d);
-    SEND_TO_Q("attributes.\r\n\r\n", d);
-    SEND_TO_Q("The old method is you roll virtual dice. The virtual dice consist of either\r\n", d);
-    SEND_TO_Q("three 6-sided dice or six 3-sided dice. The game picks the larger group of\r\n", d);
-    SEND_TO_Q("those two separate sets of dice rolls and throws out any sets with a sum less\r\n", d);
-    SEND_TO_Q("than 12. You can roll virtual dice as many times as you like. After you finish\r\n", d);
-    SEND_TO_Q("rolling dice then the game shows you what races you can pick based on the dice\r\n", d);
-    SEND_TO_Q("rolls. After picking from the races your dice rolls allow then you have to\r\n", d);
-    SEND_TO_Q("pick a class that fits your choosen stats.\r\n", d);
-    STATE(d) = Connection::states::QUESTION_STAT_METHOD;
+    write_to_output("\r\n", d);
+    write_to_output("$R$7Note: If you see a word that is entirely CAPITALIZED and $Bbold$R then there\r\n", d);
+    write_to_output("exists a helpfile for that word which you can lookup with the command\r\n", d);
+    write_to_output("help keyword.\r\n", d);
+    write_to_output("\r\n", d);
+    write_to_output("Dark Castle supports two ways of picking your race, class and initial\r\n", d);
+    write_to_output("$BATTRIBUTES$R such as $BSTRENGTH$R, $BDEXTERITY$R, $BCONSTITUION$R, $BINTELLIGENCE$R\r\n", d);
+    write_to_output("or $BWISDOM$R.\r\n\r\n", d);
+    write_to_output("The newest method is you first pick a race, a class then you get 12 points\r\n", d);
+    write_to_output("in each attribute and 23 points you can divide among those five\r\n", d);
+    write_to_output("attributes.\r\n\r\n", d);
+    write_to_output("The old method is you roll virtual dice. The virtual dice consist of either\r\n", d);
+    write_to_output("three 6-sided dice or six 3-sided dice. The game picks the larger group of\r\n", d);
+    write_to_output("those two separate sets of dice rolls and throws out any sets with a sum less\r\n", d);
+    write_to_output("than 12. You can roll virtual dice as many times as you like. After you finish\r\n", d);
+    write_to_output("rolling dice then the game shows you what races you can pick based on the dice\r\n", d);
+    write_to_output("rolls. After picking from the races your dice rolls allow then you have to\r\n", d);
+    write_to_output("pick a class that fits your choosen stats.\r\n", d);
+    conn->connected = Connection::states::QUESTION_STAT_METHOD;
     return;
 
   case Connection::states::QUESTION_STAT_METHOD:
-    SEND_TO_Q("\r\n", d);
-    SEND_TO_Q("1. Pick race, class then assign points to attributes. (new method)\r\n", d);
-    SEND_TO_Q("2. Roll virtual dice for attributes then pick race and class. (old method)\r\n", d);
-    SEND_TO_Q("What is your choice (1,2)? ", d);
+    write_to_output("\r\n", d);
+    write_to_output("1. Pick race, class then assign points to attributes. (new method)\r\n", d);
+    write_to_output("2. Roll virtual dice for attributes then pick race and class. (old method)\r\n", d);
+    write_to_output("What is your choice (1,2)? ", d);
     telnet_ga(d);
-    STATE(d) = Connection::states::GET_STAT_METHOD;
+    conn->connected = Connection::states::GET_STAT_METHOD;
     break;
 
   case Connection::states::GET_STAT_METHOD:
@@ -1271,89 +1242,89 @@ void DC::nanny(class Connection *d, std::string arg)
     }
     catch (...)
     {
-      selection = 0;
+      selection = {};
     }
 
     if (selection == 1)
     {
-      STATE(d) = Connection::states::NEW_STAT_METHOD;
+      conn->connected = Connection::states::NEW_STAT_METHOD;
     }
     else if (selection == 2)
     {
-      STATE(d) = Connection::states::OLD_STAT_METHOD;
+      conn->connected = Connection::states::OLD_STAT_METHOD;
     }
     else
     {
-      STATE(d) = Connection::states::QUESTION_STAT_METHOD;
+      conn->connected = Connection::states::QUESTION_STAT_METHOD;
     }
     break;
 
   case Connection::states::NEW_STAT_METHOD:
-    STATE(d) = Connection::states::QUESTION_RACE;
+    conn->connected = Connection::states::QUESTION_RACE;
     break;
 
   case Connection::states::QUESTION_RACE:
     show_question_race(d);
 
-    STATE(d) = Connection::states::GET_RACE;
+    conn->connected = Connection::states::GET_RACE;
     break;
 
   case Connection::states::GET_RACE:
     if (handle_get_race(d, arg) == true)
     {
-      STATE(d) = Connection::states::QUESTION_CLASS;
+      conn->connected = Connection::states::QUESTION_CLASS;
     }
     else
     {
-      STATE(d) = Connection::states::QUESTION_RACE;
+      conn->connected = Connection::states::QUESTION_RACE;
     }
     break;
 
   case Connection::states::QUESTION_CLASS:
     show_question_class(d);
 
-    STATE(d) = Connection::states::GET_CLASS;
+    conn->connected = Connection::states::GET_CLASS;
     break;
 
   case Connection::states::GET_CLASS:
     if (handle_get_class(d, arg) == false)
     {
-      if (STATE(d) != Connection::states::QUESTION_RACE)
+      if (conn->connected != Connection::states::QUESTION_RACE)
       {
-        STATE(d) = Connection::states::QUESTION_CLASS;
+        conn->connected = Connection::states::QUESTION_CLASS;
       }
     }
     else
     {
-      STATE(d) = Connection::states::QUESTION_STATS;
+      conn->connected = Connection::states::QUESTION_STATS;
     }
     break;
 
   case Connection::states::QUESTION_STATS:
     show_question_stats(d);
 
-    STATE(d) = Connection::states::GET_STATS;
+    conn->connected = Connection::states::GET_STATS;
     break;
 
   case Connection::states::GET_STATS:
     if (handle_get_stats(d, arg) == false)
     {
-      STATE(d) = Connection::states::QUESTION_STATS;
+      conn->connected = Connection::states::QUESTION_STATS;
     }
     else
     {
-      STATE(d) = Connection::states::NEW_PLAYER;
+      conn->connected = Connection::states::NEW_PLAYER;
     }
     break;
 
   case Connection::states::OLD_STAT_METHOD:
     if (ch->desc->stats != nullptr)
     {
-      delete ch->desc->stats;
+      ch->desc->stats = {};
     }
     ch->desc->stats = new stat_data;
 
-    STATE(d) = Connection::states::OLD_CHOOSE_STATS;
+    conn->connected = Connection::states::OLD_CHOOSE_STATS;
     arg.clear();
     // break;  no break on purpose...might as well do this now.  no point in waiting
 
@@ -1372,7 +1343,7 @@ void DC::nanny(class Connection *d, std::string arg)
     }
     catch (...)
     {
-      selection = 0;
+      selection = {};
     }
 
     if (selection >= 1 && selection <= 5)
@@ -1382,9 +1353,9 @@ void DC::nanny(class Connection *d, std::string arg)
       GET_RAW_WIS(ch) = ch->desc->stats->wis[selection - 1];
       GET_RAW_DEX(ch) = ch->desc->stats->dex[selection - 1];
       GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
-      delete ch->desc->stats;
-      ch->desc->stats = nullptr;
-      SEND_TO_Q("\r\nChoose a race(races you can select are marked with a *).\r\n", d);
+      ch->desc->stats = {};
+      ch->desc->stats = {};
+      write_to_output("\r\nChoose a race(races you can select are marked with a *).\r\n", d);
       sprintf(buf, "  %c1: Human\r\n  %c2: Elf\r\n  %c3: Dwarf\r\n"
                    "  %c4: Hobbit\r\n  %c5: Pixie\r\n  %c6: Ogre\r\n"
                    "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
@@ -1392,9 +1363,9 @@ void DC::nanny(class Connection *d, std::string arg)
               is_race_eligible(ch, 1) ? '*' : ' ', is_race_eligible(ch, 2) ? '*' : ' ', is_race_eligible(ch, 3) ? '*' : ' ', is_race_eligible(ch, 4) ? '*' : ' ', is_race_eligible(ch, 5) ? '*' : ' ', is_race_eligible(ch, 6) ? '*' : ' ',
               is_race_eligible(ch, 7) ? '*' : ' ', is_race_eligible(ch, 8) ? '*' : ' ', is_race_eligible(ch, 9) ? '*' : ' ');
 
-      SEND_TO_Q(buf, d);
+      write_to_output(buf, d);
       telnet_ga(d);
-      STATE(d) = Connection::states::OLD_GET_RACE;
+      conn->connected = Connection::states::OLD_GET_RACE;
       break;
     }
     ch->roll_and_display_stats();
@@ -1407,13 +1378,13 @@ void DC::nanny(class Connection *d, std::string arg)
     }
     catch (...)
     {
-      selection = 0;
+      selection = {};
     }
 
     switch (selection)
     {
     default:
-      SEND_TO_Q("That's not a race.\r\nWhat IS your race? ", d);
+      write_to_output("That's not a race.\r\nWhat IS your race? ", d);
       telnet_ga(d);
       return;
 
@@ -1533,7 +1504,7 @@ void DC::nanny(class Connection *d, std::string arg)
         return;
       }
       ch->race = RACE_TROLL;
-      ch->alignment = 0;
+      ch->alignment = {};
       GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
       GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
       GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
@@ -1543,7 +1514,7 @@ void DC::nanny(class Connection *d, std::string arg)
     }
 
     ch->set_hw();
-    SEND_TO_Q("\r\nA '*' denotes a class that fits your chosen stats.\r\n", d);
+    write_to_output("\r\nA '*' denotes a class that fits your chosen stats.\r\n", d);
     sprintf(buf, " %c 1: Warrior\r\n"
                  " %c 2: Cleric\r\n"
                  " %c 3: Mage\r\n"
@@ -1569,9 +1540,9 @@ void DC::nanny(class Connection *d, std::string arg)
             //            '*',
             (is_clss_eligible(ch, CLASS_BARD) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' '));
-    SEND_TO_Q(buf, d);
+    write_to_output(buf, d);
     telnet_ga(d);
-    STATE(d) = Connection::states::OLD_GET_CLASS;
+    conn->connected = Connection::states::OLD_GET_CLASS;
     break;
 
   case Connection::states::OLD_GET_CLASS:
@@ -1581,25 +1552,25 @@ void DC::nanny(class Connection *d, std::string arg)
     }
     catch (...)
     {
-      selection = 0;
+      selection = {};
     }
 
     switch (selection)
     {
     default:
-      SEND_TO_Q("That's not a class.\r\nWhat IS your class? ", d);
+      write_to_output("That's not a class.\r\nWhat IS your class? ", d);
       telnet_ga(d);
       return;
 
     case 1:
       //          if(!is_clss_eligible(ch, CLASS_WARRIOR))
-      //         { SEND_TO_Q(badclssmsg, d);  return; }
+      //         { write_to_output(badclssmsg, d);  return; }
       GET_CLASS(ch) = CLASS_WARRIOR;
       break;
     case 2:
       if (!is_clss_eligible(ch, CLASS_CLERIC))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_CLERIC;
@@ -1607,7 +1578,7 @@ void DC::nanny(class Connection *d, std::string arg)
     case 3:
       if (!is_clss_eligible(ch, CLASS_MAGIC_USER))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_MAGIC_USER;
@@ -1615,18 +1586,18 @@ void DC::nanny(class Connection *d, std::string arg)
     case 4:
       if (!is_clss_eligible(ch, CLASS_THIEF))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
-      SEND_TO_Q("Pstealing is legal on this mud :)\r\n"
-                "Check 'help psteal' before you try though.",
-                d);
+      write_to_output("Pstealing is legal on this mud :)\r\n"
+                      "Check 'help psteal' before you try though.",
+                      d);
       GET_CLASS(ch) = CLASS_THIEF;
       break;
     case 5:
       if (!is_clss_eligible(ch, CLASS_ANTI_PAL))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_ANTI_PAL;
@@ -1635,7 +1606,7 @@ void DC::nanny(class Connection *d, std::string arg)
     case 6:
       if (!is_clss_eligible(ch, CLASS_PALADIN))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_PALADIN;
@@ -1644,7 +1615,7 @@ void DC::nanny(class Connection *d, std::string arg)
     case 7:
       if (!is_clss_eligible(ch, CLASS_BARBARIAN))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_BARBARIAN;
@@ -1652,7 +1623,7 @@ void DC::nanny(class Connection *d, std::string arg)
     case 8:
       if (!is_clss_eligible(ch, CLASS_MONK))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_MONK;
@@ -1660,7 +1631,7 @@ void DC::nanny(class Connection *d, std::string arg)
     case 9:
       if (!is_clss_eligible(ch, CLASS_RANGER))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_RANGER;
@@ -1668,7 +1639,7 @@ void DC::nanny(class Connection *d, std::string arg)
     case 10:
       if (!is_clss_eligible(ch, CLASS_BARD))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_BARD;
@@ -1676,39 +1647,39 @@ void DC::nanny(class Connection *d, std::string arg)
     case 11:
       if (!is_clss_eligible(ch, CLASS_DRUID))
       {
-        SEND_TO_Q(badclssmsg, d);
+        write_to_output(badclssmsg, d);
         return;
       }
       GET_CLASS(ch) = CLASS_DRUID;
       break;
     }
-    STATE(d) = Connection::states::NEW_PLAYER;
+    conn->connected = Connection::states::NEW_PLAYER;
     break;
 
   case Connection::states::NEW_PLAYER:
 
     init_char(ch);
 
-    sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
+    sprintf(log_buf, "%s@%s new player.", qPrintable(ch->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
     logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
-    SEND_TO_Q("\r\n", d);
-    SEND_TO_Q(motd, d);
-    SEND_TO_Q("\r\nIf you have read this motd, press Return.", d);
+    write_to_output("\r\n", d);
+    write_to_output(motd, d);
+    write_to_output("\r\nIf you have read this motd, press Return.", d);
     telnet_ga(d);
 
-    STATE(d) = Connection::states::READ_MOTD;
+    conn->connected = Connection::states::READ_MOTD;
     break;
 
   case Connection::states::READ_MOTD:
-    SEND_TO_Q(menu, d);
+    write_to_output(DC::getInstance()->menu, d);
     telnet_ga(d);
-    STATE(d) = Connection::states::SELECT_MENU;
+    conn->connected = Connection::states::SELECT_MENU;
     break;
 
   case Connection::states::SELECT_MENU:
     if (arg.empty())
     {
-      SEND_TO_Q(menu, d);
+      write_to_output(DC::getInstance()->menu, d);
       telnet_ga(d);
       break;
     }
@@ -1717,7 +1688,7 @@ void DC::nanny(class Connection *d, std::string arg)
     {
     case '0':
       close_socket(d);
-      d = nullptr;
+      d = {};
       break;
 
     case '1':
@@ -1725,15 +1696,15 @@ void DC::nanny(class Connection *d, std::string arg)
       // by logging in twice, and leaving one at the password: prompt
       if (ch->getLevel() > 0)
       {
-        strcpy(tmp_name, GET_NAME(ch));
-        free_char(d->character, Trace("nanny Connection::states::SELECT_MENU 1"));
-        d->character = 0;
+        strcpy(tmp_name, qPrintable(ch->name()));
+        free_char(conn->character, Trace("nanny Connection::states::SELECT_MENU 1"));
+        conn->character = {};
         load_char_obj(d, tmp_name);
-        ch = d->character;
+        ch = conn->character;
 
         if (!DC::getInstance()->cf.implementer.isEmpty())
         {
-          if (QString(GET_NAME(ch)).compare(DC::getInstance()->cf.implementer, Qt::CaseInsensitive) == 0)
+          if (QString(qPrintable(ch->name())).compare(DC::getInstance()->cf.implementer, Qt::CaseInsensitive) == 0)
           {
             ch->setLevel(110);
           }
@@ -1741,21 +1712,21 @@ void DC::nanny(class Connection *d, std::string arg)
 
         if (!ch)
         {
-          write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
+          write_to_descriptor(conn->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
           close_socket(d);
-          d = nullptr;
+          d = {};
           break;
         }
       }
       unique_scan(ch);
       if (ch->getGold() > 1000000000)
       {
-        sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
+        sprintf(log_buf, "%s has more than a billion gold. Bugged?", qPrintable(ch->name()));
         logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
       if (GET_BANK(ch) > 1000000000)
       {
-        sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
+        sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", qPrintable(ch->name()));
         logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
       ch->sendln("\r\nWelcome to Dark Castle.");
@@ -1774,11 +1745,11 @@ void DC::nanny(class Connection *d, std::string arg)
 
       act("$n has entered the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       if (!GET_SHORT_ONLY(ch))
-        GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch));
+        ch->short_description(ch->name());
       DC::getInstance()->update_wizlist(ch);
       ch->check_maxes(); // Check skill maxes.
 
-      STATE(d) = Connection::states::PLAYING;
+      conn->connected = Connection::states::PLAYING;
       update_max_who();
 
       if (ch->getLevel() == 0)
@@ -1795,58 +1766,51 @@ void DC::nanny(class Connection *d, std::string arg)
                        ch);
         }
       }
-      extern void zap_eq_check(Character * ch);
+      extern void zap_eq_check(CharacterPtr ch);
       zap_eq_check(ch);
       break;
 
     case '2':
-      SEND_TO_Q("Enter a text you'd like others to see when they look at you.\r\n"
-                "Terminate with '/s' on a new line.\r\n",
-                d);
-      if (ch->description)
+      write_to_output("Enter a text you'd like others to see when they look at you.\r\n"
+                      "Terminate with '/s' on a new line.\r\n",
+                      d);
+      if (!ch->description().isEmpty())
       {
-        SEND_TO_Q("Old description:\r\n", d);
-        SEND_TO_Q(ch->description, d);
-        dc_free(ch->description);
+        write_to_output("Old description:\r\n", d);
+        write_to_output(ch->description(), d);
       }
-#ifdef LEAK_CHECK
-      ch->description = (char *)calloc(540, sizeof(char));
-#else
-      ch->description = (char *)dc_alloc(540, sizeof(char));
-#endif
+      ch->description({});
 
-      // TODO - what happens if I get to this point, then disconnect, and reconnect?  memory leak?
-
-      d->strnew = &ch->description;
-      d->max_str = 539;
-      STATE(d) = Connection::states::EXDSCR;
+      conn->qstrnew = ch->description();
+      conn->max_str = 539;
+      conn->connected = Connection::states::EXDSCR;
       break;
 
     case '3':
-      SEND_TO_Q("Enter current password: ", d);
+      write_to_output("Enter current password: ", d);
       telnet_ga(d);
-      STATE(d) = Connection::states::CONFIRM_PASSWORD_CHANGE;
+      conn->connected = Connection::states::CONFIRM_PASSWORD_CHANGE;
       break;
 
     case '4':
       // delete this character
-      if (d->character->getLevel() >= 20)
+      if (conn->character->getLevel() >= 20)
       {
-        SEND_TO_Q("\r\nOnly characters under level 20 can be self-deleted.\r\n", d);
-        STATE(d) = Connection::states::SELECT_MENU;
-        SEND_TO_Q(menu, d);
+        write_to_output("\r\nOnly characters under level 20 can be self-deleted.\r\n", d);
+        conn->connected = Connection::states::SELECT_MENU;
+        write_to_output(DC::getInstance()->menu, d);
         telnet_ga(d);
       }
       else
       {
-        SEND_TO_Q("This will _permanently_ erase you.\r\nType ERASE ME if this is really what you want: ", d);
+        write_to_output("This will _permanently_ erase you.\r\nType ERASE ME if this is really what you want: ", d);
         telnet_ga(d);
-        STATE(d) = Connection::states::DELETE_CHAR;
+        conn->connected = Connection::states::DELETE_CHAR;
       }
       break;
 
     default:
-      SEND_TO_Q(menu, d);
+      write_to_output(DC::getInstance()->menu, d);
       telnet_ga(d);
       break;
     }
@@ -1855,108 +1819,108 @@ void DC::nanny(class Connection *d, std::string arg)
   case Connection::states::ARCHIVE_CHAR:
     if (arg == "ARCHIVE ME")
     {
-      str_tmp << GET_NAME(d->character);
-      SEND_TO_Q("\r\nCharacter Archived.\r\n", d);
-      DC::getInstance()->update_wizlist(d->character);
+      str_tmp << qPrintable(conn->character->name());
+      write_to_output("\r\nCharacter Archived.\r\n", d);
+      DC::getInstance()->update_wizlist(conn->character);
       close_socket(d);
       util_archive(str_tmp.str().c_str(), 0);
     }
     else
     {
-      STATE(d) = Connection::states::SELECT_MENU;
-      SEND_TO_Q(menu, d);
+      conn->connected = Connection::states::SELECT_MENU;
+      write_to_output(DC::getInstance()->menu, d);
     }
     break;
 
   case Connection::states::DELETE_CHAR:
     if (arg == "ERASE ME")
     {
-      sprintf(buf, "%s just deleted themself.", d->character->getNameC());
+      sprintf(buf, "%s just deleted themself.", conn->qPrintable(character->name()));
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 
-      DC::getInstance()->TheAuctionHouse.HandleDelete(d->character->getName());
+      DC::getInstance()->TheAuctionHouse.HandleDelete(conn->character->name());
       // To remove the vault from memory
-      remove_familiars(d->character->getName(), SELFDELETED);
-      remove_vault(d->character->getName(), SELFDELETED);
-      if (d->character->clan)
+      remove_familiars(conn->character->name(), SELFDELETED);
+      DC::getInstance()->vaults_.remove_vault(conn->character->name(), SELFDELETED);
+      if (conn->character->clan)
       {
-        remove_clan_member(d->character->clan, d->character);
+        remove_clan_member(conn->character->clan, conn->character);
       }
-      remove_character(d->character->getName(), SELFDELETED);
+      remove_character(conn->character->name(), SELFDELETED);
 
-      d->character->setLevel(1);
-      DC::getInstance()->update_wizlist(d->character);
+      conn->character->setLevel(1);
+      DC::getInstance()->update_wizlist(conn->character);
       close_socket(d);
-      d = nullptr;
+      d = {};
     }
     else
     {
-      STATE(d) = Connection::states::SELECT_MENU;
-      SEND_TO_Q(menu, d);
+      conn->connected = Connection::states::SELECT_MENU;
+      write_to_output(DC::getInstance()->menu, d);
       telnet_ga(d);
     }
     break;
 
   case Connection::states::CONFIRM_PASSWORD_CHANGE:
-    SEND_TO_Q("\r\n", d);
-    if (std::string(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
+    write_to_output("\r\n", d);
+    if (QString(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
     {
-      SEND_TO_Q("Enter a new password: ", d);
+      write_to_output("Enter a new password: ", d);
       telnet_ga(d);
-      STATE(d) = Connection::states::RESET_PASSWORD;
+      conn->connected = Connection::states::RESET_PASSWORD;
       break;
     }
     else
     {
-      SEND_TO_Q("Incorrect.", d);
-      STATE(d) = Connection::states::SELECT_MENU;
-      SEND_TO_Q(menu, d);
+      write_to_output("Incorrect.", d);
+      conn->connected = Connection::states::SELECT_MENU;
+      write_to_output(DC::getInstance()->menu, d);
     }
     break;
 
   case Connection::states::RESET_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    write_to_output("\r\n", d);
 
     if (arg.length() < 6)
     {
-      SEND_TO_Q("Password must be at least six characters long.\r\nPassword: ", d);
+      write_to_output("Password must be at least six characters long.\r\nPassword: ", d);
       telnet_ga(d);
       return;
     }
-    strncpy(ch->player->pwd, crypt(arg.c_str(), ch->getNameC()), PASSWORD_LEN);
+    strncpy(ch->player->pwd, crypt(arg.c_str(), qPrintable(ch->name())), PASSWORD_LEN);
     ch->player->pwd[PASSWORD_LEN] = '\0';
-    SEND_TO_Q("Please retype password: ", d);
+    write_to_output("Please retype password: ", d);
     telnet_ga(d);
-    STATE(d) = Connection::states::CONFIRM_RESET_PASSWORD;
+    conn->connected = Connection::states::CONFIRM_RESET_PASSWORD;
     break;
 
   case Connection::states::CONFIRM_RESET_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    write_to_output("\r\n", d);
 
-    if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+    if (QString(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
     {
-      SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
+      write_to_output("Passwords don't match.\r\nRetype password: ", d);
       telnet_ga(d);
-      STATE(d) = Connection::states::RESET_PASSWORD;
+      conn->connected = Connection::states::RESET_PASSWORD;
       return;
     }
 
-    SEND_TO_Q("\r\nDone.\r\n", d);
-    SEND_TO_Q(menu, d);
-    STATE(d) = Connection::states::SELECT_MENU;
+    write_to_output("\r\nDone.\r\n", d);
+    write_to_output(DC::getInstance()->menu, d);
+    conn->connected = Connection::states::SELECT_MENU;
     if (ch->getLevel() > 1)
     {
       char blah1[50], blah2[50];
       // this prevents a dupe bug
-      strcpy(blah1, GET_NAME(ch));
+      strcpy(blah1, qPrintable(ch->name()));
       strcpy(blah2, ch->player->pwd);
-      free_char(d->character, Trace("nanny Connection::states::CONFIRM_RESET_PASSWORD"));
-      d->character = 0;
+      free_char(conn->character, Trace("nanny Connection::states::CONFIRM_RESET_PASSWORD"));
+      conn->character = {};
       load_char_obj(d, blah1);
-      ch = d->character;
+      ch = conn->character;
       strcpy(ch->player->pwd, blah2);
       ch->save_char_obj();
-      sprintf(log_buf, "%s password changed", GET_NAME(ch));
+      sprintf(log_buf, "%s password changed", qPrintable(ch->name()));
       logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
     }
 
@@ -1969,7 +1933,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
 // This is mostly just to keep people from putting meta-chars
 // into their email address.
-int _parse_email(char *arg)
+qint32 _parse_email(char *arg)
 {
   if (strlen(arg) < 4)
     return 0;
@@ -1983,15 +1947,15 @@ int _parse_email(char *arg)
 }
 
 // Parse a name for acceptability.
-int _parse_name(const char *arg, char *name)
+qint32 _parse_name(const char *arg, char *name)
 {
-  int i;
+  qint32 i;
 
   /* skip whitespaces */
   for (; isspace(*arg); arg++)
     ;
 
-  for (i = 0; (name[i] = arg[i]) != '\0'; i++)
+  for (i = {}; (name[i] = arg[i]) != '\0'; i++)
   {
     if (name[i] < 0 || !isalpha(name[i]) || i >= MAX_NAME_LENGTH)
       return 1;
@@ -2009,7 +1973,7 @@ int _parse_name(const char *arg, char *name)
 // Check for denial of service.
 bool check_deny(class Connection *d, char *name)
 {
-  FILE *fpdeny = nullptr;
+  FILE *fpdeny = {};
   char strdeny[MAX_INPUT_LENGTH];
   char bufdeny[MAX_STRING_LENGTH];
 
@@ -2019,10 +1983,10 @@ bool check_deny(class Connection *d, char *name)
   fclose(fpdeny);
 
   char log_buf[MAX_STRING_LENGTH] = {};
-  sprintf(log_buf, "Denying access to player %s@%s.", name, d->getPeerOriginalAddress().toString().toStdString().c_str());
+  sprintf(log_buf, "Denying access to player %s@%s.", name, conn->getPeerOriginalAddress().toString(qPrintable()));
   logentry(log_buf, ARCHANGEL, DC::LogChannel::LOG_MORTAL);
   file_to_string(strdeny, bufdeny);
-  SEND_TO_Q(bufdeny, d);
+  write_to_output(bufdeny, d);
   close_socket(d);
   return true;
 }
@@ -2040,7 +2004,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
     if (tmp_ch->isNonPlayer() || tmp_ch->desc != nullptr)
       continue;
 
-    if (str_cmp(GET_NAME(d->character), GET_NAME(tmp_ch)))
+    if (str_cmp(qPrintable(conn->character->name()), qPrintable(tmp_ch->name())))
       continue;
 
     //      if(fReconnect == false)
@@ -2049,20 +2013,20 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
     // unless someone changed their password and didn't save this doesn't seem useful
     // removed 8/29/02..i think this might be related to the bug causing people
     // to morph into other people
-    // if(d->character->player)
-    //  strncpy( d->character->player->pwd, tmp_ch->player->pwd, PASSWORD_LEN );
+    // if(conn->character->player)
+    //  strncpy( conn->character->player->pwd, tmp_ch->player->pwd, PASSWORD_LEN );
     //      }
     //      else {
 
     if (fReconnect == true)
     {
-      free_char(d->character, Trace("check_reconnect"));
-      d->character = tmp_ch;
+      free_char(conn->character, Trace("check_reconnect"));
+      conn->character = tmp_ch;
       tmp_ch->desc = d;
-      tmp_ch->timer = 0;
+      tmp_ch->timer = {};
       tmp_ch->sendln("Reconnecting.");
 
-      QString log_buf = QStringLiteral("%1@%2 has reconnected.").arg(GET_NAME(tmp_ch)).arg(d->getPeerOriginalAddress().toString());
+      QString log_buf = QStringLiteral("%1@%2 has reconnected.").arg(qPrintable(tmp_ch->name())).arg(conn->getPeerOriginalAddress().toString());
       act("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, TO_ROOM, INVIS_NULL);
 
       if (tmp_ch->isMortalPlayer())
@@ -2074,7 +2038,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
         logentry(log_buf, tmp_ch->getLevel(), DC::LogChannel::LOG_SOCKET);
       }
 
-      STATE(d) = Connection::states::PLAYING;
+      conn->connected = Connection::states::PLAYING;
 
       if (tmp_ch->getSetting("mode").startsWith("char"))
       {
@@ -2093,9 +2057,9 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 bool check_playing(class Connection *d, QString name)
 {
   class Connection *dold, *next_d;
-  Character *compare = 0;
+  CharacterPtr compare = {};
 
-  for (dold = DC::getInstance()->descriptor_list; dold; dold = next_d)
+  for (dold = DC::getInstance()->connections_; dold; dold = next_d)
   {
     next_d = dold->next;
 
@@ -2107,19 +2071,19 @@ bool check_playing(class Connection *d, QString name)
     // If this is the case we fail our precondition to str_cmp
     if (name.isEmpty())
       continue;
-    if (GET_NAME(compare) == 0)
+    if (qPrintable(compare->name()) == 0)
       continue;
 
-    if (name != GET_NAME(compare))
+    if (name != qPrintable(compare->name()))
       continue;
 
-    if (STATE(dold) == Connection::states::GET_NAME)
+    if (dold->connected == Connection::states::GET_NAME)
       continue;
 
-    if (STATE(dold) == Connection::states::GET_OLD_PASSWORD)
+    if (dold->connected == Connection::states::GET_OLD_PASSWORD)
     {
       free_char(dold->character, Trace("check_playing"));
-      dold->character = 0;
+      dold->character = {};
       close_socket(dold);
       continue;
     }
@@ -2151,25 +2115,25 @@ void short_activity()
 
 // these are for my special lag that only keeps you from doing certain
 // commands, while still allowing other.
-void add_command_lag(Character *ch, int amount)
+void add_command_lag(CharacterPtr ch, qint32 amount)
 {
   if (ch->isMortalPlayer())
     ch->timer += amount;
 }
 
-int check_command_lag(Character *ch)
+qint32 check_command_lag(CharacterPtr ch)
 {
   return ch->timer;
 }
 
-void remove_command_lag(Character *ch)
+void remove_command_lag(CharacterPtr ch)
 {
-  ch->timer = 0;
+  ch->timer = {};
 }
 
 void update_characters()
 {
-  int tmp, retval;
+  qint32 tmp, retval;
   char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
   affected_type af;
 
@@ -2185,20 +2149,20 @@ void update_characters()
       }
       else
       {
-        csendf(i, "You strain your muscles keeping the %s closed.\r\n", fname(i->brace_at->keyword).toStdString().c_str());
+        i->send(QStringLiteral("You strain your muscles keeping the %s closed.\r\n").arg(qPrintable(fname(i->brace_at->keyword))));
         act("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, TO_ROOM, 0);
       }
     }
     if (IS_AFFECTED(i, AFF_POISON) && !(i->affected_by_spell(SPELL_POISON)))
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getNameC());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", qPrintable(i->name()));
       REMBIT(i->affected_by, AFF_POISON);
     }
 
     // handle poison
     if (IS_AFFECTED(i, AFF_POISON) && !i->fighting && i->affected_by_spell(SPELL_POISON) && i->affected_by_spell(SPELL_POISON)->location == APPLY_NONE)
     {
-      int tmp = number(1, 2) + i->affected_by_spell(SPELL_POISON)->duration;
+      qint32 tmp = number(1, 2) + i->affected_by_spell(SPELL_POISON)->duration;
       if (get_saves(i, SAVE_TYPE_POISON) > number(1, 101))
       {
         tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
@@ -2222,7 +2186,7 @@ void update_characters()
     if (i->isPlayer() && i->isMortalPlayer() && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
     {
       tmp = GET_MAX_HIT(i) / 5;
-      sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), DC::getInstance()->world[i->in_room].number);
+      sprintf(log_msg, "%s drowned in room %d.", qPrintable(i->name()), DC::getInstance()->world[i->in_room].number);
       retval = noncombat_damage(i, tmp, "You gasp your last breath and everything goes dark...", "$n stops struggling as $e runs out of oxygen.", log_msg, KILL_DROWN);
       if (SOMEONE_DIED(retval))
         continue;
@@ -2242,10 +2206,10 @@ void update_characters()
       if (i->isMortalPlayer())
         i->timer--;
       else
-        i->timer = 0;
+        i->timer = {};
     }
 
-    i->shotsthisround = 0;
+    i->shotsthisround = {};
 
     if (IS_AFFECTED(i, AFF_CMAST_WEAKEN))
       REMBIT(i->affected_by, AFF_CMAST_WEAKEN);
@@ -2269,7 +2233,7 @@ void update_characters()
 
 void check_silence_beacons(void)
 {
-  Object *obj, *tmp_obj;
+  ObjectPtr obj, tmp_obj;
 
   for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
   {
@@ -2282,15 +2246,13 @@ void check_silence_beacons(void)
         obj->obj_flags.value[0]--;
     }
   }
-
-  return;
 }
 
-void checkConsecrate(int pulseType)
+void checkConsecrate(qint32 pulseType)
 {
-  Object *obj, *tmp_obj;
-  Character *ch = nullptr, *tmp_ch, *next_ch;
-  int align, amount, spl = 0;
+  ObjectPtr obj, tmp_obj;
+  CharacterPtr ch = {}, tmp_ch, next_ch;
+  qint32 align, amount, spl = {};
   char buf[MAX_STRING_LENGTH];
 
   if (pulseType == DC::PULSE_REGEN)
@@ -2312,14 +2274,14 @@ void checkConsecrate(int pulseType)
               if (spl == SPELL_CONSECRATE)
               {
                 if (ch->in_room != obj->in_room)
-                  csendf(ch, "You sense your consecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
+                  ch->send(QStringLiteral("You sense your consecration of %s has ended.\r\n").arg(DC::getInstance()->world[obj->in_room].name));
                 else
                   ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.");
               }
               else
               {
                 if (ch->in_room != obj->in_room)
-                  csendf(ch, "You sense your desecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
+                  ch->send(QStringLiteral("You sense your desecration of %s has ended.\r\n").arg(DC::getInstance()->world[obj->in_room].name));
                 else
                   ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.");
               }
@@ -2495,7 +2457,6 @@ void checkConsecrate(int pulseType)
     }
   }
   DC::getInstance()->removeDead();
-  return;
 }
 
 /* check name to see if it is listed in the file of forbidden player names */
@@ -2504,7 +2465,7 @@ bool on_forbidden_name_list(const char *name)
   FILE *nameList;
   char buf[MAX_STRING_LENGTH + 1];
   bool found = false;
-  int i;
+  qint32 i;
 
   nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
   if (!nameList)
@@ -2529,16 +2490,16 @@ bool on_forbidden_name_list(const char *name)
 
 void show_question_race(Connection *d)
 {
-  if (d == nullptr || d->character == nullptr)
+  if (d == nullptr || conn->character == nullptr)
   {
     return;
   }
 
-  Character *ch = d->character;
-  std::string buffer, races_buffer;
+  CharacterPtr ch = conn->character;
+  QString buffer, races_buffer;
   buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
   buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
-  for (int race = 1; race <= 9; race++)
+  for (qint32 race = 1; race <= 9; race++)
   {
     if (races[race].singular_name != nullptr)
     {
@@ -2554,27 +2515,27 @@ void show_question_race(Connection *d)
     ch->undo_race_saves();
   }
   buffer += "Type 1-" + std::to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
-  SEND_TO_Q(buffer.c_str(), d);
+  write_to_output(buffer.c_str(), d);
   telnet_ga(d);
 }
 
-bool handle_get_race(Connection *d, std::string arg)
+bool handle_get_race(Connection *d, QString arg)
 {
-  if (d == nullptr || d->character == nullptr || arg == "")
+  if (d == nullptr || conn->character == nullptr || arg == "")
   {
     return false;
   }
 
-  for (unsigned race = 1; race <= 9; race++)
+  for (quint32 race = 1; race <= 9; race++)
   {
     if (races[race].lowercase_name == arg)
     {
-      GET_RACE(d->character) = race;
+      conn->character->race = race;
       return true;
     }
   }
 
-  uint32_t race = 0;
+  quint32 race = {};
   try
   {
     race = stoul(arg);
@@ -2589,35 +2550,35 @@ bool handle_get_race(Connection *d, std::string arg)
     return false;
   }
 
-  GET_RACE(d->character) = race;
-  apply_race_attributes(d->character);
+  conn->character->race = race;
+  apply_race_attributes(conn->character);
 
   return true;
 }
 
 void show_question_class(Connection *d)
 {
-  if (d == nullptr || d->character == nullptr)
+  if (d == nullptr || conn->character == nullptr)
   {
     return;
   }
 
-  Character *ch = d->character;
-  std::string buffer, classes_buffer;
+  CharacterPtr ch = conn->character;
+  QString buffer, classes_buffer;
   buffer += "\r\n   Class$R\r\n";
-  int clss;
+  qint32 clss;
   for (clss = 1; clss <= CLASS_MAX_PROD; clss++)
   {
     if (pc_clss_types[clss] != nullptr)
     {
-      if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
+      if (!is_clss_race_compat(ch, clss, ch->race))
       {
         buffer += fmt::format("{:2}. {:11} (Unavailble for your race)\r\n", clss, pc_clss_types[clss]);
       }
       else
       {
         buffer += fmt::format("{:2}. {:11}\r\n", clss, pc_clss_types[clss]);
-        classes_buffer += std::string(pc_clss_types3[clss]);
+        classes_buffer += QString(pc_clss_types3[clss]);
         if (clss < CLASS_MAX_PROD)
         {
           classes_buffer += ",";
@@ -2628,42 +2589,42 @@ void show_question_class(Connection *d)
 
   buffer += "Type 'back' to go back and pick a different race.\r\n";
   buffer += "Type '1-" + std::to_string(CLASS_MAX_PROD) + "," + classes_buffer + "' or 'help keyword': ";
-  SEND_TO_Q(buffer.c_str(), d);
+  write_to_output(buffer.c_str(), d);
   telnet_ga(d);
 }
 
-bool handle_get_class(Connection *d, std::string arg)
+bool handle_get_class(Connection *d, QString arg)
 {
-  if (d == nullptr || d->character == nullptr || arg == "")
+  if (d == nullptr || conn->character == nullptr || arg == "")
   {
     return false;
   }
 
   if (arg == "back")
   {
-    STATE(d) = Connection::states::QUESTION_RACE;
+    conn->connected = Connection::states::QUESTION_RACE;
     return false;
   }
 
-  const Character *ch = d->character;
+  const CharacterPtr ch = conn->character;
 
-  for (unsigned clss = 1; clss <= CLASS_MAX_PROD; clss++)
+  for (quint32 clss = 1; clss <= CLASS_MAX_PROD; clss++)
   {
-    if (std::string(pc_clss_types[clss]) == std::string(arg) || std::string(pc_clss_types3[clss]) == std::string(arg))
+    if (QString(pc_clss_types[clss]) == QString(arg) || QString(pc_clss_types3[clss]) == QString(arg))
     {
-      if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
+      if (!is_clss_race_compat(ch, clss, ch->race))
       {
         return false;
       }
       else
       {
-        GET_CLASS(d->character) = clss;
+        GET_CLASS(conn->character) = clss;
         return true;
       }
     }
   }
 
-  uint32_t clss = 0;
+  quint32 clss = {};
   try
   {
     clss = stoul(arg);
@@ -2673,21 +2634,21 @@ bool handle_get_class(Connection *d, std::string arg)
     return false;
   }
 
-  if (clss < 1 || clss > CLASS_MAX_PROD || !is_clss_race_compat(ch, clss, GET_RACE(ch)))
+  if (clss < 1 || clss > CLASS_MAX_PROD || !is_clss_race_compat(ch, clss, ch->race))
   {
     return false;
   }
 
-  GET_CLASS(d->character) = clss;
+  GET_CLASS(conn->character) = clss;
 
   return true;
 }
 
-uint8_t stat_data::getMin(uint8_t cur, int8_t race_mod, uint8_t min)
+quint8 stat_data::getMin(quint8 cur, qint8 race_mod, quint8 min)
 {
   if (min > cur + race_mod)
   {
-    uint8_t points_needed = min - (cur + race_mod);
+    quint8 points_needed = min - (cur + race_mod);
     if (points > points_needed)
     {
       points -= points_needed;
@@ -2709,98 +2670,98 @@ void stat_data::setMin(void)
 
 void show_question_stats(Connection *d)
 {
-  if (d == nullptr || d->character == nullptr)
+  if (d == nullptr || conn->character == nullptr)
   {
     return;
   }
 
-  if (d->stats == nullptr)
+  if (conn->stats == nullptr)
   {
-    d->stats = new stat_data;
+    conn->stats = new stat_data;
 
-    Character *ch = d->character;
-    int32_t race = d->stats->race = GET_RACE(ch);
-    int8_t clss = d->stats->clss = GET_CLASS(ch);
+    CharacterPtr ch = conn->character;
+    qint32 race = conn->stats->race = ch->race;
+    qint8 clss = conn->stats->clss = GET_CLASS(ch);
 
     // Current
-    d->stats->str[0] = 12;
-    d->stats->dex[0] = 12;
-    d->stats->con[0] = 12;
-    d->stats->tel[0] = 12;
-    d->stats->wis[0] = 12;
+    conn->stats->str[0] = 12;
+    conn->stats->dex[0] = 12;
+    conn->stats->con[0] = 12;
+    conn->stats->tel[0] = 12;
+    conn->stats->wis[0] = 12;
 
-    d->stats->points = 23;
+    conn->stats->points = 23;
 
-    d->stats->setMin();
+    conn->stats->setMin();
   }
 
-  Character *ch = d->character;
-  unsigned race = GET_RACE(ch);
-  unsigned clss = GET_CLASS(ch);
-  std::string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
+  CharacterPtr ch = conn->character;
+  quint32 race = ch->race;
+  quint32 clss = GET_CLASS(ch);
+  QString buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
   buffer += fmt::format("Class: {}\r\n", classes[clss].name);
-  buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
+  buffer += fmt::format("Points left to assign: {}\r\n", conn->stats->points);
   buffer += fmt::format("## Attribute      Current  Racial Offsets  Total\r\n");
-  if (d->stats->selection == attribute_t::STRENGTH)
+  if (conn->stats->selection == attribute_t::STRENGTH)
   {
     buffer += fmt::format("1. $B*Strength*$R     {:2}      {:2}               {:2}\r\n",
-                          d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
+                          conn->stats->str[0], races[race].mod_str, conn->stats->str[0] + races[race].mod_str);
   }
   else
   {
     buffer += fmt::format("1. Strength       {:2}      {:2}               {:2}\r\n",
-                          d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
+                          conn->stats->str[0], races[race].mod_str, conn->stats->str[0] + races[race].mod_str);
   }
 
-  if (d->stats->selection == attribute_t::DEXTERITY)
+  if (conn->stats->selection == attribute_t::DEXTERITY)
   {
     buffer += fmt::format("2. $B*Dexterity*$R    {:2}      {:2}               {:2}\r\n",
-                          d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
+                          conn->stats->dex[0], races[race].mod_dex, conn->stats->dex[0] + races[race].mod_dex);
   }
   else
   {
     buffer += fmt::format("2. Dexterity      {:2}      {:2}               {:2}\r\n",
-                          d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
+                          conn->stats->dex[0], races[race].mod_dex, conn->stats->dex[0] + races[race].mod_dex);
   }
 
-  if (d->stats->selection == attribute_t::INTELLIGENCE)
+  if (conn->stats->selection == attribute_t::INTELLIGENCE)
   {
     buffer += fmt::format("3. $B*Intelligence*$R {:2}      {:2}               {:2}\r\n",
-                          d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
+                          conn->stats->tel[0], races[race].mod_int, conn->stats->tel[0] + races[race].mod_int);
   }
   else
   {
     buffer += fmt::format("3. Intelligence   {:2}      {:2}               {:2}\r\n",
-                          d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
+                          conn->stats->tel[0], races[race].mod_int, conn->stats->tel[0] + races[race].mod_int);
   }
 
-  if (d->stats->selection == attribute_t::WISDOM)
+  if (conn->stats->selection == attribute_t::WISDOM)
   {
     buffer += fmt::format("4. $B*Wisdom*$R       {:2}      {:2}               {:2}\r\n",
-                          d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
+                          conn->stats->wis[0], races[race].mod_wis, conn->stats->wis[0] + races[race].mod_wis);
   }
   else
   {
     buffer += fmt::format("4. Wisdom         {:2}      {:2}               {:2}\r\n",
-                          d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
+                          conn->stats->wis[0], races[race].mod_wis, conn->stats->wis[0] + races[race].mod_wis);
   }
 
-  if (d->stats->selection == attribute_t::CONSTITUTION)
+  if (conn->stats->selection == attribute_t::CONSTITUTION)
   {
     buffer += fmt::format("5. $B*Constitution*$R {:2}      {:2}               {:2}\r\n",
-                          d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+                          conn->stats->con[0], races[race].mod_con, conn->stats->con[0] + races[race].mod_con);
   }
   else
   {
     buffer += fmt::format("5. Constitution   {:2}      {:2}               {:2}\r\n",
-                          d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+                          conn->stats->con[0], races[race].mod_con, conn->stats->con[0] + races[race].mod_con);
   }
 
-  if (d->stats->selection == attribute_t::UNDEFINED)
+  if (conn->stats->selection == attribute_t::UNDEFINED)
   {
     buffer += "Type 1-5 or help strength,wisdom,etc: ";
   }
-  else if (d->stats->points > 0)
+  else if (conn->stats->points > 0)
   {
     buffer += "Type max, +, -, 1-5, confirm or help strength,wisdom,etc: ";
   }
@@ -2808,73 +2769,73 @@ void show_question_stats(Connection *d)
   {
     buffer += "Type -, 1-5, confirm or help strength,wisdom,etc: ";
   }
-  SEND_TO_Q(buffer.c_str(), d);
+  write_to_output(buffer.c_str(), d);
   telnet_ga(d);
 }
 
-bool handle_get_stats(Connection *d, std::string arg)
+bool handle_get_stats(Connection *d, QString arg)
 {
   if (arg != "+" && arg != "-" && arg != "confirm" && arg != "max")
   {
-    unsigned long input{};
+    quint32 long input = {};
     try
     {
       input = stoul(arg);
     }
     catch (...)
     {
-      input = 0;
+      input = {};
     }
 
     if (input >= 0 || input <= 5)
     {
-      d->stats->selection = static_cast<decltype(d->stats->selection)>(input);
+      conn->stats->selection = static_cast<decltype(conn->stats->selection)>(input);
     }
     else
     {
-      d->stats->selection = attribute_t::UNDEFINED;
-      SEND_TO_Q("Invalid number specified.\r\n", d);
+      conn->stats->selection = attribute_t::UNDEFINED;
+      write_to_output("Invalid number specified.\r\n", d);
     }
 
     return false;
   }
 
-  if (d->stats->selection != attribute_t::UNDEFINED)
+  if (conn->stats->selection != attribute_t::UNDEFINED)
   {
     if (arg == "+")
     {
-      d->stats->increase(1);
+      conn->stats->increase(1);
     }
     else if (arg == "max")
     {
-      d->stats->increase(d->stats->points);
+      conn->stats->increase(conn->stats->points);
     }
     else if (arg == "-")
     {
-      d->stats->decrease(1);
-      d->stats->setMin();
+      conn->stats->decrease(1);
+      conn->stats->setMin();
     }
     else if (arg.find("help") == 0)
     {
       arg.erase(0, 5);
-      do_help(d->character, arg.data());
+      do_help(conn->character, arg.data());
       return false;
     }
     else if (arg == "confirm")
     {
-      if (d->stats->points > 0)
+      if (conn->stats->points > 0)
       {
-        SEND_TO_Q("You must assign all your points first.\r\n", d);
+        write_to_output("You must assign all your points first.\r\n", d);
         return false;
       }
 
-      Character *ch = d->character;
-      unsigned race = GET_RACE(ch);
-      GET_RAW_STR(ch) = d->stats->str[0];
-      GET_RAW_DEX(ch) = d->stats->dex[0];
-      GET_RAW_CON(ch) = d->stats->con[0];
-      GET_RAW_INT(ch) = d->stats->tel[0];
-      GET_RAW_WIS(ch) = d->stats->wis[0];
+      CharacterPtr ch = conn->character;
+      quint32 race = ch->race;
+      GET_RAW_STR(ch) = conn->stats->str[0];
+      GET_RAW_DEX(ch) = conn->stats->dex[0];
+      GET_RAW_CON(ch) = conn->stats->con[0];
+      GET_RAW_INT(ch) = conn->stats->tel[0];
+      GET_RAW_WIS(ch) = conn->stats->wis[0];
       apply_race_attributes(ch);
 
       if (GET_CLASS(ch) == CLASS_ANTI_PAL)
@@ -2895,7 +2856,7 @@ bool handle_get_stats(Connection *d, std::string arg)
   return false;
 }
 
-bool apply_race_attributes(Character *ch, int race)
+bool apply_race_attributes(CharacterPtr ch, qint32 race)
 {
   if (ch == nullptr)
   {
@@ -2992,7 +2953,7 @@ bool apply_race_attributes(Character *ch, int race)
     break;
   case 9:
     ch->race = RACE_TROLL;
-    ch->alignment = 0;
+    ch->alignment = {};
     GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
     GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
     GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
@@ -3009,7 +2970,7 @@ bool apply_race_attributes(Character *ch, int race)
   return false;
 }
 
-bool check_race_attributes(Character *ch, int race)
+bool check_race_attributes(CharacterPtr ch, qint32 race)
 {
   if (ch == nullptr)
   {
@@ -3138,7 +3099,7 @@ bool check_race_attributes(Character *ch, int race)
       return false;
     }
     ch->race = RACE_TROLL;
-    ch->alignment = 0;
+    ch->alignment = {};
     GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
     GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
     GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
@@ -3165,14 +3126,14 @@ stat_data::stat_data(void)
   memset(wis, 0, sizeof(wis));
 }
 
-bool stat_data::increase(uint64_t number)
+bool stat_data::increase(quint64 number)
 {
   if (points <= 0)
   {
     return false;
   }
 
-  int *attribute_to_change = nullptr;
+  qint32 *attribute_to_change = {};
   switch (selection)
   {
   case attribute_t::STRENGTH:
@@ -3223,7 +3184,7 @@ bool stat_data::increase(uint64_t number)
     number = points;
   }
 
-  uint64_t diff_from_natural_max = 18 - *attribute_to_change;
+  quint64 diff_from_natural_max = 18 - *attribute_to_change;
   if (number > diff_from_natural_max)
   {
     number = diff_from_natural_max;
@@ -3234,9 +3195,9 @@ bool stat_data::increase(uint64_t number)
   return true;
 }
 
-bool stat_data::decrease(uint64_t number)
+bool stat_data::decrease(quint64 number)
 {
-  int *attribute_to_change = nullptr;
+  qint32 *attribute_to_change = {};
   switch (selection)
   {
   case attribute_t::STRENGTH:

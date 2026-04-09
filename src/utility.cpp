@@ -29,6 +29,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <ctime>
+#include <qnamespace.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -39,26 +40,22 @@
 
 #include <iostream>
 #include <sstream>
-#include <map>
-#include <algorithm>
+#include <QMap>
 
 #include <fmt/format.h>
 #include <QRandomGenerator>
 #include <QString>
 
 #include "DC/innate.h"
+#include "DC/levels.h"
 #include "DC/structs.h"
 #include "DC/player.h"
-#include "DC/timeinfo.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/room.h"
+
 #include "DC/DC.h"
+
 #include "DC/interp.h"
-#include "DC/mobile.h"
+
 #include "DC/handler.h"
-#include "DC/db.h"
-#include "DC/connect.h"
 #include "DC/act.h"
 #include "DC/spells.h"
 #include "DC/clan.h"
@@ -66,24 +63,20 @@
 #include "DC/returnvals.h"
 #include "DC/set.h"
 #include "DC/const.h"
-#include "DC/memory.h"
+#include "DC/comm.h"
 
-#ifndef GZIP
-#define GZIP "gzip"
-#endif
-
-extern std::map<int, std::map<uint8_t, std::string>> professions;
+extern QMap<qint32, QMap<quint8, QString>> professions;
 
 // extern funcs
-clan_data *get_clan(Character *);
-void release_message(Character *ch);
-timer_data *timer_list = nullptr;
+Clan *get_clan(CharacterPtr);
+void release_message(CharacterPtr ch);
+timer_data *timer_list = {};
 
 // tested in TestUtility::test_nocolor_strlen_qstring
 std::size_t nocolor_strlen(const QStringView str)
 {
-  size_t len{};
-  bool decode_color{};
+  size_t len = {};
+  bool decode_color = {};
 
   for (const auto &s : str)
   {
@@ -136,7 +129,7 @@ size_t nocolor_strlen(const char *s)
     return 0;
   }
 
-  size_t len = 0;
+  size_t len = {};
 
   while (*s != '\0')
   {
@@ -177,43 +170,15 @@ size_t nocolor_strlen(const char *s)
   return len;
 }
 
-// This function is like str_dup except it returns 0 if passed 0
-// tested in TestUtility::test_str_dup0
-char *str_dup0(const char *str)
-{
-  if (str == 0)
-  {
-    return 0;
-  }
-
-  return str_dup(str);
-}
-
-// duplicate a string with it's own memory
-// tested in TestUtility::test_str_dup
-char *str_dup(const char *str)
-{
-  char *str_new = 0;
-  size_t strlength = strlen(str);
-
-  str_new = (char *)dc_alloc(strlength + 1, sizeof(char));
-
-  if (!str_new)
-  {
-    qFatal("NO MEMORY DUPLICATING STRING!");
-  }
-  return strncpy(str_new, str, strlength);
-}
-
 // simulates a dice roll
 // basically we assign the total to the number of dice (since you always
 // roll at least a one with each die) then add a random MOD of the die
 // size.  ie, 4d10 would be 4 + loop*4 (0-9)
 // tested in TestUtility::test_dice
-int dice(int num, int size, QRandomGenerator *rng)
+qint32 dice(qint32 num, qint32 size, QRandomGenerator *rng)
 {
-  int r;
-  int sum = 0;
+  qint32 r;
+  qint32 sum = {};
 
   if (size < 1)
     return 1;
@@ -226,99 +191,54 @@ int dice(int num, int size, QRandomGenerator *rng)
 
 // compare strings but ignore case (unlike strcmp)
 // tested in TestUtility::test_str_cmp
-int str_cmp(const char *arg1, const char *arg2)
+qint32 str_cmp(QString arg1, QString arg2)
 {
-  int check, i;
-
-  assert(arg1 && arg2);
-
-  if (!arg1 || !arg2)
-  {
-    logentry(QStringLiteral("nullptr args sent to str_cmp in utility.c!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return -1;
-  }
-
-  for (i = 0; arg1[i] || arg2[i]; i++)
-  {
-    check = LOWER(arg1[i]) - LOWER(arg2[i]);
-    if (check < 0)
-      return -1;
-    if (check > 0)
-      return 1;
-  }
-
-  return 0;
+  return arg1.compare(arg2, Qt::CaseInsensitive);
 }
 
 // Tested in TestUtility::test_str_nospace
-char *str_nospace(const char *stri)
+QString str_nospace(QString stri)
 {
-  if (!stri)
-    return "";
-
-  char *stri_new = str_dup(stri);
-  int i = 0;
-
-  while (*(stri + i))
-  {
-    if (*(stri + i) == ' ')
-      stri_new[i] = '_';
-    i++;
-  }
-  return stri_new; // Must be freed by caller to avoid memory leak
+  return stri.replace(' ', '_');
 }
 
 // compare strings but ignore case and change all spaces to underscores
 // Tested in TestUtility::test_str_nosp_cmp_c_string
-int str_nosp_cmp(const char *arg1, const char *arg2)
+bool str_nosp_equal(QString arg1, QString arg2)
 {
-  char *tmp_arg1 = str_nospace(arg1);
-  char *tmp_arg2 = str_nospace(arg2);
-  int retval = str_cmp(tmp_arg1, tmp_arg2);
-  dc_free(tmp_arg2);
-  dc_free(tmp_arg1);
-
-  return retval;
-}
-
-// Tested in TestUtility::test_str_nosp_cmp_qtring
-int str_nosp_cmp(QString arg1, QString arg2)
-{
-  return str_nosp_cmp(arg1.toStdString().c_str(), arg2.toStdString().c_str());
+  return str_nospace(arg1) == str_nospace(arg2);
 }
 
 // Tested in TestUtility::test_str_n_nosp_cmp_c_string
-int str_n_nosp_cmp(const char *arg1, const char *arg2, int size)
+bool str_n_nosp_equal(QString arg1, QString arg2, qsizetype pos)
 {
-  char *tmp_arg1 = str_nospace(arg1);
-  char *tmp_arg2 = str_nospace(arg2);
-  int retval = strncasecmp(tmp_arg1, tmp_arg2, size);
-  dc_free(tmp_arg2);
-  dc_free(tmp_arg1);
-
-  return retval;
+  auto tmp_arg1 = str_nospace(arg1);
+  tmp_arg1.truncate(pos);
+  auto tmp_arg2 = str_nospace(arg2);
+  tmp_arg2.truncate(pos);
+  return tmp_arg1 == tmp_arg2;
 }
 
 // TODO - Declare these in a more appropriate place
-FILE *bug_log = 0;
-FILE *god_log = 0;
-FILE *mortal_log = 0;
-FILE *socket_log = 0;
-FILE *player_log = 0;
-FILE *world_log = 0;
-FILE *arena_log = 0;
-FILE *clan_log = 0;
-FILE *objects_log = 0;
-FILE *quest_log = 0;
-FILE *vault_log = 0;
+FILE *bug_log = {};
+FILE *god_log = {};
+FILE *mortal_log = {};
+FILE *socket_log = {};
+FILE *player_log = {};
+FILE *world_log = {};
+FILE *arena_log = {};
+FILE *clan_log = {};
+FILE *objects_log = {};
+FILE *quest_log = {};
+FILE *vault_log = {};
 
-// writes a std::string to the log
-void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *vict)
+// writes a QString to the log
+void logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
-  FILE **f = 0;
-  int stream = 1;
+  FILE **f = {};
+  qint32 stream = 1;
   std::stringstream logpath;
-  // DC *dc = dynamic_cast<DC *>(DC::instance());
+  // DCPtr dc = dynamic_cast<DCPtr >(DC::instance());
   // DC::config &cf = dc->cf;
 
   if (DC::getInstance()->cf.bport)
@@ -330,7 +250,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
     logpath << "../log/";
   }
 
-  if (type == DC::LogChannel::LOG_PLAYER && vict && !vict->getName().isEmpty())
+  if (type == DC::LogChannel::LOG_PLAYER && vict && !vict->name().isEmpty())
   {
     logpath << PLAYER_DIR;
   }
@@ -352,7 +272,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
   switch (type)
   {
   default:
-    stream = 0;
+    stream = {};
     break;
   case DC::LogChannel::LOG_BUG:
     f = &bug_log;
@@ -365,7 +285,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
     // TODO - need some sort of thing to automatically have bugs switch from file to
     //        to non-file when we're up in gdb
 
-    // stream = 0;
+    // stream = {};
     //  I want bugs to be right in the gdblog.
     //  -Sadus
 
@@ -396,9 +316,9 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
     break;
   case DC::LogChannel::LOG_PLAYER:
     f = &player_log;
-    if (vict && !vict->getName().isEmpty())
+    if (vict && !vict->name().isEmpty())
     {
-      logpath << vict->getName().toStdString();
+      logpath << vict->name().toStdString();
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
         qCritical(qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
@@ -482,7 +402,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
 
   if (stream != STDIN_FILENO)
   {
-    fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
+    qfprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
     fclose(*f);
   }
 
@@ -577,14 +497,14 @@ void logworld(QString message)
 
 // function for new SETBIT et al. commands
 // leading space until all calling functions cleaned up
-void sprintbit(uint value[], const char *names[], char *result)
+void sprintbit(uint value[], const QStringList names, char *result)
 {
-  int i;
+  qint32 i;
   *result = '\0';
 
-  for (i = 0; *names[i] != '\n'; i++)
+  for (i = {}; *names[i] != '\n'; i++)
   {
-    int a = i / ASIZE;
+    qint32 a = i / ASIZE;
     if (isSet(value[a], 1 << (i - a * 32)))
     {
       if (!strcmp(names[i], "UNUSED"))
@@ -599,14 +519,14 @@ void sprintbit(uint value[], const char *names[], char *result)
 }
 
 // no leading space
-std::string sprintbit(uint value[], const char *names[])
+QString sprintbit(uint value[], const QStringList names)
 {
-  int i;
-  std::string result;
+  qint32 i;
+  QString result;
 
-  for (i = 0; *names[i] != '\n'; i++)
+  for (i = {}; *names[i] != '\n'; i++)
   {
-    int a = i / ASIZE;
+    qint32 a = i / ASIZE;
     if (isSet(value[a], 1 << (i - a * 32)))
     {
       if (!strcmp(names[i], "UNUSED"))
@@ -631,9 +551,9 @@ std::string sprintbit(uint value[], const char *names[])
 }
 
 // leading space until all calling functions cleaned up
-void sprintbit(uint32_t vektor, const char *names[], char *result)
+void sprintbit(quint32 vektor, const QStringList names, char *result)
 {
-  int32_t nr;
+  qint32 nr;
 
   *result = '\0';
 
@@ -643,7 +563,7 @@ void sprintbit(uint32_t vektor, const char *names[], char *result)
     return;
   }
 
-  for (nr = 0; vektor; vektor >>= 1)
+  for (nr = {}; vektor; vektor >>= 1)
   {
     if (isSet(1, vektor))
     {
@@ -665,9 +585,9 @@ void sprintbit(uint32_t vektor, const char *names[], char *result)
 }
 
 // leading space until all calling functions cleaned up
-void sprintbit(uint32_t vektor, QStringList names, char *result)
+void sprintbit(quint32 vektor, QStringList names, char *result)
 {
-  int32_t nr;
+  qint32 nr;
 
   *result = '\0';
 
@@ -677,7 +597,7 @@ void sprintbit(uint32_t vektor, QStringList names, char *result)
     return;
   }
 
-  for (nr = 0; vektor; vektor >>= 1)
+  for (nr = {}; vektor; vektor >>= 1)
   {
     if (isSet(1, vektor))
     {
@@ -697,9 +617,9 @@ void sprintbit(uint32_t vektor, QStringList names, char *result)
 }
 
 // leading space until all calling functions cleaned up
-QString sprintbit(uint32_t vektor, QStringList names)
+QString sprintbit(quint32 vektor, QStringList names)
 {
-  int32_t nr;
+  qint32 nr;
   QString result;
 
   if (vektor < 0)
@@ -708,7 +628,7 @@ QString sprintbit(uint32_t vektor, QStringList names)
     return {};
   }
 
-  for (nr = 0; vektor; vektor >>= 1)
+  for (nr = {}; vektor; vektor >>= 1)
   {
     if (isSet(1, vektor))
     {
@@ -732,11 +652,11 @@ QString sprintbit(uint32_t vektor, QStringList names)
 }
 
 // no leading space
-std::string sprintbit(uint32_t vektor, const char *names[])
+QString sprintbit(quint32 vektor, const QStringList names)
 {
-  int32_t nr;
+  qint32 nr;
 
-  std::string result = {};
+  QString result = {};
 
   if (vektor < 0)
   {
@@ -744,7 +664,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
     return result;
   }
 
-  for (nr = 0; vektor; vektor >>= 1)
+  for (nr = {}; vektor; vektor >>= 1)
   {
     if (isSet(1, vektor))
     {
@@ -778,7 +698,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
   return result;
 }
 
-void sprinttype(uint64_t type, QStringList names, char *result)
+void sprinttype(quint64 type, QStringList names, char *result)
 {
   if (result)
   {
@@ -786,16 +706,16 @@ void sprinttype(uint64_t type, QStringList names, char *result)
   }
 }
 
-QString sprinttype(uint64_t type, QStringList names)
+QString sprinttype(quint64 type, QStringList names)
 {
   return names.value(type, "Undefined");
 }
 
-std::string sprinttype(int type, const char *names[])
+QString sprinttype(qint32 type, const QStringList names)
 {
-  int nr;
+  qint32 nr;
 
-  for (nr = 0; *names[nr] != '\n'; nr++)
+  for (nr = {}; *names[nr] != '\n'; nr++)
     ;
   if (type > -1 && type < nr)
     return names[type];
@@ -803,16 +723,16 @@ std::string sprinttype(int type, const char *names[])
     return "Undefined";
 }
 
-std::string sprinttype(int type, item_types_t names)
+QString sprinttype(qint32 type, item_types_t names)
 {
   return names.value(type, "Undefined").toStdString();
 }
 
-int consttype(char *search_str, const char *names[])
+qint32 consttype(char *search_str, const QStringList names)
 {
-  int nr;
+  qint32 nr;
 
-  for (nr = 0; *names[nr] != '\n'; nr++)
+  for (nr = {}; *names[nr] != '\n'; nr++)
     if (is_abbrev(search_str, names[nr]))
       return nr;
 
@@ -832,10 +752,10 @@ QString constindex(const qsizetype index, const QStringList names)
 // Calculate the MUD time passed over the last t2-t1 centuries (secs)
 time_info_data mud_time_passed(time_t t2, time_t t1)
 {
-  int32_t secs;
+  qint32 secs;
   time_info_data now;
 
-  secs = (int32_t)(t2 - t1);
+  secs = (qint32)(t2 - t1);
 
   now.hours = (secs / SECS_PER_MUD_HOUR) % 24; /* 0..23 hours */
   secs -= SECS_PER_MUD_HOUR * now.hours;
@@ -884,23 +804,23 @@ bool file_exists(const char *filename)
   return true;
 }
 
-void util_archive(const char *char_name, Character *caller)
+void util_archive(const char *char_name, CharacterPtr caller)
 {
   char buf[256];
   char buf2[256];
-  int i;
+  qint32 i;
 
   // Ok, ok, we'll do some sanity checking on the
-  // std::string to make sure that it has no meta chars in
+  // QString to make sure that it has no meta chars in
   // it.  Grumble. -Morc
-  for (i = 0; (unsigned)i < strlen(char_name); i++)
+  for (i = {}; (quint32)i < strlen(char_name); i++)
   {
     if (!isalpha(char_name[i]))
     {
       if (caller)
       {
         sprintf(buf, "Illegal archive attempt: %s by %s.",
-                char_name, GET_NAME(caller));
+                char_name, qPrintable(caller->name()));
         logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
@@ -923,7 +843,7 @@ void util_archive(const char *char_name, Character *caller)
       logentry(QStringLiteral("Attempt to archive a non-existent char."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
-  sprintf(buf, "%s -9 %s/%c/%s", GZIP, SAVE_DIR, UPPER(char_name[0]), char_name);
+  sprintf(buf, "gzip -9 %s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
   if (system(buf))
   {
     sprintf(buf, "Unsuccessful archive: %s", char_name);
@@ -942,20 +862,20 @@ void util_archive(const char *char_name, Character *caller)
   logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
-void util_unarchive(char *char_name, Character *caller)
+void util_unarchive(char *char_name, CharacterPtr caller)
 {
   char buf[256];
   char buf2[256];
-  int i;
+  qint32 i;
 
-  for (i = 0; (unsigned)i < strlen(char_name); i++)
+  for (i = {}; (quint32)i < strlen(char_name); i++)
   {
     if (!isalpha(char_name[i]))
     {
       if (caller)
       {
         sprintf(buf, "Illegal unarchive attempt: %s by %s.", char_name,
-                GET_NAME(caller));
+                qPrintable(caller->name()));
         logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
@@ -977,7 +897,7 @@ void util_unarchive(char *char_name, Character *caller)
       caller->sendln("Character not archived or already deleted!");
     return;
   }
-  sprintf(buf, "%s -d %s/%s.gz", GZIP, ARCHIVE_DIR, char_name);
+  sprintf(buf, "gzip -d %s/%s.gz", ARCHIVE_DIR, char_name);
   if (system(buf))
   {
     sprintf(buf, "Unsuccessful unarchive: %s", char_name);
@@ -996,7 +916,7 @@ void util_unarchive(char *char_name, Character *caller)
   logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
-bool ARE_CLANNED(Character *sub, Character *obj)
+bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj)
 {
   if (sub->isPlayer() &&
       obj->isNonPlayer() &&
@@ -1014,9 +934,9 @@ bool ARE_CLANNED(Character *sub, Character *obj)
   return true;
 }
 
-int DARK_AMOUNT(int room)
+qint32 DARK_AMOUNT(qint32 room)
 {
-  int glow = DC::getInstance()->world[room].light;
+  qint32 glow = DC::getInstance()->world[room].light;
 
   // indoors and cities are always lit
   if (DC::getInstance()->world[room].sector_type == SECT_INSIDE ||
@@ -1039,9 +959,9 @@ int DARK_AMOUNT(int room)
 // 0 to + is light
 // -1 to - is dark
 // SUN_DARK = -1
-bool IS_DARK(int room)
+bool IS_DARK(qint32 room)
 {
-  int glow = DARK_AMOUNT(room);
+  qint32 glow = DARK_AMOUNT(room);
 
   if (glow < 0)
     return true;
@@ -1049,10 +969,10 @@ bool IS_DARK(int room)
   return false;
 }
 
-bool ARE_GROUPED(Character *sub, Character *obj)
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj)
 {
   follow_type *f;
-  Character *k;
+  CharacterPtr k;
 
   if (obj == sub)
     return true;
@@ -1084,9 +1004,9 @@ bool ARE_GROUPED(Character *sub, Character *obj)
   return false;
 }
 
-int SWAP_CH_VICT(int value)
+qint32 SWAP_CH_VICT(qint32 value)
 {
-  int newretval = 0;
+  qint32 newretval = {};
 
   if (isSet(value, ReturnValue::eCH_DIED))
     SET_BIT(newretval, ReturnValue::eVICT_DIED);
@@ -1101,14 +1021,14 @@ int SWAP_CH_VICT(int value)
   return newretval;
 }
 
-bool SOMEONE_DIED(int value)
+bool SOMEONE_DIED(qint32 value)
 {
   if (isSet(value, ReturnValue::eCH_DIED) || isSet(value, ReturnValue::eVICT_DIED))
     return true;
   return false;
 }
 
-bool CAN_SEE(Character *sub, Character *obj, bool noprog)
+bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 {
   if (obj == sub)
     return true;
@@ -1142,7 +1062,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   if (!noprog && obj->isNonPlayer())
   {
-    int prog = sub->mprog_can_see_trigger(obj);
+    qint32 prog = sub->mprog_can_see_trigger(obj);
     if (isSet(prog, ReturnValue::eEXTRA_VALUE))
       return true;
     else if (isSet(prog, ReturnValue::eEXTRA_VAL2))
@@ -1203,30 +1123,30 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
   return false;
 }
 
-bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
+bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool blindfighting)
 {
-  int skill = 0;
+  qint32 skill = {};
   affected_type *cur_af;
 
   if (!sub->isNonPlayer() && sub->player->holyLite)
     return true;
 
-  int prog = sub->oprog_can_see_trigger(obj);
+  qint32 prog = sub->oprog_can_see_trigger(obj);
   if (isSet(prog, ReturnValue::eEXTRA_VALUE))
     return true;
   else if (isSet(prog, ReturnValue::eEXTRA_VAL2))
     return false;
 
-  skill = 0;
+  skill = {};
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_GOOD)))
-    skill = (int)cur_af->modifier;
-  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->Name()) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
+    skill = (qint32)cur_af->modifier;
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->name()) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
     return true;
 
-  skill = 0;
+  skill = {};
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_EVIL)))
-    skill = (int)cur_af->modifier;
-  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->Name()) && obj->obj_flags.value[0] == SPELL_DESECRATE)
+    skill = (qint32)cur_af->modifier;
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->name()) && obj->obj_flags.value[0] == SPELL_DESECRATE)
     return true;
 
   if (IS_OBJ_STAT(obj, ITEM_NOSEE))
@@ -1242,7 +1162,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
 
   // only see beacons if you have detect magic up
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_MAGIC)))
-    skill = (int)cur_af->modifier;
+    skill = (qint32)cur_af->modifier;
 
   if (GET_ITEM_TYPE(obj) == ITEM_BEACON && isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
   {
@@ -1269,7 +1189,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   return true;
 }
 
-bool check_blind(Character *ch)
+bool check_blind(CharacterPtr ch)
 {
 
   //   if (IS_AFFECTED(ch, AFF_true_SIGHT))
@@ -1287,14 +1207,14 @@ bool check_blind(Character *ch)
   return false;
 }
 
-int do_order(Character *ch, char *argument, cmd_t cmd)
+qint32 do_order(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
   char buf[256];
   bool found = false;
-  int org_room;
-  int retval;
-  Character *victim;
+  qint32 org_room;
+  qint32 retval;
+  CharacterPtr victim;
   follow_type *k;
 
   half_chop(argument, name, message);
@@ -1365,7 +1285,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_idea(Character *ch, char *argument, cmd_t cmd)
+qint32 do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1393,14 +1313,14 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
   return ReturnValue::eSUCCESS;
 }
 
-int do_typo(Character *ch, char *argument, cmd_t cmd)
+qint32 do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1429,14 +1349,14 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
   }
 
   sprintf(str, "**%s[%d]: %s\n",
-          GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
+          qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
   return ReturnValue::eSUCCESS;
 }
 
-int do_bug(Character *ch, char *argument, cmd_t cmd)
+qint32 do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1464,7 +1384,7 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.");
@@ -1473,16 +1393,16 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
 
 command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 {
-  int location = {}, level = {}, cost = {}, x = {};
-  Character *victim = {};
-  Character *loop_ch = {};
+  qint32 location = {}, level = {}, cost = {}, x = {};
+  CharacterPtr victim = {};
+  CharacterPtr loop_ch = {};
   float cf = {};
   QString name;
-  clan_data *clan = {};
+  Clan *clan = {};
   clan_room_data *room;
-  int found = {};
-  int retval = {};
-  int is_mob = {};
+  qint32 found = {};
+  qint32 retval = {};
+  qint32 is_mob = {};
 
   act("$n prays to $s God for transportation!", this, 0, 0, TO_ROOM, INVIS_NULL);
 
@@ -1524,7 +1444,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
     {
-      send(QStringLiteral("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(victim->getNameC()));
+      send(QStringLiteral("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(qPrintable(victim->name())));
       return ReturnValue::eFAILURE;
     }
   }
@@ -1532,14 +1452,14 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if (this->isPlayer())
   {
     x = GET_WIS(this);
-    uint64_t percent = number(1, 100);
+    quint64 percent = number(1, 100);
     if (percent > x)
     {
       percent -= x;
     }
 
     // Additional 5% chance of failure when recalling across continents
-    location = GET_HOME(victim);
+    location = victim->hometown;
     if (location > 0 && DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[location].zone).continent)
     {
       percent += 5;
@@ -1566,17 +1486,17 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
   if (this->isNonPlayer())
   {
-    location = real_room(GET_HOME(this));
+    location = real_room(hometown);
   }
   else
   {
-    if (GET_HOME(victim) == 0 || victim->getLevel() < 11 || IS_AFFECTED(victim, AFF_CANTQUIT))
+    if (victim->hometown == 0 || victim->getLevel() < 11 || IS_AFFECTED(victim, AFF_CANTQUIT))
     {
       location = real_room(START_ROOM);
     }
     else
     {
-      location = real_room(GET_HOME(victim));
+      location = real_room(victim->hometown);
     }
 
     if (location < 0)
@@ -1589,7 +1509,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     {
       victim->sendln("The gods reset your home.");
       location = real_room(START_ROOM);
-      GET_HOME(victim) = START_ROOM;
+      victim->hometown = START_ROOM;
     }
 
     // make sure they arne't recalling into someone's chall
@@ -1600,19 +1520,19 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
       {
         this->sendln("The gods frown on you, and reset your home.");
         location = real_room(START_ROOM);
-        GET_HOME(victim) = START_ROOM;
+        victim->hometown = START_ROOM;
       }
       else
       {
         for (room = clan->rooms; room; room = room->next)
-          if (room->room_number == GET_HOME(victim))
+          if (room->room_number == victim->hometown)
             found = 1;
 
         if (!found)
         {
           this->sendln("The gods frown on you, and reset your home.");
           location = real_room(START_ROOM);
-          GET_HOME(victim) = START_ROOM;
+          victim->hometown = START_ROOM;
         }
       }
     }
@@ -1640,7 +1560,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if ((level > 10) && (level <= DC::MAX_MORTAL_LEVEL))
   {
     cf = 1 + ((level - 11) * .347f);
-    cost = (int)(3440 * cf);
+    cost = (qint32)(3440 * cf);
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[location].zone).continent)
     {
@@ -1648,7 +1568,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
       cost *= 2;
     }
 
-    if (this->getGold() < (uint32_t)cost)
+    if (this->getGold() < (quint32)cost)
     {
       this->send(QStringLiteral("You don't have %1 gold!\r\n").arg(cost));
       return ReturnValue::eFAILURE;
@@ -1684,23 +1604,23 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-int do_qui(Character *ch, char *argument, cmd_t cmd)
+qint32 do_qui(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln("You have to write quit - no less, to quit!");
   return ReturnValue::eSUCCESS;
 }
 
-int do_quit(Character *ch, char *argument, cmd_t cmd)
+qint32 do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  int iWear;
+  qint32 iWear;
   follow_type *k;
-  clan_data *clan;
+  Clan *clan;
   clan_room_data *room;
-  int found = 0;
+  qint32 found = {};
   char buf[MAX_STRING_LENGTH];
-  Object *obj, *tmp_obj;
+  ObjectPtr obj, tmp_obj;
 
-  void find_and_remove_player_portal(Character * ch);
+  void find_and_remove_player_portal(CharacterPtr ch);
 
   /*
   | Code inserted by Morc 9 Apr 1997 to fix crasher
@@ -1830,7 +1750,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     {
       tmp_obj = obj->next;
       if (DC::getInstance()->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
-        if (ch == (Character *)(obj->obj_flags.origin))
+        if (ch == (CharacterPtr)(obj->obj_flags.origin))
           extract_obj(obj);
     }
   }
@@ -1841,15 +1761,15 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     affected_type af;
     af.type = OBJ_CHAMPFLAG_TIMER;
     af.duration = 5;
-    af.modifier = 0;
+    af.modifier = {};
     af.location = APPLY_NONE;
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    if (obj && obj->short_description)
-      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for %2 to reappear!\r\n").arg(GET_NAME(ch)).arg(obj->short_description));
+    if (obj && qPrintable(obj->short_description()))
+      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for %2 to reappear!\r\n").arg(ch->name()).arg(obj->short_description()));
     else
-      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(GET_NAME(ch)));
+      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(qPrintable(ch->name())));
   }
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);
@@ -1878,7 +1798,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
 
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
-  for (iWear = 0; iWear < MAX_WEAR; iWear++)
+  for (iWear = {}; iWear < MAX_WEAR; iWear++)
     if (ch->equipment[iWear])
       obj_to_char(ch->unequip_char(iWear, 1), ch);
 
@@ -1902,7 +1822,7 @@ command_return_t Character::save(cmd_t cmd)
 
   if (cmd != cmd_t::SAVE_SILENTLY)
   {
-    send(QStringLiteral("Saving %1.\r\n").arg(GET_NAME(this)));
+    send(QStringLiteral("Saving %1.\r\n").arg(qPrintable(this->name())));
   }
 
   if (this->isPlayer())
@@ -1948,11 +1868,11 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
   return save(cmd);
 }
 
-int do_home(Character *ch, char *argument, cmd_t cmd)
+qint32 do_home(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  clan_data *clan;
+  Clan *clan;
   clan_room_data *room;
-  int found = 0;
+  qint32 found = {};
 
   if (!ch->isImmortalPlayer())
   {
@@ -1974,7 +1894,7 @@ int do_home(Character *ch, char *argument, cmd_t cmd)
     if (ch->getLevel() < 11)
     {
       ch->sendln("You must grow a bit before you can leave the nursery.");
-      GET_HOME(ch) = START_ROOM;
+      ch->hometown = START_ROOM;
       return ReturnValue::eFAILURE;
     }
 
@@ -1999,7 +1919,7 @@ int do_home(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->sendln("You now consider this place to be your home.");
-  GET_HOME(ch) = DC::getInstance()->world[ch->in_room].number;
+  ch->hometown = DC::getInstance()->world[ch->in_room].number;
   return ReturnValue::eSUCCESS;
 }
 
@@ -2021,14 +1941,14 @@ command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_beep(Character *ch, char *argument, cmd_t cmd)
+qint32 do_beep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln("Beep!\a");
   return ReturnValue::eSUCCESS;
 }
 
 // if a skill has a valid name, return it, else nullptr
-QString get_skill_name(int skillnum)
+QString get_skill_name(qint32 skillnum)
 {
 
   if (skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
@@ -2050,9 +1970,9 @@ QString get_skill_name(int skillnum)
   return {};
 }
 
-// convert char std::string to int
+// convert char QString to qint32
 // return true if successful, false if error
-bool check_valid_and_convert(int &value, char *buf)
+bool check_valid_and_convert(qint32 &value, char *buf)
 {
   value = atoi(buf);
   if (value == 0 && strcmp(buf, "0"))
@@ -2062,7 +1982,7 @@ bool check_valid_and_convert(int &value, char *buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint value[])
+void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, CharacterPtr ch, uint value[])
 {
   bool found = false;
 
@@ -2078,14 +1998,14 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
       break;
     }
 
-    std::string arg1;
+    QString arg1;
     std::tie(arg1, remainder_args) = half_chop(remainder_args);
     if (arg1.empty())
     {
       break;
     }
 
-    for (int x = 0; *bits[x] != '\n'; x++)
+    for (qint32 x = {}; *bits[x] != '\n'; x++)
     {
       if (!strcmp("unused", bits[x]))
         continue;
@@ -2094,12 +2014,12 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
         if (ISSET(value, x + 1))
         {
           REMBIT(value, x + 1);
-          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
+          ch->send(QStringLiteral("%s flag REMOVED.\r\n").arg(bits[x]));
         }
         else
         {
           SETBIT(value, x + 1);
-          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
+          ch->send(QStringLiteral("%s flag ADDED.\r\n").arg(bits[x]));
         }
         found = true;
         break;
@@ -2112,11 +2032,11 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
   }
 }
 
-void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(QStringList bits, QString arg1, CharacterPtr ch, quint32 &value)
 {
-  int found = false;
+  qint32 found = false;
 
-  for (int x = 0; x < bits.size(); ++x)
+  for (qint32 x = {}; x < bits.size(); ++x)
   {
     if (bits.value(x) != "unused" && is_abbrev(arg1, bits.value(x)))
     {
@@ -2146,15 +2066,15 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint value[])
+void parse_bitstrings_into_int(const QStringList bits, const char *remainder_args, CharacterPtr ch, uint value[])
 {
-  return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
+  return parse_bitstrings_into_int(bits, QString(remainder_args), ch, value);
 }
 
-// calls below uint32_t version
-void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint16_t &value)
+// calls below quint32 version
+void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, CharacterPtr ch, quint16 &value)
 {
-  int found = false;
+  qint32 found = false;
 
   if (ch == nullptr)
   {
@@ -2168,7 +2088,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
       break;
     }
 
-    std::string arg1;
+    QString arg1;
     std::tie(arg1, remainder_args) = half_chop(remainder_args);
 
     if (arg1.empty())
@@ -2176,7 +2096,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
       break;
     }
 
-    for (int x = 0; *bits[x] != '\n'; x++)
+    for (qint32 x = {}; *bits[x] != '\n'; x++)
     {
       if (!strcmp("unused", bits[x]))
         continue;
@@ -2185,12 +2105,12 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
         if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
-          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
+          ch->send(QStringLiteral("%s flag REMOVED.\r\n").arg(bits[x]));
         }
         else
         {
           SET_BIT(value, (1 << x));
-          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
+          ch->send(QStringLiteral("%s flag ADDED.\r\n").arg(bits[x]));
         }
         found = true;
         break;
@@ -2203,16 +2123,16 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint16_t &value)
+void parse_bitstrings_into_int(const QStringList bits, const char *remainder_args, CharacterPtr ch, quint16 &value)
 {
-  return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
+  return parse_bitstrings_into_int(bits, QString(remainder_args), ch, value);
 }
 
-// Assumes bits is array of strings, ending with a "\n" std::string
+// Assumes bits is array of strings, ending with a "\n" QString
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, CharacterPtr ch, quint32 &value)
 {
   bool found = false;
 
@@ -2226,7 +2146,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
       break;
     }
 
-    std::string arg1;
+    QString arg1;
     std::tie(arg1, remainder_args) = half_chop(remainder_args);
 
     if (arg1.empty())
@@ -2234,7 +2154,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
       break;
     }
 
-    for (auto x = 0; *bits[x] != '\n'; x++)
+    for (auto x = {}; *bits[x] != '\n'; x++)
     {
       if (!strcmp("unused", bits[x]))
       {
@@ -2246,12 +2166,12 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
         if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
-          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
+          ch->send(QStringLiteral("%s flag REMOVED.\r\n").arg(bits[x]));
         }
         else
         {
           SET_BIT(value, (1 << x));
-          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
+          ch->send(QStringLiteral("%s flag ADDED.\r\n").arg(bits[x]));
         }
         found = true;
         break;
@@ -2262,15 +2182,15 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
     ch->send("No matching bits found.\n\n");
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(const QStringList bits, const char *remainder_args, CharacterPtr ch, quint32 &value)
 {
-  return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
+  return parse_bitstrings_into_int(bits, QString(remainder_args), ch, value);
 }
 
 void check_timer()
 { // Called once/sec
   timer_data *curr, *nex, *las;
-  las = nullptr;
+  las = {};
   for (curr = timer_list; curr; curr = nex)
   {
     nex = curr->next;
@@ -2284,7 +2204,7 @@ void check_timer()
         las->next = curr->next;
       else
         timer_list = curr->next;
-      delete curr;
+      curr = {};
       continue;
     }
     las = curr;
@@ -2292,10 +2212,10 @@ void check_timer()
   DC::getInstance()->removeDead();
 }
 
-int get_line(FILE *fl, char *buf)
+qint32 get_line(FILE *fl, char *buf)
 {
   char temp[256] = {};
-  int lines = 0;
+  qint32 lines = {};
 
   do
   {
@@ -2318,7 +2238,7 @@ int get_line(FILE *fl, char *buf)
 // return value can include the from or to variable
 //
 /*
-int number(int from, int to)
+qint32 number(qint32 from, qint32 to)
 {
   if (from == to)
     return to;
@@ -2331,27 +2251,27 @@ int number(int from, int to)
     produce_coredump();
     return to;
   }
-  int number = (to + 1) - from;
+  qint32 number = (to + 1) - from;
 
-  number = from + (int)((double)number * ((double)random() / ((double)RAND_MAX + 1.0)));
+  number = from + (qint32)((double)number * ((double)random() / ((double)RAND_MAX + 1.0)));
   return number;
 }
 */
 
 // Random
-int random_percent_change(uint percentage, int value)
+qint32 random_percent_change(uint percentage, qint32 value)
 {
-  int diff = abs(round(value * (percentage / 100.0)));
+  qint32 diff = abs(round(value * (percentage / 100.0)));
   return number(-diff, diff) + value;
 }
 
 // Weighted such that the worst and best values are less likely to occur
-int random_percent_change(int from, int to, int value)
+qint32 random_percent_change(qint32 from, qint32 to, qint32 value)
 {
   return round((number(from, to) / 100.0) * value) + value;
 }
 
-bool is_in_game(Character *ch)
+bool is_in_game(CharacterPtr ch)
 {
   // Bug in code if this happens
   if (ch == 0)
@@ -2384,7 +2304,7 @@ void produce_coredump(void *ptr)
 {
   logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
 
-  static int counter = 0;
+  static qint32 counter = {};
 
   if (++counter > COREDUMP_MAX)
   {
@@ -2407,11 +2327,9 @@ void produce_coredump(void *ptr)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
   }
-
-  return;
 }
 
-const char *pluralize(int qty, const char *ending)
+const char *pluralize(qint32 qty, const char *ending)
 {
   if (qty == 0 || qty > 1)
   {
@@ -2532,7 +2450,7 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
     break;
   }
 
-  for (int i = 0; i < MAX_GOLEMS; i++)
+  for (qint32 i = {}; i < MAX_GOLEMS; i++)
   {
     snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(name)[0], qPrintable(name), i);
 
@@ -2551,9 +2469,9 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   }
 }
 
-bool check_make_camp(int room)
+bool check_make_camp(qint32 room)
 {
-  Character *i, *next_i;
+  CharacterPtr i, next_i;
   bool campok = false;
 
   for (i = DC::getInstance()->world[room].people; i; i = next_i)
@@ -2571,11 +2489,11 @@ bool check_make_camp(int room)
   return campok;
 }
 
-int get_leadership_bonus(Character *ch)
+qint32 get_leadership_bonus(CharacterPtr ch)
 {
-  Character *leader;
+  CharacterPtr leader;
   follow_type *f, *next_f;
-  int highlevel = 0, bonus = 0;
+  qint32 highlevel = 0, bonus = {};
 
   if (ch->master)
     leader = ch->master;
@@ -2620,103 +2538,103 @@ int get_leadership_bonus(Character *ch)
 void update_make_camp_and_leadership(void)
 {
   affected_type af;
-  int bonus = 0;
+  qint32 bonus = {};
   const auto &character_list = DC::getInstance()->character_list;
 
-  for_each(character_list.begin(), character_list.end(),
-           [&af, &bonus](Character *i)
-           {
-             if (!i->fighting)
-             {
-               if (i->affected_by_spell(SKILL_SMITE))
-                 affect_from_char(i, SKILL_SMITE);
+  std::for_each(character_list.begin(), character_list.end(),
+                [&af, &bonus](CharacterPtr i)
+                {
+                  if (!i->fighting)
+                  {
+                    if (i->affected_by_spell(SKILL_SMITE))
+                      affect_from_char(i, SKILL_SMITE);
 
-               if (i->affected_by_spell(SKILL_PERSEVERANCE))
-               {
-                 affect_from_char(i, SKILL_PERSEVERANCE);
-                 affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
-               }
+                    if (i->affected_by_spell(SKILL_PERSEVERANCE))
+                    {
+                      affect_from_char(i, SKILL_PERSEVERANCE);
+                      affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
+                    }
 
-               if (i->affected_by_spell(SKILL_BATTLESENSE))
-                 affect_from_char(i, SKILL_BATTLESENSE);
-             }
+                    if (i->affected_by_spell(SKILL_BATTLESENSE))
+                      affect_from_char(i, SKILL_BATTLESENSE);
+                  }
 
-             if (i->in_room != DC::NOWHERE)
-             {
-               if (!check_make_camp(i->in_room))
-               {
-                 if (i->affected_by_spell(SKILL_MAKE_CAMP))
-                 {
-                   affect_from_char(i, SKILL_MAKE_CAMP);
-                   send_to_room("The camp has been disturbed.\r\n", i->in_room);
-                 }
-                 if (i->affected_by_spell(SPELL_FARSIGHT) && i->affected_by_spell(SPELL_FARSIGHT)->modifier == 111)
-                   affect_from_char(i, SPELL_FARSIGHT);
-               }
-               else
-               {
-                 if (!i->affected_by_spell(SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT))
-                 {
-                   af.type = SPELL_FARSIGHT;
-                   af.duration = -1;
-                   af.modifier = 111;
-                   af.location = 0;
-                   af.bitvector = AFF_FARSIGHT;
+                  if (i->in_room != DC::NOWHERE)
+                  {
+                    if (!check_make_camp(i->in_room))
+                    {
+                      if (i->affected_by_spell(SKILL_MAKE_CAMP))
+                      {
+                        affect_from_char(i, SKILL_MAKE_CAMP);
+                        send_to_room("The camp has been disturbed.\r\n", i->in_room);
+                      }
+                      if (i->affected_by_spell(SPELL_FARSIGHT) && i->affected_by_spell(SPELL_FARSIGHT)->modifier == 111)
+                        affect_from_char(i, SPELL_FARSIGHT);
+                    }
+                    else
+                    {
+                      if (!i->affected_by_spell(SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT))
+                      {
+                        af.type = SPELL_FARSIGHT;
+                        af.duration = -1;
+                        af.modifier = 111;
+                        af.location = {};
+                        af.bitvector = AFF_FARSIGHT;
 
-                   affect_to_char(i, &af);
-                 }
-               }
-             }
-             bonus = get_leadership_bonus(i);
+                        affect_to_char(i, &af);
+                      }
+                    }
+                  }
+                  bonus = get_leadership_bonus(i);
 
-             if (i->changeLeadBonus == true)
-             {
-               i->changeLeadBonus = false;
+                  if (i->changeLeadBonus == true)
+                  {
+                    i->changeLeadBonus = false;
 
-               if (i->curLeadBonus != bonus)
-               {
-                 i->curLeadBonus = bonus;
-                 affect_from_char(i, SKILL_LEADERSHIP_BONUS);
+                    if (i->curLeadBonus != bonus)
+                    {
+                      i->curLeadBonus = bonus;
+                      affect_from_char(i, SKILL_LEADERSHIP_BONUS);
 
-                 if (i->curLeadBonus)
-                 {
-                   af.type = SKILL_LEADERSHIP_BONUS;
-                   af.duration = -1;
-                   af.bitvector = -1;
+                      if (i->curLeadBonus)
+                      {
+                        af.type = SKILL_LEADERSHIP_BONUS;
+                        af.duration = -1;
+                        af.bitvector = -1;
 
-                   if (i->affected_by_spell(SKILL_LEADERSHIP))
-                   {
-                     af.modifier = bonus * 2;
-                     af.location = APPLY_HIT_N_DAM;
-                     affect_to_char(i, &af);
-                   }
-                   else
-                   {
-                     af.modifier = bonus * -8;
-                     af.location = APPLY_AC;
-                     affect_to_char(i, &af);
-                   }
-                 }
-               }
-             }
+                        if (i->affected_by_spell(SKILL_LEADERSHIP))
+                        {
+                          af.modifier = bonus * 2;
+                          af.location = APPLY_HIT_N_DAM;
+                          affect_to_char(i, &af);
+                        }
+                        else
+                        {
+                          af.modifier = bonus * -8;
+                          af.location = APPLY_AC;
+                          affect_to_char(i, &af);
+                        }
+                      }
+                    }
+                  }
 
-             if (i->curLeadBonus != bonus)
-               i->changeLeadBonus = true;
-           });
+                  if (i->curLeadBonus != bonus)
+                    i->changeLeadBonus = true;
+                });
 }
 
-void unique_scan(Character *victim)
+void unique_scan(CharacterPtr victim)
 {
   if (!victim)
     return;
 
-  class Object *i = nullptr;
-  class Object *j = nullptr;
-  int k;
-  std::map<int, int> virtnums;
-  std::queue<Object *> found_items;
+  ObjectPtr i = {};
+  ObjectPtr j = {};
+  qint32 k;
+  QMap<qint32, qint32> virtnums;
+  QQueue<ObjectPtr> found_items;
 
-  for (k = 0; k < MAX_WEAR; k++)
+  for (k = {}; k < MAX_WEAR; k++)
   {
     if (victim->equipment[k])
     {
@@ -2771,18 +2689,16 @@ void unique_scan(Character *victim)
 
   if (!found_items.empty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", victim->getNameC());
+    logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", qPrintable(victim->name()));
     while (!found_items.empty())
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }
-
-  return;
 }
 
-std::string replaceString(std::string message, std::string find, std::string replace)
+QString replaceString(QString message, QString find, QString replace)
 {
   size_t j;
 
@@ -2794,7 +2710,7 @@ std::string replaceString(std::string message, std::string find, std::string rep
     return message;
 
   size_t find_length = find.length();
-  for (; (j = message.find(find)) != std::string::npos;)
+  for (; (j = message.find(find)) != QString::npos;)
   {
     message.replace(j, find_length, replace);
   }
@@ -2817,7 +2733,7 @@ QString replaceString(QString message, QString find, QString replace)
   return message;
 }
 
-char *numToStringTH(int number)
+QString numToStringTH(qint32 number)
 {
   switch (number)
   {
@@ -2848,12 +2764,12 @@ char *numToStringTH(int number)
   }
 }
 
-bool champion_can_go(int room)
+bool champion_can_go(qint32 room)
 {
   try
   {
     // Champions can't enter class restricted rooms
-    for (int c_class = 1; c_class < CLASS_MAX; c_class++)
+    for (qint32 c_class = 1; c_class < CLASS_MAX; c_class++)
     {
       if (DC::getInstance()->world[room].allow_class[c_class] == true)
       {
@@ -2879,21 +2795,21 @@ bool champion_can_go(int room)
 splitstring
 This function does NOT ignore empty strings unless you tell it to.
 example:
-splitstring("std::string  with 2 spaces", " ")
+splitstring("QString  with 2 spaces", " ")
 returns:
-"std::string"
+"QString"
 ""
 "with"
 "2"
 "spaces"
 
 If you do not want this behavior, include a third argument as true.
-splitstring("std::string  with 2 spaces", " ", true)
+splitstring("QString  with 2 spaces", " ", true)
 */
-std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty)
+QList<QString> splitstring(QString splitme, QString delims, bool ignore_empty)
 {
-  std::vector<std::string> result;
-  std::size_t splitter{};
+  QList<QString> result;
+  std::size_t splitter = {};
   while ((splitter = splitme.find_first_of(delims)) != splitme.npos)
   {
     if (ignore_empty && splitter > 0)
@@ -2916,12 +2832,12 @@ returns:
 If you do not want this behavior, include a third argument as true.
 joinstring(somevectorofstrings, ",", true)
 */
-std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty)
+QString joinstring(QList<QString> joinme, QString delims, bool ignore_empty)
 {
-  std::string result;
-  unsigned int i = 0;
-  unsigned int joined = 0;
-  for (i = 0; i < joinme.size(); i++)
+  QString result;
+  quint32 i = {};
+  quint32 joined = {};
+  for (i = {}; i < joinme.size(); i++)
   {
     if (ignore_empty && joinme[i].empty())
       continue;
@@ -2935,14 +2851,14 @@ std::string joinstring(std::vector<std::string> joinme, std::string delims, bool
   return result;
 }
 
-bool class_can_go(int ch_class, int room)
+bool class_can_go(qint32 ch_class, qint32 room)
 {
   bool classRestrictions = false;
 
   try
   {
     // Determine if any class restrictions are in place
-    for (int c_class = 1; c_class < CLASS_MAX; c_class++)
+    for (qint32 c_class = 1; c_class < CLASS_MAX; c_class++)
     {
       if (DC::getInstance()->world[room].allow_class[c_class] == true)
       {
@@ -2966,12 +2882,12 @@ bool class_can_go(int ch_class, int room)
   return true;
 }
 
-QString find_profession(int c_class, uint8_t profession)
+QString find_profession(qint32 c_class, quint8 profession)
 {
   // TODO Fix
   return "Unknown";
 
-  std::map<uint8_t, std::string> profession_list = professions[c_class];
+  QMap<quint8, QString> profession_list = professions[c_class];
 
   if (profession == 0)
   {
@@ -2987,11 +2903,11 @@ QString find_profession(int c_class, uint8_t profession)
   }
 }
 
-std::string get_isr_string(uint32_t isr, int8_t loc)
+QString get_isr_string(quint32 isr, qint8 loc)
 {
   if (!isSet(isr, 1 << loc))
   {
-    return std::string();
+    return QString();
   }
 
   switch (loc)
@@ -3049,7 +2965,7 @@ std::string get_isr_string(uint32_t isr, int8_t loc)
   }
 }
 
-bool file_exists(std::string filename)
+bool file_exists(QString filename)
 {
   struct stat buffer;
 
@@ -3066,7 +2982,7 @@ bool file_exists(QString filename)
   return QFile(filename).exists();
 }
 
-bool char_file_exists(std::string name)
+bool char_file_exists(QString name)
 {
   if (all_of(name.begin(), name.end(), [](char i)
              { return isalpha(i); }) == 0)
@@ -3074,7 +2990,7 @@ bool char_file_exists(std::string name)
     return false;
   }
 
-  std::string filename;
+  QString filename;
 
   if (DC::getInstance()->cf.bport)
   {
@@ -3095,15 +3011,15 @@ void Character::setPOSFighting(void)
     setFighting();
 
     first_damage = time(nullptr);
-    damages = 0;
-    damage_done = 0;
-    last_damage = 0;
+    damages = {};
+    damage_done = {};
+    last_damage = {};
   }
 }
 
 void Character::setPlayerLastMob(vnum_t mob_vnum)
 {
-  std::string buffer;
+  QString buffer;
   if (this->player == nullptr)
   {
     return;
@@ -3177,9 +3093,9 @@ bool str_prefix(QString astr, QString bstr)
 
 bool str_infix(QString astr, QString bstr)
 {
-  int sstr1;
-  int sstr2;
-  int ichar;
+  qint32 sstr1;
+  qint32 sstr2;
+  qint32 ichar;
 
   if (astr.isEmpty())
     return false;
@@ -3188,7 +3104,7 @@ bool str_infix(QString astr, QString bstr)
   sstr1 = astr.length();
   sstr2 = bstr.length();
 
-  for (ichar = 0; ichar <= sstr2 - sstr1; ichar++)
+  for (ichar = {}; ichar <= sstr2 - sstr1; ichar++)
   {
     if (c0 == bstr[ichar].toLower() && !str_prefix(astr, bstr.sliced(ichar)))
       return false;
@@ -3221,7 +3137,7 @@ void Character::swapSkill(skill_t origSkill, skill_t newSkill)
   }
 }
 
-void Character::setSkillMin(skill_t skillnum, int minimum_learned)
+void Character::setSkillMin(skill_t skillnum, qint32 minimum_learned)
 {
   if (skills.contains(skillnum))
   {
@@ -3241,19 +3157,19 @@ char_skill_data &Character::getSkill(skill_t skillnum)
   return empty;
 }
 
-void Character::setSkill(skill_t skillnum, int learned)
+void Character::setSkill(skill_t skillnum, qint32 learned)
 {
   skills[skillnum].skillnum = skillnum;
   skills[skillnum].learned = learned;
 }
 
-void Character::upSkill(skill_t skillnum, int learned)
+void Character::upSkill(skill_t skillnum, qint32 learned)
 {
   skills[skillnum].skillnum = skillnum;
   skills[skillnum].learned += learned;
 }
 
-int len_cmp(QString s1, QString s2)
+qint32 len_cmp(QString s1, QString s2)
 {
   for (auto i1 = s1.begin(), i2 = s2.begin(); i1 != s1.end() && i2 != s2.end() && *i1 != ' '; i1++, i2++)
   {
@@ -3271,7 +3187,7 @@ bool operator!(load_status_t ls)
   return ls != load_status_t::success;
 }
 
-void WAIT_STATE(Character *ch, int cycle)
+void WAIT_STATE(CharacterPtr ch, qint32 cycle)
 {
   if (ch->desc && !ch->isImmortalPlayer())
   {
@@ -3282,7 +3198,7 @@ void WAIT_STATE(Character *ch, int cycle)
     ch->deaths = cycle;
 }
 
-int GET_WAIT(Character *ch)
+qint32 GET_WAIT(CharacterPtr ch)
 {
   if (ch->isNonPlayer())
     return ch->deaths;

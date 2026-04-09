@@ -3,25 +3,19 @@
 #include "DC/obj.h"
 #include "DC/innate.h"
 #include "DC/race.h"
-#include "DC/db.h"
 #include "DC/fight.h"
-#include "DC/room.h"
+
 #include "DC/DC.h"
-#include "DC/connect.h"
-#include "DC/utility.h"
-#include "DC/character.h"
+
 #include "DC/handler.h"
-#include "DC/db.h"
 #include "DC/player.h"
 #include "DC/interp.h"
-#include "DC/magic.h"
 #include "DC/act.h"
-#include "DC/mobile.h"
-#include "DC/spells.h"
-#include <cstring> // strstr()
-#include "DC/returnvals.h"
-#include "DC/interp.h"
 
+#include "DC/spells.h"
+#include "DC/interp.h"
+#include "DC/affect.h"
+#include "DC/utility.h"
 ////////////////////////////////////////////////////////////////////////////
 // external vars
 
@@ -31,23 +25,23 @@
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations
 
-int innate_powerwield(Character *ch, char *argument, cmd_t cmd);
-int innate_regeneration(Character *ch, char *argument, cmd_t cmd);
-int innate_illusion(Character *ch, char *argument, cmd_t cmd);
-int innate_repair(Character *ch, char *argument, cmd_t cmd);
-int innate_focus(Character *ch, char *argument, cmd_t cmd);
-int innate_evasion(Character *ch, char *argument, cmd_t cmd);
-int innate_shadowslip(Character *ch, char *argument, cmd_t cmd);
-int innate_bloodlust(Character *ch, char *argument, cmd_t cmd);
-int innate_fly(Character *ch, char *argument, cmd_t cmd);
+qint32 innate_powerwield(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_regeneration(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_illusion(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_repair(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_focus(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_evasion(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_shadowslip(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_bloodlust(CharacterPtr ch, QString argument, cmd_t cmd);
+qint32 innate_fly(CharacterPtr ch, QString argument, cmd_t cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
 class in_skills
 {
 public:
-  char *name;
-  int race;
+  const char *name;
+  qint32 race;
   DO_FUN *func;
 };
 
@@ -63,7 +57,7 @@ const in_skills innates[] = {
     {"fly", RACE_PIXIE, innate_fly},
     {"\n", 0, nullptr}};
 
-char *innate_skills[] =
+const char *innate_skills[] =
     {
         "powerwield",
         "focus",
@@ -79,7 +73,7 @@ char *innate_skills[] =
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
-int do_innate(Character *ch, char *arg, cmd_t cmd)
+qint32 do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (ch && ch->in_room > 0 &&
@@ -90,16 +84,16 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
   }
 
   bool found = false;
-  int i;
+  qint32 i;
   char buf[512];
   arg = one_argument(arg, buf);
-  for (i = 0; *innates[i].name != '\n'; i++)
+  for (i = {}; *innates[i].name != '\n'; i++)
   {
-    if (innates[i].race == GET_RACE(ch))
+    if (innates[i].race == ch->race)
     {
       if (buf[0] == '\0')
       {
-        csendf(ch, "Your race has access to the $B%s$R innate ability.\r\n", innates[i].name);
+        ch->send(QStringLiteral("Your race has access to the $B%s$R innate ability.\r\n").arg(innates[i].name));
         found = true;
       }
       else if (!str_cmp(innates[i].name, buf))
@@ -115,7 +109,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
           ch->sendln("In your dreams, or what?");
           return ReturnValue::eFAILURE;
         }
-        int retval = (*(innates[i].func))(ch, arg, cmd);
+        qint32 retval = (*(innates[i].func))(ch, arg, cmd);
         if (retval & ReturnValue::eSUCCESS)
         {
           affected_type af;
@@ -132,8 +126,8 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
             af.duration = 18;
           }
           // repair is every 12 ticks
-          af.modifier = 0;
-          af.location = 0;
+          af.modifier = {};
+          af.location = {};
           af.bitvector = -1;
           affect_to_char(ch, &af);
         }
@@ -159,26 +153,26 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
   }
 }
 
-int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_regeneration(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_REGENERATION;
   af.duration = 6;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = AFF_REGENERATION;
   affect_to_char(ch, &af);
   ch->sendln("Your innate regenerative abilities allow you to heal quickly.");
   return ReturnValue::eSUCCESS;
 }
 
-int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_powerwield(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_POWERWIELD;
   af.duration = 3;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = AFF_POWERWIELD;
   affect_to_char(ch, &af);
   ch->sendln("You gather your energy in an effort to wield two mighty weapons.");
@@ -186,7 +180,7 @@ int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_focus(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_focus(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (IS_AFFECTED(ch, AFF_FOCUS))
   {
@@ -199,7 +193,7 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
   affected_type af;
   af.type = SKILL_INNATE_FOCUS;
   af.duration = 4;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = AFF_FOCUS;
   affect_to_char(ch, &af);
@@ -207,7 +201,7 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_illusion(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_illusion(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
   {
@@ -217,8 +211,8 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
   affected_type af;
   af.type = SKILL_INNATE_ILLUSION;
   af.duration = 4;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = AFF_ILLUSION;
   affect_to_char(ch, &af);
   af.type = SPELL_INVISIBLE;
@@ -229,7 +223,7 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_bloodlust(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (!ch->fighting)
   {
@@ -242,11 +236,11 @@ int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_repair(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  class Object *obj;
+  ObjectPtr obj;
   char buf[MAX_STRING_LENGTH];
-  int i, chance = 60 - ch->getLevel();
+  qint32 i, chance = 60 - ch->getLevel();
   bool found = false;
   arg = one_argument(arg, buf);
   if ((obj = get_obj_in_list_vis(ch, buf, ch->carrying)) == nullptr)
@@ -264,7 +258,7 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("This item is unrepairable.");
     return ReturnValue::eFAILURE;
   }
-  for (i = 0; i < obj->num_affects; i++)
+  for (i = {}; i < obj->num_affects; i++)
   {
     if (obj->affected[i].location == APPLY_DAMAGED)
     {
@@ -295,33 +289,33 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
   }
 }
 
-int innate_evasion(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_evasion(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_EVASION;
   af.duration = 4;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = -1;
   affect_to_char(ch, &af);
   ch->sendln("You bring up an aura, blocking all forms of scrying your location.");
   return ReturnValue::eSUCCESS;
 }
 
-int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_shadowslip(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_SHADOWSLIP;
   af.duration = 4;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = AFF_SHADOWSLIP;
   affect_to_char(ch, &af);
   ch->sendln("You blend with the shadows, preventing people from reaching you magically.");
   return ReturnValue::eSUCCESS;
 }
 
-int innate_fly(Character *ch, char *arg, cmd_t cmd)
+qint32 innate_fly(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->affected_by_spell(SKILL_INNATE_FLY))
   {
@@ -340,8 +334,8 @@ int innate_fly(Character *ch, char *arg, cmd_t cmd)
     affected_type af;
     af.type = SKILL_INNATE_FLY;
     af.duration = -1;
-    af.modifier = 0;
-    af.location = 0;
+    af.modifier = {};
+    af.location = {};
     af.bitvector = AFF_FLYING;
     affect_to_char(ch, &af);
     ch->sendln("You spread your delicate wings and lift lightly into the air.");

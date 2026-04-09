@@ -1,6 +1,2 @@
-#ifndef CORPSE_H
-#define CORPSE_H
-
+#pragma once
 void save_corpses(void);
-
-#endif

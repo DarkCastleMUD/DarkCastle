@@ -3,24 +3,24 @@
 
 #include <cstring>
 #include <cstdlib> // qsort()
+#include <qdebug.h>
+#include <qiodevicebase.h>
 
+#include "DC/levels.h"
 #include "DC/structs.h" // MAX_INPUT_LENGTH
-#include "DC/room.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
+
+#include "DC/DC.h"
+
 #include "DC/social.h"
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/interp.h" // len_cmp
 #include "DC/returnvals.h"
-#include "DC/memory.h"
+
 #include "DC/punish.h"
 
 // storage of socials
-social_messg *soc_mess_list; // head of social array
-int32_t num_socials;         // number of actual socials (50 = 0-49)
-int32_t social_array_size;   // size of actual array (since we allocate in chunks)
+QMap<QString, social_messg> soc_mess_list; // head of social array
 
 social_messg *find_social(QString arg);
 
@@ -28,7 +28,7 @@ command_return_t Character::check_social(QString pcomm)
 {
   QString arg = {}, buf = {};
   social_messg *action = {};
-  Character *vict = {};
+  CharacterPtr vict = {};
 
   std::tie(pcomm, arg) = half_chop(pcomm);
 
@@ -144,195 +144,124 @@ char *fread_social_string(FILE *fl)
   // strip the \n
   *(buf + strlen(buf) - 1) = '\0';
 
-  rslt = str_dup(buf);
+  rslt = (buf);
   return (rslt);
 }
 
 // read one social
 // return true on success
 // return false on 'EOF'
-int read_social_from_file(int32_t num_social, FILE *fl)
+bool read_social_from_file(QTextStream &fl)
 {
-  char tmp[MAX_INPUT_LENGTH];
-  int hide, min_pos;
-
-  fscanf(fl, " %s ", tmp);
-  if (feof(fl))
+  social_messg sm;
+  fl >> sm.name;
+  if (fl.atEnd())
     return false;
-  fscanf(fl, " %d %d \n", &hide, &min_pos);
 
-  // read strings that will always be there
-  soc_mess_list[num_social].name = str_dup(tmp);
-  soc_mess_list[num_social].hide = hide;
-  soc_mess_list[num_social].min_victim_position = static_cast<decltype(soc_mess_list[num_social].min_victim_position)>(min_pos);
-  soc_mess_list[num_social].char_no_arg = fread_social_string(fl);
-  soc_mess_list[num_social].others_no_arg = fread_social_string(fl);
-  soc_mess_list[num_social].char_found = fread_social_string(fl);
+  quint32 min_victim_position;
+  fl >> sm.hide;
+  if (fl.atEnd())
+    return false;
+
+  fl >> min_victim_position;
+  if (fl.atEnd())
+    return false;
+
+  sm.min_victim_position = position_t(min_victim_position);
+
+  sm.char_no_arg = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
+  sm.others_no_arg = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
+  sm.char_found = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
   // if no char_found, then the social is done, and the ones below won't be there
-  if (!soc_mess_list[num_social].char_found)
+  if (!sm.char_found)
     return true;
-  soc_mess_list[num_social].others_found = fread_social_string(fl);
-  soc_mess_list[num_social].vict_found = fread_social_string(fl);
-  soc_mess_list[num_social].not_found = fread_social_string(fl);
-  soc_mess_list[num_social].char_auto = fread_social_string(fl);
-  soc_mess_list[num_social].others_auto = fread_social_string(fl);
+
+  sm.others_found = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
+  sm.vict_found = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
+  sm.not_found = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
+  sm.char_auto = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
+  sm.others_auto = fread_social_string(fl);
+  if (fl.atEnd())
+    return false;
+
+  soc_mess_list[name] = sm;
   return true;
-}
-
-// this function used by qsort to sort the social array
-int compare_social_sort(const void *A, const void *B)
-{
-  int i;
-  for (i = 0;; i++)
-    if (!(*(((social_messg *)A)->name + i) && *(((social_messg *)B)->name + i)))
-      break;
-    else if (*(((social_messg *)A)->name + i) > *(((social_messg *)B)->name + i))
-      return 1;
-    else if (*(((social_messg *)A)->name + i) < *(((social_messg *)B)->name + i))
-      return -1;
-  // Match so far..
-  if (strlen(((social_messg *)A)->name) > strlen(((social_messg *)B)->name))
-    return 1;
-  if (strlen(((social_messg *)A)->name) < strlen(((social_messg *)B)->name))
-    return -1;
-  return 0;
-}
-
-// this function used by qsort to search the social array
-int compare_social_search(const void *A, const void *B)
-{
-  int i;
-  for (i = 0;; i++)
-    if (!(*(((char *)A) + i) && *(((social_messg *)B)->name + i)))
-      break;
-    else if (*(((char *)A) + i) > *(((social_messg *)B)->name + i))
-      return 1;
-    else if (*(((char *)A) + i) < *(((social_messg *)B)->name + i))
-      return -1;
-  // Match so far..
-  if (strlen(((char *)A)) > strlen(((social_messg *)B)->name))
-    return 1;
-  if (strlen(((char *)A)) < strlen(((social_messg *)B)->name))
-    return 0;
-  return 0;
-  //  return len_cmp( (char *) A, ((social_messg *) B)->name );
 }
 
 void boot_social_messages(void)
 {
-  FILE *fl;
+  QFile social_messages_file(SOCIAL_FILE);
+  QTextStream fl(&social_messages_file);
 
-  // initialize our array
-  num_socials = 0;
-  social_array_size = 450; // Guess on number of socials.  Closer this is to actual without
-                           // going over saves on memory and boot up speed since we won't
-                           // have to realloc as often.
-#ifdef LEAK_CHECK
-  soc_mess_list = (social_messg *)calloc(social_array_size, sizeof(social_messg));
-#else
-  soc_mess_list = (social_messg *)dc_alloc(social_array_size, sizeof(social_messg));
-#endif
-
-  if (!(fl = fopen(SOCIAL_FILE, "r")))
+  if (!social_messages_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
   {
     perror("Can't open social file in boot_social_messages");
     abort();
   }
 
-  for (;;)
+  while (read_social_from_file(fl))
   {
-    // do we have room?
-    if (num_socials >= social_array_size)
-    {
-      social_array_size += 10;
-      // realloc the list to have enough memory for the new array size
-#ifdef LEAK_CHECK
-      soc_mess_list = (social_messg *)realloc(soc_mess_list,
-                                              (sizeof(social_messg) * social_array_size));
-#else
-      soc_mess_list = (social_messg *)dc_realloc(soc_mess_list,
-                                                 (sizeof(social_messg) * social_array_size));
-#endif
-      // clear the memory we just alloc'd
-      memset((soc_mess_list + num_socials), 0, (sizeof(social_messg) * 10));
-    }
-    if (!read_social_from_file(num_socials, fl))
-      break;
-    num_socials++;
   }
-
-  // sort it!
-  qsort(soc_mess_list, num_socials, sizeof(social_messg), compare_social_sort);
-
-  fclose(fl);
 }
 
-social_messg *find_social(QString arg)
+social_messg &find_social(QString arg)
 {
-  // now uses a linear search
-  int i;
+  if (!arg.isEmpty())
+  {
+    if (soc_mess_list.containers(arg))
+      return soc_mess_list[arg];
 
-  for (i = 1; i < num_socials; i++)
-    if (!compare_social_search((void *)arg.toStdString().c_str(), (void *)&soc_mess_list[i]))
-      return &soc_mess_list[i];
+    for (const auto &social : soc_mess_list.keys())
+      if (social.startsWith((arg)))
+        return soc_mess_list(social);
+  }
 
-  return nullptr;
-  //    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
-
-  //  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof( social_messg), compare_social_search);
+  static social_messg default;
+  default = {};
+  return default;
 }
 
 void DC::clean_socials_from_memory()
 {
-  if (!soc_mess_list)
-    return;
-
-  for (int i = 0; i < num_socials; i++)
-  {
-    if (soc_mess_list[i].name)
-      dc_free(soc_mess_list[i].name);
-    if (soc_mess_list[i].char_no_arg)
-      dc_free(soc_mess_list[i].char_no_arg);
-    if (soc_mess_list[i].others_no_arg)
-      dc_free(soc_mess_list[i].others_no_arg);
-    if (soc_mess_list[i].char_found)
-      dc_free(soc_mess_list[i].char_found);
-    if (soc_mess_list[i].others_found)
-      dc_free(soc_mess_list[i].others_found);
-    if (soc_mess_list[i].vict_found)
-      dc_free(soc_mess_list[i].vict_found);
-    if (soc_mess_list[i].not_found)
-      dc_free(soc_mess_list[i].not_found);
-    if (soc_mess_list[i].char_auto)
-      dc_free(soc_mess_list[i].char_auto);
-    if (soc_mess_list[i].others_auto)
-      dc_free(soc_mess_list[i].others_auto);
-  }
-
-  dc_free(soc_mess_list);
-  soc_mess_list = nullptr;
+  soc_mess_list.clear();
 }
 
-int do_social(Character *ch, char *argument, cmd_t cmd)
+qint32 do_social(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int i;
-  char buf[MAX_STRING_LENGTH];
-  *buf = '\0';
-
-  for (i = 1; i < num_socials; i++)
+  QString buf;
+  qint32 i{};
+  for (const auto &social : soc_mess_list)
   {
-    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
-    if (!(i % 4))
+    buf += QStringLiteral("%1").arg(social.name, 18);
+    if (!(i++ % 4))
     {
-      strcat(buf, "\r\n");
-      ch->send(buf);
-      *buf = '\0';
+      ch->sendln(buf);
+      buf.clear();
     }
   }
-  if (*buf)
-    ch->send(buf);
 
-  sprintf(buf, "\r\nCurrent Socials:  %d\r\n", i);
-  ch->send(buf);
+  ch->sendln(buf);
+  ch->sendln(QStringLiteral("Current Socials:  %1").arg(i));
   return ReturnValue::eSUCCESS;
 }

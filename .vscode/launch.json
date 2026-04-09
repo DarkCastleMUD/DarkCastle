@@ -14,7 +14,7 @@
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": false
             },
@@ -40,7 +40,7 @@
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": false
             },
@@ -66,7 +66,7 @@
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -89,7 +89,7 @@
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -112,7 +112,7 @@
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -132,7 +132,7 @@
             "cwd": "${workspaceFolder}/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": true,
                 "trace": true,
@@ -159,7 +159,7 @@
             "cwd": "${workspaceFolder}/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": true,
                 "trace": true,
@@ -186,7 +186,7 @@
             "cwd": "${workspaceFolder}/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": true,
                 "trace": true,
@@ -213,7 +213,7 @@
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": true,
                 "trace": true,
@@ -240,7 +240,7 @@
             "cwd": "${workspaceFolder}/../../dcastle/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": true,
                 "trace": true,
@@ -267,7 +267,7 @@
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "logging": {
                 "engineLogging": true,
                 "trace": true,
@@ -294,7 +294,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "miDebuggerArgs": "-ex \"set debuginfod enabled off\"",
             "logging": {
                 "engineLogging": false,
@@ -330,7 +330,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "preLaunchTask": "rebuild"
         },
         {
@@ -355,7 +355,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "preLaunchTask": "rebuild"
         },
         {
@@ -380,7 +380,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "preLaunchTask": "rebuild"
         },
         {
@@ -405,7 +405,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "preLaunchTask": "rebuild"
         },
         {
@@ -430,7 +430,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "preLaunchTask": "rebuild"
         }
     ]

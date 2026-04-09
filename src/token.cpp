@@ -9,22 +9,15 @@
 // Standard header files
 
 #include <cstring>
-#include <cctype>
-#include <cstdlib>
-#include <cstdio>
 
 #include "DC/obj.h"
-#include "DC/db.h"
-#include "DC/room.h"
-#include "DC/character.h" // Character
-#include "DC/DC.h"        // Object
-#include "DC/utility.h"   // GET_SHORT, GET_LEVEL, &c
-#include "DC/terminal.h"  // colors
-#include "DC/act.h"       // act flags
-#include "DC/player.h"    // Player::PLR_ANSI Player::PLR_VT100
-#include "DC/handler.h"   // fname()
-#include "DC/token.h"     // fname()
-#include "DC/connect.h"
+
+#include "DC/DC.h" // Character
+// GET_LEVEL, &c
+#include "DC/terminal.h" // colors
+#include "DC/act.h"      // act flags
+#include "DC/handler.h"  // fname()
+#include "DC/token.h"    // fname()
 
 #undef DEBUG_TOKEN
 
@@ -38,27 +31,27 @@
 TokenList::TokenList(const char *str) : head(0), current(0)
 {
 
-  int i, stri = 0;
+  qint32 i, stri = {};
   const char *strp = str;  // Keeps track of current position
   Token *cur_token;        // Current token
-  char temp_str[_MAX_STR]; // Temporary std::string
+  char temp_str[_MAX_STR]; // Temporary QString
 
   while (strp[stri] != 0 && stri < _MAX_STR)
   {
-    if (strp[stri] == '$') /* It's a std::string code */
+    if (strp[stri] == '$') /* It's a QString code */
     {
       temp_str[0] = strp[stri + 0];
       temp_str[1] = strp[stri + 1];
-      temp_str[2] = 0;
+      temp_str[2] = {};
       stri += 2;
     }
-    else /* Go until we find a std::string code or end */
+    else /* Go until we find a QString code or end */
     {
-      for (i = 0; (strp[stri] != 0) && (strp[stri] != '$') && (stri < _MAX_STR); i++, stri++)
+      for (i = {}; (strp[stri] != 0) && (strp[stri] != '$') && (stri < _MAX_STR); i++, stri++)
       {
         temp_str[i] = strp[stri];
       }
-      temp_str[i] = 0;
+      temp_str[i] = {};
     }
 
     cur_token = new Token(temp_str);
@@ -95,7 +88,7 @@ TokenList::~TokenList()
   for (temp_token = current; temp_token; temp_token = next_token)
   {
     next_token = temp_token->Next();
-    delete temp_token;
+    temp_token = {};
   }
 }
 
@@ -133,14 +126,14 @@ void TokenList::Next()
 | const char * TokenList::Interpret()
 | Description:  This function interprets the tokens in the list for
 |   the given character/victim/send_to combination and then returns
-|   the interpreted std::string.  This std::string should not be deallocated.
-|   Zero is returned (0) if the std::string should not be sent -- either
+|   the interpreted QString.  This QString should not be deallocated.
+|   Zero is returned (0) if the QString should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags)
+QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, CharacterPtr send_to, qint32 flags)
 {
 
-  // Reset the std::string
+  // Reset the QString
   interp.clear();
 
   //--
@@ -164,7 +157,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
     return "";
   if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
     return "";
-  if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
+  if ((send_to == (CharacterPtr)vict_obj) && (flags & NOTVICT))
     return "";
   if ((send_to->getLevel() < MIN_GOD) && (flags & GODS))
     return "";
@@ -259,7 +252,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
               switch ((current->GetBuf())[1])
               {
               case 'n':
-                if (send_to == nullptr || from == nullptr || GET_SHORT(from) == nullptr)
+                if (send_to == nullptr || from == nullptr || from->shortdesc_or_name().isEmpty())
                 {
                   break;
                 }
@@ -269,39 +262,39 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += GET_SHORT(from);
+                    interp += from->shortdesc_or_name();
                   else
                     interp += "someone";
                 }
                 else
                 {
-                  if (GET_SHORT(from))
+                  if (qPrintable(from->shortdesc_or_name()))
                   {
-                    interp += GET_SHORT(from);
+                    interp += from->shortdesc_or_name();
                   }
                 }
                 break;
               case 'N':
-                if (vict_obj == nullptr || GET_SHORT((Character *)vict_obj) == nullptr)
+                if (vict_obj == nullptr || ((CharacterPtr)vict_obj)->shortdesc_or_name().isEmpty())
                 {
                   break;
                 }
-                if (!CAN_SEE(send_to, (Character *)vict_obj, true))
+                if (!CAN_SEE(send_to, (CharacterPtr)vict_obj, true))
                 {
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += GET_SHORT((Character *)vict_obj);
+                    interp += ((CharacterPtr)vict_obj)->shortdesc_or_name();
                   else
                     interp += "someone";
                 }
                 else
                 {
-                  if (vict_obj == nullptr || GET_SHORT((Character *)vict_obj) == nullptr)
+                  if (vict_obj == nullptr || ((CharacterPtr)vict_obj)->shortdesc_or_name().isEmpty())
                   {
                     break;
                   }
-                  interp += GET_SHORT((Character *)vict_obj);
+                  interp += ((CharacterPtr)vict_obj)->shortdesc_or_name();
                 }
                 break;
               case 'm':
@@ -316,7 +309,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 {
                   break;
                 }
-                interp += HMHR((Character *)vict_obj);
+                interp += HMHR((CharacterPtr)vict_obj);
                 break;
               case 's':
                 if (from == nullptr)
@@ -330,7 +323,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 {
                   break;
                 }
-                interp += HSHR((Character *)vict_obj);
+                interp += HSHR((CharacterPtr)vict_obj);
                 break;
               case 'e':
                 if (from == nullptr)
@@ -344,10 +337,10 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 {
                   break;
                 }
-                interp += HSSH((Character *)vict_obj);
+                interp += HSSH((CharacterPtr)vict_obj);
                 break;
               case 'o':
-                if (send_to == nullptr || obj == nullptr || obj->Name().isEmpty())
+                if (send_to == nullptr || obj == nullptr || obj->name().isEmpty())
                 {
                   break;
                 }
@@ -358,29 +351,29 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                     return {};
                   else if (flags & INVIS_VISIBLE)
                   {
-                    interp += fname(obj->Name()).toStdString();
+                    interp += fname(obj->name()).toStdString();
                   }
                   else
                     interp += "something";
                 }
                 else
                 {
-                  interp += fname(obj->Name()).toStdString();
+                  interp += fname(obj->name()).toStdString();
                 }
                 break;
               case 'O':
-                if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->Name().isEmpty())
+                if (send_to == nullptr || vict_obj == nullptr || ((ObjectPtr)vict_obj)->name().isEmpty())
                 {
                   break;
                 }
-                if (!CAN_SEE_OBJ(send_to, (Object *)vict_obj))
+                if (!CAN_SEE_OBJ(send_to, (ObjectPtr)vict_obj))
                 {
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
                   {
-                    auto o = (Object *)vict_obj;
-                    auto n = o->Name();
+                    auto o = (ObjectPtr)vict_obj;
+                    auto n = o->name();
                     auto fs = fname(n).toStdString();
                     interp += fs;
                   }
@@ -389,14 +382,14 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 }
                 else
                 {
-                  auto o = (Object *)vict_obj;
-                  auto n = o->Name();
+                  auto o = (ObjectPtr)vict_obj;
+                  auto n = o->name();
                   auto fs = fname(n).toStdString();
                   interp += fs;
                 }
                 break;
               case 'p':
-                if (send_to == nullptr || obj == nullptr || obj->short_description == nullptr)
+                if (send_to == nullptr || obj == nullptr || qPrintable(obj->short_description())().isEmpty())
                 {
                   break;
                 }
@@ -406,42 +399,42 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += obj->short_description;
+                    interp += qPrintable(obj->short_description())().toStdString();
                   else
                     interp += "something";
                 }
                 else
                 {
-                  interp += obj->short_description;
+                  interp += qPrintable(obj->short_description())().toStdString();
                 }
                 break;
               case 'P':
-                if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->short_description == nullptr)
+                if (send_to == nullptr || vict_obj == nullptr || ((ObjectPtr)vict_obj)->short_description().isEmpty())
                 {
                   break;
                 }
 
-                if (!CAN_SEE_OBJ(send_to, (Object *)vict_obj))
+                if (!CAN_SEE_OBJ(send_to, (ObjectPtr)vict_obj))
                 {
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += ((Object *)vict_obj)->short_description;
+                    interp += ((ObjectPtr)vict_obj)->short_description().toStdString();
                   else
                     interp += "something";
                 }
                 else
                 {
-                  interp += ((Object *)vict_obj)->short_description;
+                  interp += ((ObjectPtr)vict_obj)->short_description().toStdString();
                 }
                 break;
               case 'a':
-                if (obj == nullptr || obj->Name().isEmpty())
+                if (obj == nullptr || obj->name().isEmpty())
                 {
                   break;
                 }
 
-                switch (*qPrintable((obj)->Name()))
+                switch (*qPrintable((obj)->name()))
                 {
                 case 'a':
                 case 'A':
@@ -463,9 +456,9 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 }
                 break;
               case 'A':
-                if (vict_obj != nullptr && !((Object *)vict_obj)->Name().isEmpty())
+                if (vict_obj != nullptr && !((ObjectPtr)vict_obj)->name().isEmpty())
                 {
-                  switch (*qPrintable(((Object *)vict_obj)->Name()))
+                  switch (*qPrintable(((ObjectPtr)vict_obj)->name()))
                   {
                   case 'a':
                   case 'A':
@@ -542,7 +535,7 @@ Token::~Token()
 {
   if (buf)
     delete[] buf;
-  buf = 0;
+  buf = {};
 }
 
 /************************************************************************
@@ -569,7 +562,7 @@ void Token::SetBuf(char *rhs)
     //--
     // This switch statement just assigns the type of token we're dealing
     // with.  If you add new colors &c, you should modify this.
-    // $$ is a little tricky, it truncates the std::string so that only one $
+    // $$ is a little tricky, it truncates the QString so that only one $
     // appears on the end result output
     // $$ now just prints both since it's handled in 'handle_ansi' -pir 2/14/01
     //--
@@ -600,7 +593,7 @@ void Token::SetBuf(char *rhs)
       break;
       // we allow $$ to go through now, since it's handled in handle_ansi -pir 2/14/01
     case '$':
-      type = TEXT; // buf[1] = 0;
+      type = TEXT; // buf[1] = {};
 #ifdef DEBUG_TOKEN
       // std::cerr << buf << ": TEXT" << std::endl;
 #endif

@@ -21,50 +21,40 @@
 /**************************************************************************/
 /* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
+#include "DC/DC.h"
 
-#include "DC/character.h"
-#include "DC/room.h"
-#include "DC/mobile.h"
-#include "DC/utility.h"
 #include "DC/fight.h"
 #include "DC/act.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
-#include "DC/returnvals.h"
 #include "DC/spells.h"
-#include "DC/race.h" // Race defines used in align-aggro messages.
-#include "DC/connect.h"
 #include "DC/inventory.h"
-#include "DC/const.h"
-#include "DC/Timer.h"
-#include "DC/move.h"
-#include "DC/memory.h"
+#include "DC/utility.h"
 
-void perform_wear(Character *ch, class Object *obj_object,
-                  int keyword);
-bool is_protected(Character *vict, Character *ch);
-void scavenge(Character *ch);
-bool is_r_denied(Character *ch, int room)
+void perform_wear(CharacterPtr ch, ObjectPtr obj_object,
+                  qint32 keyword);
+bool is_protected(CharacterPtr vict, CharacterPtr ch);
+void scavenge(CharacterPtr ch);
+bool is_r_denied(CharacterPtr ch, qint32 room)
 {
   deny_data *d;
   if (ch->isPlayer())
     return false;
-  for (d = DC::getInstance()->world[room].denied; d; d = d->next)
-    if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == d->vnum)
+  for (d = DC::getInstance()->world[room].denied; d; d = conn->next)
+    if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == conn->vnum)
       return true;
   return false;
 }
 void mobile_activity(void)
 {
-  Character *tmp_ch, *pch;
-  class Object *obj, *best_obj;
+  CharacterPtr tmp_ch, pch;
+  ObjectPtr obj, best_obj;
   char buf[1000];
-  int door, max;
-  int done;
-  int tmp_race, tmp_bitv;
-  int retval;
-  extern int mprog_cur_result;
+  qint32 door, max;
+  qint32 done;
+  qint32 tmp_race, tmp_bitv;
+  qint32 retval;
+  extern qint32 mprog_cur_result;
 
   /* Examine all mobs. */
   const auto &character_list = DC::getInstance()->character_list;
@@ -128,7 +118,7 @@ void mobile_activity(void)
     if (IS_AFFECTED(ch, AFF_PARALYSIS))
       continue;
 
-    done = 0;
+    done = {};
 
     // TODO - Try to make the 'average' mob IQ higher
     selfpurge = false;
@@ -178,11 +168,11 @@ void mobile_activity(void)
       for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
       {
         tmp2_act = tmp_act->next;
-        dc_free(tmp_act->buf);
-        dc_free(tmp_act);
+        tmp_act->buf = {};
+        tmp_act = {};
       }
-      ch->mobdata->mpactnum = 0;
-      ch->mobdata->mpact = nullptr;
+      ch->mobdata->mpactnum = {};
+      ch->mobdata->mpact = {};
     }
 
     PerfTimers["scavenge"].start();
@@ -207,7 +197,7 @@ void mobile_activity(void)
     if (ISSET(ch->mobdata->actflags, ACT_SCAVENGER) && !IS_AFFECTED(ch, AFF_CHARM) && DC::getInstance()->world[ch->in_room].contents && number(0, 4) == 0)
     {
       max = 1;
-      best_obj = 0;
+      best_obj = {};
       for (obj = DC::getInstance()->world[ch->in_room].contents; obj; obj = obj->next_content)
       {
         if (CAN_GET_OBJ(ch, obj) && obj->obj_flags.cost > max)
@@ -235,7 +225,7 @@ void mobile_activity(void)
       door = number(0, 30);
       if (door <= 5 && CAN_GO(ch, door))
       {
-        int room_nr_past_door = EXIT(ch, door)->to_room;
+        qint32 room_nr_past_door = EXIT(ch, door)->to_room;
         if (room_nr_past_door < 0)
         {
           logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
@@ -266,9 +256,9 @@ void mobile_activity(void)
     if ((ch->mobdata->hated != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
     {
       ch->sendln("You're hating.");
-      Character *next_blah;
-      //      Character *temp = get_char(get_random_hate(ch));
-      done = 0;
+      CharacterPtr next_blah;
+      //      CharacterPtr temp = get_char(get_random_hate(ch));
+      done = {};
 
       for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = next_blah)
       {
@@ -279,7 +269,7 @@ void mobile_activity(void)
         if (!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
-        if (isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
+        if (isexact(qPrintable(tmp_ch->name()), ch->mobdata->hated)) // use isname since hated is a list
         {
           if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
           {
@@ -324,16 +314,16 @@ void mobile_activity(void)
           continue;
         }
       }
-    } //  end FIRST hated IF statement
+    } //  end WEAR_WIELD hated IF statement
 
     /* Aggress */
     if (!ch->fighting) // don't aggro more than one person
       if (ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
           !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
       {
-        Character *next_aggro;
-        int targets = 1;
-        done = 0;
+        CharacterPtr next_aggro;
+        qint32 targets = 1;
+        done = {};
 
         // While not very effective what this does, is go through the
         // list of people in room.  If it finds one, it sets targets to true
@@ -344,7 +334,7 @@ void mobile_activity(void)
         // loop back through again. - pir 5/3/00
         while (!done && targets)
         {
-          targets = 0;
+          targets = {};
           for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = next_aggro)
           {
             if (!tmp_ch || !ch)
@@ -419,17 +409,17 @@ void mobile_activity(void)
           tmp_bitv = getBitvector(tmp_ch->race);
 
           if (ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
-              (ch->mobdata->hated.isEmpty() || !isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) &&
+              (ch->mobdata->hated.isEmpty() || !isexact(qPrintable(tmp_ch->name()), ch->mobdata->hated)) &&
               tmp_ch->fighting &&
               CAN_SEE(ch, tmp_ch) &&
-              (isSet(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
-               (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
+              (isSet(races[(qint32)ch->race].friendly, tmp_bitv) ||
+               (qint32)ch->race == (qint32)tmp_ch->race) &&
 
-              !(tmp_ch->fighting->isNonPlayer() && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(int)GET_RACE(ch)].friendly, getBitvector(tmp_ch->fighting->race)) &&
+              !(tmp_ch->fighting->isNonPlayer() && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(qint32)ch->race].friendly, getBitvector(tmp_ch->fighting->race)) &&
               !tmp_ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF) && !tmp_ch->isPlayerGoldThief())
           {
-            tmp_race = GET_RACE(tmp_ch);
-            if (GET_RACE(ch) == tmp_race)
+            tmp_race = tmp_ch->race;
+            if (ch->race == tmp_race)
               sprintf(buf, "$n screams 'Take heart, fellow %s!'", races[tmp_race].singular_name);
             else
               sprintf(buf, "$n screams 'HEY! Don't be picking on %s!'", races[tmp_race].plural_name);
@@ -458,7 +448,7 @@ void mobile_activity(void)
               (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked isPlayer() first
                ))
           {
-            int i = 0;
+            qint32 i = {};
             switch (ch->race)
             { // Messages for attackys
             case RACE_HUMAN:
@@ -478,7 +468,7 @@ void mobile_activity(void)
               i = 1;
               break;
             default:
-              i = 0;
+              i = {};
               break;
             }
 
@@ -553,9 +543,9 @@ void mobile_activity(void)
             }
 
             if (ISSET(ch->mobdata->actflags, ACT_RACIST) &&
-                isSet(races[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
+                isSet(races[(qint32)ch->race].hate_fear, tmp_bitv))
             {
-              tmp_race = GET_RACE(tmp_ch);
+              tmp_race = tmp_ch->race;
               bool wimpy = ISSET(ch->mobdata->actflags, ACT_WIMPY);
 
               // if mob isn't wimpy, always attack
@@ -592,7 +582,7 @@ void mobile_activity(void)
 // Just a function to have mobs say random stuff when they are "suprised"
 // about finding a player doing something and decide to attack them.
 // For example, when a mob finds a player casting "spell" on them.
-void mob_suprised_sayings(Character *ch, Character *aggressor)
+void mob_suprised_sayings(CharacterPtr ch, CharacterPtr aggressor)
 {
   switch (number(0, 6))
   {
@@ -624,10 +614,10 @@ void mob_suprised_sayings(Character *ch, Character *aggressor)
 /* check to see if the player is protected from the mob */
 // PROTECTION_FROM_EVIL and GOOD modifier contains the level
 // protected from.  PAL's ANTI's take spell/level whichever higher
-bool is_protected(Character *vict, Character *ch)
+bool is_protected(CharacterPtr vict, CharacterPtr ch)
 {
   affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
-  int level_protected = aff ? aff->modifier : 0;
+  qint32 level_protected = aff ? aff->modifier : 0;
   if (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && vict->getLevel() > level_protected)
     level_protected = vict->getLevel();
 
@@ -665,13 +655,13 @@ bool is_protected(Character *vict, Character *ch)
   return (false);
 }
 
-void scavenge(Character *ch)
+void scavenge(CharacterPtr ch)
 {
-  class Object *obj;
-  int done;
-  int keyword;
+  ObjectPtr obj;
+  qint32 done;
+  qint32 keyword;
 
-  done = 0;
+  done = {};
   if (IS_AFFECTED(ch, AFF_CHARM))
     return;
   for (obj = DC::getInstance()->world[ch->in_room].contents; obj; obj = obj->next_content)
@@ -953,10 +943,10 @@ void scavenge(Character *ch)
 
 void clear_hunt(varg_t arg1, void *arg2, void *arg3)
 {
-  clear_hunt(arg1, (Character *)arg2, nullptr);
+  clear_hunt(arg1, (CharacterPtr)arg2, nullptr);
 }
 
-void clear_hunt(varg_t arg1, Character *arg2, void *arg3)
+void clear_hunt(varg_t arg1, CharacterPtr arg2, void *arg3)
 {
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &curr : character_list)

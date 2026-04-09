@@ -2,27 +2,22 @@
 | Level 103 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-
-#include <fmt/format.h>
-
-#include "DC/wizard.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
-#include "DC/player.h"
+#include "DC/DC.h"
+#include "DC/act.h"
+#include "DC/affect.h"
 #include "DC/db.h"
-#include "DC/connect.h"
 #include "DC/interp.h"
-#include "DC/room.h"
 #include "DC/handler.h"
-#include "DC/returnvals.h"
-#include "DC/spells.h"
 #include "DC/clan.h"
 #include "DC/race.h"
 #include "DC/const.h"
+#include "DC/utility.h"
 
-int do_boot(Character *ch, char *arg, cmd_t cmd)
+#include <fmt/format.h>
+
+qint32 do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
 
   half_chop(arg, name, type);
@@ -69,7 +64,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
       sprintf(buf, "A stream of fire arcs down from the heavens, striking "
                    "you between the eyes.\r\nYou have been removed from the "
                    "world by %s.\r\n",
-              GET_SHORT(ch));
+              qPrintable(ch->shortdesc_or_name()));
       victim->send(buf);
     }
 
@@ -78,7 +73,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
         "by $N.",
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
-    sprintf(name, "%s has booted %s.", GET_NAME(ch), victim->getNameC());
+    sprintf(name, "%s has booted %s.", qPrintable(ch->name()), qPrintable(victim->name()));
     logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     if (!strcmp(type, "boot"))
@@ -158,12 +153,12 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_disconnect(Character *ch, char *argument, cmd_t cmd)
+qint32 do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
   class Connection *d;
-  unsigned sdesc;
+  quint32 sdesc;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -176,14 +171,14 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Usage: release <#>");
     return ReturnValue::eFAILURE;
   }
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto &d : DC::getInstance()->connections_)
   {
-    if (d->descriptor == sdesc)
+    if (conn->descriptor == sdesc)
     {
-      if (d->character && (d->character->getLevel() > ch->getLevel()))
+      if (conn->character && (conn->character->getLevel() > ch->getLevel()))
       {
-        sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", GET_NAME(ch));
-        d->character->send(buf);
+        sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", qPrintable(ch->name()));
+        conn->character->send(buf);
         ch->sendln("You dummy, can't do that to your elders!");
         close_socket(ch->desc);
         return ReturnValue::eFAILURE;
@@ -201,10 +196,10 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_fsave(Character *ch, std::string argument, cmd_t cmd)
+qint32 do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *vict = {};
-  std::string name = {}, buf = {};
+  CharacterPtr vict = {};
+  QString name = {}, buf = {};
 
   if (ch->isNonPlayer())
   {
@@ -233,25 +228,25 @@ int do_fsave(Character *ch, std::string argument, cmd_t cmd)
   }
   vict->save();
 
-  logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  logentry(QStringLiteral("%1 just forced %2 to save.").arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return ReturnValue::eSUCCESS;
 }
 
-int do_fighting(Character *ch, char *argument, cmd_t cmd)
+qint32 do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  const int CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
-  Character *i;
+  const qint32 CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
+  CharacterPtr i;
   bool arenaONLY = false;
-  int countFighters = 0;
+  qint32 countFighters = {};
   char buf[80];
   char arg[MAX_STRING_LENGTH];
-  clan_data *ch_clan = 0;
+  Clan *ch_clan = {};
   char ch_clan_name[CLANTAG_LEN];
-  ch_clan_name[0] = 0;
-  clan_data *victim_clan = 0;
+  ch_clan_name[0] = {};
+  Clan *victim_clan = {};
   char victim_clan_name[CLANTAG_LEN];
-  victim_clan_name[0] = 0;
+  victim_clan_name[0] = {};
 
   one_argument(argument, arg);
   if (!strcmp(arg, "arena"))
@@ -279,8 +274,8 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
       snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
 
     snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
-             GET_NAME(i), ch_clan_name,
-             GET_NAME(i->fighting), victim_clan_name,
+             qPrintable(i->name()), ch_clan_name,
+             qPrintable(i->fighting->name()), victim_clan_name,
              DC::getInstance()->world[i->in_room].number);
     ch->send(buf);
   }
@@ -295,9 +290,9 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_peace(Character *ch, char *argument, cmd_t cmd)
+qint32 do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *rch;
+  CharacterPtr rch;
 
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
@@ -311,10 +306,10 @@ int do_peace(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
+qint32 do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int i = 0;
+  qint32 i = {};
   buf[0] = '\0';
   for (; i < MAX_RACE; i++)
   {
@@ -336,9 +331,9 @@ int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int lookupClass(Character *ch, char *str)
+qint32 lookupClass(CharacterPtr ch, char *str)
 {
-  int c_class;
+  qint32 c_class;
 
   if (str != 0)
   {
@@ -358,19 +353,19 @@ int lookupClass(Character *ch, char *str)
     ch->sendln("Valid classes:");
     for (c_class = 1; c_class <= CLASS_MAX; c_class++)
     {
-      csendf(ch, "%s\r\n", pc_clss_types[c_class]);
+      ch->send(QStringLiteral("%s\r\n").arg(pc_clss_types[c_class]));
     }
   }
 
   return -1;
 }
 
-int lookupRoom(Character *ch, char *str)
+qint32 lookupRoom(CharacterPtr ch, char *str)
 {
   if (str == 0)
     return -1;
 
-  int room = atoi(str);
+  qint32 room = atoi(str);
 
   if (room == DC::NOWHERE || room > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(room))
   {
@@ -385,9 +380,9 @@ int lookupRoom(Character *ch, char *str)
   return room;
 }
 
-int do_guild(Character *ch, char *argument, cmd_t cmd)
+qint32 do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int c_class = 0, room = 0, old_room = 0;
+  qint32 c_class = 0, room = 0, old_room = {};
   char arg1[MAX_STRING_LENGTH] = {0};
   char arg2[MAX_STRING_LENGTH] = {0};
 
@@ -426,7 +421,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
         if (DC::getInstance()->rooms.contains(room) && DC::getInstance()->rooms[room].allow_class[c_class] == true)
         {
           found = true;
-          csendf(ch, "%s ", pc_clss_types[c_class]);
+          ch->send(QStringLiteral("%s ").arg(pc_clss_types[c_class]));
         }
       }
 
@@ -450,11 +445,11 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
 
-      int count = 0;
-      csendf(ch, "%s only rooms:\r\n", pc_clss_types[c_class]);
+      qint32 count = {};
+      ch->send(QStringLiteral("%s only rooms:\r\n").arg(pc_clss_types[c_class]));
 
-      int cols = 0;
-      for (int r = 0; r < DC::getInstance()->top_of_world; r++)
+      qint32 cols = {};
+      for (qint32 r = {}; r < DC::getInstance()->top_of_world; r++)
       {
         if (DC::getInstance()->rooms.contains(r) && DC::getInstance()->rooms[r].allow_class[c_class] == true)
         {
@@ -464,7 +459,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
           cols++;
           if (cols == 11)
           {
-            cols = 0;
+            cols = {};
             ch->sendln("");
           }
         }
@@ -510,12 +505,12 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
 
   if (DC::getInstance()->rooms[room].allow_class[c_class] == true)
   {
-    csendf(ch, "Removed %s class from room #%d's allow list.\r\n", pc_clss_types[c_class], room);
+    ch->send(QStringLiteral("Removed %s class from room #%d's allow list.\r\n").arg(pc_clss_types[c_class]).arg(room));
     DC::getInstance()->rooms[room].allow_class[c_class] = false;
   }
   else
   {
-    csendf(ch, "Added %s class to room #%d's allow list.\r\n", pc_clss_types[c_class], room);
+    ch->send(QStringLiteral("Added %s class to room #%d's allow list.\r\n").arg(pc_clss_types[c_class]).arg(room));
     DC::getInstance()->rooms[room].allow_class[c_class] = true;
   }
 

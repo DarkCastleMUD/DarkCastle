@@ -11,27 +11,22 @@
 #include <fmt/format.h>
 
 #include "DC/ki.h"
-#include "DC/room.h"
-#include "DC/character.h"
+
+#include "DC/DC.h"
 #include "DC/spells.h" // tar_char..
-#include "DC/utility.h"
+
 #include "DC/player.h"
 #include "DC/interp.h"
-#include "DC/mobile.h"
+
 #include "DC/fight.h"
 #include "DC/handler.h"
-#include "DC/connect.h"
 #include "DC/act.h"
-#include "DC/db.h"
-#include "DC/returnvals.h"
-#include <vector>
 #include "DC/handler.h"
+#include "DC/utility.h"
 
 const QList<ki_info_type> ki_info = {
     {/* 0 */
-     3 * DC::PULSE_TIMER, position_t::FIGHTING, 12,
-     TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, ki_blast,
-     SKILL_INCREASE_HARD},
+     3 * DC::PULSE_TIMER, position_t::FIGHTING, 12, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, ki_blast, SKILL_INCREASE_HARD},
 
     {/* 1 */
      3 * DC::PULSE_TIMER, position_t::FIGHTING, 12,
@@ -80,7 +75,7 @@ const QList<ki_info_type> ki_info = {
 
 };
 
-const char *ki[] = {
+const QStringList ki = {
     "blast",
     "punch",
     "sense",
@@ -91,25 +86,18 @@ const char *ki[] = {
     "stance",
     "agility",
     "meditation",
-    "transfer",
-    "\n"};
+    "transfer"};
 
-int16_t use_ki(Character *ch, int kn);
-bool ARE_GROUPED(Character *sub, Character *obj);
+qint16 use_ki(CharacterPtr ch, qint32 kn);
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
 
-int16_t use_ki(Character *ch, int kn)
+qint16 use_ki(CharacterPtr ch, qint32 kn)
 {
   return (ki_info[kn].min_useski());
 }
 
-int do_ki(Character *ch, char *argument, cmd_t cmd)
+qint32 do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *tar_char = ch;
-  char name[MAX_STRING_LENGTH];
-  int qend, spl = -1;
-  bool target_ok;
-  int learned;
-
   if (ch->getLevel() < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
   {
     ch->sendln("You are unable to control your ki in this way!");
@@ -122,20 +110,17 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
    return ReturnValue::eFAILURE;
    }*/
 
-  argument = skip_spaces(argument);
+  auto arguments = QString(argument).trimmed().toLower().split('\'');
+  auto ki_skill = arguments.value(1);
+  auto target_name = arguments.value(2);
 
-  if (!(*argument))
+  if (arguments.isEmpty())
   {
     ch->sendln("Yes, but WHAT would you like to do?");
     return ReturnValue::eFAILURE;
   }
 
-  for (qend = 1; *(argument + qend) && (*(argument + qend) != ' '); qend++)
-    *(argument + qend) = LOWER(*(argument + qend));
-
-  spl = old_search_block(argument, 0, qend, ki, 0);
-  spl--; /* ki goes from 0+ not 1+ like spells */
-
+  auto spl = ki.indexOf(ki_skill);
   if (spl < 0)
   {
     ch->sendln("You cannot harness that energy!");
@@ -144,13 +129,11 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (ch->getLevel() < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
-    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
-                 "the universe.\r\n",
-                 ch);
+    ch->sendln(QStringLiteral("You feel at peace, calm, relaxed, one with yourself and the universe."));
     return ReturnValue::eFAILURE;
   }
 
-  learned = ch->has_skill((spl + KI_OFFSET));
+  auto learned = ch->has_skill(spl + KI_OFFSET);
   if (!learned)
   {
     ch->sendln("You do not know that ki power!");
@@ -167,9 +150,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("You dream of wonderful ki powers.");
         break;
       case position_t::RESTING:
-        send_to_char("You cannot harness that much energy while "
-                     "resting!\r\n",
-                     ch);
+        ch->sendln("You cannot harness that much energy while resting!");
         break;
       case position_t::SITTING:
         ch->sendln("You can't do this sitting!");
@@ -183,32 +164,25 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
       }
       return ReturnValue::eFAILURE;
     }
-    argument += qend; /* Point to the space after the last ' */
-    for (; *argument == ' '; argument++)
-      ; /* skip spaces */
 
-    /* Locate targets */
-    target_ok = false;
-
+    auto target_ok = false;
+    CharacterPtr tar_char;
     if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
     {
-      argument = one_argument(argument, name);
-      if (*name)
+      if (!target_name.isEmpty())
       {
         if (isSet(ki_info[spl].targets(), TAR_CHAR_ROOM))
-          if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
+          if ((tar_char = ch->get_char_room_vis(target_name)) != nullptr)
             target_ok = true;
 
         if (!target_ok && isSet(ki_info[spl].targets(), TAR_SELF_ONLY))
-          if (str_cmp(GET_NAME(ch), name) == 0)
+          if (ch->name() == target_name)
           {
             tar_char = ch;
             target_ok = true;
           } // of !target_ok
-      } // of *name
-
-      /* No argument was typed */
-      else if (!*name)
+      }
+      else /* No argument was typed */
       {
         if (isSet(ki_info[spl].targets(), TAR_FIGHT_VICT))
           if (ch->fighting)
@@ -217,15 +191,13 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
               tar_char = ch->fighting;
               target_ok = true;
             }
+
         if (!target_ok && isSet(ki_info[spl].targets(), TAR_SELF_ONLY))
         {
           tar_char = ch;
           target_ok = true;
         }
-      } // of !*name
-
-      else
-        target_ok = false;
+      }
     }
 
     if (isSet(ki_info[spl].targets(), TAR_IGNORE))
@@ -233,14 +205,12 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
 
     if (target_ok != true)
     {
-      if (*name)
+      if (!target_name.isEmpty())
         ch->sendln("Nobody here by that name.");
-      else
-        /* No arguments were given */
+      else /* No arguments were given */
         ch->sendln("Whom should the power be used upon?");
       return ReturnValue::eFAILURE;
     }
-
     else if (target_ok)
     {
       if ((tar_char == ch) && isSet(ki_info[spl].targets(), TAR_SELF_NONO))
@@ -267,12 +237,8 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
     if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!tar_char)
       {
-        logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
-                 DC::LogChannel::LOG_BUG);
-        send_to_char(
-            "If you triggered this message, you almost crashed the\r\n"
-            "game.  Tell a god what you did immediately.\r\n",
-            ch);
+        logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+        send_to_char("If you triggered this message, you almost crashed the\r\ngame.  Tell a god what you did immediately.\r\n", ch);
         return ReturnValue::eFAILURE;
       }
 
@@ -299,9 +265,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Sorry, this power has not yet been implemented.");
     else
     {
-      if (!skill_success(ch, tar_char,
-                         spl + KI_OFFSET) &&
-          !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+      if (!skill_success(ch, tar_char, spl + KI_OFFSET) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
       {
         ch->sendln("You lost your concentration!");
         GET_KI(ch) -= use_ki(ch, spl) / 2;
@@ -335,38 +299,37 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Ok.");
       GET_KI(ch) -= use_ki(ch, spl);
 
-      return ((*ki_info[spl].ki_pointer())(ch->getLevel(), ch, argument,
-                                           tar_char));
+      return ((*ki_info[spl].ki_pointer())(ch->getLevel(), ch, argument, tar_char));
     }
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eFAILURE;
 }
 
-void reduce_ki(Character *ch, int type)
+void reduce_ki(CharacterPtr ch, qint32 type)
 {
-  int amount = 0;
+  qint32 amount = {};
 
   amount += ch->getLevel() / type; /* the higher the response
                                     * the lower the divisor */
 
   amount -= dice(1, 10);
   if (amount < 0)
-    amount = 0;
+    amount = {};
   GET_KI(ch) -= amount;
 }
 
-int Character::ki_gain_lookup(void)
+qint32 Character::ki_gain_lookup(void)
 {
-  int gain;
+  qint32 gain;
 
   /* gain 1 - 7 depedant on level */
-  gain = GET_CLASS(this) == CLASS_MONK ? (int)(this->max_ki * 0.04) : (int)(this->max_ki * 0.05); /*(this->getLevel() / 8) + 1;*/
+  gain = GET_CLASS(this) == CLASS_MONK ? (qint32)(this->max_ki * 0.04) : (qint32)(this->max_ki * 0.05); /*(this->getLevel() / 8) + 1;*/
   gain += this->ki_regen;
 
   // Normalize these so we dont underun the array below
-  int norm_wis = MAX(0, GET_WIS(this));
-  int norm_int = MAX(0, GET_INT(this));
+  qint32 norm_wis = MAX(0, GET_WIS(this));
+  qint32 norm_int = MAX(0, GET_INT(this));
 
   if (GET_CLASS(this) == CLASS_MONK)
   {
@@ -380,9 +343,9 @@ int Character::ki_gain_lookup(void)
   gain += age().year / 25;
 
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
-    gain = (int)(gain * 1.25);
+    gain = (qint32)(gain * 1.25);
 
-  int multiplyer = 1;
+  qint32 multiplyer = 1;
   switch (GET_POS(this))
   {
   case position_t::SLEEPING:
@@ -403,12 +366,12 @@ int Character::ki_gain_lookup(void)
   return MAX(gain, 1);
 }
 
-int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
-  int success = 0;
-  int exit = number(0, 5); /* Chooses an exit */
+  qint32 success = {};
+  qint32 exit = number(0, 5); /* Chooses an exit */
 
-  extern char *dirswards[];
+  extern QStringList dirswards;
   char buf[200];
 
   if (!vict)
@@ -455,10 +418,10 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     {
       if (vict->isNonPlayer())
       {
-        vict->add_memory(GET_NAME(ch), 'h');
+        vict->add_memory(qPrintable(ch->name()), 'h');
         remove_memory(vict, 'f');
       }
-      Character *tmp;
+      CharacterPtr tmp;
       for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
         if (tmp->fighting == vict)
           stop_fighting(tmp);
@@ -473,10 +436,10 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   else /* There is no exit there */
   {
     char buf[MAX_STRING_LENGTH], name[100];
-    int prev = vict->getHP();
+    qint32 prev = vict->getHP();
 
-    strcpy(name, GET_SHORT(vict));
-    int retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
+    strcpy(name, qPrintable(vict->shortdesc_or_name()));
+    qint32 retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
     if (!SOMEONE_DIED(retval) && !vict->fighting && vict->isNonPlayer())
@@ -487,7 +450,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_punch(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   if (!vict)
   {
@@ -498,7 +461,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
   set_cantquit(ch, vict);
   auto dam = number(500, 700);
   auto manadam = GET_MANA(vict) / 4;
-  int retval = ReturnValue::eFAILURE;
+  qint32 retval = ReturnValue::eFAILURE;
 
   manadam = MAX(150, manadam);
   manadam = MIN(750, manadam);
@@ -533,7 +496,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
-int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_sense(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   affected_type af;
   if (IS_AFFECTED(ch, AFF_INFRARED))
@@ -542,7 +505,7 @@ int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
     return ReturnValue::eSUCCESS;
 
   af.type = SPELL_INFRAVISION;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.duration = level;
   af.bitvector = AFF_INFRARED;
@@ -552,17 +515,17 @@ int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
-  int dam;
-  int retval;
-  Character *tmp_victim, *temp;
+  qint32 dam;
+  qint32 retval;
+  CharacterPtr tmp_victim, temp;
 
   dam = number(135, 165);
   //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
   //  act("$n's eyes flash as $e pools the energy within $m!\r\nA burst of energy slams into you!\r\n",
-  int32_t room = ch->in_room;
-  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
+  qint32 room = ch->in_room;
+  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
@@ -577,9 +540,9 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     //		if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
     //	tmp_victim->sendln("A crackle of energy echos past you.");
   }
-  int dir = number(0, 5), distance = number(1, 3), i;
+  qint32 dir = number(0, 5), distance = number(1, 3), i;
   if (room > 0)
-    for (i = 0; i < distance; i++)
+    for (i = {}; i < distance; i++)
     {
       if (!IS_EXIT(room, dir) || !IS_OPEN(room, dir))
         break;
@@ -602,7 +565,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_speed(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   affected_type af;
 
@@ -617,7 +580,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 
   af.type = SPELL_HASTE;
   af.duration = ch->has_skill(KI_OFFSET + KI_SPEED) / 15;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = AFF_HASTE;
 
@@ -635,7 +598,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   if (!vict)
   {
@@ -698,7 +661,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
+qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim)
 {
   if (!victim)
   {
@@ -710,8 +673,8 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   set_cantquit(ch, victim);
 
   bool disrupt_bingo = false;
-  int success_chance = 0;
-  int learned = ch->has_skill(KI_OFFSET + KI_DISRUPT);
+  qint32 success_chance = {};
+  qint32 learned = ch->has_skill(KI_OFFSET + KI_DISRUPT);
 
   if (learned > 85)
   {
@@ -766,7 +729,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     return ReturnValue::eFAILURE;
   }
 
-  int savebonus = 0;
+  qint32 savebonus = {};
   if (learned < 41)
   {
     savebonus = 35;
@@ -795,7 +758,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   if (af)
   {
     // We've KI_DISRUPTED the victim and failed before so we get a bonus
-    if (af->caster == std::string(GET_NAME(ch)))
+    if (af->caster == QString(qPrintable(ch->name())))
     {
       savebonus -= af->modifier;
     }
@@ -803,11 +766,11 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     {
       // Some other caster's KI_DISRUPT was on the victim, removing it
       affect_from_char(victim, KI_DISRUPT + KI_OFFSET);
-      af = 0;
+      af = {};
     }
   }
 
-  int retval = 0;
+  qint32 retval = {};
 
   if (number(1, 100) <= get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != ch->getLevel() - 1)
   {
@@ -826,7 +789,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       newaf.modifier = 1 + (learned / 20);
       newaf.location = APPLY_NONE;
       newaf.bitvector = -1;
-      newaf.caster = std::string(GET_NAME(ch));
+      newaf.caster = QString(qPrintable(ch->name()));
 
       affect_to_char(victim, &newaf);
     }
@@ -941,7 +904,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   // adds them to a list called aff_list. Then a random element of
   // the list will be chosen for removal. This ensures we pick a random
   // affect only out of those that the player is using.
-  std::vector<affected_type> aff_list;
+  QList<affected_type> aff_list;
 
   // Since we're looking for either these 3 affects OR the spells that cause them
   // we're keeping a track of which is found so we don't mark them twice
@@ -1004,7 +967,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   }
 
   // Pick the lucky spell/affect to be removed
-  uint64_t i = number((quint64)0, (quint64)aff_list.size() - 1);
+  quint64 i = number((quint64)0, (quint64)aff_list.size() - 1);
 
   try
   {
@@ -1097,7 +1060,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_stance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   affected_type af;
 
@@ -1130,9 +1093,9 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
-  int learned, chance, percent;
+  qint32 learned, chance, percent;
   affected_type af;
 
   if (ch->isNonPlayer() || ch->getLevel() >= ARCHANGEL)
@@ -1165,7 +1128,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
     ch->sendln("You instruct your party on more graceful movement.");
     act("$n holds a quick tai chi class.", ch, 0, 0, TO_ROOM, 0);
 
-    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1191,9 +1154,9 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
+qint32 ki_meditation(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
-  int gain;
+  qint32 gain;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -1208,10 +1171,10 @@ int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
+qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim)
 {
   char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
-  int amount, temp = 0;
+  qint32 amount, temp = {};
   affected_type af;
 
   argument_interpreter(arg, amt, type);
@@ -1232,7 +1195,7 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
     return ReturnValue::eFAILURE;
   }
 
-  int learned = ch->has_skill(KI_TRANSFER + KI_OFFSET);
+  qint32 learned = ch->has_skill(KI_TRANSFER + KI_OFFSET);
 
   if (victim->affected_by_spell(SPELL_KI_TRANS_TIMER))
   {
@@ -1245,8 +1208,8 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
 
   af.type = SPELL_KI_TRANS_TIMER;
   af.duration = 1;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
@@ -1274,14 +1237,14 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
   {
     GET_KI(ch) -= amount;
 
-    int mana_per_ki = learned / 5;
+    qint32 mana_per_ki = learned / 5;
 
     temp = mana_per_ki * amount;
     GET_MANA(victim) += temp;
     if (GET_MANA(victim) > GET_MAX_MANA(victim))
       GET_MANA(victim) = GET_MAX_MANA(victim);
 
-    std::string buffer;
+    QString buffer;
     buffer = fmt::format("You focus intently, bonding briefly with $N's spirit, transferring {} ki of your essence into {} mana for $M.", amount, temp);
     act(buffer.c_str(), ch, 0, victim, TO_CHAR, 0);
 

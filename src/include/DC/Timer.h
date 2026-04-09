@@ -5,22 +5,21 @@
  *      Author: jhhudso
  */
 
-#ifndef TIMER_H_
-#define TIMER_H_
+#pragma once
 
-#include <string>
-#include <map>
+#include <QString>
+#include <QMap>
 #include <ctime>
 #include <cstdint>
 #include <iostream>
-
+#include <QtTypes>
 class TimeVal
 {
 public:
   TimeVal(time_t sec = 0, suseconds_t usec = 0);
   TimeVal operator+(TimeVal t);
   TimeVal operator-(TimeVal t);
-  TimeVal operator/(int value);
+  TimeVal operator/(qint32 value);
   bool operator<(TimeVal t1);
   bool operator>(TimeVal t1);
   bool operator>=(TimeVal t1);
@@ -36,7 +35,7 @@ public:
   virtual ~Timer();
   void start();
   void stop();
-  void setCount(uint16_t c) { stopCount = c; }
+  void setCount(quint16 c) { stopCount = c; }
   TimeVal getDiff();
   TimeVal getDiffMin();
   TimeVal getDiffMax();
@@ -53,9 +52,7 @@ private:
   friend std::ostream &operator<<(std::ostream &, Timer t);
 };
 
-extern std::map<std::string, Timer> PerfTimers;
+extern QMap<QString, Timer> PerfTimers;
 
 std::ostream &operator<<(std::ostream &out, Timer t);
 std::ostream &operator<<(std::ostream &out, TimeVal tv);
-
-#endif /* TIMER_H_ */

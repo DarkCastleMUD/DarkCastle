@@ -6,25 +6,22 @@
 
 #include <cctype>
 
-#include "DC/character.h"
-#include "DC/room.h"
+#include "DC/DC.h"
+
 #include "DC/affect.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
+
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/clan.h"
 #include "DC/act.h"
-#include "DC/sing.h" // stop_grouped_bards
 #include <cstring>
-#include "DC/returnvals.h"
 #include "DC/terminal.h"
 #include "DC/comm.h"
-#include "DC/memory.h"
+#include "DC/utility.h"
 
-int do_abandon(Character *ch, char *argument, cmd_t cmd)
+qint32 do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *k;
+  CharacterPtr k;
   char buf[MAX_INPUT_LENGTH + 1];
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -58,21 +55,21 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
 
   sprintf(buf, "You abandon: %s\r\n", k->group_name);
   ch->send(buf);
-  sprintf(buf, "%s abandons: %s", GET_SHORT(ch), k->group_name);
+  sprintf(buf, "%s abandons: %s", qPrintable(ch->shortdesc_or_name()), k->group_name);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
   if (ch->isPlayer())
   {
-    ch->player->group_pkills = 0;
-    ch->player->grpplvl = 0;
-    ch->player->group_kills = 0;
+    ch->player->group_pkills = {};
+    ch->player->grpplvl = {};
+    ch->player->group_kills = {};
   }
 
   stop_follower(ch);
   return ReturnValue::eSUCCESS;
 }
 
-int do_found(Character *ch, char *argument, cmd_t cmd)
+qint32 do_found(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
 
@@ -110,17 +107,17 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  ch->group_name = str_dup(argument);
+  ch->group_name_ = argument;
   sprintf(buf, "You found: %s\r\n", argument);
   ch->send(buf);
-  sprintf(buf, "%s founds: %s", GET_SHORT(ch), argument);
+  sprintf(buf, "%s founds: %s", qPrintable(ch->shortdesc_or_name()), argument);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
   if (ch->isPlayer())
   {
-    ch->player->group_pkills = 0;
-    ch->player->grpplvl = 0;
-    ch->player->group_kills = 0;
+    ch->player->group_pkills = {};
+    ch->player->grpplvl = {};
+    ch->player->group_kills = {};
   }
 
   SETBIT(ch->affected_by, AFF_GROUP);
@@ -130,10 +127,10 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
 
 command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 {
-  quint64 share = 0, extra = 0;
-  quint64 no_members = 0;
-  Character *k = nullptr;
-  follow_type *f = nullptr;
+  quint64 share = 0, extra = {};
+  quint64 no_members = {};
+  CharacterPtr k = {};
+  follow_type *f = {};
 
   if (arguments.isEmpty())
   {
@@ -184,7 +181,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if (k->in_room == in_room)
     no_members = 1;
   else
-    no_members = 0;
+    no_members = {};
 
   for (f = k->followers; f; f = f->next)
   {
@@ -210,12 +207,12 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 
   if (k != this && k->in_room == in_room)
   {
-    k->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
-    int lost = 0;
+    k->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
+    qint32 lost = {};
     if (k->clan && get_clan(k)->tax && !isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
         (k->clan != clan || (k->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
     {
-      lost = (int)((float)share * (float)((float)get_clan(k)->tax / 100));
+      lost = (qint32)((float)share * (float)((float)get_clan(k)->tax / 100));
       k->send(QStringLiteral("Your clan taxes %L1 $B$5gold$R of your share.\r\n").arg(lost));
       get_clan(k)->cdeposit(lost);
       save_clans();
@@ -229,12 +226,12 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
         f->follower != this &&
         !f->follower->isNonPlayer())
     {
-      f->follower->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
-      int lost = 0;
+      f->follower->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
+      qint32 lost = {};
       if (f->follower->clan && get_clan(f->follower)->tax && !isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
           (f->follower->clan != clan || (f->follower->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
       {
-        lost = (int)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
+        lost = (qint32)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
         f->follower->send(QStringLiteral("Your clan taxes %L1 gold of your share.\r\n").arg(lost));
         get_clan(f->follower)->cdeposit(lost);
         save_clans();
@@ -245,7 +242,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void setup_group_buf(char *report, Character *j, Character *i)
+void setup_group_buf(char *report, CharacterPtr j, CharacterPtr i)
 {
   if (j->isNonPlayer() || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
   {
@@ -307,11 +304,11 @@ void setup_group_buf(char *report, Character *j, Character *i)
   }
 }
 
-int do_group(Character *ch, char *argument, cmd_t cmd)
+qint32 do_group(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[256];
   char buf[256], report[256];
-  Character *victim, *k, *j;
+  CharacterPtr victim, k, j;
   follow_type *f;
   bool found;
 
@@ -423,11 +420,11 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_promote(Character *ch, char *argument, cmd_t cmd)
+qint32 do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[250];
-  Character *new_new_leader, *k;
+  CharacterPtr new_new_leader, k;
   follow_type *f, *next_f;
 
   one_argument(argument, name);
@@ -478,17 +475,17 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   }
 
   sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
-          GET_SHORT(new_new_leader));
+          qPrintable(new_new_leader->shortdesc_or_name()));
   ch->send(buf);
   sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints YOU as "
                "the New Leader of: %s\r\n",
-          GET_SHORT(ch), ch->group_name,
-          GET_SHORT(ch), ch->group_name);
+          qPrintable(ch->shortdesc_or_name()), ch->group_name,
+          qPrintable(ch->shortdesc_or_name()), ch->group_name);
   new_new_leader->send(buf);
   sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints %s as "
                "the New Leader of: %s",
-          GET_SHORT(ch), ch->group_name,
-          GET_SHORT(ch), GET_SHORT(new_new_leader), ch->group_name);
+          qPrintable(ch->shortdesc_or_name()), ch->group_name,
+          qPrintable(ch->shortdesc_or_name()), qPrintable(new_new_leader->shortdesc_or_name()), ch->group_name);
   act(buf, ch, 0, new_new_leader, TO_ROOM, NOTVICT);
 
   if (ch->isPlayer() && new_new_leader->isPlayer())
@@ -496,18 +493,18 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
     new_new_leader->player->grpplvl = ch->player->grpplvl;
     new_new_leader->player->group_pkills = ch->player->group_pkills;
     new_new_leader->player->group_kills = ch->player->group_kills;
-    ch->player->group_pkills = 0;
-    ch->player->grpplvl = 0;
-    ch->player->group_kills = 0;
+    ch->player->group_pkills = {};
+    ch->player->grpplvl = {};
+    ch->player->group_kills = {};
   }
 
   if (ch->group_name)
   {
     new_new_leader->group_name = ch->group_name;
-    ch->group_name = nullptr;
+    ch->group_name = {};
   }
   else
-    new_new_leader->group_name = str_dup("I am a dork");
+    new_new_leader->group_name = QStringLiteral("I am a dork");
 
   stop_follower(new_new_leader, follower_reasons_t::CHANGE_LEADER);
 
@@ -528,11 +525,11 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_disband(Character *ch, char *argument, cmd_t cmd)
+qint32 do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[200];
-  Character *adios, *k;
+  CharacterPtr adios, k;
   follow_type *f, *next_f;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -570,14 +567,14 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "$n disbands $s group: %s", k->group_name);
     act(buf, k, 0, 0, TO_ROOM, 0);
 
-    dc_free(k->group_name);
-    k->group_name = 0;
+    k->group_name = {};
+    k->group_name = {};
 
     if (k->isPlayer())
     {
-      k->player->group_pkills = 0;
-      k->player->grpplvl = 0;
-      k->player->group_kills = 0;
+      k->player->group_pkills = {};
+      k->player->grpplvl = {};
+      k->player->group_kills = {};
     }
 
     for (f = k->followers; f; f = next_f)
@@ -624,18 +621,18 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
   stop_grouped_bards(adios, 1);
   if (adios->isPlayer())
   {
-    adios->player->grpplvl = 0;
-    adios->player->group_pkills = 0;
-    adios->player->group_kills = 0;
+    adios->player->grpplvl = {};
+    adios->player->group_pkills = {};
+    adios->player->group_kills = {};
   }
   stop_follower(adios);
   return ReturnValue::eSUCCESS;
 }
 
-int do_follow(Character *ch, char *argument, cmd_t cmd)
+qint32 do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
-  Character *leader;
+  CharacterPtr leader;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -719,7 +716,7 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd)
+command_return_t do_autojoin(CharacterPtr ch, QString str_arguments, cmd_t cmd)
 {
   if (ch->player == nullptr)
   {
@@ -761,11 +758,11 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
   return ReturnValue::eSUCCESS;
 }
 
-std::vector<Character *> Character::getFollowers(void)
+QList<CharacterPtr> Character::getFollowers(void)
 {
-  std::vector<Character *> followers = {};
+  QList<CharacterPtr> followers = {};
   follow_type *f = {};
-  Character *leader = nullptr;
+  CharacterPtr leader = {};
 
   if (!IS_AFFECTED(this, AFF_GROUP))
   {

@@ -3,41 +3,33 @@
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
-
-#include <cstring> //strstr()
-#include <cctype>
-#include <string>
-#include <queue>
-#include <tuple>
-#include <fmt/format.h>
-
-#include <QQueue>
-#include <QDateTime>
-
+#include "DC/DC.h"
 #include "DC/structs.h"
-#include "DC/room.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/connect.h"
-#include "DC/mobile.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/terminal.h"
 #include "DC/act.h"
-#include "DC/returnvals.h"
-#include "DC/obj.h"
 #include "DC/punish.h"
 
-QQueue<ChannelMessage> gossip_history;
-std::queue<QString> auction_history;
-std::queue<QString> newbie_history;
-std::queue<QString> trivia_history;
+#include <cstring> //strstr()
+#include <cctype>
+#include <QString>
+#include <QQueue>
+#include <tuple>
+#include <fmt/format.h>
+#include <QQueue>
+#include <QDateTime>
 
-command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
+QQueue<ChannelMessage> gossip_history;
+QQueue<QString> auction_history;
+QQueue<QString> newbie_history;
+QQueue<QString> trivia_history;
+
+command_return_t do_say(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int i;
-  std::string buf;
-  int retval;
+  qint32 i;
+  QString buf;
+  qint32 retval;
   extern bool MOBtrigger;
 
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
@@ -52,7 +44,7 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -104,10 +96,10 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
 
 // Psay works like 'say', just it's directed at a person
 // TODO - after this gets used alot, maybe switch speech triggers to it
-command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  std::string vict = {}, message = {}, buf = {};
-  Character *victim = nullptr;
+  QString vict = {}, message = {}, buf = {};
+  CharacterPtr victim = {};
   extern bool MOBtrigger;
 
   if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
@@ -122,7 +114,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  Object *tmp_obj = nullptr;
+  ObjectPtr tmp_obj = {};
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (tmp_obj && tmp_obj->item_number >= 0 && DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -144,7 +136,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  std::string messageStr = message;
+  QString messageStr = message;
   if (IS_IMMORTAL(ch))
   {
     messageStr = remove_all_codes(messageStr);
@@ -175,7 +167,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_pray(Character *ch, char *arg, cmd_t cmd)
+qint32 do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   class Connection *i;
@@ -210,29 +202,29 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", GET_NAME(ch), arg);
+  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", qPrintable(ch->name()), arg);
 
-  for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+  for (auto &i : DC::getInstance()->connections_)
   {
-    if ((i->character == nullptr) || (i->character->getLevel() <= MORTAL))
+    if ((conn->character == nullptr) || (conn->character->getLevel() <= MORTAL))
       continue;
-    if (!(isSet(i->character->misc, DC::LogChannel::LOG_PRAYER)))
+    if (!(isSet(conn->character->misc, DC::LogChannel::LOG_PRAYER)))
       continue;
-    if (is_busy(i->character) || is_ignoring(i->character, ch))
+    if (is_busy(conn->character) || is_ignoring(conn->character, ch))
       continue;
-    if (!i->connected)
-      send_to_char(buf1, i->character);
+    if (!conn->connected)
+      send_to_char(buf1, conn->character);
   }
   ch->sendln("\a\aOk.");
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return ReturnValue::eSUCCESS;
 }
 
-int do_gossip(Character *ch, char *argument, cmd_t cmd)
+qint32 do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -318,11 +310,11 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
       }
     }
 
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
     {
-      if (i->character != ch && !i->connected && (isSet(i->character->misc, DC::LogChannel::CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch))
+      if (conn->character != ch && !conn->connected && (isSet(conn->character->misc, DC::LogChannel::CHANNEL_GOSSIP)) && !is_ignoring(conn->character, ch))
       {
-        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
         {
           if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
           {
@@ -333,7 +325,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
 
         if (!silence)
         {
-          act(msg.getMessage(i->character->getLevel()), ch, 0, i->character, TO_VICT, 0);
+          act(msg.getMessage(conn->character->getLevel()), ch, 0, conn->character, TO_VICT, 0);
         }
       }
     }
@@ -343,8 +335,8 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
 
 command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 {
-  class Connection *i{};
-  Object *tmp_obj{};
+  class Connection *i = {};
+  ObjectPtr tmp_obj = {};
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
@@ -389,7 +381,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    std::queue<QString> tmp = auction_history;
+    QQueue<QString> tmp = auction_history;
     this->sendln("Here are the last 10 auctions:");
     while (!tmp.empty())
     {
@@ -404,11 +396,11 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     QString buf1;
     if (this->isNonPlayer())
     {
-      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(GET_SHORT(this)).arg(arguments.join(' '));
+      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(qPrintable(this->shortdesc_or_name())).arg(arguments.join(' '));
     }
     else
     {
-      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(GET_NAME(this)).arg(arguments.join(' '));
+      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(qPrintable(this->name())).arg(arguments.join(' '));
     }
 
     QString buf2 = QStringLiteral("$6$BYou auction '%1'$R").arg(arguments.join(' '));
@@ -418,30 +410,30 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     if (auction_history.size() > 10)
       auction_history.pop();
 
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-      if (i->character != this && !i->connected &&
-          (isSet(i->character->misc, DC::LogChannel::CHANNEL_AUCTION)) &&
-          !is_ignoring(i->character, this))
+    for (auto &i : DC::getInstance()->connections_)
+      if (conn->character != this && !conn->connected &&
+          (isSet(conn->character->misc, DC::LogChannel::CHANNEL_AUCTION)) &&
+          !is_ignoring(conn->character, this))
       {
-        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
           }
         if (!silence)
-          act(buf1, this, 0, i->character, TO_VICT, 0);
+          act(buf1, this, 0, conn->character, TO_VICT, 0);
       }
   }
   return ReturnValue::eSUCCESS;
 }
 
-int do_shout(Character *ch, char *argument, cmd_t cmd)
+qint32 do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -494,31 +486,31 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf2, "$BYou shout '%s'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-      if (i->character != ch && !i->connected &&
-          (DC::getInstance()->world[i->character->in_room].zone == DC::getInstance()->world[ch->in_room].zone) &&
-          (i->character->isNonPlayer() || isSet(i->character->misc, DC::LogChannel::CHANNEL_SHOUT)) &&
-          !is_ignoring(i->character, ch))
+    for (auto &i : DC::getInstance()->connections_)
+      if (conn->character != ch && !conn->connected &&
+          (DC::getInstance()->world[conn->character->in_room].zone == DC::getInstance()->world[ch->in_room].zone) &&
+          (conn->character->isNonPlayer() || isSet(conn->character->misc, DC::LogChannel::CHANNEL_SHOUT)) &&
+          !is_ignoring(conn->character, ch))
       {
-        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
           }
         if (!silence)
-          act(buf1, ch, 0, i->character, TO_VICT, 0);
+          act(buf1, ch, 0, conn->character, TO_VICT, 0);
       }
   }
   return ReturnValue::eSUCCESS;
 }
 
-int do_trivia(Character *ch, char *argument, cmd_t cmd)
+qint32 do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -568,7 +560,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
   if (!(*argument))
   {
     {
-      std::queue<QString> tmp = trivia_history;
+      QQueue<QString> tmp = trivia_history;
       ch->sendln("Here are the last 10 messages:");
       while (!tmp.empty())
       {
@@ -583,12 +575,12 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->getLevel() >= 102)
   {
-    sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", GET_SHORT(ch), argument);
+    sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", qPrintable(ch->shortdesc_or_name()), argument);
     sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument);
   }
   else
   {
-    sprintf(buf1, "$3$B%s answers '%s'$R", GET_SHORT(ch), argument);
+    sprintf(buf1, "$3$B%s answers '%s'$R", qPrintable(ch->shortdesc_or_name()), argument);
     sprintf(buf2, "$3$BYou answer '%s'$R", argument);
   }
   act(buf2, ch, 0, 0, TO_CHAR, 0);
@@ -597,30 +589,30 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
   if (trivia_history.size() > 10)
     trivia_history.pop();
 
-  for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-    if (i->character != ch && !i->connected &&
-        (isSet(i->character->misc, DC::LogChannel::CHANNEL_TRIVIA)) &&
-        !is_ignoring(i->character, ch))
+  for (auto &i : DC::getInstance()->connections_)
+    if (conn->character != ch && !conn->connected &&
+        (isSet(conn->character->misc, DC::LogChannel::CHANNEL_TRIVIA)) &&
+        !is_ignoring(conn->character, ch))
     {
-      for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+      for (tmp_obj = DC::getInstance()->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
         if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
         {
           silence = true;
           break;
         }
       if (!silence)
-        act(buf1, ch, 0, i->character, TO_VICT, 0);
+        act(buf1, ch, 0, conn->character, TO_VICT, 0);
     }
 
   return ReturnValue::eSUCCESS;
 }
 
-int do_dream(Character *ch, char *argument, cmd_t cmd)
+qint32 do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH] = {0};
   char buf2[MAX_STRING_LENGTH] = {0};
-  class Connection *i = nullptr;
-  int ctr = 0;
+  class Connection *i = {};
+  qint32 ctr = {};
 
   if ((GET_POS(ch) != position_t::SLEEPING) && (ch->getLevel() < MIN_GOD))
   {
@@ -653,7 +645,7 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  for (ctr = 0; (unsigned)ctr <= strlen(argument); ctr++)
+  for (ctr = {}; (quint32)ctr <= strlen(argument); ctr++)
   {
     if (argument[ctr] == '$')
     {
@@ -672,24 +664,24 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("It must not have been that great!!");
   else
   {
-    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\r\n", GET_SHORT(ch), argument);
+    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\r\n", qPrintable(ch->shortdesc_or_name()), argument);
     sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\r\n", argument);
     send_to_char(buf2, ch);
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
     {
-      if ((i->character != ch) &&
-          (!i->connected) &&
-          !is_ignoring(i->character, ch) &&
-          (isSet(i->character->misc, DC::LogChannel::CHANNEL_DREAM)) &&
-          ((GET_POS(i->character) == position_t::SLEEPING) ||
-           (i->character->getLevel() >= MIN_GOD)))
-        send_to_char(buf1, i->character);
+      if ((conn->character != ch) &&
+          (!conn->connected) &&
+          !is_ignoring(conn->character, ch) &&
+          (isSet(conn->character->misc, DC::LogChannel::CHANNEL_DREAM)) &&
+          ((GET_POS(conn->character) == position_t::SLEEPING) ||
+           (conn->character->getLevel() >= MIN_GOD)))
+        send_to_char(buf1, conn->character);
     }
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_tellhistory(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -701,7 +693,7 @@ command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  std::string arg1, remainder;
+  QString arg1, remainder;
   std::tie(arg1, remainder) = half_chop(argument);
 
   if (arg1 == "timestamp")
@@ -727,9 +719,9 @@ command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
 
 command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = {};
   QString name = {}, message = {}, buf = {}, log_buf = {};
-  Object *tmp_obj = nullptr;
+  ObjectPtr tmp_obj = {};
 
   if (!this->isNonPlayer() && isSet(this->player->punish, PUNISH_NOTELL))
   {
@@ -809,7 +801,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       buf = fmt::format("$2$B{} told you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
       vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$BYou told {}, '{}'$R", qPrintable(vict->shortdesc_or_name()), message.toStdString()).c_str();
       this->tell_history(this, buf);
     }
     else
@@ -847,7 +839,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       }
     if (is_ignoring(vict, this))
     {
-      csendf(this, "%s is ignoring you right now.\r\n", GET_SHORT(vict));
+      this->send(QStringLiteral("%s is ignoring you right now.\r\n").arg(qPrintable(vict->shortdesc_or_name())));
       return ReturnValue::eSUCCESS;
     }
     if (is_busy(vict) && level_ >= OVERSEER)
@@ -862,7 +854,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 
         if (this->isPlayer() && vict->isPlayer())
         {
-          vict->player->last_tell = GET_NAME(this);
+          vict->player->last_tell = qPrintable(this->name());
         }
       }
 
@@ -888,7 +880,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       {
         buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
         if (this->isPlayer() && vict->isPlayer())
-          vict->player->last_tell = GET_NAME(this);
+          vict->player->last_tell = qPrintable(this->name());
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
@@ -902,7 +894,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
@@ -918,7 +910,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
         buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
 
         if (this->isPlayer() && vict->isPlayer())
-          vict->player->last_tell = GET_NAME(this);
+          vict->player->last_tell = qPrintable(this->name());
       }
       ansi_color(GREEN, vict);
       ansi_color(BOLD, vict);
@@ -936,22 +928,22 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else
     {
-      buf = fmt::format("$2$B%s can't hear anything right now.$R", GET_SHORT(vict)).c_str();
+      buf = fmt::format("$2$B%s can't hear anything right now.$R", qPrintable(vict->shortdesc_or_name())).c_str();
       act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
     }
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  std::string buf = {};
-  Character *vict = nullptr;
+  QString buf = {};
+  CharacterPtr vict = {};
 
   if (ch->isNonPlayer() || ch->player->last_tell.isEmpty())
   {
@@ -959,7 +951,7 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -974,7 +966,7 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
     ch->sendln("Reply what?");
     if ((vict = get_char(ch->player->last_tell)) && CAN_SEE(ch, vict))
     {
-      ch->send(fmt::format("Last tell was from {}.\r\n", ch->player->last_tell.toStdString().c_str()));
+      ch->send(fmt::format("Last tell was from {}.\r\n", qPrintable(ch->player->last_tell)));
     }
     else
     {
@@ -984,18 +976,18 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  buf = fmt::format("{} {}", ch->player->last_tell.toStdString().c_str(), argument);
+  buf = fmt::format("{} {}", qPrintable(ch->player->last_tell), argument);
   ch->do_tell(QString(buf.c_str()).split(' '), cmd_t::TELL_REPLY);
   return ReturnValue::eSUCCESS;
 }
 
-int do_whisper(Character *ch, char *argument, cmd_t cmd)
+qint32 do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
       buf[MAX_STRING_LENGTH];
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -1034,12 +1026,12 @@ int do_whisper(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_ask(Character *ch, char *argument, cmd_t cmd)
+qint32 do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -1079,12 +1071,12 @@ int do_ask(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_grouptell(Character *ch, char *argument, cmd_t cmd)
+qint32 do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  Character *k;
+  CharacterPtr k;
   follow_type *f;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (ch == nullptr || ch->player == nullptr)
@@ -1175,12 +1167,12 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_newbie(Character *ch, char *argument, cmd_t cmd)
+qint32 do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1222,7 +1214,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
 
   if (!(*argument))
   {
-    std::queue<QString> tmp = newbie_history;
+    QQueue<QString> tmp = newbie_history;
     ch->sendln("Here are the last 10 messages:");
     while (!tmp.empty())
     {
@@ -1236,7 +1228,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
     {
       return ReturnValue::eFAILURE;
     }
-    sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
+    sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", qPrintable(ch->shortdesc_or_name()), argument);
     sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
@@ -1244,25 +1236,25 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
     if (newbie_history.size() > 10)
       newbie_history.pop();
 
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-      if (i->character != ch && !i->connected &&
-          !is_ignoring(i->character, ch) &&
-          (isSet(i->character->misc, DC::LogChannel::CHANNEL_NEWBIE)))
+    for (auto &i : DC::getInstance()->connections_)
+      if (conn->character != ch && !conn->connected &&
+          !is_ignoring(conn->character, ch) &&
+          (isSet(conn->character->misc, DC::LogChannel::CHANNEL_NEWBIE)))
       {
-        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
           }
         if (!silence)
-          act(buf1, ch, 0, i->character, TO_VICT, 0);
+          act(buf1, ch, 0, conn->character, TO_VICT, 0);
       }
   }
   return ReturnValue::eSUCCESS;
 }
 
-void Character::tell_history(Character *ch, QString message)
+void Character::tell_history(CharacterPtr ch, QString message)
 {
   if (!isPlayer())
   {
@@ -1278,7 +1270,7 @@ void Character::tell_history(Character *ch, QString message)
   }
 }
 
-void Character::gtell_history(Character *ch, QString message)
+void Character::gtell_history(CharacterPtr ch, QString message)
 {
   if (this->player == nullptr)
   {
@@ -1294,9 +1286,9 @@ void Character::gtell_history(Character *ch, QString message)
   }
 }
 
-communication::communication(Character *ch, QString message)
+communication::communication(CharacterPtr ch, QString message)
 {
-  this->sender = GET_NAME(ch);
+  this->sender = qPrintable(ch->name());
   this->sender_ispc = ch->isPlayer();
   this->message = message;
   this->timestamp = time(nullptr);

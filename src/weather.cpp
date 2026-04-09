@@ -16,10 +16,9 @@
 
 #include <cstdio>
 #include <cstring>
-#include "DC/timeinfo.h"
+
 #include "DC/weather.h"
-#include "DC/character.h"
-#include "DC/utility.h"
+#include "DC/DC.h"
 
 // TODO - Either rip out the pressure stuff, or make it easier to understand.
 // TODO - Add wind, and it's effects (on movement/combat etc)
@@ -38,7 +37,7 @@ extern weather_data weather_info;
 
 /* In ths part. */
 
-void another_hour(int mode);
+void another_hour(qint32 mode);
 void weather_change(void);
 
 /* Here comes the code */
@@ -53,7 +52,7 @@ void weather_update()
   weather_change();
 }
 
-void another_hour(int mode)
+void another_hour(qint32 mode)
 {
   time_info.hours++;
 
@@ -116,12 +115,12 @@ void another_hour(int mode)
 
     if (time_info.day > 34)
     {
-      time_info.day = 0;
+      time_info.day = {};
       time_info.month++;
 
       if (time_info.month > 16)
       {
-        time_info.month = 0;
+        time_info.month = {};
         time_info.year++;
       }
     }
@@ -130,7 +129,7 @@ void another_hour(int mode)
 
 void weather_change(void)
 {
-  int diff, change;
+  qint32 diff, change;
   if ((time_info.month >= 9) && (time_info.month <= 16))
     diff = (weather_info.pressure > 985 ? -2 : 2);
   else
@@ -146,7 +145,7 @@ void weather_change(void)
   weather_info.pressure = MIN(weather_info.pressure, 1040);
   weather_info.pressure = MAX(weather_info.pressure, 960);
 
-  change = 0;
+  change = {};
 
   switch (weather_info.sky)
   {
@@ -167,7 +166,7 @@ void weather_change(void)
       if (dice(1, 4) == 1)
         change = 2;
       else
-        change = 0;
+        change = {};
     }
     else if (weather_info.pressure > 1030)
     {
@@ -183,7 +182,7 @@ void weather_change(void)
       else if (dice(1, 5) == 1)
         change = 7;
       else
-        change = 0;
+        change = {};
     }
     else if (weather_info.pressure > 1030)
       change = 5;
@@ -201,14 +200,14 @@ void weather_change(void)
       else if (dice(1, 3) == 1)
         change = 9;
       else
-        change = 0;
+        change = {};
     }
     else if (weather_info.pressure < 1010)
     {
       if (dice(1, 4) == 1)
         change = 8;
       else
-        change = 0;
+        change = {};
     }
     else if (weather_info.pressure > 1030)
       change = 5;
@@ -224,7 +223,7 @@ void weather_change(void)
         change = 6;
     break;
   default:
-    change = 0;
+    change = {};
     weather_info.sky = SKY_CLOUDLESS;
     break;
   }

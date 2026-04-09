@@ -19,10 +19,8 @@
 #include <QStringLiteral>
 #include <QStringList>
 
-#include "DC/room.h"
 #include "DC/DC.h"
-#include "DC/utility.h"
-#include "DC/character.h"
+
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/player.h"
@@ -32,18 +30,17 @@
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/corpse.h"
-#include "DC/memory.h"
 
-extern int class_restricted(Character *ch, class Object *obj);
-extern int size_restricted(Character *ch, class Object *obj);
+extern qint32 class_restricted(CharacterPtr ch, ObjectPtr obj);
+extern qint32 size_restricted(CharacterPtr ch, ObjectPtr obj);
 
-void repair_shop_fix_eq(Character *ch, Character *owner, int price, Object *obj)
+void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
 {
   char buf[256];
 
   ch->removeGold(price);
   eq_remove_damage(obj);
-  sprintf(buf, "It will cost you %d coins to repair %s.", price, obj->short_description);
+  sprintf(buf, "It will cost you %d coins to repair %s.", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
   act("You watch $N fix $p...", ch, obj, owner, TO_CHAR, 0);
   act("You watch $N fix $p...", ch, obj, owner, TO_ROOM, 0);
@@ -52,32 +49,32 @@ void repair_shop_fix_eq(Character *ch, Character *owner, int price, Object *obj)
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_complain_no_cash(Character *ch, Character *owner, int price, Object *obj)
+void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
 {
   char buf[256];
 
   do_say(owner, "Trying to sucker me for a free repair job?");
-  sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, obj->short_description);
+  sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
   act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_price_check(Character *ch, Character *owner, int price, Object *obj)
+void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
 {
   char buf[256];
 
-  sprintf(buf, "It will only cost you %d coins to repair %s.'", price, obj->short_description);
+  sprintf(buf, "It will only cost you %d coins to repair %s.'", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
   act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
   char item[256];
-  int value0, cost, price;
-  int percent, eqdam;
+  qint32 value0, cost, price;
+  qint32 percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
     return ReturnValue::eFAILURE;
@@ -141,7 +138,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
     return ReturnValue::eSUCCESS;
   }
 
-  if (ch->getGold() < (uint32_t)price)
+  if (ch->getGold() < (quint32)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
     return ReturnValue::eSUCCESS;
@@ -151,11 +148,11 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   return ReturnValue::eSUCCESS;
 }
 
-int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
   char item[256];
-  int value0, value2, cost, price;
-  int percent, eqdam;
+  qint32 value0, value2, cost, price;
+  qint32 percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
     return ReturnValue::eFAILURE;
@@ -237,7 +234,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     return ReturnValue::eSUCCESS;
   }
 
-  if (ch->getGold() < (uint32_t)price)
+  if (ch->getGold() < (quint32)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
     return ReturnValue::eSUCCESS;
@@ -252,11 +249,11 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 }
 
 // Fingers
-int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
   char item[256];
-  int value0, value2, cost, price;
-  int percent, eqdam;
+  qint32 value0, value2, cost, price;
+  qint32 percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
     return ReturnValue::eFAILURE;
@@ -343,7 +340,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
     return ReturnValue::eSUCCESS;
   }
 
-  if (ch->getGold() < (uint32_t)price)
+  if (ch->getGold() < (quint32)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
     return ReturnValue::eSUCCESS;
@@ -355,12 +352,12 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   }
 }
 
-int corpse_cost(Character *ch)
+qint32 corpse_cost(CharacterPtr ch)
 {
-  int cost = 0;
-  Object *curr_cont;
+  qint32 cost = {};
+  ObjectPtr curr_cont;
 
-  for (Object *obj2 = ch->carrying; obj2; obj2 = obj2->next_content)
+  for (ObjectPtr obj2 = ch->carrying; obj2; obj2 = obj2->next_content)
   {
     if (obj2->obj_flags.type_flag == ITEM_MONEY)
       continue;
@@ -372,7 +369,7 @@ int corpse_cost(Character *ch)
     if (!isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
       cost += obj2->obj_flags.cost;
   }
-  for (int x = 0; x < MAX_WEAR; x++)
+  for (qint32 x = {}; x < MAX_WEAR; x++)
   {
     if (ch->equipment[x])
     {
@@ -387,12 +384,12 @@ int corpse_cost(Character *ch)
   return cost;
 }
 
-int corpse_cost(Object *obj)
+qint32 corpse_cost(ObjectPtr obj)
 {
-  int cost = 0;
-  Object *curr_cont;
+  qint32 cost = {};
+  ObjectPtr curr_cont;
 
-  for (Object *obj2 = obj->contains; obj2; obj2 = obj2->next_content)
+  for (ObjectPtr obj2 = obj->contains; obj2; obj2 = obj2->next_content)
   {
     if (obj2->obj_flags.type_flag == ITEM_MONEY)
       continue;
@@ -403,10 +400,10 @@ int corpse_cost(Object *obj)
   return cost;
 }
 
-int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
-  int x = 0, cost = 0, which;
-  int count = 0;
+  qint32 x = 0, cost = 0, which;
+  qint32 count = {};
   char buf[100];
 
   if (cmd != cmd_t::BUY && cmd != cmd_t::LIST && cmd != cmd_t::VALUE)
@@ -417,14 +414,14 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 
   if (cmd == cmd_t::LIST) // list
   {
-    sprintf(buf, "%s_consent", GET_NAME(ch));
+    sprintf(buf, "%s_consent", qPrintable(ch->name()));
     ch->send("Available corpses (freshest first):\r\n$B");
     for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
     {
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
         continue;
 
-      if (!isexact("pc", obj->Name()) || (!isexact(GET_NAME(ch), obj->Name()) && !isexact(buf, obj->Name())))
+      if (!isexact("pc", obj->name()) || (!isexact(qPrintable(ch->name()), obj->name()) && !isexact(buf, obj->name())))
         continue;
 
       if (obj->in_room == ch->in_room)
@@ -435,7 +432,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       cost = corpse_cost(obj);
       cost /= 20000;
       cost = MAX(cost, 30);
-      sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->short_description, cost);
+      sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, qPrintable(obj->short_description()), cost);
       ch->send(buf);
     }
     send_to_char("$RIf any corpses were listed, they are still where you left them.  This\r\n"
@@ -467,12 +464,12 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 
   for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
   {
-    sprintf(buf, "%s_consent", GET_NAME(ch));
+    sprintf(buf, "%s_consent", qPrintable(ch->name()));
 
     if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
       continue;
 
-    if (!isexact("pc", obj->Name()) || (!isexact(GET_NAME(ch), obj->Name()) && !isexact(buf, obj->Name())) || ++x < which)
+    if (!isexact("pc", obj->name()) || (!isexact(qPrintable(ch->name()), obj->name()) && !isexact(buf, obj->name())) || ++x < which)
       continue;
 
     if (!obj->contains) // skip empty corpses
@@ -484,7 +481,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     cost = corpse_cost(obj);
     cost /= 20000;
     cost = MAX(cost, 30);
-    if (GET_PLATINUM(ch) < (uint32_t)cost)
+    if (GET_PLATINUM(ch) < (quint32)cost)
     {
       ch->sendln("You can't afford that!");
       return ReturnValue::eSUCCESS;
@@ -504,16 +501,16 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
+QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = true)
 {
   QString buf;
   if (platinum)
   {
-    buf = QStringLiteral("$B$7%1$R) %2 ").arg(number + 1, -2).arg(obj->short_description);
+    buf = QStringLiteral("$B$7%1$R) %2 ").arg(number + 1, -2).arg(obj->short_description());
   }
   else
   {
-    buf = QStringLiteral("$B$7%1$R) $3$B%2$R ").arg(number + 1, -2).arg(obj->short_description);
+    buf = QStringLiteral("$B$7%1$R) $3$B%2$R ").arg(number + 1, -2).arg(obj->short_description());
   }
 
   if (obj->obj_flags.type_flag == ITEM_WEAPON)
@@ -522,8 +519,8 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
   }
 
   QString buf2;
-  qsizetype length{};
-  for (decltype(obj->num_affects) i = 0; i < obj->num_affects; i++)
+  qsizetype length = {};
+  for (decltype(obj->num_affects) i = {}; i < obj->num_affects; i++)
   {
     if ((obj->affected[i].location != APPLY_NONE) && (obj->affected[i].modifier != 0))
     {
@@ -546,7 +543,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
       qsizetype starting_point = potential_buffer.lastIndexOf("\n");
       if (starting_point == -1)
       {
-        starting_point = 0;
+        starting_point = {};
       }
       length = nocolor_strlen(potential_buffer.sliced(starting_point));
 
@@ -572,7 +569,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
       qsizetype starting_point = potential_buffer.lastIndexOf("\n");
       if (starting_point == -1)
       {
-        starting_point = 0;
+        starting_point = {};
       }
       length = nocolor_strlen(potential_buffer.sliced(starting_point));
       if (length > 79)
@@ -588,7 +585,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
   else
   {
     auto a = obj->obj_flags.extra_flags;
-    a &= ALL_CLASSES;
+    a &= ITEM_WARRIOR | ITEM_MAGE | ITEM_THIEF | ITEM_CLERIC | ITEM_PAL | ITEM_ANTI | ITEM_BARB | ITEM_MONK | ITEM_RANGER | ITEM_DRUID | ITEM_BARD;
 
     QString buffer = sprintbit(a, Object::extra_bits);
     buf2 = QStringLiteral("%1]$R, ").arg(buffer);
@@ -599,7 +596,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
       qsizetype starting_point = potential_buffer.lastIndexOf("\n");
       if (starting_point == -1)
       {
-        starting_point = 0;
+        starting_point = {};
       }
       length = nocolor_strlen(potential_buffer.sliced(starting_point));
 
@@ -627,7 +624,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
   qsizetype starting_point = potential_buffer.lastIndexOf("\n");
   if (starting_point == -1)
   {
-    starting_point = 0;
+    starting_point = {};
   }
   length = nocolor_strlen(potential_buffer.sliced(starting_point));
 
@@ -641,14 +638,14 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
   }
 
   buf += "\r\n";
-  return str_dup(buf.toStdString().c_str());
+  return buf;
 }
 
 class platsmith
 {
 public:
-  int vnum;
-  int sales[13];
+  qint32 vnum;
+  qint32 sales[13];
 };
 
 const platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538, 539, 540, 541, 0, 0, 0, 0}}, {10020, {554, 555, 556, 557, 524, 525, 526, 527, 504, 505, 506, 511, 0}}, {10021, {516, 517, 518, 519, 507, 508, 509, 510, 546, 547, 548, 549, 0}}, {10022, {500, 501, 502, 503, 520, 521, 522, 523, 528, 529, 530, 531, 0}}, {10023, {542, 543, 544, 545, 532, 533, 534, 535, 536, 550, 551, 552, 553}}, {10026, {558, 559, 560, 561, 562, 563, 564, 565, 566, 0, 0, 0, 0}}, {10004, {570, 571, 575, 577, 578, 580, 582, 584, 586, 587, 590, 591, 598}}, // weapon dude in cozy
@@ -656,11 +653,11 @@ const platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538, 539, 
                                     {0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
 // Apoc enjoys the dirty mooselove. Honest.
-int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
 
-  int mobvnum = DC::getInstance()->mob_index[owner->mobdata->nr].vnum();
-  int o;
+  qint32 mobvnum = DC::getInstance()->mob_index[owner->mobdata->nr].vnum();
+  qint32 o;
   char buf[MAX_STRING_LENGTH];
   //  return ReturnValue::eFAILURE; //disabled for now
   if (cmd == cmd_t::LIST)
@@ -671,21 +668,20 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
       return ReturnValue::eSUCCESS;
     }
 
-    for (o = 0; platsmith_list[o].vnum != 0; o++)
+    for (o = {}; platsmith_list[o].vnum != 0; o++)
       if (mobvnum == platsmith_list[o].vnum)
         break;
     if (platsmith_list[o].vnum == 0)
     {
-      owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    owner->do_tell(QStringLiteral("%1 Here's what I can do for you, %2.").arg(GET_NAME(ch)).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
+    owner->do_tell(QStringLiteral("%1 Here's what I can do for you, %2.").arg(qPrintable(ch->name())).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
 
-    for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
+    for (qint32 z = {}; z < 13 && platsmith_list[o].sales[z] != 0; z++)
     {
-      char *tmp = gl_item((Object *)DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+      auto tmp = gl_item((ObjectPtr)DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
       ch->send(tmp);
-      dc_free(tmp);
     }
     return ReturnValue::eSUCCESS;
   }
@@ -697,52 +693,52 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
       return ReturnValue::eSUCCESS;
     }
 
-    for (o = 0; platsmith_list[o].vnum != 0; o++)
+    for (o = {}; platsmith_list[o].vnum != 0; o++)
       if (mobvnum == platsmith_list[o].vnum)
         break;
     char buf[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
     one_argument(arg, arg2);
     if (platsmith_list[o].vnum == 0)
     {
-      owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
     if (!is_number(arg2))
     {
-      owner->do_tell(QStringLiteral("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    int k = atoi(arg2) - 1;
+    qint32 k = atoi(arg2) - 1;
     if (k >= 13 || k < 0 || platsmith_list[o].sales[k] == 0)
     {
-      owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    class Object *obj;
+    ObjectPtr obj;
     obj = clone_object(real_object(platsmith_list[o].sales[k]));
 
     if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
     {
-      owner->do_tell(QStringLiteral("%1 That item is not available to you.").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 That item is not available to you.").arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
-    if (GET_PLATINUM(ch) < (unsigned int)(obj->obj_flags.cost / 10))
+    if (GET_PLATINUM(ch) < (quint32)(obj->obj_flags.cost / 10))
     {
-      owner->do_tell(QStringLiteral("%1 Come back when you've got the platinum.").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 Come back when you've got the platinum.").arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
     GET_PLATINUM(ch) -= obj->obj_flags.cost / 10;
-    sprintf(buf, "%s %s", qPrintable(obj->Name()), GET_NAME(ch));
-    obj->Name(buf);
+    sprintf(buf, "%s %s", qPrintable(obj->name()), qPrintable(ch->name()));
+    obj->name(buf);
     obj_to_char(obj, ch);
-    owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
+    owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(qPrintable(ch->name())).arg(obj->short_description()).split(' '));
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::SELL)
   {
-    Object *obj;
+    ObjectPtr obj;
     char arg2[MAX_INPUT_LENGTH];
     one_argument(arg, arg2);
     obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
@@ -753,25 +749,25 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     }
     if (!obj)
     {
-      owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
     if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      owner->do_tell(QStringLiteral("%1 I don't deal in worthless junk.").arg(GET_NAME(ch)).split(' '));
+      owner->do_tell(QStringLiteral("%1 I don't deal in worthless junk.").arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
     // don't allow non-empty containers to be sold
     if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
     {
-      owner->do_tell(QStringLiteral("%1 %2$B$2 needs to be emptied first.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).split(' '));
+      owner->do_tell(QStringLiteral("%1 %2$B$2 needs to be emptied first.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
-    int cost = obj->obj_flags.cost / 10;
+    qint32 cost = obj->obj_flags.cost / 10;
 
-    owner->do_tell(QStringLiteral("%1 I'll give you %2 plats for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
+    owner->do_tell(QStringLiteral("%1 I'll give you %2 plats for that. Thanks for shoppin'.").arg(qPrintable(ch->name())).arg(cost).split(' '));
     extract_obj(obj);
     GET_PLATINUM(ch) += cost;
     return ReturnValue::eSUCCESS;
@@ -780,11 +776,11 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
 }
 
 // gl_repair_guy
-int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
   char item[256];
-  int value0, value2, cost, price;
-  int percent, eqdam;
+  qint32 value0, value2, cost, price;
+  qint32 percent, eqdam;
 
   if ((cmd != cmd_t::REPAIR) && (cmd != cmd_t::PRICE))
     return ReturnValue::eFAILURE;
@@ -876,7 +872,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eSUCCESS;
   }
 
-  if (ch->getGold() < (uint32_t)price)
+  if (ch->getGold() < (quint32)price)
   {
     repair_shop_complain_no_cash(ch, owner, price, obj);
     return ReturnValue::eSUCCESS;

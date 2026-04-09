@@ -4,14 +4,13 @@
  *  Created on: May 26, 2020
  *      Author: Jared H. Hudson
  */
-
+#include "DC/DC.h"
 #include "DC/CommandStack.h"
-#include "DC/player.h"  // DC::LogChannel::LOG_BUG
-#include "DC/utility.h" // logf
+#include "DC/levels.h"
 
-uint32_t CommandStack::depth = 0;
-uint32_t CommandStack::max_depth = 5;
-uint32_t CommandStack::overflow_count = 0;
+quint32 CommandStack::depth = {};
+quint32 CommandStack::max_depth = 5;
+quint32 CommandStack::overflow_count = {};
 
 CommandStack::CommandStack()
 {
@@ -23,10 +22,10 @@ CommandStack::CommandStack()
   }
 }
 
-CommandStack::CommandStack(uint32_t initial)
+CommandStack::CommandStack(quint32 initial)
 {
   depth = initial;
-  overflow_count = 0;
+  overflow_count = {};
   depth++;
 
   if (isOverflow() == true)
@@ -35,11 +34,11 @@ CommandStack::CommandStack(uint32_t initial)
   }
 }
 
-CommandStack::CommandStack(uint32_t initial, uint32_t max)
+CommandStack::CommandStack(quint32 initial, quint32 max)
 {
   depth = initial;
   max_depth = max;
-  overflow_count = 0;
+  overflow_count = {};
   depth++;
 
   if (isOverflow() == true)
@@ -62,25 +61,25 @@ CommandStack::~CommandStack()
 }
 
 // TODO detect invalid values
-bool CommandStack::setDepth(uint32_t value)
+bool CommandStack::setDepth(quint32 value)
 {
   depth = value;
   return true;
 }
 
-uint32_t CommandStack::getDepth(void)
+quint32 CommandStack::getDepth(void)
 {
   return depth;
 }
 
 // TODO detect invalid values
-bool CommandStack::setMax(uint32_t value)
+bool CommandStack::setMax(quint32 value)
 {
   max_depth = value;
   return true;
 }
 
-uint32_t CommandStack::getMax(void)
+quint32 CommandStack::getMax(void)
 {
   return max_depth;
 }
@@ -97,7 +96,7 @@ bool CommandStack::isOverflow(void)
   }
 }
 
-uint32_t CommandStack::getOverflowCount(void)
+quint32 CommandStack::getOverflowCount(void)
 {
   return overflow_count;
 }

@@ -14,37 +14,28 @@
  ***************************************************************************/
 /* $Id: limits.cpp,v 1.99 2014/07/04 22:00:04 jhhudso Exp $ */
 
+#include "DC/levels.h"
 #include <cstdio>
-#include <cstring>
 
 #ifdef BANDWIDTH
 #include "DC/bandwidth.h"
 #endif
-#include "DC/room.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
-#include "DC/isr.h"
+
+#include "DC/DC.h"
+
 #include "DC/spells.h" // TYPE
 #include "DC/player.h"
-#include "DC/DC.h"
-#include "DC/connect.h"
-#include "DC/db.h"    // exp_table
-#include "DC/fight.h" // damage
-#include "DC/ki.h"
-#include "DC/game_portal.h"
+#include "DC/db.h" // exp_table
 #include "DC/act.h"
 #include "DC/handler.h"
-#include "DC/race.h"
-#include "DC/returnvals.h"
 #include "DC/interp.h"
 #include "DC/clan.h" //totem
-#include "DC/vault.h"
+#include "DC/DC.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/corpse.h"
 
-int FOUNTAINisPresent(Character *ch);
+qint32 FOUNTAINisPresent(CharacterPtr ch);
 
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */
@@ -52,28 +43,28 @@ int FOUNTAINisPresent(Character *ch);
 /* When age in 45..59 calculate the line between p3 & p4 */
 /* When age in 60..79 calculate the line between p4 & p5 */
 /* When age >= 80 return the value p6 */
-int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
+qint32 graf(qint32 age, qint32 p0, qint32 p1, qint32 p2, qint32 p3, qint32 p4, qint32 p5, qint32 p6)
 {
 
   if (age < 15)
     return (p0); /* < 15   */
   else if (age <= 29)
-    return (int)(p1 + (((age - 15) * (p2 - p1)) / 15)); /* 15..29 */
+    return (qint32)(p1 + (((age - 15) * (p2 - p1)) / 15)); /* 15..29 */
   else if (age <= 44)
-    return (int)(p2 + (((age - 30) * (p3 - p2)) / 15)); /* 30..44 */
+    return (qint32)(p2 + (((age - 30) * (p3 - p2)) / 15)); /* 30..44 */
   else if (age <= 59)
-    return (int)(p3 + (((age - 45) * (p4 - p3)) / 15)); /* 45..59 */
+    return (qint32)(p3 + (((age - 45) * (p4 - p3)) / 15)); /* 45..59 */
   else if (age <= 79)
-    return (int)(p4 + (((age - 60) * (p5 - p4)) / 20)); /* 60..79 */
+    return (qint32)(p4 + (((age - 60) * (p5 - p4)) / 20)); /* 60..79 */
   else
     return (p6); /* >= 80 */
 }
 
 /* The three MAX functions define a characters Effective maximum */
 /* Which is NOT the same as the ch->max_xxxx !!!          */
-int32_t mana_limit(Character *ch)
+qint32 mana_limit(CharacterPtr ch)
 {
-  int max;
+  qint32 max;
 
   if (ch->isPlayer())
     max = (ch->max_mana);
@@ -84,14 +75,14 @@ int32_t mana_limit(Character *ch)
 }
 
 // Previously any NPC got 0 returned.
-int32_t ki_limit(Character *ch)
+qint32 ki_limit(CharacterPtr ch)
 {
   return ch->max_ki;
 }
 
-int32_t hit_limit(Character *ch)
+qint32 hit_limit(CharacterPtr ch)
 {
-  int max;
+  qint32 max;
 
   if (ch->isPlayer())
     max = (ch->max_hit) + (graf(ch->age().year, 2, 4, 17, 14, 8, 4, 3));
@@ -105,14 +96,14 @@ int32_t hit_limit(Character *ch)
   return (max);
 }
 
-const int mana_regens[] = {0, 13, 13, 1, 1, 10, 9, 1, 1, 9, 1, 13, 0, 0};
+const qint32 mana_regens[] = {0, 13, 13, 1, 1, 10, 9, 1, 1, 9, 1, 13, 0, 0};
 
 /* manapoint gain pr. game hour */
-int Character::mana_gain_lookup(void)
+qint32 Character::mana_gain_lookup(void)
 {
-  int gain = 0;
-  int divisor = 1;
-  int modifier;
+  qint32 gain = {};
+  qint32 divisor = 1;
+  qint32 modifier;
 
   if (this->isNonPlayer())
     gain = this->getLevel();
@@ -120,7 +111,7 @@ int Character::mana_gain_lookup(void)
   {
     //    gain = graf(age().year, 2,3,4,6,7,8,9);
 
-    gain = (int)(this->max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
+    gain = (qint32)(this->max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
     switch (GET_POS(this))
     {
     case position_t::SLEEPING:
@@ -162,27 +153,27 @@ int Character::mana_gain_lookup(void)
   gain += MIN(age().year, 100) / 5;
   if (this->getLevel() < 50)
 
-    gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+    gain = (qint32)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
   if (this->mana_regen > 0)
     gain += this->mana_regen;
   if (this->in_room >= 0)
     if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
-      gain = (int)(gain * 1.25);
+      gain = (qint32)(gain * 1.25);
 
   if (this->mana_regen < 0)
     gain += this->mana_regen;
   return MAX(1, gain);
 }
 
-const int hit_regens[] = {0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0};
+const qint32 hit_regens[] = {0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0};
 
-int Character::hit_gain(position_t position, bool improve)
+qint32 Character::hit_gain(position_t position, bool improve)
 {
-  int gain = 1;
+  qint32 gain = 1;
   affected_type *af;
-  int divisor = 1;
-  int learned = has_skill(SKILL_ENHANCED_REGEN);
+  qint32 divisor = 1;
+  qint32 learned = has_skill(SKILL_ENHANCED_REGEN);
   /* Neat and fast */
   if (this->isNonPlayer())
   {
@@ -194,7 +185,7 @@ int Character::hit_gain(position_t position, bool improve)
   /* PC's */
   else
   {
-    gain = (int)(this->max_hit * (float)hit_regens[GET_CLASS(this)] / 100);
+    gain = (qint32)(this->max_hit * (float)hit_regens[GET_CLASS(this)] / 100);
 
     /* Position calculations    */
 
@@ -222,10 +213,10 @@ int Character::hit_gain(position_t position, bool improve)
 
     // con multiplier modifier 15 = 1.0  30 = 1.45 (.03 increments)
     /*    if(GET_CON(this) > 15)
-     gain = (int)(gain * ((float)1+ (.03 * (GET_CON(this) - 15.0))));
+     gain = (qint32)(gain * ((float)1+ (.03 * (GET_CON(this) - 15.0))));
 
      if(GET_CLASS(this) == CLASS_MAGIC_USER || GET_CLASS(this) == CLASS_CLERIC || GET_CLASS(this) == CLASS_DRUID)
-     gain = (int)((float)gain * 0.7);*/
+     gain = (qint32)((float)gain * 0.7);*/
 
     if (GET_CON(this) < 0)
       gain += con_app[0].hp_regen;
@@ -250,22 +241,22 @@ int Character::hit_gain(position_t position, bool improve)
   if (this->hit_regen > 0)
     gain += this->hit_regen;
   if (this->getLevel() < 50)
-    gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+    gain = (qint32)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
   if (this->in_room >= 0)
     if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
-      gain = (int)(gain * 1.5);
+      gain = (qint32)(gain * 1.5);
   if (this->hit_regen < 0)
     gain += this->hit_regen;
   return MAX(1, gain);
 }
 
-int Character::move_gain_lookup(int extra)
+qint32 Character::move_gain_lookup(qint32 extra)
 /* move gain pr. game hour */
 {
-  int gain;
-  int divisor = 100000;
-  int learned = has_skill(SKILL_ENHANCED_REGEN);
+  qint32 gain;
+  qint32 divisor = 100000;
+  qint32 learned = has_skill(SKILL_ENHANCED_REGEN);
   affected_type *af;
   bool improve = true;
   if (extra == 777)
@@ -278,7 +269,7 @@ int Character::move_gain_lookup(int extra)
   else
   {
     //	gain = graf(ch->age().year, 4,5,6,7,4,3,2);
-    gain = (int)(max_move * 0.15);
+    gain = (qint32)(max_move * 0.15);
     //	gain /= 2;
     switch (getPosition())
     {
@@ -300,7 +291,7 @@ int Character::move_gain_lookup(int extra)
       gain += con_app[GET_CON(this)].move_regen;
 
     if ((af = affected_by_spell(SPELL_RAPID_MEND)))
-      gain += (int)(af->modifier * 1.5);
+      gain += (qint32)(af->modifier * 1.5);
   }
 
   if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
@@ -315,21 +306,21 @@ int Character::move_gain_lookup(int extra)
     gain += 3 + learned / 10;
 
   if (this->getLevel() < 50)
-    gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+    gain = (qint32)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
   if (this->in_room >= 0)
     if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
-      gain = (int)(gain * 1.5);
+      gain = (qint32)(gain * 1.5);
   if (this->move_regen < 0)
     gain += this->move_regen;
 
   return MAX(1, gain);
 }
 
-void redo_hitpoints(Character *ch)
+void redo_hitpoints(CharacterPtr ch)
 {
   /*affected_type *af;*/
-  int i, j, bonus = 0;
+  qint32 i, j, bonus = {};
 
   ch->max_hit = ch->raw_hit;
   for (i = 16; i < GET_CON(ch); i++)
@@ -346,10 +337,10 @@ void redo_hitpoints(Character *ch)
     af = af->next;
   }
 
-  for (i = 0; i < MAX_WEAR; i++)
+  for (i = {}; i < MAX_WEAR; i++)
   {
     if (ch->equipment[i])
-      for (j = 0; j < ch->equipment[i]->num_affects; j++)
+      for (j = {}; j < ch->equipment[i]->num_affects; j++)
       {
         if (ch->equipment[i]->affected[j].location == APPLY_HIT)
           affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);
@@ -358,11 +349,11 @@ void redo_hitpoints(Character *ch)
   add_totem_stats(ch, APPLY_HIT);
 }
 
-void redo_mana(Character *ch)
+void redo_mana(CharacterPtr ch)
 
 {
   /*affected_type *af;*/
-  int i, j, bonus = 0, stat = 0;
+  qint32 i, j, bonus = 0, stat = {};
   if (ch->isNonPlayer())
     return;
   ch->max_mana = ch->raw_mana;
@@ -376,7 +367,7 @@ void redo_mana(Character *ch)
     bonus += (i * i) / 30;
 
   if ((GET_CLASS(ch) == CLASS_WARRIOR) || (GET_CLASS(ch) == CLASS_THIEF) || (GET_CLASS(ch) == CLASS_BARBARIAN) || (GET_CLASS(ch) == CLASS_MONK))
-    bonus = 0;
+    bonus = {};
 
   ch->max_mana += bonus;
 
@@ -388,10 +379,10 @@ void redo_mana(Character *ch)
       ch->max_mana += af->modifier;
     af = af->next;
   }
-  for (i = 0; i < MAX_WEAR; i++)
+  for (i = {}; i < MAX_WEAR; i++)
   {
     if (ch->equipment[i])
-      for (j = 0; j < ch->equipment[i]->num_affects; j++)
+      for (j = {}; j < ch->equipment[i]->num_affects; j++)
       {
         if (ch->equipment[i]->affected[j].location == APPLY_MANA)
           affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);
@@ -400,9 +391,9 @@ void redo_mana(Character *ch)
   add_totem_stats(ch, APPLY_MANA);
 }
 
-void redo_ki(Character *ch)
+void redo_ki(CharacterPtr ch)
 {
-  int i, j;
+  qint32 i, j;
   ch->max_ki = ch->raw_ki;
   if (GET_CLASS(ch) == CLASS_MONK)
     ch->max_ki += GET_WIS(ch) > 15 ? GET_WIS(ch) - 15 : 0;
@@ -418,10 +409,10 @@ void redo_ki(Character *ch)
     af = af->next;
   }
 
-  for (i = 0; i < MAX_WEAR; i++)
+  for (i = {}; i < MAX_WEAR; i++)
   {
     if (ch->equipment[i])
-      for (j = 0; j < ch->equipment[i]->num_affects; j++)
+      for (j = {}; j < ch->equipment[i]->num_affects; j++)
       {
         if (ch->equipment[i]->affected[j].location == APPLY_KI)
           affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);
@@ -431,14 +422,14 @@ void redo_ki(Character *ch)
 }
 
 /* Gain maximum in various */
-void advance_level(Character *ch, int is_conversion)
+void advance_level(CharacterPtr ch, qint32 is_conversion)
 {
-  int add_hp = 0;
-  int add_mana = 1;
-  int add_moves = 0;
-  int add_ki = 0;
-  int add_practices;
-  int i;
+  qint32 add_hp = {};
+  qint32 add_mana = 1;
+  qint32 add_moves = {};
+  qint32 add_ki = {};
+  qint32 add_practices;
+  qint32 i;
   char buf[MAX_STRING_LENGTH];
 
   auto effective_level = MAX(ch->getLevel(), 1);
@@ -570,7 +561,7 @@ void advance_level(Character *ch, int is_conversion)
     ch->send(buf);
 
   if (effective_level % 3 == 0)
-    for (int i = 0; i <= SAVE_TYPE_MAX; i++)
+    for (qint32 i = {}; i <= SAVE_TYPE_MAX; i++)
       ch->saves[i]++;
 
   ch->fillHP();
@@ -579,17 +570,17 @@ void advance_level(Character *ch, int is_conversion)
   GET_KI(ch) = GET_MAX_KI(ch);
 
   if (effective_level > IMMORTAL)
-    for (i = 0; i < 3; i++)
+    for (i = {}; i < 3; i++)
       ch->conditions[i] = -1;
 
   if (effective_level > 10 && !isSet(ch->player->toggles, Player::PLR_REMORTED))
   {
-    vault_data *vault = has_vault(GET_NAME(ch));
+    auto &vault = DC::getInstance()->vaults_.has_vault(ch->name());
     if (vault)
     {
       ch->sendln("10 lbs has been added to your vault!");
-      vault->size += 10;
-      save_vault(vault->owner);
+      vault.size += 10;
+      DC::getInstance()->vaults_.save(vault.owner);
     }
   }
 
@@ -598,7 +589,7 @@ void advance_level(Character *ch, int is_conversion)
   if (effective_level == 10)
   {
     ch->sendln("You have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information.");
-    add_new_vault(GET_NAME(ch), 0);
+    DC::getInstance()->vaults_.add_new_vault(ch->name(), 0);
   }
   if (effective_level == 11)
     ch->sendln("It now costs you $B$5gold$R every time you recall.");
@@ -610,29 +601,29 @@ void advance_level(Character *ch, int is_conversion)
     ch->sendln("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)");
 }
 
-void gain_exp(Character *ch, int64_t gain)
+void gain_exp(CharacterPtr ch, qint64 gain)
 {
-  int x = 0;
-  int64_t y;
+  qint32 x = {};
+  qint64 y;
 
   if (ch->isImmortalPlayer())
     return;
 
   y = exp_table[ch->getLevel() + 1];
 
-  if (GET_EXP(ch) >= y)
+  if (ch->exp >= y)
     x = 1;
 
-  /*  if(GET_EXP(ch) > 2000000000)
+  /*  if(ch->exp > 2000000000)
    {
    ch->sendln("You have hit the 2 billion xp cap.  Convert or meta chode.");
    return;
    }*/
-  GET_EXP(ch) += gain;
-  if (GET_EXP(ch) < 0)
-    GET_EXP(ch) = 0;
+  ch->exp += gain;
+  if (ch->exp < 0)
+    ch->exp = {};
 
-  void golem_gain_exp(Character * ch);
+  void golem_gain_exp(CharacterPtr ch);
 
   if (ch->isPlayer() && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
@@ -643,38 +634,33 @@ void gain_exp(Character *ch, int64_t gain)
   if (ch->isNonPlayer())
     return;
 
-  if (!x && GET_EXP(ch) >= y)
+  if (!x && ch->exp >= y)
   {
     ch->sendln("You now have enough experience to level!");
     if (ch->getLevel() == 1)
-      csendf(ch, "$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\r\n",
-             pc_clss_types[GET_CLASS(ch)]);
+      ch->send(QStringLiteral("$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\r\n").arg(pc_clss_types[GET_CLASS(ch)]));
   }
-
-  return;
 }
 
-void gain_exp_regardless(Character *ch, int gain)
+void gain_exp_regardless(CharacterPtr ch, qint32 gain)
 {
-  GET_EXP(ch) += (int64_t)gain;
+  ch->exp += (qint64)gain;
 
-  if (GET_EXP(ch) < 0)
-    GET_EXP(ch) = 0;
+  if (ch->exp < 0)
+    ch->exp = {};
 
   if (ch->isNonPlayer())
     return;
 
-  while (GET_EXP(ch) >= (int32_t)exp_table[ch->getLevel() + 1])
+  while (ch->exp >= (qint32)exp_table[ch->getLevel() + 1])
   {
     ch->send("You raise a level!!  ");
     ch->incrementLevel();
     advance_level(ch, 0);
   }
-
-  return;
 }
 
-void gain_condition(Character *ch, int condition, int value)
+void gain_condition(CharacterPtr ch, qint32 condition, qint32 value)
 {
   bool intoxicated;
 
@@ -690,8 +676,8 @@ void gain_condition(Character *ch, int condition, int value)
 
   GET_COND(ch, condition) += value;
 
-  GET_COND(ch, condition) = MAX(0, (int)GET_COND(ch, condition));
-  GET_COND(ch, condition) = MIN(24, (int)GET_COND(ch, condition));
+  GET_COND(ch, condition) = MAX(0, (qint32)GET_COND(ch, condition));
+  GET_COND(ch, condition) = MIN(24, (qint32)GET_COND(ch, condition));
 
   if (GET_COND(ch, condition) || ch->getLevel() >= 60)
     return;
@@ -727,14 +713,14 @@ void gain_condition(Character *ch, int condition, int value)
 
 void food_update(void)
 {
-  class Object *food = nullptr;
+  ObjectPtr food = {};
 
-  const auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
+  const auto &character_list = (dynamic_cast<DCPtr>(DC::instance()))->character_list;
   for (const auto &i : character_list)
   {
     if (i->affected_by_spell(SPELL_PARALYZE))
       continue;
-    int amt = -1;
+    qint32 amt = -1;
     if (i->equipment[WEAR_FACE] && DC::getInstance()->obj_index[i->equipment[WEAR_FACE]->item_number].vnum() == 536)
       amt = -3;
     gain_condition(i, FULL, amt);
@@ -747,7 +733,7 @@ void food_update(void)
         else if (FOUNTAINisPresent(i))
           i->do_drink({QStringLiteral("fountain")});
         else if ((food = bring_type_to_front(i, ITEM_FOOD)))
-          i->do_eat(food->Name().split(' '));
+          i->do_eat(food->name().split(' '));
         else
           i->sendln("You are out of food.");
       }
@@ -763,7 +749,7 @@ void food_update(void)
         else if (FOUNTAINisPresent(i))
           i->do_drink({QStringLiteral("fountain")});
         else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
-          i->do_drink(food->Name().split(' '));
+          i->do_drink(food->name().split(' '));
         else
           i->sendln("You are out of drink.");
       }
@@ -785,14 +771,14 @@ void point_update(void)
     if (i->affected_by_spell(SPELL_POISON))
       continue;
 
-    int a;
-    Character *temp;
+    qint32 a;
+    CharacterPtr temp;
     if (i->isPlayer() && ISSET(i->affected_by, AFF_HIDE) && (a = i->has_skill(SKILL_HIDE)))
     {
-      int o;
-      for (o = 0; o < MAX_HIDE; o++)
-        i->player->hiding_from[o] = nullptr;
-      o = 0;
+      qint32 o;
+      for (o = {}; o < MAX_HIDE; o++)
+        i->player->hiding_from[o] = {};
+      o = {};
       for (temp = DC::getInstance()->world[i->in_room].people; temp; temp = temp->next_in_room)
       {
         if (i == temp)
@@ -833,15 +819,15 @@ void point_update(void)
 void update_corpses_and_portals(void)
 {
   // char buf[256];
-  class Object *j, *next_thing;
-  class Object *jj, *next_thing2;
-  int proc = 0; // Processed items. Debugging.
+  ObjectPtr j, next_thing;
+  ObjectPtr jj, next_thing2;
+  qint32 proc = {}; // Processed items. Debugging.
   bool corpses_need_saving = false;
-  void extract_obj(class Object * obj); /* handler.c */
+  void extract_obj(ObjectPtr obj); /* handler.c */
   /* objects */
   for (j = DC::getInstance()->object_list; j; j = next_thing, proc++)
   {
-    if (j == (class Object *)0x95959595)
+    if (j == (ObjectPtr)0x95959595)
       break;
     next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
@@ -911,14 +897,14 @@ void update_corpses_and_portals(void)
 
           if (GET_ITEM_TYPE(jj) == ITEM_CONTAINER)
           {
-            Object *oo, *oon;
+            ObjectPtr oo, oon;
             for (oo = jj->contains; oo; oo = oon)
             {
               oon = oo->next_content;
 
               if (isSet(oo->obj_flags.more_flags, ITEM_NO_TRADE))
               {
-                log_sacrifice((Character *)j, oo, true);
+                log_sacrifice((CharacterPtr)j, oo, true);
                 extract_obj(oo);
               }
             }
@@ -977,11 +963,11 @@ void update_corpses_and_portals(void)
   // process_portals();
 }
 
-void prepare_character_for_sixty(Character *ch)
+void prepare_character_for_sixty(CharacterPtr ch)
 {
   if (ch->isPlayer() && DC::MAX_MORTAL_LEVEL == 60)
   {
-    int skl = -1;
+    qint32 skl = -1;
     switch (GET_CLASS(ch))
     {
     case CLASS_MAGE:
@@ -1021,17 +1007,17 @@ void prepare_character_for_sixty(Character *ch)
     if (ch->has_skill(skl) && !isSet(ch->player->toggles, Player::PLR_50PLUS))
     {
       SET_BIT(ch->player->toggles, Player::PLR_50PLUS);
-      int i = (ch->exp / 100000000) * 500000;
+      qint32 i = (ch->exp / 100000000) * 500000;
       if (i > 0)
       {
-        csendf(ch, "$B$3You have been credited %d $B$5gold$R coins for your %ld experience.$R\r\n", i, ch->exp);
+        ch->send(QStringLiteral("$B$3You have been credited %d $B$5gold$R coins for your %ld experience.$R\r\n").arg(i).arg(ch->exp));
         ch->addGold(i);
       }
       else if (ch->exp > 0)
       {
         ch->sendln("Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.");
       }
-      ch->exp = 0;
+      ch->exp = {};
     }
   }
 }

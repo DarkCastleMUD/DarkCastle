@@ -23,17 +23,13 @@
 #include <memory>
 
 #include "DC/DC.h"
-#include "DC/room.h"
-#include "DC/character.h"
-#include "DC/mobile.h"
-#include "DC/utility.h"
+
 #include "DC/spells.h"
 #include "DC/player.h"
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/handler.h"
-#include "DC/vault.h"
-#include "DC/memory.h"
+#include "DC/DC.h"
 
 #ifdef USE_SQL
 #include <iostream>
@@ -43,10 +39,10 @@
 extern Database db;
 #endif
 
-class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
-bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
-void restore_weight(class Object *obj);
-void store_to_char(char_file_u4 *st, Character *ch);
+ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
+bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos);
+void restore_weight(ObjectPtr obj);
+void store_to_char(char_file_u4 *st, CharacterPtr ch);
 QString fread_alias_string(FILE *fpsave);
 
 // return 1 on success
@@ -56,7 +52,7 @@ QString fread_alias_string(FILE *fpsave);
 // -pir
 void Player::save_char_aliases(FILE *fpsave)
 {
-  uint32_t tmp_size = aliases_.size();
+  quint32 tmp_size = aliases_.size();
   fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
 
   // write the aliases out
@@ -66,22 +62,22 @@ void Player::save_char_aliases(FILE *fpsave)
     tmp_size = alias.length();
     fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
     // but we actually write tmp_size +1 to get the trailing \0
-    fwrite(alias.toStdString().c_str(), sizeof(char), (tmp_size + 1), fpsave);
+    fwrite(qPrintable(alias), sizeof(char), (tmp_size + 1), fpsave);
 
     tmp_size = command.length();
     fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
-    fwrite(command.toStdString().c_str(), sizeof(char), (tmp_size + 1), fpsave);
+    fwrite(qPrintable(command), sizeof(char), (tmp_size + 1), fpsave);
   }
 }
 
 // return pointer to aliases or nullptr
 aliases_t read_char_aliases(FILE *fpsave)
 {
-  uint32_t total{};
+  quint32 total = {};
   fread(&total, sizeof(total), 1, fpsave);
 
   aliases_t aliases;
-  for (auto x = 0; x < total; x++)
+  for (auto x = {}; x < total; x++)
   {
     QString keyword = fread_alias_string(fpsave);
     QString command = fread_alias_string(fpsave);
@@ -99,7 +95,7 @@ aliases_t read_char_aliases(FILE *fpsave)
 
 QString fread_alias_string(FILE *fpsave)
 {
-  uint32_t tmp_size{};
+  quint32 tmp_size = {};
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (read_count != 1)
   {
@@ -125,7 +121,7 @@ QString fread_alias_string(FILE *fpsave)
 
 void fwrite_var_string(const char *str, FILE *fpsave)
 {
-  uint16_t tmp_size{};
+  quint16 tmp_size = {};
 
   if (str)
   {
@@ -147,8 +143,8 @@ void fwrite_var_string(QString str, FILE *fpsave)
 
 char *fread_var_string(FILE *fpsave)
 {
-  uint16_t tmp_size = 0;
-  char *tmp_str = nullptr;
+  quint16 tmp_size = {};
+  char *tmp_str = {};
 
   size_t records_read = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (tmp_size > 0 && records_read > 0)
@@ -157,7 +153,7 @@ char *fread_var_string(FILE *fpsave)
     assert(tmp_str);
     if (tmp_str == nullptr)
     {
-      return nullptr;
+      return {};
     }
 
     records_read = fread(tmp_str, sizeof(char), tmp_size, fpsave);
@@ -165,10 +161,10 @@ char *fread_var_string(FILE *fpsave)
     {
       return tmp_str;
     }
-    dc_free(tmp_str);
+    tmp_str = {};
   }
 
-  return nullptr;
+  return {};
 }
 
 void Mobile::save(FILE *fpsave)
@@ -218,7 +214,7 @@ void fwrite_string_tilde(FILE *fpsave)
 }
 void Player::save(FILE *fpsave, time_data tmpage)
 {
-  fwrite(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
+  fwrite(qPrintable(password_), sizeof(char), PASSWORD_LEN + 1, fpsave);
   save_char_aliases(fpsave);
 
   fwrite_string_tilde(fpsave);
@@ -276,9 +272,9 @@ void Player::save(FILE *fpsave, time_data tmpage)
 
   fwrite("QST", sizeof(char), 3, fpsave);
   fwrite(&(quest_points), sizeof(quest_points), 1, fpsave);
-  for (int j = 0; j < QUEST_MAX_CANCEL; j++)
+  for (qint32 j = {}; j < QUEST_MAX_CANCEL; j++)
     fwrite(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
-  for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
+  for (qint32 j = {}; j <= QUEST_TOTAL / ASIZE; j++)
     fwrite(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
   if (buildLowVnum)
   {
@@ -361,21 +357,21 @@ void Player::save(FILE *fpsave, time_data tmpage)
 
 qsizetype fread_to_tilde(FILE *fpsave, QString filename)
 {
-  qsizetype characters_read{};
+  qsizetype characters_read = {};
   QString buffer;
-  char a{};
+  char a = {};
 
   while (characters_read++ < 160)
   {
     if (feof(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
+      qDebug(QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(qPrintable(filename)));
       return characters_read;
     }
 
     if (ferror(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
+      qDebug(QStringLiteral("fread_to_tilde: unexpected error in %1").arg(qPrintable(filename)));
       return characters_read;
     }
 
@@ -384,7 +380,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
     long after_fread_offset = ftell(fpsave);
     if (read_count != 1)
     {
-      qDebug(QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
+      qDebug(QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(qPrintable(filename)));
     }
 
     buffer += a;
@@ -396,13 +392,13 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
 
   if (characters_read >= 160)
   {
-    qDebug(QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
+    qDebug(QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(qPrintable(filename)));
   }
 
   return characters_read;
 }
 
-bool Player::read(FILE *fpsave, Character *ch, QString filename)
+bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
 {
   if (!ch)
   {
@@ -410,12 +406,12 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   }
 
   char typeflag[4] = {};
-  golem = 0;
-  quest_points = 0;
-  for (int j = 0; j < QUEST_MAX_CANCEL; j++)
-    quest_cancel[j] = 0;
-  for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
-    quest_complete[j] = 0;
+  golem = {};
+  quest_points = {};
+  for (qint32 j = {}; j < QUEST_MAX_CANCEL; j++)
+    quest_cancel[j] = {};
+  for (qint32 j = {}; j <= QUEST_TOTAL / ASIZE; j++)
+    quest_complete[j] = {};
 
   fread(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
   aliases_ = read_char_aliases(fpsave);
@@ -423,7 +419,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   {
     if (fread_to_tilde(fpsave, filename) >= 160)
     {
-      logbug(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
+      logbug(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->name()));
       return false;
     }
   }
@@ -448,7 +444,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
     tmp = fread_var_string(fpsave);
     tmp = fread_var_string(fpsave);
   }
-  skillchange = 0;
+  skillchange = {};
 
   fread(&typeflag, sizeof(char), 3, fpsave);
 
@@ -492,9 +488,9 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   if (!strcmp("QST", typeflag))
   {
     fread(&(quest_points), sizeof(quest_points), 1, fpsave);
-    for (int j = 0; j < QUEST_MAX_CANCEL; j++)
+    for (qint32 j = {}; j < QUEST_MAX_CANCEL; j++)
       fread(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
-    for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
+    for (qint32 j = {}; j <= QUEST_TOTAL / ASIZE; j++)
       fread(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
@@ -559,7 +555,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
     char *var_string = fread_var_string(fpsave);
     if (var_string != nullptr)
     {
-      std::string name = var_string;
+      QString name = var_string;
       if (name.empty() == false)
       {
         ignore_entry ie = {true, 0};
@@ -571,7 +567,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
-  skillchange = 0;
+  skillchange = {};
   // Add new items in this format
   //  if(!strcmp(typeflag, "XXX"))
   //    do_something
@@ -595,25 +591,21 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, time_data tmpage)
     return true;
   }
 
-  logbug(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
+  logbug(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(name()));
   return false;
 }
 
-bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
+bool read_pc_or_mob_data(CharacterPtr ch, FILE *fpsave, QString filename)
 {
   if (ch->isNonPlayer())
   {
-    ch->player = nullptr;
-#ifdef LEAK_CHECK
-    ch->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-    ch->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+    ch->player = {};
+    auto ch->mobdata = new Mobile;
     ch->mobdata->read(fpsave);
   }
   else
   {
-    ch->mobdata = nullptr;
+    ch->mobdata = {};
     ch->player = new Player;
     ch->setType(Character::Type::Player);
     if (!ch->player->read(fpsave, ch, filename))
@@ -626,12 +618,12 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
 
 // return 1 on success
 // return 0 on failure
-int store_worn_eq(Character *ch, FILE *fpsave)
+qint32 store_worn_eq(CharacterPtr ch, FILE *fpsave)
 {
-  int wear_pos = -1;
-  int iWear = 0;
+  qint32 wear_pos = -1;
+  qint32 iWear = {};
 
-  for (iWear = 0; iWear < MAX_WEAR; iWear++)
+  for (iWear = {}; iWear < MAX_WEAR; iWear++)
   {
     wear_pos = iWear;
     if (ch->equipment[iWear])
@@ -643,9 +635,9 @@ int store_worn_eq(Character *ch, FILE *fpsave)
   return 1;
 }
 
-int Character::char_to_store_variable_data(FILE *fpsave)
+qint32 Character::char_to_store_variable_data(FILE *fpsave)
 {
-  fwrite_var_string(this->getName(), fpsave);
+  fwrite_var_string(this->name(), fpsave);
   fwrite_var_string(this->short_desc, fpsave);
   fwrite_var_string(this->long_desc, fpsave);
   fwrite_var_string(this->description, fpsave);
@@ -664,7 +656,7 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   fwrite("END", sizeof(char), 3, fpsave);
 
   affected_type *af;
-  int16_t aff_count = 0; // do not change from int16_t
+  qint16 aff_count = {}; // do not change from qint16
 
   for (af = this->affected; af; af = af->next)
     aff_count++;
@@ -704,25 +696,25 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   return 1;
 }
 
-void read_skill(Character *ch, FILE *fpsave)
+void read_skill(CharacterPtr ch, FILE *fpsave)
 {
   char_skill_data curr = {};
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -734,15 +726,15 @@ void read_skill(Character *ch, FILE *fpsave)
   ch->skills[curr.skillnum] = curr;
 }
 
-int Character::store_to_char_variable_data(FILE *fpsave)
+qint32 Character::store_to_char_variable_data(FILE *fpsave)
 {
   char typeflag[4];
 
-  this->setName(fread_var_string(fpsave));
-  this->short_desc = fread_var_string(fpsave);
-  this->long_desc = fread_var_string(fpsave);
-  this->description = fread_var_string(fpsave);
-  this->title = fread_var_string(fpsave);
+  name(fread_var_string(fpsave));
+  short_description(fread_var_string(fpsave));
+  long_description(fread_var_string(fpsave));
+  description(fread_var_string(fpsave));
+  title = fread_var_string(fpsave);
 
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(char), 3, fpsave);
@@ -757,13 +749,13 @@ int Character::store_to_char_variable_data(FILE *fpsave)
 
   if (!strncmp(typeflag, "AFS", 3)) // affects
   {
-    int16_t aff_count; // do not change form int16_t
+    qint16 aff_count; // do not change form qint16
     fread(&aff_count, sizeof(aff_count), 1, fpsave);
-    this->affected = nullptr;
-    for (int16_t i = 0; i < aff_count; i++)
+    this->affected = {};
+    for (qint16 i = {}; i < aff_count; i++)
     {
       affected_type *af = new (std::nothrow) affected_type;
-      af->duration_type = 0;
+      af->duration_type = {};
       af->next = this->affected;
       this->affected = af;
 
@@ -781,11 +773,7 @@ int Character::store_to_char_variable_data(FILE *fpsave)
   while (!strcmp(typeflag, "MPV"))
   { // MobProgVars6
     tempvariable *mpv;
-#ifdef LEAK_CHECK
-    mpv = (tempvariable *)calloc(1, sizeof(tempvariable));
-#else
-    mpv = (tempvariable *)dc_alloc(1, sizeof(tempvariable));
-#endif
+    auto mpv = new tempvariable;
     mpv->name = fread_var_string(fpsave);
     mpv->data = fread_var_string(fpsave);
     mpv->save = 1;
@@ -810,7 +798,7 @@ int Character::store_to_char_variable_data(FILE *fpsave)
 }
 
 #ifdef USE_SQL
-void save_char_obj_db(Character *ch)
+void save_char_obj_db(CharacterPtr ch)
 {
   if (ch == 0)
     return;
@@ -834,7 +822,7 @@ void save_char_obj_db(Character *ch)
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
     uchar.load_room = DC::getInstance()->world[this->in_room].number;
   else
-    uchar.load_room = real_room(GET_HOME(ch));
+    uchar.load_room = real_room(ch->hometown);
 
   timeval start, finish;
 
@@ -842,7 +830,7 @@ void save_char_obj_db(Character *ch)
   db.save(ch, &uchar);
   gettimeofday(&finish, nullptr);
 
-  int msec = finish.tv_sec * 1000 + finish.tv_usec / 1000;
+  qint32 msec = finish.tv_sec * 1000 + finish.tv_usec / 1000;
   msec -= start.tv_sec * 1000 + start.tv_usec / 1000;
   ch->send(QStringLiteral("Save took %1ms\r\n").arg(msec));
 
@@ -870,8 +858,8 @@ void save_char_obj_db(Character *ch)
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  vault_data *vault;
-  if ((vault = has_vault(GET_NAME(ch))))
+  Vault *vault;
+  if ((vault = has_vault(qPrintable(ch->name()))))
     save_vault(vault->owner);
   */
 }
@@ -883,7 +871,7 @@ void Character::save_char_obj(void)
 {
   char_file_u4 uchar = {};
   time_data tmpage;
-  FILE *fpsave = 0;
+  FILE *fpsave = {};
   char strsave[MAX_INPUT_LENGTH] = {0};
   char name[200] = {0};
 
@@ -894,19 +882,19 @@ void Character::save_char_obj(void)
     return;
   }
 
-  if (getName().isEmpty())
+  if (name().isEmpty())
   {
-    setName("Unknown");
+    name("Unknown");
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
   if (DC::getInstance()->cf.bport)
   {
-    sprintf(name, "%s/%c/%s", BSAVE_DIR, getNameC()[0], getNameC());
+    sprintf(name, "%s/%c/%s", BSAVE_DIR, qPrintable(name())[0], qPrintable(name()));
   }
   else
   {
-    sprintf(name, "%s/%c/%s", SAVE_DIR, getNameC()[0], getNameC());
+    sprintf(name, "%s/%c/%s", SAVE_DIR, qPrintable(name())[0], qPrintable(name()));
   }
 
   sprintf(strsave, "%s.back", name);
@@ -938,7 +926,7 @@ void Character::save_char_obj(void)
     if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
       uchar.load_room = DC::getInstance()->world[in_room].number;
     else
-      uchar.load_room = real_room(GET_HOME(this));
+      uchar.load_room = real_room(hometown);
   }
 
   if ((fwrite(&uchar, sizeof(uchar), 1, fpsave)) &&
@@ -966,8 +954,8 @@ void Character::save_char_obj(void)
   }
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  vault_data *vault;
-  if ((vault = has_vault(getName())))
+  Vault *vault;
+  if ((vault = has_vault(name())))
     save_vault(vault->owner);
 }
 
@@ -975,35 +963,35 @@ void Character::save_char_obj(void)
 void load_char_obj_error(FILE *fpsave, QString strsave)
 {
   QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
-  perror(log_buf.toStdString().c_str());
+  perror(qPrintable(log_buf));
   logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }
 
 // Load a char and inventory into a new_new ch ure.
-load_status_t DC::load_char_obj(class Connection *d, QString name)
+load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
 {
-  FILE *fpsave = nullptr;
+  if (!conn || name.isEmpty())
+    return load_status_t::bad_input;
+
+  FILE *fpsave = {};
   QString strsave;
   char_file_u4 uchar;
-  class Object *last_cont = nullptr;
-  Character *ch;
+  ObjectPtr last_cont = {};
+  CharacterPtr ch;
 
-  if (name.isEmpty())
-    return load_status_t::bad_input;
+  name.toLower();
   name[0] = name[0].toUpper();
 
   ch = new Character(this);
-  auto &free_list = DC::getInstance()->free_list;
-  free_list.erase(ch);
 
-  if (d->character)
+  if (conn->character)
   {
-    free_char(d->character, Trace("load_char_obj"));
+    free_char(conn->character, Trace("load_char_obj"));
   }
 
-  d->character = ch;
+  conn->character = ch;
   clear_char(ch);
   ch->desc = d;
 
@@ -1022,7 +1010,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   //  then parse the memory instead of reading each item from file seperately
   //  Should be much faster and save our HD from turning itself to mush -pir
 
-  if ((fpsave = fopen(strsave.toStdString().c_str(), "rb")) == nullptr)
+  if ((fpsave = fopen(qPrintable(strsave), "rb")) == nullptr)
     return load_status_t::missing;
 
   if (fread(&uchar, sizeof(uchar), 1, fpsave) == 0)
@@ -1043,13 +1031,13 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   if (ch->isPlayer() && ch->player->time.logon < 1117527906)
   {
     do_clearaff(ch, "");
-    ch->affected_by[0] = ch->affected_by[1] = 0;
+    ch->affected_by[0] = ch->affected_by[1] = {};
   }
 
   // stored names only matter for mobs
   if (!ch->isNonPlayer())
   {
-    ch->setName(name);
+    ch->name(name);
   }
 
   while (!feof(fpsave))
@@ -1063,16 +1051,16 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
 }
 
 // read data from file for an item.
-class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont)
+ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
 {
-  class Object *obj;
+  ObjectPtr obj;
   //  extra_descr_data *new_new_descr;
   //  extra_descr_data *ed, *next_ed;
 
-  int j;
-  int nr;
-  uint16_t length; // do not change this type
-  int wear_pos;
+  qint32 j;
+  qint32 nr;
+  quint16 length; // do not change this type
+  qint32 wear_pos;
   char mod_type[4];
   char buf[MAX_STRING_LENGTH];
 
@@ -1081,7 +1069,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   fread(&object, sizeof(object), 1, fpsave);
 
   if (feof(fpsave))
-    return nullptr;
+    return {};
 
   // if it's a current object, clone it and continue
   // if it's not, then we need to remove it from the pfile so clone obj 1
@@ -1101,7 +1089,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   // put it at the end of the sequence and all is good.  We keep reading until
   // we hit a STP flag.  If we aren't on STP by the end of the sequence, then
   // something very bad has happened. -pir
-  mod_type[3] = 0;
+  mod_type[3] = {};
   fread(&mod_type, sizeof(char), 3, fpsave);
 
   if (!strcmp("EQL", mod_type))
@@ -1162,16 +1150,9 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   if (!strcmp("AFF", mod_type))
   {
     fread(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
-    if (obj->affected)
-      dc_free(obj->affected);
 
-#ifdef LEAK_CHECK
-    obj->affected = (obj_affected_type *)calloc(obj->num_affects, sizeof(obj_affected_type));
-#else
-    obj->affected = (obj_affected_type *)dc_alloc(obj->num_affects, sizeof(obj_affected_type));
-#endif
-
-    for (j = 0; j < obj->num_affects; j++)
+    obj->affected = {};
+    for (j = {}; j < obj->num_affects; j++)
     {
       fread(&obj->affected[j].location, sizeof(obj->affected[j].location), 1, fpsave);
       fread(&obj->affected[j].modifier, sizeof(obj->affected[j].modifier), 1, fpsave);
@@ -1181,20 +1162,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   }
   if (!strcmp("RPR", mod_type))
   {
-    obj_affected_type *a;
-#ifdef LEAK_CHECK
-    a = (obj_affected_type *)calloc(obj->num_affects + 1, sizeof(obj_affected_type));
-#else
-    a = (obj_affected_type *)dc_alloc(obj->num_affects + 1, sizeof(obj_affected_type));
-#endif
-    int i;
-    for (i = 0; i < obj->num_affects; i++)
-    {
-      a[i].location = obj->affected[i].location;
-      a[i].modifier = obj->affected[i].modifier;
-    }
-    if (obj->affected)
-      dc_free(obj->affected);
+    auto a = obj->affected;
     a[i].location = APPLY_DAMAGED;
     fread(&a[i].modifier, sizeof(a[i].modifier), 1, fpsave);
     obj->affected = a;
@@ -1206,7 +1174,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->Name(buf);
+    obj->name(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("DES", mod_type))
@@ -1214,7 +1182,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->long_description = str_hsh(buf);
+    obj->long_description = QStringLiteral(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("SDE", mod_type))
@@ -1222,7 +1190,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->short_description = str_hsh(buf);
+    qPrintable(obj->short_description()) = QStringLiteral(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("ADE", mod_type))
@@ -1240,12 +1208,12 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   }
   if (!strcmp("SAV", mod_type))
   {
-    fread(&obj->save_expiration, sizeof(uint32_t), 1, fpsave);
+    fread(&obj->save_expiration, sizeof(quint32), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("SEL", mod_type))
   {
-    fread(&obj->no_sell_expiration, sizeof(uint32_t), 1, fpsave);
+    fread(&obj->no_sell_expiration, sizeof(quint32), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
 
@@ -1299,9 +1267,9 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   return last_cont;
 }
 
-bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos)
+bool obj_to_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos)
 {
-  // class Object *tmp;
+  // ObjectPtr tmp;
 
   if (obj == nullptr)
     return true;
@@ -1324,11 +1292,11 @@ bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos)
 // return true on success
 // return false on error
 // write one object to file
-bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos)
+bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos)
 {
   obj_file_elem object;
-  Object *standard_obj = 0;
-  uint16_t length = 0; // do not change this type
+  ObjectPtr standard_obj = {};
+  quint16 length = {}; // do not change this type
 
   memset(&object, 0, sizeof(object));
 
@@ -1365,14 +1333,14 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   if (obj->in_obj) // I'm in a container
     object.container_depth = 1;
   else
-    object.container_depth = 0;
+    object.container_depth = {};
 
   // write basic item format to file
   if (!(fwrite(&object, sizeof(object), 1, fpsave)))
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = ((class Object *)DC::getInstance()->obj_index[obj->item_number].item);
+  standard_obj = ((ObjectPtr)DC::getInstance()->obj_index[obj->item_number].item);
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1468,14 +1436,14 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     // since they aren't always in the same order (builder might have swapped them in an
     // rsave or something) we have to search through for each one to see if they are there,
     // just in a different spot
-    for (iAffect = 0; (iAffect < obj->num_affects) && !change; iAffect++)
+    for (iAffect = {}; (iAffect < obj->num_affects) && !change; iAffect++)
     {
       // set it to changed, and if we find it, set it back to unchanged, then continue prior loop
       change = 1;
-      for(iAff2 = 0; (iAff2 < obj->num_affects) && change; iAff2++)
+      for(iAff2 = {}; (iAff2 < obj->num_affects) && change; iAff2++)
         if( (obj->affected[iAffect].location == standard_obj->affected[iAff2].location) ||
             (obj->affected[iAffect].modifier == standard_obj->affected[iAff2].modifier))
-          change = 0;
+          change = {};
     }
     */
   // Custom objects get all of their affects copied
@@ -1483,7 +1451,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   {
     fwrite("AFF", sizeof(char), 3, fpsave);
     fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
-    for (int iAffect = 0; iAffect < obj->num_affects; iAffect++)
+    for (qint32 iAffect = {}; iAffect < obj->num_affects; iAffect++)
     {
       fwrite(&obj->affected[iAffect].location, sizeof(obj->affected[iAffect].location), 1, fpsave);
       fwrite(&obj->affected[iAffect].modifier, sizeof(obj->affected[iAffect].modifier), 1, fpsave);
@@ -1491,8 +1459,8 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   }
   else
   { // non-custom objects only get the damaged affect copied by way of RPR
-    int i;
-    for (i = 0; i < obj->num_affects; i++)
+    qint32 i;
+    for (i = {}; i < obj->num_affects; i++)
     {
       if (obj->affected[i].location == APPLY_DAMAGED)
       {
@@ -1503,12 +1471,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     }
   }
 
-  if (!obj->Name().isEmpty() && obj->Name() != standard_obj->Name())
+  if (!obj->name().isEmpty() && obj->name() != standard_obj->name())
   {
     fwrite("NAM", sizeof(char), 3, fpsave);
-    length = strlen(qPrintable(obj->Name()));
+    length = strlen(qPrintable(obj->name()));
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(qPrintable(obj->Name()), sizeof(char), length, fpsave);
+    fwrite(qPrintable(obj->name()), sizeof(char), length, fpsave);
   }
   if (obj->long_description && strcmp(obj->long_description, standard_obj->long_description))
   {
@@ -1517,19 +1485,19 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->long_description, sizeof(char), length, fpsave);
   }
-  if (obj->short_description && strcmp(obj->short_description, standard_obj->short_description))
+  if (obj->short_description && strcmp(qPrintable(obj->short_description()), standard_obj->short_description))
   {
     fwrite("SDE", sizeof(char), 3, fpsave);
     length = strlen(obj->short_description);
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(obj->short_description, sizeof(char), length, fpsave);
+    fwrite(qPrintable(obj->short_description()), sizeof(char), length, fpsave);
   }
   if (!obj->ActionDescription().isEmpty() && obj->ActionDescription() != standard_obj->ActionDescription())
   {
     fwrite("ADE", sizeof(char), 3, fpsave);
     length = obj->ActionDescription().length();
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(obj->ActionDescription().toStdString().c_str(), sizeof(char), length, fpsave);
+    fwrite(qPrintable(obj->ActionDescription()), sizeof(char), length, fpsave);
   }
 
   if (obj->obj_flags.cost != standard_obj->obj_flags.cost)
@@ -1541,13 +1509,13 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
     fwrite("SAV", sizeof(char), 3, fpsave);
-    fwrite(&obj->save_expiration, sizeof(uint32_t), 1, fpsave);
+    fwrite(&obj->save_expiration, sizeof(quint32), 1, fpsave);
   }
 
   if (isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
   {
     fwrite("SEL", sizeof(char), 3, fpsave);
-    fwrite(&obj->no_sell_expiration, sizeof(uint32_t), 1, fpsave);
+    fwrite(&obj->no_sell_expiration, sizeof(quint32), 1, fpsave);
   }
 
   // extra descs are a little strange...it's a pointer to a list of them
@@ -1568,9 +1536,9 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
 /*
  * Restore container weights after a save.
  */
-void restore_weight(class Object *obj)
+void restore_weight(ObjectPtr obj)
 {
-  class Object *tmp;
+  ObjectPtr tmp;
 
   if (obj == nullptr)
     return;
@@ -1584,15 +1552,15 @@ void restore_weight(class Object *obj)
 
 void donothin() {}
 // Read shared data from pfile
-void store_to_char(char_file_u4 *st, Character *ch)
+void store_to_char(char_file_u4 *st, CharacterPtr ch)
 {
-  int i;
+  qint32 i;
 
   ch->clan = st->clan;
 
   GET_SEX(ch) = st->sex;
   GET_CLASS(ch) = st->c_class;
-  GET_RACE(ch) = st->race;
+  ch->race = st->race;
   ch->setLevel(st->level);
 
   ch->hometown = st->hometown;
@@ -1642,14 +1610,14 @@ void store_to_char(char_file_u4 *st, Character *ch)
   ch->affected_by[0] = st->afected_by;
   ch->affected_by[1] = st->afected_by2;
 
-  /*    i = 0;
+  /*    i = {};
       while(st->afected_by[i] != -1) {
          ch->affected_by[i] = st->afected_by[i];
          i++;
       }
       st->afected_by[i] = -1;
   */
-  for (i = 0; i <= 2; i++)
+  for (i = {}; i <= 2; i++)
     GET_COND(ch, i) = st->conditions[i];
 
   // it's ok assigning the in_room directly since do_on_login_stuff() will
@@ -1669,18 +1637,18 @@ void store_to_char(char_file_u4 *st, Character *ch)
 // return 'age' of character unmodified
 void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 {
-  int i;
-  int x;
+  qint32 i;
+  qint32 x;
   affected_type *af;
-  class Object *char_eq[MAX_WEAR];
+  ObjectPtr char_eq[MAX_WEAR];
 
   // Remove all the eq and store it in temp storage
-  for (i = 0; i < MAX_WEAR; i++)
+  for (i = {}; i < MAX_WEAR; i++)
   {
     if (equipment[i])
       char_eq[i] = unequip_char(i, true);
     else
-      char_eq[i] = 0;
+      char_eq[i] = {};
   }
 
   // Unaffect everything a character can be affected by spell-wise
@@ -1691,7 +1659,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 
   st->sex = GET_SEX(this);
   st->c_class = GET_CLASS(this);
-  st->race = GET_RACE(this);
+  st->race = this->race;
   st->level = getLevel();
 
   st->raw_str = GET_RAW_STR(this);
@@ -1711,7 +1679,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 
   st->weight = GET_WEIGHT(this);
   st->height = GET_HEIGHT(this);
-  for (i = 0; i < 3; i++)
+  for (i = {}; i < 3; i++)
     st->conditions[i] = GET_COND(this, i);
 
   st->hometown = hometown;
@@ -1720,9 +1688,9 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
   //  st->load_room = DC::getInstance()->world[in_room].number;
 
   //  st->gold      = getGold();
-  st->gold = 0; // Moved
+  st->gold = {}; // Moved
   st->plat = GET_PLATINUM(this);
-  st->exp = GET_EXP(this);
+  st->exp = this->exp;
   st->immune = immune;
   st->resist = resist;
   st->suscept = suscept;
@@ -1735,8 +1703,8 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
   st->clan = clan;
 
   // make sure rest of unused are set to 0
-  for (x = 0; x < 3; x++)
-    st->extra_ints[x] = 0;
+  for (x = {}; x < 3; x++)
+    st->extra_ints[x] = {};
 
   if (this->isNonPlayer())
   {
@@ -1787,16 +1755,16 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
       st->armor = 20;
       break;
     case CLASS_MONK:
-      st->armor = 0;
+      st->armor = {};
       break;
     default:
       st->armor = 100;
       break;
     }
-    st->hitroll = 0;
-    st->damroll = 0;
-    st->afected_by = 0;
-    st->afected_by2 = 0;
+    st->hitroll = {};
+    st->damroll = {};
+    st->afected_by = {};
+    st->afected_by2 = {};
     st->acmetas = GET_AC_METAS(this);
     st->agemetas = GET_AGE_METAS(this);
     tmpage = player->time;
@@ -1809,7 +1777,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
   }
 
   // re-equip the character with his eq
-  for (i = 0; i < MAX_WEAR; i++)
+  for (i = {}; i < MAX_WEAR; i++)
   {
     if (char_eq[i])
       equip_char(char_eq[i], i, 1);

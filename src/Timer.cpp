@@ -9,7 +9,7 @@
 #include "DC/Timer.h"
 #include <sys/time.h>
 
-std::map<std::string, Timer> PerfTimers;
+QMap<QString, Timer> PerfTimers;
 
 TimeVal::TimeVal(time_t sec, suseconds_t usec)
 {
@@ -44,7 +44,7 @@ TimeVal TimeVal::operator-(TimeVal t1)
   return t;
 }
 
-TimeVal TimeVal::operator/(int value)
+TimeVal TimeVal::operator/(qint32 value)
 {
   TimeVal t;
   t.tv_sec = tv_sec / value;
@@ -179,7 +179,7 @@ std::ostream &operator<<(std::ostream &out, Timer t)
 }
 std::ostream &operator<<(std::ostream &out, TimeVal tv)
 {
-  //	out << static_cast<unsigned __time_t>(tv.tv_sec) << "s " << static_cast<unsigned __suseconds_t>(tv.tv_usec) << "µ";
+  //	out << static_cast<quint32 __time_t>(tv.tv_sec) << "s " << static_cast<quint32 __suseconds_t>(tv.tv_usec) << "µ";
   out << tv.tv_sec << "s " << tv.tv_usec << "µ";
   return out;
 }

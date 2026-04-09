@@ -4,98 +4,45 @@
 | Commands for who, maybe? :P
 */
 #include <cstring>
+#include "DC/levels.h"
 
-#include "DC/connect.h"
-#include "DC/utility.h"
-#include "DC/character.h"
-#include "DC/mobile.h"
+#include "DC/DC.h"
 #include "DC/clan.h"
-#include "DC/room.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/returnvals.h"
 #include "DC/const.h"
-#include "DC/memory.h"
 
-// TODO - Figure out the weird bug for why when I do "who <class>" a random player
-//        from another class will pop up who name is DC::NOWHERE near matching.
+Clan *get_clan(CharacterPtr);
 
-clan_data *get_clan(Character *);
-
-// #define GWHOBUFFERSIZE   (MAX_STRING_LENGTH*2)
-// char gWhoBuffer[GWHOBUFFERSIZE];
-
-// We now use a allocated pointer for the who buffer stuff.  It stays allocated, so
-// we're not repeatedly allocing it, and it grows as needed to fit all the data (like a CString)
-// That way we never have to worry about having a bunch of players on, and overflowing it.
-// -pir 2/20/01
-char *gWhoBuffer = nullptr;
-int32_t gWhoBufferCurSize = 0;
-int32_t gWhoBufferMaxSize = 0;
-
-void add_to_who(char *strAdd)
+qint32 do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int32_t strLength = 0;
+  auto arguments = QString(argument).split(' ');
+  Connection *d{};
+  CharacterPtr k{}, i{};
+  follow_type *f{};
+  qint32 foundtarget{};
+  qint32 foundgroup{};
+  auto target = arguments.value(0);
 
-  if (!strAdd)
-    return;
-  if (!(strLength = strlen(strAdd)))
-    return;
+  auto hasholylight = ch->isNonPlayer() ? false : ch->player->holyLite;
 
-  if ((strLength + gWhoBufferCurSize) >= gWhoBufferMaxSize)
-  {                                         // expand the buffer
-    gWhoBufferMaxSize += (strLength + 500); // expand by the size + 500
+  send_to_char("$B$7($4:$7)=======================================================================($4:$7)\r\n"
+               "$7|$5/$7|                     $5Current Grouped Adventurers                       $7|$5/$7|\r\n"
+               "$7($4:$7)=======================================================================($4:$7)$R\r\n",
+               ch);
 
-    gWhoBuffer = (char *)dc_realloc(gWhoBuffer, gWhoBufferMaxSize);
+  if (!target.isEmpty())
+  {
+    ch->sendln(QStringLiteral("Searching for '$B%1$R'...").arg(target));
   }
 
-  // guaranteed to work, since we just allocated enough for it + 500
-  strcat(gWhoBuffer, strAdd);
-  gWhoBufferCurSize += strLength; // update current data size
-}
-
-void clear_who_buffer()
-{
-  if (gWhoBuffer)
-    *gWhoBuffer = '\0';  // kill the std::string
-  gWhoBufferCurSize = 0; // update the size
-}
-
-int do_whogroup(Character *ch, char *argument, cmd_t cmd)
-{
-
-  Connection *d;
-  Character *k, *i;
-  follow_type *f;
-  char target[MAX_INPUT_LENGTH];
-  char tempbuffer[800];
-  int foundtarget = 0;
-  int foundgroup = 0;
-  int hasholylight;
-
-  one_argument(argument, target);
-
-  hasholylight = ch->isNonPlayer() ? 0 : ch->player->holyLite;
-
-  send_to_char(
-      "$B$7($4:$7)=======================================================================($4:$7)\r\n"
-      "$7|$5/$7|                     $5Current Grouped Adventurers                       $7|$5/$7|\r\n"
-      "$7($4:$7)=======================================================================($4:$7)$R\r\n",
-      ch);
-
-  if (*target)
+  QString tempbuffer;
+  for (auto &d : DC::getInstance()->connections_)
   {
-    sprintf(gWhoBuffer, "Searching for '$B%s$R'...\r\n", target);
-    ch->send(gWhoBuffer);
-  }
+    foundtarget = {};
 
-  clear_who_buffer();
-
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
-  {
-    foundtarget = 0;
-
-    if ((d->connected) || (!CAN_SEE(ch, d->character)))
+    if ((conn->connected) || (!CAN_SEE(ch, conn->character)))
       continue;
 
     //  What the hell is this line supposed to be checking? -pir
@@ -103,41 +50,37 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
     //      if (ch->desc->character != ch)
     //         continue;
 
-    i = d->character;
+    i = conn->character;
 
     // If I'm the leader of my group, process it
     if ((!i->master) && (IS_AFFECTED(i, AFF_GROUP)))
     {
       foundgroup = 1; // we found someone!
       k = i;
-      sprintf(tempbuffer, "\r\n"
-                          "   $B$7[$4: $5%s $4:$7]$R\r\n"
-                          "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\r\n",
-              k->group_name,
-              k->isNonPlayer() ? 0 : k->player->group_pkills,
-              k->isNonPlayer() ? 0 : (k->player->group_pkills ? (k->player->grpplvl / k->player->group_pkills) : 0),
-              k->isNonPlayer() ? 0 : k->player->group_kills);
-      add_to_who(tempbuffer);
-
+      tempbuffer += QStringLiteral("\r\n"
+                                   "   $B$7[$4: $5%1 $4:$7]$R\r\n"
+                                   "   Player kills: %2  Average level of victim: %3  Total kills: %4\r\n")
+                        .arg(k->group_name)
+                        .arg(k->isNonPlayer() ? 0 : k->player->group_pkills, -3)
+                        .arg(k->isNonPlayer() ? 0 : (k->player->group_pkills ? (k->player->grpplvl / k->player->group_pkills) : 0))
+                        .arg(k->isNonPlayer() ? 0 : k->player->group_kills, -3);
       // If we're searching, see if this is the target
-      if (is_abbrev(target, GET_NAME(i)))
+      if (is_abbrev(target, qPrintable(i->name())))
         foundtarget = 1;
 
       // First, if they're not anonymous
       if ((!ch->isNonPlayer() && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
-        sprintf(tempbuffer,
-                "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \r\n",
-                GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
-                pc_clss_types[(int)GET_CLASS(k)], k->getLevel());
+        tempbuffer += QStringLiteral("   $B%1 %2 %3   Level %4      $1($7Leader$1)$R \r\n")
+                          .arg(k->name(), -18)
+                          .arg(races[(qint32)k->race].singular_name, -10)
+                          .arg(pc_clss_types[(qint32)GET_CLASS(k)], -14)
+                          .arg(k->getLevel(), 2);
       }
       else
       {
-        sprintf(tempbuffer,
-                "   $B%-18s %-10s Anonymous                      $1($7Leader$1)$R \r\n",
-                GET_NAME(k), races[(int)GET_RACE(k)].singular_name);
+        tempbuffer += QStringLiteral("   $B%1 %2 Anonymous                      $1($7Leader$1)$R \r\n").arg(k->name(), -18).arg(races[(qint32)k->race].singular_name, -10);
       }
-      add_to_who(tempbuffer);
 
       // loop through my followers and process them
       for (f = k->followers; f; f = f->next)
@@ -146,18 +89,19 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
           if (IS_AFFECTED(f->follower, AFF_GROUP))
           {
             // If we're searching, see if this is the target
-            if (is_abbrev(target, GET_NAME(f->follower)))
+            if (is_abbrev(target, qPrintable(f->follower->name())))
               foundtarget = 1;
             // First if they're not anonymous
             if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
-              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\r\n",
-                      GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
-                      pc_clss_types[(int)GET_CLASS(f->follower)], f->follower->getLevel());
+              tempbuffer += QStringLiteral("   %1 %2 %3   Level %4\r\n")
+                                .arg(f->follower->name(), -18)
+                                .arg(races[(qint32)f->follower->race].singular_name, -10)
+                                .arg(pc_clss_types[(qint32)GET_CLASS(f->follower)], -14)
+                                .arg(f->follower->getLevel(), 2);
             else
-              sprintf(tempbuffer,
-                      "   %-18s %-10s Anonymous            \r\n",
-                      GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name);
-            add_to_who(tempbuffer);
+              tempbuffer += QStringLiteral("   %1 %2 Anonymous            \r\n")
+                                .arg(f->follower->name(), -18)
+                                .arg(races[(qint32)f->follower->race].singular_name, -10);
           }
       } // for f = k->followers
     } //  ((!i->master) && (IS_AFFECTED(i, AFF_GROUP)) )
@@ -167,84 +111,74 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
     // If we found it, send it out, clear the buffer, and keep going in case someone else
     // matches the same target pattern.   ('whog a' gets Anarchy and Alpha's groups)
     // -pir
-    if (*target && !foundtarget)
+    if (!target.isEmpty() && !foundtarget)
     {
-      clear_who_buffer();
-      foundgroup = 0;
+      foundgroup = {};
     }
-    else if (*target && foundtarget)
+    else if (!target.isEmpty() && foundtarget)
     {
-      ch->send(gWhoBuffer);
-      clear_who_buffer();
+      ch->send(tempbuffer);
     }
   } // End for(d).
 
-  if (0 == foundgroup)
-    add_to_who("\r\nNo groups found.\r\n");
+  if (!foundgroup)
+    ch->sendln("\r\nNo groups found.");
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
-  page_string(ch->desc, gWhoBuffer, 1);
+  page_string(ch->desc, qPrintable(tempbuffer), 1);
   return ReturnValue::eSUCCESS;
 }
 
-int do_whosolo(Character *ch, char *argument, cmd_t cmd)
+qint32 do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Connection *d;
-  Character *i;
-  char tempbuffer[800];
-  char buf[MAX_INPUT_LENGTH + 1];
-  bool foundtarget;
+  auto arguments = QString(argument).split(' ');
+  auto target = arguments.value(0);
+  send_to_char("$B$7($4:$7)=======================================================================($4:$7)\r\n"
+               "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\r\n"
+               "$7($4:$7)=======================================================================($4:$7)$R\r\n"
+               "   $BName            Race      Class        Level  PKs Deaths Avg-vict-level$R\r\n",
+               ch);
 
-  one_argument(argument, buf);
-
-  send_to_char(
-      "$B$7($4:$7)=======================================================================($4:$7)\r\n"
-      "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\r\n"
-      "$7($4:$7)=======================================================================($4:$7)$R\r\n"
-      "   $BName            Race      Class        Level  PKs Deaths Avg-vict-level$R\r\n",
-      ch);
-
-  clear_who_buffer();
-
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  bool foundtarget{};
+  CharacterPtr i{};
+  QString tempbuffer;
+  for (auto d = DC::getInstance()->connections_; d; d = conn->next)
   {
     foundtarget = false;
 
-    if ((d->connected) || !(i = d->character) || (!CAN_SEE(ch, i)))
+    if ((conn->connected) || !(i = conn->character) || (!CAN_SEE(ch, i)))
       continue;
 
-    if (is_abbrev(buf, GET_NAME(i)))
+    if (is_abbrev(target, qPrintable(i->name())))
       foundtarget = true;
 
-    if (*buf && !foundtarget)
+    if (!target.isEmpty() && !foundtarget)
       continue;
 
     if (i->getLevel() <= MORTAL)
       if (!IS_AFFECTED(i, AFF_GROUP))
       {
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
-          sprintf(tempbuffer,
-                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\r\n",
-                  i->getNameC(),
-                  races[(int)GET_RACE(i)].singular_name,
-                  pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),
-                  i->isNonPlayer() ? 0 : i->player->totalpkills,
-                  i->isNonPlayer() ? 0 : i->player->pdeathslogin,
-                  i->isNonPlayer() ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
+          tempbuffer += QStringLiteral("   %1 %2 %3 %4     %5%6%7\r\n")
+                            .arg(i->name(), -15)
+                            .arg(races[(qint32)i->race].singular_name, -9)
+                            .arg(pc_clss_types[(qint32)GET_CLASS(i)], -13)
+                            .arg(i->getLevel(), 2)
+                            .arg(i->isNonPlayer() ? 0 : i->player->totalpkills, -4)
+                            .arg(i->isNonPlayer() ? 0 : i->player->pdeathslogin, -7)
+                            .arg(i->isNonPlayer() ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         else
-          sprintf(tempbuffer,
-                  "   %-15s %-9s Anonymous            %-4d%-7d%d\r\n",
-                  i->getNameC(),
-                  races[(int)GET_RACE(i)].singular_name,
-                  i->isNonPlayer() ? 0 : i->player->totalpkills,
-                  i->isNonPlayer() ? 0 : i->player->pdeathslogin,
-                  i->isNonPlayer() ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
-        add_to_who(tempbuffer);
+          tempbuffer += QStringLiteral("   %1 %2 Anonymous            %3%4%5\r\n")
+                            .arg(i->name(), -15)
+                            .arg(races[(qint32)i->race].singular_name, -9)
+                            .arg(i->isNonPlayer() ? 0 : i->player->totalpkills, -4)
+                            .arg(i->isNonPlayer() ? 0 : i->player->pdeathslogin, -7)
+                            .arg(i->isNonPlayer() ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
       } // if is affected by group
   } // End For Loop.
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
-  page_string(ch->desc, gWhoBuffer, 1);
+  page_string(ch->desc, qPrintable(tempbuffer), 1);
   return ReturnValue::eSUCCESS;
 }
 
@@ -261,9 +195,9 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       "   --------  ",
       " Implementer "};
 
-  quint64 lowlevel{}, highlevel{UINT64_MAX}, numPC{}, numImmort{};
-  bool anoncheck{}, sexcheck{}, guidecheck{}, lfgcheck{}, charcheck{}, nomatch{}, charmatchistrue{}, addimmbuf{};
-  Character::sex_t sextype{};
+  quint64 lowlevel{}, highlevel{UINT64_MAX}, numPC{}, numImmort = {};
+  bool anoncheck{}, sexcheck{}, guidecheck{}, lfgcheck{}, charcheck{}, nomatch{}, charmatchistrue{}, addimmbuf = {};
+  Character::sex_t sextype = {};
   QString charname, class_found, race_found;
   for (const auto &oneword : arguments)
   {
@@ -351,7 +285,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   QString buf;
   QString immbuf;
   bool hasholylight = this->isNonPlayer() ? false : player->holyLite;
-  for (auto d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto d = DC::getInstance()->connections_; d; d = conn->next)
   {
     QString infoBuf;
     QString extraBuf;
@@ -365,19 +299,19 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     }
 
     // Don't show any connection that's not playing or editing on who list
-    if (d->connected != Connection::states::PLAYING && !d->isEditing())
+    if (conn->connected != Connection::states::PLAYING && !conn->isEditing())
     {
       continue;
     }
 
-    Character *i{};
-    if (d->original)
+    CharacterPtr i = {};
+    if (conn->original)
     {
-      i = d->original;
+      i = conn->original;
     }
     else
     {
-      i = d->character;
+      i = conn->character;
     }
 
     if (i->isNonPlayer())
@@ -408,8 +342,8 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       continue;
     }
 
-    // Skip std::string based checks if our name matches
-    if (!charcheck || !is_abbrev(charname, GET_NAME(i)))
+    // Skip QString based checks if our name matches
+    if (!charcheck || !is_abbrev(charname, qPrintable(i->name())))
     {
       if (!class_found.isEmpty() && i->getClassName() != class_found && !charmatchistrue)
       {
@@ -439,7 +373,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
 
     if (charcheck)
     {
-      if (!is_abbrev(charname, GET_NAME(i)))
+      if (!is_abbrev(charname, qPrintable(i->name())))
       {
         continue;
       }
@@ -449,23 +383,23 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     if (i->getLevel() > MORTAL)
     {
       /* Immortals can't be anonymous */
-      if (!str_cmp(GET_NAME(i), "Urizen"))
+      if (!str_cmp(qPrintable(i->name()), "Urizen"))
       {
         infoBuf = "   Meatball  ";
       }
-      else if (!str_cmp(GET_NAME(i), "Julian"))
+      else if (!str_cmp(qPrintable(i->name()), "Julian"))
       {
         infoBuf = "    $B$7S$4a$7l$4m$7o$4n$R   ";
       }
-      else if (!strcmp(GET_NAME(i), "Apocalypse"))
+      else if (!strcmp(qPrintable(i->name()), "Apocalypse"))
       {
         infoBuf = "    $5Moose$R    ";
       }
-      else if (!strcmp(GET_NAME(i), "Pirahna"))
+      else if (!strcmp(qPrintable(i->name()), "Pirahna"))
       {
         infoBuf = "   $B$4>$5<$1($2($1($5:$4>$R   ";
       }
-      else if (!strcmp(GET_NAME(i), "Petra"))
+      else if (!strcmp(qPrintable(i->name()), "Petra"))
       {
         infoBuf = "    $B$1R$2o$1a$2d$1i$2e$R   ";
       }
@@ -492,16 +426,16 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     {
       if (!IS_ANONYMOUS(i) || (clan && clan == i->clan) || hasholylight)
       {
-        infoBuf = QStringLiteral(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(i->getLevel(), 2).arg(pc_clss_abbrev[(int)GET_CLASS(i)]).arg(race_abbrev[(int)GET_RACE(i)]);
+        infoBuf = QStringLiteral(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(i->getLevel(), 2).arg(pc_clss_abbrev[(qint32)GET_CLASS(i)]).arg(race_abbrev[(qint32)i->race]);
       }
       else
       {
-        infoBuf = QStringLiteral("  $6-==-   $B$2%1$R ").arg(race_abbrev[(int)GET_RACE(i)]);
+        infoBuf = QStringLiteral("  $6-==-   $B$2%1$R ").arg(race_abbrev[(qint32)i->race]);
       }
       numPC++;
     }
 
-    if (d->isEditing())
+    if (conn->isEditing())
     {
       tailBuf = "$1$B(writing) ";
     }
@@ -524,12 +458,12 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     auto clanPtr = get_clan(i);
     if (i->clan && clanPtr && i->getLevel() < OVERSEER)
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
-      buf += QStringLiteral("%5 $2[%6$R$2] %7$R\r\n").arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
+      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(qPrintable(i->shortdesc_or_name())).arg(i->title);
+      buf += QStringLiteral("%5 $2[%6$R$2] %7$R\r\n").arg(extraBuf).arg(clanPtr->name()).arg(tailBuf);
     }
     else
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
+      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(qPrintable(i->shortdesc_or_name())).arg(i->title);
       buf += QStringLiteral("%5 %6$R\r\n").arg(extraBuf).arg(tailBuf);
     }
 
@@ -564,10 +498,10 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_whoarena(Character *ch, char *argument, cmd_t cmd)
+qint32 do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int count = 0;
-  clan_data *clan;
+  qint32 count = {};
+  Clan *clan;
 
   ch->sendln("\r\nPlayers in the Arena:\r\n--------------------------");
 
@@ -581,9 +515,9 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
         if (tmp->room().isArena() && !isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
         {
           if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
-            csendf(ch, "%-20s - [%s$R]\r\n", GET_NAME(tmp), clan->name);
+            ch->send(QStringLiteral("%-20s - [%s$R]\r\n").arg(qPrintable(tmp->name())).arg(qPrintable(clan->name())));
           else
-            csendf(ch, "%-20s\r\n", GET_NAME(tmp));
+            ch->send(QStringLiteral("%-20s\r\n").arg(qPrintable(tmp->name())));
           count++;
         }
       }
@@ -604,13 +538,9 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
       if (tmp->room().isArena())
       {
         if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
-          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\r\n",
-                 GET_NAME(tmp),
-                 tmp->getLevel(), tmp->getHP(), tmp->in_room, clan->name);
+          ch->send(QStringLiteral("%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\r\n").arg(qPrintable(tmp->name()), tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room).arg(qPrintable(clan->name())));
         else
-          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\r\n",
-                 GET_NAME(tmp),
-                 tmp->getLevel(), tmp->getHP(), tmp->in_room);
+          ch->send(QStringLiteral("%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\r\n").arg(qPrintable(tmp->name())).arg(tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room));
         count++;
       }
     }
@@ -621,10 +551,10 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_where(Character *ch, char *argument, cmd_t cmd)
+qint32 do_where(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   class Connection *d;
-  int zonenumber;
+  qint32 zonenumber;
   char buf[MAX_INPUT_LENGTH];
 
   one_argument(argument, buf);
@@ -632,19 +562,17 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
   if (ch->isImmortalPlayer() && *buf && !strcmp(buf, "all"))
   { //  immortal noly, shows all
     ch->sendln("All Players:\r\n--------");
-    for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+    for (auto &d : DC::getInstance()->connections_)
     {
-      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
+      if (conn->character && (conn->connected == Connection::states::PLAYING) && (CAN_SEE(ch, conn->character)) && (conn->character->in_room != DC::NOWHERE))
       {
-        if (d->original)
+        if (conn->original)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%d] In body of %s\r\n", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
-                 DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
+          ch->send(QStringLiteral("%-20s - %s$R [%d] In body of %s\r\n").arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
         }
         else
         {
-          csendf(ch, "%-20s - %s$R [%d]\r\n",
-                 d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+          ch->send(QStringLiteral("%-20s - %s$R [%d]\r\n").arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
         }
       }
     } // for
@@ -652,24 +580,22 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
   else if (ch->isImmortalPlayer() && *buf)
   { // immortal only, shows ONE person
     ch->sendln("Search of Players:\r\n--------");
-    for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+    for (auto &d : DC::getInstance()->connections_)
     {
-      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
+      if (conn->character && (conn->connected == Connection::states::PLAYING) && (CAN_SEE(ch, conn->character)) && (conn->character->in_room != DC::NOWHERE))
       {
-        if (d->original)
+        if (conn->original)
         { // If switched
-          if (is_abbrev(buf, d->original->getName()))
+          if (is_abbrev(buf, conn->original->name()))
           {
-            csendf(ch, "%-20s - %s$R [%d] In body of %s\r\n", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
-                   DC::getInstance()->world[d->character->in_room].number, fname(d->character->getName()).toStdString().c_str());
+            ch->send(QStringLiteral("%-20s - %s$R [%d] In body of %s\r\n").arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
           }
         }
         else
         {
-          if (is_abbrev(buf, d->character->getNameC()))
+          if (is_abbrev(buf, qPrintable(conn->character->name())))
           {
-            csendf(ch, "%-20s - %s$R [%d]\r\n",
-                   d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+            ch->send(QStringLiteral("%-20s - %s$R [%d]\r\n").arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
           }
         }
       }
@@ -681,15 +607,18 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Players in your vicinity:\r\n-------------------------");
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_WHERE))
       return ReturnValue::eFAILURE;
-    for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+    for (auto &d : DC::getInstance()->connections_)
     {
-      if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != DC::NOWHERE) &&
-          !isSet(DC::getInstance()->world[d->character->in_room].room_flags, NO_WHERE) &&
-          CAN_SEE(ch, d->character) && !d->character->isNonPlayer() /*Don't show snooped mobs*/)
+      /*Don't show snooped mobs*/
+      if (conn->character &&
+          (conn->connected == Connection::states::PLAYING) &&
+          (conn->character->in_room != DC::NOWHERE) &&
+          !isSet(DC::getInstance()->world[conn->character->in_room].room_flags, NO_WHERE) &&
+          CAN_SEE(ch, conn->character) &&
+          !conn->character->isNonPlayer())
       {
-        if (DC::getInstance()->world[d->character->in_room].zone == zonenumber)
-          csendf(ch, "%-20s - %s$R\r\n", d->character->getNameC(),
-                 DC::getInstance()->world[d->character->in_room].name);
+        if (DC::getInstance()->world[conn->character->in_room].zone == zonenumber)
+          ch->send(QStringLiteral("%-20s - %s$R\r\n").arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name));
       }
     }
   }

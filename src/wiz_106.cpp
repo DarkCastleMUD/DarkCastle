@@ -2,26 +2,17 @@
 | Level 106 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "DC/wizard.h"
-#include "DC/handler.h"
-#include "DC/spells.h"
-#include "DC/utility.h"
-#include "DC/connect.h"
-
-#include "DC/mobile.h"
+#include "DC/DC.h"
 #include "DC/interp.h"
-#include "DC/player.h"
-#include "DC/returnvals.h"
-
 #include <fmt/format.h>
 
-int do_plats(Character *ch, char *argument, cmd_t cmd)
+qint32 do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *i;
+  CharacterPtr i;
   class Connection *d;
   char arg[100];
   char buf[100];
-  int minamt;
+  qint32 minamt;
 
   one_argument(argument, arg);
   if (*arg)
@@ -32,102 +23,99 @@ int do_plats(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("          Plats - Player");
   ch->sendln("          --------------");
 
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (const auto &d : DC::getInstance()->connections_)
   {
-    if ((d->connected) || (!CAN_SEE(ch, d->character)))
+    if ((conn->connected) || (!CAN_SEE(ch, conn->character)))
       continue;
 
-    if (d->original)
-      i = d->original;
+    if (conn->original)
+      i = conn->original;
     else
-      i = d->character;
+      i = conn->character;
 
-    if (GET_PLATINUM(i) < (uint32_t)minamt)
+    if (GET_PLATINUM(i) < (quint32)minamt)
       continue;
 
-    sprintf(buf, "%15d - %s - %ld - %d\r\n", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
+    sprintf(buf, "%15d - %s - %ld - %d\r\n", GET_PLATINUM(i), qPrintable(i->name()), i->getGold(), GET_BANK(i));
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
 }
 
-int do_force(Character *ch, std::string argument, cmd_t cmd)
+command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
 {
-  class Connection *i = {};
-  class Connection *next_i = {};
-  Character *vict = {};
-  std::string name = {}, to_force = {}, buf = {};
-
-  if (ch->isNonPlayer())
+  if (isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }
 
-  if (!ch->has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
+  if (!has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
   {
-    ch->send("Huh?\r\n");
+    sendln("Huh?");
     return ReturnValue::eFAILURE;
   }
 
-  std::tie(name, to_force) = half_chop(argument);
+  auto name = arguments.value(0);
+  auto to_force = arguments.value(1);
+  auto vict = get_char_vis(this, name);
 
-  if (name.empty() || to_force.empty())
+  if (name.isEmpty() || to_force.isEmpty())
   {
-    ch->send("Who do you wish to force to do what?\r\n");
+    sendln("Who do you wish to force to do what?");
     return ReturnValue::eFAILURE;
   }
   else if (name != "all")
   {
-    if (!(vict = get_char_vis(ch, name)))
-      ch->sendln("No one by that name here..");
+    if (!vict)
+      sendln("No one by that name here..");
     else
     {
-      if (ch->getLevel() < vict->getLevel() && vict->isNonPlayer())
+      if (getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
-        ch->sendln("Now doing that would just tick off the IMPS!");
-        logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, DC::LogChannel::LOG_GOD);
+        sendln("Now doing that would just tick off the IMPS!");
+        logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
         return ReturnValue::eSUCCESS;
       }
-      if ((ch->getLevel() <= vict->getLevel()) && vict->isPlayer())
+      if ((getLevel() <= vict->getLevel()) && vict->isPlayer())
       {
-        ch->sendln("Why be forceful?");
+        sendln("Why be forceful?");
         buf = fmt::format("$n has failed to force you to '{}'.", to_force);
         act(buf, ch, 0, vict, TO_VICT, 0);
       }
       else
       {
-        if (ch->player->stealth == false)
+        if (player->stealth == false)
         {
           buf = fmt::format("$n has forced you to '{}'.", to_force);
           act(buf, ch, 0, vict, TO_VICT, 0);
-          ch->sendln("Ok.");
+          sendln("Ok.");
         }
-        buf = fmt::format("{} just forced %s to %s.", GET_NAME(ch),
-                          GET_NAME(vict), to_force);
+        buf = fmt::format("{} just forced %s to %s.", qPrintable(name()),
+                          qPrintable(vict->name()), to_force);
         vict->command_interpreter(to_force.c_str());
-        logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+        logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
       }
     }
   }
 
   else
   { /* force all */
-    if (ch->getLevel() < OVERSEER)
+    if (getLevel() < OVERSEER)
     {
-      ch->sendln("Not gonna happen.");
+      sendln("Not gonna happen.");
       return ReturnValue::eFAILURE;
     }
-    for (i = DC::getInstance()->descriptor_list; i; i = next_i)
+    for (i = DC::getInstance()->connections_; i; i = next_i)
     {
       next_i = i->next;
       if (i->character != ch && !i->connected)
       {
         vict = i->character;
-        if (ch->getLevel() <= vict->getLevel())
+        if (getLevel() <= vict->getLevel())
           continue;
         else
         {
-          if (ch->player->stealth == false || ch->getLevel() < 109)
+          if (player->stealth == false || getLevel() < 109)
           {
             buf = fmt::format("$n has forced you to '{}'.", to_force);
             act(buf, ch, 0, vict, TO_VICT, 0);
@@ -136,42 +124,16 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
         }
       }
     }
-    ch->sendln("Ok.");
-    buf = fmt::format("{} just forced all to {}.", GET_NAME(ch), to_force);
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    sendln("Ok.");
+    buf = fmt::format("{} just forced all to {}.", qPrintable(name()), to_force);
+    logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }
 
-typedef command_return_t (*test_function_t)(Character *ch);
-
-class Test
+command_return_t run_all_events(CharacterPtr ch = {})
 {
-public:
-  Test() : function_(nullptr) {}
-  Test(QString name, test_function_t function = nullptr)
-      : name_(name), function_(function)
-  {
-  }
-  command_return_t run(Character *ch)
-  {
-    if (function_ && ch)
-    {
-      return function_(ch);
-    }
-    return ReturnValue::eFAILURE;
-  }
-  QString getName(void) const { return name_; }
-
-private:
-  QString name_;
-  test_function_t function_;
-};
-typedef QMap<QString, Test> tests_t;
-
-command_return_t run_all_events(Character *ch = nullptr)
-{
-  uint64_t counter{};
+  quint64 counter = {};
   while (timer_list != nullptr && counter++ < 1000)
   {
     if (ch)
@@ -232,9 +194,9 @@ QString rc_to_qstring(const command_return_t &rc)
   return strings.join(',');
 }
 
-void run_check(Character *ch, command_return_t *rc, auto *function, char *arguments = nullptr, cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, auto *function, char *arguments = {}, cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc{};
+  command_return_t new_rc = {};
   if (ch)
   {
     if (function)
@@ -254,9 +216,9 @@ void run_check(Character *ch, command_return_t *rc, auto *function, char *argume
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std::string arguments = std::string(), cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, command_gen2_t function, QString arguments = QString(), cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc{};
+  command_return_t new_rc = {};
   if (ch)
   {
     if (function)
@@ -276,9 +238,9 @@ void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc{};
+  command_return_t new_rc = {};
   if (ch)
   {
     if (function)
@@ -298,9 +260,9 @@ void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QSt
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_special_t function, QString arguments = "", cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, command_special_t function, QString arguments = "", cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc{};
+  command_return_t new_rc = {};
   if (ch)
   {
     if (function)
@@ -320,29 +282,29 @@ void run_check(Character *ch, command_return_t *rc, command_special_t function, 
   }
 }
 
-command_return_t test_casino(Character *ch)
+command_return_t test_casino(CharacterPtr ch)
 {
   if (!ch || !ch->player)
   {
     return ReturnValue::eFAILURE;
   }
 
-  int max_rc{};
+  qint32 max_rc = {};
 
   run_check(ch, &max_rc, &Character::do_goto, {"1"});
   run_check(ch, &max_rc, &Character::do_goto, {"21900"});
 
-  run_check(ch, &max_rc, do_look, "sign", cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, "sign", cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, QStringLiteral("sign"), cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, QStringLiteral("sign"), cmd_t::EXAMINE);
 
-  run_check(ch, &max_rc, do_move, "", cmd_t::NORTH);
+  run_check(ch, &max_rc, do_move, QStringLiteral(""), cmd_t::NORTH);
 
-  run_check(ch, &max_rc, do_look, "fountain", cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, "fountain", cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, QStringLiteral("fountain"), cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, QStringLiteral("fountain"), cmd_t::EXAMINE);
   run_check(ch, &max_rc, &Character::do_drink, {"fountain"});
 
-  run_check(ch, &max_rc, do_look, "machine", cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, "machine", cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, QStringLiteral("machine"), cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, QStringLiteral("machine"), cmd_t::EXAMINE);
 
   // saving the player's finances and giving them a consistent
   // amount of cash in bank to be withdrawn
@@ -356,10 +318,10 @@ command_return_t test_casino(Character *ch)
   run_check(ch, &max_rc, &Character::special, "", cmd_t::WITHDRAW);
   run_check(ch, &max_rc, &Character::special, "1000000", cmd_t::WITHDRAW);
 
-  run_check(ch, &max_rc, do_move, "", cmd_t::NORTH);
+  run_check(ch, &max_rc, do_move, QStringLiteral(""), cmd_t::NORTH);
 
-  run_check(ch, &max_rc, do_look, "table", cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, "table", cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, QStringLiteral("table"), cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, QStringLiteral("table"), cmd_t::EXAMINE);
 
   auto original_random = DC::getInstance()->random_;
   DC::getInstance()->random_ = QRandomGenerator(1);
@@ -439,7 +401,7 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
   else if (arg1 == "all")
   {
     sendln("Running all tests.");
-    command_return_t rc{};
+    command_return_t rc = {};
     for (auto &test : tests)
     {
       send(QStringLiteral("Running %1..").arg(test.getName()));

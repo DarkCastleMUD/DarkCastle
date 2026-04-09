@@ -1,6 +1,4 @@
-#ifndef MOVE_H_
-#define MOVE_H_
+#pragma once
 
-int attempt_move(Character *ch, cmd_t cmd, int is_retreat = 0);
-int ambush(Character *ch);
-#endif
+qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat = 0);
+qint32 ambush(CharacterPtr ch);

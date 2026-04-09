@@ -1,5 +1,3 @@
-#ifndef BUILDINFO_H
-#define BUILDINFO_H
+#pragma once
 #cmakedefine BUILD_TIME "@BUILD_TIME@"
 #cmakedefine BUILD_VERSION "@BUILD_VERSION@"
-#endif

@@ -6,20 +6,10 @@
         {
             "label": "rebuild",
             "type": "shell",
-            "command": "cmake --build --preset debug && (pidof dcastle && rebootdc.sh || true)",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "absolute"
-                ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "message": 4
-                }
-            },
+            "command": "cmake --build --preset debug -j60 && (pidof dcastle && rebootdc.sh || true)",
+            "problemMatcher": [
+                "$gcc"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true

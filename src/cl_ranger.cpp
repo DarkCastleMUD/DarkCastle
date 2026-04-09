@@ -12,36 +12,35 @@
 #include <cstdio>
 
 #include "DC/obj.h"
-#include "DC/character.h"
+#include "DC/DC.h"
 #include "DC/affect.h"
-#include "DC/mobile.h"
-#include "DC/utility.h"
+
 #include "DC/spells.h"
-#include "DC/isr.h"
+
 #include "DC/handler.h"
-#include "DC/room.h"
+
 #include "DC/terminal.h"
 #include "DC/player.h"
-#include "DC/connect.h"
 #include "DC/fight.h"
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/act.h"
-#include "DC/fileinfo.h" // SAVE_DIR
 #include "DC/returnvals.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/move.h"
 #include "DC/corpse.h"
+#include "DC/levels.h"
+#include "DC/utility.h"
 
-extern int rev_dir[];
+extern qint32 rev_dir[];
 
-int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type);
-void check_eq(Character *ch);
+qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16 save_type);
+void check_eq(CharacterPtr ch);
 
-int get_difficulty(int);
+qint32 get_difficulty(qint32);
 
-int charm_space(int level)
+qint32 charm_space(qint32 level)
 {
   if (level >= 50)
     return 10;
@@ -56,10 +55,10 @@ int charm_space(int level)
   return 1;
 }
 
-int charm_levels(Character *ch)
+qint32 charm_levels(CharacterPtr ch)
 {
-  int i = ch->getLevel() / 5;
-  int z = 3;
+  qint32 i = ch->getLevel() / 5;
+  qint32 z = 3;
   follow_type *f;
   for (f = ch->followers; f; f = f->next)
     if (IS_AFFECTED(f->follower, AFF_CHARM))
@@ -72,9 +71,9 @@ int charm_levels(Character *ch)
   return i;
 }
 
-int do_free_animal(Character *ch, char *arg, cmd_t cmd)
+qint32 do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Character *victim = nullptr;
+  CharacterPtr victim = {};
   char buf[MAX_INPUT_LENGTH];
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
@@ -86,7 +85,7 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
   arg = one_argument(arg, buf);
 
   for (follow_type *k = ch->followers; k; k = k->next)
-    if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
+    if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, qPrintable(k->follower->name())))
     {
       victim = k->follower;
       break;
@@ -120,10 +119,10 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_tame(Character *ch, char *arg, cmd_t cmd)
+qint32 do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
-  Character *victim;
+  CharacterPtr victim;
   char buf[MAX_INPUT_LENGTH];
 
   while (*arg == ' ')
@@ -177,7 +176,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("How you plan on controlling so many followers?");
     return ReturnValue::eFAILURE;
-    /*   Character * vict = nullptr;
+    /*   CharacterPtr  vict = {};
        for(follow_type *k = ch->followers; k; k = k->next)
          if(k->follower->isNonPlayer() &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
@@ -190,7 +189,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
              remove_memory(vict, 'h');
       if (vict->master) {
              stop_follower(vict, cmd_t::BROKE_CHARM);
-             vict->add_memory( GET_NAME(ch), 'h');
+             vict->add_memory( qPrintable(ch->name()), 'h');
       }
          }*/
   }
@@ -230,8 +229,8 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   else
     af.duration = 24 * 18;
 
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = AFF_CHARM;
   affect_to_char(victim, &af);
 
@@ -244,17 +243,17 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
 
 command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 {
-  int x, y;
-  int retval, how_deep, learned;
+  qint32 x, y;
+  qint32 retval, how_deep, learned;
   char buf[300];
   char race[40];
   char sex[20];
   char condition[60];
   char weight[40];
 
-  Character *quarry;
-  Character *tmp_ch = nullptr; // For checking room stuff
-  room_track_data *pScent = 0;
+  CharacterPtr quarry;
+  CharacterPtr tmp_ch = {}; // For checking room stuff
+  QSharedPointer<Tracks> pScent = {};
 
   QString victim = arguments.value(0);
 
@@ -357,8 +356,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
         this->add_memory(pScent->trackee, 't');
         ansi_color(RED, this);
         ansi_color(BOLD, this);
-        csendf(this, "You sense traces of your quarry to the %s.\r\n",
-               dirs[y]);
+        this->send(QStringLiteral("You sense traces of your quarry to the %s.\r\n").arg(dirs[y]));
         ansi_color(NTEXT, this);
 
         if (this->isNonPlayer())
@@ -370,7 +368,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             auto cmd_dir = getCommandFromDirection(y);
             if (cmd_dir)
             {
-              retval = do_move(this, "", *cmd_dir);
+              retval = do_move(this, QStringLiteral(""), *cmd_dir);
               if (isSet(retval, ReturnValue::eCH_DIED))
                 return retval;
             }
@@ -435,7 +433,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
     //    remove_memory(this, 't');
     return ReturnValue::eFAILURE;
-  } // if *victim
+  } // if victim
 
   for (x = 1; x <= how_deep; x++)
   {
@@ -539,14 +537,14 @@ command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int pick_one(int a, int b)
+qint32 pick_one(qint32 a, qint32 b)
 {
   return number(1, 100) <= 50 ? a : b;
 }
 
-int pick_one(int a, int b, int c)
+qint32 pick_one(qint32 a, qint32 b, qint32 c)
 {
-  int x = number(1, 100);
+  qint32 x = number(1, 100);
 
   if (x > 66)
     return a;
@@ -556,9 +554,9 @@ int pick_one(int a, int b, int c)
     return c;
 }
 
-int pick_one(int a, int b, int c, int d)
+qint32 pick_one(qint32 a, qint32 b, qint32 c, qint32 d)
 {
-  int x = number(1, 100);
+  qint32 x = number(1, 100);
 
   if (x > 75)
     return a;
@@ -573,8 +571,8 @@ int pick_one(int a, int b, int c, int d)
 class forage_lookup
 {
 public:
-  int ovnum;
-  int rate[4];
+  qint32 ovnum;
+  qint32 rate[4];
 };
 
 forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
@@ -707,10 +705,10 @@ forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
      {28301, {36, 34, 32, 30}}},
 };
 
-int do_forage(Character *ch, char *arg, cmd_t cmd)
+qint32 do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  int learned;
-  class Object *new_obj = 0;
+  qint32 learned;
+  ObjectPtr new_obj = {};
   affected_type af;
 
   if (ch->affected_by_spell(SKILL_FORAGE))
@@ -732,13 +730,13 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int pick = number(1, 100);
-  int ovnum;
-  int lgroup = 0;
+  qint32 pick = number(1, 100);
+  qint32 ovnum;
+  qint32 lgroup = {};
 
   if (learned >= 1 && learned <= 30)
   {
-    lgroup = 0;
+    lgroup = {};
   }
   else if (learned >= 31 && learned <= 60)
   {
@@ -752,7 +750,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
   {
     lgroup = 3;
   }
-  int cur_sector = DC::getInstance()->world[ch->in_room].sector_type;
+  qint32 cur_sector = DC::getInstance()->world[ch->in_room].sector_type;
 
   // If in a clan or safe room, set sector to inside so we fail forage
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) ||
@@ -762,9 +760,9 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
     cur_sector = SECT_INSIDE;
   }
 
-  int last = 0;
+  qint32 last = {};
 
-  for (int i = 0; i < 6; i++)
+  for (qint32 i = {}; i < 6; i++)
   {
     if (pick > last && pick <= last + forage_lookup_table[cur_sector][i].rate[lgroup])
     {
@@ -782,7 +780,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
     last = last + forage_lookup_table[cur_sector][i].rate[lgroup];
   }
 
-  int recharge;
+  qint32 recharge;
   if (new_obj)
     recharge = 10 - (learned / 20);
   else
@@ -790,7 +788,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
 
   af.type = SKILL_FORAGE;
   af.duration = recharge;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
@@ -810,11 +808,11 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-/* this is sent the arrow char std::string, and return the arrow type.
+/* this is sent the arrow char QString, and return the arrow type.
    also, checks level to make sure char is high enough
    return 0 for failure */
 
-int parse_arrow(Character *ch, char *arrow)
+qint32 parse_arrow(CharacterPtr ch, char *arrow)
 {
 
   if (GET_CLASS(ch) != CLASS_RANGER && ch->getLevel() < 100)
@@ -836,26 +834,26 @@ int parse_arrow(Character *ch, char *arrow)
 }
 
 /* go through and find an arrow */
-/* return nullptr if failure
+/* return {} if failure
  *  return pointer if success */
-class Object *find_arrow(class Object *quiver)
+ObjectPtr find_arrow(ObjectPtr quiver)
 {
-  class Object *target;
+  ObjectPtr target;
 
-  class Object *get_obj_in_list(char *, class Object *);
+  ObjectPtr get_obj_in_list(char *, ObjectPtr);
 
-  target = get_obj_in_list("arrow", quiver->contains);
+  target = get_obj_in_list(QStringLiteral("arrow"), quiver->contains);
 
   if (!target)
-    return nullptr;
+    return {};
 
   if (!(target->obj_flags.type_flag == ITEM_MISSILE))
-    target = nullptr;
+    target = {};
 
   return target;
 }
 
-void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *found)
+void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, qint32 dir, ObjectPtr found)
 {
   char buf[200];
 
@@ -886,54 +884,49 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
   case 1:
     if (dir < 0)
     {
-      sprintf(buf, "%s wizzes by.\r\n", found->short_description);
+      sprintf(buf, "%s wizzes by.\r\n", qPrintable(found->short_description()));
       victim->send(buf);
-      sprintf(buf, "%s wizzes by.", found->short_description);
+      sprintf(buf, "%s wizzes by.", qPrintable(found->short_description()));
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
-      sprintf(buf, "%s wizzes by from the %s.\r\n", found->short_description, dirs[rev_dir[dir]]);
+      sprintf(buf, "%s wizzes by from the %s.\r\n", qPrintable(found->short_description()), dirs[rev_dir[dir]]);
       victim->send(buf);
-      sprintf(buf, "%s wizzes by from the %s.",
-              found->short_description, dirs[rev_dir[dir]]);
+      sprintf(buf, "%s wizzes by from the %s.", qPrintable(found->short_description()), dirs[rev_dir[dir]]);
       act(buf, victim, nullptr, 0, TO_ROOM, 0);
     }
     break;
   case 2:
-    sprintf(buf, "A quiet whistle sounds as %s flies over your head.",
-            found->short_description);
+    sprintf(buf, "A quiet whistle sounds as %s flies over your head.", qPrintable(found->short_description()));
     act(buf, victim, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "A quiet whistle sounds as %s flies over your head.",
-            found->short_description);
+    sprintf(buf, "A quiet whistle sounds as %s flies over your head.", qPrintable(found->short_description()));
     act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
     break;
   case 3:
     if (dir < 0)
     {
-      sprintf(buf, "%s narrowly misses your head.\r\n", found->short_description);
+      sprintf(buf, "%s narrowly misses your head.\r\n", qPrintable(found->short_description()));
       victim->send(buf);
-      sprintf(buf, "%s narrowly misses $n.", found->short_description);
+      sprintf(buf, "%s narrowly misses $n.", qPrintable(found->short_description()));
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
-      sprintf(buf, "%s from the %s narrowly misses your head.\r\n",
-              found->short_description, dirs[rev_dir[dir]]);
+      sprintf(buf, "%s from the %s narrowly misses your head.\r\n", qPrintable(found->short_description()), dirs[rev_dir[dir]]);
       victim->send(buf);
-      sprintf(buf, "%s from the %s narrowly misses $n.",
-              found->short_description, dirs[rev_dir[dir]]);
+      sprintf(buf, "%s from the %s narrowly misses $n.", qPrintable(found->short_description()), dirs[rev_dir[dir]]);
       act(buf, victim, nullptr, 0, TO_ROOM, 0);
     }
     break;
   }
 }
 
-int mob_arrow_response(Character *ch, Character *victim,
-                       int dir)
+qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
+                          qint32 dir)
 {
-  int dir2 = 0;
-  int retval;
+  qint32 dir2 = {};
+  qint32 retval;
 
   /* this will make IS_STUPID mobs alot easier to kill with arrows,
      but then again, they _are_ 'stupid'.  Keeps people from tracking
@@ -943,7 +936,7 @@ int mob_arrow_response(Character *ch, Character *victim,
   if (ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
     if (!number(0, 20))
-      do_shout(victim, "Duh George, someone keeps shooting me!");
+      do_shout(victim, QStringLiteral("Duh George, someone keeps shooting me!"));
     return ReturnValue::eSUCCESS;
   }
 
@@ -952,7 +945,7 @@ int mob_arrow_response(Character *ch, Character *victim,
    * Not impossible, but harder
    */
 
-  victim->add_memory(GET_NAME(ch), 'h');
+  victim->add_memory(qPrintable(ch->name()), 'h');
 
   /* don't want the mob leaving a fight its already in */
   if (victim->fighting)
@@ -991,7 +984,7 @@ int mob_arrow_response(Character *ch, Character *victim,
       do_say(victim, "There he is!");
     }
     dir2 = rev_dir[dir];
-    for (int i = 0; i < 4; i++)
+    for (qint32 i = {}; i < 4; i++)
       if (!CAN_GO(ch, dir2))
         dir2 = number(0, 5);
     if (EXIT(victim, dir2))
@@ -1011,7 +1004,7 @@ int mob_arrow_response(Character *ch, Character *victim,
             }
 
             if (isSet(retval, ReturnValue::eFAILURE)) // can't go after the archer
-              return do_flee(victim, "");
+              return do_flee(victim, QStringLiteral(""));
           }
     }
     if (number(1, 5) == 1)
@@ -1030,14 +1023,14 @@ int mob_arrow_response(Character *ch, Character *victim,
 }
 
 /* no need anymore
-int do_arrow_damage(Character *ch, Character *victim,
-                     int dir, int dam, int artype,
-                     class Object *found)
+qint32 do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
+                     qint32 dir, qint32 dam, qint32 artype,
+                     ObjectPtr found)
 {
   char buf[200];
-  int retval;
+  qint32 retval;
 
-  void inform_victim(Character *, Character *, int);
+  void inform_victim(CharacterPtr , CharacterPtr , qint32);
 
   buf[199] = '\0'; // just cause I'm paranoid
 
@@ -1048,39 +1041,38 @@ int do_arrow_damage(Character *ch, Character *victim,
    switch(number(1,2))
    {
     case 1:
-    sprintf(buf, "Your shot impales %s through the heart!\r\n", GET_SHORT(victim));
-    ch->send(buf);
+    ch->sendln(QStringLiteral("Your shot impales %1 through the heart!").arg(qPrintable(victim->shortdesc_or_name())));
     sprintf(buf, "%s from the %s drives full force into your chest!\r\n",
-       found->short_description, dirs[rev_dir[dir]]);
+       qPrintable(found->short_description()), dirs[rev_dir[dir]]);
     victim->send(buf);
     sprintf(buf, "%s from the %s impales $n through the chest!",
-       found->short_description, dirs[rev_dir[dir]]);
+       qPrintable(found->short_description()), dirs[rev_dir[dir]]);
     act(buf, victim, nullptr, 0, TO_ROOM, 0);
     break;
 
     case 2:
     sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n",
-       found->short_description, GET_SHORT(victim));
+       qPrintable(found->short_description()), qPrintable(victim->shortdesc_or_name()));
     ch->send(buf);
     sprintf(buf, "%s drives right through your left eye!\r\nThe last thing through your mind is.........an arrowhead.\r\n",
-       found->short_description);
+       qPrintable(found->short_description()));
     victim->send(buf);
     sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.",
-       found->short_description, dirs[rev_dir[dir]]);
+       qPrintable(found->short_description()), dirs[rev_dir[dir]]);
     act(buf, victim, nullptr, 0, TO_ROOM, 0);
     break;
    } // of switch
   }
   else  // they have enough to survive the arrow..lucky bastard
   {
-    sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
-       found->short_description);
+    sprintf(buf, "You hit %s with %s!\r\n", qPrintable(victim->shortdesc_or_name()),
+       qPrintable(found->short_description()));
     ch->send(buf);
     sprintf(buf, "You get shot with %s from the %s.  Ouch.",
-          found->short_description, dirs[rev_dir[dir]]);
+          qPrintable(found->short_description()), dirs[rev_dir[dir]]);
     act(buf, victim, 0, 0, TO_CHAR, 0);
     sprintf(buf, "%s from the %s hits $n!",
-          found->short_description, dirs[rev_dir[dir]]);
+          qPrintable(found->short_description()), dirs[rev_dir[dir]]);
     act(buf, victim, 0, 0, TO_ROOM, 0);
 
     switch(artype)
@@ -1118,19 +1110,19 @@ int do_arrow_damage(Character *ch, Character *victim,
 }
 */
 
-int do_fire(Character *ch, char *arg, cmd_t cmd)
+qint32 do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Character *victim;
-  int dam, dir = -1, artype, cost, retval, victroom;
-  class Object *found;
-  unsigned cur_room, new_room = 0;
+  CharacterPtr victim;
+  qint32 dam, dir = -1, artype, cost, retval, victroom;
+  ObjectPtr found;
+  quint32 cur_room, new_room = {};
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH],
       target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH],
       buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
       victhshr[MAX_STRING_LENGTH];
   bool enchantmentused = false;
 
-  victim = nullptr;
+  victim = {};
   *direct = '\0';
   *arrow = '\0';
 
@@ -1190,9 +1182,9 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  cost = 0;
+  cost = {};
   dir = -1;
-  artype = 0;
+  artype = {};
 
   if (*arrow)
   {
@@ -1221,7 +1213,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   if (*direct)
   {
     if (direct[0] == 'n')
-      dir = 0;
+      dir = {};
     else if (direct[0] == 'e')
       dir = 1;
     else if (direct[0] == 's')
@@ -1400,12 +1392,12 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
   /* check for arrows here */
 
-  found = nullptr;
-  int where = 0;
+  found = {};
+  qint32 where = {};
   for (; where < MAX_WEAR; where++)
   {
     if (ch->equipment[where])
-      if (IS_CONTAINER(ch->equipment[where]) && isexact("quiver", ch->equipment[where]->Name()))
+      if (IS_CONTAINER(ch->equipment[where]) && isexact("quiver", ch->equipment[where]->name()))
       {
         found = find_arrow(ch->equipment[where]);
         if (found)
@@ -1461,14 +1453,14 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
     dam += dice(ch->equipment[WEAR_HOLD]->obj_flags.value[1],
                 ch->equipment[WEAR_HOLD]->obj_flags.value[2]);
-    for (int i = 0; i < found->num_affects; i++)
+    for (qint32 i = {}; i < found->num_affects; i++)
       if (found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
         dam += found->affected[i].modifier;
       else if (found->affected[i].location == APPLY_HIT_N_DAM && found->affected[i].modifier != 0)
         dam += found->affected[i].modifier;
 
     set_cantquit(ch, victim);
-    sprintf(victname, "%s", GET_SHORT(victim));
+    sprintf(victname, "%s", qPrintable(victim->shortdesc_or_name()));
     victroom = victim->in_room;
     strcpy(victhshr, HSHR(victim));
 
@@ -1486,61 +1478,41 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       case 1:
         if (dir < 0)
         {
-          sprintf(buf, "The %s impales %s through the heart!\r\n",
-                  found->short_description, victname);
+          sprintf(buf, "The %s impales %s through the heart!\r\n", qPrintable(found->short_description()), victname);
           send_to_room(buf, victroom);
         }
         else
         {
-          sprintf(buf, "Your shot impales %s through the heart!\r\n",
-                  victname);
-          ch->send(buf);
-          sprintf(buf,
-                  "%s from the %s impales %s through the chest!\r\n",
-                  found->short_description, dirs[rev_dir[dir]],
-                  victname);
+          ch->sendln(QStringLiteral("Your shot impales %1 through the heart!").arg(victname));
+          sprintf(buf, "%s from the %s impales %s through the chest!\r\n", qPrintable(found->short_description()), dirs[rev_dir[dir]], victname);
           send_to_room(buf, victroom);
         }
         break;
       case 2:
         if (dir < 0)
         {
-          sprintf(buf,
-                  "%s drives through the eye of %s, ending %s life.\r\n",
-                  found->short_description, victname, victhshr);
+          sprintf(buf, "%s drives through the eye of %s, ending %s life.\r\n", qPrintable(found->short_description()), victname, victhshr);
           send_to_room(buf, victroom);
         }
         else
         {
-          sprintf(buf,
-                  "Your %s drives through the eye of %s ending %s life.\r\n",
-                  found->short_description, victname, victhshr);
+          sprintf(buf, "Your %s drives through the eye of %s ending %s life.\r\n", qPrintable(found->short_description()), victname, victhshr);
           ch->send(buf);
-          sprintf(buf,
-                  "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n",
-                  found->short_description, dirs[rev_dir[dir]],
-                  victname, victhshr);
+          sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n", qPrintable(found->short_description()), dirs[rev_dir[dir]], victname, victhshr);
           send_to_room(buf, victroom);
         }
         break;
       case 3:
         if (dir < 0)
         {
-          sprintf(buf,
-                  "The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\r\n",
-                  found->short_description, victname, HSSH(victim));
+          sprintf(buf, "The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\r\n", qPrintable(found->short_description()), victname, HSSH(victim));
           send_to_room(buf, victroom);
         }
         else
         {
-          sprintf(buf,
-                  "Your shot rips through the throat of %s ending their life with a gurgle.\r\n",
-                  victname);
+          sprintf(buf, "Your shot rips through the throat of %s ending their life with a gurgle.\r\n", victname);
           ch->send(buf);
-          sprintf(buf,
-                  "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n",
-                  found->short_description, dirs[rev_dir[dir]],
-                  victname, HSSH(victim));
+          sprintf(buf, "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n", qPrintable(found->short_description()), dirs[rev_dir[dir]], victname, HSSH(victim));
           send_to_room(buf, victroom);
         }
         break;
@@ -1551,24 +1523,24 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       if (dir < 0)
       {
         sprintf(buf, "You get shot with %s.  Ouch.",
-                found->short_description);
+                qPrintable(found->short_description()));
         act(buf, victim, 0, 0, TO_CHAR, 0);
-        sprintf(buf, "%s hits $n!", found->short_description);
+        sprintf(buf, "%s hits $n!", qPrintable(found->short_description()));
         act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
-                found->short_description);
+        sprintf(buf, "You hit %s with %s!\r\n", qPrintable(victim->shortdesc_or_name()),
+                qPrintable(found->short_description()));
         ch->send(buf);
       }
       else
       {
-        sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
-                found->short_description);
+        sprintf(buf, "You hit %s with %s!\r\n", qPrintable(victim->shortdesc_or_name()),
+                qPrintable(found->short_description()));
         ch->send(buf);
         sprintf(buf, "You get shot with %s from the %s.  Ouch.",
-                found->short_description, dirs[rev_dir[dir]]);
+                qPrintable(found->short_description()), dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_CHAR, 0);
         sprintf(buf, "%s from the %s hits $n!",
-                found->short_description, dirs[rev_dir[dir]]);
+                qPrintable(found->short_description()), dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_ROOM, 0);
       }
       victim->setStanding();
@@ -1596,11 +1568,11 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       // just in case
       if (isSet(retval, ReturnValue::eCH_DIED))
       {
-        Object *corpse, *next;
+        ObjectPtr corpse, next;
         for (corpse = DC::getInstance()->object_list; corpse; corpse = next)
         {
           next = corpse->next;
-          if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isexact(GET_NAME(ch), corpse->Name()))
+          if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isexact(qPrintable(ch->name()), corpse->name()))
           {
             obj_from_room(corpse);
             obj_to_room(corpse, cur_room);
@@ -1718,7 +1690,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
   extract_obj(found);
 
-  DC::getInstance()->shooting_list.insert(ch);
+  DC::getInstance()->shooting_list_.insert(ch);
 
   if (ch->has_skill(SKILL_ARCHERY) < 51 || enchantmentused)
     ch->shotsthisround += DC::PULSE_VIOLENCE;
@@ -1730,11 +1702,11 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   return retval;
 }
 
-int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
+qint32 do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf[1000];
-  Character *target = nullptr;
-  //  int learned, specialization;
+  CharacterPtr target = {};
+  //  qint32 learned, specialization;
 
   if (!*arg)
   {
@@ -1768,44 +1740,43 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
 
   if (!target->isNonPlayer())
   {
-    sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
-    ch->send(buf);
+    ch->sendln(QStringLiteral("Ewwwww gross!!!  %1 is imagining you naked on all fours!").arg(qPrintable(target->shortdesc_or_name())));
     return ReturnValue::eFAILURE;
   }
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
-  ch->sendln(QStringLiteral("%1 seems to hate... %2.").arg(GET_SHORT(target)).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
+  ch->sendln(QStringLiteral("%1 seems to hate... %2.").arg(qPrintable(target->shortdesc_or_name())).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
 
   if (ch->master)
-    sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
-            GET_SHORT(ch->master));
+    sprintf(buf, "%s seems to really like... %s.\r\n", qPrintable(target->shortdesc_or_name()),
+            qPrintable(ch->master->shortdesc_or_name()));
   else
-    sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
+    sprintf(buf, "%s seems to really like... %s.\r\n", qPrintable(target->shortdesc_or_name()),
             "Noone!");
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
 
-void check_eq(Character *ch)
+void check_eq(CharacterPtr ch)
 {
-  int pos;
+  qint32 pos;
 
-  for (pos = 0; pos < MAX_WEAR; pos++)
+  for (pos = {}; pos < MAX_WEAR; pos++)
   {
     if (ch->equipment[pos])
       ch->equip_char(ch->unequip_char(pos), pos);
   }
 }
 
-int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
+qint32 do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  int i;
+  qint32 i;
   char buf[MAX_STRING_LENGTH];
   affected_type af, *cur;
 
   one_argument(arg, buf);
 
-  int learned = ch->has_skill(SKILL_NAT_SELECT);
+  qint32 learned = ch->has_skill(SKILL_NAT_SELECT);
   if (ch->isNonPlayer() || !learned)
   {
     ch->sendln("You don't know how to use this to your advantage.");
@@ -1844,18 +1815,18 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
   af.type = SKILL_NAT_SELECT;
   af.duration = -1;
   af.modifier = i;
-  af.location = 0;
+  af.location = {};
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
   af.type = SPELL_NAT_SELECT_TIMER;
   af.duration = 60 - learned / 5;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\r\n", races[i].singular_name);
+  ch->send(QStringLiteral("You study the habits of the %s race and select them as your enemy of choice.\r\n").arg(races[i].singular_name));
 
   return ReturnValue::eSUCCESS;
 }

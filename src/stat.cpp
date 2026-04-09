@@ -1,16 +1,5 @@
-#
-#include <cstring>
-
-#include <string>
-#include <map>
-#include <list>
-
 #include "DC/DC.h"
-#include "DC/character.h"
-#include "DC/room.h"
-#include "DC/utility.h"
-#include "cassert"
-#include "DC/vault.h"
+#include "DC/handler.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"
 
@@ -22,42 +11,18 @@ enum SortState
   SORT_MOB
 };
 
-class MobKills
-{
-public:
-  unsigned int howmany;
-  int name;
-};
-
-class AreaStats
-{
-public:
-  zone_t area;
-  int64_t xps;
-  int64_t gold;
-  std::vector<MobKills> mobKills;
-};
-typedef std::map<zone_t, AreaStats> area_stats_t;
-
 class AreaData
 {
 public:
-  AreaData();
-  ~AreaData() {}
-  void GetAreaData(zone_t zone_nr, int mob, int64_t xps, int64_t gold);
-  void DisplaySingleArea(Character *ch, zone_t area);
-  void DisplayAreaData(Character *ch);
-  void SortAreaData(Character *ch, SortState state);
-  void Load() {}
-  void Save() {}
+  void GetAreaData(zone_t zone_nr, qint32 mob, qint64 xps, qint64 gold);
+  void DisplaySingleArea(CharacterPtr ch, zone_t area);
+  void DisplayAreaData(CharacterPtr ch);
+  void SortAreaData(CharacterPtr ch, SortState state);
 
 private:
   area_stats_t areaStats;
 };
 
-AreaData::AreaData()
-{
-}
 bool CompareAreaXPStats(AreaStats first, AreaStats second)
 {
   return first.xps > second.xps;
@@ -68,114 +33,94 @@ bool CompareAreaGoldStats(AreaStats first, AreaStats second)
   return first.gold > second.gold;
 }
 
-void AreaData::SortAreaData(Character *ch, SortState state)
+void AreaData::SortAreaData(CharacterPtr ch, SortState state)
 {
-  std::list<AreaStats> lAreaStats;
-  area_stats_t::iterator it;
+  QList<AreaStats> lAreaStats;
   AreaStats aStats;
-  char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  std::string output_buf;
-  int i = 0;
+  qint32 i = {};
 
-  for (it = areaStats.begin(); it != areaStats.end(); it++)
+  for (const auto &areastat : areaStats)
   {
-    if ((state == SORT_XP) && (it->second.xps < 1))
-      continue;
-    if ((state == SORT_GOLD) && (it->second.gold < 1))
-      continue;
-    lAreaStats.push_back(it->second);
-  }
-  if (state == SORT_XP)
-  {
-    lAreaStats.sort(CompareAreaXPStats);
-    for (std::list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
+    switch (state)
     {
-      i++;
-      snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())), "%s", DC::getInstance()->zones.value(lit->area).NameC());
-      snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%zus $5%%15lld$R xps\r\n", 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
-      csendf(ch, buf2, i, buf, lit->xps);
+    case SORT_XP:
+      if (areastat.xps)
+        lAreaStats.push_back(areastat);
+      break;
+    case SORT_GOLD:
+      if (areastat.gold)
+        lAreaStats.push_back(areastat);
+      break;
+    case SORT_MOB:
+      lAreaStats.push_back(areastat);
+      break;
     }
   }
-  if (state == SORT_GOLD)
+
+  switch (state)
   {
-    lAreaStats.sort(CompareAreaGoldStats);
-    for (std::list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
-    {
-      i++;
-      snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())), "%s",
-               DC::getInstance()->zones.value(lit->area).NameC());
-      snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%zus $5%%15lld$R gold\r\n",
-               35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
-      csendf(ch, buf2, i, buf, lit->gold);
-    }
+  case SORT_XP:
+    std::sort(lAreaStats.begin(), lAreaStats.end(), CompareAreaXPStats);
+    for (const auto &lit : lAreaStats)
+      ch->sendln(QStringLiteral("%1)%1 $5%2$R xps").arg(++i).arg(DC::getInstance()->zones.value(lit.area).name()).arg(lit.xps));
+    break;
+  case SORT_GOLD:
+    std::sort(lAreaStats.begin(), lAreaStats.end(), CompareAreaGoldStats);
+    for (const auto &lit : lAreaStats)
+      ch->sendln(QStringLiteral("%1)%1 $5%2$R gold").arg(++i).arg(DC::getInstance()->zones.value(lit.area).name()).arg(lit.gold));
+    break;
+  case SORT_MOB:
+    break;
   }
-  return;
 }
 
-void AreaData::DisplaySingleArea(Character *ch, zone_t area)
+void AreaData::DisplaySingleArea(CharacterPtr ch, zone_t area)
 {
-
-  char buf[MAX_STRING_LENGTH];
-  std::string output_buf;
-  std::vector<MobKills>::iterator mobs;
-  Character *get_mob_vnum(int vnum);
-  Character *tmpchar;
-
   if (DC::getInstance()->zones.contains(area) == false)
   {
     ch->send("Area number is outside the limits\r\n");
     return;
   }
-  snprintf(buf, MAX_STRING_LENGTH, "%lu)%30s -- $5%12ld$R xps -- $5%12ld$R gold\r\n", area, DC::getInstance()->zones.value(area).NameC(), areaStats[area].xps, areaStats[area].gold);
-  csendf(ch, buf);
-  snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5s\r\n", "Mob Name", "Killed");
-  csendf(ch, buf);
-  for (mobs = areaStats[area].mobKills.begin(); mobs != areaStats[area].mobKills.end(); mobs++)
+
+  ch->sendln(QStringLiteral("%1)%2 -- $5%3$R xps -- $5%4$R gold").arg(area).arg(DC::getInstance()->zones.value(area).name(), 30).arg(areaStats[area].xps, 12).arg(areaStats[area].gold, 12));
+  ch->sendln(QStringLiteral("%1 %2").arg("Mob Name", -30).arg("Killed", -5));
+
+  for (auto mobs = areaStats[area].mobKills.begin(); mobs != areaStats[area].mobKills.end(); mobs++)
   {
-    tmpchar = get_mob_vnum(mobs->name);
+    auto tmpchar = get_mob_vnum(mobs->name);
     if (!tmpchar)
     {
       ch->sendln("Shit a mob is missing from game!!!");
       continue;
     }
-    snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5d %s\r\n", get_mob_vnum(mobs->name)->short_desc,
-             mobs->howmany, mobs->howmany < 2 ? "time" : "times");
-    csendf(ch, buf);
+    ch->sendln(QStringLiteral("%1 %2 %3").arg(get_mob_vnum(mobs->name)->short_description(), -30).arg(mobs->howmany, -5).arg(mobs->howmany < 2 ? "time" : "times"));
   }
-  page_string(ch->desc, output_buf.c_str(), 1);
-  return;
 }
-void AreaData::DisplayAreaData(Character *ch)
+
+void AreaData::DisplayAreaData(CharacterPtr ch)
 {
-  QString buf, buf2;
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
-  {
-    if (areaStats[zone_key].xps == 0)
-      continue;
-    buf = QStringLiteral("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\r\n").arg(35 + zone.Name().length() - nocolor_strlen(zone.Name()));
-    ch->send(buf.arg(zone_key).arg(zone.Name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
-  }
-  return;
+    if (areaStats[zone_key].xps)
+      ch->sendln(QStringLiteral("%1)%2|$5%3$R xps|$5%4$R gold|").arg(zone_key).arg(zone.name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
 }
-void AreaData::GetAreaData(zone_t zone, int mob, int64_t xps, int64_t gold)
+
+void AreaData::GetAreaData(zone_t zone, qint32 mob, qint64 xps, qint64 gold)
 {
   MobKills mobObj;
-  std::vector<MobKills>::iterator mobs;
 
+  areaStats[zone].area = zone;
   if (areaStats.end() == areaStats.find(zone))
   {
-    areaStats[zone].area = zone;
     areaStats[zone].xps = xps;
     areaStats[zone].gold = gold;
   }
   else
   {
-    areaStats[zone].area = zone;
-    areaStats[zone].gold += gold;
     areaStats[zone].xps += xps;
+    areaStats[zone].gold += gold;
   }
-  for (mobs = areaStats[zone].mobKills.begin(); mobs != areaStats[zone].mobKills.end(); mobs++)
+
+  for (auto mobs = areaStats[zone].mobKills.begin(); mobs != areaStats[zone].mobKills.end(); mobs++)
   {
     if (mobs->name == mob)
     {
@@ -186,12 +131,11 @@ void AreaData::GetAreaData(zone_t zone, int mob, int64_t xps, int64_t gold)
   mobObj.name = mob;
   mobObj.howmany = 1;
   areaStats[zone].mobKills.push_back(mobObj);
-  return;
 }
 
 AreaData areaData;
 
-int do_areastats(Character *ch, char *argument, cmd_t cmd)
+qint32 do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
 
@@ -234,8 +178,7 @@ int do_areastats(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void getAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold)
+void getAreaData(quint32 zone, qint32 mob, quint32 xps, quint32 gold)
 {
   areaData.GetAreaData(zone, mob, xps, gold);
-  return;
 }

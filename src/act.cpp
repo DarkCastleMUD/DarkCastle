@@ -3,54 +3,38 @@
 | Description:  This file contains the classes and methods used to make
 |  the act() function work.
 */
-
-#include <string>
-
 #include "DC/DC.h"
-#include "DC/character.h"
 #include "DC/comm.h"
-#include "DC/room.h"
-#include "DC/utility.h"
-#include "DC/handler.h"
-#include "DC/connect.h"
 #include "DC/act.h"
-#include "DC/mobile.h"
 #include "DC/token.h"
 #include "DC/spells.h"
-#include "DC/returnvals.h"
+#include "DC/affect.h"
+#include "DC/utility.h"
+
+#include <QString>
 
 extern bool MOBtrigger;
 
-act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
-{
-  return act(qPrintable(str), ch, obj, vict_obj, destination, flags);
-}
-
-act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
-{
-  return act(str.c_str(), ch, obj, vict_obj, destination, flags);
-}
-
 act_return act(
-    const char *str,     // Buffer
-    Character *ch,       // Character from
-    Object *obj,         // Object
-    void *vict_obj,      // Victim object
-    int16_t destination, // Destination flags
-    int16_t flags        // Optional flags
+    QString str,        // Buffer
+    CharacterPtr ch,    // Character from
+    ObjectPtr obj,      // Object
+    void *vict_obj,     // Victim object
+    qint16 destination, // Destination flags
+    qint16 flags        // Optional flags
 )
 {
   class Connection *i;
-  int retval = 0;
+  qint32 retval = {};
   TokenList *tokens;
 
   send_tokens_return st_return;
   st_return.str = QString();
-  st_return.retval = 0;
+  st_return.retval = {};
 
   act_return ar;
   ar.str = QString();
-  ar.retval = 0;
+  ar.retval = {};
 
   tokens = new TokenList(str);
 
@@ -58,13 +42,12 @@ act_return act(
   if (ch == 0)
   {
     logentry(QStringLiteral("Error in act(), character equal to 0"), OVERSEER, DC::LogChannel::LOG_BUG);
-    delete tokens;
+    tokens = {};
     ar.retval = ReturnValue::eFAILURE;
     return ar;
   }
 
-  if (
-      (IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) && (destination != TO_CHAR) && (destination != TO_GROUP) && !(flags & GODS) && !(flags & STAYHIDE))
+  if ((IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) && (destination != TO_CHAR) && (destination != TO_GROUP) && !(flags & GODS) && !(flags & STAYHIDE))
   {
     REMBIT(ch->affected_by, AFF_HIDE);
     affect_from_char(ch, SPELL_FOREST_MELD);
@@ -72,7 +55,7 @@ act_return act(
 
   if (destination == TO_VICT)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (Character *)vict_obj);
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (CharacterPtr)vict_obj);
     retval |= st_return.retval;
     ar.str = st_return.str;
     ar.retval = retval;
@@ -89,12 +72,10 @@ act_return act(
   }
   else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
-    Character *tmp_char, *next_tmp_char;
     if (ch->in_room >= 1)
     {
-      for (tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char)
+      for (const auto &tmp_char : DC::getInstance()->world[ch->in_room].people_)
       {
-        next_tmp_char = tmp_char->next_in_room;
         // If they're not really playing, and no force flag, don't send
         if (tmp_char == ch)
           continue;
@@ -123,27 +104,27 @@ act_return act(
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
       logentry(QStringLiteral("Error in act(), invalid value sent as 'destination'"), OVERSEER, DC::LogChannel::LOG_BUG);
-      delete tokens;
+      tokens = {};
       ar.retval = ReturnValue::eFAILURE;
       return ar;
     }
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
     {
       // Dropped link or they're not really playing and no force flag, don't send.
-      if (!i->character || i->character == ch)
+      if (!conn->character || conn->character == ch)
         continue;
-      if (i->character->in_room == DC::NOWHERE || ch->in_room == DC::NOWHERE)
+      if (conn->character->in_room == DC::NOWHERE || ch->in_room == DC::NOWHERE)
         continue;
-      if ((destination == TO_ZONE) && DC::getInstance()->world[i->character->in_room].zone != DC::getInstance()->world[ch->in_room].zone)
+      if ((destination == TO_ZONE) && DC::getInstance()->world[conn->character->in_room].zone != DC::getInstance()->world[ch->in_room].zone)
         continue;
-      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, i->character);
+      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, conn->character);
       retval |= st_return.retval;
       ar.str = st_return.str;
       ar.retval = retval;
     }
   }
 
-  delete tokens;
+  tokens = {};
   return ar;
 }
 
@@ -153,7 +134,7 @@ act_return act(
 |   with no interpretation and no checks.
 */
 
-void send_message(QString str, Character *to)
+void send_message(QString str, CharacterPtr to)
 {
   if (str.isEmpty())
     return;
@@ -164,31 +145,13 @@ void send_message(QString str, Character *to)
   if (!to->desc)
     return;
 
-  SEND_TO_Q(str, to->desc);
+  write_to_output(str, to->desc);
 }
 
-void send_message(const char *str, Character *to)
+send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, ObjectPtr obj, void *vict_obj, qint32 flags, CharacterPtr to)
 {
-  // This will happen when a token shouldn't be interpreted
-  if (str == 0)
-    return;
-  if (!to)
-    return;
-  if (!to->desc)
-    return;
-
-  SEND_TO_Q(str, to->desc);
-}
-
-void send_message(std::string str, Character *to)
-{
-  return send_message(str.c_str(), to);
-}
-
-send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to)
-{
-  int retval = 0;
-  QString buf = tokens->Interpret(ch, obj, vict_obj, to, flags).c_str();
+  qint32 retval = {};
+  QString buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
 
   // Uppercase first letter of sentence.
   if (buf.isEmpty() == false && buf[0] != 0)
@@ -198,7 +161,7 @@ send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, vo
   send_message(buf, to);
 
   if (MOBtrigger && buf.isEmpty() == false)
-    retval |= mprog_act_trigger(buf.toStdString(), to, ch, obj, vict_obj);
+    retval |= mprog_act_trigger(buf, to, ch, obj, vict_obj);
   if (MOBtrigger && buf.isEmpty() == false)
     retval |= ch->oprog_act_trigger(buf);
 

@@ -6,36 +6,33 @@
 */
 
 #include <algorithm>
+#include <qtypes.h>
 
 #include "DC/obj.h"
 #include "DC/structs.h"
-#include "DC/character.h"
+#include "DC/DC.h"
 #include "DC/player.h"
 #include "DC/fight.h"
-#include "DC/utility.h"
+
 #include "DC/spells.h"
 #include "DC/handler.h"
-#include "DC/mobile.h"
-#include "DC/room.h"
 #include "DC/act.h"
-#include "DC/DC.h"
-#include "DC/returnvals.h"
 #include "DC/interp.h"
 #include "DC/spells.h"
 #include "DC/const.h"
 #include "DC/move.h"
-#include "DC/memory.h"
-#include "DC/DC.h"
+#include "DC/utility.h"
+
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.
 */
 command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
 {
-  Character *victim{}, *next_victim{};
+  CharacterPtr victim{}, next_victim = {};
   QString name;
-  int dam{};
-  command_return_t retval{};
+  qint32 dam = {};
+  command_return_t retval = {};
 
   if (!canPerform(SKILL_KICK))
   {
@@ -76,11 +73,11 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   if (!charge_moves(SKILL_KICK))
     return ReturnValue::eSUCCESS;
 
-  WAIT_STATE(this, (int)(DC::PULSE_VIOLENCE * 1.5));
+  WAIT_STATE(this, (qint32)(DC::PULSE_VIOLENCE * 1.5));
 
   if (!skill_success(victim, SKILL_KICK))
   {
-    dam = 0;
+    dam = {};
     retval = damage(this, victim, 0, TYPE_BLUDGEON, SKILL_KICK);
     if (SOMEONE_DIED(retval))
       return retval;
@@ -92,7 +89,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
       act("$N's heightened battlesense sees your kick coming from a mile away.", this, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, TO_VICT, 0);
       act("$N's heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, TO_ROOM, NOTVICT);
-      dam = 0;
+      dam = {};
     }
     else
       dam = (GET_DEX(this) * 3) + (GET_STR(this) * 2) + (has_skill(SKILL_KICK));
@@ -122,7 +119,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
     next_victim = fighting;
     if (!skill_success(next_victim, SKILL_KICK))
     {
-      dam = 0;
+      dam = {};
       retval = damage(this, next_victim, 0, TYPE_UNDEFINED, SKILL_KICK);
     }
     else
@@ -149,13 +146,13 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
+qint32 do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
-  int dam, attacktype;
-  int retval;
-  int failchance = 25;
+  qint32 dam, attacktype;
+  qint32 retval;
+  qint32 failchance = 25;
 
   if (!ch->canPerform(SKILL_DEATHSTROKE))
   {
@@ -208,7 +205,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
   if (!charge_moves(ch, SKILL_DEATHSTROKE))
     return ReturnValue::eSUCCESS;
 
-  int i = ch->has_skill(SKILL_DEATHSTROKE);
+  qint32 i = ch->has_skill(SKILL_DEATHSTROKE);
   if (i > 40)
     failchance -= 5;
   if (i > 60)
@@ -218,9 +215,9 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
   if (i > 90)
     failchance -= 5;
 
-  int to_dam = GET_DAMROLL(ch);
+  qint32 to_dam = GET_DAMROLL(ch);
   if (victim->isNonPlayer())
-    to_dam = (int)((float)to_dam * .8);
+    to_dam = (qint32)((float)to_dam * .8);
 
   dam = dice(ch->equipment[WEAR_WIELD]->obj_flags.value[1],
              ch->equipment[WEAR_WIELD]->obj_flags.value[2]);
@@ -257,7 +254,7 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
       act("$N's heightened battlesense somehow notices your deathstroke coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_VICT, 0);
       act("$N's heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
-      dam = 0;
+      dam = {};
     }
     retval = damage(ch, victim, dam, attacktype, SKILL_DEATHSTROKE);
   }
@@ -265,15 +262,15 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_retreat(Character *ch, char *argument, cmd_t cmd)
+qint32 do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int attempt;
+  qint32 attempt;
   char buf[MAX_INPUT_LENGTH];
   // Azrack -- retval should be initialized to something
-  int retval = 0;
-  Character *chTemp, *loop_ch;
+  qint32 retval = {};
+  CharacterPtr chTemp, loop_ch;
 
-  int is_stunned(Character * ch);
+  qint32 is_stunned(CharacterPtr ch);
 
   if (is_stunned(ch))
     return ReturnValue::eFAILURE;
@@ -369,7 +366,7 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_hitall(Character *ch, char *argument, cmd_t cmd)
+qint32 do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer() && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
@@ -416,10 +413,10 @@ int do_hitall(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     const auto &character_list = DC::getInstance()->character_list;
-    for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
-             {
-			if (vict && vict != (Character *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
-				int retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
+    std::for_each(character_list.begin(), character_list.end(), [&ch](CharacterPtr vict)
+                  {
+			if (vict && vict != (CharacterPtr ) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
+				qint32 retval = one_hit(ch, vict, TYPE_UNDEFINED, WEAR_WIELD);
 				if (isSet(retval, ReturnValue::eCH_DIED)) {
 					REMOVE_BIT(ch->combat, COMBAT_HITALL);
 					return false;
@@ -431,12 +428,12 @@ int do_hitall(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_bash(Character *ch, char *argument, cmd_t cmd)
+qint32 do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
-  int retval;
-  int hit = 0;
+  qint32 retval;
+  qint32 hit = {};
 
   one_argument(argument, name);
 
@@ -522,7 +519,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int modifier = 0;
+  qint32 modifier = {};
   // half as accurate without a shield
   if (!ch->equipment[WEAR_SHIELD])
   {
@@ -557,7 +554,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
     break;
   }
 
-  int stat_mod = ch->get_stat(attribute_t::STRENGTH) - victim->get_stat(attribute_t::STRENGTH);
+  qint32 stat_mod = ch->get_stat(attribute_t::STRENGTH) - victim->get_stat(attribute_t::STRENGTH);
   if (stat_mod > 10)
     stat_mod = 10;
   if (stat_mod < -10)
@@ -615,9 +612,9 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_redirect(Character *ch, char *argument, cmd_t cmd)
+qint32 do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
 
   if (!ch->canPerform(SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
@@ -680,16 +677,16 @@ int do_redirect(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_disarm(Character *ch, char *argument, cmd_t cmd)
+qint32 do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
-  class Object *wielded;
+  CharacterPtr victim;
+  ObjectPtr wielded;
 
   char name[256];
-  class Object *obj;
-  int retval = 0;
+  ObjectPtr obj;
+  qint32 retval = {};
 
-  int is_fighting_mob(Character * ch);
+  qint32 is_fighting_mob(CharacterPtr ch);
 
   if (!ch->canPerform(SKILL_DISARM))
   {
@@ -761,7 +758,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
 
   wielded = victim->equipment[WEAR_WIELD];
 
-  int modifier = 0;
+  qint32 modifier = {};
   level_diff_t level_difference = victim->getLevel() - ch->getLevel();
 
   if (ch->getLevel() < 50 && ch->getLevel() + 10 < victim->getLevel()) // keep lowbies from disarming big mobs
@@ -807,9 +804,9 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
 | NON-OFFENSIVE commands.  Below here are commands that should -not-
 |   require the victim to retaliate.
 */
-int Character::do_rescue(QStringList arguments, cmd_t cmd)
+qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
 {
-  Character *victim{}, *tmp_ch{};
+  CharacterPtr victim{}, tmp_ch = {};
   QString victim_name = arguments.value(0);
 
   if (!canPerform(SKILL_RESCUE))
@@ -872,8 +869,8 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
   act("You are rescued by $N, you are confused!", victim, 0, this, TO_CHAR, 0);
   act("$n heroically rescues $N.", this, 0, victim, TO_ROOM, NOTVICT);
 
-  int tempwait = GET_WAIT(this);
-  int tempvictwait = GET_WAIT(victim);
+  qint32 tempwait = GET_WAIT(this);
+  qint32 tempvictwait = GET_WAIT(victim);
 
   if (victim->fighting == tmp_ch)
     stop_fighting(victim);
@@ -891,15 +888,15 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
     set_fighting(this, tmp_ch);
   set_fighting(tmp_ch, this);
 
-  WAIT_STATE(this, MAX(DC::PULSE_VIOLENCE * 2, tempwait));
-  WAIT_STATE(victim, MAX(DC::PULSE_VIOLENCE * 2, tempvictwait));
+  WAIT_STATE(this, MAX<quint64>(DC::PULSE_VIOLENCE * 2, tempwait));
+  WAIT_STATE(victim, MAX<quint64>(DC::PULSE_VIOLENCE * 2, tempvictwait));
   return ReturnValue::eSUCCESS;
 }
 
-int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
+qint32 do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
-  int duration = 12;
+  qint32 duration = 12;
 
   if (!ch->canPerform(SKILL_BLADESHIELD))
   {
@@ -942,7 +939,7 @@ int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
 
   af.type = SKILL_BLADESHIELD;
   af.duration = duration;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
@@ -953,20 +950,20 @@ int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
 
 // return true on guard doing anything
 // otherwise false
-int handle_any_guard(Character *ch)
+qint32 handle_any_guard(CharacterPtr ch)
 {
   if (!ch->guarded_by)
     return false;
 
-  Character *guard = nullptr;
+  CharacterPtr guard = {};
 
   // search the room for my guard
   for (follow_type *curr = ch->guarded_by; curr;)
   {
-    for (Character *vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (auto vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
-        curr = nullptr;
+        curr = {};
         guard = vict;
         break;
       }
@@ -979,7 +976,7 @@ int handle_any_guard(Character *ch)
 
   if (ch->fighting && can_be_attacked(guard, ch->fighting) && skill_success(guard, ch, SKILL_GUARD))
   {
-    guard->do_rescue(ch->getName().split(' '));
+    guard->do_rescue(ch->name().split(' '));
     if (ch->fighting)
       return true;
     else
@@ -988,7 +985,7 @@ int handle_any_guard(Character *ch)
   return false;
 }
 
-Character *is_guarding_me(Character *ch, Character *guard)
+CharacterPtr is_guarding_me(CharacterPtr ch, CharacterPtr guard)
 {
   follow_type *curr = ch->guarded_by;
 
@@ -999,17 +996,17 @@ Character *is_guarding_me(Character *ch, Character *guard)
     curr = curr->next;
   }
 
-  return nullptr;
+  return {};
 }
 
-void stop_guarding(Character *guard)
+void stop_guarding(CharacterPtr guard)
 {
   if (!guard->guarding) // i'm not guarding anyone:)  get out
     return;
 
-  Character *victim = guard->guarding;
+  CharacterPtr victim = guard->guarding;
   follow_type *curr = victim->guarded_by;
-  follow_type *last = nullptr;
+  follow_type *last = {};
 
   while (curr)
   {
@@ -1027,21 +1024,19 @@ void stop_guarding(Character *guard)
       victim->guarded_by = curr->next;
   }
   // if we didn't find guard, return, since we wanted to remove um anyway:)
-  guard->guarding = nullptr;
+  guard->guarding = {};
 }
 
-void start_guarding(Character *guard, Character *victim)
+void start_guarding(CharacterPtr guard, CharacterPtr victim)
 {
-  follow_type *curr = (follow_type *)dc_alloc(1, sizeof(follow_type));
-
+  auto curr = new follow_type;
   curr->follower = guard;
   curr->next = victim->guarded_by;
   victim->guarded_by = curr;
-
   guard->guarding = victim;
 }
 
-void stop_guarding_me(Character *victim)
+void stop_guarding_me(CharacterPtr victim)
 {
   char buf[200];
   follow_type *curr = victim->guarded_by;
@@ -1049,23 +1044,23 @@ void stop_guarding_me(Character *victim)
 
   while (curr)
   {
-    sprintf(buf, "You stop trying to guard %s.\r\n", GET_SHORT(victim));
+    sprintf(buf, "You stop trying to guard %s.\r\n", qPrintable(victim->shortdesc_or_name()));
     curr->follower->send(buf);
-    curr->follower->guarding = nullptr;
+    curr->follower->guarding = {};
     last = curr;
     curr = curr->next;
-    dc_free(last);
+    last = {};
   }
 
-  victim->guarded_by = nullptr;
+  victim->guarded_by = {};
 }
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
 
-int do_guard(Character *ch, char *argument, cmd_t cmd)
+qint32 do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
-  Character *victim = nullptr;
+  CharacterPtr victim = {};
 
   if (!ch->isNonPlayer() && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
@@ -1107,12 +1102,12 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   }
 
   start_guarding(ch, victim);
-  sprintf(name, "You begin trying to guard %s.\r\n", GET_SHORT(victim));
+  sprintf(name, "You begin trying to guard %s.\r\n", qPrintable(victim->shortdesc_or_name()));
   ch->send(name);
   return ReturnValue::eSUCCESS;
 }
 
-int do_tactics(Character *ch, char *argument, cmd_t cmd)
+qint32 do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1133,8 +1128,8 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int grpsize = 0;
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  qint32 grpsize = {};
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1158,12 +1153,12 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
 
     af.type = SKILL_TACTICS_TIMER;
     af.duration = 1 + ch->has_skill(SKILL_TACTICS) / 10;
-    af.modifier = 0;
-    af.location = 0;
+    af.modifier = {};
+    af.location = {};
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1189,10 +1184,10 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_make_camp(Character *ch, char *argument, cmd_t cmd)
+qint32 do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *i, *next_i;
-  int learned = ch->has_skill(SKILL_MAKE_CAMP);
+  CharacterPtr i, next_i;
+  qint32 learned = ch->has_skill(SKILL_MAKE_CAMP);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1245,7 +1240,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 2.5));
+  WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 2.5));
 
   ch->sendln("You scan about for signs of danger as you clear an area to make camp...");
   act("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, TO_ROOM, 0);
@@ -1260,8 +1255,8 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
 
     af.type = SKILL_MAKE_CAMP_TIMER;
     af.duration = 2 + learned / 9;
-    af.modifier = 0;
-    af.location = 0;
+    af.modifier = {};
+    af.location = {};
     af.bitvector = -1;
 
     affect_to_char(ch, &af);
@@ -1269,7 +1264,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
     af.type = SKILL_MAKE_CAMP;
     af.duration = 1 + learned / 9;
     af.modifier = ch->in_room;
-    af.location = 0;
+    af.location = {};
     af.bitvector = -1;
 
     affect_to_char(ch, &af);
@@ -1283,7 +1278,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
         af.type = SPELL_FARSIGHT;
         af.duration = -1;
         af.modifier = 111;
-        af.location = 0;
+        af.location = {};
         af.bitvector = AFF_FARSIGHT;
 
         affect_to_char(i, &af);
@@ -1294,9 +1289,9 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_triage(Character *ch, char *argument, cmd_t cmd)
+qint32 do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int learned = ch->has_skill(SKILL_TRIAGE);
+  qint32 learned = ch->has_skill(SKILL_TRIAGE);
   affected_type af;
 
   if (ch->isMortalPlayer() && !learned)
@@ -1325,9 +1320,9 @@ int do_triage(Character *ch, char *argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   af.type = SKILL_TRIAGE_TIMER;
-  af.modifier = 0;
+  af.modifier = {};
   af.duration = 6;
-  af.location = 0;
+  af.location = {};
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
@@ -1351,9 +1346,9 @@ int do_triage(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_battlesense(Character *ch, char *argument, cmd_t cmd)
+qint32 do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int learned = ch->has_skill(SKILL_BATTLESENSE);
+  qint32 learned = ch->has_skill(SKILL_BATTLESENSE);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1380,7 +1375,7 @@ int do_battlesense(Character *ch, char *argument, cmd_t cmd)
     act("$n's movements become quick and calculated as $s senses heighten with the rush of battle.", ch, 0, 0, TO_ROOM, 0);
 
     af.type = SKILL_BATTLESENSE;
-    af.location = 0;
+    af.location = {};
     af.modifier = 10 + learned / 4;
     af.duration = 1 + learned / 11;
     af.bitvector = -1;
@@ -1391,11 +1386,11 @@ int do_battlesense(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_smite(Character *ch, char *argument, cmd_t cmd)
+qint32 do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = {};
   char name[MAX_STRING_LENGTH];
-  int learned = ch->has_skill(SKILL_SMITE);
+  qint32 learned = ch->has_skill(SKILL_SMITE);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1443,8 +1438,8 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
   }
 
   af.type = SKILL_SMITE_TIMER;
-  af.location = 0;
-  af.modifier = 0;
+  af.location = {};
+  af.modifier = {};
   af.duration = 22 - learned / 10;
   af.bitvector = -1;
 
@@ -1465,8 +1460,8 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
     act("$n shouts a mighty challenge and begins to assault $N with lethal efficiency.", ch, 0, vict, TO_ROOM, NOTVICT);
 
     af.type = SKILL_SMITE;
-    af.location = 0;
-    af.modifier = 0;
+    af.location = {};
+    af.modifier = {};
     af.victim = vict;
     af.duration = 1 + learned / 16;
     af.bitvector = -1;
@@ -1477,9 +1472,9 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
   return ch->fighting ? ReturnValue::eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
 }
 
-int do_leadership(Character *ch, char *argument, cmd_t cmd)
+qint32 do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int learned = ch->has_skill(SKILL_LEADERSHIP);
+  qint32 learned = ch->has_skill(SKILL_LEADERSHIP);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1509,7 +1504,7 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("You loudly call, 'Once more unto the breach, dear friends!'");
   act("$n loudly calls, 'Once more unto the breach, dear friends!'", ch, 0, 0, TO_ROOM, 0);
 
-  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
+  WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 1.5));
 
   if (!skill_success(ch, 0, SKILL_LEADERSHIP))
   {
@@ -1524,7 +1519,7 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
     af.type = SKILL_LEADERSHIP;
     af.duration = 1 + learned / 20;
     af.modifier = learned / 19; // cap on bonus
-    af.location = 0;
+    af.location = {};
     af.bitvector = -1;
 
     affect_to_char(ch, &af);
@@ -1536,9 +1531,9 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_perseverance(Character *ch, char *argument, cmd_t cmd)
+qint32 do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int learned = ch->has_skill(SKILL_PERSEVERANCE);
+  qint32 learned = ch->has_skill(SKILL_PERSEVERANCE);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1565,7 +1560,7 @@ int do_perseverance(Character *ch, char *argument, cmd_t cmd)
     act("$n seems to build energy and $s movements gain momentum as the battle drags on...", ch, 0, 0, TO_ROOM, 0);
 
     af.type = SKILL_PERSEVERANCE;
-    af.location = 0;
+    af.location = {};
     af.duration = 1 + learned / 11;
     af.modifier = learned;
     af.bitvector = -1;
@@ -1576,10 +1571,10 @@ int do_perseverance(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
+qint32 do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *vict = nullptr;
-  int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
+  CharacterPtr vict = {};
+  qint32 learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1611,7 +1606,7 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
     act("$n braces $mself to defend against $N's onslaught.", ch, 0, vict, TO_ROOM, NOTVICT);
 
     af.type = SKILL_DEFENDERS_STANCE;
-    af.location = 0;
+    af.location = {};
     af.modifier = 5 + learned / 2;
     af.duration = 1 + learned / 12;
     af.bitvector = -1;
@@ -1621,9 +1616,9 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_onslaught(Character *ch, char *argument, cmd_t cmd)
+qint32 do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int learned = ch->has_skill(SKILL_ONSLAUGHT);
+  qint32 learned = ch->has_skill(SKILL_ONSLAUGHT);
   affected_type af;
 
   if (ch->isMortalPlayer() && !learned)
@@ -1652,8 +1647,8 @@ int do_onslaught(Character *ch, char *argument, cmd_t cmd)
     act("$n waves $s weapon in the air in a futile attempt to look skillful.", ch, 0, 0, TO_ROOM, 0);
 
     af.type = SKILL_ONSLAUGHT_TIMER;
-    af.location = 0;
-    af.modifier = 0;
+    af.location = {};
+    af.modifier = {};
     af.duration = 7;
     af.bitvector = -1;
     affect_to_char(ch, &af);
@@ -1664,16 +1659,16 @@ int do_onslaught(Character *ch, char *argument, cmd_t cmd)
     act("$n's attacks come fast and furious as $e harnesses $s battle expertise.", ch, 0, 0, TO_ROOM, 0);
 
     af.type = SKILL_ONSLAUGHT;
-    af.location = 0;
-    af.modifier = 0;
+    af.location = {};
+    af.modifier = {};
     af.duration = 1 + learned / 15;
     af.bitvector = -1;
 
     affect_to_char(ch, &af);
 
     af.type = SKILL_ONSLAUGHT_TIMER;
-    af.location = 0;
-    af.modifier = 0;
+    af.location = {};
+    af.modifier = {};
     af.duration = 7 + learned / 15;
     af.bitvector = -1;
 

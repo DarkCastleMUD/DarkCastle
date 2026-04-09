@@ -12,14 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-#include "DC/obj.h"
-#include "DC/db.h"
-#include "DC/room.h"
-#include "DC/player.h"
-#include "DC/utility.h"
-
-typedef int SPEC_FUN(Character *ch, Object *obj, cmd_t cmd, const char *argument, Character *owner);
-typedef int ROOM_PROC(Character *ch, cmd_t cmd, const char *argument);
+#include "DC/DC.h"
 
 void boot_the_shops();
 void boot_player_shops();
@@ -48,14 +41,14 @@ void DC::assign_mobiles(void)
 // The following four functions are just here to make sure when someone removes a mob
 // or object from the world, we don't try to assign procs to index[-1]
 
-void assign_one_mob_non(int vnum, special_function func)
+void assign_one_mob_non(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
     DC::getInstance()->mob_non_combat_functions[vnum] = func;
   }
 
-  int rnum = real_mobile(vnum);
+  qint32 rnum = real_mobile(vnum);
 
   if (rnum >= 0)
   {
@@ -63,14 +56,14 @@ void assign_one_mob_non(int vnum, special_function func)
   }
 }
 
-void assign_one_mob_com(int vnum, special_function func)
+void assign_one_mob_com(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
     DC::getInstance()->mob_non_combat_functions[vnum] = func;
   }
 
-  int rnum = real_mobile(vnum);
+  qint32 rnum = real_mobile(vnum);
 
   if (rnum >= 0)
   {
@@ -78,14 +71,14 @@ void assign_one_mob_com(int vnum, special_function func)
   }
 }
 
-void assign_one_obj_non(int vnum, special_function func)
+void assign_one_obj_non(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
     DC::getInstance()->obj_non_combat_functions[vnum] = func;
   }
 
-  int rnum = real_object(vnum);
+  qint32 rnum = real_object(vnum);
 
   if (rnum >= 0)
   {
@@ -93,14 +86,14 @@ void assign_one_obj_non(int vnum, special_function func)
   }
 }
 
-void assign_one_obj_com(int vnum, special_function func)
+void assign_one_obj_com(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
     DC::getInstance()->obj_combat_functions[vnum] = func;
   }
 
-  int rnum = real_object(vnum);
+  qint32 rnum = real_object(vnum);
 
   if (rnum >= 0)
   {
@@ -298,8 +291,6 @@ void assign_non_combat_procs()
   assign_one_mob_non(10031, eddie_shopkeeper);
   assign_one_mob_non(10032, reroll_trader);
   assign_one_mob_non(23006, redeem_trader);
-
-  return;
 }
 
 void assign_combat_procs()
@@ -410,7 +401,6 @@ void assign_combat_procs()
   assign_one_mob_com(27133, firestormer);
   assign_one_mob_com(27140, hellstreamer);
   assign_one_mob_com(32044, active_tarrasque);
-  return;
 }
 
 /* assign special procedures to objects */
@@ -659,11 +649,9 @@ void assign_objects(void)
   assign_one_obj_com(586, godload_hydratail);
   //  assign_one_obj_com(22743,  bonusattack);
   //  assign_one_obj_com(22605,  souldrainer);
-  int i;
+  qint32 i;
   for (i = 1940; i <= 1950; i++) /* Guild boards.*/
     assign_one_obj_non(i, board);
-
-  return;
 }
 
 /* assign special procedures to rooms */

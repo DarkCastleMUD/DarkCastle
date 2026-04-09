@@ -1,34 +1,17 @@
-#ifndef CONST_H
-#define CONST_H
-#include "DC/obj.h"
+#pragma once
 #include "DC/mobile.h"
-#include "DC/db.h"
-#include "DC/character.h"
-#include "DC/DC.h"
+#include "DC/structs.h"
 
-extern const char *dirs[];
+extern const QStringList dirs;
 extern race_data races[];
-extern const char *spells[];
+extern const QStringList spells;
 extern const char *apply_types[];
-extern item_types_t item_types;
 extern const char *race_types[];
 extern const char *zone_modes[];
 extern const char *isr_bits[];
 extern const char *sector_types[];
 extern const char *room_bits[];
 extern const char *sector_types[];
-extern class_skill_defines g_skills[];
-extern class_skill_defines w_skills[];
-extern class_skill_defines t_skills[];
-extern class_skill_defines d_skills[];
-extern class_skill_defines b_skills[];
-extern class_skill_defines a_skills[];
-extern class_skill_defines p_skills[];
-extern class_skill_defines r_skills[];
-extern class_skill_defines k_skills[];
-extern class_skill_defines u_skills[];
-extern class_skill_defines c_skills[];
-extern class_skill_defines m_skills[];
 extern const char *pc_clss_types[];
 extern const char *pc_clss_types2[];
 extern const char *pc_clss_types3[];
@@ -36,46 +19,41 @@ extern const char *pc_clss_abbrev[];
 
 /* External variables */
 
-extern int max_who;
+extern qint32 max_who;
 
 extern char globalBuf[MAX_STRING_LENGTH];
 extern bool wizlock;
 
-extern Character *character_list;
-extern Character *combat_list;
-extern char *ban_list[30];
 extern char *nonew_new_list[30];
 extern const char *zone_modes[];
 extern const char *equipment_types[];
 extern const char *utility_item_types[];
 
-extern int top_of_mobt;
-extern int top_of_objt;
+extern qint32 top_of_mobt;
+extern qint32 top_of_objt;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *size_bitfields[];
 extern char *strs_damage_types[];
 extern char *obj_types[];
-extern std::vector<std::string> continent_names;
-extern int top_of_objt;
+extern QList<QString> continent_names;
+extern qint32 top_of_objt;
 
-extern const char *drinks[];
+extern const QStringList drinks;
 extern const char *portal_bits[];
 extern const char *player_bits[];
 extern const char *combat_bits[];
 extern const char *connected_types[];
 extern const char *mob_types[];
 extern const char *exit_bits[];
-extern int mob_race_mod[][5];
+extern qint32 mob_race_mod[][5];
 
 extern const char *race_abbrev[];
 
-extern int max_who;
-extern int movement_loss[];
-extern const char *skills[];
-extern const char *ki[];
+extern qint32 max_who;
+extern qint32 movement_loss[];
+extern const QStringList skills;
+extern const QStringList ki;
 extern const char *innate_skills[];
-extern const char *reserved[];
-extern room_t IMM_PIRAHNA_ROOM;
+extern const QStringList reserved;
 extern char *time_look[];
-#endif

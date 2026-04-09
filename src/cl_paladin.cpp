@@ -5,21 +5,15 @@
 |
 | File create with do_layhands -Pirahna 7/6/1999
 */
-#include "DC/obj.h"
+#include "DC/DC.h"
+#include "DC/isr.h"
 #include "DC/structs.h"
-#include "DC/character.h"
 #include "DC/player.h"
 #include "DC/fight.h"
-#include "DC/utility.h"
 #include "DC/spells.h"
-#include "DC/handler.h"
-#include "DC/connect.h"
-#include "DC/mobile.h"
-#include "DC/room.h"
 #include "DC/act.h"
-#include "DC/db.h"
-#include "DC/returnvals.h"
 #include "DC/interp.h"
+#include "DC/utility.h"
 
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the
@@ -28,13 +22,13 @@
 
 // Note that most of the (anti)paladin skills are already in "cl_warrior.C"
 
-int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
+qint32 do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
-  // Character *tmp_ch;
+  CharacterPtr victim;
+  // CharacterPtr tmp_ch;
   char victim_name[MAX_INPUT_LENGTH];
   affected_type af;
-  int retval = ReturnValue::eSUCCESS, dam;
+  qint32 retval = ReturnValue::eSUCCESS, dam;
 
   one_argument(argument, victim_name);
 
@@ -79,7 +73,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
   if (!charge_moves(ch, SKILL_HARM_TOUCH))
     return ReturnValue::eSUCCESS;
 
-  int duration = 24;
+  qint32 duration = 24;
   if (!skill_success(ch, victim, SKILL_HARM_TOUCH))
   {
     ch->sendln("Your god refuses you.");
@@ -96,7 +90,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
       if (ch->has_skill(SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
       {
         char dammsg[MAX_STRING_LENGTH];
-        int amount = ch->getLevel() * 10;
+        qint32 amount = ch->getLevel() * 10;
         if (amount + ch->getHP() > GET_MAX_HIT(ch))
           amount = GET_MAX_HIT(ch) - ch->getHP();
         sprintf(dammsg, "$B%d$R", amount);
@@ -107,7 +101,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
   }
   af.type = SKILL_HARM_TOUCH;
   af.duration = duration;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
@@ -122,13 +116,13 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
 
 // Again note that alot of them are in cl_warrior.C
 
-int do_layhands(Character *ch, char *argument, cmd_t cmd)
+qint32 do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
-  // Character *tmp_ch;
+  CharacterPtr victim;
+  // CharacterPtr tmp_ch;
   char victim_name[240];
   affected_type af;
-  int duration = 24;
+  qint32 duration = 24;
   one_argument(argument, victim_name);
 
   if (!ch->canPerform(SKILL_LAY_HANDS, "You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n"))
@@ -176,7 +170,7 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
   else
   {
     char dammsg[MAX_STRING_LENGTH];
-    int amount = 500 + (ch->has_skill(SKILL_LAY_HANDS) * 10);
+    qint32 amount = 500 + (ch->has_skill(SKILL_LAY_HANDS) * 10);
     if (amount + victim->getHP() > GET_MAX_HIT(victim))
       amount = GET_MAX_HIT(victim) - victim->getHP();
     victim->addHP(amount);
@@ -191,21 +185,21 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
 
   af.type = SKILL_LAY_HANDS;
   af.duration = duration;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
   return ReturnValue::eSUCCESS;
 }
 
-int do_behead(Character *ch, char *argument, cmd_t cmd)
+qint32 do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   double modifier = 0.0;
   double enemy_hp = 0.0;
-  int chance = 0;
-  int retval = ReturnValue::eSUCCESS;
+  qint32 chance = {};
+  qint32 retval = ReturnValue::eSUCCESS;
   char buf[MAX_STRING_LENGTH];
-  Character *vict;
+  CharacterPtr vict;
 
   one_argument(argument, buf);
 
@@ -243,18 +237,18 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
   if (!charge_moves(ch, SKILL_BEHEAD))
     return ReturnValue::eSUCCESS;
 
-  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE));
+  WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE));
 
   if (!skill_success(ch, vict, SKILL_BEHEAD))
   {
     ch->sendln("Your mighty swing goes wild!");
     act("$n takes a mighty swing at your head, but it goes wild!", ch, 0, vict, TO_VICT, 0);
     act("$n takes a mighty swing at $n's head, but it goes wild!", ch, 0, vict, TO_ROOM, NOTVICT);
-    retval = one_hit(ch, vict, SKILL_BEHEAD, FIRST);
+    retval = one_hit(ch, vict, SKILL_BEHEAD, WEAR_WIELD);
     return retval;
   }
 
-  int skill_level = ch->has_skill(SKILL_BEHEAD);
+  qint32 skill_level = ch->has_skill(SKILL_BEHEAD);
   modifier = 50.0 + skill_level / 2.0 + GET_ALIGNMENT(ch) / 100.0;
   modifier /= 100.0; // range .15-1.0
 
@@ -264,12 +258,12 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
   if (enemy_hp <= 0)
     enemy_hp = 0.01;
 
-  chance = (int)(modifier / (enemy_hp * enemy_hp));
+  chance = (qint32)(modifier / (enemy_hp * enemy_hp));
 
   if (enemy_hp < 0.3) // covered is 0.3
   {
     chance += (ch->has_skill(SKILL_TWO_HANDED_WEAPONS) / 6);
-    // csendf(ch, "BEHEAD chance increased by %d\r\n", ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6);
+    // ch->send(QStringLiteral("BEHEAD chance increased by %d\r\n").arg(ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6));
   }
   else
     chance >>= 1; // halving the chance if less than covered (nerf)
@@ -278,9 +272,9 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
     chance = 85;
 
   if (chance < 0)
-    chance = 0;
+    chance = {};
 
-  // csendf(ch, "behead chance: %d, enemy hp%: %f\r\n", chance, enemy_hp);
+  // ch->send(QStringLiteral("behead chance: %d, enemy hp%: %f\r\n").arg(chance).arg(enemy_hp));
 
   if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {

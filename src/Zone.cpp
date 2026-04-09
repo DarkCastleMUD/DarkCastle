@@ -1,5 +1,4 @@
 #include "DC/DC.h"
-#include "DC/utility.h"
 
 Zone::Zone(zone_t zone_key)
     : id_(zone_key)
@@ -26,7 +25,7 @@ void Zone::setFilename(QString value)
   filename = value;
 }
 
-uint64_t Zone::getDiedThisTick(void)
+quint64 Zone::getDiedThisTick(void)
 {
   return died_this_tick;
 }
@@ -36,7 +35,7 @@ void Zone::incrementDiedThisTick(void)
   died_this_tick++;
 }
 
-void Zone::setDiedThisTick(uint64_t died)
+void Zone::setDiedThisTick(quint64 died)
 {
   died_this_tick = died;
 }
@@ -126,17 +125,17 @@ void Zone::setNoHunt(bool flag)
   }
 }
 
-void Zone::setZoneFlags(uint64_t flags)
+void Zone::setZoneFlags(quint64 flags)
 {
   zone_flags = flags;
 }
 
-void Zone::setGold(uint64_t value)
+void Zone::setGold(quint64 value)
 {
   gold = value;
 }
 
-void Zone::addGold(uint64_t value)
+void Zone::addGold(quint64 value)
 {
   gold += value;
 }
@@ -156,17 +155,17 @@ room_t Zone::getBottom(void)
   return bottom;
 }
 
-void Zone::setBottom(int room_key)
+void Zone::setBottom(qint32 room_key)
 {
   bottom = room_key;
 }
 
-int Zone::getTop(void)
+qint32 Zone::getTop(void)
 {
   return top;
 }
 
-void Zone::setTop(int room_key)
+void Zone::setTop(qint32 room_key)
 {
   top = room_key;
 }
@@ -176,17 +175,17 @@ room_t Zone::getRealBottom(void)
   return bottom_rnum;
 }
 
-void Zone::setRealBottom(int room_key)
+void Zone::setRealBottom(qint32 room_key)
 {
   bottom_rnum = room_key;
 }
 
-int Zone::getRealTop(void)
+qint32 Zone::getRealTop(void)
 {
   return top_rnum;
 }
 
-void Zone::setRealTop(int room_key)
+void Zone::setRealTop(qint32 room_key)
 {
   top_rnum = room_key;
 }
@@ -201,7 +200,7 @@ bool operator==(ResetCommand a, ResetCommand b)
   return false;
 }
 
-zone_t getZoneKey(Character *ch, const QString input, bool *ok)
+zone_t getZoneKey(CharacterPtr ch, const QString input, bool *ok)
 {
   zone_t zone_key = input.toULongLong(ok);
   if (!isValidZoneKey(ch, zone_key) && ok)
@@ -212,7 +211,7 @@ zone_t getZoneKey(Character *ch, const QString input, bool *ok)
   return zone_key;
 }
 
-bool isValidZoneKey(Character *ch, const zone_t zone_key)
+bool isValidZoneKey(CharacterPtr ch, const zone_t zone_key)
 {
   const auto dc = DC::getInstance();
   if (!dc->zones.contains(zone_key))
@@ -234,9 +233,9 @@ bool isValidZoneKey(Character *ch, const zone_t zone_key)
   return true;
 }
 
-uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok)
+quint64 getZoneCommandKey(CharacterPtr ch, const Zone &zone, const QString input, bool *ok)
 {
-  uint64_t zone_command_key = input.toULongLong(ok);
+  quint64 zone_command_key = input.toULongLong(ok);
   if (!isValidZoneCommandKey(ch, zone, zone_command_key - 1) && ok)
   {
     *ok = false;
@@ -244,7 +243,7 @@ uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input,
   return zone_command_key - 1;
 }
 
-bool isValidZoneCommandKey(Character *ch, const Zone &zone, const qsizetype zone_command_key)
+bool isValidZoneCommandKey(CharacterPtr ch, const Zone &zone, const qsizetype zone_command_key)
 {
   if (zone.cmd.isEmpty() || zone_command_key >= zone.cmd.size())
   {

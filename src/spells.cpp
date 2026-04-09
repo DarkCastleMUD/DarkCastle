@@ -28,55 +28,50 @@
 #include <cstdlib>
 
 #include "DC/obj.h"
-#include "DC/character.h"
+#include "DC/DC.h"
 #include "DC/race.h"
 #include "DC/spells.h"
 #include "DC/magic.h"
 #include "DC/player.h"
-#include "DC/isr.h"
-#include "DC/utility.h"
+
 #include "DC/fight.h"
-#include "DC/mobile.h"
-#include "DC/room.h"
+
 #include "DC/handler.h"
-#include "DC/connect.h"
 #include "DC/interp.h"
 #include "DC/act.h"
-#include "DC/returnvals.h"
 #include "DC/ki.h"
-#include "DC/sing.h"
 #include "DC/clan.h"
-#include "DC/memory.h"
+#include "DC/utility.h"
 
 // Global data
 
-extern class_skill_defines w_skills[];
-extern class_skill_defines t_skills[];
-extern class_skill_defines d_skills[];
-extern class_skill_defines b_skills[];
-extern class_skill_defines a_skills[];
-extern class_skill_defines p_skills[];
-extern class_skill_defines r_skills[];
-extern class_skill_defines k_skills[];
-extern class_skill_defines u_skills[];
-extern class_skill_defines c_skills[];
-extern class_skill_defines m_skills[];
+extern CharacterClassSkill w_skills[];
+extern CharacterClassSkill t_skills[];
+extern CharacterClassSkill d_skills[];
+extern CharacterClassSkill b_skills[];
+extern CharacterClassSkill a_skills[];
+extern CharacterClassSkill p_skills[];
+extern CharacterClassSkill r_skills[];
+extern CharacterClassSkill k_skills[];
+extern CharacterClassSkill u_skills[];
+extern CharacterClassSkill c_skills[];
+extern CharacterClassSkill m_skills[];
 extern char *spell_wear_off_msg[];
 
 // Functions used in spells.C
-int spl_lvl(int lev);
+qint32 spl_lvl(qint32 lev);
 
 // Extern procedures
-void make_dust(Character *ch);
-int say_spell(Character *ch, int si, int room = 0);
+void make_dust(CharacterPtr ch);
+qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room = 0);
 
 #if (0)
-uint8_t beats;               /* Waiting time after spell     */
+quint8 beats;                /* Waiting time after spell     */
 position_t minimum_position; /* Position for caster          */
-uint8_t min_usesmana;        /* Mana used                    */
-int16_t targets;             /* Legal targets                */
+quint8 min_usesmana;         /* Mana used                    */
+qint16 targets;              /* Legal targets                */
 SPELL_FUN *spell_pointer;    /* Function to call             */
-int16_t difficulty;
+qint16 difficulty;
 #endif
 
 const QList<spell_info_type> spell_info =
@@ -103,13 +98,13 @@ const QList<spell_info_type> spell_info =
 
         {/* 10 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_colour_spray, SKILL_INCREASE_HARD},
 
-        {/* 11 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 25, TAR_IGNORE, cast_control_weather, SKILL_INCREASE_MEDIUM},
+        {/* 11 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 25, TAR_IGNORE, cast_control_weather, SKILL_INCREASE_MEDIUM},
 
-        {/* 12 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 5, TAR_IGNORE, cast_create_food, SKILL_INCREASE_MEDIUM},
+        {/* 12 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 5, TAR_IGNORE, cast_create_food, SKILL_INCREASE_MEDIUM},
 
-        {/* 13 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 5, TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_create_water, SKILL_INCREASE_MEDIUM},
+        {/* 13 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 5, TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_create_water, SKILL_INCREASE_MEDIUM},
 
-        {/* 14 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_remove_blind, SKILL_INCREASE_MEDIUM},
+        {/* 14 */ (quint8)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_remove_blind, SKILL_INCREASE_MEDIUM},
 
         {/* 15 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_cure_critic, SKILL_INCREASE_MEDIUM},
 
@@ -151,13 +146,13 @@ const QList<spell_info_type> spell_info =
 
         {/* 34 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_protection_from_evil, SKILL_INCREASE_MEDIUM},
 
-        {/* 35 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 18, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_curse, SKILL_INCREASE_MEDIUM},
+        {/* 35 */ (quint8)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 18, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_curse, SKILL_INCREASE_MEDIUM},
 
         {/* 36 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 60, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_sanctuary, SKILL_INCREASE_HARD},
 
         {/* 37 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_shocking_grasp, SKILL_INCREASE_MEDIUM},
 
-        {/* 38 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD},
+        {/* 38 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD},
 
         {/* 39 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_strength, SKILL_INCREASE_MEDIUM},
 
@@ -165,13 +160,13 @@ const QList<spell_info_type> spell_info =
 
         {/* 41 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 5, TAR_CHAR_ROOM | TAR_OBJ_ROOM | TAR_SELF_NONO, cast_ventriloquate, SKILL_INCREASE_EASY},
 
-        {/* 42 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM},
+        {/* 42 */ (quint8)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM},
 
-        {/* 43 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 12, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM},
+        {/* 43 */ (quint8)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 12, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM},
 
         {/* 44 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_sense_life, SKILL_INCREASE_EASY},
 
-        {/* 45 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM},
+        {/* 45 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM},
 
         {/* 46 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_IGNORE, cast_lighted_path, SKILL_INCREASE_HARD},
 
@@ -181,7 +176,7 @@ const QList<spell_info_type> spell_info =
 
         {/* 49 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_rapid_mend, SKILL_INCREASE_HARD},
 
-        {/* 50 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD},
+        {/* 50 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD},
 
         {/* 51 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 22, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_water_breathing, SKILL_INCREASE_EASY},
 
@@ -219,7 +214,7 @@ const QList<spell_info_type> spell_info =
 
         {/* 68 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT, cast_weaken, SKILL_INCREASE_HARD},
 
-        {/* 69 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM},
+        {/* 69 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM},
 
         {/* 70 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_acid_blast, SKILL_INCREASE_HARD},
 
@@ -247,13 +242,13 @@ const QList<spell_info_type> spell_info =
 
         {/* 82 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_vampiric_touch, SKILL_INCREASE_HARD},
 
-        {/* 83 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM},
+        {/* 83 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM},
 
         {/* 84 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_paralyze, SKILL_INCREASE_HARD},
 
-        {/* 85 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 18, TAR_CHAR_ROOM, cast_remove_paralysis, SKILL_INCREASE_MEDIUM},
+        {/* 85 */ (quint8)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 18, TAR_CHAR_ROOM, cast_remove_paralysis, SKILL_INCREASE_MEDIUM},
 
-        {/* 86 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 160, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_fireshield, SKILL_INCREASE_MEDIUM},
+        {/* 86 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 160, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_fireshield, SKILL_INCREASE_MEDIUM},
 
         {/* 87 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_meteor_swarm, SKILL_INCREASE_HARD},
 
@@ -263,7 +258,7 @@ const QList<spell_info_type> spell_info =
 
         {/* 90 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 0, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_mana, 0},
 
-        {/* 91 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 200, TAR_IGNORE, cast_solar_gate, SKILL_INCREASE_MEDIUM},
+        {/* 91 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 200, TAR_IGNORE, cast_solar_gate, SKILL_INCREASE_MEDIUM},
 
         {/* 92 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_IGNORE, cast_heroes_feast, SKILL_INCREASE_EASY},
 
@@ -337,7 +332,7 @@ const QList<spell_info_type> spell_info =
 
         {/* 127 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 40, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stone_shield, SKILL_INCREASE_HARD},
 
-        {/* 128 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 55, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_greater_stone_shield, SKILL_INCREASE_HARD},
+        {/* 128 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 55, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_greater_stone_shield, SKILL_INCREASE_HARD},
 
         {/* 129 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_iron_roots, SKILL_INCREASE_HARD},
 
@@ -347,17 +342,17 @@ const QList<spell_info_type> spell_info =
 
         {/* 132 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD},
 
-        {/* 133 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 65, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_lightning_shield, SKILL_INCREASE_HARD},
+        {/* 133 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 65, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_lightning_shield, SKILL_INCREASE_HARD},
 
-        {/* 134 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 10, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_blue_bird, SKILL_INCREASE_EASY},
+        {/* 134 */ (quint8)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 10, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_blue_bird, SKILL_INCREASE_EASY},
 
         {/* 135 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_debility, SKILL_INCREASE_MEDIUM},
 
         {/* 136 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 30, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_attrition, SKILL_INCREASE_MEDIUM},
 
-        {/* 137 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_vampiric_aura, SKILL_INCREASE_EASY},
+        {/* 137 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_vampiric_aura, SKILL_INCREASE_EASY},
 
-        {/* 138 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY},
+        {/* 138 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY},
 
         {/* 139 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 5, TAR_IGNORE, cast_dismiss_familiar, SKILL_INCREASE_MEDIUM},
 
@@ -425,13 +420,13 @@ const QList<spell_info_type> spell_info =
 
         {/* 171 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 125, TAR_IGNORE, cast_spirit_shield, SKILL_INCREASE_HARD},
 
-        {/* 172 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD},
+        {/* 172 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD},
 
-        {/* 173 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_heroism, SKILL_INCREASE_HARD},
+        {/* 173 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_heroism, SKILL_INCREASE_HARD},
 
-        {/* 174 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD},
+        {/* 174 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD},
 
-        {/* 175 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD},
+        {/* 175 */ (quint8)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD},
         {/* 176 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_ROOM_EXIT, cast_elemental_wall, SKILL_INCREASE_MEDIUM},
         {/* 177 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_IGNORE, cast_ethereal_focus, SKILL_INCREASE_EASY}};
 
@@ -558,7 +553,7 @@ const QList<skill_stuff> skill_info =
         /*    */ {"\n", 0},
 };
 
-const char *skills[] =
+const QStringList skills =
     {
         "trip", // 0
         "dodge",
@@ -704,7 +699,7 @@ const char *skills[] =
         "ministrel",
         "\n"};
 
-const char *spells[] =
+const QStringList spells =
     {
         "armor", /* 1 */
         "teleport",
@@ -897,7 +892,7 @@ bool Character::canPerform(const int_fast32_t &skillType, QString failMessage)
 }
 
 // Figures out how many % of max your damage does
-int dam_percent(int learned, int damage)
+qint32 dam_percent(qint32 learned, qint32 damage)
 {
   auto percent = 50.0;
   if (!learned)
@@ -908,9 +903,9 @@ int dam_percent(int learned, int damage)
   return damage * percent / 100.0;
 }
 
-int use_mana(Character *ch, int sn)
+qint32 use_mana(CharacterPtr ch, qint32 sn)
 {
-  int base = spell_info[sn].min_usesmana();
+  qint32 base = spell_info[sn].min_usesmana();
 
   // TODO - if we want mana to be modified by anything, we'll need to put something
   // here.  Since the "min_level_x" stuff doesn't exist anymore, and i'm too lazy
@@ -920,7 +915,7 @@ int use_mana(Character *ch, int sn)
 
   return base;
   /*
-      int divisor;
+      qint32 divisor;
 
       divisor = 2 + ch->getLevel();
       if ( GET_CLASS(ch) == CLASS_CLERIC )
@@ -944,10 +939,10 @@ int use_mana(Character *ch, int sn)
   */
 }
 
-void affect_update(int32_t duration_type)
+void affect_update(qint32 duration_type)
 {
   static affected_type *af, *next_af_dude;
-  void update_char_objects(Character * ch); /* handler.c */
+  void update_char_objects(CharacterPtr ch); /* handler.c */
 
   if (duration_type != DC::PULSE_REGEN && duration_type != DC::PULSE_TIMER && duration_type != DC::PULSE_VIOLENCE && duration_type != DC::PULSE_TIME) // Default
     return;
@@ -979,10 +974,9 @@ void affect_update(int32_t duration_type)
         af->duration--;
         if (af->type == SPELL_ICESTORM)
           af->modifier = 0 - af->duration;
-        if (!(af->caster).empty()) // means bard song
+        if (!af->caster.isEmpty()) // means bard song
         {
-          Character *get_pc_room_vis_exact(Character * ch, const char *name);
-          Character *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
+          auto bard = get_pc_room_vis_exact(i, af->caster);
           if (!bard || !ARE_GROUPED(i, bard))
           {
             i->sendln("Away from the music, the effect weakens...");
@@ -1032,7 +1026,7 @@ void affect_update(int32_t duration_type)
 }
 
 // Sets any ISR's that go with a spell..  (ISR's arent saved)
-void isr_set(Character *ch)
+void isr_set(CharacterPtr ch)
 {
   // char buf[100];
   static affected_type *afisr;
@@ -1044,7 +1038,7 @@ void isr_set(Character *ch)
   }
 
   /*  why do we need this spamming the logs?
-     sprintf(buf, "isr_set ch %s", GET_NAME(ch));
+     sprintf(buf, "isr_set ch %s", qPrintable(ch->name()));
      logentry(buf, 0, DC::LogChannel::LOG_BUG);
   */
   for (afisr = ch->affected; afisr; afisr = afisr->next)
@@ -1056,7 +1050,7 @@ void isr_set(Character *ch)
   }
 }
 
-bool many_charms(Character *ch)
+bool many_charms(CharacterPtr ch)
 {
   follow_type *k;
   for (k = ch->followers; k; k = k->next)
@@ -1068,9 +1062,9 @@ bool many_charms(Character *ch)
   return false;
 }
 /* Stop the familiar without a master floods*/
-void extractFamiliar(Character *ch)
+void extractFamiliar(CharacterPtr ch)
 {
-  Character *victim = nullptr;
+  CharacterPtr victim = {};
   for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
@@ -1085,12 +1079,12 @@ void extractFamiliar(Character *ch)
   extract_char(victim, true);
 }
 
-bool any_charms(Character *ch)
+bool any_charms(CharacterPtr ch)
 {
   return many_charms(ch);
   /*
     follow_type *k;
-    int counter = 0;
+    qint32 counter = {};
 
     for(k = ch->followers; k; k = k->next) {
        if(IS_AFFECTED(k->follower, AFF_CHARM))
@@ -1106,9 +1100,9 @@ bool any_charms(Character *ch)
 
 // check if making ch follow victim will create an illegal
 // follow "Loop/circle"
-bool circle_follow(Character *ch, Character *victim)
+bool circle_follow(CharacterPtr ch, CharacterPtr victim)
 {
-  Character *k;
+  CharacterPtr k;
 
   for (k = victim; k; k = k->master)
   {
@@ -1121,7 +1115,7 @@ bool circle_follow(Character *ch, Character *victim)
 
 // Called when stop following persons, or stopping charm
 // This will NOT do if a character quits/dies!!
-void stop_follower(Character *ch, follower_reasons_t reason)
+void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 {
   follow_type *j, *k;
 
@@ -1191,7 +1185,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
   { /* Head of follower-list? */
     k = ch->master->followers;
     ch->master->followers = k->next;
-    dc_free(k);
+    k = {};
   }
   else
   { /* locate follower who is not head of list */
@@ -1202,11 +1196,11 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 
       j = k->next;
       k->next = j->next;
-      dc_free(j);
+      j = {};
     }
   }
 
-  ch->master = 0;
+  ch->master = {};
 
   /* do this after setting master to nullptr, to prevent endless loop */
   /* between affect_remove() and stop_follower()                   */
@@ -1220,10 +1214,10 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 }
 
 /* Called when a character that follows/is followed dies */
-void die_follower(Character *ch)
+void die_follower(CharacterPtr ch)
 {
   follow_type *j, *k;
-  Character *zombie;
+  CharacterPtr zombie;
 
   if (ch->master)
     stop_follower(ch);
@@ -1238,7 +1232,7 @@ void die_follower(Character *ch)
         affect_from_char(zombie, SPELL_CHARM_PERSON);
       stop_follower(zombie);
     }
-    if (GET_RACE(zombie) == RACE_UNDEAD)
+    if (zombie->race == RACE_UNDEAD)
     {
       send_to_char("The forces holding you together are gone.  You cease "
                    "to exist.",
@@ -1254,7 +1248,7 @@ void die_follower(Character *ch)
 
 /* Do NOT call ths before having checked if a circle of followers */
 /* will arise. CH will follow leader                               */
-void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
+void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reason)
 {
   follow_type *k;
 
@@ -1265,11 +1259,7 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
 
   ch->master = leader;
 
-#ifdef LEAK_CHECK
-  k = (follow_type *)calloc(1, sizeof(follow_type));
-#else
-  k = (follow_type *)dc_alloc(1, sizeof(follow_type));
-#endif
+  auto k = new follow_type;
 
   k->follower = ch;
   k->next = leader->followers;
@@ -1287,13 +1277,13 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
   }
 }
 
-int say_spell(Character *ch, int si, int room)
+qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
 {
   char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
   char buf2[MAX_STRING_LENGTH];
 
-  int j, offs, retval = 0;
-  Character *temp_char;
+  qint32 j, offs, retval = {};
+  CharacterPtr temp_char;
 
   class syllable
   {
@@ -1356,11 +1346,11 @@ int say_spell(Character *ch, int si, int room)
   strcpy(buf, "");
   strcpy(splwd, spells[si - 1]);
 
-  offs = 0;
+  offs = {};
 
   while (*(splwd + offs))
   {
-    for (j = 0; *(syls[j].org); j++)
+    for (j = {}; *(syls[j].org); j++)
       if (strncmp(syls[j].org, splwd + offs, strlen(syls[j].org)) == 0)
       {
         strcat(buf, syls[j].new_new);
@@ -1374,7 +1364,7 @@ int say_spell(Character *ch, int si, int room)
   sprintf(buf2, "$n utters the words, '%s'", buf);
   sprintf(buf, "$n utters the words, '%s'", spells[si - 1]);
 
-  Character *people;
+  CharacterPtr people;
   if (room > 0)
   {
     people = DC::getInstance()->world[room].people;
@@ -1413,9 +1403,9 @@ int say_spell(Character *ch, int si, int room)
 // returns 0 or positive if saving throw is made. The more, the higher it was made.
 // return -number of failure.   The lower, the more it was failed.
 //
-int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type)
+qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16 save_type)
 {
-  double save = 0;
+  double save = {};
 
   // Gods always succeed saving throws.  We rock!
   if (IS_MINLEVEL_PC(vict, IMMORTAL))
@@ -1464,21 +1454,21 @@ int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_typ
 
   save += number(1, 100);
   spell_base += number(1, 100);
-  return (int)(save - spell_base);
+  return (qint32)(save - spell_base);
 }
 
-char *skip_spaces(char *string)
+const char *skip_spaces(const char *s)
 {
-  for (; *string && (*string) == ' '; string++)
+  for (; *s && (*s) == ' '; s++)
     ;
 
-  return (string);
+  return s;
 }
 
 /*
     Release command.
 */
-int do_release(Character *ch, char *argument, cmd_t cmd)
+qint32 do_release(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type *aff, *aff_next;
   bool printed = false;
@@ -1533,7 +1523,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
         continue;
       if (get_skill_name(aff->type).isEmpty())
         continue;
-      if (QString(argument) != "all" && str_prefix(argument, get_skill_name(aff->type).toStdString().c_str()))
+      if (QString(argument) != "all" && str_prefix(argument, qPrintable(get_skill_name(aff->type))))
         continue;
 
       if (ch->getMove() < 25)
@@ -1554,7 +1544,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
       ch->decrementMove(25);
       ch->sendln(QStringLiteral("You release the spell effect '%1'.").arg(get_skill_name(aff->type)));
       char buffer[255];
-      int aftype = aff->type;
+      qint32 aftype = aff->type;
 
       if (*spell_wear_off_msg[aff->type])
       {
@@ -1574,22 +1564,22 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int skill_value(Character *ch, int skillnum, int min = 33)
+qint32 skill_value(CharacterPtr ch, qint32 skillnum, qint32 min = 33)
 {
   if (ch->skills.contains(skillnum))
   {
-    return MAX(min, (int)ch->skills[skillnum].learned);
+    return MAX(min, (qint32)ch->skills[skillnum].learned);
   }
 
   return 0;
 }
 
-int stat_mod[] = {
+qint32 stat_mod[] = {
     0, -5, -5, -4, -4, -3, -3, -2, -2, -1, -1,
     0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7,
     7, 8, 9, 10};
 
-int get_difficulty(int skillnum)
+qint32 get_difficulty(qint32 skillnum)
 {
 
   if (skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
@@ -1602,12 +1592,12 @@ int get_difficulty(int skillnum)
   return 0;
 }
 
-bool Character::skill_success(Character *victim, int skillnum, int mod)
+bool Character::skill_success(CharacterPtr victim, qint32 skillnum, qint32 mod)
 {
-  //  extern int stat_mod[];
-  //  int modifier = 0;
-  // class_skill_defines *t;
-  attribute_t stat{};
+  //  extern qint32 stat_mod[];
+  //  qint32 modifier = {};
+  // CharacterClassSkill *t;
+  attribute_t stat = {};
 
   switch (skillnum)
   {
@@ -1691,7 +1681,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
     stat = attribute_t::CONSTITUTION;
     break;
   }
-  int i = 0, learned = 0;
+  qint32 i = 0, learned = {};
 
   if (!isNonPlayer())
   {
@@ -1741,8 +1731,8 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
        (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET + MAX_KI_LIST))))
     i = 101; // auto success on songs and ki with focus
 
-  int a = get_difficulty(skillnum);
-  /*  int o = ch->getLevel()*2+1;
+  qint32 a = get_difficulty(skillnum);
+  /*  qint32 o = ch->getLevel()*2+1;
     if (o > 101 || ch->isNonPlayer()) o = 101;
     if (i > o) o = i+1;
   */
@@ -1762,27 +1752,26 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   }
 }
 
-bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
+bool skill_success(CharacterPtr ch, CharacterPtr victim, qint32 skillnum, qint32 mod)
 {
   return ch->skill_success(victim, skillnum, mod);
 }
 
-void set_conc_loss(Character *ch, int spl)
+void set_conc_loss(CharacterPtr ch, qint32 spl)
 {
   affected_type af;
   af.type = CONC_LOSS_FIXER;
   af.duration = 1;
   af.modifier = spl;
-  af.location = 0;
+  af.location = {};
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
-  return;
 }
-bool check_conc_loss(Character *ch, int spl)
+bool check_conc_loss(CharacterPtr ch, qint32 spl)
 {
   affected_type *af;
-  int afspl;
+  qint32 afspl;
   if (!(af = ch->affected_by_spell(CONC_LOSS_FIXER)))
     return false;
 
@@ -1797,12 +1786,12 @@ bool check_conc_loss(Character *ch, int spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-int do_cast(Character *ch, char *argument, cmd_t cmd)
+qint32 do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  class Object *tar_obj;
-  Character *tar_char;
+  ObjectPtr tar_obj;
+  CharacterPtr tar_char;
   char name[MAX_STRING_LENGTH], filter[MAX_STRING_LENGTH];
-  int qend, spl, i, learned;
+  qint32 qend, spl, i, learned;
   bool target_ok;
 
   //  if (ch->isNonPlayer())
@@ -1821,7 +1810,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -1967,11 +1956,11 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
       /* **************** Locate targets **************** */
 
       target_ok = false;
-      tar_char = 0;
-      tar_obj = 0;
+      tar_char = {};
+      tar_obj = {};
       bool ok_self = false;
-      int oldroom = 0;
-      int dir = -1;
+      qint32 oldroom = {};
+      qint32 dir = -1;
       bool group_spell = false;
       if (spl == SPELL_LIGHTNING_BOLT && ch->has_skill(SKILL_SPELLCRAFT) && cmd != cmd_t::FILTER)
       { // Oh the special cases of spellcraft.
@@ -1983,7 +1972,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           *argument = LOWER(*(argument + strlen(name) + 1));
 
           if (*argument == 'n')
-            dir = 0;
+            dir = {};
           else if (*argument == 'e')
             dir = 1;
           else if (*argument == 's')
@@ -2014,7 +2003,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             ch->sendln("You cannot concentrate enough to fire a bolt of lightning into another room!");
             return ReturnValue::eFAILURE;
           }
-          int new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
+          qint32 new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
           if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE) || isSet(DC::getInstance()->world[new_room].room_flags, NO_MAGIC))
           {
             ch->sendln("That room is protected from this harmful magic.");
@@ -2075,7 +2064,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
       {
         argument = skip_spaces(argument);
 
-        for (int64_t i = 0; i < MAX_SPL_LIST; i++)
+        for (qint64 i = {}; i < MAX_SPL_LIST; i++)
         {
           if (!strcmp(spells[i], argument))
           {
@@ -2092,9 +2081,9 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           return ReturnValue::eFAILURE;
         }
       } // end spell immunity
-      int fil = 0;
+      qint32 fil = {};
       float rel = 1;
-      int fillvl = ch->has_skill(SKILL_ELEMENTAL_FILTER);
+      qint32 fillvl = ch->has_skill(SKILL_ELEMENTAL_FILTER);
       if (cmd == cmd_t::FILTER && fillvl)
       {
         if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM ||
@@ -2131,7 +2120,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               else if (fil == FILTER_COLD && fillvl > 90)
                 rel = 1.75;
               else
-                fil = 0;
+                fil = {};
             }
             else if (spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM)
             {
@@ -2142,7 +2131,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               else if (fil == FILTER_ENERGY && fillvl > 90)
                 rel = 1.75;
               else
-                fil = 0;
+                fil = {};
             }
             else if (spl == SPELL_LIGHTNING_BOLT)
             {
@@ -2153,7 +2142,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               else if (fil == FILTER_MAGIC && fillvl > 90)
                 rel = 1.75;
               else
-                fil = 0;
+                fil = {};
             }
             else if (spl == SPELL_CHILL_TOUCH)
             {
@@ -2164,7 +2153,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               else if (fil == FILTER_FIRE && fillvl > 90)
                 rel = 1.75;
               else
-                fil = 0;
+                fil = {};
             }
           }
           else
@@ -2230,8 +2219,8 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
 
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_EQUIP))
           {
-            for (i = 0; i < MAX_WEAR && !target_ok; i++)
-              if (ch->equipment[i] && ch->equipment[i]->Name() == name)
+            for (i = {}; i < MAX_WEAR && !target_ok; i++)
+              if (ch->equipment[i] && ch->equipment[i]->name() == name)
               {
                 tar_obj = ch->equipment[i];
                 target_ok = true;
@@ -2239,7 +2228,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           }
 
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_SELF_ONLY))
-            if (str_cmp(GET_NAME(ch), name) == 0)
+            if (str_cmp(qPrintable(ch->name()), name) == 0)
             {
               tar_char = ch;
               target_ok = true;
@@ -2281,7 +2270,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         target_ok = true; /* No target, is a good target */
       }
 
-      quint64 mana_cost{};
+      quint64 mana_cost = {};
       if (!target_ok)
       {
         if (*name)
@@ -2360,7 +2349,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         }
       }
 
-      int retval = 0;
+      qint32 retval = {};
       if (spl != SPELL_VENTRILOQUATE)
       { /* :-) */
         retval = say_spell(ch, spl, oldroom);
@@ -2380,13 +2369,13 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
       if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL))
         WAIT_STATE(ch, spell_info[spl].beats());
       else
-        WAIT_STATE(ch, (int)(spell_info[spl].beats() / 1.5));
+        WAIT_STATE(ch, (qint32)(spell_info[spl].beats() / 1.5));
 
       if ((spell_info[spl].spell_pointer() == 0 && spell_info[spl].spell_pointer2() == 0) && spl > 0)
         ch->sendln("Sorry, this magic has not yet been implemented :(");
       else
       {
-        int chance = 50;
+        qint32 chance = 50;
 
         if (ch->isNonPlayer())
         {
@@ -2400,7 +2389,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         else
           chance += wis_app[GET_WIS(ch)].conc_bonus;
 
-        if (GET_RACE(ch) == RACE_HUMAN)
+        if (ch->race == RACE_HUMAN)
           chance = MIN(95, chance);
         else
           chance = MIN(97, chance);
@@ -2417,7 +2406,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         if (!ch->isImmortalPlayer() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
-          csendf(ch, "You lost your concentration and are unable to cast %s!\r\n", spells[spl - 1]);
+          ch->send(QStringLiteral("You lost your concentration and are unable to cast %s!\r\n").arg(spells[spl - 1]));
           if (rel > 1)
           {
             ch->sendln("The failed elemental filter drains you of additional mana.");
@@ -2444,14 +2433,14 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
 
         if (group_spell)
         {
-          Character *leader;
+          CharacterPtr leader;
           if (ch->master)
             leader = ch->master;
           else
             leader = ch;
 
           follow_type *k;
-          int counter = 0;
+          qint32 counter = {};
 
           for (k = leader->followers; k; k = k->next)
             if (k->follower->in_room == ch->in_room)
@@ -2485,10 +2474,10 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         if (tar_char && tar_char != ch && ch->isPlayer() && tar_char->isPlayer() && tar_char->desc && ch->desc)
         {
           /*
-          if (!strcmp(tar_char->desc->getPeerOriginalAddress().toString().toStdString().c_str(), ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()))
+          if (!strcmp(tar_char->desc->getPeerOriginalAddress().toString(qPrintable()), ch->desc->getPeerOriginalAddress().toString(qPrintable())))
           {
-            sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
-                    get_skill_name(spl), GET_NAME(tar_char));
+            sprintf(log_buf, "Multi: %s casted '%s' on %s", qPrintable(ch->name()),
+                    get_skill_name(spl), qPrintable(tar_char->name()));
             logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
           }*/
 
@@ -2501,22 +2490,22 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
-                   GET_NAME(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
+                   qPrintable(ch->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
               return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
-                   GET_NAME(ch->fighting), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", qPrintable(ch->name()),
+                   qPrintable(ch->fighting->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
               return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
-                   get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", qPrintable(ch->name()),
+                   get_skill_name(qPrintable(spl)), qPrintable(tar_char->name()), qPrintable(tar_char->fighting->name()));
               return ReturnValue::eFAILURE;
             }
           }
@@ -2529,7 +2518,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
-                   GET_NAME(ch), get_clan_name(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), get_clan_name(tar_char));
+                   qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
 
@@ -2537,20 +2526,20 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
-                   GET_NAME(ch), get_clan_name(ch),
-                   GET_NAME(ch->fighting), get_clan_name(ch->fighting),
-                   get_skill_name(spl).toStdString().c_str(),
-                   GET_NAME(tar_char), get_clan_name(tar_char));
+                   qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
+                   qPrintable(ch->fighting->name()), get_clan_name(ch->fighting),
+                   get_skill_name(qPrintable(spl)),
+                   qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
-                   GET_NAME(ch), get_clan_name(ch),
-                   get_skill_name(spl).toStdString().c_str(),
-                   GET_NAME(tar_char), get_clan_name(tar_char),
-                   GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
+                   qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
+                   get_skill_name(qPrintable(spl)),
+                   qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)),
+                   qPrintable(tar_char->fighting->name()), get_clan_name(tar_char->fighting));
               return ReturnValue::eFAILURE;
             }
           }
@@ -2586,14 +2575,14 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           }
         }
 
-        uint8_t level = ch->getLevel();
-        char *argument_ptr = nullptr;
+        quint8 level = ch->getLevel();
+        char *argument_ptr = {};
 
         if (group_spell)
         {
           ch->sendln("You utter a swift prayer to the gods to amplify your powers.");
           act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
-          argument = strdup("communegroupspell");
+          argument = QStringLiteral("communegroupspell");
           argument_ptr = argument;
         }
         else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY) && tar_char->affected_by_spell(SPELL_IMMUNITY)->modifier == spl - 1)
@@ -2608,32 +2597,32 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           switch (fil)
           {
           case FILTER_FIRE:
-            csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\r\n", spells[spl - 1]);
+            ch->send(QStringLiteral("Upon casting, your %s filters through a $B$4blast of flame$R!\r\n").arg(spells[spl - 1]));
             act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_FIRE - TYPE_HIT;
             break;
           case FILTER_ACID:
-            csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\r\n", spells[spl - 1]);
+            ch->send(QStringLiteral("Upon casting, your %s filters through $B$2sizzling acid$R!\r\n").arg(spells[spl - 1]));
             act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_ACID - TYPE_HIT;
             break;
           case FILTER_COLD:
-            csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\r\n", spells[spl - 1]);
+            ch->send(QStringLiteral("Upon casting, your %s filters through $B$3shards of ice$R!\r\n").arg(spells[spl - 1]));
             act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_COLD - TYPE_HIT;
             break;
           case FILTER_ENERGY:
-            csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\r\n", spells[spl - 1]);
+            ch->send(QStringLiteral("Upon casting, your %s filters through $B$5crackling energy$R!\r\n").arg(spells[spl - 1]));
             act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_ENERGY - TYPE_HIT;
             break;
           case FILTER_MAGIC:
-            csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\r\n", spells[spl - 1]);
+            ch->send(QStringLiteral("Upon casting, your %s filters through a $B$7burst of magic$R!\r\n").arg(spells[spl - 1]));
             act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_MAGIC - TYPE_HIT;
             break;
           case FILTER_POISON:
-            csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\r\n", spells[spl - 1]);
+            ch->send(QStringLiteral("Upon casting, your %s filters through $2poisonous fumes$R!\r\n").arg(spells[spl - 1]));
             act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_POISON - TYPE_HIT;
             break;
@@ -2644,9 +2633,9 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         }
 
         if (spell_info[spl].spell_pointer())
-          int retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+          qint32 retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
         else if (spell_info[spl].spell_pointer2())
-          int retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
+          qint32 retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
         if (argument_ptr != nullptr)
         {
           free(argument_ptr);
@@ -2656,7 +2645,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         {
           char_from_room(ch);
           char_to_room(ch, oldroom);
-          WAIT_STATE(ch, (int)(spell_info[spl].beats()));
+          WAIT_STATE(ch, (qint32)(spell_info[spl].beats()));
 
           if (spl == SPELL_LIGHTNING_BOLT)
           {
@@ -2699,31 +2688,31 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_skills(Character *ch, char *arg, cmd_t cmd)
+qint32 do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
-  int mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
+  qint32 mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 
-  for (int i = SKILL_BASE; i <= SKILL_MAX; i++)
+  for (qint32 i = SKILL_BASE; i <= SKILL_MAX; i++)
   {
-    mage = 0;
-    cleric = 0;
-    thief = 0;
-    warrior = 0;
-    anti = 0;
-    pal = 0;
-    barb = 0;
-    monk = 0;
-    ranger = 0;
-    bard = 0;
-    druid = 0;
+    mage = {};
+    cleric = {};
+    thief = {};
+    warrior = {};
+    anti = {};
+    pal = {};
+    barb = {};
+    monk = {};
+    ranger = {};
+    bard = {};
+    druid = {};
     buf2[0] = '\0';
-    for (int j = 0; m_skills[j].skillnum; j++)
+    for (qint32 j = {}; m_skills[j].skillnum; j++)
     {
       if (m_skills[j].skillnum == i)
       {
@@ -2732,7 +2721,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; c_skills[j].skillnum; j++)
+    for (qint32 j = {}; c_skills[j].skillnum; j++)
     {
       if (c_skills[j].skillnum == i)
       {
@@ -2744,7 +2733,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; t_skills[j].skillnum; j++)
+    for (qint32 j = {}; t_skills[j].skillnum; j++)
     {
       if (t_skills[j].skillnum == i)
       {
@@ -2756,7 +2745,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; w_skills[j].skillnum; j++)
+    for (qint32 j = {}; w_skills[j].skillnum; j++)
     {
       if (w_skills[j].skillnum == i)
       {
@@ -2768,7 +2757,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; a_skills[j].skillnum; j++)
+    for (qint32 j = {}; a_skills[j].skillnum; j++)
     {
       if (a_skills[j].skillnum == i)
       {
@@ -2780,7 +2769,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; p_skills[j].skillnum; j++)
+    for (qint32 j = {}; p_skills[j].skillnum; j++)
     {
       if (p_skills[j].skillnum == i)
       {
@@ -2792,7 +2781,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; b_skills[j].skillnum; j++)
+    for (qint32 j = {}; b_skills[j].skillnum; j++)
     {
       if (b_skills[j].skillnum == i)
       {
@@ -2804,7 +2793,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; k_skills[j].skillnum; j++)
+    for (qint32 j = {}; k_skills[j].skillnum; j++)
     {
       if (k_skills[j].skillnum == i)
       {
@@ -2816,7 +2805,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; r_skills[j].skillnum; j++)
+    for (qint32 j = {}; r_skills[j].skillnum; j++)
     {
       if (r_skills[j].skillnum == i)
       {
@@ -2828,7 +2817,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; d_skills[j].skillnum; j++)
+    for (qint32 j = {}; d_skills[j].skillnum; j++)
     {
       if (d_skills[j].skillnum == i)
       {
@@ -2840,7 +2829,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; u_skills[j].skillnum; j++)
+    for (qint32 j = {}; u_skills[j].skillnum; j++)
     {
       if (u_skills[j].skillnum == i)
       {
@@ -2920,7 +2909,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_songs(Character *ch, char *arg, cmd_t cmd)
+qint32 do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf[16384];
 
@@ -2929,7 +2918,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
 
   buf[0] = '\0';
 
-  for (int i = 0; d_skills[i].skillnum; i++)
+  for (qint32 i = {}; d_skills[i].skillnum; i++)
   {
     if (d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX)
     {
@@ -2947,27 +2936,27 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_spells(Character *ch, char *arg, cmd_t cmd)
+qint32 do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
-  int mage, cleric, anti, pal, ranger, druid;
+  qint32 mage, cleric, anti, pal, ranger, druid;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 
-  for (int i = 0; i <= MAX_SPL_LIST; i++)
+  for (qint32 i = {}; i <= MAX_SPL_LIST; i++)
   {
-    mage = 0;
-    cleric = 0;
-    anti = 0;
-    pal = 0;
-    ranger = 0;
-    druid = 0;
+    mage = {};
+    cleric = {};
+    anti = {};
+    pal = {};
+    ranger = {};
+    druid = {};
     buf2[0] = '\0';
-    for (int j = 0; m_skills[j].skillnum; j++)
+    for (qint32 j = {}; m_skills[j].skillnum; j++)
     {
       if (m_skills[j].skillnum == i)
       {
@@ -2976,7 +2965,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; c_skills[j].skillnum; j++)
+    for (qint32 j = {}; c_skills[j].skillnum; j++)
     {
       if (c_skills[j].skillnum == i)
       {
@@ -2988,7 +2977,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; a_skills[j].skillnum; j++)
+    for (qint32 j = {}; a_skills[j].skillnum; j++)
     {
       if (a_skills[j].skillnum == i)
       {
@@ -3000,7 +2989,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; p_skills[j].skillnum; j++)
+    for (qint32 j = {}; p_skills[j].skillnum; j++)
     {
       if (p_skills[j].skillnum == i)
       {
@@ -3012,7 +3001,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; r_skills[j].skillnum; j++)
+    for (qint32 j = {}; r_skills[j].skillnum; j++)
     {
       if (r_skills[j].skillnum == i)
       {
@@ -3024,7 +3013,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         break;
       }
     }
-    for (int j = 0; u_skills[j].skillnum; j++)
+    for (qint32 j = {}; u_skills[j].skillnum; j++)
     {
       if (u_skills[j].skillnum == i)
       {
@@ -3079,7 +3068,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int spl_lvl(int lev)
+qint32 spl_lvl(qint32 lev)
 {
   if (lev >= MIN_GOD)
     return 0;
@@ -3089,10 +3078,10 @@ int spl_lvl(int lev)
 // search through a character's list to see if they have a particular skill
 // if so, return their level of knowledge
 // if not, return 0
-int Character::has_skill(skill_t skill)
+qint32 Character::has_skill(skill_t skill)
 {
-  class Object *o;
-  int bonus = 0;
+  ObjectPtr o;
+  qint32 bonus = {};
 
   if (isNonPlayer() || !isPlayer())
     return 0;
@@ -3102,13 +3091,13 @@ int Character::has_skill(skill_t skill)
 
   if (affected_by_spell(SPELL_VILLAINY) && (skill == SPELL_VILLAINY))
   {
-    bonus = 0;
+    bonus = {};
   }
   else if (affected_by_spell(SPELL_VILLAINY))
     bonus += affected_by_spell(SPELL_VILLAINY)->modifier / 5;
   if (affected_by_spell(SPELL_HEROISM) && (skill == SPELL_HEROISM))
   {
-    bonus = 0;
+    bonus = {};
   }
   else if (affected_by_spell(SPELL_HEROISM))
     bonus += affected_by_spell(SPELL_HEROISM)->modifier / 5;
@@ -3119,24 +3108,24 @@ int Character::has_skill(skill_t skill)
 
     for (o = this->player->skillchange; o; o = o->next_skill)
     {
-      int a;
-      for (a = 0; a < o->num_affects; a++)
+      qint32 a;
+      for (a = {}; a < o->num_affects; a++)
       {
         if (o->affected[a].location == skill * 1000)
         {
           bonus += o->affected[a].modifier;
-          if ((int)curr.learned + bonus > 150)
+          if ((qint32)curr.learned + bonus > 150)
             bonus = 150 - curr.learned;
         }
       }
     }
-    return ((int)curr.learned) + bonus;
+    return ((qint32)curr.learned) + bonus;
   }
 
   return 0;
 }
 
-int has_skill(Character *ch, skill_t skill)
+qint32 has_skill(CharacterPtr ch, skill_t skill)
 {
   return ch->has_skill(skill);
 }

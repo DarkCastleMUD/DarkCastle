@@ -2,21 +2,14 @@
 | Level 107 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "DC/wizard.h"
+#include "DC/DC.h"
+
 #include "DC/interp.h"
-#include "DC/utility.h"
 
-#include "DC/player.h"
-#include "DC/mobile.h"
-#include "DC/connect.h"
-#include "DC/handler.h"
-#include "DC/returnvals.h"
-#include "DC/spells.h"
-
-int do_archive(Character *ch, char *argument, cmd_t cmd)
+qint32 do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[50];
-  Character *victim;
+  CharacterPtr victim;
 
   argument = one_argument(argument, name);
 
@@ -41,7 +34,7 @@ int do_archive(Character *ch, char *argument, cmd_t cmd)
   send_to_char("Suddenly someone reaches down and packs you into a "
                "little ball.\r\n",
                victim);
-  csendf(victim, "You have been archived by %s.  Goodbye.\r\n", GET_NAME(ch));
+  victim->send(QStringLiteral("You have been archived by %s.  Goodbye.\r\n").arg(qPrintable(ch->name())));
   act("$N is grabbed up and packed into a small ball by $n.", ch, 0,
       victim, TO_ROOM, 0);
   do_quit(victim, "", cmd_t::SAVE_SILENTLY);
@@ -50,7 +43,7 @@ int do_archive(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_unarchive(Character *ch, char *argument, cmd_t cmd)
+qint32 do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[50];
   argument = one_argument(argument, name);
@@ -82,7 +75,7 @@ command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
 
   if (!this->desc)
     return ReturnValue::eFAILURE;
@@ -115,10 +108,10 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
     this->sendln("(You can only snoop a link-active pc.)");
     return ReturnValue::eFAILURE;
   }
-  if ((victim->getLevel() > this->getLevel()) && (GET_NAME(this) != victim->getNameC()))
+  if ((victim->getLevel() > this->getLevel()) && (qPrintable(this->name()) != qPrintable(victim->name())))
   {
     this->sendln("Can't do that. That mob is higher than you!");
-    logentry(QStringLiteral("%1 tried to snoop a higher mob\r\n").arg(GET_NAME(this)), OVERSEER, DC::LogChannel::LOG_GOD);
+    logentry(QStringLiteral("%1 tried to snoop a higher mob\r\n").arg(qPrintable(this->name())), OVERSEER, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
 
@@ -127,17 +120,17 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
     this->sendln("Ok, you just snoop yourself.");
     if (this->desc->snooping)
     {
-      this->desc->snooping->snoop_by = 0;
-      this->desc->snooping = 0;
+      this->desc->snooping->snoop_by = {};
+      this->desc->snooping = {};
     }
-    logentry(QStringLiteral("%1 snoops themself.").arg(getName()), this->getLevel(), DC::LogChannel::LOG_GOD);
+    logentry(QStringLiteral("%1 snoops themself.").arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
     return ReturnValue::eSUCCESS;
   }
 
   if (victim->getLevel() == IMPLEMENTER)
   {
     sendln("What are you!? Crazy! You can't snoop an Imp.");
-    victim->sendln(QStringLiteral("%1 failed snooping you.").arg(getName()));
+    victim->sendln(QStringLiteral("%1 failed snooping you.").arg(name()));
     return ReturnValue::eFAILURE;
   }
 
@@ -145,7 +138,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   {
     if (victim->desc->snoop_by->character)
     {
-      sendln(QStringLiteral("%1 is snooping them already.").arg(victim->desc->snoop_by->character->getName()));
+      sendln(QStringLiteral("%1 is snooping them already.").arg(victim->desc->snoop_by->character->name()));
     }
     else
     {
@@ -160,15 +153,15 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   sendln("Ok.");
 
   if (this->desc->snooping)
-    this->desc->snooping->snoop_by = nullptr;
+    this->desc->snooping->snoop_by = {};
 
   this->desc->snooping = victim->desc;
   victim->desc->snoop_by = this->desc;
-  logentry(QStringLiteral("%1 snoops %2.").arg(getName()).arg(victim->getName()), getLevel(), DC::LogChannel::LOG_GOD);
+  logentry(QStringLiteral("%1 snoops %2.").arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
-int do_stealth(Character *ch, char *argument, cmd_t cmd)
+qint32 do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -191,10 +184,10 @@ int do_stealth(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_send(Character *ch, char *argument, cmd_t cmd)
+qint32 do_send(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
-  Character *vict;
+  CharacterPtr vict;
   char name[100], message[200], buf[350];
 
   half_chop(argument, name, message);
@@ -219,7 +212,7 @@ int do_send(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You send '%s' to %s.\r\n", message, GET_NAME(vict));
+  sprintf(buf, "You send '%s' to %s.\r\n", message, qPrintable(vict->name()));
   ch->send(buf);
   sprintf(buf, "%s\r\n", message);
   vict->send(buf);

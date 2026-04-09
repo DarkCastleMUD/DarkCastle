@@ -5,60 +5,15 @@
  *      Author: jhhudso
  */
 
-#include <cstring>
-#include <sstream>
-
-#include "DC/Leaderboard.h"
-#include "DC/utility.h"
+#include "DC/DC.h"
 #include "DC/structs.h"
-#include "DC/connect.h"
-#include "DC/db.h"
 #include "DC/interp.h"
-#include "DC/returnvals.h"
-#include "DC/memory.h"
-
-Leaderboard::Leaderboard()
-{
-  memset(hpactivename, 0, 5 * sizeof(char *));
-  memset(mnactivename, 0, 5 * sizeof(char *));
-  memset(kiactivename, 0, 5 * sizeof(char *));
-  memset(pkactivename, 0, 5 * sizeof(char *));
-  memset(pdactivename, 0, 5 * sizeof(char *));
-  memset(rdactivename, 0, 5 * sizeof(char *));
-  memset(mvactivename, 0, 5 * sizeof(char *));
-  memset(&hpactive, 0, 5 * sizeof(int));
-  memset(&mnactive, 0, 5 * sizeof(int));
-  memset(&kiactive, 0, 5 * sizeof(int));
-  memset(&pkactive, 0, 5 * sizeof(int));
-  memset(&pdactive, 0, 5 * sizeof(int));
-  memset(&rdactive, 0, 5 * sizeof(int));
-  memset(&mvactive, 0, 5 * sizeof(int));
-  memset(hpactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char *));
-  memset(mnactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char *));
-  memset(kiactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char *));
-  memset(pkactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char *));
-  memset(pdactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char *));
-  memset(rdactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char *));
-  memset(mvactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char *));
-  memset(hpactiveclass, 0, (CLASS_MAX - 2) * 5 * sizeof(int));
-  memset(mnactiveclass, 0, (CLASS_MAX - 2) * 5 * sizeof(int));
-  memset(kiactiveclass, 0, (CLASS_MAX - 2) * 5 * sizeof(int));
-  memset(pkactiveclass, 0, (CLASS_MAX - 2) * 5 * sizeof(int));
-  memset(pdactiveclass, 0, (CLASS_MAX - 2) * 5 * sizeof(int));
-  memset(rdactiveclass, 0, (CLASS_MAX - 2) * 5 * sizeof(int));
-  memset(mvactiveclass, 0, (CLASS_MAX - 2) * 5 * sizeof(int));
-}
-
-Leaderboard::~Leaderboard()
-{
-  // TODO Auto-generated destructor stub
-}
+#include <cstring>
 
 void Leaderboard::check(void)
 {
   // check online players to the file and make sure the file is up to date
-  class Connection *d;
-  int i, j, k;
+  qint32 i, j, k;
 
   DC::getInstance()->currentType("leaderboard");
   DC::getInstance()->currentName("NA");
@@ -66,439 +21,368 @@ void Leaderboard::check(void)
 
   read_file();
 
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto &d : DC::getInstance()->connections_)
   {
-    if (!d->character || d->character->getLevel() >= IMMORTAL || d->character->isNonPlayer())
+    if (!conn->character || conn->character->getLevel() >= IMMORTAL || conn->character->isNonPlayer())
       continue;
-    if (!d->connected == Connection::states::PLAYING)
+    if (!conn->connected == Connection::states::PLAYING)
       continue;
-    if (!d->character->player)
+    if (!conn->character->player)
       continue;
 
-    k = MIN(CLASS_DRUID - 1, GET_CLASS(d->character) - 1);
+    k = MIN(CLASS_DRUID - 1, GET_CLASS(conn->character) - 1);
 
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (hpactivename[i] && !strcmp(hpactivename[i], GET_NAME(d->character)))
+      if (hpactivename[i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           hpactive[j] = hpactive[j + 1];
-          dc_free(hpactivename[j]);
-          hpactivename[j] = str_dup0(hpactivename[j + 1]);
+          hpactivename[j] = hpactivename[j + 1];
         }
-        hpactive[4] = 0;
-        dc_free(hpactivename[4]);
-        hpactivename[4] = str_dup(" ");
+        hpactive[4] = {};
+        hpactivename[4] = " ";
       }
-      if (mnactivename[i] && !strcmp(mnactivename[i], GET_NAME(d->character)))
+      if (mnactivename[i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           mnactive[j] = mnactive[j + 1];
-          dc_free(mnactivename[j]);
-          mnactivename[j] = str_dup0(mnactivename[j + 1]);
+          mnactivename[j] = mnactivename[j + 1];
         }
-        mnactive[4] = 0;
-        dc_free(mnactivename[4]);
-        mnactivename[4] = str_dup(" ");
+        mnactive[4] = {};
+        mnactivename[4] = " ";
       }
-      if (kiactivename[i] && !strcmp(kiactivename[i], GET_NAME(d->character)))
+      if (kiactivename[i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           kiactive[j] = kiactive[j + 1];
-          dc_free(kiactivename[j]);
-          kiactivename[j] = str_dup0(kiactivename[j + 1]);
+          kiactivename[j] = kiactivename[j + 1];
         }
-        kiactive[4] = 0;
-        dc_free(kiactivename[4]);
-        kiactivename[4] = str_dup(" ");
+        kiactive[4] = {};
+        kiactivename[4] = " ";
       }
-      if (pkactivename[i] && !strcmp(pkactivename[i], GET_NAME(d->character)))
+      if (pkactivename[i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           pkactive[j] = pkactive[j + 1];
-          dc_free(pkactivename[j]);
-          pkactivename[j] = str_dup0(pkactivename[j + 1]);
+          pkactivename[j] = pkactivename[j + 1];
         }
-        pkactive[4] = 0;
-        dc_free(pkactivename[4]);
-        pkactivename[4] = str_dup(" ");
+        pkactive[4] = {};
+        pkactivename[4] = QStringLiteral(" ");
       }
-      if (pdactivename[i] && !strcmp(pdactivename[i], GET_NAME(d->character)))
+      if (pdactivename[i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           pdactive[j] = pdactive[j + 1];
-          dc_free(pdactivename[j]);
-          pdactivename[j] = str_dup0(pdactivename[j + 1]);
+          pdactivename[j] = pdactivename[j + 1];
         }
-        pdactive[4] = 0;
-        dc_free(pdactivename[4]);
-        pdactivename[4] = str_dup(" ");
+        pdactive[4] = {};
+        pdactivename[4] = QStringLiteral(" ");
       }
-      if (rdactivename[i] && !strcmp(rdactivename[i], GET_NAME(d->character)))
+      if (rdactivename[i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           rdactive[j] = rdactive[j + 1];
-          dc_free(rdactivename[j]);
-          rdactivename[j] = str_dup0(rdactivename[j + 1]);
+          rdactivename[j] = rdactivename[j + 1];
         }
-        rdactive[4] = 0;
-        dc_free(rdactivename[4]);
-        rdactivename[4] = str_dup(" ");
+        rdactive[4] = {};
+        rdactivename[4] = QStringLiteral(" ");
       }
-      if (mvactivename[i] && !strcmp(mvactivename[i], GET_NAME(d->character)))
+      if (mvactivename[i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           mvactive[j] = mvactive[j + 1];
-          dc_free(mvactivename[j]);
-          mvactivename[j] = str_dup0(mvactivename[j + 1]);
+          mvactivename[j] = mvactivename[j + 1];
         }
-        mvactive[4] = 0;
-        dc_free(mvactivename[4]);
-        mvactivename[4] = str_dup(" ");
+        mvactive[4] = {};
+        mvactivename[4] = QStringLiteral(" ");
       }
     }
 
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (hpactiveclassname[k][i] && !strcmp(hpactiveclassname[k][i],
-                                             GET_NAME(d->character)))
+      if (hpactiveclassname[k][i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           hpactiveclass[k][j] = hpactiveclass[k][j + 1];
-          dc_free(hpactiveclassname[k][j]);
-          hpactiveclassname[k][j] = str_dup0(
-              hpactiveclassname[k][j + 1]);
+          hpactiveclassname[k][j] = hpactiveclassname[k][j + 1];
         }
-        hpactiveclass[k][4] = 0;
-        dc_free(hpactiveclassname[k][4]);
-        hpactiveclassname[k][4] = str_dup(" ");
+        hpactiveclass[k][4] = {};
+        hpactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (mnactiveclassname[k][i] && !strcmp(mnactiveclassname[k][i],
-                                             GET_NAME(d->character)))
+      if (mnactiveclassname[k][i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           mnactiveclass[k][j] = mnactiveclass[k][j + 1];
-          dc_free(mnactiveclassname[k][j]);
-          mnactiveclassname[k][j] = str_dup0(
-              mnactiveclassname[k][j + 1]);
+          mnactiveclassname[k][j] = mnactiveclassname[k][j + 1];
         }
-        mnactiveclass[k][4] = 0;
-        dc_free(mnactiveclassname[k][4]);
-        mnactiveclassname[k][4] = str_dup(" ");
+        mnactiveclass[k][4] = {};
+        mnactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (kiactiveclassname[k][i] && !strcmp(kiactiveclassname[k][i],
-                                             GET_NAME(d->character)))
+      if (kiactiveclassname[k][i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           kiactiveclass[k][j] = kiactiveclass[k][j + 1];
-          dc_free(kiactiveclassname[k][j]);
-          kiactiveclassname[k][j] = str_dup0(
-              kiactiveclassname[k][j + 1]);
+          kiactiveclassname[k][j] = kiactiveclassname[k][j + 1];
         }
-        kiactiveclass[k][4] = 0;
-        dc_free(kiactiveclassname[k][4]);
-        kiactiveclassname[k][4] = str_dup(" ");
+        kiactiveclass[k][4] = {};
+        kiactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (pkactiveclassname[k][i] && !strcmp(pkactiveclassname[k][i],
-                                             GET_NAME(d->character)))
+      if (pkactiveclassname[k][i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           pkactiveclass[k][j] = pkactiveclass[k][j + 1];
-          dc_free(pkactiveclassname[k][j]);
-          pkactiveclassname[k][j] = str_dup0(
-              pkactiveclassname[k][j + 1]);
+          pkactiveclassname[k][j] = pkactiveclassname[k][j + 1];
         }
-        pkactiveclass[k][4] = 0;
-        dc_free(pkactiveclassname[k][4]);
-        pkactiveclassname[k][4] = str_dup(" ");
+        pkactiveclass[k][4] = {};
+        pkactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (pdactiveclassname[k][i] && !strcmp(pdactiveclassname[k][i],
-                                             GET_NAME(d->character)))
+      if (pdactiveclassname[k][i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           pdactiveclass[k][j] = pdactiveclass[k][j + 1];
-          dc_free(pdactiveclassname[k][j]);
-          pdactiveclassname[k][j] = str_dup0(
-              pdactiveclassname[k][j + 1]);
+          pdactiveclassname[k][j] = pdactiveclassname[k][j + 1];
         }
-        pdactiveclass[k][4] = 0;
-        dc_free(pdactiveclassname[k][4]);
-        pdactiveclassname[k][4] = str_dup(" ");
+        pdactiveclass[k][4] = {};
+        pdactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (rdactiveclassname[k][i] && !strcmp(rdactiveclassname[k][i],
-                                             GET_NAME(d->character)))
+      if (rdactiveclassname[k][i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           rdactiveclass[k][j] = rdactiveclass[k][j + 1];
-          dc_free(rdactiveclassname[k][j]);
-          rdactiveclassname[k][j] = str_dup0(
-              rdactiveclassname[k][j + 1]);
+          rdactiveclassname[k][j] = rdactiveclassname[k][j + 1];
         }
-        rdactiveclass[k][4] = 0;
-        dc_free(rdactiveclassname[k][4]);
-        rdactiveclassname[k][4] = str_dup(" ");
+        rdactiveclass[k][4] = {};
+        rdactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (mvactiveclassname[k][i] && !strcmp(mvactiveclassname[k][i],
-                                             GET_NAME(d->character)))
+      if (mvactiveclassname[k][i] == conn->character->name())
       {
         for (j = i; j < 4; j++)
         {
           mvactiveclass[k][j] = mvactiveclass[k][j + 1];
-          dc_free(mvactiveclassname[k][j]);
-          mvactiveclassname[k][j] = str_dup0(
-              mvactiveclassname[k][j + 1]);
+          mvactiveclassname[k][j] = mvactiveclassname[k][j + 1];
         }
-        mvactiveclass[k][4] = 0;
-        dc_free(mvactiveclassname[k][4]);
-        mvactiveclassname[k][4] = str_dup(" ");
+        mvactiveclass[k][4] = {};
+        mvactiveclassname[k][4] = QStringLiteral(" ");
       }
     }
 
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_HIT(d->character) > hpactive[i])
+      if (GET_MAX_HIT(conn->character) > hpactive[i])
       {
         for (j = 4; j > i; j--)
         {
           hpactive[j] = hpactive[j - 1];
-          dc_free(hpactivename[j]);
-          hpactivename[j] = str_dup0(hpactivename[j - 1]);
+          hpactivename[j] = hpactivename[j - 1];
         }
-        hpactive[i] = GET_MAX_HIT(d->character);
-        dc_free(hpactivename[i]);
-        hpactivename[i] = str_dup(GET_NAME(d->character));
+        hpactive[i] = GET_MAX_HIT(conn->character);
+        hpactivename[i] = conn->character->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_MANA(d->character) > mnactive[i])
+      if (GET_MAX_MANA(conn->character) > mnactive[i])
       {
         for (j = 4; j > i; j--)
         {
           mnactive[j] = mnactive[j - 1];
-          dc_free(mnactivename[j]);
-          mnactivename[j] = str_dup0(mnactivename[j - 1]);
+          mnactivename[j] = mnactivename[j - 1];
         }
-        mnactive[i] = GET_MAX_MANA(d->character);
-        dc_free(mnactivename[i]);
-        mnactivename[i] = str_dup(GET_NAME(d->character));
+        mnactive[i] = GET_MAX_MANA(conn->character);
+        mnactivename[i] = conn->character->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_KI(d->character) > kiactive[i])
+      if (GET_MAX_KI(conn->character) > kiactive[i])
       {
         for (j = 4; j > i; j--)
         {
           kiactive[j] = kiactive[j - 1];
-          dc_free(kiactivename[j]);
-          kiactivename[j] = str_dup0(kiactivename[j - 1]);
+          kiactivename[j] = kiactivename[j - 1];
         }
-        kiactive[i] = GET_MAX_KI(d->character);
-        dc_free(kiactivename[i]);
-        kiactivename[i] = str_dup(GET_NAME(d->character));
+        kiactive[i] = GET_MAX_KI(conn->character);
+        kiactivename[i] = conn->character->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if ((int)GET_PKILLS(d->character) > pkactive[i])
+      if ((qint32)GET_PKILLS(conn->character) > pkactive[i])
       {
         for (j = 4; j > i; j--)
         {
           pkactive[j] = pkactive[j - 1];
-          dc_free(pkactivename[j]);
-          pkactivename[j] = str_dup0(pkactivename[j - 1]);
+          pkactivename[j] = pkactivename[j - 1];
         }
-        pkactive[i] = (int)GET_PKILLS(d->character);
-        dc_free(pkactivename[i]);
-        pkactivename[i] = str_dup(GET_NAME(d->character));
+        pkactive[i] = (qint32)GET_PKILLS(conn->character);
+        pkactivename[i] = conn->character->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (pdscore(d->character) > pdactive[i])
+      if (pdscore(conn->character) > pdactive[i])
       {
         for (j = 4; j > i; j--)
         {
           pdactive[j] = pdactive[j - 1];
-          dc_free(pdactivename[j]);
-          pdactivename[j] = str_dup0(pdactivename[j - 1]);
+          pdactivename[j] = pdactivename[j - 1];
         }
-        pdactive[i] = pdscore(d->character);
-        dc_free(pdactivename[i]);
-        pdactivename[i] = str_dup(GET_NAME(d->character));
+        pdactive[i] = pdscore(conn->character);
+        pdactivename[i] = conn->character->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (d->character->getLevel() < DC::MAX_MORTAL_LEVEL)
+      if (conn->character->getLevel() < DC::MAX_MORTAL_LEVEL)
         break;
-      if ((int)GET_RDEATHS(d->character) > rdactive[i])
+      if ((qint32)GET_RDEATHS(conn->character) > rdactive[i])
       {
         for (j = 4; j > i; j--)
         {
           rdactive[j] = rdactive[j - 1];
-          dc_free(rdactivename[j]);
-          rdactivename[j] = str_dup0(rdactivename[j - 1]);
+          rdactivename[j] = rdactivename[j - 1];
         }
-        rdactive[i] = (int)GET_RDEATHS(d->character);
-        dc_free(rdactivename[i]);
-        rdactivename[i] = str_dup(GET_NAME(d->character));
+        rdactive[i] = (qint32)GET_RDEATHS(conn->character);
+        rdactivename[i] = conn->character->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_MOVE(d->character) > mvactive[i])
+      if (GET_MAX_MOVE(conn->character) > mvactive[i])
       {
         for (j = 4; j > i; j--)
         {
           mvactive[j] = mvactive[j - 1];
-          dc_free(mvactivename[j]);
-          mvactivename[j] = str_dup0(mvactivename[j - 1]);
+          mvactivename[j] = mvactivename[j - 1];
         }
-        mvactive[i] = GET_MAX_MOVE(d->character);
-        dc_free(mvactivename[i]);
-        mvactivename[i] = str_dup(GET_NAME(d->character));
+        mvactive[i] = GET_MAX_MOVE(conn->character);
+        mvactivename[i] = conn->character->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_HIT(d->character) > hpactiveclass[k][i])
+      if (GET_MAX_HIT(conn->character) > hpactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           hpactiveclass[k][j] = hpactiveclass[k][j - 1];
-          dc_free(hpactiveclassname[k][j]);
-          hpactiveclassname[k][j] = str_dup0(
-              hpactiveclassname[k][j - 1]);
+          hpactiveclassname[k][j] = hpactiveclassname[k][j - 1];
         }
-        hpactiveclass[k][i] = GET_MAX_HIT(d->character);
-        dc_free(hpactiveclassname[k][i]);
-        hpactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+        hpactiveclass[k][i] = GET_MAX_HIT(conn->character);
+        hpactiveclassname[k][i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_MANA(d->character) > mnactiveclass[k][i])
+      if (GET_MAX_MANA(conn->character) > mnactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           mnactiveclass[k][j] = mnactiveclass[k][j - 1];
-          dc_free(mnactiveclassname[k][j]);
-          mnactiveclassname[k][j] = str_dup0(
-              mnactiveclassname[k][j - 1]);
+          mnactiveclassname[k][j] = mnactiveclassname[k][j - 1];
         }
-        mnactiveclass[k][i] = GET_MAX_MANA(d->character);
-        dc_free(mnactiveclassname[k][i]);
-        mnactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+        mnactiveclass[k][i] = GET_MAX_MANA(conn->character);
+        mnactiveclassname[k][i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_KI(d->character) > kiactiveclass[k][i])
+      if (GET_MAX_KI(conn->character) > kiactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           kiactiveclass[k][j] = kiactiveclass[k][j - 1];
-          dc_free(kiactiveclassname[k][j]);
-          kiactiveclassname[k][j] = str_dup0(
-              kiactiveclassname[k][j - 1]);
+          kiactiveclassname[k][j] = kiactiveclassname[k][j - 1];
         }
-        kiactiveclass[k][i] = GET_MAX_KI(d->character);
-        dc_free(kiactiveclassname[k][i]);
-        kiactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+        kiactiveclass[k][i] = GET_MAX_KI(conn->character);
+        kiactiveclassname[k][i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if ((int)GET_PKILLS(d->character) > pkactiveclass[k][i])
+      if ((qint32)GET_PKILLS(conn->character) > pkactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           pkactiveclass[k][j] = pkactiveclass[k][j - 1];
-          dc_free(pkactiveclassname[k][j]);
-          pkactiveclassname[k][j] = str_dup0(
-              pkactiveclassname[k][j - 1]);
+          pkactiveclassname[k][j] = pkactiveclassname[k][j - 1];
         }
-        pkactiveclass[k][i] = (int)GET_PKILLS(d->character);
-        dc_free(pkactiveclassname[k][i]);
-        pkactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+        pkactiveclass[k][i] = (qint32)GET_PKILLS(conn->character);
+        pkactiveclassname[k][i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (pdscore(d->character) > pdactiveclass[k][i])
+      if (pdscore(conn->character) > pdactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           pdactiveclass[k][j] = pdactiveclass[k][j - 1];
-          dc_free(pdactiveclassname[k][j]);
-          pdactiveclassname[k][j] = str_dup0(
-              pdactiveclassname[k][j - 1]);
+          pdactiveclassname[k][j] = {};
+          pdactiveclassname[k][j] = pdactiveclassname[k][j - 1];
         }
-        pdactiveclass[k][i] = pdscore(d->character);
-        dc_free(pdactiveclassname[k][i]);
-        pdactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+        pdactiveclass[k][i] = pdscore(conn->character);
+        pdactiveclassname[k][i] = {};
+        pdactiveclassname[k][i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (d->character->getLevel() < DC::MAX_MORTAL_LEVEL)
+      if (conn->character->getLevel() < DC::MAX_MORTAL_LEVEL)
         break;
-      if ((int)GET_RDEATHS(d->character) > rdactiveclass[k][i])
+      if ((qint32)GET_RDEATHS(conn->character) > rdactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           rdactiveclass[k][j] = rdactiveclass[k][j - 1];
-          dc_free(rdactiveclassname[k][j]);
-          rdactiveclassname[k][j] = str_dup0(
-              rdactiveclassname[k][j - 1]);
+          rdactiveclassname[k][j] = {};
+          rdactiveclassname[k][j] = rdactiveclassname[k][j - 1];
         }
-        rdactiveclass[k][i] = (int)GET_RDEATHS(d->character);
-        dc_free(rdactiveclassname[k][i]);
-        rdactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+        rdactiveclass[k][i] = (qint32)GET_RDEATHS(conn->character);
+        rdactiveclassname[k][i] = {};
+        rdactiveclassname[k][i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_MOVE(d->character) > mvactiveclass[k][i])
+      if (GET_MAX_MOVE(conn->character) > mvactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           mvactiveclass[k][j] = mvactiveclass[k][j - 1];
-          dc_free(mvactiveclassname[k][j]);
-          mvactiveclassname[k][j] = str_dup0(
-              mvactiveclassname[k][j - 1]);
+          mvactiveclassname[k][j] = {};
+          mvactiveclassname[k][j] = mvactiveclassname[k][j - 1];
         }
-        mvactiveclass[k][i] = GET_MAX_MOVE(d->character);
-        dc_free(mvactiveclassname[k][i]);
-        mvactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+        mvactiveclass[k][i] = GET_MAX_MOVE(conn->character);
+        mvactiveclassname[k][i] = {};
+        mvactiveclassname[k][i] = (qPrintable(conn->character->name()));
         break;
       }
     }
@@ -506,95 +390,93 @@ void Leaderboard::check(void)
 
   write_file(LEADERBOARD_FILE);
 
-  in_port_t port1 = 0;
+  in_port_t port1 = {};
   if (DC::getInstance()->cf.ports.size() > 0)
   {
     port1 = DC::getInstance()->cf.ports[0];
   }
 
-  std::stringstream ssbuffer;
-  ssbuffer << HTDOCS_DIR << port1 << "/" << LEADERBOARD_FILE;
-  write_file(ssbuffer);
+  write_file(QStringLiteral("%1%2/%3").arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
 
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(hpactivename[i]);
-    hpactivename[i] = nullptr;
+    hpactivename[i] = {};
+    hpactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mnactivename[i]);
-    mnactivename[i] = nullptr;
+    mnactivename[i] = {};
+    mnactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(kiactivename[i]);
-    kiactivename[i] = nullptr;
+    kiactivename[i] = {};
+    kiactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pkactivename[i]);
-    pkactivename[i] = nullptr;
+    pkactivename[i] = {};
+    pkactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pdactivename[i]);
-    pdactivename[i] = nullptr;
+    pdactivename[i] = {};
+    pdactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(rdactivename[i]);
-    rdactivename[i] = nullptr;
+    rdactivename[i] = {};
+    rdactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mvactivename[i]);
-    mvactivename[i] = nullptr;
+    mvactivename[i] = {};
+    mvactivename[i] = {};
   }
-  for (j = 0; j < CLASS_MAX - 2; j++)
+  for (j = {}; j < CLASS_MAX - 2; j++)
   {
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(hpactiveclassname[j][i]);
-      hpactiveclassname[j][i] = nullptr;
+      hpactiveclassname[j][i] = {};
+      hpactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(mnactiveclassname[j][i]);
-      mnactiveclassname[j][i] = nullptr;
+      mnactiveclassname[j][i] = {};
+      mnactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(kiactiveclassname[j][i]);
-      kiactiveclassname[j][i] = nullptr;
+      kiactiveclassname[j][i] = {};
+      kiactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(pkactiveclassname[j][i]);
-      pkactiveclassname[j][i] = nullptr;
+      pkactiveclassname[j][i] = {};
+      pkactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(pdactiveclassname[j][i]);
-      pdactiveclassname[j][i] = nullptr;
+      pdactiveclassname[j][i] = {};
+      pdactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(rdactiveclassname[j][i]);
-      rdactiveclassname[j][i] = nullptr;
+      rdactiveclassname[j][i] = {};
+      rdactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(mvactiveclassname[j][i]);
-      mvactiveclassname[j][i] = nullptr;
+      mvactiveclassname[j][i] = {};
+      mvactiveclassname[j][i] = {};
     }
   }
 }
 
 void Leaderboard::check_offline(void)
 {
-  Character *ch;
-  int i, j, k;
+  CharacterPtr ch;
+  qint32 i, j, k;
 
   DC::getInstance()->currentType("leaderboard");
   DC::getInstance()->currentName("NA");
@@ -610,428 +492,407 @@ void Leaderboard::check_offline(void)
 
     k = MIN(CLASS_DRUID - 1, GET_CLASS(ch) - 1);
 
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (hpactivename[i] && !strcmp(hpactivename[i], GET_NAME(ch)))
+      if (hpactivename[i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           hpactive[j] = hpactive[j + 1];
-          dc_free(hpactivename[j]);
-          hpactivename[j] = str_dup0(hpactivename[j + 1]);
+          hpactivename[j] = {};
+          hpactivename[j] = hpactivename[j + 1];
         }
-        hpactive[4] = 0;
-        dc_free(hpactivename[4]);
-        hpactivename[4] = str_dup(" ");
+        hpactive[4] = {};
+        hpactivename[4] = {};
+        hpactivename[4] = QStringLiteral(" ");
       }
-      if (mnactivename[i] && !strcmp(mnactivename[i], GET_NAME(ch)))
+      if (mnactivename[i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           mnactive[j] = mnactive[j + 1];
-          dc_free(mnactivename[j]);
-          mnactivename[j] = str_dup0(mnactivename[j + 1]);
+          mnactivename[j] = {};
+          mnactivename[j] = mnactivename[j + 1];
         }
-        mnactive[4] = 0;
-        dc_free(mnactivename[4]);
-        mnactivename[4] = str_dup(" ");
+        mnactive[4] = {};
+        mnactivename[4] = {};
+        mnactivename[4] = QStringLiteral(" ");
       }
-      if (kiactivename[i] && !strcmp(kiactivename[i], GET_NAME(ch)))
+      if (kiactivename[i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           kiactive[j] = kiactive[j + 1];
-          dc_free(kiactivename[j]);
-          kiactivename[j] = str_dup0(kiactivename[j + 1]);
+          kiactivename[j] = {};
+          kiactivename[j] = kiactivename[j + 1];
         }
-        kiactive[4] = 0;
-        dc_free(kiactivename[4]);
-        kiactivename[4] = str_dup(" ");
+        kiactive[4] = {};
+        kiactivename[4] = {};
+        kiactivename[4] = QStringLiteral(" ");
       }
-      if (pkactivename[i] && !strcmp(pkactivename[i], GET_NAME(ch)))
+      if (pkactivename[i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           pkactive[j] = pkactive[j + 1];
-          dc_free(pkactivename[j]);
-          pkactivename[j] = str_dup0(pkactivename[j + 1]);
+          pkactivename[j] = {};
+          pkactivename[j] = pkactivename[j + 1];
         }
-        pkactive[4] = 0;
-        dc_free(pkactivename[4]);
-        pkactivename[4] = str_dup(" ");
+        pkactive[4] = {};
+        pkactivename[4] = {};
+        pkactivename[4] = QStringLiteral(" ");
       }
-      if (pdactivename[i] && !strcmp(pdactivename[i], GET_NAME(ch)))
+      if (pdactivename[i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           pdactive[j] = pdactive[j + 1];
-          dc_free(pdactivename[j]);
-          pdactivename[j] = str_dup0(pdactivename[j + 1]);
+          pdactivename[j] = {};
+          pdactivename[j] = pdactivename[j + 1];
         }
-        pdactive[4] = 0;
-        dc_free(pdactivename[4]);
-        pdactivename[4] = str_dup(" ");
+        pdactive[4] = {};
+        pdactivename[4] = {};
+        pdactivename[4] = QStringLiteral(" ");
       }
-      if (rdactivename[i] && !strcmp(rdactivename[i], GET_NAME(ch)))
+      if (rdactivename[i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           rdactive[j] = rdactive[j + 1];
-          dc_free(rdactivename[j]);
-          rdactivename[j] = str_dup0(rdactivename[j + 1]);
+          rdactivename[j] = {};
+          rdactivename[j] = rdactivename[j + 1];
         }
-        rdactive[4] = 0;
-        dc_free(rdactivename[4]);
-        rdactivename[4] = str_dup(" ");
+        rdactive[4] = {};
+        rdactivename[4] = {};
+        rdactivename[4] = QStringLiteral(" ");
       }
-      if (mvactivename[i] && !strcmp(mvactivename[i], GET_NAME(ch)))
+      if (mvactivename[i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           mvactive[j] = mvactive[j + 1];
-          dc_free(mvactivename[j]);
-          mvactivename[j] = str_dup0(mvactivename[j + 1]);
+          mvactivename[j] = {};
+          mvactivename[j] = mvactivename[j + 1];
         }
-        mvactive[4] = 0;
-        dc_free(mvactivename[4]);
-        mvactivename[4] = str_dup(" ");
+        mvactive[4] = {};
+        mvactivename[4] = {};
+        mvactivename[4] = QStringLiteral(" ");
       }
     }
 
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (hpactiveclassname[k][i] && !strcmp(hpactiveclassname[k][i],
-                                             GET_NAME(ch)))
+      if (hpactiveclassname[k][i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           hpactiveclass[k][j] = hpactiveclass[k][j + 1];
-          dc_free(hpactiveclassname[k][j]);
-          hpactiveclassname[k][j] = str_dup0(
-              hpactiveclassname[k][j + 1]);
+          hpactiveclassname[k][j] = {};
+          hpactiveclassname[k][j] = hpactiveclassname[k][j + 1];
         }
-        hpactiveclass[k][4] = 0;
-        dc_free(hpactiveclassname[k][4]);
-        hpactiveclassname[k][4] = str_dup(" ");
+        hpactiveclass[k][4] = {};
+        hpactiveclassname[k][4] = {};
+        hpactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (mnactiveclassname[k][i] && !strcmp(mnactiveclassname[k][i],
-                                             GET_NAME(ch)))
+      if (mnactiveclassname[k][i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           mnactiveclass[k][j] = mnactiveclass[k][j + 1];
-          dc_free(mnactiveclassname[k][j]);
-          mnactiveclassname[k][j] = str_dup0(
-              mnactiveclassname[k][j + 1]);
+          mnactiveclassname[k][j] = {};
+          mnactiveclassname[k][j] = mnactiveclassname[k][j + 1];
         }
-        mnactiveclass[k][4] = 0;
-        dc_free(mnactiveclassname[k][4]);
-        mnactiveclassname[k][4] = str_dup(" ");
+        mnactiveclass[k][4] = {};
+        mnactiveclassname[k][4] = {};
+        mnactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (kiactiveclassname[k][i] && !strcmp(kiactiveclassname[k][i],
-                                             GET_NAME(ch)))
+      if (kiactiveclassname[k][i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           kiactiveclass[k][j] = kiactiveclass[k][j + 1];
-          dc_free(kiactiveclassname[k][j]);
-          kiactiveclassname[k][j] = str_dup0(
-              kiactiveclassname[k][j + 1]);
+          kiactiveclassname[k][j] = {};
+          kiactiveclassname[k][j] = kiactiveclassname[k][j + 1];
         }
-        kiactiveclass[k][4] = 0;
-        dc_free(kiactiveclassname[k][4]);
-        kiactiveclassname[k][4] = str_dup(" ");
+        kiactiveclass[k][4] = {};
+        kiactiveclassname[k][4] = {};
+        kiactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (pkactiveclassname[k][i] && !strcmp(pkactiveclassname[k][i],
-                                             GET_NAME(ch)))
+      if (pkactiveclassname[k][i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           pkactiveclass[k][j] = pkactiveclass[k][j + 1];
-          dc_free(pkactiveclassname[k][j]);
-          pkactiveclassname[k][j] = str_dup0(
-              pkactiveclassname[k][j + 1]);
+          pkactiveclassname[k][j] = {};
+          pkactiveclassname[k][j] = pkactiveclassname[k][j + 1];
         }
-        pkactiveclass[k][4] = 0;
-        dc_free(pkactiveclassname[k][4]);
-        pkactiveclassname[k][4] = str_dup(" ");
+        pkactiveclass[k][4] = {};
+        pkactiveclassname[k][4] = {};
+        pkactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (pdactiveclassname[k][i] && !strcmp(pdactiveclassname[k][i],
-                                             GET_NAME(ch)))
+      if (pdactiveclassname[k][i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           pdactiveclass[k][j] = pdactiveclass[k][j + 1];
-          dc_free(pdactiveclassname[k][j]);
-          pdactiveclassname[k][j] = str_dup0(
-              pdactiveclassname[k][j + 1]);
+          pdactiveclassname[k][j] = {};
+          pdactiveclassname[k][j] = pdactiveclassname[k][j + 1];
         }
-        pdactiveclass[k][4] = 0;
-        dc_free(pdactiveclassname[k][4]);
-        pdactiveclassname[k][4] = str_dup(" ");
+        pdactiveclass[k][4] = {};
+        pdactiveclassname[k][4] = {};
+        pdactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (rdactiveclassname[k][i] && !strcmp(rdactiveclassname[k][i],
-                                             GET_NAME(ch)))
+      if (rdactiveclassname[k][i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           rdactiveclass[k][j] = rdactiveclass[k][j + 1];
-          dc_free(rdactiveclassname[k][j]);
-          rdactiveclassname[k][j] = str_dup0(
-              rdactiveclassname[k][j + 1]);
+          rdactiveclassname[k][j] = {};
+          rdactiveclassname[k][j] = rdactiveclassname[k][j + 1];
         }
-        rdactiveclass[k][4] = 0;
-        dc_free(rdactiveclassname[k][4]);
-        rdactiveclassname[k][4] = str_dup(" ");
+        rdactiveclass[k][4] = {};
+        rdactiveclassname[k][4] = {};
+        rdactiveclassname[k][4] = QStringLiteral(" ");
       }
-      if (mvactiveclassname[k][i] && !strcmp(mvactiveclassname[k][i],
-                                             GET_NAME(ch)))
+      if (mvactiveclassname[k][i] == ch->name())
       {
         for (j = i; j < 4; j++)
         {
           mvactiveclass[k][j] = mvactiveclass[k][j + 1];
-          dc_free(mvactiveclassname[k][j]);
-          mvactiveclassname[k][j] = str_dup0(
-              mvactiveclassname[k][j + 1]);
+          mvactiveclassname[k][j] = {};
+          mvactiveclassname[k][j] = mvactiveclassname[k][j + 1];
         }
-        mvactiveclass[k][4] = 0;
-        dc_free(mvactiveclassname[k][4]);
-        mvactiveclassname[k][4] = str_dup(" ");
+        mvactiveclass[k][4] = {};
+        mvactiveclassname[k][4] = {};
+        mvactiveclassname[k][4] = QStringLiteral(" ");
       }
     }
 
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_HIT(ch) > hpactive[i])
       {
         for (j = 4; j > i; j--)
         {
           hpactive[j] = hpactive[j - 1];
-          dc_free(hpactivename[j]);
-          hpactivename[j] = str_dup0(hpactivename[j - 1]);
+          hpactivename[j] = {};
+          hpactivename[j] = hpactivename[j - 1];
         }
         hpactive[i] = GET_MAX_HIT(ch);
-        dc_free(hpactivename[i]);
-        hpactivename[i] = str_dup(GET_NAME(ch));
+        hpactivename[i] = {};
+        hpactivename[i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_MANA(ch) > mnactive[i])
       {
         for (j = 4; j > i; j--)
         {
           mnactive[j] = mnactive[j - 1];
-          dc_free(mnactivename[j]);
-          mnactivename[j] = str_dup0(mnactivename[j - 1]);
+          mnactivename[j] = {};
+          mnactivename[j] = mnactivename[j - 1];
         }
         mnactive[i] = GET_MAX_MANA(ch);
-        dc_free(mnactivename[i]);
-        mnactivename[i] = str_dup(GET_NAME(ch));
+        mnactivename[i] = {};
+        mnactivename[i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_KI(ch) > kiactive[i])
       {
         for (j = 4; j > i; j--)
         {
           kiactive[j] = kiactive[j - 1];
-          dc_free(kiactivename[j]);
-          kiactivename[j] = str_dup0(kiactivename[j - 1]);
+          kiactivename[j] = {};
+          kiactivename[j] = kiactivename[j - 1];
         }
         kiactive[i] = GET_MAX_KI(ch);
-        dc_free(kiactivename[i]);
-        kiactivename[i] = str_dup(GET_NAME(ch));
+        kiactivename[i] = {};
+        kiactivename[i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if ((int)GET_PKILLS(ch) > pkactive[i])
+      if ((qint32)GET_PKILLS(ch) > pkactive[i])
       {
         for (j = 4; j > i; j--)
         {
           pkactive[j] = pkactive[j - 1];
-          dc_free(pkactivename[j]);
-          pkactivename[j] = str_dup0(pkactivename[j - 1]);
+          pkactivename[j] = {};
+          pkactivename[j] = pkactivename[j - 1];
         }
-        pkactive[i] = (int)GET_PKILLS(ch);
-        dc_free(pkactivename[i]);
-        pkactivename[i] = str_dup(GET_NAME(ch));
+        pkactive[i] = (qint32)GET_PKILLS(ch);
+        pkactivename[i] = {};
+        pkactivename[i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (pdscore(ch) > pdactive[i])
       {
         for (j = 4; j > i; j--)
         {
           pdactive[j] = pdactive[j - 1];
-          dc_free(pdactivename[j]);
-          pdactivename[j] = str_dup0(pdactivename[j - 1]);
+          pdactivename[j] = {};
+          pdactivename[j] = pdactivename[j - 1];
         }
         pdactive[i] = pdscore(ch);
-        dc_free(pdactivename[i]);
-        pdactivename[i] = str_dup(GET_NAME(ch));
+        pdactivename[i] = {};
+        pdactivename[i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (ch->getLevel() < DC::MAX_MORTAL_LEVEL)
         break;
-      if ((int)GET_RDEATHS(ch) > rdactive[i])
+      if ((qint32)GET_RDEATHS(ch) > rdactive[i])
       {
         for (j = 4; j > i; j--)
         {
           rdactive[j] = rdactive[j - 1];
-          dc_free(rdactivename[j]);
-          rdactivename[j] = str_dup0(rdactivename[j - 1]);
+          rdactivename[j] = {};
+          rdactivename[j] = rdactivename[j - 1];
         }
-        rdactive[i] = (int)GET_RDEATHS(ch);
-        dc_free(rdactivename[i]);
-        rdactivename[i] = str_dup(GET_NAME(ch));
+        rdactive[i] = (qint32)GET_RDEATHS(ch);
+        rdactivename[i] = {};
+        rdactivename[i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_MOVE(ch) > mvactive[i])
       {
         for (j = 4; j > i; j--)
         {
           mvactive[j] = mvactive[j - 1];
-          dc_free(mvactivename[j]);
-          mvactivename[j] = str_dup0(mvactivename[j - 1]);
+          mvactivename[j] = {};
+          mvactivename[j] = mvactivename[j - 1];
         }
         mvactive[i] = GET_MAX_MOVE(ch);
-        dc_free(mvactivename[i]);
-        mvactivename[i] = str_dup(GET_NAME(ch));
+        mvactivename[i] = {};
+        mvactivename[i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_HIT(ch) > hpactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           hpactiveclass[k][j] = hpactiveclass[k][j - 1];
-          dc_free(hpactiveclassname[k][j]);
-          hpactiveclassname[k][j] = str_dup0(
-              hpactiveclassname[k][j - 1]);
+          hpactiveclassname[k][j] = {};
+          hpactiveclassname[k][j] = hpactiveclassname[k][j - 1];
         }
         hpactiveclass[k][i] = GET_MAX_HIT(ch);
-        dc_free(hpactiveclassname[k][i]);
-        hpactiveclassname[k][i] = str_dup(GET_NAME(ch));
+        hpactiveclassname[k][i] = {};
+        hpactiveclassname[k][i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_MANA(ch) > mnactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           mnactiveclass[k][j] = mnactiveclass[k][j - 1];
-          dc_free(mnactiveclassname[k][j]);
-          mnactiveclassname[k][j] = str_dup0(
-              mnactiveclassname[k][j - 1]);
+          mnactiveclassname[k][j] = {};
+          mnactiveclassname[k][j] = mnactiveclassname[k][j - 1];
         }
         mnactiveclass[k][i] = GET_MAX_MANA(ch);
-        dc_free(mnactiveclassname[k][i]);
-        mnactiveclassname[k][i] = str_dup(GET_NAME(ch));
+        mnactiveclassname[k][i] = {};
+        mnactiveclassname[k][i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_KI(ch) > kiactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           kiactiveclass[k][j] = kiactiveclass[k][j - 1];
-          dc_free(kiactiveclassname[k][j]);
-          kiactiveclassname[k][j] = str_dup0(
-              kiactiveclassname[k][j - 1]);
+          kiactiveclassname[k][j] = {};
+          kiactiveclassname[k][j] = kiactiveclassname[k][j - 1];
         }
         kiactiveclass[k][i] = GET_MAX_KI(ch);
-        dc_free(kiactiveclassname[k][i]);
-        kiactiveclassname[k][i] = str_dup(GET_NAME(ch));
+        kiactiveclassname[k][i] = {};
+        kiactiveclassname[k][i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if ((int)GET_PKILLS(ch) > pkactiveclass[k][i])
+      if ((qint32)GET_PKILLS(ch) > pkactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           pkactiveclass[k][j] = pkactiveclass[k][j - 1];
-          dc_free(pkactiveclassname[k][j]);
-          pkactiveclassname[k][j] = str_dup0(
-              pkactiveclassname[k][j - 1]);
+          pkactiveclassname[k][j] = {};
+          pkactiveclassname[k][j] = pkactiveclassname[k][j - 1];
         }
-        pkactiveclass[k][i] = (int)GET_PKILLS(ch);
-        dc_free(pkactiveclassname[k][i]);
-        pkactiveclassname[k][i] = str_dup(GET_NAME(ch));
+        pkactiveclass[k][i] = (qint32)GET_PKILLS(ch);
+        pkactiveclassname[k][i] = {};
+        pkactiveclassname[k][i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (pdscore(ch) > pdactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           pdactiveclass[k][j] = pdactiveclass[k][j - 1];
-          dc_free(pdactiveclassname[k][j]);
-          pdactiveclassname[k][j] = str_dup0(
-              pdactiveclassname[k][j - 1]);
+          pdactiveclassname[k][j] = {};
+          pdactiveclassname[k][j] = pdactiveclassname[k][j - 1];
         }
         pdactiveclass[k][i] = pdscore(ch);
-        dc_free(pdactiveclassname[k][i]);
-        pdactiveclassname[k][i] = str_dup(GET_NAME(ch));
+        pdactiveclassname[k][i] = {};
+        pdactiveclassname[k][i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (ch->getLevel() < DC::MAX_MORTAL_LEVEL)
         break;
-      if ((int)GET_RDEATHS(ch) > rdactiveclass[k][i])
+      if ((qint32)GET_RDEATHS(ch) > rdactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           rdactiveclass[k][j] = rdactiveclass[k][j - 1];
-          dc_free(rdactiveclassname[k][j]);
-          rdactiveclassname[k][j] = str_dup0(
-              rdactiveclassname[k][j - 1]);
+          rdactiveclassname[k][j] = {};
+          rdactiveclassname[k][j] = rdactiveclassname[k][j - 1];
         }
-        rdactiveclass[k][i] = (int)GET_RDEATHS(ch);
-        dc_free(rdactiveclassname[k][i]);
-        rdactiveclassname[k][i] = str_dup(GET_NAME(ch));
+        rdactiveclass[k][i] = (qint32)GET_RDEATHS(ch);
+        rdactiveclassname[k][i] = {};
+        rdactiveclassname[k][i] = ch->name();
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
       if (GET_MAX_MOVE(ch) > mvactiveclass[k][i])
       {
         for (j = 4; j > i; j--)
         {
           mvactiveclass[k][j] = mvactiveclass[k][j - 1];
-          dc_free(mvactiveclassname[k][j]);
-          mvactiveclassname[k][j] = str_dup0(
-              mvactiveclassname[k][j - 1]);
+          mvactiveclassname[k][j] = {};
+          mvactiveclassname[k][j] = mvactiveclassname[k][j - 1];
         }
         mvactiveclass[k][i] = GET_MAX_MOVE(ch);
-        dc_free(mvactiveclassname[k][i]);
-        mvactiveclassname[k][i] = str_dup(GET_NAME(ch));
+        mvactiveclassname[k][i] = {};
+        mvactiveclassname[k][i] = ch->name();
         break;
       }
     }
@@ -1039,87 +900,85 @@ void Leaderboard::check_offline(void)
 
   write_file(LEADERBOARD_FILE);
 
-  in_port_t port1 = 0;
+  in_port_t port1 = {};
   if (DC::getInstance()->cf.ports.size() > 0)
   {
     port1 = DC::getInstance()->cf.ports[0];
   }
 
-  std::stringstream ssbuffer;
-  ssbuffer << HTDOCS_DIR << port1 << "/" << LEADERBOARD_FILE;
-  write_file(ssbuffer);
+  write_file(QStringLiteral("%1%2/%3").arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
 
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(hpactivename[i]);
-    hpactivename[i] = nullptr;
+    hpactivename[i] = {};
+    hpactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mnactivename[i]);
-    mnactivename[i] = nullptr;
+    mnactivename[i] = {};
+    mnactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(kiactivename[i]);
-    kiactivename[i] = nullptr;
+    kiactivename[i] = {};
+    kiactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pkactivename[i]);
-    pkactivename[i] = nullptr;
+    pkactivename[i] = {};
+    pkactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pdactivename[i]);
-    pdactivename[i] = nullptr;
+    pdactivename[i] = {};
+    pdactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(rdactivename[i]);
-    rdactivename[i] = nullptr;
+    rdactivename[i] = {};
+    rdactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mvactivename[i]);
-    mvactivename[i] = nullptr;
+    mvactivename[i] = {};
+    mvactivename[i] = {};
   }
-  for (j = 0; j < CLASS_MAX - 2; j++)
+  for (j = {}; j < CLASS_MAX - 2; j++)
   {
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(hpactiveclassname[j][i]);
-      hpactiveclassname[j][i] = nullptr;
+      hpactiveclassname[j][i] = {};
+      hpactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(mnactiveclassname[j][i]);
-      mnactiveclassname[j][i] = nullptr;
+      mnactiveclassname[j][i] = {};
+      mnactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(kiactiveclassname[j][i]);
-      kiactiveclassname[j][i] = nullptr;
+      kiactiveclassname[j][i] = {};
+      kiactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(pkactiveclassname[j][i]);
-      pkactiveclassname[j][i] = nullptr;
+      pkactiveclassname[j][i] = {};
+      pkactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(pdactiveclassname[j][i]);
-      pdactiveclassname[j][i] = nullptr;
+      pdactiveclassname[j][i] = {};
+      pdactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(rdactiveclassname[j][i]);
-      rdactiveclassname[j][i] = nullptr;
+      rdactiveclassname[j][i] = {};
+      rdactiveclassname[j][i] = {};
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      dc_free(mvactiveclassname[j][i]);
-      mvactiveclassname[j][i] = nullptr;
+      mvactiveclassname[j][i] = {};
+      mvactiveclassname[j][i] = {};
     }
   }
 }
@@ -1127,7 +986,7 @@ void Leaderboard::check_offline(void)
 void Leaderboard::read_file(void)
 {
   FILE *fl;
-  int i, j;
+  qint32 i, j;
 
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
@@ -1137,133 +996,133 @@ void Leaderboard::read_file(void)
   {
     try
     {
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         hpactivename[i] = fread_string(fl, 0);
         hpactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(hpactivename[i]) == false)
         {
-          hpactivename[i] = str_dup("UNKNOWN");
-          hpactive[i] = 0;
+          hpactivename[i] = QStringLiteral("UNKNOWN");
+          hpactive[i] = {};
         }
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         mnactivename[i] = fread_string(fl, 0);
         mnactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(mnactivename[i]) == false)
         {
-          mnactivename[i] = str_dup("UNKNOWN");
+          mnactivename[i] = QStringLiteral("UNKNOWN");
         }
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         kiactivename[i] = fread_string(fl, 0);
         kiactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(kiactivename[i]) == false)
         {
-          kiactivename[i] = str_dup("UNKNOWN");
+          kiactivename[i] = QStringLiteral("UNKNOWN");
         }
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         pkactivename[i] = fread_string(fl, 0);
         pkactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(pkactivename[i]) == false)
         {
-          pkactivename[i] = str_dup("UNKNOWN");
+          pkactivename[i] = QStringLiteral("UNKNOWN");
         }
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         pdactivename[i] = fread_string(fl, 0);
         pdactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(pdactivename[i]) == false)
         {
-          pdactivename[i] = str_dup("UNKNOWN");
+          pdactivename[i] = QStringLiteral("UNKNOWN");
         }
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         rdactivename[i] = fread_string(fl, 0);
         rdactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(rdactivename[i]) == false)
         {
-          rdactivename[i] = str_dup("UNKNOWN");
+          rdactivename[i] = QStringLiteral("UNKNOWN");
         }
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         mvactivename[i] = fread_string(fl, 0);
         mvactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(mvactivename[i]) == false)
         {
-          mvactivename[i] = str_dup("UNKNOWN");
+          mvactivename[i] = QStringLiteral("UNKNOWN");
         }
       }
-      for (j = 0; j < CLASS_MAX - 2; j++)
+      for (j = {}; j < CLASS_MAX - 2; j++)
       {
-        for (i = 0; i < 5; i++)
+        for (i = {}; i < 5; i++)
         {
           hpactiveclassname[j][i] = fread_string(fl, 0);
           hpactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(hpactiveclassname[j][i]) == false)
           {
-            hpactiveclassname[j][i] = str_dup("UNKNOWN");
+            hpactiveclassname[j][i] = QStringLiteral("UNKNOWN");
           }
         }
-        for (i = 0; i < 5; i++)
+        for (i = {}; i < 5; i++)
         {
           mnactiveclassname[j][i] = fread_string(fl, 0);
           mnactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(mnactiveclassname[j][i]) == false)
           {
-            mnactiveclassname[j][i] = str_dup("UNKNOWN");
+            mnactiveclassname[j][i] = QStringLiteral("UNKNOWN");
           }
         }
-        for (i = 0; i < 5; i++)
+        for (i = {}; i < 5; i++)
         {
           kiactiveclassname[j][i] = fread_string(fl, 0);
           kiactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(kiactiveclassname[j][i]) == false)
           {
-            kiactiveclassname[j][i] = str_dup("UNKNOWN");
+            kiactiveclassname[j][i] = QStringLiteral("UNKNOWN");
           }
         }
-        for (i = 0; i < 5; i++)
+        for (i = {}; i < 5; i++)
         {
           pkactiveclassname[j][i] = fread_string(fl, 0);
           pkactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(pkactiveclassname[j][i]) == false)
           {
-            pkactiveclassname[j][i] = str_dup("UNKNOWN");
+            pkactiveclassname[j][i] = QStringLiteral("UNKNOWN");
           }
         }
-        for (i = 0; i < 5; i++)
+        for (i = {}; i < 5; i++)
         {
           pdactiveclassname[j][i] = fread_string(fl, 0);
           pdactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(pdactiveclassname[j][i]) == false)
           {
-            pdactiveclassname[j][i] = str_dup("UNKNOWN");
+            pdactiveclassname[j][i] = QStringLiteral("UNKNOWN");
           }
         }
-        for (i = 0; i < 5; i++)
+        for (i = {}; i < 5; i++)
         {
           rdactiveclassname[j][i] = fread_string(fl, 0);
           rdactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(rdactiveclassname[j][i]) == false)
           {
-            rdactiveclassname[j][i] = str_dup("UNKNOWN");
+            rdactiveclassname[j][i] = QStringLiteral("UNKNOWN");
           }
         }
-        for (i = 0; i < 5; i++)
+        for (i = {}; i < 5; i++)
         {
           mvactiveclassname[j][i] = fread_string(fl, 0);
           mvactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(mvactiveclassname[j][i]) == false)
           {
-            mvactiveclassname[j][i] = str_dup("UNKNOWN");
+            mvactiveclassname[j][i] = QStringLiteral("UNKNOWN");
           }
         }
       }
@@ -1274,24 +1133,14 @@ void Leaderboard::read_file(void)
     }
     catch (error_negative_int &)
     {
-      logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative int found where positive expected", LEADERBOARD_FILE);
+      logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative qint32 found where positive expected", LEADERBOARD_FILE);
     }
 
     fclose(fl);
   }
 }
 
-void Leaderboard::write_file(std::stringstream &filename)
-{
-  write_file(filename.str().c_str());
-}
-
-void Leaderboard::write_file(std::string &filename)
-{
-  write_file(filename.c_str());
-}
-
-void Leaderboard::write_file(const char filename[])
+void Leaderboard::write_file(QString filename)
 {
   if (DC::getInstance()->cf.leaderboard_check == "suspend" || DC::getInstance()->cf.bport == true)
   {
@@ -1299,55 +1148,48 @@ void Leaderboard::write_file(const char filename[])
   }
 
   FILE *fl;
-  int i, j;
+  qint32 i, j;
 
-  if (!(fl = fopen(filename, "w")))
+  if (!(fl = fopen(qPrintable(filename), "w")))
   {
     logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
     return;
   }
-  for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", hpactivename[i], hpactive[i]);
-  for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", mnactivename[i], mnactive[i]);
-  for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", kiactivename[i], kiactive[i]);
-  for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
-  for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
-  for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
-  for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", mvactivename[i], mvactive[i]);
-  for (j = 0; j < CLASS_MAX - 2; j++)
+  for (i = {}; i < 5; i++)
+    qfprintf(fl, "%s~ %d\n", hpactivename[i], hpactive[i]);
+  for (i = {}; i < 5; i++)
+    qfprintf(fl, "%s~ %d\n", mnactivename[i], mnactive[i]);
+  for (i = {}; i < 5; i++)
+    qfprintf(fl, "%s~ %d\n", kiactivename[i], kiactive[i]);
+  for (i = {}; i < 5; i++)
+    qfprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
+  for (i = {}; i < 5; i++)
+    qfprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
+  for (i = {}; i < 5; i++)
+    qfprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
+  for (i = {}; i < 5; i++)
+    qfprintf(fl, "%s~ %d\n", mvactivename[i], mvactive[i]);
+  for (j = {}; j < CLASS_MAX - 2; j++)
   {
-    for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", hpactiveclassname[j][i],
-              hpactiveclass[j][i]);
-    for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", mnactiveclassname[j][i],
-              mnactiveclass[j][i]);
-    for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", kiactiveclassname[j][i],
-              kiactiveclass[j][i]);
-    for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", pkactiveclassname[j][i],
-              pkactiveclass[j][i]);
-    for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", pdactiveclassname[j][i],
-              pdactiveclass[j][i]);
-    for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", rdactiveclassname[j][i],
-              rdactiveclass[j][i]);
-    for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", mvactiveclassname[j][i],
-              mvactiveclass[j][i]);
+    for (i = {}; i < 5; i++)
+      qfprintf(fl, "%s~ %d\n", hpactiveclassname[j][i], hpactiveclass[j][i]);
+    for (i = {}; i < 5; i++)
+      qfprintf(fl, "%s~ %d\n", mnactiveclassname[j][i], mnactiveclass[j][i]);
+    for (i = {}; i < 5; i++)
+      qfprintf(fl, "%s~ %d\n", kiactiveclassname[j][i], kiactiveclass[j][i]);
+    for (i = {}; i < 5; i++)
+      qfprintf(fl, "%s~ %d\n", pkactiveclassname[j][i], pkactiveclass[j][i]);
+    for (i = {}; i < 5; i++)
+      qfprintf(fl, "%s~ %d\n", pdactiveclassname[j][i], pdactiveclass[j][i]);
+    for (i = {}; i < 5; i++)
+      qfprintf(fl, "%s~ %d\n", rdactiveclassname[j][i], rdactiveclass[j][i]);
+    for (i = {}; i < 5; i++)
+      qfprintf(fl, "%s~ %d\n", mvactiveclassname[j][i], mvactiveclass[j][i]);
   }
   fclose(fl);
 }
 
-int Leaderboard::pdscore(Character *ch)
+qint32 Leaderboard::pdscore(CharacterPtr ch)
 {
   return ch->player->pdeaths;
 }
@@ -1358,30 +1200,30 @@ int Leaderboard::pdscore(Character *ch)
  things, otherwise renames will crash the server hard.
  */
 
-int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
+qint32 do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   class Connection *d;
   FILE *fl;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-  int i, j, k, validclass = 0;
+  qint32 i, j, k, validclass = {};
   char *hponlinename[5], *mnonlinename[5], *kionlinename[5], *pkonlinename[5],
       *pdonlinename[5], *rdonlinename[5], *mvonlinename[5];
-  int hponline[] = {0, 0, 0, 0, 0}, mnonline[] = {0, 0, 0, 0, 0},
-      kionline[] = {0, 0, 0, 0, 0}, pkonline[] = {0, 0, 0, 0, 0},
-      pdonline[] = {0, 0, 0, 0, 0}, rdonline[] = {0, 0, 0, 0, 0},
-      mvonline[] = {0, 0, 0, 0, 0};
+  qint32 hponline[] = {0, 0, 0, 0, 0}, mnonline[] = {0, 0, 0, 0, 0},
+         kionline[] = {0, 0, 0, 0, 0}, pkonline[] = {0, 0, 0, 0, 0},
+         pdonline[] = {0, 0, 0, 0, 0}, rdonline[] = {0, 0, 0, 0, 0},
+         mvonline[] = {0, 0, 0, 0, 0};
   char *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5],
       *pdactivename[5], *rdactivename[5], *mvactivename[5];
-  int hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5],
+  qint32 hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5],
       rdactive[5], mvactive[5];
-  int placea = 1, placeb = 1, placec = 1, placed = 1;
-  int skippeda = 0, skippedb = 0, skippedc = 0, skippedd = 0;
+  qint32 placea = 1, placeb = 1, placec = 1, placed = 1;
+  qint32 skippeda = 0, skippedb = 0, skippedc = 0, skippedd = {};
   char *clss_types[] = {"mage", "cleric", "thief", "warrior", "antipaladin",
                         "paladin", "barbarian", "monk", "ranger", "bard", "druid", "\n"};
 
   if (ch->isPlayer() && ch->getLevel() >= IMPLEMENTER)
   {
-    std::string arg1, remainder;
+    QString arg1, remainder;
     std::tie(arg1, remainder) = half_chop(argument);
     if (arg1 == "suspend")
     {
@@ -1393,7 +1235,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
       {
         DC::getInstance()->cf.leaderboard_check = "suspend";
         ch->sendln("Leaderboard writes suspended.");
-        logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
+        logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
@@ -1408,7 +1250,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
       {
         DC::getInstance()->cf.leaderboard_check = "";
         ch->sendln("Leaderboard writes resumed.");
-        logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
+        logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
@@ -1423,23 +1265,23 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     leaderboard.check();
   }
 
-  for (i = 0; i < 5; i++)
-    hponlinename[i] = str_dup(" ");
-  for (i = 0; i < 5; i++)
-    mnonlinename[i] = str_dup(" ");
-  for (i = 0; i < 5; i++)
-    kionlinename[i] = str_dup(" ");
-  for (i = 0; i < 5; i++)
-    pkonlinename[i] = str_dup(" ");
-  for (i = 0; i < 5; i++)
-    pdonlinename[i] = str_dup(" ");
-  for (i = 0; i < 5; i++)
-    rdonlinename[i] = str_dup(" ");
-  for (i = 0; i < 5; i++)
-    mvonlinename[i] = str_dup(" ");
+  for (i = {}; i < 5; i++)
+    hponlinename[i] = QStringLiteral(" ");
+  for (i = {}; i < 5; i++)
+    mnonlinename[i] = QStringLiteral(" ");
+  for (i = {}; i < 5; i++)
+    kionlinename[i] = QStringLiteral(" ");
+  for (i = {}; i < 5; i++)
+    pkonlinename[i] = QStringLiteral(" ");
+  for (i = {}; i < 5; i++)
+    pdonlinename[i] = QStringLiteral(" ");
+  for (i = {}; i < 5; i++)
+    rdonlinename[i] = QStringLiteral(" ");
+  for (i = {}; i < 5; i++)
+    mvonlinename[i] = QStringLiteral(" ");
 
   one_argument(argument, buf);
-  for (k = 0; k < 11; k++)
+  for (k = {}; k < 11; k++)
   {
     if (is_abbrev(buf, clss_types[k]))
     {
@@ -1453,111 +1295,111 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
     return ReturnValue::eFAILURE;
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
     hpactivename[i] = fread_string(fl, 0);
     hpactive[i] = fread_int(fl, 0, 2147483467);
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
     mnactivename[i] = fread_string(fl, 0);
     mnactive[i] = fread_int(fl, 0, 2147483467);
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
     kiactivename[i] = fread_string(fl, 0);
     kiactive[i] = fread_int(fl, 0, 2147483467);
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
     pkactivename[i] = fread_string(fl, 0);
     pkactive[i] = fread_int(fl, 0, 2147483467);
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
     pdactivename[i] = fread_string(fl, 0);
     pdactive[i] = fread_int(fl, 0, 2147483467);
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
     rdactivename[i] = fread_string(fl, 0);
     rdactive[i] = fread_int(fl, 0, 2147483467);
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
     mvactivename[i] = fread_string(fl, 0);
     mvactive[i] = fread_int(fl, 0, 2147483467);
   }
   if (validclass)
   {
-    for (j = 0; j < k + 1; j++)
+    for (j = {}; j < k + 1; j++)
     {
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
-        dc_free(hpactivename[i]);
-        hpactivename[i] = nullptr;
+        hpactivename[i] = {};
+        hpactivename[i] = {};
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
-        dc_free(mnactivename[i]);
-        mnactivename[i] = nullptr;
+        mnactivename[i] = {};
+        mnactivename[i] = {};
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
-        dc_free(kiactivename[i]);
-        kiactivename[i] = nullptr;
+        kiactivename[i] = {};
+        kiactivename[i] = {};
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
-        dc_free(pkactivename[i]);
-        pkactivename[i] = nullptr;
+        pkactivename[i] = {};
+        pkactivename[i] = {};
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
-        dc_free(pdactivename[i]);
-        pdactivename[i] = nullptr;
+        pdactivename[i] = {};
+        pdactivename[i] = {};
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
-        dc_free(rdactivename[i]);
-        rdactivename[i] = nullptr;
+        rdactivename[i] = {};
+        rdactivename[i] = {};
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
-        dc_free(mvactivename[i]);
-        mvactivename[i] = nullptr;
+        mvactivename[i] = {};
+        mvactivename[i] = {};
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         hpactivename[i] = fread_string(fl, 0);
         hpactive[i] = fread_int(fl, 0, 2147483467);
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         mnactivename[i] = fread_string(fl, 0);
         mnactive[i] = fread_int(fl, 0, 2147483467);
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         kiactivename[i] = fread_string(fl, 0);
         kiactive[i] = fread_int(fl, 0, 2147483467);
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         pkactivename[i] = fread_string(fl, 0);
         pkactive[i] = fread_int(fl, 0, 2147483467);
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         pdactivename[i] = fread_string(fl, 0);
         pdactive[i] = fread_int(fl, 0, 2147483467);
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         rdactivename[i] = fread_string(fl, 0);
         rdactive[i] = fread_int(fl, 0, 2147483467);
       }
-      for (i = 0; i < 5; i++)
+      for (i = {}; i < 5; i++)
       {
         mvactivename[i] = fread_string(fl, 0);
         mvactive[i] = fread_int(fl, 0, 2147483467);
@@ -1567,138 +1409,137 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   fclose(fl);
 
   // top 5 online
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->connections_; d; d = conn->next)
   {
 
-    if (!d->character || d->character->getLevel() >= IMMORTAL)
+    if (!conn->character || conn->character->getLevel() >= IMMORTAL)
       continue;
-    if (!d->connected == Connection::states::PLAYING)
+    if (!conn->connected == Connection::states::PLAYING)
       continue;
-    if (!d->character->player)
+    if (!conn->character->player)
       continue;
-    if (!CAN_SEE(ch, d->character))
-      continue;
-
-    if (validclass && GET_CLASS(d->character) != k + 1)
+    if (!CAN_SEE(ch, conn->character))
       continue;
 
-    for (i = 0; i < 5; i++)
+    if (validclass && GET_CLASS(conn->character) != k + 1)
+      continue;
+
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_HIT(d->character) > hponline[i])
+      if (GET_MAX_HIT(conn->character) > hponline[i])
       {
         for (j = 4; j > i; j--)
         {
           hponline[j] = hponline[j - 1];
-          dc_free(hponlinename[j]);
-          hponlinename[j] = str_dup(hponlinename[j - 1]);
+          hponlinename[j] = {};
+          hponlinename[j] = (hponlinename[j - 1]);
         }
-        hponline[i] = GET_MAX_HIT(d->character);
-        dc_free(hponlinename[i]);
-        hponlinename[i] = str_dup(GET_NAME(d->character));
+        hponline[i] = GET_MAX_HIT(conn->character);
+        hponlinename[i] = {};
+        hponlinename[i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_MANA(d->character) > mnonline[i])
+      if (GET_MAX_MANA(conn->character) > mnonline[i])
       {
         for (j = 4; j > i; j--)
         {
           mnonline[j] = mnonline[j - 1];
-          dc_free(mnonlinename[j]);
-          mnonlinename[j] = str_dup(mnonlinename[j - 1]);
+          mnonlinename[j] = {};
+          mnonlinename[j] = (mnonlinename[j - 1]);
         }
-        mnonline[i] = GET_MAX_MANA(d->character);
-        dc_free(mnonlinename[i]);
-        mnonlinename[i] = str_dup(GET_NAME(d->character));
+        mnonline[i] = GET_MAX_MANA(conn->character);
+        mnonlinename[i] = {};
+        mnonlinename[i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_KI(d->character) > kionline[i])
+      if (GET_MAX_KI(conn->character) > kionline[i])
       {
         for (j = 4; j > i; j--)
         {
           kionline[j] = kionline[j - 1];
-          dc_free(kionlinename[j]);
-          kionlinename[j] = str_dup(kionlinename[j - 1]);
+          kionlinename[j] = {};
+          kionlinename[j] = (kionlinename[j - 1]);
         }
-        kionline[i] = GET_MAX_KI(d->character);
-        dc_free(kionlinename[i]);
-        kionlinename[i] = str_dup(GET_NAME(d->character));
+        kionline[i] = GET_MAX_KI(conn->character);
+        kionlinename[i] = {};
+        kionlinename[i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if ((int)GET_PKILLS(d->character) > pkonline[i])
+      if ((qint32)GET_PKILLS(conn->character) > pkonline[i])
       {
         for (j = 4; j > i; j--)
         {
           pkonline[j] = pkonline[j - 1];
-          dc_free(pkonlinename[j]);
-          pkonlinename[j] = str_dup(pkonlinename[j - 1]);
+          pkonlinename[j] = {};
+          pkonlinename[j] = (pkonlinename[j - 1]);
         }
-        pkonline[i] = (int)GET_PKILLS(d->character);
-        dc_free(pkonlinename[i]);
-        pkonlinename[i] = str_dup(GET_NAME(d->character));
+        pkonline[i] = (qint32)GET_PKILLS(conn->character);
+        pkonlinename[i] = {};
+        pkonlinename[i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (leaderboard.pdscore(d->character) > pdonline[i])
+      if (leaderboard.pdscore(conn->character) > pdonline[i])
       {
         for (j = 4; j > i; j--)
         {
           pdonline[j] = pdonline[j - 1];
-          dc_free(pdonlinename[j]);
-          pdonlinename[j] = str_dup(pdonlinename[j - 1]);
+          pdonlinename[j] = {};
+          pdonlinename[j] = (pdonlinename[j - 1]);
         }
-        pdonline[i] = leaderboard.pdscore(d->character);
-        dc_free(pdonlinename[i]);
-        pdonlinename[i] = str_dup(GET_NAME(d->character));
+        pdonline[i] = leaderboard.pdscore(conn->character);
+        pdonlinename[i] = {};
+        pdonlinename[i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (d->character->getLevel() < DC::MAX_MORTAL_LEVEL)
+      if (conn->character->getLevel() < DC::MAX_MORTAL_LEVEL)
         break;
-      if ((int)GET_RDEATHS(d->character) > rdonline[i])
+      if ((qint32)GET_RDEATHS(conn->character) > rdonline[i])
       {
         for (j = 4; j > i; j--)
         {
           rdonline[j] = rdonline[j - 1];
-          dc_free(rdonlinename[j]);
-          rdonlinename[j] = str_dup(rdonlinename[j - 1]);
+          rdonlinename[j] = {};
+          rdonlinename[j] = (rdonlinename[j - 1]);
         }
-        rdonline[i] = (int)GET_RDEATHS(d->character);
-        dc_free(rdonlinename[i]);
-        rdonlinename[i] = str_dup(GET_NAME(d->character));
+        rdonline[i] = (qint32)GET_RDEATHS(conn->character);
+        rdonlinename[i] = {};
+        rdonlinename[i] = (qPrintable(conn->character->name()));
         break;
       }
     }
-    for (i = 0; i < 5; i++)
+    for (i = {}; i < 5; i++)
     {
-      if (GET_MAX_MOVE(d->character) > mvonline[i])
+      if (GET_MAX_MOVE(conn->character) > mvonline[i])
       {
         for (j = 4; j > i; j--)
         {
           mvonline[j] = mvonline[j - 1];
-          dc_free(mvonlinename[j]);
-          mvonlinename[j] = str_dup(mvonlinename[j - 1]);
+          mvonlinename[j] = {};
+          mvonlinename[j] = (mvonlinename[j - 1]);
         }
-        mvonline[i] = GET_MAX_MOVE(d->character);
-        dc_free(mvonlinename[i]);
-        mvonlinename[i] = str_dup(GET_NAME(d->character));
+        mvonline[i] = GET_MAX_MOVE(conn->character);
+        mvonlinename[i] = {};
+        mvonlinename[i] = (qPrintable(conn->character->name()));
         break;
       }
     }
   }
-  sprintf(buf,
-          "(*)**************************************************************************(*)\r\n");
+  sprintf(buf, "(*)**************************************************************************(*)\r\n");
   strcat(buf,
          "(*)                          $BDark Castle Leaderboard$R                         (*)\r\n");
   if (validclass)
@@ -1729,28 +1570,28 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     if (hponline[i] != hponline[i - 1])
     {
       placea += ++skippeda;
-      skippeda = 0;
+      skippeda = {};
     }
     else
       skippeda++;
     if (hpactive[i] != hpactive[i - 1])
     {
       placeb += ++skippedb;
-      skippedb = 0;
+      skippedb = {};
     }
     else
       skippedb++;
     if (mnonline[i] != mnonline[i - 1])
     {
       placec += ++skippedc;
-      skippedc = 0;
+      skippedc = {};
     }
     else
       skippedc++;
     if (mnactive[i] != mnactive[i - 1])
     {
       placed += ++skippedd;
-      skippedd = 0;
+      skippedd = {};
     }
     else
       skippedd++;
@@ -1765,10 +1606,10 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   placeb = 1;
   placec = 1;
   placed = 1;
-  skippeda = 0;
-  skippedb = 0;
-  skippedc = 0;
-  skippedd = 0;
+  skippeda = {};
+  skippedb = {};
+  skippedc = {};
+  skippedd = {};
   strcat(buf,
          "(*)                                                                          (*)\r\n");
   strcat(buf,
@@ -1782,28 +1623,28 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     if (kionline[i] != kionline[i - 1])
     {
       placea += ++skippeda;
-      skippeda = 0;
+      skippeda = {};
     }
     else
       skippeda++;
     if (kiactive[i] != kiactive[i - 1])
     {
       placeb += ++skippedb;
-      skippedb = 0;
+      skippedb = {};
     }
     else
       skippedb++;
     if (mvonline[i] != mvonline[i - 1])
     {
       placec += ++skippedc;
-      skippedc = 0;
+      skippedc = {};
     }
     else
       skippedc++;
     if (mvactive[i] != mvactive[i - 1])
     {
       placed += ++skippedd;
-      skippedd = 0;
+      skippedd = {};
     }
     else
       skippedd++;
@@ -1818,10 +1659,10 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   placeb = 1;
   placec = 1;
   placed = 1;
-  skippeda = 0;
-  skippedb = 0;
-  skippedc = 0;
-  skippedd = 0;
+  skippeda = {};
+  skippedb = {};
+  skippedc = {};
+  skippedd = {};
   strcat(buf,
          "(*)                                                                          (*)\r\n");
   strcat(buf,
@@ -1835,28 +1676,28 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     if (pkonline[i] != pkonline[i - 1])
     {
       placea += ++skippeda;
-      skippeda = 0;
+      skippeda = {};
     }
     else
       skippeda++;
     if (pkactive[i] != pkactive[i - 1])
     {
       placeb += ++skippedb;
-      skippedb = 0;
+      skippedb = {};
     }
     else
       skippedb++;
     if (pdonline[i] != pdonline[i - 1])
     {
       placec += ++skippedc;
-      skippedc = 0;
+      skippedc = {};
     }
     else
       skippedc++;
     if (pdactive[i] != pdactive[i - 1])
     {
       placed += ++skippedd;
-      skippedd = 0;
+      skippedd = {};
     }
     else
       skippedd++;
@@ -1872,10 +1713,10 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   placeb = 1;
   placec = 1;
   placed = 1;
-  skippeda = 0;
-  skippedb = 0;
-  skippedc = 0;
-  skippedd = 0;
+  skippeda = {};
+  skippedb = {};
+  skippedc = {};
+  skippedd = {};
   strcat(buf,
          "(*)                                                                          (*)\r\n");
   strcat(buf,
@@ -1889,25 +1730,25 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     if (rdonline[i] != rdonline[i - 1])
     {
       placea += ++skippeda;
-      skippeda = 0;
+      skippeda = {};
     }
     else
       skippeda++;
     if (rdactive[i] != rdactive[i - 1])
     {
       placeb += ++skippedb;
-      skippedb = 0;
+      skippedb = {};
     }
     else
       skippedb++;
     //   if(rdonline[i] != rdonline[i-1]) {
     //    placec += ++skippedc;
-    //    skippedc = 0;
+    //    skippedc = {};
     // }
     // else skippedc++;
     //  if(rdactive[i] != rdactive[i-1]) {
     //      placed += ++skippedd;
-    //       skippedd = 0;
+    //       skippedd = {};
     //     }
     //      else skippedd++;
     sprintf(buf2,
@@ -1925,75 +1766,75 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   strcat(buf,
          "(*)**************************************************************************(*)\r\n");
   page_string(ch->desc, buf, 1);
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(hponlinename[i]);
-    hponlinename[i] = nullptr;
+    hponlinename[i] = {};
+    hponlinename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mnonlinename[i]);
-    mnonlinename[i] = nullptr;
+    mnonlinename[i] = {};
+    mnonlinename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(kionlinename[i]);
-    kionlinename[i] = nullptr;
+    kionlinename[i] = {};
+    kionlinename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pkonlinename[i]);
-    pkonlinename[i] = nullptr;
+    pkonlinename[i] = {};
+    pkonlinename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pdonlinename[i]);
-    pdonlinename[i] = nullptr;
+    pdonlinename[i] = {};
+    pdonlinename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(rdonlinename[i]);
-    rdonlinename[i] = nullptr;
+    rdonlinename[i] = {};
+    rdonlinename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mvonlinename[i]);
-    mvonlinename[i] = nullptr;
+    mvonlinename[i] = {};
+    mvonlinename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(hpactivename[i]);
-    hpactivename[i] = nullptr;
+    hpactivename[i] = {};
+    hpactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mnactivename[i]);
-    mnactivename[i] = nullptr;
+    mnactivename[i] = {};
+    mnactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(kiactivename[i]);
-    kiactivename[i] = nullptr;
+    kiactivename[i] = {};
+    kiactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pkactivename[i]);
-    pkactivename[i] = nullptr;
+    pkactivename[i] = {};
+    pkactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(pdactivename[i]);
-    pdactivename[i] = nullptr;
+    pdactivename[i] = {};
+    pdactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(rdactivename[i]);
-    rdactivename[i] = nullptr;
+    rdactivename[i] = {};
+    rdactivename[i] = {};
   }
-  for (i = 0; i < 5; i++)
+  for (i = {}; i < 5; i++)
   {
-    dc_free(mvactivename[i]);
-    mvactivename[i] = nullptr;
+    mvactivename[i] = {};
+    mvactivename[i] = {};
   }
 
   return ReturnValue::eSUCCESS;
@@ -2001,7 +1842,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
 
 void Leaderboard::rename(QString oldname, QString newname)
 {
-  FILE *fl{};
+  FILE *fl = {};
   // lines is the number of lines rewritten back to leaderboard file
   // after a rename.. must sync up with # of outputs
 
@@ -2016,17 +1857,17 @@ void Leaderboard::rename(QString oldname, QString newname)
     abort();
   }
 
-  QList<int> value;
+  QList<qint32> value;
   QList<QString> name;
   auto lines = 35 * (CLASS_MAX - 1);
-  for (auto i = 0; i < lines; i++)
+  for (auto i = {}; i < lines; i++)
   {
     name.insert(i, fread_string(fl, 0));
     value.insert(i, fread_int(fl, 0, 2147483467));
   }
   fclose(fl);
 
-  for (auto i = 0; i < lines; i++)
+  for (auto i = {}; i < lines; i++)
   {
     if (name[i] == oldname)
     {
@@ -2036,7 +1877,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 
   if (DC::getInstance()->cf.leaderboard_check == "suspend")
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname.toStdString().c_str(), newname.toStdString().c_str());
+    logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", qPrintable(oldname), qPrintable(newname));
   }
   else
   {
@@ -2046,22 +1887,22 @@ void Leaderboard::rename(QString oldname, QString newname)
       abort();
     }
 
-    for (auto i = 0; i < lines; i++)
+    for (auto i = {}; i < lines; i++)
     {
-      fprintf(fl, "%s~ %d\n", name[i].toStdString().c_str(), value[i]);
+      qfprintf(fl, "%s~ %d\n", qPrintable(name[i]), value[i]);
     }
 
     fclose(fl);
   }
 }
 
-void Leaderboard::setHP(unsigned int placement, std::string name, int value)
+void Leaderboard::setHP(quint32 placement, QString name, qint32 value)
 {
   hpactive[placement] = value;
   hpactivename[placement] = name.data();
 }
 
-int Leaderboard::scan(Character *ch)
+qint32 Leaderboard::scan(CharacterPtr ch)
 {
   check_offline();
 

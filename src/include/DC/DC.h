@@ -2,169 +2,584 @@
  * Copyright 2017-2023 Jared H. Hudson
  * Licensed under the LGPL.
  */
-#ifndef DC_H_
-#define DC_H_
-
-#define SAVE_DIR "../save"
-#define BSAVE_DIR "../bsave"
-#define QSAVE_DIR "../save/qdata"
-#define NEWSAVE_DIR "../newsave"
-#define ARCHIVE_DIR "../archive"
-#define MOB_DIR "../MOBProgs/"
-#define BAN_FILE "banned.txt"
-#define SHOP_DIR "../lib/shops"
-#define PLAYER_SHOP_DIR "../lib/playershops"
-#define FORBIDDEN_NAME_FILE "../lib/forbidden_names.txt"
-#define SKILL_QUEST_FILE "../lib/skill_quests.txt"
-#define FAMILIAR_DIR "../familiar"
-#define FOLLOWER_DIR "../follower"
-#define VAULT_DIR "../vaults"
-
-// TODO - Remove tinyworld.shp and divide the stops up into some meaningful
-//        format in their own directory like the world/mob/obj files
-#define SHOP_FILE "tinyworld.shp"
-
-#define WEBPAGE_FILE "webresponse.txt"
-#define GREETINGS1_FILE "greetings1.txt"
-#define GREETINGS2_FILE "greetings3.txt"
-#define GREETINGS3_FILE "greetings4.txt"
-#define GREETINGS4_FILE "greetings5.txt"
-#define CREDITS_FILE "credits.txt"
-#define MOTD_FILE "../lib/motd.txt"
-#define IMOTD_FILE "motdimm.txt"
-#define STORY_FILE "story.txt"
-#define TIME_FILE "time.txt"
-#define IDEA_LOG "ideas.log"
-#define TYPO_LOG "typos.log"
-#define MESS_FILE "messages.txt"
-#define MESS2_FILE "messages2.txt"
-#define SOCIAL_FILE "social.txt"
-#define HELP_KWRD_FILE "help_key.txt"
-#define HELP_PAGE_FILE "help.txt"
-#define INFO_FILE "info.txt"
-#define LOCAL_WHO_FILE "onlinewho.txt"
-
-#define WEB_WHO_FILE "/srv/www/www.dcastle.org/htdocs/onlinewho.txt"
-#define WEB_AUCTION_FILE "/srv/www/www.dcastle.org/htdocs/auctions.txt"
-#define NEW_HELP_FILE "new_help.txt"
-#define WEB_HELP_FILE "/srv/www/www.dcastle.org/htdocs/webhelp.txt"
-#define NEW_HELP_PAGE_FILE "new_help_screen.txt"
-#define NEW_IHELP_PAGE_FILE "new_ihelp_screen.txt"
-#define LEADERBOARD_FILE "leaderboard.txt"
-#define QUEST_FILE "quests.txt"
-#define WEBCLANSLIST_FILE "webclanslist.txt"
-#define HTDOCS_DIR "/srv/www/www.dcastle.org/htdocs/"
-
-#define PLAYER_DIR "player/"
-#define BUG_LOG "bug.log"
-#define GOD_LOG "god.log"
-#define MORTAL_LOG "mortal.log"
-#define SOCKET_LOG "socket.log"
-#define PLAYER_LOG "player.log"
-#define WORLD_LOG "world.log"
-#define ARENA_LOG "arena.log"
-#define CLAN_LOG "clan.log"
-#define OBJECTS_LOG "objects.log"
-#define QUEST_LOG "quest.log"
-#define VAULT_LOG "vault.log"
-
-#define WORLD_INDEX_FILE "worldindex"
-#define OBJECT_INDEX_FILE "objectindex"
-#define MOB_INDEX_FILE "mobindex"
-#define ZONE_INDEX_FILE "zoneindex"
-#define PLAYER_SHOP_INDEX "playershopindex"
-
-#define OBJECT_INDEX_FILE_TINY "objectindex.tiny"
-#define WORLD_INDEX_FILE_TINY "worldindex.tiny"
-#define MOB_INDEX_FILE_TINY "mobindex.tiny"
-#define ZONE_INDEX_FILE_TINY "zoneindex.tiny"
-
-#define VAULT_INDEX_FILE "../vaults/vaultindex"
-#define VAULT_INDEX_FILE_TMP "../vaults/vaultindex.tmp"
-
-#include <set>
-#include <queue>
-#include <unordered_set>
-#include <unordered_map>
+#pragma once
 #include <netinet/in.h>
-#include <string>
-#include <map>
+
 #include <expected>
 
+#include <libssh/libssh.h>
+#include <libssh/server.h>
+
+#include <QtTypes>
 #include <QSharedPointer>
 #include <QCoreApplication>
+#include <QSqlDatabase>
 #include <QMap>
+#include <QList>
+#include <QSet>
 #include <QString>
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
+#include <QThread>
+
 #include "DC/DC_global.h"
 
-typedef uint64_t vnum_t;
-typedef uint64_t rnum_t;
-typedef int32_t legacy_rnum_t;
-typedef qint64 level_diff_t;
-typedef QMap<QString, bool> joining_t;
+enum class cmd_t
+{
+  UNDEFINED,   // 0
+  NORTH,       // 1
+  EAST,        // 2
+  SOUTH,       // 3
+  WEST,        // 4
+  UP,          // 5
+  DOWN,        // 6
+  BELLOW,      // 8
+  DEFAULT,     // 9
+  TRACK,       // 10
+  PALM,        // 10
+  SAY,         // 11
+  LOOK,        // 12
+  BACKSTAB,    // 13
+  SBS,         // 14
+  ORCHESTRATE, // 15
+  REPLY,       // 16
+  WHISPER,     // 17
+  GLANCE,      // 20
+  FLEE,        // 28
+  ESCAPE,      // 29
+  PICK,        // 35
+  STOCK,       // 56
+  BUY,         // 56
+  SELL,        // 57
+  VALUE,       // 58
+  LIST,        // 59
+  ENTER,       // 60
+  CLIMB,       // 60
+  DESIGN,      // 62
+  PRICE,       // 65
+  REPAIR,      // 66
+  READ,        // 67
+  REMOVE,      // 69
+  ERASE,       // 70
+  ESTIMATE,    // 71
+  REMORT,      // 80
+  REROLL,      // 81
+  CHOOSE,      // 82
+  CONFIRM,     // 83
+  CANCEL,      // 84
+  SLIP,        // 87
+  GIVE,        // 88
+  DROP,        // 89
+  DONATE,      // 90
+  QUIT,        // 91
+  SACRIFICE,   // 92
+  PUT,         // 93
+  OPEN,        // 98
+  EDITOR,      // 100
+  FORCE,       // 123
+  WRITE,       // 128
+  WATCH,       // 155
+  PRACTICE,    // 164
+  TRAIN,       // 165
+  PROFESSION,  // 166
+  GAIN,        // 171
+  BALANCE,     // 172
+  DEPOSIT,     // 173
+  WITHDRAW,    // 174
+  CLEAN,       // 177
+  PLAY,        // 178
+  FINISH,      // 179
+  VETERNARIAN, // 180
+  FEED,        // 181
+  ASSEMBLE,    // 182
+  PAY,         // 183
+  RESTRING,    // 184
+  PUSH,        // 185
+  PULL,        // 186
+  LEAVE,       // 187
+  TREMOR,      // 188
+  BET,         // 189
+  INSURANCE,   // 190
+  DOUBLE,      // 191
+  STAY,        // 192
+  SPLIT,       // 193
+  HIT,         // 194
+  LOOT,        // 195
+  GTELL,       // 200
+  CTELL,       // 201
+  SETVOTE,     // 202
+  VOTE,        // 203
+  VEND,        // 204
+  FILTER,      // 205
+  EXAMINE,     // 206
+  GAG,         // 207
+  IMMORT,      // 208
+  IMPCHAN,     // 209
+  TELL,        // 210
+  TELLH,       // 211
+  PRIZE,       // 999
+  OTHER,       // 999
+  TELL_REPLY,  // 9999
+  GAZE,        // 1820
+  SAVE_SILENTLY,
+  ONEWAY,
+  TWOWAY,
+  MLOCATE_CHARACTER,
+  FEAR,
+  PAGING_HELP,
+  QUEST_CANCEL,
+  QUEST_START,
+  QUEST_FINISH,
+  QUEST_LIST,
+  GOLEMSCORE,
+  FSCORE,
+  REDEEM
+};
 
-typedef QList<QString> hints_t;
-#include "DC/levels.h"
-#include "DC/Trace.h"
-#include "DC/SSH.h"
-#include "DC/Zone.h"
-#include "DC/Shops.h"
-#include "DC/room.h"
-#include "DC/Database.h"
-#include "DC/Command.h"
-#include "DC/shop.h"
-#include "DC/Index.h"
-
-class Connection;
-class clan_data;
-
-using special_function = int (*)(Character *, class Object *, cmd_t, const char *, Character *);
 void close_file(std::FILE *fp);
 using unique_file_t = std::unique_ptr<std::FILE, decltype(&close_file)>;
 
-typedef std::set<Character *> character_list_t;
-typedef std::set<class Object *> obj_list_t;
-typedef std::set<int> client_descriptor_list_t;
-typedef std::set<int> server_descriptor_list_t;
-typedef std::vector<in_port_t> port_list_t;
-typedef std::set<Character *>::iterator character_list_i;
-typedef std::set<int>::iterator client_descriptor_list_i;
-typedef std::set<int>::iterator server_descriptor_list_i;
-typedef std::vector<in_port_t>::iterator port_list_i;
-typedef std::unordered_map<Character *, Trace> death_list_t;
-typedef std::unordered_map<Character *, Trace> free_list_t;
-typedef uint64_t zone_t;
-typedef uint64_t room_t;
-typedef uint64_t gold_t;
-typedef std::map<vnum_t, special_function> special_function_list_t;
-// class Zone;
-typedef QMap<zone_t, Zone> zones_t;
+typedef quint64 rnum_t;
+typedef qint32 legacy_rnum_t;
+typedef qint64 level_diff_t;
+typedef QMap<QString, bool> joining_t;
+typedef QList<QString> hints_t;
+typedef QSet<qint32> client_descriptor_list_t;
+typedef QSet<qint32> server_descriptor_list_t;
+typedef QList<in_port_t> port_list_t;
+typedef QSet<qint32>::iterator client_descriptor_list_i;
+typedef QSet<qint32>::iterator server_descriptor_list_i;
+typedef QList<in_port_t>::iterator port_list_i;
+typedef quint64 zone_t;
+typedef quint64 room_t;
+typedef quint64 gold_t;
+typedef qint8 attribute_points_t;
+typedef quint64 help_index_id_t;
+typedef QMap<QString, quint64> help_index_t;
+typedef quint64 clan_id_t;
+typedef qint32 command_return_t;
+typedef quint64 level_t;
+typedef QMap<QString, QString> aliases_t;
+typedef quint64 vnum_t;
+typedef quint64 room_t;
+typedef quint64 move_t;
+typedef qint16 skill_t;
+typedef qint32 HAND_FUNC(qint32 hand[5]);
+typedef qint32 socket_t;
+typedef qint16 skill_t;
+typedef quint64 gold_t;
+typedef QString player_config_key_t;
+typedef QString player_config_value_t;
+typedef QStringList item_types_t;
+extern item_types_t item_types;
+using DCPtr = QPointer<class DC>;
+using CharacterPtr = QPointer<class Character>;
+using ObjectPtr = QPointer<class Object>;
+typedef command_return_t (*test_function_t)(CharacterPtr ch);
+typedef QList<class quest_info *> quest_list_t;
+typedef qint32 SPEC_FUN(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString argument, CharacterPtr owner);
+typedef qint32 ROOM_PROC(CharacterPtr ch, cmd_t cmd, QString argument);
+typedef quint8 class_t;
 
-/* element in monster and object index-tables   */
+constexpr level_t MORTAL = 60;
+constexpr level_t GIFTED_COMMAND = 101; // noone should ever "be" this level
+constexpr level_t IMMORTAL = 102;
+constexpr level_t ANGEL = 103;
+constexpr level_t DEITY = 104;
+constexpr level_t OVERSEER = 105;
+constexpr level_t DIVINITY = 106;
+constexpr level_t COORDINATOR = 108;
+constexpr level_t IMPLEMENTER = 110;
+constexpr level_t ARCHITECT = ANGEL;
+constexpr level_t ARCHANGEL = ANGEL;
+constexpr level_t SERAPH = ANGEL;
+constexpr level_t PATRON = DEITY;
+constexpr level_t POWER = DEITY;
+constexpr level_t G_POWER = DEITY;
+constexpr level_t MIN_GOD = IMMORTAL;
+constexpr level_t PIRAHNA_FAKE_LVL = 102;
 
-class World
+typedef QMap<player_config_key_t, player_config_value_t> player_config_t;
+class PlayerConfig : public QObject
+{
+  Q_OBJECT
+public:
+  explicit PlayerConfig(QObject *parent = {});
+  player_config_t::iterator begin();
+  player_config_t::iterator end();
+  player_config_t::const_iterator constBegin() const;
+  player_config_t::const_iterator constEnd() const;
+  player_config_value_t value(const player_config_key_t &key, const player_config_value_t &defaultValue = player_config_value_t()) const;
+  player_config_key_t key(const player_config_value_t &value, const player_config_key_t &defaultKey = player_config_key_t()) const;
+  player_config_t::iterator find(const player_config_key_t &k);
+  player_config_t::iterator insert(const player_config_key_t &key, const player_config_value_t &value);
+  player_config_t &getQMap(void);
+
+private:
+  player_config_t config;
+};
+
+class class_data
 {
 public:
-  Room &operator[](room_t room_key);
+  QString name;
+  QString lname;
+  QString abbrev;
+  bool playable;
+  qint8 min_str;
+  qint8 min_dex;
+  qint8 min_con;
+  qint8 min_int;
+  qint8 min_wis;
 };
+
+typedef QList<class_data> classes_t;
+class ignore_entry
+{
+public:
+  bool ignore;
+  quint64 ignored_count;
+};
+class strcasecmp_compare
+{
+public:
+  bool operator()(const QString &l, const QString &r) const
+  {
+    return l.compare(r, Qt::CaseInsensitive);
+  }
+};
+typedef QMap<QString, ignore_entry> ignoring_t;
+class communication
+{
+public:
+  communication(CharacterPtr ch, QString message);
+  QString sender;
+  bool sender_ispc;
+  QString message;
+  time_t timestamp;
+};
+typedef QQueue<communication> history_t;
+
+class MobKills
+{
+public:
+  quint32 howmany;
+  qint32 name;
+};
+
+class AreaStats
+{
+public:
+  zone_t area;
+  qint64 xps;
+  qint64 gold;
+  QList<MobKills> mobKills;
+};
+typedef QMap<zone_t, AreaStats> area_stats_t;
+
+class char_skill_data
+{
+public:
+  skill_t skillnum{}; // ID # of skill.
+  qint16 learned{};   // % chance for success must be > 0
+  qint32 unused[5]{}; // for future use
+};
+typedef QMap<skill_t, char_skill_data> skill_list_t;
+
+class CharacterClassSkill
+{
+public:
+  QString skillname_;       // name of skill
+  qint16 skillnum{};        // ID # of skill
+  level_t levelavailable{}; // what level class can get it
+  qint16 maximum{};         // maximum value PC can train it to (1-100)
+  quint8 group{};           // which class tree group it is assigned
+  qint16 attrs{};           // What attributes the skill is based on
+};
+class MinimumEntity
+{
+  QString name_;
+
+public:
+  MinimumEntity(QString n = {}) : name_(n) {}
+
+  QString name(void) const
+  {
+    return name_;
+  }
+  void name(QString n)
+  {
+    name_ = n;
+  }
+};
+
+class ResetCommand
+{
+public:
+  ResetCommand() {};
+  ResetCommand(char comm) : command(comm), active(1) {};
+  char command = {};   /* current command                      */
+  qint32 if_flag = {}; // 0=always 1=if prev exe'd  2=if prev DIDN'T exe   3=ONLY on reboot
+  qint32 arg1 = {};
+  qint32 arg2 = {};
+  qint32 arg3 = {};
+  QString comment = {}; /* Any comments that went with the command */
+  qint32 active = {};   // is it active? alot aren't on the builders' port
+  time_t last = {};     // when was it last reset
+  CharacterPtr lastPop = {};
+  time_t lastSuccess = {};
+  quint64 attempts = {};
+  quint64 successes = {};
+  /*
+   *  Commands:              *
+   *  'M': Read a mobile     *
+   *  'O': Read an object    *
+   *  'P': Put obj in obj    *
+   *  'G': Obj to char       *
+   *  'E': Obj to char equip *
+   *  'D': Set state of door *
+   *  '%': arg1 in arg2 chance of being true *
+   *       (this is used for putting a %chance on next command *
+   */
+};
+
+bool operator==(ResetCommand a, ResetCommand b);
+typedef QList<QSharedPointer<ResetCommand>> zone_commands_t;
+
+class weather_data
+{
+public:
+  qint32 pressure; // How is the pressure ( Mb )
+  qint32 change;   // How fast and what way does it change.
+  qint32 sky;      // How is the sky.
+  qint32 sunlight; // And how much sun.
+
+  // following are usused at this time
+  qint32 windspeed;     // How fast wind is blowing
+  qint32 winddirection; // What direction it is blowing in
+  qint32 temperature;   // Duh...
+  qint32 modifiers;     // fog?  Ice?
+};
+
+class Zone : public MinimumEntity
+{
+
+public:
+  enum class ResetType
+  {
+    normal,
+    full
+  };
+
+  // Remember to update const.C  Zone::zone_bits if you change this
+  enum Flag
+  {
+    NO_TELEPORT = 1,
+    IS_TOWN = 1 << 1, // Keep out the really bad baddies that are STAY_NO_TOWN
+    MODIFIED = 1 << 2,
+    UNUSED = 1 << 3,
+    BPORT = 1 << 4,
+    NOCLAIM = 1 << 5, // cannot claim this area
+    NOHUNT = 1 << 6,
+  };
+
+  static QStringList zone_bits;
+
+  Zone(quint64 zone_key = 0);
+
+  quint64 lifespan = {}; /* how long between resets (minutes)  */
+  QDateTime last_full_reset = {};
+  quint64 age = {}; /* current age of ths zone (minutes) */
+
+  quint64 players = {}; // Number of PCs in the zone
+
+  qint32 reset_mode = {}; /* conditions for reset (see below)   */
+
+  zone_commands_t cmd = {}; /* command table for reset             */
+
+  /*
+   *  Reset mode:                              *
+   *  0: Don't reset, and don't update age.    *
+   *  1: Reset if no PC's are located in zone. *
+   *  2: Just reset.                           *
+   *  Update char * zone_modes[] (const.C) if you change this *
+   */
+
+  weather_data weather_info = {}; // for zones with unique weather
+
+  qint32 num_mob_first_repop = {}; // number of mobs in this zone that were repoped in first repop
+  qint32 num_mob_on_repop = {};    // number of mobs in this zone that were repoped in last repop
+  qint32 death_counter = {};       // +- counter for how often mobs in zone are killed
+  qint32 counter_mod = {};         // how quickly mobs are taken off the death_counter
+
+  qint32 clanowner = {};
+  qint32 gold = {};                  // gold (possibly the most descriptive comment of all time)
+  qint32 continent = {};             // what continent the zone belongs to
+  qint32 repops_without_deaths = {}; // Number of repops in a row with no deaths
+  qint32 repops_with_bonus = {};     // Number of repops where a 10% bonus occurred.
+
+  void reset(ResetType type = ResetType::normal);
+  bool isEmpty(void);
+
+  bool isTown(void);
+  void setTown(bool flag = true);
+
+  bool isNoTeleport(void);
+  void setNoTeleport(bool flag = true);
+
+  bool isNoClaim(void);
+  void setNoClaim(bool flag = true);
+
+  bool isNoHunt(void);
+  void setNoHunt(bool flag = true);
+
+  bool isModified(void);
+  void setModified(bool flag = true);
+
+  void incrementDiedThisTick(void);
+  void setDiedThisTick(quint64 died = {});
+  quint64 getDiedThisTick(void);
+
+  QString getFilename(void);
+  void setFilename(QString);
+
+  void setZoneFlags(quint64);
+  quint64 getZoneFlags(void) { return zone_flags; }
+
+  void setGold(quint64 value);
+  void addGold(quint64 value);
+  void incrementPlayers(void);
+  void decrementPlayers(void);
+
+  room_t getBottom(void);
+  void setBottom(qint32 room_key);
+
+  qint32 getTop(void);
+  void setTop(qint32 room_key);
+
+  room_t getRealBottom(void);
+  void setRealBottom(qint32 room_key);
+
+  qint32 getRealTop(void);
+  void setRealTop(qint32 room_key);
+
+  void write(FILE *fl);
+  qint32 show_info(CharacterPtr ch);
+
+  zone_t getID(void) const
+  {
+    return id_;
+  }
+
+private:
+  zone_t id_ = {};
+  quint64 died_this_tick = {}; // number of mobs that have died in this zone this pop
+  quint64 zone_flags = {};     /* flags for the entire zone eg: !teleport */
+  QString filename = {};       /* name of the file this zone is kept in */
+  room_t bottom = {};          /* bottom limit for room vnums in this zone */
+  room_t top = {};             /* upper limit for room vnums in this zone */
+  room_t bottom_rnum = {};
+  room_t top_rnum = {};
+};
+typedef QMap<zone_t, Zone> zones_t;
+bool isValidZoneKey(CharacterPtr ch, const zone_t zone_key);
+bool isValidZoneCommandKey(CharacterPtr ch, const Zone &zone, const qsizetype zone_command_key);
+qsizetype getZoneLastCommandNumber(const Zone &zone);
+zone_t getZoneKey(CharacterPtr ch, const QString input, bool *ok = {});
+quint64 getZoneCommandKey(CharacterPtr ch, const Zone &zone, const QString input, bool *ok = {});
+zone_t zedit_add(CharacterPtr ch, QStringList arguments, Zone &zone);
 
 class bestowable_god_commands_type
 {
 public:
-  QString name{}; // name of command
-  int16_t num{};  // ID # of command
+  QString name;   // name of command
+  qint16 num{};   // ID # of command
   bool testcmd{}; // true = test command, false = normal command
 };
+
+/* Bits for 'affected_by' */
+constexpr auto AFF_BLIND = 1;
+constexpr auto AFF_INVISIBLE = 2;
+constexpr auto AFF_DETECT_EVIL = 3;
+constexpr auto AFF_DETECT_INVISIBLE = 4;
+constexpr auto AFF_DETECT_MAGIC = 5;
+constexpr auto AFF_SENSE_LIFE = 6;
+constexpr auto AFF_REFLECT = 7;
+constexpr auto AFF_SANCTUARY = 8;
+constexpr auto AFF_GROUP = 9;
+constexpr auto AFF_EAS = 10;
+constexpr auto AFF_CURSE = 11;
+constexpr auto AFF_FROSTSHIELD = 12;
+constexpr auto AFF_POISON = 13;
+constexpr auto AFF_PROTECT_EVIL = 14;
+constexpr auto AFF_PARALYSIS = 15;
+constexpr auto AFF_DETECT_GOOD = 16;
+constexpr auto AFF_FIRESHIELD = 17;
+constexpr auto AFF_SLEEP = 18;
+constexpr auto AFF_true_SIGHT = 19;
+constexpr auto AFF_SNEAK = 20;
+constexpr auto AFF_HIDE = 21;
+constexpr auto AFF_IGNORE_WEAPON_WEIGHT = 22;
+constexpr auto AFF_CHARM = 23;
+constexpr auto AFF_RAGE = 24;
+constexpr auto AFF_SOLIDITY = 25;
+constexpr auto AFF_INFRARED = 26;
+constexpr auto AFF_CANTQUIT = 27;
+constexpr auto AFF_KILLER = 28;
+constexpr auto AFF_FLYING = 29;
+constexpr auto AFF_LIGHTNINGSHIELD = 30;
+constexpr auto AFF_HASTE = 31;
+constexpr auto AFF_SHADOWSLIP = 33;
+constexpr auto AFF_INSOMNIA = 34;
+constexpr auto AFF_FREEFLOAT = 35;
+constexpr auto AFF_FARSIGHT = 36;
+constexpr auto AFF_CAMOUFLAGUE = 37;
+constexpr auto AFF_STABILITY = 38;
+constexpr auto AFF_NEWSAVE = 39; // Newsave
+constexpr auto AFF_GOLEM = 40;   // This is used for IRON golem, not stone. It differs the two.
+constexpr auto AFF_FOREST_MELD = 41;
+constexpr auto AFF_INSANE = 42;
+constexpr auto AFF_GLITTER_DUST = 43;
+constexpr auto AFF_UTILITY = 44;
+constexpr auto AFF_ALERT = 45;
+constexpr auto AFF_NO_FLEE = 46;
+constexpr auto AFF_FAMILIAR = 47;
+constexpr auto AFF_PROTECT_GOOD = 48;
+constexpr auto AFF_POWERWIELD = 49;   // Innate Powerwield
+constexpr auto AFF_REGENERATION = 50; // Innate Regeneration
+constexpr auto AFF_FOCUS = 51;        // Innate focus
+constexpr auto AFF_ILLUSION = 52;     // Innate illusion
+constexpr auto AFF_KNOW_ALIGN = 53;
+constexpr auto AFF_BLACKJACK_ALERT = 54; // cannot be blackjacked, or blackjack //no longer used?
+constexpr auto AFF_WATER_BREATHING = 55;
+constexpr auto AFF_AMBUSH_ALERT = 56; // alert enough even for ambush
+constexpr auto AFF_FEARLESS = 57;
+constexpr auto AFF_NO_PARA = 58;
+constexpr auto AFF_NO_CIRCLE = 59;
+constexpr auto AFF_NO_BEHEAD = 60;
+constexpr auto AFF_BOUNT_SONNET_HUNGER = 61;
+constexpr auto AFF_BOUNT_SONNET_THIRST = 62;
+constexpr auto AFF_CMAST_WEAKEN = 63;
+constexpr auto AFF_RUSH_CD = 65; // bullrush cooldown
+constexpr auto AFF_CRIPPLE = 66;
+constexpr auto AFF_CHAMPION = 67;
+constexpr auto AFF_BLACKJACK = 68;
+constexpr auto AFF_NO_REGEN = 69;
+constexpr auto AFF_ACID_SHIELD = 70;
+constexpr auto AFF_PRIMAL_FURY = 71;
+constexpr auto AFF_ELEMENTAL = 72;
+constexpr auto AFF_ITEM_REMOVE = 73;
+// #define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
+// #define AFF_CHECKTHISASIZE	128
+// Make sure affected_bits[] in const.cpp is updated
 
 class command_lag
 {
 public:
-  command_lag *next;
-  class Character *ch;
-  cmd_t cmd_number;
-  int lag;
+  command_lag *next{};
+  CharacterPtr ch{};
+  cmd_t cmd_number{};
+  qint32 lag{};
 };
 
 class Arena
@@ -213,21 +628,17 @@ public:
   auto isClosed(void) const -> bool { return Status() == Statuses::CLOSED; }
 
 private:
-  level_t low_{};
-  level_t high_{};
-  quint64 number_{};
-  quint64 current_number_{};
-  quint64 hp_limit_{};
-  Types type_{};
-  Statuses status_{};
-  gold_t entry_fee_{};
+  level_t low_ = {};
+  level_t high_ = {};
+  quint64 number_ = {};
+  quint64 current_number_ = {};
+  quint64 hp_limit_ = {};
+  Types type_ = {};
+  Statuses status_ = {};
+  gold_t entry_fee_ = {};
 };
 
-#define auction_duration 1209600
-#define AUC_MIN_PRICE 1000
-#define AUC_MAX_PRICE 2000000000
-
-Object *ticket_object_load(QMap<unsigned int, class AuctionTicket>::iterator Item_it, int ticket);
+void produce_coredump(void *ptr = 0);
 
 enum ListOptions
 {
@@ -254,68 +665,68 @@ enum AuctionStates
 class AuctionTicket
 {
 public:
-  int vitem;
+  qint32 vitem;
   QString item_name;
-  unsigned int price;
+  quint32 price;
   QString seller;
   QString buyer;
   AuctionStates state;
-  unsigned int end_time;
-  Object *obj;
+  quint32 end_time;
+  ObjectPtr obj;
 };
-class Character;
+
 class AuctionHouse
 {
 public:
   AuctionHouse(QString in_file);
   AuctionHouse();
   ~AuctionHouse();
-  void CollectTickets(Character *ch, unsigned int ticket = 0);
-  void CancelAll(Character *ch);
-  void AddItem(Character *ch, Object *obj, unsigned int price, QString buyer);
-  void RemoveTicket(Character *ch, unsigned int ticket);
-  void BuyItem(Character *ch, unsigned int ticket);
-  void ListItems(Character *ch, ListOptions options, QString name, unsigned int to, unsigned int from);
+  void CollectTickets(CharacterPtr ch, quint32 ticket = 0);
+  void CancelAll(CharacterPtr ch);
+  void AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QString buyer);
+  void RemoveTicket(CharacterPtr ch, quint32 ticket);
+  void BuyItem(CharacterPtr ch, quint32 ticket);
+  void ListItems(CharacterPtr ch, ListOptions options, QString name, quint32 to, quint32 from);
   void CheckExpire();
-  void Identify(Character *ch, unsigned int ticket);
-  void AddRoom(Character *ch, int room);
-  void RemoveRoom(Character *ch, int room);
-  void ListRooms(Character *ch);
-  void HandleRename(Character *ch, QString old_name, QString new_name);
+  void Identify(CharacterPtr ch, quint32 ticket);
+  void AddRoom(CharacterPtr ch, qint32 room);
+  void RemoveRoom(CharacterPtr ch, qint32 room);
+  void ListRooms(CharacterPtr ch);
+  void HandleRename(CharacterPtr ch, QString old_name, QString new_name);
   void HandleDelete(QString name);
-  void CheckForSoldItems(Character *ch);
-  bool IsAuctionHouse(int room);
-  void DoModify(Character *ch, unsigned int ticket, unsigned int new_price);
-  void ShowStats(Character *ch);
+  void CheckForSoldItems(CharacterPtr ch);
+  bool IsAuctionHouse(qint32 room);
+  void DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price);
+  void ShowStats(CharacterPtr ch);
   void Save();
   void Load();
-  [[nodiscard]] unsigned int getItemsPosted(void) { return ItemsPosted; }
-  void setItemsPosted(unsigned int items_posted) { ItemsPosted = items_posted; }
+  [[nodiscard]] quint32 getItemsPosted(void) { return ItemsPosted; }
+  void setItemsPosted(quint32 items_posted) { ItemsPosted = items_posted; }
 
 private:
-  unsigned int ItemsPosted;
-  unsigned int ItemsExpired;
-  unsigned int ItemsSold;
-  unsigned int TaxCollected;
-  unsigned int Revenue;
-  unsigned int UncollectedGold;
-  unsigned int ItemsActive;
+  quint32 ItemsPosted;
+  quint32 ItemsExpired;
+  quint32 ItemsSold;
+  quint32 TaxCollected;
+  quint32 Revenue;
+  quint32 UncollectedGold;
+  quint32 ItemsActive;
   void ParseStats();
-  bool CanSellMore(Character *ch);
-  bool IsOkToSell(Object *obj);
-  bool IsWearable(Character *ch, int vnum);
-  bool IsNoTrade(int vnum);
+  bool CanSellMore(CharacterPtr ch);
+  bool IsOkToSell(ObjectPtr obj);
+  bool IsWearable(CharacterPtr ch, qint32 vnum);
+  bool IsNoTrade(qint32 vnum);
   bool IsSeller(QString in_name, QString seller);
-  bool IsExist(QString name, int vnum);
-  bool IsClass(int vnum, QString isclass);
-  bool IsRace(int vnum, QString israce);
-  bool IsName(QString name, int vnum);
-  bool IsSlot(QString slot, int vnum);
-  bool IsLevel(unsigned int to, unsigned int from, int vnum);
-  QMap<int, int> auction_rooms;
-  unsigned int cur_index;
+  bool IsExist(QString name, qint32 vnum);
+  bool IsClass(qint32 vnum, QString isclass);
+  bool IsRace(qint32 vnum, QString israce);
+  bool IsName(QString name, qint32 vnum);
+  bool IsSlot(QString slot, qint32 vnum);
+  bool IsLevel(quint32 to, quint32 from, qint32 vnum);
+  QMap<qint32, qint32> auction_rooms;
+  quint32 cur_index;
   QString file_name;
-  QMap<unsigned int, AuctionTicket> Items_For_Sale;
+  QMap<quint32, AuctionTicket> Items_For_Sale;
 };
 
 class wizlist_info
@@ -336,7 +747,7 @@ public:
   QString filename;
   vnum_t firstnum;
   vnum_t lastnum;
-  int32_t flags;
+  qint32 flags;
   world_file_list_item *next;
 };
 enum class create_error
@@ -345,6 +756,6992 @@ enum class create_error
   index_full,
   entry_exists
 };
+
+enum BACKUP_TYPE
+{
+  NONE,
+  SELFDELETED,
+  CONDEATH,
+  ZAPPED
+};
+void remove_character(QString name, BACKUP_TYPE backup = NONE);
+void remove_familiars(QString name, BACKUP_TYPE backup = NONE);
+
+class vault_items_data
+{
+public:
+  qint32 item_vnum;
+  qint32 count;
+  ObjectPtr obj; // for full-save items
+};
+
+class vault_access_data
+{
+public:
+  QString name;
+};
+
+class sorted_vault
+{
+public:
+  // This stores the quantity of each item found in a vault
+  QMap<QString, std::pair<ObjectPtr, quint32>> vault_content_qty = {};
+
+  // This stores the order in which vault items are found
+  QList<QString> vault_contents = {};
+
+  quint32 weight = {};
+};
+
+typedef command_return_t (*command_gen2_t)(CharacterPtr ch, QString argument, cmd_t cmd);
+typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
+typedef command_return_t (Character::*command_special_t)(QString arguments, cmd_t cmd);
+typedef qint32 (*command_gen1_t)(CharacterPtr ch, QString argument, cmd_t cmd);
+typedef qint32 (*command_gen1b_t)(CharacterPtr ch, QString argument, cmd_t cmd);
+
+enum class CommandType
+{
+  all,
+  players_only,
+  non_players_only,
+  immortals_only,
+  implementors_only
+};
+
+enum class position_t : quint8
+{
+  DEAD = 0,
+  STUNNED = 3,
+  SLEEPING = 4,
+  RESTING = 5,
+  SITTING = 6,
+  FIGHTING = 7,
+  STANDING = 8
+};
+
+typedef qint32 SPELL_FUN(quint8 level, CharacterPtr ch,
+                         const QString arg, qint32 type,
+                         CharacterPtr tar_ch,
+                         ObjectPtr tar_obj,
+                         qint32 skill);
+typedef qint32 SPELL_FUN2(quint8 level, CharacterPtr ch,
+                          const QString arg, qint32 type,
+                          CharacterPtr tar_ch,
+                          ObjectPtr tar_obj,
+                          qint32 skill, quint64 mana_cost);
+// typedef qint32 (*spell_gen1_t)(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill);
+// typedef command_return_t (*spell_gen2_t)(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill, quint64 mana_cost);
+
+// NOTE:  If you change this structure, keep in mind how it is used in guild.C
+// The min_level_XXX stuff MUST be updated in guild.C if you change this.  It is
+// using an offset from min_level_magic depending on class *(min_level_magic+2bytes)
+class spell_info_type
+{
+public:
+  spell_info_type(quint32 beats, position_t minimum_position, quint8 min_usesmana, qint16 targets, qint16 difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(nullptr), spell_pointer2_(nullptr), difficulty_(difficulty)
+  {
+  }
+  spell_info_type(quint32 beats, position_t minimum_position, quint8 min_usesmana, qint16 targets, SPELL_FUN *spell_pointer, qint16 difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(spell_pointer), difficulty_(difficulty)
+  {
+  }
+  spell_info_type(quint32 beats, position_t minimum_position, quint8 min_usesmana, qint16 targets, SPELL_FUN2 *spell_pointer, qint16 difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer2_(spell_pointer), difficulty_(difficulty)
+  {
+  }
+  // spell_info_type(quint32 beats, position_t minimum_position, quint8 min_usesmana, qint16 targets, spell_gen2_t spell_pointer, qint16 difficulty)
+  //     : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(nullptr), spell_pointer2_(spell_pointer), difficulty_(difficulty)
+  //{
+  // }
+  quint32 beats(void) const { return beats_; }
+  position_t minimum_position(void) const { return minimum_position_; }
+  quint8 min_usesmana(void) const { return min_usesmana_; }
+  qint16 targets(void) const { return targets_; }
+  SPELL_FUN *spell_pointer(void) const { return spell_pointer_; }
+  qint16 difficulty(void) const { return difficulty_; }
+  SPELL_FUN2 *spell_pointer2(void) const { return spell_pointer2_; }
+
+private:
+  quint32 beats_;               /* Waiting time after spell	*/
+  position_t minimum_position_; /* Position for caster		*/
+  quint8 min_usesmana_;         /* Mana used			*/
+  qint16 targets_;              /* Legal targets		*/
+  SPELL_FUN *spell_pointer_;    /* Function to call		*/
+  qint16 difficulty_;           /* Spell difficulty */
+  SPELL_FUN2 *spell_pointer2_;  /* Function to call		*/
+};
+extern const QList<spell_info_type> spell_info;
+
+class Command : public MinimumEntity
+{
+public:
+  Command(QString name = QString(), command_gen1_t ptr1 = {}, command_gen1b_t ptr1b = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {},
+          position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
+          bool allow_charmie = false, quint8 toggle_hide = {}, CommandType type = {})
+      : MinimumEntity(name),
+        command_pointer1_(ptr1), command_pointer1b_(ptr1b), command_pointer2_(ptr2), command_pointer3_(ptr3),
+        minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
+        allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type)
+  {
+  }
+  Command(QString name, command_gen1_t ptr1,
+          position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
+          bool allow_charmie = false, quint8 toggle_hide = {}, CommandType type = {})
+      : MinimumEntity(name),
+        command_pointer1_(ptr1), command_pointer1b_(nullptr), command_pointer2_(nullptr), command_pointer3_(nullptr),
+        minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
+        allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type)
+  {
+  }
+  Command(QString name, command_gen1b_t ptr1b,
+          position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
+          bool allow_charmie = false, quint8 toggle_hide = {}, CommandType type = {})
+      : MinimumEntity(name),
+        command_pointer1_(nullptr), command_pointer1b_(ptr1b), command_pointer2_(nullptr), command_pointer3_(nullptr),
+        minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
+        allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type)
+  {
+  }
+  Command(QString name, command_gen2_t ptr2,
+          position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
+          bool allow_charmie = false, quint8 toggle_hide = {}, CommandType type = {})
+      : MinimumEntity(name),
+        command_pointer1_(nullptr), command_pointer1b_(nullptr), command_pointer2_(ptr2), command_pointer3_(nullptr),
+        minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
+        allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type)
+  {
+  }
+  Command(QString name, command_gen3_t ptr3,
+          position_t min_pos = {}, level_t min_lvl = {}, cmd_t nr = cmd_t::DEFAULT,
+          bool allow_charmie = false, quint8 toggle_hide = {}, CommandType type = {})
+      : MinimumEntity(name),
+        command_pointer1_(nullptr), command_pointer1b_(nullptr), command_pointer2_(nullptr), command_pointer3_(ptr3),
+        minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
+        allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type)
+  {
+  }
+
+  [[nodiscard]] inline command_gen1_t getFunction1(void) const { return command_pointer1_; }
+  void setFunction1(const command_gen1_t function) { command_pointer1_ = function; }
+
+  [[nodiscard]] inline command_gen1b_t getFunction1b(void) const { return command_pointer1b_; }
+  void setFunction1b(const command_gen1b_t function) { command_pointer1b_ = function; }
+
+  [[nodiscard]] inline command_gen2_t getFunction2(void) const { return command_pointer2_; }
+  void setFunction2(const command_gen2_t function) { command_pointer2_ = function; }
+
+  [[nodiscard]] inline command_gen3_t getFunction3(void) const { return command_pointer3_; }
+  void setFunction3(const command_gen3_t function) { command_pointer3_ = function; }
+
+  [[nodiscard]] inline cmd_t getNumber(void) const { return command_number_; }
+  void setNumber(const cmd_t number) { command_number_ = number; }
+
+  [[nodiscard]] inline level_t getMinimumLevel(void) const { return minimum_level_; }
+  void setMinimumLevel(const level_t level) { minimum_level_ = level; }
+
+  [[nodiscard]] inline position_t getMinimumPosition(void) const { return minimum_position_; }
+  void setMinimumPosition(const position_t minimum_position) { minimum_position_ = minimum_position; }
+
+  bool isCharmieAllowed(void) const { return allow_charmie_ == true; }
+
+  [[nodiscard]] inline CommandType getType(void) const { return type_; }
+  void setType(const CommandType type) { type_ = type; }
+
+  // qint32 (*command_pointer_)(CharacterPtr ch, QString argument, cmd_t cmd);               /* Function that does it            */
+  // command_return_t (*command_pointer2_)(CharacterPtr ch, QString argument, cmd_t cmd); /* Function that does it            */
+  // command_return_t (Character::*command_pointer3_)(QStringList arguments, cmd_t cmd);    /* Function that does it            */
+
+  command_gen1_t command_pointer1_;
+  command_gen1b_t command_pointer1b_;
+  command_gen2_t command_pointer2_;
+  command_gen3_t command_pointer3_;
+  position_t minimum_position_; /* Position commander must be in    */
+  level_t minimum_level_;       /* Minimum level needed             */
+  cmd_t command_number_;        /* Passed to function as argument   */
+  bool allow_charmie_;
+  quint8 toggle_hide_;
+  CommandType type_;
+};
+
+enum class search_error
+{
+  invalid_input,
+  not_found
+};
+
+class Commands
+{
+public:
+  Commands(void);
+  void add(Command cmd);
+  auto find(QString arg) -> std::expected<Command, search_error>;
+  auto find(cmd_t cmd) -> std::expected<Command, search_error>;
+  static QList<Command> commands_;
+  static QMap<QString, Command> qstring_command_map_;
+  static QMap<cmd_t, Command> cmd_t_command_map_;
+};
+
+bool isCommandTypeDirection(cmd_t cmd);
+bool isCommandTypeCasino(cmd_t cmd);
+auto getCommandFromDirection(qint32 dir) -> std::expected<cmd_t, bool>;
+auto getDirectionFromCommand(cmd_t cmd) -> std::expected<qint32, bool>;
+
+enum class inet_protocol_family_t
+{
+  UNKNOWN,
+  TCP4,
+  TCP6,
+  UNRECOGNIZED
+};
+class Proxy
+{
+public:
+  Proxy(QString);
+  Proxy(void) {}
+
+  inet_protocol_family_t getInet_Protocol_Fanily(void) { return inet_protocol_family; }
+  QString getHeader(void) { return header; }
+  bool isActive(void) { return active; }
+  QHostAddress getSourceAddress(void) { return source_address; }
+  QHostAddress getDestinationAddress(void) { return destination_address; }
+  quint16 getSourcePort(void) { return source_port; }
+  quint16 getDestinationPort(void) { return destination_port; }
+
+private:
+  inet_protocol_family_t inet_protocol_family = {};
+  QString header = {};
+  bool active = false;
+  QHostAddress source_address = {};
+  QHostAddress destination_address = {};
+  quint16 source_port = {};
+  quint16 destination_port = {};
+};
+
+class Connection : public QObject
+{
+  Q_OBJECT
+public:
+  enum states
+  {
+    PLAYING,
+    GET_PROXY,
+    GET_NAME,
+    GET_OLD_PASSWORD,
+    CONFIRM_NEW_NAME,
+    GET_NEW_PASSWORD,
+    CONFIRM_NEW_PASSWORD,
+    GET_NEW_SEX,
+    OLD_GET_CLASS,
+    READ_MOTD,
+    SELECT_MENU,
+    RESET_PASSWORD,
+    CONFIRM_RESET_PASSWORD,
+    EXDSCR,
+    OLD_GET_RACE,
+    WRITE_BOARD,
+    EDITING,
+    EDITING_V2,
+    SEND_MAIL,
+    DELETE_CHAR,
+    OLD_CHOOSE_STATS,
+    PFILE_WIPE,
+    ARCHIVE_CHAR,
+    CLOSE,
+    CONFIRM_PASSWORD_CHANGE,
+    EDIT_MPROG,
+    DISPLAY_ENTRANCE,
+    PRE_DISPLAY_ENTRANCE,
+    SELECT_RECOVERY_MENU,
+    GET_NEW_RECOVERY_QUESTION,
+    GET_NEW_RECOVERY_ANSWER,
+    GET_NEW_RECOVERY_EMAIL,
+    QUESTION_ANSI,
+    GET_ANSI,
+    QUESTION_SEX,
+    QUESTION_STAT_METHOD,
+    GET_STAT_METHOD,
+    OLD_STAT_METHOD,
+    NEW_STAT_METHOD,
+    NEW_PLAYER,
+    QUESTION_RACE,
+    GET_RACE,
+    QUESTION_CLASS,
+    GET_CLASS,
+    QUESTION_STATS,
+    GET_STATS
+  };
+
+  Proxy proxy = {};
+
+  qint32 descriptor = {}; /* file descriptor for socket	*/
+  qint32 desc_num = {};
+
+  states connected = {}; /* mode of 'connectedness'	*/
+  qint32 web_connected = {};
+  qint32 wait = {};        /* wait for how many loops	*/
+  char *showstr_head = {}; /* for paging through texts	*/
+  const char **showstr_vector = {};
+  qint32 showstr_count = {};
+  qint32 showstr_page = {};
+  bool new_newline = {}; /* prepend newline in output	*/
+  //  char	**str;			/* for the modify-str system	*/
+  char **hashstr = {};
+  char *astr = {};
+  qint32 max_str = {};
+  QString buf = {};        /* buffer for raw input	*/
+  QString last_input = {}; /* the last input	*/
+  QByteArray output = {};  /* output buffer for writing to connection	*/
+  QString inbuf = {};
+  QQueue<QString> input = {};  /* queue of unprocessed input	*/
+  CharacterPtr character = {}; /* linked to char		*/
+  CharacterPtr original = {};  /* for switch / return		*/
+  Connection *snooping = {};   /* Who is this char snooping       */
+  Connection *snoop_by = {};   /* And who is snooping this char   */
+  Connection *next = {};       /* link to next descriptor	*/
+  qint32 tick_wait = {};       /* # ticks desired to wait	*/
+  qint32 reallythere = {};     /* Goddamm #&@$*% sig 13 (hack) */
+  qint32 prompt_mode = {};
+  quint8 idle_tics = {};
+  time_t login_time = {};
+  class stat_data *stats = {}; // for rolling up a char
+
+  char **strnew{}; /* for the modify-str system	*/
+  QString qstrnew;
+  QString backstr;
+  qint32 idle_time = {}; // How long the descriptor has been idle, overall.
+  bool color = {};
+  bool server_size_echo = false;
+  bool allowColor = 1;
+
+  void send(QString txt);
+
+  QHostAddress getPeerAddress(void)
+  {
+    return peer_address_;
+  }
+  QHostAddress getPeerOriginalAddress(void)
+  {
+    if (proxy.isActive())
+    {
+      return proxy.getSourceAddress();
+    }
+    return getPeerAddress();
+  }
+
+  QString getPeerFullAddressString(void)
+  {
+    if (proxy.isActive())
+    {
+      return QStringLiteral("%1 via %2").arg(getPeerOriginalAddress().toString()).arg(getPeerAddress().toString());
+    }
+    else
+    {
+      return getPeerOriginalAddress().toString();
+    }
+  }
+
+  void setPeerAddress(QHostAddress address)
+  {
+    peer_address_ = address;
+  }
+
+  void setPeerPort(quint16 port)
+  {
+    peer_port_ = port;
+  }
+
+  QString getName(void);
+  inline bool isEditing(void) const noexcept
+  {
+    return connected == Connection::states::EDITING ||
+           connected == Connection::states::EDITING_V2 ||
+           connected == Connection::states::WRITE_BOARD ||
+           connected == Connection::states::EDIT_MPROG ||
+           connected == Connection::states::SEND_MAIL ||
+           connected == Connection::states::EXDSCR;
+  }
+  inline bool isPlaying(void) const noexcept
+  {
+    return connected == Connection::states::PLAYING;
+  }
+  [[nodiscard]] inline QString name(void) { return name_; }
+  inline QString name(QString s)
+  {
+    name_ = s;
+    return s;
+  }
+  qint32 process_output(void);
+  QString createBlackjackPrompt(void);
+  QString createPrompt(void);
+  void setOutput(QString output_buffer);
+  void appendOutput(QString output_buffer);
+  QByteArray getOutput(void) const;
+
+private:
+  QHostAddress peer_address_ = {};
+  quint16 peer_port_ = {};
+  QString name_; /* Copy of the player name	*/
+};
+using ConnectionPtr = QPointer<Connection>;
+
+enum class attribute_t : quint8
+{
+  UNDEFINED = 0,
+  STRENGTH = 1,
+  DEXTERITY = 2,
+  INTELLIGENCE = 3,
+  WISDOM = 4,
+  CONSTITUTION = 5
+};
+
+enum class vault_search_type
+{
+  UNDEFINED,
+  KEYWORD,
+  LEVEL,
+  MIN_LEVEL,
+  MAX_LEVEL
+};
+
+enum class load_status_t
+{
+  unknown,  // default unknown value
+  success,  // successfully loaded something
+  missing,  // not found
+  error,    // error loading
+  bad_input // bad input
+};
+
+bool operator!(load_status_t ls);
+
+constexpr auto ASIZE = 32; // don't change unless you want to be screwed
+
+[[nodiscard]] inline constexpr bool isSet(auto flag, auto bit)
+{
+  return flag & bit;
+};
+
+const auto DARK = 1;
+const auto NOHOME = 1 << 1;
+const auto NO_MOB = 1 << 2;
+
+const auto INDOORS = 1 << 3;
+const auto TELEPORT_BLOCK = 1 << 4;
+const auto NO_KI = 1 << 5;
+const auto NOLEARN = 1 << 6;
+const auto NO_MAGIC = 1 << 7;
+const auto TUNNEL = 1 << 8;
+const auto PRIVATE = 1 << 9;
+const auto SAFE = 1 << 10;
+const auto NO_SUMMON = 1 << 11;
+const auto NO_ASTRAL = 1 << 12; // usused
+const auto NO_PORTAL = 1 << 13;
+const auto IMP_ONLY = 1 << 14;
+const auto FALL_DOWN = 1 << 15;
+const auto ARENA = 1 << 16;
+const auto QUIET = 1 << 17;
+const auto UNSTABLE = 1 << 18;
+const auto NO_QUIT = 1 << 19;
+const auto FALL_UP = 1 << 20;
+const auto FALL_EAST = 1 << 21;
+const auto FALL_WEST = 1 << 22;
+const auto FALL_SOUTH = 1 << 23;
+const auto FALL_NORTH = 1 << 24;
+const auto NO_TELEPORT = 1 << 25;
+const auto NO_TRACK = 1 << 26;
+const auto CLAN_ROOM = 1 << 27;
+const auto NO_SCAN = 1 << 28;
+const auto NO_WHERE = 1 << 29;
+const auto LIGHT_ROOM = 1 << 30;
+
+constexpr auto PASSWORD_LEN = 20;
+
+class deny_data
+{
+public:
+  deny_data *next;
+  qint32 vnum;
+};
+
+class extra_descr_data
+{
+public:
+  QString keyword_ = {};       /* Keyword in look/examine          */
+  QString description_ = {};   /* What to see                      */
+  extra_descr_data *next = {}; /* Next in list                     */
+};
+
+auto &operator<<(auto &out, extra_descr_data *currdesc)
+{
+  while (currdesc)
+  {
+    out << "E\n";
+    string_to_file(out, currdesc->keyword_);
+    string_to_file(out, currdesc->description_);
+    currdesc = currdesc->next;
+  }
+  return out;
+}
+
+class room_direction_data
+{
+public:
+  char *general_description; /* When look DIR.                  */
+  char *keyword;             /* for open/close                  */
+  qint16 exit_info;          /* Exit info                       */
+  CharacterPtr bracee;       /* This is who is bracing the door */
+  qint16 key;                /* Key's number (-1 for no key)    */
+  qint16 to_room;            /* Where direction leeds (NOWHERE) */
+};
+
+const auto MAX_DIRS = 6;
+constexpr auto CLASS_MAX = 13;
+
+class follow_type
+{
+public:
+  CharacterPtr follower;
+  class follow_type *next;
+};
+
+constexpr auto AFF_MAX = 73;
+
+class tempvariable
+{
+public:
+  class tempvariable *next = {};
+  QString name;
+  QString data;
+  qint16 save = {}; // save or not
+};
+
+class affected_type
+{
+public:
+  quint32 type = {};    /* The type of spell that caused ths      */
+  qint16 duration = {}; /* For how long its effects will last      */
+  qint32 duration_type = {};
+  qint32 modifier = {};  /* This is added to apropriate ability     */
+  qint32 location = {};  /* Tells which ability to change(APPLY_XXX)*/
+  qint32 bitvector = {}; /* Tells which bits to set (AFF_XXX)       */
+  QString caster = {};
+  affected_type *next = {};
+  CharacterPtr origin = {};
+  CharacterPtr victim = {};
+};
+
+enum ReturnValue
+{
+  eFAILURE = 1U,
+  eSUCCESS = 1U << 1,
+  eCH_DIED = 1U << 2,
+  eVICT_DIED = 1U << 3,
+  eINTERNAL_ERROR = 1U << 4,
+  eEXTRA_VALUE = 1U << 5, // Added to act like a flag, setting if something
+                          // Special happened in the function.. (verify_existing_components use at the moment)
+  eEXTRA_VAL2 = 1U << 6,  // damage() needs two
+
+  eDELAYED_EXEC = 1U << 7, // Mobprogs, MPPAUSE
+  eIMMUNE_VICTIM = 1U << 8 // returned by damage() when attacking somethat's immune to attack
+};
+
+constexpr auto SAVE_TYPE_MAX = 5; // Do not change this value.  Used in pfile writing
+// for size of the array.
+
+class Entity
+{
+  QString description_;
+  QString short_description_; /* when worn/carry/in cont.         */
+  QString long_description_;  /* When in room                     */
+  QString action_description_;
+
+public:
+  class Room &room(void);
+  room_t in_room = {};
+
+  QString description(QString s)
+  {
+    description_ = s;
+    return s;
+  }
+  QString description(void)
+  {
+    return description_;
+  }
+
+  QString short_description(QString s)
+  {
+    short_description_ = s;
+    return s;
+  }
+  [[nodiscard]] QString short_description(void) const { return short_description_; }
+
+  QString long_description(QString s)
+  {
+    long_description_ = s;
+    return s;
+  }
+  [[nodiscard]] QString long_description(void) const { return long_description_; }
+
+  QString action_description(QString s)
+  {
+    action_description_ = s;
+    return s;
+  }
+  [[nodiscard]] QString action_description(void) const { return action_description_; }
+};
+
+class songInfo
+{
+public:
+  qint16 song_timer;  /* status for songs being sung */
+  qint16 song_number; /* number of song being sung */
+  QString song_data_;
+};
+
+constexpr auto MAX_WEAR = 23;
+class time_data
+{
+public:
+  qint32 birth;  /* This represents the character's age                */
+  qint32 logon;  /* Time of the last logon (used to calculate played) */
+  qint32 played; /* This is the total accumulated time played in secs */
+};
+void char_to_store(CharacterPtr ch, class char_file_u4 *st, time_data &tmpage); /* These data contain information about a players time data */
+
+class time_info_data
+{
+public:
+  qint32 hours;
+  qint32 day;
+  qint32 month;
+  qint32 year;
+};
+time_info_data mud_time_passed(time_t t2, time_t t1);
+
+class Vault
+{
+public:
+  Vault(QString owner = {}, quint32 size = {}, quint32 weight = {}, quint64 gold = {}, DCPtr dc = {})
+      : owner_(owner), size_(size), weight_(weight), gold_(gold), dc_(dc)
+  {
+  }
+  void access_remove(QString name);
+  void item_remove(ObjectPtr obj);
+  void item_add(qint32 vnum);
+
+  ObjectPtr get_obj(QString keyword, qint32 num);
+  ObjectPtr get_unique_obj(QString keyword, qint32 num);
+  vault_items_data &get_item(QString keyword, qint32 num);
+  vault_items_data &get_unique_item(QString keyword, qint32 num);
+
+  void sort(sorted_vault &sv);
+  void save(void);
+
+  QString owner_;
+  quint32 size_;
+  quint32 weight_;
+  quint64 gold_;
+  DCPtr dc_;
+
+  QList<vault_access_data> access;
+  QList<vault_items_data> items;
+  operator bool() { return !owner_.isEmpty(); }
+};
+
+enum mob_type_t
+{
+  MOB_NORMAL = 0,
+  MOB_GUARD,
+  MOB_CLAN_GUARD,
+  MOB_TYPE_FIRST = MOB_NORMAL,
+  MOB_TYPE_LAST = MOB_CLAN_GUARD
+};
+const qint32 MAX_MOB_VALUES = 4;
+
+class mob_flag_data
+{
+public:
+  qint32 value[MAX_MOB_VALUES]; /* Mob type-specific value numbers */
+  mob_type_t type;              /* Type of mobile                     */
+};
+
+class mob_prog_act_list
+{
+public:
+  mob_prog_act_list *next = {};
+  QString buf_;
+  CharacterPtr ch = {};
+  ObjectPtr obj = {};
+  void *vo = {};
+};
+
+constexpr auto ACT_MAX = 38;
+
+class Mobile
+{
+public:
+  qint32 nr = {};
+  position_t default_pos = {};                // Default position for NPC
+  qint8 last_direction = {};                  // Last direction the mobile went in
+  quint32 attack_type = {};                   // Bitvector of damage type for bare-handed combat
+  quint32 actflags[ACT_MAX / ASIZE + 1] = {}; // flags for NPC behavior
+
+  qint16 damnodice = {};   // The number of damage dice's
+  qint16 damsizedice = {}; // The size of the damage dice's
+
+  char *fears = {};   /* will flee from ths person on sight     */
+  QString hated = {}; /* List of PC's I hate */
+
+  mob_prog_act_list *mpact = {}; // list of MOBProgs
+  qint16 mpactnum = {};          // num
+  qint32 last_room = {};         // Room rnum the mob was last in. Used
+                                 // For !magic,!track changing flags.
+  class threat_data *threat = {};
+  QSharedPointer<ResetCommand> reset = {};
+  mob_flag_data mob_flags = {}; /* Mobile information               */
+  bool paused = {};
+
+  void setObject(ObjectPtr);
+  ObjectPtr getObject(void);
+  bool isObject(void);
+  void save(FILE *fpsave);
+  void read(FILE *fpsave);
+
+private:
+  ObjectPtr object = {};
+};
+
+class Character : public MinimumEntity, public Entity, public QObject
+{
+  Q_OBJECT
+public:
+  Character(DCPtr dc);
+  enum Type
+  {
+    Undefined,
+    Player,
+    NPC,
+    ObjectProgram
+  };
+  Q_ENUM(Type)
+  void setType(const Type type);
+  auto getType(void) const -> Type;
+
+  enum sex_t : qint8
+  {
+    NEUTRAL = 0,
+    MALE = 1,
+    FEMALE = 2
+  };
+  enum class PromptVariableType
+  {
+    Legacy,
+    Advanced
+  };
+  static constexpr qsizetype MIN_NAME_SIZE = 3;
+  static constexpr qsizetype MAX_NAME_SIZE = 12;
+  static const QList<qint32> wear_to_item_wear;
+  static bool validateName(QString name);
+
+  class Mobile *mobdata = {};
+  class Player *player = {};
+  ObjectPtr objdata = {};
+
+  Connection *desc = {}; // nullptr normally for mobs
+
+  QString title_;
+
+  sex_t sex = {};
+
+  qint8 c_class = {};
+  auto getClass(void) const
+  {
+    return c_class;
+  }
+  void setClass(auto new_class)
+  {
+    c_class = new_class;
+  }
+  QString class_to_string(class_t class_nr) const
+  {
+    return Character::class_names.value(class_nr);
+  }
+  QString getClassName(void) const
+  {
+    return class_to_string(c_class);
+  }
+
+  qint8 race = {};
+  auto getRace(void) const
+  {
+    return race;
+  }
+  void setRace(auto new_race)
+  {
+    race = new_race;
+  }
+  QString getRaceName(void) const
+  {
+    return race_names.value(race);
+  }
+
+  level_t getLevel(void) const;
+  level_t *getLevelPtr(void)
+  {
+    return &level_;
+  }
+  void setLevel(level_t level);
+  void incrementLevel(level_t level_change = 1)
+  {
+    if (level_ <= INT64_MAX - level_change)
+    {
+      level_ += level_change;
+    }
+  }
+  void decrementLevel(level_t level_change = 1)
+  {
+    if (level_ >= level_change)
+    {
+      level_ -= level_change;
+    }
+    else
+    {
+      level_ = {};
+    }
+  }
+
+  bool isDead(void) const
+  {
+    return position_ == position_t::DEAD;
+  }
+  void setDead(void)
+  {
+    position_ = position_t::DEAD;
+  }
+
+  bool isStunned(void) const
+  {
+    return position_ == position_t::STUNNED;
+  }
+  void setStunned(void)
+  {
+    position_ = position_t::STUNNED;
+  }
+
+  bool isSleeping(void) const
+  {
+    return position_ == position_t::SLEEPING;
+  }
+  void setSleeping(void)
+  {
+    position_ = position_t::SLEEPING;
+  }
+
+  bool isResting(void) const
+  {
+    return position_ == position_t::RESTING;
+  }
+  void setResting(void)
+  {
+    position_ = position_t::RESTING;
+  }
+
+  bool isSitting(void) const
+  {
+    return position_ == position_t::SITTING;
+  }
+  void setSitting(void)
+  {
+    position_ = position_t::SITTING;
+  }
+
+  bool isFighting(void) const
+  {
+    return position_ == position_t::FIGHTING;
+  }
+  void setFighting(void)
+  {
+    position_ = position_t::FIGHTING;
+  }
+
+  bool isStanding(void) const
+  {
+    return position_ == position_t::STANDING;
+  }
+  void setStanding(void)
+  {
+    position_ = position_t::STANDING;
+  }
+
+  void setPosition(position_t position)
+  {
+    position_ = position;
+  }
+  position_t getPosition(void)
+  {
+    return position_;
+  }
+  position_t *getPositionPtr(void)
+  {
+    return &position_;
+  }
+  QString shortdesc_or_name(void)
+  {
+    if (short_description().isEmpty())
+      return name();
+    return short_description();
+  }
+
+  attribute_points_t str = {};
+  attribute_points_t raw_str = {};
+  attribute_points_t str_bonus = {};
+  attribute_points_t intel = {};
+  attribute_points_t raw_intel = {};
+  attribute_points_t intel_bonus = {};
+  attribute_points_t wis = {};
+  attribute_points_t raw_wis = {};
+  attribute_points_t wis_bonus = {};
+  attribute_points_t dex = {};
+  attribute_points_t raw_dex = {};
+  attribute_points_t dex_bonus = {};
+  attribute_points_t con = {};
+  attribute_points_t raw_con = {};
+  attribute_points_t con_bonus = {};
+
+  qint8 conditions[3] = {}; // Drunk full etc.
+
+  quint8 weight = {}; /* PC/NPC's weight */
+  quint8 height = {}; /* PC/NPC's height */
+
+  qint16 hometown = {}; /* PC/NPC home town */
+
+  quint32 plat = {};                    /* Platinum                                */
+  qint64 exp = {};                      /* The experience of the player            */
+  quint32 immune = {};                  // Bitvector of damage types I'm immune to
+  quint32 resist = {};                  // Bitvector of damage types I'm resistant to
+  quint32 suscept = {};                 // Bitvector of damage types I'm susceptible to
+  qint16 saves[SAVE_TYPE_MAX + 1] = {}; // Saving throw bonuses
+
+  qint32 mana = {};
+  qint32 max_mana = {}; /* Not useable                             */
+  qint32 raw_mana = {}; /* before qint32 bonus                        */
+  qint32 hit = {};
+  qint32 max_hit = {}; /* Max hit for NPC                         */
+  qint32 raw_hit = {}; /* before con bonus                        */
+
+  move_t move_limit(void);
+  move_t getMove(void)
+  {
+    return move_;
+  }
+  move_t *getMovePtr(void)
+  {
+    return &move_;
+  }
+  void setMove(move_t new_move)
+  {
+    move_ = new_move;
+  }
+  bool incrementMove(move_t move_change = 1)
+  {
+    if (move_ <= INT64_MAX - move_change)
+    {
+      move_ += move_change;
+
+      if (move_ > move_limit())
+      {
+        move_ = move_limit();
+      }
+
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  bool decrementMove(move_t move_change = 1, QString message = QStringLiteral("You're too out of breath!"))
+  {
+    if (move_ >= move_change)
+    {
+      move_ -= move_change;
+      return true;
+    }
+    else
+    {
+      move_ = {};
+      if (!message.isEmpty())
+      {
+        sendln(message);
+      }
+    }
+    return false;
+  }
+
+  qint32 raw_move = {};
+  qint32 max_move = {}; /* Max move for NPC                        */
+  qint32 ki = {};
+  qint32 max_ki = {};
+  qint32 raw_ki = {};
+
+  qint16 alignment = {}; // +-1000 for alignments
+
+  quint32 hpmetas = {};   // total number of times meta'd hps
+  quint32 manametas = {}; // total number of times meta'd mana
+  quint32 movemetas = {}; // total number of times meta'd moves
+  quint32 acmetas = {};   // total number of times meta'd ac
+  qint32 agemetas = {};   // number of years age has been meta'd
+
+  qint16 hit_regen = {};  // modifier to hp regen
+  qint16 mana_regen = {}; // modifier to mana regen
+  qint16 move_regen = {}; // modifier to move regen
+  qint16 ki_regen = {};   // modifier to ki regen
+
+  qint16 melee_mitigation = {}; // modifies melee damage
+  qint16 spell_mitigation = {}; // modified spell damage
+  qint16 song_mitigation = {};  // modifies song damage
+  qint16 spell_reflect = {};
+
+  clan_id_t clan{}; /* Clan the char is in */
+
+  qint16 armor = {};   // Armor class
+  qint16 hitroll = {}; // Any bonus or penalty to the hit roll
+  qint16 damroll = {}; // Any bonus or penalty to the damage roll
+
+  qint16 glow_factor = {}; // Amount that the character glows
+
+  ObjectPtr beacon = {}; /* pointer to my beacon */
+
+  QList<songInfo> songs = {}; // Song list
+                              //     qint16 song_timer = {};       /* status for songs being sung */
+                              //     qint16 song_number = {};      /* number of song being sung */
+                              //     char * song_data = {};        /* args for the songs */
+
+  ObjectPtr equipment[MAX_WEAR] = {}; // Equipment List
+
+  skill_list_t skills = {};           // Skills List
+  class affected_type *affected = {}; // Affected by list
+  ObjectPtr carrying = {};            // Inventory List
+
+  qint16 poison_amount = {}; // How much poison damage I'm taking every few seconds
+
+  qint16 carry_weight = {}; // Carried weight
+  qint16 carry_items = {};  // Number of items carried
+
+  QString hunting = {}; // Name of "track" target
+  QString ambush = {};  // Name of "ambush" target
+
+  CharacterPtr guarding = {};   // Pointer to who I am guarding
+  follow_type *guarded_by = {}; // List of people guarding me
+
+  quint32 affected_by[AFF_MAX / ASIZE + 1] = {}; // Quick reference bitvector for spell affects
+  quint32 combat = {};                           // Bitvector for combat related flags (bash, stun, shock)
+  quint32 misc = {};                             // Bitvector for logs/channels.  So possessed mobs can channel
+
+  CharacterPtr fighting = {};      /* Opponent     */
+  CharacterPtr next = {};          /* Next anywhere in game */
+  CharacterPtr next_in_room = {};  /* Next in room */
+  CharacterPtr next_fighting = {}; /* Next fighting */
+  ObjectPtr altar = {};
+  follow_type *followers = {}; /* List of followers */
+  CharacterPtr master = {};    /* Who is char following? */
+  QString group_name_;         /* Name of group */
+
+  qint32 timer = {};           // Timer for update
+  qint32 shotsthisround = {};  // Arrows fired this round
+  qint32 spellcraftglyph = {}; // Used for spellcraft glyphs
+  bool changeLeadBonus = {};
+  qint32 curLeadBonus = {};
+  qint32 cRooms = {}; // number of rooms consecrated/desecrated
+
+  // TODO - see if we can move the "wait" timer from desc to char
+  // since we need something to lag mobs too
+
+  qint32 deaths = {}; /* deaths is reused for mobs as a
+                   timer to check for WAIT_STATE */
+
+  qint32 cID = {}; // character ID
+
+  class timer_data *timerAttached = {};
+  tempvariable *tempVariable = {};
+  qint32 spelldamage = {};
+#ifdef USE_SQL
+  qint32 player_id = {};
+#endif
+  qint32 spec = {};
+
+  bool getDebug(void) const
+  {
+    return debug_;
+  }
+  void setDebug(bool state)
+  {
+    debug_ = state;
+  }
+
+  class room_direction_data *brace_at{}, *brace_exit{}; // exits affected by brace
+  time_t first_damage = {};
+  quint64 damage_done = {};
+  quint64 damages = {};
+  time_t last_damage = {};
+  quint64 damage_per_second = {};
+  static const classes_t classes_;
+
+  bool addGold(quint64 gold);
+  bool save_pc_or_mob_data(FILE *fpsave, time_data tmpage);
+  void add_command_lag(cmd_t cmd, qint32 lag);
+  bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
+  qint32 char_to_store_variable_data(FILE *fpsave);
+  void display_string_list(QStringList list);
+  void display_string_list(const char **list);
+  bool charge_moves(qint32 skill, double modifier = 1);
+  void check_maxes(void);
+  qint32 check_charmiejoin(void);
+  void add_memory(QString victim_name, char type);
+  bool can_use_command(cmd_t cmd);
+  ObjectPtr clan_altar(void);
+  void do_inate_race_abilities(void);
+  void do_on_login_stuff(void);
+  void check_hw(void);
+  void add_to_bard_list(void);
+  time_info_data age(void);
+
+  command_return_t check_pursuit(CharacterPtr victim, QString dircommand);
+  command_return_t check_social(QString pcomm);
+  command_return_t command_interpreter(QString argument, bool procced = 0);
+  ObjectPtr get_object_in_equip_vis(QString arg, ObjectPtr equipment[], qint32 *j, bool blindfighting);
+
+  command_return_t do_clanarea(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_config(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_experience(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_split(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+
+  command_return_t do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT);
+
+  command_return_t do_edit_generic(auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+  {
+    if (arguments.isEmpty())
+      return do_edit_generic_show(getfnc(), fieldname, desc, arguments, cmd);
+
+    setfnc(arguments.join(' '));
+    sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(getfnc()));
+    return ReturnValue::eSUCCESS;
+  }
+
+  command_return_t do_edit_generic(auto *entity, auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+  {
+    if (!entity)
+      return ReturnValue::eFAILURE;
+
+    auto getter = [entity, getfnc]()
+    {
+      return (*entity.*(getfnc))();
+    };
+    auto setter = [entity, setfnc](QString value)
+    {
+      return (*entity.*(setfnc))(value);
+    };
+
+    return do_edit_generic(getter, setter, fieldname, desc, arguments, cmd);
+  }
+
+  command_return_t do_edit_generic(auto **field, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+  {
+    if (!field)
+      return ReturnValue::eFAILURE;
+
+    auto getter = [field]()
+    {
+      return QString(*field);
+    };
+    auto setter = [field](QString value)
+    {
+      *field = value;
+    };
+    return do_edit_generic(getter, setter, fieldname, desc, arguments, cmd);
+  }
+
+  template <typename T>
+  command_return_t do_edit_generic_numeric(auto *entity, auto getfnc, auto setfnc, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
+  {
+    if (!entity)
+      return ReturnValue::eFAILURE;
+
+    if (arguments.isEmpty())
+    {
+      do_edit_generic_show((*entity.*(getfnc))(), fieldname, desc, arguments, cmd);
+      sendln(QStringLiteral("$3Valid types$R:"));
+
+      quint64 longest_typename{};
+      for (const auto &type : item_types)
+        if (longest_typename < type.length())
+          longest_typename = type.length();
+
+      quint8 column = 1;
+      for (const auto &type : item_types)
+      {
+        send(QStringLiteral("%1").arg(type.toLower(), longest_typename));
+        if (!(column++ % 3))
+          sendln();
+        else
+          send("   ");
+      }
+      sendln();
+      return ReturnValue::eFAILURE;
+    }
+
+    if ((!(*entity.*(setfnc))(arguments.join(' ').toLower())))
+    {
+      sendln(QStringLiteral("Invalid input."));
+      return ReturnValue::eFAILURE;
+    }
+    sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(arguments.join(' ').toLower()));
+    return ReturnValue::eSUCCESS;
+  }
+
+  command_return_t do_oedit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_oedit_new(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_oedit_delete(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_zsave(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_wizhelp(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_goto(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_save(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_search(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_identify(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_recall(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_cdeposit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t generic_command(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_sockets(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_who(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_beep_set(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_bard_song_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_brief(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_news_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_ascii_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_damage_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_charmiejoin_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_guide(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_lfg_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_notax_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_guide_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_summon_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_nodupekeys_toggle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_compact(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_anonymous(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_ansi(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_vt100(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_wimpy(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_pager(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_autoeat(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_shutdow(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_shutdown(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_linkload(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_rename_char(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_auction(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_test(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_tell(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_wake(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_rescue(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_rage(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_join(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_outcast(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_backstab(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_pview(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_snoop(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_zap(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_track(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_hit(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_ambush(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_botcheck(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_mpsettemp(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_bestow(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_alias(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_pets(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_kick(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_givealldot(QString name, QString target, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_give(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_drink(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_eat(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_ban(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_unban(QStringList rguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_force(QStringList arguments = {}, cmd_t cmd = cmd_t::FORCE);
+  command_return_t do_open(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  auto do_arena(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
+  auto do_notitle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
+  auto do_arena_info(QStringList arguments) -> command_return_t;
+  auto do_arena_start(QStringList arguments) -> command_return_t;
+  auto do_arena_join(QStringList arguments) -> command_return_t;
+  auto do_arena_cancel(QStringList arguments) -> command_return_t;
+  auto do_arena_usage(QStringList arguments) -> command_return_t;
+
+  command_return_t wake(CharacterPtr victim = {});
+  command_return_t oprog_command_trigger(QString command, QString arguments);
+  command_return_t save(cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t special(QString arg, cmd_t cmd = cmd_t::DEFAULT);
+
+  void show_obj_to_char(ObjectPtr object, qint32 mode);
+  void list_obj_to_char(ObjectPtr list, qint32 mode, bool show);
+  void list_char_to_char(CharacterPtr list, qint32 mode);
+
+  bool mprog_seval(QString lhs, QString opr, QString rhs);
+  QString getTemp(QString name);
+
+  QString get_random_hate(void);
+  CharacterPtr getVisiblePlayer(QString name);
+  CharacterPtr getVisibleCharacter(QString name);
+  ObjectPtr getVisibleObject(QString name);
+  QString getStatDiff(qint32 base, qint32 random, bool swapcolors = false);
+  void tell_history(CharacterPtr sender, QString message);
+  void gtell_history(CharacterPtr sender, QString message);
+  void setPOSFighting();
+  qint32 getHP(void);
+  void setHP(qint32 hp, CharacterPtr causer = {});
+  void addHP(qint32 hp, CharacterPtr causer = {});
+  void removeHP(qint32 dam, CharacterPtr causer = {});
+  void fillHP(void);
+  void fillHPLimit(void);
+  void send(const char *buffer);
+  void send(QString buffer);
+  void sendln(QString buffer = {})
+  {
+    buffer = buffer.append("\r\n");
+    send(buffer);
+  }
+  command_return_t tell(CharacterPtr, QString);
+  void sendRaw(QString);
+  QList<CharacterPtr> getFollowers(void);
+  void setPlayerLastMob(u_int64_t mobvnum);
+
+  void swapSkill(skill_t oldSkill, skill_t newSkill);
+  void setSkillMin(skill_t skill, qint32 value);
+  char_skill_data &getSkill(skill_t skill);
+  void setSkill(skill_t, qint32 value = 0);
+  void upSkill(skill_t skillnum, qint32 learned = 1);
+
+  QString getSetting(QString key, QString defaultValue = QString());
+  QString getSettingAsColor(QString key, QString defaultValue = QString());
+
+  bool isMortalPlayer(void) const;
+  bool isImmortalPlayer(void) const;
+  bool isImplementerPlayer(void) const;
+  bool isPlayer(void) const;
+  bool isNonPlayer(void) const;
+  bool isObjectProgram(void) const;
+
+  quint64 getGold(void);
+  quint64 &getGoldReference(void);
+  void setGold(quint64 gold);
+
+  bool multiplyGold(double mult);
+  bool removeGold(quint64 gold);
+  qint32 store_to_char_variable_data(FILE *fpsave);
+
+  bool load_charmie_equipment(QString name, bool previous = false);
+  qint32 has_skill(skill_t skill);
+  affected_type *affected_by_spell(quint32 skill);
+  bool skill_success(CharacterPtr victim, qint32 skillnum, qint32 mod = 0);
+  qint32 skillmax(qint32 skill, qint32 eh);
+  char charthing(qint32 known, qint32 skill, qint32 maximum);
+  void output_praclist(CharacterClassSkill *skilllist);
+  qint32 skills_guild(const QString arg, CharacterPtr owner);
+  qint32 get_stat(attribute_t stat);
+  qint32 get_stat_bonus(qint32 stat);
+  void skill_increase_check(qint32 skill, qint32 learned, qint32 difficulty);
+  void verify_max_stats(void);
+  qint32 get_max(qint32 skill);
+  qint32 learn_skill(qint32 skill, qint32 amount, qint32 maximum);
+  CharacterClassSkill *get_skill_list(void);
+  CharacterPtr get_char_room_vis(QString name);
+  CharacterPtr get_rand_other_char_room_vis(void);
+  qint32 hit_gain(position_t position, bool improve = true);
+  qint32 hit_gain(void)
+  {
+    return hit_gain(getPosition(), true);
+  }
+
+  qint32 hit_gain_lookup(void)
+  {
+    return hit_gain(getPosition(), false);
+  }
+  qint32 mana_gain_lookup(void);
+  qint32 move_gain_lookup(qint32 extra = 0);
+  qint32 ki_gain_lookup(void);
+  static QString position_to_string(position_t position)
+  {
+    return position_types.value(static_cast<qint64>(position));
+  }
+
+  QString getPositionQString(void)
+  {
+    return position_to_string(getPosition());
+  }
+  CharacterPtr get_active_pc_vis(QString name);
+  void swap_hate_memory(void);
+  void set_hw(void);
+  void roll_and_display_stats(void);
+  void remove_from_bard_list(void);
+  qint64 moves_exp_spent(void);
+  qint64 moves_plats_spent(void);
+  qint64 hps_exp_spent(void);
+  qint64 hps_plats_spent(void);
+  qint64 mana_exp_spent(void);
+  qint64 mana_plats_spent(void);
+  qint32 meta_get_stat_exp_cost(attribute_t stat);
+  qint32 meta_get_stat_plat_cost(attribute_t targetstat);
+  void meta_list_stats(void);
+  quint64 meta_get_moves_exp_cost(void);
+  quint64 meta_get_moves_plat_cost(qint32 amount);
+  quint64 meta_get_hps_exp_cost(void);
+  quint64 meta_get_hps_plat_cost(qint32 amount);
+  quint64 meta_get_mana_exp_cost(void);
+  quint64 meta_get_mana_plat_cost(qint32 amount);
+  quint64 meta_get_ki_plat_cost(void);
+  qint32 meta_get_ki_exp_cost(void);
+  void undo_race_saves(void);
+  bool is_race_applicable(qint32 race);
+  bool would_die(void);
+  void set_heightweight(void);
+  char *race_message(qint32 race);
+
+  qint32 hands_are_free(qint32 number);
+  qint32 recheck_height_wears(void);
+  void heightweight(bool add);
+  static const QStringList class_names;
+  static const QStringList race_names;
+  static const QStringList position_types;
+  static const QStringList song_names;
+  static constexpr quint64 PLAYER_OBJECT_THIEF = 297ULL;
+  static constexpr quint64 PLAYER_GOLD_THIEF = 298ULL;
+  static constexpr quint64 PLAYER_CANTQUIT = 299ULL;
+  bool isPlayerObjectThief(void) { return affected_by_spell(PLAYER_OBJECT_THIEF); }
+  bool isPlayerGoldThief(void) { return affected_by_spell(PLAYER_GOLD_THIEF); }
+  bool isPlayerCantQuit(void) { return affected_by_spell(PLAYER_CANTQUIT); }
+  bool allowColor(void);
+
+  QString parse_prompt_variable(QString variable, PromptVariableType type = PromptVariableType::Advanced);
+  QString get_parsed_legacy_prompt_variable(QString var);
+  QString calc_name(bool use_color = false);
+
+  QString getPrompt(void) const;
+  void setPrompt(QString prompt);
+  QString getLastPrompt(void) const;
+  void setLastPrompt(QString prompt);
+
+  QString createPrompt(void);
+  QString createBlackjackPrompt(void);
+  void sendBlackjackPrompt(void);
+  void setDC(DCPtr dc) { dc_ = dc; }
+  DCPtr getDC(void) { return dc_; }
+  void prog_error(QString error_message);
+  bool isNowhere(void);
+  void vault_access(QString owner);
+  void vault_myaccess(QString owner);
+  void vault_balance(QString owner);
+  void vault_stats(QString owner);
+  void add_vault_access(QString name, Vault &vault);
+  void remove_vault_access(QString name, Vault &vault);
+  void vault_list(QString owner);
+  void load_golem_data(qint32 golemtype);
+  qint32 mprog_greet_trigger(void);
+  qint32 mprog_can_see_trigger(CharacterPtr mob);
+  qint32 mprog_speech_trigger(const char *txt);
+  qint32 oprog_can_see_trigger(ObjectPtr item);
+  qint32 oprog_speech_trigger(const char *txt);
+  qint32 oprog_act_trigger(QString txt);
+  qint32 oprog_greet_trigger(void);
+  qint32 oprog_load_trigger(void);
+  qint32 oprog_weapon_trigger(ObjectPtr item);
+  qint32 oprog_armour_trigger(ObjectPtr item);
+  bool mprog_seval(const char *lhs, const char *opr, const char *rhs);
+  bool isTank(void);
+  void save_char_obj(void);
+
+  bool equip_char(ObjectPtr obj, qint32 pos, bool flag = false);
+  ObjectPtr unequip_char(qint32 pos, bool flag = false);
+  void vault_withdraw(quint32 amount, char *owner);
+  void vault_deposit(quint32 amount, char *owner);
+  void vault_get(QString object_keyword, QString owner);
+  void vault_put(QString object_keyword, QString owner);
+  void my_vault_access(void);
+  void vault_sell(QString object_keyword, QStringList arguments);
+  void vault_cost(QString object_keyword, QStringList arguments);
+  qint32 vault_search(QString object_keyword);
+
+private:
+  Type type_ = Type::Undefined;
+  gold_t gold_ = {}; /* Money carried */
+  level_t level_ = {};
+  bool debug_ = false;
+  move_t move_ = {};
+  QString name_; // Keyword 'kill X'
+  position_t position_ = {};
+  DCPtr dc_;
+};
+typedef QSet<CharacterPtr> character_list_t;
+void add_command_lag(CharacterPtr ch, cmd_t cmd, qint32 lag);
+typedef qint32 DO_FUN(CharacterPtr ch, QString argument, cmd_t cmd);
+
+class snoop_data
+{
+public:
+  CharacterPtr snooping;
+  CharacterPtr snoop_by;
+};
+
+qint32 do_add_quest(CharacterPtr, char *);
+void list_quests(CharacterPtr);
+void show_quest_info(CharacterPtr, qint32);
+bool check_available_quest(CharacterPtr, quest_info *);
+bool check_quest_current(CharacterPtr, qint32);
+bool check_quest_pass(CharacterPtr, qint32);
+bool check_quest_complete(CharacterPtr, qint32);
+qint32 get_quest_price(quest_info *);
+void show_quest_header(CharacterPtr);
+void show_quest_amount(CharacterPtr);
+void show_quest_closer(CharacterPtr);
+qint32 show_one_quest(CharacterPtr, quest_info *, qint32);
+qint32 show_one_complete_quest(CharacterPtr, quest_info *, qint32);
+qint32 show_one_available_quest(CharacterPtr, quest_info *, qint32);
+void show_available_quests(CharacterPtr);
+void show_pass_quests(CharacterPtr);
+void show_current_quests(CharacterPtr);
+void show_complete_quests(CharacterPtr);
+qint32 start_quest(CharacterPtr, quest_info *);
+qint32 pass_quest(CharacterPtr, quest_info *);
+qint32 complete_quest(CharacterPtr, quest_info *);
+qint32 stop_current_quest(CharacterPtr, quest_info *);
+qint32 stop_current_quest(CharacterPtr, qint32);
+qint32 stop_all_quests(CharacterPtr);
+qint32 quest_handler(CharacterPtr, CharacterPtr, qint32, char *);
+qint32 quest_master(CharacterPtr, ObjectPtr, qint32, char *, CharacterPtr);
+qint32 do_quest(CharacterPtr, char *, qint32);
+
+class Test
+{
+public:
+  Test() : function_(nullptr) {}
+  Test(QString name, test_function_t function = {})
+      : name_(name), function_(function)
+  {
+  }
+  command_return_t run(CharacterPtr ch)
+  {
+    if (function_ && ch)
+    {
+      return function_(ch);
+    }
+    return ReturnValue::eFAILURE;
+  }
+  QString getName(void) const { return name_; }
+
+private:
+  QString name_;
+  test_function_t function_;
+};
+
+typedef QMap<QString, Test> tests_t;
+union varg_t
+{
+  CharacterPtr ch;
+  clan_id_t clan;
+  class player_data *player;
+  class table_data *table;
+  class machine_data *machine;
+  class wheel_data *wheel;
+};
+typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);
+class timer_data
+{
+public:
+  qint32 timeleft = {};
+  timer_data *next = {};
+  varg_t arg1 = {};
+  QVariant var_arg1{};
+  void *arg2 = {};
+  void *arg3 = {};
+  TIMER_FUNC *function = {};
+};
+extern class timer_data *timer_list;
+
+typedef QSet<ObjectPtr> obj_list_t;
+using special_function = qint32 (*)(CharacterPtr, ObjectPtr, cmd_t, const char *, CharacterPtr);
+typedef QMap<vnum_t, special_function> special_function_list_t;
+typedef QSet<CharacterPtr>::iterator character_list_i;
+class Trace
+{
+public:
+  typedef QList<QString> tracks_t;
+  Trace(QString source = "unknown");
+  ~Trace();
+  const tracks_t &getTracks();
+  void addTrack(QString source);
+
+private:
+  tracks_t tracks;
+};
+typedef QMap<CharacterPtr, Trace> death_list_t;
+typedef QMap<CharacterPtr, Trace> free_list_t;
+
+auto &operator<<(auto &out, Trace &t)
+{
+  qsizetype track_index = {};
+  for (auto &track : t.getTracks())
+  {
+    out << track;
+    if (++track_index != t.getTracks().length())
+    {
+      out << "->";
+    }
+  }
+  return out;
+}
+class redeem_t
+{
+public:
+  ObjectPtr choice1_obj = {};
+  ObjectPtr choice2_obj = {};
+  quint64 orig_rnum = {};
+  vnum_t orig_vnum = {};
+  ObjectPtr orig_obj = {};
+  quint8 token_count = {};
+  bool random = false;
+
+  enum state_t
+  {
+    BEGIN,
+    PICKED_OBJ_TO_REDEEM,
+    REDEEM,
+    CHOSEN
+  } state = {};
+};
+
+class Table;
+class Column;
+class Database
+{
+public:
+  Database(void);
+  Database(const QString &name, const QString &hostname = "", const QString &type = "QPSQL");
+  QSqlDatabase getQSqlDatabase(void) { return database_; }
+  QString getName(void) { return name_; }
+  QString getHostname(void) { return hostname_; }
+  QString getType(void) { return type_; }
+  Table table(QString name);
+
+  QMap<QString, Table> tables;
+
+private:
+  QString name_;
+  QString hostname_;
+  QString type_;
+  QSqlDatabase database_;
+};
+
+class Table
+{
+public:
+  Table(Database &database, const QString &name = "");
+  Database &getDatabase(void) { return database_; }
+  QString getName(void) { return name_; }
+  Column column(QString name, QString type);
+
+private:
+  Database database_;
+  QString name_;
+};
+
+class Column
+{
+public:
+  Column(Table &table, const QString &name = "", const QString &type = "");
+  Table &getTable(void) { return table_; }
+  QString getName(void) { return name_; }
+  QString getType(void) { return type_; }
+  Column column(QString name, QString type);
+
+private:
+  Table table_;
+  QString name_;
+  QString type_;
+};
+
+class Shop
+{
+public:
+  QMap<quint64, qint32> type; /* Types of things shop will buy.       */
+  float profit_buy = {};      /* Factor to multiply cost with.        */
+  float profit_sell = {};     /* Factor to multiply cost with.        */
+  float profit_buy_base = {};
+  QString no_such_item1{};      /* Message if keeper hasn't got an item */
+  QString no_such_item2{};      /* Message if player hasn't got an item */
+  QString missing_cash1{};      /* Message if keeper hasn't got cash    */
+  QString missing_cash2{};      /* Message if player hasn't got cash    */
+  QString do_not_buy = {};      /* If keeper doesn't buy such things.   */
+  QString message_buy = {};     /* Message when player buys item        */
+  QString message_sell = {};    /* Message when player sells item       */
+  vnum_t keeper = {};           /* The mob who owns the shop (virt)  */
+  room_t in_room = {};          /* Where is the shop?                   */
+  qint32 open1{}, open2 = {};   /* When does the shop open?             */
+  qint32 close1{}, close2 = {}; /* When does the shop close?            */
+  ObjectPtr inventory = {};     /* list of things shop never runs out of
+                                 */
+};
+
+class Clan;
+typedef QMap<clan_id_t, Clan> clan_list_t;
+
+constexpr auto ERROR_PROG = -1;
+constexpr auto IN_FILE_PROG = 0;
+constexpr auto ACT_PROG = 1;
+constexpr auto SPEECH_PROG = 2;
+constexpr auto RAND_PROG = 4;
+constexpr auto FIGHT_PROG = 8;
+constexpr auto DEATH_PROG = 16;
+constexpr auto HITPRCNT_PROG = 32;
+constexpr auto ENTRY_PROG = 64;
+constexpr auto GREET_PROG = 128;
+constexpr auto ALL_GREET_PROG = 256;
+constexpr auto GIVE_PROG = 512;
+constexpr auto BRIBE_PROG = 1024;
+constexpr auto CATCH_PROG = 2048;
+constexpr auto ATTACK_PROG = 4096;
+constexpr auto ARAND_PROG = 8192;
+constexpr auto LOAD_PROG = 16384;
+constexpr auto COMMAND_PROG = 16384 << 1;
+constexpr auto WEAPON_PROG = 16384 << 2;
+constexpr auto ARMOUR_PROG = 16384 << 3;
+constexpr auto CAN_SEE_PROG = 16384 << 4;
+constexpr auto DAMAGE_PROG = 16384 << 5;
+constexpr auto MPROG_MAX_TYPE_VALUE = 16384 << 6;
+class Program
+{
+  bool is_object_ = {};
+  qint32 type_ = {};
+  QString arglist_;
+  QString comlist_;
+
+public:
+  [[nodiscard]] qint32 type(void) const { return type_; }
+  [[nodiscard]] QString typeString(void) const
+  {
+    if (is_object_)
+      return oprog_type_to_name(type_);
+    else
+      return mprog_type_to_name(type_);
+  }
+  [[nodiscard]] QString arglist(void) const { return arglist_; }
+  [[nodiscard]] QString comlist(void) const { return comlist_; }
+  [[nodiscard]] static QString mprog_type_to_name(qint32 type)
+  {
+    switch (type)
+    {
+    case IN_FILE_PROG:
+      return "in_file_prog";
+    case ACT_PROG:
+      return "act_prog";
+    case SPEECH_PROG:
+      return "speech_prog";
+    case RAND_PROG:
+      return "rand_prog";
+    case ARAND_PROG:
+      return "arand_prog";
+    case FIGHT_PROG:
+      return "fight_prog";
+    case HITPRCNT_PROG:
+      return "hitprcnt_prog";
+    case DEATH_PROG:
+      return "death_prog";
+    case ENTRY_PROG:
+      return "entry_prog";
+    case GREET_PROG:
+      return "greet_prog";
+    case ALL_GREET_PROG:
+      return "all_greet_prog";
+    case GIVE_PROG:
+      return "give_prog";
+    case BRIBE_PROG:
+      return "bribe_prog";
+    case CATCH_PROG:
+      return "catch_prog";
+    case ATTACK_PROG:
+      return "attack_prog";
+    case LOAD_PROG:
+      return "load_prog";
+    case CAN_SEE_PROG:
+      return "can_see_prog";
+    case DAMAGE_PROG:
+      return "damage_prog";
+    case COMMAND_PROG:
+      return "command_prog";
+    default:
+      return "ERROR_PROG";
+    }
+  }
+  [[nodiscard]] static QString oprog_type_to_name(qint32 type)
+  {
+    switch (type)
+    {
+    case ALL_GREET_PROG:
+      return "all_greet_prog";
+    case WEAPON_PROG:
+      return "weapon_prog";
+    case ARMOUR_PROG:
+      return "armour_prog";
+    case LOAD_PROG:
+      return "load_prog";
+    case COMMAND_PROG:
+      return "command_prog";
+    case ACT_PROG:
+      return "act_prog";
+    case ARAND_PROG:
+      return "arand_prog";
+    case CATCH_PROG:
+      return "catch_prog";
+    case SPEECH_PROG:
+      return "speech_prog";
+    case RAND_PROG:
+      return "rand_prog";
+    case CAN_SEE_PROG:
+      return "can_see_prog";
+    default:
+      return "ERROR_PROG";
+    }
+  }
+};
+
+class mob_prog_data
+{
+public:
+  mob_prog_data *next = {};
+  qint32 type = {};
+  QString arglist = {};
+  QString comlist = {};
+};
+void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
+{
+  if (mprg->next)
+  {
+    write_mprog_recur(fl, mprg->next, mob);
+  }
+
+  if (mob)
+  {
+    fl << ">" << Program::mprog_type_to_name(mprg->type) << " ";
+  }
+  else
+  {
+    fl << "\\" << Program::mprog_type_to_name(mprg->type) << " ";
+  }
+
+  if (!mprg->arglist.isEmpty())
+  {
+    string_to_file(fl, mprg->arglist);
+  }
+  else
+  {
+    string_to_file(fl, "Saved During Edit");
+  }
+
+  if (!mprg->comlist.isEmpty())
+  {
+    string_to_file(fl, mprg->comlist);
+  }
+  else
+  {
+    string_to_file(fl, "Saved During Edit");
+  }
+}
+
+class index_data
+{
+public:
+  void vnum(vnum_t v) { vnum_ = v; }
+  [[nodiscard]] vnum_t vnum(void) const { return vnum_; }
+  quint64 qty = {};                                                                        /* number of existing units of ths mob/obj */
+  qint32 (*non_combat_func)(CharacterPtr, ObjectPtr, cmd_t, const char *, CharacterPtr){}; // non Combat special proc
+  qint32 (*combat_func)(CharacterPtr, ObjectPtr, cmd_t, const char *, CharacterPtr){};     // combat special proc
+  void *item = {};                                                                         /* the mobile/object itself                 */
+
+  QList<mob_prog_data> mobprogs_;
+  QList<mob_prog_data> mobspec_;
+  qint32 progtypes = {};
+
+private:
+  vnum_t vnum_ = {}; /* virt number of ths mob/obj           */
+};
+
+namespace SSH
+{
+  class SSH : public QObject
+  {
+    Q_OBJECT
+  public:
+    explicit SSH(QObject *parent = {});
+    void setup(void);
+    qint32 poll(void);
+    void close(void);
+    ~SSH();
+
+  signals:
+
+  public slots:
+    void run(void);
+
+  private:
+    ssh_bind sshbind = {};
+    ssh_session sshsession = {};
+    char *data = {};
+  };
+}
+
+class World
+{
+public:
+  Room &operator[](room_t room_key);
+};
+
+class SVoteData
+{
+public:
+  QString answer;
+  qint32 votes;
+};
+constexpr auto MAX_INDEX = 6000;
+class CVoteData
+{
+public:
+  void SetQuestion(CharacterPtr ch, QString question);
+  void AddAnswer(CharacterPtr ch, QString answer);
+  void RemoveAnswer(CharacterPtr ch, quint32 answer);
+  void StartVote(CharacterPtr ch);
+  void EndVote(CharacterPtr ch);
+  void Reset(CharacterPtr ch);
+  void OutToFile();
+  bool HasVoted(CharacterPtr ch);
+  bool Vote(CharacterPtr ch, quint32 vote);
+  void DisplayVote(CharacterPtr ch);
+  void DisplayResults(CharacterPtr ch);
+  bool IsActive() { return active; }
+  CVoteData();
+  ~CVoteData();
+
+private:
+  bool active;
+  QString vote_question;
+  QList<SVoteData> answers;
+  qint32 total_votes;
+  QMap<QString, bool> ip_voted;
+  QMap<QString, bool> char_voted;
+};
+
+class Ban : public MinimumEntity
+{
+public:
+  enum class type_t : qsizetype
+  {
+    NOT,
+    NEW,
+    SELECT,
+    ALL
+  };
+  static const QStringList ban_types;
+
+  Ban(QString name = {}, QString site = {}, type_t type = {}, QDateTime dt = {}) : MinimumEntity(name),
+                                                                                   site_(site),
+                                                                                   type_(type),
+                                                                                   date_(dt)
+  {
+  }
+
+  inline auto site(QString s)
+  {
+    site_ = s;
+    return s;
+  }
+  [[nodiscard]] inline auto site(void) const { return site_; }
+
+  inline auto type(type_t t)
+  {
+    type_ = t;
+    return t;
+  }
+  inline auto type(QString t)
+  {
+    auto i = ban_types.indexOf(t);
+    type_ = type_t(i);
+    return t;
+  }
+  [[nodiscard]] inline auto type(void) const { return type_; }
+
+  inline auto date(QDateTime dt)
+  {
+    date_ = dt;
+    return dt;
+  }
+  [[nodiscard]] inline auto date(void) const { return date_; }
+
+  void save(QTextStream &out) const;
+
+private:
+  QString site_;
+  type_t type_ = {};
+  QDateTime date_;
+};
+
+auto &operator<<(auto &out, Ban::type_t type)
+{
+  out << qint32(type);
+  return out;
+}
+
+auto &operator>>(auto &in, Ban::type_t &type)
+{
+  qint32 t;
+  in >> t;
+  type = Ban::type_t(t);
+  return in;
+}
+
+class Bans
+{
+public:
+  void load(void);
+  void save(void) const;
+  void clear(void);
+  Ban::type_t is_banned(QString site) const;
+  void add(Ban ban);
+  void remove(QString site) { list_.remove(site); }
+  auto list(void) const { return list_; }
+  operator bool() const { return !list_.isEmpty(); }
+
+private:
+  const QString BANNED_FILE = QStringLiteral("banned");
+  QMap<QString, Ban> list_;
+};
+
+class Vaults
+{
+  QMap<QString, Vault> list_;
+
+public:
+  void save(QString name);
+  [[nodiscard]] inline Vault &has_vault(QString name)
+  {
+    if (list_.contains(name))
+      return list_[name];
+    else
+    {
+      static Vault v;
+      v = {};
+      return v;
+    }
+  }
+  void add_new_vault(QString name, qint32 indexonly);
+  void remove_vault(QString name, BACKUP_TYPE backup = NONE);
+  void rename_vault_owner(QString oldname, QString newname);
+  void remove_vault_accesses(QString name);
+
+  ObjectPtr get_obj_in_all_vaults(char *object, qint32 num);
+  vault_items_data &get_items_in_all_vaults(char *object, qint32 num);
+};
+
+class Shops
+{
+public:
+  explicit Shops(QObject *parent = {});
+};
+
+class Room : public QObject
+{
+public:
+  class Tracks
+  {
+  public:
+    qint32 weight;
+    qint32 race;
+    qint32 direction;
+    qint32 sex;
+    qint32 condition;
+    QString trackee;
+  };
+  class path_data
+  { // Keeps track of paths connecting to a room or path.
+  public:
+    class Path *p;
+    qint32 num;
+  };
+
+  class Path : public QMap<qint32, qint32>
+  {
+  private:
+    bool findRoom(qint32 from, qint32 to, qint32 steps, qint32 leaststeps, char *buf);
+    void resetPath();
+    qint32 leastSteps(qint32 from, qint32 to, qint32 val, qint32 *bestval);
+
+  public:
+    class Path *next; // main Path list
+
+    char *determineRoute(CharacterPtr, qint32, qint32); // ch, from, to
+    void addRoom(CharacterPtr, qint32, bool);           // ch, room, IgnoreConnectingIssues
+
+    bool isRoomPathed(qint32 room);
+    bool isRoomConnected(qint32 room);
+    bool isPathConnected(class Path *pa);
+    qint32 connectRoom(class Path *);
+    path_data *p;
+    char *name;
+    qint32 s;
+    Path() : next(nullptr), p(nullptr), name(nullptr), s(0) {}
+  };
+
+  Room(DCPtr dc);
+  Room(qint16 room_nr, DCPtr dc);
+  operator bool() const { return number > 0; }
+  qint16 number = {}; // Rooms number
+  zone_t zone = {};   // Room zone (for resetting)
+  QSharedPointer<class Zone> zonePtr = {};
+  qint32 sector_type = {}; // sector type (move/hide)
+  deny_data *denied = {};
+  QString name_;                                  // Rooms name 'You are ...'
+  QString description_;                           // Shown when entered
+  extra_descr_data *ex_description = {};          // for examine/look
+  room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
+  quint32 room_flags = {};                        // DEATH, DARK ... etc
+  constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }
+  constexpr auto isNoHome() const -> bool { return isSet(room_flags, NOHOME); }
+  constexpr auto isNoMob() const -> bool { return isSet(room_flags, NO_MOB); }
+  constexpr auto isIndoors() const -> bool { return isSet(room_flags, INDOORS); }
+  constexpr auto isTeleportBlocked() const -> bool { return isSet(room_flags, TELEPORT_BLOCK); }
+  constexpr auto isNoKi() const -> bool { return isSet(room_flags, NO_KI); }
+  constexpr auto isNoLearn() const -> bool { return isSet(room_flags, NOLEARN); }
+  constexpr auto isNoMagic() const -> bool { return isSet(room_flags, NO_MAGIC); }
+  constexpr auto isTunnel() const -> bool { return isSet(room_flags, TUNNEL); }
+  constexpr auto isPrivate() const -> bool { return isSet(room_flags, PRIVATE); }
+  constexpr auto isSafe() const -> bool { return isSet(room_flags, SAFE); }
+  constexpr auto isNoSummon() const -> bool { return isSet(room_flags, NO_SUMMON); }
+  constexpr auto isNoAstral() const -> bool { return isSet(room_flags, NO_ASTRAL); }
+  constexpr auto isNoPortal() const -> bool { return isSet(room_flags, NO_PORTAL); }
+  constexpr auto isImpOnly() const -> bool { return isSet(room_flags, IMP_ONLY); }
+  constexpr auto isFallDown() const -> bool { return isSet(room_flags, FALL_DOWN); }
+  constexpr auto isArena() const -> bool { return isSet(room_flags, ARENA); }
+  constexpr auto isQuiet() const -> bool { return isSet(room_flags, QUIET); }
+  constexpr auto isUnstable() const -> bool { return isSet(room_flags, UNSTABLE); }
+  constexpr auto isNoQuit() const -> bool { return isSet(room_flags, NO_QUIT); }
+  constexpr auto isFallUp() const -> bool { return isSet(room_flags, FALL_UP); }
+  constexpr auto isFallEast() const -> bool { return isSet(room_flags, FALL_EAST); }
+  constexpr auto isFallWest() const -> bool { return isSet(room_flags, FALL_WEST); }
+  constexpr auto isFallSouth() const -> bool { return isSet(room_flags, FALL_SOUTH); }
+  constexpr auto isFallNorth() const -> bool { return isSet(room_flags, FALL_NORTH); }
+  constexpr auto isNoTeleport() const -> bool { return isSet(room_flags, NO_TELEPORT); }
+  constexpr auto isNoTrack() const -> bool { return isSet(room_flags, NO_TRACK); }
+  constexpr auto isClanRoom() const -> bool { return isSet(room_flags, CLAN_ROOM); }
+  constexpr auto isNoScan() const -> bool { return isSet(room_flags, NO_SCAN); }
+  constexpr auto isNoWhere() const -> bool { return isSet(room_flags, NO_WHERE); }
+  constexpr auto isLightRoom() const -> bool { return isSet(room_flags, LIGHT_ROOM); }
+
+  auto arena() -> class Arena &;
+
+  quint32 temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
+  qint16 light = {};            // Light factor of room
+
+  qint32 (*funct)(CharacterPtr, cmd_t, const char *) = {}; // special procedure
+
+  QList<ObjectPtr> contents_ = {};  // List of items in room
+  QList<CharacterPtr> people_ = {}; // List of NPC / PC in room
+  QList<Tracks> tracks_;            // beginning of the list of scents
+  qint32 iFlags = {};               // Internal flags. These do NOT save.
+  QList<path_data> paths_;
+  bool allow_class[CLASS_MAX] = {};
+
+  void AddTrackItem(Tracks &newTrack);
+  Tracks &TrackItem(qint32 nIndex);
+
+  enum class room_errors_t
+  {
+    direction,
+    number,
+    zone,
+    zonePtr,
+    sector_type,
+    denied,
+    name,
+    description,
+    ex_description,
+    room_flags,
+    temp_room_flags,
+    light,
+    funct,
+    alllow_class
+  };
+  /*
+          static auto compare(Room &r1, Room &r2) -> std::expected<bool, room_errors_t>
+          {
+              for (qint32 direction = {}; direction < MAX_DIRS; ++direction)
+              {
+                  if (r1.dir_option[direction] == r2.dir_option[direction])
+                  {
+                      continue;
+                  }
+                  else if (r1.dir_option[direction] && r2.dir_option[direction] &&
+                           *r1.dir_option[direction] == *r2.dir_option[direction])
+                  {
+                      continue;
+                  }
+                  else
+                  {
+                      return std::unexpected(Room::room_errors_t::direction);
+                  }
+              }
+              if (r1.number != r2.number)
+                  return std::unexpected(Room::room_errors_t::number);
+              if (r1.zone != r2.zone)
+                  return std::unexpected(Room::room_errors_t::zone);
+              if (r1.zonePtr != r2.zonePtr)
+                  return std::unexpected(Room::room_errors_t::zonePtr);
+              if (r1.sector_type != r2.sector_type)
+                  return std::unexpected(Room::room_errors_t::sector_type);
+              if (r1.denied != r2.denied)
+                  return std::unexpected(Room::room_errors_t::denied);
+              if (QString(r1.name) != QString(r2.name))
+                  return std::unexpected(Room::room_errors_t::name);
+              if (QString(r1.description) != QString(r2.description))
+                  return std::unexpected(Room::room_errors_t::description);
+              if (r1.ex_description != r2.ex_description)
+                  return std::unexpected(Room::room_errors_t::ex_description);
+              if (r1.room_flags != r2.room_flags)
+                  return std::unexpected(Room::room_errors_t::room_flags);
+              if (r1.temp_room_flags != r2.temp_room_flags)
+                  return std::unexpected(Room::room_errors_t::temp_room_flags);
+              if (r1.light != r2.light)
+                  return std::unexpected(Room::room_errors_t::light);
+              if (r1.funct != r2.funct)
+                  return std::unexpected(Room::room_errors_t::funct);
+              // r1.contents == r2.contents &&
+              // r1.people == r2.people &&
+              // r1.nTracks == r2.nTracks &&
+              // r1.tracks == r2.tracks &&
+              // r1.iFlags == r2.iFlags &&
+              // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
+              if (memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)))
+                  return std::unexpected(Room::room_errors_t::alllow_class);
+
+              return true;
+          }
+      */
+private:
+  DCPtr dc_;
+};
+auto &operator<<(auto &out, const Room &room);
+bool operator==(const Room &r1, const Room &r2);
+room_t real_room(room_t virt);
+auto &operator>>(auto &in, Room &room)
+{
+  room_t room_nr = {};
+  QString temp = {};
+  char ch = {};
+  qint32 dir = {};
+  extra_descr_data *new_new_descr{};
+  zone_t zone_nr = {};
+
+  ch = fread_char(in);
+
+  if (ch != '$')
+  {
+    room_nr = fread_int(in, 0, 1000000);
+    temp = fread_string(in, 0);
+
+    if (room_nr)
+    {
+      /*
+      DC::getInstance()->currentVNUM(room_nr);
+      DC::getInstance()->currentType("Room");
+      DC::getInstance()->currentName(temp);
+
+      if (room_nr >= DC::getInstance()->top_of_world_alloc)
+      {
+        DC::getInstance()->top_of_world_alloc = room_nr + 200;
+      }
+
+      if (DC::getInstance()->top_of_world < room_nr)
+        DC::getInstance()->top_of_world = room_nr;
+      */
+
+      room.paths_ = {};
+      room.number = room_nr;
+      room.name_ = temp;
+    }
+    QString description = fread_string(in, 0);
+    if (room_nr)
+    {
+      room.description_ = description;
+      room.tracks_ = {};
+      room.denied = {};
+      // DC::getInstance()->total_rooms++;
+    }
+    // Ignore recorded zone number since it may not longer be valid
+    fread_int(in, -1, 64000); // zone nr
+
+    if (room_nr)
+    {
+      // Go through the zone table until room.number is
+      // in the current zone.
+
+      bool found = false;
+      zone_t zone_nr = {};
+      for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+      {
+        if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
+        {
+          found = true;
+          zone_nr = zone_key;
+          break;
+        }
+      }
+      if (!found)
+      {
+        // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
+        // logentry(error);
+        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      }
+      else
+      {
+        auto &zone = DC::getInstance()->zones[zone_nr];
+        if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
+        {
+          if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
+          {
+            zone.setRealBottom(room_nr);
+          }
+          if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
+          {
+            zone.setRealTop(room_nr);
+          }
+        }
+        room.zone = zone_nr;
+      }
+    }
+
+    quint32 room_flags = fread_bitvector(in, -1, 2147483467);
+
+    if (room_nr)
+    {
+      room.room_flags = room_flags;
+      if (isSet(room.room_flags, NO_ASTRAL))
+      {
+        REMOVE_BIT(room.room_flags, NO_ASTRAL);
+      }
+
+      // This bitvector is for runtime and not stored in the files, so just initialize it to 0
+      room.temp_room_flags = {};
+    }
+
+    qint32 sector_type = fread_int(in, -1, 64000);
+
+    if (room_nr)
+    {
+      room.sector_type = sector_type;
+      room.funct = {};
+      room.contents_ = {};
+      room.people_ = {};
+      room.light = {}; /* Zero light sources */
+
+      for (size_t tmp = {}; tmp <= 5; tmp++)
+        room.dir_option[tmp] = {};
+
+      room.ex_description = {};
+    }
+
+    for (;;)
+    {
+      ch = fread_char(in); /* dir field */
+
+      /* direction field */
+      if (ch == 'D')
+      {
+        dir = fread_int(in, 0, 5);
+        setup_dir(in, room_nr, dir);
+      }
+      /* extra description field */
+      else if (ch == 'E')
+      {
+        // strip off the \n after the E
+        if (fread_char(in) != '\n')
+        {
+          fseek(in, -1, SEEK_CUR);
+        }
+
+        new_new_descr = new extra_descr_data;
+        new_new_descr->keyword_ = fread_string(in, 0);
+        new_new_descr->description_ = fread_string(in, 0);
+
+        if (room_nr)
+        {
+          new_new_descr->next = room.ex_description;
+          room.ex_description = new_new_descr;
+        }
+        else
+        {
+          new_new_descr = {};
+        }
+      }
+      else if (ch == 'B')
+      {
+        deny_data *deni;
+
+        deni = new deny_data;
+        deni->vnum = fread_int(in, -1, 2147483467);
+
+        if (room_nr)
+        {
+          deni->next = room.denied;
+          room.denied = deni;
+        }
+        else
+        {
+          deni = {};
+        }
+      }
+      else if (ch == 'S') /* end of current room */
+        break;
+      else if (ch == 'C')
+      {
+        qint32 c_class = fread_int(in, 0, CLASS_MAX);
+        if (room_nr)
+        {
+          room.allow_class[c_class] = true;
+        }
+      }
+    } // of for (;;) (get directions and extra descs)
+  } // if == $
+
+  return in;
+}
+typedef quint16 object_type_t;
+typedef qint32 object_value_t;
+
+namespace DCNS
+{
+  Q_NAMESPACE
+
+  enum ObjectPosition
+  {
+    TAKE = 1 << 0,
+    FINGER = 1 << 1,
+    NECK = 1 << 2,
+    BODY = 1 << 3,
+    HEAD = 1 << 4,
+    LEGS = 1 << 5,
+    FEET = 1 << 6,
+    HANDS = 1 << 7,
+    ARMS = 1 << 8,
+    SHIELD = 1 << 9,
+    ABOUT = 1 << 10,
+    WAISTE = 1 << 11,
+    WRIST = 1 << 12,
+    WIELD = 1 << 13,
+    HOLD = 1 << 14,
+    THROW = 1 << 15,
+    LIGHT_SOURCE = 1 << 16,
+    FACE = 1 << 17,
+    EAR = 1 << 18
+  };
+  Q_DECLARE_FLAGS(ObjectPositions, ObjectPosition)
+  Q_DECLARE_OPERATORS_FOR_FLAGS(ObjectPositions)
+  Q_FLAG_NS(ObjectPositions)
+
+  template <typename T>
+  QStringList QFlagsToStrings(void)
+  {
+    QStringList list;
+    auto metaEnum = QMetaEnum::fromType<T>();
+    for (qint32 i = {}; i < metaEnum.keyCount(); ++i)
+    {
+      if (metaEnum.key(i))
+        list.push_back(QString(metaEnum.key(i)).replace('_', '-'));
+    }
+    return list;
+  }
+  template <typename T>
+  QString QFlagsToStrings(T flags)
+  {
+    return QMetaEnum::fromType<T>().valueToKeys(flags).replace('_', '-').replace('|', ' ');
+  }
+
+}
+using namespace DCNS;
+qint32 sprintf(QString &str, const char *format, ...);
+
+class obj_flag_data
+{
+public:
+  object_value_t value[4] = {}; /* Values of the item (see list)    */
+  object_type_t type_flag = {}; /* Type of item                     */
+  ObjectPositions wear_flags = {};
+  quint16 size = {};        /* Race restrictions                */
+  quint32 extra_flags = {}; /* If it hums, glows etc            */
+  qint16 weight = {};       /* Weight what else                 */
+  qint32 cost = {};         /* Value when sold (gp.)            */
+  quint32 more_flags = {};  /* A second bitvector (extra_flags2)*/
+  level_t eq_level = {};    /* Min level to use it for eq       */
+  qint16 timer = {};        /* Timer for object                 */
+  CharacterPtr origin = {}; /* Creator of object, previously was stored at value[3] */
+  bool Value(qsizetype i, object_value_t v)
+  {
+    if (i >= 0 && i < 4)
+    {
+      value[i] = v;
+      return true;
+    }
+    return false;
+  }
+  object_value_t Value(qsizetype i)
+  {
+    if (i >= 0 && i < 4)
+    {
+      return value[i];
+    }
+    return {};
+  }
+};
+
+// DO NOT change most of these types without checking the save files
+// first, or you will probably end up corrupting all the pfiles
+
+class Toggle
+{
+public:
+  Toggle(void) = default;
+  Toggle(QString name, quint64 shift, command_gen3_t function, quint64 dependency_shift = UINT64_MAX, QString on_message = "$B$2on$R", QString off_message = "$B$4off$R");
+  bool isValid(void) { return valid_; }
+
+  QString name_;
+  bool valid_ = false;
+  quint64 shift_ = {};
+  quint64 dependency_shift_ = {};
+  quint64 value_ = {};
+  QString on_message_;
+  QString off_message_;
+  command_return_t (Character::*function_)(QStringList arguments, cmd_t cmd);
+};
+
+constexpr auto MAX_HIDE = 10;
+
+constexpr auto QUEST_MAX = 1;         // max quests at a time
+constexpr auto QUEST_SHOW = 10;       // max quests shown at a time
+constexpr auto QUEST_MAX_CANCEL = 15; // max quests canceled at a time
+constexpr auto QUEST_TOTAL = 500;     // max total quests in file
+constexpr auto QUEST_MASTER = 10027;  // vnum of questmaster
+
+class Player
+{
+  QString prompt_;
+  QString last_prompt_;
+
+public:
+  void setPrompt(QString prompt)
+  {
+    prompt_ = prompt;
+  }
+  QString getPrompt(void) const
+  {
+    return prompt_;
+  }
+  void setLastPrompt(QString last_prompt)
+  {
+    last_prompt_ = last_prompt;
+  }
+  QString getLastPrompt(void) const
+  {
+    return last_prompt_;
+  }
+  /************************************************************************
+  | Player vectors
+  | Character->player->toggles
+  */
+  QString last_site;          /* Last login from.. */
+  QString poofin;             /* poofin message */
+  QString poofout;            /* poofout message */
+  ObjectPtr skillchange = {}; /* Skill changing equipment. */
+  CharacterPtr golem = {};    // CURRENT golem.
+
+  constexpr static quint32 PLR_BRIEF = 1U;
+  constexpr static quint32 PLR_BRIEF_BIT = {};
+  constexpr static quint32 PLR_COMPACT = 1U << 1;
+  constexpr static quint32 PLR_COMPACT_BIT = 1;
+  constexpr static quint32 PLR_DONTSET = 1U << 2;
+  constexpr static quint32 PLR_DONTSET_BIT = 2;
+  constexpr static quint32 PLR_DONOTUSE = 1U << 3;
+  constexpr static quint32 PLR_DONOTUSE_BIT = 3;
+  constexpr static quint32 PLR_NOHASSLE = 1U << 4;
+  constexpr static quint32 PLR_NOHASSLE_BIT = 4;
+  constexpr static quint32 PLR_SUMMONABLE = 1U << 5;
+  constexpr static quint32 PLR_SUMMONABLE_BIT = 5;
+  constexpr static quint32 PLR_WIMPY = 1U << 6;
+  constexpr static quint32 PLR_WIMPY_BIT = 6;
+  constexpr static quint32 PLR_ANSI = 1U << 7;
+  constexpr static quint32 PLR_ANSI_BIT = 7;
+  constexpr static quint32 PLR_VT100 = 1U << 8;
+  constexpr static quint32 PLR_VT100_BIT = 8;
+  constexpr static quint32 PLR_ONEWAY = 1U << 9;
+  constexpr static quint32 PLR_ONEWAY_BIT = 9;
+  constexpr static quint32 PLR_DISGUISED = 1U << 10;
+  constexpr static quint32 PLR_DISGUISED_BIT = 10;
+  constexpr static quint32 PLR_UNUSED = 1U << 11;
+  constexpr static quint32 PLR_UNUSED_BIT = 11;
+  constexpr static quint32 PLR_PAGER = 1U << 12;
+  constexpr static quint32 PLR_PAGER_BIT = 12;
+  constexpr static quint32 PLR_BEEP = 1U << 13;
+  constexpr static quint32 PLR_BEEP_BIT = 13;
+  constexpr static quint32 PLR_BARD_SONG = 1U << 14;
+  constexpr static quint32 PLR_BARD_SONG_BIT = 14;
+  constexpr static quint32 PLR_ANONYMOUS = 1U << 15;
+  constexpr static quint32 PLR_ANONYMOUS_BIT = 15;
+  constexpr static quint32 PLR_AUTOEAT = 1U << 16;
+  constexpr static quint32 PLR_AUTOEAT_BIT = 16;
+  constexpr static quint32 PLR_LFG = 1U << 17;
+  constexpr static quint32 PLR_LFG_BIT = 17;
+  constexpr static quint32 PLR_CHARMIEJOIN = 1U << 18;
+  constexpr static quint32 PLR_CHARMIEJOIN_BIT = 18;
+  constexpr static quint32 PLR_NOTAX = 1U << 19;
+  constexpr static quint32 PLR_NOTAX_BIT = 19;
+  constexpr static quint32 PLR_GUIDE = 1U << 20;
+  constexpr static quint32 PLR_GUIDE_BIT = 20;
+  constexpr static quint32 PLR_GUIDE_TOG = 1U << 21;
+  constexpr static quint32 PLR_GUIDE_TOG_BIT = 21;
+  constexpr static quint32 PLR_NEWS = 1U << 22;
+  constexpr static quint32 PLR_NEWS_BIT = 22;
+  constexpr static quint32 PLR_50PLUS = 1U << 23;
+  constexpr static quint32 PLR_50PLUS_BIT = 23;
+  constexpr static quint32 PLR_ASCII = 1U << 24;
+  constexpr static quint32 PLR_ASCII_BIT = 24;
+  constexpr static quint32 PLR_DAMAGE = 1U << 25;
+  constexpr static quint32 PLR_DAMAGE_BIT = 25;
+  constexpr static quint32 PLR_CLS_TREE_A = 1U << 26;
+  constexpr static quint32 PLR_CLS_TREE_A_BIT = 26;
+  constexpr static quint32 PLR_CLS_TREE_B = 1U << 27;
+  constexpr static quint32 PLR_CLS_TREE_B_BIT = 27;
+  constexpr static quint32 PLR_CLS_TREE_C = 1U << 28; // might happen one day
+  constexpr static quint32 PLR_CLS_TREE_C_BIT = 28;
+  constexpr static quint32 PLR_EDITOR_WEB = 1U << 29;
+  constexpr static quint32 PLR_EDITOR_WEB_BIT = 29;
+  constexpr static quint32 PLR_REMORTED = 1U << 30;
+  constexpr static quint32 PLR_REMORTED_BIT = 30;
+  constexpr static quint32 PLR_NODUPEKEYS = 1U << 31;
+  constexpr static quint32 PLR_NODUPEKEYS_BIT = 31;
+  static const QList<Toggle> togglables;
+  static const QStringList toggle_txt;
+
+  QString password_;
+  ignoring_t ignoring = {}; /* List of ignored names */
+
+  quint32 totalpkills = {};   // total number of pkills THIS LOGIN
+  quint32 totalpkillslv = {}; // sum of levels of pkills THIS LOGIN
+  quint32 pdeathslogin = {};  // pdeaths THIS LOGIN
+
+  quint32 rdeaths = {};      // total number of real deaths
+  quint32 pdeaths = {};      // total number of times pkilled
+  quint32 pkills = {};       // # of pkills ever
+  quint32 pklvl = {};        // # sum of levels of pk victims ever
+  quint32 group_pkills = {}; // # of pkills for group
+  quint32 grpplvl = {};      // sum of levels of group pkill victims
+  quint32 group_kills = {};  // # of kills for group
+
+  time_data time = {}; // PC time data.  logon, played, birth
+
+  quint32 bad_pw_tries = {}; // How many times people have entered bad pws
+
+  qint16 statmetas = {}; // How many times I've metad a stat
+                         // This number could go negative from stat loss
+  quint16 kimetas = {};  // How many times I've metad ki (pc only)
+
+  qint32 wizinvis = {};
+
+  quint16 practices = {};       // How many can you learn yet this level
+  quint16 specializations = {}; // How many specializations a player has left
+
+  qint16 saves_mods[SAVE_TYPE_MAX + 1] = {}; // character dependant mods to saves (meta'able)
+
+  quint32 bank = {}; /* gold in bank                            */
+
+  quint32 toggles = {};   // Bitvector for toggles.  (Was specials.act)
+  quint32 punish = {};    // flags for punishments
+  quint32 quest_bv1 = {}; // 1st bitvector for quests
+
+  qint16 buildLowVnum = {}, buildHighVnum = {};
+  qint16 buildMLowVnum = {}, buildMHighVnum = {};
+  qint16 buildOLowVnum = {}, buildOHighVnum = {};
+
+  vnum_t last_mob_edit = {}; // vnum of last mob edited
+  vnum_t last_obj_vnum = {}; // vnum of last obj edited
+
+  QString last_tell = {};     /* last person who told           */
+  qint16 last_mess_read = {}; /* for reading messages */
+
+  // TODO: these 3 need to become PLR toggles
+  bool holyLite = {};  // Holy lite mode
+  bool stealth = {};   // If on, you are more stealth then norm. (god)
+  bool incognito = {}; // invis imms will be seen by people in same room
+
+  bool possesing = {};  /*  is the person possessing? */
+  bool unjoinable = {}; // Do NOT autojoin
+  bool hide[MAX_HIDE] = {};
+  CharacterPtr hiding_from[MAX_HIDE] = {};
+  QQueue<QString> away_msgs = {};
+  QQueue<class ChannelMessage> tell_history = {};
+  history_t gtell_history = {};
+  joining_t joining = {};
+  quint32 quest_points = {};
+  qint16 quest_current[QUEST_MAX] = {};
+  quint32 quest_current_ticksleft[QUEST_MAX] = {};
+  qint16 quest_cancel[QUEST_MAX_CANCEL] = {};
+  quint32 quest_complete[QUEST_TOTAL / ASIZE + 1] = {};
+  std::multimap<qint32, std::pair<timeval, timeval>> *lastseen = {};
+  quint8 profession = {};
+  bool multi = {};
+  PlayerConfig *config = {};
+
+  QString getJoining(void);
+  void setJoining(QString list);
+  void toggleJoining(QString key);
+  void save_char_aliases(FILE *fpsave);
+  QString perform_alias(QString orig);
+  void save(FILE *fpsave, time_data tmpage);
+  bool read(FILE *fpsave, CharacterPtr ch, QString filename);
+
+  aliases_t aliases_; /* Aliases */
+};
+
+constexpr auto ITEM_LIGHT = 1;
+constexpr auto ITEM_SCROLL = 2;
+constexpr auto ITEM_WAND = 3;
+constexpr auto ITEM_STAFF = 4;
+constexpr auto ITEM_WEAPON = 5;
+constexpr auto ITEM_FIREWEAPON = 6;
+constexpr auto ITEM_MISSILE = 7;
+constexpr auto ITEM_TREASURE = 8;
+constexpr auto ITEM_ARMOR = 9;
+constexpr auto ITEM_POTION = 10;
+constexpr auto ITEM_WORN = 11; // not used, can change
+constexpr auto ITEM_OTHER = 12;
+constexpr auto ITEM_TRASH = 13;
+constexpr auto ITEM_TRAP = 14;
+constexpr auto ITEM_CONTAINER = 15;
+constexpr auto ITEM_NOTE = 16;
+constexpr auto ITEM_DRINKCON = 17;
+constexpr auto ITEM_KEY = 18;
+constexpr auto ITEM_FOOD = 19;
+constexpr auto ITEM_MONEY = 20;
+constexpr auto ITEM_PEN = 21;
+constexpr auto ITEM_BOAT = 22;
+constexpr auto ITEM_BOARD = 23;
+constexpr auto ITEM_PORTAL = 24;
+constexpr auto ITEM_FOUNTAIN = 25;
+constexpr auto ITEM_INSTRUMENT = 26;
+constexpr auto ITEM_UTILITY = 27;
+constexpr auto ITEM_BEACON = 28;
+constexpr auto ITEM_LOCKPICK = 29;
+constexpr auto ITEM_CLIMBABLE = 30;
+constexpr auto ITEM_MEGAPHONE = 31;
+constexpr auto ITEM_ALTAR = 32;
+constexpr auto ITEM_TOTEM = 33;
+constexpr auto ITEM_KEYRING = 34;
+constexpr auto ITEM_TYPE_MAX = 34;
+
+/* Bitvector for 'extra_flags' */
+
+constexpr auto ITEM_GLOW = 1U;
+constexpr auto ITEM_HUM = 1U << 1;
+constexpr auto ITEM_DARK = 1U << 2;
+constexpr auto ITEM_LOCK = 1U << 3;
+constexpr auto ITEM_ANY_CLASS = 1U << 4;
+constexpr auto ITEM_INVISIBLE = 1U << 5;
+constexpr auto ITEM_MAGIC = 1U << 6;
+constexpr auto ITEM_NODROP = 1U << 7;
+constexpr auto ITEM_BLESS = 1U << 8;
+constexpr auto ITEM_ANTI_GOOD = 1U << 9;
+constexpr auto ITEM_ANTI_EVIL = 1U << 10;
+constexpr auto ITEM_ANTI_NEUTRAL = 1U << 11;
+constexpr auto ITEM_WARRIOR = 1U << 12;
+constexpr auto ITEM_MAGE = 1U << 13;
+constexpr auto ITEM_THIEF = 1U << 14;
+constexpr auto ITEM_CLERIC = 1U << 15;
+constexpr auto ITEM_PAL = 1U << 16;
+constexpr auto ITEM_ANTI = 1U << 17;
+constexpr auto ITEM_BARB = 1U << 18;
+constexpr auto ITEM_MONK = 1U << 19;
+constexpr auto ITEM_RANGER = 1U << 20;
+constexpr auto ITEM_DRUID = 1U << 21;
+constexpr auto ITEM_BARD = 1U << 22;
+constexpr auto ITEM_TWO_HANDED = 1U << 23;
+constexpr auto ITEM_ENCHANTED = 1U << 24;
+constexpr auto ITEM_SPECIAL = 1U << 25;
+constexpr auto ITEM_NOSAVE = 1U << 26;
+constexpr auto ITEM_NOSEE = 1U << 27;
+constexpr auto ITEM_NOREPAIR = 1U << 28;
+constexpr auto ITEM_NEWBIE = 1U << 29;
+constexpr auto ITEM_PC_CORPSE = 1U << 30;
+constexpr auto ITEM_QUEST = 1U << 31;
+
+/* Bitvector for 'more_flags' */
+
+constexpr auto ITEM_NO_RESTRING = 1U;
+constexpr auto ITEM_LIMIT_SACRIFICE = 1U << 1;
+constexpr auto ITEM_UNIQUE = 1U << 2;
+constexpr auto ITEM_NO_TRADE = 1U << 3;
+constexpr auto ITEM_NONOTICE = 1U << 4;
+constexpr auto ITEM_NOLOCATE = 1U << 5;
+constexpr auto ITEM_UNIQUE_SAVE = 1U << 6;
+
+constexpr auto ITEM_NPC_CORPSE = 1U << 7;
+constexpr auto ITEM_PC_CORPSE_LOOTED = 1U << 8;
+constexpr auto ITEM_NO_SCRAP = 1U << 9;
+constexpr auto ITEM_CUSTOM = 1U << 10;
+constexpr auto ITEM_24H_SAVE = 1U << 11;
+constexpr auto ITEM_NO_DISARM = 1U << 12;
+constexpr auto ITEM_TOGGLE = 1U << 13;
+constexpr auto ITEM_NO_CUSTOM = 1U << 14;
+constexpr auto ITEM_24H_NO_SELL = 1U << 15;
+constexpr auto ITEM_POOF_AFTER_24H = 1U << 16;
+constexpr auto ITEM_POOF_NEVER = 1U << 17;
+
+/* Bitvector for 'size' */
+#define SIZE_ANY 1U
+constexpr auto SIZE_SMALL = 1U << 1;
+constexpr auto SIZE_MEDIUM = 1U << 2;
+constexpr auto SIZE_LARGE = 1U << 3;
+
+/* Different types of 'utility' items */
+
+constexpr auto UTILITY_CATSTINK = 1;
+constexpr auto UTILITY_EXIT_TRAP = 2;
+constexpr auto UTILITY_MOVEMENT_TRAP = 3;
+constexpr auto UTILITY_MORTAR = 4;
+constexpr auto UTILITY_ITEM_MAX = 4;
+
+/* Some different kind of liquids */
+constexpr auto LIQ_WATER = 0;
+constexpr auto LIQ_BEER = 1;
+constexpr auto LIQ_WINE = 2;
+constexpr auto LIQ_ALE = 3;
+constexpr auto LIQ_DARKALE = 4;
+constexpr auto LIQ_WHISKY = 5;
+constexpr auto LIQ_LEMONADE = 6;
+constexpr auto LIQ_FIREBRT = 7;
+constexpr auto LIQ_LOCALSPC = 8;
+constexpr auto LIQ_SLIME = 9;
+constexpr auto LIQ_MILK = 10;
+constexpr auto LIQ_TEA = 11;
+constexpr auto LIQ_COFFEE = 12;
+constexpr auto LIQ_BLOOD = 13;
+constexpr auto LIQ_SALTWATER = 14;
+constexpr auto LIQ_COKE = 15;
+constexpr auto LIQ_GATORADE = 16;
+constexpr auto LIQ_HOLYWATER = 17;
+constexpr auto LIQ_INK = 18;
+
+typedef qint32 location_t;
+typedef qint32 modifier_t;
+class obj_affected_type
+{
+public:
+  location_t location = {}; /* Which ability to change (APPLY_XXX) */
+  modifier_t modifier = {}; /* How much it changes by              */
+};
+
+class Object : public MinimumEntity, public Entity, public QObject
+{
+  Q_OBJECT
+public:
+  enum class portal_types_t
+  {
+    Player = 0,
+    Permanent = 1,
+    Temp = 2,
+    LookOnly = 3,
+    PermanentNoLook = 4
+  };
+
+  enum portal_flags_t
+  {
+    No_Leave = 1 << 0,
+    No_Enter = 1 << 1
+  };
+
+  typedef QString (Object::*getter_t)(void);
+  typedef bool (Object::*setter_t)(QString);
+
+  static const QStringList size_bits;
+  static const QStringList more_obj_bits;
+  static const QStringList extra_bits;
+  static const QStringList apply_types;
+
+  qint32 item_number = {};      /* Where in data-base               */
+  qint32 vroom = {};            /* for corpse saving */
+  obj_flag_data obj_flags = {}; /* Object information               */
+  qint16 num_affects = {};
+  QList<obj_affected_type> affected = {}; /* Which abilities in PC to change  */
+  extra_descr_data *ex_description = {};  /* extra descriptions     */
+  CharacterPtr carried_by = {};           /* Carried by :NULL in room/conta   */
+  CharacterPtr equipped_by = {};          /* so I can access the player :)    */
+
+  ObjectPtr in_obj = {};   /* In what object NULL when none    */
+  ObjectPtr contains = {}; /* Contains objects                 */
+
+  ObjectPtr next_content = {}; /* For 'contains' lists             */
+  ObjectPtr next = {};         /* For the object list              */
+  ObjectPtr next_skill = {};
+  table_data *table = {};
+  class machine_data *slot = {};
+  class wheel_data *wheel = {};
+  time_t save_expiration = {};
+  time_t no_sell_expiration = {};
+
+  Object(DCPtr dc);
+  bool isDark(void);
+  bool isPortal(void);
+  bool isTotem(void)
+  {
+    return obj_flags.type_flag == ITEM_TOTEM;
+  }
+  bool isWeapon(void)
+  {
+    return obj_flags.type_flag == ITEM_WEAPON;
+  }
+  bool isArmor(void)
+  {
+    return obj_flags.type_flag == ITEM_ARMOR;
+  }
+  bool isInstrument(void)
+  {
+    return obj_flags.type_flag == ITEM_INSTRUMENT;
+  }
+  bool isContainer(void)
+  {
+    return obj_flags.type_flag == ITEM_CONTAINER;
+  }
+  bool isLight(void)
+  {
+    return obj_flags.type_flag == ITEM_LIGHT;
+  }
+  bool isScroll(void)
+  {
+    return obj_flags.type_flag == ITEM_SCROLL;
+  }
+  bool isWand(void)
+  {
+    return obj_flags.type_flag == ITEM_WAND;
+  }
+  bool isStaff(void)
+  {
+    return obj_flags.type_flag == ITEM_STAFF;
+  }
+  bool isFireWeapon(void)
+  {
+    return obj_flags.type_flag == ITEM_FIREWEAPON;
+  }
+  bool isMissle(void)
+  {
+    return obj_flags.type_flag == ITEM_MISSILE;
+  }
+  bool isTreasure(void)
+  {
+    return obj_flags.type_flag == ITEM_TREASURE;
+  }
+  bool isPotion(void)
+  {
+    return obj_flags.type_flag == ITEM_POTION;
+  }
+  bool isWorn(void)
+  {
+    return obj_flags.type_flag == ITEM_WORN;
+  }
+  bool isOther(void)
+  {
+    return obj_flags.type_flag == ITEM_OTHER;
+  }
+  bool isTrash(void)
+  {
+    return obj_flags.type_flag == ITEM_TRASH;
+  }
+  bool isTrap(void)
+  {
+    return obj_flags.type_flag == ITEM_TRAP;
+  }
+  bool isNote(void)
+  {
+    return obj_flags.type_flag == ITEM_NOTE;
+  }
+  bool isDrinkContainer(void)
+  {
+    return obj_flags.type_flag == ITEM_DRINKCON;
+  }
+  bool isKey(void)
+  {
+    return obj_flags.type_flag == ITEM_KEY;
+  }
+  bool isFood(void)
+  {
+    return obj_flags.type_flag == ITEM_FOOD;
+  }
+  bool isMoney(void)
+  {
+    return obj_flags.type_flag == ITEM_MONEY;
+  }
+  bool isPen(void)
+  {
+    return obj_flags.type_flag == ITEM_PEN;
+  }
+  bool isBoat(void)
+  {
+    return obj_flags.type_flag == ITEM_BOAT;
+  }
+  bool isBoard(void)
+  {
+    return obj_flags.type_flag == ITEM_BOARD;
+  }
+  bool isFountain(void)
+  {
+    return obj_flags.type_flag == ITEM_FOUNTAIN;
+  }
+  bool isUtility(void)
+  {
+    return obj_flags.type_flag == ITEM_UTILITY;
+  }
+  bool isBeacon(void)
+  {
+    return obj_flags.type_flag == ITEM_BEACON;
+  }
+  bool isLockpick(void)
+  {
+    return obj_flags.type_flag == ITEM_LOCKPICK;
+  }
+  bool isClimbable(void)
+  {
+    return obj_flags.type_flag == ITEM_CLIMBABLE;
+  }
+  bool isMegaphone(void)
+  {
+    return obj_flags.type_flag == ITEM_MEGAPHONE;
+  }
+  bool isAltar(void)
+  {
+    return obj_flags.type_flag == ITEM_ALTAR;
+  }
+  bool isKeyring(void)
+  {
+    return obj_flags.type_flag == ITEM_KEYRING;
+  }
+
+  room_t getPortalDestinationRoom(void)
+  {
+    if (!isPortal())
+    {
+      return 0;
+    }
+    return obj_flags.value[0];
+  }
+  void setPortalDestinationRoom(room_t room)
+  {
+    if (!isPortal())
+    {
+      return;
+    }
+    obj_flags.value[0] = room;
+  }
+
+  portal_types_t getPortalType(void)
+  {
+    if (!isPortal())
+    {
+      return portal_types_t::Player;
+    }
+    return static_cast<portal_types_t>(obj_flags.value[1]);
+  }
+  bool isPortalTypePlayer(void)
+  {
+    return getPortalType() == portal_types_t::Player;
+  }
+  bool isPortalTypePermanent(void)
+  {
+    return getPortalType() == portal_types_t::Permanent;
+  }
+  bool isPortalTypeTemp(void)
+  {
+    return getPortalType() == portal_types_t::Temp;
+  }
+  bool isPortalTypeLookOnly(void)
+  {
+    return getPortalType() == portal_types_t::LookOnly;
+  }
+  bool isPortalTypePermanentNoLook(void)
+  {
+    return getPortalType() == portal_types_t::PermanentNoLook;
+  }
+  bool isQuest(void);
+  bool isTest(void);
+  bool isGodload(void);
+  bool isCustom(void)
+  {
+    return isSet(obj_flags.more_flags, ITEM_NO_CUSTOM);
+  }
+
+  qint32 getPortalLeaveZone(void)
+  {
+    if (!isPortal())
+    {
+      return -1;
+    }
+    return obj_flags.value[2];
+  }
+  qint32 getPortalFlags(void)
+  {
+    if (!isPortal())
+    {
+      return 0;
+    }
+    return obj_flags.value[3];
+  }
+  bool hasPortalFlagNoLeave(void);
+  bool hasPortalFlagNoEnter(void);
+
+  quint64 getLevel(void);
+
+  qint32 keywordfind(void);
+  void setOwner(QString owner) { owner_ = owner; }
+  QString getOwner(void) { return owner_; }
+
+  [[nodiscard]] inline bool isCorpse(void) const
+  {
+    return isSet(obj_flags.extra_flags, ITEM_PC_CORPSE) || isSet(obj_flags.extra_flags, ITEM_PC_CORPSE_LOOTED);
+  }
+  [[nodiscard]] inline bool isTradable(void) const
+  {
+    return !isSet(obj_flags.more_flags, ITEM_NO_TRADE);
+  }
+  bool ActionDescription(QString action_description)
+  {
+    action_description_ = action_description;
+    if (action_description.isEmpty())
+      return false;
+    else
+      return true;
+  }
+  QString ActionDescription(void) const { return action_description_; }
+  object_type_t Type(void) { return obj_flags.type_flag; }
+  QString TypeString(void);
+  bool Type(object_type_t type)
+  {
+    if (type >= ITEM_TYPE_MAX)
+    {
+      type = {};
+      obj_flags.Value(2, 0);
+      return false;
+    }
+    obj_flags.type_flag = type;
+    if (obj_flags.type_flag == 24)
+      obj_flags.Value(2, -1);
+    else
+      obj_flags.Value(2, 0);
+    return true;
+  }
+  bool TypeString(QString type);
+  ~Object();
+
+private:
+  QString owner_;
+  QString name_;               /* Title of object :get etc.        */
+  QString action_description_; /* What to write when used          */
+};
+
+ObjectPtr ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it, qint32 ticket);
+
+// Character, Character
+// This contains all memory items for a player/mob
+// All non-specific data is held in this structure
+// PC/MOB specific data are held in the appropriate pointed-to structs
+
+class player_data
+{
+public:
+  player_data *next;
+  class table_data *table;
+  CharacterPtr ch;
+  qint32 hand_data[21];
+  // theoretical cardmax is lower than 21, but whatever
+  qint32 bet;
+  bool insurance;
+  bool doubled;
+  qint32 state;
+};
+
+class table_data
+{
+public:
+  ObjectPtr obj; // linked to obj
+  class cDeck *deck;
+  player_data *plr;
+  player_data *cr; // current
+  bool gold;
+  qint32 options;
+  CharacterPtr dealer;
+  qint32 hand_data[21]; // dealer
+  qint32 handnr;
+  qint32 state;
+  qint32 won;
+  qint32 lost;
+};
+
+class cDeck
+{
+public:
+  table_data *table;
+  qint32 *cards;
+  qint32 pos;
+  qint32 decks;
+};
+
+typedef quint64 vnum_t;
+
+constexpr auto SEX_NEUTRAL = Character::sex_t::NEUTRAL;
+constexpr auto SEX_MALE = Character::sex_t::MALE;
+constexpr auto SEX_FEMALE = Character::sex_t::FEMALE;
+
+command_return_t do_mscore(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_huntclear(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+
+command_return_t do_metastat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_abandon(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_accept(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_action(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_autojoin(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ambush(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_assemble(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_jab(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_areas(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ask(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_auction(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ban(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_beacon(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_beep(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_berserk(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_boot(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_boss(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_brace(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_channel(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_check(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_chpwd(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_cinfo(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_clans(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_cmotd(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ctax(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_cwithdraw(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_cbalance(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_colors(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_config(CharacterPtr ch, QStringList arguments, cmd_t cmd);
+command_return_t do_consent(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_count(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_cpromote(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_crazedassault(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_credits(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_cripple(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ctell(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_debug(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_dream(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_emote(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_setvote(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_vote(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_equipment(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_export(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_fill(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_find(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_findpath(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_findPath(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_fire(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_flee(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+/* DO_FUN  do_fly; */
+command_return_t do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_follow(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_forage(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_found(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_free_animal(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_freeze(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_global(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_gossip(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_install(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_guard(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mortal_help(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_hide(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_highfive(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_hitall(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_holylite(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_home(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_identify(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ignore(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_imotd(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_incognito(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_info(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_initiate(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_innate(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_instazone(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_inventory(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_joinarena(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+// command_return_t do_land (CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_layhands(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_leadership(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_leave(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_levels(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+
+command_return_t do_linkdead(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_load(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+// command_return_t do_motdload (CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_msave(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpstat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_look(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_maxes(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mlocate(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_move(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_motd(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mphit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpsetmath(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mppause(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_murder(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_name(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_natural_selection(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_newPath(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_noemote(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_noname(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t generic_command(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+
+command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_offer(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_olocate(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_oneway(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_orchestrate(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_osave(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_peace(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_poof(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_practice(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pray(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_profession(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_promote(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_prompt(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_lastprompt(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_processes(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_psay(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+// command_return_t do_pshopedit (CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pview(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_punish(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_quest(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_qui(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_quivering_palm(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_quit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_rage(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_random(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_range(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_rdelete(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_read(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_redirect(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_rent(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_reply(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_repop(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_rest(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_restore(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_return(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_revoke(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_rsave(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_say(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::SAY);
+command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sector(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_send(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_shout(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_showhunt(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_skills(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_social(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_songs(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_stromboli(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+
+command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_silence(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_stupid(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sing(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_spells(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_stat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_stealth(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_story(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_string(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_switch(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_tame(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_tellhistory(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_testhand(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_testhit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_transfer(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_triage(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_varstat(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_version(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_visible(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_whisper(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_whoclan(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_wield(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_world(CharacterPtr ch, QString args, cmd_t cmd);
+command_return_t do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_editor(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+command_return_t do_pursue(CharacterPtr ch, QString argument, cmd_t cmd = cmd_t::DEFAULT);
+
+/* handling the affected-structures */
+void affect_total(CharacterPtr ch);
+void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool add, qint32 flag = 0);
+
+void affect_from_char(CharacterPtr ch, qint32 skill, qint32 flags = 0);
+void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags);
+void affect_join(CharacterPtr ch, affected_type *af, bool avg_dur, bool avg_mod);
+
+class Sockets
+{
+public:
+  Sockets(CharacterPtr ch = {}, QString searchkey = "");
+  auto getIPs(void) const { return IPs_; }
+  auto getConnections(void) const { return connections_; }
+  quint64 getLongestNameSize(void) const { return longest_name_size_; }
+  quint64 getLongestIPSize(void) const { return longest_IP_size_; }
+  quint64 getLongestConnectionStateSize(void) const { return longest_connection_state_size_; }
+  quint64 getLongestIdleSize(void) const { return longest_idle_size_; }
+
+private:
+  QMap<QString, quint64> IPs_;
+  QList<ConnectionPtr> connections_;
+  qsizetype longest_name_size_ = {};
+  qsizetype longest_IP_size_ = {};
+  qsizetype longest_connection_state_size_ = {};
+  qsizetype longest_idle_size_ = {};
+};
+
+// This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE
+// There is a method in save.C for adding additional items to the pfile
+// Check there if you need to add something
+// This structure contains everything that would be serialized for both
+// a 'saved' mob, and for a player
+// Note, any "strings" are done afterwards in the functions.  Since these
+// are variable length, we can't do them with a single write
+
+// This structure was created as a replacement for char_file_u so that it
+// would be portable between 32-bit and 64-bit code.
+class char_file_u4
+{
+public:
+  char_file_u4();
+  Character::sex_t sex = {}; /* Sex */
+  qint8 c_class = {};        /* Class */
+  qint8 race = {};           /* Race */
+  qint8 level = {};          /* Level */
+
+  qint8 raw_str = {};
+  qint8 raw_intel = {};
+  qint8 raw_wis = {};
+  qint8 raw_dex = {};
+
+  qint8 raw_con = {};
+  qint8 conditions[3] = {};
+
+  quint8 weight = {};
+  quint8 height = {};
+  qint16 hometown = {};
+
+  quint32 gold = {};
+  quint32 plat = {};
+  qint64 exp = {};
+  quint32 immune = {};
+  quint32 resist = {};
+  quint32 suscept = {};
+
+  qint32 mana = {};     // current
+  qint32 raw_mana = {}; // max without eq/stat bonuses
+  qint32 hit = {};
+  qint32 raw_hit = {};
+  qint32 move = {};
+  qint32 raw_move = {};
+  qint32 ki = {};
+  qint32 raw_ki = {};
+
+  qint16 alignment = {};
+  qint16 unused1 = {};
+
+  quint32 hpmetas = {}; // Used by familiars too... why not.
+  quint32 manametas = {};
+  quint32 movemetas = {};
+
+  qint16 armor = {}; // have to save these since mobs have different bases
+  qint16 hitroll = {};
+
+  qint16 damroll = {};
+  qint16 unused2 = {};
+
+  qint32 afected_by = {};
+  qint32 afected_by2 = {};
+  quint32 misc = {}; // channel flags
+
+  qint16 clan = {};
+  qint16 unused3 = {};
+  qint32 load_room = {}; // Which room to place char in
+
+  quint32 acmetas = {};
+  qint32 agemetas = {};
+  qint32 extra_ints[3] = {}; // available just in case
+}
+__attribute__((packed));
+
+void char_to_store(class char_file_u4 *st, time_data &tmpage);
+
+/* These data contain information about a players time data */
+
+extern QList<QString> continent_names;
+
+void renum_world(void);
+void renum_zone_table(void);
+
+void clear_hunt(varg_t arg1, void *arg2, void *arg3);
+void clear_hunt(varg_t arg1, CharacterPtr arg2, void *arg3);
+auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
+#define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))
+
+template <typename T>
+T check_returns(T in_str)
+{
+  T new_string;
+  for (auto checker = in_str.begin(); checker != in_str.end(); checker++)
+  {
+    if (*checker == '\n')
+    {
+      if (checker + 1 != in_str.end() && *(checker + 1) != '\r')
+        new_string.push_back('\r');
+    }
+    new_string.push_back(*checker);
+  }
+
+  return new_string;
+}
+
+void affects_to_file(auto &out, ObjectPtr obj)
+{
+  for (qint32 i = {}; i < obj->num_affects; i++)
+  {
+    out << "A\n";
+    out << obj->affected[i].location << " " << obj->affected[i].modifier << "\n";
+  }
+}
+
+void write_object(ObjectPtr obj, auto &out)
+{
+  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].vnum());
+  string_to_file(out, obj->name());
+  string_to_file(out, obj->short_description());
+  string_to_file(out, obj->long_description());
+  string_to_file(out, obj->ActionDescription());
+  out << obj->obj_flags;
+  out << obj->ex_description;
+  affects_to_file(out, obj);
+  out << DC::getInstance()->obj_index[obj->item_number].mobprogs_;
+  out << "S\n";
+}
+
+auto &operator<<(auto &out, const obj_flag_data &of)
+{
+  out << of.type_flag << " " << of.extra_flags << " " << of.wear_flags << " " << of.size << "\n";
+  out << of.value[0] << " " << of.value[1] << " " << of.value[2] << " " << of.value[3] << " " << of.eq_level << "\n";
+  out << of.weight << " " << of.cost << " " << of.more_flags << "\n";
+  return out;
+}
+
+template <typename T>
+T parse_bitstrings(QString arg1, CharacterPtr ch = {}, T value = {})
+{
+  bool found = false;
+  auto metaEnum = QMetaEnum::fromType<T>();
+
+  for (qint32 x = {}; x < metaEnum.keyCount(); ++x)
+  {
+    auto obj_position = ObjectPosition(1 << x);
+    if (is_abbrev(arg1, metaEnum.key(x)))
+    {
+      if (value.testFlag(obj_position))
+      {
+        // value
+        value.setFlag(obj_position, false);
+        if (ch)
+          ch->send(QStringLiteral("%1 flag REMOVED.\r\n").arg(metaEnum.key(x)));
+      }
+      else
+      {
+        value.setFlag(obj_position);
+        if (ch)
+          ch->send(QStringLiteral("%1 flag ADDED.\r\n").arg(metaEnum.key(x)));
+      }
+      found = true;
+      break;
+    }
+  }
+  if (!found && ch)
+    ch->sendln("No matching bits found.");
+  return value;
+}
+
+void warn_if_duplicate_ip(CharacterPtr ch);
+void record_msg(QString messg, CharacterPtr ch);
+bool is_multi(CharacterPtr ch);
+char *calc_condition(CharacterPtr ch, bool colour = false);
+CharacterPtr get_charmie(CharacterPtr ch);
+
+constexpr auto auction_duration = 1209600UL;
+constexpr auto AUC_MIN_PRICE = 1000;
+constexpr auto AUC_MAX_PRICE = 2000000000;
+
+const auto SAVE_DIR = QStringLiteral("../save");
+const auto BSAVE_DIR = QStringLiteral("../bsave");
+const auto QSAVE_DIR = QStringLiteral("../save/qdata");
+const auto NEWSAVE_DIR = QStringLiteral("../newsave");
+const auto ARCHIVE_DIR = QStringLiteral("../archive");
+const auto MOB_DIR = QStringLiteral("../MOBProgs/");
+const auto BAN_FILE = QStringLiteral("banned.txt");
+const auto SHOP_DIR = QStringLiteral("../lib/shops");
+const auto PLAYER_SHOP_DIR = QStringLiteral("../lib/playershops");
+const auto FORBIDDEN_NAME_FILE = QStringLiteral("../lib/forbidden_names.txt");
+const auto SKILL_QUEST_FILE = QStringLiteral("../lib/skill_quests.txt");
+const auto FAMILIAR_DIR = QStringLiteral("../familiar");
+const auto FOLLOWER_DIR = QStringLiteral("../follower");
+const auto VAULT_DIR = QStringLiteral("../vaults");
+const auto SHOP_FILE = QStringLiteral("tinyworld.shp");
+const auto WEBPAGE_FILE = QStringLiteral("webresponse.txt");
+const auto GREETINGS1_FILE = QStringLiteral("greetings1.txt");
+const auto GREETINGS2_FILE = QStringLiteral("greetings3.txt");
+const auto GREETINGS3_FILE = QStringLiteral("greetings4.txt");
+const auto GREETINGS4_FILE = QStringLiteral("greetings5.txt");
+const auto CREDITS_FILE = QStringLiteral("credits.txt");
+const auto MOTD_FILE = QStringLiteral("../lib/motd.txt");
+const auto IMOTD_FILE = QStringLiteral("motdimm.txt");
+const auto STORY_FILE = QStringLiteral("story.txt");
+const auto TIME_FILE = QStringLiteral("time.txt");
+const auto IDEA_LOG = QStringLiteral("ideas.log");
+const auto TYPO_LOG = QStringLiteral("typos.log");
+const auto MESS_FILE = QStringLiteral("messages.txt");
+const auto MESS2_FILE = QStringLiteral("messages2.txt");
+const auto SOCIAL_FILE = QStringLiteral("social.txt");
+const auto HELP_KWRD_FILE = QStringLiteral("help_key.txt");
+const auto HELP_PAGE_FILE = QStringLiteral("help.txt");
+const auto INFO_FILE = QStringLiteral("info.txt");
+const auto LOCAL_WHO_FILE = QStringLiteral("onlinewho.txt");
+const auto WEB_WHO_FILE = QStringLiteral("/srv/www/www.dcastle.org/htdocs/onlinewho.txt");
+const auto WEB_AUCTION_FILE = QStringLiteral("/srv/www/www.dcastle.org/htdocs/auctions.txt");
+const auto NEW_HELP_FILE = QStringLiteral("new_help.txt");
+const auto WEB_HELP_FILE = QStringLiteral("/srv/www/www.dcastle.org/htdocs/webhelp.txt");
+const auto NEW_HELP_PAGE_FILE = QStringLiteral("new_help_screen.txt");
+const auto NEW_IHELP_PAGE_FILE = QStringLiteral("new_ihelp_screen.txt");
+const auto LEADERBOARD_FILE = QStringLiteral("leaderboard.txt");
+const auto QUEST_FILE = QStringLiteral("quests.txt");
+const auto WEBCLANSLIST_FILE = QStringLiteral("webclanslist.txt");
+const auto HTDOCS_DIR = QStringLiteral("/srv/www/www.dcastle.org/htdocs/");
+const auto PLAYER_DIR = QStringLiteral("player/");
+const auto BUG_LOG = QStringLiteral("bug.log");
+const auto GOD_LOG = QStringLiteral("god.log");
+const auto MORTAL_LOG = QStringLiteral("mortal.log");
+const auto SOCKET_LOG = QStringLiteral("socket.log");
+const auto PLAYER_LOG = QStringLiteral("player.log");
+const auto WORLD_LOG = QStringLiteral("world.log");
+const auto ARENA_LOG = QStringLiteral("arena.log");
+const auto CLAN_LOG = QStringLiteral("clan.log");
+const auto OBJECTS_LOG = QStringLiteral("objects.log");
+const auto QUEST_LOG = QStringLiteral("quest.log");
+const auto VAULT_LOG = QStringLiteral("vault.log");
+const auto WORLD_INDEX_FILE = QStringLiteral("worldindex");
+const auto OBJECT_INDEX_FILE = QStringLiteral("objectindex");
+const auto MOB_INDEX_FILE = QStringLiteral("mobindex");
+const auto ZONE_INDEX_FILE = QStringLiteral("zoneindex");
+const auto PLAYER_SHOP_INDEX = QStringLiteral("playershopindex");
+const auto OBJECT_INDEX_FILE_TINY = QStringLiteral("objectindex.tiny");
+const auto WORLD_INDEX_FILE_TINY = QStringLiteral("worldindex.tiny");
+const auto MOB_INDEX_FILE_TINY = QStringLiteral("mobindex.tiny");
+const auto ZONE_INDEX_FILE_TINY = QStringLiteral("zoneindex.tiny");
+const auto VAULT_INDEX_FILE = QStringLiteral("../vaults/vaultindex");
+const auto VAULT_INDEX_FILE_TMP = QStringLiteral("../vaults/vaultindex.tmp");
+
+typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
+class clan_room_data
+{
+public:
+  qint32 room_number;
+  clan_room_data *next;
+};
+
+class ClanMember
+{
+public:
+  ClanMember(CharacterPtr ch = {});
+  ClanMember *next;
+
+  [[nodiscard]] inline auto name(void) const
+  {
+    return name_;
+  }
+  [[nodiscard]] inline auto unused1(void) const
+  {
+    return unused1_;
+  }
+  [[nodiscard]] inline auto unused2(void) const
+  {
+    return unused2_;
+  }
+  [[nodiscard]] inline auto unused3(void) const
+  {
+    return unused3_;
+  }
+  [[nodiscard]] inline auto unused4(void) const
+  {
+    return unused4_;
+  }
+  [[nodiscard]] inline auto rights(void) const
+  {
+    return rights_;
+  }
+  [[nodiscard]] inline auto rank(void) const
+  {
+    return rank_;
+  }
+  [[nodiscard]] inline auto time_joined(void) const
+  {
+    return time_joined_;
+  }
+
+  inline auto name(auto s)
+  {
+    name_ = s;
+    return s;
+  }
+  inline auto unused1(auto u)
+  {
+    unused1_ = u;
+    return u;
+  }
+  inline auto unused2(auto u)
+  {
+    unused2_ = u;
+    return u;
+  }
+  inline auto unused3(auto u)
+  {
+    unused3_ = u;
+    return u;
+  }
+  inline auto unused4(auto u)
+  {
+    unused4_ = u;
+    return u;
+  }
+  inline auto rights(auto r)
+  {
+    rights_ = r;
+    return r;
+  }
+  inline auto rank(auto r)
+  {
+    rank_ = r;
+    return r;
+  }
+  inline auto time_joined(auto tj)
+  {
+    time_joined_ = tj;
+    return tj;
+  }
+
+private:
+  QString name_;
+  qint64 unused1_;
+  qint64 unused2_;
+  quint64 unused3_;
+  QString unused4_;
+  quint32 rights_;
+  qint32 rank_;
+  quint32 time_joined_;
+};
+
+class Clan : public MinimumEntity
+{
+public:
+  Clan(QString n = {});
+  QString leader_;
+  QString founder_;
+  QString email_;
+  QString description_;
+  QString login_message_;
+  QString death_message_;
+  QString logout_message_;
+  QString clanmotd_;
+  quint16 tax_{};
+  clan_id_t id_{};
+  quint16 amt_{};
+  QList<clan_room_data> rooms_;
+  QList<ClanMember> members_;
+  QList<vault_access_data> acc_;
+  QQueue<QString> ctell_history_;
+
+  void cdeposit(gold_t deposit);
+  void cwithdraw(gold_t withdraw);
+  gold_t getBalance(void);
+  void setBalance(gold_t value);
+  void log(QString entry);
+
+private:
+  gold_t balance_;
+};
+Clan *get_clan(qint32 nClan);
+Clan *get_clan(CharacterPtr ch);
+void add_clan(Clan *new_new_clan);
+void add_clan_member(Clan *theClan, ClanMember *new_new_member);
+void add_clan_member(Clan *theClan, CharacterPtr ch);
+void remove_clan_member(Clan *theClan, CharacterPtr ch);
+QString get_clan_name(Clan *clan);
+
+void extractFamiliar(CharacterPtr ch);
+
+bool skill_success(CharacterPtr ch, CharacterPtr victim, qint32 skillnum, qint32 mod = 0);
+extern weather_data weather_info;
+qint32 GET_WAIT(CharacterPtr ch);
+void WAIT_STATE(CharacterPtr ch, qint32 cycle);
+bool is_hiding(CharacterPtr ch, CharacterPtr vict);
+
+void SETBIT(auto var, auto bit)
+{
+  (var)[(bit) / ASIZE] |= (1 << (((bit) - (((bit) / ASIZE) * ASIZE) - 1)));
+}
+
+void REMBIT(auto var, auto bit)
+{
+  (var)[(bit) / ASIZE] &= ~(1 << (((bit) - (((bit) / ASIZE) * ASIZE) - 1)));
+}
+
+void TOGBIT(auto var, auto bit)
+{
+  (var)[(bit) / ASIZE] ^= (1 << (((bit) - (((bit) / ASIZE) * ASIZE) - 1)));
+}
+
+bool ISSET(auto var, auto bit)
+{
+  return (var)[(bit) / ASIZE] & (1 << (((bit) - (((bit) / ASIZE) * ASIZE) - 1)));
+}
+bool IS_OBJ(auto ch)
+{
+  return ch->getType() == Character::Type::ObjectProgram;
+}
+bool IS_IMMORTAL(auto ch) { return IS_MINLEVEL_PC(ch, IMMORTAL); }
+bool IS_MORTAL(auto ch) { return IS_MAXLEVEL_PC(ch, IMMORTAL - 1); }
+
+void clan_death(char *b, CharacterPtr ch);
+
+qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting = true);
+
+bool circle_follow(CharacterPtr ch, CharacterPtr victim);
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
+bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj);
+void gain_condition(CharacterPtr ch, qint32 condition, qint32 value);
+void set_fighting(CharacterPtr ch, CharacterPtr vict);
+void stop_fighting(CharacterPtr ch, qint32 clearlag = 1);
+qint32 do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following);
+qint32 mana_limit(CharacterPtr ch);
+qint32 ki_limit(CharacterPtr ch);
+qint32 hit_limit(CharacterPtr ch);
+QString get_skill_name(qint32 skillnum);
+void gain_exp_regardless(CharacterPtr ch, qint32 gain);
+void advance_level(CharacterPtr ch, qint32 is_conversion);
+qint32 close_socket(class Connection *d);
+qint32 isexact(const QString arg, joining_t &namelist);
+void page_string(class Connection *d, const char *str, qint32 keep_internal);
+void gain_exp(CharacterPtr ch, qint64 gain);
+void redo_hitpoints(CharacterPtr ch); /* Rua's put in  */
+void redo_mana(CharacterPtr ch);      /* Rua's put in  */
+void redo_ki(CharacterPtr ch);        /* And Urizen*/
+void free_obj(ObjectPtr obj);
+qint32 char_from_room(CharacterPtr ch, bool stop_fighting);
+qint32 char_from_room(CharacterPtr ch);
+void do_start(CharacterPtr ch);
+void update_pos(CharacterPtr victim);
+void clear_object(ObjectPtr obj);
+void death_cry(CharacterPtr ch);
+void unique_scan(CharacterPtr victim);
+bool obj_to_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos);
+void check_idling(CharacterPtr ch);
+
+enum class follower_reasons_t
+{
+  DEFAULT,           // 0
+  END_STALK,         // 1
+  CHANGE_LEADER,     // 2
+  BROKE_CHARM,       // 3
+  BROKE_CHARM_LILITH // 4
+};
+void stop_follower(CharacterPtr ch, follower_reasons_t reason = follower_reasons_t::DEFAULT);
+void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reason = follower_reasons_t::DEFAULT);
+bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog = false);
+qint32 SWAP_CH_VICT(qint32 value);
+bool SOMEONE_DIED(qint32 value);
+bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool bf = false);
+bool check_blind(CharacterPtr ch);
+void raw_kill(CharacterPtr ch, CharacterPtr victim);
+void check_killer(CharacterPtr ch, CharacterPtr victim);
+qint32 map_eq_level(CharacterPtr mob);
+void disarm(CharacterPtr ch, CharacterPtr victim);
+qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg, CharacterPtr invoker);
+void ansi_color(const char *txt, CharacterPtr ch);
+void send_to_char(QString messg, CharacterPtr ch);
+void send_to_char_nosp(const char *messg, CharacterPtr ch);
+void send_to_char_nosp(QString messg, CharacterPtr ch);
+void util_archive(const char *, CharacterPtr);
+void util_unarchive(char *, CharacterPtr);
+bool is_busy(CharacterPtr ch);
+qint32 is_ignoring(const CharacterPtr ch, const CharacterPtr i);
+void colorCharSend(char *s, CharacterPtr ch);
+void send_to_char_regardless(QString messg, CharacterPtr ch);
+void send_to_char_regardless(QString messg, CharacterPtr ch);
+qint32 csendf(CharacterPtr ch, const QString arg, ...);
+void record_track_data(CharacterPtr ch, cmd_t cmd);
+void send_to_room(QString messg, qint32 room, bool awakeonly = false, CharacterPtr nta = {});
+qint32 use_mana(CharacterPtr ch, qint32 sn);
+void mob_suprised_sayings(CharacterPtr ch, CharacterPtr aggressor);
+void parse_bitstrings_into_int(const QStringList bits, const char *strings, CharacterPtr ch, quint32 value[]);
+void parse_bitstrings_into_int(const QStringList bits, const char *strings, CharacterPtr ch, quint32 &value);
+void parse_bitstrings_into_int(QStringList bits, QString strings, CharacterPtr ch, quint32 &value);
+void parse_bitstrings_into_int(const QStringList bits, const char *strings, CharacterPtr ch, quint16 &value);
+void parse_bitstrings_into_int(const QStringList bits, QString strings, CharacterPtr ch, quint32 value[]);
+void parse_bitstrings_into_int(const QStringList bits, QString strings, CharacterPtr ch, quint32 &value);
+void parse_bitstrings_into_int(const QStringList bits, QString strings, CharacterPtr ch, quint16 &value);
+qint32 contains_no_trade_item(ObjectPtr obj);
+qint32 contents_cause_unique_problem(ObjectPtr obj, CharacterPtr vict);
+bool check_make_camp(qint32);
+qint32 get_leadership_bonus(CharacterPtr);
+
+// MOBProgs prototypes
+qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr object, void *vo, qint32 type, bool reverse = false);
+void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr object, void *vo, qint32 type);
+qint32 mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch, ObjectPtr obj, void *vo);
+qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount);
+qint32 mprog_entry_trigger(CharacterPtr mob);
+qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj);
+qint32 mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch);
+qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch);
+qint32 mprog_death_trigger(CharacterPtr mob, CharacterPtr killer);
+qint32 mprog_random_trigger(CharacterPtr mob);
+qint32 mprog_arandom_trigger(CharacterPtr mob);
+qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, char *var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm);
+qint32 mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch);
+qint32 mprog_load_trigger(CharacterPtr mob);
+qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount);
+bool is_in_game(CharacterPtr ch);
+qint32 get_stat(CharacterPtr ch, attribute_t stat);
+qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 percent);
+void show_obj_class_size_mini(ObjectPtr obj, CharacterPtr ch);
+const char *item_condition(ObjectPtr obj);
+bool identify(CharacterPtr ch, ObjectPtr obj);
+extern void end_oproc(CharacterPtr ch, Trace trace = Trace("unknown"));
+QByteArray handle_ansi(QByteArray, CharacterPtr ch);
+QString handle_ansi(QString, CharacterPtr ch);
+QString handle_ansi(QString s, CharacterPtr ch);
+char *handle_ansi_(char *s, CharacterPtr ch);
+void show_string(class Connection *d, const char *input);
+qint32 get_saves(CharacterPtr ch, qint32 savetype);
+
+constexpr auto MAX_THROW_NAME = 60;
+class mprog_throw_type
+{
+public:
+  qint32 target_mob_num;                // num of mob to recieve
+  char target_mob_name[MAX_THROW_NAME]; // string used to find target name
+
+  qint32 data_num; // number of catch call to activate on target
+  qint32 delay;    // how qint32 until the mob gets it
+
+  qint32 pitcher; // vnum of mob that threw the call
+  qint32 opt;
+  mprog_throw_type *next;
+  bool mob;  // Mob or object.
+  char *var; // temporary variable
+  CharacterPtr actor;
+  ObjectPtr obj;
+  void *vo;
+  CharacterPtr rndm; // $r
+
+  // new mppause crap below..
+  CharacterPtr tMob;    // it should NOT throw it to another similar mob :P
+  qint32 ifchecks[256]; // Let's hope noone nests more ifs than that.
+  qint32 startPos;
+  qint32 cPos;
+  char *orig;
+  // end mppause crap
+};
+
+class Leaderboard
+{
+public:
+  Leaderboard();
+  virtual ~Leaderboard();
+  void check(void);
+  void check_offline(void);
+  void read_file(void);
+  void write_file(QString filename);
+  qint32 pdscore(CharacterPtr ch);
+  void rename(QString oldname, QString newname);
+  void setHP(quint32 placement, QString name, qint32 value);
+  qint32 scan(CharacterPtr ch);
+
+private:
+  QString hpactivename[5];
+  QString mnactivename[5];
+  QString kiactivename[5];
+  QString pkactivename[5];
+  QString pdactivename[5];
+  QString rdactivename[5];
+  QString mvactivename[5];
+  qint32 hpactive[5];
+  qint32 mnactive[5];
+  qint32 kiactive[5];
+  qint32 pkactive[5];
+  qint32 pdactive[5];
+  qint32 rdactive[5];
+  qint32 mvactive[5];
+  QString hpactiveclassname[CLASS_MAX - 2][5];
+  QString mnactiveclassname[CLASS_MAX - 2][5];
+  QString kiactiveclassname[CLASS_MAX - 2][5];
+  QString pkactiveclassname[CLASS_MAX - 2][5];
+  QString pdactiveclassname[CLASS_MAX - 2][5];
+  QString rdactiveclassname[CLASS_MAX - 2][5];
+  QString mvactiveclassname[CLASS_MAX - 2][5];
+  qint32 hpactiveclass[CLASS_MAX - 2][5];
+  qint32 mnactiveclass[CLASS_MAX - 2][5];
+  qint32 kiactiveclass[CLASS_MAX - 2][5];
+  qint32 pkactiveclass[CLASS_MAX - 2][5];
+  qint32 pdactiveclass[CLASS_MAX - 2][5];
+  qint32 rdactiveclass[CLASS_MAX - 2][5];
+  qint32 mvactiveclass[CLASS_MAX - 2][5];
+};
+
+extern Leaderboard leaderboard;
+
+typedef qint32 SING_FUN(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill);
+
+class song_info_type
+{
+public:
+  quint8 beats_;                /* Waiting time after ki */
+  position_t minimum_position_; /* min position for use */
+  quint8 min_useski_;           /* minimum ki used */
+  qint16 skill_num_;            /* skill number of the song */
+  qint16 targets_;              /* Legal targets */
+  qint16 rating_;               /* Rating for orchestrate */
+  SING_FUN *song_pointer_;      /* function to call */
+  SING_FUN *exec_pointer_;      /* other function to call */
+  SING_FUN *song_pulse_;        /* other other function to call */
+  SING_FUN *intrp_pointer_;     /* other other function to call */
+  qint32 difficulty_;
+
+public:
+  song_info_type(quint8 beats, position_t minimum_position, quint8 min_useski, qint16 skill_num,
+                 qint16 targets, qint16 rating, SING_FUN *song_pointer, SING_FUN *exec_pointer, SING_FUN *song_pulse,
+                 SING_FUN *intrp_pointer, qint32 difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_useski_(min_useski), skill_num_(skill_num),
+        targets_(targets), rating_(rating), song_pointer_(song_pointer), exec_pointer_(exec_pointer), song_pulse_(song_pulse),
+        intrp_pointer_(intrp_pointer), difficulty_(difficulty)
+  {
+  }
+  quint8 beats(void) const { return beats_; }
+  position_t minimum_position(void) const { return minimum_position_; }
+  quint8 min_useski(void) const { return min_useski_; }
+  qint16 skill_num(void) const { return skill_num_; }
+  qint16 targets(void) const { return targets_; }
+  qint16 rating(void) const { return rating_; }
+  SING_FUN *song_pointer(void) const { return song_pointer_; }
+  SING_FUN *exec_pointer(void) const { return exec_pointer_; }
+  SING_FUN *song_pulse(void) const { return song_pulse_; }
+  SING_FUN *intrp_pointer(void) const { return intrp_pointer_; }
+  qint32 difficulty(void) const { return difficulty_; }
+};
+extern const QList<song_info_type> song_info;
+
+/************************************************************************
+| Function declarations
+*/
+QDebug operator<<(QDebug debug, const songInfo &song);
+void stop_grouped_bards(CharacterPtr ch, qint32 action);
+void update_character_singing(CharacterPtr ch);
+void get_instrument_bonus(CharacterPtr ch, qint32 &comb, qint32 &non_comb);
+
+const char *skip_spaces(const char *s);
+SING_FUN song_whistle_sharp;
+SING_FUN song_disrupt;
+SING_FUN song_healing_melody;
+SING_FUN execute_song_healing_melody;
+SING_FUN song_revealing_stacato;
+SING_FUN execute_song_revealing_stacato;
+SING_FUN song_note_of_knowledge;
+SING_FUN execute_song_note_of_knowledge;
+SING_FUN song_terrible_clef;
+SING_FUN execute_song_terrible_clef;
+SING_FUN song_listsongs;
+SING_FUN song_soothing_remembrance;
+SING_FUN execute_song_soothing_remembrance;
+SING_FUN song_traveling_march;
+SING_FUN execute_song_traveling_march;
+SING_FUN song_stop;
+SING_FUN song_summon_song;
+SING_FUN execute_song_summon_song;
+SING_FUN song_astral_chanty;
+SING_FUN execute_song_astral_chanty;
+SING_FUN pulse_song_astral_chanty;
+SING_FUN song_forgetful_rhythm;
+SING_FUN execute_song_forgetful_rhythm;
+SING_FUN song_shattering_resonance;
+SING_FUN execute_song_shattering_resonance;
+SING_FUN song_insane_chant;
+SING_FUN execute_song_insane_chant;
+SING_FUN song_flight_of_bee;
+SING_FUN execute_song_flight_of_bee;
+SING_FUN pulse_flight_of_bee;
+SING_FUN intrp_flight_of_bee;
+SING_FUN song_searching_song;
+SING_FUN execute_song_searching_song;
+SING_FUN song_jig_of_alacrity;
+SING_FUN execute_song_jig_of_alacrity;
+SING_FUN pulse_jig_of_alacrity;
+SING_FUN intrp_jig_of_alacrity;
+SING_FUN song_glitter_dust;
+SING_FUN execute_song_glitter_dust;
+SING_FUN song_bountiful_sonnet;
+SING_FUN execute_song_bountiful_sonnet;
+SING_FUN song_synchronous_chord;
+SING_FUN execute_song_synchronous_chord;
+SING_FUN song_sticky_lullaby;
+SING_FUN execute_song_sticky_lullaby;
+SING_FUN song_vigilant_siren;
+SING_FUN execute_song_vigilant_siren;
+SING_FUN pulse_vigilant_siren;
+SING_FUN intrp_vigilant_siren;
+SING_FUN song_unresistable_ditty;
+SING_FUN execute_song_unresistable_ditty;
+SING_FUN song_fanatical_fanfare;
+SING_FUN execute_song_fanatical_fanfare;
+SING_FUN pulse_song_fanatical_fanfare;
+SING_FUN intrp_song_fanatical_fanfare;
+SING_FUN song_dischordant_dirge;
+SING_FUN execute_song_dischordant_dirge;
+SING_FUN song_crushing_crescendo;
+SING_FUN execute_song_crushing_crescendo;
+SING_FUN song_hypnotic_harmony;
+SING_FUN execute_song_hypnotic_harmony;
+SING_FUN song_mking_charge;
+SING_FUN execute_song_mking_charge;
+SING_FUN pulse_mking_charge;
+SING_FUN intrp_mking_charge;
+SING_FUN song_submariners_anthem;
+SING_FUN execute_song_submariners_anthem;
+SING_FUN pulse_submariners_chorus;
+SING_FUN intrp_submariners_chorus;
+
+class active_object
+{
+  ObjectPtr obj = {};
+  active_object *next = {};
+};
+qint32 eq_max_damage(ObjectPtr obj);
+qint32 damage_eq_once(ObjectPtr obj);
+qint32 eq_current_damage(ObjectPtr obj);
+void eq_remove_damage(ObjectPtr obj);
+void add_obj_affect(ObjectPtr obj, qint32 loc, qint32 mod);
+void remove_obj_affect_by_index(ObjectPtr obj, qint32 index);
+void remove_obj_affect_by_type(ObjectPtr obj, qint32 loc);
+bool fullSave(ObjectPtr obj);
+void heightweight(CharacterPtr ch, bool add);
+void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword);
+qint32 obj_from(ObjectPtr obj);
+void mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, class mprog_throw_type *thrw, CharacterPtr rndm);
+bool charExists(CharacterPtr ch);
+class SelfPurge
+{
+public:
+  SelfPurge(void);
+  SelfPurge(bool);
+  void setOwner(CharacterPtr, QString);
+  explicit operator bool(void) const;
+  QString getFunction(void) const;
+  bool getState(void) const;
+  CharacterPtr getOwner(void) const { return owner; }
+
+private:
+  bool state = {};
+  CharacterPtr owner = {};
+  QString function = {};
+};
+// QDebug operator<<(QDebug dbg, const SelfPurge &sp);
+
+void translate_value(char *leftptr, char *rightptr, qint16 **vali, quint32 **valui,
+                     char ***valstr, qint64 **vali64, quint64 **valui64, qint8 **valb, CharacterPtr mob, CharacterPtr actor,
+                     ObjectPtr obj, void *vo, CharacterPtr rndm, QString &valqstr);
+
+void save_golem_data(CharacterPtr ch);
+void save_charmie_data(CharacterPtr ch);
+typedef qint32 KI_FUN(quint8 level, CharacterPtr ch, const QString arg, CharacterPtr vict);
+class ki_info_type
+{
+  quint32 beats_;               /* Waiting time after ki */
+  position_t minimum_position_; /* min position for use */
+  quint8 min_useski_;           /* minimum ki used */
+  qint16 targets_;              /* Legal targets */
+  KI_FUN *ki_pointer_;          /* function to call */
+  qint32 difficulty_;
+
+public:
+  ki_info_type(quint32 beats, position_t minimum_position, quint8 min_useski, qint16 targets, KI_FUN *ki_pointer, qint32 difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_useski_(min_useski), targets_(targets), ki_pointer_(ki_pointer), difficulty_(difficulty) {}
+  quint32 beats(void) const { return beats_; }
+  position_t minimum_position(void) const { return minimum_position_; }
+  quint8 min_useski(void) const { return min_useski_; }
+  qint16 targets(void) const { return targets_; }
+  KI_FUN *ki_pointer(void) const { return ki_pointer_; }
+  qint32 difficulty(void) const { return difficulty_; }
+};
+extern const QList<ki_info_type> ki_info;
+qint32 ki_check(CharacterPtr ch);
+void reduce_ki(CharacterPtr ch, qint32 type);
+
+KI_FUN ki_blast;
+KI_FUN ki_punch;
+KI_FUN ki_sense;
+KI_FUN ki_storm;
+KI_FUN ki_speed;
+KI_FUN ki_purify;
+KI_FUN ki_disrupt;
+KI_FUN ki_stance;
+KI_FUN ki_agility;
+KI_FUN ki_meditation;
+KI_FUN ki_transfer;
+
+ObjectPtr create_money(qint32 amount);
+qint32 get_max_stat(CharacterPtr ch, attribute_t stat);
+// TIMERS
+bool isTimer(CharacterPtr ch, qint32 spell);
+void addTimer(CharacterPtr ch, qint32 spell, qint32 ticks);
+qint32 move_obj(ObjectPtr obj, qint32 dest);
+qint32 move_obj(ObjectPtr obj, CharacterPtr ch);
+qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj);
+
+qint32 obj_to_char(ObjectPtr object, CharacterPtr ch);
+qint32 obj_from_char(ObjectPtr object);
+
+qint32 obj_to_room(ObjectPtr object, qint32 room);
+qint32 obj_from_room(ObjectPtr object);
+
+qint32 obj_to_obj(ObjectPtr obj, ObjectPtr obj_to);
+qint32 obj_from_obj(ObjectPtr obj);
+
+ObjectPtr get_obj_in_list(char *name, ObjectPtr list);
+ObjectPtr get_obj_in_list_num(qint32 num, ObjectPtr list);
+class affected_type *affected_by_random(CharacterPtr ch);
+
+ObjectPtr get_obj(QString name);
+ObjectPtr get_obj(qint32 vnum);
+ObjectPtr get_obj_num(qint32 nr);
+
+void object_list_new_new_owner(ObjectPtr list, CharacterPtr ch);
+
+void extract_obj(ObjectPtr obj);
+
+/* ******* characters ********* */
+
+CharacterPtr get_char_room(QString name, room_t room, bool careful = false);
+
+CharacterPtr get_char_num(qint32 nr);
+CharacterPtr get_char(QString name);
+CharacterPtr get_mob(char *name);
+CharacterPtr get_pc(QString name);
+
+qint32 char_from_room(CharacterPtr ch, bool stop_all_fighting);
+qint32 char_from_room(CharacterPtr ch);
+qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting = true);
+
+/* find if character can see */
+CharacterPtr get_active_pc(const char *name);
+CharacterPtr get_active_pc(QString name);
+CharacterPtr get_all_pc(char *name);
+CharacterPtr get_char_vis(CharacterPtr ch, const char *name);
+CharacterPtr get_char_vis(CharacterPtr ch, const QString &name);
+CharacterPtr get_char_vis(CharacterPtr ch, const QString &name);
+CharacterPtr get_pc_vis(CharacterPtr ch, const char *name);
+CharacterPtr get_pc_vis(CharacterPtr ch, QString name);
+CharacterPtr get_pc_vis_exact(CharacterPtr ch, QString name);
+CharacterPtr get_mob_vis(CharacterPtr ch, QString name);
+CharacterPtr get_random_mob_vnum(qint32 vnum);
+CharacterPtr get_mob_room_vis(CharacterPtr ch, const char *name);
+CharacterPtr get_mob_vnum(qint32 vnum);
+ObjectPtr get_obj_vnum(qint32 vnum);
+ObjectPtr get_obj_vnum(QString vnum);
+ObjectPtr get_objindex_vnum(vnum_t vnum);
+ObjectPtr get_objindex_vnum(QString vnum);
+vnum_t get_vnum(QString vnum_str);
+ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, bool bf = false);
+ObjectPtr get_obj_in_list_vis(CharacterPtr ch, qint32 item_num, ObjectPtr list, bool bf = false);
+ObjectPtr get_obj_vis(CharacterPtr ch, const char *name, bool loc = false);
+ObjectPtr get_obj_vis(CharacterPtr ch, QString name, bool loc = false);
+
+void extract_char(CharacterPtr ch, bool pull, Trace t = Trace("unknown"));
+/* wiz_102.cpp */
+
+typedef QMap<QString, quint64> skill_results_t;
+skill_results_t find_skills_by_name(QString name);
+CharacterPtr get_pc_vis(CharacterPtr ch, QString name);
+qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, CharacterPtr *tar_ch, ObjectPtr *tar_obj, bool verbose = false);
+bool is_wearing(CharacterPtr ch, ObjectPtr item);
+
+bool objExists(ObjectPtr obj);
+bool charge_moves(CharacterPtr ch, qint32 skill, double modifier = 1);
+
+void die_follower(CharacterPtr ch);
+void stop_guarding_me(CharacterPtr victim);
+void stop_guarding(CharacterPtr guard);
+void remove_memory(CharacterPtr ch, char type);
+void remove_memory(CharacterPtr ch, char type, CharacterPtr vict);
+QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
+template <typename T>
+T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max())
+{
+  T number;
+
+  QString line = qDebugQTextStreamLine(in, "");
+  QStringList namelist = line.split(' ');
+  QString arg1 = namelist.value(0);
+  in >> number >> Qt::ws;
+
+  bool ok = false;
+  if (std::is_signed<T>::value)
+  {
+    if (arg1.toLongLong(&ok) != number && ok)
+    {
+      logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+    }
+    else if (!ok)
+    {
+      logentry(QStringLiteral("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(minval).name()));
+    }
+  }
+  else if (std::is_unsigned<T>::value)
+  {
+    if (arg1.toULongLong(&ok) != number && ok)
+    {
+      logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+    }
+    else if (!ok)
+    {
+      logentry(QStringLiteral("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(minval).name()));
+    }
+  }
+  else
+  {
+    qFatal("arg1 neither signed nor quint32");
+  }
+
+  if (number < minval)
+  {
+    qDebug("increasing number");
+    number = minval;
+  }
+  else if (number > maxval)
+  {
+    qDebug("decreasing number");
+    number = maxval;
+  }
+
+  // qDebug() << "fread_int returning" << number;
+  // qDebugQTextStreamLine(in, "After fread_int");
+  return number;
+}
+
+void write_object_csv(ObjectPtr obj, std::ofstream &fout);
+ObjectPtr read_object(qint32 nr, FILE *fl, bool zz);
+ObjectPtr read_object(qint32 nr, QTextStream &fl, bool zz);
+ObjectPtr clone_object(qint32 nr);
+void randomize_object(ObjectPtr obj);
+std::ofstream &operator<<(std::ofstream &out, ObjectPtr obj);
+std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj);
+void copySaveData(ObjectPtr new_obj, ObjectPtr obj);
+bool verify_item(ObjectPtr *obj);
+bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2);
+bool has_random(ObjectPtr obj);
+class pulse_data
+{ /* list for keeping tract of 'pulsing' chars */
+public:
+  CharacterPtr thechar;
+  pulse_data *next;
+};
+
+bool can_modify_this_room(CharacterPtr ch, qint32 room);
+bool can_modify_room(CharacterPtr ch, qint32 room);
+bool can_modify_mobile(CharacterPtr ch, qint32 room);
+bool can_modify_object(CharacterPtr ch, qint32 room);
+class LegacyFile : public QObject
+{
+  Q_OBJECT
+public:
+  LegacyFile(QString directory, QString filename, QString error_message);
+  ~LegacyFile();
+  FILE *openFile(void);
+  bool backupFile(void);
+  bool isOpen(void)
+  {
+    if (!file_handle_ || feof(file_handle_) || ferror(file_handle_))
+    {
+      return false;
+    }
+    return true;
+  }
+  FILE *file_handle_;
+  QString directory_;
+  QString filename_;
+  QString filepath_;
+  QString error_message_;
+
+private:
+};
+
+class LegacyFileWorld : public LegacyFile
+{
+public:
+  LegacyFileWorld(QString filename)
+      : LegacyFile("world", filename, "Unable to open world file '%1")
+  {
+  }
+  ~LegacyFileWorld();
+};
+
+void write_one_room(LegacyFile &fl, qint32 nr);
+void write_mobile(LegacyFile &lf, CharacterPtr mob);
+void write_object(LegacyFile &lf, ObjectPtr obj);
+void write_mprog_recur(FILE *fl, class mob_prog_data *mprg, bool mob);
+qint32 load_new_help(FILE *fl, qint32 reload = 0, CharacterPtr ch = {});
+
+auto &operator<<(auto &out, mob_prog_data *mobprogs)
+{
+  if (mobprogs)
+  {
+    write_mprog_recur(out, mobprogs, false);
+    out << "|\n";
+  }
+  return out;
+}
+void init_char(CharacterPtr ch);
+void clear_char(CharacterPtr ch);
+void clear_object(ObjectPtr obj);
+void reset_char(CharacterPtr ch);
+void free_char(CharacterPtr ch, Trace trace = Trace("Unknown"));
+void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent, cmd_t cmd);
+void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay);
+qint32 search_char_for_item_count(CharacterPtr ch, qint16 item_number, bool wearonly);
+ObjectPtr search_char_for_item(CharacterPtr ch, qint16 item_number, bool wearonly);
+qint32 find_door(CharacterPtr ch, char *type, char *dir);
+qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent);
+bool search_container_for_item(ObjectPtr obj, qint32 item_number);
+ObjectPtr bring_type_to_front(CharacterPtr ch, qint32 item_type);
+
+qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_type, qint32 attacktype, qint32 weapon = {}, bool is_death_prog = false, ObjectPtr obj = {});
+qint32 noncombat_damage(CharacterPtr ch, qint32 dam, const char *char_death_msg, const char *room_death_msg, const char *death_log_msg, qint32 type);
+void send_damage(char const *, CharacterPtr, ObjectPtr, CharacterPtr, char const *, char const *, qint32);
+void send_damage(QString buf, CharacterPtr, ObjectPtr, CharacterPtr, QString dmg, QString buf2, qint32);
+
+qint32 getRealSpellDamage(CharacterPtr ch);
+
+void make_dust(CharacterPtr ch);
+bool do_frostshield(CharacterPtr ch, CharacterPtr vict);
+qint32 speciality_bonus(CharacterPtr ch, qint32 attacktype, qint32 level);
+void make_husk(CharacterPtr ch);
+void make_heart(CharacterPtr ch, CharacterPtr vict);
+void make_head(CharacterPtr ch);
+void make_arm(CharacterPtr ch);
+void make_leg(CharacterPtr ch);
+void make_bowels(CharacterPtr ch);
+void make_blood(CharacterPtr ch);
+void make_scraps(CharacterPtr ch, ObjectPtr obj);
+void room_mobs_only_hate(CharacterPtr ch);
+
+constexpr auto WEAR_LIGHT = 0;
+constexpr auto WEAR_FINGER_R = 1;
+constexpr auto WEAR_FINGER_L = 2;
+constexpr auto WEAR_NECK_1 = 3;
+constexpr auto WEAR_NECK_2 = 4;
+constexpr auto WEAR_BODY = 5;
+constexpr auto WEAR_HEAD = 6;
+constexpr auto WEAR_LEGS = 7;
+constexpr auto WEAR_FEET = 8;
+constexpr auto WEAR_HANDS = 9;
+constexpr auto WEAR_ARMS = 10;
+constexpr auto WEAR_SHIELD = 11;
+constexpr auto WEAR_ABOUT = 12;
+constexpr auto WEAR_WAISTE = 13;
+constexpr auto WEAR_WRIST_R = 14;
+constexpr auto WEAR_WRIST_L = 15;
+constexpr auto WEAR_WIELD = 16;
+constexpr auto WEAR_SECOND_WIELD = 17;
+constexpr auto WEAR_HOLD = 18;
+constexpr auto WEAR_HOLD2 = 19;
+constexpr auto WEAR_FACE = 20;
+constexpr auto WEAR_EAR_L = 21;
+constexpr auto WEAR_EAR_R = 22;
+// #define WEAR_MAX        22
+
+qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 attack = WEAR_WIELD);
+
+void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr vict, qint32 w_type, qint32 modifier);
+void group_gain(CharacterPtr ch, CharacterPtr vict);
+qint32 check_magic_block(CharacterPtr ch, CharacterPtr victim, qint32 attacktype);
+qint32 check_riposte(CharacterPtr ch, CharacterPtr vict, qint32 attacktype);
+qint32 check_shieldblock(CharacterPtr ch, CharacterPtr vict, qint32 attacktype);
+bool check_parry(CharacterPtr ch, CharacterPtr vict, qint32 attacktype, bool display_results = true);
+bool check_dodge(CharacterPtr ch, CharacterPtr vict, qint32 attacktype, bool display_results = true);
+void disarm(CharacterPtr ch, CharacterPtr vict);
+void trip(CharacterPtr ch, CharacterPtr vict);
+qint32 checkCounterStrike(CharacterPtr, CharacterPtr);
+qint32 doTumblingCounterStrike(CharacterPtr, CharacterPtr);
+
+qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon);
+qint32 do_skewer(CharacterPtr ch, CharacterPtr vict, qint32 dam, qint32 wt, qint32 wt2, qint32 weapon);
+void do_combatmastery(CharacterPtr ch, CharacterPtr vict, qint32 weapon);
+qint32 do_behead_skill(CharacterPtr ch, CharacterPtr victim);
+qint32 do_execute_skill(CharacterPtr, CharacterPtr, qint32);
+qint32 weapon_spells(CharacterPtr ch, CharacterPtr vict, qint32 weapon);
+void eq_damage(CharacterPtr ch, CharacterPtr vict, qint32 dam, qint32 weapon_type, qint32 attacktype);
+void fight_kill(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 spec_type);
+qint32 can_attack(CharacterPtr ch);
+qint32 can_be_attacked(CharacterPtr ch, CharacterPtr vict);
+qint32 second_attack(CharacterPtr ch);
+qint32 third_attack(CharacterPtr ch);
+qint32 fourth_attack(CharacterPtr ch);
+qint32 second_wield(CharacterPtr ch);
+void set_cantquit(CharacterPtr, CharacterPtr, bool = false);
+qint32 is_pkill(CharacterPtr ch, CharacterPtr vict);
+void raw_kill(CharacterPtr ch, CharacterPtr victim);
+void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_attacker = false);
+void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type);
+void do_dead(CharacterPtr ch, CharacterPtr victim);
+void eq_destroyed(CharacterPtr ch, ObjectPtr obj, qint32 pos);
+qint32 is_stunned(CharacterPtr ch);
+void update_flags(CharacterPtr vict);
+void update_stuns(CharacterPtr ch);
+void do_dam_msgs(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 attacktype, qint32 weapon, qint32 filter = 0);
+qint32 act_poisonous(CharacterPtr ch);
+qint32 isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type, qint32 &reduce);
+void inform_victim(CharacterPtr ch, CharacterPtr victim, qint32 dam);
+CharacterPtr loop_followers(follow_type **f);
+CharacterPtr get_highest_level_killer(CharacterPtr leader, CharacterPtr killer);
+qint32 count_xp_eligibles(CharacterPtr leader, CharacterPtr killer, qint32 highest_level, qint32 *total_levels);
+qint64 scale_char_xp(CharacterPtr ch, CharacterPtr killer, CharacterPtr victim, qint32 no_killers, qint32 total_levels, qint32 highest_level, qint64 base_xp, qint64 *bonus_xp);
+void remove_active_potato(CharacterPtr vict);
+
+void prepare_character_for_sixty(CharacterPtr ch);
+bool isPaused(CharacterPtr mob);
+
+typedef QSharedPointer<Program> ProgramPtr;
+
+class Programs
+{
+  bool object = {};
+  QList<ProgramPtr> list_;
+
+public:
+  friend qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, qint32 type, bool reverse);
+  [[nodiscard]] bool isEmpty(void) const { return list_.isEmpty(); }
+  [[nodiscard]] ProgramPtr value(qsizetype i) { return list_.value(i); }
+  [[nodiscard]] qint32 types(void) const
+  {
+    qint32 t = {};
+    for (const auto &program : list_)
+      t = t | program->type();
+    return t;
+  }
+  void write(FILE *fl, bool mob);
+  void write(auto &fl, bool mob)
+  {
+    for (const auto &mprg : list_)
+    {
+      if (mob)
+        fl << ">" << mprg->typeString() << " ";
+      else
+        fl << "\\" << mprg->typeString() << " ";
+
+      if (mprg->arglist().isEmpty())
+        string_to_file(fl, "Saved During Edit");
+      else
+        string_to_file(fl, mprg->arglist());
+
+      if (mprg->comlist().isEmpty())
+        string_to_file(fl, "Saved During Edit");
+      else
+        string_to_file(fl, mprg->comlist());
+    }
+  }
+  QString list(void);
+};
+
+auto &operator<<(auto &out, Programs programs)
+{
+  if (!programs.isEmpty())
+  {
+    programs.write(out, false);
+    out << "|\n";
+  }
+  return out;
+}
+extern room_t IMM_PIRAHNA_ROOM;
+extern CharacterClassSkill g_skills[];
+extern CharacterClassSkill w_skills[];
+extern CharacterClassSkill t_skills[];
+extern CharacterClassSkill d_skills[];
+extern CharacterClassSkill b_skills[];
+extern CharacterClassSkill a_skills[];
+extern CharacterClassSkill p_skills[];
+extern CharacterClassSkill r_skills[];
+extern CharacterClassSkill k_skills[];
+extern CharacterClassSkill u_skills[];
+extern CharacterClassSkill c_skills[];
+extern CharacterClassSkill m_skills[];
+extern CharacterPtr character_list;
+extern CharacterPtr combat_list;
+class stat_data
+{
+public:
+  stat_data();
+  void setMin(void);
+  quint8 getMin(quint8 cur, qint8 mod, quint8 min);
+  qint32 str[5], tel[5], wis[5], dex[5], con[5];
+  qint32 min_str, min_int, min_wis, min_dex, min_con;
+  quint64 points;
+  attribute_t selection = {};
+  quint8 race;
+  quint8 clss;
+  bool increase(quint64 points = 1);
+  bool decrease(quint64 points = 1);
+};
+
+namespace Combinables
+{
+
+  class Brew
+  {
+  public:
+    class recipe
+    {
+    public:
+      bool operator<(const recipe &r2) const
+      {
+        if (container < r2.container)
+        {
+          return true;
+        }
+        else if (container == r2.container)
+        {
+          if (liquid < r2.liquid)
+          {
+            return true;
+          }
+          else if (liquid == r2.liquid)
+          {
+            if (herb < r2.herb)
+            {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+      vnum_t herb = {};
+      qint64 liquid = {};
+      vnum_t container = {};
+    };
+
+    Brew();
+    ~Brew();
+    void load(void);
+    void save(void);
+    void list(CharacterPtr ch);
+    qint32 add(CharacterPtr ch, QString argument);
+    qint32 remove(CharacterPtr ch, QString argument);
+    qint32 size(void);
+    qint32 find(recipe);
+
+  private:
+    static QMap<recipe, qint32> recipes;
+    class loadError
+    {
+    };
+    static const char RECIPES_FILENAME[];
+    static bool initialized;
+  };
+
+  // I feel just wrong doing this, but it's the easiest way at the moment
+  // this really should be combined into a parent class with 2 children
+  // inheriting common functionality...
+
+  class Scribe
+  {
+  public:
+    class recipe
+    {
+    public:
+      bool operator<(const recipe &r2) const
+      {
+        if (ink < r2.ink)
+        {
+          return true;
+        }
+        else if (ink == r2.ink)
+        {
+          if (dust < r2.dust)
+          {
+            return true;
+          }
+          else if (dust == r2.dust)
+          {
+            if (pen < r2.pen)
+            {
+              return true;
+            }
+            else if (pen == r2.pen)
+            {
+              if (paper < r2.paper)
+              {
+                return true;
+              }
+            }
+          }
+        }
+
+        return false;
+      }
+      vnum_t ink;
+      vnum_t dust;
+      vnum_t pen;
+      vnum_t paper;
+    };
+
+    Scribe();
+    ~Scribe();
+    void load(void);
+    void save(void);
+    void list(CharacterPtr ch);
+    qint32 add(CharacterPtr ch, QString argument);
+    qint32 remove(CharacterPtr ch, QString argument);
+    qint32 size(void);
+    qint32 find(recipe);
+
+  private:
+    static QMap<recipe, qint32> recipes;
+    class loadError
+    {
+    };
+    static const char RECIPES_FILENAME[];
+    static bool initialized;
+  };
+
+}
+
+void barb_magic_resist(CharacterPtr ch, qint32 old, qint32 nw);
+
+/*-----------------------------------------------------------------------
+| Token section.  This section begins the Token class and methods.
+*/
+
+constexpr qint32 ANSI = 1 << 0;  /* If it's an ansi code */
+constexpr qint32 VT100 = 1 << 1; /* If it's a vt100 code */
+constexpr qint32 CODE = 1 << 2;  /* If it should be interped */
+constexpr qint32 TEXT = 1 << 3;  /* If it's just text */
+constexpr qint32 _MAX_STR = 2048;
+
+class Token
+{
+public:
+  //--
+  // Public functions
+  //--
+
+  Token(QString rhs);
+  ~Token();
+  qint32 IsAnsi() { return (type & ANSI); }
+  qint32 IsVt100() { return (type & VT100); }
+  qint32 IsCode() { return (type & CODE); }
+  qint32 IsText() { return (type & TEXT); }
+  QString GetBuf() { return (buf); }
+  void SetBuf(char *);
+  Token *Next() { return next; }
+  void Next(Token *n) { next = n; }
+
+private:
+  //--
+  // Private variables
+  //--
+  QString buf; /* Holds the buffer */
+  qint32 type; /* Holds type of buffer */
+  Token *next; /* Next token in the list */
+}; // end of Token class
+
+class TokenList
+{
+public:
+  //--
+  // Public functions
+  //--
+
+  TokenList(QString);
+  ~TokenList();
+  QString Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, CharacterPtr send_to, qint32 flags);
+
+private:
+  //--
+  // Private functions
+  //--
+  void AddToken(const Token *);
+  void Reset();
+  void Next();
+
+  //--
+  // Private constants
+  //--
+
+  //--
+  // Private variables
+  //--
+  Token *head;    // Head of the list
+  Token *current; // Current token
+  QString interp; // Interpreted tokens
+
+}; // end of TokenList class
+
+/* Function headers */
+void display_punishes(CharacterPtr ch, Character vict);
+qint32 is_in_range(CharacterPtr ch, qint32 virt);
+void isr_set(CharacterPtr ch);
+command_return_t mob_stat(CharacterPtr ch, CharacterPtr k);
+void obj_stat(CharacterPtr ch, ObjectPtr j);
+qint32 number_or_name(char **name, qint32 *num);
+qint32 mob_in_index(char *name, qint32 index);
+qint32 obj_in_index(char *name, qint32 index);
+void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random = false);
+void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt);
+void colorCharSend(char *s, CharacterPtr ch);
+obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random);
+qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start = 0, quint64 num_to_show = 0, bool stats = false);
+qint32 show_zone_commands(CharacterPtr ch, zone_t zone_key, quint64 start = 0, quint64 num_to_show = 0, bool stats = false);
+void add_totem(ObjectPtr altar, ObjectPtr totem);
+void remove_totem(ObjectPtr altar, ObjectPtr totem);
+void add_totem_stats(CharacterPtr ch, qint32 stat = 0);
+void remove_totem_stats(CharacterPtr ch, qint32 stat = 0);
+bool others_clan_room(CharacterPtr ch, class Room *room);
+void clan_login(CharacterPtr ch);
+void clan_logout(CharacterPtr ch);
+qint32 has_right(CharacterPtr ch, quint32 bit);
+QString get_clan_name(qint32 nClan);
+QString get_clan_name(CharacterPtr ch);
+qint32 plr_rights(CharacterPtr ch);
+void remove_clan_member(qint32 clannumber, CharacterPtr ch);
+void free_member(ClanMember *member);
+ClanMember *get_member(QString strName, qint32 nClanId);
+void show_clan_log(CharacterPtr ch);
+void clan_death(CharacterPtr ch, CharacterPtr killer);
+
+/* Our own constants */
+const qint32 MAX_MESSAGE_LENGTH = 4096;
+constexpr auto DRUNK = 0;
+constexpr auto FULL = 1;
+constexpr auto THIRST = 2;
+
+/*  For cut and paste purposes
+   switch(GET_CLASS(mob))
+   {
+      case CLASS_MAGIC_USER:
+      case CLASS_CLERIC:
+      case CLASS_THIEF:
+      case CLASS_WARRIOR:
+      case CLASS_ANTI_PAL:
+      case CLASS_PALADIN:
+      case CLASS_BARBARIAN:
+      case CLASS_MONK:
+      case CLASS_RANGER:
+      case CLASS_BARD:
+      case CLASS_DRUID:
+      case CLASS_PSIONIC:
+      case CLASS_NECROMANCER:
+      default:
+         break;
+   }
+
+*/
+/************************************************************************
+| These should not be here - in fact, some of them should not exist.  We're
+|   leaving them here for compatibility until we can get rid of them.
+|   Morc XXX
+*/
+constexpr auto APPLY_NONE = 0;
+constexpr auto APPLY_STR = 1;
+constexpr auto APPLY_DEX = 2;
+constexpr auto APPLY_INT = 3;
+constexpr auto APPLY_WIS = 4;
+constexpr auto APPLY_CON = 5;
+constexpr auto APPLY_SEX = 6;
+constexpr auto APPLY_CLASS = 7;
+constexpr auto APPLY_LEVEL = 8;
+constexpr auto APPLY_AGE = 9;
+constexpr auto APPLY_CHAR_WEIGHT = 10;
+constexpr auto APPLY_CHAR_HEIGHT = 11;
+constexpr auto APPLY_MANA = 12;
+constexpr auto APPLY_HIT = 13;
+constexpr auto APPLY_MOVE = 14;
+constexpr auto APPLY_GOLD = 15;
+constexpr auto APPLY_EXP = 16;
+constexpr auto APPLY_AC = 17;
+constexpr auto APPLY_ARMOR = 17;
+constexpr auto APPLY_HITROLL = 18;
+constexpr auto APPLY_DAMROLL = 19;
+constexpr auto APPLY_SAVING_FIRE = 20;
+constexpr auto APPLY_SAVING_COLD = 21;
+constexpr auto APPLY_SAVING_ENERGY = 22;
+constexpr auto APPLY_SAVING_ACID = 23;
+constexpr auto APPLY_SAVING_MAGIC = 24;
+constexpr auto APPLY_SAVING_POISON = 25;
+constexpr auto APPLY_HIT_N_DAM = 26;
+constexpr auto APPLY_SANCTUARY = 27;
+constexpr auto APPLY_SENSE_LIFE = 28;
+constexpr auto APPLY_DETECT_INVIS = 29;
+constexpr auto APPLY_INVISIBLE = 30;
+constexpr auto APPLY_SNEAK = 31;
+constexpr auto APPLY_INFRARED = 32;
+constexpr auto APPLY_HASTE = 33;
+constexpr auto APPLY_PROTECT_EVIL = 34;
+constexpr auto APPLY_FLY = 35;
+constexpr auto WEP_MAGIC_MISSILE = 36;
+constexpr auto WEP_BLIND = 37;
+constexpr auto WEP_EARTHQUAKE = 38;
+constexpr auto WEP_CURSE = 39;
+constexpr auto WEP_COLOUR_SPRAY = 40;
+constexpr auto WEP_DISPEL_EVIL = 41;
+constexpr auto WEP_ENERGY_DRAIN = 42;
+constexpr auto WEP_FIREBALL = 43;
+constexpr auto WEP_LIGHTNING_BOLT = 44;
+constexpr auto WEP_HARM = 45;
+constexpr auto WEP_POISON = 46;
+constexpr auto WEP_SLEEP = 47;
+constexpr auto WEP_FEAR = 48;
+constexpr auto WEP_DISPEL_MAGIC = 49;
+constexpr auto WEP_WEAKEN = 50;
+constexpr auto WEP_CAUSE_LIGHT = 51;
+constexpr auto WEP_CAUSE_CRITICAL = 52;
+constexpr auto WEP_PARALYZE = 53;
+constexpr auto WEP_ACID_BLAST = 54;
+constexpr auto WEP_BEE_STING = 55;
+constexpr auto WEP_CURE_LIGHT = 56;
+constexpr auto WEP_FLAMESTRIKE = 57;
+constexpr auto WEP_HEAL_SPRAY = 58;
+constexpr auto WEP_DROWN = 59;
+constexpr auto WEP_HOWL = 60;
+constexpr auto WEP_SOULDRAIN = 61;
+constexpr auto WEP_SPARKS = 62;
+constexpr auto APPLY_BARKSKIN = 63;
+constexpr auto APPLY_RESIST_FIRE = 64;
+constexpr auto APPLY_RESIST_COLD = 65;
+constexpr auto APPLY_KI = 66;
+constexpr auto APPLY_CAMOUFLAGE = 67;
+constexpr auto APPLY_FARSIGHT = 68;
+constexpr auto APPLY_FREEFLOAT = 69;
+constexpr auto APPLY_FROSTSHIELD = 70;
+constexpr auto APPLY_INSOMNIA = 71;
+constexpr auto APPLY_LIGHTNING_SHIELD = 72;
+constexpr auto APPLY_REFLECT = 73;
+constexpr auto APPLY_RESIST_ELECTRIC = 74;
+constexpr auto APPLY_SHADOWSLIP = 75;
+constexpr auto APPLY_SOLIDITY = 76;
+constexpr auto APPLY_STABILITY = 77;
+constexpr auto APPLY_STAUNCHBLOOD = 78;
+constexpr auto WEP_DISPEL_GOOD = 79;
+constexpr auto WEP_TELEPORT = 80;
+constexpr auto WEP_CHILL_TOUCH = 81;
+constexpr auto WEP_POWER_HARM = 82;
+constexpr auto WEP_VAMPIRIC_TOUCH = 83;
+constexpr auto WEP_LIFE_LEECH = 84;
+constexpr auto WEP_METEOR_SWARM = 85;
+constexpr auto WEP_ENTANGLE = 86;
+constexpr auto APPLY_INSANE_CHANT = 87;
+constexpr auto APPLY_GLITTER_DUST = 88;
+constexpr auto APPLY_RESIST_ACID = 89;
+constexpr auto APPLY_HP_REGEN = 90;
+constexpr auto APPLY_MANA_REGEN = 91;
+constexpr auto APPLY_MOVE_REGEN = 92;
+constexpr auto APPLY_KI_REGEN = 93;
+constexpr auto WEP_CREATE_FOOD = 94;
+constexpr auto APPLY_DAMAGED = 95;
+constexpr auto WEP_THIEF_POISON = 96;
+constexpr auto APPLY_PROTECT_GOOD = 97;
+constexpr auto APPLY_MELEE_DAMAGE = 98;
+constexpr auto APPLY_SPELL_DAMAGE = 99;
+constexpr auto APPLY_SONG_DAMAGE = 100;
+constexpr auto APPLY_RESIST_MAGIC = 101;
+constexpr auto APPLY_SAVES = 102;
+constexpr auto APPLY_SPELLDAMAGE = 103;
+constexpr auto APPLY_BOUNT_SONNET_HUNGER = 104;
+constexpr auto APPLY_BOUNT_SONNET_THIRST = 105;
+constexpr auto APPLY_BLIND = 106;
+constexpr auto APPLY_WATER_BREATHING = 107;
+constexpr auto APPLY_DETECT_MAGIC = 108;
+constexpr auto WEP_WILD_MAGIC = 109;
+constexpr auto APPLY_MAXIMUM_VALUE = 109;
+
+/*
+ 1000+ are reserved, so if you were thinking about using, think
+ again.
+*/
+/* RESERVED: 100-150 for more weapon affects */
+/* Morc XXX */
+
+// different stat combos for skill groups
+constexpr auto STRDEX = 1;
+constexpr auto STRCON = 2;
+constexpr auto STRINT = 3;
+constexpr auto STRWIS = 4;
+constexpr auto DEXCON = 5;
+constexpr auto DEXINT = 6;
+constexpr auto DEXWIS = 7;
+constexpr auto CONINT = 8;
+constexpr auto CONWIS = 9;
+constexpr auto INTWIS = 10;
+
+constexpr auto MAX_PROFESSIONS = 2;
+
+// Constructor commented out for const.C initialization purposes
+class str_app_type
+{
+public:
+  qint16 todam;           /* Damage Bonus/Penalty                */
+  qint16 carry_w;         /* Maximum weight that can be carrried */
+  qint16 cold_resistance; /* Cold resistance */
+};
+
+class dex_app_type
+{
+public:
+  qint16 tohit;
+  qint16 ac_mod;
+  qint16 move_gain;
+  qint16 fire_resistance;
+};
+
+// Constructor commented out for const.C initialization purposes
+class wis_app_type
+{
+public:
+  qint16 mana_regen;
+  qint16 ki_regen;
+  qint16 bonus; /* how many bonus skills a player can */
+  /* practice pr. level                 */
+  qint16 energy_resistance;
+  qint16 conc_bonus;
+  qint16 spell_dam_bonus; // For Cleric/Druid/Paladins naturally
+};
+
+// Constructor commented out for const.C initialization purposes
+class int_app_type
+{
+public:
+  qint16 mana_regen;
+  qint16 ki_regen;
+  qint16 easy_bonus;
+  qint16 medium_bonus;
+  qint16 hard_bonus;
+  qint16 learn_bonus;
+  qint16 magic_resistance;
+  qint16 conc_bonus;
+  qint16 spell_dam_bonus; // For Mage/Anti/Bard
+};
+
+// Constructor commented out for const.C initialization purposes
+class con_app_type
+{
+public:
+  qint16 hp_regen;
+  qint16 move_regen;
+  qint16 hp_gain;
+  qint16 poison_resistance;
+};
+
+/* Extern definitions. These are all in const.cpp. */
+extern const dex_app_type dex_app[];
+extern const con_app_type con_app[];
+extern const int_app_type int_app[];
+extern const str_app_type str_app[];
+extern const wis_app_type wis_app[];
+
+void check_timer();
+
+static const qint32 COREDUMP_MAX = 10;
+
+auto &MOB_WAIT_STATE(auto ch)
+{
+  return ch->deaths;
+}
+
+void REM_WAIT_STATE(auto czh, auto cycle)
+{
+  if (czh->desc)
+  {
+    if (czh->desc->wait < cycle)
+    {
+      czh->desc->wait = 0;
+    }
+    else
+    {
+      czh->desc->wait -= cycle;
+    }
+  }
+  else
+  {
+    if (czh->isNonPlayer())
+    {
+      if (MOB_WAIT_STATE(czh) < cycle)
+      {
+        MOB_WAIT_STATE(czh) = 0;
+      }
+      else
+      {
+        MOB_WAIT_STATE(czh) -= cycle;
+      }
+    }
+  }
+}
+
+// Defines for gradual skill increase code
+// Usage is defined in guild.cpp
+
+constexpr auto SKILL_INCREASE_EASY = 100;
+constexpr auto SKILL_INCREASE_MEDIUM = 200;
+constexpr auto SKILL_INCREASE_HARD = 300;
+void check_timer();
+
+// End defines for gradual skill increase code
+
+constexpr auto SILENCE_OBJ_NUMBER = 407;
+constexpr auto SPIRIT_SHIELD_OBJ_NUMBER = 408;
+constexpr auto CONSECRATE_OBJ_NUMBER = 409;
+constexpr auto CONSECRATE_COMP_OBJ_NUMBER = 3094;
+constexpr auto DESECRATE_COMP_OBJ_NUMBER = 303;
+
+void REMOVE_FROM_LIST(auto item, auto head, auto next)
+{
+  if (item == head)
+    head = item->next;
+  else
+  {
+    auto temp = head;
+    while (temp && temp->next != item)
+      temp = temp->next;
+
+    if (temp)
+      temp->next = item->next;
+  }
+}
+
+template <typename T>
+T MIN(T a, T b)
+{
+  if (a < b)
+    return a;
+  else
+    return b;
+}
+
+template <typename T>
+T MAX(T a, T b)
+{
+  if (a > b)
+    return a;
+  else
+    return b;
+}
+
+char LOWER(auto c)
+{
+  if (c >= 'A' && c <= 'Z')
+    return c + ('a' - 'A');
+  else
+    return c;
+}
+
+char UPPER(auto c)
+{
+  if (c >= 'a' && c <= 'z')
+    return c + ('A' - 'a');
+  else
+    return c;
+}
+
+// #define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r' || (ch) == '|')
+// replaced to leave off the pipe and put it eclusively in comm.c
+// where we could check to see if we were in an editor first.
+auto ISNEWL(auto ch)
+{
+  return ch == '\n' || ch == '\r';
+}
+
+auto CAP(auto st)
+{
+  *st = UPPER(*st);
+  return st;
+}
+
+void SET_BIT(auto var, auto bit)
+{
+  (var) = (var) | (bit);
+}
+void TOGGLE_BIT(auto var, auto bit)
+{
+  (var) = (var) ^ (bit);
+}
+
+bool IS_AFFECTED(auto ch, auto skill)
+{
+  return ISSET(ch->affected_by, skill);
+}
+
+qint32 DARK_AMOUNT(qint32 room);
+bool IS_DARK(qint32 room);
+bool IS_LIGHT(auto room) { return !IS_DARK(room); }
+
+auto HSHR(auto ch)
+{
+  if (ch->sex)
+  {
+    if (ch->sex == 1)
+    {
+      return "his";
+    }
+    else
+    {
+      return "her";
+    }
+  }
+  return "its";
+}
+
+auto HSSH(auto ch)
+{
+  return (ch)->sex ? (((ch)->sex == 1) ? "he" : "she") : "it";
+}
+
+auto HMHR(auto ch)
+{
+  return (ch)->sex ? (((ch)->sex == 1) ? "him" : "her") : "it";
+}
+
+// #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
+// #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
+
+bool IS_FAMILIAR(auto ch) { return IS_AFFECTED(ch, AFF_FAMILIAR); }
+
+bool IS_MINLEVEL_PC(auto ch, auto level) { return ch->getLevel() >= level && ch->isPlayer(); }
+bool IS_MAXLEVEL_PC(auto ch, auto level) { return ch->getLevel() <= level && ch->isPlayer(); }
+bool IS_MINLEVEL_NPC(auto ch, auto level) { return ch->getLevel() >= level && ch->isNonPlayer(); }
+
+#define GET_RDEATHS(ch) ((ch)->player->rdeaths)
+#define GET_PDEATHS(ch) ((ch)->player->pdeaths)
+#define GET_PKILLS(ch) ((ch)->player->pkills)
+#define GET_PKILLS_TOTAL(ch) ((ch)->player->pklvl)
+
+#define GET_PKILLS_LOGIN(ch) ((ch)->player->totalpkills)
+#define GET_PKILLS_TOTAL_LOGIN(ch) ((ch)->player->totalpkillslv)
+#define GET_PDEATHS_LOGIN(ch) ((ch)->player->pdeathslogin)
+
+#define GET_GROUP_KILLS(ch) ((ch)->player->group_kills)
+#define GET_GROUP_PKILLS(ch) ((ch)->player->group_pkills)
+#define GET_GROUP_PKILLSTOTAL(ch) ((ch)->player->grpplvl)
+
+#define GET_HP_METAS(ch) ((ch)->hpmetas)
+#define GET_MANA_METAS(ch) ((ch)->manametas)
+#define GET_MOVE_METAS(ch) ((ch)->movemetas)
+#define GET_AC_METAS(ch) ((ch)->acmetas)
+#define GET_AGE_METAS(ch) ((ch)->agemetas)
+#define GET_KI_METAS(ch) ((ch)->player->kimetas)
+
+#define GET_POS(ch) ((ch)->getPosition())
+#define GET_COND(ch, i) ((ch)->conditions[(i)])
+
+#define GET_SHORT_ONLY(ch) (qPrintable((ch)->short_description()))
+
+#define GET_OBJ_SHORT(obj) (qPrintable((obj)->short_description()))
+
+#define GET_OBJ_RNUM(obj) ((obj)->item_number)
+#define GET_OBJ_VAL(obj, val) ((obj)->obj_flags.value[(val)])
+#define GET_OBJ_VROOM(obj) ((obj)->vroom)
+#define GET_OBJ_EXTRA(obj) ((obj)->obj_flags.extra_flags)
+#define GET_OBJ_TIMER(obj) ((obj)->obj_flags.timer)
+#define GET_OBJ_TYPE(obj) ((obj)->obj_flags.type_flag)
+#define GET_OBJ_WEAR(obj) ((obj)->obj_flags.wear_flags)
+#define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
+#define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
+#define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? DC::getInstance()->obj_index[GET_OBJ_RNUM(obj)].vnum() : -1)
+#define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= DC::getInstance()->top_of_world)
+#define GET_ROOM_VNUM(rnum) ((qint32)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
+
+#define GET_TOGGLES(ch) ((ch)->player->toggles)
+
+#define GET_CLASS(ch) ((ch)->c_class)
+#define GET_AGE(ch) ((ch)->age().year)
+
+#define GET_STR(ch) ((ch)->str)
+#define GET_DEX(ch) ((ch)->dex)
+#define GET_INT(ch) ((ch)->intel)
+#define GET_WIS(ch) ((ch)->wis)
+#define GET_CON(ch) ((ch)->con)
+
+#define GET_STR_BONUS(ch) ((ch)->str_bonus)
+#define GET_DEX_BONUS(ch) ((ch)->dex_bonus)
+#define GET_INT_BONUS(ch) ((ch)->intel_bonus)
+#define GET_WIS_BONUS(ch) ((ch)->wis_bonus)
+#define GET_CON_BONUS(ch) ((ch)->con_bonus)
+
+#define GET_RAW_STR(ch) ((ch)->raw_str)
+#define GET_RAW_DEX(ch) ((ch)->raw_dex)
+#define GET_RAW_INT(ch) ((ch)->raw_intel)
+#define GET_RAW_WIS(ch) ((ch)->raw_wis)
+#define GET_RAW_CON(ch) ((ch)->raw_con)
+
+#define GET_POISON_AMOUNT(ch) ((ch)->poison_amount)
+
+#define STRENGTH_APPLY_INDEX(ch) \
+  (GET_STR(ch))
+
+#define GET_AC(ch) ((ch)->armor)
+#define GET_ARMOR(ch) ((ch)->armor + dex_app[GET_DEX((ch))].ac_mod)
+#define GET_HIT(ch) ((ch)->hit)
+#define GET_RAW_HIT(ch) ((ch)->raw_hit)
+#define GET_MAX_HIT(ch) (hit_limit(ch))
+#define GET_MOVE(ch) ((ch)->getMove())
+#define GET_RAW_MOVE(ch) ((ch)->raw_move)
+#define GET_MAX_MOVE(ch) ((ch)->move_limit())
+#define GET_MANA(ch) ((ch)->mana)
+#define GET_RAW_MANA(ch) ((ch)->raw_mana)
+#define GET_MAX_MANA(ch) (mana_limit(ch))
+#define GET_KI(ch) ((ch)->ki)
+#define GET_RAW_KI(ch) ((ch)->raw_ki)
+#define GET_MAX_KI(ch) ((ch)->max_ki)
+
+#define GET_PLATINUM(ch) ((ch)->plat)
+#define GET_BANK(ch) ((ch)->player->bank)
+#define GET_CLAN(ch) ((ch)->clan)
+
+#define GET_HEIGHT(ch) ((ch)->height)
+#define GET_WEIGHT(ch) ((ch)->weight)
+#define GET_SEX(ch) ((ch)->sex)
+#define GET_HITROLL(ch) ((ch)->hitroll)
+#define GET_REAL_HITROLL(ch) ((ch)->hitroll + dex_app[GET_DEX((ch))].tohit)
+#define GET_DAMROLL(ch) ((ch)->damroll)
+#define GET_REAL_DAMROLL(ch) ((ch)->damroll + str_app[GET_STR((ch))].todam)
+#define GET_QPOINTS(ch) ((ch)->player->quest_points)
+
+auto GET_SPELLDAMAGE(auto ch)
+{
+  return ch->spelldamage;
+}
+
+// #define GET_BITV(ch) ((ch)->race == 1 ? 1 : (1 << (((ch)->race) - 1)))
+auto getBitvector(auto value)
+{
+  if (value == 0)
+  {
+    return 0;
+  }
+
+  if (value == 1)
+  {
+    return 1;
+  }
+
+  return 1 << (value - 1);
+}
+#define IS_UNDEAD(ch) ((ch->race == RACE_UNDEAD) || (ch->race == RACE_GHOST))
+
+#define AWAKE(ch) (GET_POS(ch) != position_t::SLEEPING)
+
+#define IS_ANONYMOUS(ch) (ch->isNonPlayer() ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
+/*
+inline const short IS_ANONYMOUS(CharacterPtr ch)
+{
+  if (ch->isNonPlayer())
+     // this should really never be called on mobs
+     return 1;
+  else if (ch->getLevel() >= 101)
+     return 0;
+  else
+     return (isSet(ch->player->toggles, Player::PLR_ANONYMOUS) != 0);
+}
+*/
+/* Object And Carry related macros */
+
+#define GET_ITEM_TYPE(obj) ((obj)->obj_flags.type_flag)
+#define GET_MOB_TYPE(mob) ((mob)->mobdata->mob_flags.type)
+#define GET_OBJ_WEIGHT(obj) ((obj)->obj_flags.weight)
+
+#define CAN_WEAR(obj, part) (isSet((obj)->obj_flags.wear_flags, part))
+
+#define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + ch->has_skill(SKILL_VIGOR))
+#define CAN_CARRY_N(ch) (5 + GET_DEX(ch))
+#define IS_CARRYING_W(ch) ((ch)->carry_weight)
+#define IS_CARRYING_N(ch) ((ch)->carry_items)
+
+#define CAN_CARRY_OBJ(ch, obj)                                       \
+  (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) && \
+   ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)))
+#define CAN_GET_OBJ(ch, obj)                              \
+  (CAN_WEAR((obj), TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
+   CAN_SEE_OBJ((ch), (obj)))
+
+#define IS_OBJ_STAT(obj, stat) (isSet((obj)->obj_flags.extra_flags, stat))
+#define IS_SPECIAL(obj) (IS_OBJ_STAT(obj, ITEM_SPECIAL))
+#define NOT_SPECIAL(obj) (!IS_SPECIAL(obj))
+
+#define IS_CONTAINER(obj) (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
+#define NOT_CONTAINER(obj) (!IS_CONTAINER(obj))
+
+#define IS_ALTAR(obj) (GET_ITEM_TYPE(obj) == ITEM_ALTAR)
+#define NOT_ALTAR(obj) (!IS_ALTAR(obj))
+
+#define IS_KEYRING(obj) (GET_ITEM_TYPE(obj) == ITEM_KEYRING)
+#define NOT_KEYRING(obj) (!IS_KEYRING(obj))
+
+#define IS_KEY(obj) (GET_ITEM_TYPE(obj) == ITEM_KEY)
+#define NOT_KEY(obj) (!IS_KEY(obj))
+
+#define ARE_CONTAINERS(obj) (IS_CONTAINER(obj) || IS_ALTAR(obj) || IS_KEYRING(obj))
+#define NOT_CONTAINERS(obj) (NOT_CONTAINER(obj) && NOT_ALTAR(obj) && NOT_KEYRING(obj))
+
+/* char name/short_desc(for mobs) or someone?  */
+
+#define PERS(ch, vict) ( \
+    ch->getLevel() > MIN_GOD ? (CAN_SEE(vict, ch) ? qPrintable(ch->shortdesc_or_name()) : "an immortal presence") : (CAN_SEE(vict, ch) ? qPrintable(ch->shortdesc_or_name()) : "someone"))
+
+#define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? (obj)->short_description : "something")
+
+#define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? fname((obj)->name) : "something")
+
+#define IS_EXIT(room, door) (DC::getInstance()->world[(room)].dir_option[(door)])
+#define EXIT_TO(room, door) (DC::getInstance()->world[(room)].dir_option[(door)]->to_room)
+#define IS_OPEN(room, door) (!isSet(DC::getInstance()->world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
+
+#define OUTSIDE(ch) (!isSet(DC::getInstance()->world[(ch)->in_room].room_flags, INDOORS))
+#define EXIT(ch, door) (DC::getInstance()->world[(ch)->in_room].dir_option[door])
+
+typedef quint64 zone_t;
+typedef quint64 room_t;
+
+// const auto NOHOME       = 1<<31;
+// const auto NO_KI        = 1<<31;
+
+/* Bitvector For 'temp_room_flags'
+   temp_room_flags are NOT in the world file and cannot be saved or added at boot time
+   These are for runtime flags, such as ETHEREAL_FOCUS
+*/
+
+;
+const auto ROOM_ETHEREAL_FOCUS = 1;
+const auto TEMP_ROOM_FLAG_AVAILABLE = 1 << 1;
+
+/* Internal flags */
+;
+const auto iNO_TRACK = 1;
+const auto iNO_MAGIC = 1 << 1;
+
+/* For 'dir_option' */
+
+;
+const auto NORTH = 0;
+const auto EAST = 1;
+const auto SOUTH = 2;
+const auto WEST = 3;
+const auto UP = 4;
+const auto DOWN = 5;
+
+const auto EX_ISDOOR = 1;
+const auto EX_CLOSED = 2;
+const auto EX_LOCKED = 4;
+const auto EX_HIDDEN = 8;
+const auto EX_IMM_ONLY = 16;
+const auto EX_PICKPROOF = 32;
+const auto EX_BROKEN = 64
+
+    /* For 'Sector types' */
+
+    ;
+const auto SECT_INSIDE = 0;
+const auto SECT_CITY = 1;
+const auto SECT_FIELD = 2;
+const auto SECT_FOREST = 3;
+const auto SECT_HILLS = 4;
+const auto SECT_MOUNTAIN = 5;
+const auto SECT_WATER_SWIM = 6;
+const auto SECT_WATER_NOSWIM = 7;
+const auto SECT_BEACH = 8;
+const auto SECT_PAVED_ROAD = 9;
+const auto SECT_DESERT = 10;
+const auto SECT_UNDERWATER = 11;
+const auto SECT_SWAMP = 12;
+const auto SECT_AIR = 13;
+const auto SECT_FROZEN_TUNDRA = 14;
+const auto SECT_ARCTIC = 15;
+const auto SECT_MAX_SECT = 15; // update this if you add more
+                               // and; const.c stuff for sectors
+
+bool CAN_GO(auto ch, auto door)
+{
+  return EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
+}
+
+#define GET_ALIGNMENT(ch) ((ch)->alignment)
+#define IS_GOOD(ch) (GET_ALIGNMENT(ch) >= 350)
+#define IS_EVIL(ch) (GET_ALIGNMENT(ch) <= -350)
+#define IS_NEUTRAL(ch) (!IS_GOOD(ch) && !IS_EVIL(ch))
+#define IS_SINGING(ch) (!((ch)->songs.empty()))
+
+enum MatchType
+{
+  Failure,
+  Subset,
+  Exact
+};
+
+char *str_hsh(const char *);
+bool ishashed(char *);
+template <typename T>
+T double_dollars(T source)
+{
+  T destination = {};
+
+  for (const auto &c : source)
+  {
+    if (c == '$')
+    {
+      destination += "$$";
+    }
+    else
+    {
+      destination += c;
+    }
+  }
+
+  return destination;
+}
+
+// Tested in TestUtility::test_space_to_underscore
+template <typename T>
+T space_to_underscore(T str)
+{
+  for (auto &c : str)
+  {
+    if (c == ' ')
+    {
+      c = '_';
+    }
+  }
+
+  return str;
+}
+
+// Tested in TestUtility::str_n_nosp_cmp_begin
+template <typename T>
+MatchType str_n_nosp_cmp_begin(T arg1, T arg2)
+{
+  auto tmp_arg1 = space_to_underscore(arg1);
+  auto tmp_arg1_len = tmp_arg1.length();
+  auto tmp_arg2 = space_to_underscore(arg2);
+  auto tmp_arg2_len = tmp_arg2.length();
+
+  qint32 compare_result = -1;
+  if constexpr (std::convertible_to<T, std::string_view>)
+  {
+    compare_result = strncasecmp(tmp_arg1.c_str(), tmp_arg2.c_str(), tmp_arg1_len);
+  }
+  else if constexpr (std::convertible_to<T, QStringView>)
+  {
+    tmp_arg2.truncate(tmp_arg1_len);
+    compare_result = tmp_arg1.compare(tmp_arg2, Qt::CaseInsensitive);
+  }
+  else
+  {
+    static_assert(false, "Unhandled variable type passed to str_n_nosp_cmp_begin");
+  }
+
+  if (compare_result == 0)
+  {
+    if (tmp_arg1_len == tmp_arg2_len)
+    {
+      return MatchType::Exact;
+    }
+    else
+    {
+      return MatchType::Subset;
+    }
+  }
+  else
+  {
+    return MatchType::Failure;
+  }
+}
+
+// qint32 number(qint32 from, qint32 to);
+
+qint32 dice(qint32 number, qint32 size, QRandomGenerator *rng = QRandomGenerator::global());
+
+qint32 str_cmp(QString arg1, QString arg2);
+
+bool str_nosp_equal(QString arg1, QString arg2);
+bool str_n_nosp_equal(QString arg1, QString arg2, qsizetype pos);
+QString str_nospace(QString stri);
+
+void logarena(QString message);
+void logbug(QString message);
+void logclan(QString message);
+void logprayer(QString message);
+void logquest(QString message);
+void logsocket(QString message);
+void logvault(QString message);
+void logdatabase(QString message);
+void logdebug(QString message);
+void loggod(QString message);
+void loghelp(QString message);
+void logmisc(QString message);
+void logmortal(QString message);
+void logworld(QString message);
+void logobjects(QString message);
+void logplayer(QString message);
+
+void sprintbit(uint value[], const QStringList names, char *result);
+QString sprintbit(uint value[], const QStringList names);
+
+void sprintbit(quint32 vektor, const QStringList names, char *result);
+QString sprintbit(quint32 vektor, const QStringList names);
+
+void sprintbit(quint32 vektor, QStringList names, char *result);
+QString sprintbit(quint32 vektor, QStringList names);
+
+// void sprinttype(quint64 type, const QStringList names, char *result);
+template <typename T>
+void sprinttype(T type, const QStringList names, char *result)
+{
+  if (!result)
+  {
+    return;
+  }
+
+  qsizetype nr = {};
+  for (; *names[nr] != '\n'; nr++)
+  {
+    ;
+  }
+
+  if (type > -1 && type < nr)
+  {
+    strcpy(result, names[type]);
+  }
+  else
+  {
+    strcpy(result, "Undefined");
+  }
+}
+
+QString sprinttype(qint32 type, const QStringList names);
+
+void sprinttype(qint32 type, QList<const char *>, char *result);
+void sprinttype(qint32 type, QStringList, char *result);
+QString sprinttype(quint64 type, QStringList names);
+
+// void sprinttype(quint64 type, QStringList names, char *result);
+template <typename T>
+void sprinttype(T type, QStringList names, char *result)
+{
+  if (result == nullptr)
+  {
+    return;
+  }
+  strcpy(result, names.value(static_cast<qsizetype>(type), "Undefined").toStdString().c_str());
+}
+
+QString sprinttype(qint32 type, QList<const char *>);
+
+qint32 consttype(char *search_str, const QStringList names);
+QString constindex(const qsizetype index, const QStringList names);
+// bool is_number(const char *str);
+bool is_number(QString str);
+
+qint32 isprefix(QString str, QString namel);
+
+qint32 isexact(QString arg, QString namelist);
+qint32 isexact(QString arg, const char *namelist);
+qint32 isexact(QString arg, const char *namelist);
+qint32 isexact(QString arg, QString namelist);
+qint32 isexact(QString arg, QStringList namelist);
+qint32 isexact(const QString arg, const char *namelist);
+qint32 isexact(const QString arg, QString namelist);
+void assign_rooms(void);
+void assign_objects(void);
+
+QList<QString> splitstring(QString splitme, QString delims, bool ignore_empty = false);
+QString joinstring(QList<QString> joinme, QString delims, bool ignore_empty = false);
+
+void send_to_outdoor(char *messg);
+void send_to_zone(const char *messg, qint32 zone);
+void weather_and_time(qint32 mode);
+void night_watchman(void);
+qint32 file_to_string(const char *name, char *buf);
+
+#ifdef USE_SQL
+void save_char_obj_db(CharacterPtr ch);
+#endif
+
+void send_to_all(QString messg);
+
+qint32 write_to_descriptor_fd(qint32 desc, char *txt);
+void write_to_q(const QString txt, QQueue<QString> &queue);
+
+void automail(char *name);
+bool file_exists(const char *);
+
+template <typename T>
+bool check_range_valid_and_convert(T &value, QString buf, T begin, T end)
+{
+  bool ok = false;
+
+  if (std::is_unsigned<T>::value)
+  {
+    value = buf.toULongLong(&ok);
+  }
+  else if (std::is_signed<T>::value)
+  {
+    value = buf.toLongLong(&ok);
+  }
+
+  if (!ok)
+  {
+    value = {};
+    return false;
+  }
+
+  if (value < begin)
+  {
+    value = begin;
+    return false;
+  }
+
+  if (value > end)
+  {
+    value = end;
+    return false;
+  }
+
+  return true;
+}
+
+bool check_valid_and_convert(qint32 &value, char *buf);
+void update_make_camp_and_leadership(void);
+qint32 _parse_name(const QString arg, char *name);
+
+const char *pluralize(qint32 qty, const char ending[] = "s");
+size_t nocolor_strlen(const char *s);
+size_t nocolor_strlen(const QStringView str);
+
+qsizetype find(QString haystack, auto needle, qsizetype pos)
+{
+  return haystack.indexOf(needle, pos);
+}
+
+template <typename T>
+T remove_all_codes(T input)
+{
+  auto found_pos = find(input, "$", 0);
+  decltype(found_pos) pos{}, skip = {};
+
+  while (found_pos != -1)
+  {
+    skip = 1;
+
+    if (found_pos + 1 <= input.length())
+    {
+      try
+      {
+        input = input.replace(found_pos, 1, "$$");
+        skip = 2;
+      }
+      catch (...)
+      {
+      }
+    }
+    pos = found_pos + skip;
+    found_pos = find(input, "$", pos);
+  }
+
+  return input;
+}
+
+template <typename T>
+T remove_non_color_codes(T input)
+{
+  auto found_pos = find(input, "$", 0);
+  decltype(found_pos) pos = {};
+
+  T output = {};
+  while (found_pos != -1)
+  {
+    if (found_pos + 1 == input.length())
+    {
+      output += input.sliced(0, found_pos + 1);
+      output += "$";
+      input = input.remove(0, found_pos + 1);
+      output += input;
+      return output;
+    }
+
+    QChar code = input.at(found_pos + 1);
+    switch (code.toLatin1())
+    {
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case 'I':
+    case 'L':
+    case '*':
+    case 'R':
+    case 'B':
+      output += input.sliced(0, found_pos + 2);
+      input = input.remove(0, found_pos + 2);
+      break;
+    default:
+      output += input.sliced(0, found_pos + 1);
+      output += "$";
+      input = input.remove(0, found_pos + 1);
+      break;
+    }
+    found_pos = find(input, "$", 0);
+  }
+  output += input;
+
+  return output;
+}
+
+bool str_prefix(const char *astr, const char *bstr);
+bool str_infix(QString astr, QString bstr);
+
+constexpr auto MPROG_CATCH_MIN = 1;
+constexpr auto MPROG_CATCH_MAX = 100;
+
+class mprog_variable_data
+{
+public:
+  QString invoker_;
+  QString object_;
+  QString rndm_;
+  QString voi_;
+  qint32 nested; // amount of nested ifs, at time of pause
+  QString program_;
+};
+
+QString replaceString(QString message, QString find, QString replace);
+QString replaceString(QString message, QString find, QString replace);
+QString numToStringTH(qint32 number);
+bool champion_can_go(qint32 room);
+bool class_can_go(qint32 ch_class, qint32 room);
+
+QString find_profession(qint32 c_class, quint8 profession);
+
+QString get_isr_string(quint32, qint8);
+
+bool file_exists(QString filename);
+bool file_exists(QString filename);
+bool char_file_exists(QString name);
+qint32 random_percent_change(uint percentage, qint32 value);
+qint32 random_percent_change(qint32 from, qint32 to, qint32 value);
+
+void special_log(QString message);
+qint32 graf(qint32 age, qint32 p0, qint32 p1, qint32 p2, qint32 p3, qint32 p4, qint32 p5, qint32 p6);
+qint32 len_cmp(const char *s1, const char *s2);
+qint32 len_cmp(QString s1, QString s2);
+
+class act_return
+{
+public:
+  QString str;
+  qint32 retval;
+};
+
+act_return act(QString str, CharacterPtr ch, ObjectPtr obj, void *vict_obj, qint16 destination, qint16 flags);
+
+class send_tokens_return
+{
+public:
+  QString str;
+  qint32 retval;
+};
+
+send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, ObjectPtr obj, void *vch, qint32 flags, CharacterPtr to);
+
+void send_message(const char *str, CharacterPtr to);
+void send_message(QString str, CharacterPtr to);
+//--
+// Constants
+//--
+// Undefine the old ones if this header is included
+#undef TO_ROOM
+#undef TO_VICT
+#undef TO_CHAR
+
+// These constants need to go in the destination variable
+constexpr auto TO_ROOM = 0;           // Everyone in ch's room except ch
+constexpr auto TO_VICT = 1;           // Just vict_obj
+constexpr auto TO_CHAR = 2;           // Just ch
+constexpr auto TO_ZONE = 3;           // Everyone in ch's zone except ch
+constexpr auto TO_WORLD = 4;          // Everyone in the world except ch
+constexpr auto TO_GROUP = 5;          // Everyone in the ch's group except ch
+constexpr auto TO_ROOM_NOT_GROUP = 6; // Everyone in ch's room except ch's group or ch
+
+// These constants go in the flags part (optional -- 0 for none)
+constexpr auto FLAG_DEFAULT = 0;       // "someone" if invisible, sleepers skipped
+constexpr auto NOTVICT = 1 << 0;       // Sends to destination except victim
+constexpr auto GODS = 1 << 1;          // Sends to destination, gods only
+constexpr auto ASLEEP = 1 << 2;        // Will send even to sleepers
+constexpr auto INVIS_NULL = 1 << 3;    // Invisible messages are skipped completely
+constexpr auto INVIS_VISIBLE = 1 << 4; // Invisible messages are shown w/names visible
+constexpr auto FLAG_FORCE = 1 << 5;    // Sends regardless of nanny state
+constexpr auto STAYHIDE = 1 << 6;      // Stayhide flag keeps thieves in hiding.
+constexpr auto BARDSONG = 1 << 7;      // Bard song so only show it to people in room with BARD_SONG toggle set to verbose
+
+qint32 search_skills(QString arg, CharacterClassSkill *list_skills);
+qint32 search_skills2(qint32 arg, CharacterClassSkill *list_skills);
+qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg, CharacterPtr owner);
+
+constexpr auto CLASS_MAGIC_USER = 1;
+constexpr auto CLASS_MAGE = 1; // Laziness > consistency
+constexpr auto CLASS_CLERIC = 2;
+constexpr auto CLASS_THIEF = 3;
+constexpr auto CLASS_WARRIOR = 4;
+constexpr auto CLASS_ANTI_PAL = 5;
+constexpr auto CLASS_PALADIN = 6;
+constexpr auto CLASS_BARBARIAN = 7;
+constexpr auto CLASS_MONK = 8;
+constexpr auto CLASS_RANGER = 9;
+constexpr auto CLASS_BARD = 10;
+constexpr auto CLASS_DRUID = 11;
+constexpr auto CLASS_MAX_PROD = 11;
+constexpr auto CLASS_PSIONIC = 12;
+constexpr auto CLASS_NECROMANCER = 13;
+
+constexpr auto SECS_PER_REAL_MIN = 60;
+constexpr auto SECS_PER_REAL_HOUR = (60 * SECS_PER_REAL_MIN);
+constexpr auto SECS_PER_REAL_DAY = (24 * SECS_PER_REAL_HOUR);
+constexpr auto SECS_PER_REAL_YEAR = (365 * SECS_PER_REAL_DAY);
+
+constexpr auto SECS_PER_MUD_HOUR = 65;
+constexpr auto SECS_PER_MUD_DAY = (24 * SECS_PER_MUD_HOUR);
+constexpr auto SECS_PER_MUD_MONTH = (35 * SECS_PER_MUD_DAY);
+constexpr auto SECS_PER_MUD_YEAR = (17 * SECS_PER_MUD_MONTH);
+
+constexpr auto ISR_PIERCE = 1;
+constexpr auto ISR_SLASH = 1 << 1;
+constexpr auto ISR_MAGIC = 1 << 2;
+constexpr auto ISR_CHARM = 1 << 3;
+constexpr auto ISR_FIRE = 1 << 4;
+constexpr auto ISR_ENERGY = 1 << 5;
+constexpr auto ISR_ACID = 1 << 6;
+constexpr auto ISR_POISON = 1 << 7;
+constexpr auto ISR_SLEEP = 1 << 8;
+constexpr auto ISR_COLD = 1 << 9;
+constexpr auto ISR_PARA = 1 << 10;
+constexpr auto ISR_BLUDGEON = 1 << 11;
+constexpr auto ISR_WHIP = 1 << 12;
+constexpr auto ISR_CRUSH = 1 << 13;
+constexpr auto ISR_HIT = 1 << 14;
+constexpr auto ISR_BITE = 1 << 15;
+constexpr auto ISR_STING = 1 << 16;
+constexpr auto ISR_CLAW = 1 << 17;
+constexpr auto ISR_PHYSICAL = 1 << 18;
+constexpr auto ISR_NON_MAGIC = 1 << 19;
+constexpr auto ISR_KI = 1 << 20;
+constexpr auto ISR_SONG = 1 << 21;
+constexpr auto ISR_WATER = 1 << 22;
+constexpr auto ISR_FEAR = 1 << 23;
+constexpr auto ISR_MAX = 23;
+
+// if you add an ISR, add the QString to get_isr_string in utility.cpp
+
+constexpr auto SAVE_TYPE_FIRE = 0;
+constexpr auto SAVE_TYPE_COLD = 1;
+constexpr auto SAVE_TYPE_ENERGY = 2;
+constexpr auto SAVE_TYPE_ACID = 3;
+constexpr auto SAVE_TYPE_MAGIC = 4;
+constexpr auto SAVE_TYPE_POISON = 5;
+
+// If you decide to add a new saving throw type you
+// will have to be a little tricky:) -pir 12/13/01 3:32am
+
+qint32 qfprintf(FILE *stream, const char *format, ...);
+
+constexpr auto MAX_BUF_LENGTH = 240;
+
+QMap<qint32, qint32> fill_skill_cost();
+
+const QMap<qint32, qint32> skill_cost = fill_skill_cost();
+
+/* New skill quest thingy. */
+class skill_quest
+{
+public:
+  skill_quest *next;
+  QString message_;
+  qint32 num;
+  qint32 clas;
+  qint32 level;
+};
+
+class skill_stuff
+{
+  const char *name_;
+  qint32 difficulty_;
+
+public:
+  skill_stuff(const char *name, qint32 difficulty) : name_(name), difficulty_(difficulty) {}
+  QString name(void) const { return name_; }
+  qint32 difficulty(void) const { return difficulty_; }
+};
+
+skill_quest *find_sq(qint32 sq);
+skill_quest *find_sq(QString);
+extern skill_quest *skill_list;
+qint32 dam_percent(qint32 learned, qint32 damage);
+
+/*
+ * Spell numbers are well known.
+ * They appear in tinyworld files attached to magical items.
+ * Spells and skills share the same address space (for practicing)
+ *   and also for special damage messages as attack types.
+ */
+constexpr auto TYPE_UNDEFINED = -1;
+constexpr auto SPELL_RESERVED_DBC = 0;
+constexpr auto SPELL_ARMOR = 1;
+constexpr auto SPELL_TELEPORT = 2;
+constexpr auto SPELL_BLESS = 3;
+constexpr auto SPELL_BLINDNESS = 4;
+constexpr auto SPELL_BURNING_HANDS = 5;
+constexpr auto SPELL_IRIDESCENT_AURA = 6;
+constexpr auto SPELL_CHARM_PERSON = 7;
+constexpr auto SPELL_CHILL_TOUCH = 8;
+constexpr auto SPELL_CLONE = 9;
+constexpr auto SPELL_COLOUR_SPRAY = 10;
+constexpr auto SPELL_CONTROL_WEATHER = 11;
+constexpr auto SPELL_CREATE_FOOD = 12;
+constexpr auto SPELL_CREATE_WATER = 13;
+constexpr auto SPELL_REMOVE_BLIND = 14;
+constexpr auto SPELL_CURE_CRITIC = 15;
+constexpr auto SPELL_CURE_LIGHT = 16;
+constexpr auto SPELL_CURSE = 17;
+constexpr auto SPELL_DETECT_EVIL = 18;
+constexpr auto SPELL_DETECT_INVISIBLE = 19;
+constexpr auto SPELL_DETECT_MAGIC = 20;
+constexpr auto SPELL_DETECT_POISON = 21;
+constexpr auto SPELL_DISPEL_EVIL = 22;
+constexpr auto SPELL_EARTHQUAKE = 23;
+constexpr auto SPELL_ENCHANT_WEAPON = 24;
+constexpr auto SPELL_ENERGY_DRAIN = 25;
+constexpr auto SPELL_FIREBALL = 26;
+constexpr auto SPELL_HARM = 27;
+constexpr auto SPELL_HEAL = 28;
+constexpr auto SPELL_INVISIBLE = 29;
+constexpr auto SPELL_LIGHTNING_BOLT = 30;
+constexpr auto SPELL_LOCATE_OBJECT = 31;
+constexpr auto SPELL_MAGIC_MISSILE = 32;
+constexpr auto SPELL_POISON = 33;
+constexpr auto SPELL_PROTECT_FROM_EVIL = 34;
+constexpr auto SPELL_REMOVE_CURSE = 35;
+constexpr auto SPELL_SANCTUARY = 36;
+constexpr auto SPELL_SHOCKING_GRASP = 37;
+constexpr auto SPELL_SLEEP = 38;
+constexpr auto SPELL_STRENGTH = 39;
+constexpr auto SPELL_SUMMON = 40;
+constexpr auto SPELL_VENTRILOQUATE = 41;
+constexpr auto SPELL_WORD_OF_RECALL = 42;
+constexpr auto SPELL_REMOVE_POISON = 43;
+constexpr auto SPELL_SENSE_LIFE = 44;
+constexpr auto SPELL_SUMMON_FAMILIAR = 45;
+constexpr auto SPELL_LIGHTED_PATH = 46;
+constexpr auto SPELL_RESIST_ACID = 47;
+constexpr auto SPELL_SUN_RAY = 48;
+constexpr auto SPELL_RAPID_MEND = 49;
+constexpr auto SPELL_ACID_SHIELD = 50;
+constexpr auto SPELL_WATER_BREATHING = 51;
+constexpr auto SPELL_GLOBE_OF_DARKNESS = 52;
+constexpr auto SPELL_IDENTIFY = 53;
+constexpr auto SPELL_ANIMATE_DEAD = 54;
+constexpr auto SPELL_FEAR = 55;
+constexpr auto SPELL_FLY = 56;
+constexpr auto SPELL_CONT_LIGHT = 57;
+constexpr auto SPELL_KNOW_ALIGNMENT = 58;
+constexpr auto SPELL_DISPEL_MAGIC = 59;
+constexpr auto SPELL_CONJURE_ELEMENTAL = 60;
+constexpr auto SPELL_CURE_SERIOUS = 61;
+constexpr auto SPELL_CAUSE_LIGHT = 62;
+constexpr auto SPELL_CAUSE_CRITICAL = 63;
+constexpr auto SPELL_CAUSE_SERIOUS = 64;
+constexpr auto SPELL_FLAMESTRIKE = 65;
+constexpr auto SPELL_STONE_SKIN = 66;
+constexpr auto SPELL_SHIELD = 67;
+constexpr auto SPELL_WEAKEN = 68;
+constexpr auto SPELL_MASS_INVISIBILITY = 69;
+constexpr auto SPELL_ACID_BLAST = 70;
+constexpr auto SPELL_PORTAL = 71;
+constexpr auto SPELL_INFRAVISION = 72;
+constexpr auto SPELL_REFRESH = 73;
+constexpr auto SPELL_HASTE = 74;
+constexpr auto SPELL_DISPEL_GOOD = 75;
+constexpr auto SPELL_HELLSTREAM = 76;
+constexpr auto SPELL_POWER_HEAL = 77;
+constexpr auto SPELL_FULL_HEAL = 78;
+constexpr auto SPELL_FIRESTORM = 79;
+constexpr auto SPELL_POWER_HARM = 80;
+constexpr auto SPELL_DETECT_GOOD = 81;
+constexpr auto SPELL_VAMPIRIC_TOUCH = 82;
+constexpr auto SPELL_LIFE_LEECH = 83;
+constexpr auto SPELL_PARALYZE = 84;
+constexpr auto SPELL_REMOVE_PARALYSIS = 85;
+constexpr auto SPELL_FIRESHIELD = 86;
+constexpr auto SPELL_METEOR_SWARM = 87;
+constexpr auto SPELL_WIZARD_EYE = 88;
+constexpr auto SPELL_TRUE_SIGHT = 89;
+constexpr auto SPELL_MANA = 90;
+constexpr auto SPELL_SOLAR_GATE = 91;
+constexpr auto SPELL_HEROES_FEAST = 92;
+constexpr auto SPELL_HEAL_SPRAY = 93;
+constexpr auto SPELL_GROUP_SANC = 94;
+constexpr auto SPELL_GROUP_RECALL = 95;
+constexpr auto SPELL_GROUP_FLY = 96;
+constexpr auto SPELL_ENCHANT_ARMOR = 97;
+constexpr auto SPELL_RESIST_FIRE = 98;
+constexpr auto SPELL_RESIST_COLD = 99;
+constexpr auto SPELL_BEE_STING = 100;
+constexpr auto SPELL_BEE_SWARM = 101;
+constexpr auto SPELL_CREEPING_DEATH = 102;
+constexpr auto SPELL_BARKSKIN = 103;
+constexpr auto SPELL_HERB_LORE = 104;
+constexpr auto SPELL_CALL_FOLLOWER = 105;
+constexpr auto SPELL_ENTANGLE = 106;
+constexpr auto SPELL_EYES_OF_THE_OWL = 107;
+constexpr auto SPELL_FELINE_AGILITY = 108;
+constexpr auto SPELL_FOREST_MELD = 109;
+constexpr auto SPELL_COMPANION = 110;
+constexpr auto SPELL_DROWN = 111;
+constexpr auto SPELL_HOWL = 112;
+constexpr auto SPELL_SOULDRAIN = 113;
+constexpr auto SPELL_SPARKS = 114;
+constexpr auto SPELL_CAMOUFLAGE = 115;
+constexpr auto SPELL_FARSIGHT = 116;
+constexpr auto SPELL_FREEFLOAT = 117;
+constexpr auto SPELL_INSOMNIA = 118;
+constexpr auto SPELL_SHADOWSLIP = 119;
+constexpr auto SPELL_RESIST_ENERGY = 120;
+constexpr auto SPELL_STAUNCHBLOOD = 121;
+constexpr auto SPELL_CREATE_GOLEM = 122;
+constexpr auto SPELL_REFLECT = 123;
+constexpr auto SPELL_DISPEL_MINOR = 124;
+constexpr auto SPELL_RELEASE_GOLEM = 125;
+constexpr auto SPELL_BEACON = 126;
+constexpr auto SPELL_STONE_SHIELD = 127;
+constexpr auto SPELL_GREATER_STONE_SHIELD = 128;
+constexpr auto SPELL_IRON_ROOTS = 129;
+constexpr auto SPELL_EYES_OF_THE_EAGLE = 130;
+constexpr auto SPELL_MISANRA_QUIVER = 131;
+constexpr auto SPELL_ICESTORM = 132;
+constexpr auto SPELL_LIGHTNING_SHIELD = 133;
+constexpr auto SPELL_BLUE_BIRD = 134;
+constexpr auto SPELL_DEBILITY = 135;
+constexpr auto SPELL_ATTRITION = 136;
+constexpr auto SPELL_VAMPIRIC_AURA = 137;
+constexpr auto SPELL_HOLY_AURA = 138;
+constexpr auto SPELL_DISMISS_FAMILIAR = 139;
+constexpr auto SPELL_DISMISS_CORPSE = 140;
+constexpr auto SPELL_BLESSED_HALO = 141;
+constexpr auto SPELL_VISAGE_OF_HATE = 142;
+constexpr auto SPELL_PROTECT_FROM_GOOD = 143;
+constexpr auto SPELL_OAKEN_FORTITUDE = 144;
+constexpr auto SPELL_FROSTSHIELD = 145;
+constexpr auto SPELL_STABILITY = 146;
+constexpr auto SPELL_KILLER = 147;
+constexpr auto SPELL_CANTQUIT = 148;
+constexpr auto SPELL_SOLIDITY = 149;
+constexpr auto SPELL_EAS = 150;
+constexpr auto SPELL_ALIGN_GOOD = 151; // uriel's fire of redemption
+constexpr auto SPELL_ALIGN_EVIL = 152; // Moruk's heart
+constexpr auto SPELL_AEGIS = 153;
+constexpr auto SPELL_U_AEGIS = 154;
+constexpr auto SPELL_RESIST_MAGIC = 155;
+constexpr auto SPELL_EAGLE_EYE = 156;
+constexpr auto SPELL_CALL_LIGHTNING = 157;
+constexpr auto SPELL_DIVINE_FURY = 158;
+constexpr auto SPELL_GHOSTWALK = 159;
+constexpr auto SPELL_MEND_GOLEM = 160;
+constexpr auto SPELL_CLARITY = 161;
+constexpr auto SPELL_DIVINE_INTER = 162;
+constexpr auto SPELL_WRATH_OF_GOD = 163;
+constexpr auto SPELL_ATONEMENT = 164;
+constexpr auto SPELL_SILENCE = 165;
+constexpr auto SPELL_IMMUNITY = 166;
+constexpr auto SPELL_BONESHIELD = 167;
+constexpr auto SPELL_CHANNEL = 168;
+constexpr auto SPELL_RELEASE_ELEMENTAL = 169;
+constexpr auto SPELL_WILD_MAGIC = 170;
+constexpr auto SPELL_SPIRIT_SHIELD = 171;
+constexpr auto SPELL_VILLAINY = 172;
+constexpr auto SPELL_HEROISM = 173;
+constexpr auto SPELL_CONSECRATE = 174;
+constexpr auto SPELL_DESECRATE = 175;
+constexpr auto SPELL_ELEMENTAL_WALL = 176;
+constexpr auto SPELL_ETHEREAL_FOCUS = 177;
+constexpr auto MAX_SPL_LIST = 177;
+
+// if you add a spell, make sure you update "spells[]" in spells.C
+
+/*
+ * 150 to 249 reserved for more spells.
+ */
+
+/*
+ * KI usage is here to avoid code duplication
+ */
+constexpr auto KI_BLAST = 0;
+constexpr auto KI_PUNCH = 1;
+constexpr auto KI_SENSE = 2;
+constexpr auto KI_STORM = 3;
+constexpr auto KI_SPEED = 4;
+constexpr auto KI_PURIFY = 5;
+constexpr auto KI_DISRUPT = 6;
+constexpr auto KI_STANCE = 7;
+constexpr auto KI_AGILITY = 8;
+constexpr auto KI_MEDITATION = 9;
+constexpr auto KI_TRANSFER = 10;
+constexpr auto MAX_KI_LIST = 10;
+constexpr auto KI_OFFSET = 250; // why this is done differently than the rest, I have no
+                                // idea....ki skills are 250-296.  -pir
+
+constexpr auto SKILL_BASE = 300;
+constexpr auto SKILL_TRIP = 300;
+constexpr auto SKILL_DODGE = 301;
+constexpr auto SKILL_SECOND_ATTACK = 302;
+constexpr auto SKILL_DISARM = 303;
+constexpr auto SKILL_THIRD_ATTACK = 304;
+constexpr auto SKILL_PARRY = 305;
+constexpr auto SKILL_DEATHSTROKE = 306;
+constexpr auto SKILL_CIRCLE = 307;
+constexpr auto SKILL_BERSERK = 308;
+constexpr auto SKILL_HEADBUTT = 309;
+constexpr auto SKILL_EAGLE_CLAW = 310;
+constexpr auto SKILL_QUIVERING_PALM = 311;
+constexpr auto SKILL_PALM = 312;
+constexpr auto SKILL_STALK = 313;
+constexpr auto SKILL_UNUSED = 314;
+constexpr auto SKILL_DUAL_BACKSTAB = 315;
+constexpr auto SKILL_HITALL = 316;
+constexpr auto SKILL_STUN = 317;
+constexpr auto SKILL_SCAN = 318;
+constexpr auto SKILL_CONSIDER = 319;
+constexpr auto SKILL_SWITCH = 320;
+constexpr auto SKILL_REDIRECT = 321;
+constexpr auto SKILL_AMBUSH = 322;
+constexpr auto SKILL_FORAGE = 323;
+constexpr auto SKILL_TAME = 324;
+constexpr auto SKILL_TRACK = 325;
+constexpr auto SKILL_SKEWER = 326;
+constexpr auto SKILL_SLIP = 327;
+constexpr auto SKILL_RETREAT = 328;
+constexpr auto SKILL_RAGE = 329;
+constexpr auto SKILL_BATTLECRY = 330;
+constexpr auto SKILL_ARCHERY = 331;
+constexpr auto SKILL_RIPOSTE = 332;
+constexpr auto SKILL_LAY_HANDS = 333;
+constexpr auto SKILL_INSANE_CHANT = 334;
+constexpr auto SKILL_GLITTER_DUST = 335;
+constexpr auto SKILL_SNEAK = 336;
+constexpr auto SKILL_HIDE = 337;
+constexpr auto SKILL_STEAL = 338;
+constexpr auto SKILL_BACKSTAB = 339;
+constexpr auto SKILL_PICK_LOCK = 340;
+constexpr auto SKILL_KICK = 341;
+constexpr auto SKILL_BASH = 342;
+constexpr auto SKILL_RESCUE = 343;
+constexpr auto SKILL_BLOOD_FURY = 344;
+constexpr auto SKILL_DUAL_WIELD = 345;
+constexpr auto SKILL_HARM_TOUCH = 346;
+constexpr auto SKILL_SHIELDBLOCK = 347;
+constexpr auto SKILL_BLADESHIELD = 348;
+constexpr auto SKILL_POCKET = 349;
+constexpr auto SKILL_GUARD = 350;
+constexpr auto SKILL_FRENZY = 351;
+constexpr auto SKILL_BLINDFIGHTING = 352;
+constexpr auto SKILL_FOCUSED_REPELANCE = 353;
+constexpr auto SKILL_VITAL_STRIKE = 354;
+constexpr auto SKILL_CRAZED_ASSAULT = 355;
+constexpr auto SKILL_DIVINE_PROTECTION = 356;
+constexpr auto SKILL_BLUDGEON_WEAPONS = 357;
+constexpr auto SKILL_PIERCEING_WEAPONS = 358;
+constexpr auto SKILL_SLASHING_WEAPONS = 359;
+constexpr auto SKILL_WHIPPING_WEAPONS = 360;
+constexpr auto SKILL_CRUSHING_WEAPONS = 361;
+constexpr auto SKILL_TWO_HANDED_WEAPONS = 362;
+constexpr auto SKILL_HAND_TO_HAND = 363;
+constexpr auto SKILL_BULLRUSH = 364;
+constexpr auto SKILL_FEROCITY = 365;
+constexpr auto SKILL_TACTICS = 366;
+constexpr auto SKILL_DECEIT = 367;
+constexpr auto SKILL_RELEASE = 368;
+constexpr auto SKILL_FEARGAZE = 369;
+constexpr auto SKILL_EYEGOUGE = 370;
+constexpr auto SKILL_MAGIC_RESIST = 371;
+constexpr auto NEW_SAVE = 372; // Savefix.
+constexpr auto SKILL_SPELLCRAFT = 373;
+constexpr auto SKILL_DEFENSE = 374; // MArtial defense
+constexpr auto SKILL_KNOCKBACK = 375;
+constexpr auto SKILL_STINGING_WEAPONS = 376;
+constexpr auto SKILL_JAB = 377;
+constexpr auto SKILL_APPRAISE = 378;
+constexpr auto SKILL_NATURES_LORE = 379;
+constexpr auto SKILL_FIRE_ARROW = 380;
+constexpr auto SKILL_ICE_ARROW = 381;
+constexpr auto SKILL_TEMPEST_ARROW = 382;
+constexpr auto SKILL_GRANITE_ARROW = 383;
+constexpr auto DO_NOT_USE = 384; // Oh how convenient skills are for this,
+                                 // and so bad looking. yay. I want mysql.
+constexpr auto META_REIMB = 385;
+constexpr auto SKILL_COMBAT_MASTERY = 386;
+constexpr auto SKILL_FASTJOIN = 387;
+constexpr auto SKILL_ENHANCED_REGEN = 388;
+constexpr auto SKILL_CRIPPLE = 389;
+constexpr auto SKILL_NAT_SELECT = 390;
+constexpr auto SKILL_CLANAREA_CLAIM = 391;
+constexpr auto SKILL_CLANAREA_CHALLENGE = 392;
+constexpr auto SKILL_COMMUNE = 393;
+constexpr auto SKILL_SCRIBE = 394;
+constexpr auto SKILL_MAKE_CAMP = 395;
+constexpr auto SKILL_BATTLESENSE = 396;
+constexpr auto SKILL_PERSEVERANCE = 397;
+constexpr auto SKILL_TRIAGE = 398;
+constexpr auto SKILL_SMITE = 399;
+constexpr auto SKILL_LEADERSHIP = 400;
+constexpr auto SKILL_EXECUTE = 401;
+constexpr auto SKILL_DEFENDERS_STANCE = 402;
+constexpr auto SKILL_BEHEAD = 403;
+constexpr auto SKILL_PRIMAL_FURY = 404;
+constexpr auto SKILL_VIGOR = 405;
+constexpr auto SKILL_ESCAPE = 406;
+constexpr auto SKILL_CRIT_HIT = 407;
+constexpr auto SKILL_BATTERBRACE = 408;
+constexpr auto SKILL_FREE_ANIMAL = 409;
+constexpr auto SKILL_OFFHAND_DOUBLE = 410;
+constexpr auto SKILL_ONSLAUGHT = 411;
+constexpr auto SKILL_COUNTER_STRIKE = 412;
+constexpr auto SKILL_IMBUE = 413;
+constexpr auto SKILL_ELEMENTAL_FILTER = 414;
+constexpr auto SKILL_ORCHESTRATE = 415;
+constexpr auto SKILL_TUMBLING = 416;
+constexpr auto SKILL_BREW = 417;
+constexpr auto SKILL_PURSUIT = 418;
+//			                     419
+// warrior
+constexpr auto SKILL_LEGIONNAIRE = 420;
+constexpr auto SKILL_GLADIATOR = 421;
+// Barbarian
+constexpr auto SKILL_BATTLERAGER = 422;
+constexpr auto SKILL_CHIEFTAN = 423;
+// thief
+constexpr auto SKILL_PILFERER = 424;
+constexpr auto SKILL_ASSASSIN = 425;
+// mage
+constexpr auto SKILL_WARMAGE = 426;
+constexpr auto SKILL_SPELLBINDER = 427;
+// cleric
+constexpr auto SKILL_ZEALOT = 428;
+constexpr auto SKILL_RITUALIST = 429;
+// druid
+constexpr auto SKILL_ELEMENTALIST = 430;
+constexpr auto SKILL_SHAPESHIFTER = 431;
+// anti-paladin
+constexpr auto SKILL_CULTIST = 432;
+constexpr auto SKILL_REAVER = 433;
+// paladin
+constexpr auto SKILL_TEMPLAR = 434;
+constexpr auto SKILL_INQUISITOR = 435;
+// ranger
+constexpr auto SKILL_SCOUT = 436;
+constexpr auto SKILL_TRACKER = 437;
+// monk
+constexpr auto SKILL_SENSEI = 438;
+constexpr auto SKILL_SPIRITUALIST = 439;
+// bard
+constexpr auto SKILL_TROUBADOUR = 440;
+constexpr auto SKILL_MINISTREL = 441;
+
+constexpr auto SKILL_MAX = 441;
+
+// if you add a skill, make sure you update "skills[]" in spells.C
+// as well as SKILL_MAX
+
+constexpr auto SKILL_SONG_BASE = 525;
+constexpr auto SKILL_SONG_LIST_SONGS = 525;
+constexpr auto SKILL_SONG_WHISTLE_SHARP = 526;
+constexpr auto SKILL_SONG_STOP = 527;
+constexpr auto SKILL_SONG_TRAVELING_MARCH = 528;
+constexpr auto SKILL_SONG_BOUNT_SONNET = 529;
+constexpr auto SKILL_SONG_INSANE_CHANT = 530;
+constexpr auto SKILL_SONG_GLITTER_DUST = 531;
+constexpr auto SKILL_SONG_SYNC_CHORD = 532;
+constexpr auto SKILL_SONG_HEALING_MELODY = 533;
+constexpr auto SKILL_SONG_STICKY_LULL = 534;
+constexpr auto SKILL_SONG_REVEAL_STACATO = 535;
+constexpr auto SKILL_SONG_FLIGHT_OF_BEE = 536;
+constexpr auto SKILL_SONG_JIG_OF_ALACRITY = 537;
+constexpr auto SKILL_SONG_NOTE_OF_KNOWLEDGE = 538;
+constexpr auto SKILL_SONG_TERRIBLE_CLEF = 539;
+constexpr auto SKILL_SONG_SOOTHING_REMEM = 540;
+constexpr auto SKILL_SONG_FORGETFUL_RHYTHM = 541;
+constexpr auto SKILL_SONG_SEARCHING_SONG = 542;
+constexpr auto SKILL_SONG_VIGILANT_SIREN = 543;
+constexpr auto SKILL_SONG_ASTRAL_CHANTY = 544;
+constexpr auto SKILL_SONG_DISARMING_LIMERICK = 545;
+constexpr auto SKILL_SONG_SHATTERING_RESO = 546;
+constexpr auto SKILL_SONG_UNRESIST_DITTY = 547;
+constexpr auto SKILL_SONG_FANATICAL_FANFARE = 548;
+constexpr auto SKILL_SONG_DISCHORDANT_DIRGE = 549;
+constexpr auto SKILL_SONG_CRUSHING_CRESCENDO = 550;
+constexpr auto SKILL_SONG_HYPNOTIC_HARMONY = 551;
+constexpr auto SKILL_SONG_MKING_CHARGE = 552;
+constexpr auto SKILL_SONG_SUBMARINERS_ANTHEM = 553;
+constexpr auto SKILL_SONG_SUMMONING_SONG = 554;
+constexpr auto SKILL_SONG_MAX = 554;
+// if you add a song, make sure you update "songs[]" in sing.C
+// as well as SKILL_SONG_MAX
+
+// God commands that are "bestow"/"revoke"able
+constexpr auto COMMAND_BASE = 600;
+constexpr auto COMMAND_STRING = 600;
+constexpr auto COMMAND_IMP_CHAN = 601;
+constexpr auto COMMAND_STAT = 602;
+constexpr auto COMMAND_SNOOP = 603;
+constexpr auto COMMAND_FIND = 604;
+constexpr auto COMMAND_POSSESS = 606;
+constexpr auto COMMAND_RESTORE = 607;
+constexpr auto COMMAND_PURLOIN = 608;
+constexpr auto COMMAND_ARENA = 609;
+constexpr auto COMMAND_SET = 610;
+constexpr auto COMMAND_SQSAVE = 611;
+constexpr auto COMMAND_WHATTONERF = 612;
+constexpr auto COMMAND_FORCE = 613;
+constexpr auto COMMAND_SEND = 614;
+constexpr auto COMMAND_LOAD = 615;
+constexpr auto COMMAND_SHUTDOWN = 616;
+constexpr auto COMMAND_MP_EDIT = 617;
+constexpr auto COMMAND_RANGE = 618;
+constexpr auto COMMAND_MPSTAT = 619;
+constexpr auto COMMAND_SEDIT = 621;
+constexpr auto COMMAND_SOCKETS = 622;
+constexpr auto COMMAND_PUNISH = 623;
+constexpr auto COMMAND_SQEDIT = 624;
+constexpr auto COMMAND_OCLONE = 625;
+constexpr auto COMMAND_RELOAD = 626;
+constexpr auto COMMAND_HEDIT = 627;
+constexpr auto COMMAND_OPSTAT = 629;
+constexpr auto COMMAND_OPEDIT = 630;
+constexpr auto COMMAND_EQMAX = 631;
+constexpr auto COMMAND_LOG = 632;
+constexpr auto COMMAND_ADDNEWS = 633;
+constexpr auto COMMAND_PRIZE = 634;
+constexpr auto COMMAND_QEDIT = 635;
+constexpr auto COMMAND_RENAME = 636;
+constexpr auto COMMAND_FINDPATH = 637;
+#define COMMAND_FINDPATH2 638
+constexpr auto COMMAND_ADDROOM = 639;
+constexpr auto COMMAND_NEWPATH = 640;
+constexpr auto COMMAND_LISTPATHSBYZONE = 641;
+constexpr auto COMMAND_LISTALLPATHS = 642;
+constexpr auto COMMAND_TESTHAND = 643;
+constexpr auto COMMAND_DOPATHPATH = 644;
+constexpr auto COMMAND_DO_THE_THING = 645;
+constexpr auto COMMAND_QUEST = 646;
+constexpr auto COMMAND_TESTPORT = 647;
+constexpr auto COMMAND_REMORT = 648;
+constexpr auto COMMAND_TESTHIT = 649;
+constexpr auto COMMAND_TESTUSER = 650;
+// make sure up you update bestowable_god_commands_type DC::bestowable_god_commands[]
+// if you modify this command list any
+
+constexpr auto SKILL_TRADE_BASE = 700;
+constexpr auto SKILL_TRADE_POISON = 700;
+constexpr auto SKILL_TRADE_MAX = 700;
+// make sure you update tradeskills[] in combinables.cpp if you add to this
+
+constexpr auto SKILL_RECALL = 800;
+constexpr auto INTERNAL_SLEEPING = 801;
+
+constexpr auto SKILL_FLAMESLASH = 850; // just used internally for flameslash, do not want in skill lists etc
+
+/*
+ * Only for dragon breaths, not char abilities.
+ */
+constexpr auto SPELL_FIRE_BREATH = 900;
+constexpr auto SPELL_GAS_BREATH = 901;
+constexpr auto SPELL_FROST_BREATH = 902;
+constexpr auto SPELL_ACID_BREATH = 903;
+constexpr auto SPELL_LIGHTNING_BREATH = 904;
+
+/*
+ * Types of attacks.
+ * Must be non-overlapping with spell/skill types,
+ * but may be arbitrary beyond that.
+ * If you change this, update strs_damage_types[] in const.cpp
+ */
+constexpr auto TYPE_HIT = 1000;
+#define TYPE_BLUDGEON (TYPE_HIT + 1)
+#define TYPE_PIERCE (TYPE_HIT + 2)
+#define TYPE_SLASH (TYPE_HIT + 3)
+#define TYPE_WHIP (TYPE_HIT + 4)
+#define TYPE_CLAW (TYPE_HIT + 5)
+#define TYPE_BITE (TYPE_HIT + 6)
+#define TYPE_STING (TYPE_HIT + 7)
+#define TYPE_CRUSH (TYPE_HIT + 8)
+#define TYPE_SUFFERING (TYPE_HIT + 9)
+#define TYPE_MAGIC (TYPE_HIT + 10)
+#define TYPE_CHARM (TYPE_HIT + 11)
+#define TYPE_FIRE (TYPE_HIT + 12)
+#define TYPE_ENERGY (TYPE_HIT + 13)
+#define TYPE_ACID (TYPE_HIT + 14)
+#define TYPE_POISON (TYPE_HIT + 15)
+#define TYPE_SLEEP (TYPE_HIT + 16)
+#define TYPE_COLD (TYPE_HIT + 17)
+#define TYPE_PARA (TYPE_HIT + 18)
+#define TYPE_KI (TYPE_HIT + 19)
+#define TYPE_SONG (TYPE_HIT + 20)
+#define TYPE_PHYSICAL_MAGIC (TYPE_HIT + 21)
+#define TYPE_WATER (TYPE_HIT + 22)
+// If you change this, update strs_damage_types[] in const.cpp
+////////////////////////////////////////////////////////////////
+
+constexpr auto BASE_TIMERS = 1100;
+
+// NOTE  "skill" numbers 1500-1599 are reserved for innate skill abilities
+// These are in innate.h
+
+//////////////////////////////////////////////////////////////////////
+// NOTE 'spell' wear off timers are here.  Reserved messages 4000-4099
+// If you change this, update reserved[] in const.cpp
+//////////////////////////////////////////////////////////////////////
+constexpr auto RESERVED_BASE = 4000;
+constexpr auto SPELL_HOLY_AURA_TIMER = 4000;
+constexpr auto SPELL_NAT_SELECT_TIMER = 4001;
+constexpr auto SPELL_DIV_INT_TIMER = 4002;
+constexpr auto SPELL_NO_CAST_TIMER = 4003;
+constexpr auto SKILL_CM_TIMER = 4004;
+constexpr auto OBJ_CHAMPFLAG_TIMER = 4005;
+constexpr auto SKILL_TRIAGE_TIMER = 4006;
+constexpr auto SKILL_SMITE_TIMER = 4007;
+constexpr auto SKILL_MAKE_CAMP_TIMER = 4008;
+constexpr auto SKILL_LEADERSHIP_BONUS = 4009;
+constexpr auto SKILL_PERSEVERANCE_BONUS = 4010;
+constexpr auto SKILL_DECEIT_TIMER = 4011;
+constexpr auto SKILL_FEROCITY_TIMER = 4012;
+constexpr auto SKILL_TACTICS_TIMER = 4013;
+constexpr auto CONC_LOSS_FIXER = 4014;
+constexpr auto SKILL_ONSLAUGHT_TIMER = 4015;
+constexpr auto SPELL_KI_TRANS_TIMER = 4016;
+constexpr auto SKILL_BREW_TIMER = 4017;
+constexpr auto SKILL_SCRIBE_TIMER = 4018;
+constexpr auto SKILL_PROFESSION = 4019;
+constexpr auto OBJ_LILITHRING = 4020;
+constexpr auto OBJ_DAWNSWORD = 4021;
+constexpr auto OBJ_DURENDAL = 4022;
+constexpr auto SPELL_VAMPIRIC_AURA_TIMER = 4023;
+constexpr auto RESERVED_MAX = 4023;
+
+///////////////////////////////////////////////////////////////////////
+
+constexpr auto TAR_IGNORE = 1;
+constexpr auto TAR_CHAR_ROOM = 1 << 1;
+constexpr auto TAR_CHAR_WORLD = 1 << 2;
+constexpr auto TAR_FIGHT_SELF = 1 << 3;
+constexpr auto TAR_FIGHT_VICT = 1 << 4;
+constexpr auto TAR_SELF_ONLY = 1 << 5;
+constexpr auto TAR_SELF_NONO = 1 << 6;
+constexpr auto TAR_OBJ_INV = 1 << 7;
+constexpr auto TAR_OBJ_ROOM = 1 << 8;
+constexpr auto TAR_OBJ_WORLD = 1 << 9;
+constexpr auto TAR_OBJ_EQUIP = 1 << 10;
+constexpr auto TAR_NONE_OK = 1 << 11;
+constexpr auto TAR_SELF_DEFAULT = 1 << 12;
+constexpr auto TAR_ROOM_EXIT = 1 << 13;
+
+////////////////////////////////////////////////////////////////////////
+
+constexpr auto ETHEREAL_FOCUS_TRIGGER_ACT = 1;
+constexpr auto ETHEREAL_FOCUS_TRIGGER_MOVE = 2;
+constexpr auto ETHEREAL_FOCUS_TRIGGER_SOCIAL = 3;
+
+////////////////////////////////////////////////////////////////////////
+
+constexpr auto SPELL_TYPE_SPELL = 0;
+constexpr auto SPELL_TYPE_POTION = 1;
+constexpr auto SPELL_TYPE_WAND = 2;
+constexpr auto SPELL_TYPE_STAFF = 3;
+constexpr auto SPELL_TYPE_SCROLL = 4;
+
+constexpr auto FIRE_ELEMENTAL = 88;
+constexpr auto WATER_ELEMENTAL = 89;
+constexpr auto AIR_ELEMENTAL = 90;
+constexpr auto EARTH_ELEMENTAL = 91;
+
+constexpr auto WILD_OFFENSIVE = 0;
+constexpr auto WILD_DEFENSIVE = 1;
+
+/*
+ * Attack types with grammar.
+ */
+class attack_hit_type
+{
+public:
+  QString singular_;
+  QString plural_;
+};
+
+constexpr auto RARE1_PAPER = 1;
+constexpr auto RARE2_PAPER = 1 << 1;
+constexpr auto RARE3_PAPER = 1 << 2;
+constexpr auto RARE4_PAPER = 1 << 3;
+constexpr auto RARE5_PAPER = 1 << 4;
+// #define FREE_SLOT	1<<5
+
+constexpr auto CLERIC_PEN = 1 << 6;
+constexpr auto MAGE_PEN = 1 << 7;
+constexpr auto DRUID_PEN = 1 << 8;
+constexpr auto ANTI_PEN = 1 << 9;
+constexpr auto RANGER_PEN = 1 << 10;
+constexpr auto NONE_PEN = 1 << 11;
+// #define FREE_SLOT	1<<12
+
+constexpr auto MAGIC_INK = 1 << 13;
+constexpr auto FIRE_INK = 1 << 14;
+constexpr auto EVIL_INK = 1 << 15;
+// #define FREE_SLOT	1<<16
+
+constexpr auto FLASHY_DUST = 1 << 17;
+constexpr auto EXPLOSIVE_DUST = 1 << 18;
+constexpr auto GENERIC_DUST = 1 << 19;
+// #define FREE_SLOT	1<<20
+
+constexpr auto FILTER_FIRE = 1;
+constexpr auto FILTER_MAGIC = 2;
+constexpr auto FILTER_COLD = 3;
+constexpr auto FILTER_ENERGY = 4;
+constexpr auto FILTER_ACID = 5;
+constexpr auto FILTER_POISON = 6;
+
+constexpr auto DETECT_GOOD_VNUM = 6302;
+constexpr auto DETECT_EVIL_VNUM = 6301;
+constexpr auto DETECT_INVISIBLE_VNUM = 6306;
+constexpr auto SENSE_LIFE_VNUM = 6304;
+constexpr auto INFRA_VNUM = 6308;
+constexpr auto INVIS_VNUM = 6303;
+constexpr auto FARSIGHT_VNUM = 6307;
+constexpr auto SOLIDITY_VNUM = 6309;
+constexpr auto LIGHTNING_SHIELD_VNUM = 6310;
+constexpr auto INSOMNIA_VNUM = 6311;
+constexpr auto HASTE_VNUM = 6312;
+constexpr auto TRUE_VNUM = 6305;
+
+constexpr auto MAX_STRING_LENGTH = 8192;
+
+constexpr auto MAX_INPUT_LENGTH = 160;
+constexpr auto MAX_MESSAGES = 150;
+constexpr auto MAX_OBJ_SDESC_LENGTH = 100;
+
+constexpr auto MESS_ATTACKER = 1;
+constexpr auto MESS_VICTIM = 2;
+constexpr auto MESS_ROOM = 3;
+
+/* ======================================================================== */
+class txt_block
+{
+public:
+  QString text = {};
+  txt_block *next = {};
+  qint32 aliased = {};
+};
+
+typedef class txt_q
+{
+public:
+  txt_block *head;
+  txt_block *tail;
+} TXT_Q;
+
+class msg_type
+{
+public:
+  QString attacker_msg; /* message to attacker */
+  QString victim_msg;   /* message to victim   */
+  QString room_msg;     /* message to room     */
+};
+
+class message_type
+{
+public:
+  msg_type die_msg;       /* messages when death            */
+  msg_type miss_msg;      /* messages when miss             */
+  msg_type hit_msg;       /* messages when hit              */
+  msg_type sanctuary_msg; /* messages when hit on sanctuary */
+  msg_type god_msg;       /* messages when hit on god       */
+  message_type *next;     /* to next messages of ths kind.*/
+};
+
+class message_list
+{
+public:
+  qint32 a_type;            /* Attack type				*/
+  qint32 number_of_attacks; /* # messages to chose from		*/
+  message_type *msg;        /* List of messages			*/
+  message_type *msg2;       /* List of messages with toggle damage ON */
+};
+
+/*
+ * TO types for act() output.
+ */
+/* OLD
+constexpr auto TO_ROOM    0
+constexpr auto TO_VICT    1
+constexpr auto TO_NOTVICT 2
+constexpr auto TO_CHAR    3
+constexpr auto TO_GODS    4
+*/
+extern void debugpoint();
+
+class reroll_t
+{
+public:
+  ObjectPtr choice1_obj = {};
+  ObjectPtr choice2_obj = {};
+  quint64 orig_rnum = {};
+  vnum_t orig_vnum = {};
+  ObjectPtr orig_obj = {};
+
+  enum reroll_states_t
+  {
+    BEGIN,
+    PICKED_OBJ_TO_REROLL,
+    REROLLED,
+    CHOSEN
+  } state = {};
+};
+
+extern QMap<QString, reroll_t> reroll_sessions;
+
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -353,10 +7750,10 @@ public:
   class config
   {
   public:
-    config(int argc = {}, char **argv = {})
+    config(qint32 argc = {}, char **argv = {})
         : argc_(argc), argv_(argv) {}
-    int argc_{};
-    char **argv_{};
+    qint32 argc_ = {};
+    char **argv_ = {};
     bool sql = true;
     port_list_t ports;
     bool allow_imp_password = false;
@@ -411,17 +7808,17 @@ public:
   static constexpr room_t NOWHERE = 0ULL;
   static constexpr vnum_t INVALID_VNUM = -1ULL;
   static constexpr vnum_t INVALID_RNUM = -1ULL;
-  static constexpr uint64_t PASSES_PER_SEC = 100;
-  static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_OBJECT = 4 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_VIOLENCE = 2 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_BARD = 1 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_TENSEC = 10 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_WEATHER = 45 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_TIME = 60 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
+  static constexpr quint64 PASSES_PER_SEC = 100;
+  static constexpr quint64 PULSE_TIMER = 1 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_MOBILE = 4 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_OBJECT = 4 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_VIOLENCE = 2 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_BARD = 1 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_TENSEC = 10 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_WEATHER = 45 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_TIME = 60 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_REGEN = 15 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_SHORT = 1; // Pulses all the time.
   static constexpr level_t MAX_MORTAL_LEVEL = 60ULL;
   static constexpr quint64 PER_IP_CONNECTION_LIMIT = 20;
   static const QString HINTS_FILE_NAME;
@@ -429,19 +7826,20 @@ public:
   static const QStringList connected_states;
   static QList<bestowable_god_commands_type> bestowable_god_commands;
 
-  Connection *descriptor_list = nullptr; /* master desc list */
+  static const QString menu;
+
+  QList<ConnectionPtr> connections_; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
   character_list_t character_list;
   death_list_t death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
-  std::unordered_set<Character *> shooting_list;
+  QSet<CharacterPtr> shooting_list_;
   special_function_list_t mob_non_combat_functions;
   special_function_list_t mob_combat_functions;
   special_function_list_t obj_non_combat_functions;
   special_function_list_t obj_combat_functions;
-  free_list_t free_list;
   SSH::SSH ssh;
   fd_set input_set = {};
   fd_set output_set = {};
@@ -449,34 +7847,32 @@ public:
   fd_set null_set = {};
   zones_t zones = {};
   QMap<room_t, Room> rooms;
-  class World world;
-  clan_data *clan_list{};
-  clan_data *end_clan_list{};
+  World world;
+  clan_list_t clan_list_;
   class index_data obj_index_array[MAX_INDEX] = {};
   class index_data *obj_index = obj_index_array;
 
-  class index_data mob_index_array[MAX_INDEX] = {};
-  class index_data *mob_index = mob_index_array;
-  world_file_list_item *world_file_list = 0; // List of the world files
-  world_file_list_item *mob_file_list = 0;   // List of the mob files
-  world_file_list_item *obj_file_list = 0;   // List of the obj files
-  class Object *object_list = 0;             // the global linked list of obj's
-  class pulse_data *bard_list = 0;           // global l-list of bards
-  int top_of_helpt = 0;                      // top of help index table
-  int new_top_of_helpt = 0;                  // top of help index table
-  room_t top_of_world_alloc = 0;             // index of last alloc'd memory in world
-  room_t top_of_world = 0;
-  int total_rooms = 0; // total amount of rooms in memory
+  world_file_list_item *world_file_list = {}; // List of the world files
+  world_file_list_item *mob_file_list = {};   // List of the mob files
+  world_file_list_item *obj_file_list = {};   // List of the obj files
+  ObjectPtr object_list = {};                 // the global linked list of obj's
+  class pulse_data *bard_list = {};           // global l-list of bards
+  qint32 top_of_helpt = {};                   // top of help index table
+  qint32 new_top_of_helpt = {};               // top of help index table
+  room_t top_of_world_alloc = {};             // index of last alloc'd memory in world
+  room_t top_of_world = {};
+  qint32 total_rooms = {}; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
   QList<wizlist_info> wizlist;
   QMap<QString, redeem_t> redeem_sessions = {};
+  help_index_t help_index_;
 
   static QString getBuildVersion();
   static QString getBuildTime();
-  static DC *getInstance();
+  static DCPtr getInstance();
   static zone_t getRoomZone(room_t room_nr);
   static QString getZoneName(zone_t zone_key);
-  static void setZoneClanOwner(zone_t zone_key, int clan_key);
+  static void setZoneClanOwner(zone_t zone_key, qint32 clan_key);
   static void setZoneClanGold(zone_t zone_key, gold_t gold);
   static void setZoneTopRoom(zone_t zone_key, room_t room_key);
   static void setZoneBottomRoom(zone_t zone_key, room_t room_key);
@@ -484,15 +7880,15 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
-  Object *getObject(vnum_t vnum);
+  ObjectPtr getObject(vnum_t vnum);
   void findLibrary(void);
-  int create_one_room(Character *ch, int vnum);
-  void update_wizlist(Character *ch);
+  qint32 create_one_room(CharacterPtr ch, qint32 vnum);
+  void update_wizlist(CharacterPtr ch);
   void do_godlist(void);
   void write_wizlist(std::stringstream &filename);
-  void write_wizlist(std::string filename);
+  void write_wizlist(QString filename);
   void write_wizlist(const char filename[]);
-  explicit DC(int &argc, char **argv);
+  explicit DC(qint32 &argc, char **argv);
   explicit DC(config c);
   void setup(void);
   DC(const DC &) = delete; // non-copyable
@@ -508,13 +7904,13 @@ public:
   void boot_world(void);
   void write_one_zone(FILE *fl, zone_t zone_key);
   zone_t read_one_zone(FILE *fl);
-  int read_one_room(FILE *fl, int &room_nr);
+  qint32 read_one_room(FILE *fl, qint32 &room_nr);
   void load_hints(void);
   void save_hints(void);
   void send_hint(void);
   void assign_mobiles(void);
-  bool authenticate(QString username, QString password, uint64_t level = 0);
-  bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
+  bool authenticate(QString username, QString password, quint64 level = 0);
+  bool authenticate(const QHttpServerRequest &request, quint64 level = 0);
   void crash_hotboot(void);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
@@ -548,7 +7944,7 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
   }
 
-  void logverbose(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+  void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
   void clean_socials_from_memory(void);
@@ -556,17 +7952,17 @@ public:
   void remove_all_objs_from_world(void);
   void free_zones_from_memory(void);
   void free_clans_from_memory(void);
-  void set_zone_saved_zone(int32_t room);
-  void set_zone_modified_zone(int32_t room);
+  void set_zone_saved_zone(qint32 room);
+  void set_zone_modified_zone(qint32 room);
   [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>;
-  void set_zone_modified(int32_t modnum, world_file_list_item *list);
-  void set_zone_modified_world(int32_t room);
-  void set_zone_modified_mob(int32_t mob);
-  void set_zone_modified_obj(int32_t obj);
-  void set_zone_saved(int32_t modnum, world_file_list_item *list);
-  void set_zone_saved_world(int32_t room);
-  void set_zone_saved_mob(int32_t mob);
-  void set_zone_saved_obj(int32_t obj);
+  void set_zone_modified(qint32 modnum, world_file_list_item *list);
+  void set_zone_modified_world(qint32 room);
+  void set_zone_modified_mob(qint32 mob);
+  void set_zone_modified_obj(qint32 obj);
+  void set_zone_saved(qint32 modnum, world_file_list_item *list);
+  void set_zone_saved_world(qint32 room);
+  void set_zone_saved_mob(qint32 mob);
+  void set_zone_saved_obj(qint32 obj);
   void free_world_from_memory(void);
   void free_mobs_from_memory(void);
   void free_objs_from_memory(void);
@@ -581,28 +7977,28 @@ public:
   void testing_load_vaults(void);
   void reload_vaults(void);
   void load_corpses(void);
-  int write_hotboot_file(void);
-  int load_hotboot_descs(void);
-  vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
-  vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
-  vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
-  index_data *generate_mob_indices(int *top, index_data *index);
-  index_data *generate_obj_indices(int *top, index_data *index);
-  Character *read_mobile(int nr, FILE *fl);
-  Character *clone_mobile(int nr);
-  auto create_blank_item(int nr) -> std::expected<int, create_error>;
-  int create_blank_mobile(int nr);
+  qint32 write_hotboot_file(void);
+  qint32 load_hotboot_descs(void);
+  vnum_t getObjectVNUM(ObjectPtr obj, bool *ok = {});
+  vnum_t getObjectVNUM(qint32 nr, bool *ok = {});
+  vnum_t getObjectVNUM(rnum_t nr, bool *ok = {});
+  index_data *generate_mob_indices(qint32 *top, index_data *index);
+  index_data *generate_obj_indices(qint32 *top, index_data *index);
+  CharacterPtr read_mobile(qint32 nr, FILE *fl);
+  CharacterPtr clone_mobile(qint32 nr);
+  auto create_blank_item(qint32 nr) -> std::expected<qint32, create_error>;
+  qint32 create_blank_mobile(qint32 nr);
   void game_test_init(void);
   void heartbeat(void);
   void finish_hotboot(void);
-  load_status_t load_char_obj(Connection *d, QString name);
-  bool has_vault_access(QString owner, class vault_data *vault);
-  bool has_vault_access(Character *ch, class vault_data *vault);
+  std::expected<ConnectionPtr, load_status_t> load_char_obj(QString name);
+  bool has_vault_access(QString owner, Vault &vault);
+  bool has_vault_access(CharacterPtr ch, Vault &vault);
   void update_mprog_throws(void);
-  Character *initiate_oproc(Character *ch, Object *obj);
-  int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
-  int oprog_rand_trigger(Object *item);
-  int oprog_arand_trigger(Object *item);
+  CharacterPtr initiate_oproc(CharacterPtr ch, ObjectPtr obj);
+  qint32 oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, char *var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm);
+  qint32 oprog_rand_trigger(ObjectPtr item);
+  qint32 oprog_arand_trigger(ObjectPtr item);
 
   ~DC(void)
   {
@@ -629,7 +8025,7 @@ public:
   }
 
   QRandomGenerator random_;
-  QMap<uint64_t, Shop> shop_index;
+  QMap<quint64, Shop> shop_index;
   CVoteData DCVote;
 
   QString last_processed_cmd = {};
@@ -637,6 +8033,10 @@ public:
   room_t last_char_room = {};
   Commands CMD_;
   Arena arena_;
+  index_data mob_index_array[MAX_INDEX] = {};
+  class index_data *mob_index = mob_index_array;
+  Bans bans_;
+  Vaults vaults_;
 
 private:
   timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
@@ -644,24 +8044,97 @@ private:
   Shops shops_;
   QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
   Database database_;
-  command_lag *command_lag_list_{};
+  command_lag *command_lag_list_ = {};
   QString current_type_;
   QString current_name_;
-  vnum_t current_VNUM_{};
+  vnum_t current_VNUM_ = {};
   QString current_filename_;
-
   void game_loop_init(void);
   void game_loop(void);
-  int init_socket(in_port_t port);
-  int exceeded_connection_limit(Connection *new_conn);
-  void nanny(class Connection *d, std::string arg = "");
-  void object_activity(uint64_t pulse_type);
+  qint32 init_socket(in_port_t port);
+  qint32 exceeded_connection_limit(Connection *new_conn);
+  void nanny(Connection *d, QString arg = "");
+  void object_activity(quint64 pulse_type);
 };
-void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
-void logf(int level, DC::LogChannel type, const char *arg, ...);
-void logf(int level, DC::LogChannel type, QString arg);
-int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type);
-void produce_coredump(void *ptr = 0);
+class ChannelMessage
+{
+  QString sender_name_;
+  level_t wizinvis_;
+  DC::LogChannel type_;
+  QString msg_;
+  QDateTime timestamp_;
+
+public:
+  ChannelMessage(const CharacterPtr sender, const DC::LogChannel type, const char *msg)
+      : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
+  {
+    set_wizinvis(sender);
+    set_name(sender);
+  }
+
+  ChannelMessage(const CharacterPtr sender, const DC::LogChannel type, const QString &msg)
+      : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
+  {
+    set_wizinvis(sender);
+    set_name(sender);
+  }
+
+  QString getMessage(CharacterPtr ch) const;
+  QString getMessage(const level_t receiver_level, bool show_timestamps = false, QTimeZone timezone = {}, Qt::DateFormat timestamp_format = {}) const
+  {
+    QString msg;
+    QTextStream output(&msg);
+    QString sender_name;
+
+    if (receiver_level < wizinvis_)
+    {
+      sender_name = "Someone";
+    }
+    else
+    {
+      sender_name = sender_name_;
+    }
+
+    switch (type_)
+    {
+    case DC::LogChannel::CHANNEL_GOSSIP:
+      if (show_timestamps)
+        output << "$5$B" << getTimestamp(timezone, timestamp_format) << ": " << sender_name << " gossips '" << msg_ << "$5$B'$R";
+      else
+        output << "$5$B" << sender_name << " gossips '" << msg_ << "$5$B'$R";
+      break;
+    case DC::LogChannel::CHANNEL_TELL:
+      if (show_timestamps)
+        output << "$2$B" << getTimestamp(timezone, timestamp_format) << ": " << msg_ << "$R";
+      else
+        output << "$2$B" << msg_ << "$R";
+      break;
+    default:
+      output << "$5$B" << sender_name << " " << type_ << " '" << msg << "$5$B'$R";
+      break;
+    }
+
+    return msg;
+  }
+
+  QString getTimestamp(void) const
+  {
+    return timestamp_.toString();
+  }
+
+  QString getTimestamp(const QTimeZone &timezone, const Qt::DateFormat format = Qt::DateFormat::ISODate) const
+  {
+    return timestamp_.toTimeZone(timezone).toString(format);
+  }
+
+  void set_wizinvis(const CharacterPtr sender);
+  void set_name(const CharacterPtr sender);
+};
+
+void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
+void logf(qint32 level, DC::LogChannel type, const QString arg, ...);
+void logf(qint32 level, DC::LogChannel type, QString arg);
+qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
 
 template <typename T>
 T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
@@ -688,242 +8161,5 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
     return rng->bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
   }
 }
-
-extern std::vector<std::string> continent_names;
-
-void renum_world(void);
-void renum_zone_table(void);
-
-union varg_t
-{
-  Character *ch;
-  clan_t clan;
-  class player_data *player;
-  class table_data *table;
-  class machine_data *machine;
-  class wheel_data *wheel;
-};
-
-typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);
-
-class timer_data
-{
-public:
-  int timeleft{};
-  timer_data *next{};
-  varg_t arg1{};
-  QVariant var_arg1{};
-  void *arg2{};
-  void *arg3{};
-  TIMER_FUNC *function{};
-};
-
-void clear_hunt(varg_t arg1, void *arg2, void *arg3);
-void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
-
-auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
-#define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))
-
-auto &operator>>(auto &in, Room &room)
-{
-  room_t room_nr = {};
-  char *temp = nullptr;
-  char ch = 0;
-  int dir = 0;
-  extra_descr_data *new_new_descr{};
-  zone_t zone_nr = {};
-
-  ch = fread_char(in);
-
-  if (ch != '$')
-  {
-    room_nr = fread_int(in, 0, 1000000);
-    temp = fread_string(in, 0);
-
-    if (room_nr)
-    {
-      /*
-      DC::getInstance()->currentVNUM(room_nr);
-      DC::getInstance()->currentType("Room");
-      DC::getInstance()->currentName(temp);
-
-      if (room_nr >= DC::getInstance()->top_of_world_alloc)
-      {
-        DC::getInstance()->top_of_world_alloc = room_nr + 200;
-      }
-
-      if (DC::getInstance()->top_of_world < room_nr)
-        DC::getInstance()->top_of_world = room_nr;
-      */
-
-      room.paths = 0;
-      room.number = room_nr;
-      room.name = temp;
-    }
-    char *description = fread_string(in, 0);
-    if (room_nr)
-    {
-      room.description = description;
-      room.nTracks = 0;
-      room.tracks = 0;
-      room.last_track = 0;
-      room.denied = 0;
-      // DC::getInstance()->total_rooms++;
-    }
-    // Ignore recorded zone number since it may not longer be valid
-    fread_int(in, -1, 64000); // zone nr
-
-    if (room_nr)
-    {
-      // Go through the zone table until room.number is
-      // in the current zone.
-
-      bool found = false;
-      zone_t zone_nr = {};
-      for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
-      {
-        if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
-        {
-          found = true;
-          zone_nr = zone_key;
-          break;
-        }
-      }
-      if (!found)
-      {
-        // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
-        // logentry(error);
-        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
-      }
-      else
-      {
-        auto &zone = DC::getInstance()->zones[zone_nr];
-        if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
-        {
-          if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
-          {
-            zone.setRealBottom(room_nr);
-          }
-          if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
-          {
-            zone.setRealTop(room_nr);
-          }
-        }
-        room.zone = zone_nr;
-      }
-    }
-
-    uint32_t room_flags = fread_bitvector(in, -1, 2147483467);
-
-    if (room_nr)
-    {
-      room.room_flags = room_flags;
-      if (isSet(room.room_flags, NO_ASTRAL))
-      {
-        REMOVE_BIT(room.room_flags, NO_ASTRAL);
-      }
-
-      // This bitvector is for runtime and not stored in the files, so just initialize it to 0
-      room.temp_room_flags = 0;
-    }
-
-    int sector_type = fread_int(in, -1, 64000);
-
-    if (room_nr)
-    {
-      room.sector_type = sector_type;
-      room.funct = 0;
-      room.contents = 0;
-      room.people = 0;
-      room.light = 0; /* Zero light sources */
-
-      for (size_t tmp = 0; tmp <= 5; tmp++)
-        room.dir_option[tmp] = 0;
-
-      room.ex_description = 0;
-    }
-
-    for (;;)
-    {
-      ch = fread_char(in); /* dir field */
-
-      /* direction field */
-      if (ch == 'D')
-      {
-        dir = fread_int(in, 0, 5);
-        setup_dir(in, room_nr, dir);
-      }
-      /* extra description field */
-      else if (ch == 'E')
-      {
-        // strip off the \n after the E
-        if (fread_char(in) != '\n')
-        {
-          fseek(in, -1, SEEK_CUR);
-        }
-
-        new_new_descr = new extra_descr_data;
-        new_new_descr->keyword = fread_string(in, 0);
-        new_new_descr->description = fread_string(in, 0);
-
-        if (room_nr)
-        {
-          new_new_descr->next = room.ex_description;
-          room.ex_description = new_new_descr;
-        }
-        else
-        {
-          delete new_new_descr;
-        }
-      }
-      else if (ch == 'B')
-      {
-        deny_data *deni;
-
-        deni = new deny_data;
-        deni->vnum = fread_int(in, -1, 2147483467);
-
-        if (room_nr)
-        {
-          deni->next = room.denied;
-          room.denied = deni;
-        }
-        else
-        {
-          delete deni;
-        }
-      }
-      else if (ch == 'S') /* end of current room */
-        break;
-      else if (ch == 'C')
-      {
-        int c_class = fread_int(in, 0, CLASS_MAX);
-        if (room_nr)
-        {
-          room.allow_class[c_class] = true;
-        }
-      }
-    } // of for (;;) (get directions and extra descs)
-  } // if == $
-
-  return in;
-}
-
-template <typename T>
-T check_returns(T in_str)
-{
-  T new_string;
-  for (auto checker = in_str.begin(); checker != in_str.end(); checker++)
-  {
-    if (*checker == '\n')
-    {
-      if (checker + 1 != in_str.end() && *(checker + 1) != '\r')
-        new_string.push_back('\r');
-    }
-    new_string.push_back(*checker);
-  }
-
-  return new_string;
-}
-
-#endif
+bool IS_ARENA(auto room) { return isSet(DC::getInstance()->world[room].room_flags, ARENA); }
+void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type = DC::PULSE_TIME);

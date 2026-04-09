@@ -8,15 +8,15 @@
 #include "DC/handler.h"
 #include <iostream>
 
-uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
+quint16 DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 
-DC::config parse_arguments(int argc, char **argv);
+DC::config parse_arguments(qint32 argc, char **argv);
 
 /**********************************************************************
  *  main game loop and related stuff                                  *
  **********************************************************************/
 
-int main(int argc, char **argv)
+qint32 main(qint32 argc, char **argv)
 {
   DC dcastle(parse_arguments(argc, argv));
   QThread::currentThread()->setObjectName("Main Thread");
@@ -64,10 +64,10 @@ int main(int argc, char **argv)
   return 0;
 }
 
-DC::config parse_arguments(int argc, char **argv)
+DC::config parse_arguments(qint32 argc, char **argv)
 {
-  int opt{};
-  uint32_t port{};
+  qint32 opt = {};
+  quint32 port = {};
   DC::config cf(argc, argv);
 
   while ((opt = getopt(argc, argv, "tvp:Pmbd:shwcn?i:")) != -1)

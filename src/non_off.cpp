@@ -11,15 +11,11 @@
 #include <cctype>
 #include <cstring>
 
+#include "DC/levels.h"
 #include "DC/obj.h"
-#include "DC/connect.h"
-#include "DC/character.h"
-#include "DC/room.h"
 #include "DC/DC.h"
-#include "DC/mobile.h"
-#include "DC/utility.h"
+
 #include "DC/handler.h"
-#include "DC/db.h"
 #include "DC/interp.h"
 #include "DC/player.h"
 #include "DC/act.h"
@@ -27,15 +23,15 @@
 #include "DC/returnvals.h"
 #include "DC/comm.h"
 #include "DC/structs.h"
-#include "DC/utility.h"
-#include <string>
+
+#include <QString>
 #include <vector>
-#include <map>
-#include "DC/memory.h"
+#include <QMap>
+
 #include "DC/punish.h"
 
 // decay variable means it's from a decaying corpse, not a player
-void log_sacrifice(Character *ch, Object *obj, bool decay = false)
+void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
 {
 
   if (GET_OBJ_RNUM(obj) == DC::NOWHERE)
@@ -43,14 +39,14 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 
   if (!decay)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", qPrintable(ch->name()), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((ObjectPtr)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
-  for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+  for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
          GET_OBJ_SHORT(obj),
@@ -59,9 +55,9 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
   }
 }
 
-int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
+qint32 do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  class Object *obj;
+  ObjectPtr obj;
   char name[MAX_INPUT_LENGTH + 1];
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -72,7 +68,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (!*name || !str_cmp(name, GET_NAME(ch)))
+  if (!*name || !str_cmp(name, qPrintable(ch->name())))
   {
     act("$n offers $mself to $s god, who graciously declines.", ch, 0, 0, TO_ROOM, 0);
     act("Your god appreciates your offer and may accept it later.", ch, 0, 0, TO_CHAR, 0);
@@ -85,7 +81,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
   if (obj == nullptr)
   {
     obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
-    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isexact("corpse", obj->Name()) || isexact("pc", obj->Name()))
+    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isexact("corpse", obj->name()) || isexact("pc", obj->name()))
     {
       act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
       return ReturnValue::eFAILURE;
@@ -103,7 +99,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("(This item is cursed, BTW.)");
   }
 
-  if (obj->obj_flags.value[3] == 1 && isexact("pc", obj->Name()))
+  if (obj->obj_flags.value[3] == 1 && isexact("pc", obj->name()))
   {
     ch->sendln("You probably don't *really* want to do that.");
     return ReturnValue::eFAILURE;
@@ -149,7 +145,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_visible(Character *ch, char *argument, cmd_t cmd)
+qint32 do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
@@ -170,14 +166,14 @@ int do_visible(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_donate(Character *ch, char *argument, cmd_t cmd)
+qint32 do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  class Object *obj{};
-  char name[MAX_INPUT_LENGTH + 1]{};
-  char buf[MAX_STRING_LENGTH]{};
-  int location{};
-  int room = 3099;
-  int origin{};
+  ObjectPtr obj = {};
+  char name[MAX_INPUT_LENGTH + 1] = {};
+  char buf[MAX_STRING_LENGTH] = {};
+  qint32 location = {};
+  qint32 room = 3099;
+  qint32 origin = {};
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -222,13 +218,13 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       {
         REMBIT(ch->affected_by, AFF_CHAMPION);
 
-        sprintf(buf, "\r\n##%s has just yielded %s!\r\n", GET_NAME(ch), obj->short_description);
+        sprintf(buf, "\r\n##%s has just yielded %s!\r\n", qPrintable(ch->name()), qPrintable(obj->short_description()));
         send_info(buf);
 
         affected_type af;
         af.type = OBJ_CHAMPFLAG_TIMER;
         af.duration = 5;
-        af.modifier = 0;
+        af.modifier = {};
         af.location = APPLY_NONE;
         af.bitvector = -1;
         affect_to_char(ch, &af);
@@ -250,14 +246,14 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        sprintf(buf, "%s had %s, but no AFF_CHAMPION.", GET_NAME(ch), obj->short_description);
+        sprintf(buf, "%s had %s, but no AFF_CHAMPION.", qPrintable(ch->name()), qPrintable(obj->short_description()));
         logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         return ReturnValue::eFAILURE;
       }
     }
     else
     {
-      ch->sendln(QStringLiteral("You can only yield %1 from a safe room.").arg(obj->short_description));
+      ch->sendln(QStringLiteral("You can only yield %1 from a safe room.").arg(obj->short_description()));
       return ReturnValue::eFAILURE;
     }
   }
@@ -306,11 +302,11 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), qPrintable(obj->Name()), DC::getInstance()->obj_index[obj->item_number].vnum());
+    sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), DC::getInstance()->obj_index[obj->item_number].vnum());
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-    for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
-           loop_obj->short_description,
+    for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj->short_description()),
+           qPrintable(loop_obj->short_description()),
            DC::getInstance()->obj_index[loop_obj->item_number].vnum());
   }
 
@@ -332,15 +328,15 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
 auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
 {
   sendln("You now have no title.");
-  title = str_hsh("");
+  title_ = {};
   save(cmd_t::SAVE_SILENTLY);
   return ReturnValue::eSUCCESS;
 }
 
-int do_title(Character *ch, char *argument, cmd_t cmd)
+qint32 do_title(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[100];
-  int ctr;
+  qint32 ctr;
 
   if (!*argument)
   {
@@ -371,7 +367,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
 
   // TODO - decide if we still need this anymore since I think the $color code
   // keeps mortals from using $'s anyway  No idea why we don't let them use ?'s offhand
-  for (ctr = 0; (unsigned)ctr <= strlen(argument); ctr++)
+  for (ctr = {}; (quint32)ctr <= strlen(argument); ctr++)
   {
     if (((argument[ctr] == '$') && (argument[ctr + 1] == '$')) || ((argument[ctr] == '?') && (argument[ctr + 1] == '?')))
     {
@@ -381,8 +377,8 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (ch->title) // this should always be true, but why not check anyway?
-    dc_free(ch->title);
-  ch->title = str_dup(argument);
+    ch->title = {};
+  ch->title = (argument);
   sprintf(buf, "Your title is now: %s\r\n", argument);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
@@ -398,7 +394,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    qsizetype longest_toggle_name{};
+    qsizetype longest_toggle_name = {};
     for (const auto &t : Player::togglables)
     {
       if (t.name_.size() > longest_toggle_name)
@@ -449,7 +445,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int Character::do_config(QStringList arguments, cmd_t cmd)
+qint32 Character::do_config(QStringList arguments, cmd_t cmd)
 {
   if (player->config == nullptr)
   {
@@ -514,10 +510,10 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
     bool found = false;
     for (auto i = player->config->begin(); i != player->config->end(); ++i)
     {
-      if (key == i.key() || key.isEmpty() || i.key().startsWith(key))
+      if (key == conn->key() || key.isEmpty() || conn->key().startsWith(key))
       {
         found = true;
-        send(QStringLiteral("%1=%2\r\n").arg(i.key()).arg(i.value()));
+        send(QStringLiteral("%1=%2\r\n").arg(conn->key()).arg(conn->value()));
       }
     }
 
@@ -1026,7 +1022,7 @@ command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_stand(Character *ch, char *argument, cmd_t cmd)
+qint32 do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   switch (GET_POS(ch))
   {
@@ -1078,7 +1074,7 @@ int do_stand(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_sit(Character *ch, char *argument, cmd_t cmd)
+qint32 do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1132,7 +1128,7 @@ int do_sit(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_rest(Character *ch, char *argument, cmd_t cmd)
+qint32 do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1184,7 +1180,7 @@ int do_rest(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_sleep(Character *ch, char *argument, cmd_t cmd)
+qint32 do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type *paf;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1205,7 +1201,7 @@ int do_sleep(Character *ch, char *argument, cmd_t cmd)
 
   if ((paf = ch->affected_by_spell(SPELL_SLEEP)) &&
       paf->modifier == 1 && GET_POS(ch) != position_t::SLEEPING)
-    paf->modifier = 0;
+    paf->modifier = {};
 
   switch (GET_POS(ch))
   {
@@ -1243,8 +1239,8 @@ int do_sleep(Character *ch, char *argument, cmd_t cmd)
 
   affected_type af;
   af.type = INTERNAL_SLEEPING;
-  af.duration = 0;
-  af.modifier = 0;
+  af.duration = {};
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
@@ -1252,7 +1248,7 @@ int do_sleep(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::wake(Character *victim)
+command_return_t Character::wake(CharacterPtr victim)
 {
   if (!isSleeping())
   {
@@ -1275,7 +1271,7 @@ command_return_t Character::wake(Character *victim)
 
 command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 {
-  Character *tmp_char{};
+  CharacterPtr tmp_char = {};
   QString arg1 = arguments.value(0);
   if (arg1.isEmpty())
   {
@@ -1363,12 +1359,12 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 }
 
 // global tag var
-Character *tagged_person;
+CharacterPtr tagged_person;
 
-int do_tag(Character *ch, char *argument, cmd_t cmd)
+qint32 do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   one_argument(name, argument);
 
@@ -1381,11 +1377,11 @@ int do_tag(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void CVoteData::DisplayVote(Character *ch)
+void CVoteData::DisplayVote(CharacterPtr ch)
 {
   char buf[MAX_STRING_LENGTH];
-  std::vector<SVoteData>::iterator answer_it;
-  int i = 1;
+  QList<SVoteData>::iterator answer_it;
+  qint32 i = 1;
   if (vote_question.empty())
   {
     ch->send("\r\nSorry! There are no active votes right now!\r\n\r\n");
@@ -1401,7 +1397,7 @@ void CVoteData::DisplayVote(Character *ch)
   ch->send("\r\n");
 }
 
-void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
+void CVoteData::RemoveAnswer(CharacterPtr ch, quint32 answer)
 {
   if (active)
   {
@@ -1418,12 +1414,12 @@ void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
     ch->sendln("That answer doesn't exist!");
     return;
   }
-  std::vector<SVoteData>::iterator answer_it = answers.begin();
+  QList<SVoteData>::iterator answer_it = answers.begin();
   answers.erase(answer_it + answer - 1); // need to offset by 1
   ch->sendln("Answer removed!");
 }
 
-void CVoteData::StartVote(Character *ch)
+void CVoteData::StartVote(CharacterPtr ch)
 {
   if (active)
   {
@@ -1446,10 +1442,9 @@ void CVoteData::StartVote(Character *ch)
 
   active = true;
   this->OutToFile();
-  return;
 }
 
-void CVoteData::EndVote(Character *ch)
+void CVoteData::EndVote(CharacterPtr ch)
 {
   if (!active)
   {
@@ -1462,7 +1457,7 @@ void CVoteData::EndVote(Character *ch)
   send_info("\r\n##The vote has ended! Type \"Vote Results\" to see the results!\r\n");
 }
 
-void CVoteData::AddAnswer(Character *ch, std::string answer)
+void CVoteData::AddAnswer(CharacterPtr ch, QString answer)
 {
   if (active)
   {
@@ -1471,17 +1466,17 @@ void CVoteData::AddAnswer(Character *ch, std::string answer)
   }
   ch->sendln("Answer added.");
   SVoteData tmp;
-  tmp.votes = 0;
+  tmp.votes = {};
   tmp.answer = answer;
   answers.push_back(tmp);
 }
 
-bool CVoteData::HasVoted(Character *ch)
+bool CVoteData::HasVoted(CharacterPtr ch)
 {
-  return (ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] || char_voted[GET_NAME(ch)]);
+  return (ip_voted[ch->desc->getPeerOriginalAddress().toString(qPrintable())] || char_voted[qPrintable(ch->name())]);
 }
 
-bool CVoteData::Vote(Character *ch, unsigned int vote)
+bool CVoteData::Vote(CharacterPtr ch, quint32 vote)
 {
   if (!ch->desc)
   {
@@ -1501,8 +1496,8 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
     return false;
   }
 
-  ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] = true;
-  char_voted[GET_NAME(ch)] = true;
+  ip_voted[ch->desc->getPeerOriginalAddress().toString(qPrintable())] = true;
+  char_voted[qPrintable(ch->name())] = true;
   total_votes++;
   answers.at(vote - 1).votes++;
 
@@ -1511,9 +1506,9 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
   return true;
 }
 
-void CVoteData::DisplayResults(Character *ch)
+void CVoteData::DisplayResults(CharacterPtr ch)
 {
-  if (active && ch->getLevel() > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] && ch->isMortalPlayer())
+  if (active && ch->getLevel() > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString(qPrintable())] && ch->isMortalPlayer())
   {
     ch->sendln("Sorry, but you have to cast a vote before you can see the results.");
     return;
@@ -1523,27 +1518,24 @@ void CVoteData::DisplayResults(Character *ch)
     ch->sendln("There hasn't been any votes to view the results of.");
     return;
   }
-  char buf[MAX_STRING_LENGTH];
-  std::vector<SVoteData>::iterator answer_it;
+
+  QList<SVoteData>::iterator answer_it;
   ch->sendln("--Current Vote Results--");
-  int percent;
-  strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
-  csendf(ch, buf);
-  ch->sendln("");
+  ch->sendln(vote_question);
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
     if (ch->isMortalPlayer())
     {
-      percent = (answer_it->votes * 100) / total_votes;
-      csendf(ch, "%3d\%: %s\r\n", percent, answer_it->answer.c_str());
+      qint32 percent = (answer_it->votes * 100) / total_votes;
+      ch->send(QStringLiteral("%3d\%: %s\r\n").arg(percent).arg(answer_it->answer.c_str()));
     }
     else
-      csendf(ch, "%3d: %s\r\n", answer_it->votes, answer_it->answer.c_str());
+      ch->send(QStringLiteral("%3d: %s\r\n").arg(answer_it->votes).arg(answer_it->answer.c_str()));
   }
   ch->sendln("");
 }
 
-void CVoteData::Reset(Character *ch)
+void CVoteData::Reset(CharacterPtr ch)
 {
   if (active)
   {
@@ -1554,7 +1546,7 @@ void CVoteData::Reset(Character *ch)
   if (ch)
     ch->sendln("Ok. Vote cleared.");
 
-  total_votes = 0;
+  total_votes = {};
   vote_question.clear();
   answers.clear();
   ip_voted.clear();
@@ -1575,40 +1567,39 @@ void CVoteData::OutToFile()
     return;
   }
 
-  fprintf(the_file, "%d\n", active);
-  fprintf(the_file, "%d\n", total_votes);
+  qfprintf(the_file, "%d\n", active);
+  qfprintf(the_file, "%d\n", total_votes);
 
-  fprintf(the_file, "%s\n", vote_question.c_str());
+  qfprintf(the_file, "%s\n", vote_question.c_str());
 
-  fprintf(the_file, "%d\n", answers.size());
+  qfprintf(the_file, "%d\n", answers.size());
 
-  std::vector<SVoteData>::iterator answer_it;
+  QList<SVoteData>::iterator answer_it;
 
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
-    fprintf(the_file, "%d\n", answer_it->votes);
-    fprintf(the_file, "%s\n", answer_it->answer.c_str());
+    qfprintf(the_file, "%d\n", answer_it->votes);
+    qfprintf(the_file, "%s\n", answer_it->answer.c_str());
   }
 
-  std::map<std::string, bool>::iterator ip_it;
+  QMap<QString, bool>::iterator ip_it;
 
-  fprintf(the_file, "%d\n", ip_voted.size());
+  qfprintf(the_file, "%d\n", ip_voted.size());
   for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
-    fprintf(the_file, "%s\n", ip_it->first.c_str());
+    qfprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  fprintf(the_file, "%d\n", char_voted.size());
+  qfprintf(the_file, "%d\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
-    fprintf(the_file, "%s\n", ip_it->first.c_str());
+    qfprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
   fclose(the_file);
-  return;
 }
 
-void CVoteData::SetQuestion(Character *ch, std::string question)
+void CVoteData::SetQuestion(CharacterPtr ch, QString question)
 {
   if (active)
   {
@@ -1623,11 +1614,11 @@ CVoteData::CVoteData()
     : active(false), total_votes(0)
 {
   char buf[MAX_STRING_LENGTH];
-  FILE *the_file = nullptr;
+  FILE *the_file = {};
   ;
-  int num = 0;
-  int is_active = 0;
-  int i = 0;
+  qint32 num = {};
+  qint32 is_active = {};
+  qint32 i = {};
   SVoteData tmp_vote_data;
   active = false;
 
@@ -1658,7 +1649,7 @@ CVoteData::CVoteData()
     logentry(QStringLiteral("Error reading question from vote file."), 0, DC::LogChannel::LOG_MISC);
     return;
   }
-  buf[strlen(buf) - 1] = 0;
+  buf[strlen(buf) - 1] = {};
   vote_question = buf;
 
   // ANSWERS
@@ -1674,7 +1665,7 @@ CVoteData::CVoteData()
       return;
     }
 
-    buf[strlen(buf) - 1] = 0;
+    buf[strlen(buf) - 1] = {};
     tmp_vote_data.votes = num;
     tmp_vote_data.answer = buf;
     answers.push_back(tmp_vote_data);
@@ -1691,7 +1682,7 @@ CVoteData::CVoteData()
       this->Reset(nullptr);
       return;
     }
-    buf[strlen(buf) - 1] = 0;
+    buf[strlen(buf) - 1] = {};
     ip_voted[buf] = true;
   }
 
@@ -1706,7 +1697,7 @@ CVoteData::CVoteData()
       this->Reset(nullptr);
       return;
     }
-    buf[strlen(buf) - 1] = 0;
+    buf[strlen(buf) - 1] = {};
     char_voted[buf] = true;
   }
 
@@ -1720,10 +1711,10 @@ CVoteData::~CVoteData()
 {
 }
 
-int do_vote(Character *ch, char *arg, cmd_t cmd)
+qint32 do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int vote;
+  qint32 vote;
   arg = one_argument(arg, buf);
 
   if (!strcmp(buf, "results"))
@@ -1751,15 +1742,15 @@ int do_vote(Character *ch, char *arg, cmd_t cmd)
 
   vote = atoi(buf);
   if (true == DC::getInstance()->DCVote.Vote(ch, vote))
-    logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\r\n", GET_NAME(ch), vote);
+    logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\r\n", qPrintable(ch->name()), vote);
 
   return ReturnValue::eSUCCESS;
 }
 
-int do_random(Character *ch, char *argument, cmd_t cmd)
+qint32 do_random(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int i = 0;
+  qint32 i = {};
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {

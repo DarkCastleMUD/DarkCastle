@@ -15,12 +15,30 @@
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_COMPILER": "/usr/bin/g++-15",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_CXX_STANDARD": "26",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+            }
+        },
+        {
+            "name": "debugtracy",
+            "displayName": "Debug Config with Tracy",
+            "description": "debug with Tracy build using Ninja generator",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/debugtracy",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_C_COMPILER_LAUNCHER": "ccache",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
                 "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
                 "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON"
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_CXX_STANDARD": "26",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON"
             }
         },
         {
@@ -31,12 +49,14 @@
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "CMAKE_CXX_COMPILER": "/usr/bin/g++-15",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_C_COMPILER_LAUNCHER": "ccache",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
                 "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
                 "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON"
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_CXX_STANDARD": "26",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON"
             }
         }
     ],
@@ -44,20 +64,34 @@
         {
             "name": "debug",
             "configurePreset": "debug",
-            "verbose": true,
-            "jobs": 128
+            "verbose": true
+        },
+        {
+            "name": "debugtracy",
+            "configurePreset": "debugtracy",
+            "verbose": true
         },
         {
             "name": "release",
             "configurePreset": "release",
-            "verbose": false,
-            "jobs": 128
+            "verbose": false
         }
     ],
     "testPresets": [
         {
             "name": "debug",
             "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "debugtracy",
+            "configurePreset": "debugtracy",
             "output": {
                 "outputOnFailure": true
             },
@@ -98,6 +132,19 @@
                 {
                     "type": "build",
                     "name": "debug"
+                }
+            ]
+        },
+        {
+            "name": "debugtracy",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "debugtracy"
+                },
+                {
+                    "type": "build",
+                    "name": "debugtracy"
                 }
             ]
         },

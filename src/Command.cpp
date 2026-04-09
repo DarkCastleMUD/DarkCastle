@@ -1,7 +1,9 @@
 #include "DC/Command.h"
-#include "DC/character.h"
-#include "DC/common.h"
-
+#include "DC/DC.h"
+#include "DC/levels.h"
+#include <QMap>
+#include <QString>
+#include <DC/Direction.h>
 QMap<QString, Command> Commands::qstring_command_map_ = {};
 QMap<cmd_t, Command> Commands::cmd_t_command_map_ = {};
 
@@ -9,7 +11,7 @@ QMap<cmd_t, Command> Commands::cmd_t_command_map_ = {};
 // 0  - char will always become visibile.
 // 1  - char will not become visible when using this command.
 // 2+ - char has a greater chance of breaking hide as this increases.
-const QList<Command> Commands::commands_ =
+QList<Command> Commands::commands_ =
     {
         // Movement commands
         Command(QStringLiteral("north"), do_move, position_t::STANDING, 0, cmd_t::NORTH, true, 1, CommandType::all),
@@ -115,7 +117,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("grab"), do_grab, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
         Command(QStringLiteral("hold"), do_grab, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
         Command(QStringLiteral("lock"), do_lock, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
-        Command(QStringLiteral("open"), do_open, position_t::RESTING, 0, cmd_t::OPEN, true, 25, CommandType::all),
+        Command(QStringLiteral("open"), &Character::do_open, position_t::RESTING, 0, cmd_t::OPEN, true, 25, CommandType::all),
         Command(QStringLiteral("pour"), do_pour, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
         Command(QStringLiteral("put"), do_put, position_t::RESTING, 0, cmd_t::PUT, true, 0, CommandType::all),
         Command(QStringLiteral("quaff"), do_quaff, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
@@ -350,14 +352,14 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("unarchive"), do_unarchive, position_t::DEAD, 108, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("stealth"), do_stealth, position_t::DEAD, OVERSEER, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("disconnect"), do_disconnect, position_t::DEAD, 106, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
-        Command(QStringLiteral("force"), do_force, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
+        Command(QStringLiteral("force"), &Character::do_force, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("pardon"), do_pardon, position_t::DEAD, OVERSEER, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("goto"), &Character::do_goto, position_t::DEAD, 102, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("restore"), do_restore, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("purloin"), do_purloin, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("set"), do_set, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
-        Command(QStringLiteral("unban"), do_unban, position_t::DEAD, 108, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
-        Command(QStringLiteral("ban"), do_ban, position_t::DEAD, 108, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
+        Command(QStringLiteral("unban"), &Character::do_unban, position_t::DEAD, 108, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
+        Command(QStringLiteral("ban"), &Character::do_ban, position_t::DEAD, 108, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("echo"), do_echo, position_t::DEAD, 106, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("eqmax"), do_eqmax, position_t::DEAD, 105, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("send"), do_send, position_t::DEAD, 106, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
@@ -524,12 +526,12 @@ auto Commands::find(cmd_t cmd) -> std::expected<Command, search_error>
 
 Commands::Commands(void)
 {
-  for (const auto &command : commands_)
+  for (auto &command : commands_)
   {
-    qstring_command_map_[command.getName()] = command;
-    for (qsizetype position = 1; position < command.getName().length(); position++)
+    qstring_command_map_[command.name()] = command;
+    for (qsizetype position = 1; position < command.name().length(); position++)
     {
-      auto keyword = command.getName();
+      auto keyword = command.name();
       keyword.truncate(position);
       if (!qstring_command_map_.contains(keyword))
       {
@@ -584,26 +586,26 @@ bool isCommandTypeCasino(cmd_t cmd)
   return false;
 }
 
-auto getCommandFromDirection(int dir) -> std::expected<cmd_t, bool>
+auto getCommandFromDirection(qint32 dir) -> std::expected<cmd_t, bool>
 {
   switch (dir)
   {
-  case NORTH:
+  case Direction::NORTH:
     return cmd_t::NORTH;
     break;
-  case EAST:
+  case Direction::EAST:
     return cmd_t::EAST;
     break;
-  case SOUTH:
+  case Direction::SOUTH:
     return cmd_t::SOUTH;
     break;
-  case WEST:
+  case Direction::WEST:
     return cmd_t::WEST;
     break;
-  case UP:
+  case Direction::UP:
     return cmd_t::UP;
     break;
-  case DOWN:
+  case Direction::DOWN:
     return cmd_t::DOWN;
     break;
   default:
@@ -612,27 +614,27 @@ auto getCommandFromDirection(int dir) -> std::expected<cmd_t, bool>
   return std::unexpected(false);
 }
 
-auto getDirectionFromCommand(cmd_t cmd) -> std::expected<int, bool>
+auto getDirectionFromCommand(cmd_t cmd) -> std::expected<qint32, bool>
 {
   switch (cmd)
   {
   case cmd_t::NORTH:
-    return NORTH;
+    return Direction::NORTH;
     break;
   case cmd_t::EAST:
-    return EAST;
+    return Direction::EAST;
     break;
   case cmd_t::SOUTH:
-    return SOUTH;
+    return Direction::SOUTH;
     break;
   case cmd_t::WEST:
-    return WEST;
+    return Direction::WEST;
     break;
   case cmd_t::UP:
-    return UP;
+    return Direction::UP;
     break;
   case cmd_t::DOWN:
-    return DOWN;
+    return Direction::DOWN;
     break;
   default:
     break;

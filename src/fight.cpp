@@ -23,82 +23,75 @@
  * $Id: fight.cpp,v 1.571 2015/06/16 04:10:54 pirahna Exp $               *
  **************************************************************************/
 
+#include "DC/DC.h"
+// log
 #include <cassert>
 
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
-
+#include "DC/comm.h"
 #include "DC/fight.h"
 #include "DC/race.h"
 #include "DC/player.h" // log
-#include "DC/character.h"
-#include "DC/utility.h" // log
-#include "DC/connect.h"
 #include "DC/spells.h" // weapon_spells
-#include "DC/isr.h"
-#include "DC/mobile.h"
-#include "DC/room.h"
 #include "DC/handler.h"
-#include "DC/interp.h"  // do_flee()
-#include "DC/db.h"      // fread_string()
-#include "DC/connect.h" // Connection
-#include "DC/magic.h"   // weapon spells
+#include "DC/interp.h" // do_flee()
+#include "DC/db.h"     // fread_string()
+#include "DC/magic.h"  // weapon spells
 #include "DC/act.h"
 #include "DC/clan.h"
-#include "DC/returnvals.h"
-#include "DC/sing.h" // stop_grouped_bards
 #include "DC/innate.h"
 #include "DC/token.h"
-#include "DC/vault.h"
+#include "DC/DC.h"
 #include "DC/const.h"
 #include "DC/corpse.h"
 #include "DC/stat.h"
 #include "DC/obj.h"
-#include "DC/memory.h"
+
 #include "DC/punish.h"
+#include "DC/utility.h"
 
-#define MAX_CHAMP_DEATH_MESSAGE 14
+constexpr auto MAX_CHAMP_DEATH_MESSAGE = 14;
 
-Character *combat_list = nullptr, *combat_next_dude = nullptr;
+CharacterPtr combat_list = {}, combat_next_dude = {};
 
-char *champ_death_messages[] =
+const char *champ_death_messages[] =
     {
-        /*1*/ "\r\n##Somewhere a village has been deprived of their idiot.\r\n",
+        "\r\n##Somewhere a village has been deprived of their idiot.\r\n",
         "\r\n##Don't feel bad %s. A lot of people have no talent!\r\n",
         "\r\n##If at first you don't succeed, failure may be your style.\r\n",
         "\r\n##%s just found the cure for stupidity. Death.\r\n",
-        /*5*/ "\r\n##%s just succumbed to a fatal case of stupidity.\r\n",
+        "\r\n##%s just succumbed to a fatal case of stupidity.\r\n",
         "\r\n##%s: About as useful as a windshield wiper on a goat's ass.\r\n",
         "\r\n##Proof of reincarnation. Nobody could be as stupid as %s in one lifetime.\r\n",
         "\r\n##%s: The poster child for birth control.\r\n",
         "\r\n##Someone... we're not saying who... but someone is an unmitigated moron.\r\n",
-        /*10*/ "\r\n##%s wasn't ready.\r\n",
+        "\r\n##%s wasn't ready.\r\n",
         "\r\n##EPIC FAIL\r\n",
         "\r\n##%s wants a do-over.\r\n",
         "\r\n##%s prays, 'THIS GAME SUCKS'\r\n",
         "\r\n##DarkCastle: Helping people like %s to die since 1991.\r\n"};
 
-int debug_retval(Character *ch, Character *victim, int retval);
+qint32 debug_retval(CharacterPtr ch, CharacterPtr victim, qint32 retval);
 
-void do_champ_flag_death(Character *victim)
+void do_champ_flag_death(CharacterPtr victim)
 {
-
   char buf[MAX_STRING_LENGTH];
-  Object *obj;
+  ObjectPtr obj;
   obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying);
   if (obj)
   {
     obj_from_char(obj);
     obj_to_room(obj, CFLAG_HOME);
-    snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], victim->getNameC());
+    snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], qPrintable(victim->name()));
     send_info(buf);
 
-    if (obj && obj->short_description)
-      send_info(QStringLiteral("##%1 has just died with %2, watch for it to reappear!\r\n").arg(victim->getName()).arg(obj->short_description));
+    if (obj && qPrintable(obj->short_description()))
+      send_info(QStringLiteral("##%1 has just died with %2, watch for it to reappear!\r\n").arg(victim->name()).arg(obj->short_description()));
     else
-      send_info(QStringLiteral("##%1 has just died with the Champion Flag, watch for it to reappear!\r\n").arg(victim->getName()));
+      send_info(QStringLiteral("##%1 has just died with the Champion Flag, watch for it to reappear!\r\n").arg(victim->name()));
   }
   else
   {
@@ -106,9 +99,9 @@ void do_champ_flag_death(Character *victim)
   }
 }
 
-bool someone_fighting(Character *ch)
+bool someone_fighting(CharacterPtr ch)
 {
-  Character *vict;
+  CharacterPtr vict;
   if (ch->fighting && ch->fighting->fighting == ch)
     return true;
   for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
@@ -119,7 +112,7 @@ bool someone_fighting(Character *ch)
   return false;
 }
 
-int check_autojoiners(Character *ch, int skill = 0)
+qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE; // irrelevant
@@ -130,7 +123,7 @@ int check_autojoiners(Character *ch, int skill = 0)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     return ReturnValue::eFAILURE;
 
-  Character *tmp;
+  CharacterPtr tmp;
   for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
   {
     if (tmp == ch || tmp == ch->fighting)
@@ -145,27 +138,27 @@ int check_autojoiners(Character *ch, int skill = 0)
       continue;
     if (tmp->player == nullptr || tmp->player->joining.empty())
       continue;
-    if (!isexact(GET_NAME(ch), tmp->player->joining))
+    if (!isexact(qPrintable(ch->name()), tmp->player->joining))
       continue;
     if (IS_AFFECTED(tmp, AFF_INSANE))
       continue;
     if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN))
       continue;
-    int retval = tmp->do_join(QStringLiteral("0.%1").arg(ch->getName()).split(' '));
+    qint32 retval = tmp->do_join(QStringLiteral("0.%1").arg(ch->name()).split(' '));
     if (SOMEONE_DIED(retval))
       return retval;
   }
   return ReturnValue::eSUCCESS;
 }
 
-int check_joincharmie(Character *ch, int skill = 0)
+qint32 check_joincharmie(CharacterPtr ch, qint32 skill = 0)
 {
   if (ch->isPlayer())
     return ReturnValue::eFAILURE; // irrelevant
   if (!ch->fighting)
     return ReturnValue::eFAILURE;
 
-  Character *tmp = ch->master;
+  CharacterPtr tmp = ch->master;
   if (!tmp)
     return ReturnValue::eFAILURE;
   if (tmp == ch || tmp == ch->fighting)
@@ -188,17 +181,17 @@ int check_joincharmie(Character *ch, int skill = 0)
   return tmp->do_join({"follower"});
 }
 
-int Character::check_charmiejoin(void)
+qint32 Character::check_charmiejoin(void)
 {
   if (fighting || !master || master == this || !isStanding())
   {
     return ReturnValue::eFAILURE;
   }
 
-  return do_join(QStringLiteral("0.%1").arg(master->getName()).split(' '));
+  return do_join(QStringLiteral("0.%1").arg(master->name()).split(' '));
 }
 
-int check_charmiejoin(Character *ch)
+qint32 check_charmiejoin(CharacterPtr ch)
 {
   if (ch)
   {
@@ -213,9 +206,9 @@ int check_charmiejoin(Character *ch)
 void perform_violence(void)
 {
   // char debug[256];
-  Character *ch;
-  int is_mob = 0;
-  int retval;
+  CharacterPtr ch;
+  qint32 is_mob = {};
+  qint32 retval;
   static affected_type *af, *next_af_dude;
   follow_type *fol, *folnext;
   extern char *spell_wear_off_msg[];
@@ -236,8 +229,8 @@ void perform_violence(void)
     }
 
     // DEBUG CODE
-    int last_virt = -1;
-    int last_class = GET_CLASS(ch);
+    qint32 last_virt = -1;
+    qint32 last_class = GET_CLASS(ch);
     if (ch->isNonPlayer())
       last_virt = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     // DEBUG CODE
@@ -249,7 +242,7 @@ void perform_violence(void)
       stop_fighting(ch);
       continue;
     }
-    int retval = check_autojoiners(ch);
+    qint32 retval = check_autojoiners(ch);
     if (SOMEONE_DIED(retval))
       continue;
     if (IS_AFFECTED(ch, AFF_CHARM))
@@ -296,7 +289,7 @@ void perform_violence(void)
         {
           if (MOB_WAIT_STATE(ch) > 0)
           {
-            // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
+            // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", qPrintable(ch->shortdesc_or_name()), MOB_WAIT_STATE(ch));
             // MOB_WAIT_STATE(ch) -= DC::PULSE_VIOLENCE; // MIKE
             // logentry(debug, OVERSEER, DC::LogChannel::LOG_BUG);
           }
@@ -341,7 +334,7 @@ void perform_violence(void)
 
     // This takes care of flee and stuff
     if (ch && ch->fighting)
-      if (ch->fighting != (Character *)0x95959595 && ch->in_room != (ch->fighting)->in_room)
+      if (ch->fighting != (CharacterPtr)0x95959595 && ch->in_room != (ch->fighting)->in_room)
         stop_fighting(ch);
   } // for
   //
@@ -368,7 +361,7 @@ void perform_violence(void)
       next_af_dude = af->next;
       if (af->type == SPELL_POISON && af->location == APPLY_NONE)
       {
-        int dam = af->duration * 10 + number(30, 50);
+        qint32 dam = af->duration * 10 + number(30, 50);
         if (get_saves(ch, SAVE_TYPE_POISON) > number(1, 100))
         {
           dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
@@ -441,39 +434,33 @@ void perform_violence(void)
   }
 }
 
-void add_threat(Character *mob, Character *ch, int amt)
+void add_threat(CharacterPtr mob, CharacterPtr ch, qint32 amt)
 {
-  threat_data *thr;
-  if (!mob || !ch || !amt || mob->isPlayer() || !ch->getNameC())
+  if (!mob || !ch || !amt || mob->isPlayer() || !qPrintable(ch->name()))
     return;
-  for (thr = mob->mobdata->threat; thr; thr = thr->next)
+  for (auto thr = mob->mobdata->threat; thr; thr = thr->next)
   {
-    if (!str_cmp(ch->getNameC(), thr->name))
+    if (ch->name() == thr->name_)
     { // Already angry with player.
       thr->threat += amt;
       return;
     }
   }
-#ifdef LEAK_CHECK
-  thr = (threat_data *)calloc(1, sizeof(threat_data));
-#else
-  thr = (threat_data *)dc_alloc(1, sizeof(threat_data));
-#endif
+  auto thr = new threat_data;
   thr->next = mob->mobdata->threat;
   thr->threat = amt;
-  thr->name = str_dup(GET_NAME(ch));
+  thr->name_ = ch->name();
   mob->mobdata->threat = thr;
   // Threat added.
-  return;
 }
 
 // could use bits for all that, but I dun' wanna.
-#define DAMAGE 1
-#define HEALING 2
-#define AREA_DAM 3
-#define AREA_HEAL 4
+constexpr auto DAMAGE = 1;
+constexpr auto HEALING = 2;
+constexpr auto AREA_DAM = 3;
+constexpr auto AREA_HEAL = 4;
 
-void generate_skillthreat(Character *mob, int skill, int damage, Character *actor, Character *target)
+void generate_skillthreat(CharacterPtr mob, qint32 skill, qint32 damage, CharacterPtr actor, CharacterPtr target)
 {
   if (!actor || !mob || mob->isPlayer())
     return;
@@ -481,8 +468,8 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
   float v = (float)actor->has_skill(skill) / 100.0;
   if (!v)
     v = 0.4; // like weapons
-  int type = 0;
-  int threat = 0;
+  qint32 type = {};
+  qint32 threat = {};
   switch (skill)
   {
   case SPELL_HELLSTREAM:
@@ -492,10 +479,10 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
   };
   if (!threat)
   { // Nothing set. Bugger.
-    logf(110, DC::LogChannel::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill).toStdString().c_str(), skill);
+    logf(110, DC::LogChannel::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", qPrintable(get_skill_name(skill)), skill);
     return;
   }
-  threat = (int)(threat * v); // vary depending on skill
+  threat = (qint32)(threat * v); // vary depending on skill
 
   if (type == DAMAGE)
   {
@@ -506,7 +493,7 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
     {
       // damaging yerself gets you no coochie coochie
       for (thr = mob->mobdata->threat; thr; thr = thr->next)
-        if (!str_cmp(thr->name, GET_NAME(target)))
+        if (thr->name_ == target->name()))
           threat = 0 - threat; // this guy deserves mucho love, let's provide.
       // it damaged something else, get pissed off if friendly flagged
       if (threat > 0 && !ISSET(mob->mobdata->actflags, ACT_FRIENDLY))
@@ -516,7 +503,7 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
   }
 }
 
-bool gets_dual_wield_attack(Character *ch)
+bool gets_dual_wield_attack(CharacterPtr ch)
 {
   if (!ch->equipment[WEAR_SECOND_WIELD]) // only if we have a second wield:)
     return false;
@@ -530,14 +517,14 @@ bool gets_dual_wield_attack(Character *ch)
   return true;
 }
 
-// int attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
+// qint32 attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
 // standard retvals
-int attack(Character *ch, Character *vict, int type, int weapon)
+qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 {
-  int result = 0;
-  int chance;
-  Object *wielded = 0;
-  int handle_any_guard(Character * ch);
+  qint32 result = {};
+  qint32 chance;
+  ObjectPtr wielded = {};
+  qint32 handle_any_guard(CharacterPtr ch);
 
   if (!ch || !vict)
   {
@@ -587,8 +574,8 @@ int attack(Character *ch, Character *vict, int type, int weapon)
       remove_memory(vict, 't');
       stop_fighting(vict);
     }
-    do_say(ch, std::string("I'm sorry my fellow mob, I have seen the error of my ways."));
-    do_say(vict, std::string("It is okay my friend, let's go have a beer."));
+    do_say(ch, QString("I'm sorry my fellow mob, I have seen the error of my ways."));
+    do_say(vict, QString("It is okay my friend, let's go have a beer."));
     return ReturnValue::eFAILURE;
   }
 
@@ -610,7 +597,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
   if (ch->has_skill(SKILL_NAT_SELECT) &&
       ch->affected_by_spell(SKILL_NAT_SELECT) &&
-      ch->affected_by_spell(SKILL_NAT_SELECT)->modifier == GET_RACE(vict) &&
+      ch->affected_by_spell(SKILL_NAT_SELECT)->modifier == vict->race &&
       number(0, 3) == 0)
   {
     ch->skill_increase_check(SKILL_NAT_SELECT, ch->has_skill(SKILL_NAT_SELECT),
@@ -629,7 +616,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   {
     if (ch->getLevel() >= MORTAL)
     {
-      result = one_hit(ch, vict, type, FIRST);
+      result = one_hit(ch, vict, type, WEAR_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
@@ -637,28 +624,28 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     if (ch->getLevel() > 47)
       if (number(0, 1))
       {
-        result = one_hit(ch, vict, type, FIRST);
+        result = one_hit(ch, vict, type, WEAR_WIELD);
         if (SOMEONE_DIED(result))
           return result;
       }
 
     if (ch->getLevel() > 39)
     {
-      result = one_hit(ch, vict, type, FIRST);
+      result = one_hit(ch, vict, type, WEAR_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
     else if (ch->getLevel() > 29)
       if (number(0, 1))
       {
-        result = one_hit(ch, vict, type, FIRST);
+        result = one_hit(ch, vict, type, WEAR_WIELD);
         if (SOMEONE_DIED(result))
           return result;
       }
 
     if (ch->getLevel() > 19)
     {
-      result = one_hit(ch, vict, type, FIRST);
+      result = one_hit(ch, vict, type, WEAR_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
@@ -674,7 +661,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
         chance = 101;
       if (chance > number(1, 100))
       {
-        result = one_hit(ch, vict, type, FIRST);
+        result = one_hit(ch, vict, type, WEAR_WIELD);
         if (SOMEONE_DIED(result))
           return result;
       }
@@ -682,7 +669,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
     // lose an attack if using a shield
     //    if(ch->getLevel() > 9 && !ch->equipment[WEAR_SHIELD]) {
-    //    result = one_hit(ch, vict, type, FIRST);
+    //    result = one_hit(ch, vict, type, WEAR_WIELD);
     //  if(SOMEONE_DIED(result))       return result;
     // }
 
@@ -693,7 +680,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     }
     else if (ch->isPlayer() || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
     {
-      result = one_hit(ch, vict, type, FIRST);
+      result = one_hit(ch, vict, type, WEAR_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
@@ -707,7 +694,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     }
     else if (ch->isPlayer() || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
     {
-      result = one_hit(ch, vict, type, FIRST); // everyone get's one hit (normally)
+      result = one_hit(ch, vict, type, WEAR_WIELD); // everyone get's one hit (normally)
       if (SOMEONE_DIED(result))
         return result;
     }
@@ -719,19 +706,19 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
     if (second_attack(ch))
     {
-      result = one_hit(ch, vict, type, FIRST);
+      result = one_hit(ch, vict, type, WEAR_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
     if (third_attack(ch))
     {
-      result = one_hit(ch, vict, type, FIRST);
+      result = one_hit(ch, vict, type, WEAR_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
     if (fourth_attack(ch))
     {
-      result = one_hit(ch, vict, type, FIRST);
+      result = one_hit(ch, vict, type, WEAR_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
@@ -747,7 +734,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
       if (chance > number(1, 100))
       {
-        result = one_hit(ch, vict, type, FIRST);
+        result = one_hit(ch, vict, type, WEAR_WIELD);
         if (SOMEONE_DIED(result))
           return result;
       }
@@ -756,7 +743,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     {
       if (number(1, 100) < ch->has_skill(SKILL_ONSLAUGHT) / 2)
       {
-        result = one_hit(ch, vict, type, FIRST);
+        result = one_hit(ch, vict, type, WEAR_WIELD);
         if (SOMEONE_DIED(result))
           return result;
       }
@@ -764,19 +751,19 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     // if(second_wield(ch) && gets_dual_wield_attack(ch)) {
     if (gets_dual_wield_attack(ch))
     {
-      result = one_hit(ch, vict, type, SECOND);
+      result = one_hit(ch, vict, type, WEAR_SECOND_WIELD);
       if (SOMEONE_DIED(result))
         return result;
     }
 
-    int lrn = ch->has_skill(SKILL_OFFHAND_DOUBLE);
+    qint32 lrn = ch->has_skill(SKILL_OFFHAND_DOUBLE);
     if (gets_dual_wield_attack(ch) && lrn)
     {
       ch->skill_increase_check(SKILL_OFFHAND_DOUBLE, lrn, SKILL_INCREASE_HARD);
-      int p = lrn / 2 + ch->getHP() * 10 / GET_MAX_HIT(ch) - (10 - ch->has_skill(SKILL_SECOND_ATTACK) / 10);
+      qint32 p = lrn / 2 + ch->getHP() * 10 / GET_MAX_HIT(ch) - (10 - ch->has_skill(SKILL_SECOND_ATTACK) / 10);
       if (number(1, 100) <= p)
       {
-        result = one_hit(ch, vict, type, SECOND);
+        result = one_hit(ch, vict, type, WEAR_SECOND_WIELD);
         if (SOMEONE_DIED(result))
           return result;
       }
@@ -786,7 +773,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   return ReturnValue::eSUCCESS;
 } // of attack
 
-void update_flags(Character *vict)
+void update_flags(CharacterPtr vict)
 {
   if (isSet(vict->combat, COMBAT_BASH1))
   {
@@ -879,7 +866,7 @@ void update_flags(Character *vict)
   }
 }
 
-void update_stuns(Character *ch)
+void update_stuns(CharacterPtr ch)
 {
   if (isSet(ch->combat, COMBAT_SHOCKED))
   {
@@ -916,7 +903,7 @@ void update_stuns(Character *ch)
   }
 }
 
-bool do_frostshield(Character *ch, Character *vict)
+bool do_frostshield(CharacterPtr ch, CharacterPtr vict)
 {
   if (!ch || !vict)
   {
@@ -940,10 +927,10 @@ bool do_frostshield(Character *ch, Character *vict)
   }
 }
 
-int do_lightning_shield(Character *ch, Character *vict, int dam)
+qint32 do_lightning_shield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
   affected_type *cur_af;
-  int learned = 0;
+  qint32 learned = {};
 
   if (!ch || !vict)
   {
@@ -957,14 +944,14 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
     return ReturnValue::eFAILURE;
   if (!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))
     return ReturnValue::eFAILURE;
-  if (isSet(races[(int)GET_RACE(ch)].immune, ISR_ENERGY) || isSet(ch->immune, ISR_ENERGY))
+  if (isSet(races[(qint32)ch->race].immune, ISR_ENERGY) || isSet(ch->immune, ISR_ENERGY))
   {
-    dam = 0;
+    dam = {};
   }
   else
   {
     if ((cur_af = vict->affected_by_spell(SPELL_LIGHTNING_SHIELD)))
-      learned = (int)cur_af->modifier;
+      learned = (qint32)cur_af->modifier;
 
     if (learned == 0) // mob
       learned = 81;
@@ -987,12 +974,12 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
       dam /= 2;
     if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
       dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
-    int save = get_saves(ch, SAVE_TYPE_ENERGY);
+    qint32 save = get_saves(ch, SAVE_TYPE_ENERGY);
     if (number(1, 100) < save || save < 0)
     {
       if (save > 50)
         save = 50;
-      dam -= (int)(dam * (double)save / 100);
+      dam -= (qint32)(dam * (double)save / 100);
     }
   }
 
@@ -1025,7 +1012,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
 }
 
 // standard retvals
-int do_vampiric_aura(Character *ch, Character *vict)
+qint32 do_vampiric_aura(CharacterPtr ch, CharacterPtr vict)
 {
   if (!ch || !vict || ch == vict)
   {
@@ -1044,8 +1031,8 @@ int do_vampiric_aura(Character *ch, Character *vict)
   // ch just hit vict...vict has Vampiric aura up
   if (number(0, 101) < ((af->modifier) / 1.7))
   {
-    int level = MAX(1, af->modifier / 6);
-    int retval = spell_vampiric_touch(level, vict, ch, 0, af->modifier);
+    qint32 level = MAX(1, af->modifier / 6);
+    qint32 retval = spell_vampiric_touch(level, vict, ch, 0, af->modifier);
     retval = SWAP_CH_VICT(retval);
     return debug_retval(ch, vict, retval);
   }
@@ -1053,12 +1040,12 @@ int do_vampiric_aura(Character *ch, Character *vict)
 }
 
 // standard retvals
-int do_fireshield(Character *ch, Character *vict, int dam)
+qint32 do_fireshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
   affected_type *cur_af;
-  int learned = 0;
+  qint32 learned = {};
 
   if (!ch || !vict || ch == vict)
   {
@@ -1073,15 +1060,15 @@ int do_fireshield(Character *ch, Character *vict, int dam)
   if (!IS_AFFECTED(vict, AFF_FIRESHIELD))
     return ReturnValue::eFAILURE;
 
-  if (isSet(races[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
+  if (isSet(races[(qint32)ch->race].immune, ISR_FIRE) ||
       isSet(ch->immune, ISR_FIRE))
   {
-    dam = 0;
+    dam = {};
   }
   else
   {
     if ((cur_af = vict->affected_by_spell(SPELL_FIRESHIELD)))
-      learned = (int)cur_af->modifier;
+      learned = (qint32)cur_af->modifier;
 
     if (learned == 0) // mob
       learned = 81;
@@ -1104,12 +1091,12 @@ int do_fireshield(Character *ch, Character *vict, int dam)
       dam /= 2;
     if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
       dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
-    int save = get_saves(ch, SAVE_TYPE_FIRE);
+    qint32 save = get_saves(ch, SAVE_TYPE_FIRE);
     if (number(1, 100) < save || save < 0)
     {
       if (save > 50)
         save = 50;
-      dam -= (int)(dam * (double)save / 100);
+      dam -= (qint32)(dam * (double)save / 100);
     }
   }
 
@@ -1142,12 +1129,12 @@ int do_fireshield(Character *ch, Character *vict, int dam)
 }
 
 // standard retvals
-int do_acidshield(Character *ch, Character *vict, int dam)
+qint32 do_acidshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
   affected_type *cur_af;
-  int learned = 0;
+  qint32 learned = {};
 
   if (!ch || !vict || ch == vict)
   {
@@ -1162,12 +1149,12 @@ int do_acidshield(Character *ch, Character *vict, int dam)
   if (!IS_AFFECTED(vict, AFF_ACID_SHIELD))
     return ReturnValue::eFAILURE;
 
-  if (isSet(races[(int)GET_RACE(ch)].immune, ISR_ACID) || isSet(ch->immune, ISR_ACID))
-    dam = 0;
+  if (isSet(races[(qint32)ch->race].immune, ISR_ACID) || isSet(ch->immune, ISR_ACID))
+    dam = {};
   else
   {
     if ((cur_af = vict->affected_by_spell(SPELL_ACID_SHIELD)))
-      learned = (int)cur_af->modifier;
+      learned = (qint32)cur_af->modifier;
 
     if (learned == 0) // mob
       learned = 81;
@@ -1190,12 +1177,12 @@ int do_acidshield(Character *ch, Character *vict, int dam)
       dam /= 2;
     if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
       dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
-    int save = get_saves(ch, SAVE_TYPE_ACID);
+    qint32 save = get_saves(ch, SAVE_TYPE_ACID);
     if (number(1, 100) < save || save < 0)
     {
       if (save > 50)
         save = 50;
-      dam -= (int)(dam * (double)save / 100);
+      dam -= (qint32)(dam * (double)save / 100);
     }
   }
 
@@ -1227,12 +1214,12 @@ int do_acidshield(Character *ch, Character *vict, int dam)
   return ReturnValue::eSUCCESS;
 }
 
-int do_boneshield(Character *ch, Character *vict, int dam)
+qint32 do_boneshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
   affected_type *cur_af;
-  int learned = 0;
+  qint32 learned = {};
 
   if (!ch || !vict || ch == vict)
   {
@@ -1247,13 +1234,13 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   if (!vict->affected_by_spell(SPELL_BONESHIELD))
     return ReturnValue::eFAILURE;
 
-  if (isSet(races[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
+  if (isSet(races[(qint32)ch->race].immune, ISR_PHYSICAL) ||
       isSet(ch->immune, ISR_PHYSICAL))
-    dam = 0;
+    dam = {};
   else
   {
     if ((cur_af = vict->affected_by_spell(SPELL_BONESHIELD)))
-      learned = (int)cur_af->modifier;
+      learned = (qint32)cur_af->modifier;
 
     dam = learned;
 
@@ -1287,11 +1274,11 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   return ReturnValue::eSUCCESS;
 }
 
-void check_weapon_skill_bonus(Character *ch, int type, Object *wielded,
-                              int &weapon_skill_hit_bonus, int &weapon_skill_dam_bonus)
+void check_weapon_skill_bonus(CharacterPtr ch, qint32 type, ObjectPtr wielded,
+                              qint32 &weapon_skill_hit_bonus, qint32 &weapon_skill_dam_bonus)
 {
-  int specialization;
-  int skill, learned;
+  qint32 specialization;
+  qint32 skill, learned;
   switch (type)
   {
   case TYPE_BLUDGEON:
@@ -1317,8 +1304,8 @@ void check_weapon_skill_bonus(Character *ch, int type, Object *wielded,
     skill = SKILL_HAND_TO_HAND;
     break;
   default:
-    weapon_skill_hit_bonus = 0;
-    weapon_skill_dam_bonus = 0;
+    weapon_skill_hit_bonus = {};
+    weapon_skill_dam_bonus = {};
     return;
   }
   learned = ch->has_skill(skill);
@@ -1360,7 +1347,7 @@ void check_weapon_skill_bonus(Character *ch, int type, Object *wielded,
   }
 }
 
-int get_weapon_damage_type(class Object *wielded)
+qint32 get_weapon_damage_type(ObjectPtr wielded)
 {
   char log_buf[256];
 
@@ -1391,15 +1378,15 @@ int get_weapon_damage_type(class Object *wielded)
     return TYPE_PIERCE;
     break;
   default:
-    logbug(QStringLiteral("WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3.").arg(wielded->item_number).arg(wielded->Name()).arg(wielded->obj_flags.value[3]));
+    logbug(QStringLiteral("WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3.").arg(wielded->item_number).arg(wielded->name()).arg(wielded->obj_flags.value[3]));
     break;
   }
   return TYPE_HIT; // should never get here
 }
 
-int get_monk_bare_damage(Character *ch)
+qint32 get_monk_bare_damage(CharacterPtr ch)
 {
-  int dam = 0;
+  qint32 dam = {};
 
   if (ch->getLevel() < 11)
     dam = dice(4, 1);
@@ -1425,7 +1412,7 @@ int get_monk_bare_damage(Character *ch)
   return dam;
 }
 
-int calculate_paladin_damage_bonus(Character *ch, Character *victim)
+qint32 calculate_paladin_damage_bonus(CharacterPtr ch, CharacterPtr victim)
 {
   if (GET_CLASS(ch) != CLASS_PALADIN)
     return 0;
@@ -1440,17 +1427,17 @@ int calculate_paladin_damage_bonus(Character *ch, Character *victim)
 }
 
 // standard "returnvals.h" returns
-int one_hit(Character *ch, Character *vict, int type, int weapon)
+qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 {
-  class Object *wielded; /* convenience */
-  int w_type;            /* Holds type info for damage() */
-  int weapon_type;
-  int dam = 0; /* Self explan. */
-  int retval = 0;
-  int weapon_skill_hit_bonus = 0;
-  int weapon_skill_dam_bonus = 0;
+  ObjectPtr wielded; /* convenience */
+  qint32 w_type;     /* Holds type info for damage() */
+  qint32 weapon_type;
+  qint32 dam = {}; /* Self explan. */
+  qint32 retval = {};
+  qint32 weapon_skill_hit_bonus = {};
+  qint32 weapon_skill_dam_bonus = {};
 
-  extern uint8_t backstab_mult[];
+  extern quint8 backstab_mult[];
 
   if (!vict || !ch)
   {
@@ -1481,7 +1468,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   wielded = ch->equipment[weapon];
 
   // Second got called without a secondary wield
-  if (weapon == SECOND && wielded == nullptr)
+  if (weapon == WEAR_SECOND_WIELD && wielded == nullptr)
     return ReturnValue::eFAILURE;
 
   set_cantquit(ch, vict); /* This sets the flag if necessary */
@@ -1506,7 +1493,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   if (wielded)
   {
     if (ch->affected_by_spell(SKILL_SMITE) && ch->affected_by_spell(SKILL_SMITE)->victim == vict)
-      for (int i = 0; i < wielded->obj_flags.value[1]; i++)
+      for (qint32 i = {}; i < wielded->obj_flags.value[1]; i++)
         dam += wielded->obj_flags.value[2] - number(0, 1);
     else
       dam = dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]);
@@ -1544,7 +1531,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         if (type == SKILL_CIRCLE)
           dam = dam * 3 / 2; // non stabbing weapons
         else
-          dam *= ((backstab_mult[(int)ch->getLevel()]) / 2);
+          dam *= ((backstab_mult[(qint32)ch->getLevel()]) / 2);
       else
         dam *= 25;
       REMOVE_BIT(ch->combat, COMBAT_CIRCLE);
@@ -1554,7 +1541,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
     {
       if (ch->getLevel() <= MORTAL)
       {
-        dam *= backstab_mult[(int)ch->getLevel()];
+        dam *= backstab_mult[(qint32)ch->getLevel()];
       }
       else
         dam *= 25;
@@ -1578,7 +1565,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
     return debug_retval(ch, vict, retval);
 
   if (ch->has_skill(SKILL_NAT_SELECT) && ch->affected_by_spell(SKILL_NAT_SELECT))
-    if (ch->affected_by_spell(SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
+    if (ch->affected_by_spell(SKILL_NAT_SELECT)->modifier == vict->race)
       dam += 15 + ch->has_skill(SKILL_NAT_SELECT) / 10;
 
   do_combatmastery(ch, vict, weapon);
@@ -1587,7 +1574,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (w_type == TYPE_HIT && ch->isNonPlayer())
   {
-    int a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    qint32 a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     switch (a)
     {
     case 88:
@@ -1712,7 +1699,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 } // one_hit
 
 // pos of -1 means inventory
-void eq_destroyed(Character *ch, Object *obj, int pos)
+void eq_destroyed(CharacterPtr ch, ObjectPtr obj, qint32 pos)
 {
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     return;
@@ -1730,7 +1717,7 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
     }
     else if ((pos == WEAR_WIELD) && (ch->equipment[WEAR_SECOND_WIELD]))
     {
-      Object *temp;
+      ObjectPtr temp;
       temp = ch->unequip_char(WEAR_SECOND_WIELD);
       ch->equip_char(temp, WEAR_WIELD);
     }
@@ -1767,12 +1754,12 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
   extract_obj(obj);
 }
 
-void eq_damage(Character *ch, Character *victim,
-               int dam, int weapon_type, int attacktype)
+void eq_damage(CharacterPtr ch, CharacterPtr victim,
+               qint32 dam, qint32 weapon_type, qint32 attacktype)
 {
-  int count, eqdam, chance, value;
-  class Object *obj;
-  int pos;
+  qint32 count, eqdam, chance, value;
+  ObjectPtr obj;
+  qint32 pos;
 
   if (ch->room().isArena()) // Don't damage eq in arena
     return;
@@ -1872,7 +1859,7 @@ void eq_damage(Character *ch, Character *victim,
   victim->save_char_obj();
 }
 
-void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
+void pir_stat_loss(CharacterPtr victim, qint32 chance, bool heh, bool zz)
 {
   char log_buf[MAX_STRING_LENGTH] = {};
   if (victim->getLevel() < 50)
@@ -1889,7 +1876,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_STR(victim) -= 1;
         victim->raw_str -= 1;
         victim->sendln("*** You lose one strength point ***");
-        sprintf(log_buf, "%s lost a str too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a str too. ouch.", qPrintable(victim->name()));
       }
       break;
     case 2:
@@ -1898,14 +1885,14 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_WIS(victim) -= 1;
         victim->raw_wis -= 1;
         victim->sendln("*** You lose one wisdom point ***");
-        sprintf(log_buf, "%s lost a wis too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a wis too. ouch.", qPrintable(victim->name()));
       }
       break;
     case 3:
       GET_CON(victim) -= 1;
       victim->raw_con -= 1;
       victim->sendln("*** You lose one constitution point ***");
-      sprintf(log_buf, "%s lost a con too. ouch.", victim->getNameC());
+      sprintf(log_buf, "%s lost a con too. ouch.", qPrintable(victim->name()));
       break;
     case 4:
       if (GET_INT(victim) > 4)
@@ -1913,7 +1900,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_INT(victim) -= 1;
         victim->raw_intel -= 1;
         victim->sendln("*** You lose one intelligence point ***");
-        sprintf(log_buf, "%s lost a int too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a qint32 too. ouch.", qPrintable(victim->name()));
       }
       break;
     case 5:
@@ -1922,7 +1909,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
         GET_DEX(victim) -= 1;
         victim->raw_dex -= 1;
         victim->sendln("*** You lose one dexterity point ***");
-        sprintf(log_buf, "%s lost a dex too. ouch.", victim->getNameC());
+        sprintf(log_buf, "%s lost a dex too. ouch.", qPrintable(victim->name()));
       }
       break;
     } // of switch
@@ -1931,7 +1918,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
   } // of pir's extra stat loss
 }
 
-int damage_retval(Character *ch, Character *vict, int value)
+qint32 damage_retval(CharacterPtr ch, CharacterPtr vict, qint32 value)
 {
   // we need to make sure in the case of a reflect or something
   // that we are returning the death of the CH if he died
@@ -1942,7 +1929,7 @@ int damage_retval(Character *ch, Character *vict, int value)
   return value;
 }
 
-bool is_bingo(int dam, int weapon_type, int attacktype)
+bool is_bingo(qint32 dam, qint32 weapon_type, qint32 attacktype)
 {
   if (weapon_type != TYPE_UNDEFINED)
     return false;
@@ -1962,9 +1949,9 @@ bool is_bingo(int dam, int weapon_type, int attacktype)
   return false;
 }
 
-int getRealSpellDamage(Character *ch)
+qint32 getRealSpellDamage(CharacterPtr ch)
 {
-  int spell_dam;
+  qint32 spell_dam;
   switch (GET_CLASS(ch))
   {
   case CLASS_MAGE:
@@ -1990,14 +1977,14 @@ int getRealSpellDamage(Character *ch)
   return spell_dam;
 }
 
-int32_t Character::getHP(void)
+qint32 Character::getHP(void)
 {
   return hit;
 }
 
-void Character::setHP(int dam, Character *causer)
+void Character::setHP(qint32 dam, CharacterPtr causer)
 {
-  int old_hp = hit;
+  qint32 old_hp = hit;
   hit = dam;
 
   if (causer)
@@ -2008,7 +1995,7 @@ void Character::setHP(int dam, Character *causer)
   }
 }
 
-void Character::removeHP(int dam, Character *causer)
+void Character::removeHP(qint32 dam, CharacterPtr causer)
 {
   hit -= dam;
 
@@ -2030,7 +2017,7 @@ void Character::fillHPLimit(void)
   setHP(hit_limit(this));
 }
 
-void Character::addHP(int newhp, Character *causer)
+void Character::addHP(qint32 newhp, CharacterPtr causer)
 {
   hit += newhp;
   if (hit > max_hit)
@@ -2040,20 +2027,20 @@ void Character::addHP(int newhp, Character *causer)
 }
 
 // returns standard returnvals.h return codes
-int damage(Character *ch, Character *victim, int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog, Object *obj)
+qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_type, qint32 attacktype, qint32 weapon, bool is_death_prog, ObjectPtr obj)
 {
-  int can_miss = 1;
-  int32_t weapon_bit;
-  class Object *wielded;
-  int typeofdamage;
-  int damage_type(int weapon_type);
-  int32_t get_weapon_bit(int weapon_type);
-  int32_t hit_limit(Character * ch);
-  int retval = 0;
-  int modifier = 0;
-  int percent;
-  int learned;
-  int ethereal = 0;
+  qint32 can_miss = 1;
+  qint32 weapon_bit;
+  ObjectPtr wielded;
+  qint32 typeofdamage;
+  qint32 damage_type(qint32 weapon_type);
+  qint32 get_weapon_bit(qint32 weapon_type);
+  qint32 hit_limit(CharacterPtr ch);
+  qint32 retval = {};
+  qint32 modifier = {};
+  qint32 percent;
+  qint32 learned;
+  qint32 ethereal = {};
   bool reflected = false;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 
@@ -2082,7 +2069,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
                                           attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW ||
                                           attacktype == SPELL_POISON))
     return debug_retval(ch, victim, retval);
-  int l = 0;
+  qint32 l = {};
   if (dam != 0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED && attacktype != SKILL_FLAMESLASH)
   { // Skill damages based on learned %
     l = ch->has_skill(attacktype);
@@ -2099,7 +2086,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     dam = dam_percent(l, dam);
     dam = number(dam - (dam / 10), dam + (dam / 10)); // +- 10%
     if (ch->isNonPlayer())
-      dam = (int)(dam * 0.6);
+      dam = (qint32)(dam * 0.6);
   }
 
   if (!weapon)
@@ -2107,7 +2094,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
 
   // here goes le elemental stuff
 
-  extern int elemental_damage_bonus(int spell, Character *ch);
+  extern qint32 elemental_damage_bonus(qint32 spell, CharacterPtr ch);
 
   if (attacktype && attacktype < MAX_SPL_LIST && attacktype != TYPE_UNDEFINED)
     dam += elemental_damage_bonus(attacktype, ch);
@@ -2157,7 +2144,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   }
 
   learned = victim->has_skill(SKILL_MAGIC_RESIST);
-  int save = 0;
+  qint32 save = {};
   if (!imm)
     switch (weapon_type)
     {
@@ -2198,7 +2185,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     default:
       break;
     }
-  /* int v = 0;
+  /* qint32 v = {};
   if (GET_CLASS(ch) == CLASS_MAGIC_USER) {
   //spellcraft
     v = ch->has_skill( SKILL_SPELLCRAFT);
@@ -2212,13 +2199,13 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   {
     double mult = 0 - save; // Turns positive.
     mult = 1.0 + (double)mult / 100;
-    dam = (int)(dam * mult);
+    dam = (qint32)(dam * mult);
     if (reflected)
     {
       strcpy(buf3, buf);
       sprintf(buf2, "s additional damage.");
       strcat(buf, buf2);
-      sprintf(buf2, "%s is susceptible to the reflected ", GET_SHORT(ch));
+      sprintf(buf2, "%s is susceptible to the reflected ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
       sprintf(buf2, " additional damage.");
@@ -2234,13 +2221,13 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       strcat(buf, buf2);
       sprintf(buf2, " additional damage.");
       strcat(buf3, buf2);
-      sprintf(buf2, "%s is susceptible to %s's ", GET_SHORT(victim), GET_SHORT(ch));
+      sprintf(buf2, "%s is susceptible to %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-      sprintf(buf2, "%s is susceptible to your ", GET_SHORT(victim));
+      sprintf(buf2, "%s is susceptible to your ", qPrintable(victim->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_VICT, 0);
-      sprintf(buf2, "You are susceptible to %s's ", GET_SHORT(ch));
+      sprintf(buf2, "You are susceptible to %s's ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf3);
       act(buf2, victim, 0, ch, TO_CHAR, 0);
     }
@@ -2249,13 +2236,13 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   {
     if (save > 50)
       save = 50;
-    dam -= (int)(dam * (double)save / 100); // Save chance.
+    dam -= (qint32)(dam * (double)save / 100); // Save chance.
     if (reflected)
     {
       strcpy(buf3, buf);
       sprintf(buf2, "s reduced damage.");
       strcat(buf, buf2);
-      sprintf(buf2, "%s resists the reflected ", GET_SHORT(ch));
+      sprintf(buf2, "%s resists the reflected ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
       sprintf(buf2, " reduced damage.");
@@ -2271,13 +2258,13 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       strcat(buf, buf2);
       sprintf(buf2, " reduced damage.");
       strcat(buf3, buf2);
-      sprintf(buf2, "%s resists %s's ", GET_SHORT(victim), GET_SHORT(ch));
+      sprintf(buf2, "%s resists %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-      sprintf(buf2, "%s resists your ", GET_SHORT(victim));
+      sprintf(buf2, "%s resists your ", qPrintable(victim->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_VICT, 0);
-      sprintf(buf2, "You resist %s's ", GET_SHORT(ch));
+      sprintf(buf2, "You resist %s's ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf3);
       act(buf2, victim, 0, ch, TO_CHAR, 0);
     }
@@ -2287,7 +2274,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   }
   /*
   if (v) { // spellcraft damage bonus
-  int o = 0;
+  qint32 o = {};
      switch (attacktype)
      {
   case SPELL_BURNING_HANDS: o = 10; break;
@@ -2304,13 +2291,13 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
 
   if (ch->affected_by_spell(SKILL_SONG_MKING_CHARGE))
   {
-    dam = (int)(dam * 1.2); // scary!
+    dam = (qint32)(dam * 1.2); // scary!
     SET_BIT(modifier, COMBAT_MOD_FRENZY);
   }
 
   // Can't hurt god, but he likes to see the messages.
   if (victim->getLevel() >= IMMORTAL && victim->isPlayer())
-    dam = 0;
+    dam = {};
 
   if (victim != ch)
   {
@@ -2383,35 +2370,35 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL)
   {
     if (isSet(ch->combat, COMBAT_BERSERK))
-      dam = (int)(dam * 1.75);
+      dam = (qint32)(dam * 1.75);
     if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
       dam = dam * 5;
     if (isSet(ch->combat, COMBAT_RAGE1) || (isSet(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB))
-      dam = (int)(dam * 1.4);
+      dam = (qint32)(dam * 1.4);
     if (isSet(ch->combat, COMBAT_HITALL))
-      dam = (int)(dam * 2);
+      dam = (qint32)(dam * 2);
     if (isSet(ch->combat, COMBAT_ORC_BLOODLUST1))
     {
-      dam = (int)(dam * 1.7);
+      dam = (qint32)(dam * 1.7);
       //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
       //      SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
     if (isSet(ch->combat, COMBAT_ORC_BLOODLUST2))
     {
-      dam = (int)(dam * 1.7);
+      dam = (qint32)(dam * 1.7);
       //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
-    percent = (int)((((float)ch->getHP()) / ((float)GET_MAX_HIT(ch))) * 100);
+    percent = (qint32)((((float)ch->getHP()) / ((float)GET_MAX_HIT(ch))) * 100);
     if (percent < 40 && (learned = ch->has_skill(SKILL_FRENZY)))
     {
       if (skill_success(ch, victim, SKILL_FRENZY))
       {
-        dam = (int)(dam * 1.2);
+        dam = (qint32)(dam * 1.2);
         SET_BIT(modifier, COMBAT_MOD_FRENZY);
       }
     }
     if (isSet(ch->combat, COMBAT_VITAL_STRIKE))
-      dam = (int)(dam * 2.5);
+      dam = (qint32)(dam * 2.5);
 
     // we do this AFTER all the multipliers but BEFORE all the reducers
     // to make it cause the smallest impact
@@ -2437,17 +2424,17 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   // sanct damage now 35% for all caster aligns
   if (IS_AFFECTED(victim, AFF_SANCTUARY) && dam > 0)
   {
-    int mod = victim->affected_by_spell(SPELL_SANCTUARY) ? victim->affected_by_spell(SPELL_SANCTUARY)->modifier : 35;
-    dam -= (int)(float)((float)dam * ((float)mod / 100.0));
+    qint32 mod = victim->affected_by_spell(SPELL_SANCTUARY) ? victim->affected_by_spell(SPELL_SANCTUARY)->modifier : 35;
+    dam -= (qint32)(float)((float)dam * ((float)mod / 100.0));
   }
   if (isSet(victim->combat, COMBAT_MONK_STANCE) && dam > 0) // half damage
     dam /= 2;
-  int reduce = 0, type = 0;
+  qint32 reduce = 0, type = {};
   if (can_miss == 1)
   {
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
     {
-      int retval2 = 0;
+      qint32 retval2 = {};
 
       retval2 = isHit(ch, victim, attacktype, type, reduce);
       if (SOMEONE_DIED(retval2)) // Riposte
@@ -2464,12 +2451,12 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
         case 1:
         case 2:
           SET_BIT(modifier, COMBAT_MOD_REDUCED);
-          dam -= (int)((float)dam * ((float)reduce / 100));
+          dam -= (qint32)((float)dam * ((float)reduce / 100));
           break;
           // Shield block or Mdefense or tumbling partial avoid
 
         case 3:
-          dam = 0; // Miss!
+          dam = {}; // Miss!
           break;
         default:
           return ReturnValue::eFAILURE; // Shouldn't happen
@@ -2489,14 +2476,14 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     if((reduce = check_shieldblock(ch, victim, attacktype)))
      {
   SET_BIT(modifier, COMBAT_MOD_REDUCED);
-  dam -= (int)((float) dam * ((float)reduce/100));
+  dam -= (qint32)((float) dam * ((float)reduce/100));
      }
    */
 
       if ((learned = ch->has_skill(SKILL_CRIT_HIT)) && dam)
         if (number(1, 101) <= learned / 10 + GET_DEX(ch) - GET_DEX(victim))
         {
-          dam += (int)(dam * (float)(2 + learned / 5) / 100);
+          dam += (qint32)(dam * (float)(2 + learned / 5) / 100);
           act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
           act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
           act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -2514,14 +2501,14 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   }*/
     if (attacktype <= MAX_SPL_LIST && attacktype != TYPE_UNDEFINED)
     {
-      int reduce = 0;
+      qint32 reduce = {};
       if ((reduce = check_magic_block(ch, victim, attacktype)))
       {
         if (GET_CLASS(victim) != CLASS_MONK && victim->isPlayer())
         {
           if (number(1, 100) <= MAX(1, dam / 150))
           {
-            int eqdam = damage_eq_once(victim->equipment[WEAR_SHIELD]);
+            qint32 eqdam = damage_eq_once(victim->equipment[WEAR_SHIELD]);
             if (victim->equipment[WEAR_SHIELD])
             {
               if (DC::getInstance()->obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
@@ -2536,15 +2523,15 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
             }
           }
         }
-        dam -= (int)((float)dam * ((float)reduce / 100));
+        dam -= (qint32)((float)dam * ((float)reduce / 100));
       }
     } // spellblock
 
   } // can_miss
 
-  int pre_stoneshield_dam = 0;
+  qint32 pre_stoneshield_dam = {};
   std::stringstream string1;
-  affected_type *pspell = nullptr;
+  affected_type *pspell = {};
   if (!victim->isImmortalPlayer() && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = victim->affected_by_spell(SPELL_STONE_SHIELD)) ||
        (pspell = victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))))
@@ -2554,7 +2541,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     {
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
-      csendf(victim, "Your stones absorb %d damage allowing %d through.\r\n", pspell->modifier, dam);
+      victim->send(QStringLiteral("Your stones absorb %d damage allowing %d through.\r\n").arg(pspell->modifier).arg(dam));
       string1 << "Your attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
       act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
       string1.clear();
@@ -2584,7 +2571,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   }
 
   if (dam < 0)
-    dam = 0;
+    dam = {};
 
   // Immune / Susceptibilities / Resistances
   // Some code is in saves_spell  (for obvious reasons)
@@ -2627,7 +2614,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
 
   if (isSet(victim->immune, weapon_bit))
   {
-    dam = 0;
+    dam = {};
     SET_BIT(retval, ReturnValue::eIMMUNE_VICTIM);
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
     {
@@ -2640,7 +2627,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     //    magic stuff is handled elsewhere
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
     {
-      dam = (int)(dam * 1.3);
+      dam = (qint32)(dam * 1.3);
       SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
     }
   }
@@ -2649,16 +2636,16 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     //    magic stuff is handled elsewhere
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
     {
-      dam = (int)(dam * 0.7);
+      dam = (qint32)(dam * 0.7);
       SET_BIT(modifier, COMBAT_MOD_RESIST);
     }
   }
   if (dam < 0)
-    dam = 0;
+    dam = {};
 
-  percent = (int)((((float)victim->getHP()) /
-                   ((float)GET_MAX_HIT(victim))) *
-                  100);
+  percent = (qint32)((((float)victim->getHP()) /
+                      ((float)GET_MAX_HIT(victim))) *
+                     100);
   if (percent < 40 && (learned = victim->has_skill(SKILL_FRENZY)))
   {
     switch (attacktype)
@@ -2701,7 +2688,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
             "$n's spell!",
             ch, 0, victim, TO_ROOM, NOTVICT);
 
-        dam = (int)(dam * (double)(number(45, 55) / 100.0));
+        dam = (qint32)(dam * (double)(number(45, 55) / 100.0));
       }
       break;
     }
@@ -2764,21 +2751,21 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
 
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL && type == 1 && reduce > 0 && dam > 0 && ch != victim)
   { // Shieldblock riposte..
-    int retval2 = check_riposte(ch, victim, attacktype);
+    qint32 retval2 = check_riposte(ch, victim, attacktype);
     if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
   }
 
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL && type == 2 && reduce > 0 && dam > 0 && ch != victim)
   { // Martial Defense Counter Strike..
-    int retval2 = checkCounterStrike(ch, victim);
+    qint32 retval2 = checkCounterStrike(ch, victim);
     if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
   }
 
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim && attacktype != SKILL_ARCHERY && !is_death_prog)
   {
-    int retval2;
+    qint32 retval2;
     retval2 = do_fireshield(ch, victim, MAX(pre_stoneshield_dam, dam));
     if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
@@ -2864,17 +2851,16 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
 
 // this function deals damage in noncombat situations (falls, drowning, etc.)
 // returns standard returnvals.h return codes
-int noncombat_damage(Character *ch, int dam, char *char_death_msg,
-                     char *room_death_msg, char *death_log_msg, int type)
+qint32 noncombat_damage(CharacterPtr ch, qint32 dam, const char *char_death_msg, const char *room_death_msg, const char *death_log_msg, qint32 type)
 {
-  int kill_type = TYPE_CHOOSE;
+  qint32 kill_type = TYPE_CHOOSE;
 
   if (IS_AFFECTED(ch, AFF_EAS))
     dam /= 4;
   if (IS_AFFECTED(ch, AFF_SANCTUARY))
   {
-    int mod = ch->affected_by_spell(SPELL_SANCTUARY) ? ch->affected_by_spell(SPELL_SANCTUARY)->modifier : 35;
-    dam -= (int)(float)((float)dam * ((float)mod / 100.0));
+    qint32 mod = ch->affected_by_spell(SPELL_SANCTUARY) ? ch->affected_by_spell(SPELL_SANCTUARY)->modifier : 35;
+    dam -= (qint32)(float)((float)dam * ((float)mod / 100.0));
   }
   if (ch->affected_by_spell(SPELL_HOLY_AURA) && ch->affected_by_spell(SPELL_HOLY_AURA)->modifier == 50 && (type == KILL_DROWN || type == KILL_FALL))
     dam /= 2;
@@ -2907,9 +2893,9 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
   }
 }
 
-int is_pkill(Character *ch, Character *vict)
+qint32 is_pkill(CharacterPtr ch, CharacterPtr vict)
 {
-  Character *tmp_ch;
+  CharacterPtr tmp_ch;
 
   // TODO - change this so a mob following another mob isn't a pkill
 
@@ -2945,18 +2931,18 @@ int is_pkill(Character *ch, Character *vict)
   return false;
 }
 
-void send_damage(QString buf, Character *ch, Object *obj, Character *victim, QString dmg, QString buf2, int to)
+void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victim, QString dmg, QString buf2, qint32 to)
 {
   send_damage(qPrintable(buf), ch, obj, victim, qPrintable(dmg), qPrintable(buf2), to);
 }
 
-void send_damage(char const *buf, Character *ch, Object *obj, Character *victim, char const *dmg, char const *buf2, int to)
+void send_damage(char const *buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victim, char const *dmg, char const *buf2, qint32 to)
 {
-  Character *tmpch;
+  CharacterPtr tmpch;
   char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH];
 
-  int i, z = 0, y = 0;
-  for (i = 0; i <= (int)strlen(buf); i++)
+  qint32 i, z = 0, y = {};
+  for (i = {}; i <= (qint32)strlen(buf); i++)
   {
     if (*(buf + i) == '|')
     {
@@ -3009,15 +2995,15 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
     else
       send_tokens(tokens2, ch, obj, victim, 0, victim);
   }
-  delete tokens;
-  delete tokens2;
+  tokens = {};
+  tokens2 = {};
 }
 
-void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int weapon, int filter)
+void do_dam_msgs(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 attacktype, qint32 weapon, qint32 filter)
 {
   extern message_list fight_messages[MAX_MESSAGES];
   message_type *messages, *messages2;
-  int i, j, nr;
+  qint32 i, j, nr;
   QString find, replace;
 
   if (is_bingo(dam, weapon, attacktype))
@@ -3060,7 +3046,7 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
     }
   }
 
-  for (i = 0; i < MAX_MESSAGES; i++)
+  for (i = {}; i < MAX_MESSAGES; i++)
   {
     if (fight_messages[i].a_type != attacktype)
       continue;
@@ -3126,13 +3112,13 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
   }
 }
 
-void set_cantquit(Character *ch, Character *vict, bool forced)
+void set_cantquit(CharacterPtr ch, CharacterPtr vict, bool forced)
 {
   affected_type af, *paf;
-  Character *realch;
-  Character *realvict;
-  int ch_vnum = -1;
-  int vict_vnum = -1;
+  CharacterPtr realch;
+  CharacterPtr realvict;
+  qint32 ch_vnum = -1;
+  qint32 vict_vnum = -1;
 
   if (!ch || !vict)
     return; /* This will happen if the char was in a fall room */
@@ -3172,12 +3158,12 @@ void set_cantquit(Character *ch, Character *vict, bool forced)
   {
     af.type = Character::PLAYER_CANTQUIT;
     af.duration = 5;
-    af.modifier = 0;
+    af.modifier = {};
     af.location = APPLY_NONE;
     af.bitvector = AFF_CANTQUIT;
-    if (realvict && GET_NAME(realvict))
+    if (realvict && qPrintable(realvict->name()))
     {
-      af.caster = GET_NAME(realvict);
+      af.caster = qPrintable(realvict->name());
     }
 
     if (!ISSET(realch->affected_by, AFF_CANTQUIT))
@@ -3193,7 +3179,7 @@ void set_cantquit(Character *ch, Character *vict, bool forced)
   }
 }
 
-void fight_kill(Character *ch, Character *vict, int type, int spec_type)
+void fight_kill(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 spec_type)
 {
   if (!vict)
   {
@@ -3210,7 +3196,7 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
     stop_fighting(ch);
 
   // loop through world and stop anyone else that was fighting vict from fighting
-  Character *ich, *next_ich;
+  CharacterPtr ich, next_ich;
   for (ich = combat_list; ich; ich = next_ich)
   {
     next_ich = ich->next_fighting;
@@ -3245,16 +3231,16 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
   }
 }
 
-QString translate_name(const Character *ch)
+QString translate_name(const CharacterPtr ch)
 {
   if (ch->isNonPlayer())
   {
-    return QStringLiteral("%1(v%2)").arg(GET_NAME(ch)).arg(DC::getInstance()->mob_index[ch->mobdata->nr].vnum());
+    return QStringLiteral("%1(v%2)").arg(qPrintable(ch->name())).arg(DC::getInstance()->mob_index[ch->mobdata->nr].vnum());
   }
-  return GET_NAME(ch);
+  return qPrintable(ch->name());
 }
 
-void debug_isHit(const Character *ch, const Character *victim, const int &attacktype, const int &type, const int &reduce, const int &tohit, const QString message = QString())
+void debug_isHit(const CharacterPtr ch, const CharacterPtr victim, const qint32 &attacktype, const qint32 &type, const qint32 &reduce, const qint32 &tohit, const QString message = QString())
 {
   if (ch->getDebug() || victim->getDebug())
   {
@@ -3262,7 +3248,7 @@ void debug_isHit(const Character *ch, const Character *victim, const int &attack
   }
 }
 
-void debug_isHit_toHit(const Character *ch, const Character *victim, const int &toHit)
+void debug_isHit_toHit(const CharacterPtr ch, const CharacterPtr victim, const qint32 &toHit)
 {
   if (ch->getDebug() || victim->getDebug())
   {
@@ -3270,7 +3256,7 @@ void debug_isHit_toHit(const Character *ch, const Character *victim, const int &
   }
 }
 
-void debug_isHit_generic(const Character *ch, const Character *victim, const auto &parry, const auto &dodge, const auto &block, const auto &martial, const auto &tumbling)
+void debug_isHit_generic(const CharacterPtr ch, const CharacterPtr victim, const auto &parry, const auto &dodge, const auto &block, const auto &martial, const auto &tumbling)
 {
   if (ch->getDebug() || victim->getDebug())
   {
@@ -3279,7 +3265,7 @@ void debug_isHit_generic(const Character *ch, const Character *victim, const aut
 }
 
 // New toHit code
-int isHit(Character *ch, Character *victim, int attacktype, int &type, int &reduce)
+qint32 isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type, qint32 &reduce)
 {
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
       (isSet(victim->combat, COMBAT_STUNNED2)) ||
@@ -3295,10 +3281,10 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   }
 
   level_diff_t level_difference = ch->getLevel() - victim->getLevel();
-  int skill = 0;
+  qint32 skill = {};
 
   // Figure out toHit value.
-  int toHit = GET_REAL_HITROLL(ch);
+  qint32 toHit = GET_REAL_HITROLL(ch);
   debug_isHit_toHit(ch, victim, toHit);
   //  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
 
@@ -3336,12 +3322,12 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 
   if (isSet(ch->combat, COMBAT_BERSERK) || IS_AFFECTED(ch, AFF_PRIMAL_FURY))
   {
-    toHit = (int)((float)toHit * 0.90) - 5;
+    toHit = (qint32)((float)toHit * 0.90) - 5;
     debug_isHit_toHit(ch, victim, toHit);
   }
   else if (isSet(ch->combat, COMBAT_RAGE1) || isSet(ch->combat, COMBAT_RAGE2))
   {
-    toHit = (int)((float)toHit * 0.95) - 2;
+    toHit = (qint32)((float)toHit * 0.95) - 2;
     debug_isHit_toHit(ch, victim, toHit);
   }
 
@@ -3378,7 +3364,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   float lowlvlmod = (50.0 - ch->getLevel() - (victim->getLevel() / 2.0)) / 10.0;
   if (lowlvlmod > 1.0)
   {
-    toHit = (int)((float)toHit * lowlvlmod);
+    toHit = (qint32)((float)toHit * lowlvlmod);
     debug_isHit_toHit(ch, victim, toHit);
   }
 
@@ -3390,24 +3376,24 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   // "percent" now contains the maximum avoidance rate. If they do not have two maxed defensive skills, it will actually be less.
 
   // Determine defensive skills.
-  int parry = victim->isNonPlayer() ? ISSET(victim->mobdata->actflags, ACT_PARRY) ? victim->getLevel() / 2 : 0 : victim->has_skill(SKILL_PARRY);
-  int dodge = victim->isNonPlayer() ? ISSET(victim->mobdata->actflags, ACT_DODGE) ? victim->getLevel() / 2 : 0 : victim->has_skill(SKILL_DODGE);
-  int block = victim->has_skill(SKILL_SHIELDBLOCK);
-  int martial = victim->has_skill(SKILL_DEFENSE);
-  int tumbling = victim->has_skill(SKILL_TUMBLING);
+  qint32 parry = victim->isNonPlayer() ? ISSET(victim->mobdata->actflags, ACT_PARRY) ? victim->getLevel() / 2 : 0 : victim->has_skill(SKILL_PARRY);
+  qint32 dodge = victim->isNonPlayer() ? ISSET(victim->mobdata->actflags, ACT_DODGE) ? victim->getLevel() / 2 : 0 : victim->has_skill(SKILL_DODGE);
+  qint32 block = victim->has_skill(SKILL_SHIELDBLOCK);
+  qint32 martial = victim->has_skill(SKILL_DEFENSE);
+  qint32 tumbling = victim->has_skill(SKILL_TUMBLING);
 
   debug_isHit_generic(ch, victim, parry, dodge, block, martial, tumbling);
 
   if (victim->equipment[WEAR_WIELD] == nullptr)
-    parry = 0;
+    parry = {};
 
   if (!victim->equipment[WEAR_SHIELD])
-    block = 0;
+    block = {};
   else if (victim->isNonPlayer())
     block = victim->getLevel() / 2;
 
   // Modify defense rate accordingly
-  int amt = parry + dodge + block + martial + tumbling;
+  qint32 amt = parry + dodge + block + martial + tumbling;
 
   float scale = (float)amt / (196.0); // Mobs can get a bonus if they can perform 3+.
 
@@ -3425,7 +3411,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     victim->skill_increase_check(SKILL_TUMBLING, tumbling, SKILL_INCREASE_HARD + 500);
 
   // Ze random stuff.
-  if (number(1, 100) < (int)percent && !isSet(victim->combat, COMBAT_BLADESHIELD1) && !isSet(victim->combat, COMBAT_BLADESHIELD2))
+  if (number(1, 100) < (qint32)percent && !isSet(victim->combat, COMBAT_BLADESHIELD1) && !isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     debug_isHit(ch, victim, attacktype, type, reduce, toHit, QStringLiteral("Ze random stuff percent=%1").arg(percent));
     return ReturnValue::eFAILURE;
@@ -3435,8 +3421,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 
   amt += 8; // Chance for a pure miss.
 
-  int what = number(0, amt);
-  int retval = 0;
+  qint32 what = number(0, amt);
+  qint32 retval = {};
 
   if (what < parry || isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   { // Parry. Riposte-check goes here.
@@ -3512,9 +3498,9 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 // check counter strike never returns ReturnValue::eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
-int checkCounterStrike(Character *ch, Character *victim)
+qint32 checkCounterStrike(CharacterPtr ch, CharacterPtr victim)
 {
-  int retval, lvl = victim->has_skill(SKILL_COUNTER_STRIKE);
+  qint32 retval, lvl = victim->has_skill(SKILL_COUNTER_STRIKE);
 
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
       (victim->equipment[WEAR_WIELD] != nullptr) ||
@@ -3528,7 +3514,7 @@ int checkCounterStrike(Character *ch, Character *victim)
       (isSet(ch->combat, COMBAT_BLADESHIELD2)))
     return ReturnValue::eFAILURE;
 
-  int p = lvl / 2 - (100 - victim->has_skill(SKILL_DEFENSE)) - GET_DEX(ch) + victim->getHP() * 10 / GET_MAX_HIT(victim);
+  qint32 p = lvl / 2 - (100 - victim->has_skill(SKILL_DEFENSE)) - GET_DEX(ch) + victim->getHP() * 10 / GET_MAX_HIT(victim);
 
   victim->skill_increase_check(SKILL_COUNTER_STRIKE, lvl, SKILL_INCREASE_HARD);
 
@@ -3562,7 +3548,7 @@ int checkCounterStrike(Character *ch, Character *victim)
     break;
   }
 
-  retval = one_hit(victim, ch, TYPE_HIT, FIRST);
+  retval = one_hit(victim, ch, TYPE_HIT, WEAR_WIELD);
   retval = SWAP_CH_VICT(retval);
 
   REMOVE_BIT(retval, ReturnValue::eSUCCESS);
@@ -3574,9 +3560,9 @@ int checkCounterStrike(Character *ch, Character *victim)
 // check counter strike never returns ReturnValue::eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
-int doTumblingCounterStrike(Character *ch, Character *victim)
+qint32 doTumblingCounterStrike(CharacterPtr ch, CharacterPtr victim)
 {
-  int retval;
+  qint32 retval;
 
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
       (isSet(victim->combat, COMBAT_STUNNED2)) ||
@@ -3606,7 +3592,7 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
     break;
   }
 
-  retval = one_hit(victim, ch, TYPE_HIT, FIRST);
+  retval = one_hit(victim, ch, TYPE_HIT, WEAR_WIELD);
   retval = SWAP_CH_VICT(retval);
 
   REMOVE_BIT(retval, ReturnValue::eSUCCESS);
@@ -3618,9 +3604,9 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
 // check riposte never returns ReturnValue::eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
-int check_riposte(Character *ch, Character *victim, int attacktype)
+qint32 check_riposte(CharacterPtr ch, CharacterPtr victim, qint32 attacktype)
 {
-  int retval;
+  qint32 retval;
 
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
       (ch->equipment[WEAR_WIELD] == nullptr && number(1, 101) >= 50) ||
@@ -3650,7 +3636,7 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
     }
     else
     {
-      int modifier = 0;
+      qint32 modifier = {};
 
       modifier += speciality_bonus(ch, attacktype, victim->getLevel());
       modifier -= GET_DEX(ch) / 2;
@@ -3667,7 +3653,7 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
   act("$n turns your attack against you!", victim, nullptr, ch, TO_VICT, 0);
   act("You turn $N's attack against $M.", victim, nullptr, ch, TO_CHAR, 0);
 
-  retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+  retval = one_hit(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
   retval = SWAP_CH_VICT(retval);
 
   REMOVE_BIT(retval, ReturnValue::eSUCCESS);
@@ -3676,9 +3662,9 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
   return debug_retval(ch, victim, retval);
 }
 
-int check_magic_block(Character *ch, Character *victim, int attacktype)
+qint32 check_magic_block(CharacterPtr ch, CharacterPtr victim, qint32 attacktype)
 {
-  int reduce = 0;
+  qint32 reduce = {};
   if (victim->equipment[WEAR_SHIELD] == nullptr && GET_CLASS(victim) != CLASS_MONK)
     return 0;
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
@@ -3698,8 +3684,8 @@ int check_magic_block(Character *ch, Character *victim, int attacktype)
   else if (!((reduce = victim->has_skill(SKILL_DEFENSE)) && GET_CLASS(victim) == CLASS_MONK))
     return 0;
 
-  int skill = reduce / 10;
-  reduce = (int)((float)reduce * 0.75);
+  qint32 skill = reduce / 10;
+  reduce = (qint32)((float)reduce * 0.75);
 
   if (number(1, 101) > skill)
     return 0;
@@ -3714,15 +3700,15 @@ int check_magic_block(Character *ch, Character *victim, int attacktype)
     act("$n manages to avoid taking a direct hit from $N's spell!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     act("$n avoids part of your spell!", victim, nullptr, ch, TO_VICT, 0);
     act("Your martial defense allows you to avoid a direct hit from $N's spell!", victim, nullptr, ch, TO_CHAR, 0);
-    reduce = (int)((float)reduce / 1.25);
+    reduce = (qint32)((float)reduce / 1.25);
   }
   return reduce;
 }
 
-int check_shieldblock(Character *ch, Character *victim, int attacktype)
+qint32 check_shieldblock(CharacterPtr ch, CharacterPtr victim, qint32 attacktype)
 {
-  int modifier = 0;
-  int reduce = 0;
+  qint32 modifier = {};
+  qint32 reduce = {};
   if (victim->equipment[WEAR_SHIELD] == nullptr && GET_CLASS(victim) != CLASS_MONK)
     return 0;
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
@@ -3751,7 +3737,7 @@ int check_shieldblock(Character *ch, Character *victim, int attacktype)
     case CLASS_RANGER:
     case CLASS_BARBARIAN:
     case CLASS_THIEF:
-      modifier = 0;
+      modifier = {};
       break;
     default:
       modifier = -5;
@@ -3764,7 +3750,7 @@ int check_shieldblock(Character *ch, Character *victim, int attacktype)
     return 0;
   modifier += speciality_bonus(ch, attacktype, victim->getLevel());
 
-  //  extern int stat_mod[];
+  //  extern qint32 stat_mod[];
   // modifier -= stat_mod[GET_DEX(ch)];
 
   //  if (victim->isNonPlayer()) modifier -= 50;
@@ -3790,14 +3776,14 @@ int check_shieldblock(Character *ch, Character *victim, int attacktype)
       act("You swiftly deflect $N's attack.",victim, nullptr, ch, TO_CHAR, 0);
     }*/
   if (GET_CLASS(victim) == CLASS_MONK)
-    reduce = (int)((float)reduce / 1.25);
+    reduce = (qint32)((float)reduce / 1.25);
 
   return reduce;
 }
 
-bool check_parry(Character *ch, Character *victim, int attacktype, bool display_results)
+bool check_parry(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, bool display_results)
 {
-  int modifier = 0;
+  qint32 modifier = {};
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
       (victim->equipment[WEAR_WIELD] == nullptr) ||
       (victim->isNonPlayer() && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
@@ -3849,7 +3835,7 @@ bool check_parry(Character *ch, Character *victim, int attacktype, bool display_
       modifier = -5;
       break;
     default:
-      modifier = 0;
+      modifier = {};
       break;
     }
   }
@@ -3880,10 +3866,10 @@ bool check_parry(Character *ch, Character *victim, int attacktype, bool display_
   return true;
 }
 
-int speciality_bonus(Character *ch, int attacktype, int level)
+qint32 speciality_bonus(CharacterPtr ch, qint32 attacktype, qint32 level)
 {
-  int skill = 0;
-  /*  int w_type = TYPE_HIT;
+  qint32 skill = {};
+  /*  qint32 w_type = TYPE_HIT;
     if(wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
        w_type = get_weapon_damage_type(wielded);*/
   switch (attacktype)
@@ -3919,25 +3905,25 @@ int speciality_bonus(Character *ch, int attacktype, int level)
     return ch->has_skill(skill) / 10;
 
   if (level < -20 && ch->isNonPlayer())
-    return 0 - (int)(ch->getLevel() / 2.4);
+    return 0 - (qint32)(ch->getLevel() / 2.4);
   else if (level < -10 && ch->isNonPlayer())
-    return 0 - (int)(ch->getLevel() / 2.6);
+    return 0 - (qint32)(ch->getLevel() / 2.6);
   else if (level < 0 && ch->isNonPlayer())
-    return 0 - (int)(ch->getLevel() / 2.8);
+    return 0 - (qint32)(ch->getLevel() / 2.8);
   else if (ch->isNonPlayer())
-    return 0 - (int)(ch->getLevel() / 3.5);
+    return 0 - (qint32)(ch->getLevel() / 3.5);
 
-  int l = ch->has_skill(skill) / 2;
+  qint32 l = ch->has_skill(skill) / 2;
   return 0 - l;
 }
 
 /*
  * Check for dodge.
  */
-bool check_dodge(Character *ch, Character *victim, int attacktype, bool display_results)
+bool check_dodge(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, bool display_results)
 {
-  //  int chance;
-  int modifier = 0;
+  //  qint32 chance;
+  qint32 modifier = {};
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
       (isSet(victim->combat, COMBAT_STUNNED2)) ||
       (isSet(victim->combat, COMBAT_BASH1)) ||
@@ -3986,11 +3972,11 @@ bool check_dodge(Character *ch, Character *victim, int attacktype, bool display_
       modifier = -5;
       break;
     default:
-      modifier = 0;
+      modifier = {};
       break;
     }
     if (!ISSET(victim->mobdata->actflags, ACT_DODGE))
-      modifier = 0; // damned mobs
+      modifier = {}; // damned mobs
     else if (modifier == 0)
       modifier = 5;
   }
@@ -4020,10 +4006,10 @@ bool check_dodge(Character *ch, Character *victim, int attacktype, bool display_
 /*
  * Load fighting messages into memory.
  */
-void load_messages(char *file, int base)
+void load_messages(const char *file, qint32 base)
 {
   FILE *fl;
-  int i, type;
+  qint32 i, type;
   extern message_list fight_messages[MAX_MESSAGES];
   message_type *messages;
   char chk[100];
@@ -4034,12 +4020,12 @@ void load_messages(char *file, int base)
     exit(0);
   }
   if (base == 0)
-    for (i = 0; i < MAX_MESSAGES; i++)
+    for (i = {}; i < MAX_MESSAGES; i++)
     {
-      fight_messages[i].a_type = 0;
-      fight_messages[i].number_of_attacks = 0;
-      fight_messages[i].msg = 0;
-      fight_messages[i].msg2 = 0;
+      fight_messages[i].a_type = {};
+      fight_messages[i].number_of_attacks = {};
+      fight_messages[i].msg = {};
+      fight_messages[i].msg2 = {};
     }
 
   fscanf(fl, "%s\n", chk);
@@ -4048,8 +4034,8 @@ void load_messages(char *file, int base)
   {
     fscanf(fl, " %d\n", &type);
     //     type += base;
-    for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
-                (fight_messages[i].a_type);
+    for (i = {}; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
+                 (fight_messages[i].a_type);
          i++)
       ;
     //     if (type == 80)
@@ -4060,13 +4046,7 @@ void load_messages(char *file, int base)
       exit(0);
     }
 
-#ifdef LEAK_CHECK
-    messages = (message_type *)
-        calloc(1, sizeof(message_type));
-#else
-    messages = (message_type *)
-        dc_alloc(1, sizeof(message_type));
-#endif
+    messages = new message_type;
     if (!base)
       fight_messages[i].number_of_attacks++;
     fight_messages[i].a_type = type;
@@ -4101,14 +4081,14 @@ void load_messages(char *file, int base)
 void DC::free_messages_from_memory(void)
 {
   extern message_list fight_messages[MAX_MESSAGES];
-  message_type *next_message = nullptr;
-  int i;
+  message_type *next_message = {};
+  qint32 i;
 
-  for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type); i++)
+  for (i = {}; (i < MAX_MESSAGES) && (fight_messages[i].a_type); i++)
     while (fight_messages[i].msg)
     {
       next_message = fight_messages[i].msg->next;
-      dc_free(fight_messages[i].msg);
+      fight_messages[i].msg = {};
       fight_messages[i].msg = next_message;
     }
 }
@@ -4116,7 +4096,7 @@ void DC::free_messages_from_memory(void)
 /*
  * Set position of a victim.
  */
-void update_pos(Character *victim)
+void update_pos(CharacterPtr victim)
 {
   if (victim->getHP() > 0)
   {
@@ -4132,10 +4112,10 @@ void update_pos(Character *victim)
 /*
  * Start fights.
  */
-void set_fighting(Character *ch, Character *vict)
+void set_fighting(CharacterPtr ch, CharacterPtr vict)
 {
-  Character *k, *next_char;
-  int count = 0;
+  CharacterPtr k, next_char;
+  qint32 count = {};
 
   if (ch->fighting) /* If he's already fighting */
     return;
@@ -4146,12 +4126,12 @@ void set_fighting(Character *ch, Character *vict)
 
   if (ch->isPlayer() && vict->isNonPlayer())
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID))
-      vict->add_memory(GET_NAME(ch), 'h');
+      vict->add_memory(qPrintable(ch->name()), 'h');
 
   if (ch->isNonPlayer() && vict->isNonPlayer() && IS_AFFECTED(ch, AFF_CHARM) &&
       ch->master && ch->master->isPlayer())
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID))
-      vict->add_memory(GET_NAME(ch->master), 'h');
+      vict->add_memory(qPrintable(ch->master->name()), 'h');
 
   if (ch->isPlayer() && vict->isNonPlayer())
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID) && vict->hunting.isEmpty())
@@ -4159,7 +4139,7 @@ void set_fighting(Character *ch, Character *vict)
       level_diff_t level_difference = ch->getLevel() - (vict->getLevel() / 2.0);
       if (level_difference > 0 || ch->getLevel() == 60)
       {
-        vict->add_memory(GET_NAME(ch), 't');
+        vict->add_memory(qPrintable(ch->name()), 't');
         timer_data *timer = new timer_data;
         timer->var_arg1 = vict->hunting;
         timer->arg2 = (void *)vict;
@@ -4174,7 +4154,7 @@ void set_fighting(Character *ch, Character *vict)
           level_diff_t level_difference = vict->getLevel() - (ch->getLevel() / 2);
           if (level_difference > 0 || vict->getLevel() == 60)
           {
-            ch->add_memory(vict->getName(), 't');
+            ch->add_memory(vict->name(), 't');
             timer_data *timer = new timer_data;
             timer->var_arg1 = ch->hunting;
             timer->arg2 = (void *)ch;
@@ -4213,14 +4193,12 @@ void set_fighting(Character *ch, Character *vict)
       (!isSet(ch->combat, COMBAT_BASH1)) &&
       (!isSet(ch->combat, COMBAT_BASH2)))
     ch->setPOSFighting();
-
-  return;
 }
 
 // Stop fights.
-void stop_fighting(Character *ch, int clearlag)
+void stop_fighting(CharacterPtr ch, qint32 clearlag)
 {
-  Character *tmp;
+  CharacterPtr tmp;
 
   if (!ch)
   {
@@ -4317,7 +4295,7 @@ void stop_fighting(Character *ch, int clearlag)
 
   // Remove ch's lag if he wasn't using wimpy.
   if (ch->isPlayer() && ch->desc && !isSet(ch->player->toggles, Player::PLR_WIMPY) && clearlag)
-    ch->desc->wait = 0;
+    ch->desc->wait = {};
 
   if (ch == combat_next_dude)
     combat_next_dude = ch->next_fighting;
@@ -4338,8 +4316,8 @@ void stop_fighting(Character *ch, int clearlag)
     tmp->next_fighting = ch->next_fighting;
   }
 
-  ch->next_fighting = 0;
-  ch->fighting = 0;
+  ch->next_fighting = {};
+  ch->fighting = {};
 
   if (isSet(ch->combat, COMBAT_BASH1))
     REMOVE_BIT(ch->combat, COMBAT_BASH1);
@@ -4356,7 +4334,7 @@ void stop_fighting(Character *ch, int clearlag)
 
   ch->last_damage = time(nullptr);
 
-  uint64_t fight_length = ch->last_damage - ch->first_damage;
+  quint64 fight_length = ch->last_damage - ch->first_damage;
   if (fight_length < 1)
   {
     fight_length = 1;
@@ -4366,64 +4344,60 @@ void stop_fighting(Character *ch, int clearlag)
   auto showdps = ch->getSetting("fighting.showdps", "0");
   if (showdps == "1" || showdps.startsWith('t', Qt::CaseInsensitive))
   {
-    csendf(ch, "You caused %lu damage over %lu seconds with DPS of %lu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
+    ch->send(QStringLiteral("You caused %lu damage over %lu seconds with DPS of %lu.\r\n").arg(ch->damage_done).arg(fight_length).arg(ch->damage_per_second));
   }
-  return;
 }
 
-void make_scraps(Character *ch, class Object *obj)
+void make_scraps(CharacterPtr ch, ObjectPtr obj)
 {
-  class Object *corpse /*, *o*/;
+  ObjectPtr corpse /*, o*/;
   char buf[MAX_STRING_LENGTH];
-  /*int i;*/
+  /*qint32 i;*/
 
   corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("scraps"));
+  corpse->name(QStringLiteral("scraps"));
 
-  sprintf(buf, "A pile of scraps from %s is lying here.",
-          obj->short_description);
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "A pile of scraps from %s is lying here.", qPrintable(obj->short_description()));
+  corpse->long_description(buf);
 
   sprintf(buf, "a pile of scraps.");
-  corpse->short_description = str_hsh(buf);
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
   corpse->obj_flags.wear_flags = {TAKE};
-  corpse->obj_flags.value[0] = 0;
-  corpse->obj_flags.value[3] = 0;
+  corpse->obj_flags.value[0] = {};
+  corpse->obj_flags.value[3] = {};
   corpse->obj_flags.weight = obj->obj_flags.weight;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
 
-  corpse->obj_flags.more_flags = 0;
+  corpse->obj_flags.more_flags = {};
 
-  corpse->obj_flags.timer = 0;
+  corpse->obj_flags.timer = {};
 
   object_list_new_new_owner(corpse, 0);
   obj_to_room(corpse, ch->in_room);
-
-  return;
 }
 
-static constexpr uint64_t MAX_NPC_CORPSE_TIME = 10;
-static constexpr uint64_t MAX_PC_CORPSE_TIME = 30;
+static constexpr quint64 MAX_NPC_CORPSE_TIME = 10;
+static constexpr quint64 MAX_PC_CORPSE_TIME = 30;
 
-void make_corpse(Character *ch)
+void make_corpse(CharacterPtr ch)
 {
-  class Object *corpse{}, *o{}, *o_in_container{}, *next_o_in_container{};
-  class Object *money{}, *next_obj{};
+  ObjectPtr corpse{}, *o{}, *o_in_container{}, next_o_in_container = {};
+  ObjectPtr money{}, next_obj = {};
 
-  char buf[MAX_STRING_LENGTH]{};
-  int i{};
+  char buf[MAX_STRING_LENGTH] = {};
+  qint32 i = {};
 
   corpse = new Object;
   clear_object(corpse);
   if (ch->isPlayer())
   {
-    corpse->setOwner(GET_NAME(ch));
+    corpse->setOwner(qPrintable(ch->name()));
   }
 
   corpse->item_number = -1;
@@ -4436,49 +4410,47 @@ void make_corpse(Character *ch)
   if (ch->isNonPlayer())
   {
     corpse->obj_flags.wear_flags = {};
-    sprintf(buf, "corpse %s", GET_NAME(ch));
+    sprintf(buf, "corpse %s", qPrintable(ch->name()));
   }
   else if (ch->isPlayerObjectThief())
   {
     corpse->obj_flags.wear_flags = {};
-    sprintf(buf, "corpse %s thiefcorpse", GET_NAME(ch));
+    sprintf(buf, "corpse %s thiefcorpse", qPrintable(ch->name()));
   }
   else
   {
     corpse->obj_flags.wear_flags = {TAKE};
 
     if (ch->getLevel() >= 50)
-      sprintf(buf, "corpse %s pc lootable", GET_NAME(ch));
+      sprintf(buf, "corpse %s pc lootable", qPrintable(ch->name()));
     else
-      sprintf(buf, "corpse %s pc", GET_NAME(ch));
+      sprintf(buf, "corpse %s pc", qPrintable(ch->name()));
   }
-  corpse->Name(buf);
+  corpse->name(buf);
 
-  sprintf(buf, "the corpse of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "the corpse of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->long_description(buf);
 
-  sprintf(buf, "the corpse of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->short_description = str_hsh(buf);
+  sprintf(buf, "the corpse of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_CONTAINER;
-  corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1; /* corpse identifier */
+  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->obj_flags.value[3] = 1;  /* corpse identifier */
   corpse->obj_flags.weight = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
 
   SET_BIT(GET_OBJ_EXTRA(corpse), ITEM_UNIQUE_SAVE);
   if (ch->isNonPlayer())
   {
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     SET_BIT(corpse->obj_flags.more_flags, ITEM_NPC_CORPSE);
     GET_OBJ_VROOM(corpse) = DC::NOWHERE;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
     SET_BIT(GET_OBJ_EXTRA(corpse), ITEM_PC_CORPSE);
     GET_OBJ_VROOM(corpse) = GET_ROOM_VNUM(ch->in_room);
@@ -4495,7 +4467,7 @@ void make_corpse(Character *ch)
     else
     {
       // Mob corpses with level 50+ equipment also get flag ITEM_LIMIT_SACRIFICE
-      for (i = 0; i < MAX_WEAR; i++)
+      for (i = {}; i < MAX_WEAR; i++)
       {
         if (ch->equipment[i] && ch->equipment[i]->obj_flags.eq_level >= 50)
         {
@@ -4538,7 +4510,7 @@ void make_corpse(Character *ch)
   // level 1-19 PC's can keep their eq
   if (ch->isNonPlayer() || ch->getLevel() > 19)
   {
-    for (i = 0; i < MAX_WEAR; i++)
+    for (i = {}; i < MAX_WEAR; i++)
       if (ch->equipment[i])
         obj_to_char(ch->unequip_char(i), ch);
 
@@ -4551,77 +4523,52 @@ void make_corpse(Character *ch)
 
     if (ch->isNonPlayer() && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
     {
-      class Object *recipeitem = nullptr;
-      int rarity = number(1, 100);
+      ObjectPtr recipeitem = {};
+      qint32 rarity = number(1, 100);
       bool itemtype = number(0, 1);
       if (rarity > 95) // 96-100 5%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
+        if (itemtype == 0)
           recipeitem = clone_object(real_object(6324));
-          break;
-        case 1:
+        else if (itemtype == 1)
           recipeitem = clone_object(real_object(6338));
-          break;
-        }
       }
       else if (rarity > 85) // 85-95 10%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
+        if (itemtype == 0)
           recipeitem = clone_object(real_object(6323));
-          break;
-        case 1:
+        else if (itemtype == 1)
           recipeitem = clone_object(real_object(6339));
-          break;
-        }
       }
       else if (rarity > 65) // 65-85 20%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
+        if (itemtype == 0)
           recipeitem = clone_object(real_object(6322));
-          break;
-        case 1:
+        else if (itemtype == 1)
           recipeitem = clone_object(real_object(6340));
-          break;
-        }
       }
       else if (rarity > 40) // 41-65 25%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
+        if (itemtype == 0)
           recipeitem = clone_object(real_object(6321));
-          break;
-        case 1:
+        else if (itemtype == 1)
           recipeitem = clone_object(real_object(6341));
-          break;
-        }
       }
       else // 1-40 40%
       {
         if (itemtype == 1)
-        {
           recipeitem = clone_object(real_object(6342));
-        }
         else if (itemtype == 0)
-        {
-
           recipeitem = clone_object(real_object(6320));
-        }
       }
-      if (recipeitem > (Object *)0)
+      if (recipeitem != nullptr)
       {
         obj_to_obj(recipeitem, corpse);
       }
       else
       {
         char bugmsg[MAX_STRING_LENGTH];
-        sprintf(bugmsg, "%s was supposed to drop a paper/bottle but was unable to create the item", GET_NAME(ch));
+        sprintf(bugmsg, "%s was supposed to drop a paper/bottle but was unable to create the item", qPrintable(ch->name()));
         logentry(bugmsg, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
     }
@@ -4662,13 +4609,13 @@ void make_corpse(Character *ch)
     save_corpses();
 }
 
-void make_dust(Character *ch)
+void make_dust(CharacterPtr ch)
 {
-  class Object *o, *tmp_o, *blah;
-  class Object *money, *next_obj;
-  int i;
+  ObjectPtr o, *tmp_o, blah;
+  ObjectPtr money, next_obj;
+  qint32 i;
 
-  for (i = 0; i < MAX_WEAR; i++)
+  for (i = {}; i < MAX_WEAR; i++)
     if (ch->equipment[i])
       obj_to_char(ch->unequip_char(i), ch);
 
@@ -4696,11 +4643,9 @@ void make_dust(Character *ch)
       move_obj(o, ch->in_room);
 
   } // for
-
-  return;
 }
 
-int alignment_value(int val)
+qint32 alignment_value(qint32 val)
 {
   if (val >= 350)
     return 1;
@@ -4710,19 +4655,19 @@ int alignment_value(int val)
 }
 
 // run through eq removing and rewearing is
-void zap_eq_check(Character *ch)
+void zap_eq_check(CharacterPtr ch)
 {
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  for (int i = 0; i < MAX_WEAR; i++)
+  for (qint32 i = {}; i < MAX_WEAR; i++)
     if (ch->equipment[i])
       ch->equip_char(ch->unequip_char(i, 1), i, 1);
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 }
 
 // ch kills victim
-void change_alignment(Character *ch, Character *victim)
+void change_alignment(CharacterPtr ch, CharacterPtr victim)
 {
-  int change;
+  qint32 change;
 
   change = (GET_ALIGNMENT(victim) * 2) / 100;
   if (IS_NEUTRAL(ch))
@@ -4738,319 +4683,266 @@ void change_alignment(Character *ch, Character *victim)
 
 /* head of a corpse or withered husk  */
 
-void make_husk(Character *ch)
+void make_husk(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("husk"));
-  sprintf(buf, "The withered husk of %s, its soul drained, flutters here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->long_description = str_hsh(buf);
-  sprintf(buf, "Husk of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->short_description = str_hsh(buf);
+  corpse->name(QStringLiteral("husk"));
+  sprintf(buf, "The withered husk of %s, its soul drained, flutters here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->long_description(buf);
+  sprintf(buf, "Husk of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
   corpse->obj_flags.wear_flags = {};
-  corpse->obj_flags.value[0] = 0;
+  corpse->obj_flags.value[0] = {};
   corpse->obj_flags.value[3] = 1;
   corpse->obj_flags.weight = 1000;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
   obj_to_room(corpse, ch->in_room);
-  return;
 }
 
-void make_head(Character *ch)
+void make_head(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("head"));
+  corpse->name(QStringLiteral("head"));
 
-  sprintf(buf, "The head of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "The head of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->long_description(buf);
 
-  sprintf(buf, "Head of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->short_description = str_hsh(buf);
+  sprintf(buf, "Head of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
   corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1; /* corpse identifyer */
+  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
   corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
-
-  return;
 }
 
-void make_arm(Character *ch)
+void make_arm(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("arm"));
+  corpse->name(QStringLiteral("arm"));
 
-  sprintf(buf, "The arm of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "The arm of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->long_description(buf);
 
-  sprintf(buf, "Arm of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->short_description = str_hsh(buf);
+  sprintf(buf, "Arm of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
   corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1; /* corpse identifyer */
+  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
   corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
-
-  return;
 }
 
-void make_leg(Character *ch)
+void make_leg(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("leg"));
+  corpse->name(QStringLiteral("leg"));
 
-  sprintf(buf, "The leg of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "The leg of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->long_description(buf);
 
-  sprintf(buf, "Leg of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->short_description = str_hsh(buf);
+  sprintf(buf, "Leg of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
   corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1; /* corpse identifyer */
+  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
   corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
-
-  return;
 }
 
-void make_bowels(Character *ch)
+void make_bowels(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("bowels"));
+  corpse->name(QStringLiteral("bowels"));
 
-  sprintf(buf, "The steaming bowels of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "The steaming bowels of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->long_description(buf);
 
-  sprintf(buf, "Bowels of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->short_description = str_hsh(buf);
+  sprintf(buf, "Bowels of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
   corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1; /* corpse identifyer */
+  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
   corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
-
-  return;
 }
 
-void make_blood(Character *ch)
+void make_blood(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("blood"));
+  corpse->name(QStringLiteral("blood"));
 
-  sprintf(buf, "A pool of %s's blood is here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "A pool of %s's blood is here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->long_description(buf);
 
-  sprintf(buf, "Pooled blood of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
-  corpse->short_description = str_hsh(buf);
+  sprintf(buf, "Pooled blood of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
   corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1; /* corpse identifyer */
+  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
   corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
-
-  return;
 }
 
-void make_heart(Character *ch, Character *vict)
+void make_heart(CharacterPtr ch, CharacterPtr vict)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   if (!ch->hands_are_free(1))
     return;
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
 
   clear_object(corpse);
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->Name(QStringLiteral("heart"));
+  corpse->name(QStringLiteral("heart"));
 
-  sprintf(buf, "%s's heart is laying here.",
-          (vict->isNonPlayer() ? vict->short_desc : GET_NAME(vict)));
-  corpse->long_description = str_hsh(buf);
+  sprintf(buf, "%s's heart is laying here.", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
+  corpse->long_description(buf);
 
-  sprintf(buf, "the heart of %s",
-          (vict->isNonPlayer() ? vict->short_desc : GET_NAME(vict)));
-  corpse->short_description = str_hsh(buf);
+  sprintf(buf, "the heart of %s", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
+  corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_FOOD;
   corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = 0; /* You can't store stuff in a heart */
-  corpse->obj_flags.value[3] = 1; /* corpse identifier */
+  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a heart */
+  corpse->obj_flags.value[3] = 1;  /* corpse identifier */
   corpse->obj_flags.weight = 2;
-  corpse->obj_flags.eq_level = 0;
+  corpse->obj_flags.eq_level = {};
 
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = 0;
+    corpse->obj_flags.more_flags = {};
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
 
@@ -5060,14 +4952,12 @@ void make_heart(Character *ch, Character *vict)
     ch->equip_char(corpse, WEAR_HOLD2);
   else
     extract_obj(corpse);
-
-  return;
 }
 
-void death_cry(Character *ch)
+void death_cry(CharacterPtr ch)
 {
-  int door, was_in;
-  char *message;
+  qint32 door, was_in;
+  const char *message;
 
   act("Your blood freezes as you hear $n's death cry.",
       ch, 0, 0, TO_ROOM, 0);
@@ -5078,7 +4968,7 @@ void death_cry(Character *ch)
     message = "You hear someone's death cry.";
 
   was_in = ch->in_room;
-  for (door = 0; door <= 5; door++)
+  for (door = {}; door <= 5; door++)
   {
     if (CAN_GO(ch, door))
     {
@@ -5093,9 +4983,9 @@ void death_cry(Character *ch)
 }
 
 // Return true if killed vict.  False otherwise
-int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weapon)
+qint32 do_skewer(CharacterPtr ch, CharacterPtr vict, qint32 dam, qint32 wt, qint32 wt2, qint32 weapon)
 {
-  int damadd = 0;
+  qint32 damadd = {};
 
   if ((GET_CLASS(ch) != CLASS_WARRIOR) && ch->getLevel() < ARCHANGEL)
     return 0;
@@ -5112,7 +5002,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
   if (ch->affected_by_spell(SKILL_DEFENDERS_STANCE))
     return 0;
 
-  int type = get_weapon_damage_type(ch->equipment[weapon]);
+  qint32 type = get_weapon_damage_type(ch->equipment[weapon]);
   if (!(type == TYPE_PIERCE || type == TYPE_SLASH || type == TYPE_STING))
     return 0;
   if (!skill_success(ch, vict, SKILL_SKEWER))
@@ -5143,8 +5033,8 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
     //  act("$n jams $s weapon into $N!!", ch, 0, vict, TO_ROOM, NOTVICT);
     //  act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
     //  act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
-    damadd = (int)(dam * 1.5);
-    int retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
+    damadd = (qint32)(dam * 1.5);
+    qint32 retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
     if (SOMEONE_DIED(retval))
       return debug_retval(ch, vict, retval);
     // vict->removeHP(damadd);
@@ -5169,9 +5059,9 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
   return ReturnValue::eSUCCESS;
 }
 
-int do_behead_skill(Character *ch, Character *vict)
+qint32 do_behead_skill(CharacterPtr ch, CharacterPtr vict)
 {
-  int chance, percent;
+  qint32 chance, percent;
 
   percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
   chance = number(0, 101);
@@ -5226,9 +5116,9 @@ int do_behead_skill(Character *ch, Character *vict)
   return ReturnValue::eFAILURE;
 }
 
-int do_execute_skill(Character *ch, Character *vict, int w_type)
+qint32 do_execute_skill(CharacterPtr ch, CharacterPtr vict, qint32 w_type)
 {
-  int chance, percent;
+  qint32 chance, percent;
 
   percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
   chance = number(0, 101);
@@ -5305,7 +5195,7 @@ int do_execute_skill(Character *ch, Character *vict, int w_type)
   return ReturnValue::eFAILURE;
 }
 
-void do_combatmastery(Character *ch, Character *vict, int weapon)
+void do_combatmastery(CharacterPtr ch, CharacterPtr vict, qint32 weapon)
 {
   if ((GET_CLASS(ch) != CLASS_WARRIOR) && ch->getLevel() < ARCHANGEL)
     return;
@@ -5318,7 +5208,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
   if (ch->in_room != vict->in_room)
     return;
 
-  int type = get_weapon_damage_type(ch->equipment[weapon]);
+  qint32 type = get_weapon_damage_type(ch->equipment[weapon]);
   if (type != TYPE_STING && type != TYPE_WHIP && type != TYPE_CRUSH && type != TYPE_BLUDGEON)
     return;
 
@@ -5393,23 +5283,21 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
 
       affected_type af;
       af.type = SKILL_CM_TIMER;
-      af.location = 0;
-      af.modifier = 0;
+      af.location = {};
+      af.modifier = {};
       af.duration = number(3, 4);
       af.bitvector = -1;
       affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
     }
   }
-
-  return;
 }
 
-void raw_kill(Character *ch, Character *victim)
+void raw_kill(CharacterPtr ch, CharacterPtr victim)
 {
   char buf[MAX_STRING_LENGTH];
   char buf2[100];
-  int is_thief = 0;
-  int death_room = 0;
+  qint32 is_thief = {};
+  qint32 death_room = {};
 
   if (!victim)
   {
@@ -5430,23 +5318,23 @@ void raw_kill(Character *ch, Character *victim)
   }
   if (ch && ch->isImmortalPlayer() && victim->isNonPlayer())
   {
-    special_log(QString(QStringLiteral("%1 killed %2 in room %3!")).arg(ch->getName()).arg(victim->getName()).arg(ch->in_room));
+    special_log(QString(QStringLiteral("%1 killed %2 in room %3!")).arg(ch->name()).arg(victim->name()).arg(ch->in_room));
   }
 
   // register my death with this zone's counter
   DC::incrementZoneDiedTick(DC::getInstance()->world[victim->in_room].zone);
 
   victim->setStanding();
-  int retval = mprog_death_trigger(victim, ch);
+  qint32 retval = mprog_death_trigger(victim, ch);
   if (SOMEONE_DIED(retval))
     return;
   victim->setDead();
 
-  if (GET_RACE(victim) == RACE_UNDEAD ||
-      GET_RACE(victim) == RACE_GHOST ||
-      GET_RACE(victim) == RACE_ELEMENT ||
-      GET_RACE(victim) == RACE_PLANAR ||
-      GET_RACE(victim) == RACE_SLIME ||
+  if (victim->race == RACE_UNDEAD ||
+      victim->race == RACE_GHOST ||
+      victim->race == RACE_ELEMENT ||
+      victim->race == RACE_PLANAR ||
+      victim->race == RACE_SLIME ||
       (victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 8))
     make_dust(victim);
   else
@@ -5454,7 +5342,7 @@ void raw_kill(Character *ch, Character *victim)
 
   if (ch != nullptr && IS_AFFECTED(ch, AFF_GROUP))
   {
-    Character *master = ch->master ? ch->master : ch;
+    CharacterPtr master = ch->master ? ch->master : ch;
     if (master->isPlayer())
     {
       if (victim->isPlayer())
@@ -5476,7 +5364,7 @@ void raw_kill(Character *ch, Character *victim)
       }
       else
       {
-        // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
+        // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", qPrintable(ch->name()), qPrintable(victim->name()));
       }
       selfpurge = true;
       selfpurge.setOwner(ch, "raw_kill");
@@ -5492,13 +5380,13 @@ void raw_kill(Character *ch, Character *victim)
 
   if (victim->player->golem)
   {
-    void release_message(Character * ch);
-    void shatter_message(Character * ch);
+    void release_message(CharacterPtr ch);
+    void shatter_message(CharacterPtr ch);
 
     if (number(0, 99) < (victim->getLevel() / 10 + victim->player->golem->getLevel() / 5))
     { /* rk */
       char buf[MAX_STRING_LENGTH];
-      sprintf(buf, "%s's golem lost a level!", victim->getNameC());
+      sprintf(buf, "%s's golem lost a level!", qPrintable(victim->name()));
       logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
       shatter_message(victim->player->golem);
       extract_char(victim->player->golem, true);
@@ -5509,9 +5397,9 @@ void raw_kill(Character *ch, Character *victim)
       extract_char(victim->player->golem, false);
     }
   }
-  victim->player->group_pkills = 0;
-  victim->player->grpplvl = 0;
-  victim->player->group_kills = 0;
+  victim->player->group_pkills = {};
+  victim->player->grpplvl = {};
+  victim->player->group_kills = {};
   if (isSet(victim->player->punish, PUNISH_SPAMMER))
     REMOVE_BIT(victim->player->punish, PUNISH_SPAMMER);
   if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
@@ -5546,13 +5434,13 @@ void raw_kill(Character *ch, Character *victim)
   if (GET_CLASS(victim) == CLASS_MONK)
     GET_AC(victim) -= (victim->getLevel() * 2);
   GET_AC(victim) -= victim->has_skill(SKILL_COMBAT_MASTERY) / 2;
-  GET_COND(victim, FULL) = 0;
-  GET_COND(victim, THIRST) = 0;
+  GET_COND(victim, FULL) = {};
+  GET_COND(victim, THIRST) = {};
 
   if (victim && isSet(victim->combat, COMBAT_BERSERK))
   {
     GET_AC(victim) -= 30;
-    victim->combat = 0;
+    victim->combat = {};
   }
 
   victim->save_char_obj();
@@ -5563,10 +5451,10 @@ void raw_kill(Character *ch, Character *victim)
 
     remove_memory(i, 'h', victim);
     if (i->isNonPlayer() && (i->mobdata->fears))
-      if (!strcmp(i->mobdata->fears, victim->getNameC()))
+      if (!strcmp(i->mobdata->fears, qPrintable(victim->name())))
         remove_memory(i, 'f');
     if (i->isNonPlayer() && !i->hunting.isEmpty())
-      if (i->hunting == victim->getName())
+      if (i->hunting == victim->name())
         remove_memory(i, 't');
   }
 
@@ -5577,17 +5465,16 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %d (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].vnum(),
-                GET_NAME(ch));
+        sprintf(buf, "%s killed by %lu (%s)", qPrintable(victim->name()), DC::getInstance()->mob_index[ch->mobdata->nr].vnum(), qPrintable(ch->name()));
       }
       else
       {
-        sprintf(buf, "%s killed by %s", victim->getNameC(), GET_NAME(ch));
+        sprintf(buf, "%s killed by %s", qPrintable(victim->name()), qPrintable(ch->name()));
       }
     }
     else
     {
-      sprintf(buf, "%s killed by [null killer]", victim->getNameC());
+      sprintf(buf, "%s killed by [null killer]", qPrintable(victim->name()));
     }
 
     // notify the clan members - clan_death checks for null ch/vict
@@ -5610,25 +5497,25 @@ void raw_kill(Character *ch, Character *victim)
         pir_stat_loss(victim, 100, true, is_thief);
       else if (victim->getLevel() > 20)
       {
-        int chance = ch ? ch->getLevel() / 10 : 50 / 10;
+        qint32 chance = ch ? ch->getLevel() / 10 : 50 / 10;
         chance += victim->getLevel() / 2;
         if (victim->getLevel() >= 50)
         {
-          chance += (int)(25.0 * (float)((float)(ch ? ch->getLevel() : 50) / 100.0) * (float)((float)(ch ? ch->getLevel() : 50) / 100.0));
+          chance += (qint32)(25.0 * (float)((float)(ch ? ch->getLevel() : 50) / 100.0) * (float)((float)(ch ? ch->getLevel() : 50) / 100.0));
           // An extra 1% for each level over 50.
           chance += victim->getLevel() - 50;
         }
 
         if (number(0, 99) < chance)
         {
-          if (GET_RACE(victim) != RACE_TROLL)
+          if (victim->race != RACE_TROLL)
           {
             GET_CON(victim) -= 1;
             victim->raw_con -= 1;
             victim->sendln("*** You lose one constitution point ***");
             if (victim->isPlayer())
             {
-              sprintf(log_buf, "%s lost a con. ouch.", victim->getNameC());
+              sprintf(log_buf, "%s lost a con. ouch.", qPrintable(victim->name()));
               logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
@@ -5640,7 +5527,7 @@ void raw_kill(Character *ch, Character *victim)
             victim->sendln("*** You lose one dexterity point ***");
             if (victim->isPlayer())
             {
-              sprintf(log_buf, "%s lost a dex. ouch.", victim->getNameC());
+              sprintf(log_buf, "%s lost a dex. ouch.", qPrintable(victim->name()));
               logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
@@ -5664,19 +5551,17 @@ void raw_kill(Character *ch, Character *victim)
                      "          \\             /  \\|\r\n"
                      "           `-----------`\r\n",
                      victim);
-        char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        auto name = victim->name();
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
-
         remove_familiars(name, CONDEATH);
-        remove_vault(name, CONDEATH);
+        DC::getInstance()->vaults_.remove_vault(name, CONDEATH);
         if (victim->clan)
         {
           remove_clan_member(victim->clan, victim);
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s permanently dies.", name);
+        sprintf(buf2, "%s permanently dies.", qPrintable(name));
         logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
@@ -5711,19 +5596,18 @@ void raw_kill(Character *ch, Character *victim)
                      "           8   88MM::::::::::::::::::::::M:::M::::::::MM\r\n",
                      victim);
 
-        char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        auto name = victim->name();
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
-        remove_vault(name, CONDEATH);
+        DC::getInstance()->vaults_.remove_vault(name, CONDEATH);
         if (victim->clan)
         {
           remove_clan_member(victim->clan, victim);
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s sees tits.", name);
+        sprintf(buf2, "%s sees tits.", qPrintable(name));
         logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
@@ -5738,19 +5622,18 @@ void raw_kill(Character *ch, Character *victim)
                      "         /.-.-./ \" \" \\.-.-.\\\r\n",
                      victim);
 
-        char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        auto name = victim->name();
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
-        remove_vault(name, CONDEATH);
+        DC::getInstance()->vaults_.remove_vault(name, CONDEATH);
         if (victim->clan)
         {
           remove_clan_member(victim->clan, victim);
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s gets batted to death.", name);
+        sprintf(buf2, "%s gets batted to death.", qPrintable(name));
         logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
@@ -5771,23 +5654,23 @@ void raw_kill(Character *ch, Character *victim)
                      "              \\                       | \r\n"
                      "              |                       |\r\n",
                      victim);
-        char name[100];
-        strncpy(name, victim->getNameC(), 100);
+
+        auto name = victim->name();
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
-        remove_vault(name, CONDEATH);
+        DC::getInstance()->vaults_.remove_vault(name, CONDEATH);
         if (victim->clan)
         {
           remove_clan_member(victim->clan, victim);
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s goes to moose heaven.", name);
+        sprintf(buf2, "%s goes to moose heaven.", qPrintable(name));
         logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
-      else if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL)
+      else if (GET_DEX(victim) <= 4 && victim->race == RACE_TROLL)
       {
         victim->sendln("Your Dexterity has reached 4...you are permanently dead!");
         send_to_char("\r\n"
@@ -5815,19 +5698,18 @@ void raw_kill(Character *ch, Character *victim)
                      "       `\\   VVV~                 ~VVV  /'$R\r\n",
                      victim);
 
-        char name[100];
-        strncpy(name, victim->getNameC(), 100);
+        auto name = victim->name();
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
-        remove_vault(name, CONDEATH);
+        DC::getInstance()->vaults_.remove_vault(name, CONDEATH);
         if (victim->clan)
         {
           remove_clan_member(victim->clan, victim);
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s permanently dies the horrible dex-death.", name);
+        sprintf(buf2, "%s permanently dies the horrible dex-death.", qPrintable(name));
         logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
@@ -5837,17 +5719,17 @@ void raw_kill(Character *ch, Character *victim)
     if (ch)
       penalty += ch->getLevel() * .05;
     penalty = MIN(penalty, 2);
-    GET_EXP(victim) = (int64_t)(GET_EXP(victim) / penalty);
+    victim->exp = (qint64)(victim->exp / penalty);
   } // isPlayer()
 }
 
-void group_gain(Character *ch, Character *victim)
+void group_gain(CharacterPtr ch, CharacterPtr victim)
 {
   char buf[256];
-  int32_t no_members = 0, total_levels = 0;
-  int64_t share, total_share = 0;
-  int64_t base_xp = 0, bonus_xp = 0;
-  Character *leader, *highest, *tmp_ch;
+  qint32 no_members = 0, total_levels = {};
+  qint64 share, total_share = {};
+  qint64 base_xp = 0, bonus_xp = {};
+  CharacterPtr leader, highest, tmp_ch;
   follow_type *f;
 
   if (is_pkill(ch, victim))
@@ -5902,12 +5784,12 @@ void group_gain(Character *ch, Character *victim)
     }
 
     /* calculate base XP value */
-    base_xp = GET_EXP(victim);
+    base_xp = victim->exp;
     if (IS_AFFECTED(victim, AFF_CHARM))
     {
-      share = 0;
-      base_xp = 0;
-      bonus_xp = 0;
+      share = {};
+      base_xp = {};
+      bonus_xp = {};
     }
     /* calculate this character's share of the XP */
     else
@@ -5916,7 +5798,7 @@ void group_gain(Character *ch, Character *victim)
     }
 
     if (IS_AFFECTED(tmp_ch, AFF_CHAMPION))
-      share = (int)((double)share * 1.10);
+      share = (qint32)((double)share * 1.10);
     sprintf(buf, "You receive %ld exps of %ld total.\r\n", share, base_xp + bonus_xp);
     tmp_ch->send(buf);
     gain_exp(tmp_ch, share);
@@ -5930,10 +5812,10 @@ void group_gain(Character *ch, Character *victim)
 }
 
 /* find the highest level present at the kill */
-Character *get_highest_level_killer(Character *leader, Character *killer)
+CharacterPtr get_highest_level_killer(CharacterPtr leader, CharacterPtr killer)
 {
   follow_type *f;
-  Character *highest = killer;
+  CharacterPtr highest = killer;
 
   /* check to see if the group leader was involved and outranks the killer */
   if (leader->in_room == killer->in_room && leader->getLevel() > killer->getLevel())
@@ -5954,13 +5836,13 @@ Character *get_highest_level_killer(Character *leader, Character *killer)
 }
 
 /* count the number of group members eligible for XP from a kill */
-int32_t count_xp_eligibles(Character *leader, Character *killer,
-                           int32_t highest_level, int32_t *total_levels)
+qint32 count_xp_eligibles(CharacterPtr leader, CharacterPtr killer,
+                          qint32 highest_level, qint32 *total_levels)
 {
   follow_type *f;
-  int32_t num_eligibles = 0;
+  qint32 num_eligibles = {};
 
-  *total_levels = 0;
+  *total_levels = {};
 
   /* check to see if the group leader was involved and eligible for XP */
   if (leader->in_room == killer->in_room && highest_level - leader->getLevel() < 20)
@@ -5985,12 +5867,12 @@ int32_t count_xp_eligibles(Character *leader, Character *killer,
 }
 
 /* scale character XP based on various factors */
-int64_t scale_char_xp(Character *ch, Character *killer, Character *victim,
-                      int32_t no_killers, int32_t total_levels, int32_t highest_level,
-                      int64_t base_xp, int64_t *bonus_xp)
+qint64 scale_char_xp(CharacterPtr ch, CharacterPtr killer, CharacterPtr victim,
+                     qint32 no_killers, qint32 total_levels, qint32 highest_level,
+                     qint64 base_xp, qint64 *bonus_xp)
 {
-  int32_t scaled_share;
-  *bonus_xp = 0;
+  qint32 scaled_share;
+  *bonus_xp = {};
 
   scaled_share = ((base_xp + *bonus_xp) * MAX(ch->getLevel(), 1)) / total_levels;
 
@@ -6001,9 +5883,9 @@ int64_t scale_char_xp(Character *ch, Character *killer, Character *victim,
 }
 
 /* advance to the next follower in the list */
-Character *loop_followers(follow_type **f)
+CharacterPtr loop_followers(follow_type **f)
 {
-  Character *tmp_ch;
+  CharacterPtr tmp_ch;
 
   // this loops the followers
   if (*f)
@@ -6012,29 +5894,29 @@ Character *loop_followers(follow_type **f)
     *f = (*f)->next;
   }
   else
-    tmp_ch = nullptr;
+    tmp_ch = {};
 
   return (tmp_ch);
 }
 
-char *elem_type[] =
+const char *elem_type[] =
     {
         "$B$4stream of flame$R",
         "$B$3shards of ice$R",
         "$B$5bolt of energy$R",
         "$B$0stone fist$R"};
 
-void dam_message(int dam, Character *ch, Character *victim,
-                 int w_type, int32_t modifier)
+void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
+                 qint32 w_type, qint32 modifier)
 {
-  static const char *attack_table[] =
+  static const QStringList attack_table =
       {
           "hit", "pound", "pierce", "slash", "whip", "claw",
           "bite", "sting", "crush"};
 
   char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
-  char *vs, *vp, *vx;
-  const char *attack = 0;
+  const char *vs, *vp, *vx;
+  const char *attack = {};
   char punct;
   char modstring[200];
   char endstring[200];
@@ -6174,10 +6056,10 @@ void dam_message(int dam, Character *ch, Character *victim,
   if (w_type != SKILL_FLAMESLASH)
   {
     w_type -= TYPE_HIT;
-    if (((unsigned)w_type) >= sizeof(attack_table))
+    if (((quint32)w_type) >= sizeof(attack_table))
     {
       logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, DC::LogChannel::LOG_BUG);
-      w_type = 0;
+      w_type = {};
     }
   }
   else
@@ -6281,14 +6163,14 @@ void dam_message(int dam, Character *ch, Character *victim,
       }
     }
     else if (victim->equipment[WEAR_SHIELD])
-      sprintf(shield, "%s", victim->equipment[WEAR_SHIELD]->short_description);
+      sprintf(shield, "%s", qPrintable(victim->equipment[WEAR_SHIELD]->short_description()));
 
     if (GET_CLASS(victim) == CLASS_MONK)
     {
       if (w_type == 0)
       {
         if (!attack)
-          attack = races[GET_RACE(ch)].unarmed;
+          attack = races[ch->race].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
         sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
         sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
@@ -6324,7 +6206,7 @@ void dam_message(int dam, Character *ch, Character *victim,
       if (w_type == 0)
       {
         if (!attack)
-          attack = races[GET_RACE(ch)].unarmed;
+          attack = races[ch->race].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
         sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
         sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
@@ -6344,8 +6226,8 @@ void dam_message(int dam, Character *ch, Character *victim,
     if (w_type == 0)
     {
       if (!attack)
-        attack = races[GET_RACE(ch)].unarmed;
-      int a;
+        attack = races[ch->race].unarmed;
+      qint32 a;
       if (ch->isNonPlayer() && (a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum()) < 92 && a > 87)
         attack = elem_type[a - 88];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
@@ -6371,9 +6253,9 @@ void dam_message(int dam, Character *ch, Character *victim,
  * Disarm a creature.
  * Caller must check for successful attack.
  */
-void disarm(Character *ch, Character *victim)
+void disarm(CharacterPtr ch, CharacterPtr victim)
 {
-  class Object *obj;
+  ObjectPtr obj;
 
   if (victim->equipment[WEAR_WIELD] == nullptr)
     return;
@@ -6427,7 +6309,7 @@ void disarm(Character *ch, Character *victim)
  * Trip a creature.
  * Caller must check for successful attack.
  */
-void trip(Character *ch, Character *victim)
+void trip(CharacterPtr ch, CharacterPtr victim)
 {
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return;
@@ -6445,22 +6327,20 @@ void trip(Character *ch, Character *victim)
 
   WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
   victim->setSitting();
-
-  return;
 }
 
-#define PKILL_COUNT_LIMIT 20
+constexpr auto PKILL_COUNT_LIMIT = 20;
 
 // 'ch' can be null
 // do_pkill should never be called directly, only through "fight_kill"
-void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
+void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_attacker)
 {
-  int num;
+  qint32 num;
   char killer_message[MAX_STRING_LENGTH];
-  //  Character *i = 0;
+  //  CharacterPtr i = {};
   affected_type *af, *afpk;
 
-  void move_player_home(Character * victim);
+  void move_player_home(CharacterPtr victim);
   num = number(1, 1000);
 
   if (!victim)
@@ -6473,7 +6353,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   {
     set_cantquit(ch, victim);
   }
-  extern void pk_check(Character * ch, Character * victim);
+  extern void pk_check(CharacterPtr ch, CharacterPtr victim);
   pk_check(ch, victim);
   // Kill charmed mobs outright
   if (victim->isNonPlayer())
@@ -6545,9 +6425,9 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   move_player_home(victim);
 
   victim->setResting();
-  GET_COND(victim, DRUNK) = 0;
-  GET_COND(victim, FULL) = 0;
-  GET_COND(victim, THIRST) = 0;
+  GET_COND(victim, DRUNK) = {};
+  GET_COND(victim, FULL) = {};
+  GET_COND(victim, THIRST) = {};
 
   victim->save_char_obj();
 
@@ -6555,94 +6435,94 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   if (ch != nullptr)
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", qPrintable(victim->name()));
     else if (type == KILL_MORTAR)
-      sprintf(killer_message, "\r\n##%s just got a FIRE IN THE HOLE!!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##%s just got a FIRE IN THE HOLE!!\r\n", qPrintable(victim->name()));
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\r\n##%s has perished from %s's POISON!\r\n", victim->getNameC(), GET_NAME(ch));
-    else if (!str_cmp(GET_NAME(ch), victim->getNameC()))
+      sprintf(killer_message, "\r\n##%s has perished from %s's POISON!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
+    else if (!str_cmp(qPrintable(ch->name()), qPrintable(victim->name())))
       sprintf(killer_message, "");
-    //    sprintf(killer_message,"\r\n##%s just commited SUICIDE!\r\n", victim->getNameC());
+    //    sprintf(killer_message,"\r\n##%s just commited SUICIDE!\r\n", qPrintable(victim->name()));
     else if (victim->getLevel() < PKILL_COUNT_LIMIT || ch == victim)
-      // sprintf(killer_message,"\r\n##%s just DIED!\r\n", victim->getNameC());
-      // sprintf(killer_message,"\r\n##%s was just introduced to the warm hospitality of Dark Castle!!\r\n", victim->getNameC());
+      // sprintf(killer_message,"\r\n##%s just DIED!\r\n", qPrintable(victim->name()));
+      // sprintf(killer_message,"\r\n##%s was just introduced to the warm hospitality of Dark Castle!!\r\n", qPrintable(victim->name()));
       sprintf(killer_message, "");
     else if (num == 1000)
-      sprintf(killer_message, "\r\n##%s was just ANALLY PROBED by %s!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\r\n##%s was just ANALLY PROBED by %s!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master)
       sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's familiar!\r\n",
-              victim->getNameC(), GET_NAME(ch->master));
+              qPrintable(victim->name()), qPrintable(ch->master->name()));
     else if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
       sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's charmie!\r\n",
-              victim->getNameC(), GET_NAME(ch->master));
+              qPrintable(victim->name()), qPrintable(ch->master->name()));
     else if (ch->in_room == real_room(START_ROOM))
       sprintf(killer_message, "\r\n##%s was just PINGED by %s!\r\n",
-              victim->getNameC(), GET_NAME(ch));
+              qPrintable(victim->name()), qPrintable(ch->name()));
     else if (ch->in_room == real_room(SECOND_START_ROOM))
       sprintf(killer_message, "\r\n##%s was just PONGED by %s!\r\n",
-              victim->getNameC(), GET_NAME(ch));
+              qPrintable(victim->name()), qPrintable(ch->name()));
     else if (IS_ANONYMOUS(ch))
       sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
-              victim->getNameC(), GET_NAME(ch));
+              qPrintable(victim->name()), qPrintable(ch->name()));
     else if (ch->getLevel() > MORTAL)
-      sprintf(killer_message, "\r\n##%s was just SMITED...er..SMOTED..err PKILLED by %s!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\r\n##%s was just SMITED...er..SMOTED..err PKILLED by %s!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else if (type == KILL_BINGO)
       sprintf(killer_message, "\r\n##%s was just BINGOED by %s!\r\n",
-              victim->getNameC(), GET_NAME(ch));
+              qPrintable(victim->name()), qPrintable(ch->name()));
     else if (type == SPELL_CONSECRATE)
-      sprintf(killer_message, "\r\n##%s was just slain by %s's CONSECRATION!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\r\n##%s was just slain by %s's CONSECRATION!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else if (type == SPELL_DESECRATE)
-      sprintf(killer_message, "\r\n##%s was just slain by %s's DESECRATION!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\r\n##%s was just slain by %s's DESECRATION!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else
       switch (GET_CLASS(ch))
       {
       case CLASS_MAGIC_USER:
         sprintf(killer_message, "\r\n##%s was just FRIED by %s's magic!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_CLERIC:
         sprintf(killer_message, "\r\n##%s was just BANISHED by %s's holiness!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_THIEF:
         sprintf(killer_message, "\r\n##%s was just ASSASSINATED by %s!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_WARRIOR:
         sprintf(killer_message, "\r\n##%s was just SLAIN by %s's might!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_ANTI_PAL:
         sprintf(killer_message, "\r\n##%s was just CONSUMED by %s's darkness!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_PALADIN:
         sprintf(killer_message, "\r\n##%s was just VANQUISHED by %s's goodness!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_BARBARIAN:
         sprintf(killer_message, "\r\n##%s was just SHREDDED by %s's crazed fury!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_MONK:
         sprintf(killer_message, "\r\n##%s was just SHATTERED by %s's karma!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_RANGER:
         sprintf(killer_message, "\r\n##%s was just PENETRATED by %s's wood!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_BARD:
         sprintf(killer_message, "\r\n##%s was just MUTED by %s's snazzy rhythm!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_DRUID:
         sprintf(killer_message, "\r\n##%s was just VIOLATED by %s's woodland friends!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       default:
         sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
-                victim->getNameC(), GET_NAME(ch));
+                qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       }
     level_diff_t level_spread;
@@ -6671,7 +6551,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
 
         if (IS_AFFECTED(ch, AFF_GROUP))
         {
-          Character *master = ch->master ? ch->master : ch;
+          CharacterPtr master = ch->master ? ch->master : ch;
           if (master->isPlayer())
           {
             if (victim->isPlayer())
@@ -6709,7 +6589,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
         {
           if (IS_AFFECTED(ch->master->master, AFF_GROUP))
           {
-            Character *master = ch->master->master ? ch->master->master : ch->master;
+            CharacterPtr master = ch->master->master ? ch->master->master : ch->master;
             if (master->isPlayer())
             {
               if (victim->isPlayer())
@@ -6748,7 +6628,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
         {
           if (IS_AFFECTED(ch->master->master, AFF_GROUP))
           {
-            Character *master = ch->master->master ? ch->master->master : ch->master;
+            CharacterPtr master = ch->master->master ? ch->master->master : ch->master;
             if (master->isPlayer())
             {
               if (victim->isPlayer())
@@ -6768,17 +6648,17 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   {
     // ch == nullptr
     if (type == KILL_DROWN)
-      sprintf(killer_message, "\r\n##%s just DROWNED!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##%s just DROWNED!\r\n", qPrintable(victim->name()));
     else if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", qPrintable(victim->name()));
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\r\n##%s has perished from POISON!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##%s has perished from POISON!\r\n", qPrintable(victim->name()));
     else if (type == KILL_FALL)
-      sprintf(killer_message, "\r\n##%s has FALLEN to death!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##%s has FALLEN to death!\r\n", qPrintable(victim->name()));
     else if (type == KILL_BATTER)
-      sprintf(killer_message, "\r\n##That's using your head! %s just died attempting to batter a door!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##That's using your head! %s just died attempting to batter a door!\r\n", qPrintable(victim->name()));
     else
-      sprintf(killer_message, "\r\n##%s just DIED!\r\n", victim->getNameC());
+      sprintf(killer_message, "\r\n##%s just DIED!\r\n", qPrintable(victim->name()));
   }
 
   send_info(killer_message);
@@ -6786,7 +6666,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   if (IS_AFFECTED(victim, AFF_CHAMPION) && ch && ch != victim)
   {
     REMBIT(victim->affected_by, AFF_CHAMPION);
-    Object *obj = nullptr;
+    ObjectPtr obj = {};
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
       logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -6797,36 +6677,36 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
       if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || isSet(DC::getInstance()->world[ch->master->in_room].room_flags, CLAN_ROOM))
       {
         SETBIT(victim->affected_by, AFF_CHAMPION);
-        sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\r\n", GET_NAME(ch->master), victim->getNameC());
+        sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\r\n", qPrintable(ch->master->name()), qPrintable(victim->name()));
       }
       else
       {
         move_obj(obj, ch->master);
         SETBIT(ch->master->affected_by, AFF_CHAMPION);
-        sprintf(killer_message, "##%s has become the new Champion!\r\n", GET_NAME(ch->master));
+        sprintf(killer_message, "##%s has become the new Champion!\r\n", qPrintable(ch->master->name()));
       }
     }
     else
     {
       move_obj(obj, ch);
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      sprintf(killer_message, "##%s has become the new Champion!\r\n", GET_NAME(ch));
+      sprintf(killer_message, "##%s has become the new Champion!\r\n", qPrintable(ch->name()));
     }
     send_info(killer_message);
   }
 }
 
 // 'ch' can be null
-void arena_kill(Character *ch, Character *victim, int type)
+void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
 {
-  void remove_nosave(Character * vict);
+  void remove_nosave(CharacterPtr vict);
 
   char killer_message[MAX_STRING_LENGTH];
-  //  Character *i;
-  clan_data *ch_clan = nullptr;
-  clan_data *victim_clan = nullptr;
-  int eliminated = 1;
-  void move_player_home(Character * victim);
+  //  CharacterPtr i;
+  Clan *ch_clan = {};
+  Clan *victim_clan = {};
+  qint32 eliminated = 1;
+  void move_player_home(CharacterPtr victim);
 
   if (!victim)
   {
@@ -6864,55 +6744,50 @@ void arena_kill(Character *ch, Character *victim, int type)
 
     if (type == KILL_BINGO)
     {
-      sprintf(killer_message, "\r\n## %s [%s] just BINGOED %s [%s] in the arena!\r\n",
-              ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-              victim->getNameC(), get_clan_name(victim_clan));
+      sprintf(killer_message, "\r\n## %s [%s] just BINGOED %s [%s] in the arena!\r\n", ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
     }
     else
     {
-      sprintf(killer_message, "\r\n## %s [%s] just SLAUGHTERED %s [%s] in the arena!\r\n",
-              ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-              victim->getNameC(), get_clan_name(victim_clan));
+      sprintf(killer_message, "\r\n## %s [%s] just SLAUGHTERED %s [%s] in the arena!\r\n", ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
     }
 
     logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
-         ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-         victim->getNameC(), get_clan_name(victim_clan));
+         ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
   }
   else if (ch)
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else if (type == KILL_MASHED)
-      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else
     {
       if (type == KILL_BINGO)
       {
         sprintf(killer_message, "\r\n## %s just BINGOED %s in the arena!\r\n",
-                (ch->isNonPlayer() && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
+                (ch->isNonPlayer() && (ch->master) ? qPrintable(ch->master->shortdesc_or_name()) : qPrintable(ch->shortdesc_or_name())), qPrintable(victim->shortdesc_or_name()));
       }
       else
       {
         sprintf(killer_message, "\r\n## %s just SLAUGHTERED %s in the arena!\r\n",
-                (ch->isNonPlayer() && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
+                (ch->isNonPlayer() && (ch->master) ? qPrintable(ch->master->shortdesc_or_name()) : qPrintable(ch->shortdesc_or_name())), qPrintable(victim->shortdesc_or_name()));
       }
     }
   }
   else
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else if (type == KILL_MASHED)
-      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else
-      sprintf(killer_message, "\r\n## %s just DIED in the arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\r\n## %s just DIED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
   }
   send_info(killer_message);
 
   if (ch && victim && (arena.isPrize() || arena.isChaos()))
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", GET_NAME(ch), victim->getNameC());
+    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", qPrintable(ch->name()), qPrintable(victim->name()));
   }
 
   // if it's a chaos, see if the clan was eliminated
@@ -6924,13 +6799,13 @@ void arena_kill(Character *ch, Character *victim, int type)
 
       if (tmp->room().isArena())
         if (victim->clan == tmp->clan && victim != tmp && tmp->isMortalPlayer())
-          eliminated = 0;
+          eliminated = {};
     }
     if (eliminated)
     {
-      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\r\n", get_clan_name(victim_clan));
+      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\r\n", qPrintable(get_clan_name(victim_clan)));
       send_info(killer_message);
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", get_clan_name(victim_clan));
+      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", qPrintable(get_clan_name(victim_clan)));
     }
   }
 
@@ -6942,13 +6817,13 @@ void arena_kill(Character *ch, Character *victim, int type)
   GET_KI(victim) = GET_MAX_KI(victim);
 
   if (ch)
-    ch->combat = 0; // remove all combat effects
+    ch->combat = {}; // remove all combat effects
 
   remove_active_potato(victim);
   victim->save_char_obj();
 }
 
-int is_stunned(Character *ch)
+qint32 is_stunned(CharacterPtr ch)
 {
   if (isSet(ch->combat, COMBAT_STUNNED))
     return true;
@@ -6961,7 +6836,7 @@ int is_stunned(Character *ch)
   return false;
 }
 
-int can_attack(Character *ch)
+qint32 can_attack(CharacterPtr ch)
 {
   if (ch->room().isArena() && ch->room().arena().isOpened())
   {
@@ -6985,7 +6860,7 @@ int can_attack(Character *ch)
   return true;
 }
 
-int can_be_attacked(Character *ch, Character *vict)
+qint32 can_be_attacked(CharacterPtr ch, CharacterPtr vict)
 {
   /* this will happen sometimes, no need to log it */
   if (!ch || !vict)
@@ -7015,14 +6890,14 @@ int can_be_attacked(Character *ch, Character *vict)
     {
       ch->sendln("You are already fighting someone.");
       logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
-           GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
+           qPrintable(ch->name()), qPrintable(ch->fighting->name()), qPrintable(vict->name()));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch)
     {
       ch->sendln("They are already fighting someone.");
       logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
-           GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
+           qPrintable(ch->name()), qPrintable(vict->name()), qPrintable(vict->fighting->name()));
       return false;
     }
   }
@@ -7034,14 +6909,14 @@ int can_be_attacked(Character *ch, Character *vict)
     {
       ch->sendln("You are already fighting someone from another clan.");
       logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
-           GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
+           qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(ch->fighting->name()), qPrintable(get_clan_name(ch->fighting)), qPrintable(vict->name()), qPrintable(get_clan_name(vict)));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
       ch->sendln("They are already fighting someone.");
       logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
-           GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
+           qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(vict->name()), qPrintable(get_clan_name(vict)), qPrintable(vict->fighting->name()), qPrintable(get_clan_name(vict->fighting)));
       return false;
     }
   }
@@ -7144,10 +7019,10 @@ int can_be_attacked(Character *ch, Character *vict)
   return true;
 }
 
-int weapon_spells(Character *ch, Character *vict, int weapon)
+qint32 weapon_spells(CharacterPtr ch, CharacterPtr vict, qint32 weapon)
 {
-  int i, current_affect, chance, percent, retval;
-  Object *weap;
+  qint32 i, current_affect, chance, percent, retval;
+  ObjectPtr weap;
 
   if (!ch || !vict)
   {
@@ -7166,7 +7041,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   if (!ch->equipment[weapon] && weapon != ITEM_MISSILE)
     return ReturnValue::eFAILURE;
 
-  int wep_skill = 40;
+  qint32 wep_skill = 40;
 
   if (weapon == ITEM_MISSILE)
     weap = get_obj_in_list_vis(ch, "arrow", ch->carrying);
@@ -7176,7 +7051,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   if (!weap)
     return ReturnValue::eFAILURE;
 
-  for (i = 0; i < weap->num_affects; i++)
+  for (i = {}; i < weap->num_affects; i++)
   {
     /* It's possible the victim has fled or died */
     if (ch->in_room != vict->in_room)
@@ -7328,7 +7203,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   return ReturnValue::eSUCCESS;
 } /* spell effects */
 
-int act_poisonous(Character *ch)
+qint32 act_poisonous(CharacterPtr ch)
 {
   if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_POISONOUS))
     if (!number<quint64>(0, ch->getLevel() / 10))
@@ -7337,9 +7212,9 @@ int act_poisonous(Character *ch)
   return false;
 }
 
-int second_attack(Character *ch)
+qint32 second_attack(CharacterPtr ch)
 {
-  int learned;
+  qint32 learned;
 
   if ((ch->isNonPlayer()) && (ISSET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return true;
@@ -7353,9 +7228,9 @@ int second_attack(Character *ch)
   return false;
 }
 
-int third_attack(Character *ch)
+qint32 third_attack(CharacterPtr ch)
 {
-  int learned;
+  qint32 learned;
 
   if ((ch->isNonPlayer()) && (ISSET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return true;
@@ -7369,7 +7244,7 @@ int third_attack(Character *ch)
   return false;
 }
 
-int fourth_attack(Character *ch)
+qint32 fourth_attack(CharacterPtr ch)
 {
   if ((ch->isNonPlayer()) && (ISSET(ch->mobdata->actflags, ACT_4TH_ATTACK)))
     return true;
@@ -7378,7 +7253,7 @@ int fourth_attack(Character *ch)
 
 /*  No longer used.  Any class can try to use their second wield if they have
     the skill.
-int second_wield(Character *ch)
+qint32 second_wield(CharacterPtr ch)
 {
   // If the ch is capable of using the WEAR_SECOND_WIELD
   if((GET_CLASS(ch) == CLASS_MAGIC_USER) || (GET_CLASS(ch) == CLASS_MONK))
@@ -7387,9 +7262,9 @@ int second_wield(Character *ch)
 }
 */
 
-void inform_victim(Character *ch, Character *victim, int dam)
+void inform_victim(CharacterPtr ch, CharacterPtr victim, qint32 dam)
 {
-  int max_hit;
+  qint32 max_hit;
 
   switch (GET_POS(victim))
   {
@@ -7431,7 +7306,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
           remove_memory(victim, 't');
           remove_memory(victim, 'h', victim);
           if (victim->fighting)
-            victim->add_memory(GET_NAME(victim->fighting), 'f');
+            victim->add_memory(qPrintable(victim->fighting->name()), 'f');
           if ((!IS_AFFECTED(victim, AFF_PARALYSIS)) &&
               (!isSet(victim->combat, COMBAT_STUNNED)) &&
               (!isSet(victim->combat, COMBAT_STUNNED2)) &&
@@ -7469,9 +7344,9 @@ void inform_victim(Character *ch, Character *victim, int dam)
 | the function returns 0.
 | Morc 8/6/95
 */
-int is_fighting_mob(Character *ch)
+qint32 is_fighting_mob(CharacterPtr ch)
 {
-  Character *fighting = ch->fighting;
+  CharacterPtr fighting = ch->fighting;
   if (!fighting)
     return 0;
   if (is_pkill(ch, fighting))
@@ -7481,10 +7356,10 @@ int is_fighting_mob(Character *ch)
   return 0;
 }
 
-int do_flee(Character *ch, char *argument, cmd_t cmd)
+qint32 do_flee(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  int i, attempt, retval, escape = 0;
-  Character *chTemp, *loop_ch, *vict = nullptr;
+  qint32 i, attempt, retval, escape = {};
+  CharacterPtr chTemp, loop_ch, vict = {};
 
   if (is_stunned(ch))
     return ReturnValue::eFAILURE;
@@ -7514,7 +7389,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
 
     ch->skill_increase_check(SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
     if (number(1, 101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape / 1.5 - GET_INT(vict) / 2 - GET_WIS(vict) / 2), 100))
-      escape = 0;
+      escape = {};
   }
 
   if (IS_AFFECTED(ch, AFF_SNEAK) && !escape)
@@ -7535,7 +7410,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (i = 0; i < 3; i++)
+  for (i = {}; i < 3; i++)
   {
     attempt = number(0, 5); // Select a random direction
 
@@ -7555,7 +7430,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
           act("$n quickly ducks $N's attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
         }
         // The flee has succeeded
-        Character *last_fighting = ch->fighting;
+        CharacterPtr last_fighting = ch->fighting;
         ch->setStanding();
         ;
 
@@ -7614,13 +7489,13 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-command_return_t Character::check_pursuit(Character *victim, QString dircommand)
+command_return_t Character::check_pursuit(CharacterPtr victim, QString dircommand)
 {
   // Handle pursuit skill
   if (victim == 0 || this->isNonPlayer() || !affected_by_spell(SKILL_PURSUIT))
     return ReturnValue::eFAILURE;
 
-  int pursuit = this->has_skill(SKILL_PURSUIT);
+  qint32 pursuit = this->has_skill(SKILL_PURSUIT);
   if (number(1, 100) > pursuit)
   {
     // failure
@@ -7637,7 +7512,7 @@ command_return_t Character::check_pursuit(Character *victim, QString dircommand)
     act("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", this, 0, victim, TO_CHAR, 0);
     act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, TO_ROOM, NOTVICT);
 
-    int retval = this->command_interpreter(dircommand);
+    qint32 retval = this->command_interpreter(dircommand);
     if (isSet(retval, ReturnValue::eCH_DIED))
       return ReturnValue::eSUCCESS;
 
@@ -7651,7 +7526,7 @@ command_return_t Character::check_pursuit(Character *victim, QString dircommand)
   return ReturnValue::eSUCCESS;
 }
 
-int32_t get_weapon_bit(int weapon_type)
+qint32 get_weapon_bit(qint32 weapon_type)
 {
   switch (weapon_type)
   {
@@ -7706,9 +7581,9 @@ int32_t get_weapon_bit(int weapon_type)
   return (0);
 }
 
-void remove_nosave(Character *vict)
+void remove_nosave(CharacterPtr vict)
 {
-  class Object *o, *next_obj, *blah, *tmp_o;
+  ObjectPtr o, *next_obj, *blah, tmp_o;
 
   if (!vict)
   {
@@ -7740,9 +7615,9 @@ void remove_nosave(Character *vict)
   } // for
 }
 
-void remove_active_potato(Character *vict)
+void remove_active_potato(CharacterPtr vict)
 {
-  class Object *obj, *next_obj;
+  ObjectPtr obj, next_obj;
   // char buf[256];
 
   if (!vict)
@@ -7761,7 +7636,7 @@ void remove_active_potato(Character *vict)
   }
 }
 
-int damage_type(int weapon_type)
+qint32 damage_type(qint32 weapon_type)
 {
   switch (weapon_type)
   {
@@ -7799,9 +7674,9 @@ int damage_type(int weapon_type)
   return (0);
 }
 
-int debug_retval(Character *ch, Character *victim, int retval)
+qint32 debug_retval(CharacterPtr ch, CharacterPtr victim, qint32 retval)
 {
-  static int dumped = 0;
+  static qint32 dumped = {};
   bool bugged = false;
 
   // Only coredump up to 10 times
@@ -7819,7 +7694,7 @@ void Character::send(const char *buffer)
   send_to_char(buffer, this);
 }
 
-void Character::send(std::string buffer)
+void Character::send(QString buffer)
 {
   send_to_char(buffer.c_str(), this);
 }
@@ -7829,11 +7704,11 @@ void Character::send(QString buffer)
   send_to_char(buffer, this);
 }
 
-void Character::sendRaw(std::string buffer)
+void Character::sendRaw(QString buffer)
 {
   if (this->desc != nullptr)
   {
-    this->desc->allowColor = 0;
+    this->desc->allowColor = {};
   }
 
   this->send(buffer);
@@ -7844,11 +7719,11 @@ void Character::sendRaw(std::string buffer)
   }
 }
 
-command_return_t Character::tell(Character *victim, QString message)
+command_return_t Character::tell(CharacterPtr victim, QString message)
 {
   if (victim && !message.isEmpty())
   {
-    return do_tell((victim->getName() + " " + message).split(' '), cmd_t::TELL);
+    return do_tell((victim->name() + " " + message).split(' '), cmd_t::TELL);
   }
   return ReturnValue::eFAILURE;
 }

@@ -14,27 +14,18 @@
  ***************************************************************************/
 
 #include <cassert>
-#include <cstring>
 
-#include "DC/character.h"
-#include "DC/structs.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
-#include "DC/spells.h"
-#include "DC/room.h"
-#include "DC/handler.h"
-#include "DC/magic.h"
-#include "DC/fight.h"
 #include "DC/DC.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
+
+#include "DC/handler.h"
 #include "DC/player.h"
-#include "DC/connect.h"
 #include "DC/interp.h"
-#include "DC/isr.h"
+
 #include "DC/race.h"
 #include "DC/db.h"
-#include "DC/sing.h"
 #include "DC/act.h"
-#include "DC/ki.h"
 #include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/meta.h"
@@ -44,10 +35,10 @@
  START META-PHYSICIAN
 
  */
-int64_t new_meta_platinum_cost(int start, int end)
+qint64 new_meta_platinum_cost(qint32 start, qint32 end)
 { // This is the laziest function ever. I didn't feel like
   // figuring out a formulae to work with the ranges, so I didn't.
-  int64_t platcost = 0;
+  qint64 platcost = {};
   if (end <= start || end < 0 || start < 0)
     return 0; // That's cheap!
   while (start < end)
@@ -77,10 +68,10 @@ int64_t new_meta_platinum_cost(int start, int end)
   return platcost;
 }
 
-int r_new_meta_platinum_cost(int start, int64_t plats)
+qint32 r_new_meta_platinum_cost(qint32 start, qint64 plats)
 { // This is a copy of the laziest function ever. I didn't feel like
   // figuring out a formulae to work with the ranges, so I didn't.
-  int64_t platcost = 0;
+  qint64 platcost = {};
   if (plats <= 0 || start < 0)
     return 0;
   while (platcost < plats)
@@ -110,7 +101,7 @@ int r_new_meta_platinum_cost(int start, int64_t plats)
   return start - 5;
 }
 
-int r_new_meta_exp_cost(int start, int64_t exp)
+qint32 r_new_meta_exp_cost(qint32 start, qint64 exp)
 {
   if (exp <= 0)
     return start;
@@ -122,41 +113,41 @@ int r_new_meta_exp_cost(int start, int64_t exp)
   return start - 5;
 }
 
-int64_t new_meta_exp_cost_one(int start)
+qint64 new_meta_exp_cost_one(qint32 start)
 {
   if (start < 0)
     return 0;
   return new_meta_platinum_cost(start, start + 1) * 51523;
 }
 
-int64_t Character::moves_exp_spent(void)
+qint64 Character::moves_exp_spent(void)
 {
-  int start = GET_MAX_MOVE(this) - GET_MOVE_METAS(this);
-  int64_t expcost = 0;
+  qint32 start = GET_MAX_MOVE(this) - GET_MOVE_METAS(this);
+  qint64 expcost = {};
   while (start < GET_MAX_MOVE(this))
   {
-    expcost += (int)((5000000 + (start * 2500)) * 1.2);
+    expcost += (qint32)((5000000 + (start * 2500)) * 1.2);
     start++;
   }
   return expcost;
 }
 
-int64_t Character::moves_plats_spent(void)
+qint64 Character::moves_plats_spent(void)
 {
-  int64_t expcost = 0;
-  int start = GET_MAX_MOVE(this) - GET_MOVE_METAS(this);
+  qint64 expcost = {};
+  qint32 start = GET_MAX_MOVE(this) - GET_MOVE_METAS(this);
   while (start < GET_MAX_MOVE(this))
   {
-    expcost += (int64_t)(((int)(125 + (int)((0.025 * start * (start / 1000 == 0 ? 1 : start / 1000)))) * 0.9));
+    expcost += (qint64)(((qint32)(125 + (qint32)((0.025 * start * (start / 1000 == 0 ? 1 : start / 1000)))) * 0.9));
     start++;
   }
   return expcost;
 }
 
-int64_t Character::hps_exp_spent(void)
+qint64 Character::hps_exp_spent(void)
 {
-  int64_t expcost = 0;
-  int cost;
+  qint64 expcost = {};
+  qint32 cost;
   switch (GET_CLASS(this))
   {
   case CLASS_BARBARIAN:
@@ -196,23 +187,23 @@ int64_t Character::hps_exp_spent(void)
     cost = 3000;
     break;
   }
-  int base = GET_MAX_HIT(this) - GET_HP_METAS(this);
+  qint32 base = GET_MAX_HIT(this) - GET_HP_METAS(this);
   while (base < GET_MAX_HIT(this))
   {
-    expcost += (int64_t)((5000000 + (cost * base)) * 1.2);
+    expcost += (qint64)((5000000 + (cost * base)) * 1.2);
     base++;
   }
   return expcost;
 }
 
-int64_t Character::hps_plats_spent(void)
+qint64 Character::hps_plats_spent(void)
 {
-  int cost;
-  int64_t platcost = 0;
+  qint32 cost;
+  qint64 platcost = {};
   switch (GET_CLASS(this))
   {
   case CLASS_BARBARIAN:
-    cost = 0;
+    cost = {};
     break;
   case CLASS_WARRIOR:
     cost = 10;
@@ -248,19 +239,19 @@ int64_t Character::hps_plats_spent(void)
     cost = 100;
     break;
   }
-  int base = GET_MAX_HIT(this) - GET_HP_METAS(this);
+  qint32 base = GET_MAX_HIT(this) - GET_HP_METAS(this);
   while (base < GET_MAX_HIT(this))
   {
-    platcost += (int64_t)((100 + cost + (int)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
+    platcost += (qint64)((100 + cost + (qint32)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
     base++;
   }
   return platcost;
 }
 
-int64_t Character::mana_exp_spent(void)
+qint64 Character::mana_exp_spent(void)
 {
-  int cost;
-  int64_t expcost = 0;
+  qint32 cost;
+  qint64 expcost = {};
   switch (GET_CLASS(this))
   {
   case CLASS_PALADIN:
@@ -284,19 +275,19 @@ int64_t Character::mana_exp_spent(void)
   default:
     return 0;
   }
-  int base = GET_MAX_MANA(this) - GET_MANA_METAS(this);
+  qint32 base = GET_MAX_MANA(this) - GET_MANA_METAS(this);
   while (base < GET_MAX_MANA(this))
   {
-    expcost += (int64_t)((5000000 + (cost * base)) * 1.2);
+    expcost += (qint64)((5000000 + (cost * base)) * 1.2);
     base++;
   }
   return expcost;
 }
 
-int64_t Character::mana_plats_spent(void)
+qint64 Character::mana_plats_spent(void)
 {
-  int cost;
-  int64_t platcost = 0;
+  qint32 cost;
+  qint64 platcost = {};
   switch (GET_CLASS(this))
   {
   case CLASS_PALADIN:
@@ -315,24 +306,24 @@ int64_t Character::mana_plats_spent(void)
     cost = 10;
     break;
   case CLASS_MAGIC_USER:
-    cost = 0;
+    cost = {};
     break;
   default:
     return 0;
   }
-  int base = GET_MAX_MANA(this) - GET_MANA_METAS(this);
+  qint32 base = GET_MAX_MANA(this) - GET_MANA_METAS(this);
   while (base < GET_MAX_MANA(this))
   {
-    platcost += (int64_t)((100 + cost + (int)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
+    platcost += (qint64)((100 + cost + (qint32)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
     base++;
   }
   return platcost;
 }
 
-int Character::meta_get_stat_exp_cost(attribute_t stat)
+qint32 Character::meta_get_stat_exp_cost(attribute_t stat)
 {
-  int xp_price;
-  int curr_stat = 0;
+  qint32 xp_price;
+  qint32 curr_stat = {};
   switch (stat)
   {
   case attribute_t::CONSTITUTION:
@@ -412,10 +403,10 @@ int Character::meta_get_stat_exp_cost(attribute_t stat)
   return xp_price;
 }
 
-int Character::meta_get_stat_plat_cost(attribute_t targetstat)
+qint32 Character::meta_get_stat_plat_cost(attribute_t targetstat)
 {
-  int plat_cost;
-  int stat;
+  qint32 plat_cost;
+  qint32 stat;
 
   switch (targetstat)
   {
@@ -455,7 +446,7 @@ int Character::meta_get_stat_plat_cost(attribute_t targetstat)
 
 void Character::meta_list_stats(void)
 {
-  int xp_price, plat_cost, max_stat;
+  qint32 xp_price, plat_cost, max_stat;
 
   xp_price = meta_get_stat_exp_cost(attribute_t::STRENGTH);
   plat_cost = meta_get_stat_plat_cost(attribute_t::STRENGTH);
@@ -463,8 +454,7 @@ void Character::meta_list_stats(void)
   if (this->raw_str >= max_stat)
     this->send(QStringLiteral("$B$31)$R Str:       Your strength is already %1.\r\n").arg(max_stat));
   else
-    csendf(this, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n",
-           (this->raw_str + 1), xp_price, plat_cost);
+    this->send(QStringLiteral("$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n").arg((this->raw_str + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::DEXTERITY);
   plat_cost = meta_get_stat_plat_cost(attribute_t::DEXTERITY);
@@ -472,8 +462,7 @@ void Character::meta_list_stats(void)
   if (this->raw_dex >= max_stat)
     this->send(QStringLiteral("$B$32)$R Dex:       Your dexterity is already %1.\r\n").arg(max_stat));
   else
-    csendf(this, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n",
-           (this->raw_dex + 1), xp_price, plat_cost);
+    this->send(QStringLiteral("$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_dex + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::CONSTITUTION);
   plat_cost = meta_get_stat_plat_cost(attribute_t::CONSTITUTION);
@@ -481,8 +470,7 @@ void Character::meta_list_stats(void)
   if (this->raw_con >= max_stat)
     this->send(QStringLiteral("$B$33)$R Con:       Your constitution is already %1.\r\n").arg(max_stat));
   else
-    csendf(this, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n",
-           (this->raw_con + 1), xp_price, plat_cost);
+    this->send(QStringLiteral("$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_con + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::INTELLIGENCE);
   plat_cost = meta_get_stat_plat_cost(attribute_t::INTELLIGENCE);
@@ -490,8 +478,7 @@ void Character::meta_list_stats(void)
   if (this->raw_intel >= max_stat)
     this->send(QStringLiteral("$B$34)$R Int:       Your intelligence is already %1.\r\n").arg(max_stat));
   else
-    csendf(this, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n",
-           (this->raw_intel + 1), xp_price, plat_cost);
+    this->send(QStringLiteral("$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_intel + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::WISDOM);
   plat_cost = meta_get_stat_plat_cost(attribute_t::WISDOM);
@@ -499,21 +486,20 @@ void Character::meta_list_stats(void)
   if (this->raw_wis >= max_stat)
     this->send(QStringLiteral("$B$35)$R Wis:       Your wisdom is already %1.\r\n").arg(max_stat));
   else
-    csendf(this, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n",
-           (this->raw_wis + 1), xp_price, plat_cost);
+    this->send(QStringLiteral("$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_wis + 1)).arg(xp_price).arg(plat_cost));
 }
 
 quint64 Character::meta_get_moves_exp_cost(void)
 {
-  int meta = GET_MOVE_METAS(this);
+  qint32 meta = GET_MOVE_METAS(this);
   if (GET_MAX_MOVE(this) - GET_RAW_MOVE(this) < 0)
     meta += GET_MAX_MOVE(this) - GET_RAW_MOVE(this);
   return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-quint64 Character::meta_get_moves_plat_cost(int amount)
+quint64 Character::meta_get_moves_plat_cost(qint32 amount)
 {
-  int meta = GET_MOVE_METAS(this);
+  qint32 meta = GET_MOVE_METAS(this);
   if (GET_MAX_MOVE(this) - GET_RAW_MOVE(this) < 0)
     meta += GET_MAX_MOVE(this) - GET_RAW_MOVE(this);
   return new_meta_platinum_cost(MAX(0, meta), MAX(0, meta) + amount);
@@ -521,10 +507,10 @@ quint64 Character::meta_get_moves_plat_cost(int amount)
 
 quint64 Character::meta_get_hps_exp_cost(void)
 {
-  int meta = GET_HP_METAS(this);
-  int bonus = 0;
+  qint32 meta = GET_HP_METAS(this);
+  qint32 bonus = {};
 
-  for (int i = 16; i < GET_RAW_CON(this); i++)
+  for (qint32 i = 16; i < GET_RAW_CON(this); i++)
     bonus += (i * i) / 30;
 
   meta -= bonus;
@@ -535,12 +521,12 @@ quint64 Character::meta_get_hps_exp_cost(void)
   return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-quint64 Character::meta_get_hps_plat_cost(int amount)
+quint64 Character::meta_get_hps_plat_cost(qint32 amount)
 {
-  int meta = GET_HP_METAS(this);
-  int bonus = 0;
+  qint32 meta = GET_HP_METAS(this);
+  qint32 bonus = {};
 
-  for (int i = 16; i < GET_RAW_CON(this); i++)
+  for (qint32 i = 16; i < GET_RAW_CON(this); i++)
     bonus += (i * i) / 30;
 
   meta -= bonus;
@@ -553,17 +539,17 @@ quint64 Character::meta_get_hps_plat_cost(int amount)
 
 quint64 Character::meta_get_mana_exp_cost(void)
 {
-  int meta = GET_MANA_METAS(this);
-  int stat, bonus = 0;
+  qint32 meta = GET_MANA_METAS(this);
+  qint32 stat, bonus = {};
 
   if (GET_CLASS(this) == CLASS_MAGIC_USER || GET_CLASS(this) == CLASS_ANTI_PAL || GET_CLASS(this) == CLASS_RANGER)
     stat = GET_RAW_INT(this);
   else if (GET_CLASS(this) == CLASS_CLERIC || GET_CLASS(this) == CLASS_PALADIN || GET_CLASS(this) == CLASS_DRUID)
     stat = GET_RAW_WIS(this);
   else
-    stat = 0;
+    stat = {};
 
-  for (int i = 16; i < stat; i++)
+  for (qint32 i = 16; i < stat; i++)
     bonus += (i * i) / 30;
 
   meta -= bonus;
@@ -574,19 +560,19 @@ quint64 Character::meta_get_mana_exp_cost(void)
   return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-quint64 Character::meta_get_mana_plat_cost(int amount)
+quint64 Character::meta_get_mana_plat_cost(qint32 amount)
 {
-  int meta = GET_MANA_METAS(this);
-  int stat, bonus = 0;
+  qint32 meta = GET_MANA_METAS(this);
+  qint32 stat, bonus = {};
 
   if (GET_CLASS(this) == CLASS_MAGIC_USER || GET_CLASS(this) == CLASS_ANTI_PAL || GET_CLASS(this) == CLASS_RANGER)
     stat = GET_RAW_INT(this);
   else if (GET_CLASS(this) == CLASS_CLERIC || GET_CLASS(this) == CLASS_PALADIN || GET_CLASS(this) == CLASS_DRUID)
     stat = GET_RAW_WIS(this);
   else
-    stat = 0;
+    stat = {};
 
-  for (int i = 16; i < stat; i++)
+  for (qint32 i = 16; i < stat; i++)
     bonus += (i * i) / 30;
 
   meta -= bonus;
@@ -597,9 +583,9 @@ quint64 Character::meta_get_mana_plat_cost(int amount)
   return new_meta_platinum_cost(MAX(0, meta), MAX(0, meta) + amount);
 }
 
-int Character::meta_get_ki_exp_cost(void)
+qint32 Character::meta_get_ki_exp_cost(void)
 {
-  int cost, stat;
+  qint32 cost, stat;
   switch (GET_CLASS(this))
   {
   case CLASS_MONK:
@@ -616,14 +602,14 @@ int Character::meta_get_ki_exp_cost(void)
     return 0;
   }
   cost = 10000000 + ((GET_MAX_KI(this) - stat) * cost);
-  return (int)(cost * 1.2);
+  return (qint32)(cost * 1.2);
 }
 
 quint64 Character::meta_get_ki_plat_cost(void)
 {
-  uint64_t cost{};
-  uint64_t stat{};
-  const uint64_t adjusted_max_ki = MIN(250UL, MAX(0, GET_MAX_KI(this)));
+  quint64 cost = {};
+  quint64 stat = {};
+  const quint64 adjusted_max_ki = MIN<quint64>(250UL, MAX(0, GET_MAX_KI(this)));
 
   switch (GET_CLASS(this))
   {
@@ -639,22 +625,22 @@ quint64 Character::meta_get_ki_plat_cost(void)
     return 0UL;
   }
   cost = 500UL + cost + (((adjusted_max_ki - stat) / 2UL) * ((adjusted_max_ki - stat) / 10UL));
-  return static_cast<uint64_t>(cost * 0.9);
+  return static_cast<quint64>(cost * 0.9);
 }
 
-int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-              Character *owner)
+qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                 CharacterPtr owner)
 {
   char argument[MAX_INPUT_LENGTH];
 
-  int stat;
-  int choice;
-  int increase;
-  int64_t hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = 0;
-  int statplatprice = 0, max_stat = 0;
+  qint32 stat;
+  qint32 choice;
+  qint32 increase;
+  qint64 hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = {};
+  qint32 statplatprice = 0, max_stat = {};
 
-  int8_t *pstat = 0;
-  int pprice = 0;
+  qint8 *pstat = {};
+  qint32 pprice = {};
 
   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY) && (cmd != cmd_t::ESTIMATE))
     return ReturnValue::eFAILURE;
@@ -705,21 +691,21 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       return ReturnValue::eSUCCESS;
     }
 
-    int choice = atoi(argument);
+    qint32 choice = atoi(argument);
     if (choice < 1 || choice > 3)
     {
       ch->sendln("$B$2The Meta-physician tells you, 'I cannot estimate that. Type estimate by itself for a list.'$R ");
       return ReturnValue::eSUCCESS;
     }
-    int amount = atoi(arg2);
+    qint32 amount = atoi(arg2);
     if (amount < 5 || amount > 10000)
     {
       ch->sendln("$B$2The Meta-physician tells you, 'The amount cannot be over 10000 or less than 5.'$R ");
       return ReturnValue::eSUCCESS;
     }
 
-    int64_t platcost;
-    int64_t expcost;
+    qint64 platcost;
+    qint64 expcost;
     switch (choice)
     {
     case 1:
@@ -733,7 +719,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       break;
     }
     expcost = platcost * 51523;
-    csendf(ch, "$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \r\n", platcost, expcost);
+    ch->send(QStringLiteral("$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \r\n").arg(platcost).arg(expcost));
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::LIST)
@@ -745,44 +731,32 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     ch->sendln("$BStatistic Meta:$R");
     if (hit_exp && hit_cost)
-      csendf(ch, "$B$36)$R Add 5 points to your hit points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
-             hit_exp, hit_cost);
+      ch->sendln("$B$36)$R Add 5 points to your hit points:   %ld experience points and %ld Platinum coins.\r\n").arg(hit_exp).arg(hit_cost));
     else
       ch->sendln("$B$36)$R Add to your hit points:   You cannot do ch.");
 
     if (hit_exp && hit_cost)
-      csendf(ch, "$B$37)$R Add 1 point to your hit points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
-             (int64_t)(hit_exp / 5 * 1.1), (int64_t)(hit_cost / 5 * 1.1));
+      ch->sendln("$B$37)$R Add 1 point to your hit points:   %ld experience points and %ld Platinum coins.").arg((qint64)(hit_exp / 5 * 1.1)).arg((qint64)(hit_cost / 5 * 1.1)));
     else
       ch->sendln("$B$37)$R Add to your hit points:   You cannot do ch.");
 
     if (mana_exp && mana_cost)
-      csendf(ch, "$B$38)$R Add 5 points to your mana points:  %ld experience points and %ld"
-                 " Platinum coins.\r\n",
-             mana_exp, mana_cost);
+      ch->sendln(QStringLiteral("$B$38)$R Add 5 points to your mana points:  %ld experience points and %ld Platinum coins.").arg(mana_exp).arg(mana_cost));
     else
       ch->sendln("$B$38)$R Add to your mana points:  You cannot do ch.");
 
     if (mana_exp && mana_cost)
-      csendf(ch, "$B$39)$R Add 1 point to your mana points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
-             (int64_t)(mana_exp / 5 * 1.1), (int64_t)(mana_cost / 5 * 1.1));
+      ch->sendln("$B$39)$R Add 1 point to your mana points:   %ld experience points and %ld Platinum coins.\r\n").arg((qint64)(mana_exp / 5 * 1.1)).arg((qint64)(mana_cost / 5 * 1.1)));
     else
       ch->sendln("$B$39)$R Add to your mana points:   You cannot do ch.");
 
     if (move_exp && move_cost)
-      csendf(ch, "$B$310)$R Add 5 points to your movement points: %ld experience points and %ld"
-                 " Platinum coins.\r\n",
-             move_exp, move_cost);
+      ch->sendln(QStringLiteral("$B$310)$R Add 5 points to your movement points: %ld experience points and %ld Platinum coins.").arg(move_exp).arg(move_cost));
     else
       ch->sendln("$B$310)$R Add to your movement points:  You cannot do ch.");
 
     if (move_exp && move_cost)
-      csendf(ch, "$B$311)$R Add 1 points to your movement points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
-             (int64_t)(move_exp / 5 * 1.1), (int64_t)(move_cost / 5 * 1.1));
+      ch->sendln("$B$311)$R Add 1 points to your movement points:   %ld experience points and %ld Platinum coins.").arg((qint64)(move_exp / 5 * 1.1)).arg((qint64)(move_cost / 5 * 1.1)));
     else
       ch->sendln("$B$311)$R Add to your movement points:   You cannot do ch.");
 
@@ -790,7 +764,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (!ch->isNonPlayer() && ki_cost && ki_exp)
     { // mobs can't meta ki
-      csendf(ch, "$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n", ki_exp, ki_cost);
+      ch->send(QStringLiteral("$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n").arg(ki_exp).arg(ki_cost));
     }
     else if (!ch->isNonPlayer())
       ch->sendln("$B$312)$R Add a point of ki:        You cannot do ch.");
@@ -809,7 +783,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         ch);
     if (!ch->isNonPlayer())
     {
-      csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\r\n", GET_AC_METAS(ch));
+      ch->send(QStringLiteral("$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\r\n").arg(GET_AC_METAS(ch)));
       ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
     }
 
@@ -861,19 +835,19 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       max_stat = get_max_stat(ch, attribute_t::WISDOM);
       break;
     default:
-      stat = 0;
+      stat = {};
       break;
     }
 
     if (choice < 6)
     {
 
-      if (GET_PLATINUM(ch) < (unsigned)statplatprice)
+      if (GET_PLATINUM(ch) < (quint32)statplatprice)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services.  SCRAM!'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_EXP(ch) < pprice)
+      if (ch->exp < pprice)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
@@ -884,7 +858,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         return ReturnValue::eSUCCESS;
       }
 
-      GET_EXP(ch) -= pprice;
+      ch->exp -= pprice;
       GET_PLATINUM(ch) -= statplatprice;
 
       *pstat += 1;
@@ -909,17 +883,17 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (choice == 6 && hit_exp && hit_cost)
     {
-      if (GET_EXP(ch) < hit_exp)
+      if (ch->exp < hit_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (uint32_t)hit_cost)
+      if (GET_PLATINUM(ch) < (quint32)hit_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
         return ReturnValue::eSUCCESS;
       }
-      GET_EXP(ch) -= hit_exp;
+      ch->exp -= hit_exp;
       GET_PLATINUM(ch) -= hit_cost;
 
       increase = 5;
@@ -934,20 +908,20 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (choice == 7 && hit_exp && hit_cost)
     {
-      hit_exp = (int)(hit_exp / 5 * 1.1);
-      hit_cost = (int)(hit_cost / 5 * 1.1);
+      hit_exp = (qint32)(hit_exp / 5 * 1.1);
+      hit_cost = (qint32)(hit_cost / 5 * 1.1);
 
-      if (GET_EXP(ch) < hit_exp)
+      if (ch->exp < hit_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (uint32_t)hit_cost)
+      if (GET_PLATINUM(ch) < (quint32)hit_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!$R'");
         return ReturnValue::eSUCCESS;
       }
-      GET_EXP(ch) -= hit_exp;
+      ch->exp -= hit_exp;
       GET_PLATINUM(ch) -= hit_cost;
 
       increase = 1;
@@ -963,18 +937,18 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (choice == 8 && mana_exp && mana_cost)
     {
 
-      if (GET_EXP(ch) < mana_exp)
+      if (ch->exp < mana_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (uint32_t)mana_cost)
+      if (GET_PLATINUM(ch) < (quint32)mana_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
         return ReturnValue::eSUCCESS;
       }
 
-      GET_EXP(ch) -= mana_exp;
+      ch->exp -= mana_exp;
       GET_PLATINUM(ch) -= mana_cost;
 
       increase = 5;
@@ -989,21 +963,21 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (choice == 9 && mana_exp && mana_cost)
     {
-      mana_exp = (int)(mana_exp / 5 * 1.1);
-      mana_cost = (int)(mana_cost / 5 * 1.1);
+      mana_exp = (qint32)(mana_exp / 5 * 1.1);
+      mana_cost = (qint32)(mana_cost / 5 * 1.1);
 
-      if (GET_EXP(ch) < mana_exp)
+      if (ch->exp < mana_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (uint32_t)mana_cost)
+      if (GET_PLATINUM(ch) < (quint32)mana_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
         return ReturnValue::eSUCCESS;
       }
 
-      GET_EXP(ch) -= mana_exp;
+      ch->exp -= mana_exp;
       GET_PLATINUM(ch) -= mana_cost;
 
       increase = 1;
@@ -1018,18 +992,18 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (choice == 10 && move_exp && move_cost)
     {
-      if (GET_EXP(ch) < move_exp)
+      if (ch->exp < move_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (uint32_t)move_cost)
+      if (GET_PLATINUM(ch) < (quint32)move_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
         return ReturnValue::eSUCCESS;
       }
 
-      GET_EXP(ch) -= move_exp;
+      ch->exp -= move_exp;
       GET_PLATINUM(ch) -= move_cost;
       ch->raw_move += 5;
       ch->max_move += 5;
@@ -1044,21 +1018,21 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (choice == 11 && move_exp && move_cost)
     {
-      move_exp = (int)(move_exp / 5 * 1.1);
-      move_cost = (int)(move_cost / 5 * 1.1);
+      move_exp = (qint32)(move_exp / 5 * 1.1);
+      move_cost = (qint32)(move_cost / 5 * 1.1);
 
-      if (GET_EXP(ch) < move_exp)
+      if (ch->exp < move_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (uint32_t)move_cost)
+      if (GET_PLATINUM(ch) < (quint32)move_cost)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
         return ReturnValue::eSUCCESS;
       }
 
-      GET_EXP(ch) -= move_exp;
+      ch->exp -= move_exp;
       GET_PLATINUM(ch) -= move_cost;
       ch->raw_move += 1;
       ch->max_move += 1;
@@ -1077,18 +1051,18 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         ch->sendln("Mobs cannot meta ki.");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_EXP(ch) < ki_exp)
+      if (ch->exp < ki_exp)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (uint32_t)(ki_cost))
+      if (GET_PLATINUM(ch) < (quint32)(ki_cost))
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
         return ReturnValue::eSUCCESS;
       }
 
-      GET_EXP(ch) -= ki_exp;
+      ch->exp -= ki_exp;
       GET_PLATINUM(ch) -= ki_cost;
 
       ch->raw_ki += 1;
@@ -1180,7 +1154,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
     if (choice == 18)
     {
-      if (GET_EXP(ch) < 100000000)
+      if (ch->exp < 100000000)
       {
         ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
         return ReturnValue::eSUCCESS;
@@ -1191,7 +1165,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         return ReturnValue::eSUCCESS;
       }
 
-      GET_EXP(ch) -= 100000000;
+      ch->exp -= 100000000;
       ch->addGold(500000);
 
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
@@ -1205,7 +1179,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!'$R");
         return ReturnValue::eSUCCESS;
       }
-      class Object *obj = clone_object(real_object(10003));
+      ObjectPtr obj = clone_object(real_object(10003));
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
         ch->sendln("You can't carry that many items.");
@@ -1265,7 +1239,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       GET_AC(ch) -= 2;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
+      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1284,10 +1258,10 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       }
 
       GET_QPOINTS(ch) -= 1;
-      GET_EXP(ch) += 2000000;
+      ch->exp += 2000000;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
+      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1311,7 +1285,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
 void Character::undo_race_saves(void)
 {
-  switch (GET_RACE(this))
+  switch (this->race)
   {
   case RACE_HUMAN:
     this->saves[SAVE_TYPE_FIRE] -= RACE_HUMAN_FIRE_MOD;
@@ -1398,7 +1372,7 @@ void Character::undo_race_saves(void)
   }
 }
 
-bool Character::is_race_applicable(int race)
+bool Character::is_race_applicable(qint32 race)
 {
   if (GET_CLASS(this) == CLASS_PALADIN && (race != RACE_HUMAN && race != RACE_ELVEN && race != RACE_DWARVEN))
     return false;
@@ -1458,7 +1432,7 @@ bool Character::would_die(void)
 
 void Character::set_heightweight(void)
 {
-  switch (GET_RACE(this))
+  switch (this->race)
   {
   case RACE_HUMAN:
     this->height = number(66, 77);
@@ -1497,11 +1471,11 @@ void Character::set_heightweight(void)
     this->weight = number(240, 280);
     break;
   }
-  logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
-  logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
+  logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
+  logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
 }
 
-int changecost(int oldrace, int newrace)
+qint32 changecost(qint32 oldrace, qint32 newrace)
 {
   switch (oldrace)
   {
@@ -1575,57 +1549,57 @@ int changecost(int oldrace, int newrace)
   return 100000;
 }
 
-char *Character::race_message(int race)
+char *Character::race_message(qint32 race)
 {
   static char buf[MAX_STRING_LENGTH];
-  if (GET_RACE(this) == race)
+  if (this->race == race)
     return "You are already of this race.";
   else if (!is_race_applicable(race))
     return "You do not qualify for becoming this race.";
 
-  sprintf(buf, "%d platinum coins.", changecost(GET_RACE(this), race));
+  sprintf(buf, "%d platinum coins.", changecost(this->race, race));
   return &buf[0];
 }
 
-int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, Character *owner)
+qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argument, CharacterPtr owner)
 {
   if (cmd == cmd_t::LIST) // list
   {
     ch->sendln("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n");
     ch->sendln("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)");
 
-    for (int i = 1; i <= MAX_PC_RACE; i++)
-      csendf(ch, "$B$3%d)$R  %-32s - %s\r\n", i, races[i].singular_name, ch->race_message(i));
+    for (qint32 i = 1; i <= MAX_PC_RACE; i++)
+      ch->send(QStringLiteral("$B$3%d)$R  %-32s - %s\r\n").arg(i).arg(races[i].singular_name).arg(ch->race_message(i)));
 
     ch->sendln("$BOther Services:$R");
 
-    csendf(ch, "$B$3%d)$R %-32s - 1000 platinum coins.\r\n", MAX_PC_RACE + 1, "Sex Change");
-    csendf(ch, "$B$3%d)$R %-32s - 50 platinum coins.\r\n", MAX_PC_RACE + 2, "A deep red vial of mana");
+    ch->send(QStringLiteral("$B$3%d)$R %-32s - 1000 platinum coins.\r\n").arg(MAX_PC_RACE + 1).arg("Sex Change"));
+    ch->send(QStringLiteral("$B$3%d)$R %-32s - 50 platinum coins.\r\n").arg(MAX_PC_RACE + 2).arg("A deep red vial of mana"));
 
     ch->sendln("$BHeight/Weight Change:$R");
     ch->heightweight(false);
     if (ch->height < races[ch->race].max_height)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 3, "Increase your height by 1");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 3).arg("Increase your height by 1"));
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 3, "You cannot increase your height further");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 3).arg("You cannot increase your height further"));
 
     if (ch->height > races[ch->race].min_height)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 4, "Decrease your height by 1");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 4).arg("Decrease your height by 1"));
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 4, "You cannot decrease your height further");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 4).arg("You cannot decrease your height further"));
 
     if (ch->weight < races[ch->race].max_weight)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 5, "Increase your weight by 1");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 5).arg("Increase your weight by 1"));
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 5, "You cannot increase your weight further");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 5).arg("You cannot increase your weight further"));
 
     if (ch->weight > races[ch->race].min_weight)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 6, "Decrease your weight by 1");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 6).arg("Decrease your weight by 1"));
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 6, "You cannot decrease your weight further");
+      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 6).arg("You cannot decrease your weight further"));
     ch->heightweight(true);
-    csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 7, "Increase your age by 1 (500 max)");
-    csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 8, "Decrease your age by 1  (18 min)");
+    ch->send(QStringLiteral("$B$3%d)$R %-32s - 5 quest points.\r\n").arg(MAX_PC_RACE + 7).arg("Increase your age by 1 (500 max)"));
+    ch->send(QStringLiteral("$B$3%d)$R %-32s - 5 quest points.\r\n").arg(MAX_PC_RACE + 8).arg("Decrease your age by 1  (18 min)"));
 
     return ReturnValue::eSUCCESS;
   }
@@ -1634,7 +1608,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
     char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
     argument = one_argument(argument, arg);
     argument = one_argument(argument, arg2);
-    int choice = atoi(arg);
+    qint32 choice = atoi(arg);
     if (choice > 0 && choice <= MAX_PC_RACE)
     {
       if (ch->would_die())
@@ -1642,7 +1616,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         ch->sendln("$B$2Cardinal Thelonius tells you, 'The process would kill you!'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_RACE(ch) == choice)
+      if (ch->race == choice)
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You are already a member of that race!'$R");
         return ReturnValue::eSUCCESS;
@@ -1652,7 +1626,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You do not qualify for becoming that race!'$R");
         return ReturnValue::eSUCCESS;
       }
-      if (GET_PLATINUM(ch) < (unsigned)changecost(GET_RACE(ch), choice))
+      if (GET_PLATINUM(ch) < (quint32)changecost(ch->race, choice))
       {
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
         return ReturnValue::eSUCCESS;
@@ -1660,10 +1634,10 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
 
       if (!str_cmp(arg2, "confirm"))
       {
-        GET_PLATINUM(ch) -= changecost(GET_RACE(ch), choice);
+        GET_PLATINUM(ch) -= changecost(ch->race, choice);
         ch->undo_race_saves();
 
-        GET_RACE(ch) = choice;
+        ch->race = choice;
 
         GET_RAW_STR(ch) = MIN(get_max_stat(ch, attribute_t::STRENGTH), GET_RAW_STR(ch));
         GET_RAW_STR(ch) -= 2;
@@ -1707,7 +1681,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
     }
     else if (choice == MAX_PC_RACE + 1)
     {
-      Character::sex_t newsex{};
+      Character::sex_t newsex = {};
       if (arg2[0] == 'n')
         newsex = Character::sex_t::NEUTRAL;
       else if (arg2[0] == 'm')
@@ -1716,7 +1690,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         newsex = Character::sex_t::FEMALE;
       else
       {
-        csendf(ch, "Syntax: buy %d m/f/n\r\n", MAX_PC_RACE + 1);
+        ch->send(QStringLiteral("Syntax: buy %d m/f/n\r\n").arg(MAX_PC_RACE + 1));
         return ReturnValue::eSUCCESS;
       }
       if (GET_SEX(ch) == newsex)
@@ -1742,7 +1716,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
         return ReturnValue::eSUCCESS;
       }
-      class Object *obj = clone_object(real_object(10004));
+      ObjectPtr obj = clone_object(real_object(10004));
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
         ch->sendln("You can't carry that many items.");
@@ -1802,22 +1776,22 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       if (choice == 3)
       {
         ch->height++;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by 1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
       }
       if (choice == 4)
       {
         ch->height--;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by -1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
       }
       if (choice == 5)
       {
         ch->weight++;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by 1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
       }
       if (choice == 6)
       {
         ch->weight--;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
       }
       return ReturnValue::eSUCCESS;
     }
@@ -1843,7 +1817,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       GET_AGE_METAS(ch) += 1;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
+      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1870,7 +1844,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       GET_AGE_METAS(ch) -= 1;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
+      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;

@@ -1,14 +1,12 @@
 #ifdef BANDWIDTH
-#ifndef BANDWIDTH_H_
-#define BANDWIDTH_H_
+#pragma once
 
 void setup_bandwidth();
-void add_bandwidth(int amount);
+void add_bandwidth(qint32 amount);
 bandwidth_type read_bandwidth(const char *file);
-int write_bandwidth();
+qint32 write_bandwidth();
 
-int32_t get_bandwidth_start();
-int32_t get_bandwidth_amount();
+qint32 get_bandwidth_start();
+qint32 get_bandwidth_amount();
 
-#endif /* #ifndef BANDWIDTH_H_ */
 #endif /* #ifdef BANDWIDTH */

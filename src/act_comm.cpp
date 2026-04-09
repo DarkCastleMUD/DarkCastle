@@ -12,30 +12,19 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
+#include "DC/DC.h"
 #include <cassert>
-#include <cstdint>
-
 #include <fmt/format.h>
 #include <QFile>
-
-#include "DC/DC.h"
-#include "DC/character.h"
+#include <qtypes.h>
 #include "DC/punish.h"
 #include "DC/terminal.h"
-#include "DC/connect.h"
-#include "DC/room.h"
-#include "DC/mobile.h"
-#include "DC/handler.h"
 #include "DC/interp.h"
-#include "DC/utility.h"
-#include "DC/act.h"
 #include "DC/db.h"
-#include "DC/returnvals.h"
-#include "DC/obj.h"
 
 extern bool MOBtrigger;
 
-int do_report(Character *ch, char *argument, cmd_t cmd)
+qint32 do_report(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[256];
   char report[200];
@@ -55,8 +44,8 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isPlayer() && argument != nullptr)
   {
-    std::string arg1, remainder_args;
-    std::tie(arg1, remainder_args) = half_chop(std::string(argument));
+    QString arg1, remainder_args;
+    std::tie(arg1, remainder_args) = half_chop(QString(argument));
     if (arg1 == "help")
     {
       ch->sendln("report       - Reports hps, mana, moves and ki. (default)");
@@ -68,13 +57,13 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
     if (arg1 == "xp")
     {
       // calculate how many levels a player could gain with their current XP
-      uint8_t levels_to_gain = 0;
-      int64_t players_exp = GET_EXP(ch);
+      quint8 levels_to_gain = {};
+      qint64 players_exp = ch->exp;
       while (levels_to_gain < IMMORTAL)
       {
-        if (players_exp >= (int64_t)exp_table[(int)ch->getLevel() + levels_to_gain + 1])
+        if (players_exp >= (qint64)exp_table[(qint32)ch->getLevel() + levels_to_gain + 1])
         {
-          players_exp -= (int64_t)exp_table[(int)ch->getLevel() + levels_to_gain + 1];
+          players_exp -= (qint64)exp_table[(qint32)ch->getLevel() + levels_to_gain + 1];
           levels_to_gain++;
         }
         else
@@ -83,9 +72,9 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
         }
       }
 
-      snprintf(report, 200, "XP: %ld, XP till level: %ld, Levels to gain: %u",
-               GET_EXP(ch),
-               (int64_t)(exp_table[(int)ch->getLevel() + 1] - (int64_t)GET_EXP(ch)),
+      snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
+               ch->exp,
+               (qint64)(exp_table[(qint32)ch->getLevel() + 1] - (qint64)ch->exp),
                levels_to_gain);
 
       sprintf(buf, "$n reports '%s'", report);
@@ -97,14 +86,14 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (ch->isNonPlayer() || IS_ANONYMOUS(ch))
-    snprintf(report, 200, "%d%% hps, %d%% mana, %d%% movement, and %d%% ki.",
+    snprintf(report, 200, "%d%% hps, %d%% mana, %llu%% movement, and %d%% ki.",
              MAX(1, ch->getHP() * 100) / MAX(1, GET_MAX_HIT(ch)),
              MAX(1, GET_MANA(ch) * 100) / MAX(1, GET_MAX_MANA(ch)),
-             MAX(1, GET_MOVE(ch) * 100) / MAX(1, GET_MAX_MOVE(ch)),
+             MAX<move_t>(1, GET_MOVE(ch) * 100) / MAX<move_t>(1, GET_MAX_MOVE(ch)),
              MAX(1, GET_KI(ch) * 100) / MAX(1, GET_MAX_KI(ch)));
   else
   {
-    snprintf(report, 200, "%d/%d hps, %d/%d mana, %d/%d movement, and %d/%d ki.",
+    snprintf(report, 200, "%d/%d hps, %d/%d mana, %llu/%llu movement, and %d/%d ki.",
              ch->getHP(), GET_MAX_HIT(ch),
              GET_MANA(ch), GET_MAX_MANA(ch),
              GET_MOVE(ch), GET_MAX_MOVE(ch),
@@ -127,12 +116,11 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
+qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
 {
   QString buf1;
   QString buf;
   QString typestr;
-  Connection *i = nullptr;
 
   if (message.isEmpty())
   {
@@ -206,37 +194,37 @@ int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
   buf = QStringLiteral("//(%1) %2\r\n").arg(typestr).arg(message);
   buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\r\n").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
 
-  for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+  for (auto &conn : DC::getInstance()->connections_)
   {
-    if ((i->character == nullptr) || (i->character->getLevel() <= MORTAL))
+    if ((conn->character == nullptr) || (conn->character->getLevel() <= MORTAL))
       continue;
-    if (!(isSet(i->character->misc, type)))
+    if (!(isSet(conn->character->misc, type)))
       continue;
-    if (is_busy(i->character))
+    if (is_busy(conn->character))
       continue;
-    if (!i->connected && i->character->getLevel() >= god_level)
+    if (!conn->connected && conn->character->getLevel() >= god_level)
     {
-      if (i->character->isNonPlayer() || isSet(i->character->player->toggles, Player::PLR_ANSI))
-        send_to_char(buf1, i->character);
+      if (conn->character->isNonPlayer() || isSet(conn->character->player->toggles, Player::PLR_ANSI))
+        send_to_char(buf1, conn->character);
       else
-        i->character->send(buf);
+        conn->character->send(buf);
     }
   }
   return (1);
 }
 
-int do_channel(Character *ch, char *arg, cmd_t cmd)
+qint32 do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
 {
-  int x;
-  int y = 0;
-  char buf[200];
-  char buf2[200];
+  qint32 x;
+  qint32 y = {};
+  QString buf;
+  QString buf2;
 
-  const char *on_off[] = {
+  const QStringList on_off = {
       "$B$4off$R",
       "$B$2on$R"};
 
-  const char *types[] = {
+  const QStringList types = {
       "bug", // 0
       "prayer",
       "god",
@@ -283,20 +271,20 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
         if (isSet(ch->misc, (1 << x)))
           y = 1;
         else
-          y = 0;
+          y = {};
         sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
     }
     else
     {
-      int o = ch->getLevel() == 110 ? 21 : 19;
-      for (x = 0; x <= o; x++)
+      qint32 o = ch->getLevel() == 110 ? 21 : 19;
+      for (x = {}; x <= o; x++)
       {
         if (isSet(ch->misc, (1 << x)))
           y = 1;
         else
-          y = 0;
+          y = {};
         sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
@@ -305,24 +293,24 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
     if (isSet(ch->misc, 1 << 22))
       y = 1;
     else
-      y = 0;
+      y = {};
     sprintf(buf2, "%-9s%s\r\n", types[22], on_off[y]);
     send_to_char(buf2, ch);
 
     if (isSet(ch->misc, 1 << 23))
       y = 1;
     else
-      y = 0;
+      y = {};
     sprintf(buf2, "%-9s%s\r\n", types[23], on_off[y]);
     send_to_char(buf2, ch);
 
-    int o = ch->getLevel() == 110 ? 26 : 0;
+    qint32 o = ch->getLevel() == 110 ? 26 : 0;
     for (x = 24; x <= o; x++)
     {
       if (isSet(ch->misc, (1 << x)))
         y = 1;
       else
-        y = 0;
+        y = {};
       sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
       send_to_char(buf2, ch);
     }
@@ -330,7 +318,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  for (x = 0; x <= 27; x++)
+  for (x = {}; x <= 27; x++)
   {
     if (x == 27)
     {
@@ -367,7 +355,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
+command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -380,7 +368,7 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (args.empty())
+  if (args.isEmpty())
   {
     if (ch->player->ignoring.empty())
     {
@@ -388,72 +376,72 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    // convert ignoring std::map into "char1 char2 char3" format
-    std::string ignoreString = {};
-    for (const auto &ignore : ch->player->ignoring)
+    // convert ignoring QMap into "char1 char2 char3" format
+    QString ignoreString = {};
+    for (const auto &[keyword, entry] : ch->player->ignoring.asKeyValueRange())
     {
-      if (ignore.second.ignore)
+      if (entry.ignore)
       {
-        if (ignoreString.empty())
+        if (ignoreString.isEmpty())
         {
-          ignoreString = ignore.first;
+          ignoreString = keyword;
         }
         else
         {
-          ignoreString = ignoreString + " " + ignore.first;
+          ignoreString = ignoreString + " " + keyword;
         }
       }
     }
-    ch->send(fmt::format("Ignoring: {}\r\n", ignoreString));
+    ch->sendln(QStringLiteral("Ignoring: %1").arg(ignoreString));
 
     return ReturnValue::eSUCCESS;
   }
 
-  std::string arg1 = {}, remainder_args = {};
+  QString arg1 = {}, remainder_args = {};
   std::tie(arg1, remainder_args) = half_chop(args);
-  if (arg1.empty())
+  if (arg1.isEmpty())
   {
     ch->send("Ignore who?\r\n");
     return ReturnValue::eFAILURE;
   }
-  arg1[0] = toupper(arg1[0]);
+  arg1[0] = arg1[0].toUpper();
 
-  if (ch->player->ignoring.contains(arg1) == false)
+  if (ch->player->ignoring.contains(arg1))
   {
-    ch->player->ignoring[arg1] = {true, 0};
-    ch->send(fmt::format("You now ignore anyone named {}.\r\n", arg1));
+    ch->player->ignoring.remove(arg1);
+    ch->sendln(QStringLiteral("You stop ignoring %1.").arg(arg1));
   }
   else
   {
-    ch->player->ignoring.erase(arg1);
-    ch->send(fmt::format("You stop ignoring {}.\r\n", arg1));
+    ch->player->ignoring[arg1] = {true, 0};
+    ch->sendln(QStringLiteral("You now ignore anyone named %1.").arg(arg1));
   }
   return ReturnValue::eSUCCESS;
 }
 
-int is_ignoring(const Character *const ch, const Character *const i)
+qint32 is_ignoring(const CharacterPtr const ch, const CharacterPtr const victim)
 {
-  if (ch->isNonPlayer() || (i->getLevel() >= IMMORTAL && i->isPlayer()) || ch->player->ignoring.empty())
+  if (ch->isNonPlayer() || (victim->getLevel() >= IMMORTAL && victim->isPlayer()) || ch->player->ignoring.empty())
   {
     return false;
   }
 
-  if (GET_NAME(i) == nullptr)
+  if (victim->name().isEmpty())
   {
     return false;
   }
 
-  if (ch->player->ignoring.contains(GET_NAME(i)))
+  if (ch->player->ignoring.contains(qPrintable(victim->name())))
   {
     return true;
   }
 
   // Since it didn't match the whole name, see if it matches one of
   // the name keywords used for a mob name
-  std::string names = GET_NAME(i);
-  std::string name1 = {}, remainder_names = {};
+  QString names = qPrintable(victim->name());
+  QString name1 = {}, remainder_names = {};
   std::tie(name1, remainder_names) = half_chop(names);
-  while (name1.empty() == false)
+  while (name1.isEmpty() == false)
   {
     if (ch->player->ignoring.contains(name1))
     {
@@ -466,11 +454,11 @@ int is_ignoring(const Character *const ch, const Character *const i)
   return false;
 }
 
-#define MAX_NOTE_LENGTH 1000 /* arbitrary */
+constexpr auto MAX_NOTE_LENGTH = 1000; /* arbitrary */
 
-int do_write(Character *ch, char *argument, cmd_t cmd)
+qint32 do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  class Object *paper = 0, *pen = 0;
+  ObjectPtr paper = 0, pen = {};
   char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
       buf[MAX_STRING_LENGTH];
 
@@ -516,7 +504,7 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     if (paper->obj_flags.type_flag == ITEM_PEN) /* oops, a pen.. */
     {
       pen = paper;
-      paper = 0;
+      paper = {};
     }
     else if (paper->obj_flags.type_flag != ITEM_NOTE)
     {
@@ -569,11 +557,11 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
-int do_insult(Character *ch, char *argument, cmd_t cmd)
+qint32 do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[100];
   char arg[MAX_STRING_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   one_argument(argument, arg);
 
@@ -587,7 +575,7 @@ int do_insult(Character *ch, char *argument, cmd_t cmd)
     {
       if (victim != ch)
       {
-        sprintf(buf, "You insult %s.\r\n", GET_SHORT(victim));
+        sprintf(buf, "You insult %s.\r\n", qPrintable(victim->shortdesc_or_name()));
         ch->send(buf);
 
         switch (number(0, 3))
@@ -625,9 +613,9 @@ int do_insult(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_emote(Character *ch, char *argument, cmd_t cmd)
+qint32 do_emote(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  int i;
+  qint32 i;
   char buf[MAX_STRING_LENGTH];
 
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOEMOTE))
@@ -636,7 +624,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  for (i = 0; *(argument + i) == ' '; i++)
+  for (i = {}; *(argument + i) == ' '; i++)
     ;
 
   if (!*(argument + i))
@@ -647,7 +635,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
     // don't want players triggering mobs with emotes
     MOBtrigger = false;
     act(buf, ch, 0, 0, TO_ROOM, 0);
-    csendf(ch, "%s %s\r\n", GET_SHORT(ch), argument + i);
+    ch->send(QStringLiteral("%s %s\r\n").arg(qPrintable(ch->shortdesc_or_name())).arg(argument + i));
     MOBtrigger = true;
   }
   return ReturnValue::eSUCCESS;
@@ -718,7 +706,7 @@ void DC::save_hints(void)
 
   QTextStream out(&file);
 
-  uint64_t hint_key = 0;
+  quint64 hint_key = {};
   for (hints_t::iterator i = hints_.begin(); i != hints_.end(); ++i)
   {
     out << "#" << ++hint_key << "\n";
@@ -737,7 +725,7 @@ void DC::send_hint(void)
 
   auto num = number(0LL, hints_.size() - 1);
 
-  uint64_t attempts = 0;
+  quint64 attempts = {};
   while (hints_.value(num).isEmpty() && attempts++ < 100)
   {
     num = number(0LL, hints_.size() - 1);
@@ -745,18 +733,16 @@ void DC::send_hint(void)
 
   QString hint = QStringLiteral("$B$5HINT:$7 %1$R\r\n").arg(hints_.value(num));
 
-  for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
+  for (auto &i : DC::getInstance()->connections_)
   {
-    if (i->connected || !i->character || !i->character->desc || is_busy(i->character) || i->character->isNonPlayer())
+    if (!i.isPlaying() || !conn->character || !conn->character->desc || is_busy(conn->character) || conn->character->isNonPlayer())
     {
       continue;
     }
 
-    if (isSet(i->character->misc, DC::LogChannel::CHANNEL_HINTS))
+    if (isSet(conn->character->misc, DC::LogChannel::CHANNEL_HINTS))
     {
-      i->character->send(hint);
+      conn->character->send(hint);
     }
   }
-
-  return;
 }

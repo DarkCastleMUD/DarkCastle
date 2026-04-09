@@ -2,30 +2,26 @@
 | Level 101 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include <queue>
-#include <string>
+#include <QQueue>
+#include <QString>
 
 #include <fmt/format.h>
-#include <expected>
-
-#include "DC/utility.h"
-#include "DC/mobile.h"
 
 #include "DC/interp.h"
-#include "DC/room.h"
+
 #include "DC/DC.h"
-#include "DC/character.h"
 #include "DC/terminal.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/db.h"
+#include "DC/levels.h"
 
-std::queue<std::string> imm_history;
-std::queue<std::string> imp_history;
+QQueue<QString> imm_history;
+QQueue<QString> imp_history;
 
-#define MAX_MESSAGE_LENGTH 4096
+constexpr auto MAX_MESSAGE_LENGTH = 4096;
 
 command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 {
@@ -36,14 +32,14 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 
   const auto dc = DC::getInstance();
   QString buffer, bestow_buffer, test_buffer;
-  uint64_t column{}, bestow_column{}, test_column{};
-  for (level_t v = 101; v <= getLevel(); ++v)
+  quint64 column{}, bestow_column{}, test_column = {};
+  for (level_t v = level_t(101); v <= getLevel(); ++v)
   {
-    for (const auto &command : DC::getInstance()->CMD_.commands_)
+    for (auto &command : DC::getInstance()->CMD_.commands_)
     {
       if (command.getMinimumLevel() == GIFTED_COMMAND && v == getLevel())
       {
-        auto bestow_command = get_bestow_command(command.getName());
+        auto bestow_command = get_bestow_command(command.name());
 
         if (!bestow_command.has_value())
         {
@@ -57,7 +53,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 
         if (bestow_command->testcmd == false)
         {
-          bestow_buffer.append(QStringLiteral("[GFT]%1").arg(command.getName(), -11));
+          bestow_buffer.append(QStringLiteral("[GFT]%1").arg(command.name(), -11));
           if (++bestow_column % 5 == 0)
           {
             bestow_buffer.append("\r\n");
@@ -65,7 +61,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
         }
         else
         {
-          test_buffer.append(QStringLiteral("[TST]%1").arg(command.getName(), -11));
+          test_buffer.append(QStringLiteral("[TST]%1").arg(command.name(), -11));
           if (++test_column % 5 == 0)
           {
             test_buffer.append("\r\n");
@@ -79,7 +75,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
         continue;
       }
 
-      buffer.append(QStringLiteral("[%1]%2").arg(command.getMinimumLevel(), 2).arg(command.getName(), -11));
+      buffer.append(QStringLiteral("[%1]%2").arg(command.getMinimumLevel(), 2).arg(command.name(), -11));
 
       if (++column % 5 == 0)
       {
@@ -116,12 +112,12 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 {
-  int loc_nr = {}, location = -1, i = {}, start_room = {};
+  qint32 loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};
-  Character *target_mob = {}, *pers = {};
-  Character *tmp_ch = {};
+  CharacterPtr target_mob = {}, pers = {};
+  CharacterPtr tmp_ch = {};
   follow_type *k = {}, *next_dude = {};
-  class Object *target_obj = {};
+  ObjectPtr target_obj = {};
 
   if (this->isNonPlayer())
   {
@@ -172,7 +168,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       loc_nr = zone.getRealBottom();
     }
 
-    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(std::string(DC::getInstance()->zones.value(zone_key).Name().toStdString()))));
+    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(QString(DC::getInstance()->zones.value(zone_key).name().toStdString()))));
 
     if (loc_nr > DC::getInstance()->top_of_world || loc_nr < 0)
     {
@@ -209,19 +205,19 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if ((target_mob = getVisiblePlayer(arg1)))
       {
         location = target_mob->in_room;
-        send(QStringLiteral("Going to player %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
+        send(QStringLiteral("Going to player %1 in room %2.\r\n").arg(qPrintable(target_mob->name())).arg(location));
       }
       else if ((target_mob = getVisibleCharacter(arg1)))
       {
         location = target_mob->in_room;
-        send(QStringLiteral("Going to character %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
+        send(QStringLiteral("Going to character %1 in room %2.\r\n").arg(qPrintable(target_mob->name())).arg(location));
       }
       else if ((target_obj = getVisibleObject(arg1)))
       {
         if (target_obj->in_room != DC::NOWHERE)
         {
           location = target_obj->in_room;
-          send(QStringLiteral("Going to object %1 in room %2.\r\n").arg(target_obj->Name()).arg(location));
+          send(QStringLiteral("Going to object %1 in room %2.\r\n").arg(target_obj->name()).arg(location));
         }
         else
         {
@@ -352,17 +348,17 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if (start_room == k->follower->in_room && CAN_SEE(k->follower, this) &&
           k->follower->getLevel() >= IMMORTAL)
       {
-        csendf(k->follower, "You follow %s.\r\n\r\n", GET_SHORT(this));
+        k->follower->send(QStringLiteral("You follow %s.\r\n\r\n").arg(qPrintable(this->shortdesc_or_name())));
         k->follower->do_goto(arguments, cmd_t::DEFAULT);
       }
     }
   return ReturnValue::eSUCCESS;
 }
 
-int do_poof(Character *ch, char *arg, cmd_t cmd)
+qint32 do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char inout[100], buf[100];
-  int ctr, nope;
+  qint32 ctr, nope;
   char _convert[2];
 
   if (ch->isNonPlayer())
@@ -375,7 +371,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
 
   if (!*inout)
   {
-    ch->sendln("Usage:\r\npoof [i|o] <std::string>");
+    ch->sendln("Usage:\r\npoof [i|o] <QString>");
     ch->sendln("\r\nCurrent poof in is:");
     ch->send(ch->player->poofin);
     ch->sendln("");
@@ -387,7 +383,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
 
   if (inout[0] != 'i' && inout[0] != 'o')
   {
-    ch->sendln("Usage:\r\npoof [i|o] <std::string>");
+    ch->sendln("Usage:\r\npoof [i|o] <QString>");
     return ReturnValue::eFAILURE;
   }
 
@@ -403,9 +399,9 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  nope = 0;
+  nope = {};
 
-  for (ctr = 0; (unsigned)ctr <= strlen(arg); ctr++)
+  for (ctr = {}; (quint32)ctr <= strlen(arg); ctr++)
   {
     if (arg[ctr] == '%')
     {
@@ -433,17 +429,17 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
   _convert[0] = arg[0];
   _convert[1] = '\0';
   if (arg[ctr] == '%')
-    strcpy(buf, GET_NAME(ch));
+    strcpy(buf, qPrintable(ch->name()));
   else
     strcpy(buf, _convert);
 
   /* No reason to assign _convert[1] every time through, is there? */
-  for (ctr = 1; (unsigned)ctr < strlen(arg); ctr++)
+  for (ctr = 1; (quint32)ctr < strlen(arg); ctr++)
   {
     _convert[0] = arg[ctr];
 
     if (arg[ctr] == '%')
-      strcat(buf, GET_NAME(ch));
+      strcat(buf, qPrintable(ch->name()));
     else
       strcat(buf, _convert);
   }
@@ -461,12 +457,12 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_at(Character *ch, char *argument, cmd_t cmd)
+qint32 do_at(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
-  int loc_nr, location, original_loc;
-  Character *target_mob;
-  class Object *target_obj;
+  qint32 loc_nr, location, original_loc;
+  CharacterPtr target_mob;
+  ObjectPtr target_obj;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -521,7 +517,7 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
 
   original_loc = ch->in_room;
   move_char(ch, location, false);
-  int retval = ch->command_interpreter(command);
+  qint32 retval = ch->command_interpreter(command);
 
   /* check if the guy's still there */
   for (target_mob = DC::getInstance()->world[location].people; target_mob; target_mob =
@@ -533,9 +529,9 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_highfive(Character *ch, char *argument, cmd_t cmd)
+qint32 do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char buf[200];
 
   if (ch->isNonPlayer())
@@ -556,18 +552,18 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
 
   if (ch == victim)
   {
-    sprintf(buf, "%s conjures a clap of thunder to resound the land!\r\n", GET_SHORT(ch));
+    sprintf(buf, "%s conjures a clap of thunder to resound the land!\r\n", qPrintable(ch->shortdesc_or_name()));
     send_to_all(buf);
   }
   else
   {
-    sprintf(buf, "Time stops for a minute as %s and %s high-five!\r\n", GET_SHORT(ch), GET_SHORT(victim));
+    sprintf(buf, "Time stops for a minute as %s and %s high-five!\r\n", qPrintable(ch->shortdesc_or_name()), qPrintable(victim->shortdesc_or_name()));
     send_to_all(buf);
   }
   return ReturnValue::eSUCCESS;
 }
 
-int do_holylite(Character *ch, char *argument, cmd_t cmd)
+qint32 do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -590,11 +586,11 @@ int do_holylite(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
+qint32 do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[200];
 
-  int arg1;
+  qint32 arg1;
 
   if (ch->isNonPlayer())
   {
@@ -604,7 +600,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
   arg1 = atoi(argument);
 
   if (arg1 < 0)
-    arg1 = 0;
+    arg1 = {};
 
   if (!*argument)
   {
@@ -614,7 +610,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      ch->player->wizinvis = 0;
+      ch->player->wizinvis = {};
     }
   }
   else
@@ -623,12 +619,11 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
       arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
-  sprintf(buf, "WizInvis Set to: %d \r\n", ch->player->wizinvis);
-  ch->send(buf);
+  ch->sendln(QStringLiteral("WizInvis Set to: %1 ").arg(ch->player->wizinvis));
   return ReturnValue::eSUCCESS;
 }
 
-int do_nohassle(Character *ch, char *argument, cmd_t cmd)
+qint32 do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -648,10 +643,10 @@ int do_nohassle(Character *ch, char *argument, cmd_t cmd)
 
 // cmd == cmd_t::DEFAULT - imm
 // cmd == 8 - /
-command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  std::string buf1 = {};
-  Connection *i = nullptr;
+  QString buf1 = {};
+  Connection *i = {};
 
   if (ch->isNonPlayer())
   {
@@ -669,7 +664,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
 
   if (argument.empty())
   {
-    std::queue<std::string> tmp;
+    QQueue<QString> tmp;
     if (cmd == cmd_t::IMMORT)
     {
       tmp = imm_history;
@@ -701,14 +696,14 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
 
     if (cmd == cmd_t::IMMORT)
     {
-      buf1 = fmt::format("$B$4{}$7: $7$B{}$R\r\n", GET_SHORT(ch), argument);
+      buf1 = fmt::format("$B$4{}$7: $7$B{}$R\r\n", qPrintable(ch->shortdesc_or_name()), argument);
       imm_history.push(buf1);
       if (imm_history.size() > 10)
         imm_history.pop();
     }
     else
     {
-      buf1 = fmt::format("$B$7{}> {}$R\r\n", GET_SHORT(ch), argument);
+      buf1 = fmt::format("$B$7{}> {}$R\r\n", qPrintable(ch->shortdesc_or_name()), argument);
       imp_history.push(buf1);
       if (imp_history.size() > 10)
         imp_history.pop();
@@ -717,7 +712,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
     send_to_char(buf1.c_str(), ch);
     ansi_color(NTEXT, ch);
 
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
     {
       if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && i->character->isPlayer())
       {
@@ -738,24 +733,24 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_findfix(Character *ch, char *argument, cmd_t cmd)
+qint32 do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
-    for (qsizetype j = 0; j < zone.cmd.size(); j++)
+    for (qsizetype j = {}; j < zone.cmd.size(); j++)
     {
       bool first = true;
       bool found = false;
       if (zone.cmd[j]->command != 'M')
         continue;
 
-      int vnum = zone.cmd[j]->arg1;
-      int max = zone.cmd[j]->arg2;
+      qint32 vnum = zone.cmd[j]->arg1;
+      qint32 max = zone.cmd[j]->arg2;
       if (max == 1 || max == -1)
         continue; // Don't care about those..
 
-      int amt = 0;
-      for (qsizetype z = 0; z < zone.cmd.size(); z++)
+      qint32 amt = {};
+      for (qsizetype z = {}; z < zone.cmd.size(); z++)
       {
         if (zone.cmd[z]->command != 'M')
           continue;
@@ -795,11 +790,11 @@ int do_findfix(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_varstat(Character *ch, char *argument, cmd_t cmd)
+qint32 do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
-  Character *vict;
+  CharacterPtr vict;
 
   if ((vict = get_char_vis(ch, arg)) == nullptr)
   {

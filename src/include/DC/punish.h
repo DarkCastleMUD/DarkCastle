@@ -1,24 +1,21 @@
-#ifndef PUNISH_H_
-#define PUNISH_H_
+#pragma once
 /************************************************************************
 | $Id: punish.h,v 1.4 2008/11/13 19:10:49 kkoons Exp $
 | punish.h
 | Description: Contains punishment vectors
 */
 
-#define PUNISH_SILENCED     1
-#define PUNISH_NOEMOTE      1<<1
-#define PUNISH_LOG          1<<2
-#define PUNISH_FREEZE       1<<3
-#define PUNISH_DENY         1<<4
-#define PUNISH_UNUSED       1<<5
-#define PUNISH_NONAME       1<<6
-#define PUNISH_SPAMMER      1<<7
-#define PUNISH_STUPID       1<<8
-#define PUNISH_NOARENA      1<<9
-#define PUNISH_NOTITLE      1<<10
-#define PUNISH_UNLUCKY      1<<11
-#define PUNISH_NOTELL       1<<12
-#define PUNISH_NOPRAY       1<<13
-
-#endif
+constexpr auto PUNISH_SILENCED = 1;
+constexpr auto PUNISH_NOEMOTE = 1 << 1;
+constexpr auto PUNISH_LOG = 1 << 2;
+constexpr auto PUNISH_FREEZE = 1 << 3;
+constexpr auto PUNISH_DENY = 1 << 4;
+constexpr auto PUNISH_UNUSED = 1 << 5;
+constexpr auto PUNISH_NONAME = 1 << 6;
+constexpr auto PUNISH_SPAMMER = 1 << 7;
+constexpr auto PUNISH_STUPID = 1 << 8;
+constexpr auto PUNISH_NOARENA = 1 << 9;
+constexpr auto PUNISH_NOTITLE = 1 << 10;
+constexpr auto PUNISH_UNLUCKY = 1 << 11;
+constexpr auto PUNISH_NOTELL = 1 << 12;
+constexpr auto PUNISH_NOPRAY = 1 << 13;

@@ -3,15 +3,13 @@
 | alias.C
 | Description:  Commands for the alias processor.
 */
-#include <cstring>
-
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/player.h"
-#include "DC/returnvals.h"
+#include "DC/DC.h"
+#include "DC/class.h"
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/const.h"
+#include "DC/utility.h"
+#include "DC/isr.h"
 
 command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 {
@@ -34,7 +32,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
       sendln("Removed an alias with an empty alias.");
     }
 
-    uint64_t x{};
+    quint64 x = {};
     sendln("Aliases:");
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {
@@ -119,9 +117,9 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-QString pet_info(Character *ch, QString type, unsigned victim_count)
+QString pet_info(CharacterPtr ch, QString type, quint32 victim_count)
 {
-  unsigned attacks = 1;
+  quint32 attacks = 1;
 
   if (ISSET(ch->mobdata->actflags, ACT_2ND_ATTACK))
     attacks++;
@@ -132,7 +130,7 @@ QString pet_info(Character *ch, QString type, unsigned victim_count)
 
   auto bare_damage_str = QStringLiteral("$7$B%1$Rd$7$B%2$R").arg(ch->mobdata->damnodice).arg(ch->mobdata->damsizedice);
 
-  char buffer[MAX_STRING_LENGTH]{};
+  char buffer[MAX_STRING_LENGTH] = {};
   sprintbit(ch->affected_by, affected_bits, buffer);
   QString affected_by_str = QString(buffer).trimmed();
 
@@ -145,7 +143,7 @@ QString pet_info(Character *ch, QString type, unsigned victim_count)
       .arg(GET_ARMOR(ch), 4)
       .arg(bare_damage_str, 17)
       .arg(type, 7)
-      .arg(ch->short_desc)
+      .arg(ch->short_description())
       .arg(affected_by_str)
       .arg((victim_count ? "$B$5*$R" : ""));
 }
@@ -160,16 +158,16 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   bool arg2_level_ok = false;
   auto arg2_level = arg2.toUInt(&arg2_level_ok);
 
-  extern int top_of_mobt;
+  extern qint32 top_of_mobt;
   QMultiMap<level_t, QString> results;
 
-  for (vnum_t vnum = 0; (vnum <= DC::getInstance()->mob_index[top_of_mobt].vnum()); ++vnum)
+  for (vnum_t vnum = {}; (vnum <= DC::getInstance()->mob_index[top_of_mobt].vnum()); ++vnum)
   {
     auto nr = real_mobile(vnum);
     if (nr < 0)
       continue;
 
-    auto victim = (Character *)(DC::getInstance()->mob_index[nr].item);
+    auto victim = (CharacterPtr)(DC::getInstance()->mob_index[nr].item);
     if ((arg1_level_ok && victim->getLevel() < arg1_level) ||
         (arg2_level_ok && victim->getLevel() < arg2_level))
       continue;
@@ -269,7 +267,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   if (results.isEmpty())
   {
     if (arg1.isEmpty())
-      sendln(QStringLiteral("No charmable pets found for a %1.").arg(classes[GET_CLASS(this)].name.c_str()));
+      sendln(QStringLiteral("No charmable pets found for a %1.").arg(Character::classes_[c_class].name));
     else
       sendln(QStringLiteral("No charmable pets found for a %1.").arg(arg1));
     sendln("Type 'pets all' to see charmable pets for all classes.");

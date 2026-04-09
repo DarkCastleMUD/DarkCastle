@@ -12,35 +12,20 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-#include <cstring>
-#include <cctype>
-
 #include "DC/DC.h"
-#include "DC/mobile.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/player.h"
-#include "DC/clan.h"
-#include "DC/room.h"
-#include "DC/weather.h"
-#include "DC/handler.h"
-#include "DC/terminal.h"
-#include "DC/interp.h"
-#include "DC/connect.h"
-#include "DC/db.h" // help_index_element
-#include "DC/spells.h"
-#include "DC/returnvals.h"
+#include "DC/db.h"
+#include <cstring>
 
 /* Used for "who" */
-int max_who = 0;
+qint32 max_who = {};
 
 /* extern functions */
 
-void page_string(class Connection *d, const char *str, int keep_internal);
+void page_string(class Connection *d, const char *str, qint32 keep_internal);
 
-int do_levels(Character *ch, char *argument, cmd_t cmd)
+qint32 do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int i;
+  qint32 i;
   char buf[MAX_STRING_LENGTH];
 
   if (ch->isNonPlayer())

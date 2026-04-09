@@ -1,249 +1,187 @@
+#include "DC/DC.h"
+#include "DC/interp.h"
+
 #include <arpa/inet.h>
-#include <cstring>
 #include <fmt/format.h>
 #include <fmt/chrono.h>
+#include <QFile>
+#include <QDebug>
+#include <QHostAddress>
+#include <QIODevice>
+#include <QObject>
+#include <QtTypes>
 
-#include "DC/structs.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/interp.h"
-#include "DC/db.h"
-#include "DC/returnvals.h"
-#include "DC/memory.h"
-
-ban_list_element *ban_list = nullptr;
-
-const char *ban_types[] = {
-    "no",
-    "new",
-    "select",
-    "all",
-    "ERROR"};
-
-void load_banned(void)
+void Bans::load(void)
 {
-  FILE *fl;
-  int i, date;
-  char site_name[BANNED_SITE_LENGTH + 1], ban_type[100];
-  char name[100 + 1];
-  ban_list_element *next_node;
+  QFile file(BANNED_FILE);
 
-  ban_list = 0;
-
-  if (!(fl = fopen("banned", "r")))
+  if (!file.open(QIODeviceBase::Text))
   {
-    perror("Unable to open banfile 'banned'");
+    qWarning() << "Unable to open" << BANNED_FILE;
     return;
   }
-  while (fscanf(fl, " %s %s %d %s ", ban_type, site_name, &date, name) == 4)
+
+  QTextStream out(&file);
+  QString name, site_name;
+  Ban::type_t ban_type;
+  qint32 i = {};
+  qint64 date = {};
+  list_.clear();
+  while (out >> ban_type >> site_name >> date >> name)
   {
-    CREATE(next_node, ban_list_element, 1);
-    strncpy(next_node->site, site_name, BANNED_SITE_LENGTH);
-    next_node->site[BANNED_SITE_LENGTH] = '\0';
-    strncpy(next_node->name, name, 100);
-    next_node->name[99] = '\0';
-    next_node->date = date;
+    Ban ban;
+    ban.name(name);
+    ban.site(site_name);
+    auto datetime = QDateTime::fromSecsSinceEpoch(date);
+    ban.date(datetime);
+    switch (ban_type)
+    {
+    case Ban::type_t::NOT:
+    case Ban::type_t::NEW:
+    case Ban::type_t::SELECT:
+    case Ban::type_t::ALL:
+      ban.type(ban_type);
+      break;
+    }
 
-    for (i = BAN_NOT; i <= BAN_ALL; i++)
-      if (!strcmp(ban_type, ban_types[i]))
-        next_node->type = i;
-
-    next_node->next = ban_list;
-    ban_list = next_node;
+    add(ban);
   }
+}
 
-  fclose(fl);
+void Bans::clear(void)
+{
+  list_.clear();
+}
+
+void Bans::add(Ban ban)
+{
+  if (!ban.site().isNull())
+    list_[ban.site()] = ban;
 }
 
 void DC::free_ban_list_from_memory(void)
 {
-  ban_list_element *next = nullptr;
-
-  for (; ban_list; ban_list = next)
-  {
-    next = ban_list->next;
-    dc_free(ban_list);
-  }
+  bans_.clear();
 }
 
-int isbanned(QHostAddress address)
+Ban::type_t Bans::is_banned(QString site) const
 {
-  QString hostname = address.toString();
-
-  if (hostname.isEmpty())
-  {
-    return 0;
-  }
-
-  hostname = hostname.trimmed().toLower();
-
-  int i = 0;
-  for (ban_list_element *banned_node = ban_list; banned_node; banned_node = banned_node->next)
-  {
-    if (hostname == banned_node->site) /* if hostname is a substring */
-    {
-      i = MAX(i, banned_node->type);
-    }
-  }
-
-  return i;
+  return list_.value(site).type();
 }
 
-void _write_one_node(FILE *fp, ban_list_element *node)
+void Ban::save(QTextStream &out) const
 {
-  if (node)
-  {
-    _write_one_node(fp, node->next);
-    fprintf(fp, "%s %s %d %s\n", ban_types[node->type], node->site, (int32_t)node->date, node->name);
-  }
+  out << ban_types.value(qsizetype(type())) << site() << date().toString() << name();
 }
 
-void write_ban_list(void)
+void Bans::save(void) const
 {
-  FILE *fl;
+  QFile file(BANNED_FILE);
 
-  if (!(fl = fopen("banned", "w")))
+  if (!file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
-    perror("write_ban_list");
+    qWarning() << "Unable to open" << BANNED_FILE;
     return;
   }
-  _write_one_node(fl, ban_list); /* recursively write from end to start */
-  fclose(fl);
-  return;
+
+  QTextStream out(&file);
+  for (auto &entry : list_)
+  {
+    entry.save(out);
+  }
 }
 
-int do_ban(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
 {
-  char flag[MAX_INPUT_LENGTH], format[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
-  int i;
-  char buf[MAX_STRING_LENGTH];
-  ban_list_element *ban_node;
-  std::string buffer;
-
-  *buf = '\0';
-
-  if (!*argument)
+  if (arguments.isEmpty())
   {
-    if (!ban_list)
+    if (DC::getInstance()->bans_)
     {
-      ch->sendln("No sites are banned.");
+      sendln("No sites are banned.");
       return ReturnValue::eSUCCESS;
     }
-    strcpy(format, "%-15.15s  %-8.8s  %-19s  %-16.16s\r\n");
-    sprintf(buf, format,
-            "Banned Site Name",
-            "Ban Type",
-            "Banned On",
-            "Banned By");
-    ch->send(buf);
-    sprintf(buf, format,
-            "-----------------------",
-            "---------------------------------",
-            "-------------------",
-            "---------------------------------");
-    ch->send(buf);
 
-    for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
+    sendln(QStringLiteral("%1  %2  %3  %4").arg("Banned Site Name ", -15).arg("Ban Type", -8).arg("Banned On", -19).arg("Banned By", -16));
+    sendln(QStringLiteral("%1  %2  %3  %4").arg("-----------------------", -15).arg("---------------------------------", -8).arg("-------------------", -19).arg("---------------------------------", -16));
+
+    QString buffer;
+    for (const auto &ban : DC::getInstance()->bans_.list())
     {
-      if (ban_node->date)
-      {
-        buffer = fmt::format("{:%Y-%m-%d %H:%M:%S}", *std::localtime(&(ban_node->date)));
-      }
-      else
-      {
-        buffer = "Unknown";
-      }
-
-      csendf(ch, format, ban_node->site, ban_types[ban_node->type], buffer.c_str(), ban_node->name);
+      sendln(QStringLiteral("%1  %2  %3  %4").arg(ban.site(), -15).arg(Ban::ban_types.value(qsizetype(ban.type())), -8).arg(ban.date().toString(), -19).arg(ban.name(), -16));
     }
     return ReturnValue::eSUCCESS;
   }
-  half_chop(argument, flag, site);
-  if (!*site || !*flag)
+
+  auto flag = arguments.value(0).toUpper();
+  auto site = arguments.value(1);
+  if (flag.isEmpty() || site.isEmpty())
   {
-    ch->sendln("Usage: ban {all | select | new} site_name");
+    sendln("Usage: ban {all | select | new} site_name");
     return ReturnValue::eSUCCESS;
   }
 
-  struct sockaddr_in sa;
-  if (inet_pton(AF_INET, site, &(sa.sin_addr)) == 0)
+  struct sockaddr_in sa{};
+  if (inet_pton(AF_INET, qPrintable(site), &(sa.sin_addr)) == 0)
   {
-    ch->sendln("Invalid IP address.");
+    sendln("Invalid IP address.");
     return ReturnValue::eFAILURE;
   }
 
-  if (!(!str_cmp(flag, "select") || !str_cmp(flag, "all") || !str_cmp(flag, "new")))
+  if (flag != "SELECT" && flag != "ALL" && flag != "NEW")
   {
-    ch->sendln("Flag must be ALL, SELECT, or NEW.");
+    sendln("Flag must be ALL, SELECT, or NEW.");
     return ReturnValue::eSUCCESS;
   }
-  for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
+  switch (DC::getInstance()->bans_.is_banned(site))
   {
-    if (!str_cmp(ban_node->site, site))
-    {
-      ch->sendln("That site has already been banned -- unban it to change the ban type.");
-      return ReturnValue::eSUCCESS;
-    }
+  case Ban::type_t::NOT:
+    break;
+  case Ban::type_t::NEW:
+  case Ban::type_t::SELECT:
+  case Ban::type_t::ALL:
+    sendln("That site has already been banned -- unban it to change the ban type.");
+    return ReturnValue::eSUCCESS;
+    break;
   }
 
-  CREATE(ban_node, ban_list_element, 1);
-  strncpy(ban_node->site, site, BANNED_SITE_LENGTH);
-  for (nextchar = ban_node->site; *nextchar; nextchar++)
-    *nextchar = LOWER(*nextchar);
-  ban_node->site[BANNED_SITE_LENGTH] = '\0';
-  strncpy(ban_node->name, GET_NAME(ch), 100);
-  ban_node->name[99] = '\0';
-  ban_node->date = time(0);
+  Ban ban;
+  ban.site(site);
+  ban.name(name());
+  ban.date(QDateTime::fromSecsSinceEpoch(time(0)));
+  ban.type(flag);
+  DC::getInstance()->bans_.add(ban);
 
-  for (i = BAN_NEW; i <= BAN_ALL; i++)
-    if (!str_cmp(flag, ban_types[i]))
-      ban_node->type = i;
-
-  ban_node->next = ban_list;
-  ban_list = ban_node;
-
-  sprintf(buf, "%s has banned %s for %s players.", GET_NAME(ch), site,
-          ban_types[ban_node->type]);
-  logentry(buf, POWER, DC::LogChannel::LOG_GOD);
-  ch->sendln("Site banned.");
-  write_ban_list();
+  loggod(QStringLiteral("1s has banned %2 for %3 players.").arg(name()).arg(site).arg(Ban::ban_types.value(qsizetype(ban.type()))));
+  sendln("Site banned.");
+  DC::getInstance()->bans_.save();
   return ReturnValue::eSUCCESS;
 }
 
-int do_unban(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_unban(QStringList arguments, cmd_t cmd)
 {
-  char site[MAX_INPUT_LENGTH + 1];
-  ban_list_element *ban_node, *temp;
-  int found = 0;
-  char buf[MAX_STRING_LENGTH];
-
-  one_argument(argument, site);
-  if (!*site)
+  auto site = arguments.value(0);
+  if (site.isEmpty())
   {
-    ch->sendln("A site to unban might help.");
+    sendln("A site to unban might help.");
     return ReturnValue::eSUCCESS;
   }
-  ban_node = ban_list;
-  while (ban_node && !found)
-  {
-    if (!str_cmp(ban_node->site, site))
-      found = 1;
-    else
-      ban_node = ban_node->next;
-  }
 
-  if (!found)
+  switch (DC::getInstance()->bans_.is_banned(site))
   {
-    ch->sendln("That site is not currently banned.");
+  case Ban::type_t::NOT:
+    sendln("That site is not currently banned.");
     return ReturnValue::eSUCCESS;
+    break;
+  case Ban::type_t::NEW:
+  case Ban::type_t::SELECT:
+  case Ban::type_t::ALL:
+    break;
   }
-  REMOVE_FROM_LIST(ban_node, ban_list, next);
-  ch->sendln("Site unbanned.");
-  sprintf(buf, "%s removed the %s-player ban on %s.",
-          GET_NAME(ch), ban_types[ban_node->type], ban_node->site);
-  logentry(buf, POWER, DC::LogChannel::LOG_GOD);
 
-  dc_free(ban_node);
-  write_ban_list();
+  DC::getInstance()->bans_.remove(site);
+  sendln("Site unbanned.");
+  loggod(QStringLiteral("%1 removed the %2-player ban.").arg(name()).arg(site));
+  DC::getInstance()->bans_.save();
+
   return ReturnValue::eSUCCESS;
 }

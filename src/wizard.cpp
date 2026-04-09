@@ -3,34 +3,26 @@
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
-#include "DC/wizard.h"
-#include "DC/character.h"
-#include "DC/utility.h"
-
-#include "DC/db.h"
-#include "DC/room.h"
-#include "DC/player.h"
 #include "DC/DC.h"
-#include "DC/mobile.h"
+#include "DC/wizard.h"
+#include "DC/db.h"
+#include "DC/player.h"
 #include "DC/handler.h"
-#include "DC/connect.h"
 #include "DC/spells.h"
 #include "DC/interp.h"
-#include "DC/returnvals.h"
-#include <unistd.h>
 #include "DC/comm.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
-#include "DC/memory.h"
 
+#include <unistd.h>
 #include <fmt/format.h>
 #include <QString>
 
-int getRealSpellDamage(Character *ch);
+qint32 getRealSpellDamage(CharacterPtr ch);
 
-int number_or_name(char **name, int *num)
+qint32 number_or_name(char **name, qint32 *num)
 {
-  int i;
+  qint32 i;
   char *ppos;
   char number[MAX_INPUT_LENGTH];
 
@@ -40,7 +32,7 @@ int number_or_name(char **name, int *num)
     strcpy(number, *name);
     strcpy(*name, ppos);
 
-    for (i = 0; *(number + i); i++)
+    for (i = {}; *(number + i); i++)
       if (!isdigit(*(number + i)))
         return (0);
 
@@ -55,13 +47,13 @@ int number_or_name(char **name, int *num)
 }
 
 #if (0)
-int number_or_name(char **name, int *num)
+qint32 number_or_name(char **name, qint32 *num)
 {
-  unsigned i;
-  char *ppos = nullptr;
+  quint32 i;
+  char *ppos = {};
   char number[MAX_INPUT_LENGTH];
 
-  for (i = 0; i < strlen(*name); i++)
+  for (i = {}; i < strlen(*name); i++)
   {
     if (*name[i] == '.')
     {
@@ -75,7 +67,7 @@ int number_or_name(char **name, int *num)
     strcpy(number, *name);
     strcpy(*name, ppos);
 
-    for (i = 0; *(number + i); i++)
+    for (i = {}; *(number + i); i++)
       if (!isdigit(*(number + i)))
         return (0);
 
@@ -90,13 +82,13 @@ int number_or_name(char **name, int *num)
 }
 #endif
 
-void do_mload(Character *ch, int rnum, int cnt)
+void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
 {
   if (!ch)
     return;
-  Character *mob = nullptr;
+  CharacterPtr mob = {};
   char buf[MAX_STRING_LENGTH];
-  int i;
+  qint32 i;
   if (cnt == 0)
     cnt = 1;
   for (i = 1; i <= cnt; i++)
@@ -107,7 +99,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     mprog_load_trigger(mob);
     if (selfpurge)
     {
-      mob = nullptr;
+      mob = {};
     }
   }
 
@@ -121,7 +113,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     if (cnt > 1)
     {
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
-               GET_NAME(ch),
+               qPrintable(ch->name()),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
                mob->short_desc,
@@ -131,7 +123,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     else
     {
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
-               GET_NAME(ch),
+               qPrintable(ch->name()),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
                mob->short_desc,
@@ -143,7 +135,7 @@ void do_mload(Character *ch, int rnum, int cnt)
   else
   {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
-             GET_NAME(ch),
+             qPrintable(ch->name()),
              cnt,
              DC::getInstance()->mob_index[rnum].vnum(),
              DC::getInstance()->world[ch->in_room].number,
@@ -153,11 +145,11 @@ void do_mload(Character *ch, int rnum, int cnt)
   }
 }
 
-obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
+obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
 {
-  Object *obj = nullptr;
+  ObjectPtr obj = {};
   obj_list_t obj_list = {};
-  std::string buf;
+  QString buf;
 
   if (cnt == 0)
   {
@@ -186,15 +178,15 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
     }
   }
 
-  ch->send(fmt::format("You create {} {}{}.\r\n", cnt, random ? "randomized " : "", obj->short_description));
+  ch->send(fmt::format("You create {} {}{}.\r\n", cnt, random ? "randomized " : "", qPrintable(obj->short_description())));
 
   buf = fmt::format("{} loads {} {}{} of obj {} ({}) at room {} ({}).",
-                    GET_NAME(ch),
+                    qPrintable(ch->name()),
                     cnt,
                     random ? "randomized " : "",
                     cnt > 1 ? "copies" : "copy",
                     GET_OBJ_VNUM(obj),
-                    obj->short_description,
+                    qPrintable(obj->short_description()),
                     DC::getInstance()->world[ch->in_room].number,
                     DC::getInstance()->world[ch->in_room].name);
   logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
@@ -202,11 +194,11 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
   return obj_list;
 }
 
-void do_oload(Character *ch, int rnum, int cnt, bool random)
+void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
 {
-  class Object *obj = nullptr;
+  ObjectPtr obj = {};
   char buf[MAX_STRING_LENGTH];
-  int i;
+  qint32 i;
 
   if (cnt == 0)
     cnt = 1;
@@ -234,28 +226,28 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
     }
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", obj->short_description);
+  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", qPrintable(obj->short_description()));
 
   ch->send(buf);
   if (cnt > 1)
   {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %lu (%s) at room %d (%s).",
-             GET_NAME(ch),
+             qPrintable(ch->name()),
              cnt,
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
-             obj->short_description,
+             qPrintable(obj->short_description()),
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
   }
   else
   {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %lu (%s) at room %d (%s).",
-             GET_NAME(ch),
+             qPrintable(ch->name()),
              cnt,
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
-             obj->short_description,
+             qPrintable(obj->short_description()),
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
   }
@@ -269,45 +261,44 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
  * k, the mob or player that is being stated.  It prints it in a format similar to score.
  *  -- Borodin  Dec 23 2001 */
 
-void boro_mob_stat(Character *ch, Character *k)
+void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 {
-  int i, i2;
+  qint32 i, i2;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
   follow_type *fol;
-  class Object *j = 0;
+  ObjectPtr j = {};
   affected_type *aff;
 
   sprinttype(k->c_class, pc_clss_types, buf2);
-  sprintf(buf,
-          "$R(:)========================================================================(:)\r\n"
-          "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5lu $3Room$R: %-5d |=|\r\n"
-          "|=|$3 Short$R: %-50s $3RNUM$R: %-6d |=|\r\n"
-          "|=|$3 Long$R: %s"
-          "(:)====================(:)=================================================(:)\r\n"
-          "|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
-          "|~|  $4Master$R:   %-9s|o|  $1Class$R:  %-10s $1Mana$R:   %5d$1/$R(%5d+%-3d) |\\|\r\n",
+  sprintf(buf, "$R(:)========================================================================(:)\r\n"
+               "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5lu $3Room$R: %-5d |=|\r\n"
+               "|=|$3 Short$R: %-50s $3RNUM$R: %-6d |=|\r\n"
+               "|=|$3 Long$R: %s"
+               "(:)====================(:)=================================================(:)\r\n"
+               "|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
+               "|~|  $4Master$R:   %-9s|o|  $1Class$R:  %-10s $1Mana$R:   %5d$1/$R(%5d+%-3d) |\\|\r\n",
 
           (k->isPlayer() ? "PC" : "MOB"),
-          GET_NAME(k),
+          qPrintable(k->name()),
           (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
           (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
           /* end of first line */
 
-          (k->short_desc ? k->short_desc : "None"),
-          (int32_t)(k->isNonPlayer() ? k->mobdata->nr : 0),
+          (!k->short_description().isEmpty() ? qPrintable(k->short_description()) : "None"),
+          (qint32)(k->isNonPlayer() ? k->mobdata->nr : 0),
           /* end of second line */
 
-          (k->long_desc ? k->long_desc : "None"),
+          (!k->long_description().isEmpty() ? qPrintable(k->long_description()) : "None"),
           /* end of third line */
 
-          (k->fighting ? GET_NAME(k->fighting) : "Nobody"),
-          (races[(int)(GET_RACE(k))].singular_name),
+          (k->fighting ? qPrintable(k->fighting->name()) : "Nobody"),
+          (races[(qint32)(k->race)].singular_name),
           k->getHP(), hit_limit(k), k->hit_gain_lookup(),
           /* end of fourth line */
 
-          (k->master ? GET_NAME(k->master) : "Nobody"),
-          buf2, /* this is for the class std::string, the sprinttype above inits it. */
+          (k->master ? qPrintable(k->master->name()) : "Nobody"),
+          buf2, /* this is for the class QString, the sprinttype above inits it. */
           GET_MANA(k), mana_limit(k), k->mana_gain_lookup());
   /* end of the first sprintf */
 
@@ -315,7 +306,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (k->isNonPlayer())
   {
-    sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
+    sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
     sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
   }
   else
@@ -324,10 +315,9 @@ void boro_mob_stat(Character *ch, Character *k)
     sprintf(buf3, "Nobody");
   }
 
-  sprintf(buf,
-          "|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9llu  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
-          "|o|  $4Fears$R:    %-9s|~|  $1Height$R: %-9d  $1Ki$R:     %5d$1/$R(%5d)     |/|\r\n"
-          "|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
+  sprintf(buf, "|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9llu  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
+               "|o|  $4Fears$R:    %-9s|~|  $1Height$R: %-9d  $1Ki$R:     %5d$1/$R(%5d)     |/|\r\n"
+               "|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
 
           buf2, // who the mob hates
           k->getLevel(),
@@ -339,7 +329,7 @@ void boro_mob_stat(Character *ch, Character *k)
           GET_KI(k), ki_limit(k),
           /* end of second line */
 
-          (k->hunting.isEmpty() ? "NOBODY" : k->hunting.toStdString().c_str()),
+          (k->hunting.isEmpty() ? "NOBODY" : qPrintable(k->hunting)),
           GET_WEIGHT(k),
           k->alignment);
 
@@ -362,9 +352,8 @@ void boro_mob_stat(Character *ch, Character *k)
     break;
   }
 
-  sprintf(buf,
-          "|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
-          "(:)====================(:)==========(:)====================================(:)\r\n",
+  sprintf(buf, "|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
+               "(:)====================(:)==========(:)====================================(:)\r\n",
           k->timer,
           (ch->isPlayer() ? k->hometown : -1),
           buf2); /* buf is the sex... */
@@ -383,9 +372,8 @@ void boro_mob_stat(Character *ch, Character *k)
       strcpy(buf3, "None");
   }
 
-  sprintf(buf,
-          "|/|  $4FIRE$R: %3d  $1COLD$R: %3d $5NRGY$R: %3d |\\| Mob Non-Combat Spec Proc: %-9s|o|\r\n"
-          "|o|  $2$BACID$R: %3d  $3MAGK$R: %3d $2POIS$R: %3d |~| Mob Combat Spec Proc:     %-9s|/|\r\n",
+  sprintf(buf, "|/|  $4FIRE$R: %3d  $1COLD$R: %3d $5NRGY$R: %3d |\\| Mob Non-Combat Spec Proc: %-9s|o|\r\n"
+               "|o|  $2$BACID$R: %3d  $3MAGK$R: %3d $2POIS$R: %3d |~| Mob Combat Spec Proc:     %-9s|/|\r\n",
 
           k->saves[SAVE_TYPE_FIRE], k->saves[SAVE_TYPE_COLD], k->saves[SAVE_TYPE_ENERGY],
           buf2, /* whether nor not they have a non_combat spec proc */
@@ -405,9 +393,8 @@ void boro_mob_stat(Character *ch, Character *k)
 
   for (i = 0, j = k->carrying; j; j = j->next_content, ++i)
     ;
-  sprintf(buf,
-          "|\\|  $3Pos$R: %-9s$3DefPos$R: %-9s|/| $1Thirst$R: %-3d $4Hunger$R: %-3d $6Drunk$R: %-3d |~|\r\n"
-          "|/|  $3Dex$R: %2d    $3Con$R: %2d    $3Str$R: %2d  |\\| $3Carried Weight$R: %-4d $3Inv. Items$R: %-3d|o|\r\n",
+  sprintf(buf, "|\\|  $3Pos$R: %-9s$3DefPos$R: %-9s|/| $1Thirst$R: %-3d $4Hunger$R: %-3d $6Drunk$R: %-3d |~|\r\n"
+               "|/|  $3Dex$R: %2d    $3Con$R: %2d    $3Str$R: %2d  |\\| $3Carried Weight$R: %-4d $3Inv. Items$R: %-3d|o|\r\n",
 
           buf2, buf3, // pos and default pos respectively
           k->conditions[THIRST],
@@ -417,35 +404,31 @@ void boro_mob_stat(Character *ch, Character *k)
 
           GET_DEX(k), GET_CON(k), GET_STR(k),
           IS_CARRYING_W(k), i);
-  /* END OF SECOND LINE */
+  /* END OF WEAR_SECOND_WIELD LINE */
 
   ch->send(buf);
 
-  for (i = 0, i2 = 0; i < MAX_WEAR; i++)
+  for (i = 0, i2 = {}; i < MAX_WEAR; i++)
     if (k->equipment[i])
       i2++;
 
-  sprintf(buf,
-          "|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
+  sprintf(buf, "|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
           GET_INT(k), GET_WIS(k), GET_ARMOR(k), IS_CARRYING_N(k), i2);
   ch->send(buf);
 
-  sprintf(buf,
-          "|o| $3 Hitroll$R: %3d     $3Damroll$R: %3d  |~|                                    |/|\r\n"
-          "(:)=================================(:)====================================(:)\r\n",
+  sprintf(buf, "|o| $3 Hitroll$R: %3d     $3Damroll$R: %3d  |~|                                    |/|\r\n"
+               "(:)=================================(:)====================================(:)\r\n",
           k->hitroll, k->damroll);
   ch->send(buf);
 
   sprintbit(k->suscept, isr_bits, buf2);
   sprintbit(k->immune, isr_bits, buf3);
-  sprintf(buf,
-          "|/| $7Immune$R: %-63s|o|\r\n"
-          "|o| $7Susceptible$R: %-58s|/|\r\n",
+  sprintf(buf, "|/| $7Immune$R: %-63s|o|\r\n"
+               "|o| $7Susceptible$R: %-58s|/|\r\n",
           buf2, buf3); // immune and susceptible bits, first and second.
   ch->send(buf);
   sprintbit(k->affected_by, affected_bits, buf2);
-  sprintf(buf,
-          "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
+  sprintf(buf, "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
   ch->send(buf);
 
   if (k->isNonPlayer()) // AND THIS
@@ -453,16 +436,14 @@ void boro_mob_stat(Character *ch, Character *k)
   else
     strcpy(buf2, "Not a mob");
   sprintbit(k->combat, combat_bits, buf3);
-  sprintf(buf,
-          "|~| $7NPC flags$R: %-60s|\\|\r\n"
-          "|/| $7Combat flags$R: %-57s|o|\r\n",
+  sprintf(buf, "|~| $7NPC flags$R: %-60s|\\|\r\n"
+               "|/| $7Combat flags$R: %-57s|o|\r\n",
           buf2, buf3); // npc flags and combat flags respectively
   ch->send(buf);
 
   sprintbit(k->resist, isr_bits, buf2);
-  sprintf(buf,
-          "|o| $7Resistant$R: %-60s|/|\r\n"
-          "(:)========================================================================(:)\r\n",
+  sprintf(buf, "|o| $7Resistant$R: %-60s|/|\r\n"
+               "(:)========================================================================(:)\r\n",
           buf2); // the resisted bits
   ch->send(buf);
 
@@ -473,8 +454,8 @@ void boro_mob_stat(Character *ch, Character *k)
 
   // Description
   ch->sendln("$3Detailed description$R:");
-  if (k->description)
-    ch->send(k->description);
+  if (!k->description().isEmpty())
+    ch->send(k->description());
   else
     ch->send("None");
 
@@ -488,7 +469,7 @@ void boro_mob_stat(Character *ch, Character *k)
     sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs $3Played$R[%d]secs\r\n",
             k->player->time.birth,
             k->player->time.logon,
-            (int32_t)(k->player->time.played));
+            (qint32)(k->player->time.played));
     ch->send(buf);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
@@ -548,10 +529,10 @@ void boro_mob_stat(Character *ch, Character *k)
     for (aff = k->affected; aff; aff = aff->next)
     {
       sprintf(buf, "Spell : '%s'\r\n",
-              aff->type < 300 ? spells[(int)aff->type - 1] : skills[(int)aff->type - 300]);
+              aff->type < 300 ? spells[(qint32)aff->type - 1] : skills[(qint32)aff->type - 300]);
       ch->send(buf);
       sprintf(buf, "     Modifies %s by %d points\r\n",
-              apply_types[(int)aff->location], aff->modifier);
+              apply_types[(qint32)aff->location], aff->modifier);
       ch->send(buf);
       sprintf(buf, "     Expires in %3d hours, Bits set ", aff->duration);
       ch->send(buf);
@@ -574,26 +555,25 @@ void boro_mob_stat(Character *ch, Character *k)
   ch->send(buf);
 }
 
-command_return_t mob_stat(Character *ch, Character *k)
+command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 {
   if (!ch || !k)
   {
     return ReturnValue::eFAILURE;
   }
 
-  int i;
+  qint32 i;
   char buf[MAX_STRING_LENGTH];
   follow_type *fol;
-  int i2;
+  qint32 i2;
   char buf2[MAX_STRING_LENGTH];
-  class Object *j = 0;
+  ObjectPtr j = {};
   affected_type *aff;
 
   if (k->isNonPlayer())
   {
-    sprintf(buf,
-            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
-            (k->isPlayer() ? "PC" : "MOB"), GET_NAME(k),
+    sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
+            (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
             (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
             (k->isNonPlayer() ? k->mobdata->nr : 0),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
@@ -605,13 +585,13 @@ command_return_t mob_stat(Character *ch, Character *k)
   else
   {
     sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\r\n",
-            (k->isPlayer() ? "PC" : "MOB"), GET_NAME(k),
+            (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
   }
   ch->send(buf);
 
   strcpy(buf, "$3Short description$R: ");
-  strcat(buf, (k->short_desc ? k->short_desc : "None"));
+  strcat(buf, (!k->short_description().isEmpty() ? qPrintable(k->short_description()) : "None"));
   strcat(buf, "\r\n");
   ch->send(buf);
 
@@ -621,13 +601,13 @@ command_return_t mob_stat(Character *ch, Character *k)
   ch->send(buf);
 
   ch->send("$3Long description$R: ");
-  if (k->long_desc)
-    ch->send(k->long_desc);
+  if (!k->long_description().isEmpty())
+    ch->send(k->long_description());
   else
     ch->send("None");
   ch->sendln("$3Detailed description$R:");
-  if (k->description)
-    ch->send(k->description);
+  if (!k->description().isEmpty())
+    ch->send(k->description());
   else
     ch->send("None");
 
@@ -642,7 +622,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   ch->send(buf);
   sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
   ch->send(buf);
-  sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
+  sprintf(buf, "$3Race$R: %s\r\n", races[(qint32)(k->race)].singular_name);
   ch->send(buf);
 
   if (!k->isNonPlayer())
@@ -650,7 +630,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs  $3Played$R[%d]secs\r\n",
             k->player->time.birth,
             k->player->time.logon,
-            (int32_t)(k->player->time.played));
+            (qint32)(k->player->time.played));
     ch->send(buf);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
@@ -716,7 +696,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   ch->send(buf);
 
   sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\r\n",
-          GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
+          GET_ARMOR(k), k->exp, GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
   if (!k->isNonPlayer())
@@ -726,8 +706,8 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", k->getPositionQString().toStdString().c_str(),
-          ((k->fighting) ? GET_NAME(k->fighting)
+  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", qPrintable(k->getPositionQString()),
+          ((k->fighting) ? qPrintable(k->fighting->name())
                          : "Nobody"));
   if (k->desc)
   {
@@ -740,7 +720,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (k->isNonPlayer())
   {
     strcpy(buf, "$3Default position$R: ");
-    strcat(buf, Character::position_to_string(k->mobdata->default_pos).toStdString().c_str());
+    strcat(buf, Character::position_to_string(qPrintable(k->mobdata->default_pos)));
     ch->send(buf);
   }
 
@@ -788,7 +768,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ;
   sprintf(buf, "$3Items in inventory$R: %d  ", i);
 
-  for (i = 0, i2 = 0; i < MAX_WEAR; i++)
+  for (i = 0, i2 = {}; i < MAX_WEAR; i++)
     if (k->equipment[i])
       i2++;
 
@@ -826,13 +806,13 @@ command_return_t mob_stat(Character *ch, Character *k)
           k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
   ch->send(buf);
 
-  sprintf(buf, "$3Tracking$R: '%s'\r\n", ((k->hunting.isEmpty()) ? "NOBODY" : k->hunting.toStdString().c_str()));
+  sprintf(buf, "$3Tracking$R: '%s'\r\n", ((k->hunting.isEmpty()) ? "NOBODY" : qPrintable(k->hunting)));
   ch->send(buf);
 
   if (k->isNonPlayer())
   {
     sprintf(buf, "$3Hates$R: '%s'\r\n",
-            (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
+            (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
     ch->send(buf);
 
     sprintf(buf, "$3Fears$R: '%s'\r\n",
@@ -841,7 +821,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   }
 
   sprintf(buf, "$3Master$R: '%s'\r\n",
-          ((k->master) ? GET_NAME(k->master) : "NOBODY"));
+          ((k->master) ? qPrintable(k->master->name()) : "NOBODY"));
   ch->send(buf);
   ch->sendln("$3Followers$R:");
   for (fol = k->followers; fol; fol = fol->next)
@@ -855,16 +835,16 @@ command_return_t mob_stat(Character *ch, Character *k)
     display_punishes(ch, k);
 
   sprintbit(k->affected_by, affected_bits, buf);
-  csendf(ch, "$3Affected by$R: [%d %d] %s\r\n", k->affected_by[0], k->affected_by[1], buf);
+  ch->send(QStringLiteral("$3Affected by$R: [%d %d] %s\r\n").arg(k->affected_by[0]).arg(k->affected_by[1]).arg(buf));
 
   sprintbit(k->immune, isr_bits, buf);
-  csendf(ch, "$3Immune$R: [%d] %s\r\n", k->immune, buf);
+  ch->send(QStringLiteral("$3Immune$R: [%d] %s\r\n").arg(k->immune).arg(buf));
 
   sprintbit(k->suscept, isr_bits, buf);
-  csendf(ch, "$3Susceptible$R: [%d] %s\r\n", k->suscept, buf);
+  ch->send(QStringLiteral("$3Susceptible$R: [%d] %s\r\n").arg(k->suscept).arg(buf));
 
   sprintbit(k->resist, isr_bits, buf);
-  csendf(ch, "$3Resistant$R: [%d] %s\r\n", k->resist, buf);
+  ch->send(QStringLiteral("$3Resistant$R: [%d] %s\r\n").arg(k->resist).arg(buf));
 
   if (!k->isNonPlayer())
   {
@@ -891,12 +871,12 @@ command_return_t mob_stat(Character *ch, Character *k)
     }
   }
 
-  csendf(ch, "$3Lag Left$R:  %d\r\n", (GET_WAIT(k) ? GET_WAIT(k) : 0));
+  ch->send(QStringLiteral("$3Lag Left$R:  %d\r\n").arg((GET_WAIT(k) ? GET_WAIT(k) : 0)));
 
   if (k->isPlayer())
   {
-    csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n", GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k), GET_AC_METAS(k), GET_AGE_METAS(k));
-    csendf(ch, "$3Profession$R: %s (%d)\r\n", qPrintable(find_profession(k->c_class, k->player->profession)), k->player->profession);
+    ch->send(QStringLiteral("$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n").arg(GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k)).arg(GET_KI_METAS(k)).arg(GET_AC_METAS(k)).arg(GET_AGE_METAS(k)));
+    ch->send(QStringLiteral("$3Profession$R: %s (%d)\r\n").arg(qPrintable(find_profession(k->c_class).arg(k->player->profession))).arg(k->player->profession));
   }
 
   if (k->affected)
@@ -918,7 +898,7 @@ command_return_t mob_stat(Character *ch, Character *k)
       }
       ch->sendln(QStringLiteral("Spell : '%1' (%2)").arg(aff_name).arg(aff->type));
       sprintf(buf, "     Modifies %s by %d points\r\n",
-              apply_types[(int)aff->location], aff->modifier);
+              apply_types[(qint32)aff->location], aff->modifier);
       ch->send(buf);
       sprintf(buf, "     Expires in %3d hours", aff->duration);
       //    strcat(buf,",Bits set ");
@@ -966,18 +946,18 @@ command_return_t mob_stat(Character *ch, Character *k)
   return ReturnValue::eSUCCESS;
 }
 
-void obj_stat(Character *ch, class Object *j)
+void obj_stat(CharacterPtr ch, ObjectPtr j)
 {
-  class Object *j2 = 0;
+  ObjectPtr j2 = {};
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
   char buf4[MAX_STRING_LENGTH];
   extra_descr_data *desc;
   bool found;
-  int i, virt;
+  qint32 i, virt;
 
-  int its;
+  qint32 its;
 
   /*
     if(isSet(j->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
@@ -989,7 +969,7 @@ void obj_stat(Character *ch, class Object *j)
 
   virt = (j->item_number >= 0) ? DC::getInstance()->obj_index[j->item_number].vnum() : 0;
   sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
-          qPrintable(j->Name()), j->item_number, virt);
+          qPrintable(j->name()), j->item_number, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
   strcat(buf, buf2);
@@ -1036,8 +1016,7 @@ void obj_stat(Character *ch, class Object *j)
   strcat(buf, "\r\n");
   ch->send(buf);
 
-  sprintf(buf,
-          "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %llu\r\n",
+  sprintf(buf, "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %llu\r\n",
           j->obj_flags.weight,
           j->obj_flags.cost,
           j->obj_flags.timer,
@@ -1053,9 +1032,9 @@ void obj_stat(Character *ch, class Object *j)
     strcat(buf, buf2);
   }
   strcat(buf, "  $3In object$R: ");
-  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->Name()).toStdString().c_str()));
+  strcat(buf, (!j->in_obj ? "None" : fname(qPrintable(j->in_obj->name()))));
   strcat(buf, "  $3Carried by$R: ");
-  strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
+  strcat(buf, (!j->carried_by) ? "Nobody" : qPrintable(j->carried_by->name()));
   strcat(buf, "\r\n");
   ch->send(buf);
 
@@ -1096,7 +1075,7 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[2]);
     break;
   case ITEM_WEAPON:
-    int get_weapon_damage_type(class Object * wielded);
+    qint32 get_weapon_damage_type(ObjectPtr wielded);
     its = get_weapon_damage_type(j) - 1000;
     extern char *strs_damage_types[];
     sprintf(buf, "$3Unused(v1)$R: %d (make 0)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
@@ -1150,11 +1129,10 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[1]);
     break;
   case ITEM_CONTAINER:
-    sprintf(buf,
-            "$3Max-contains(v1)$R : %d\r\n"
-            "$3Locktype(v2)$R     : %d\r\n"
-            "$3Key #$R            : %d\r\n"
-            "$3Corpse(v4)$R       : %s",
+    sprintf(buf, "$3Max-contains(v1)$R : %d\r\n"
+                 "$3Locktype(v2)$R     : %d\r\n"
+                 "$3Key #$R            : %d\r\n"
+                 "$3Corpse(v4)$R       : %s",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
             j->obj_flags.value[2],
@@ -1163,11 +1141,10 @@ void obj_stat(Character *ch, class Object *j)
   case ITEM_DRINKCON:
     sprinttype(j->obj_flags.value[2], drinks, buf2);
     //  strcpy(buf2,drinks[j->obj_flags.value[2]]);
-    sprintf(buf,
-            "$3Max-contains(v1)$R: %d\r\n"
-            "$3Contains    (v2)$R: %d\r\n"
-            "$3Liquid      (v3)$R: %s (%d)\r\n"
-            "$3Poisoned    (v4)$R: %d",
+    sprintf(buf, "$3Max-contains(v1)$R: %d\r\n"
+                 "$3Contains    (v2)$R: %d\r\n"
+                 "$3Liquid      (v3)$R: %s (%d)\r\n"
+                 "$3Poisoned    (v4)$R: %d",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
             buf2,
@@ -1294,7 +1271,7 @@ void obj_stat(Character *ch, class Object *j)
   else
   {
     found = false;
-    for (i = 0; i < MAX_WEAR; i++)
+    for (i = {}; i < MAX_WEAR; i++)
     {
       if (j->carried_by->equipment[i] == j)
       {
@@ -1324,7 +1301,7 @@ void obj_stat(Character *ch, class Object *j)
   found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
   {
-    strcat(buf, qPrintable(fname(j2->Name())));
+    strcat(buf, qPrintable(fname(j2->name())));
     strcat(buf, "\r\n");
     found = true;
   }
@@ -1333,7 +1310,7 @@ void obj_stat(Character *ch, class Object *j)
   ch->send(buf);
 
   ch->sendln("$3Can affect char$R :");
-  for (i = 0; i < j->num_affects; i++)
+  for (i = {}; i < j->num_affects; i++)
   {
     //      sprinttype(j->affected[i].location,apply_types,buf2);
     if (j->affected[i].location < 1000)
@@ -1346,10 +1323,9 @@ void obj_stat(Character *ch, class Object *j)
     sprintf(buf, "    $3Affects$R : %s By %d\r\n", buf2, j->affected[i].modifier);
     ch->send(buf);
   }
-  return;
 }
 
-void do_start(Character *ch)
+void do_start(CharacterPtr ch)
 {
   char buf[256];
 
@@ -1359,17 +1335,17 @@ void do_start(Character *ch)
     return;
 
   ch->setLevel(1);
-  GET_EXP(ch) = 1;
+  ch->exp = 1;
 
-  if (GET_TITLE(ch) == nullptr)
+  if (ch->title == nullptr)
   {
-    GET_TITLE(ch) = str_dup("is a virgin.");
+    ch->title = QStringLiteral("is a virgin.");
   }
 
-  sprintf(buf, "%s appears with an ear-splitting bang!", GET_SHORT(ch));
+  sprintf(buf, "%s appears with an ear-splitting bang!", qPrintable(ch->shortdesc_or_name()));
   ch->player->poofin = buf;
 
-  sprintf(buf, "%s disappears in a puff of smoke.", GET_SHORT(ch));
+  sprintf(buf, "%s disappears in a puff of smoke.", qPrintable(ch->shortdesc_or_name()));
   ch->player->poofout = buf;
 
   ch->raw_hit = 10;
@@ -1398,9 +1374,9 @@ void do_start(Character *ch)
   advance_level(ch, 0);
   redo_hitpoints(ch);
 
-  GET_RDEATHS(ch) = 0;
-  GET_PDEATHS(ch) = 0;
-  GET_PKILLS(ch) = 0;
+  GET_RDEATHS(ch) = {};
+  GET_PDEATHS(ch) = {};
+  GET_PKILLS(ch) = {};
 
   ch->fillHPLimit();
   GET_MANA(ch) = mana_limit(ch);
@@ -1408,13 +1384,13 @@ void do_start(Character *ch)
 
   GET_COND(ch, THIRST) = 24;
   GET_COND(ch, FULL) = 24;
-  GET_COND(ch, DRUNK) = 0;
+  GET_COND(ch, DRUNK) = {};
 
-  ch->player->time.played = 0;
+  ch->player->time.played = {};
   ch->player->time.logon = time(0);
 }
 
-command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
+command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
 {
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1422,20 +1398,20 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  std::string arg1;
+  QString arg1;
   std::tie(arg1, arguments) = half_chop(arguments);
 
   if (arg1 == "full")
   {
     ch->sendln("Performing full zone reset!");
-    std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
+    QString buf = fmt::format("{} full repopped zone #{}.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln("Resetting this entire zone!");
-    std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
+    QString buf = fmt::format("{} repopped zone #{}.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
@@ -1443,10 +1419,10 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_clear(Character *ch, char *argument, cmd_t cmd)
+qint32 do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int zone = DC::getInstance()->world[ch->in_room].zone;
+  qint32 zone = DC::getInstance()->world[ch->in_room].zone;
 
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1471,7 +1447,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
     {
       if (tmp_victim->isNonPlayer())
       {
-        for (int l = 0; l < MAX_WEAR; l++)
+        for (qint32 l = {}; l < MAX_WEAR; l++)
         {
           if (tmp_victim->equipment[l])
             extract_obj(tmp_victim->unequip_char(l));
@@ -1485,14 +1461,14 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
     }
   }
   ch->sendln("You have just caused the deion of countless creatures in ths area!");
-  sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
+  sprintf(buf, "%s just CLEARED zone #%d!", qPrintable(ch->name()), zone);
   logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
-int do_linkdead(Character *ch, char *arg, cmd_t cmd)
+qint32 do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  int x = 0;
+  qint32 x = {};
   char buf[100];
 
   const auto &character_list = DC::getInstance()->character_list;
@@ -1504,11 +1480,11 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
     x++;
 
     if (i->player->possesing)
-      sprintf(buf, "%14s -- [%d] %s  *possessing*\r\n", GET_NAME(i),
-              (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+      sprintf(buf, "%14s -- [%d] %s  *possessing*\r\n", qPrintable(i->name()),
+              (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     else
-      sprintf(buf, "%14s -- [%d] %s\r\n", GET_NAME(i),
-              (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+      sprintf(buf, "%14s -- [%d] %s\r\n", qPrintable(i->name()),
+              (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     ch->send(buf);
   }
 
@@ -1517,16 +1493,16 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_echo(Character *ch, char *argument, cmd_t cmd)
+qint32 do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int i;
+  qint32 i;
   char buf[MAX_STRING_LENGTH];
-  Character *vict;
+  CharacterPtr vict;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  for (i = 0; *(argument + i) == ' '; i++)
+  for (i = {}; *(argument + i) == ' '; i++)
     ;
 
   if (!*(argument + i))
@@ -1541,13 +1517,13 @@ int do_echo(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_restore(Character *ch, char *argument, cmd_t cmd)
+qint32 do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char buf[100];
   class Connection *i;
 
-  void update_pos(Character * victim);
+  void update_pos(CharacterPtr victim);
 
   if (!ch->has_skill(COMMAND_RESTORE))
   {
@@ -1586,7 +1562,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
       }
     }
 
-    sprintf(buf, "%s restored %s.", GET_NAME(ch), victim->getNameC());
+    sprintf(buf, "%s restored %s.", qPrintable(ch->name()), qPrintable(victim->name()));
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     update_pos(victim);
@@ -1605,12 +1581,12 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
     if (ch->getLevel() < OVERSEER)
     {
       ch->sendln("You don't have the ability to do that!");
-      sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
+      sprintf(buf, "%s tried to do a restore all!", qPrintable(ch->name()));
       logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
       return ReturnValue::eFAILURE;
     }
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
       if (i->character != ch && !i->connected)
       {
 
@@ -1636,7 +1612,7 @@ int do_restore(Character *ch, char *argument, cmd_t cmd)
             victim, 0, ch, TO_CHAR, 0);
         victim->save();
       }
-    sprintf(buf, "%s did a restore all!", GET_NAME(ch));
+    sprintf(buf, "%s did a restore all!", qPrintable(ch->name()));
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("Trying to be Mister Popularity?");
   }
@@ -1650,9 +1626,9 @@ class hunt_data
 public:
   hunt_data *next;
   char *huntname;
-  int itemnum;
-  int time;
-  int itemsAvail[50];
+  qint32 itemnum;
+  qint32 time;
+  qint32 itemsAvail[50];
 };
 
 class hunt_items
@@ -1660,17 +1636,17 @@ class hunt_items
 public:
   hunt_items *next;
   hunt_data *hunt;
-  class Object *obj;
+  ObjectPtr obj;
   char *mobname;
 };
 
-hunt_data *hunt_list = nullptr;
-hunt_items *hunt_items_list = nullptr;
+hunt_data *hunt_list = {};
+hunt_items *hunt_items_list = {};
 
 void check_end_of_hunt(hunt_data *h, bool forced = false)
 {
-  hunt_items *i, *p = nullptr, *in;
-  int items = 0;
+  hunt_items *i, *p = {}, *in;
+  qint32 items = {};
 
   for (i = hunt_items_list; i; i = in)
   {
@@ -1686,8 +1662,8 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
           hunt_items_list = in;
 
         extract_obj(i->obj);
-        dc_free(i->mobname);
-        dc_free(i);
+        i->mobname = {};
+        i = {};
         continue;
       }
       else
@@ -1710,9 +1686,9 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     else
@@ -1723,12 +1699,12 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     send_info(buf);
 
-    hunt_data *hl, *p = nullptr;
+    hunt_data *hl, *p = {};
     for (hl = hunt_list; hl; hl = hl->next)
     {
       if (hl == h)
@@ -1741,12 +1717,12 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       }
       p = hl;
     }
-    dc_free(h->huntname);
-    dc_free(h);
+    h->huntname = {};
+    h = {};
   }
 }
 
-int do_huntclear(Character *ch, char *arg, cmd_t cmd)
+qint32 do_huntclear(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   arg = one_argument(arg, arg1);
@@ -1770,9 +1746,9 @@ int do_huntclear(Character *ch, char *arg, cmd_t cmd)
   }
 }
 
-void huntclear_item(class Object *obj)
+void huntclear_item(ObjectPtr obj)
 {
-  hunt_items *hi, *hin, *hip = nullptr;
+  hunt_items *hi, *hin, *hip = {};
   for (hi = hunt_items_list; hi; hi = hin)
   {
     hin = hi->next;
@@ -1782,17 +1758,17 @@ void huntclear_item(class Object *obj)
         hip->next = hin;
       else
         hunt_items_list = hin;
-      dc_free(hi->mobname);
-      dc_free(hi);
+      hi->mobname = {};
+      hi = {};
       continue; // Hopefully there's not two in the list, but just in case.
     }
     hip = hi;
   }
 }
 
-int get_rand_obj(hunt_data *h)
+qint32 get_rand_obj(hunt_data *h)
 {
-  int i, v;
+  qint32 i, v;
 
   for (i = 49; i > 0; i--)
     if (h->itemsAvail[i] > 0)
@@ -1802,7 +1778,7 @@ int get_rand_obj(hunt_data *h)
     return -1;
 
   v = number(0, i);
-  int c = h->itemsAvail[v];
+  qint32 c = h->itemsAvail[v];
   h->itemsAvail[v] = h->itemsAvail[i];
   h->itemsAvail[i] = -1;
 
@@ -1814,13 +1790,13 @@ void init_random_hunt_items(hunt_data *h)
   FILE *f;
   if ((f = fopen("huntitems.txt", "r")) == nullptr)
   {
-    for (int i = 0; i < 50; i++)
+    for (qint32 i = {}; i < 50; i++)
       h->itemsAvail[i] = -1;
     return;
   }
-  int a, i;
+  qint32 a, i;
   bool over = false;
-  for (a = 0; a < 50; a++)
+  for (a = {}; a < 50; a++)
   {
     if (!over)
     {
@@ -1840,13 +1816,13 @@ void init_random_hunt_items(hunt_data *h)
 
 char *last_hunt_time(char *last_hunt)
 {
-  static char *time_of_last_hunt = nullptr;
+  static char *time_of_last_hunt = {};
   char buf[MAX_STRING_LENGTH];
 
   if (!time_of_last_hunt)
   {
     sprintf(buf, "There have been no hunts since the last reboot.       \r\n");
-    time_of_last_hunt = str_dup(buf);
+    time_of_last_hunt = (buf);
   }
 
   if (last_hunt)
@@ -1855,24 +1831,20 @@ char *last_hunt_time(char *last_hunt)
   return time_of_last_hunt;
 }
 
-void begin_hunt(int item, int duration, int amount, char *huntname)
+void begin_hunt(qint32 item, qint32 duration, qint32 amount, char *huntname)
 { // time, itme, item
   hunt_data *n;
   char *tmp;
-  tm *pTime = nullptr;
+  tm *pTime = {};
   time_t ct;
 
-#ifdef LEAK_CHECK
-  n = (hunt_data *)calloc(1, sizeof(hunt_data));
-#else
-  n = (hunt_data *)dc_alloc(1, sizeof(hunt_data));
-#endif
+  auto n = new hunt_data;
   n->next = hunt_list;
   hunt_list = n;
   n->itemnum = item;
   n->time = duration;
   if (huntname)
-    n->huntname = str_dup(huntname);
+    n->huntname = (huntname);
 
   ct = time(0);
   pTime = localtime(&ct);
@@ -1900,19 +1872,19 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
   if (item == 76)
     init_random_hunt_items(n);
-  int rnum = real_object(item);
-  extern int top_of_mobt;
+  qint32 rnum = real_object(item);
+  extern qint32 top_of_mobt;
   if (rnum < 0)
     return;
 
-  for (int i = 0; i < amount; i++)
+  for (qint32 i = {}; i < amount; i++)
   {
-    int mob = -1;
-    Character *vict;
+    qint32 mob = -1;
+    CharacterPtr vict;
     while (1)
     {
       mob = number(1, top_of_mobt);
-      int vnum = DC::getInstance()->mob_index[mob].vnum(); // debug
+      qint32 vnum = DC::getInstance()->mob_index[mob].vnum(); // debug
       if (!(DC::getInstance()->mob_index[mob].vnum() > 300 &&
             (DC::getInstance()->mob_index[mob].vnum() < 2300 || DC::getInstance()->mob_index[mob].vnum() > 2499) &&
             (DC::getInstance()->mob_index[mob].vnum() < 29200 || DC::getInstance()->mob_index[mob].vnum() > 29299) &&
@@ -1924,7 +1896,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
         continue;
 
       // Skip mobs marked NO_HUNT
-      Character *m = static_cast<Character *>(DC::getInstance()->mob_index[mob].item);
+      CharacterPtr m = static_cast<CharacterPtr>(DC::getInstance()->mob_index[mob].item);
       if (m && m->mobdata && ISSET(m->mobdata->actflags, ACT_NO_HUNT))
       {
         continue;
@@ -1942,27 +1914,23 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
       break;
     }
-    class Object *obj = clone_object(rnum);
+    ObjectPtr obj = clone_object(rnum);
     obj_to_char(obj, vict);
     hunt_items *ni;
-#ifdef LEAK_CHECK
-    ni = (hunt_items *)calloc(1, sizeof(hunt_items));
-#else
-    ni = (hunt_items *)dc_alloc(1, sizeof(hunt_items));
-#endif
+    auto ni = new hunt_items;
     ni->hunt = n;
     ni->obj = obj;
-    ni->mobname = str_dup(vict->short_desc);
+    ni->mobname = (vict->short_desc);
     ni->next = hunt_items_list;
     hunt_items_list = ni;
   }
 }
 
-void pick_up_item(Character *ch, class Object *obj)
+void pick_up_item(CharacterPtr ch, ObjectPtr obj)
 {
-  hunt_items *i, *p = nullptr, *in;
+  hunt_items *i, *p = {}, *in;
   char buf[MAX_STRING_LENGTH];
-  int gold = 0;
+  qint32 gold = {};
   for (i = hunt_items_list; i; i = in)
   {
     in = i->next;
@@ -1972,13 +1940,13 @@ void pick_up_item(Character *ch, class Object *obj)
         p->next = in;
       else
         hunt_items_list = in;
-      int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+      qint32 vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
       sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
-              obj->short_description, i->mobname, ch->getNameC());
+              qPrintable(obj->short_description()), i->mobname, qPrintable(ch->name()));
       send_info(buf);
       hunt_data *h = i->hunt;
-      class Object *oitem = nullptr, *citem;
-      int r1 = 0;
+      ObjectPtr oitem = {}, citem;
+      qint32 r1 = {};
       switch (vnum)
       {
       case 76:
@@ -1989,10 +1957,10 @@ void pick_up_item(Character *ch, class Object *obj)
         {
           oitem = clone_object(r1);
           sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
-                  obj->short_description, oitem->short_description);
+                  qPrintable(obj->short_description()), oitem->short_description);
           ch->send(buf);
           sprintf(buf, "## %s turned into %s!\r\n",
-                  obj->short_description, oitem->short_description);
+                  qPrintable(obj->short_description()), oitem->short_description);
           send_info(buf);
           if (isSet(oitem->obj_flags.more_flags, ITEM_UNIQUE))
           {
@@ -2035,7 +2003,7 @@ void pick_up_item(Character *ch, class Object *obj)
       case 27918:
         gold = obj->obj_flags.value[0];
         sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
-                obj->short_description, gold);
+                qPrintable(obj->short_description()), gold);
         ch->send(buf);
 
         ch->addGold(gold);
@@ -2043,8 +2011,8 @@ void pick_up_item(Character *ch, class Object *obj)
         obj_to_room(obj, 6345);
         break;
       }
-      dc_free(i->mobname);
-      dc_free(i);
+      i->mobname = {};
+      i = {};
       check_end_of_hunt(h);
       continue;
     }
@@ -2071,7 +2039,7 @@ void pulse_hunts()
       return;
     }
 
-    class Object *obj, *onext;
+    ObjectPtr obj, onext;
     for (obj = DC::getInstance()->world[6345].contents; obj; obj = onext)
     {
       onext = obj->next_content;
@@ -2084,9 +2052,9 @@ void pulse_hunts()
   }
 }
 
-int do_showhunt(Character *ch, char *arg, cmd_t cmd)
+qint32 do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  std::string buf;
+  QString buf;
   hunt_data *h;
   hunt_items *hi;
 
@@ -2105,14 +2073,14 @@ int do_showhunt(Character *ch, char *arg, cmd_t cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
 
-    int itemsleft = 0;
+    qint32 itemsleft = {};
     for (hi = hunt_items_list; hi; hi = hi->next)
     {
       if (hi->hunt != h)
@@ -2132,17 +2100,17 @@ int do_showhunt(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_huntstart(Character *ch, char *argument, cmd_t cmd)
+qint32 do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 #ifdef TWITTER
   twitCurl twitterObj;
-  std::string authUrl, replyMsg;
-  std::string myOAuthAccessTokenKey("");
-  std::string myOAuthAccessTokenSecret("");
-  std::string userName("");
-  std::string passWord("");
-  std::string message("");
+  QString authUrl, replyMsg;
+  QString myOAuthAccessTokenKey("");
+  QString myOAuthAccessTokenSecret("");
+  QString userName("");
+  QString passWord("");
+  QString message("");
 
   userName = "username";
   passWord = "password";
@@ -2150,11 +2118,11 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
   twitterObj.setTwitterUsername(userName);
   twitterObj.setTwitterPassword(passWord);
 
-  twitterObj.getOAuth().setConsumerKey(std::string("xyz"));
-  twitterObj.getOAuth().setConsumerSecret(std::string("xyz"));
+  twitterObj.getOAuth().setConsumerKey(QString("xyz"));
+  twitterObj.getOAuth().setConsumerSecret(QString("xyz"));
 
-  twitterObj.getOAuth().setOAuthTokenKey(std::string("xyz-xyz"));
-  twitterObj.getOAuth().setOAuthTokenSecret(std::string("xyz"));
+  twitterObj.getOAuth().setOAuthTokenKey(QString("xyz-xyz"));
+  twitterObj.getOAuth().setOAuthTokenSecret(QString("xyz"));
 
   if (twitterObj.accountVerifyCredGet())
   {
@@ -2179,7 +2147,7 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]");
     return ReturnValue::eSUCCESS;
   }
-  int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
+  qint32 vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
   if (vnum <= 0 || real_object(vnum) < 0)
   {
     ch->sendln("Non-existent item.");
@@ -2218,12 +2186,12 @@ int do_huntstart(Character *ch, char *argument, cmd_t cmd)
   send_info(buf);
 
 #ifdef TWITTER
-  std::string holding[3] = {
+  QString holding[3] = {
       "Get your ass to MAHS... err, DC.  There's a hunt!",
       "You may be wondering why I've gathered you here today.  There's a hunt!",
       "Aussie Aussie Aussie! Oi Oi Hunt!!"};
 
-  int pos = rand() % 3;
+  qint32 pos = rand() % 3;
 
   message = holding[pos];
 

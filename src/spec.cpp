@@ -4,36 +4,19 @@
 
 */
 
-#include <cctype>
-#include <cstring>
-
 #include "DC/structs.h"
-#include "DC/room.h"
-#include "DC/character.h"
 #include "DC/DC.h"
-#include "DC/utility.h"
-#include "DC/terminal.h"
-#include "DC/player.h"
-#include "DC/mobile.h"
-#include "DC/clan.h"
-#include "DC/handler.h"
-#include "DC/db.h"
+
 #include "DC/interp.h"
-#include "DC/connect.h"
-#include "DC/spells.h"
-#include "DC/race.h"
-#include "DC/act.h"
-#include "DC/set.h"
 #include "DC/returnvals.h"
-#include "DC/timeinfo.h"
 
 class spec_data
 {
 public:
-  char *name;
-  char *description;
-  int pcclass;
-  int skills[10];
+  const char *name = {};
+  const char *description = {};
+  qint32 pcclass = {};
+  qint32 skills[10] = {};
 };
 
 const spec_data spec_list[] =
@@ -41,7 +24,7 @@ const spec_data spec_list[] =
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
-int do_spec(Character *ch, char *argument, cmd_t cmd)
+qint32 do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
@@ -51,7 +34,7 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
   if (!str_cmp(arg, "list"))
   {
     /*
-       for (int i = 0; spec_list[i].name != nullptr; i++)
+       for (qint32 i = {}; spec_list[i].name != nullptr; i++)
         {
            if (spec_list[i].pcclass != GET_CLASS(ch)) continue;
            sprintf(buf, "%d. %s : %s\r\n",i+1, spec_list[i].name,
@@ -80,9 +63,9 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You do not have the required 10000 platinum.");
       return ReturnValue::eFAILURE;
     }
-    for (int i = 0; i < 10; i++)
+    for (qint32 i = {}; i < 10; i++)
     { // Free up skills tied to the specilization.
-      std::queue<skill_t> skills_to_delete = {};
+      QQueue<skill_t> skills_to_delete = {};
       for (const auto &curr : ch->skills)
       {
         if (curr.first == spec_list[ch->spec].skills[i])
@@ -96,7 +79,7 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
         skills_to_delete.pop();
       }
     }
-    ch->spec = 0;
+    ch->spec = {};
     GET_PLATINUM(ch) -= 10000;
     ch->saves[SAVE_TYPE_FIRE] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
                                                          : 0 + ch->getLevel() > 53   ? 1

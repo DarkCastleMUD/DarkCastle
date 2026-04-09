@@ -2,8 +2,7 @@
 // Usage: This file contains special procedures pertaining to objects, except
 // for the boards which are in board.C
 
-#include <vector>
-#include <string>
+#include <QString>
 #include <sstream>
 
 #include <cstring> // strstr()
@@ -11,28 +10,23 @@
 #include <fmt/format.h>
 
 #include "DC/fight.h"
-#include "DC/room.h"
+
 #include "DC/DC.h"
-#include "DC/connect.h"
-#include "DC/utility.h"
-#include "DC/character.h"
+
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/player.h"
-#include "DC/sing.h"
 #include "DC/interp.h"
 #include "DC/magic.h"
 #include "DC/act.h"
-#include "DC/mobile.h"
+
 #include "DC/spells.h"
-#include "DC/returnvals.h"
-#include "DC/set.h"
 #include "DC/race.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
-#include "DC/memory.h"
+#include "DC/utility.h"
 
-#define EMOTING_FILE "emoting-objects.txt"
+const auto EMOTING_FILE = QStringLiteral("emoting-objects.txt");
 
 extern mprog_throw_type *g_mprog_throw_list;
 
@@ -62,21 +56,21 @@ obj_emote_index obj_emote_head = {
 
 void free_emoting_obj_data(obj_emote_index *myobj)
 {
-  obj_emote_data *curr_data = nullptr;
+  obj_emote_data *curr_data = {};
 
   while (myobj->data)
   {
     curr_data = myobj->data;
     myobj->data = curr_data->next;
 
-    dc_free(curr_data->emote_text);
-    dc_free(curr_data);
+    curr_data->emote_text = {};
+    curr_data = {};
   }
 }
 
 void DC::free_emoting_objects_from_memory(void)
 {
-  obj_emote_index *curr_index = nullptr;
+  obj_emote_index *curr_index = {};
 
   while (obj_emote_head.next)
   {
@@ -84,7 +78,7 @@ void DC::free_emoting_objects_from_memory(void)
     obj_emote_head.next = curr_index->next;
 
     free_emoting_obj_data(curr_index);
-    dc_free(curr_index);
+    curr_index = {};
   }
 
   free_emoting_obj_data(&obj_emote_head);
@@ -92,8 +86,8 @@ void DC::free_emoting_objects_from_memory(void)
 
 void load_emoting_objects()
 {
-  obj_emote_index *index_cursor = nullptr;
-  obj_emote_data *data_cursor = nullptr;
+  obj_emote_index *index_cursor = {};
+  obj_emote_data *data_cursor = {};
   FILE *fl;
   // short i;
   char fromfile;
@@ -102,28 +96,16 @@ void load_emoting_objects()
   short offset;
 
   fl = fopen(EMOTING_FILE, "r");
-#ifdef LEAK_CHECK
-  obj_emote_head.next = (obj_emote_index *)
-      calloc(1, sizeof(obj_emote_index));
-#else
-  obj_emote_head.next = (obj_emote_index *)
-      dc_alloc(1, sizeof(obj_emote_index));
-#endif
+  obj_emote_head.next = new obj_emote_index;
   index_cursor = obj_emote_head.next;
-  index_cursor->next = nullptr;
-  index_cursor->data = nullptr;
+  index_cursor->next = {};
+  index_cursor->data = {};
   index_cursor->room_number = DC::NOWHERE;
   index_cursor->emote_index_length = -1;
-  index_cursor->frequency = 0;
-#ifdef LEAK_CHECK
-  data_cursor = (obj_emote_data *)
-      calloc(1, sizeof(obj_emote_index));
-#else
-  data_cursor = (obj_emote_data *)
-      dc_alloc(1, sizeof(obj_emote_index));
-#endif
+  index_cursor->frequency = {};
+  data_cursor = new obj_emote_data;
   index_cursor->data = data_cursor;
-  data_cursor->next = nullptr;
+  data_cursor->next = {};
   while (!done2)
   {
     index_cursor->room_number = fread_int(fl, 0, 1000000);
@@ -143,17 +125,11 @@ void load_emoting_objects()
       }
       else
       {
-#ifdef LEAK_CHECK
-        data_cursor->next = (obj_emote_data *)
-            calloc(1, sizeof(obj_emote_data));
-#else
-        data_cursor->next = (obj_emote_data *)
-            dc_alloc(1, sizeof(obj_emote_data));
-#endif
+        data_cursor->next = new obj_emote_data;
         data_cursor = data_cursor->next;
-        data_cursor->next = nullptr;
+        data_cursor->next = {};
         // Azrack -- fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
-        // because fseek takes an unsigned int.
+        // because fseek takes an quint32.
         fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
       }
     }
@@ -164,39 +140,26 @@ void load_emoting_objects()
     else
     {
       fseek(fl, (1 * sizeof(char)), SEEK_CUR);
-#ifdef LEAK_CHECK
-      index_cursor->next = (obj_emote_index *)
-          calloc(1, sizeof(obj_emote_index));
-#else
-      index_cursor->next = (obj_emote_index *)
-          dc_alloc(1, sizeof(obj_emote_index));
-#endif
+      index_cursor->next = new obj_emote_index;
       index_cursor = index_cursor->next;
-      index_cursor->next = nullptr;
-#ifdef LEAK_CHECK
-      index_cursor->data = (obj_emote_data *)
-          calloc(1, sizeof(obj_emote_data));
-#else
-      index_cursor->data = (obj_emote_data *)
-          dc_alloc(1, sizeof(obj_emote_data));
-#endif
+      index_cursor->next = {};
+      index_cursor->data = new obj_emote_data;
       index_cursor->room_number = DC::NOWHERE;
       index_cursor->emote_index_length = -1;
       index_cursor->frequency = -1;
       data_cursor = index_cursor->data;
-      data_cursor->next = nullptr;
+      data_cursor->next = {};
     }
   }
   fclose(fl);
-  return;
 }
 
-int emoting_object(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                      CharacterPtr invoker)
 {
-  obj_emote_index *index_cursor = nullptr;
-  obj_emote_data *data_cursor = nullptr;
-  short i = 0;
+  obj_emote_index *index_cursor = {};
+  obj_emote_data *data_cursor = {};
+  short i = {};
   if (cmd != cmd_t::UNDEFINED)
   {
     return ReturnValue::eFAILURE;
@@ -224,7 +187,7 @@ int emoting_object(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       }
       i = number<decltype(index_cursor->emote_index_length)>(0, (index_cursor->emote_index_length));
       data_cursor = index_cursor->data;
-      for (i = 0; i < number<decltype(index_cursor->emote_index_length)>(0, index_cursor->emote_index_length); i++)
+      for (i = {}; i < number<decltype(index_cursor->emote_index_length)>(0, index_cursor->emote_index_length); i++)
       {
         data_cursor = data_cursor->next;
       }
@@ -238,8 +201,8 @@ int emoting_object(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int barbweap(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-             Character *invoker)
+qint32 barbweap(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                CharacterPtr invoker)
 { // Cestus
   if (cmd != cmd_t::PUSH)
     return ReturnValue::eFAILURE;
@@ -259,12 +222,12 @@ int barbweap(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
   return ReturnValue::eFAILURE;
 }
-int souldrainer(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                Character *invoker)
+qint32 souldrainer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                   CharacterPtr invoker)
 {
-  // class Object *wielded;
-  int percent, chance;
-  Character *vict;
+  // ObjectPtr wielded;
+  qint32 percent, chance;
+  CharacterPtr vict;
 
   if (!(vict = ch->fighting))
   {
@@ -318,8 +281,8 @@ int souldrainer(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-             Character *invoker)
+qint32 pushwand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                CharacterPtr invoker)
 {
   if (cmd != cmd_t::SAY && cmd != cmd_t::PUSH)
     return ReturnValue::eFAILURE;
@@ -332,7 +295,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       ch->sendln("You try to separate the wand pieces, but you find yourself too weak to do so.");
       return ReturnValue::eSUCCESS;
     }
-    int newspell;
+    qint32 newspell;
     switch (obj->obj_flags.value[3])
     {
     case 17:
@@ -359,7 +322,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   {
     if (str_cmp(arg, "recharge"))
       return ReturnValue::eFAILURE;
-    class Object *curr;
+    ObjectPtr curr;
     for (curr = ch->carrying; curr; curr = curr->next_content)
     {
       if (DC::getInstance()->obj_index[curr->item_number].vnum() == 22427) // red dragon snout
@@ -377,7 +340,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eFAILURE;
 }
 
-int dawnsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 dawnsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::SAY)
     return ReturnValue::eFAILURE;
@@ -401,7 +364,7 @@ int dawnsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   addTimer(ch, OBJ_DAWNSWORD, 24);
 
   ch->sendln("You whisper a prayer to Dawn and it responds in a brilliant flash of light!");
-  Character *v;
+  CharacterPtr v;
   affected_type af;
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
   {
@@ -428,7 +391,7 @@ int dawnsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 
   return ReturnValue::eSUCCESS;
 }
-int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -444,8 +407,8 @@ int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     return ReturnValue::eFAILURE;
   obj->obj_flags.timer = 5;
 
-  int heal;
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  qint32 heal;
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -462,7 +425,7 @@ int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       }
       else
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
+        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", qPrintable(ch->name()), heal);
         tmp_char->send(buf);
       }
     }
@@ -476,9 +439,9 @@ int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-void check_eq(Character *ch);
+void check_eq(CharacterPtr ch);
 
-int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 lilithring(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::SAY)
     return ReturnValue::eFAILURE;
@@ -488,7 +451,7 @@ int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   arg = one_argument(arg, arg2);
   if (str_cmp(arg1, "ateni"))
     return ReturnValue::eFAILURE;
-  Character *victim;
+  CharacterPtr victim;
   if (!(victim = ch->get_char_room_vis(arg2)))
   {
     ch->sendln("Noone here by that name.");
@@ -541,8 +504,8 @@ int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 
   af.type = OBJ_LILITHRING;
   af.duration = 3;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = AFF_CHARM;
   affect_to_char(victim, &af);
 
@@ -552,7 +515,7 @@ int lilithring(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   return ReturnValue::eSUCCESS;
 }
 
-int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 orrowand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   switch (cmd)
   {
@@ -580,8 +543,8 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
     return ReturnValue::eSUCCESS;
   }
 
-  class Object *curr;
-  class Object *firstP = nullptr, *secondP = nullptr, *vial = nullptr, *diamond = nullptr;
+  ObjectPtr curr;
+  ObjectPtr firstP = {}, *secondP = {}, *vial = {}, diamond = {};
 
   for (curr = ch->carrying; curr; curr = curr->next_content)
   {
@@ -600,22 +563,22 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
     ch->sendln("Recharge unsuccessful. Missing required components:");
     if (!firstP && real_object(27903))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27903)].item);
+      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27903)].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!secondP && real_object(27903))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27903)].item);
+      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27903)].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!vial && real_object(27904))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27904)].item);
+      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27904)].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!diamond && real_object(17399))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(17399)].item);
+      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(17399)].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     return ReturnValue::eSUCCESS;
@@ -633,12 +596,12 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-int holyavenger(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                Character *invoker)
+qint32 holyavenger(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                   CharacterPtr invoker)
 {
-  // class Object *wielded;
-  int percent, chance;
-  Character *vict;
+  // ObjectPtr wielded;
+  qint32 percent, chance;
+  CharacterPtr vict;
 
   if (!(vict = ch->fighting))
   {
@@ -700,18 +663,18 @@ int holyavenger(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int hooktippedsteelhalberd(Character *ch, class Object *obj, cmd_t cmd,
-                           const char *arg, Character *invoker)
+qint32 hooktippedsteelhalberd(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                              const char *arg, CharacterPtr invoker)
 {
-  Character *victim;
+  CharacterPtr victim;
   if (!(victim = ch->fighting))
     return ReturnValue::eFAILURE;
   if (number(1, 101) > 2)
     return ReturnValue::eFAILURE;
-  int which = number(0, MAX_WEAR - 1);
+  qint32 which = number(0, MAX_WEAR - 1);
   if (!victim->equipment[which])
     return ReturnValue::eFAILURE; // Lucky
-  int i = damage_eq_once(victim->equipment[which]);
+  qint32 i = damage_eq_once(victim->equipment[which]);
   if (!victim->equipment[which])
     return ReturnValue::eSUCCESS;
   if (i >= eq_max_damage(victim->equipment[which]))
@@ -735,12 +698,12 @@ int hooktippedsteelhalberd(Character *ch, class Object *obj, cmd_t cmd,
 }
 
 // TODO - I think we actually used this for a while but it was too powerful
-int drainingstaff(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                  Character *invoker)
+qint32 drainingstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                     CharacterPtr invoker)
 {
-  Character *vict;
-  Object *staff;
-  int dam;
+  CharacterPtr vict;
+  ObjectPtr staff;
+  qint32 dam;
 
   if (!(vict = ch->fighting))
   {
@@ -782,11 +745,11 @@ int drainingstaff(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-         Character *invoker)
+qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+            CharacterPtr invoker)
 {
   char buf[MAX_INPUT_LENGTH];
-  int32_t x;
+  qint32 x;
 
   if (cmd != cmd_t::BALANCE && cmd != cmd_t::DEPOSIT && cmd != cmd_t::WITHDRAW)
     return ReturnValue::eFAILURE;
@@ -813,12 +776,12 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       ch->sendln("Deposit what?");
       return ReturnValue::eSUCCESS;
     }
-    if ((uint32_t)x > ch->getGold())
+    if ((quint32)x > ch->getGold())
     {
       ch->sendln("You don't have that much gold!");
       return ReturnValue::eSUCCESS;
     }
-    if ((uint32_t)x + GET_BANK(ch) > 2000000000)
+    if ((quint32)x + GET_BANK(ch) > 2000000000)
     {
       ch->sendln("That would bring you over your account maximum!");
       return ReturnValue::eSUCCESS;
@@ -837,7 +800,7 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     ch->sendln("Withdraw what?");
     return ReturnValue::eSUCCESS;
   }
-  if ((uint32_t)x > GET_BANK(ch))
+  if ((quint32)x > GET_BANK(ch))
   {
     ch->sendln("You don't have that much $B$5gold$R in the bank!");
     return ReturnValue::eSUCCESS;
@@ -849,11 +812,11 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-               Character *invoker)
+qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                  CharacterPtr invoker)
 {
   char buf[MAX_INPUT_LENGTH];
-  int32_t x;
+  qint32 x;
 
   if (cmd != cmd_t::BALANCE && cmd != cmd_t::DEPOSIT && cmd != cmd_t::WITHDRAW)
     return ReturnValue::eFAILURE;
@@ -879,7 +842,7 @@ int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     ch->sendln("Withdraw what?");
     return ReturnValue::eSUCCESS;
   }
-  if ((uint32_t)x > GET_BANK(ch))
+  if ((quint32)x > GET_BANK(ch))
   {
     ch->sendln("You don't have that much $B$5gold$R in the bank!");
     return ReturnValue::eSUCCESS;
@@ -899,8 +862,8 @@ int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 // where the exit is supposed to go
 // I should probably just change the exit temporarily to point to the "bad" room
 // and then change it back after the move.
-int returner(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-             Character *invoker)
+qint32 returner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                CharacterPtr invoker)
 {
 
   if (!isCommandTypeDirection(cmd))
@@ -929,16 +892,16 @@ int returner(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-#define MAX_GEM_ASSEMBLER_ITEM 10
+constexpr auto MAX_GEM_ASSEMBLER_ITEM = 10;
 
 class assemble_item
 {
 public:
-  char *finish_to_char;
-  char *finish_to_room;
-  char *missing_to_char;
-  int components[MAX_GEM_ASSEMBLER_ITEM];
-  int item;
+  const char *finish_to_char{};
+  const char *finish_to_room{};
+  const char *missing_to_char{};
+  qint32 components[MAX_GEM_ASSEMBLER_ITEM]{};
+  qint32 item{};
 };
 
 assemble_item assemble_items[] = {
@@ -1011,8 +974,8 @@ assemble_item assemble_items[] = {
 
 };
 
-int hellmouth_thing(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                    Character *invoker)
+qint32 hellmouth_thing(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                       CharacterPtr invoker)
 {
   if (cmd != cmd_t::SAY)
     return ReturnValue::eFAILURE;
@@ -1037,7 +1000,7 @@ int hellmouth_thing(Character *ch, class Object *obj, cmd_t cmd, const char *arg
   //  char_to_room(invoker, real_room(4801));
   GET_KI(invoker) -= 50;
   if (GET_KI(invoker) < 0)
-    GET_KI(invoker) = 0;
+    GET_KI(invoker) = {};
   invoker->setHP(invoker->getHP() / 2);
   GET_MANA(invoker) /= 2;
   invoker->setMove(invoker->getMove() / 2.0);
@@ -1050,7 +1013,7 @@ int hellmouth_thing(Character *ch, class Object *obj, cmd_t cmd, const char *arg
   return ReturnValue::eFAILURE; // So normal say function will execute after this
 }
 
-int search_assemble_items(int vnum)
+qint32 search_assemble_items(qint32 vnum)
 {
   // This should never happen
   if (vnum < 1)
@@ -1060,11 +1023,11 @@ int search_assemble_items(int vnum)
     return -1;
   }
 
-  for (int item_index = 0; assemble_items[item_index].item != -1; item_index++)
+  for (qint32 item_index = {}; assemble_items[item_index].item != -1; item_index++)
   {
     // We search until MAX_GEM_ASSEMBLER_ITEM -1 because we don't want to include the last item
     // which is the finished item vnum
-    for (int component_index = 0; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++)
+    for (qint32 component_index = {}; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++)
     {
       if (assemble_items[item_index].components[component_index] == vnum)
       {
@@ -1076,7 +1039,7 @@ int search_assemble_items(int vnum)
   return -1;
 }
 
-bool assemble_item_index(Character *ch, int item_index)
+bool assemble_item_index(CharacterPtr ch, qint32 item_index)
 {
   // This should never happen
   if (item_index < 0)
@@ -1087,16 +1050,16 @@ bool assemble_item_index(Character *ch, int item_index)
   }
 
   // Look through all the components of item_index and see if the player has them
-  for (int component_index = 0; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++)
+  for (qint32 component_index = {}; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++)
   {
 
-    int component_virt = assemble_items[item_index].components[component_index];
+    qint32 component_virt = assemble_items[item_index].components[component_index];
     if (component_virt < 1)
     {
       continue;
     }
 
-    int component_real = real_object(component_virt);
+    qint32 component_real = real_object(component_virt);
     if (component_real < 0)
     {
       logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
@@ -1114,9 +1077,9 @@ bool assemble_item_index(Character *ch, int item_index)
   }
 
   // If we get to this point then all components for item_index were found
-  int item_vnum = assemble_items[item_index].item;
-  int item_real = real_object(item_vnum);
-  Object *item = (Object *)DC::getInstance()->obj_index[item_real].item;
+  qint32 item_vnum = assemble_items[item_index].item;
+  qint32 item_real = real_object(item_vnum);
+  ObjectPtr item = (ObjectPtr)DC::getInstance()->obj_index[item_real].item;
 
   // Check if the item to be assembled is marked UNIQUE but the player already has one
   if (isSet(item->obj_flags.more_flags, ITEM_UNIQUE))
@@ -1133,15 +1096,15 @@ bool assemble_item_index(Character *ch, int item_index)
   act(assemble_items[item_index].finish_to_room, ch, 0, 0, TO_ROOM, 0);
 
   // Remove all the components from the player
-  for (int component_index = 0; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++)
+  for (qint32 component_index = {}; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++)
   {
-    int component_virt = assemble_items[item_index].components[component_index];
+    qint32 component_virt = assemble_items[item_index].components[component_index];
     if (component_virt < 1)
     {
       continue;
     }
 
-    int component_real = real_object(component_virt);
+    qint32 component_real = real_object(component_virt);
     if (component_real < 0)
     {
       logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
@@ -1151,13 +1114,13 @@ bool assemble_item_index(Character *ch, int item_index)
       return true;
     }
 
-    Object *component_obj = get_obj_in_list_num(component_real, ch->carrying);
+    ObjectPtr component_obj = get_obj_in_list_num(component_real, ch->carrying);
     obj_from_char(component_obj);
     extract_obj(component_obj);
   }
 
   // make the new item
-  Object *reward_item = clone_object(item_real);
+  ObjectPtr reward_item = clone_object(item_real);
   if (reward_item == 0)
   {
     logf(ANGEL, DC::LogChannel::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
@@ -1170,12 +1133,12 @@ bool assemble_item_index(Character *ch, int item_index)
   return true;
 }
 
-int do_assemble(Character *ch, char *argument, cmd_t cmd)
+qint32 do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool different_item_components = false;
-  int vnum, item_index = -1, last_item_index = -1;
+  qint32 vnum, item_index = -1, last_item_index = -1;
   char arg1[MAX_INPUT_LENGTH + 1];
-  Object *obj;
+  ObjectPtr obj;
 
   one_argument(argument, arg1);
 
@@ -1230,7 +1193,7 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
       // Attempt to assemble all the components
       if (assemble_item_index(ch, last_item_index) == false)
       {
-        csendf(ch, "%s", assemble_items[last_item_index].missing_to_char);
+        ch->send(QStringLiteral("%s").arg(assemble_items[last_item_index].missing_to_char));
         return ReturnValue::eFAILURE;
       }
     }
@@ -1259,15 +1222,15 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
   // Attempt to assemble all the components
   if (assemble_item_index(ch, item_index) == false)
   {
-    csendf(ch, "%s", assemble_items[item_index].missing_to_char);
+    ch->send(QStringLiteral("%s").arg(assemble_items[item_index].missing_to_char));
     return ReturnValue::eFAILURE;
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-int stupid_button(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                  Character *invoker)
+qint32 stupid_button(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                     CharacterPtr invoker)
 {
   if (cmd != cmd_t::PUSH)
     return ReturnValue::eFAILURE;
@@ -1289,10 +1252,10 @@ int stupid_button(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // Fear gaze.
-int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                Character *invoker)
+qint32 gazeofgaiot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                   CharacterPtr invoker)
 {
-  Character *victim;
+  CharacterPtr victim;
   char vict[MAX_INPUT_LENGTH]; // buffer overflow fix
 
   one_argument(arg, vict);
@@ -1335,7 +1298,7 @@ int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   affected_type af;
   af.type = SKILL_FEARGAZE;
   af.duration = 30;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
@@ -1346,14 +1309,14 @@ int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-             Character *invoker)
+qint32 pfe_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                CharacterPtr invoker)
 {
   // char buf[MAX_INPUT_LENGTH];
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  class Object *obj_object;
-  int j;
+  ObjectPtr obj_object;
+  qint32 j;
 
   if (cmd == cmd_t::UNDEFINED && obj) // This is where we recharge
     if (obj->obj_flags.value[3])
@@ -1365,7 +1328,7 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (!ch)
     return ReturnValue::eFAILURE;
-  int pos = WEAR_HOLD;
+  qint32 pos = WEAR_HOLD;
   if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
   {
     pos = WEAR_HOLD2;
@@ -1441,14 +1404,14 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-               Character *invoker)
+qint32 devilsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                  CharacterPtr invoker)
 {
   // char buf[MAX_INPUT_LENGTH];
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  // class Object *obj_object;
-  // int j;
+  // ObjectPtr obj_object;
+  // qint32 j;
 
   if (cmd != cmd_t::SAY)
     return ReturnValue::eFAILURE;
@@ -1500,7 +1463,7 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
 // If you have AFFsanct but not the spell, kill it
 // This works fine as long as they don't have perma-sanct eq
-void remove_eliara(Character *ch)
+void remove_eliara(CharacterPtr ch)
 {
 
   if (!IS_AFFECTED(ch, AFF_SANCTUARY))
@@ -1514,20 +1477,20 @@ void remove_eliara(Character *ch)
   REMBIT(ch->affected_by, AFF_SANCTUARY);
 }
 
-int dancevest(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-              Character *invoker)
+qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                 CharacterPtr invoker)
 {
   if (cmd == cmd_t::UNDEFINED || cmd != cmd_t::SAY || !ch || !ch->in_room || str_cmp(arg, " just dance"))
   {
     return ReturnValue::eFAILURE;
   }
-  do_say(ch, "just dance", cmd_t::SAY);
+  do_say(ch, QStringLiteral("just dance"), cmd_t::SAY);
   if (obj->obj_flags.timer > 0)
   {
     ch->sendln("The vest remains silent.");
     return ReturnValue::eSUCCESS;
   }
-  char *command_list[] =
+  const char *command_list[] =
       {
           "dance", // 0
           "shuffle",
@@ -1540,7 +1503,7 @@ int dancevest(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           "headbang",
           "showtune" // 9
       };
-  Character *v;
+  CharacterPtr v;
   ch->sendln("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!");
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
   {
@@ -1557,8 +1520,8 @@ int dancevest(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-             Character *invoker)
+qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                CharacterPtr invoker)
 {
 
   if (cmd == cmd_t::UNDEFINED)
@@ -1600,7 +1563,7 @@ int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
   ch->sendln("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!");
   act("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, TO_ROOM, 0);
-  Character *v, *vn;
+  CharacterPtr v, vn;
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = vn)
   {
     vn = v->next_in_room;
@@ -1618,11 +1581,11 @@ int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // When fighting an evil opponent, sancts PC
-int eliara_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                  Character *invoker)
+qint32 eliara_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                     CharacterPtr invoker)
 {
 
-  Character *vict = nullptr;
+  CharacterPtr vict = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -1651,8 +1614,8 @@ int eliara_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int eliara_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 eliara_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
 
   if (!ch)
@@ -1672,8 +1635,8 @@ int eliara_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eFAILURE;
 }
 
-int carriage(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-             Character *invoker)
+qint32 carriage(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                CharacterPtr invoker)
 {
   // this ain't done yet...it's natashas half written proc
 
@@ -1697,8 +1660,8 @@ int carriage(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int arenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                Character *invoker)
+qint32 arenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                   CharacterPtr invoker)
 {
   // only go off when a player types a command
   if (cmd == cmd_t::UNDEFINED)
@@ -1714,7 +1677,7 @@ int arenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->in_room != obj->in_room)
     return ReturnValue::eFAILURE;
 
-  if (!move_char(ch, real_room(number(17800, 17949))) == 0)
+  if (move_char(ch, real_room(number(17800, 17949))) == 0)
     return ReturnValue::eFAILURE;
 
   if (ch->fighting)
@@ -1732,10 +1695,10 @@ int arenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int movingarenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                      Character *invoker)
+qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                         CharacterPtr invoker)
 {
-  int32_t room = 17840;
+  qint32 room = 17840;
 
   if (cmd == cmd_t::UNDEFINED)
   {
@@ -1773,12 +1736,12 @@ int movingarenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                     Character *invoker)
+qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                        CharacterPtr invoker)
 {
   char name[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
-  class Object *target_obj = nullptr;
+  ObjectPtr target_obj = {};
 
   if (cmd != cmd_t::RESTRING)
     return ReturnValue::eFAILURE;
@@ -1817,7 +1780,7 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     return ReturnValue::eSUCCESS;
   }
 
-  if (GET_PLATINUM(ch) < (uint32_t)(ch->getLevel()))
+  if (GET_PLATINUM(ch) < (quint32)(ch->getLevel()))
   {
     ch->send("'Insufficient platinum.  *beep*'\n");
     return ReturnValue::eSUCCESS;
@@ -1825,12 +1788,12 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   GET_PLATINUM(ch) -= (ch->getLevel());
 
-  //  dc_free(target_obj->short_description);
+  //  target_obj->short_description={};
   //  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
   //  strcpy(target_obj->short_description, buf);
   char zarg[MAX_STRING_LENGTH];
   sprintf(zarg, "$B$7%s$R", buf);
-  target_obj->short_description = str_hsh(zarg);
+  target_obj->short_description(zarg);
 
   send_to_char("\r\n'Beginning magical transformation process. *beep*'\r\n"
                "You put your item into the machine and close the lid.\r\n"
@@ -1842,8 +1805,8 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   return ReturnValue::eSUCCESS;
 }
 
-int weenie_weedy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                 Character *invoker)
+qint32 weenie_weedy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                    CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -1864,8 +1827,8 @@ int weenie_weedy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 // this should really be a azrack megaphone, but i'm too lazy to figure out how they
 // work right now
 // TODO - figure out how azrack's megaphone's work
-int stupid_message(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+qint32 stupid_message(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                      CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -1887,22 +1850,22 @@ int stupid_message(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
 // If there is a player in rooms 8695-8699 (the pillars), then they cause a
 // "balance" and we can remove the imp_only flag from the target room
-int pagoda_balance(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                      CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  Character *vict = nullptr;
-  int found = 0;
+  CharacterPtr vict = {};
+  qint32 found = {};
 
-  for (int i = 8695; i < 8699; i++)
+  for (qint32 i = 8695; i < 8699; i++)
   {
     // TODO - should probably check to make sure these are valid rooms before we
     // use them.  Proc isn't used yet though, so no biggy.
     for (vict = DC::getInstance()->world[real_room(i)].people; vict; vict = vict->next_in_room)
       if (vict->isNonPlayer())
-        found = 0;
+        found = {};
       else
       {
         found = 1;
@@ -1917,7 +1880,7 @@ int pagoda_balance(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!found)
     return ReturnValue::eFAILURE;
 
-  for (int j = 8695; j < 8699; j++)
+  for (qint32 j = 8695; j < 8699; j++)
     send_to_room("The weight of your body helps shift the balances.\r\n"
                  "You hear the poping of a magical barrier dissapating.\r\n\r\n",
                  real_room(j));
@@ -1927,8 +1890,8 @@ int pagoda_balance(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // If players enter the room, pop a "imp_only" flag back on the room.
-int pagoda_shield_restorer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                           Character *invoker)
+qint32 pagoda_shield_restorer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                              CharacterPtr invoker)
 {
   if (cmd == cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE; // only restore if a player is in the room
@@ -1943,10 +1906,10 @@ int pagoda_shield_restorer(Character *ch, class Object *obj, cmd_t cmd, const ch
 }
 
 // stupid little item I made for an ex-gf so she could find me when she logged in
-int phish_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                  Character *invoker)
+qint32 phish_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                     CharacterPtr invoker)
 {
-  Character *victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd != cmd_t::PUSH) // push
     return ReturnValue::eFAILURE;
@@ -1964,20 +1927,20 @@ int phish_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   ch->sendln("Found him!");
 
-  do_transfer(victim, GET_NAME(ch));
+  do_transfer(victim, qPrintable(ch->name()));
   return ReturnValue::eSUCCESS;
 }
 
-int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
-  Character *victim;
-  Character *next_vict;
+  CharacterPtr victim;
+  CharacterPtr next_vict;
 
   if (cmd != cmd_t::PUSH) // push
     return ReturnValue::eFAILURE;
 
-  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  qint32 obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
 
   switch (obj_vnum)
   {
@@ -2003,12 +1966,12 @@ int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                Character *invoker)
+qint32 portal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                   CharacterPtr invoker)
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  Character *victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2063,12 +2026,12 @@ int portal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                   Character *invoker)
+qint32 full_heal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                      CharacterPtr invoker)
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  Character *victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2126,8 +2089,8 @@ int full_heal_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int mana_box(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-             Character *invoker)
+qint32 mana_box(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2146,8 +2109,8 @@ int mana_box(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                    Character *invoker)
+qint32 fireshield_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                       CharacterPtr invoker)
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
@@ -2200,12 +2163,12 @@ int fireshield_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                  Character *invoker)
+qint32 teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                     CharacterPtr invoker)
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  Character *victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2267,8 +2230,8 @@ int teleport_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                   Character *invoker)
+qint32 alignment_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                      CharacterPtr invoker)
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
@@ -2318,7 +2281,7 @@ int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   else if (!strcmp("evil", junk))
     GET_ALIGNMENT(ch) = -1000;
   else if (!strcmp("neutral", junk))
-    GET_ALIGNMENT(ch) = 0;
+    GET_ALIGNMENT(ch) = {};
   else
     ch->sendln("The box somehow seems......confused.");
 
@@ -2329,8 +2292,8 @@ int alignment_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                    Character *invoker)
+qint32 protection_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                       CharacterPtr invoker)
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
@@ -2394,12 +2357,12 @@ int protection_word(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 // Proc for handling any 'pull' actions.  Just put it on the object and put in an entry
 // Lots of things in here will crash if you remove the zone and stuff, but you just have
 // to assume some of these things will work.  If they don't, we got bigger problems anyway
-int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 pull_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::PULL) // pull
     return ReturnValue::eFAILURE;
 
-  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  qint32 obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
 
   switch (obj_vnum)
   {
@@ -2429,9 +2392,9 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  class Object *p;
+  ObjectPtr p;
   // 30097
   if (cmd != cmd_t::UNDEFINED && cmd == cmd_t::EXAMINE)
   {
@@ -2462,7 +2425,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     }
     if (first && real_room(30000) != DC::NOWHERE)
     {
-      int zone = DC::getInstance()->world[real_room(30000)].zone;
+      qint32 zone = DC::getInstance()->world[real_room(30000)].zone;
       const auto &character_list = DC::getInstance()->character_list;
       for (const auto &tmp_victim : character_list)
       {
@@ -2480,7 +2443,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
         {
           if (tmp_victim->isNonPlayer())
           {
-            for (int l = 0; l < MAX_WEAR; l++)
+            for (qint32 l = {}; l < MAX_WEAR; l++)
             {
               if (tmp_victim->equipment[l])
                 extract_obj(tmp_victim->unequip_char(l));
@@ -2501,7 +2464,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
   }
 
   obj->obj_flags.timer++;
-  class Object *n;
+  ObjectPtr n;
   if (obj->obj_flags.timer >= 1800)
   {
     // once one expires, ALL expire.
@@ -2510,7 +2473,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
       n = p->next;
       if (DC::getInstance()->obj_index[p->item_number].vnum() == 30097)
       {
-        Character *v = nullptr;
+        CharacterPtr v = {};
 
         if (p->carried_by)
         {
@@ -2540,19 +2503,18 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
               move_char(v, real_room(30000));
               do_look(v, "");
 
-              mprog_throw_type *throwitem = nullptr;
-              throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
+              auto throwitem = new mprog_throw_type;
               throwitem->target_mob_num = 30033;
               strcpy(throwitem->target_mob_name, "");
               throwitem->data_num = 99;
-              throwitem->delay = 0;
+              throwitem->delay = {};
               throwitem->mob = true; // This is, surprisingly, a mob
               throwitem->actor = v;
-              throwitem->obj = nullptr;
-              throwitem->vo = nullptr;
-              throwitem->rndm = nullptr;
-              throwitem->opt = 0;
-              throwitem->var = nullptr;
+              throwitem->obj = {};
+              throwitem->vo = {};
+              throwitem->rndm = {};
+              throwitem->opt = {};
+              throwitem->var = {};
               throwitem->next = g_mprog_throw_list;
               g_mprog_throw_list = throwitem;
             }
@@ -2564,13 +2526,13 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
   return ReturnValue::eSUCCESS;
 }
 
-int szrildor_pass_checks(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 szrildor_pass_checks(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   // 30096
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  int count = 0;
+  qint32 count = {};
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)
   {
@@ -2609,11 +2571,11 @@ int szrildor_pass_checks(Character *ch, class Object *obj, cmd_t cmd, const char
   return ReturnValue::eSUCCESS;
 }
 
-int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
-                   const char *arg, Character *invoker)
+qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                      const char *arg, CharacterPtr invoker)
 {
   char msg1[MAX_STRING_LENGTH], msg2[MAX_STRING_LENGTH];
-  int low, high, room, time, sector = 0;
+  qint32 low, high, room, time, sector = {};
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
@@ -2647,7 +2609,7 @@ int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
   if (obj->obj_flags.timer <= 0)
   {
     obj->obj_flags.timer = time;
-    uint64_t tries = 0;
+    quint64 tries = {};
     while ((room = number(low, high)))
     {
       // Give up after 100 tries
@@ -2661,7 +2623,7 @@ int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
       if (sector)
         if (DC::getInstance()->world[real_room(room)].sector_type != sector)
           continue;
-      class Object *o;
+      ObjectPtr o;
       for (o = DC::getInstance()->world[real_room(room)].contents; o; o = o->next_content)
       {
         if (o->isPortal())
@@ -2690,7 +2652,7 @@ int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
 }
 
 // searches for if a certain mob is alive.  If so, you cannot use magic in this room.
-int no_magic_while_alive(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 no_magic_while_alive(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2698,7 +2660,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, cmd_t cmd, const char
   if (obj->in_room == DC::NOWHERE)
     return ReturnValue::eFAILURE;
 
-  Character *vict = DC::getInstance()->world[obj->in_room].people;
+  CharacterPtr vict = DC::getInstance()->world[obj->in_room].people;
 
   for (; vict; vict = vict->next_in_room)
   {
@@ -2724,7 +2686,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, cmd_t cmd, const char
 }
 
 // Send a message to all rooms on a boat
-void send_to_boat(int boat, char *message)
+void send_to_boat(qint32 boat, const char *message)
 {
   switch (boat)
   {
@@ -2741,7 +2703,7 @@ void send_to_boat(int boat, char *message)
 }
 
 // How many stops, order of stops (will reverse order on way back)
-int dk_boat[] =
+qint32 dk_boat[] =
     {8, 9593, 9510, 9509, 9508, 9521, 9507, 9506, 9505};
 
 // boat values [pos in travel list] [timer] [boat-entry-room] [time-between-moves]
@@ -2752,7 +2714,7 @@ int dk_boat[] =
 
 // Also, make sure you update "send_to_boat" for the messages
 //
-int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED && cmd != cmd_t::ENTER)
     return ReturnValue::eFAILURE;
@@ -2761,7 +2723,7 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     return ReturnValue::eFAILURE; // someone loaded me
 
   // figure out which boat I am
-  int *boat_list = nullptr;
+  qint32 *boat_list = {};
   switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
   case 9531:
@@ -2789,7 +2751,7 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   // boat pulsed.  Time to move
   if (!obj->obj_flags.value[1])
   {
-    int move_to;
+    qint32 move_to;
     // reset timer
     obj->obj_flags.value[1] = obj->obj_flags.value[3];
     if (obj->obj_flags.value[0] < 0) // on way back
@@ -2822,10 +2784,10 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 }
 
 // Depending on which boat we're on, exit the boat if we're not 'at sea'
-int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 leave_boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  Object *obj2;
-  int i;
+  ObjectPtr obj2;
+  qint32 i;
 
   if (cmd != cmd_t::LEAVE) // leave
     return ReturnValue::eFAILURE;
@@ -2882,16 +2844,16 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
   return ReturnValue::eSUCCESS;
 }
 
-#define BONEWRACK_ROOM 9597
-#define GAIOT_AVATAR 9622
+constexpr auto BONEWRACK_ROOM = 9597;
+constexpr auto GAIOT_AVATAR = 9622;
 
 // This proc waits for players to enter the room.  Once they do, it echos messages
 // and loads the mob into the room.  Can work for multiple messages with a 'wait' state
 // obj values:  [current pulse] [unused] [unused] [unused]
 //
-int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 mob_summoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  Character *vict;
+  CharacterPtr vict;
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2907,7 +2869,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   // no?  reset pulse state and get out
   if (!vict)
   {
-    obj->obj_flags.value[0] = 0;
+    obj->obj_flags.value[0] = {};
     return ReturnValue::eSUCCESS;
   }
 
@@ -2930,7 +2892,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
     case 2:
       send_to_room("The dragon $B$2Bonewrack$R flies in from above!\r\n", BONEWRACK_ROOM, true);
       move_char(vict, BONEWRACK_ROOM);
-      obj->obj_flags.value[0] = 0;
+      obj->obj_flags.value[0] = {};
       break;
     default:
       break;
@@ -2954,7 +2916,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
     case 2:
       send_to_room("The creature shatters in illusion!\r\n", GAIOT_AVATAR, true);
       move_char(vict, GAIOT_AVATAR);
-      obj->obj_flags.value[0] = 0;
+      obj->obj_flags.value[0] = {};
       break;
     default:
       break;
@@ -2973,7 +2935,7 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
 // Takes care of lighting back up a room when globe of darkness wears off
 // values:  [time left] [how dark] [unused] [unused]
 //
-int globe_of_darkness_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 globe_of_darkness_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2994,7 +2956,7 @@ int globe_of_darkness_proc(Character *ch, class Object *obj, cmd_t cmd, const ch
   return ReturnValue::eSUCCESS;
 }
 
-int hornoplenty(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 hornoplenty(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3005,8 +2967,8 @@ int hornoplenty(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   if (number(0, 100))
     return ReturnValue::eFAILURE;
 
-  class Object *newobj = nullptr;
-  int objnum = real_object(3170); // chewy tuber
+  ObjectPtr newobj = {};
+  qint32 objnum = real_object(3170); // chewy tuber
   if (objnum < 0)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Horn o plenty load obj incorrent.");
@@ -3019,8 +2981,8 @@ int hornoplenty(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   return ReturnValue::eSUCCESS;
 }
 
-int gl_dragon_fire(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                   Character *invoker)
+qint32 gl_dragon_fire(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                      CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3034,14 +2996,13 @@ int gl_dragon_fire(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     return ReturnValue::eFAILURE;
 
   ch->sendln("The head of your dragon staff animates and breathes $B$4fire$R all around you!");
-  act("The head of the dragon staff in $n's hands animates and begins to breath fire!",
-      ch, obj, 0, TO_ROOM, 0);
+  act("The head of the dragon staff in $n's hands animates and begins to breath fire!", ch, obj, 0, TO_ROOM, 0);
 
-  return cast_fire_breath(10, ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, 0);
+  return cast_fire_breath(10, ch, QStringLiteral(""), SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
 
-int dk_rend(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-            Character *invoker)
+qint32 dk_rend(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+               CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3064,8 +3025,8 @@ int dk_rend(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int magic_missile_boots(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                        Character *invoker)
+qint32 magic_missile_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                           CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3084,8 +3045,8 @@ int magic_missile_boots(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return spell_magic_missile((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
 }
 
-int shield_combat_procs(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                        Character *invoker)
+qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                           CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3128,10 +3089,10 @@ int shield_combat_procs(Character *ch, class Object *obj, cmd_t cmd, const char 
   return ReturnValue::eFAILURE;
 }
 
-int generic_weapon_combat(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                          Character *invoker)
+qint32 generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                             CharacterPtr invoker)
 {
-  extern int top_of_objt;
+  extern qint32 top_of_objt;
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3173,10 +3134,10 @@ int generic_weapon_combat(Character *ch, class Object *obj, cmd_t cmd, char *arg
 }
 
 // item players can buy to find the ToHS
-int TOHS_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                 Character *invoker)
+qint32 TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                    CharacterPtr invoker)
 {
-  Object *victim = nullptr;
+  ObjectPtr victim = {};
 
   if (cmd != cmd_t::PUSH) // push
     return ReturnValue::eFAILURE;
@@ -3188,7 +3149,7 @@ int TOHS_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   ch->sendln("You push the small button and then hold the looking glass to your face peering through it.\r\n");
 
   // 1406 is the portal 'rock' you enter to get to Tohs
-  int searchnum = real_object(1406);
+  qint32 searchnum = real_object(1406);
 
   for (victim = DC::getInstance()->object_list; victim; victim = victim->next)
     if (victim->item_number == searchnum)
@@ -3208,18 +3169,18 @@ int TOHS_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-/*int no_magic_item(Character *ch, class Object *obj, cmd, char
-*arg, Character *invoker)
+/*qint32 no_magic_item(CharacterPtr ch, ObjectPtr obj, cmd, char
+*arg, CharacterPtr invoker)
 { // mobdata last_direction
    if (cmd != cmd_t::UNDEFINED)  // Not activated through commands..
      return ReturnValue::eFAILURE;
 //   if (
 }
 */
-int gotta_dance_boots(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 gotta_dance_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
-  void make_person_dance(Character * ch);
+  void make_person_dance(CharacterPtr ch);
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3241,8 +3202,8 @@ int gotta_dance_boots(Character *ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int random_dir_boots(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                     Character *invoker)
+qint32 random_dir_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                        CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3265,8 +3226,8 @@ int random_dir_boots(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
 // WARNING - uses obj_flags.value[3] to store stuff
 
-int noremove_eq(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                Character *invoker)
+qint32 noremove_eq(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                   CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED && cmd != cmd_t::REMOVE)
     return ReturnValue::eFAILURE;
@@ -3276,28 +3237,27 @@ int noremove_eq(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   {
     obj->obj_flags.value[3]--;
     if (!obj->obj_flags.value[3])
-      obj->equipped_by->send(QStringLiteral("The %1 loses it's grip on your body.\r\n").arg(obj->short_description));
+      obj->equipped_by->send(QStringLiteral("The %1 loses it's grip on your body.\r\n").arg(obj->short_description()));
     return ReturnValue::eSUCCESS;
   }
   if (cmd == cmd_t::UNDEFINED && obj->obj_flags.value[3] <= 0)
   {
     if (number(0, 4))
       return ReturnValue::eSUCCESS;
-    csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n",
-           obj->short_description);
+    obj->equipped_by->send(QStringLiteral("The %s clamps down onto your body locking your equipment in place!\r\n").arg(qPrintable(obj->short_description())));
     obj->obj_flags.value[3] = 5;
     return ReturnValue::eSUCCESS;
   }
   if (obj->obj_flags.value[3] > 0)
   {
-    obj->equipped_by->send(QStringLiteral("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description));
+    obj->equipped_by->send(QStringLiteral("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description()));
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
 }
 
-int glove_combat_procs(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                       Character *invoker)
+qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                          CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3306,7 +3266,7 @@ int glove_combat_procs(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->equipment[WEAR_HANDS] != obj)
     return ReturnValue::eFAILURE;
 
-  int dam;
+  qint32 dam;
 
   switch (DC::getInstance()->obj_index[obj->item_number].vnum())
   {
@@ -3358,14 +3318,14 @@ int glove_combat_procs(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   return ReturnValue::eFAILURE;
 }
 
-std::vector<std::string> sword_non_combat;
-std::vector<std::string> sword_class_specific_combat;
-std::vector<std::string> sword_combat;
+QList<QString> sword_non_combat;
+QList<QString> sword_class_specific_combat;
+QList<QString> sword_combat;
 
 void do_talking_init()
 {
 
-  std::string buf;
+  QString buf;
 
   /* GENERIC NONCOMBAT MESSAGE */
   buf = "Who wrote such crappy dialogue for me? Pirahna?";
@@ -3458,8 +3418,8 @@ void do_talking_init()
   sword_combat.push_back(buf);
 }
 
-int chaosblade(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-               Character *invoker)
+qint32 chaosblade(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                  CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3468,8 +3428,8 @@ int chaosblade(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if ((++obj->obj_flags.timer) > 4)
   {
-    int dam = number(175, 250);
-    obj->obj_flags.timer = 0;
+    qint32 dam = number(175, 250);
+    obj->obj_flags.timer = {};
     if (GET_HIT(obj->equipped_by) * 30 / 1000 > dam)
     {
       dam = GET_HIT(obj->equipped_by) * 30 / 1000;
@@ -3490,8 +3450,8 @@ int chaosblade(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int rubybrooch(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-               Character *invoker)
+qint32 rubybrooch(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                  CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3510,7 +3470,7 @@ int rubybrooch(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     {
       obj->obj_flags.timer = 40; // 40+ = can be removed
     }
-    int dam = number(75, 150);
+    qint32 dam = number(75, 150);
     if (dam >= GET_HIT(obj->equipped_by))
     {
       dam = GET_HIT(obj->equipped_by) - 1;
@@ -3527,8 +3487,8 @@ int rubybrooch(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int eternitystaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                  Character *invoker)
+qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                     CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3537,8 +3497,8 @@ int eternitystaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if ((++obj->obj_flags.timer) > 4)
   {
-    int dam = number(175, 200);
-    obj->obj_flags.timer = 0;
+    qint32 dam = number(175, 200);
+    obj->obj_flags.timer = {};
     if (GET_MANA(obj->equipped_by) * 30 / 1000 > dam)
     {
       dam = GET_MANA(obj->equipped_by) * 30 / 1000;
@@ -3559,11 +3519,11 @@ int eternitystaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                 Character *invoker)
+qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                    CharacterPtr invoker)
 {
-  Character *vict = nullptr;
-  int unequip = -1;
+  CharacterPtr vict = {};
+  qint32 unequip = -1;
   static bool init_done = false;
   if (cmd != cmd_t::UNDEFINED)
   {
@@ -3619,8 +3579,8 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (obj->obj_flags.value[0] == 0)
   {
-    std::vector<std::string> tmp;
-    std::string buf;
+    QList<QString> tmp;
+    QString buf;
 
     if (GET_POS(vict) == position_t::FIGHTING)
     {
@@ -3637,7 +3597,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         tmp.push_back(buf);
         unequip = tmp.size() - 1;
       }
-      switch (GET_RACE(vict->fighting))
+      switch (vict->fighting->race)
       {
       case RACE_HOBBIT:
         buf = "Oh, that is just gross! Like, seriously, shave your feet some time.";
@@ -3734,7 +3694,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (!tmp.empty())
     {
-      int rnd = number((quint64)0, (quint64)tmp.size() - 1);
+      qint32 rnd = number((quint64)0, (quint64)tmp.size() - 1);
       char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
       strcat(buf2, tmp[rnd].c_str());
       strcat(buf2, "'$R\r\n");
@@ -3754,7 +3714,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           {
             act("You move your $p to be your primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
             act("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-            class Object *weapon;
+            ObjectPtr weapon;
             weapon = vict->unequip_char(WEAR_SECOND_WIELD);
             vict->equip_char(weapon, WEAR_WIELD);
           }
@@ -3776,12 +3736,12 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
 // Fun item to give to mortals...ticks for a while and then when it blows
 // up BOOM!!!
-int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-               Character *invoker)
+qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                  CharacterPtr invoker)
 {
   auto &arena = DC::getInstance()->arena_;
-  int dropped = 0;
-  Character *vict = nullptr;
+  qint32 dropped = {};
+  CharacterPtr vict = {};
 
   if (obj->equipped_by)
     vict = obj->equipped_by;
@@ -3857,7 +3817,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     char obj[MAX_INPUT_LENGTH];
     char target[MAX_INPUT_LENGTH];
     half_chop(arg, obj, target);
-    Character *give_vict;
+    CharacterPtr give_vict;
     if (!(give_vict = ch->get_char_room_vis(target)))
       return ReturnValue::eFAILURE; // Not giving to char/mob, so ok
     if (give_vict->isNonPlayer() && vict->isMortalPlayer())
@@ -3898,7 +3858,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
 
     if (vict->isPlayer())
-      for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
+      for (Connection *i = DC::getInstance()->connections_; i; i = i->next)
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
           i->character->sendln("You hear a large BOOM from somewhere in the distance.");
 
@@ -3952,12 +3912,12 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // proc for mortar shells - see object.cpp
-int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  int dam = 0;
+  qint32 dam = {};
   char buf[MAX_STRING_LENGTH];
-  Character *victim = nullptr;
-  Character *next_v = nullptr;
+  CharacterPtr victim = {};
+  CharacterPtr next_v = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3971,7 +3931,7 @@ int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const c
 
   send_to_room("The mortar shell explodes ripping the area to shreds!\r\n", obj->in_room);
 
-  for (int i = 0; i < 6; i++)
+  for (qint32 i = {}; i < 6; i++)
     if (DC::getInstance()->world[obj->in_room].dir_option[i] && DC::getInstance()->world[obj->in_room].dir_option[i]->to_room)
       send_to_room("You hear a loud boom.\r\n", DC::getInstance()->world[obj->in_room].dir_option[i]->to_room);
 
@@ -3997,10 +3957,10 @@ int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const c
 }
 
 // 565
-int godload_banshee(Character *ch, class Object *obj, cmd_t cmd,
-                    const char *arg, Character *invoker)
+qint32 godload_banshee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                       const char *arg, CharacterPtr invoker)
 {
-  Character *vict;
+  CharacterPtr vict;
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
   if (!(vict = ch->fighting))
@@ -4009,13 +3969,13 @@ int godload_banshee(Character *ch, class Object *obj, cmd_t cmd,
     return ReturnValue::eFAILURE;
   act("$n's instrument takes on a life of its own, sending out a piercing wail.", ch, 0, vict, TO_ROOM, 0);
   ch->sendln("Your instrument sends out a piercing wail.");
-  return song_whistle_sharp(51, ch, "", vict, 50);
+  return song_whistle_sharp(51, ch, QStringLiteral(""), vict, 50);
 }
 // 511
-int godload_claws(Character *ch, class Object *obj, cmd_t cmd,
-                  char *arg, Character *invoker)
+qint32 godload_claws(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                     char *arg, CharacterPtr invoker)
 {
-  Character *vict;
+  CharacterPtr vict;
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
   if (!(vict = ch->fighting))
@@ -4028,9 +3988,9 @@ int godload_claws(Character *ch, class Object *obj, cmd_t cmd,
 }
 
 // 556
-int godload_defender(Character *ch, class Object *obj, cmd_t cmd,
-                     const char *arg,
-                     Character *invoker)
+qint32 godload_defender(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                        const char *arg,
+                        CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4049,9 +4009,9 @@ int godload_defender(Character *ch, class Object *obj, cmd_t cmd,
 }
 
 // 500
-int godload_stargazer(Character *ch, class Object *obj, cmd_t cmd,
-                      const char *arg,
-                      Character *invoker)
+qint32 godload_stargazer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                         const char *arg,
+                         CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4072,9 +4032,9 @@ int godload_stargazer(Character *ch, class Object *obj, cmd_t cmd,
 }
 
 // 534
-int godload_cassock(Character *ch, class Object *obj, cmd_t cmd,
-                    const char *arg,
-                    Character *invoker)
+qint32 godload_cassock(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                       const char *arg,
+                       CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4091,12 +4051,12 @@ int godload_cassock(Character *ch, class Object *obj, cmd_t cmd,
   }
   addTimer(ch, SPELL_GROUP_SANC, 36);
   ch->sendln("Your cassocks begin to hum loudly!");
-  return spell_group_sanc((uint8_t)50, ch, ch, 0, 100);
+  return spell_group_sanc((quint8)50, ch, ch, 0, 100);
 }
 
 // 526
-int godload_armbands(Character *ch, class Object *obj, cmd_t cmd,
-                     const char *arg, Character *invoker)
+qint32 godload_armbands(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                        const char *arg, CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4116,9 +4076,9 @@ int godload_armbands(Character *ch, class Object *obj, cmd_t cmd,
 }
 
 // 548
-int godload_gaze(Character *ch, class Object *obj, cmd_t cmd,
-                 const char *arg,
-                 Character *invoker)
+qint32 godload_gaze(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
+                    const char *arg,
+                    CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4137,8 +4097,8 @@ int godload_gaze(Character *ch, class Object *obj, cmd_t cmd,
 }
 
 // 514
-int godload_wailka(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+qint32 godload_wailka(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                      CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4153,7 +4113,7 @@ int godload_wailka(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     ch->sendln("The ring hums, but nothing happens.");
     return ReturnValue::eSUCCESS;
   }
-  Character *vict;
+  CharacterPtr vict;
   if ((vict = ch->get_char_room_vis(arg2)) == nullptr)
   {
     ch->sendln("You need to tell the item who.");
@@ -4165,8 +4125,8 @@ int godload_wailka(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // 517
-int godload_choker(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+qint32 godload_choker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                      CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4186,8 +4146,8 @@ int godload_choker(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // 519
-int godload_lorne(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                  Character *invoker)
+qint32 godload_lorne(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                     CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4207,8 +4167,8 @@ int godload_lorne(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // 528
-int godload_leprosy(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                    Character *invoker)
+qint32 godload_leprosy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+                       CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -4228,8 +4188,8 @@ int godload_leprosy(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 }
 
 // 540
-int godload_quiver(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+qint32 godload_quiver(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                      CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4244,10 +4204,10 @@ int godload_quiver(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_MISANRA_QUIVER, 24);
-  class Object *obj2;
-  int i;
+  ObjectPtr obj2;
+  qint32 i;
   ch->sendln("The quiver glitters, and hums.");
-  for (i = 0; i < 25; i++)
+  for (i = {}; i < 25; i++)
   {
     if ((obj->obj_flags.weight + 1) < obj->obj_flags.value[0])
     {
@@ -4270,8 +4230,8 @@ int godload_quiver(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int godload_aligngood(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 godload_aligngood(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4293,8 +4253,8 @@ int godload_aligngood(Character *ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int godload_alignevil(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 godload_alignevil(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4316,8 +4276,8 @@ int godload_alignevil(Character *ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int godload_tovmier(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                    Character *invoker)
+qint32 godload_tovmier(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                       CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::PULL || !is_wearing(ch, obj))
@@ -4328,7 +4288,7 @@ int godload_tovmier(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     return ReturnValue::eFAILURE;
 
   ch->sendln("You twist the handle of the staff.");
-  for (int i = 0; i < obj->num_affects; i++)
+  for (qint32 i = {}; i < obj->num_affects; i++)
     if (obj->affected[i].location == WEP_DISPEL_EVIL)
     {
       obj->affected[i].location = WEP_DISPEL_GOOD;
@@ -4343,8 +4303,8 @@ int godload_tovmier(Character *ch, class Object *obj, cmd_t cmd, const char *arg
   return ReturnValue::eSUCCESS;
 }
 
-int godload_hammer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+qint32 godload_hammer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                      CharacterPtr invoker)
 {
   if (cmd != cmd_t::TREMOR || !ch)
     return ReturnValue::eFAILURE;
@@ -4359,13 +4319,13 @@ int godload_hammer(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   act("$n smashes $s hammer into the ground causing a tectonic blast.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You smash your hammer into the ground, causing it to shake violently.");
   addTimer(ch, SPELL_EARTHQUAKE, 24);
-  int retval = spell_earthquake(50, ch, ch, 0, 100);
+  qint32 retval = spell_earthquake(50, ch, ch, 0, 100);
   if (!SOMEONE_DIED(retval))
     retval |= spell_earthquake(50, ch, ch, 0, 100);
   return retval;
 }
 
-int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   if (cmd != cmd_t::OPEN || ch->in_room != 29263)
     return ReturnValue::eFAILURE;
@@ -4380,7 +4340,7 @@ int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   REMOVE_BIT(DC::getInstance()->world[29265].dir_option[2]->exit_info, EX_CLOSED);
   act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_ROOM, 0);
   act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_CHAR, 0);
-  Character *a, *b, *c;
+  CharacterPtr a, b, c;
   b = ch->getDC()->initiate_oproc(nullptr, obj);
   for (a = DC::getInstance()->world[ch->in_room].people; a; a = c)
   {
@@ -4395,7 +4355,7 @@ int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   return ReturnValue::eSUCCESS;
 }
 
-int godload_phyraz(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+qint32 godload_phyraz(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
@@ -4411,7 +4371,7 @@ int godload_phyraz(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eSUCCESS;
   }
   addTimer(ch, SPELL_WIZARD_EYE, 24);
-  Character *vict = get_char_vis(ch, arg2);
+  CharacterPtr vict = get_char_vis(ch, arg2);
   if (!vict)
   {
     ch->sendln("The scrying ball stays murky.");
@@ -4421,9 +4381,9 @@ int godload_phyraz(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return spell_wizard_eye(100, ch, vict, 0, 100);
 }
 
-void destroy_spellcraft_glyphs(Character *ch)
+void destroy_spellcraft_glyphs(CharacterPtr ch)
 {
-  class Object *tmp_obj, *loop_obj;
+  ObjectPtr tmp_obj, loop_obj;
 
   for (tmp_obj = ch->carrying; tmp_obj; tmp_obj = tmp_obj->next_content)
   {
@@ -4434,13 +4394,13 @@ void destroy_spellcraft_glyphs(Character *ch)
     if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6353)
       obj_from_char(tmp_obj);
   }
-  ch->spellcraftglyph = 0;
+  ch->spellcraftglyph = {};
 }
 
-int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *argi, Character *invoker)
+qint32 spellcraft_glyphs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *argi, CharacterPtr invoker)
 {
   char target[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
-  class Object *sunglyph, *bookglyph, *heartglyph;
+  ObjectPtr sunglyph, *bookglyph, heartglyph;
 
   if (cmd != cmd_t::PUT)
     return ReturnValue::eFAILURE; // put
@@ -4577,10 +4537,10 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int godload_grathelok(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 godload_grathelok(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
-  Character *vict;
+  CharacterPtr vict;
 
   if (!(vict = ch->fighting))
     return ReturnValue::eFAILURE;
@@ -4608,10 +4568,10 @@ int godload_grathelok(Character *ch, class Object *obj, cmd_t cmd, const char *a
   fight_kill(ch, vict, TYPE_CHOOSE, 0);
   return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
 }
-int goldenbatleth(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                  Character *invoker)
+qint32 goldenbatleth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                     CharacterPtr invoker)
 {
-  Character *vict;
+  CharacterPtr vict;
 
   if (!(vict = ch->fighting))
     return ReturnValue::eFAILURE;
@@ -4640,8 +4600,8 @@ int goldenbatleth(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
 }
 
-int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 godload_jaelgreth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -4657,9 +4617,9 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
   ch->sendln("You thrust your sacrificial blade into your victim, leeching their lifeforce!");
   act("$n's dagger sinks into your flesh, and you feel your life force being drained!",
       ch, obj, ch->fighting, TO_VICT, 0);
-  Character *victim = ch->fighting;
+  CharacterPtr victim = ch->fighting;
 
-  int dam = 100;
+  qint32 dam = 100;
 
   if (victim->affected_by_spell(SPELL_DIVINE_INTER) && dam > victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
     dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
@@ -4674,7 +4634,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
 
   dam = MIN(100, GET_MANA(victim));
   if (dam < 0)
-    dam = 0;
+    dam = {};
 
   GET_MANA(victim) -= dam;
   GET_MANA(ch) += dam;
@@ -4696,8 +4656,8 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                       Character *invoker)
+qint32 godload_foecrusher(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                          CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -4710,7 +4670,7 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
   if (number(1, 100) > 5)
     return ReturnValue::eFAILURE;
 
-  int dam = 80;
+  qint32 dam = 80;
   switch (number(1, 2))
   {
   case 1:
@@ -4728,7 +4688,7 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
         ch, obj, ch->fighting, TO_CHAR, 0);
     break;
   }
-  Character *victim = ch->fighting;
+  CharacterPtr victim = ch->fighting;
   dam = number(50, dam);
 
   if (victim->affected_by_spell(SPELL_DIVINE_INTER) && dam > victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
@@ -4749,8 +4709,8 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-int godload_hydratail(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                      Character *invoker)
+qint32 godload_hydratail(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+                         CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -4763,10 +4723,10 @@ int godload_hydratail(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (number(1, 100) > 10)
     return ReturnValue::eFAILURE;
 
-  int damtype = 0;
+  qint32 damtype = {};
   char dammsg[MAX_STRING_LENGTH];
-  int dam = number(50, 100);
-  std::string damtypeStr;
+  qint32 dam = number(50, 100);
+  QString damtypeStr;
   sprintf(dammsg, "$B%d$R", dam);
 
   switch (number(1, 4))
@@ -4788,7 +4748,7 @@ int godload_hydratail(Character *ch, class Object *obj, cmd_t cmd, const char *a
     damtype = TYPE_ENERGY;
     break;
   }
-  Character *victim = ch->fighting;
+  CharacterPtr victim = ch->fighting;
 
   std::stringstream strwithdam;
   std::stringstream strwithoutdam;

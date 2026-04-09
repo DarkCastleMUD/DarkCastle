@@ -11,21 +11,18 @@
 #include "DC/DC.h"
 #include "DC/db.h"
 #include "DC/Version.h"
-#include "DC/character.h"
-#include "DC/connect.h"
-#include "DC/obj.h"
 
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 
-DC::DC(int &argc, char **argv)
-    : QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse("auctionhouse")
+DC::DC(qint32 &argc, char **argv)
+    : QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), TheAuctionHouse("auctionhouse")
 {
   setup();
 }
 
 DC::DC(config c)
-    : QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse("auctionhouse")
+    : QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global()), TheAuctionHouse("auctionhouse")
 {
   setup();
 }
@@ -78,51 +75,35 @@ void DC::findLibrary(void)
 
 void DC::removeDead(void)
 {
-  for (auto &node : death_list)
+  while (!death_list.isEmpty())
   {
-    character_list.erase(node.first);
-    assert(!character_list.contains(node.first));
-    shooting_list.erase(node.first);
-    Trace &t = node.second;
-    t.addTrack("DC::removeDeath");
-    free_char(node.first, t);
+    auto &trace = death_list.first();
+    auto victim = death_list.firstKey();
+    trace.addTrack("DC::removeDeath");
+    free_char(victim, trace);
+    death_list.remove(death_list.firstKey());
   }
-  death_list.clear();
 
-  while (!obj_free_list.empty())
+  while (!obj_free_list.isEmpty())
   {
-    Object *obj = *(obj_free_list.cbegin());
-    active_obj_list.erase(obj);
-    obj_free_list.erase(obj);
-    delete obj;
+    auto obj = *obj_free_list.cbegin();
+    active_obj_list.remove(obj);
+    obj_free_list.remove(obj);
+    obj = {};
   }
 }
 
 void DC::handleShooting(void)
 {
-  std::unordered_set<Character *> remove_list;
+  QSet<CharacterPtr> remove_list;
 
-  for (const auto &ch : shooting_list)
+  for (auto i = shooting_list_.cbegin(), end = shooting_list_.cend(); i != end; ++i)
   {
-    // ignore the dead
-    if (ch->in_room == DC::NOWHERE)
-    {
-      continue;
-    }
-
-    if (ch->shotsthisround)
-    {
-      ch->shotsthisround--;
-    }
+    auto &ch = *i;
+    if (ch->in_room == DC::NOWHERE || !ch->shotsthisround)
+      shooting_list_.erase(i);
     else
-    {
-      remove_list.insert(ch);
-    }
-  }
-
-  for (const auto &ch : remove_list)
-  {
-    shooting_list.erase(ch);
+      ch->shotsthisround--;
   }
 }
 
@@ -136,16 +117,16 @@ QString DC::getBuildTime(void)
   return Version::build_time_;
 }
 
-DC *DC::getInstance(void)
+DCPtr DC::getInstance(void)
 {
-  DC *dc = dynamic_cast<DC *>(DC::instance());
-  assert(dc != nullptr);
+  DCPtr dc = dynamic_cast<DC *>(DC::instance());
+  assert(dc.isNull());
   return dc;
 }
 
 zone_t DC::getRoomZone(room_t room_nr)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     for (auto [zone_key, zone] : dc->zones.asKeyValueRange())
@@ -161,21 +142,21 @@ zone_t DC::getRoomZone(room_t room_nr)
 
 QString DC::getZoneName(zone_t zone_key)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
     {
-      return dc->zones.value(zone_key).Name();
+      return dc->zones.value(zone_key).name();
     }
   }
 
   return QString();
 }
 
-void DC::setZoneClanOwner(zone_t zone_key, int clan_key)
+void DC::setZoneClanOwner(zone_t zone_key, qint32 clan_key)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -187,7 +168,7 @@ void DC::setZoneClanOwner(zone_t zone_key, int clan_key)
 
 void DC::setZoneClanGold(zone_t zone_key, gold_t gold)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -199,7 +180,7 @@ void DC::setZoneClanGold(zone_t zone_key, gold_t gold)
 
 void DC::setZoneTopRoom(zone_t zone_key, room_t room_key)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -211,7 +192,7 @@ void DC::setZoneTopRoom(zone_t zone_key, room_t room_key)
 
 void DC::setZoneBottomRoom(zone_t zone_key, room_t room_key)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -223,7 +204,7 @@ void DC::setZoneBottomRoom(zone_t zone_key, room_t room_key)
 
 void DC::setZoneModified(zone_t zone_key)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -235,7 +216,7 @@ void DC::setZoneModified(zone_t zone_key)
 
 void DC::setZoneNotModified(zone_t zone_key)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -247,7 +228,7 @@ void DC::setZoneNotModified(zone_t zone_key)
 
 void DC::incrementZoneDiedTick(zone_t zone_key)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -259,7 +240,7 @@ void DC::incrementZoneDiedTick(zone_t zone_key)
 
 void DC::resetZone(zone_t zone_key, Zone::ResetType reset_type)
 {
-  DC *dc = getInstance();
+  DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones.contains(zone_key))
@@ -269,7 +250,7 @@ void DC::resetZone(zone_t zone_key, Zone::ResetType reset_type)
   }
 }
 
-bool DC::authenticate(QString username, QString password, uint64_t level)
+bool DC::authenticate(QString username, QString password, quint64 level)
 {
   username = username.toLower();
   username[0] = username[0].toUpper();
@@ -278,21 +259,21 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
     return false;
   }
 
-  Connection d;
-  if (!load_char_obj(&d, username.toStdString().c_str()))
+  ConnectionPtr d{new Connection};
+  if (!load_char_obj(d, username))
   {
     return false;
   }
 
-  if (d.character == nullptr || d.character->player == nullptr)
+  if (conn->character == nullptr || conn->character->player == nullptr)
   {
     return false;
   }
 
-  QString cipher = d.character->player->pwd;
-  if (crypt(password.toStdString().c_str(), cipher.toStdString().c_str()) == cipher)
+  QString cipher = conn->character->player->password_;
+  if (crypt(qPrintable(password), qPrintable(cipher)) == cipher)
   {
-    if (d.character->getLevel() >= level)
+    if (conn->character->getLevel() >= level)
     {
       return true;
     }
@@ -301,7 +282,7 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
   return false;
 }
 
-bool DC::authenticate(const QHttpServerRequest &request, uint64_t level)
+bool DC::authenticate(const QHttpServerRequest &request, quint64 level)
 {
   const auto query = request.query();
   if (!query.hasQueryItem("username") || !query.hasQueryItem("password"))
@@ -327,19 +308,19 @@ bool DC::isAllowedHost(QHostAddress address)
   return false;
 }
 
-Object *DC::getObject(vnum_t vnum)
+ObjectPtr DC::getObject(vnum_t vnum)
 {
   vnum_t rnum = real_object(vnum);
 
   if (rnum == -1)
   {
-    return nullptr;
+    return {};
   }
 
-  return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
+  return static_cast<ObjectPtr>(DC::getInstance()->obj_index[rnum].item);
 }
 
-void DC::logverbose(QString str, uint64_t god_level, DC::LogChannel type, Character *vict)
+void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
   if (cf.verbose_mode)
   {
@@ -385,7 +366,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
     arena.type = CHAOS; // -2
     sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
     send_info(buf);
-    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
+    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", qPrintable(ch->name()));
   }
 
   if (!strcmp(arg4, "potato"))
@@ -451,4 +432,116 @@ auto Character::do_arena_usage(QStringList arguments) -> command_return_t
   sendln("arena cancel        - Cancel an arena");
 
   return command_return_t();
+}
+
+QString Character::getPrompt(void) const
+{
+  if (player)
+    return player->getPrompt();
+  return {};
+}
+void Character::setPrompt(QString prompt)
+{
+  if (player)
+    player->setPrompt(prompt);
+}
+QString Character::getLastPrompt(void) const
+{
+  if (player)
+    return player->getLastPrompt();
+  return {};
+}
+void Character::setLastPrompt(QString prompt)
+{
+  if (player)
+    player->setLastPrompt(prompt);
+}
+
+bool Character::isNowhere(void)
+{
+  return in_room == DC::NOWHERE;
+}
+
+command_return_t Character::do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd)
+{
+  sendln(QStringLiteral("$3%1$R: %2").arg(desc).arg(value));
+
+  auto command = dc_->CMD_.find(cmd);
+  if (command)
+    sendln(QStringLiteral("$3Syntax$R: %1 [vnum] %2 <value>").arg(command->name()).arg(fieldname));
+
+  return ReturnValue::eSUCCESS;
+}
+
+bool Object::isPortal(void)
+{
+  return obj_flags.type_flag == ITEM_PORTAL;
+}
+const classes_t Character::classes_ = {
+    {"UNDEFINED", "undefined", "Und", false, 0, 0, 0, 0, 0},
+    {"Mage", "mage", "Mag", true, 0, 0, 0, 15, 0},
+    {"Cleric", "cleric", "Cle", true, 0, 0, 0, 0, 15},
+    {"Thief", "thief", "Thi", true, 0, 15, 0, 0, 0},
+    {"Warrior", "warrior", "War", true, 15, 0, 0, 0, 0},
+    {"Anti-Paladin", "anti-paladin", "Ant", true, 0, 14, 0, 14, 0},
+    {"Paladin", "paladin", "Pal", true, 14, 0, 0, 0, 14},
+    {"Barbarian", "barbarian", "Bar", true, 14, 0, 14, 0, 0},
+    {"Monk", "monk", "Mon", true, 0, 0, 14, 0, 14},
+    {"Ranger", "ranger", "Ran", true, 0, 14, 14, 0, 0},
+    {"Bard", "bard", "Brd", true, 0, 0, 14, 14, 0},
+    {"Druid", "druid", "Drd", true, 0, 0, 0, 14, 14},
+    {"Psionic", "psionic", "Psi", false, 0, 0, 0, 0, 0},
+    {"Necromancer", "necromancer", "Nec", false, 0, 0, 0, 0, 0}};
+
+const QStringList Ban::ban_types = {
+    "no",
+    "new",
+    "select",
+    "all",
+    "ERROR"};
+
+const QString DC::menu = QStringLiteral(
+    "\r\nWelcome to Dark Castle Mud\r\n\r\n"
+    "0) Exit Dark Castle.\r\n"
+    "1) Enter the game.\r\n"
+    "2) Enter your character's description.\r\n"
+    "3) Change your password.\r\n"
+    "4) Delete this character.\r\n\r\n"
+    "   Make your choice: ");
+
+const char Combinables::Scribe::RECIPES_FILENAME[] = "scribe.dat";
+QMap<Combinables::Scribe::recipe, qint32> Combinables::Scribe::recipes;
+bool Combinables::Scribe::initialized = false;
+
+qint32 qfprintf(FILE *stream, const char *format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+  auto print_count = fprintf(stream, "%s", qPrintable(QString::vasprintf(format, ap)));
+  va_end(ap);
+  return print_count;
+}
+
+LegacyFileWorld::~LegacyFileWorld()
+{
+  if (file_handle_)
+  {
+    qfprintf(file_handle_, "$~\n");
+  }
+}
+
+qint32 sprintf(QString &str, const char *format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+  str = QString::vasprintf(format, ap);
+  va_end(ap);
+  return str.length();
+}
+
+Character::Character(DCPtr dc)
+    : dc_(dc)
+{
+  if (dc)
+    QObject(dynamic_cast<QObject *>(dc.data()));
 }

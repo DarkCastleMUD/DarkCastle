@@ -2,31 +2,29 @@
 | Level 105 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+#include "DC/DC.h"
 #include "DC/punish.h"
-#include "DC/wizard.h"
 #include "DC/spells.h" // Character::PLAYER_CANTQUIT
-#include "DC/mobile.h"
 #include "DC/handler.h"
-#include "DC/room.h"
 #include "DC/player.h"
 #include "DC/fight.h"
-#include "DC/utility.h"
-
 #include "DC/interp.h"
-#include "DC/returnvals.h"
 #include "DC/innate.h"
 #include "DC/const.h"
 #include "DC/Timer.h"
-#include "DC/common.h"
-#include "DC/memory.h"
 
-int do_clearaff(Character *ch, char *argument, cmd_t cmd)
+#include <qdebug.h>
+#include <qiodevicebase.h>
+
+#include <cstdio>
+
+qint32 do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool found = false;
   char buf[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
   affected_type *af, *afpk;
-  class Object *dummy;
+  ObjectPtr dummy;
 
   one_argument(argument, buf);
 
@@ -65,27 +63,26 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
+qint32 do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  extern FILE *help_fl;
-  extern help_index_element *help_index;
-  extern help_index_element *build_help_index(FILE * fl, int *num);
   DC::getInstance()->free_help_from_memory();
-  fclose(help_fl);
-  if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
+  QFile help_keyword_file(HELP_KWRD_FILE);
+  if (!help_keyword_file.open(QIODeviceBase::Text))
   {
     perror(HELP_KWRD_FILE);
     abort();
   }
-  help_index = build_help_index(help_fl, &DC::getInstance()->top_of_helpt);
+  QTextStream help_fl(&help_keyword_file);
+  help_index = build_help_index(help_fl);
+
   ch->sendln("Reloaded.");
   return ReturnValue::eSUCCESS;
 }
 
-int do_log(Character *ch, char *argument, cmd_t cmd)
+qint32 do_log(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *vict;
-  class Object *dummy;
+  CharacterPtr vict;
+  ObjectPtr dummy;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
@@ -111,23 +108,23 @@ int do_log(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("LOG removed.");
     REMOVE_BIT(vict->player->punish, PUNISH_LOG);
-    sprintf(buf2, "%s removed log on %s.", GET_NAME(ch), GET_NAME(vict));
+    sprintf(buf2, "%s removed log on %s.", qPrintable(ch->name()), qPrintable(vict->name()));
     logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
     ch->sendln("LOG set.");
     SET_BIT(vict->player->punish, PUNISH_LOG);
-    sprintf(buf2, "%s just logged %s.", GET_NAME(ch), GET_NAME(vict));
+    sprintf(buf2, "%s just logged %s.", qPrintable(ch->name()), qPrintable(vict->name()));
     logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }
 
-int do_showbits(Character *ch, char *argument, cmd_t cmd)
+qint32 do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
   one_argument(argument, person);
 
   if (!*person)
@@ -138,7 +135,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
     {
       if (victim->isNonPlayer())
         continue;
-      sprintf(buf, "0.%s", victim->getNameC());
+      sprintf(buf, "0.%s", qPrintable(victim->name()));
       do_showbits(ch, buf, cmd);
     }
     return ReturnValue::eSUCCESS;
@@ -149,7 +146,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  csendf(ch, "Player: %s\r\n", victim->getNameC());
+  ch->send(QStringLiteral("Player: %s\r\n").arg(qPrintable(victim->name())));
 
   if (isSet(victim->combat, COMBAT_SHOCKED))
     ch->sendln("COMBAT_SHOCKED");
@@ -231,10 +228,10 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_debug(Character *ch, char *args, cmd_t cmd)
+qint32 do_debug(CharacterPtr ch, char *args, cmd_t cmd)
 {
-  std::string arg1, arg2, arg3;
-  std::string remainder;
+  QString arg1, arg2, arg3;
+  QString remainder;
 
   std::tie(arg1, remainder) = half_chop(args);
   if (arg1 == "perf")
@@ -242,9 +239,9 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
     std::tie(arg2, remainder) = half_chop(remainder);
     if (arg2 == "list")
     {
-      for (const auto &pt : PerfTimers)
+      for (const auto &name : PerfTimers.keys())
       {
-        csendf(ch, "%s\r\n", pt.first.c_str());
+        ch->sendln(QStringLiteral("%1").arg(name));
       }
     }
     else if (arg2 == "show")
@@ -252,39 +249,38 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
       std::tie(arg3, remainder) = half_chop(remainder);
       if (arg3 == "all")
       {
-        for (const auto &pt : PerfTimers)
+        for (const auto &[key, t] : PerfTimers.asKeyValueRange())
         {
-          std::string key = pt.first;
-          Timer t = pt.second;
-          csendf(ch, "%15s: "
-                     "cur:%lus %luμs"
-                     "\tmin:%lus %luμs"
-                     "\tmax:%lus %luμs"
-                     "\tavg:%lus %luμs\r\n",
-                 key.c_str(),
-                 t.getDiff().tv_sec, t.getDiff().tv_usec,
-                 t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
-                 t.getDiffMax().tv_sec, t.getDiffMax().tv_usec,
-                 t.getDiffAvg().tv_sec, t.getDiffAvg().tv_usec);
+          ch->sendln(QStringLiteral("%15s: cur:%lus %luμs\tmin:%lus %luμs\tmax:%lus %luμs\tavg:%lus %luμs")
+                         .arg(key)
+                         .arg(t.getDiff().tv_sec)
+                         .arg(t.getDiff().tv_usec)
+                         .arg(t.getDiffMin().tv_sec)
+                         .arg(t.getDiffMin().tv_usec)
+                         .arg(t.getDiffMax().tv_sec)
+                         .arg(t.getDiffMax().tv_usec)
+                         .arg(t.getDiffAvg().tv_sec)
+                         .arg(t.getDiffAvg().tv_usec));
         }
       }
       else if (arg3 != "")
       {
-        std::map<std::string, Timer>::iterator i = PerfTimers.find(arg3);
+        QMap<QString, Timer>::iterator i = PerfTimers.find(arg3);
         if (i != PerfTimers.end())
         {
-          std::string key = i->first;
-          Timer t = i->second;
-          csendf(ch, "%15s: "
-                     "cur:%lus %luμs"
-                     "\tmin:%lus %luμs"
-                     "\tmax:%lus %luμs"
-                     "\tavg:%lus %luμs\r\n",
-                 key.c_str(),
-                 t.getDiff().tv_sec, t.getDiff().tv_usec,
-                 t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
-                 t.getDiffMax().tv_sec, t.getDiffMax().tv_usec,
-                 t.getDiffAvg().tv_sec, t.getDiffAvg().tv_usec);
+          QString key = conn->key();
+          Timer t = conn->value();
+          ch->sendln(QStringLiteral(
+                         "%15s: cur:%lus %luμs\tmin:%lus %luμs\tmax:%lus %luμs\tavg:%lus %luμs")
+                         .arg(key)
+                         .arg(t.getDiff().tv_sec)
+                         .arg(t.getDiff().tv_usec)
+                         .arg(t.getDiffMin().tv_sec)
+                         .arg(t.getDiffMin().tv_usec)
+                         .arg(t.getDiffMax().tv_sec)
+                         .arg(t.getDiffMax().tv_usec)
+                         .arg(t.getDiffAvg().tv_sec)
+                         .arg(t.getDiffAvg().tv_usec));
         }
         else
         {
@@ -319,7 +315,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     victim->setDebug(!victim->getDebug());
-    ch->sendln(QStringLiteral("Debug for %1 toggled %2").arg(GET_NAME(victim)).arg(victim->getDebug() ? "on" : "off"));
+    ch->sendln(QStringLiteral("Debug for %1 toggled %2").arg(qPrintable(victim->name())).arg(victim->getDebug() ? "on" : "off"));
     return ReturnValue::eSUCCESS;
   }
   else if (arg1 == "mobile")
@@ -336,7 +332,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
 
         // All NPCs instances of a specific VNUM will have debug toggled
         // according to the first matching NPC.
-        uint64_t change_count{};
+        quint64 change_count = {};
         bool first_npc_found = false;
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)
@@ -374,11 +370,11 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_pardon(Character *ch, char *argument, cmd_t cmd)
+qint32 do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
   char flag[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -434,16 +430,16 @@ int do_pardon(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("Done.");
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "%s pardons %s for %s.",
-          GET_NAME(ch), victim->getNameC(), flag);
+          qPrintable(ch->name()), qPrintable(victim->name()), flag);
   logentry(log_buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
-int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
+qint32 do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  class Object *obj_object;
-  int eqdam;
+  ObjectPtr obj_object;
+  qint32 eqdam;
 
   one_argument(argument, buf);
 
@@ -473,48 +469,41 @@ int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-char *print_classes(int bitv)
+QString print_classes(qint32 bitv)
 {
-  static char buf[512];
-  int i = 0;
-  buf[0] = '\0';
-
+  qint32 i = {};
+  QString buf;
   for (; *pc_clss_types2[i] != '\n'; i++)
-  {
     if (isSet(bitv, 1 << (i - 1)))
-      sprintf(buf, "%s %s", buf, pc_clss_types2[i]);
-  }
-
+      buf = QStringLiteral("%1 %2").arg(buf).arg(pc_clss_types2[i]);
   return buf;
 }
 
 // do_string is in modify.C
 
-skill_quest *find_sq(char *testa)
+skill_quest *find_sq(QString testa)
 {
-  skill_quest *curr;
-  for (curr = skill_list; curr; curr = curr->next)
-    if (!str_nosp_cmp(get_skill_name(curr->num), testa))
+  for (auto curr = skill_list; curr; curr = curr->next)
+    if (str_nosp_equal(get_skill_name(curr->num), testa))
       return curr;
-  return nullptr;
+  return {};
 }
 
-skill_quest *find_sq(int sq)
+skill_quest *find_sq(qint32 sq)
 {
-  skill_quest *curr;
-  for (curr = skill_list; curr; curr = curr->next)
+  for (auto curr = skill_list; curr; curr = curr->next)
     if (sq == curr->num)
       return curr;
-  return nullptr;
+  return {};
 }
 
-int do_sqedit(Character *ch, char *argument, cmd_t cmd)
+qint32 do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   argument = one_argument(argument, command);
-  int clas = 1;
+  qint32 clas = 1;
 
-  const char *fields[] = {
+  const QStringList fields = {
       "new",
       "delete",
       "message",
@@ -534,12 +523,12 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   /*  if (!argument || !*argument)
     {
        send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
-                    "$3Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
+                    "$3Syntax:$R sqedit message/new/<skillname>\r\n",ch)={};
        ch->sendln("$3Syntax:$R sqedit list.");
        return ReturnValue::eFAILURE;
     }*/
-  int i;
-  for (i = 0;; i++)
+  qint32 i;
+  for (i = {};; i++)
   {
     if (!str_cmp((char *)fields[i], command) ||
         !str_cmp((char *)fields[i], "\n"))
@@ -559,7 +548,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
   bool done = false;
   argument = one_argument(argument, arg1);
-  skill_quest *skill = nullptr;
+  skill_quest *skill = {};
 
   if (argument && *argument)
   {
@@ -575,12 +564,11 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Unknown skill.");
     return ReturnValue::eFAILURE;
   }
-  skill_quest *curren, *last = nullptr;
+  skill_quest *curren, *last = {};
   switch (i)
   {
   case 0:
-    skill_quest *newOne;
-    ///	int i;
+    ///	qint32 i;
     if (arg3[0] != '\0')
       i = find_skill_num(arg3);
     if (i <= 0)
@@ -597,20 +585,16 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     }
     //	argument = one_argument(argument,arg3);
     if (arg3[0] != '\0')
-      for (int x = 0; *pc_clss_types2[x] != '\n'; x++)
+      for (qint32 x = {}; *pc_clss_types2[x] != '\n'; x++)
       {
         if (!str_cmp(pc_clss_types2[x], arg2))
           clas = x;
       }
 
-#ifdef LEAK_CHECK
-    newOne = (skill_quest *)calloc(1, sizeof(skill_quest));
-#else
-    newOne = (skill_quest *)dc_alloc(1, sizeof(skill_quest));
-#endif
+    auto newOne = new skill_quest;
     newOne->num = i;
     newOne->level = 1;
-    newOne->message = str_dup("New skillquest.");
+    newOne->message = QStringLiteral("New skillquest.");
     newOne->clas = (1 << (clas - 1));
     newOne->next = skill_list;
     skill_list = newOne;
@@ -626,8 +610,8 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
         else
           skill_list = curren->next;
         ch->sendln("Deleted.");
-        dc_free(curren->message);
-        dc_free(curren);
+        curren->message = {};
+        curren = {};
         return ReturnValue::eSUCCESS;
       }
       last = curren;
@@ -654,10 +638,10 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     }
     break;
   case 4:
-    int i;
+    qint32 i;
     if (!is_number(arg2))
     {
-      for (i = 0; *pc_clss_types2[i] != '\n'; i++)
+      for (i = {}; *pc_clss_types2[i] != '\n'; i++)
       {
         if (!str_cmp(pc_clss_types2[i], arg2))
           break;
@@ -685,11 +669,11 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Class modified.");
     break;
   case 5: // show
-    csendf(ch, "$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n", get_skill_name(skill->num).toStdString().c_str(), skill->message, print_classes(skill->clas), skill->level);
+    ch->send(QStringLiteral("$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n").arg(qPrintable(get_skill_name(skill->num))).arg(skill->message).arg(print_classes(skill->clas)).arg(skill->level));
     break;
   case 6:
-    int l;
-    for (l = 0; *pc_clss_types2[l] != '\n'; l++)
+    qint32 l;
+    for (l = {}; *pc_clss_types2[l] != '\n'; l++)
     {
       if (!str_cmp(pc_clss_types2[l], arg1))
         break;
@@ -700,12 +684,12 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ch->sendln("These are the current sqs:");
-    csendf(ch, "$3%s skillquests.$R\r\n", pc_clss_types2[l]);
+    ch->send(QStringLiteral("$3%s skillquests.$R\r\n").arg(pc_clss_types2[l]));
     for (curren = skill_list; curren; curren = curren->next)
     {
       if (!isSet(curren->clas, 1 << (l - 1)))
         continue;
-      csendf(ch, "$3%d$R. %s\r\n", curren->num, get_skill_name(curren->num).toStdString().c_str());
+      ch->send(QStringLiteral("$3%d$R. %s\r\n").arg(curren->num).arg(qPrintable(get_skill_name(curren->num))));
       done = true;
     }
     if (!done)
@@ -720,10 +704,10 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   }
   return ReturnValue::eSUCCESS;
 }
-int max_aff(class Object *obj, int type)
+qint32 max_aff(ObjectPtr obj, qint32 type)
 {
-  int a, b = -1;
-  for (a = 0; a < obj->num_affects; a++)
+  qint32 a, b = -1;
+  for (a = {}; a < obj->num_affects; a++)
   {
     if (obj->affected[a].location > 30)
       continue;
@@ -733,7 +717,7 @@ int max_aff(class Object *obj, int type)
   return b;
 }
 
-int maxcheck(int &check, int max)
+qint32 maxcheck(qint32 &check, qint32 max)
 {
   if (check < max)
   {
@@ -745,19 +729,19 @@ int maxcheck(int &check, int max)
   return 0;
 }
 
-int wear_bitv[MAX_WEAR] = {
+qint32 wear_bitv[MAX_WEAR] = {
     65535, 2, 2, 4, 4, 8, 16, 32, 64, 128, 256, 512,
     1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072,
     262144, 262144};
 
-int do_eqmax(Character *ch, char *argument, cmd_t cmd)
+qint32 do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   char arg[MAX_INPUT_LENGTH];
-  int a = 0, o;
+  qint32 a = 0, o;
   argument = one_argument(argument, arg);
-  extern int class_restricted(Character * ch, class Object * obj);
-  extern int size_restricted(Character * ch, class Object * obj);
+  extern qint32 class_restricted(CharacterPtr ch, ObjectPtr obj);
+  extern qint32 size_restricted(CharacterPtr ch, ObjectPtr obj);
 
   if ((vict = get_pc_vis(ch, arg)) == nullptr)
   {
@@ -765,10 +749,10 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, arg);
-  int type;
-  int last_max[MAX_WEAR] =
+  qint32 type;
+  qint32 last_max[MAX_WEAR] =
       {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-  int last_vnum[5][MAX_WEAR] = {
+  qint32 last_vnum[5][MAX_WEAR] = {
       {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -797,13 +781,13 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
   bool nodouble = false;
   if (!str_cmp(arg, "nodouble"))
     nodouble = true;
-  int i = 1;
-  class Object *obj;
+  qint32 i = 1;
+  ObjectPtr obj;
   for (i = 1; i < 32000; i++)
   {
     if (real_object(i) < 0)
       continue;
-    obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
+    obj = (ObjectPtr)DC::getInstance()->obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, TAKE) &&
@@ -811,10 +795,10 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
         obj->obj_flags.eq_level <= vict->getLevel() &&
         !isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      for (o = 0; o < MAX_WEAR; o++)
+      for (o = {}; o < MAX_WEAR; o++)
         if (CAN_WEAR(obj, wear_bitv[o]))
         {
-          int dam = max_aff(obj, type);
+          qint32 dam = max_aff(obj, type);
           if ((a = maxcheck(last_max[o], dam)))
           {
             if (a == 1)
@@ -829,8 +813,8 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
             }
             else
             {
-              int v;
-              for (v = 0; v < 5; v++)
+              qint32 v;
+              for (v = {}; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
                   last_vnum[v][o] = DC::getInstance()->obj_index[obj->item_number].vnum();
@@ -842,7 +826,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
     }
   }
   char buf1[MAX_STRING_LENGTH];
-  int tot = 0;
+  qint32 tot = {};
   for (i = 1; i < MAX_WEAR; i++)
   {
     buf1[0] = '\0';
@@ -852,11 +836,11 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
     if (last_vnum[a][i] == -1)
       sprintf(buf1, "%s Nothing\r\n", buf1);
     else
-      for (a = 0; a < 5; a++)
+      for (a = {}; a < 5; a++)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable(((ObjectPtr)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
@@ -867,7 +851,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_reload(Character *ch, char *argument, cmd_t cmd)
+qint32 do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern char motd[MAX_STRING_LENGTH];
   extern char imotd[MAX_STRING_LENGTH];
@@ -920,7 +904,7 @@ int do_reload(Character *ch, char *argument, cmd_t cmd)
     file_to_string(NEW_IHELP_PAGE_FILE, new_ihelp);
   else if (!str_cmp(arg, "xhelp"))
   {
-    do_reload_help(ch, str_hsh(""));
+    do_reload_help(ch, QStringLiteral(""));
     ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "greetings"))
@@ -945,10 +929,10 @@ int do_reload(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_listproc(Character *ch, char *argument, cmd_t cmd)
+qint32 do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  int start, i, end, tot;
+  qint32 start, i, end, tot;
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
@@ -974,11 +958,11 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
       break;
     if (mob)
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Character *)DC::getInstance()->mob_index[real_mobile(i)].item)->getName()));
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((CharacterPtr)DC::getInstance()->mob_index[real_mobile(i)].item)->name()));
     }
     else
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Object *)DC::getInstance()->obj_index[real_object(i)].item)->Name()));
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((ObjectPtr)DC::getInstance()->obj_index[real_object(i)].item)->name()));
     }
   }
   return ReturnValue::eSUCCESS;

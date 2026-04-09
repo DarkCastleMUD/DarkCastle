@@ -6,43 +6,42 @@
 
 #include <cstdio>
 #include <cstring>
-#include <vector>
+#include <qnamespace.h>
 
-#include "DC/sing.h"
-#include "DC/room.h"
-#include "DC/character.h"
+#include "DC/DC.h"
 #include "DC/spells.h" // tar_char..
-#include "DC/utility.h"
+
 #include "DC/player.h"
 #include "DC/interp.h"
-#include "DC/mobile.h"
+
 #include "DC/fight.h"
 #include "DC/handler.h"
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/magic.h"  // dispel_magic
 #include "DC/innate.h" // SKILL_INNATE_EVASION
-#include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/handler.h"
-#include "DC/memory.h"
+#include "DC/utility.h"
+#include "DC/sing.h"
+#include "DC/class.h"
 
-Character *origsing = nullptr;
+CharacterPtr origsing = {};
 
-void check_eq(Character *ch);
+void check_eq(CharacterPtr ch);
 
-//        uint8_t beats;     /* Waiting time after ki */
-//        uint8_t minimum_position; /* min position for use */
-//        uint8_t min_useski;       /* minimum ki used */
-//        int16_t skill_num;       /* skill number of the song */
-//        int16_t targets;         /* Legal targets */
-//        int16_t rating;		/* Rating for orchestrate */
+//        quint8 beats;     /* Waiting time after ki */
+//        quint8 minimum_position; /* min position for use */
+//        quint8 min_useski;       /* minimum ki used */
+//        qint16 skill_num;       /* skill number of the song */
+//        qint16 targets;         /* Legal targets */
+//        qint16 rating;		/* Rating for orchestrate */
 //        SING_FUN *song_pointer; /* function to call */
 //        SING_FUN *exec_pointer; /* other function to call */
 //        SING_FUN *song_pulse;    /* other other function to call */
 //        SING_FUN *intrp_pointer; /* other other function to call */
-//	  int difficulty
+//	  qint32 difficulty
 
 const QList<song_info_type> song_info = {
 
@@ -191,18 +190,18 @@ const QList<song_info_type> song_info = {
      nullptr, SKILL_INCREASE_MEDIUM},
 };
 
-int16_t use_song(Character *ch, int kn);
-bool ARE_GROUPED(Character *sub, Character *obj);
+qint16 use_song(CharacterPtr ch, qint32 kn);
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
 
-int16_t use_song(Character *ch, int kn)
+qint16 use_song(CharacterPtr ch, qint32 kn)
 {
   return (song_info[kn].min_useski());
 }
 
-int getTotalRating(Character *ch)
+qint32 getTotalRating(CharacterPtr ch)
 {
-  int rating = 0;
-  std::vector<songInfo>::iterator i;
+  qint32 rating = {};
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -212,10 +211,10 @@ int getTotalRating(Character *ch)
   return rating;
 }
 
-void stop_grouped_bards(Character *ch, int bardsing)
+void stop_grouped_bards(CharacterPtr ch, qint32 bardsing)
 {
-  Character *master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (IS_SINGING(ch))
   { // kill everybody elses love
@@ -226,7 +225,7 @@ void stop_grouped_bards(Character *ch, int bardsing)
       if (bardsing)
         origsing = master;
       do_sing(ch, "stop");
-      origsing = nullptr;
+      origsing = {};
     }
     for (fvictim = master->followers; fvictim; fvictim = fvictim->next)
     {
@@ -235,7 +234,7 @@ void stop_grouped_bards(Character *ch, int bardsing)
       else
         origsing = fvictim->follower;
       do_sing(ch, "stop");
-      origsing = nullptr;
+      origsing = {};
     }
   }
   else
@@ -257,14 +256,14 @@ void stop_grouped_bards(Character *ch, int bardsing)
     {
       do_sing(master, "stop");
     }
-    origsing = nullptr;
+    origsing = {};
   }
 }
 
-void get_instrument_bonus(Character *ch, int &comb, int &non_comb)
+void get_instrument_bonus(CharacterPtr ch, qint32 &comb, qint32 &non_comb)
 {
-  comb = 0;
-  non_comb = 0;
+  comb = {};
+  non_comb = {};
 
   if (!ch->equipment[WEAR_HOLD])
     return;
@@ -275,53 +274,36 @@ void get_instrument_bonus(Character *ch, int &comb, int &non_comb)
   non_comb = ch->equipment[WEAR_HOLD]->obj_flags.value[0];
 }
 
-int do_sing(Character *ch, char *arg, cmd_t cmd)
+qint32 do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Character *tar_char = 0;
-  Object *tar_obj = 0;
-  char name[MAX_STRING_LENGTH];
-  char spellarg[MAX_STRING_LENGTH];
-  char *argument = nullptr;
-  int qend, spl = -1;
-  bool target_ok;
-  int learned;
-  std::vector<songInfo>::iterator i;
-
   if (ch->isPlayer() && GET_CLASS(ch) != CLASS_BARD && !ch->isImmortalPlayer())
   {
     ch->check_social("sing");
     return ReturnValue::eSUCCESS;
   }
 
-  // we do this so we can pass constants to "do_sing" and no crash
-  strcpy(spellarg, arg);
-  argument = spellarg;
-
-  argument = skip_spaces(argument);
-
-  if (!(*argument))
+  auto q_arg = QString(arg);
+  QStringList arguments;
+  QString song;
+  QString target;
+  auto q_arg_quote_count = q_arg.count('\'');
+  if (q_arg_quote_count == 0) // no quotes so we assume it's: sing SONG TARGET
   {
-    ch->sendln("Yes, but WHAT would you like to sing?");
-    return ReturnValue::eFAILURE;
+    arguments = q_arg.split(' ');
   }
-
-  if (*argument == '\'') // song is in 's
+  else if (q_arg_quote_count == 1) // only one single-quote so possibly: sing 'SONG
   {
-    argument++;
-    for (qend = 1; *(argument + qend) && (*(argument + qend) != '\''); qend++)
-      *(argument + qend) = LOWER(*(argument + qend));
-    if (*(argument + qend) != '\'')
-    {
-      ch->sendln("If you start with a ' you have to end with a ' too.");
-      return ReturnValue::eFAILURE;
-    }
+    ch->sendln("If you start with a ' you have to end with a ' too.");
+    return ReturnValue::eFAILURE;
   }
   else
   {
-    for (qend = 1; *(argument + qend) && (*(argument + qend) != ' '); qend++)
-      *(argument + qend) = LOWER(*(argument + qend));
+    arguments = q_arg.split('\'', Qt::SkipEmptyParts);
   }
-  spl = old_search_block(argument, 0, qend, Character::song_names, 0);
+  song = arguments.value(0);
+  target = arguments.value(1);
+
+  auto spl = old_search_block(song, Character::song_names, false);
   spl--; /* songs goes from 0+ not 1+ like spells */
 
   if (spl < 0)
@@ -450,8 +432,8 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
 
         if (!target_ok && isSet(song_info[spl].targets(), TAR_OBJ_EQUIP))
         {
-          for (int i = 0; i < MAX_WEAR && !target_ok; i++)
-            if (ch->equipment[i] && ch->equipment[i]->Name() == name)
+          for (qint32 i = {}; i < MAX_WEAR && !target_ok; i++)
+            if (ch->equipment[i] && ch->equipment[i]->name() == name)
             {
               tar_obj = ch->equipment[i];
               target_ok = true;
@@ -463,7 +445,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
             target_ok = true;
 
         if (!target_ok && isSet(song_info[spl].targets(), TAR_SELF_ONLY))
-          if (str_cmp(GET_NAME(ch), name) == 0)
+          if (str_cmp(qPrintable(ch->name()), name) == 0)
           {
             tar_char = ch;
             target_ok = true;
@@ -619,7 +601,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
             ch->sendln("You stop orchestrating all of your music.");
           else if (ch->songs.size() > 1 && *name)
           {
-            int hold = old_search_block(name, 0, strlen(name), Character::song_names, 0);
+            qint32 hold = old_search_block(name, 0, strlen(name), Character::song_names, 0);
             bool found = false;
             if (--hold < 0)
             {
@@ -670,8 +652,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         }
         else
         {
-          csendf(ch, "You seamlessly orchestrate a %s melody with your current song, playing them in perfect concert!\r\n",
-                 numToStringTH(ch->songs.size() + 1));
+          ch->send(QStringLiteral("You seamlessly orchestrate a %s melody with your current song, playing them in perfect concert!\r\n").arg(numToStringTH(ch->songs.size() + 1)));
           act("$n seamlessly orchestrates another melody with $s current song, playing them in perfect concert!", ch, 0, 0, TO_ROOM, 0);
         }
       }
@@ -686,8 +667,8 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       {
         songInfo data;
         data.song_number = spl;
-        data.song_timer = 0;
-        data.song_data = 0;
+        data.song_timer = {};
+        data.song_data = {};
         ch->songs.push_back(data);
       }
 
@@ -697,9 +678,9 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-void update_character_singing(Character *ch)
+void update_character_singing(CharacterPtr ch)
 {
-  for (std::vector<songInfo>::iterator j = ch->songs.begin(); j != ch->songs.end(); ++j)
+  for (QList<songInfo>::iterator j = ch->songs.begin(); j != ch->songs.end(); ++j)
   {
     if ((*j).song_timer == -1)
     {
@@ -712,12 +693,12 @@ void update_character_singing(Character *ch)
           break;
         }
       }
-      (*j).song_timer = 0;
+      (*j).song_timer = {};
       if ((*j).song_data)
       {
-        if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-          dc_free((*j).song_data);
-        (*j).song_data = 0;
+        if ((qint64)(*j).song_data > 10) // Otherwise it's a temp variable.
+          (*j).song_data = {};
+        (*j).song_data = {};
       }
       ch->songs.erase(j);
       --j;
@@ -743,11 +724,11 @@ void update_character_singing(Character *ch)
         }
         if ((*j).song_data)
         {
-          if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-            dc_free((*j).song_data);
-          (*j).song_data = 0;
+          if ((qint64)(*j).song_data > 10) // Otherwise it's a temp variable.
+            (*j).song_data = {};
+          (*j).song_data = {};
         }
-        (*j).song_timer = 0;
+        (*j).song_timer = {};
         ch->songs.erase(j);
         --j;
         continue;
@@ -755,7 +736,7 @@ void update_character_singing(Character *ch)
       else if ((((GET_POS(ch) < song_info[(*j).song_number].minimum_position()) && ch->isPlayer()) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
       {
         ch->sendln("You can't keep singing in this position!");
-        (*j).song_timer = 0;
+        (*j).song_timer = {};
         if ((song_info[(*j).song_number].intrp_pointer()))
         {
           ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
@@ -766,9 +747,9 @@ void update_character_singing(Character *ch)
         }
         if ((*j).song_data)
         {
-          if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-            dc_free((*j).song_data);
-          (*j).song_data = 0;
+          if ((qint64)(*j).song_data > 10) // Otherwise it's a temp variable.
+            (*j).song_data = {};
+          (*j).song_data = {};
         }
         ch->songs.erase(j);
         --j;
@@ -787,12 +768,12 @@ void update_character_singing(Character *ch)
               break;
             }
           }
-          (*j).song_timer = 0;
+          (*j).song_timer = {};
           if ((*j).song_data)
           {
-            if ((int64_t)(*j).song_data > 10) // Otherwise it's a temp variable.
-              dc_free((*j).song_data);
-            (*j).song_data = 0;
+            if ((qint64)(*j).song_data > 10) // Otherwise it's a temp variable.
+              (*j).song_data = {};
+            (*j).song_data = {};
           }
           ch->songs.erase(j);
           --j;
@@ -805,10 +786,10 @@ void update_character_singing(Character *ch)
     {
       (*j).song_timer--;
 
-      std::string buffer_for_singer = "Singing [" + Character::song_names.value((*j).song_number).toStdString() + "]: ";
-      std::string buffer_for_group = "$N is singing [" + Character::song_names.value((*j).song_number).toStdString() + "]: ";
-      std::string buffer_for_room = "$N is singing " + Character::song_names.value((*j).song_number).toStdString() + ".";
-      for (int k = 0; k < (*j).song_timer; k++)
+      QString buffer_for_singer = "Singing [" + Character::song_names.value((*j).song_number).toStdString() + "]: ";
+      QString buffer_for_group = "$N is singing [" + Character::song_names.value((*j).song_number).toStdString() + "]: ";
+      QString buffer_for_room = "$N is singing " + Character::song_names.value((*j).song_number).toStdString() + ".";
+      for (qint32 k = {}; k < (*j).song_timer; k++)
       {
         buffer_for_singer += "* ";
         buffer_for_group += "* ";
@@ -819,10 +800,10 @@ void update_character_singing(Character *ch)
     }
     else if ((*j).song_timer == 1)
     {
-      (*j).song_timer = 0;
+      (*j).song_timer = {};
 
-      int learned = ch->has_skill(((*j).song_number + SKILL_SONG_BASE));
-      int retval = 0;
+      qint32 learned = ch->has_skill(((*j).song_number + SKILL_SONG_BASE));
+      qint32 retval = {};
 
       if ((song_info[(*j).song_number].exec_pointer()))
       {
@@ -877,9 +858,9 @@ void update_bard_singing()
   DC::getInstance()->removeDead();
 }
 
-int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   if (!victim || !ch)
   {
@@ -896,16 +877,16 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
       break;
   }
 
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
   (*i).song_timer = (song_info[(*i).song_number].beats() - (skill / 15));
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Character *victim, int skill)
+qint32 execute_song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   affected_type af;
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   if (!ch || ch->songs.empty())
   {
@@ -921,13 +902,13 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 
   if (!(victim = ch->get_char_room_vis((*i).song_data)))
   {
-    dc_free((*i).song_data);
-    (*i).song_data = 0;
+    (*i).song_data = {};
+    (*i).song_data = {};
     ch->sendln("They seem to have left.\r\nIn the middle of your performance too!");
     return ReturnValue::eFAILURE;
   }
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   if (victim->isPlayer() || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
@@ -943,8 +924,8 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
     return ReturnValue::eFAILURE;
   }
 
-  int charm_levels(Character * ch);
-  int charm_space(int level);
+  qint32 charm_levels(CharacterPtr ch);
+  qint32 charm_space(qint32 level);
 
   if (charm_levels(ch) - charm_space(victim->getLevel()) < 0 && victim->master != ch)
   {
@@ -962,8 +943,8 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   af.type = SPELL_CHARM_PERSON;
   af.duration = 24 + ((level > 40) * 6) + ((level > 60) * 6) + ((level > 80) * 12);
 
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = AFF_CHARM;
   affect_to_char(victim, &af);
 
@@ -975,7 +956,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   if (!victim || !ch)
   {
@@ -983,7 +964,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  int learned = ch->has_skill(song_info[SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE].skill_num());
+  qint32 learned = ch->has_skill(song_info[SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE].skill_num());
 
   act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", ch, 0, victim, TO_VICT, 0);
   act("$n sings a hilarious limerick about a man from Nantucket to $N!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1024,11 +1005,11 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
   return spell_dispel_magic(ch->getLevel() - 1, ch, victim, 0, 0);
 }
 
-int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_whistle_sharp(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int dam = 0;
-  int retval;
-  std::vector<songInfo>::iterator i;
+  qint32 dam = {};
+  qint32 retval;
+  QList<songInfo>::iterator i;
 
   if (!victim)
   {
@@ -1051,7 +1032,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
     return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_SONG_WHISTLE_SHARP);
   }
 
-  int combat, non_combat;
+  qint32 combat, non_combat;
   get_instrument_bonus(ch, combat, non_combat);
 
   //   dam = ch->getLevel() + GET_INT(ch) + combat;
@@ -1083,9 +1064,9 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int song_healing_melody(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_healing_melody(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a song of healing...");
   act("$n raises $s voice in a soothing melody...", ch, 0, 0, TO_ROOM, 0);
@@ -1102,11 +1083,11 @@ int song_healing_melody(uint8_t level, Character *ch, char *arg, Character *vict
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_healing_melody(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int heal = 0;
-  int combat, non_combat;
-  std::vector<songInfo>::iterator i;
+  qint32 heal = {};
+  qint32 combat, non_combat;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1123,7 +1104,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
   }
   GET_KI(ch) -= 2;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -1140,7 +1121,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
       }
       else
       {
-        csendf(tmp_char, "You feel %s's Healing Melody soothing %d points of your health.\r\n", GET_NAME(ch), heal);
+        tmp_char->send(QStringLiteral("You feel %s's Healing Melody soothing %d points of your health.\r\n").arg(qPrintable(ch->name())).arg(heal));
       }
     }
     else
@@ -1159,7 +1140,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1174,9 +1155,9 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a song of revealing...");
   act("$n begins to chant in rhythm...", ch, 0, 0, TO_ROOM, 0);
@@ -1190,12 +1171,12 @@ int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *v
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *i;
+  CharacterPtr i;
   Room *room;
   char buf[MAX_STRING_LENGTH];
-  char *direction[] = {
+  QStringList direction = {
       "to the North",
       "to the East",
       "to the South",
@@ -1205,7 +1186,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
       "\n",
   };
 
-  std::vector<songInfo>::iterator k;
+  QList<songInfo>::iterator k;
 
   for (k = ch->songs.begin(); k != ch->songs.end(); ++k)
   {
@@ -1233,7 +1214,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 
   if (skill > 80)
   {
-    for (int j = 0; j < 6; j++)
+    for (qint32 j = {}; j < 6; j++)
     {
       if (CAN_GO(ch, j))
       {
@@ -1264,7 +1245,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*k).song_number).toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*k).song_number).toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*k).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1275,9 +1256,9 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_note_of_knowledge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
     if ((*i).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE)
@@ -1285,7 +1266,7 @@ int song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *v
 
   // store the obj name here, cause A, we don't pass tar_obj
   // and B, there's no place to save it before we execute
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
 
   ch->sendln("You begin to sing a long single note...");
   act("$n sings a long solitary note.", ch, 0, 0, TO_ROOM, 0);
@@ -1294,13 +1275,13 @@ int song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *v
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_note_of_knowledge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Object *obj = nullptr;
-  Character *vict = nullptr;
-  Object *corpse = nullptr;
+  ObjectPtr obj = {};
+  CharacterPtr vict = {};
+  ObjectPtr corpse = {};
   char buf[MAX_STRING_LENGTH];
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1312,10 +1293,10 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
   vict = ch->get_char_room_vis((*i).song_data);
   corpse = get_obj_in_list_vis(ch, (*i).song_data, DC::getInstance()->world[ch->in_room].contents);
   if (corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1))
-    corpse = nullptr;
+    corpse = {};
 
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
 
   if (obj)
   {
@@ -1323,7 +1304,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
   }
   else if (skill > 80 && corpse)
   {
-    ch->sendln(QStringLiteral("Corpse '%1'").arg(corpse->Name()));
+    ch->sendln(QStringLiteral("Corpse '%1'").arg(corpse->name()));
     spell_identify(ch->getLevel(), ch, 0, corpse, 0);
   }
   else if (skill > 85 && vict)
@@ -1335,9 +1316,9 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin a song of battle!");
   act("$n sings a horrible battle hymn!", ch, 0, 0, TO_ROOM, 0);
@@ -1350,11 +1331,11 @@ int song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int dam = 0;
-  int retval;
-  std::vector<songInfo>::iterator i;
+  qint32 dam = {};
+  qint32 retval;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1370,7 +1351,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
     return ReturnValue::eSUCCESS;
   }
 
-  int combat, non_combat;
+  qint32 combat, non_combat;
   get_instrument_bonus(ch, combat, non_combat);
 
   dam = ((ch->has_skill(SKILL_SONG_TERRIBLE_CLEF)) * 1.5 + 225);
@@ -1402,7 +1383,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names[(*i).song_number].toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names[(*i).song_number].toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names[(*i).song_number].toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1413,25 +1394,25 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
   return ReturnValue::eSUCCESS;
 }
 
-int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_listsongs(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   char buf[200];
 
   ch->sendln("Available Songs\r\n---------------");
-  for (qsizetype i = 0; i < Character::song_names.length(); i++)
+  for (qsizetype i = {}; i < Character::song_names.length(); i++)
   {
     if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))
       continue;
 
-    sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(i).toStdString().c_str(), song_info[i].min_useski());
+    sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(qPrintable(i)), song_info[i].min_useski());
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
 }
 
-int song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_soothing_remembrance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a song of rememberance...");
   act("$n raises $s voice in a soothing ballad...", ch, 0, 0, TO_ROOM, 0);
@@ -1444,11 +1425,11 @@ int song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int heal = 0;
+  qint32 heal = {};
   char buf[MAX_STRING_LENGTH];
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1463,10 +1444,10 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
   }
   GET_KI(ch) -= 3;
 
-  int combat, non_combat;
+  qint32 combat, non_combat;
   get_instrument_bonus(ch, combat, non_combat);
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -1480,7 +1461,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
       if (tmp_char == ch)
         sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
       else
-        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", GET_NAME(ch), heal);
+        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", qPrintable(ch->name()), heal);
       tmp_char->send(buf);
     }
     else
@@ -1499,7 +1480,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1511,9 +1492,9 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
   return ReturnValue::eSUCCESS;
 }
 
-int song_traveling_march(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_traveling_march(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a song of travel...");
   act("$n raises $s voice in an uplifting march...", ch, 0, 0, TO_ROOM, 0);
@@ -1530,16 +1511,16 @@ int song_traveling_march(uint8_t level, Character *ch, char *arg, Character *vic
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int heal;
+  qint32 heal;
   affected_type af;
   char buf[MAX_STRING_LENGTH];
 
-  int combat, non_combat;
+  qint32 combat, non_combat;
   get_instrument_bonus(ch, combat, non_combat);
 
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1560,9 +1541,9 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
   af.duration = 1;
   af.location = APPLY_AC;
   af.bitvector = -1;
-  af.caster = GET_NAME(ch);
+  af.caster = qPrintable(ch->name());
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -1579,7 +1560,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
       }
       else
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
+        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", qPrintable(ch->name()), heal);
         tmp_char->send(buf);
       }
     }
@@ -1597,7 +1578,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1611,7 +1592,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
   return ReturnValue::eSUCCESS;
 }
 
-int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_stop(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   if (origsing)
     return ReturnValue::eFAILURE;
@@ -1621,14 +1602,14 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
     return ReturnValue::eFAILURE;
   }
 
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   if (*arg)
   { // sing 'stop' <song>
-    int spl = old_search_block(arg, 0, strlen(arg), Character::song_names, 0);
+    qint32 spl = old_search_block(arg, 0, strlen(arg), Character::song_names, 0);
     spl--; /* songs goes from 0+ not 1+ like spells */
 
-    std::vector<songInfo>::iterator i;
+    QList<songInfo>::iterator i;
 
     for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
     {
@@ -1662,9 +1643,9 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
   return ReturnValue::eSUCCESS;
 }
 
-int song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing an astral chanty...");
   act("$n starts quietly in a sea chanty...", ch, 0, 0, TO_ROOM, 0);
@@ -1676,13 +1657,13 @@ int song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victi
   (*i).song_timer = song_info[(*i).song_number].beats() - (skill / 10);
 
   // Store it for later, since we can't store the vict pointer
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
   return ReturnValue::eSUCCESS;
 }
 
-void do_astral_chanty_movement(Character *victim, Character *target)
+void do_astral_chanty_movement(CharacterPtr victim, CharacterPtr target)
 {
-  int retval;
+  qint32 retval;
 
   if (!victim || !target)
   {
@@ -1717,7 +1698,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
     return;
   }
 
-  Character *tmpch;
+  CharacterPtr tmpch;
 
   for (tmpch = DC::getInstance()->world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
@@ -1741,10 +1722,10 @@ void do_astral_chanty_movement(Character *victim, Character *target)
   act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
-int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int status = 0;
-  std::vector<songInfo>::iterator i;
+  qint32 status = {};
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1774,7 +1755,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
   else
   {
 
-    Character *tmpch;
+    CharacterPtr tmpch;
 
     for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
       if (search_char_for_item(tmpch, real_object(51), false))
@@ -1797,8 +1778,8 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
           // free our stored char name
           if ((*i).song_data)
           {
-            dc_free((*i).song_data);
-            (*i).song_data = 0;
+            (*i).song_data = {};
+            (*i).song_data = {};
           }
 
           return ReturnValue::eFAILURE;
@@ -1810,8 +1791,8 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
         }
       }
 
-      Character *next_char = 0;
-      for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_char)
+      CharacterPtr next_char = {};
+      for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_char)
       {
         next_char = tmp_char->next_in_room;
         if (!ARE_GROUPED(ch, tmp_char))
@@ -1829,14 +1810,14 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
   // free our stored char name
   if ((*i).song_data)
   {
-    dc_free((*i).song_data);
-    (*i).song_data = 0;
+    (*i).song_data = {};
+    (*i).song_data = {};
   }
 
   return status;
 }
 
-int pulse_song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 pulse_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   if (number(1, 3) == 3)
     act("$n sings a rousing chanty!", ch, 0, 0, TO_ROOM, 0);
@@ -1844,9 +1825,9 @@ int pulse_song_astral_chanty(uint8_t level, Character *ch, char *arg, Character 
   return ReturnValue::eSUCCESS;
 }
 
-int song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_forgetful_rhythm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a song of forgetfulness...");
   act("$n begins an entrancing rhythm...", ch, 0, 0, TO_ROOM, 0);
@@ -1858,15 +1839,15 @@ int song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *vi
   (*i).song_timer = song_info[(*i).song_number].beats() - skill / 15;
 
   // store the arg here, cause there's no place to save it before we execute
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_forgetful_rhythm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int retval;
-  std::vector<songInfo>::iterator i;
+  qint32 retval;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1877,12 +1858,12 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
   if (!(victim = ch->get_char_room_vis((*i).song_data)))
   {
     ch->sendln("You don't see that person here.");
-    dc_free((*i).song_data);
-    (*i).song_data = 0;
+    (*i).song_data = {};
+    (*i).song_data = {};
     return ReturnValue::eFAILURE;
   }
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
 
   act("$n sings to $N about beautiful rainbows.", ch, 0, victim, TO_ROOM, NOTVICT);
 
@@ -1914,9 +1895,9 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-int song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_shattering_resonance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a song of shattering...");
   act("$n begins a fading resonance...", ch, 0, 0, TO_ROOM, 0);
@@ -1931,16 +1912,16 @@ int song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character
     (*i).song_timer = song_info[(*i).song_number].beats();
 
   // store the arg here, cause there's no place to save it before we execute
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Object *obj = nullptr;
-  Object *tobj = nullptr;
-  std::vector<songInfo>::iterator i;
+  ObjectPtr obj = {};
+  ObjectPtr tobj = {};
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -1951,12 +1932,12 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
   if (!(obj = get_obj_in_list((*i).song_data, DC::getInstance()->world[ch->in_room].contents)))
   {
     ch->sendln("You don't see that object here.");
-    dc_free((*i).song_data);
-    (*i).song_data = 0;
+    (*i).song_data = {};
+    (*i).song_data = {};
     return ReturnValue::eFAILURE;
   }
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
 
   // code to shatter a beacon
   if (GET_ITEM_TYPE(obj) == ITEM_BEACON)
@@ -1973,8 +1954,8 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
       ch->sendln("The magic is shattered by your will!");
       act("$p blinks out of existence with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
       obj->equipped_by->sendln("Your magic beacon is shattered!");
-      obj->equipped_by->beacon = nullptr;
-      obj->equipped_by = nullptr;
+      obj->equipped_by->beacon = {};
+      obj->equipped_by = {};
     }
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
@@ -1986,7 +1967,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
     ch->sendln("You can't shatter that!");
     return ReturnValue::eFAILURE;
   }
-  if (!isexact("pcportal", obj->Name()))
+  if (!isexact("pcportal", obj->name()))
   {
     ch->sendln("The portal resists your song.");
     return ReturnValue::eFAILURE;
@@ -2020,9 +2001,9 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
   return ReturnValue::eSUCCESS;
 }
 
-int song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_insane_chant(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin chanting insanely...");
   act("$n begins chanting wildly...", ch, 0, 0, TO_ROOM, 0);
@@ -2035,16 +2016,16 @@ int song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_insane_chant(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   affected_type af;
 
   af.type = SKILL_INSANE_CHANT;
   af.duration = 1;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_INSANE_CHANT;
   af.bitvector = -1;
-  af.caster = GET_NAME(ch);
+  af.caster = qPrintable(ch->name());
 
   act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("Your singing drives everyone around you INSANE!!!");
@@ -2073,9 +2054,9 @@ int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-int song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_flight_of_bee(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a lofty song...");
   act("$n raises $s voice in an flighty quick march...", ch, 0, 0, TO_ROOM, 0);
@@ -2089,18 +2070,18 @@ int song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_flight_of_bee(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   affected_type af;
 
   af.type = SKILL_SONG_FLIGHT_OF_BEE;
   af.duration = 1 + skill / 10;
-  af.modifier = 0;
-  af.location = 0;
-  af.caster = GET_NAME(ch);
+  af.modifier = {};
+  af.location = {};
+  af.caster = qPrintable(ch->name());
   af.bitvector = AFF_FLYING;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2123,9 +2104,9 @@ int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Characte
   return ReturnValue::eSUCCESS;
 }
 
-int song_searching_song(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_searching_song(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("Your voice raises sending out a song to search the lands...");
   act("$n raises $s voice sending out a song to search the lands....", ch, 0, 0, TO_ROOM, 0);
@@ -2138,16 +2119,16 @@ int song_searching_song(uint8_t level, Character *ch, char *arg, Character *vict
 
   // store the char name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_searching_song(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *target = nullptr;
+  CharacterPtr target = {};
   char buf[200];
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -2157,8 +2138,8 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 
   target = get_char((*i).song_data);
 
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
 
   act("$n's song ends and quietly fades away.", ch, 0, 0, TO_ROOM, 0);
 
@@ -2173,7 +2154,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
     return ReturnValue::eFAILURE;
   }
 
-  snprintf(buf, 200, "Your song finds %s ", GET_SHORT(target));
+  snprintf(buf, 200, "Your song finds %s ", qPrintable(target->shortdesc_or_name()));
 
   switch (GET_POS(target))
   {
@@ -2211,9 +2192,9 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a quick little jig of alacrity...");
   act("$n starts humming a quick little ditty...", ch, 0, 0, TO_ROOM, 0);
@@ -2227,9 +2208,9 @@ int song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vic
   return ReturnValue::eSUCCESS;
 }
 
-int song_fanatical_fanfare(uint8_t level, Character *ch, char *Aag, Character *victim, int skill)
+qint32 song_fanatical_fanfare(quint8 level, CharacterPtr ch, char *Aag, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing loudly, and poke everyone in your surroundings with a stick..");
   act("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, TO_ROOM, 0);
@@ -2242,9 +2223,9 @@ int song_fanatical_fanfare(uint8_t level, Character *ch, char *Aag, Character *v
 
   return ReturnValue::eSUCCESS;
 }
-int song_summon_song(uint8_t level, Character *ch, char *Aag, Character *victim, int skill)
+qint32 song_summon_song(quint8 level, CharacterPtr ch, char *Aag, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin an inappropriately bawdy tune of your intimacy with pets.");
   act("$n begins an inappropriately bawdy tune of $s intimacy with pets.", ch, 0, 0, TO_ROOM, 0);
@@ -2257,10 +2238,10 @@ int song_summon_song(uint8_t level, Character *ch, char *Aag, Character *victim,
 
   return ReturnValue::eSUCCESS;
 }
-int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_summon_song(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   bool summoned = false;
-  follow_type *fvictim = nullptr;
+  follow_type *fvictim = {};
 
   if (ch->followers)
     for (fvictim = ch->followers; fvictim; fvictim = fvictim->next)
@@ -2280,9 +2261,9 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
   }
   return ReturnValue::eSUCCESS;
 }
-int song_mking_charge(uint8_t level, Character *ch, char *Aag, Character *victim, int skill)
+qint32 song_mking_charge(quint8 level, CharacterPtr ch, char *Aag, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You inspire your allies with your rousing songs about rising against oppression!");
   act("$n starts singing songs about former glory and past victories, rousing $s allies!", ch, 0, 0, TO_ROOM, 0);
@@ -2296,10 +2277,10 @@ int song_mking_charge(uint8_t level, Character *ch, char *Aag, Character *victim
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   // Note, the jig effects everyone in the group BUT the bard.
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -2315,12 +2296,12 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
   affected_type af;
   af.type = SKILL_SONG_JIG_OF_ALACRITY;
   af.duration = 1;
-  af.modifier = 0;
-  af.location = 0;
-  af.caster = GET_NAME(ch);
+  af.modifier = {};
+  af.location = {};
+  af.caster = qPrintable(ch->name());
   af.bitvector = AFF_HASTE;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2353,7 +2334,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     (*i).song_timer = -1;
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -2367,32 +2348,32 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   affected_type af1, af2, af3;
 
   af1.type = SKILL_SONG_FANATICAL_FANFARE;
   af1.duration = skill / 30;
-  af1.modifier = 0;
-  af1.location = 0;
+  af1.modifier = {};
+  af1.location = {};
   af1.bitvector = AFF_INSOMNIA;
-  af1.caster = GET_NAME(ch);
+  af1.caster = qPrintable(ch->name());
 
   af2.type = SKILL_SONG_FANATICAL_FANFARE;
   af2.duration = skill / 30;
-  af2.modifier = 0;
-  af2.location = 0;
+  af2.modifier = {};
+  af2.location = {};
   af2.bitvector = AFF_FEARLESS;
-  af2.caster = GET_NAME(ch);
+  af2.caster = qPrintable(ch->name());
 
   af3.type = SKILL_SONG_FANATICAL_FANFARE;
   af3.duration = skill / 30;
-  af3.modifier = 0;
-  af3.location = 0;
+  af3.modifier = {};
+  af3.location = {};
   af3.bitvector = AFF_NO_PARA;
-  af3.caster = GET_NAME(ch);
+  af3.caster = qPrintable(ch->name());
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2418,15 +2399,15 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
     if (ch == tmp_char)
       tmp_char->sendln("Your song causes your mind to race at a thousand miles an hour!");
     else
-      csendf(tmp_char, "%s's song causes your mind to race at a thousand miles an hour!\r\n", GET_NAME(ch));
+      tmp_char->send(QStringLiteral("%s's song causes your mind to race at a thousand miles an hour!\r\n").arg(qPrintable(ch->name())));
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_mking_charge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -2442,16 +2423,16 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
   affected_type af;
   af.type = SKILL_SONG_MKING_CHARGE;
   af.duration = 1;
-  af.modifier = 0;
-  af.location = 0;
-  af.caster = GET_NAME(ch);
+  af.modifier = {};
+  af.location = {};
+  af.caster = qPrintable(ch->name());
 
   if (skill > 80)
     af.bitvector = AFF_HASTE;
   else
     af.bitvector = -1;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2490,7 +2471,7 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     (*i).song_timer = -1;
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -2503,29 +2484,29 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-/*int pulse_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+/*qint32 pulse_song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
  {
  if (number(1,5) == 2)
  act("$n combines singing and poking the people with a stick, getting people worked up.", ch, 0, 0, TO_ROOM,0);
  return ReturnValue::eSUCCESS;
  }*/
 
-int pulse_mking_charge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 pulse_mking_charge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   return ReturnValue::eSUCCESS;
 }
 
-int pulse_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 pulse_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   if (number(1, 5) == 3)
     act("$n prances around like a fairy.", ch, 0, 0, TO_ROOM, 0);
   return ReturnValue::eSUCCESS;
 }
 
-int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 intrp_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2552,10 +2533,10 @@ int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vi
   return ReturnValue::eSUCCESS;
 }
 
-int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 intrp_song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2589,10 +2570,10 @@ int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Charac
 
   return ReturnValue::eSUCCESS;
 }
-int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 intrp_mking_charge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2619,9 +2600,9 @@ int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_glitter_dust(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You throw dust in the air and sing a wily ditty...");
   act("$n throws some dust in the air and sings a wily ditty...", ch, 0, 0, TO_ROOM, 0);
@@ -2635,24 +2616,24 @@ int song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_glitter_dust(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   affected_type af;
   affected_type af2;
 
   af.type = SKILL_GLITTER_DUST;
   af.duration = (ch->getLevel() > 25) ? 2 : 1;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_GLITTER_DUST;
   af.bitvector = -1;
-  af.caster = GET_NAME(ch);
+  af.caster = qPrintable(ch->name());
 
   af2.type = SKILL_GLITTER_DUST;
   af2.duration = (ch->getLevel() > 25) ? 2 : 1;
   af2.modifier = 10 + ch->has_skill(SKILL_SONG_GLITTER_DUST) / 3;
   af2.location = APPLY_AC;
   af2.bitvector = -1;
-  af2.caster = GET_NAME(ch);
+  af2.caster = qPrintable(ch->name());
 
   act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("Your dust clings to everyone, showing where they are!");
@@ -2670,7 +2651,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
     // prevent stacking
     if (IS_AFFECTED(victim, AFF_GLITTER_DUST))
     {
-      csendf(ch, "%s is already covered in glitter.\r\n", GET_SHORT(victim));
+      ch->send(QStringLiteral("%s is already covered in glitter.\r\n").arg(qPrintable(victim->shortdesc_or_name())));
       continue;
     }
 
@@ -2680,11 +2661,11 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
     bool post_see = CAN_SEE(ch, victim);
     if (!pre_see && post_see)
     {
-      csendf(ch, "Your glitter reveals %s.\r\n", GET_SHORT(victim));
+      ch->send(QStringLiteral("Your glitter reveals %s.\r\n").arg(qPrintable(victim->shortdesc_or_name())));
     }
   }
 
-  Object *item;
+  ObjectPtr item;
   for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
   {
     if (GET_ITEM_TYPE(item) == ITEM_BEACON && isSet(item->obj_flags.extra_flags, ITEM_INVISIBLE))
@@ -2697,9 +2678,9 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-int song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_bountiful_sonnet(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin long restoring sonnet...");
   act("$n begins a long restorous sonnet...", ch, 0, 0, TO_ROOM, 0);
@@ -2713,10 +2694,10 @@ int song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *vi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_bountiful_sonnet(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ch->master->in_room == ch->in_room && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2753,11 +2734,11 @@ int execute_song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *target = nullptr;
+  CharacterPtr target = {};
   // char buf[400];
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -2767,8 +2748,8 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
   target = ch->get_char_room_vis((*i).song_data);
 
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
 
   act("$n's dirge ends in a shriek.", ch, 0, 0, TO_ROOM, 0);
 
@@ -2786,7 +2767,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
   if (target->isPlayer())
   {
-    csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\r\n", GET_NAME(target), HSHR(target));
+    ch->send(QStringLiteral("%s is too strong willed for you to break any of %s loyalties.\r\n").arg(qPrintable(target->name())).arg(HSHR(target)));
     return ReturnValue::eFAILURE;
   }
   if (!target->affected_by_spell(SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
@@ -2794,7 +2775,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
     ch->sendln("As far as you can tell, they are not loyal to anyone.");
     return ReturnValue::eFAILURE;
   }
-  int type = 0;
+  qint32 type = {};
   if (DC::getInstance()->mob_index[target->mobdata->nr].vnum() == 8)
     type = 4;
   else if (IS_AFFECTED(target, AFF_FAMILIAR))
@@ -2811,7 +2792,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
     return attack(target, ch, TYPE_UNDEFINED);
   }
 
-  // int i;
+  // qint32 i;
   /*   for (i = 22394; i < 22399; i++)
    if (real_mobile(i) == target->mobdata->nr)
    {
@@ -2856,9 +2837,9 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin a wailing dirge...");
   act("$n begins to sing a wailing dirge...", ch, 0, 0, TO_ROOM, 0);
@@ -2873,14 +2854,14 @@ int song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *v
 
   // store the char name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
 
   return ReturnValue::eSUCCESS;
 }
 
-int song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin a strong chord...");
   act("$n begins to sound a chord...", ch, 0, 0, TO_ROOM, 0);
@@ -2895,16 +2876,16 @@ int song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *v
 
   // store the char name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *target = nullptr;
+  CharacterPtr target = {};
   char buf[400];
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -2914,8 +2895,8 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 
   target = ch->get_char_room_vis((*i).song_data);
 
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
 
   act("$n's song ends with an abrupt stop.", ch, 0, 0, TO_ROOM, 0);
 
@@ -2939,7 +2920,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
   auto new_hate = target->get_random_hate();
-  sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
+  sprintf(buf, "%s seems to hate... %s.\r\n", qPrintable(target->shortdesc_or_name()), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
   ch->send(buf);
 
   if (skill > 80)
@@ -2950,7 +2931,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is resistant to: %s\r\n", GET_SHORT(target), buf);
+    ch->send(QStringLiteral("%s is resistant to: %s\r\n").arg(qPrintable(target->shortdesc_or_name())).arg(buf));
   }
   if (skill > 85)
   {
@@ -2960,7 +2941,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is immune to: %s\r\n", GET_SHORT(target), buf);
+    ch->send(QStringLiteral("%s is immune to: %s\r\n").arg(qPrintable(target->shortdesc_or_name())).arg(buf));
   }
   if (skill > 90)
   {
@@ -2970,15 +2951,15 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is susceptible to: %s\r\n", GET_SHORT(target), buf);
+    ch->send(QStringLiteral("%s is susceptible to: %s\r\n").arg(qPrintable(target->shortdesc_or_name())).arg(buf));
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-int song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_sticky_lullaby(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin a slow numbing lullaby...");
   act("$n starts singing an eye-drooping lullaby.", ch, 0, 0, TO_ROOM, 0);
@@ -2993,14 +2974,14 @@ int song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *vict
 
   // store the char name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
-  (*i).song_data = str_dup(arg);
+  (*i).song_data = (arg);
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_sticky_lullaby(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -3015,13 +2996,13 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
     else
     {
       ch->sendln("You don't see that person here.");
-      dc_free((*i).song_data);
-      (*i).song_data = 0;
+      (*i).song_data = {};
+      (*i).song_data = {};
       return ReturnValue::eFAILURE;
     }
   }
-  dc_free((*i).song_data);
-  (*i).song_data = 0;
+  (*i).song_data = {};
+  (*i).song_data = {};
   if (number(1, 100) < get_saves(victim, SAVE_TYPE_POISON))
   {
     act("$N resists your sticky lullaby!", ch, nullptr, victim, TO_CHAR, 0);
@@ -3037,9 +3018,9 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int song_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing a fast nervous tune...");
   act("$n starts mumbling out a quick, nervous tune...", ch, 0, 0, TO_ROOM, 0);
@@ -3053,14 +3034,14 @@ int song_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *vict
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   if (GET_KI(ch) < 2) // we don't have the ki to keep the song going
   {
     return intrp_vigilant_siren(level, ch, arg, victim, -1);
   }
 
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -3072,26 +3053,26 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
 
   af1.type = SKILL_SONG_VIGILANT_SIREN;
   af1.duration = 1;
-  af1.modifier = 0;
-  af1.location = 0;
+  af1.modifier = {};
+  af1.location = {};
   af1.bitvector = AFF_ALERT;
-  af1.caster = GET_NAME(ch);
+  af1.caster = qPrintable(ch->name());
 
   af2.type = SKILL_SONG_VIGILANT_SIREN;
   af2.duration = 1;
-  af2.modifier = 0;
-  af2.location = 0;
+  af2.modifier = {};
+  af2.location = {};
   af2.bitvector = AFF_NO_CIRCLE;
-  af2.caster = GET_NAME(ch);
+  af2.caster = qPrintable(ch->name());
 
   af3.type = SKILL_SONG_VIGILANT_SIREN;
   af3.duration = 1;
-  af3.modifier = 0;
-  af3.location = 0;
+  af3.modifier = {};
+  af3.location = {};
   af3.bitvector = AFF_NO_BEHEAD;
-  af3.caster = GET_NAME(ch);
+  af3.caster = qPrintable(ch->name());
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -3120,7 +3101,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     (*i).song_timer = -1;
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -3133,17 +3114,17 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int pulse_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 pulse_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   if (number(1, 5) == 3)
     act("$n chatters a ditty about being alert and ever watchful.", ch, 0, 0, TO_ROOM, 0);
   return ReturnValue::eSUCCESS;
 }
 
-int intrp_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 intrp_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -3179,13 +3160,13 @@ int intrp_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *vic
   return ReturnValue::eSUCCESS;
 }
 
-void make_person_dance(Character *ch)
+void make_person_dance(CharacterPtr ch)
 {
-  char *dances[] = {"dance",                                         // 0
-                    "tango", "boogie", "jig", "waltz", "bellydance", // 5
-                    "\n"};
+  QStringList dances = {"dance",                                         // 0
+                        "tango", "boogie", "jig", "waltz", "bellydance", // 5
+                        "\n"};
 
-  int numdances = 5;
+  qint32 numdances = 5;
   char dothis[50];
 
   strcpy(dothis, dances[number(0, numdances)]);
@@ -3193,9 +3174,9 @@ void make_person_dance(Character *ch)
   ch->command_interpreter(dothis);
 }
 
-int song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_unresistable_ditty(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing an irresistable little ditty...");
   act("$n begins to sing, 'du du dudu du du dudu du du dudu!'", ch, 0, 0, TO_ROOM, 0);
@@ -3209,14 +3190,14 @@ int song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_unresistable_ditty(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *i;
+  CharacterPtr i;
 
   act("$n finishs $s song, 'Ahhhhh!  Macarena!'", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("Ahhh....such beautiful music.");
 
-  //   int specialization = skill / 100;
+  //   qint32 specialization = skill / 100;
   skill %= 100;
 
   for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
@@ -3241,9 +3222,9 @@ int execute_song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Cha
   return ReturnValue::eSUCCESS;
 }
 
-int song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_crushing_crescendo(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing, approaching crescendo!");
   act("$n begins to sing, raising the volume to deafening levels!", ch, 0, 0, TO_ROOM, 0);
@@ -3253,16 +3234,16 @@ int song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *
       break;
 
   (*i).song_timer = song_info[(*i).song_number].beats();
-  (*i).song_data = 0; // first round.
+  (*i).song_data = {}; // first round.
 
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  int dam = 0;
-  int retval;
-  std::vector<songInfo>::iterator i;
+  qint32 dam = {};
+  qint32 retval;
+  QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -3270,7 +3251,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
       break;
   }
 
-  // int specialization = skill / 100;
+  // qint32 specialization = skill / 100;
   skill %= 100;
 
   victim = ch->fighting;
@@ -3281,16 +3262,16 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
     return ReturnValue::eSUCCESS;
   }
 
-  int combat, non_combat;
+  qint32 combat, non_combat;
   get_instrument_bonus(ch, combat, non_combat);
 
-  int j;
+  qint32 j;
   dam = ((ch->has_skill(SKILL_SONG_CRUSHING_CRESCENDO)) + 25);
-  for (j = 0; j < (int64_t)(*i).song_data; j++)
+  for (j = {}; j < (qint64)(*i).song_data; j++)
     dam = dam * 2;
-  dam += combat * 5;                                      // Make it hurt some more.
-                                                          //   if ((int)(*i).song_data < 3) // Doesn't help beyond that.
-  (*i).song_data = (char *)((int64_t)(*i).song_data + 1); // Add one round.
+  dam += combat * 5;                                     // Make it hurt some more.
+                                                         //   if ((qint32)(*i).song_data < 3) // Doesn't help beyond that.
+  (*i).song_data = (char *)((qint64)(*i).song_data + 1); // Add one round.
   // Bleh, C allows easier pointer manipulation
   if (isSet(victim->immune, ISR_SONG))
   {
@@ -3309,7 +3290,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
     }
     char dmgmsg[MAX_STRING_LENGTH];
     sprintf(dmgmsg, "$B%d$R", dam);
-    switch ((int64_t)(*i).song_data)
+    switch ((qint64)(*i).song_data)
     {
     case 1:
       send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!",
@@ -3365,19 +3346,19 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
     return retval;
   }
 
-  if ((int64_t)(*i).song_data > ch->has_skill(SKILL_SONG_CRUSHING_CRESCENDO) / 20 || (int64_t)(*i).song_data > 3)
+  if ((qint64)(*i).song_data > ch->has_skill(SKILL_SONG_CRUSHING_CRESCENDO) / 20 || (qint64)(*i).song_data > 3)
   {
     ch->sendln("You run out of lyrics and end the song.");
     ch->songs.erase(i);
     return ReturnValue::eEXTRA_VALUE;
   }
 
-  if (((int64_t)(*i).song_data) != 3)
+  if (((qint64)(*i).song_data) != 3)
   {
     if (GET_KI(ch) < song_info[(*i).song_number].min_useski())
     {
       ch->sendln("Having run out of ki, your song ends abruptly.");
-      (*i).song_data = 0; // Reset, just in case.
+      (*i).song_data = {}; // Reset, just in case.
       return ReturnValue::eSUCCESS;
     }
     GET_KI(ch) -= song_info[(*i).song_number].min_useski();
@@ -3386,9 +3367,9 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
   return ReturnValue::eSUCCESS;
 }
 
-int song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 song_submariners_anthem(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  std::vector<songInfo>::iterator i;
+  QList<songInfo>::iterator i;
 
   ch->sendln("You begin to sing about the shining sea and her terrible ways...");
   act("$n sings a surly number about $s fickle mistress, the briny deep.", ch, 0, 0, TO_ROOM, 0);
@@ -3402,15 +3383,15 @@ int song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+qint32 execute_song_submariners_anthem(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  Character *master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
   affected_type af;
   af.type = SKILL_SONG_SUBMARINERS_ANTHEM;
   af.duration = 1 + (skill / 10);
-  af.modifier = 0;
-  af.caster = GET_NAME(ch);
+  af.modifier = {};
+  af.caster = qPrintable(ch->name());
   af.location = APPLY_NONE;
   af.bitvector = -1;
 

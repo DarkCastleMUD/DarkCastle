@@ -3,53 +3,51 @@
 #include <cstring>
 #include <cstdlib>
 
+#include "DC/comm.h"
 #include "DC/connect.h" // Connection
-#include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
-#include "DC/interp.h"
 #include "DC/DC.h"
-#include "DC/newedit.h"
-#include "DC/memory.h"
 
-#include <string>
+#include "DC/interp.h"
+#include "DC/newedit.h"
+#include "DC/structs.h"
+
+#include <QString>
 #include <fmt/format.h>
 
 // send_to_char("Write your note.  (/s saves /h for help)
-void new_edit_board_unlock_board(Character *ch, int abort);
-void format_text(char **ptr_string, int mode, class Connection *d, int maxlen);
-int replace_str(char **string, char *pattern, char *replacement, int rep_all, int max_size);
-void check_for_awaymsgs(Character *);
+void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort);
+void format_text(char **ptr_string, qint32 mode, class Connection *d, qint32 maxlen);
+qint32 replace_str(char **string, char *pattern, char *replacement, qint32 rep_all, qint32 max_size);
+void check_for_awaymsgs(CharacterPtr);
 
 /*  handle some editor commands */
 void parse_action(parse_t action, char *str, class Connection *d)
 {
-  int indent = 0, rep_all = 0, flags = 0, total_len, replaced;
-  int j = 0;
-  int i, line_low, line_high;
+  qint32 indent = 0, rep_all = 0, flags = 0, total_len, replaced;
+  qint32 j = {};
+  qint32 i, line_low, line_high;
   char *s, *t, temp, buf[32768], buf2[32768];
-  std::string sbuffer;
+  QString sbuffer;
 
   switch (action)
   {
   case parse_t::HELP:
-    sprintf(buf,
-            "Editor command formats: /<letter>\r\n\r\n"
-            "/a         -  aborts editor\r\n"
-            "/c         -  clears buffer\r\n"
-            "/d#        -  deletes a line #\r\n"
-            "/e# <text> -  changes the line at # with <text>\r\n"
-            "/f         -  formats text\r\n"
-            "/fi        -  indented formatting of text\r\n"
-            "/h         -  list text editor commands\r\n"
-            "/i# <text> -  inserts <text> before line #\r\n"
-            "/l         -  lists buffer\r\n"
-            "/n         -  lists buffer with line numbers\r\n"
-            "/r 'a' 'b' -  replace 1st occurance of text <a> in buffer with text <b>\r\n"
-            "/ra 'a' 'b'-  replace all occurances of text <a> within buffer with text <b>\r\n"
-            "              usage: /r[a] 'pattern' 'replacement'\r\n"
-            "/s         -  saves text\r\n");
-    SEND_TO_Q(buf, d);
+    sprintf(buf, "Editor command formats: /<letter>\r\n\r\n"
+                 "/a         -  aborts editor\r\n"
+                 "/c         -  clears buffer\r\n"
+                 "/d#        -  deletes a line #\r\n"
+                 "/e# <text> -  changes the line at # with <text>\r\n"
+                 "/f         -  formats text\r\n"
+                 "/fi        -  indented formatting of text\r\n"
+                 "/h         -  list text editor commands\r\n"
+                 "/i# <text> -  inserts <text> before line #\r\n"
+                 "/l         -  lists buffer\r\n"
+                 "/n         -  lists buffer with line numbers\r\n"
+                 "/r 'a' 'b' -  replace 1st occurance of text <a> in buffer with text <b>\r\n"
+                 "/ra 'a' 'b'-  replace all occurances of text <a> within buffer with text <b>\r\n"
+                 "              usage: /r[a] 'pattern' 'replacement'\r\n"
+                 "/s         -  saves text\r\n");
+    write_to_output(buf, d);
     break;
   case parse_t::FORMAT:
     while (isalpha(str[j]) && j < 2)
@@ -68,9 +66,9 @@ void parse_action(parse_t action, char *str, class Connection *d)
       }
       j++;
     }
-    format_text(d->strnew, flags, d, d->max_str);
+    format_text(conn->strnew, flags, d, conn->max_str);
     sprintf(buf, "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
-    SEND_TO_Q(buf, d);
+    write_to_output(buf, d);
     break;
   case parse_t::REPLACE:
     while (isalpha(str[j]) && j < 2)
@@ -91,57 +89,57 @@ void parse_action(parse_t action, char *str, class Connection *d)
     s = strtok(str, "'");
     if (s == nullptr)
     {
-      SEND_TO_Q("Invalid format.\r\n", d);
+      write_to_output("Invalid format.\r\n", d);
       return;
     }
     s = strtok(nullptr, "'");
     if (s == nullptr)
     {
-      SEND_TO_Q("Target std::string must be enclosed in single quotes.\r\n", d);
+      write_to_output("Target QString must be enclosed in single quotes.\r\n", d);
       return;
     }
     t = strtok(nullptr, "'");
     if (t == nullptr)
     {
-      SEND_TO_Q("No replacement std::string.\r\n", d);
+      write_to_output("No replacement QString.\r\n", d);
       return;
     }
     t = strtok(nullptr, "'");
     if (t == nullptr)
     {
-      SEND_TO_Q("Replacement std::string must be enclosed in single quotes.\r\n", d);
+      write_to_output("Replacement QString must be enclosed in single quotes.\r\n", d);
       return;
     }
-    total_len = ((strlen(t) - strlen(s)) + strlen(*d->strnew));
-    //  sprintf(buf, "ORG: '%s'(%d), NEW: '%s'(%d), OTOT: %d, NTOT: %d\r\n", t, strlen(t), s, strlen(s), strlen(*d->strnew), total_lenth);
-    //    SEND_TO_Q(buf, d);
-    if (total_len < d->max_str)
+    total_len = ((strlen(t) - strlen(s)) + strlen(*conn->strnew));
+    //  sprintf(buf, "ORG: '%s'(%d), NEW: '%s'(%d), OTOT: %d, NTOT: %d\r\n", t, strlen(t), s, strlen(s), strlen(*conn->strnew), total_lenth);
+    //    write_to_output(buf, d);
+    if (total_len < conn->max_str)
     {
-      if ((replaced = replace_str(d->strnew, s, t, rep_all, d->max_str)) > 0)
+      if ((replaced = replace_str(conn->strnew, s, t, rep_all, conn->max_str)) > 0)
       {
         sprintf(buf, "Replaced %d occurance%sof '%s' with '%s'.\r\n", replaced, ((replaced != 1) ? "s " : " "), s, t);
-        SEND_TO_Q(buf, d);
+        write_to_output(buf, d);
       }
       else if (replaced == 0)
       {
         sprintf(buf, "String '%s' not found.\r\n", s);
-        SEND_TO_Q(buf, d);
+        write_to_output(buf, d);
       }
       else
       {
-        SEND_TO_Q("ERROR: Replacement std::string causes buffer overflow, aborted replace.\r\n", d);
+        write_to_output("ERROR: Replacement QString causes buffer overflow, aborted replace.\r\n", d);
       }
     }
     else
     {
-      SEND_TO_Q("Not enough space left in buffer.\r\n", d);
+      write_to_output("Not enough space left in buffer.\r\n", d);
     }
     break;
   case parse_t::DELETE:
     switch (sscanf(str, " %d - %d ", &line_low, &line_high))
     {
     case 0:
-      SEND_TO_Q("You must specify a line number or range to delete.\r\n", d);
+      write_to_output("You must specify a line number or range to delete.\r\n", d);
       return;
     case 1:
       line_high = line_low;
@@ -149,7 +147,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
     case 2:
       if (line_high < line_low)
       {
-        SEND_TO_Q("That range is invalid.\r\n", d);
+        write_to_output("That range is invalid.\r\n", d);
         return;
       }
       break;
@@ -157,9 +155,9 @@ void parse_action(parse_t action, char *str, class Connection *d)
 
     i = 1;
     total_len = 1;
-    if ((s = *d->strnew) == nullptr)
+    if ((s = *conn->strnew) == nullptr)
     {
-      SEND_TO_Q("Buffer is empty.\r\n", d);
+      write_to_output("Buffer is empty.\r\n", d);
       return;
     }
     if (line_low > 0)
@@ -172,7 +170,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
         }
       if ((i < line_low) || (s == nullptr))
       {
-        SEND_TO_Q("Line(s) out of range; not deleting.\r\n", d);
+        write_to_output("Line(s) out of range; not deleting.\r\n", d);
         return;
       }
 
@@ -193,14 +191,15 @@ void parse_action(parse_t action, char *str, class Connection *d)
       else
         total_len--;
       *t = '\0';
-      RECREATE(*d->strnew, char, strlen(*d->strnew) + 3);
+      // TODO rework strnew system
+      // RECREATE(*conn->strnew, char, strlen(*conn->strnew) + 3);
       sprintf(buf, "%d line%sdeleted.\r\n", total_len,
               ((total_len != 1) ? "s " : " "));
-      SEND_TO_Q(buf, d);
+      write_to_output(buf, d);
     }
     else
     {
-      SEND_TO_Q("Invalid line numbers to delete must be higher than 0.\r\n", d);
+      write_to_output("Invalid line numbers to must be higher than 0.\r\n", d) = {};
       return;
     }
     break;
@@ -227,12 +226,12 @@ void parse_action(parse_t action, char *str, class Connection *d)
 
     if (line_low < 1)
     {
-      SEND_TO_Q("Line numbers must be greater than 0.\r\n", d);
+      write_to_output("Line numbers must be greater than 0.\r\n", d);
       return;
     }
     if (line_high < line_low)
     {
-      SEND_TO_Q("That range is invalid.\r\n", d);
+      write_to_output("That range is invalid.\r\n", d);
       return;
     }
     *buf = '\0';
@@ -241,8 +240,8 @@ void parse_action(parse_t action, char *str, class Connection *d)
       sprintf(buf, "Current buffer range [%d - %d]:\r\n", line_low, line_high);
     }
     i = 1;
-    total_len = 0;
-    s = *d->strnew;
+    total_len = {};
+    s = *conn->strnew;
     while (s && (i < line_low))
       if ((s = strchr(s, '\n')) != nullptr)
       {
@@ -251,7 +250,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
       }
     if ((i < line_low) || (s == nullptr))
     {
-      SEND_TO_Q("Line(s) out of range; no buffer listing.\r\n", d);
+      write_to_output("Line(s) out of range; no buffer listing.\r\n", d);
       return;
     }
 
@@ -277,7 +276,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
           ((total_len != 1)?"s ":" "));
      */
     // page_string(d, buf, true);
-    SEND_TO_Q(buf, d);
+    write_to_output(buf, d);
     break;
   case parse_t::LIST_NUM:
     /* note: my buf,buf1,buf2 vars are defined at 32k sizes so they
@@ -302,18 +301,18 @@ void parse_action(parse_t action, char *str, class Connection *d)
 
     if (line_low < 1)
     {
-      SEND_TO_Q("Line numbers must be greater than 0.\r\n", d);
+      write_to_output("Line numbers must be greater than 0.\r\n", d);
       return;
     }
     if (line_high < line_low)
     {
-      SEND_TO_Q("That range is invalid.\r\n", d);
+      write_to_output("That range is invalid.\r\n", d);
       return;
     }
     *buf = '\0';
     i = 1;
-    total_len = 0;
-    s = *d->strnew;
+    total_len = {};
+    s = *conn->strnew;
     while (s && (i < line_low))
       if ((s = strchr(s, '\n')) != nullptr)
       {
@@ -322,7 +321,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
       }
     if ((i < line_low) || (s == nullptr))
     {
-      SEND_TO_Q("Line(s) out of range; no buffer listing.\r\n", d);
+      write_to_output("Line(s) out of range; no buffer listing.\r\n", d);
       return;
     }
 
@@ -335,9 +334,9 @@ void parse_action(parse_t action, char *str, class Connection *d)
         s++;
         temp = *s;
         *s = '\0';
-        sbuffer = fmt::format("{}{:4}: ", buf, (i - 1));
-        strncpy(buf, sbuffer.c_str(), sizeof(buf) - 1);
-        buf[sizeof(buf) - 1] = 0;
+        sbuffer = QStringLiteral("%1%2: ").arg(buf).arg(i - 1, 4);
+        strncpy(buf, qPrintable(sbuffer), sizeof(buf) - 1);
+        buf[sizeof(buf) - 1] = {};
         strncat(buf, t, 32768 - strlen(buf) - 1);
         *s = temp;
         t = s;
@@ -356,14 +355,14 @@ void parse_action(parse_t action, char *str, class Connection *d)
           ((total_len != 1)?"s ":" "));
      */
     // page_string(d, buf, true);
-    SEND_TO_Q(buf, d);
+    write_to_output(buf, d);
     break;
 
   case parse_t::INSERT:
     half_chop(str, buf, buf2);
     if (*buf == '\0')
     {
-      SEND_TO_Q("You must specify a line number before which to insert text.\r\n", d);
+      write_to_output("You must specify a line number before which to insert text.\r\n", d);
       return;
     }
     line_low = atoi(buf);
@@ -371,9 +370,9 @@ void parse_action(parse_t action, char *str, class Connection *d)
 
     i = 1;
     *buf = '\0';
-    if ((s = *d->strnew) == nullptr)
+    if ((s = *conn->strnew) == nullptr)
     {
-      SEND_TO_Q("Buffer is empty, nowhere to insert.\r\n", d);
+      write_to_output("Buffer is empty, nowhere to insert.\r\n", d);
       return;
     }
     if (line_low > 0)
@@ -386,30 +385,31 @@ void parse_action(parse_t action, char *str, class Connection *d)
         }
       if ((i < line_low) || (s == nullptr))
       {
-        SEND_TO_Q("Line number out of range; insert aborted.\r\n", d);
+        write_to_output("Line number out of range; insert aborted.\r\n", d);
         return;
       }
       temp = *s;
       *s = '\0';
-      if ((int)((strlen(*d->strnew) + strlen(buf2) + strlen(s + 1) + 3)) > d->max_str)
+      if ((qint32)((strlen(*conn->strnew) + strlen(buf2) + strlen(s + 1) + 3)) > conn->max_str)
       {
         *s = temp;
-        SEND_TO_Q("Insert text pushes buffer over maximum size, insert aborted.\r\n", d);
+        write_to_output("Insert text pushes buffer over maximum size, insert aborted.\r\n", d);
         return;
       }
-      if (*d->strnew && (**d->strnew != '\0'))
-        strncat(buf, *d->strnew, 32768 - strlen(buf) - 1);
+      if (*conn->strnew && (**conn->strnew != '\0'))
+        strncat(buf, *conn->strnew, 32768 - strlen(buf) - 1);
       *s = temp;
       strncat(buf, buf2, 32768 - strlen(buf) - 1);
       if (s && (*s != '\0'))
         strncat(buf, s, 32768 - strlen(buf) - 1);
-      RECREATE(*d->strnew, char, strlen(buf) + 3);
-      strcpy(*d->strnew, buf);
-      SEND_TO_Q("Line inserted.\r\n", d);
+      // TODO rework strnew system
+      // RECREATE(*conn->strnew, char, strlen(buf) + 3);
+      strcpy(*conn->strnew, buf);
+      write_to_output("Line inserted.\r\n", d);
     }
     else
     {
-      SEND_TO_Q("Line number must be higher than 0.\r\n", d);
+      write_to_output("Line number must be higher than 0.\r\n", d);
       return;
     }
     break;
@@ -418,7 +418,7 @@ void parse_action(parse_t action, char *str, class Connection *d)
     half_chop(str, buf, buf2);
     if (*buf == '\0')
     {
-      SEND_TO_Q("You must specify a line number at which to change text.\r\n", d);
+      write_to_output("You must specify a line number at which to change text.\r\n", d);
       return;
     }
     line_low = atoi(buf);
@@ -426,9 +426,9 @@ void parse_action(parse_t action, char *str, class Connection *d)
 
     i = 1;
     *buf = '\0';
-    if ((s = *d->strnew) == nullptr)
+    if ((s = *conn->strnew) == nullptr)
     {
-      SEND_TO_Q("Buffer is empty, nothing to change.\r\n", d);
+      write_to_output("Buffer is empty, nothing to change.\r\n", d);
       return;
     }
     if (line_low > 0)
@@ -443,18 +443,18 @@ void parse_action(parse_t action, char *str, class Connection *d)
       /* make sure that there was a THAT line in the text */
       if ((i < line_low) || (s == nullptr))
       {
-        SEND_TO_Q("Line number out of range; change aborted.\r\n", d);
+        write_to_output("Line number out of range; change aborted.\r\n", d);
         return;
       }
-      /* if s is the same as *d->strnew that means im at the beginning of the
+      /* if s is the same as *conn->strnew that means im at the beginning of the
        * message text and i dont need to put that into the changed buffer */
-      if (s != *d->strnew)
+      if (s != *conn->strnew)
       {
         /* first things first .. we get this part into buf. */
         temp = *s;
         *s = '\0';
         /* put the first 'good' half of the text into storage */
-        strncat(buf, *d->strnew, 32768 - strlen(buf) - 1);
+        strncat(buf, *conn->strnew, 32768 - strlen(buf) - 1);
         *s = temp;
       }
       /* put the new 'good' line into place. */
@@ -469,46 +469,47 @@ void parse_action(parse_t action, char *str, class Connection *d)
         strncat(buf, s, 32768 - strlen(buf) - 1);
       }
       /* check for buffer overflow */
-      if ((int)strlen(buf) > d->max_str)
+      if ((qint32)strlen(buf) > conn->max_str)
       {
-        SEND_TO_Q("Change causes new length to exceed buffer maximum size, aborted.\r\n", d);
+        write_to_output("Change causes new length to exceed buffer maximum size, aborted.\r\n", d);
         return;
       }
       /* change the size of the REAL buffer to fit the new text */
-      RECREATE(*d->strnew, char, strlen(buf) + 3);
-      strcpy(*d->strnew, buf);
-      SEND_TO_Q("Line changed.\r\n", d);
+      // TODO rework strnew system
+      // RECREATE(*conn->strnew, char, strlen(buf) + 3);
+      strcpy(*conn->strnew, buf);
+      write_to_output("Line changed.\r\n", d);
     }
     else
     {
-      SEND_TO_Q("Line number must be higher than 0.\r\n", d);
+      write_to_output("Line number must be higher than 0.\r\n", d);
       return;
     }
     break;
   default:
-    SEND_TO_Q("Invalid option.\r\n", d);
+    write_to_output("Invalid option.\r\n", d);
     logentry(QStringLiteral("SYSERR: invalid command passed to parse_action"), OVERSEER, DC::LogChannel::LOG_MISC);
     return;
   }
 }
 
-/* std::string manipulation fucntion originally by Darren Wilson */
+/* QString manipulation fucntion originally by Darren Wilson */
 /* (wilson@shark.cc.cc.ca.us) improved and bug fixed by Chris (zero@cnw.com) */
 /* completely re-written again by M. Scott 10/15/96 (scottm@workcommn.net), */
-/* substitute appearances of 'pattern' with 'replacement' in std::string */
+/* substitute appearances of 'pattern' with 'replacement' in QString */
 /* and return the # of replacements */
-int replace_str(char **string, char *pattern, char *replacement, int rep_all,
-                int max_size)
+qint32 replace_str(char **string, char *pattern, char *replacement, qint32 rep_all,
+                   qint32 max_size)
 {
-  char *replace_buffer = nullptr;
+  char *replace_buffer = {};
   char *flow, *jetsam, temp;
-  int len, i;
+  qint32 len, i;
 
-  if ((int)(strlen(*string) - strlen(pattern)) + (int)strlen(replacement) > max_size)
+  if ((qint32)(strlen(*string) - strlen(pattern)) + (qint32)strlen(replacement) > max_size)
     return -1;
 
-  CREATE(replace_buffer, char, max_size);
-  i = 0;
+  replace_buffer = new char[max_size];
+  i = {};
   jetsam = *string;
   flow = *string;
   *replace_buffer = '\0';
@@ -519,7 +520,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
       i++;
       temp = *flow;
       *flow = '\0';
-      if ((int)(strlen(replace_buffer) + (int)strlen(jetsam) + (int)strlen(replacement)) > max_size)
+      if ((qint32)(strlen(replace_buffer) + (qint32)strlen(jetsam) + (qint32)strlen(replacement)) > max_size)
       {
         i = -1;
         break;
@@ -549,7 +550,8 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
     return 0;
   if (i > 0)
   {
-    RECREATE(*string, char, strlen(replace_buffer) + 3);
+    // TODO rework strnew system
+    // RECREATE(*string, char, strlen(replace_buffer) + 3);
     strcpy(*string, replace_buffer);
   }
   free(replace_buffer);
@@ -557,11 +559,11 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
 }
 
 /* re-formats message type formatted char * */
-/* (for strings edited with d->strnew) (mostly olc and mail)     */
-void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
+/* (for strings edited with conn->strnew) (mostly olc and mail)     */
+void format_text(char **ptr_string, qint32 mode, class Connection *d, qint32 maxlen)
 {
-  int total_chars, cap_next = true, cap_next_next = false;
-  char *flow, *start = nullptr, temp;
+  qint32 total_chars, cap_next = true, cap_next_next = false;
+  char *flow, *start = {}, temp;
   /* warning: do not edit messages with max_str's of over this value */
   char formated[MAX_STRING_LENGTH];
 
@@ -577,7 +579,7 @@ void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
   else
   {
     *formated = '\0';
-    total_chars = 0;
+    total_chars = {};
   }
 
   while (*flow != '\0')
@@ -625,7 +627,7 @@ void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
       if ((total_chars + strlen(start) + 1) > 79)
       {
         strcat(formated, "\r\n");
-        total_chars = 0;
+        total_chars = {};
       }
 
       if (!cap_next)
@@ -639,7 +641,7 @@ void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
       else
       {
         cap_next = false;
-        *start = UPPER(*start);
+        *start = QChar(*start).toUpper().toLatin1();
       }
 
       total_chars += strlen(start);
@@ -653,7 +655,7 @@ void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
       if ((total_chars + 3) > 79)
       {
         strcat(formated, "\r\n");
-        total_chars = 0;
+        total_chars = {};
       }
       else
       {
@@ -664,26 +666,27 @@ void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
   }
   strcat(formated, "\r\n");
 
-  if ((int)strlen(formated) > maxlen)
+  if ((qint32)strlen(formated) > maxlen)
     formated[maxlen] = '\0';
-  RECREATE(*ptr_string, char, MIN(maxlen, (int)strlen(formated) + 3));
+  // TODO rework strnew system
+  // RECREATE(*ptr_string, char, MIN(maxlen, (qint32)strlen(formated) + 3));
   strcpy(*ptr_string, formated);
 }
 
 void new_string_add(class Connection *d, char *str)
 {
   // char *scan;
-  int terminator = 0, action = 0;
-  Character *ch = d->character;
-  int i = 2, j = 0;
+  qint32 terminator = 0, action = {};
+  CharacterPtr ch = conn->character;
+  qint32 i = 2, j = {};
   char actions[MAX_INPUT_LENGTH];
 
-  int a = 0;
+  qint32 a = {};
   while (str[a] != '\0')
   {
     if (str[a++] == '~')
     {
-      SEND_TO_Q("Cannot add tildes.\r\n", d);
+      write_to_output("Cannot add tildes.\r\n", d);
       return;
     }
   }
@@ -711,13 +714,13 @@ void new_string_add(class Connection *d, char *str)
       terminator = 2; /* working on an abort message */
       break;
     case 'c':
-      if (*(d->strnew))
+      if (*(conn->strnew))
       {
-        *(d->strnew) = nullptr;
-        SEND_TO_Q("Current buffer cleared.\r\n", d);
+        *(conn->strnew) = {};
+        write_to_output("Current buffer cleared.\r\n", d);
       }
       else
-        SEND_TO_Q("Current buffer empty.\r\n", d);
+        write_to_output("Current buffer empty.\r\n", d);
       break;
     case 'd':
       parse_action(parse_t::DELETE, actions, d);
@@ -726,31 +729,31 @@ void new_string_add(class Connection *d, char *str)
       parse_action(parse_t::EDIT, actions, d);
       break;
     case 'f':
-      if (*(d->strnew))
+      if (*(conn->strnew))
         parse_action(parse_t::FORMAT, actions, d);
       else
-        SEND_TO_Q("Current buffer empty.\r\n", d);
+        write_to_output("Current buffer empty.\r\n", d);
       break;
     case 'i':
-      if (*(d->strnew))
+      if (*(conn->strnew))
         parse_action(parse_t::INSERT, actions, d);
       else
-        SEND_TO_Q("Current buffer empty.\r\n", d);
+        write_to_output("Current buffer empty.\r\n", d);
       break;
     case 'h':
       parse_action(parse_t::HELP, actions, d);
       break;
     case 'l':
-      if (*d->strnew)
+      if (*conn->strnew)
         parse_action(parse_t::LIST_NORM, actions, d);
       else
-        SEND_TO_Q("Current buffer empty.\r\n", d);
+        write_to_output("Current buffer empty.\r\n", d);
       break;
     case 'n':
-      if (*d->strnew)
+      if (*conn->strnew)
         parse_action(parse_t::LIST_NUM, actions, d);
       else
-        SEND_TO_Q("Current buffer empty.\r\n", d);
+        write_to_output("Current buffer empty.\r\n", d);
       break;
     case 'r':
       parse_action(parse_t::REPLACE, actions, d);
@@ -760,114 +763,117 @@ void new_string_add(class Connection *d, char *str)
       *str = '\0';
       break;
     default:
-      SEND_TO_Q("Invalid option.\r\n", d);
+      write_to_output("Invalid option.\r\n", d);
       break;
     }
   }
 
-  if (!(*d->strnew))
+  if (!(*conn->strnew))
   {
-    if ((int)strlen(str) > d->max_str)
+    if ((qint32)strlen(str) > conn->max_str)
     {
-      SEND_TO_Q("String too long - Truncated.\r\n", d);
-      *(str + d->max_str) = '\0';
+      write_to_output("String too long - Truncated.\r\n", d);
+      *(str + conn->max_str) = '\0';
     }
-    CREATE(*d->strnew, char, strlen(str) + 5);
-    strcpy(*d->strnew, str);
+    // TODO rework strnew system
+    //*conn->strnew = new char[strlen(str) + 5];
+    strcpy(*conn->strnew, str);
   }
   else
   {
-    if ((int)(strlen(str) + strlen(*d->strnew)) > d->max_str)
+    if ((qint32)(strlen(str) + strlen(*conn->strnew)) > conn->max_str)
     {
       if (!action)
-        SEND_TO_Q("String too long, limit reached on message.  Last line ignored.\r\n", d);
+        write_to_output("String too long, limit reached on message.  Last line ignored.\r\n", d);
     }
     else
     {
-      if (!(*d->strnew = (char *)dc_realloc(*d->strnew, strlen(*d->strnew) + strlen(str) + 5)))
+      if (!(*conn->strnew = *conn->strnew = new char[strlen(*conn->strnew) + strlen(str) + 5]))
       {
         perror("string_add");
         abort();
       }
-      strcat(*d->strnew, str);
+      strcat(*conn->strnew, str);
     }
   }
 
   bool ishashed(char *arg);
   if (terminator)
   {
-    if (terminator == 2 || *(d->strnew) == nullptr)
+    if (terminator == 2 || *(conn->strnew) == nullptr)
     {
-      if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew))
-        dc_free(*d->strnew);
-      if (d->backstr)
+      if ((conn->strnew) && (*conn->strnew) && (**conn->strnew == '\0') && !ishashed(*conn->strnew))
+        *conn->strnew = {};
+      if (!conn->backstr.isEmpty())
       {
-        *d->strnew = d->backstr;
+        // TODO rework strnew system
+        //  *conn->qstrnew = conn->backstr;
       }
       else
       {
-        //         *d->strnew = nullptr;
-        *d->strnew = strdup("");
+        //         *conn->strnew = {};
+        // TODO rework strnew system
+        //*conn->qstrnew = "";
       }
-      d->backstr = nullptr;
-      d->strnew = nullptr;
-      if (d->connected == Connection::states::WRITE_BOARD)
+      conn->backstr = {};
+      conn->strnew = {};
+      if (conn->connected == Connection::states::WRITE_BOARD)
       {
-        if (d->character)
+        if (conn->character)
         {
-          d->connected = Connection::states::PLAYING;
+          conn->connected = Connection::states::PLAYING;
         }
-        new_edit_board_unlock_board(d->character, 1);
+        new_edit_board_unlock_board(conn->character, 1);
       }
       else
       {
-        if (d->connected != Connection::states::EXDSCR)
-          d->connected = Connection::states::PLAYING;
+        if (conn->connected != Connection::states::EXDSCR)
+          conn->connected = Connection::states::PLAYING;
       }
       ch->sendln("Aborted.");
-      if (d->connected == Connection::states::EXDSCR)
+      if (conn->connected == Connection::states::EXDSCR)
       {
-        STATE(d) = Connection::states::SELECT_MENU;
-        SEND_TO_Q(menu, d);
+        conn->connected = Connection::states::SELECT_MENU;
+        write_to_output(DC::getInstance()->menu, d);
       }
       else
         check_for_awaymsgs(ch);
     }
     else
     {
-      if (strlen(*d->strnew) == 0)
+      if (strlen(*conn->strnew) == 0)
       {
-        SEND_TO_Q("You can't save blank messages, try /a for abort.\r\n", d);
+        write_to_output("You can't save blank messages, try /a for abort.\r\n", d);
       }
       else
       {
-        if (STATE(d) == Connection::states::EXDSCR)
-          d->character->save_char_obj();
-        if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
-          dc_free(*d->strnew);
-        d->backstr = nullptr;
-        d->strnew = nullptr;
-        if (d->connected == Connection::states::WRITE_BOARD)
+        if (conn->connected == Connection::states::EXDSCR)
+          conn->character->save_char_obj();
+        if ((conn->strnew) && (*conn->strnew) && (**conn->strnew == '\0') && !ishashed(*conn->strnew) && conn->connected)
+          *conn->strnew = {};
+        conn->backstr = {};
+        conn->strnew = {};
+        if (conn->connected == Connection::states::WRITE_BOARD)
         {
-          if (d->character)
+          if (conn->character)
           {
-            d->connected = Connection::states::PLAYING;
+            conn->connected = Connection::states::PLAYING;
           }
-          new_edit_board_unlock_board(d->character, 0);
+          new_edit_board_unlock_board(conn->character, 0);
         }
         else
         {
           ch->sendln("Ok.");
 
-          if (d->connected != Connection::states::EXDSCR)
+          if (conn->connected != Connection::states::EXDSCR)
           {
-            d->connected = Connection::states::PLAYING;
+            conn->connected = Connection::states::PLAYING;
             check_for_awaymsgs(ch);
           }
           else
           {
-            STATE(d) = Connection::states::SELECT_MENU;
-            SEND_TO_Q(menu, d);
+            conn->connected = Connection::states::SELECT_MENU;
+            write_to_output(DC::getInstance()->menu, d);
           }
         }
       }
@@ -875,9 +881,9 @@ void new_string_add(class Connection *d, char *str)
   }
   else
   {
-    if (!action && !((int)(strlen(str) + strlen(*d->strnew) + 2) > d->max_str))
+    if (!action && !((qint32)(strlen(str) + strlen(*conn->strnew) + 2) > conn->max_str))
     {
-      strcat(*d->strnew, "\r\n");
+      strcat(*conn->strnew, "\r\n");
     }
   }
 }

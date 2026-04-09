@@ -2,27 +2,18 @@
 | cl_mage.C
 | Description:  Commands for the mage class.
 */
-#include <cstring>
-
+#include "DC/DC.h"
 #include "DC/spells.h"
-#include "DC/obj.h"
 #include "DC/structs.h"
-#include "DC/player.h"
-#include "DC/character.h"
-#include "DC/utility.h"
+
 #include "DC/fight.h"
-#include "DC/mobile.h"
-#include "DC/connect.h"
-#include "DC/handler.h"
+
 #include "DC/act.h"
 #include "DC/interp.h"
-#include "DC/returnvals.h"
-#include "DC/room.h"
-#include "DC/db.h"
 
-int spellcraft(Character *ch, int spell)
+qint32 spellcraft(CharacterPtr ch, qint32 spell)
 {
-  int a = ch->has_skill(SKILL_SPELLCRAFT);
+  qint32 a = ch->has_skill(SKILL_SPELLCRAFT);
   if (!a)
     return false;
   if (ch->has_skill(spell) < 71)
@@ -91,11 +82,11 @@ int spellcraft(Character *ch, int spell)
   return false;
 }
 
-int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
+qint32 do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  // uint8_t percent;
+  // quint8 percent;
   affected_type af;
-  int duration = 40;
+  qint32 duration = 40;
 
   if (!ch->canPerform(SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n"))
   {
@@ -129,8 +120,8 @@ int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
 
   af.type = SKILL_FOCUSED_REPELANCE;
   af.duration = duration;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
@@ -138,12 +129,12 @@ int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_imbue(Character *ch, char *argument, cmd_t cmd)
+qint32 do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int lvl = ch->has_skill(SKILL_IMBUE);
-  int charges = 0, manacost = 0;
-  Object *wand;
+  qint32 lvl = ch->has_skill(SKILL_IMBUE);
+  qint32 charges = 0, manacost = {};
+  ObjectPtr wand;
   affected_type af;
 
   *buf = '\0';
@@ -177,10 +168,10 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   if (!(wand = get_obj_in_list_vis(ch, buf, ch->carrying)))
   {
     wand = ch->equipment[WEAR_HOLD];
-    if ((wand == 0) || !isexact(buf, wand->Name()))
+    if ((wand == 0) || !isexact(buf, wand->name()))
     {
       wand = ch->equipment[WEAR_HOLD2];
-      if ((wand == 0) || !isexact(buf, wand->Name()))
+      if ((wand == 0) || !isexact(buf, wand->name()))
       {
         ch->sendln("You do not have that wand.");
         return ReturnValue::eFAILURE;
@@ -219,8 +210,8 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
 
   af.type = SKILL_IMBUE;
   af.duration = 2;
-  af.modifier = 0;
-  af.location = 0;
+  af.modifier = {};
+  af.location = {};
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
@@ -274,7 +265,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
     wand->obj_flags.value[2] -= charges;
     if (wand->obj_flags.value[2] <= 0)
     {
-      wand->obj_flags.value[2] = 0;
+      wand->obj_flags.value[2] = {};
       act("The energy in $p has been completely lost!", ch, wand, 0, TO_CHAR, 0);
     }
     else
@@ -289,11 +280,11 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
 // Remember that ch is the person triggering the call, meaning they are actually the victim
 // ReturnValue::eSUCCESS means the character is unaffected and can keep doing whatever.
 // ReturnValue::eFAILURE means the character was interrupted
-int check_ethereal_focus(Character *ch, int trigger_type)
+qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
 {
-  Character *i, *next_i, *ally, *next_ally;
+  CharacterPtr i, next_i, ally, next_ally;
   char buf[MAX_STRING_LENGTH];
-  int retval;
+  qint32 retval;
 
   // Moving, and act() calls both happen a lot, so we want to get out of here as fast as possible if
   // we can.  We do this by checking if the room has a flag or not
@@ -329,7 +320,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         IS_AFFECTED(i, AFF_PARALYSIS) ||
         (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
     {
-      sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
+      sprintf(buf, "I see you %s but I can't do anything about it!", qPrintable(ch->shortdesc_or_name()));
       do_say(i, buf);
       break;
     }
@@ -340,7 +331,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     }
     else
     {
-      sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
+      sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? qPrintable(ch->shortdesc_or_name()) : qPrintable(ch->name()));
       do_say(i, buf);
       set_fighting(i, ch);
       set_fighting(ch, i);
@@ -380,7 +371,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         if (trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL)
         {
           // Get um!
-          sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
+          sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? qPrintable(ch->shortdesc_or_name()) : qPrintable(ch->name()));
           do_say(ally, buf);
           set_fighting(ally, ch);
           set_fighting(ch, ally);

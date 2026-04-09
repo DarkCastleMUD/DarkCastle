@@ -9,11 +9,13 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
-#include "DC/character.h"
-#include "DC/db.h"     // get_mob_room_vis
+#include "DC/DC.h"
+#include "DC/comm.h"
+#include "DC/handler.h"
 #include "DC/spells.h" // INTERNAL_SLEEPING
 #include "DC/act.h"    // TO_ROOM
 #include "DC/punish.h"
+#include "DC/utility.h"
 
 auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 {
@@ -55,13 +57,13 @@ auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
   return ReturnValue::eSUCCESS;
 }
 
-auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
+auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
 {
   char buf[256];
-  int send_to = DC::NOWHERE;
+  qint32 send_to = DC::NOWHERE;
   affected_type *af, *next_af;
-  int pot_low = 6362;
-  int pot_hi = 6379;
+  qint32 pot_low = 6362;
+  qint32 pot_hi = 6379;
 
   auto &arena = DC::getInstance()->arena_;
   if (arena.Low() > ch->getLevel() || arena.High() < ch->getLevel())
@@ -120,7 +122,7 @@ auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
   }
 
   /* remove combat-related bits */
-  ch->combat = 0;
+  ch->combat = {};
 
   ch->setMove(GET_MAX_MOVE(ch));
   GET_MANA(ch) = GET_MAX_MANA(ch);
@@ -142,7 +144,7 @@ auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
   if (move_char(ch, send_to) == 0)
     return ReturnValue::eFAILURE;
   act("$n appears, preparing for battle.", ch, 0, 0, TO_ROOM, 0);
-  sprintf(buf, "## %s has joined the bloodbath!\r\n", GET_SHORT(ch));
+  sprintf(buf, "## %s has joined the bloodbath!\r\n", qPrintable(ch->shortdesc_or_name()));
   send_info(buf);
   do_look(ch, "");
   return ReturnValue::eSUCCESS;

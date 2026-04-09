@@ -32,17 +32,18 @@
 #include <cstdlib>
 #include <cctype>
 
-#include <map>
-#include <string>
+#include <QMap>
+#include <QString>
 #include <algorithm>
 
 #include <fmt/format.h>
 #include <QString>
 
+#include "DC/levels.h"
 #include "DC/player.h"
-#include "DC/room.h"
+
 #include "DC/structs.h"
-#include "DC/utility.h"
+
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -50,19 +51,18 @@
 #include "DC/inventory.h"
 #include "DC/DC.h"
 #include "DC/Trace.h"
-#include "DC/memory.h"
 
 // Extern variables
 
-Character *rndm2;
+CharacterPtr rndm2;
 
-int activeProgs = 0; // loop protection
+qint32 activeProgs = {}; // loop protection
 
-Character *activeActor = nullptr;
-Character *activeRndm = nullptr;
-Character *activeTarget = nullptr;
-Object *activeObj = nullptr;
-void *activeVo = nullptr;
+CharacterPtr activeActor = {};
+CharacterPtr activeRndm = {};
+CharacterPtr activeTarget = {};
+ObjectPtr activeObj = {};
+void *activeVo = {};
 
 char *activeProg;
 char *activePos;
@@ -70,7 +70,7 @@ char *activeProgTmpBuf;
 // Global defined here
 
 bool MOBtrigger;
-mprog_throw_type *g_mprog_throw_list = 0; // holds all pending mprog throws
+mprog_throw_type *g_mprog_throw_list = {}; // holds all pending mprog throws
 
 SelfPurge::SelfPurge()
 {
@@ -86,13 +86,13 @@ SelfPurge::operator bool() const
   return state;
 }
 
-void SelfPurge::setOwner(Character *c, std::string m)
+void SelfPurge::setOwner(CharacterPtr c, QString m)
 {
   owner = c;
   function = m;
 }
 
-std::string SelfPurge::getFunction(void) const
+QString SelfPurge::getFunction(void) const
 {
   return function;
 }
@@ -104,40 +104,40 @@ bool SelfPurge::getState(void) const
 
 selfpurge_t selfpurge = {};
 
-int cIfs[256]; // for MPPAUSE
-int ifpos;
+qint32 cIfs[256]; // for MPPAUSE
+qint32 ifpos;
 
 // This 2 variables keep track of what command and line number a mprog script
 // is on for error logging purposes.
-int mprog_command_num = 0;
-int mprog_line_num = 0;
+qint32 mprog_command_num = {};
+qint32 mprog_line_num = {};
 
 /*
  * Local function prototypes
  */
 
-int mprog_veval(int64_t lhs, char *opr, int64_t rhs);
-int mprog_do_ifchck(char *ifchck, Character *mob,
-                    Character *actor, Object *obj,
-                    void *vo, Character *rndm);
+qint32 mprog_veval(qint64 lhs, char *opr, qint64 rhs);
+qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob,
+                       CharacterPtr actor, ObjectPtr obj,
+                       void *vo, CharacterPtr rndm);
 char *mprog_process_if(char *ifchck, char *com_list,
-                       Character *mob, Character *actor,
-                       Object *obj, void *vo,
-                       Character *rndm, mprog_throw_type *thrw = nullptr);
-void mprog_translate(char ch, char *t, Character *mob,
-                     Character *actor, Object *obj,
-                     void *vo, Character *rndm);
-int mprog_process_cmnd(char *cmnd, Character *mob,
-                       Character *actor, Object *obj,
-                       void *vo, Character *rndm);
+                       CharacterPtr mob, CharacterPtr actor,
+                       ObjectPtr obj, void *vo,
+                       CharacterPtr rndm, mprog_throw_type *thrw = {});
+void mprog_translate(char ch, char *t, CharacterPtr mob,
+                     CharacterPtr actor, ObjectPtr obj,
+                     void *vo, CharacterPtr rndm);
+qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob,
+                          CharacterPtr actor, ObjectPtr obj,
+                          void *vo, CharacterPtr rndm);
 
 /***************************************************************************
  * Local function code and brief comments.
  */
 
-/* Used to get sequential lines of a multi line std::string (separated by "\r\n")
+/* Used to get sequential lines of a multi line QString (separated by "\r\n")
  * Thus its like one_argument(), but a trifle different. It is deive
- * to the multi line std::string argument, and thus clist must not be shared.
+ * to the multi line QString argument, and thus clist must not be shared.
  */
 char *mprog_next_command(char *clist)
 {
@@ -168,7 +168,7 @@ char *mprog_next_command(char *clist)
 }
 
 /* These two functions do the basic evaluation of ifcheck operators.
- *  It is important to note that the std::string operations are not what
+ *  It is important to note that the QString operations are not what
  *  you probably expect.  Equality is exact and division is substring.
  *  remember that lhs has been stripped of leading space, but can
  *  still have trailing spaces so be careful when editing since:
@@ -212,7 +212,7 @@ bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
 }
 
 /*
-int mprog_veval( int lhs, char *opr, int rhs )
+qint32 mprog_veval( qint32 lhs, char *opr, qint32 rhs )
 {
 
   if ( !str_cmp( opr, "==" ) )
@@ -237,7 +237,7 @@ int mprog_veval( int lhs, char *opr, int rhs )
 
 }
 */
-int mprog_veval(int64_t lhs, char *opr, int64_t rhs)
+qint32 mprog_veval(qint64 lhs, char *opr, qint64 rhs)
 {
 
   if (!str_cmp(opr, "=="))
@@ -261,7 +261,7 @@ int mprog_veval(int64_t lhs, char *opr, int64_t rhs)
   return 0;
 }
 /*
-int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs )
+qint32 mprog_veval( quint64 lhs, char *opr, quint64 rhs )
 {
   if ( !str_cmp( opr, "==" ) )
         return ( lhs == rhs );
@@ -296,10 +296,10 @@ bool Character::isTank(void)
   return false;
 }
 
-void translate_value(char *leftptr, char *rightptr, int16_t **vali,
-                     uint32_t **valui, char ***valstr, int64_t **vali64, uint64_t **valui64, int8_t **valb,
-                     Character *mob, Character *actor, Object *obj, void *vo,
-                     Character *rndm, QString &valqstr)
+void translate_value(char *leftptr, char *rightptr, qint16 **vali,
+                     quint32 **valui, char ***valstr, qint64 **vali64, quint64 **valui64, qint8 **valb,
+                     CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo,
+                     CharacterPtr rndm, QString &valqstr)
 {
   /*
    $n.age
@@ -312,17 +312,17 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
    'hasskill' = right
    */
 
-  Character *target = nullptr;
-  Object *otarget = nullptr;
-  int rtarget = -1, ztarget = -1;
+  CharacterPtr target = {};
+  ObjectPtr otarget = {};
+  qint32 rtarget = -1, ztarget = -1;
   bool valset = false; // done like that to determine if value is set, since it can be 0
-  tempvariable *mobTempVar = nullptr;
+  tempvariable *mobTempVar = {};
   if (mob)
   {
     mobTempVar = mob->tempVariable;
   }
 
-  activeTarget = nullptr;
+  activeTarget = {};
   char *tmp, half[MAX_INPUT_LENGTH];
   half[0] = '\0';
   if ((tmp = strchr(leftptr, ',')) != nullptr)
@@ -348,9 +348,9 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 
     const auto &character_list = DC::getInstance()->character_list;
     auto result = find_if(character_list.begin(), character_list.end(),
-                          [&target, &left](Character *const &tmp)
+                          [&target, &left](CharacterPtr const &tmp)
                           {
-                            if (isexact(left, GET_NAME(tmp)))
+                            if (isexact(left, qPrintable(tmp->name())))
                             {
                               target = tmp;
                               return true;
@@ -367,9 +367,9 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 
     const auto &character_list = DC::getInstance()->character_list;
     auto result = find_if(character_list.begin(), character_list.end(),
-                          [&target, &left, &mob](Character *const &tmp)
+                          [&target, &left, &mob](CharacterPtr const &tmp)
                           {
-                            if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, GET_NAME(tmp)))
+                            if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, qPrintable(tmp->name())))
                             {
                               target = tmp;
                               return true;
@@ -383,10 +383,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
   else if (!str_prefix("mroom_", left))
   {
     left += 6;
-    Character *tmp;
+    CharacterPtr tmp;
     for (tmp = DC::getInstance()->world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
     {
-      if (isexact(left, GET_NAME(tmp)))
+      if (isexact(left, qPrintable(tmp->name())))
       {
         target = tmp;
         break;
@@ -409,13 +409,13 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
   else if (!str_prefix("ozone_", left))
   {
     left += 6;
-    Object *otmp;
-    int z = DC::getInstance()->world[mob->in_room].zone;
+    ObjectPtr otmp;
+    qint32 z = DC::getInstance()->world[mob->in_room].zone;
     for (otmp = DC::getInstance()->object_list; otmp; otmp = otmp->next)
     {
-      Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
+      ObjectPtr cmp = otmp->in_obj ? otmp->in_obj : otmp;
       if ((cmp->in_room != DC::NOWHERE && DC::getInstance()->world[cmp->in_room].zone == z) || (cmp->carried_by && DC::getInstance()->world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && DC::getInstance()->world[cmp->equipped_by->in_room].zone == z))
-        if (isexact(left, otmp->Name()))
+        if (isexact(left, otmp->name()))
         {
           otarget = otmp;
           break;
@@ -435,7 +435,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
   }
   else if (*left == '$')
   {
-    uint8_t number_of_dollar_signs = 1;
+    quint8 number_of_dollar_signs = 1;
     while (*(left + number_of_dollar_signs) == '$')
     {
       number_of_dollar_signs++;
@@ -457,13 +457,13 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       break;
 
     case 't':
-      target = (Character *)vo;
+      target = (CharacterPtr)vo;
       break;
     case 'o':
       otarget = obj;
       break;
     case 'p':
-      otarget = (Object *)vo;
+      otarget = (ObjectPtr)vo;
       break;
     case 'f':
       if (actor)
@@ -476,7 +476,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
     case 'v':
       char buf[MAX_STRING_LENGTH];
       buf[0] = '\0';
-      int i;
+      qint32 i;
       for (i = 2; *(left + i); i++)
       {
         if (*(left + i) == '[')
@@ -544,12 +544,13 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
   activeTarget = target;
   // target acquired. fucking boring code.
   // more boring code. FUCK.
-  int16_t *intval = nullptr;
-  uint32_t *uintval = nullptr;
-  char **stringval = nullptr;
-  int64_t *llval = nullptr;
-  uint64_t *ullval = nullptr;
-  int8_t *sbval = nullptr;
+  qint16 *intval = {};
+  quint32 *uintval = {};
+  char **stringval = {};
+  QString *qstringval = {};
+  qint64 *llval = {};
+  quint64 *ullval = {};
+  qint8 *sbval = {};
   bool tError = false;
 
   /*
@@ -636,7 +637,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else
       {
-        int16_t ageint = target->age().year;
+        qint16 ageint = target->age().year;
         intval = &ageint;
       }
     }
@@ -659,22 +660,22 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else if (otarget->carried_by)
       {
-        valqstr = otarget->carried_by->getName();
+        valqstr = otarget->carried_by->name();
       }
       else if (otarget->equipped_by)
       {
-        valqstr = otarget->equipped_by->getName();
+        valqstr = otarget->equipped_by->name();
       }
       else if (otarget->in_obj && otarget->in_obj->carried_by)
       {
-        valqstr = otarget->in_obj->carried_by->getName();
+        valqstr = otarget->in_obj->carried_by->name();
       }
       else if (otarget->in_obj && otarget->in_obj->equipped_by)
       {
-        valqstr = otarget->in_obj->equipped_by->getName();
+        valqstr = otarget->in_obj->equipped_by->name();
       }
       else
-        stringval = nullptr;
+        stringval = {};
     }
     else if (!str_cmp(right, "carryingitems"))
     {
@@ -682,7 +683,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else
       {
-        int16_t car = target->carry_items;
+        qint16 car = target->carry_items;
         intval = &car;
       }
     }
@@ -692,7 +693,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else
       {
-        int16_t car = target->carry_weight;
+        qint16 car = target->carry_weight;
         intval = &car;
       }
     }
@@ -729,7 +730,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else
       {
-        uintval = (uint32_t *)&otarget->obj_flags.cost;
+        uintval = (quint32 *)&otarget->obj_flags.cost;
       }
     }
     break;
@@ -848,7 +849,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else
       {
-        int skl = 0;
+        qint32 skl = {};
         if (*half == '\0' || (skl = atoi(half)) < 0)
         {
           logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
@@ -856,7 +857,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
                DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
           tError = true;
         }
-        int16_t sklint = target->has_skill(skl);
+        qint16 sklint = target->has_skill(skl);
         intval = &sklint;
       }
     }
@@ -865,14 +866,14 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        sbval = (int8_t *)(&target->height);
+        sbval = (qint8 *)(&target->height);
     }
     else if (!str_cmp(right, "hitpoints"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->hit;
+        uintval = (quint32 *)&target->hit;
     }
     else if (!str_cmp(right, "hitroll"))
     {
@@ -904,7 +905,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->immune;
+        uintval = (quint32 *)&target->immune;
     }
     else if (!str_cmp(right, "inroom"))
     {
@@ -912,14 +913,14 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else if (target)
       {
-        static uint32_t tmp;
-        tmp = (uint32_t)target->in_room;
+        static quint32 tmp;
+        tmp = (quint32)target->in_room;
         uintval = &tmp;
       }
       else
       {
-        static uint32_t tmp;
-        tmp = (uint32_t)otarget->in_room;
+        static quint32 tmp;
+        tmp = (quint32)otarget->in_room;
         uintval = &tmp;
       }
     }
@@ -928,7 +929,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        sbval = (int8_t *)&target->intel;
+        sbval = (qint8 *)&target->intel;
     }
     break;
   case 'l':
@@ -965,7 +966,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else
       {
-        uintval = (uint32_t *)&target->ki;
+        uintval = (quint32 *)&target->ki;
       }
     }
     break;
@@ -982,35 +983,35 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->mana;
+        uintval = (quint32 *)&target->mana;
     }
     else if (!str_cmp(right, "maxhitpoints"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->max_hit;
+        uintval = (quint32 *)&target->max_hit;
     }
     else if (!str_cmp(right, "maxmana"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->max_mana;
+        uintval = (quint32 *)&target->max_mana;
     }
     else if (!str_cmp(right, "maxmove"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->max_move;
+        uintval = (quint32 *)&target->max_move;
     }
     else if (!str_cmp(right, "maxki"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->max_ki;
+        uintval = (quint32 *)&target->max_ki;
     }
     else if (!str_cmp(right, "meleemit"))
     {
@@ -1040,7 +1041,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)target->getMovePtr();
+        uintval = (quint32 *)target->getMovePtr();
     }
     break;
   case 'n':
@@ -1057,7 +1058,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       }
       else
       {
-        valqstr = target->getName();
+        valqstr = target->name();
       }
     }
     break;
@@ -1083,14 +1084,14 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        intval = (int16_t *)target->getPositionPtr();
+        intval = (qint16 *)target->getPositionPtr();
     }
     else if (!str_cmp(right, "practices"))
     {
       if (!target || !target->player)
         tError = true;
       else
-        intval = (int16_t *)&target->player->practices;
+        intval = (qint16 *)&target->player->practices;
     }
     break;
   case 'q':
@@ -1143,28 +1144,28 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->raw_hit;
+        uintval = (quint32 *)&target->raw_hit;
     }
     else if (!str_cmp(right, "rawmana"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->raw_mana;
+        uintval = (quint32 *)&target->raw_mana;
     }
     else if (!str_cmp(right, "rawmove"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->raw_move;
+        uintval = (quint32 *)&target->raw_move;
     }
     else if (!str_cmp(right, "rawki"))
     {
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->raw_ki;
+        uintval = (quint32 *)&target->raw_ki;
     }
     else if (!str_cmp(right, "resist"))
     {
@@ -1188,7 +1189,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         tError = true;
       else
       {
-        intval = (int16_t *)&otarget->obj_flags.size;
+        intval = (qint16 *)&otarget->obj_flags.size;
       }
     }
     else if (!str_cmp(right, "short"))
@@ -1214,7 +1215,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        uintval = (uint32_t *)&target->spelldamage;
+        uintval = (quint32 *)&target->spelldamage;
     }
     else if (!str_cmp(right, "spellmit"))
     {
@@ -1255,14 +1256,14 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!target)
         tError = true;
       else
-        stringval = &target->title;
+        qstringval = &target->title;
     }
     else if (!str_cmp(right, "type"))
     {
       if (!otarget)
         tError = true;
       else
-        sbval = (int8_t *)&otarget->obj_flags.type_flag;
+        sbval = (qint8 *)&otarget->obj_flags.type_flag;
     }
     else if (!str_cmp(right, "thirst"))
     {
@@ -1280,28 +1281,28 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
       if (!otarget)
         tError = true;
       else
-        uintval = (uint32_t *)&otarget->obj_flags.value[0];
+        uintval = (quint32 *)&otarget->obj_flags.value[0];
     }
     else if (!str_cmp(right, "value1"))
     {
       if (!otarget)
         tError = true;
       else
-        uintval = (uint32_t *)&otarget->obj_flags.value[1];
+        uintval = (quint32 *)&otarget->obj_flags.value[1];
     }
     else if (!str_cmp(right, "value2"))
     {
       if (!otarget)
         tError = true;
       else
-        uintval = (uint32_t *)&otarget->obj_flags.value[2];
+        uintval = (quint32 *)&otarget->obj_flags.value[2];
     }
     else if (!str_cmp(right, "value3"))
     {
       if (!otarget)
         tError = true;
       else
-        uintval = (uint32_t *)&otarget->obj_flags.value[3];
+        uintval = (quint32 *)&otarget->obj_flags.value[3];
     }
     break;
   case 'w':
@@ -1324,7 +1325,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
         intval = &otarget->obj_flags.weight;
       }
       else
-        sbval = (int8_t *)&target->weight;
+        sbval = (qint8 *)&target->weight;
     }
     else if (!str_cmp(right, "wisdom"))
     {
@@ -1370,8 +1371,6 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
     *valui64 = ullval;
   if (sbval)
     *valb = sbval;
-
-  return;
 }
 
 /* This function performs the evaluation of the if checks.  It is
@@ -1386,11 +1385,11 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
  */
 
 // Azrack -- this was originally returning a bool, but its returning all sorts of values,
-// switched it to int
+// switched it to qint32
 
 enum mprog_ifs
 {
-  eRAND = 1, // start this at 1, std::map returns 0 if not found
+  eRAND = 1, // start this at 1, QMap returns 0 if not found
   eRAND1K,
   eAMTITEMS,
   eNUMPCS,
@@ -1429,9 +1428,9 @@ enum mprog_ifs
 
 };
 
-std::map<std::string, mprog_ifs> load_ifchecks()
+QMap<QString, mprog_ifs> load_ifchecks()
 {
-  std::map<std::string, mprog_ifs> ifcheck_tmp;
+  QMap<QString, mprog_ifs> ifcheck_tmp;
 
   ifcheck_tmp["rand"] = eRAND;
   ifcheck_tmp["rand1k"] = eRAND1K;
@@ -1478,10 +1477,10 @@ std::map<std::string, mprog_ifs> load_ifchecks()
   return ifcheck_tmp;
 }
 
-std::map<std::string, mprog_ifs> ifcheck = load_ifchecks();
+QMap<QString, mprog_ifs> ifcheck = load_ifchecks();
 
-int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
-                    Object *obj, void *vo, Character *rndm)
+qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
+                       ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -1489,8 +1488,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   char opr[MAX_INPUT_LENGTH];
   char val[MAX_INPUT_LENGTH];
   char val2[MAX_INPUT_LENGTH]; // used for non-traditional
-  Character *vict = (Character *)vo;
-  Object *v_obj = (Object *)vo;
+  CharacterPtr vict = (CharacterPtr)vo;
+  ObjectPtr v_obj = (ObjectPtr)vo;
   char *bufpt = buf;
   char *argpt = arg;
   char *oprpt = opr;
@@ -1615,14 +1614,14 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
    *  send the lhs,opr,rhs off to be evaluated.
    */
 
-  Character *fvict = nullptr;
+  CharacterPtr fvict = {};
   bool ye = false;
   if (arg[0] == '$' && arg[1] == 'v')
   {
     tempvariable *eh = mob->tempVariable;
     char buf1[MAX_STRING_LENGTH];
     buf1[0] = '\0';
-    int i;
+    qint32 i;
     for (i = 2; arg[i]; i++)
     {
       if (arg[i] == '[')
@@ -1638,7 +1637,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       if (eh->name == buf1)
         break;
     if (eh)
-      strcpy(arg, eh->data.toStdString().c_str());
+      strcpy(arg, qPrintable(eh->data));
   }
 
   if (!is_number(arg) && !(arg[0] == '$') && traditional)
@@ -1648,8 +1647,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   }
   if (!(arg[0] == '$') && is_number(arg) && traditional)
   {
-    Character *te;
-    int vnum = atoi(arg);
+    CharacterPtr te;
+    qint32 vnum = atoi(arg);
     for (te = DC::getInstance()->world[mob->in_room].people; te; te = te->next)
     {
       if (te->isPlayer())
@@ -1663,14 +1662,14 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     ye = true;
   }
 
-  int16_t *lvali = nullptr;
-  uint32_t *lvalui = nullptr;
-  char **lvalstr = nullptr;
+  qint16 *lvali = {};
+  quint32 *lvalui = {};
+  char **lvalstr = {};
   QString lvalqstr;
-  int64_t *lvali64 = nullptr;
-  uint64_t *lvalui64 = nullptr;
-  int8_t *lvalb = nullptr;
-  //  int type = 0;
+  qint64 *lvali64 = {};
+  quint64 *lvalui64 = {};
+  qint8 *lvalb = {};
+  //  qint32 type = {};
 
   if (!traditional)
     translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
@@ -1686,11 +1685,11 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     if (lvalui)
       return mprog_veval(*lvalui, opr, (uint)atoi(val));
     if (lvali64)
-      return mprog_veval((int)*lvali64, opr, atoi(val));
+      return mprog_veval((qint32)*lvali64, opr, atoi(val));
     if (lvalui64)
-      return mprog_veval((int)*lvalui64, opr, atoi(val));
+      return mprog_veval((qint32)*lvalui64, opr, atoi(val));
     if (lvalb)
-      return mprog_veval((int)*lvalb, opr, atoi(val));
+      return mprog_veval((qint32)*lvalb, opr, atoi(val));
     if (lvalstr)
       return mob->mprog_seval(*lvalstr, opr, val);
     if (!lvalqstr.isEmpty())
@@ -1698,20 +1697,20 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   }
   else
   {
-    int16_t *rvali = nullptr;
-    uint32_t *rvalui = nullptr;
-    char **rvalstr = nullptr;
+    qint16 *rvali = {};
+    quint32 *rvalui = {};
+    char **rvalstr = {};
     QString rvalqstr;
-    int64_t *rvali64 = nullptr;
-    uint64_t *rvalui64 = nullptr;
-    int8_t *rvalb = nullptr;
+    qint64 *rvali64 = {};
+    quint64 *rvalui64 = {};
+    qint8 *rvalb = {};
     translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalui64, &rvalb, mob, actor, obj, vo, rndm, rvalqstr);
-    int64_t rval = 0;
+    qint64 rval = {};
     if (rvalstr || rvali || rvalui || rvali64 || rvalui64 || rvalb)
     {
       if (rvalstr && lvalstr)
         return mob->mprog_seval(*lvalstr, opr, *rvalstr);
-      // The rest fit in an int64_t, so let's just use that.
+      // The rest fit in an qint64, so let's just use that.
       if (rvalstr)
         rval = atoi(*rvalstr);
       if (rvali)
@@ -1732,7 +1731,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       if (lvali64)
         return mprog_veval(*lvali64, opr, rval);
       if (lvalb)
-        return mprog_veval((int)*lvalb, opr, rval);
+        return mprog_veval((qint32)*lvalb, opr, rval);
     }
   }
 
@@ -1752,8 +1751,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eNUMPCS:
   {
-    Character *p;
-    int count = 0;
+    CharacterPtr p;
+    qint32 count = {};
     for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
       if (p->isPlayer())
         count++;
@@ -1763,12 +1762,12 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eNUMOFMOBSINWORLD:
   {
-    int target = atoi(arg);
-    int count = 0;
+    qint32 target = atoi(arg);
+    qint32 count = {};
 
     const auto &character_list = DC::getInstance()->character_list;
     count = std::count_if(character_list.begin(), character_list.end(),
-                          [&target](Character *vch)
+                          [&target](CharacterPtr vch)
                           {
                             if (vch->isNonPlayer() && vch->in_room != DC::NOWHERE && DC::getInstance()->mob_index[vch->mobdata->nr].vnum() == target)
                             {
@@ -1785,10 +1784,10 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   break;
   case eNUMOFOBJSINWORLD:
   {
-    int target = atoi(arg);
-    int count = 0;
+    qint32 target = atoi(arg);
+    qint32 count = {};
 
-    Object *p;
+    ObjectPtr p;
     for (p = DC::getInstance()->object_list; p; p = p->next)
     {
       if (DC::getInstance()->obj_index[p->item_number].vnum() == target)
@@ -1803,9 +1802,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eNUMOFMOBSINROOM:
   {
-    int target = atoi(arg);
-    Character *p;
-    int count = 0;
+    qint32 target = atoi(arg);
+    CharacterPtr p;
+    qint32 count = {};
     for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
       if (p->isNonPlayer() && DC::getInstance()->mob_index[p->mobdata->nr].vnum() == target)
         count++;
@@ -1825,7 +1824,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return 0;
     case 'z':
       if (mob->beacon)
-        return reinterpret_cast<Character *>(mob->beacon)->isNonPlayer();
+        return reinterpret_cast<CharacterPtr>(mob->beacon)->isNonPlayer();
       else
         return -1;
     case 'n':
@@ -1870,7 +1869,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return (mob->equipment[WEAR_WIELD]) ? 1 : 0;
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->equipment[WEAR_WIELD] ? 1 : 0;
+        return ((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD] ? 1 : 0;
       else
         return -1;
 
@@ -1918,8 +1917,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       else
         return 0;
     case 'z':
-      if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_WIELD])
-        return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+      if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD])
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
         return -1;
     case 'n':
@@ -1956,8 +1955,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       else
         return 0;
     case 'z':
-      if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+      if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD])
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
         return -1;
     case 'n':
@@ -1992,7 +1991,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return true;
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->isNonPlayer();
+        return ((CharacterPtr)mob->beacon)->isNonPlayer();
       else
         return false;
 
@@ -2029,7 +2028,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return IS_GOOD(mob);
     case 'z':
       if (mob->beacon)
-        return IS_GOOD(((Character *)mob->beacon));
+        return IS_GOOD(((CharacterPtr)mob->beacon));
       else
         return -1;
     case 'n':
@@ -2065,7 +2064,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return IS_NEUTRAL(mob);
     case 'z':
       if (mob->beacon)
-        return IS_NEUTRAL(((Character *)mob->beacon));
+        return IS_NEUTRAL(((CharacterPtr)mob->beacon));
       else
         return -1;
     case 'n':
@@ -2101,7 +2100,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return IS_EVIL(mob);
     case 'z':
       if (mob->beacon)
-        return IS_EVIL(((Character *)mob->beacon));
+        return IS_EVIL(((CharacterPtr)mob->beacon));
       else
         return -1;
     case 'n':
@@ -2127,7 +2126,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eISWORN:
   {
-    Object *o = nullptr;
+    ObjectPtr o = {};
     if (mob->mobdata->isObject())
     {
       o = mob->mobdata->getObject();
@@ -2140,7 +2139,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     {
     case 'z':
       if (mob->beacon)
-        return is_wearing(((Character *)mob->beacon), o);
+        return is_wearing(((CharacterPtr)mob->beacon), o);
       else
         return -1;
     case 'i':
@@ -2176,7 +2175,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     {
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->fighting ? 1 : 0;
+        return ((CharacterPtr)mob->beacon)->fighting ? 1 : 0;
       else
         return -1;
 
@@ -2212,7 +2211,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     {
     case 'z':
       if (mob->beacon)
-        return reinterpret_cast<Character *>(mob->beacon)->isTank();
+        return reinterpret_cast<CharacterPtr>(mob->beacon)->isTank();
       else
         return -1;
 
@@ -2250,7 +2249,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return (mob->getLevel() > IMMORTAL);
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->getLevel() > IMMORTAL;
+        return ((CharacterPtr)mob->beacon)->getLevel() > IMMORTAL;
       else
         return -1;
 
@@ -2287,7 +2286,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return IS_AFFECTED(mob, AFF_CHARM);
     case 'z':
       if (mob->beacon)
-        return IS_AFFECTED(((Character *)mob->beacon), AFF_CHARM);
+        return IS_AFFECTED(((CharacterPtr)mob->beacon), AFF_CHARM);
       else
         return -1;
 
@@ -2325,7 +2324,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return (mob->master != nullptr && mob->master->in_room == mob->in_room);
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->master && ((Character *)mob->beacon)->master->in_room == ((Character *)mob->beacon)->in_room;
+        return ((CharacterPtr)mob->beacon)->master && ((CharacterPtr)mob->beacon)->master->in_room == ((CharacterPtr)mob->beacon)->in_room;
       else
         return -1;
     case 'n':
@@ -2351,7 +2350,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eISSPELLED:
   {
-    int find_skill_num(char *name);
+    qint32 find_skill_num(char *name);
 
     if (!str_cmp(val, "fly")) // needs special check.. sigh..
     {
@@ -2367,7 +2366,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
         break;
       case 'z':
         if (mob->beacon)
-          if (IS_AFFECTED(((Character *)mob->beacon), AFF_FLYING))
+          if (IS_AFFECTED(((CharacterPtr)mob->beacon), AFF_FLYING))
             return true;
         break;
       case 'n': // actor
@@ -2403,41 +2402,41 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     }
 
     if (fvict)
-      return (int64_t)(fvict->affected_by_spell(find_skill_num(val)));
+      return (qint64)(fvict->affected_by_spell(find_skill_num(val)));
     if (ye)
       return false;
     switch (arg[1])
     {
     case 'i': // mob
-      return (int64_t)(mob->affected_by_spell(find_skill_num(val)));
+      return (qint64)(mob->affected_by_spell(find_skill_num(val)));
     case 'z':
       if (mob->beacon)
-        return (int64_t)((Character *)mob->beacon)->affected_by_spell((find_skill_num(val)));
+        return (qint64)((CharacterPtr)mob->beacon)->affected_by_spell((find_skill_num(val)));
       else
         return -1;
 
     case 'n': // actor
       if (actor)
-        return (int64_t)(actor->affected_by_spell(find_skill_num(val)));
+        return (qint64)(actor->affected_by_spell(find_skill_num(val)));
       else
         return -1;
     case 't': // vict
       if (vict)
-        return (int64_t)(vict->affected_by_spell(find_skill_num(val)));
+        return (qint64)(vict->affected_by_spell(find_skill_num(val)));
       else
         return -1;
     case 'r': // rand
       if (rndm)
-        return (int64_t)(rndm->affected_by_spell(find_skill_num(val)));
+        return (qint64)(rndm->affected_by_spell(find_skill_num(val)));
       return -1;
     case 'f':
       if (actor && actor->fighting)
-        return (int64_t)(actor->fighting->affected_by_spell(find_skill_num(val)));
+        return (qint64)(actor->fighting->affected_by_spell(find_skill_num(val)));
       else
         return -1;
     case 'g':
       if (mob && mob->fighting)
-        return (int64_t)(mob->fighting->affected_by_spell(find_skill_num(val)));
+        return (qint64)(mob->fighting->affected_by_spell(find_skill_num(val)));
       else
         return 0;
     default:
@@ -2460,7 +2459,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return (ISSET(mob->affected_by, atoi(val)));
     case 'z':
       if (mob->beacon)
-        return (ISSET(((Character *)mob->beacon)->affected_by, atoi(val)));
+        return (ISSET(((CharacterPtr)mob->beacon)->affected_by, atoi(val)));
       else
         return -1;
 
@@ -2488,7 +2487,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eHITPRCNT:
   {
-    int lhsvl, rhsvl;
+    qint32 lhsvl, rhsvl;
     if (fvict)
     {
       lhsvl = (fvict->hit * 100) / fvict->max_hit;
@@ -2506,7 +2505,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     case 'z':
       if (mob->beacon)
       {
-        lhsvl = (((Character *)mob->beacon)->hit * 100) / ((Character *)mob->beacon)->max_hit;
+        lhsvl = (((CharacterPtr)mob->beacon)->hit * 100) / ((CharacterPtr)mob->beacon)->max_hit;
         rhsvl = atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
@@ -2549,8 +2548,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eWEARS:
   {
-    class Object *obj = 0;
-    Character *take;
+    ObjectPtr obj = {};
+    CharacterPtr take;
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
 
@@ -2568,8 +2567,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       case 'z':
         if (!mob->beacon)
           return -1;
-        obj = search_char_for_item(((Character *)mob->beacon), real_object(atoi(valu)), true);
-        take = ((Character *)mob->beacon);
+        obj = search_char_for_item(((CharacterPtr)mob->beacon), real_object(atoi(valu)), true);
+        take = ((CharacterPtr)mob->beacon);
       case 'i': // mob
         obj = search_char_for_item(mob, real_object(atoi(valu)), true);
         take = mob;
@@ -2603,10 +2602,10 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return 1;
     else if (!str_cmp(bufeh, "take"))
     {
-      int i;
+      qint32 i;
       if (obj->carried_by)
         obj_from_char(obj);
-      for (i = 0; i < MAX_WEAR; i++)
+      for (i = {}; i < MAX_WEAR; i++)
         if (obj == take->equipment[i])
         {
           obj_from_char(take->unequip_char(i));
@@ -2620,8 +2619,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eCARRIES:
   {
-    class Object *obj = 0;
-    Character *take;
+    ObjectPtr obj = {};
+    CharacterPtr take;
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
     if (fvict)
@@ -2638,8 +2637,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       case 'z':
         if (!mob->beacon)
           return -1;
-        obj = search_char_for_item(((Character *)mob->beacon), real_object(atoi(valu)), false);
-        take = ((Character *)mob->beacon);
+        obj = search_char_for_item(((CharacterPtr)mob->beacon), real_object(atoi(valu)), false);
+        take = ((CharacterPtr)mob->beacon);
       case 'i': // mob
         obj = search_char_for_item(mob, real_object(atoi(valu)), false);
         take = mob;
@@ -2673,10 +2672,10 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return 1;
     else if (!str_cmp(bufeh, "take"))
     {
-      int i;
+      qint32 i;
       if (obj->carried_by)
         obj_from_char(obj);
-      for (i = 0; i < MAX_WEAR; i++)
+      for (i = {}; i < MAX_WEAR; i++)
         if (obj == take->equipment[i])
         {
           obj_from_char(take->unequip_char(i));
@@ -2690,7 +2689,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eNUMBER:
   {
-    int lhsvl, rhsvl;
+    qint32 lhsvl, rhsvl;
     if (fvict)
     {
       if (fvict->isPlayer())
@@ -2711,9 +2710,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     case 'z':
       if (mob->beacon)
       {
-        if (((Character *)mob->beacon)->isNonPlayer())
+        if (((CharacterPtr)mob->beacon)->isNonPlayer())
         {
-          lhsvl = DC::getInstance()->mob_index[((Character *)mob->beacon)->mobdata->nr].vnum();
+          lhsvl = DC::getInstance()->mob_index[((CharacterPtr)mob->beacon)->mobdata->nr].vnum();
           rhsvl = atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
@@ -2815,7 +2814,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
     case 'z':
       if (mob->beacon)
       {
-        return mob->mprog_seval(((Character *)mob->beacon)->getTemp(buf4), opr, val);
+        return mob->mprog_seval(((CharacterPtr)mob->beacon)->getTemp(buf4), opr, val);
       }
       else
         return -1;
@@ -2850,9 +2849,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   // search a room for a mob with vnum arg
   case eISMOBVNUMINROOM:
   {
-    int target = atoi(arg);
+    qint32 target = atoi(arg);
 
-    for (Character *vch = DC::getInstance()->world[mob->in_room].people;
+    for (CharacterPtr vch = DC::getInstance()->world[mob->in_room].people;
          vch;
          vch = vch->next_in_room)
     {
@@ -2868,9 +2867,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   // search a room for a obj with vnum arg
   case eISOBJVNUMINROOM:
   {
-    int target = atoi(arg);
+    qint32 target = atoi(arg);
 
-    for (Object *obj = DC::getInstance()->world[mob->in_room].contents;
+    for (ObjectPtr obj = DC::getInstance()->world[mob->in_room].contents;
          obj;
          obj = obj->next_content)
     {
@@ -2915,9 +2914,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   case eINSAMEZONE:
     if (fvict)
-      return (GET_ZONE(fvict) == GET_ZONE(mob));
+      return (DC::getInstance()->world[(fvict)->in_room].zone == DC::getInstance()->world[(mob)->in_room].zone);
     else if ((fvict = get_pc(arg)) != nullptr)
-      return (GET_ZONE(fvict) == GET_ZONE(mob));
+      return (DC::getInstance()->world[(fvict)->in_room].zone == DC::getInstance()->world[(mob)->in_room].zone);
 
     switch (arg[1])
     {
@@ -2925,13 +2924,13 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
       return 1; // always in the same zone as itself
     case 'n':
       if (actor)
-        return (GET_ZONE(actor) == GET_ZONE(mob));
+        return (DC::getInstance()->world[(actor)->in_room].zone == DC::getInstance()->world[(mob)->in_room].zone);
       else
         return -1;
     case 'r':
     case 't':
       if (vict)
-        return (GET_ZONE(vict) == GET_ZONE(mob));
+        return (DC::getInstance()->world[(vict)->in_room].zone == DC::getInstance()->world[(mob)->in_room].zone);
       else
         return -1;
     default:
@@ -3004,24 +3003,24 @@ char null[1];
 // It will hold ReturnValue::eCH_DIED if the mob died doing it's proc.  We need to
 // make sure this is not true when returning from an if check or the
 // mob's pointer is no longer valid
-int mprog_cur_result;
+qint32 mprog_cur_result;
 #define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
-char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
-                       Character *actor, Object *obj, void *vo,
-                       Character *rndm, mprog_throw_type *thrw)
+char *mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
+                       CharacterPtr actor, ObjectPtr obj, void *vo,
+                       CharacterPtr rndm, mprog_throw_type *thrw)
 {
 
   char buf[MAX_INPUT_LENGTH];
-  char *morebuf = 0;
-  char *cmnd = 0;
+  char *morebuf = {};
+  char *cmnd = {};
   bool loopdone = false;
   bool flag = false;
-  int legal;
+  qint32 legal;
 
   *null = '\0';
 
-  Character *ur = nullptr;
+  CharacterPtr ur = {};
   if (ur)
     ur->sendln("\r\nProg initiated.");
 
@@ -3036,7 +3035,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
         return null;
     }
     if (ur)
-      csendf(ur, "%d>%d\r\n", ifpos - 1, legal);
+      ur->send(QStringLiteral("%d>%d\r\n").arg(ifpos - 1).arg(legal));
   }
   else
   {
@@ -3045,9 +3044,9 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
     if (legal >= 1)
       flag = true;
     else if (legal < 0)
-      return nullptr;
+      return {};
     if (ur)
-      csendf(ur, "%d>-%d\r\n", thrw->cPos - 1, legal);
+      ur->send(QStringLiteral("%d>-%d\r\n").arg(thrw->cPos - 1).arg(legal));
   }
 
   while (loopdone == false) /*scan over any existing or statements */
@@ -3075,7 +3074,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
             return null;
         }
         if (ur)
-          csendf(ur, "%d<%d\r\n", ifpos - 1, legal);
+          ur->send(QStringLiteral("%d<%d\r\n").arg(ifpos - 1).arg(legal));
       }
       else
       {
@@ -3084,9 +3083,9 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
         if (legal == 1)
           flag = true;
         else if (legal < 0)
-          return nullptr;
+          return {};
         if (ur)
-          csendf(ur, "%d<-%d\r\n", thrw->cPos - 1, legal);
+          ur->send(QStringLiteral("%d<-%d\r\n").arg(thrw->cPos - 1).arg(legal));
       }
     }
     else
@@ -3116,7 +3115,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
         return com_list;
       if (!str_cmp(buf, "else"))
       {
-        int nest = 0;
+        qint32 nest = {};
         while (str_cmp(buf, "endif") || nest > 0)
         {
           if (!str_cmp(buf, "if"))
@@ -3204,7 +3203,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
     }
   else /*false ifcheck, find else and do existing commands or quit at endif*/
   {
-    int nest = 0;
+    qint32 nest = {};
     while (true)
     { // Fix here 13/4 2004. Nested ifs are now taken into account.
       if (!str_cmp(buf, "if"))
@@ -3294,7 +3293,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
     }
   }
 
-  return nullptr;
+  return {};
 }
 
 /* This routine handles the variables for command expansion.
@@ -3303,23 +3302,23 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
  * can be as creative as you want. The only catch is to check
  * that your variables exist before you use them. At the moment,
  * using $t when the secondary target refers to an object
- * i.e. >prog_act drops~<nl>if ispc($t)<nl>sigh<nl>endif<nl>~<nl>
+ * conn->e. >prog_act drops~<nl>if ispc($t)<nl>sigh<nl>endif<nl>~<nl>
  * probably makes the mud crash (vice versa as well) The cure
  * would be to change act() so that vo becomes vict & v_obj.
  * but this would require a lot of small changes all over the code.
  */
-void mprog_translate(char ch, char *t, Character *mob, Character *actor,
-                     Object *obj, void *vo, Character *rndm)
+void mprog_translate(char ch, char *t, CharacterPtr mob, CharacterPtr actor,
+                     ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
-  static char *he_she[] = {"it", "he", "she"};
-  static char *him_her[] = {"it", "him", "her"};
-  static char *his_her[] = {"its", "his", "her"};
-  Character *vict = (Character *)vo;
-  Object *v_obj = (Object *)vo;
+  static const QStringList he_she = {"it", "he", "she"};
+  static const QStringList him_her = {"it", "him", "her"};
+  static const QStringList his_her = {"its", "his", "her"};
+  CharacterPtr vict = (CharacterPtr)vo;
+  ObjectPtr v_obj = (ObjectPtr)vo;
 
   *t = '\0';
 
-  auto q = mob->getName();
+  auto q = mob->name();
   auto s = q.toStdString();
   auto mob_nameC = s.c_str();
 
@@ -3331,23 +3330,23 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
   case 'z':
     if (mob->beacon)
     {
-      one_argument(((Character *)mob->beacon)->getNameC(), t);
+      one_argument(qPrintable(((CharacterPtr)mob->beacon)->name()), t);
       break;
     }
     strcpy(t, "error");
     break;
   case 'Z':
     if (mob->beacon)
-      strcpy(t, ((Character *)mob->beacon)->short_desc);
+      strcpy(t, qPrintable(((CharacterPtr)mob->beacon)->short_description()));
     else
       strcpy(t, "error");
     break;
   case 'I':
-    strcpy(t, mob->short_desc);
+    strcpy(t, qPrintable(mob->short_description()));
     break;
   case 'x':
-    if (mob->beacon && ((Character *)mob->beacon)->fighting)
-      one_argument(((Character *)mob->beacon)->fighting->getNameC(), t);
+    if (mob->beacon && ((CharacterPtr)mob->beacon)->fighting)
+      one_argument(qPrintable(((CharacterPtr)mob->beacon)->fighting->name()), t);
     else
       strcpy(t, "error");
     *t = UPPER(*t);
@@ -3357,7 +3356,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     {
       // Mobs can see them no matter what.  Use "cansee()" if you don't want that
       //	   if ( CAN_SEE( mob,actor ) )
-      one_argument(actor->getNameC(), t);
+      one_argument(qPrintable(actor->name()), t);
       if (actor->isPlayer())
         *t = UPPER(*t);
     }
@@ -3372,7 +3371,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
           strcpy(t, actor->short_desc);
         else
         {
-          strcpy(t, actor->getNameC());
+          strcpy(t, qPrintable(actor->name()));
           strcat(t, " ");
           strcat(t, actor->title);
         }
@@ -3386,7 +3385,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     if (vict)
     {
       if (CAN_SEE(mob, vict))
-        one_argument(vict->getNameC(), t);
+        one_argument(qPrintable(vict->name()), t);
       if (vict->isPlayer())
         *t = UPPER(*t);
     }
@@ -3401,7 +3400,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
           strcpy(t, vict->short_desc);
         else
         {
-          strcpy(t, vict->getNameC());
+          strcpy(t, qPrintable(vict->name()));
           strcat(t, " ");
           strcat(t, vict->title);
         }
@@ -3415,7 +3414,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     if (actor && actor->fighting)
     {
       if (CAN_SEE(mob, actor->fighting))
-        one_argument(actor->fighting->getNameC(), t);
+        one_argument(actor->qPrintable(fighting->name()), t);
       if (actor->fighting->isPlayer())
         *t = UPPER(*t);
     }
@@ -3429,7 +3428,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
           strcpy(t, actor->fighting->short_desc);
         else
         {
-          strcpy(t, actor->fighting->getNameC());
+          strcpy(t, actor->qPrintable(fighting->name()));
           strcat(t, " ");
           strcat(t, actor->fighting->title);
         }
@@ -3440,7 +3439,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     if (mob && mob->fighting)
     {
       if (CAN_SEE(mob, mob->fighting))
-        one_argument(mob->fighting->getNameC(), t);
+        one_argument(mob->qPrintable(fighting->name()), t);
       if (mob->fighting->isPlayer())
         *t = UPPER(*t);
     }
@@ -3454,7 +3453,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
           strcpy(t, mob->fighting->short_desc);
         else
         {
-          strcpy(t, mob->fighting->getNameC());
+          strcpy(t, mob->qPrintable(fighting->name()));
           strcat(t, " ");
           strcat(t, mob->fighting->title);
         }
@@ -3465,7 +3464,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     if (rndm)
     {
       if (CAN_SEE(mob, rndm))
-        one_argument(rndm->getNameC(), t);
+        one_argument(qPrintable(rndm->name()), t);
       if (rndm->isPlayer())
         *t = UPPER(*t);
     }
@@ -3482,7 +3481,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
         }
         else
         {
-          strcpy(t, rndm->getNameC());
+          strcpy(t, qPrintable(rndm->name()));
           strcat(t, " ");
           strcat(t, rndm->title);
         }
@@ -3566,19 +3565,19 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
   case 'o':
     if (obj)
-      CAN_SEE_OBJ(mob, obj) ? strcpy(t, qPrintable(obj->Name().split(' ').value(0)))
+      CAN_SEE_OBJ(mob, obj) ? strcpy(t, qPrintable(obj->name().split(' ').value(0)))
                             : strcpy(t, "something");
     break;
 
   case 'O':
     if (obj)
-      CAN_SEE_OBJ(mob, obj) ? strcpy(t, obj->short_description)
+      CAN_SEE_OBJ(mob, obj) ? strcpy(t, qPrintable(obj->short_description()))
                             : strcpy(t, "something");
     break;
 
   case 'p':
     if (v_obj)
-      CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, qPrintable(v_obj->Name().split(' ').value(0)))
+      CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, qPrintable(v_obj->name().split(' ').value(0)))
                               : strcpy(t, "something");
     break;
 
@@ -3590,7 +3589,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
   case 'a':
     if (obj)
-      switch (*qPrintable(obj->Name()))
+      switch (*qPrintable(obj->name()))
       {
       case 'a':
       case 'e':
@@ -3606,7 +3605,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
   case 'A':
     if (v_obj)
-      switch (*(qPrintable(v_obj->Name())))
+      switch (*(qPrintable(v_obj->name())))
       {
       case 'a':
       case 'e':
@@ -3628,8 +3627,6 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad $$var : %c", DC::getInstance()->mob_index[mob->mobdata->nr].vnum(), ch);
     break;
   }
-
-  return;
 }
 
 bool do_bufs(char *bufpt, char *argpt, char *point)
@@ -3690,8 +3687,8 @@ void debugpoint() {};
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
  */
-int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
-                       Object *obj, void *vo, Character *rndm)
+qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor,
+                          ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   char buf[MAX_INPUT_LENGTH * 2];
   char tmp[MAX_INPUT_LENGTH * 2];
@@ -3709,11 +3706,11 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
            if ((*str == '=' || *str == '+' || *str == '-' || *str == '&' || *str == '|' ||
                   *str == '*' || *str == '/') && *(str+1) == '=' && *(str+2) != '\0')
            {
-            int16_t *lvali = 0;
-            uint32_t *lvalui = 0;
-            char **lvalstr = 0;
-            int64_t *lvali64 = 0;
-            int8_t *lvalb = 0;
+            qint16 *lvali = {};
+            quint32 *lvalui = {};
+            char **lvalstr = {};
+            qint64 *lvali64 = {};
+            qint8 *lvalb = {};
             *str = '\0';
             if (do_bufs(&buf[0], &tmp[0], cmnd))
                   translate_value(buf, tmp, &lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
@@ -3759,13 +3756,13 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
       break; // panic!
     if (*(str + 1) == '.')
     {
-      int16_t *lvali = 0;
-      uint32_t *lvalui = 0;
-      char **lvalstr = 0;
+      qint16 *lvali = {};
+      quint32 *lvalui = {};
+      char **lvalstr = {};
       QString lvalqstr;
-      int64_t *lvali64 = 0;
-      uint64_t *lvalui64 = 0;
-      int8_t *lvalb = 0;
+      qint64 *lvali64 = {};
+      quint64 *lvalui64 = {};
+      qint8 *lvalb = {};
       char left[MAX_INPUT_LENGTH], right[MAX_INPUT_LENGTH];
       left[0] = '$';
       left[1] = *str;
@@ -3786,7 +3783,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
         sprintf(buf, "%lu", *lvalui64);
       if (lvalb)
         sprintf(buf, "%d", *lvalb);
-      for (int i = 0; buf[i]; i++)
+      for (qint32 i = {}; buf[i]; i++)
         *point++ = buf[i];
       continue;
     }
@@ -3802,13 +3799,13 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
         while (*str != ']' && *str != '\0')
           *tmp1++ = *str++;
         *tmp1 = '\0';
-        Character *who = nullptr;
+        CharacterPtr who = {};
         if (a == 'v')
           who = mob;
         else if (a == 'V')
           who = actor;
         else if (a == 'w')
-          who = (Character *)vo;
+          who = (CharacterPtr)vo;
         else if (a == 'W')
           who = rndm;
         if (who)
@@ -3819,7 +3816,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
               break;
           if (eh)
           {
-            strcpy(tmp, eh->data.toStdString().c_str());
+            strcpy(tmp, qPrintable(eh->data));
             if (!eh->data.isEmpty())
               eh->data[0] = eh->data[0].toUpper();
           }
@@ -3838,14 +3835,14 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
   *point = '\0';
 
   //  if(strlen(buf) > MAX_INPUT_LENGTH-1)
-  //    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
+  //    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", qPrintable(mob->name()));
 
   return mob->command_interpreter(buf, true);
 }
 
-bool objExists(Object *obj)
+bool objExists(ObjectPtr obj)
 {
-  Object *tobj;
+  ObjectPtr tobj;
 
   for (tobj = DC::getInstance()->object_list; tobj; tobj = tobj->next)
     if (tobj == obj)
@@ -3860,21 +3857,21 @@ bool objExists(Object *obj)
  *  the command list and figuring out what to do. However, like all
  *  complex procedures, everything is farmed out to the other guys.
  */
-void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj, void *vo, mprog_throw_type *thrw, Character *rndm)
+void mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, mprog_throw_type *thrw, CharacterPtr rndm)
 {
   char tmpcmndlst[MAX_STRING_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   char *morebuf;
   char *command_list;
   char *cmnd;
-  // Character *rndm  = nullptr;
-  Character *vch = nullptr;
-  int count = 0;
+  // CharacterPtr rndm  = {};
+  CharacterPtr vch = {};
+  qint32 count = {};
   if (IS_AFFECTED(mob, AFF_CHARM))
     return;
   selfpurge = false;
   mprog_cur_result = ReturnValue::eSUCCESS;
-  mprog_line_num = 0;
+  mprog_line_num = {};
 
   activeProgs++;
   if (activeProgs > 20)
@@ -3884,15 +3881,15 @@ void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj,
     return;
   }
 
-  // int cIfs[256]; // for MPPAUSE
-  // int ifpos;
-  ifpos = 0;
-  memset(&cIfs[0], 0, sizeof(int) * 256);
+  // qint32 cIfs[256]; // for MPPAUSE
+  // qint32 ifpos;
+  ifpos = {};
+  memset(&cIfs[0], 0, sizeof(qint32) * 256);
 
   if (!charExists(actor))
-    actor = nullptr;
+    actor = {};
   if (!objExists(obj))
-    obj = nullptr;
+    obj = {};
 
   activeActor = actor;
   activeObj = obj;
@@ -3902,9 +3899,9 @@ void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj,
 
   if (!com_list) // this can happen when someone is editing
   {
-    activeActor = activeRndm = nullptr;
-    activeObj = nullptr;
-    activeVo = nullptr;
+    activeActor = activeRndm = {};
+    activeObj = {};
+    activeVo = {};
     activeProgs--;
     return;
   }
@@ -3952,9 +3949,9 @@ void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj,
                                                   actor, obj, vo, rndm, thrw);
       if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
       {
-        activeActor = activeRndm = nullptr;
-        activeObj = nullptr;
-        activeVo = nullptr;
+        activeActor = activeRndm = {};
+        activeObj = {};
+        activeVo = {};
         activeProgs--;
         return;
       }
@@ -3967,9 +3964,9 @@ void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj,
         SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
         if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || selfpurge || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
         {
-          activeActor = activeRndm = nullptr;
-          activeObj = nullptr;
-          activeVo = nullptr;
+          activeActor = activeRndm = {};
+          activeObj = {};
+          activeVo = {};
           activeProgs--;
           return;
         }
@@ -3978,11 +3975,10 @@ void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj,
     cmnd = command_list;
     activePos = command_list = mprog_next_command(command_list);
   }
-  activeActor = activeRndm = nullptr;
-  activeObj = nullptr;
-  activeVo = nullptr;
+  activeActor = activeRndm = {};
+  activeObj = {};
+  activeVo = {};
   activeProgs--;
-  return;
 }
 
 /***************************************************************************
@@ -3995,23 +3991,23 @@ void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj,
  */
 // Returns true if match
 // false if no match
-int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
-                         Object *obj, void *vo, int type, bool reverse)
-// reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
+qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
+                            ObjectPtr obj, void *vo, qint32 type, bool reverse)
+// reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE WEAR_WIELD WORD
 {
 
-  char temp1[MAX_STRING_LENGTH]{};
-  char temp2[MAX_STRING_LENGTH]{};
-  char word[MAX_INPUT_LENGTH]{};
-  mob_prog_data *mprg{};
-  mob_prog_data *next{};
-  char *list{};
-  char *start{};
-  char *dupl{};
-  char *end{};
-  int i{};
-  int retval{};
-  bool done{};
+  char temp1[MAX_STRING_LENGTH] = {};
+  char temp2[MAX_STRING_LENGTH] = {};
+  char word[MAX_INPUT_LENGTH] = {};
+  mob_prog_data *mprg = {};
+  mob_prog_data *next = {};
+  char *list = {};
+  char *start = {};
+  char *dupl = {};
+  char *end = {};
+  qint32 i = {};
+  qint32 retval = {};
+  bool done = {};
   //  for ( mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs; mprg != nullptr; mprg
   //= next )
   mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
@@ -4021,7 +4017,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
     mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobspec;
   }
 
-  mprog_command_num = 0;
+  mprog_command_num = {};
   for (; mprg != nullptr; mprg = next)
   {
     mprog_command_num++;
@@ -4031,19 +4027,19 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
       if (!reverse)
         strcpy(temp1, mprg->arglist);
       else
-        strcpy(temp1, arg.toStdString().c_str());
+        strcpy(temp1, qPrintable(arg));
 
       list = temp1;
-      for (i = 0; i < (signed)strlen(list); i++)
+      for (i = {}; i < (qint32)strlen(list); i++)
         list[i] = LOWER(list[i]);
 
       if (!reverse)
-        strcpy(temp2, arg.toStdString().c_str());
+        strcpy(temp2, qPrintable(arg));
       else
         strcpy(temp2, mprg->arglist);
 
       dupl = temp2;
-      for (i = 0; i < (signed)strlen(dupl); i++)
+      for (i = {}; i < (qint32)strlen(dupl); i++)
         dupl[i] = LOWER(dupl[i]);
       if ((list[0] == 'p') && (list[1] == ' '))
       {
@@ -4095,11 +4091,11 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
   return retval;
 }
 
-void mprog_percent_check(Character *mob, Character *actor, Object *obj,
-                         void *vo, int type)
+void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr obj,
+                         void *vo, qint32 type)
 {
-  mob_prog_data *mprg{};
-  mob_prog_data *next{};
+  mob_prog_data *mprg = {};
+  mob_prog_data *next = {};
   bool done = false;
   mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
   if (!mprg)
@@ -4113,7 +4109,7 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
     debugpoint();
   }
 
-  mprog_command_num = 0;
+  mprog_command_num = {};
   for (; mprg != nullptr; mprg = next)
   {
     mprog_command_num++;
@@ -4132,7 +4128,6 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
       next = DC::getInstance()->mob_index[mob->mobdata->nr].mobspec;
     }
   }
-  return;
 }
 
 /* The triggers.. These are really basic, and since most appear only
@@ -4143,8 +4138,8 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
-                      Object *obj, void *vo)
+qint32 mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch,
+                         ObjectPtr obj, void *vo)
 {
 
   //  mob_prog_act_list * tmp_act;
@@ -4156,47 +4151,17 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
     return mprog_cur_result;
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ACT_PROG) && isPaused(mob) == false)
-    mprog_wordlist_check(buf.c_str(), mob, ch,
-                         obj, vo, ACT_PROG);
+    mprog_wordlist_check(buf.c_str(), mob, ch, obj, vo, ACT_PROG);
 
-  /* Why oh why was it like this? They can add lag themselves if needed.
-    if
-  ( IS_NPC( mob )
-            && ( DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
-          {
-  #ifdef LEAK_CHECK
-            tmp_act = (mob_prog_act_list *) calloc( 1, sizeof( mob_prog_act_list ) );
-  #else
-            tmp_act = (mob_prog_act_list *) dc_alloc( 1, sizeof( mob_prog_act_list ) );
-  #endif
-
-            if(!mob->mobdata->mpact)
-                  mob->mobdata->mpact = tmp_act;
-            else {
-                  curr = mob->mobdata->mpact;
-                  while(curr->next)
-                    curr = curr->next;
-                  curr->next = tmp_act;
-            }
-
-            tmp_act->next = nullptr;
-            tmp_act->buf = str_dup( buf );
-            tmp_act->ch  = ch;
-            tmp_act->obj = obj;
-            tmp_act->vo  = vo;
-            mob->mobdata->mpactnum++;
-
-          }
-  */
   return mprog_cur_result;
 }
 
-int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
+qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
 {
 
-  mob_prog_data *mprg = 0;
-  mob_prog_data *next = 0;
-  Object *obj = 0;
+  mob_prog_data *mprg = {};
+  mob_prog_data *next = {};
+  ObjectPtr obj = {};
   bool done = false;
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG) && isPaused(mob) == false)
@@ -4210,7 +4175,7 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
       mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobspec;
     }
 
-    mprog_command_num = 0;
+    mprog_command_num = {};
     for (; mprg != nullptr; mprg = next)
     {
       mprog_command_num++;
@@ -4235,12 +4200,12 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
   return mprog_cur_result;
 }
 
-int mprog_damage_trigger(Character *mob, Character *ch, int amount)
+qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
 {
 
-  mob_prog_data *mprg = 0;
-  mob_prog_data *next = 0;
-  Object *obj = 0;
+  mob_prog_data *mprg = {};
+  mob_prog_data *next = {};
+  ObjectPtr obj = {};
   bool done = false;
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
   {
@@ -4252,7 +4217,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
       mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobspec;
     }
 
-    mprog_command_num = 0;
+    mprog_command_num = {};
     for (; mprg != nullptr; mprg = next)
     {
       mprog_command_num++;
@@ -4276,7 +4241,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
   return mprog_cur_result;
 }
 
-int mprog_death_trigger(Character *mob, Character *killer)
+qint32 mprog_death_trigger(CharacterPtr mob, CharacterPtr killer)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DEATH_PROG) && isPaused(mob) == false)
@@ -4288,7 +4253,7 @@ int mprog_death_trigger(Character *mob, Character *killer)
   return mprog_cur_result;
 }
 
-int mprog_entry_trigger(Character *mob)
+qint32 mprog_entry_trigger(CharacterPtr mob)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG) && isPaused(mob) == false)
@@ -4297,7 +4262,7 @@ int mprog_entry_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int mprog_fight_trigger(Character *mob, Character *ch)
+qint32 mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch)
 {
 
   if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG) && isPaused(mob) == false)
@@ -4306,7 +4271,7 @@ int mprog_fight_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int mprog_attack_trigger(Character *mob, Character *ch)
+qint32 mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG) && isPaused(mob) == false)
@@ -4315,12 +4280,12 @@ int mprog_attack_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
+qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
 {
 
   char buf[MAX_INPUT_LENGTH];
-  mob_prog_data *mprg{};
-  mob_prog_data *next{};
+  mob_prog_data *mprg = {};
+  mob_prog_data *next = {};
   bool done = false, okay = false;
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
   {
@@ -4331,14 +4296,14 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
       mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobspec;
     }
 
-    mprog_command_num = 0;
+    mprog_command_num = {};
     for (; mprg != nullptr; mprg = next)
     {
       mprog_command_num++;
 
       next = mprg->next;
       one_argument(mprg->arglist, buf);
-      if ((mprg->type & GIVE_PROG) && ((obj->Name() == mprg->arglist)) || (!str_cmp("all", buf)))
+      if ((mprg->type & GIVE_PROG) && ((obj->name() == mprg->arglist)) || (!str_cmp("all", buf)))
       {
         okay = true;
         mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
@@ -4357,7 +4322,7 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 
   if (okay && !SOMEONE_DIED(mprog_cur_result))
   {
-    Object *a;
+    ObjectPtr a;
     SET_BIT(mprog_cur_result, ReturnValue::eEXTRA_VALUE);
     for (a = mob->carrying; a; a = a->next_content)
       if (a == obj)
@@ -4369,7 +4334,7 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
   return mprog_cur_result;
 }
 
-int Character::mprog_greet_trigger(void)
+qint32 Character::mprog_greet_trigger(void)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
   for (auto vmob = dc_->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
@@ -4386,10 +4351,10 @@ int Character::mprog_greet_trigger(void)
   return mprog_cur_result;
 }
 
-int mprog_hitprcnt_trigger(Character *mob, Character *ch)
+qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
 {
-  mob_prog_data *mprg{};
-  mob_prog_data *next{};
+  mob_prog_data *mprg = {};
+  mob_prog_data *next = {};
   bool done = false;
 
   if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
@@ -4401,7 +4366,7 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
       mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobspec;
     }
 
-    mprog_command_num = 0;
+    mprog_command_num = {};
     for (; mprg != nullptr; mprg = next)
     {
       mprog_command_num++;
@@ -4426,7 +4391,7 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int mprog_random_trigger(Character *mob)
+qint32 mprog_random_trigger(CharacterPtr mob)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4436,7 +4401,7 @@ int mprog_random_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int mprog_load_trigger(Character *mob)
+qint32 mprog_load_trigger(CharacterPtr mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4449,7 +4414,7 @@ int mprog_load_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int mprog_arandom_trigger(Character *mob)
+qint32 mprog_arandom_trigger(CharacterPtr mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4461,7 +4426,7 @@ int mprog_arandom_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int Character::mprog_can_see_trigger(Character *mob)
+qint32 Character::mprog_can_see_trigger(CharacterPtr mob)
 {
   if (isDead() || isNowhere())
   {
@@ -4480,14 +4445,14 @@ int Character::mprog_can_see_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int Character::mprog_speech_trigger(const char *txt)
+qint32 Character::mprog_speech_trigger(const char *txt)
 {
   if (isDead() || isNowhere())
   {
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4501,16 +4466,16 @@ int Character::mprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm)
+qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, char *var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
     return ReturnValue::eFAILURE;
   }
 
-  mob_prog_data *mprg{};
-  mob_prog_data *next{};
-  int curr_catch;
+  mob_prog_data *mprg = {};
+  mob_prog_data *next = {};
+  qint32 curr_catch;
   bool done = false;
   mprog_cur_result = ReturnValue::eFAILURE;
 
@@ -4523,7 +4488,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
       mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobspec;
     }
 
-    mprog_command_num = 0;
+    mprog_command_num = {};
     for (; mprg != nullptr; mprg = next)
     {
       mprog_command_num++;
@@ -4552,16 +4517,10 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
             }
             else
             {
-#ifdef LEAK_CHECK
-              eh = (tempvariable *)
-                  calloc(1, sizeof(tempvariable));
-#else
-              eh = (tempvariable *)
-                  dc_alloc(1, sizeof(tempvariable));
-#endif
+              eh = new tempvariable;
 
               eh->data = var;
-              eh->name = str_dup("throw");
+              eh->name = QStringLiteral("throw");
               eh->next = mob->tempVariable;
               mob->tempVariable = eh;
             }
@@ -4587,9 +4546,9 @@ void DC::update_mprog_throws(void)
 {
   mprog_throw_type *curr;
   mprog_throw_type *action;
-  mprog_throw_type *last = nullptr;
-  Character *vict;
-  Object *vobj;
+  mprog_throw_type *last = {};
+  CharacterPtr vict;
+  ObjectPtr vobj;
   for (curr = g_mprog_throw_list; curr;)
   {
     // update
@@ -4600,8 +4559,8 @@ void DC::update_mprog_throws(void)
       curr = curr->next;
       continue;
     }
-    vobj = nullptr;
-    vict = nullptr;
+    vobj = {};
+    vict = {};
 
     //		if (curr->data_num == -999)
     //			debugpoint();
@@ -4656,8 +4615,8 @@ void DC::update_mprog_throws(void)
         mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
       }
 
-      dc_free(action->orig);
-      action->orig = 0;
+      action->orig = {};
+      action->orig = {};
     }
     else if (action->data_num == -1000 && vict)
     {
@@ -4666,8 +4625,8 @@ void DC::update_mprog_throws(void)
         action->tMob->mobdata->paused = false;
       }
       mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
-      dc_free(action->orig);
-      action->orig = 0;
+      action->orig = {};
+      action->orig = {};
     }
     else if (vict)
     { // activate
@@ -4681,13 +4640,13 @@ void DC::update_mprog_throws(void)
       oprog_catch_trigger(vobj, action->data_num, action->var, action->opt, action->actor, action->obj, action->vo, action->rndm);
     }
 
-    dc_free(action);
+    action = {};
   }
 }
 
-Character *DC::initiate_oproc(Character *ch, Object *obj)
+CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
 { // Sneakiness.
-  Character *temp;
+  CharacterPtr temp;
   temp = clone_mobile(real_mobile(12));
   mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
   mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
@@ -4697,20 +4656,20 @@ Character *DC::initiate_oproc(Character *ch, Object *obj)
   else
     char_to_room(temp, obj->in_room);
   if (ch)
-    temp->beacon = (Object *)ch;
+    temp->beacon = (ObjectPtr)ch;
   temp->mobdata->setObject(obj);
   //  temp->master = ch;
-  // dc_free(temp->short_desc);
-  temp->short_desc = str_hsh(obj->short_description);
+  // temp->short_desc={};
+  temp->short_desc = QStringLiteral(obj->short_description);
   char buf[MAX_STRING_LENGTH];
-  sprintf(buf, "%s", qPrintable(obj->Name()));
-  for (int i = strlen(buf) - 1; i > 0; i--)
+  sprintf(buf, "%s", qPrintable(obj->name()));
+  for (qint32 i = strlen(buf) - 1; i > 0; i--)
     if (buf[i] == ' ')
     {
       buf[i] = '\0';
       break;
     }
-  temp->setName(buf);
+  temp->name(buf);
 
   temp->setType(Character::Type::ObjectProgram);
   temp->objdata = obj;
@@ -4718,9 +4677,9 @@ Character *DC::initiate_oproc(Character *ch, Object *obj)
   return temp;
 }
 
-void end_oproc(Character *ch, Trace trace)
+void end_oproc(CharacterPtr ch, Trace trace)
 {
-  static int core_counter = 0;
+  static qint32 core_counter = {};
   if (selfpurge)
   {
     logentry(QStringLiteral("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -4740,14 +4699,14 @@ void end_oproc(Character *ch, Trace trace)
   }
 }
 
-int Character::oprog_can_see_trigger(Object *item)
+qint32 Character::oprog_can_see_trigger(ObjectPtr item)
 {
   if (!isDead() || isNowhere())
   {
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
   mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (dc_->obj_index[item->item_number].progtypes & CAN_SEE_PROG)
@@ -4760,15 +4719,15 @@ int Character::oprog_can_see_trigger(Object *item)
   return mprog_cur_result;
 }
 
-int Character::oprog_speech_trigger(const char *txt)
+qint32 Character::oprog_speech_trigger(const char *txt)
 {
   if (isDead() || isNowhere())
   {
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob = nullptr;
-  Object *item;
+  CharacterPtr vmob = {};
+  ObjectPtr item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4795,7 +4754,7 @@ int Character::oprog_speech_trigger(const char *txt)
       end_oproc(vmob, Trace("oprog_speech_trigger4"));
     }
 
-  for (int i = 0; i < MAX_WEAR; i++)
+  for (qint32 i = {}; i < MAX_WEAR; i++)
     if (equipment[i])
       if (dc_->obj_index[equipment[i]->item_number].progtypes & SPEECH_PROG)
       {
@@ -4809,17 +4768,17 @@ int Character::oprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm)
+qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, char *var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm)
 {
-  mob_prog_data *mprg{};
-  int curr_catch;
+  mob_prog_data *mprg = {};
+  qint32 curr_catch;
   mprog_cur_result = ReturnValue::eFAILURE;
-  Character *vmob;
+  CharacterPtr vmob;
 
   if (obj_index[obj->item_number].progtypes & CATCH_PROG)
   {
     mprg = obj_index[obj->item_number].mobprogs;
-    mprog_command_num = 0;
+    mprog_command_num = {};
     for (; mprg != nullptr; mprg = mprg->next)
     {
       mprog_command_num++;
@@ -4838,14 +4797,10 @@ int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Char
           {
             tempvariable *eh;
 
-#ifdef LEAK_CHECK
-            eh = (tempvariable *)calloc(1, sizeof(tempvariable));
-#else
-            eh = (tempvariable *)dc_alloc(1, sizeof(tempvariable));
-#endif
+            auto eh = new tempvariable;
 
             eh->data = var;
-            eh->name = str_dup("throw");
+            eh->name = QStringLiteral("throw");
             eh->next = vmob->tempVariable;
             vmob->tempVariable = eh;
           }
@@ -4862,15 +4817,15 @@ int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Char
   return mprog_cur_result;
 }
 
-int Character::oprog_act_trigger(QString txt)
+qint32 Character::oprog_act_trigger(QString txt)
 {
   if (isDead() || isNowhere())
   {
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
-  Object *item;
+  CharacterPtr vmob;
+  ObjectPtr item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4900,7 +4855,7 @@ int Character::oprog_act_trigger(QString txt)
       end_oproc(vmob, Trace("oprog_act_trigger4"));
     }
 
-  for (int i = 0; i < MAX_WEAR; i++)
+  for (qint32 i = {}; i < MAX_WEAR; i++)
     if (equipment[i])
       if (dc_->obj_index[equipment[i]->item_number].progtypes & ACT_PROG)
       {
@@ -4915,7 +4870,7 @@ int Character::oprog_act_trigger(QString txt)
   return mprog_cur_result;
 }
 
-int Character::oprog_greet_trigger(void)
+qint32 Character::oprog_greet_trigger(void)
 {
   if (isDead() || isNowhere())
   {
@@ -4935,16 +4890,16 @@ int Character::oprog_greet_trigger(void)
   return mprog_cur_result;
 }
 
-int DC::oprog_rand_trigger(Object *item)
+qint32 DC::oprog_rand_trigger(ObjectPtr item)
 {
-  Character *vmob;
-  //  Object *item;
-  Character *ch;
+  CharacterPtr vmob;
+  //  ObjectPtr item;
+  CharacterPtr ch;
   mprog_cur_result = ReturnValue::eSUCCESS;
   if (item->carried_by)
     ch = item->carried_by;
   else
-    ch = nullptr;
+    ch = {};
   if (obj_index[item->item_number].progtypes & RAND_PROG)
   {
     vmob = initiate_oproc(ch, item);
@@ -4955,16 +4910,16 @@ int DC::oprog_rand_trigger(Object *item)
   return mprog_cur_result;
 }
 
-int DC::oprog_arand_trigger(Object *item)
+qint32 DC::oprog_arand_trigger(ObjectPtr item)
 {
-  Character *vmob;
-  Character *ch;
+  CharacterPtr vmob;
+  CharacterPtr ch;
   mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (item->carried_by)
     ch = item->carried_by;
   else
-    ch = nullptr;
+    ch = {};
   if (obj_index[item->item_number].progtypes & ARAND_PROG)
   {
     vmob = initiate_oproc(ch, item);
@@ -4975,10 +4930,10 @@ int DC::oprog_arand_trigger(Object *item)
   return mprog_cur_result;
 }
 
-int Character::oprog_load_trigger(void)
+qint32 Character::oprog_load_trigger(void)
 {
-  Character *vmob;
-  Object *item;
+  CharacterPtr vmob;
+  ObjectPtr item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4999,7 +4954,7 @@ int Character::oprog_load_trigger(void)
       return mprog_cur_result;
     }
 
-  for (int i = 0; i < MAX_WEAR; i++)
+  for (qint32 i = {}; i < MAX_WEAR; i++)
     if (equipment[i])
       if (dc_->obj_index[equipment[i]->item_number].progtypes & LOAD_PROG)
       {
@@ -5011,14 +4966,14 @@ int Character::oprog_load_trigger(void)
   return mprog_cur_result;
 }
 
-int Character::oprog_weapon_trigger(Object *item)
+qint32 Character::oprog_weapon_trigger(ObjectPtr item)
 {
   if (isDead() || isNowhere())
   {
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -5033,14 +4988,14 @@ int Character::oprog_weapon_trigger(Object *item)
   return mprog_cur_result;
 }
 
-int Character::oprog_armour_trigger(Object *item)
+qint32 Character::oprog_armour_trigger(ObjectPtr item)
 {
   if (isDead() || isNowhere())
   {
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -5062,8 +5017,8 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob = nullptr;
-  Object *item = nullptr;
+  CharacterPtr vmob = {};
+  ObjectPtr item = {};
   mprog_cur_result = ReturnValue::eFAILURE;
   QString buf;
   if (in_room >= 0)
@@ -5074,7 +5029,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
       {
         if (!arguments.isEmpty())
         {
-          do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '));
+          do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(name()).arg(arguments).split(' '));
         }
 
         vmob = dc_->initiate_oproc(this, item);
@@ -5094,7 +5049,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
     {
       if (!arguments.isEmpty())
       {
-        do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '));
+        do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(name()).arg(arguments).split(' '));
       }
       vmob = dc_->initiate_oproc(this, item);
       if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
@@ -5106,7 +5061,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
     }
   }
 
-  for (int i = 0; i < MAX_WEAR; i++)
+  for (qint32 i = {}; i < MAX_WEAR; i++)
   {
     if (equipment[i])
     {
@@ -5114,7 +5069,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
       {
         if (!arguments.isEmpty())
         {
-          do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '));
+          do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(name()).arg(arguments).split(' '));
         }
 
         vmob = dc_->initiate_oproc(this, equipment[i]);
@@ -5130,9 +5085,9 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
   return mprog_cur_result;
 }
 
-bool isPaused(Character *mob)
+bool isPaused(CharacterPtr mob)
 {
-  if (mob == nullptr || mob == (Character *)0x95959595)
+  if (mob == nullptr || mob == (CharacterPtr)0x95959595)
   {
     return false;
   }

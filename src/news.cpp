@@ -16,11 +16,9 @@
 #include <cstring>
 #include <cstdlib>
 #include "DC/structs.h"
-#include "DC/room.h"
-#include "DC/character.h"
+
 #include "DC/DC.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
+
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
 #include "DC/connect.h"
@@ -28,16 +26,15 @@
 #include "DC/set.h"
 #include "DC/returnvals.h"
 #include "DC/news.h"
-#include "DC/memory.h"
 
-news_data *thenews = nullptr;
+news_data *thenews = {};
 void addnews(news_data *newnews)
 {
   if (!thenews)
     thenews = newnews;
   else
   {
-    news_data *tmpnews, *tmpnews2 = nullptr;
+    news_data *tmpnews, *tmpnews2 = {};
     for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
     {
       if (tmpnews->time < newnews->time)
@@ -58,7 +55,7 @@ void addnews(news_data *newnews)
       tmpnews2 = tmpnews;
     }
     tmpnews2->next = newnews;
-    newnews->next = nullptr;
+    newnews->next = {};
   }
 }
 
@@ -74,10 +71,10 @@ void savenews()
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
     // This should be %ld but we need to through the existing news files 1st
-    fprintf(fl, "%d %s~\n", (int)tmpnews->time, tmpnews->addedby);
+    qfprintf(fl, "%d %s~\n", (qint32)tmpnews->time, tmpnews->addedby);
     string_to_file(fl, tmpnews->news);
   }
-  fprintf(fl, "0\n");
+  qfprintf(fl, "0\n");
   fclose(fl);
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
@@ -93,28 +90,22 @@ void loadnews()
     logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
     return;
   }
-  int i;
+  qint32 i;
   while ((i = fread_int(fl, 0, 2147483467)) != 0)
   {
     news_data *nnews;
-#ifdef LEAK_CHECK
-    nnews = (news_data *)
-        calloc(1, sizeof(news_data));
-#else
-    nnews = (news_data *)
-        dc_alloc(1, sizeof(news_data));
-#endif
+    nnews = new news_data;
     nnews->time = i;
     nnews->addedby = fread_string(fl, 0);
     nnews->news = fread_string(fl, 0);
-    int i, v = 0;
+    qint32 i, v = {};
     char buf[MAX_STRING_LENGTH];
-    for (i = 0; i < (int)strlen(nnews->news); i++)
+    for (i = {}; i < (qint32)strlen(nnews->news); i++)
     {
       buf[v++] = *(nnews->news + i);
     }
     buf[v] = '\0';
-    nnews->news = str_dup(buf);
+    nnews->news = (buf);
     addnews(nnews);
   }
   fclose(fl);
@@ -123,11 +114,11 @@ void loadnews()
 const char *newsify(char *string)
 {
   static char tmp[MAX_STRING_LENGTH * 2];
-  int i, a = 0;
+  qint32 i, a = {};
   tmp[0] = '\0';
-  for (i = 0; *(string + i) != '\0'; i++)
+  for (i = {}; *(string + i) != '\0'; i++)
   {
-    if (*(string + i) == '\n' && i < (int)(strlen(string) - 1))
+    if (*(string + i) == '\n' && i < (qint32)(strlen(string) - 1))
     {
       tmp[a++] = '\0';
       strcat(tmp, "\n              ");
@@ -138,10 +129,10 @@ const char *newsify(char *string)
   }
   tmp[a++] = '\0';
   return &tmp[0];
-  //  return str_dup(tmp);
+  //  return (tmp);
 }
 
-int do_news(Character *ch, char *argument, cmd_t cmd)
+qint32 do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool up;
   if (ch->isNonPlayer())
@@ -158,7 +149,7 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
   if (str_cmp(arg, "all"))
     thetime = time(nullptr) - 604800;
   else
-    thetime = 0;
+    thetime = {};
 
   for (tnews = thenews; tnews; tnews = tnews->next)
   {
@@ -192,7 +183,7 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_addnews(Character *ch, char *argument, cmd_t cmd)
+qint32 do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (!ch->has_skill(COMMAND_ADDNEWS))
@@ -226,9 +217,9 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
       do_addnews(ch, "");
       return ReturnValue::eFAILURE;
     }
-    tmptime.tm_sec = 0;
-    tmptime.tm_hour = 0;
-    tmptime.tm_min = 0;
+    tmptime.tm_sec = {};
+    tmptime.tm_hour = {};
+    tmptime.tm_min = {};
     tmptime.tm_isdst = -1;
     thetime = mktime(&tmptime);
   }
@@ -236,9 +227,9 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   {
     thetime = time(nullptr);
     tm *tmptime = localtime(&thetime);
-    tmptime->tm_sec = 0;
-    tmptime->tm_hour = 0;
-    tmptime->tm_min = 0;
+    tmptime->tm_sec = {};
+    tmptime->tm_hour = {};
+    tmptime->tm_min = {};
     tmptime->tm_isdst = -1;
     thetime = mktime(tmptime);
   }
@@ -252,22 +243,16 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   }
   if (!nnews)
   {
-#ifdef LEAK_CHECK
-    nnews = (news_data *)
-        calloc(1, sizeof(news_data));
-#else
-    nnews = (news_data *)
-        dc_alloc(1, sizeof(news_data));
-#endif
-    nnews->addedby = str_dup(GET_NAME(ch));
+    nnews = new news_data;
+    nnews->addedby = (qPrintable(ch->name()));
     nnews->time = thetime;
     addnews(nnews);
-    nnews->news = nullptr;
+    nnews->news = {};
   }
   ch->sendln("        Enter news item.  (/s saves /h for help)");
   if (nnews->news)
     ch->send(nnews->news);
-  //  nnews->news = str_dup("Temporary data.\r\n");
+  //  nnews->news = QStringLiteral("Temporary data.\r\n");
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(nnews->news);
   ch->desc->max_str = 2096;

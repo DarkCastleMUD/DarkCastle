@@ -1,5 +1,4 @@
-#ifndef TERMINAL_H_
-#define TERMINAL_H_
+#pragma once
 /************************************************************************
 | $Id: terminal.h,v 1.5 2006/04/25 10:36:13 dcastle Exp $
 | Terminal.h
@@ -17,29 +16,28 @@
 | We're not #define'ing these because of the way they're used in
 |   strings.  Maybe we'll fix it some day.
 */
-#define BLACK   "[30m"
-#define RED     "[31m"
-#define GREEN   "[32m"
-#define YELLOW  "[33m"
-#define BLUE    "[34m"
-#define PURPLE  "[35m"
-#define CYAN    "[36m"
-#define GREY    "[37m"
+#include <QString>
+const auto BLACK = QStringLiteral("[30m");
+const auto RED = QStringLiteral("[31m");
+const auto GREEN = QStringLiteral("[32m");
+const auto YELLOW = QStringLiteral("[33m");
+const auto BLUE = QStringLiteral("[34m");
+const auto PURPLE = QStringLiteral("[35m");
+const auto CYAN = QStringLiteral("[36m");
+const auto GREY = QStringLiteral("[37m");
 
-#define EEEE    "#8"           /* Turns screen to EEEEs */
-#define CLRSCR  "[2j"          /* Clear screen          */
-#define CLREOL   "["          /* Clear to end of line  */
+const auto EEEE = QStringLiteral("#8");    /* Turns screen to EEEEs */
+const auto CLRSCR = QStringLiteral("[2j"); /* Clear screen          */
+const auto CLREOL = QStringLiteral("[");   /* Clear to end of line  */
 
-#define UPARR    "[A"
-#define DOWNARR  "[B"
-#define RIGHTARR "[C"
-#define LEFTARR  "[D"
-#define HOMEPOS  "[H"
+const auto UPARR = QStringLiteral("[A");
+const auto DOWNARR = QStringLiteral("[B");
+const auto RIGHTARR = QStringLiteral("[C");
+const auto LEFTARR = QStringLiteral("[D");
+const auto HOMEPOS = QStringLiteral("[H");
 
-#define FLASH     "[4m"
-#define BLINK     "[5m"
-#define BOLD     "[1m"
-#define INVERSE  "[7m"
-#define NTEXT    "[0m[37m"      /* Makes it normal */
-
-#endif
+const auto FLASH = QStringLiteral("[4m");
+const auto BLINK = QStringLiteral("[5m");
+const auto BOLD = QStringLiteral("[1m");
+const auto INVERSE = QStringLiteral("[7m");
+const auto NTEXT = QStringLiteral("[0m[37m"); /* Makes it normal */

@@ -17,10 +17,11 @@
 
 #include <fmt/format.h>
 
-#include "DC/utility.h"
+#include "DC/handler.h"
+#include "DC/levels.h"
 
 #include "DC/player.h"
-#include "DC/mobile.h"
+
 #include "DC/interp.h"
 #include "DC/clan.h"
 #include "DC/returnvals.h"
@@ -30,12 +31,12 @@
 #include "DC/db.h"
 #include "DC/Leaderboard.h"
 #include "DC/const.h"
-#include "DC/vault.h"
+#include "DC/DC.h"
 #include "DC/meta.h"
 
-int get_max_stat_bonus(Character *ch, int attrs)
+qint32 get_max_stat_bonus(CharacterPtr ch, qint32 attrs)
 {
-  int bonus = 0;
+  qint32 bonus = {};
 
   switch (attrs)
   {
@@ -70,25 +71,25 @@ int get_max_stat_bonus(Character *ch, int attrs)
     bonus = MAX(0, get_max_stat(ch, attribute_t::INTELLIGENCE) - 15) + MAX(0, get_max_stat(ch, attribute_t::WISDOM) - 15);
     break;
   default:
-    bonus = 0;
+    bonus = {};
   }
 
   return bonus;
 }
 
 // List skill maxes.
-int do_maxes(Character *ch, char *argument, cmd_t cmd)
+qint32 do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  class_skill_defines *classskill;
+  CharacterClassSkill *classskill;
   argument = one_argument(argument, arg);
   one_argument(argument, arg2);
-  int oclass = GET_CLASS(ch); // old class.
+  qint32 oclass = GET_CLASS(ch); // old class.
 
   // get_skill_list uses a char argument, and so to keep upkeep
   // at a min I'm just modifying this here.
-  int i;
-  for (i = 0; pc_clss_types2[i][0] != '\n'; i++)
+  qint32 i;
+  for (i = {}; pc_clss_types2[i][0] != '\n'; i++)
     if (!str_cmp(pc_clss_types2[i], arg))
       break;
   if (pc_clss_types2[i][0] == '\n')
@@ -105,22 +106,22 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
   {
     if (!str_cmp(race_types[i], arg2))
     {
-      int orace = GET_RACE(ch);
-      GET_RACE(ch) = i;
-      for (i = 0; *classskill[i].skillname != '\n'; i++)
+      qint32 orace = ch->race;
+      ch->race = i;
+      for (i = {}; *classskill[i].skillname != '\n'; i++)
       {
-        int max = classskill[i].maximum;
+        qint32 max = classskill[i].maximum;
 
         float percent = max * 0.75;
         if (classskill[i].attrs)
         {
           percent += max / 100.0 * get_max_stat_bonus(ch, classskill[i].attrs);
         }
-        percent = MIN(max, percent);
-        percent = MAX(max * 0.75, percent);
-        csendf(ch, "%s: %d\r\n", classskill[i].skillname, (int)percent);
+        percent = MIN((float)max, percent);
+        percent = MAX((double)max * 0.75, (double)percent);
+        ch->send(QStringLiteral("%s: %d\r\n").arg(classskill[i].skillname).arg((qint32)percent));
       }
-      GET_RACE(ch) = orace;
+      ch->race = orace;
       return ReturnValue::eSUCCESS;
     }
   }
@@ -131,10 +132,10 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
 // give a command to a god
 command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 {
-  QString name = arguments.value(0);
+  QString victim_name = arguments.value(0);
   QString command = arguments.value(1);
 
-  if (name.isEmpty())
+  if (victim_name.isEmpty())
   {
     send_to_char("Bestow gives a god command to a god.\r\n"
                  "Syntax:  bestow <god> <command>\r\n"
@@ -143,10 +144,10 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  Character *victim = get_pc_vis(this, name);
+  CharacterPtr victim = get_pc_vis(this, victim_name);
   if (!victim)
   {
-    this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
+    this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(victim_name));
     return ReturnValue::eSUCCESS;
   }
 
@@ -189,25 +190,25 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
   // if has
   if (victim->has_skill(bc->num))
   {
-    this->sendln(QStringLiteral("%1 already has that command.").arg(victim->getName()));
+    this->sendln(QStringLiteral("%1 already has that command.").arg(victim->name()));
     return ReturnValue::eSUCCESS;
   }
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), DC::LogChannel::LOG_GOD);
-  this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
-  this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
+  logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
+  this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(qPrintable(victim->name())).arg(bc->name));
+  this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(name()).arg(bc->name));
   return ReturnValue::eSUCCESS;
 }
 
 // take away a command from a god
-int do_revoke(Character *ch, char *arg, cmd_t cmd)
+qint32 do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = {};
   char buf[MAX_INPUT_LENGTH];
   char command[MAX_INPUT_LENGTH];
-  int i;
+  qint32 i;
 
   half_chop(arg, arg, command);
 
@@ -227,23 +228,23 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  char_skill_data *last = nullptr;
+  char_skill_data *last = {};
 
   if (!strcmp(command, "all"))
   {
     vict->skills.clear();
 
-    sprintf(buf, "%s has had all comands revoked.\r\n", GET_NAME(vict));
+    sprintf(buf, "%s has had all comands revoked.\r\n", qPrintable(vict->name()));
     ch->send(buf);
-    sprintf(buf, "%s has had all commands revoked by %s.\r\n", GET_NAME(vict),
-            GET_NAME(ch));
+    sprintf(buf, "%s has had all commands revoked by %s.\r\n", qPrintable(vict->name()),
+            qPrintable(ch->name()));
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-    sprintf(buf, "%s has revoked all commands from you.\r\n", GET_NAME(ch));
+    sprintf(buf, "%s has revoked all commands from you.\r\n", qPrintable(ch->name()));
     vict->send(buf);
     return ReturnValue::eSUCCESS;
   }
 
-  for (i = 0; i < DC::bestowable_god_commands.size(); i++)
+  for (i = {}; i < DC::bestowable_god_commands.size(); i++)
     if (DC::bestowable_god_commands[i].name == command)
       break;
 
@@ -256,38 +257,38 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
-    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
+    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name));
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
+  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name));
   ch->send(buf);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name), GET_NAME(ch));
+  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name), qPrintable(ch->name()));
   logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch), qPrintable(DC::bestowable_god_commands[i].name));
+  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", qPrintable(ch->name()), qPrintable(DC::bestowable_god_commands[i].name));
   vict->send(buf);
   return ReturnValue::eSUCCESS;
 }
 
 /* Thunder is currently in wiz_104.c */
 
-int do_wizlock(Character *ch, char *argument, cmd_t cmd)
+qint32 do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   wizlock = !wizlock;
 
   if (wizlock)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "Game has been wizlocked by %s.", GET_NAME(ch));
+    sprintf(log_buf, "Game has been wizlocked by %s.", qPrintable(ch->name()));
     logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game wizlocked.");
   }
   else
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "Game has been un-wizlocked by %s.", GET_NAME(ch));
+    sprintf(log_buf, "Game has been un-wizlocked by %s.", qPrintable(ch->name()));
     logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game un-wizlocked.");
   }
@@ -301,9 +302,9 @@ int do_wizlock(Character *ch, char *argument, cmd_t cmd)
 | Side effects: None
 | Returns: None
 */
-int do_chpwd(Character *ch, char *arg, cmd_t cmd)
+qint32 do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[100], buf[50];
 
   /* Verify preconditions */
@@ -333,18 +334,18 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)victim->getNameC()), PASSWORD_LEN);
+  strncpy(victim->player->pwd, (char *)crypt(name, qPrintable(victim->name())), PASSWORD_LEN);
   victim->player->pwd[PASSWORD_LEN] = '\0';
 
   ch->sendln("Ok.");
   return ReturnValue::eSUCCESS;
 }
 
-int do_fakelog(Character *ch, char *argument, cmd_t cmd)
+qint32 do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   char lev_str[MAX_INPUT_LENGTH];
-  uint64_t lev_nr = 110;
+  quint64 lev_nr = 110;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -391,7 +392,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     newname[0] = newname[0].toUpper();
   }
 
-  Character *victim = get_pc(oldname);
+  CharacterPtr victim = get_pc(oldname);
   if (!victim)
   {
     send(QStringLiteral("%1 is not in the game.\r\n").arg(oldname));
@@ -401,7 +402,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (level_ <= victim->getLevel())
   {
     send("You can't rename someone your level or higher.\r\n");
-    send(QStringLiteral("%1 just tried to rename you.\r\n").arg(GET_NAME(this)));
+    send(QStringLiteral("%1 just tried to rename you.\r\n").arg(qPrintable(this->name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -423,9 +424,9 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     else
     {
       GET_PLATINUM(victim) -= 500;
-      send(QStringLiteral("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
+      send(QStringLiteral("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(qPrintable(victim->shortdesc_or_name())).arg(GET_PLATINUM(victim)));
       victim->send(QStringLiteral("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, DC::LogChannel::LOG_GOD);
+      logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
     }
   }
 
@@ -445,69 +446,69 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (unsigned iWear = 0; iWear < MAX_WEAR; iWear++)
+  for (quint32 iWear = {}; iWear < MAX_WEAR; iWear++)
   {
     if (victim->equipment[iWear] &&
         isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      QString tmp = victim->equipment[iWear]->Name();
-      qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
+      QString tmp = victim->equipment[iWear]->name();
+      qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
       }
 
       tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-      victim->equipment[iWear]->Name(tmp);
+      victim->equipment[iWear]->name(tmp);
     }
     if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
     {
-      for (Object *obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
+      for (ObjectPtr obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
       {
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          QString tmp = obj->Name();
-          qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
+          QString tmp = obj->name();
+          qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
           }
           tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-          obj->Name(tmp);
+          obj->name(tmp);
         }
       }
     }
   }
 
-  Object *obj = victim->carrying;
+  ObjectPtr obj = victim->carrying;
   while (obj)
   {
     if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      QString tmp = QStringLiteral("%1").arg(obj->Name());
-      qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
+      QString tmp = QStringLiteral("%1").arg(obj->name());
+      qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
       }
       tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-      obj->Name(tmp);
+      obj->name(tmp);
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
     {
-      Object *obj2;
+      ObjectPtr obj2;
       for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
       {
         if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          QString tmp = QStringLiteral("%1").arg(obj2->Name());
-          qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
+          QString tmp = QStringLiteral("%1").arg(obj2->name());
+          qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
           }
           tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
-          obj2->Name(tmp);
+          obj2->name(tmp);
         }
       }
     }
@@ -516,51 +517,51 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   auto clan = GET_CLAN(victim);
   auto rights = plr_rights(victim);
-  victim->do_outcast(victim->getName().split(' '));
+  victim->do_outcast(victim->name().split(' '));
 
-  do_fsave(this, victim->getNameC());
+  do_fsave(this, qPrintable(victim->name()));
 
   // Copy the pfile
   QString buffer;
   if (DC::getInstance()->cf.bport == false)
   {
-    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(SAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->name()[0]).arg(qPrintable(victim->name())).arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->name()[0]).arg(qPrintable(victim->name())).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
-  system(buffer.toStdString().c_str());
+  system(qPrintable(buffer));
 
   struct stat buf = {};
 
   // Only copy golems if they exist
-  for (unsigned i = 0; i < MAX_GOLEMS; i++)
+  for (quint32 i = {}; i < MAX_GOLEMS; i++)
   {
-    QString src_filename = QStringLiteral("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
-    if (0 == stat(src_filename.toStdString().c_str(), &buf))
+    QString src_filename = QStringLiteral("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(qPrintable(victim->name())[0]).arg(qPrintable(victim->name())).arg(i);
+    if (0 == stat(qPrintable(src_filename), &buf))
     {
       // Make backup
-      QString dst_filename = QStringLiteral("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
+      QString dst_filename = QStringLiteral("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(qPrintable(victim->name())[0]).arg(qPrintable(victim->name())).arg(i);
       QString command = QStringLiteral("cp -f %1 %2").arg(src_filename).arg(dst_filename);
-      system(command.toStdString().c_str());
+      system(qPrintable(command));
 
       // Rename
       dst_filename = QStringLiteral("%1/%2/%3.%4").arg(FAMILIAR_DIR).arg(newname[0]).arg(newname).arg(i);
       command = QStringLiteral("mv -f %1 %2").arg(src_filename).arg(dst_filename);
-      system(command.toStdString().c_str());
+      system(qPrintable(command));
     }
   }
 
-  buffer = QStringLiteral("%1 renamed to %2.").arg(victim->getNameC()).arg(newname);
+  buffer = QStringLiteral("%1 renamed to %2.").arg(qPrintable(victim->name())).arg(newname);
   logentry(buffer, level_, DC::LogChannel::LOG_GOD);
 
   // handle the renames
-  DC::getInstance()->TheAuctionHouse.HandleRename(this, victim->getNameC(), newname);
+  DC::getInstance()->TheAuctionHouse.HandleRename(this, qPrintable(victim->name()), newname);
 
   // Get rid of the existing one
-  do_zap(victim->getName().split(' '), cmd_t::TRACK);
+  do_zap(victim->name().split(' '), cmd_t::TRACK);
 
   // load the new guy
   do_linkload(newname.split(' '), cmd_t::DEFAULT);
@@ -572,15 +573,15 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   }
   do_name(victim, " %");
 
-  ClanMember *pmember = nullptr;
+  ClanMember *pmember = {};
 
   if (clan)
   {
-    clan_data *tc = get_clan(clan);
+    Clan *tc = get_clan(clan);
     victim->clan = clan;
     add_clan_member(tc, victim);
-    if ((pmember = get_member(victim->getName(), this->clan)))
-      pmember->Rights(rights);
+    if ((pmember = get_member(victim->name(), this->clan)))
+      pmember->rights(rights);
     add_totem_stats(victim);
   }
   rename_vault_owner(oldname, newname);
@@ -588,11 +589,11 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   return ReturnValue::eSUCCESS;
 }
-int do_install(Character *ch, char *arg, cmd_t cmd)
+qint32 do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   char buf[256], type[256], arg1[256], err[256], arg2[256];
-  int range = 0, type_ok = 0, numrooms = 0;
-  int ret;
+  qint32 range = 0, type_ok = 0, numrooms = {};
+  qint32 ret;
 
   /*  if(!ch->has_skill( COMMAND_INSTALL)) {
           ch->sendln("Huh?");
@@ -653,7 +654,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     type_ok = 1;
     break;
   default:
-    type_ok = 0;
+    type_ok = {};
     break;
   }
 
@@ -689,95 +690,76 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_range(Character *ch, char *arg, cmd_t cmd)
+qint32 do_range(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Character *victim;
-  char name[160], buf[160];
-  char kind[160];
-  char trail[160];
-  char message[256];
-
-  /*
-
-
-
-  */
   if (!ch->has_skill(COMMAND_RANGE))
   {
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
   }
 
-  arg = one_argument(arg, name);
-  arg = one_argument(arg, kind);
-  arg = one_argument(arg, buf);
-  arg = one_argument(arg, trail);
-
-  if (!(*name) || !(*buf) || !(*kind))
+  auto arguments = QString(arg).split(' ');
+  QString name = arguments.value(0);
+  QString kind = arguments.value(1);
+  QString buf = arguments.value(2);
+  QString trail = arguments.value(3);
+  if (name.isEmpty() || buf.isEmpty() || kind.isEmpty())
   {
     ch->sendln("Syntax: range <god> <low vnum> <high vnum>");
     ch->sendln("Syntax: range <god> <r/m/o> <low vnum> <high vnum>");
     return ReturnValue::eFAILURE;
   }
 
-  if (!(victim = get_pc_vis(ch, name)))
+  auto victim = get_pc_vis(ch, name);
+  if (!victim)
   {
     ch->sendln("Set whose range?!");
     return ReturnValue::eFAILURE;
   }
-  int low, high;
-  if (trail[0] != '\0')
+
+  room_t low, high;
+  if (!trail.isEmpty())
   {
-    if (!isdigit(*buf) || !isdigit(*trail))
+    if (!buf[0].isDigit() || !trail[0].isDigit())
     {
       ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
       return ReturnValue::eFAILURE;
     }
-    low = atoi(buf);
-    high = atoi(trail);
+    low = buf.toULong();
+    high = trail.toULong();
   }
   else
   {
-    if (!isdigit(*buf) || !isdigit(*kind))
+    if (!buf[0].isDigit() || !kind[0].isDigit())
     {
       ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
       return ReturnValue::eFAILURE;
     }
-    low = atoi(kind);
-    high = atoi(buf);
+    low = kind.toULong();
+    high = buf.toULong();
   }
-  if (low < 0 || high < 0)
+
+  if (!trail.isEmpty())
   {
-    ch->sendln("The number needs to be positive.");
-    return ReturnValue::eFAILURE;
-  }
-  if (trail[0])
-  {
-    switch (LOWER(kind[0]))
+    switch (kind[0].toLower().toLatin1())
     {
     case 'm':
       victim->player->buildMLowVnum = low;
       victim->player->buildMHighVnum = high;
-      sprintf(message, "%s M range set to %d-%d.\r\n", victim->getNameC(), low, high);
-      ch->send(message);
-      sprintf(message, "Your M range has been set to %d-%d.\r\n", low, high);
-      victim->send(message);
+      ch->sendln(QStringLiteral("%1 M range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
+      victim->sendln(QStringLiteral("Your M range has been set to %1-%2.").arg(low).arg(high));
       return ReturnValue::eSUCCESS;
     case 'o':
       victim->player->buildOLowVnum = low;
       victim->player->buildOHighVnum = high;
-      sprintf(message, "%s O range set to %d-%d.\r\n", victim->getNameC(), low, high);
-      ch->send(message);
-      sprintf(message, "Your O range has been set to %d-%d.\r\n", low, high);
-      victim->send(message);
+      ch->sendln(QStringLiteral("%1 O range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
+      victim->sendln(QStringLiteral("Your O range has been set to %1-%2.").arg(low).arg(high));
       return ReturnValue::eSUCCESS;
     case 'r':
       victim->player->buildLowVnum = low;
       victim->player->buildHighVnum = high;
-      sprintf(message, "%s R range set to %d-%d.\r\n", victim->getNameC(), low, high);
-      ch->send(message);
-      sprintf(message, "Your R range has been set to %d-%d.\r\n", low, high);
-      victim->send(message);
+      ch->sendln(QStringLiteral("%1 R range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
+      victim->sendln(QStringLiteral("Your R range has been set to %1-%2.").arg(low).arg(high));
       return ReturnValue::eSUCCESS;
     default:
       ch->sendln("Invalid type. Valid ones are r/o/m.");
@@ -788,18 +770,16 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   {
     victim->player->buildLowVnum = victim->player->buildOLowVnum = victim->player->buildMLowVnum = low;
     victim->player->buildHighVnum = victim->player->buildOHighVnum = victim->player->buildMHighVnum = high;
-    sprintf(message, "%s range set to %d-%d.\r\n", victim->getNameC(), low, high);
-    ch->send(message);
-    sprintf(message, "Your range has been set to %d-%d.\r\n", low, high);
-    victim->send(message);
+    ch->sendln(QStringLiteral("%1 range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
+    victim->send(QStringLiteral("Your range has been set to %1-%2.").arg(low).arg(high));
   }
   return ReturnValue::eSUCCESS;
 }
 
-int do_metastat(Character *ch, char *argument, cmd_t cmd)
+qint32 do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
@@ -831,8 +811,8 @@ int do_metastat(Character *ch, char *argument, cmd_t cmd)
   ch->send(buf);
 
   buf[0] = '\0';
-  unsigned int i = 1, l = 0;
-  for (auto i = 0; i < Commands::commands_.length(); i++)
+  quint32 l = {};
+  for (qsizetype i = {}; i < Commands::commands_.length(); i++)
   {
     if ((l++ % 10) == 0)
       sprintf(buf, "%s\r\n", buf);
@@ -842,7 +822,7 @@ int do_metastat(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_acfinder(Character *ch, char *argument, cmd_t cmd)
+qint32 do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   argument = one_argument(argument, arg);
@@ -853,7 +833,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int i = 1;
+  qint32 i = 1;
   for (; i < QFlagsToStrings<ObjectPositions>().size(); i++)
     if (QFlagsToStrings<ObjectPositions>().value(i) == QString(arg))
       break;
@@ -863,22 +843,22 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   i = 1 << i;
-  int r, o = 1;
-  Object *obj;
+  qint32 r, o = 1;
+  ObjectPtr obj;
   char buf[MAX_STRING_LENGTH];
-  for (r = 0; r < top_of_objt; r++)
+  for (r = {}; r < top_of_objt; r++)
   {
-    obj = (Object *)DC::getInstance()->obj_index[r].item;
+    obj = (ObjectPtr)DC::getInstance()->obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
       continue;
-    int ac = 0 - obj->obj_flags.value[0];
-    for (int z = 0; z < obj->num_affects; z++)
+    qint32 ac = 0 - obj->obj_flags.value[0];
+    for (qint32 z = {}; z < obj->num_affects; z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].vnum(), ac);
+            o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), DC::getInstance()->obj_index[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)
@@ -890,7 +870,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_testhit(Character *ch, char *argument, cmd_t cmd)
+qint32 do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -902,7 +882,7 @@ int do_testhit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Syntax: <tohit> <level> <target level>");
     return ReturnValue::eFAILURE;
   }
-  int toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
+  qint32 toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
   float lvldiff = level - tlevel;
   if (lvldiff > 15 && lvldiff < 25)
     toHit += 25;
@@ -916,24 +896,23 @@ int do_testhit(Character *ch, char *argument, cmd_t cmd)
   float lvl = (50.0 - level - tlevel / 2.0) / 10.0;
 
   if (lvl >= 1.0)
-    toHit = (int)(toHit * lvl);
+    toHit = (qint32)(toHit * lvl);
 
-  for (int AC = 100; AC > -1010; AC -= 10)
+  for (qint32 AC = 100; AC > -1010; AC -= 10)
   {
     float num1 = 1.0 - (-300.0 - (float)AC) * 4.761904762 * 0.0001;
     float num2 = 20.0 + (-300.0 - (float)AC) * 0.0095238095;
 
     float percent = 30 + num1 * (float)(toHit)-num2;
 
-    csendf(ch, "%d AC - %f%% chance to hit\r\n", AC,
-           percent);
+    ch->send(QStringLiteral("%d AC - %f%% chance to hit\r\n").arg(AC).arg(percent));
   }
   return ReturnValue::eSUCCESS;
 }
 
 void write_array_csv(const char *const *array, std::ofstream &fout)
 {
-  int index = 0;
+  qint32 index = {};
   const char *ptr = array[index];
   while (*ptr != '\n')
   {
@@ -950,7 +929,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
   }
 }
 
-int do_export(Character *ch, char *args, cmd_t cmd)
+qint32 do_export(CharacterPtr ch, char *args, cmd_t cmd)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
   world_file_list_item *curr = DC::getInstance()->obj_file_list;
@@ -983,9 +962,9 @@ int do_export(Character *ch, char *args, cmd_t cmd)
 
     while (curr)
     {
-      for (int x = curr->firstnum; x <= curr->lastnum; x++)
+      for (qint32 x = curr->firstnum; x <= curr->lastnum; x++)
       {
-        write_object_csv((Object *)DC::getInstance()->obj_index[x].item, fout);
+        write_object_csv((ObjectPtr)DC::getInstance()->obj_index[x].item, fout);
       }
       curr = curr->next;
     }
@@ -1004,7 +983,7 @@ int do_export(Character *ch, char *args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
+command_return_t do_world(CharacterPtr ch, QString args, cmd_t cmd)
 {
 
   if (args == "rename")
@@ -1018,7 +997,7 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
         ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
         ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
 
-        if (rename(world->filename.toStdString().c_str(), potential_filename.toStdString().c_str()) == -1)
+        if (rename(qPrintable(world->filename), qPrintable(potential_filename)) == -1)
         {
           auto rename_errno = errno;
           char *errStr = strerror(rename_errno);

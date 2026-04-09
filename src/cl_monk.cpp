@@ -7,27 +7,26 @@
 #include "DC/structs.h"
 #include "DC/player.h"
 #include "DC/fight.h"
-#include "DC/utility.h"
-#include "DC/character.h"
+
+#include "DC/DC.h"
 #include "DC/spells.h"
 #include "DC/handler.h"
-#include "DC/connect.h"
-#include "DC/mobile.h"
+
 #include "DC/act.h"
 #include "DC/returnvals.h"
-#include "DC/db.h"
-#include "DC/room.h"
+
 #include "DC/interp.h"
+#include "DC/levels.h"
 
 /************************************************************************
 | OFFENSIVE commands.
 */
-int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
+qint32 do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[MAX_INPUT_LENGTH];
-  int dam;
-  int retval;
+  qint32 dam;
+  qint32 retval;
   time_t time_raw_format;
   struct tm *ptr_time;
 
@@ -36,7 +35,7 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int hands = 0;
+  qint32 hands = {};
   if (ch->equipment[WEAR_WIELD])
     hands++;
   if (ch->equipment[WEAR_SECOND_WIELD])
@@ -117,14 +116,14 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
+qint32 do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
 
   affected_type af;
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
-  int dam, retval;
-  int duration = 100;
+  qint32 dam, retval;
+  qint32 duration = 100;
 
   if (!ch->canPerform(SKILL_QUIVERING_PALM, "Stick to palming yourself for now bucko.\r\n"))
   {
@@ -139,7 +138,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int hands = 0;
+  qint32 hands = {};
   if (ch->equipment[WEAR_WIELD])
     hands++;
   if (ch->equipment[WEAR_SECOND_WIELD])
@@ -216,7 +215,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   af.type = SKILL_QUIVERING_PALM;
   af.duration = duration;
-  af.modifier = 0;
+  af.modifier = {};
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
@@ -224,11 +223,11 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_stun(Character *ch, char *argument, cmd_t cmd)
+qint32 do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
-  int retval;
+  qint32 retval;
 
   if (!ch->canPerform(SKILL_STUN, "Your lack of knowledge is stunning...\r\n"))
   {

@@ -1,18 +1,19 @@
-
-#define READ_SIZE 256
-#define MAX_HELP_KEYWORD_LENGTH 20
-#define MAX_HELP_RELATED_LENGTH 60
-#define MAX_HELP_LENGTH 8192
+#pragma once
+#include <QString>
+constexpr auto READ_SIZE = 256;
+constexpr auto MAX_HELP_KEYWORD_LENGTH = 20;
+constexpr auto MAX_HELP_RELATED_LENGTH = 60;
+constexpr auto MAX_HELP_LENGTH = 8192;
 
 class help_index_element_new
 {
 public:
-  char *keyword1;
-  char *keyword2;
-  char *keyword3;
-  char *keyword4;
-  char *keyword5;
-  char *entry;
-  char *related;
-  int min_level;
+  QString keyword1_;
+  QString keyword2_;
+  QString keyword3_;
+  QString keyword4_;
+  QString keyword5_;
+  QString entry_;
+  QString related_;
+  QString min_level_;
 };

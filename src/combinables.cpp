@@ -1,61 +1,51 @@
 // This file takes care of all the skills that make stuff by combining it
 // in it's container type.  For example, poison making.
 
-#include <vector>
-#include <algorithm>
 #include <iostream>
 #include <fstream>
-#include <iterator>
 #include <utility>
-#include <string>
-#include <sstream>
 
 #include "DC/obj.h"
 #include "DC/db.h"
-#include "DC/fight.h"
-#include "DC/room.h"
+
 #include "DC/DC.h"
-#include "DC/connect.h"
-#include "DC/utility.h"
-#include "DC/character.h"
+
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/player.h"
 #include "DC/interp.h"
 #include "DC/magic.h"
 #include "DC/act.h"
-#include "DC/mobile.h"
+
 #include "DC/spells.h"
-#include <cstring> // strstr()
-#include "DC/returnvals.h"
 #include "DC/combinables.h"
 #include "DC/const.h"
-#include "DC/guild.h"
+#include "DC/utility.h"
 
 using namespace Combinables;
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
 
-#define TRADE_SKILL_POISON_CONT 698 // mortar & pestle
+constexpr auto TRADE_SKILL_POISON_CONT = 698; // mortar & pestle
 
-char *tradeskills[] =
+const QStringList tradeskills =
     {
         "poisonmaking",
         "\n"};
 
-#define MAX_INGREDIANTS 10
+constexpr auto MAX_INGREDIANTS = 10;
 
 class trade_data_type
 {
 public:
-  int pieces[MAX_INGREDIANTS];
-  int result; // last item in array must be -1 for this
-  int trivial;
+  qint32 pieces[MAX_INGREDIANTS];
+  qint32 result; // last item in array must be -1 for this
+  qint32 trivial;
 };
-void determine_trade_skill_increase(Character *ch, int skillnum, int learned, int trivial);
-int determine_trade_skill_chance(int learned, int trivial);
-int valid_trade_skill_combine(class Object *container, class trade_data_type *data, Character *ch);
+void determine_trade_skill_increase(CharacterPtr ch, qint32 skillnum, qint32 learned, qint32 trivial);
+qint32 determine_trade_skill_chance(qint32 learned, qint32 trivial);
+qint32 valid_trade_skill_combine(ObjectPtr container, class trade_data_type *data, CharacterPtr ch);
 
 // POISON DEFINES
 trade_data_type poison_vial_data[] =
@@ -98,7 +88,7 @@ trade_data_type poison_vial_data[] =
 class thief_poison_data
 {
 public:
-  char *poison_type;
+  const char *poison_type;
 };
 
 thief_poison_data poison_vial_combat_data[] =
@@ -118,9 +108,9 @@ thief_poison_data poison_vial_combat_data[] =
 ////////////////////////////////////////////////////////////////////////////
 // command functions
 
-int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
+qint32 do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int learned = ch->has_skill(SKILL_TRADE_POISON);
+  qint32 learned = ch->has_skill(SKILL_TRADE_POISON);
 
   if (ch->getLevel() > IMMORTAL)
     learned = 500;
@@ -132,7 +122,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   }
 
   // TODO search for mortar and pestle
-  Object *container = get_obj_in_list_vis(ch, TRADE_SKILL_POISON_CONT, ch->carrying);
+  ObjectPtr container = get_obj_in_list_vis(ch, TRADE_SKILL_POISON_CONT, ch->carrying);
 
   if (!container)
   {
@@ -141,7 +131,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   }
 
   // search if the items in mortar and pestle match any poison vial types
-  int index = valid_trade_skill_combine(container, poison_vial_data, ch);
+  qint32 index = valid_trade_skill_combine(container, poison_vial_data, ch);
 
   if (index == -2)
     return ReturnValue::eFAILURE;
@@ -152,9 +142,9 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   while (container->contains)
     extract_obj(container->contains);
 
-  int failure = 0;
-  int chance = 0;
-  int percent;
+  qint32 failure = {};
+  qint32 chance = {};
+  qint32 percent;
 
   // determine success/failure
 
@@ -179,22 +169,22 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   }
 
   // give poison to player
-  int rewardnum = real_object(poison_vial_data[index].result);
+  qint32 rewardnum = real_object(poison_vial_data[index].result);
   if (rewardnum < 0)
   {
     ch->sendln("That poison is broken.  Tell a god.");
     return (ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR);
   }
 
-  Object *reward = clone_object(rewardnum);
+  ObjectPtr reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
-  ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description));
+  ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description()));
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
 
   return ReturnValue::eSUCCESS;
 }
 
-int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
+qint32 do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
@@ -219,7 +209,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   }
 
   // find weapon
-  Object *weapon = ch->equipment[WEAR_WIELD];
+  ObjectPtr weapon = ch->equipment[WEAR_WIELD];
   if (!weapon)
   {
     ch->sendln("You aren't wielding a weapon to poison.");
@@ -227,15 +217,15 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   }
 
   // find vial and verify it's a valid poison vial
-  Object *vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
+  ObjectPtr vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
   if (!vial)
   {
     ch->send(QStringLiteral("You don't seem to have any %1.\r\n").arg(vialarg));
     return ReturnValue::eFAILURE;
   }
 
-  int found = -1;
-  for (int i = 0; poison_vial_data[i].result != -1; i++)
+  qint32 found = -1;
+  for (qint32 i = {}; poison_vial_data[i].result != -1; i++)
     if (poison_vial_data[i].result == DC::getInstance()->obj_index[vial->item_number].vnum())
     {
       found = i;
@@ -244,11 +234,11 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
 
   if (found < 0)
   {
-    ch->send(QStringLiteral("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description));
+    ch->send(QStringLiteral("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description()));
     return ReturnValue::eFAILURE;
   }
 
-  for (int j = 0; j < weapon->num_affects; j++)
+  for (qint32 j = {}; j < weapon->num_affects; j++)
     if (weapon->affected[j].location == WEP_THIEF_POISON)
     {
       ch->sendln("Your weapon is already poisoned.");
@@ -271,18 +261,18 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
 // Return index of match on successful find
 // Return -1 on failure
 // Return -2 if there's nothing in the container
-int valid_trade_skill_combine(Object *container, trade_data_type *data, Character *ch)
+qint32 valid_trade_skill_combine(ObjectPtr container, trade_data_type *data, CharacterPtr ch)
 {
   if (!(container->contains))
   {
-    ch->send(QStringLiteral("Your %1 appears to be empty.\r\n").arg(container->short_description));
+    ch->send(QStringLiteral("Your %1 appears to be empty.\r\n").arg(container->short_description()));
     return -2;
   }
 
-  std::vector<int> current;
+  QList<qint32> current;
 
   // take all the items in our container and put them in an array by vnum
-  for (Object *j = container->contains; j; j = j->next_content)
+  for (ObjectPtr j = container->contains; j; j = j->next_content)
     if (j->item_number >= 0)
       current.push_back(DC::getInstance()->obj_index[j->item_number].vnum());
     else
@@ -290,13 +280,13 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 
   sort(current.begin(), current.end());
 
-  std::vector<int> valid;
+  QList<qint32> valid;
 
   // loop through the valid combinations, and try to find a match
-  for (int i = 0; data[i].result != -1; i++)
+  for (qint32 i = {}; data[i].result != -1; i++)
   {
     valid.clear();
-    for (int k = 0; k < MAX_INGREDIANTS && data[i].pieces[k] != -1; k++)
+    for (qint32 k = {}; k < MAX_INGREDIANTS && data[i].pieces[k] != -1; k++)
       valid.push_back(data[i].pieces[k]);
 
     sort(valid.begin(), valid.end());
@@ -311,9 +301,9 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
   return -1; // didn't match any
 }
 
-int determine_trade_skill_chance(int learned, int trivial)
+qint32 determine_trade_skill_chance(qint32 learned, qint32 trivial)
 {
-  int chance = 50;
+  qint32 chance = 50;
 
   chance -= trivial;
   chance += learned;
@@ -324,7 +314,7 @@ int determine_trade_skill_chance(int learned, int trivial)
   return chance;
 }
 
-void determine_trade_skill_increase(Character *ch, int skillnum, int learned, int trivial)
+void determine_trade_skill_increase(CharacterPtr ch, qint32 skillnum, qint32 learned, qint32 trivial)
 {
   // can't learn past item's trivial value
   if (learned >= trivial)
@@ -339,10 +329,10 @@ void determine_trade_skill_increase(Character *ch, int skillnum, int learned, in
   ch->learn_skill(skillnum, 1, 500);
 }
 
-int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
+qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 type)
 {
-  int retval = ReturnValue::eSUCCESS;
-  // unused   int dam;
+  qint32 retval = ReturnValue::eSUCCESS;
+  // unused   qint32 dam;
 
   if (!ch->equipment[WEAR_WIELD])
   {
@@ -372,7 +362,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
              SET_BIT(vict->combat, COMBAT_MISS_AN_ATTACK);
              dam = 10;
            }
-           else dam = 0;
+           else dam = {};
            retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type);
            break;
 
@@ -398,14 +388,14 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
   return retval;
 }
 
-int do_brew(Character *ch, char *argument, cmd_t cmd)
+qint32 do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
-  Object *herbobj, *liquidobj, *containerobj;
+  ObjectPtr herbobj, *liquidobj, containerobj;
   affected_type af;
   Brew b;
 
-  int learned = ch->has_skill(SKILL_BREW);
+  qint32 learned = ch->has_skill(SKILL_BREW);
 
   if (ch->isMortalPlayer() && !learned)
   {
@@ -598,9 +588,9 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   Brew::recipe r = {DC::getInstance()->obj_index[herbobj->item_number].vnum(),
                     liquidobj->obj_flags.value[2],
                     DC::getInstance()->obj_index[containerobj->item_number].vnum()};
-  int spell = b.find(r);
+  qint32 spell = b.find(r);
 
-  //  csendf(ch, "Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
+  //  ch->sendln(QStringLiteral("Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
   //	 DC::getInstance()->obj_index[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
   //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
   //	 DC::getInstance()->obj_index[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
@@ -612,7 +602,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
 
     af.type = SKILL_BREW_TIMER;
     af.location = APPLY_NONE;
-    af.modifier = 0;
+    af.modifier = {};
     af.duration = 1;
     af.bitvector = -1;
     affect_to_char(ch, &af);
@@ -621,7 +611,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   {
     af.type = SKILL_BREW_TIMER;
     af.location = APPLY_NONE;
-    af.modifier = 0;
+    af.modifier = {};
     af.duration = 1;
     af.bitvector = -1;
     affect_to_char(ch, &af);
@@ -635,7 +625,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     act(buffer, ch, containerobj, 0, TO_ROOM, 0);
 
     // Find container key (crude, plain, etc)
-    auto container_key = containerobj->Name().split(' ').value(2);
+    auto container_key = containerobj->name().split(' ').value(2);
 
     // Find liquid key (salty, milk, strong)
     const char *liquid_key;
@@ -656,19 +646,19 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
     }
 
     // Put it all together into the new name
-    std::stringstream potionname, potionshort, potionlong;
-    potionname << "potion " << container_key << " " << liquid_key;
-    potionshort << "a " << container_key << " " << liquid_key << " " << potion_color << " potion";
-    potionlong << "a " << container_key << " " << liquid_key << " " << potion_color << " potion lies here.";
+
+    auto potionname = QStringLiteral("potion %1 %2").arg(container_key).arg(liquid_key);
+    auto potionshort = QStringLiteral("a %1 %2 %3 potion").arg(container_key).arg(liquid_key).arg(potion_color);
+    auto potionlong = QStringLiteral("a %1 %2 %3 potion lies here.").arg(container_key).arg(liquid_key).arg(potion_color);
 
     containerobj->obj_flags.type_flag = ITEM_POTION;
     containerobj->obj_flags.value[0] = (learned / 2 - 5) + GET_WIS(ch) / 2 + GET_INT(ch) / 2;
     containerobj->obj_flags.value[1] = spell;
-    containerobj->obj_flags.value[2] = 0;
-    containerobj->obj_flags.value[3] = 0;
-    containerobj->Name(potionname.str().c_str());
-    GET_OBJ_SHORT(containerobj) = str_dup(potionshort.str().c_str());
-    containerobj->long_description = str_dup(potionlong.str().c_str());
+    containerobj->obj_flags.value[2] = {};
+    containerobj->obj_flags.value[3] = {};
+    containerobj->name(potionname);
+    containerobj->short_description(potionshort);
+    containerobj->long_description(potionlong);
     // We set the item to custom so that it will save everytime uniquely
     SET_BIT(containerobj->obj_flags.more_flags, ITEM_CUSTOM);
 
@@ -721,7 +711,7 @@ void Brew::load(void)
   {
     while (!ifs.eof())
     {
-      int spell = 0;
+      qint32 spell = {};
       recipe r = {0, 0, 0};
 
       ifs >> r.herb;
@@ -753,11 +743,11 @@ void Brew::save(void)
 
   try
   {
-    for (std::map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
+    for (QMap<recipe, qint32>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
     {
-      std::pair<recipe, int> p = *iter;
+      std::pair<recipe, qint32> p = *iter;
       recipe r = p.first;
-      int spell = p.second;
+      qint32 spell = p.second;
 
       ofs << r.herb << " " << r.liquid << " " << r.container << " " << spell << std::endl;
     }
@@ -768,10 +758,10 @@ void Brew::save(void)
   }
 }
 
-void Brew::list(Character *ch)
+void Brew::list(CharacterPtr ch)
 {
   char buffer[MAX_STRING_LENGTH] = {};
-  int i = {};
+  qint32 i = {};
 
   if (!ch)
   {
@@ -779,20 +769,20 @@ void Brew::list(Character *ch)
   }
 
   ch->sendln("[# ] [herb #] [liquid] [container] Spell Name\r\n");
-  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
-    int spell = iter->second;
+    qint32 spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    csendf(ch, "[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\r\n", ++i, r.herb, r.liquid, r.container, buffer, spell);
+    ch->send(QStringLiteral("[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\r\n").arg(++i, r.herb, r.liquid).arg(r.container).arg(buffer).arg(spell));
   }
 }
 
-int Brew::add(Character *ch, char *argument)
+qint32 Brew::add(CharacterPtr ch, char *argument)
 {
   vnum_t herb_vnum = {}, container_vnum = {};
-  int liquid_type = {}, spell = {};
+  qint32 liquid_type = {}, spell = {};
   char arg1[MAX_INPUT_LENGTH] = {}, arg2[MAX_INPUT_LENGTH] = {}, arg3[MAX_INPUT_LENGTH] = {}, arg4[MAX_INPUT_LENGTH] = {};
 
   if (!ch)
@@ -828,8 +818,7 @@ int Brew::add(Character *ch, char *argument)
   case LIQ_SALTWATER:
     break;
   default:
-    csendf(ch, "Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\r\n",
-           LIQ_MILK, LIQ_WINE, LIQ_SALTWATER);
+    ch->send(QStringLiteral("Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\r\n").arg(LIQ_MILK).arg(LIQ_WINE).arg(LIQ_SALTWATER));
     return ReturnValue::eFAILURE;
     break;
   }
@@ -842,7 +831,7 @@ int Brew::add(Character *ch, char *argument)
 
   if ((spell = find_skill_num(arg4)) < 0)
   {
-    csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
+    ch->send(QStringLiteral("Cannot find spell '%s' in master spell list.\r\n").arg(arg4));
     return ReturnValue::eFAILURE;
   }
 
@@ -854,7 +843,7 @@ int Brew::add(Character *ch, char *argument)
   return ReturnValue::eSUCCESS;
 }
 
-int Brew::remove(Character *ch, char *argument)
+qint32 Brew::remove(CharacterPtr ch, char *argument)
 {
   if (!ch)
   {
@@ -867,10 +856,10 @@ int Brew::remove(Character *ch, char *argument)
     return ReturnValue::eFAILURE;
   }
 
-  int i = 0;
-  int target = atoi(argument);
+  qint32 i = {};
+  qint32 target = atoi(argument);
 
-  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     if (++i == target)
     {
@@ -885,16 +874,16 @@ int Brew::remove(Character *ch, char *argument)
   return ReturnValue::eFAILURE;
 }
 
-int Brew::size(void)
+qint32 Brew::size(void)
 {
   return recipes.size();
 }
 
-int Brew::find(Brew::recipe r)
+qint32 Brew::find(Brew::recipe r)
 {
-  int spell = 0;
+  qint32 spell = {};
 
-  std::map<recipe, int>::iterator result = recipes.find(r);
+  QMap<recipe, qint32>::iterator result = recipes.find(r);
   if (result != recipes.end())
   {
     spell = result->second;
@@ -903,14 +892,14 @@ int Brew::find(Brew::recipe r)
   return spell;
 }
 
-int do_scribe(Character *ch, char *argument, cmd_t cmd)
+qint32 do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
-  Object *inkobj, *dustobj, *penobj, *paperobj;
+  ObjectPtr inkobj, *dustobj, *penobj, paperobj;
   affected_type af;
   Scribe s;
 
-  int learned = ch->has_skill(SKILL_SCRIBE);
+  qint32 learned = ch->has_skill(SKILL_SCRIBE);
 
   if (ch->isMortalPlayer() && !learned)
   {
@@ -1067,7 +1056,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
                       DC::getInstance()->obj_index[dustobj->item_number].vnum(),
                       DC::getInstance()->obj_index[penobj->item_number].vnum(),
                       DC::getInstance()->obj_index[paperobj->item_number].vnum()};
-  int spell = s.find(r);
+  qint32 spell = s.find(r);
 
   act("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, TO_CHAR, 0);
   act("$n sits down and carefully inscribes the words of the gods onto some parchment.", ch, 0, 0, TO_ROOM, 0);
@@ -1084,7 +1073,7 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
 
     af.type = SKILL_SCRIBE_TIMER;
     af.location = APPLY_NONE;
-    af.modifier = 0;
+    af.modifier = {};
     af.duration = 1;
     af.bitvector = -1;
     affect_to_char(ch, &af);
@@ -1109,30 +1098,29 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
 
     af.type = SKILL_SCRIBE_TIMER;
     af.location = APPLY_NONE;
-    af.modifier = 0;
+    af.modifier = {};
     af.duration = 1;
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    auto ink_key = inkobj->Name().split(' ').value(2);
-    auto dust_key = dustobj->Name().split(' ').value(2);
-    auto pen_key = penobj->Name().split(' ').value(2);
-    auto paper_key = paperobj->Name().split(' ').value(2);
+    auto ink_key = inkobj->name().split(' ').value(2);
+    auto dust_key = dustobj->name().split(' ').value(2);
+    auto pen_key = penobj->name().split(' ').value(2);
+    auto paper_key = paperobj->name().split(' ').value(2);
 
     // Put it all together into the new name
-    std::stringstream scrollname, scrollshort, scrolllong;
-    scrollname << "scroll " << paper_key << " " << dust_key << " " << pen_key << " " << ink_key;
-    scrollshort << "a " << paper_key << " $B" << dust_key << "$R scroll " << pen_key << " in " << ink_key << " ink";
-    scrolllong << "a " << paper_key << " " << dust_key << " scroll " << pen_key << " in " << ink_key << "ink lies here";
+    auto scrollname = QStringLiteral("scroll %1 %2 %3 %4").arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
+    auto scrollshort = QStringLiteral("a %1 $B%2$R scroll %3 in %4 ink").arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
+    auto scrolllong = QStringLiteral("a %1 $B%2$R scroll %3 in %4 ink lies here.").arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
 
     paperobj->obj_flags.type_flag = ITEM_SCROLL;
     paperobj->obj_flags.value[0] = learned / 4 + ch->getLevel() / 2;
     paperobj->obj_flags.value[1] = spell;
-    paperobj->obj_flags.value[2] = 0;
-    paperobj->obj_flags.value[3] = 0;
-    paperobj->Name(scrollname.str().c_str());
-    GET_OBJ_SHORT(paperobj) = str_dup(scrollshort.str().c_str());
-    paperobj->long_description = str_dup(scrolllong.str().c_str());
+    paperobj->obj_flags.value[2] = {};
+    paperobj->obj_flags.value[3] = {};
+    paperobj->name(scrollname);
+    paperobj->short_description(scrollshort);
+    paperobj->long_description(scrolllong);
 
     // We set the item to custom so that it will save uniquely every time
     SET_BIT(paperobj->obj_flags.more_flags, ITEM_CUSTOM);
@@ -1172,7 +1160,7 @@ void Scribe::load(void)
   {
     while (!ifs.eof())
     {
-      int spell = 0;
+      qint32 spell = {};
       recipe r = {0, 0, 0, 0};
 
       ifs >> r.ink;
@@ -1205,11 +1193,11 @@ void Scribe::save(void)
 
   try
   {
-    for (std::map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
+    for (QMap<recipe, qint32>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
     {
-      std::pair<recipe, int> p = *iter;
+      std::pair<recipe, qint32> p = *iter;
       recipe r = p.first;
-      int spell = p.second;
+      qint32 spell = p.second;
 
       ofs << r.ink << " " << r.dust << " " << r.pen << " " << r.paper << " " << spell << std::endl;
     }
@@ -1220,10 +1208,10 @@ void Scribe::save(void)
   }
 }
 
-void Scribe::list(Character *ch)
+void Scribe::list(CharacterPtr ch)
 {
   char buffer[MAX_STRING_LENGTH];
-  int i = 0;
+  qint32 i = {};
 
   if (ch == 0)
   {
@@ -1231,20 +1219,20 @@ void Scribe::list(Character *ch)
   }
 
   ch->sendln("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\r\n");
-  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
-    int spell = iter->second;
+    qint32 spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    csendf(ch, "[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\r\n", ++i, r.ink, r.dust, r.pen, r.paper, buffer, spell);
+    ch->send(QStringLiteral("[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\r\n").arg(++i, r.ink, r.dust, r.pen).arg(r.paper).arg(buffer).arg(spell));
   }
 }
 
-int Scribe::add(Character *ch, char *argument)
+qint32 Scribe::add(CharacterPtr ch, char *argument)
 {
   vnum_t ink_vnum = {}, dust_vnum = {}, pen_vnum = {}, paper_vnum = {};
-  int spell = {};
+  qint32 spell = {};
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
 
   if (!ch)
@@ -1295,7 +1283,7 @@ int Scribe::add(Character *ch, char *argument)
 
   if ((spell = find_skill_num(arg5)) < 0)
   {
-    csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
+    ch->send(QStringLiteral("Cannot find spell '%s' in master spell list.\r\n").arg(arg4));
     return ReturnValue::eFAILURE;
   }
 
@@ -1307,7 +1295,7 @@ int Scribe::add(Character *ch, char *argument)
   return ReturnValue::eSUCCESS;
 }
 
-int Scribe::remove(Character *ch, char *argument)
+qint32 Scribe::remove(CharacterPtr ch, char *argument)
 {
   if (!ch)
   {
@@ -1320,10 +1308,10 @@ int Scribe::remove(Character *ch, char *argument)
     return ReturnValue::eFAILURE;
   }
 
-  int i = 0;
-  int target = atoi(argument);
+  qint32 i = {};
+  qint32 target = atoi(argument);
 
-  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     if (++i == target)
     {
@@ -1338,16 +1326,16 @@ int Scribe::remove(Character *ch, char *argument)
   return ReturnValue::eFAILURE;
 }
 
-int Scribe::size(void)
+qint32 Scribe::size(void)
 {
   return recipes.size();
 }
 
-int Scribe::find(Scribe::recipe r)
+qint32 Scribe::find(Scribe::recipe r)
 {
-  int spell = 0;
+  qint32 spell = {};
 
-  std::map<recipe, int>::iterator result = recipes.find(r);
+  QMap<recipe, qint32>::iterator result = recipes.find(r);
   if (result != recipes.end())
   {
     spell = result->second;
@@ -1355,3 +1343,7 @@ int Scribe::find(Scribe::recipe r)
 
   return spell;
 }
+
+const char Brew::RECIPES_FILENAME[] = "brewables.dat";
+QMap<Brew::recipe, qint32> Brew::recipes;
+bool Brew::initialized = false;

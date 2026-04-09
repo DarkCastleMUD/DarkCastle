@@ -24,14 +24,16 @@
 #include <signal.h>
 #include <cctype>
 #include <sys/time.h>
+
+#ifdef TRACY
 #include <tracy/Tracy.hpp>
+#endif
 
 #include <sstream>
 #include <iostream>
-#include <list>
 #include <algorithm>
-#include <string>
-#include <queue>
+#include <QString>
+#include <QQueue>
 #include <cstdint>
 
 #include <fmt/format.h>
@@ -42,32 +44,19 @@
 #include <QtNetwork>
 
 #include "DC/terminal.h"
-#include "DC/fileinfo.h"
-#include "DC/act.h"
-#include "DC/player.h"
-#include "DC/room.h"
-#include "DC/structs.h"
-#include "DC/utility.h"
-#include "DC/connect.h"
+
 #include "DC/interp.h"
-#include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/comm.h"
-#include "DC/returnvals.h"
 #include "DC/quest.h"
 #include "DC/shop.h"
-#include "DC/Leaderboard.h"
 #include "DC/Timer.h"
 #ifdef USE_SQL
 #include "Backend/Database.h"
 #endif
 #include "DC/Timer.h"
-#include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/CommandStack.h"
-#include "DC/SSH.h"
-#include "DC/character.h"
-#include "DC/memory.h"
 
 class multiplayer
 {
@@ -77,26 +66,22 @@ public:
   QString name2;
 };
 
-#ifndef INVALID_SOCKET
-#define INVALID_SOCKET -1
-#endif
-
 extern bool MOBtrigger;
 
 // This is turned on right before we call game_loop
-int do_not_save_corpses = 1;
-int try_to_hotboot_on_crash = 0;
-int was_hotboot = 0;
-int died_from_sigsegv = 0;
+qint32 do_not_save_corpses = 1;
+qint32 try_to_hotboot_on_crash = {};
+qint32 was_hotboot = {};
+qint32 died_from_sigsegv = {};
 
 /* these are here for the eventual addition of ban */
-int num_invalid = 0;
-int restrict = 0;
+qint32 num_invalid = {};
+qint32 restrict = {};
 
 /* externs */
-extern int restrict;
-// extern int mini_mud;
-// extern int no_rent_check;
+extern qint32 restrict;
+// extern qint32 mini_mud;
+// extern qint32 no_rent_check;
 
 /* In db.c */
 extern const char *sector_types[];
@@ -107,27 +92,27 @@ void save_slot_machines(void);
 void check_silence_beacons(void);
 
 /* local globals */
-txt_block *bufpool = 0; /* pool of large output buffers */
-int buf_largecount = 0; /* # of large buffers which exist */
-int buf_overflows = 0;  /* # of overflows of output */
-int buf_switches = 0;   /* # of switches from small to large buf */
-int _shutdown = 0;      /* clean shutdown */
-// int nameserver_is_slow = 0;	/* see config.c */
-// extern int auto_save;		/* see config.c */
-// extern int autosave_time;	/* see config.c */
+txt_block *bufpool = {};    /* pool of large output buffers */
+qint32 buf_largecount = {}; /* # of large buffers which exist */
+qint32 buf_overflows = {};  /* # of overflows of output */
+qint32 buf_switches = {};   /* # of switches from small to large buf */
+qint32 _shutdown = {};      /* clean shutdown */
+// qint32 nameserver_is_slow = {};	/* see config.c */
+// extern qint32 auto_save;		/* see config.c */
+// extern qint32 autosave_time;	/* see config.c */
 struct timeval null_time; /* zero-valued time structure */
 time_t start_time;
 
 // heartbeat globals
-int pulse_timer;
-int pulse_mobile;
-int pulse_bard;
-int pulse_violence;
-int pulse_tensec;
-int pulse_weather;
-int pulse_regen;
-int pulse_time;
-int pulse_short; // short timer, for archery
+qint32 pulse_timer;
+qint32 pulse_mobile;
+qint32 pulse_bard;
+qint32 pulse_violence;
+qint32 pulse_tensec;
+qint32 pulse_weather;
+qint32 pulse_regen;
+qint32 pulse_time;
+qint32 pulse_short; // short timer, for archery
 
 #ifdef USE_SQL
 Database db;
@@ -136,15 +121,15 @@ Database db;
 /* functions in this file */
 void update_characters(void);
 void short_activity();
-void skip_spaces(char **string);
+void skip_spaces(const char **s);
 char *any_one_arg(char *argument, char *first_arg);
-char *calc_color(int hit, int max_hit);
-std::string get_from_q(std::queue<std::string> &input_queue);
+const char *calc_color(qint32 hit, qint32 max_hit);
+QString get_from_q(QQueue<QString> &input_queue);
 void signal_setup(void);
-int new_descriptor(int s);
-int process_input(class Connection *t);
+qint32 new_descriptor(qint32 s);
+qint32 process_input(class Connection *t);
 void flush_queues(class Connection *d);
-int perform_subst(class Connection *t, char *orig, char *subst);
+qint32 perform_subst(class Connection *t, char *orig, char *subst);
 
 void check_idle_passwords(void);
 void init_heartbeat();
@@ -157,7 +142,7 @@ void zone_update(void);
 void point_update(void); /* In limits.c */
 void food_update(void);  /* In limits.c */
 void mobile_activity(void);
-void object_activity(uint64_t pulse_type);
+void object_activity(quint64 pulse_type);
 void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, char *str);
 void perform_violence(void);
@@ -165,7 +150,7 @@ void time_update();
 void weather_update();
 void send_hint();
 extern void pulse_command_lag();
-void checkConsecrate(int);
+void checkConsecrate(qint32);
 
 // extern char greetings1[MAX_STRING_LENGTH];
 // extern char greetings2[MAX_STRING_LENGTH];
@@ -174,7 +159,7 @@ void checkConsecrate(int);
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
-int DC::write_hotboot_file(void)
+qint32 DC::write_hotboot_file(void)
 {
   FILE *fp;
   class Connection *sd;
@@ -183,43 +168,43 @@ int DC::write_hotboot_file(void)
     logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, DC::LogChannel::LOG_MISC);
     return 0;
   }
-  // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
-  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const int &fd)
-           { fprintf(fp, "%d\n", fd); });
+  // std::for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
+  std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const qint32 &fd)
+                { qfprintf(fp, "%d\n", fd); });
 
-  for (Connection *d = descriptor_list; d; d = sd)
+  for (auto &d : connections_)
   {
-    sd = d->next;
-    if (STATE(d) != Connection::states::PLAYING || !d->character || d->character->getLevel() < 1)
+    sd = conn->next;
+    if (conn->connected != Connection::states::PLAYING || !conn->character || conn->character->getLevel() < 1)
     {
       // Kick out anyone not currently playing in the game.
-      write_to_descriptor(d->descriptor, "We are rebooting, come back in a minute.");
+      write_to_descriptor(conn->descriptor, "We are rebooting, come back in a minute.");
       close_socket(d);
     }
     else
     {
-      STATE(d) = Connection::states::PLAYING; // if editors.
-      if (d->original)
+      conn->connected = Connection::states::PLAYING; // if editors.
+      if (conn->original)
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), qPrintable(d->getPeerOriginalAddress().toString()));
-        if (d->original->player)
+        qfprintf(fp, "%d\n%s\n%s\n", conn->descriptor, qPrintable(conn->original->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
+        if (conn->original->player)
         {
-          d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
-          d->original->player->time.logon = time(0);
+          conn->original->player->last_site = conn->original->desc->getPeerOriginalAddress().toString();
+          conn->original->player->time.logon = time(0);
         }
-        d->original->save_char_obj();
+        conn->original->save_char_obj();
       }
       else
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), qPrintable(d->getPeerOriginalAddress().toString()));
-        if (d->character->player)
+        qfprintf(fp, "%d\n%s\n%s\n", conn->descriptor, qPrintable(conn->character->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
+        if (conn->character->player)
         {
-          d->character->player->last_site = d->character->desc->getPeerOriginalAddress().toString();
-          d->character->player->time.logon = time(0);
+          conn->character->player->last_site = conn->character->desc->getPeerOriginalAddress().toString();
+          conn->character->player->time.logon = time(0);
         }
-        d->character->save_char_obj();
+        conn->character->save_char_obj();
       }
-      write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
+      write_to_descriptor(conn->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
     }
   }
   fclose(fp);
@@ -260,7 +245,7 @@ int DC::write_hotboot_file(void)
 
 // attempts to read in the descs written to file, and reconnect their
 // links to the mud.
-int DC::load_hotboot_descs(void)
+qint32 DC::load_hotboot_descs(void)
 {
   QFile hotboot_file{QStringLiteral("hotboot")};
   if (!hotboot_file.exists())
@@ -274,16 +259,16 @@ int DC::load_hotboot_descs(void)
     logmisc(QStringLiteral("Hotboot, reloading characters."));
 
     QTextStream out(&hotboot_file);
-    for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
-             {
-             int fd;
+    std::for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
+                  {
+             qint32 fd;
             out >> fd;
             //qDebug("Read %d for port %d", fd, port);
             server_descriptor_list.insert(fd); });
 
     while (!out.atEnd())
     {
-      int descriptor;
+      qint32 descriptor;
       out >> descriptor;
       if (out.atEnd())
         break;
@@ -298,24 +283,24 @@ int DC::load_hotboot_descs(void)
       // qDebug("Read %d as descriptor for character '%s' from %s", descriptor, qPrintable(character_name), qPrintable(address));
 
       auto d = new Connection;
-      d->idle_time = 0;
-      d->idle_tics = 0;
-      d->wait = 1;
-      d->prompt_mode = 1;
-      d->output = {};
-      d->input = std::queue<std::string>();
-      d->output = qPrintable(character_name); // store it for later
-      d->login_time = time(0);
-      d->setPeerAddress(QHostAddress(address));
-      d->descriptor = descriptor;
+      conn->idle_time = {};
+      conn->idle_tics = {};
+      conn->wait = 1;
+      conn->prompt_mode = 1;
+      conn->output = {};
+      conn->input = QQueue<QString>();
+      conn->output = qPrintable(character_name); // store it for later
+      conn->login_time = time(0);
+      conn->setPeerAddress(QHostAddress(address));
+      conn->descriptor = descriptor;
 
       for (const auto &str : {"Recovering...\r\n", "Link recovery successful.\r\nPlease wait while mud finishes rebooting...\r\n"})
       {
         if (write_to_descriptor(descriptor, str) == -1)
         {
           logentry(QStringLiteral("Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot.").arg(address).arg(character_name).arg(descriptor));
-          CLOSE_SOCKET(descriptor);
-          delete d;
+          close(descriptor);
+          d = {};
           d = {};
           break;
         }
@@ -323,8 +308,8 @@ int DC::load_hotboot_descs(void)
       if (!d)
         continue;
 
-      d->next = DC::getInstance()->descriptor_list;
-      DC::getInstance()->descriptor_list = d;
+      conn->next = DC::getInstance()->connections_;
+      DC::getInstance()->connections_ = d;
     }
     hotboot_file.close();
   }
@@ -336,7 +321,7 @@ int DC::load_hotboot_descs(void)
   return 1;
 }
 
-vnum_t DC::getObjectVNUM(Object *obj, bool *ok)
+vnum_t DC::getObjectVNUM(ObjectPtr obj, bool *ok)
 {
   if (obj && obj_index)
   {
@@ -395,36 +380,37 @@ void DC::finish_hotboot(void)
   class Connection *d;
   char buf[MAX_STRING_LENGTH];
 
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto &conn : DC::getInstance()->connections_)
   {
-    write_to_descriptor(d->descriptor, "Reconnecting your link to your character...\r\n");
+    write_to_descriptor(conn->descriptor, "Reconnecting your link to your character...\r\n");
 
-    if (!load_char_obj(d, d->output))
+    auto result = load_char_obj(conn->output);
+    if (!result || !result.value())
     {
-      logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(d->output));
-      write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
+      logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(conn->output));
+      write_to_descriptor(conn->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
     }
 
-    write_to_descriptor(d->descriptor, "Success...May your visit continue to suck...\r\n");
+    write_to_descriptor(conn->descriptor, "Success...May your visit continue to suck...\r\n");
 
-    d->output.clear();
+    conn->output.clear();
 
     auto &character_list = DC::getInstance()->character_list;
-    character_list.insert(d->character);
+    character_list.insert(conn->character);
 
-    d->character->do_on_login_stuff();
+    conn->character->do_on_login_stuff();
 
-    STATE(d) = Connection::states::PLAYING;
+    conn->connected = Connection::states::PLAYING;
 
     update_max_who();
   }
 
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto &d : DC::getInstance()->connections_)
   {
-    do_look(d->character, "");
-    d->character->save(cmd_t::SAVE_SILENTLY);
+    do_look(conn->character, "");
+    conn->character->save(cmd_t::SAVE_SILENTLY);
   }
 }
 
@@ -450,10 +436,10 @@ void DC::init_game(void)
     logverbose(QStringLiteral("Hotboot failed.  Starting regular sockets."));
     logverbose(QStringLiteral("Opening mother connections."));
 
-    for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
-             {
+    std::for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
+                  {
                logf(0, DC::LogChannel::LOG_MISC, "Opening port %d.", port);
-               int listen_fd = init_socket(port);
+               qint32 listen_fd = init_socket(port);
                if (listen_fd >= 0)
                {
                  server_descriptor_list.insert(listen_fd);
@@ -485,7 +471,7 @@ void DC::init_game(void)
 
   if (DC::getInstance()->cf.bport == false)
   {
-    do_not_save_corpses = 0;
+    do_not_save_corpses = {};
   }
 
   if (cf.testing)
@@ -500,15 +486,15 @@ void DC::init_game(void)
   do_not_save_corpses = 1;
 
   logentry(QStringLiteral("Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
-  while (DC::getInstance()->descriptor_list)
+  while (DC::getInstance()->connections_)
   {
-    close_socket(DC::getInstance()->descriptor_list);
+    close_socket(DC::getInstance()->connections_);
   }
 
-  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [](const int &fd)
-           {
+  std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [](const qint32 &fd)
+                {
              logf(0, DC::LogChannel::LOG_MISC, "Closing fd %d.", fd);
-             CLOSE_SOCKET(fd); });
+             close(fd); });
 
   logentry(QStringLiteral("Goodbye."), 0, DC::LogChannel::LOG_MISC);
   logentry(QStringLiteral("Normal termination of game."), 0, DC::LogChannel::LOG_MISC);
@@ -518,9 +504,9 @@ void DC::init_game(void)
  * init_socket sets up the mother descriptor - creates the socket, sets
  * its options up, binds it, and listens.
  */
-int DC::init_socket(in_port_t port)
+qint32 DC::init_socket(in_port_t port)
 {
-  int fd, opt;
+  qint32 fd, opt;
   struct sockaddr_in sa;
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -544,8 +530,8 @@ int DC::init_socket(in_port_t port)
   }
 
   struct linger ld;
-  ld.l_onoff = 0;
-  ld.l_linger = 0;
+  ld.l_onoff = {};
+  ld.l_linger = {};
   if (setsockopt(fd, SOL_SOCKET, SO_LINGER, (char *)&ld, sizeof(ld)) < 0)
   {
     perror("setsockopt LINGER");
@@ -559,7 +545,7 @@ int DC::init_socket(in_port_t port)
   if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0)
   {
     perror("bind");
-    CLOSE_SOCKET(fd);
+    close(fd);
     exit(1);
   }
 
@@ -582,7 +568,7 @@ int DC::init_socket(in_port_t port)
 // it if we are closing the socket that is next to be processed.
 class Connection *next_d;
 std::stringstream timingDebugStr;
-uint64_t pulseavg = 0;
+quint64 pulseavg = {};
 
 /*
  * game_loop contains the main loop which drives the entire MUD.  It
@@ -597,7 +583,7 @@ void DC::game_loop(void)
   if (last_execution.isValid())
   {
     quint64 nsecs_expired = last_execution.nsecsElapsed();
-    double msecs_expired = 0;
+    double msecs_expired = {};
     if (nsecs_expired >= 1000000)
     {
       msecs_expired = nsecs_expired / 1000000.0;
@@ -617,11 +603,11 @@ void DC::game_loop(void)
 
   // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
   // otherwise an alias'd command could easily overrun the buffer
-  std::string comm = {};
+  QString comm = {};
   char buf[128] = {};
   class Connection *d = {};
-  int maxdesc = {};
-  int aliased = false;
+  qint32 maxdesc = {};
+  qint32 aliased = false;
 
   /* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
   PerfTimers["gameloop"].start();
@@ -634,29 +620,29 @@ void DC::game_loop(void)
   FD_ZERO(&output_set);
   FD_ZERO(&exc_set);
 
-  maxdesc = 0;
+  maxdesc = {};
   fd_set &input_set = this->input_set;
-  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set, &maxdesc](const int &fd)
-           {
+  std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set, &maxdesc](const qint32 &fd)
+                {
                FD_SET(fd, &input_set);
                if (fd > maxdesc)
                {
                  maxdesc = fd;
                } });
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = connections_; d; d = conn->next)
   {
-    if (d->descriptor > maxdesc)
-      maxdesc = d->descriptor;
-    FD_SET(d->descriptor, &input_set);
-    FD_SET(d->descriptor, &output_set);
-    FD_SET(d->descriptor, &exc_set);
+    if (conn->descriptor > maxdesc)
+      maxdesc = conn->descriptor;
+    FD_SET(conn->descriptor, &input_set);
+    FD_SET(conn->descriptor, &output_set);
+    FD_SET(conn->descriptor, &exc_set);
   }
 
   // poll (without blocking) for new input, output, and exceptions
   if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) < 0)
   {
-    int save_errno = errno;
+    qint32 save_errno = errno;
     perror("game_loop : select : poll");
     if (save_errno != EINTR)
     {
@@ -665,32 +651,32 @@ void DC::game_loop(void)
   }
 
   // If new connection waiting, accept it
-  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [this, &input_set](const int &fd)
-           {
+  std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [this, &input_set](const qint32 &fd)
+                {
                if (FD_ISSET(fd, &input_set))
                {
                  new_descriptor(fd);
                } });
 
   // close the weird descriptors in the exception set
-  for (d = descriptor_list; d; d = next_d)
+  for (d = connections_; d; d = next_d)
   {
-    next_d = d->next;
-    if (FD_ISSET(d->descriptor, &exc_set))
+    next_d = conn->next;
+    if (FD_ISSET(conn->descriptor, &exc_set))
     {
-      FD_CLR(d->descriptor, &input_set);
-      FD_CLR(d->descriptor, &output_set);
+      FD_CLR(conn->descriptor, &input_set);
+      FD_CLR(conn->descriptor, &output_set);
       close_socket(d);
     }
   }
 
   /* process descriptors with input pending */
-  for (d = descriptor_list; d; d = next_d)
+  for (d = connections_; d; d = next_d)
   {
-    next_d = d->next;
+    next_d = conn->next;
 
-    const auto idle_seconds = d->idle_time / DC::PASSES_PER_SEC;
-    if (FD_ISSET(d->descriptor, &input_set))
+    const auto idle_seconds = conn->idle_time / DC::PASSES_PER_SEC;
+    if (FD_ISSET(conn->descriptor, &input_set))
     {
       if (process_input(d) < 0)
       {
@@ -699,13 +685,13 @@ void DC::game_loop(void)
     }
     else
     {
-      switch (d->connected)
+      switch (conn->connected)
       {
       case Connection::states::GET_NAME:
       case Connection::states::GET_OLD_PASSWORD:
         if (idle_seconds > 30)
         {
-          SEND_TO_Q(QStringLiteral("Disconnected for being idle for over 30 seconds.\r\n"), d);
+          write_to_output(QStringLiteral("Disconnected for being idle for over 30 seconds.\r\n"), d);
           close_socket(d);
         }
         break;
@@ -759,74 +745,71 @@ void DC::game_loop(void)
   }
 
   /* process commands we just read from process_input */
-  for (d = descriptor_list; d; d = next_d)
+  for (d = connections_; d; d = next_d)
   {
-    if (d->character != nullptr)
+    if (conn->character != nullptr)
     {
-      QLocale::setDefault(QLocale(d->character->getSetting("locale", "en_US")));
+      QLocale::setDefault(QLocale(conn->character->getSetting("locale", "en_US")));
     }
 
-    next_d = d->next;
-    d->wait = MAX(d->wait, 1);
-    if (d->connected == Connection::states::CLOSE)
+    next_d = conn->next;
+    conn->wait = MAX(conn->wait, 1);
+    if (conn->connected == Connection::states::CLOSE)
     {
       close_socket(d); // So they don't have to type a command.
       continue;
     }
-    --(d->wait);
-    if (STATE(d) == Connection::states::QUESTION_ANSI ||
-        STATE(d) == Connection::states::QUESTION_SEX ||
-        STATE(d) == Connection::states::QUESTION_STAT_METHOD ||
-        STATE(d) == Connection::states::NEW_STAT_METHOD ||
-        STATE(d) == Connection::states::OLD_STAT_METHOD ||
-        STATE(d) == Connection::states::QUESTION_RACE ||
-        STATE(d) == Connection::states::QUESTION_CLASS ||
-        STATE(d) == Connection::states::QUESTION_STATS ||
-        STATE(d) == Connection::states::NEW_PLAYER)
+    --(conn->wait);
+    if (conn->connected == Connection::states::QUESTION_ANSI ||
+        conn->connected == Connection::states::QUESTION_SEX ||
+        conn->connected == Connection::states::QUESTION_STAT_METHOD ||
+        conn->connected == Connection::states::NEW_STAT_METHOD ||
+        conn->connected == Connection::states::OLD_STAT_METHOD ||
+        conn->connected == Connection::states::QUESTION_RACE ||
+        conn->connected == Connection::states::QUESTION_CLASS ||
+        conn->connected == Connection::states::QUESTION_STATS ||
+        conn->connected == Connection::states::NEW_PLAYER)
     {
       nanny(d);
     }
-    else if ((d->wait <= 0) && !d->input.empty())
+    else if ((conn->wait <= 0) && !conn->input.empty())
     {
 
-      comm = get_from_q(d->input);
-#ifdef DEBUG_INPUT
-      // std::cerr << "Got command [" << comm << "] from the d->input queue" << std::endl;
-#endif
+      comm = get_from_q(conn->input);
       /* reset the idle timer & pull char back from void if necessary */
-      d->wait = 1;
-      d->prompt_mode = 1;
+      conn->wait = 1;
+      conn->prompt_mode = 1;
 
-      if (d->showstr_count) /* reading something w/ pager     */
+      if (conn->showstr_count) /* reading something w/ pager     */
         show_string(d, comm.data());
-      //	else if (d->str)		/* writing boards, mail, etc.     */
+      //	else if (conn->str)		/* writing boards, mail, etc.     */
       //	  string_add(d, comm);
-      else if (d->strnew && STATE(d) == Connection::states::EXDSCR)
+      else if (conn->strnew && conn->connected == Connection::states::EXDSCR)
         new_string_add(d, comm.data());
-      else if (d->hashstr)
+      else if (conn->hashstr)
         string_hash_add(d, comm.data());
-      else if (d->strnew && (d->character->isNonPlayer() || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
+      else if (conn->strnew && (conn->character->isNonPlayer() || !isSet(conn->character->player->toggles, Player::PLR_EDITOR_WEB)))
         new_string_add(d, comm.data());
-      else if (d->connected != Connection::states::PLAYING) /* in menus, etc. */
+      else if (conn->connected != Connection::states::PLAYING) /* in menus, etc. */
         nanny(d, comm);
       else
       {              /* else: we're playing normally */
         if (aliased) /* to prevent recursive aliases */
-          d->prompt_mode = 0;
-        else if (d && d->character && d->character->player)
+          conn->prompt_mode = {};
+        else if (d && conn->character && conn->character->player)
         {
-          comm = d->character->player->perform_alias(comm.c_str()).toStdString();
+          comm = conn->character->player->perform_alias(comm.c_str()).toStdString();
         }
         PerfTimers["command"].start();
         // Azrack's a chode.  Don't forget to check
         // ->snooping before you check snooping->char:P
-        if (!comm.empty() && comm[0] == '%' && d->snooping && d->snooping->character)
+        if (!comm.empty() && comm[0] == '%' && conn->snooping && conn->snooping->character)
         {
-          d->snooping->character->command_interpreter(comm.substr(1).c_str());
+          conn->snooping->character->command_interpreter(comm.substr(1).c_str());
         }
         else
         {
-          d->character->command_interpreter(comm.c_str()); /* send it to interpreter */
+          conn->character->command_interpreter(comm.c_str()); /* send it to interpreter */
         }
         PerfTimers["command"].stop();
 
@@ -837,13 +820,13 @@ void DC::game_loop(void)
     // this line processes a "get" or "post" if available.  Otherwise it prints the
     // entrance screen.  If a player has already entered their name, it processes
     // that too.
-    else if (d->connected == Connection::states::DISPLAY_ENTRANCE)
+    else if (conn->connected == Connection::states::DISPLAY_ENTRANCE)
       nanny(d, "");
     // this line allows the mud to skip this descriptor until next pulse
-    else if (d->connected == Connection::states::PRE_DISPLAY_ENTRANCE)
-      d->connected = Connection::states::DISPLAY_ENTRANCE;
+    else if (conn->connected == Connection::states::PRE_DISPLAY_ENTRANCE)
+      conn->connected = Connection::states::DISPLAY_ENTRANCE;
     else
-      d->idle_time++;
+      conn->idle_time++;
   } // for
 
   // do what needs to be done.  violence, repoping, regen, etc.
@@ -859,14 +842,14 @@ void DC::game_loop(void)
   PerfTimers["output"].start();
 
   /* send queued output out to the operating system (ultimately to user) */
-  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
+  for (d = DC::getInstance()->connections_; d; d = next_d)
   {
-    next_d = d->next;
-    if ((FD_ISSET(d->descriptor, &output_set) && !d->output.isEmpty()) || d->prompt_mode)
-      if (d->process_output() < 0)
+    next_d = conn->next;
+    if ((FD_ISSET(conn->descriptor, &output_set) && !conn->output.isEmpty()) || conn->prompt_mode)
+      if (conn->process_output() < 0)
         close_socket(d);
     // else
-    // d->prompt_mode = 1;
+    // conn->prompt_mode = 1;
   }
   PerfTimers["output"].stop();
   // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
@@ -878,13 +861,15 @@ void DC::game_loop(void)
   // else logf(110, DC::LogChannel::LOG_BUG, "0 delay on pulse");
   gettimeofday(&last_time_, nullptr);
   PerfTimers["gameloop"].stop();
+#ifdef TRACY
   FrameMark;
+#endif
 }
 
 void DC::game_loop_init(void)
 {
-  null_time.tv_sec = 0;
-  null_time.tv_usec = 0;
+  null_time.tv_sec = {};
+  null_time.tv_usec = {};
   FD_ZERO(&null_set);
   init_heartbeat();
 
@@ -899,9 +884,9 @@ void DC::game_loop_init(void)
   auto dc = this;
 
   server.route("/myApi/<arg>", QHttpServerRequest::Method::Get,
-               [&dc](int id, const QHttpServerRequest &request)
+               [&dc](qint32 id, const QHttpServerRequest &request)
                {
-                 return QHttpServerResponse(QStringLiteral("int:%1\r\n").arg(id));
+                 return QHttpServerResponse(QStringLiteral("qint32:%1\r\n").arg(id));
                });
   server.route("/myApi/<arg>/<arg>", QHttpServerRequest::Method::Get,
                [&dc](QString str, QString str2, const QHttpServerRequest &request)
@@ -956,7 +941,7 @@ void DC::game_loop_init(void)
 
                  auto future = QtConcurrent::run([]() {});
 
-                 int do_not_save_corpses = 1;
+                 qint32 do_not_save_corpses = 1;
 
                  QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
@@ -1013,59 +998,59 @@ void DC::game_test_init(void)
   assert(!strcmp(name, "1"));
 
   auto d = new Connection;
-  Character *ch = new Character(this);
-  ch->setName("Debugimp");
+  CharacterPtr ch = new Character(this);
+  ch->name("Debugimp");
   ch->player = new Player;
   ch->setType(Character::Type::Player);
 
   ch->desc = d;
   ch->setLevel(110);
-  d->descriptor = 1;
-  d->character = ch;
-  d->output = {};
+  conn->descriptor = 1;
+  conn->character = ch;
+  conn->output = {};
 
   auto &character_list = DC::getInstance()->character_list;
-  character_list.insert(d->character);
+  character_list.insert(conn->character);
 
-  d->character->do_on_login_stuff();
+  conn->character->do_on_login_stuff();
 
-  STATE(d) = Connection::states::PLAYING;
+  conn->connected = Connection::states::PLAYING;
 
-  for (uint32_t i = 0; i < UINT32_MAX; ++i)
+  for (quint32 i = {}; i < UINT32_MAX; ++i)
   {
     QString aff_name = get_skill_name(i);
   }
 
   update_max_who();
 
-  do_restore(ch, "debugimp");
+  do_restore(ch, QStringLiteral("debugimp"));
 
-  do_stand(ch, "");
-  d->process_output();
+  do_stand(ch, QStringLiteral(""));
+  conn->process_output();
 
   char_to_room(ch, 3001);
-  d->process_output();
+  conn->process_output();
   ch->do_toggle({"pager"}, cmd_t::DEFAULT);
   ch->do_toggle({"ansi"}, cmd_t::DEFAULT);
   ch->do_toggle({}, cmd_t::DEFAULT);
   ch->do_goto({"23"});
-  do_score(ch, "");
-  d->process_output();
+  do_score(ch, QStringLiteral(""));
+  conn->process_output();
 
-  do_load(ch, "m 23");
-  d->process_output();
+  do_load(ch, QStringLiteral("m 23"));
+  conn->process_output();
 
   do_look(ch, "debugimp");
-  d->process_output();
+  conn->process_output();
 
   ch->do_bestow({"debugimp", "load"});
-  d->process_output();
+  conn->process_output();
 
-  do_load(ch, "m 23");
-  d->process_output();
+  do_load(ch, QStringLiteral("m 23"));
+  conn->process_output();
 
   ch->do_test({"all"});
-  d->process_output();
+  conn->process_output();
 
   std::cout << std::endl;
   std::cerr << std::endl;
@@ -1263,7 +1248,7 @@ void telnet_echo_off(class Connection *d)
           (char)0,
       };
 
-  SEND_TO_Q(off_string, d);
+  write_to_output(off_string, d);
 }
 
 /*
@@ -1281,22 +1266,22 @@ void telnet_echo_on(class Connection *d)
           (char)0,
       };
 
-  SEND_TO_Q(on_string, d);
+  write_to_output(on_string, d);
 }
 
 void telnet_sga(Connection *d)
 {
   const char suppress_go_ahead[] = {(char)IAC, (char)WILL, (char)TELOPT_SGA, (char)0};
-  SEND_TO_Q(QByteArray(suppress_go_ahead), d);
+  write_to_output(QByteArray(suppress_go_ahead), d);
 }
 
 void telnet_ga(Connection *d)
 {
   const char go_ahead[] = {(char)IAC, (char)GA, (char)0};
-  SEND_TO_Q(QByteArray(go_ahead), d);
+  write_to_output(QByteArray(go_ahead), d);
 }
 
-int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
+qint32 do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->getLastPrompt().isEmpty())
     ch->sendln("Last prompt: unset");
@@ -1306,7 +1291,7 @@ int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_prompt(Character *ch, char *arg, cmd_t cmd)
+qint32 do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1345,7 +1330,7 @@ int do_prompt(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-char *calc_color_align(int align)
+const char *calc_color_align(qint32 align)
 {
   if (align <= -351)
     return BOLD RED;
@@ -1358,10 +1343,10 @@ char *calc_color_align(int align)
   return BOLD GREEN;
 }
 
-char *calc_color(int hit, int max_hit)
+const char *calc_color(qint32 hit, qint32 max_hit)
 {
   /* damn whiney players
-  int percentage = hit * 100 / max_hit;
+  qint32 percentage = hit * 100 / max_hit;
 
   if(percentage >= 100)
     return BOLD GREEN;
@@ -1387,7 +1372,7 @@ char *calc_color(int hit, int max_hit)
   return GREEN;
 }
 
-char *cond_txtz[] = {
+const char *cond_txtz[] = {
     "excellent condition",
     "a few scratches",
     "slightly hurt",
@@ -1397,7 +1382,7 @@ char *cond_txtz[] = {
     "near death",
     "dead as a doornail"};
 
-char *cond_txtc[] = {
+const char *cond_txtc[] = {
     BOLD GREEN "excellent condition" NTEXT,
     GREEN "a few scratches" NTEXT,
     BOLD YELLOW "slightly hurt" NTEXT,
@@ -1407,9 +1392,9 @@ char *cond_txtc[] = {
     BOLD GREY "near death" NTEXT,
     "dead as a doornail"};
 
-char *calc_condition(Character *ch, bool colour)
+char *calc_condition(CharacterPtr ch, bool colour)
 {
-  int percent;
+  qint32 percent;
   char *cond_txt[8]; // = cond_txtz;
 
   if (colour)
@@ -1418,7 +1403,7 @@ char *calc_condition(Character *ch, bool colour)
     memcpy(cond_txt, cond_txtz, sizeof(cond_txtz));
 
   if (ch->getHP() == 0 || GET_MAX_HIT(ch) == 0)
-    percent = 0;
+    percent = {};
   else
     percent = ch->getHP() * 100 / GET_MAX_HIT(ch);
 
@@ -1466,7 +1451,7 @@ QString Connection::createPrompt(void)
   {
     return "] ";
   }
-  else if (STATE(this) != Connection::states::PLAYING)
+  else if (connected != Connection::states::PLAYING)
   {
     return {};
   }
@@ -1486,7 +1471,7 @@ QString Connection::createPrompt(void)
   return prompt;
 }
 
-Character *get_charmie(Character *ch)
+CharacterPtr get_charmie(CharacterPtr ch)
 {
   if (!ch)
     return 0;
@@ -1497,10 +1482,10 @@ Character *get_charmie(Character *ch)
       if (IS_AFFECTED(k->follower, AFF_CHARM))
         return k->follower;
 
-  return nullptr;
+  return {};
 }
 
-void write_to_q(const std::string txt, std::queue<std::string> &input_queue)
+void write_to_q(const QString txt, QQueue<QString> &input_queue)
 {
 #ifdef DEBUG_INPUT
   // std::cerr << "Writing to queue '" << txt << "'" << std::endl;
@@ -1508,14 +1493,14 @@ void write_to_q(const std::string txt, std::queue<std::string> &input_queue)
   input_queue.push(txt);
 }
 
-std::string get_from_q(std::queue<std::string> &input_queue)
+QString get_from_q(QQueue<QString> &input_queue)
 {
   if (input_queue.empty())
   {
-    return std::string();
+    return QString();
   }
 
-  std::string dest = input_queue.front();
+  QString dest = input_queue.front();
   input_queue.pop();
 
   return dest;
@@ -1524,27 +1509,27 @@ std::string get_from_q(std::queue<std::string> &input_queue)
 /* Empty the queues before closing connection */
 void flush_queues(class Connection *d)
 {
-  while (!get_from_q(d->input).empty())
+  while (!get_from_q(conn->input).empty())
     ;
-  if (!d->output.isEmpty())
+  if (!conn->output.isEmpty())
   {
-    write_to_descriptor(d->descriptor, d->output);
+    write_to_descriptor(conn->descriptor, conn->output);
   }
 }
 
 void DC::free_buff_pool_from_memory(void)
 {
-  txt_block *curr = nullptr;
+  txt_block *curr = {};
 
   while (bufpool)
   {
     curr = bufpool->next;
-    dc_free(bufpool);
+    bufpool = {};
     bufpool = curr;
   }
 }
 
-void scramble_text(std::string &txt)
+void scramble_text(QString &txt)
 {
   for (auto &curr : txt)
   {
@@ -1578,7 +1563,7 @@ void write_to_output(const char *txt, class Connection *t)
   }
 }
 
-void write_to_output(std::string txt, class Connection *t)
+void write_to_output(QString txt, class Connection *t)
 {
   if (!txt.empty())
   {
@@ -1606,7 +1591,7 @@ void write_to_output(QByteArray txt, class Connection *t)
   }
   if (t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == Connection::states::PLAYING)
   {
-    txt = scramble_text(txt.toStdString().c_str()).toStdString().c_str();
+    txt = qPrintable(scramble_text(txt));
   }
   t->output.append(txt);
 }
@@ -1615,11 +1600,11 @@ void write_to_output(QByteArray txt, class Connection *t)
  *  socket handling                                                  *
  ****************************************************************** */
 
-int new_descriptor(int s)
+qint32 new_descriptor(qint32 s)
 {
   socket_t desc = {};
   socklen_t i = {};
-  static int last_desc = 0; /* last descriptor number */
+  static qint32 last_desc = {}; /* last descriptor number */
   class Connection *newd = {};
   struct sockaddr_in peer = {};
   char buf[MAX_STRING_LENGTH] = {};
@@ -1648,38 +1633,38 @@ int new_descriptor(int s)
 
   /* create a new descriptor */
   newd = new Connection;
-  newd->setPeerAddress(QHostAddress(inet_ntoa(peer.sin_addr)));
+  newd.setPeerAddress(QHostAddress(inet_ntoa(peer.sin_addr)));
 
   /* determine if the site is banned */
-  if (isbanned(newd->getPeerOriginalAddress()) == BAN_ALL)
+  if (DC::getInstance()->bans_.is_banned(newd.getPeerOriginalAddress().toString()) == Ban::type_t::ALL)
   {
     write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\r\n"
                               "Questions, please email us at:\r\n"
                               "imps@dcastle.org\r\n");
 
-    CLOSE_SOCKET(desc);
-    logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
-    delete newd;
+    close(desc);
+    logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd.getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
+    newd = {};
     return 0;
   }
 
   /* initialize descriptor data */
-  newd->descriptor = desc;
-  newd->idle_tics = 0;
-  newd->idle_time = 0;
-  newd->wait = 1;
-  newd->output = {};
-  newd->next = DC::getInstance()->descriptor_list;
-  newd->login_time = time(0);
-  newd->astr = 0;
+  newd.descriptor = desc;
+  newd.idle_tics = {};
+  newd.idle_time = {};
+  newd.wait = 1;
+  newd.output = {};
+  newd.next = DC::getInstance()->connections_;
+  newd.login_time = time(0);
+  newd.astr = {};
   if (++last_desc == 1000)
     last_desc = 1;
-  newd->desc_num = last_desc;
+  newd.desc_num = last_desc;
 
   /* prepend to list */
-  DC::getInstance()->descriptor_list = newd;
+  DC::getInstance()->connections_ = newd;
 
-  newd->connected = Connection::states::PRE_DISPLAY_ENTRANCE;
+  newd.connected = Connection::states::PRE_DISPLAY_ENTRANCE;
   return 0;
 }
 
@@ -1705,7 +1690,7 @@ QByteArray Connection::getOutput(void) const
   return output;
 }
 
-int Connection::process_output(void)
+qint32 Connection::process_output(void)
 {
   QByteArray i = output;
 
@@ -1724,23 +1709,23 @@ int Connection::process_output(void)
    * now, send the output.  If this is an 'interruption', use the prepended
    * CRLF, otherwise send the straight output sans CRLF.
    */
-  int result{};
+  qint32 result = {};
   if (!prompt_mode)
   { /* && !t->connected) */
     result = write_to_descriptor(descriptor, "\r\n" + i);
-    prompt_mode = 0;
+    prompt_mode = {};
   }
   else
   {
     result = write_to_descriptor(descriptor, i);
-    prompt_mode = 0;
+    prompt_mode = {};
   }
   /* handle snooping: prepend "% " and send to snooper */
   if (snoop_by)
   {
-    SEND_TO_Q("% ", snoop_by);
-    SEND_TO_Q(output, snoop_by);
-    SEND_TO_Q("%%", snoop_by);
+    write_to_output("% ", snoop_by);
+    write_to_output(output, snoop_by);
+    write_to_output("%%", snoop_by);
   }
 
   output = {};
@@ -1748,7 +1733,7 @@ int Connection::process_output(void)
   return result;
 }
 
-int write_to_descriptor(int desc, QByteArray txt)
+qint32 write_to_descriptor(qint32 desc, QByteArray txt)
 {
   if (txt.isEmpty())
     return 0;
@@ -1795,7 +1780,7 @@ void process_iac(Connection *t)
   size_t iac_pos = t->inbuf.find(telnet::iac);
   if (iac_pos != t->inbuf.npos)
   {
-    size_t processed = 0;
+    size_t processed = {};
     auto iac_str = t->inbuf.substr(iac_pos);
     for (const auto &c : iac_str)
     {
@@ -1825,8 +1810,8 @@ void process_iac(Connection *t)
           break;
 
         default:
-          // std::cerr << "Unrecognized telnet option " << hex << static_cast<int>(c) << std::endl;
-          prev = 0;
+          // std::cerr << "Unrecognized telnet option " << hex << static_cast<qint32>(c) << std::endl;
+          prev = {};
           break;
         }
       }
@@ -1843,21 +1828,21 @@ void process_iac(Connection *t)
         }
         else
         {
-          // std::cerr << "Unrecognized do option " << hex << static_cast<int>(c) << std::endl;
+          // std::cerr << "Unrecognized do option " << hex << static_cast<qint32>(c) << std::endl;
         }
-        prev = 0;
+        prev = {};
       }
       else
       {
-        // std::cerr << "Unrecognized telnet code " << hex << static_cast<int>(c) << std::endl;
-        prev = 0;
+        // std::cerr << "Unrecognized telnet code " << hex << static_cast<qint32>(c) << std::endl;
+        prev = {};
       }
     }
     t->inbuf.erase(iac_pos, processed);
   }
 }
 
-std::string removeUnprintable(std::string input)
+QString removeUnprintable(QString input)
 {
   size_t found_pos = input.npos;
   do
@@ -1890,7 +1875,7 @@ std::string removeUnprintable(std::string input)
   return input;
 }
 
-std::string makePrintable(std::string input)
+QString makePrintable(QString input)
 {
   size_t found_pos = input.npos;
   do
@@ -1930,12 +1915,12 @@ std::string makePrintable(std::string input)
  * ASSUMPTION: There will be no newlines in the raw input buffer when this
  * function is called.  We must maintain that before returning.
  */
-int process_input(class Connection *t)
+qint32 process_input(class Connection *t)
 {
   size_t eoc_pos = t->inbuf.npos;
-  size_t erase = 0;
-  ssize_t bytes_read = 0;
-  t->idle_time = 0;
+  size_t erase = {};
+  ssize_t bytes_read = {};
+  t->idle_time = {};
 
   do
   {
@@ -1958,9 +1943,9 @@ int process_input(class Connection *t)
     }
     else if (bytes_read == 0)
     {
-      if (t->character != nullptr && GET_NAME(t->character) != nullptr)
+      if (t->character != nullptr && qPrintable(t->character->name()) != nullptr)
       {
-        logentry(QStringLiteral("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        logentry(QStringLiteral("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(qPrintable(t->character->name())), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
       else
       {
@@ -1969,14 +1954,14 @@ int process_input(class Connection *t)
 
       return -1;
     }
-    std::string buffer = c_buffer;
+    QString buffer = c_buffer;
     t->inbuf += buffer;
 
     // Search for telnet control codes
     process_iac(t);
     if (t->server_size_echo)
     {
-      std::string new_buffer;
+      QString new_buffer;
       for (const auto &c : buffer)
       {
         if ((c >= ' ' && c <= '~'))
@@ -2013,7 +1998,7 @@ int process_input(class Connection *t)
   do
   {
     eoc_pos = t->inbuf.npos;
-    erase = 0;
+    erase = {};
     size_t crnl_pos = t->inbuf.find("\r\n");
     if (crnl_pos != t->inbuf.npos)
     {
@@ -2040,7 +2025,7 @@ int process_input(class Connection *t)
     // std::cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
     << "(" << t->inbuf.length() << ")" << std::endl;
 #endif
-    std::string buffer = t->inbuf.substr(0, eoc_pos);
+    QString buffer = t->inbuf.substr(0, eoc_pos);
     t->inbuf.erase(0, eoc_pos + erase);
 #ifdef DEBUG_INPUT
     // std::cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
@@ -2057,13 +2042,13 @@ int process_input(class Connection *t)
     // Only search for pipe (|) when not editing
     if (!t->isEditing())
     {
-      size_t pipe_pos = 0;
+      size_t pipe_pos = {};
       do
       {
         pipe_pos = buffer.find('|');
         if (pipe_pos != buffer.npos)
         {
-          std::string new_buffer = buffer.substr(0, pipe_pos);
+          QString new_buffer = buffer.substr(0, pipe_pos);
           write_to_q(new_buffer, t->input);
 
           buffer.erase(0, pipe_pos + 1);
@@ -2102,7 +2087,7 @@ int process_input(class Connection *t)
               space_left -= 2;
             }
             else
-              space_left = 0; // if no space left, so it truncates properly
+              space_left = {}; // if no space left, so it truncates properly
                               // do nothing, which junks the $
           }
         }
@@ -2117,7 +2102,7 @@ int process_input(class Connection *t)
 
       if ((space_left <= 0) && (ptr < nl_pos))
       {
-        std::string buffer;
+        QString buffer;
 
         buffer = fmt::format("Line too long.  Truncated to:\r\n{}\r\n", tmp);
         if (write_to_descriptor(t->descriptor, buffer) < 0)
@@ -2125,11 +2110,11 @@ int process_input(class Connection *t)
       }
       if (t->snoop_by)
       {
-        SEND_TO_Q("% ", t->snoop_by);
-        SEND_TO_Q(tmp, t->snoop_by);
-        SEND_TO_Q("\r\n", t->snoop_by);
+        write_to_output("% ", t->snoop_by);
+        write_to_output(tmp, t->snoop_by);
+        write_to_output("\r\n", t->snoop_by);
       }
-      failed_subst = 0;
+      failed_subst = {};
 
       if (!tmp.empty() && tmp[0] == '!')
       {
@@ -2154,7 +2139,7 @@ int process_input(class Connection *t)
   // see if there's another newline in the input buffer
 
     read_point = ptr = nl_pos;
-    for (nl_pos = nullptr; *ptr && !nl_pos; ptr++)
+    for (nl_pos = {}; *ptr && !nl_pos; ptr++)
       if (ISNEWL(*ptr) || (t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDITING && t->connected != Connection::states::EDIT_MPROG && *ptr == '|'))
         nl_pos = ptr;
 
@@ -2173,17 +2158,17 @@ int process_input(class Connection *t)
 
 /*
  * perform substitution for the '^..^' csh-esque syntax
- * orig is the orig std::string (i.e. the one being modified.
- * subst contains the substition std::string, i.e. "^telm^tell"
+ * orig is the orig QString (conn->e. the one being modified.
+ * subst contains the substition QString, conn->e. "^telm^tell"
  */
-int perform_subst(class Connection *t, char *orig, char *subst)
+qint32 perform_subst(class Connection *t, char *orig, char *subst)
 {
   char new_subst[MAX_INPUT_LENGTH + 5];
 
   char *first, *second, *strpos;
 
   /*
-   * first is the position of the beginning of the first std::string (the one
+   * first is the position of the beginning of the first QString (the one
    * to be replaced
    */
   first = subst + 1;
@@ -2191,35 +2176,35 @@ int perform_subst(class Connection *t, char *orig, char *subst)
   /* now find the second '^' */
   if (!(second = strchr(first, '^')))
   {
-    SEND_TO_Q("Invalid substitution.\r\n", t);
+    write_to_output("Invalid substitution.\r\n", t);
     return 1;
   }
   /* terminate "first" at the position of the '^' and make 'second' point
-   * to the beginning of the second std::string */
+   * to the beginning of the second QString */
   *(second++) = '\0';
 
-  /* now, see if the contents of the first std::string appear in the original */
+  /* now, see if the contents of the first QString appear in the original */
   if (!(strpos = strstr(orig, first)))
   {
-    SEND_TO_Q("Invalid substitution.\r\n", t);
+    write_to_output("Invalid substitution.\r\n", t);
     return 1;
   }
-  /* now, we construct the new std::string for output. */
+  /* now, we construct the new QString for output. */
 
-  /* first, everything in the original, up to the std::string to be replaced */
+  /* first, everything in the original, up to the QString to be replaced */
   strncpy(new_subst, orig, (strpos - orig));
   new_subst[(strpos - orig)] = '\0';
 
-  /* now, the replacement std::string */
+  /* now, the replacement QString */
   strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
 
-  /* now, if there's anything left in the original after the std::string to
+  /* now, if there's anything left in the original after the QString to
    * replaced, copy that too. */
   if (((strpos - orig) + strlen(first)) < strlen(orig))
     strncat(new_subst, strpos + strlen(first),
             (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
 
-  /* terminate the std::string in case of an overflow from strncat */
+  /* terminate the QString in case of an overflow from strncat */
   new_subst[MAX_INPUT_LENGTH - 1] = '\0';
   strcpy(subst, new_subst);
 
@@ -2228,75 +2213,75 @@ int perform_subst(class Connection *t, char *orig, char *subst)
 
 // return 1 on success
 // return 0 if we quit everyone out at the bottom
-int close_socket(class Connection *d)
+qint32 close_socket(class Connection *d)
 {
   char buf[128], idiotbuf[128];
   class Connection *temp;
-  // int32_t target_idnum = -1;
+  // qint32 target_idnum = -1;
   if (!d)
     return 0;
   flush_queues(d);
-  CLOSE_SOCKET(d->descriptor);
+  close(conn->descriptor);
 
   /* Forget snooping */
-  if (d->snooping)
-    d->snooping->snoop_by = nullptr;
+  if (conn->snooping)
+    conn->snooping->snoop_by = {};
 
-  if (d->snoop_by)
+  if (conn->snoop_by)
   {
-    SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
-    d->snoop_by->snooping = nullptr;
+    write_to_output("Your victim is no longer among us.\r\n", conn->snoop_by);
+    conn->snoop_by->snooping = {};
   }
-  if (d->hashstr)
+  if (conn->hashstr)
   {
     strcpy(idiotbuf, "\r\n~\r\n");
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
-  if (d->strnew && (d->character->isNonPlayer() || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
+  if (conn->strnew && (conn->character->isNonPlayer() || !isSet(conn->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
     strcpy(idiotbuf, "/s\r\n");
     strcat(idiotbuf, "\0");
     new_string_add(d, idiotbuf);
   }
-  if (d->character)
+  if (conn->character)
   {
-    // target_idnum = GET_IDNUM(d->character);
-    if (d->isPlaying() || d->isEditing())
+    // target_idnum = GET_IDNUM(conn->character);
+    if (conn->isPlaying() || conn->isEditing())
     {
-      d->character->save_char_obj();
+      conn->character->save_char_obj();
       // clan area stuff
-      extern void check_quitter(Character * ch);
-      check_quitter(d->character);
+      extern void check_quitter(CharacterPtr ch);
+      check_quitter(conn->character);
 
       // end any performances
-      if (IS_SINGING(d->character))
-        do_sing(d->character, "stop");
+      if (IS_SINGING(conn->character))
+        do_sing(conn->character, QStringLiteral("stop"));
 
-      act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
+      act("$n has lost $s link.", conn->character, 0, 0, TO_ROOM, 0);
 
-      if (IS_AFFECTED(d->character, AFF_CANTQUIT))
+      if (IS_AFFECTED(conn->character, AFF_CANTQUIT))
       {
-        logsocket(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        logsocket(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
       }
       else
       {
-        logsocket(QStringLiteral("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        logsocket(QStringLiteral("%1@%2 has disconnected from room %3.").arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
       }
-      d->character->desc = nullptr;
+      conn->character->desc = {};
     }
     else
     {
       sprintf(buf, "Losing player: %s.",
-              GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
+              qPrintable(conn->character->name()) ? qPrintable(conn->character->name()) : "<null>");
       logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
-      if (d->isEditing())
+      if (conn->isEditing())
       {
         //		sprintf(buf, "Suspicious: %s.",
-        //			GET_NAME(d->character));
+        //			qPrintable(conn->character->name()));
         //		logentry(buf, 110, LOG_HMM);
       }
-      free_char(d->character, Trace("close_socket"));
+      free_char(conn->character, Trace("close_socket"));
     }
   }
   //   Removed this log caues it's so fricken annoying
@@ -2304,31 +2289,31 @@ int close_socket(class Connection *d)
   //    logentry(QStringLiteral("Losing descriptor without char."), ANGEL, DC::LogChannel::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
-  if (d->original && d->original->desc)
-    d->original->desc = nullptr;
+  if (conn->original && conn->original->desc)
+    conn->original->desc = {};
 
   // if we're closing the socket that is next to be processed, we want to
   // go ahead and move on to the next one
   if (d == next_d)
-    next_d = d->next;
+    next_d = conn->next;
 
-  REMOVE_FROM_LIST(d, DC::getInstance()->descriptor_list, next);
+  DC::getInstance()->connections_.remove(d);
 
-  if (d->showstr_head)
-    dc_free(d->showstr_head);
-  if (d->showstr_count)
-    dc_free(d->showstr_vector);
+  if (conn->showstr_head)
+    conn->showstr_head = {};
+  if (conn->showstr_count)
+    conn->showstr_vector = {};
 
-  delete d;
-  d = nullptr;
+  d = {};
+  d = {};
 
-  /*  if(DC::getInstance()->descriptor_list == nullptr)
+  /*  if(DC::getInstance()->connections_ == nullptr)
   {
     // if there is NOONE on (everyone got disconnected) loop through and
     // boot all of the linkdeads.  That way if the mud's link is cut, the
     // first person back on can't RK everyone
-    Character * next_i;
-    for(Character * i = character_list; i; i = next_i) {
+    CharacterPtr  next_i;
+    for(CharacterPtr  i = character_list; i; i = next_i) {
        next_i = i->next;
        if(i->isNonPlayer())
          continue;
@@ -2343,21 +2328,21 @@ void check_idle_passwords(void)
 {
   class Connection *d, *next_d;
 
-  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
+  for (d = DC::getInstance()->connections_; d; d = next_d)
   {
-    next_d = d->next;
-    if (STATE(d) != Connection::states::GET_OLD_PASSWORD && STATE(d) != Connection::states::GET_NAME)
+    next_d = conn->next;
+    if (conn->connected != Connection::states::GET_OLD_PASSWORD && conn->connected != Connection::states::GET_NAME)
       continue;
-    if (!d->idle_tics)
+    if (!conn->idle_tics)
     {
-      d->idle_tics++;
+      conn->idle_tics++;
       continue;
     }
-    else if (d->idle_tics > 5)
+    else if (conn->idle_tics > 5)
     {
       telnet_echo_on(d);
-      SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
-      STATE(d) = Connection::states::CLOSE;
+      write_to_output("\r\nTimed out... goodbye.\r\n", d);
+      conn->connected = Connection::states::CLOSE;
     }
   }
 }
@@ -2369,43 +2354,43 @@ void report_debug_logging()
 
 void DC::crash_hotboot(void)
 {
-  class Connection *d = nullptr;
-  extern int try_to_hotboot_on_crash;
-  extern int died_from_sigsegv;
+  class Connection *d = {};
+  extern qint32 try_to_hotboot_on_crash;
+  extern qint32 died_from_sigsegv;
 
   // This can be dangerous, because if we had a SIGSEGV due to a descriptor being
-  // invalid, we're going to do it again.  That's why we put in extern int died_from_sigsegv
+  // invalid, we're going to do it again.  That's why we put in extern qint32 died_from_sigsegv
   // sigsegv = # of times we've crashed from SIGSEGV
 
-  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  for (d = connections_; d && died_from_sigsegv < 2; d = conn->next)
   {
-    write_to_descriptor(d->descriptor, "Mud crash detected.\r\n");
+    write_to_descriptor(conn->descriptor, "Mud crash detected.\r\n");
   }
 
   // attempt to hotboot
   if (try_to_hotboot_on_crash)
   {
-    for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+    for (d = connections_; d && died_from_sigsegv < 2; d = conn->next)
     {
-      write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
+      write_to_descriptor(conn->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
     logentry(QStringLiteral("Attempting to hotboot from the crash."), ANGEL, DC::LogChannel::LOG_BUG);
     write_hotboot_file();
     // we shouldn't return from there unless we failed
     logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, DC::LogChannel::LOG_BUG);
-    for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+    for (d = connections_; d && died_from_sigsegv < 2; d = conn->next)
     {
-      write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
+      write_to_descriptor(conn->descriptor, "Hotboot failed giving up.\r\n");
     }
   }
 
-  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  for (d = connections_; d && died_from_sigsegv < 2; d = conn->next)
   {
-    write_to_descriptor(d->descriptor, "Giving up, goodbye.\r\n");
+    write_to_descriptor(conn->descriptor, "Giving up, goodbye.\r\n");
   }
 }
 
-void crashill(int sig)
+void crashill(qint32 sig)
 {
   report_debug_logging();
   logentry(QStringLiteral("Recieved SIGFPE (Illegal Instruction)"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -2414,7 +2399,7 @@ void crashill(int sig)
   exit(0);
 }
 
-void crashfpe(int sig)
+void crashfpe(qint32 sig)
 {
   report_debug_logging();
   logentry(QStringLiteral("Recieved SIGFPE (Arithmetic Error)"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -2423,9 +2408,9 @@ void crashfpe(int sig)
   exit(0);
 }
 
-void crashsig(int sig)
+void crashsig(qint32 sig)
 {
-  extern int died_from_sigsegv;
+  extern qint32 died_from_sigsegv;
   died_from_sigsegv++;
   if (died_from_sigsegv > 3)
   { // panic! error is in log...lovely  just give up
@@ -2443,26 +2428,26 @@ void crashsig(int sig)
   exit(0);
 }
 
-void unrestrict_game(int sig)
+void unrestrict_game(qint32 sig)
 {
-  extern ban_list_element *ban_list;
-  extern int num_invalid;
+  extern class ban_list_element *ban_list;
+  extern qint32 num_invalid;
 
   logentry(QStringLiteral("Received SIGUSR2 - completely unrestricting game (emergent)"),
            ANGEL, DC::LogChannel::LOG_GOD);
-  ban_list = nullptr;
-  restrict = 0;
-  num_invalid = 0;
+  ban_list = {};
+  restrict = {};
+  num_invalid = {};
 }
 
-void hupsig(int sig)
+void hupsig(qint32 sig)
 {
   logentry(QStringLiteral("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."), 0, DC::LogChannel::LOG_MISC);
   abort(); /* perhaps something more elegant should
             * substituted */
 }
 
-void sigusr1(int sig)
+void sigusr1(qint32 sig)
 {
   do_not_save_corpses = 1;
   logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
@@ -2472,13 +2457,11 @@ void sigusr1(int sig)
   }
 }
 
-#ifndef WIN32
-void sigchld(int sig)
+void sigchld(qint32 sig)
 {
   struct rusage ru;
   wait3(nullptr, WNOHANG, &ru);
 }
-#endif
 /*
  * This is an implementation of signal() using sigaction() for portability.
  * (sigaction() is POSIX; signal() is not.)  Taken from Stevens' _Advanced
@@ -2495,11 +2478,11 @@ void sigchld(int sig)
 
 #define my_signal(signo, func) signal(signo, func)
 
-void signal_handler(int signal, siginfo_t *si, void *)
+void signal_handler(qint32 signal, siginfo_t *si, void *)
 {
   logf(IMMORTAL, DC::LogChannel::LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
                                           "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
-                                          "int=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
+                                          "qint32=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
                                           "fd=%d",
        si->si_signo, si->si_errno, si->si_code,
        si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value.sival_int,
@@ -2512,8 +2495,8 @@ void signal_handler(int signal, siginfo_t *si, void *)
   }
   if (signal == SIGHUP)
   {
-    char **new_argv = nullptr;
-    extern int do_not_save_corpses;
+    char **new_argv = {};
+    extern qint32 do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
     logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
@@ -2551,7 +2534,7 @@ void signal_setup(void)
   sahup.sa_sigaction = signal_handler;
   sigemptyset(&sahup.sa_mask);
   sahup.sa_flags = SA_SIGINFO;
-  sahup.sa_restorer = nullptr;
+  sahup.sa_restorer = {};
   sigaction(SIGHUP, &sahup, nullptr);
 
   my_signal(SIGTERM, hupsig);
@@ -2568,35 +2551,35 @@ void signal_setup(void)
  *       Public routines for system-to-player-communication        *
  **************************************************************** */
 
-void send_to_char_regardless(QString messg, Character *ch)
+void send_to_char_regardless(QString messg, CharacterPtr ch)
 {
   if (ch->desc && !messg.isEmpty())
   {
-    SEND_TO_Q(messg, ch->desc);
+    write_to_output(messg, ch->desc);
   }
 }
 
-void send_to_char_regardless(std::string messg, Character *ch)
+void send_to_char_regardless(QString messg, CharacterPtr ch)
 {
   if (ch->desc && !messg.empty())
   {
-    SEND_TO_Q(messg, ch->desc);
+    write_to_output(messg, ch->desc);
   }
 }
 
-void send_to_char_nosp(const char *messg, Character *ch)
+void send_to_char_nosp(const char *messg, CharacterPtr ch)
 {
-  char *tmp = str_nospace(messg);
+  auto tmp = str_nospace(messg);
   ch->send(tmp);
-  dc_free(tmp);
+  tmp = {};
 }
 
-void send_to_char_nosp(QString messg, Character *ch)
+void send_to_char_nosp(QString messg, CharacterPtr ch)
 {
-  send_to_char_nosp(messg.toStdString().c_str(), ch);
+  send_to_char_nosp(qPrintable(messg), ch);
 }
 
-void record_msg(QString messg, Character *ch)
+void record_msg(QString messg, CharacterPtr ch)
 {
   if (messg.isEmpty() || !ch->isImmortalPlayer())
     return;
@@ -2607,9 +2590,9 @@ void record_msg(QString messg, Character *ch)
   }
 }
 
-int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
+qint32 do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int lines = 0;
+  qint32 lines = {};
   QString tmp;
 
   if (ch->isNonPlayer())
@@ -2617,7 +2600,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->player->away_msgs.isEmpty())
   {
-    SEND_TO_Q("No messages have been recorded.\r\n", ch->desc);
+    write_to_output("No messages have been recorded.\r\n", ch->desc);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2625,13 +2608,13 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
   while (!ch->player->away_msgs.isEmpty())
   {
     tmp = ch->player->away_msgs.front();
-    SEND_TO_Q(tmp, ch->desc);
+    write_to_output(tmp, ch->desc);
     ch->player->away_msgs.pop_back();
 
     if (++lines == 23)
     {
-      SEND_TO_Q("\r\nMore msgs available. Type awaymsgs to see them\r\n",
-                ch->desc);
+      write_to_output("\r\nMore msgs available. Type awaymsgs to see them\r\n",
+                      ch->desc);
       break;
     }
   }
@@ -2639,7 +2622,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void check_for_awaymsgs(Character *ch)
+void check_for_awaymsgs(CharacterPtr ch)
 {
   if (!ch)
     return;
@@ -2656,7 +2639,7 @@ void check_for_awaymsgs(Character *ch)
   ch->sendln("Type awaymsgs to view them.");
 }
 
-void send_to_char(QString messg, Character *ch)
+void send_to_char(QString messg, CharacterPtr ch)
 {
   if (ch->isNonPlayer() && !ch->desc && MOBtrigger && !messg.isEmpty())
     mprog_act_trigger(messg.toStdString(), ch, 0, 0, 0);
@@ -2665,7 +2648,7 @@ void send_to_char(QString messg, Character *ch)
 
   if (!selfpurge && (ch->desc && !messg.isEmpty()) && (!is_busy(ch)))
   {
-    SEND_TO_Q(messg, ch->desc);
+    write_to_output(messg, ch->desc);
   }
 }
 
@@ -2676,7 +2659,7 @@ void DC::sendAll(QString message)
     return;
   }
 
-  for (auto i = descriptor_list; i; i = i->next)
+  for (auto i = connections_; i; i = i->next)
   {
     if (i->connected == Connection::states::PLAYING)
     {
@@ -2691,17 +2674,17 @@ void send_to_all(QString message)
 
   if (!message.isEmpty())
   {
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
     {
       if (!i->connected)
       {
-        SEND_TO_Q(message.toStdString().c_str(), i);
+        write_to_output(qPrintable(message), i);
       }
     }
   }
 }
 
-void ansi_color(const char *txt, Character *ch)
+void ansi_color(const char *txt, CharacterPtr ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
@@ -2724,10 +2707,10 @@ void ansi_color(const char *txt, Character *ch)
 
 void send_info(QString messg)
 {
-  send_info(messg.toStdString().c_str());
+  send_info(qPrintable(messg));
 }
 
-void send_info(std::string messg)
+void send_info(QString messg)
 {
   send_info(messg.c_str());
 }
@@ -2737,13 +2720,13 @@ void send_info(const char *messg)
   class Connection *i;
 
   if (messg)
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
     {
       if (!(i->character) ||
           !isSet(i->character->misc, DC::LogChannel::CHANNEL_INFO))
         continue;
       if ((!i->connected) && !is_busy(i->character))
-        SEND_TO_Q(messg, i);
+        write_to_output(messg, i);
     }
 }
 
@@ -2752,30 +2735,30 @@ void send_to_outdoor(char *messg)
   class Connection *i;
 
   if (messg)
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
       if (!i->connected)
         if (OUTSIDE(i->character) && !is_busy(i->character))
-          SEND_TO_Q(messg, i);
+          write_to_output(messg, i);
 }
 
-void send_to_zone(char *messg, int zone)
+void send_to_zone(const char *messg, qint32 zone)
 {
-  class Connection *i = nullptr;
+  class Connection *i = {};
   if (messg)
   {
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    for (auto &i : DC::getInstance()->connections_)
     {
       if (!i->connected && !is_busy(i->character) && i->character->in_room != DC::NOWHERE && DC::getInstance()->world[i->character->in_room].zone == zone)
       {
-        SEND_TO_Q(messg, i);
+        write_to_output(messg, i);
       }
     }
   }
 }
 
-void send_to_room(QString messg, int room, bool awakeonly, Character *nta)
+void send_to_room(QString messg, qint32 room, bool awakeonly, CharacterPtr nta)
 {
-  Character *i = nullptr;
+  CharacterPtr i = {};
 
   // If a megaphone goes off when in someone's inventory this happens
   if (room == DC::NOWHERE)
@@ -2789,10 +2772,10 @@ void send_to_room(QString messg, int room, bool awakeonly, Character *nta)
     for (i = DC::getInstance()->world[room].people; i; i = i->next_in_room)
       if (i->desc && !is_busy(i) && nta != i)
         if (!awakeonly || GET_POS(i) > position_t::SLEEPING)
-          SEND_TO_Q(messg, i->desc);
+          write_to_output(messg, i->desc);
 }
 
-bool is_busy(Character *ch)
+bool is_busy(CharacterPtr ch)
 {
   if (ch->desc && ch->desc->isEditing())
   {
@@ -2819,13 +2802,13 @@ QString Player::perform_alias(QString orig)
   return arguments.join(' ');
 }
 
-void skip_spaces(char **string)
+void skip_spaces(const char **s)
 {
-  for (; **string && isspace(**string); (*string)++)
+  for (; **s && isspace(**s); (*s)++)
     ;
 }
 
-char *any_one_arg(char *argument, char *first_arg)
+const char *any_one_arg(const QString argument, char *first_arg)
 {
   skip_spaces(&argument);
 
@@ -2839,40 +2822,34 @@ char *any_one_arg(char *argument, char *first_arg)
   return argument;
 }
 
-bool is_multi(Character *ch)
+bool is_multi(CharacterPtr ch)
 {
-  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
-  {
-    if (d->character != nullptr && strcmp(GET_NAME(ch), GET_NAME(d->character)) && d->getPeerOriginalAddress() == ch->desc->getPeerOriginalAddress())
-    {
+  for (auto &d : DC::getInstance()->connections_)
+    if (conn->character && ch->name() != conn->character->name() && conn->getPeerOriginalAddress() == ch->desc->getPeerOriginalAddress())
       return true;
-    }
-  }
 
   return false;
 }
 
-void warn_if_duplicate_ip(Character *ch)
+void warn_if_duplicate_ip(CharacterPtr ch)
 {
   char buf[256];
-  int highlev = 51;
+  qint32 highlev = 51;
 
   std::list<multiplayer> multi_list;
 
-  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto &d : DC::getInstance()->connections_)
   {
-    if (d->character &&
-        strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
-        !strcmp(d->getPeerOriginalAddress().toString().toStdString().c_str(), ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()))
+    if (conn->character && ch->name() != conn->character->name() && conn->getPeerOriginalAddress().toString() == ch->desc->getPeerOriginalAddress().toString())
     {
       multiplayer m;
-      m.host = d->getPeerAddress();
-      m.name1 = GET_NAME(ch);
-      m.name2 = GET_NAME(d->character);
+      m.host = conn->getPeerAddress();
+      m.name1 = qPrintable(ch->name());
+      m.name2 = qPrintable(conn->character->name());
 
       multi_list.push_back(m);
 
-      highlev = MAX(d->character->getLevel(), ch->getLevel());
+      highlev = MAX(conn->character->getLevel(), ch->getLevel());
       highlev = MAX(highlev, OVERSEER);
 
       // Mark both characters as multi-playing until they log out
@@ -2882,20 +2859,20 @@ void warn_if_duplicate_ip(Character *ch)
         ch->player->multi = true;
       }
 
-      if (d->character->player)
+      if (conn->character->player)
       {
-        d->character->player->multi = true;
+        conn->character->player->multi = true;
       }
     }
   }
 
   for (std::list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
-    logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1.toStdString().c_str(), (*i).name2.toStdString().c_str());
+    logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", qPrintable((*i).host.toString()), qPrintable((*i).name1), qPrintable((*i).name2));
   }
 }
 
-int do_editor(Character *ch, char *argument, cmd_t cmd)
+qint32 do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)
@@ -2904,7 +2881,7 @@ int do_editor(Character *ch, char *argument, cmd_t cmd)
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  csendf(ch, "Current editor: %s\r\n\r\n", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
+  ch->send(QStringLiteral("Current editor: %s\r\n\r\n").arg(isSet(ch->player->toggles).arg(Player::PLR_EDITOR_WEB) ? "web" : "game"));
 
   one_argument(argument, arg1);
 
@@ -2957,7 +2934,7 @@ Proxy::Proxy(QString h)
     else
     {
       inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2)));
     }
   }
 
@@ -2979,7 +2956,7 @@ Proxy::Proxy(QString h)
     source_port = arg5.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg5).toStdString().c_str());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(QStringLiteral("Invalid source port [%1]").arg(arg5)));
       return;
     }
   }
@@ -2992,7 +2969,7 @@ Proxy::Proxy(QString h)
     destination_port = arg6.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg6).toStdString().c_str());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(QStringLiteral("Invalid source port [%1]").arg(arg6)));
       return;
     }
 

@@ -1,36 +1,36 @@
 /* Set eq stuff. defines. */
-
+#pragma once
 class set_data
 {
 public:
-  char *SetName;
-  int amount;
-  int vnum[19];
-  char *Set_Wear_Message;
-  char *Set_Remove_Message;
+  const char *SetName = {};
+  qint32 amount = {};
+  qint32 vnum[19] = {};
+  const char *Set_Wear_Message = {};
+  const char *Set_Remove_Message = {};
 };
 
-#define BASE_SETS 1400
-#define SET_SAIYAN 0
-#define SET_VESTMENTS 1
-#define SET_HUNTERS 2
-#define SET_CAPTAINS 3
-#define SET_CELEBRANTS 4
-#define SET_RAGER 5
-#define SET_FIELDPLATE 6
-#define SET_MOAD 7
-#define SET_FERAL 8
-#define SET_WHITECRYSTAL 9
-#define SET_BLACKCRYSTAL 10
-#define SET_AQUA 11
-#define SET_APPARATUS 12
-#define SET_TITANIC 13
-#define SET_MOSS 14
-#define SET_BLACKSTEEL 15
+constexpr auto BASE_SETS = 1400;
+constexpr auto SET_SAIYAN = 0;
+constexpr auto SET_VESTMENTS = 1;
+constexpr auto SET_HUNTERS = 2;
+constexpr auto SET_CAPTAINS = 3;
+constexpr auto SET_CELEBRANTS = 4;
+constexpr auto SET_RAGER = 5;
+constexpr auto SET_FIELDPLATE = 6;
+constexpr auto SET_MOAD = 7;
+constexpr auto SET_FERAL = 8;
+constexpr auto SET_WHITECRYSTAL = 9;
+constexpr auto SET_BLACKCRYSTAL = 10;
+constexpr auto SET_AQUA = 11;
+constexpr auto SET_APPARATUS = 12;
+constexpr auto SET_TITANIC = 13;
+constexpr auto SET_MOSS = 14;
+constexpr auto SET_BLACKSTEEL = 15;
 #define SET_MOAD2 16
 #define SET_RAGER2 17
-#define SET_TRAPPINGS 18
-#define SET_FINERY 19
-#define SET_MAX 1419
+constexpr auto SET_TRAPPINGS = 18;
+constexpr auto SET_FINERY = 19;
+constexpr auto SET_MAX = 1419;
 
 extern const set_data set_list[];

@@ -7,15 +7,12 @@
 #include <cstdio>
 #include <stdarg.h>
 
-#include "DC/connect.h"
-#include "DC/character.h"
-#include "DC/utility.h"
+#include "DC/DC.h"
+
 #include "DC/terminal.h"
-#include "DC/utility.h"
-#include "DC/memory.h"
 
 /*
- * logf, str_hsh, and csendf by Sadus, others by Ysafar.
+ * logf, QStringLiteral, and csendf by Sadus, others by Ysafar.
  */
 
 class hash_info
@@ -36,8 +33,8 @@ void kill_hsh_tree_func(hash_info *leaf)
   if (leaf->right)
     kill_hsh_tree_func(leaf->right);
 
-  dc_free(leaf->name);
-  dc_free(leaf);
+  leaf->name = {};
+  leaf = {};
 }
 
 // Since the top of the tree is static, we have to free both sides
@@ -61,93 +58,33 @@ bool ishashed(char *arg)
   return false;
 }
 
-char *str_hsh(const char *arg)
-{
-  int scratch;
-  hash_info *current = &tree;
-  hash_info *next;
-  hash_info *temp;
-
-  // Second spot for "" args so we don't leak them all over the place
-  // if(*arg == '\0')
-  //  return(nulltree.name);
-  if (!arg)
-    return nullptr;
-
-  for (; current; current = next)
-  {
-    if ((scratch = strcmp(arg, current->name)) == 0)
-      return (current->name);
-
-    if (scratch < 0)
-      next = current->left;
-    else
-      next = current->right;
-    temp = current;
-  }
-
-#ifdef LEAK_CHECK
-  current = (hash_info *)calloc(1, sizeof(hash_info));
-#else
-  current = (hash_info *)dc_alloc(1, sizeof(hash_info));
-#endif
-
-  current->right = current->left = nullptr;
-  if (scratch < 0)
-    temp->left = current;
-  else
-    temp->right = current;
-  current->name = (char *)str_dup(arg);
-
-  return (current->name);
-}
-
-void logf(int level, DC::LogChannel type, QString arg)
-{
-  logentry(arg, level, type);
-}
-
-/* logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
-void logf(int level, DC::LogChannel type, const char *arg, ...)
+/* logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", qPrintable(ch->name())); */
+void logf(qint32 level, DC::LogChannel type, QString cformat, ...)
 {
   va_list args;
-  char s[MAX_STRING_LENGTH];
+  QString s;
 
-  va_start(args, arg);
-  vsnprintf(s, MAX_STRING_LENGTH, arg, args);
+  va_start(args, cformat);
+  s = QString::vasprintf(qPrintable(cformat), args);
   va_end(args);
 
   logentry(s, level, type);
 }
 
-int csendf(Character *ch, const char *arg, ...)
-{
-  va_list args;
-  char s[MAX_STRING_LENGTH];
-
-  va_start(args, arg);
-  /* vsnprintf(s, MAX_STRING_LENGTH, arg, args); */
-  vsprintf(s, arg, args);
-  va_end(args);
-
-  ch->send(s);
-
-  return (1);
-}
-
-char *handle_ansi_(char *s, Character *ch)
+char *handle_ansi_(char *s, CharacterPtr ch)
 {
   char *t;
-  char *tp, *sp, *i;
+  char *tp, *sp;
+  const char *i;
 
   char nullstring[] = "";
   char dollarstring[] = "$";
 
-  // Worse case scenario is a std::string of color codes that are all $R's.  These take up
+  // Worse case scenario is a QString of color codes that are all $R's.  These take up
   // 11 characters each.  So to handle that, we'll count the number of $'s and multiply
   // that by 11 for the amount of extra space we need.
 
-  int numdollars = 0;
+  qint32 numdollars = {};
 
   t = s;
   while ((t = strstr(t, "$")))
@@ -156,11 +93,7 @@ char *handle_ansi_(char *s, Character *ch)
     t++;
   }
 
-#ifdef LEAK_CHECK
-  t = (char *)calloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
-#else
-  t = (char *)dc_alloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
-#endif
+  t = new char[(strlen(s) + numdollars * 11 + 1)];
   *t = '\0';
 
   i = nullstring;
@@ -258,12 +191,12 @@ char *handle_ansi_(char *s, Character *ch)
   return t;
 }
 
-QString handle_ansi(QString haystack, Character *ch)
+QString handle_ansi(QString haystack, CharacterPtr ch)
 {
-  return handle_ansi(QByteArray(haystack.toStdString().c_str()), ch);
+  return handle_ansi(haystack.toLatin1(), ch);
 }
 
-QByteArray handle_ansi(QByteArray haystack, Character *ch)
+QByteArray handle_ansi(QByteArray haystack, CharacterPtr ch)
 {
   QMap<size_t, bool> ignore;
   QMap<char, QPair<QByteArray, QByteArray>> rep;

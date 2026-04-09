@@ -4,38 +4,34 @@
 |
 | Authors: DikuMUD, Pirahna, Staylor, Urizen, Rahz, Zaphod, Shane, Jhhudso, Heaven1 and others
 */
-#include <cctype>
 #include <cstring>
-
-#include <queue>
 
 #include <fmt/format.h>
 
+#include "DC/common.h"
+#include "DC/levels.h"
 #include "DC/obj.h"
-#include "DC/connect.h"
-#include "DC/character.h"
 #include "DC/DC.h"
-#include "DC/mobile.h"
-#include "DC/room.h"
+
 #include "DC/structs.h"
-#include "DC/utility.h"
+
 #include "DC/player.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
-#include "DC/db.h"
 #include "DC/act.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/clan.h"
 #include "DC/inventory.h"
 #include "DC/corpse.h"
+#include "DC/comm.h"
 
 /* extern variables */
 
-extern int rev_dir[];
+extern qint32 rev_dir[];
 
 /* procedures related to get */
-void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, cmd_t cmd)
+void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent, cmd_t cmd)
 {
   QString buffer;
 
@@ -48,7 +44,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         ch->sendln("You cannot get that item.");
         return;
       }
-      else if (!obj_object->getOwner().isEmpty() && obj_object->getOwner() != GET_NAME(ch))
+      else if (!obj_object->getOwner().isEmpty() && obj_object->getOwner() != qPrintable(ch->name()))
       {
         ch->send(QStringLiteral("You cannot get that item because it's marked NO_TRADE and owned by %1\r\n").arg(obj_object->getOwner()));
         return;
@@ -80,25 +76,21 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
   if (sub_object)
   {
-    buffer = QStringLiteral("%1_consent").arg(GET_NAME(ch));
+    buffer = QStringLiteral("%1_consent").arg(ch->name());
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())) && !isexact(buffer, sub_object->Name()))
+      if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isexact(buffer, sub_object->name()))
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
-        ;
-        affected_type pthiefaf;
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-
-        char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->Name()));
-        logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+        logmortal(QStringLiteral("%1 looted %2[%3] from %4").arg(ch->name()).arg(obj_object->short_description()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()));
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
+        affected_type pthiefaf;
         pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
         pthiefaf.duration = 10;
-        pthiefaf.modifier = 0;
+        pthiefaf.modifier = {};
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
 
@@ -111,22 +103,20 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->Name()))
+    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name()))
     {
-      if (cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name()))
+      if (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name()))
       {
         affected_type pthiefaf;
 
         pthiefaf.type = Character::PLAYER_GOLD_THIEF;
         pthiefaf.duration = 10;
-        pthiefaf.modifier = 0;
+        pthiefaf.modifier = {};
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
-
-        char log_buf[MAX_STRING_LENGTH] = {};
-        logmortal(QStringLiteral("%1 looted %2 coins from %3").arg(GET_NAME(ch)).arg(obj_object->obj_flags.value[0]).arg(sub_object->Name()));
+        logmortal(QStringLiteral("%1 looted %2 coins from %3").arg(qPrintable(ch->name())).arg(obj_object->obj_flags.value[0]).arg(sub_object->name()));
 
         if (ch->isPlayerGoldThief())
         {
@@ -140,9 +130,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
-      logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(sub_object->Name()).arg(DC::getInstance()->obj_index[sub_object->item_number].vnum()));
-      for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
+      logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(qPrintable(ch->name())).arg(obj_object->name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()).arg(DC::getInstance()->obj_index[sub_object->item_number].vnum()));
+      for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+        logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
     }
     move_obj(obj_object, ch);
     if (sub_object->carried_by == ch)
@@ -163,20 +153,20 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(ch->in_room));
-      for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
+      logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(qPrintable(ch->name())).arg(obj_object->name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(ch->in_room));
+      for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+        logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description()).arg(loop_obj->short_description()).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
     }
 
     if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
     {
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      buffer = QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item)->short_description);
+      buffer = QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(qPrintable(ch->name())).arg(static_cast<ObjectPtr>(DC::getInstance()->obj_index[obj_object->item_number].item)->short_description());
       send_info(buffer);
     }
   }
   if (sub_object && sub_object->obj_flags.value[3] == 1 &&
-      isexact("pc", sub_object->Name()))
+      isexact("pc", sub_object->name()))
     ch->save(cmd_t::SAVE_SILENTLY);
 
   if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
@@ -195,7 +185,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                                                         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
-      int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
+      qint32 cgold = (qint32)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
       if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
@@ -208,14 +198,14 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         ch->sendln(QStringLiteral("Clan %1 collects %2 bounty, leaving %3 for you.").arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
-    //           !isexact("pc",sub_object->Name()) && ch->clan
+    //           !isexact("pc",sub_object->name()) && ch->clan
     //            && get_clan(ch)->tax && !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
-    if (((sub_object && sub_object->obj_flags.value[3] == 1 && !isexact("pc", sub_object->Name())) || !sub_object) &&
+    if (((sub_object && sub_object->obj_flags.value[3] == 1 && !isexact("pc", sub_object->name())) || !sub_object) &&
         ch->clan &&
         get_clan(ch)->tax &&
         !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     {
-      int cgold = (int)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax) / 100.0));
+      qint32 cgold = (qint32)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax) / 100.0));
       obj_object->obj_flags.value[0] -= cgold;
       ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
@@ -263,18 +253,18 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 // code at the end that would affect any attempted 'get' it looks really nasty and
 // is never utilized.  Restructure it so it is clear.  Pay proper attention to 'saving'
 // however so as not to introduce a potential dupe-bug.
-int do_get(Character *ch, char *argument, cmd_t cmd)
+qint32 do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
-  class Object *sub_object;
-  class Object *obj_object;
-  class Object *next_obj;
+  ObjectPtr sub_object;
+  ObjectPtr obj_object;
+  ObjectPtr next_obj;
   bool found = false;
   bool fail = false;
   bool has_consent = false;
-  int type = 3;
+  qint32 type = 3;
   bool alldot = false;
   bool inventorycontainer = false, blindlag = false;
   char allbuf[MAX_STRING_LENGTH];
@@ -284,7 +274,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
   /* get type */
   if (!*arg1)
   {
-    type = 0;
+    type = {};
   }
   if (*arg1 && !*arg2)
   {
@@ -386,7 +376,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Not in the donation room.");
       return ReturnValue::eFAILURE;
     }
-    sub_object = 0;
+    sub_object = {};
     found = false;
     fail = false;
     for (obj_object = DC::getInstance()->world[ch->in_room].contents;
@@ -396,7 +386,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       next_obj = obj_object->next_content;
 
       /* IF all.obj, only get those named "obj" */
-      if (alldot && !isexact(allbuf, obj_object->Name()))
+      if (alldot && !isexact(allbuf, obj_object->name()))
         continue;
 
       // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
@@ -406,7 +396,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       // Ignore NO_TRADE items on a 'get all'
       if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
       {
-        ch->send(QStringLiteral("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
+        ch->send(QStringLiteral("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description()));
         continue;
       }
       if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
@@ -419,26 +409,26 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
 
       if (obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
       {
-        ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
+        ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description()));
         continue;
       }
 
       if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isexact(GET_NAME(ch), obj_object->Name()) && ch->getLevel() < IMPLEMENTER)
+          !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
       {
-        ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
+        ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description()));
         continue;
       }
 
       // PC corpse
-      if ((obj_object->obj_flags.value[3] == 1 && isexact("pc", obj_object->Name())) || isexact("thiefcorpse", obj_object->Name()))
+      if ((obj_object->obj_flags.value[3] == 1 && isexact("pc", obj_object->name())) || isexact("thiefcorpse", obj_object->name()))
       {
-        sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if ((isexact("thiefcorpse", obj_object->Name()) &&
-             !isexact(GET_NAME(ch), obj_object->Name())) ||
-            isexact(GET_NAME(ch), obj_object->Name()) || ch->getLevel() >= OVERSEER)
+        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+        if ((isexact("thiefcorpse", obj_object->name()) &&
+             !isexact(qPrintable(ch->name()), obj_object->name())) ||
+            isexact(qPrintable(ch->name()), obj_object->name()) || ch->getLevel() >= OVERSEER)
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), obj_object->Name()))
+        if (!has_consent && !isexact(qPrintable(ch->name()), obj_object->name()))
         {
           if (ch->getLevel() < OVERSEER)
           {
@@ -467,13 +457,13 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
             !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
         {
-          sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
+          sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           fail = true;
         }
         else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
         {
-          sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
+          sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           fail = true;
         }
@@ -509,7 +499,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
   /* get ??? */
   case 2:
   {
-    sub_object = 0;
+    sub_object = {};
     found = false;
     fail = false;
     obj_object = get_obj_in_list_vis(ch, arg1,
@@ -518,12 +508,12 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     {
       if (obj_object->obj_flags.type_flag == ITEM_CONTAINER &&
           obj_object->obj_flags.value[3] == 1 &&
-          isexact("pc", obj_object->Name()))
+          isexact("pc", obj_object->name()))
       {
-        sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if (isexact(GET_NAME(ch), obj_object->Name()))
+        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+        if (isexact(qPrintable(ch->name()), obj_object->name()))
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), obj_object->Name()))
+        if (!has_consent && !isexact(qPrintable(ch->name()), obj_object->name()))
         {
           send_to_char("You don't have consent to take the "
                        "corpse.\r\n",
@@ -534,21 +524,21 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       }
 
       if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isexact(GET_NAME(ch), obj_object->Name()) && ch->getLevel() < IMPLEMENTER)
+          !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
       {
-        ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
+        ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description()));
       }
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
       {
-        sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
+        sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
         ch->send(buffer);
         fail = true;
       }
       else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
                !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
       {
-        sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
+        sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
         ch->send(buffer);
         fail = true;
       }
@@ -564,12 +554,12 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       {
         if (ch->in_room != real_room(3099))
         {
-          ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
+          ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description()));
           fail = true;
         }
         else
         {
-          ch->send(QStringLiteral("The aura of the donation room allows you to pick up %1.\r\n").arg(obj_object->short_description));
+          ch->send(QStringLiteral("The aura of the donation room allows you to pick up %1.\r\n").arg(obj_object->short_description()));
           get(ch, obj_object, sub_object, 0, cmd);
           ch->save(cmd_t::SAVE_SILENTLY);
           found = true;
@@ -622,13 +612,13 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     {
       if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
           ((sub_object->obj_flags.value[3] == 1 &&
-            isexact("pc", sub_object->Name())) ||
-           isexact("thiefcorpse", sub_object->Name())))
+            isexact("pc", sub_object->name())) ||
+           isexact("thiefcorpse", sub_object->name())))
       {
-        sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if ((isexact("thiefcorpse", sub_object->Name()) && !isexact(GET_NAME(ch), sub_object->Name())) || isexact(buffer, sub_object->Name()) || ch->getLevel() > 105)
+        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+        if ((isexact("thiefcorpse", sub_object->name()) && !isexact(qPrintable(ch->name()), sub_object->name())) || isexact(buffer, sub_object->name()) || ch->getLevel() > 105)
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), sub_object->Name()))
+        if (!has_consent && !isexact(qPrintable(ch->name()), sub_object->name()))
         {
           ch->sendln("You don't have consent to touch the corpse.");
           return ReturnValue::eFAILURE;
@@ -638,7 +628,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       {
         if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->Name())));
+          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
           return ReturnValue::eFAILURE;
         }
@@ -649,22 +639,22 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           next_obj = obj_object->next_content;
           if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
           {
-            csendf(ch, "%s : It seems magically attached to the corpse.\r\n", qPrintable(fname(obj_object->Name())));
+            ch->send(QStringLiteral("%s : It seems magically attached to the corpse.\r\n").arg(qPrintable(fname(obj_object->name()))));
             continue;
           } /*
-       class Object *temp,*next_contentthing;
+       ObjectPtr temp,*next_contentthing;
        for (temp = obj_object->contains;temp;temp = next_contentthing)
        {
       next_contentthing = temp->next_content;
       if(isSet(temp->obj_flags.more_flags, ITEM_NO_TRADE))
       {
-      csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n", temp->short_description,obj_object->short_description);
+      ch->send(QStringLiteral("Whoa!  The %s inside the %s poofed into thin air!\r\n").arg(temp->short_description,obj_object->short_description));
       extract_obj(temp);
       }
        }*/
           //		}
           /* IF all.obj, only get those named "obj" */
-          if (alldot && !isexact(allbuf, obj_object->Name()))
+          if (alldot && !isexact(allbuf, obj_object->name()))
           {
             continue;
           }
@@ -672,14 +662,14 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           // Ignore NO_TRADE items on a 'get all'
           if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < 100)
           {
-            ch->send(QStringLiteral("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
+            ch->send(QStringLiteral("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description()));
             continue;
           }
 
           if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-              !isexact(GET_NAME(ch), obj_object->Name()) && ch->getLevel() < IMPLEMENTER)
+              !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
           {
-            ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
+            ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description()));
             continue;
           }
 
@@ -688,7 +678,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
             if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                 !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
             {
-              sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
+              sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
               ch->send(buffer);
               fail = true;
             }
@@ -705,13 +695,13 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   // the other of the corpse, has_consent will be false.
                   if (!ch->isImmortalPlayer())
                   {
-                    if (isexact(obj_object->Name(), "thiefcorpse"))
+                    if (isexact(obj_object->name(), "thiefcorpse"))
                     {
-                      ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
+                      ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description()));
                       extract_obj(obj_object);
                       continue;
                     }
-                    csendf(ch, "%s : It seems magically attached to the corpse.\r\n", qPrintable(fname(obj_object->Name())));
+                    ch->send(QStringLiteral("%s : It seems magically attached to the corpse.\r\n").arg(qPrintable(fname(obj_object->name()))));
                     continue;
                   }
                 }
@@ -725,7 +715,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
 
                 if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
                 {
-                  ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
+                  ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description()));
                   continue;
                 }
 
@@ -742,7 +732,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
               }
               else
               {
-                sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
+                sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
                 ch->send(buffer);
                 fail = true;
               }
@@ -751,14 +741,14 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         }
         if (!found && !fail)
         {
-          sprintf(buffer, "You do not see anything in the %s.\r\n", qPrintable(fname(sub_object->Name())));
+          sprintf(buffer, "You do not see anything in the %s.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
           fail = true;
         }
       }
       else
       {
-        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->Name())));
+        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
         ch->send(buffer);
         fail = true;
       }
@@ -797,16 +787,16 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
     {
       if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
           ((sub_object->obj_flags.value[3] == 1 &&
-            isexact("pc", sub_object->Name())) ||
-           isexact("thiefcorpse", sub_object->Name())))
+            isexact("pc", sub_object->name())) ||
+           isexact("thiefcorpse", sub_object->name())))
       {
-        sprintf(buffer, "%s_consent", GET_NAME(ch));
+        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
 
-        if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->Name()) && !isexact(GET_NAME(ch), sub_object->Name()))) || isexact(buffer, sub_object->Name()))
+        if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->name()) && !isexact(qPrintable(ch->name()), sub_object->name()))) || isexact(buffer, sub_object->name()))
           has_consent = true;
-        if (!isexact(GET_NAME(ch), sub_object->Name()) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
+        if (!isexact(qPrintable(ch->name()), sub_object->name()) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
           has_consent = true;
-        if (!has_consent && !isexact(GET_NAME(ch), sub_object->Name()))
+        if (!has_consent && !isexact(qPrintable(ch->name()), sub_object->name()))
         {
           send_to_char("You don't have consent to touch the "
                        "corpse.\r\n",
@@ -818,7 +808,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       {
         if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->Name())));
+          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
           return ReturnValue::eFAILURE;
         }
@@ -840,14 +830,14 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
 
           else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
           {
-            ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
+            ch->send(QStringLiteral("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description()));
             fail = true;
           }
 
           else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                    !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
           {
-            sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
+            sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
             ch->send(buffer);
             fail = true;
           }
@@ -862,31 +852,31 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
               // the other of the corpse, has_consent will be false.
               if (!ch->isImmortalPlayer())
               {
-                if (isexact("thiefcorpse", sub_object->Name()) || (cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())))
+                if (isexact("thiefcorpse", sub_object->name()) || (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())))
                 {
-                  ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
+                  ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description()));
 
                   char log_buf[MAX_STRING_LENGTH] = {};
                   sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
-                          GET_NAME(ch),
+                          qPrintable(ch->name()),
                           obj_object->short_description,
                           DC::getInstance()->obj_index[obj_object->item_number].vnum(),
-                          qPrintable(sub_object->Name()),
+                          qPrintable(sub_object->name()),
                           DC::getInstance()->obj_index[sub_object->item_number].vnum());
                   logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
                   fail = true;
-                  sprintf(buffer, "%s_consent", GET_NAME(ch));
+                  sprintf(buffer, "%s_consent", qPrintable(ch->name()));
 
-                  if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->Name())) && !isexact(buffer, sub_object->Name()))
+                  if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isexact(buffer, sub_object->name()))
                   {
                     SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
                     affected_type pthiefaf;
 
                     pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
                     pthiefaf.duration = 10;
-                    pthiefaf.modifier = 0;
+                    pthiefaf.modifier = {};
                     pthiefaf.location = APPLY_NONE;
                     pthiefaf.bitvector = -1;
 
@@ -903,7 +893,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                 }
                 else
                 {
-                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", qPrintable(fname(obj_object->Name())));
+                  ch->send(QStringLiteral("%s : It seems magically attached to the corpse.\r\n").arg(qPrintable(fname(obj_object->name()))));
                   fail = true;
                 }
               }
@@ -926,21 +916,21 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           }
           else
           {
-            sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->Name())));
+            sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
             ch->send(buffer);
             fail = true;
           }
         }
         else
         {
-          sprintf(buffer, "The %s does not contain the %s.\r\n", qPrintable(fname(sub_object->Name())), arg1);
+          sprintf(buffer, "The %s does not contain the %s.\r\n", qPrintable(fname(sub_object->name())), arg1);
           ch->send(buffer);
           fail = true;
         }
       }
       else
       {
-        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->Name())));
+        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
         ch->send(buffer);
         fail = true;
       }
@@ -960,10 +950,10 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_consent(Character *ch, char *arg, cmd_t cmd)
+qint32 do_consent(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  class Object *obj{};
-  Character *vict{};
+  ObjectPtr obj = {};
+  CharacterPtr vict = {};
 
   auto arguments = QString(arg).trimmed().split(' ');
   auto arg1 = arguments.value(0);
@@ -1000,38 +990,38 @@ int do_consent(Character *ch, char *arg, cmd_t cmd)
 
   for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
   {
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || obj->Name().isEmpty())
+    if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || obj->name().isEmpty())
       continue;
 
-    if (!isexact(GET_NAME(ch), obj->Name()))
+    if (!isexact(qPrintable(ch->name()), obj->name()))
       // corpse isn't owned by the consenting player
       continue;
 
     // check to see if this player is already consented for the corpse
-    if (isexact(QStringLiteral("%1_consent").arg(arg1), obj->Name()))
+    if (isexact(QStringLiteral("%1_consent").arg(arg1), obj->name()))
       // keep looking; there might be other corpses not yet consented
       continue;
 
     // check for buffer overflow before adding the new name to the list
-    if (obj->Name().size() + arg1.size() + QStringLiteral(" _consent").size() > (MAX_STRING_LENGTH / 2))
+    if (obj->name().size() + arg1.size() + QStringLiteral(" _consent").size() > (MAX_STRING_LENGTH / 2))
     {
       ch->sendln("Don't you think there are enough perverts molesting your");
       ch->sendln("maggot-ridden corpse already?");
       return ReturnValue::eFAILURE;
     }
-    auto buf2 = QStringLiteral("%1 %1_consent").arg(obj->Name()).arg(arg1);
-    obj->Name(buf2);
+    auto buf2 = QStringLiteral("%1 %1_consent").arg(obj->name()).arg(arg1);
+    obj->name(buf2);
   }
 
   ch->sendln(QStringLiteral("All corpses in the game which belong to you can now be molested by anyone named %1.").arg(arg1));
   return ReturnValue::eSUCCESS;
 }
 
-int contents_cause_unique_problem(Object *obj, Character *vict)
+qint32 contents_cause_unique_problem(ObjectPtr obj, CharacterPtr vict)
 {
-  int lastnum = -1;
+  qint32 lastnum = -1;
 
-  for (Object *inside = obj->contains; inside; inside = inside->next_content)
+  for (ObjectPtr inside = obj->contains; inside; inside = inside->next_content)
   {
     if (inside->item_number < 0) // skip -1 items
       continue;
@@ -1046,9 +1036,9 @@ int contents_cause_unique_problem(Object *obj, Character *vict)
   return false;
 }
 
-int contains_no_trade_item(Object *obj)
+qint32 contains_no_trade_item(ObjectPtr obj)
 {
-  Object *inside = obj->contains;
+  ObjectPtr inside = obj->contains;
 
   while (inside)
   {
@@ -1060,13 +1050,13 @@ int contains_no_trade_item(Object *obj)
   return false;
 }
 
-int do_drop(Character *ch, char *argument, cmd_t cmd)
+qint32 do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
-  int amount;
+  qint32 amount;
   char buffer[MAX_STRING_LENGTH];
-  class Object *tmp_object;
-  class Object *next_obj;
+  ObjectPtr tmp_object;
+  ObjectPtr next_obj;
   bool test = false, blindlag = false;
   char alldot[MAX_STRING_LENGTH];
 
@@ -1100,7 +1090,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Sorry, you can't do that!");
       return ReturnValue::eFAILURE;
     }
-    if (ch->getGold() < (uint32_t)amount)
+    if (ch->getGold() < (quint32)amount)
     {
       ch->sendln("You haven't got that many coins!");
       return ReturnValue::eFAILURE;
@@ -1115,7 +1105,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
     ch->removeGold(amount);
     if (ch->isImmortalPlayer())
     {
-      special_log(QString(QStringLiteral("%1 dropped %2 coins in room %3!")).arg(ch->getName()).arg(amount).arg(ch->in_room));
+      special_log(QString(QStringLiteral("%1 dropped %2 coins in room %3!")).arg(ch->name()).arg(amount).arg(ch->in_room));
     }
 
     ch->save(cmd_t::SAVE_SILENTLY);
@@ -1130,7 +1120,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
       {
         next_obj = tmp_object->next_content;
 
-        if (alldot[0] != '\0' && !isexact(alldot, tmp_object->Name()))
+        if (alldot[0] != '\0' && !isexact(alldot, tmp_object->name()))
           continue;
 
         if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
@@ -1165,9 +1155,9 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-            for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
@@ -1233,9 +1223,9 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-            for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
@@ -1258,10 +1248,10 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-void do_putalldot(Character *ch, char *name, char *target, cmd_t cmd)
+void do_putalldot(CharacterPtr ch, char *name, char *target, cmd_t cmd)
 {
-  class Object *tmp_object;
-  class Object *next_object;
+  ObjectPtr tmp_object;
+  ObjectPtr next_object;
   char buf[200];
   bool found = false;
 
@@ -1274,15 +1264,15 @@ void do_putalldot(Character *ch, char *name, char *target, cmd_t cmd)
     next_object = tmp_object->next_content;
     if (!name && CAN_SEE_OBJ(ch, tmp_object))
     {
-      sprintf(buf, "%s %s", fname(tmp_object->Name()).toStdString().c_str(), target);
-      buf[99] = 0;
+      sprintf(buf, "%s %s", qPrintable(fname(tmp_object->name())), target);
+      buf[99] = {};
       found = true;
       do_put(ch, buf, cmd);
     }
-    else if (isexact(name, tmp_object->Name()) && CAN_SEE_OBJ(ch, tmp_object))
+    else if (isexact(name, tmp_object->name()) && CAN_SEE_OBJ(ch, tmp_object))
     {
       sprintf(buf, "%s %s", name, target);
-      buf[99] = 0;
+      buf[99] = {};
       found = true;
       do_put(ch, buf, cmd);
     }
@@ -1292,24 +1282,24 @@ void do_putalldot(Character *ch, char *name, char *target, cmd_t cmd)
     ch->sendln("You don't have one.");
 }
 
-int weight_in(class Object *obj)
+qint32 weight_in(ObjectPtr obj)
 { // Sheldon backpack. Damn procs.
-  int w = 0;
-  class Object *obj2;
+  qint32 w = {};
+  ObjectPtr obj2;
   for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
     w += obj2->obj_flags.weight;
   return w;
 }
 
-int do_put(Character *ch, char *argument, cmd_t cmd)
+qint32 do_put(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   char buffer[MAX_STRING_LENGTH];
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
-  class Object *obj_object;
-  class Object *sub_object;
-  Character *tmp_char;
-  int bits;
+  ObjectPtr obj_object;
+  ObjectPtr sub_object;
+  CharacterPtr tmp_char;
+  qint32 bits;
   char allbuf[MAX_STRING_LENGTH];
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1380,7 +1370,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
             // Keyrings can only hold keys
             if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING && GET_ITEM_TYPE(obj_object) != ITEM_KEY)
             {
-              csendf(ch, "You can't put %s on a keyring.\r\n", GET_OBJ_SHORT(obj_object));
+              ch->send(QStringLiteral("You can't put %s on a keyring.\r\n").arg(GET_OBJ_SHORT(obj_object)));
               return ReturnValue::eFAILURE;
             }
 
@@ -1428,12 +1418,12 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                 {
                   if (ch && ch->player && isSet(ch->player->toggles, Player::PLR_NODUPEKEYS))
                   {
-                    csendf(ch, "A duplicate of %s is already on your keyring so you will not attach another one.\r\n", GET_OBJ_SHORT(obj_object));
+                    ch->send(QStringLiteral("A duplicate of %s is already on your keyring so you will not attach another one.\r\n").arg(GET_OBJ_SHORT(obj_object)));
                     return ReturnValue::eFAILURE;
                   }
                   else
                   {
-                    csendf(ch, "A duplicate of %s is already on your keyring but you don't care.\r\n", GET_OBJ_SHORT(obj_object));
+                    ch->send(QStringLiteral("A duplicate of %s is already on your keyring but you don't care.\r\n").arg(GET_OBJ_SHORT(obj_object)));
                   }
                 }
               }
@@ -1462,7 +1452,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
-                       ch->getNameC(),
+                       qPrintable(ch->name()),
                        obj_object->short_description,
                        DC::getInstance()->obj_index[obj_object->item_number].vnum(),
                        sub_object->short_description,
@@ -1473,7 +1463,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
-                       ch->getNameC(),
+                       qPrintable(ch->name()),
                        obj_object->short_description,
                        DC::getInstance()->obj_index[obj_object->item_number].vnum(),
                        sub_object->short_description,
@@ -1492,7 +1482,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
           }
           else
           {
-            sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->Name()).toStdString().c_str());
+            sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
             ch->send(buffer);
           }
         }
@@ -1531,9 +1521,9 @@ command_return_t Character::do_givealldot(QString name, QString target, cmd_t cm
     if (name.isEmpty() && CAN_SEE_OBJ(this, tmp_object))
     {
       found = true;
-      do_give({fname(tmp_object->Name()), target});
+      do_give({fname(tmp_object->name()), target});
     }
-    else if (isexact(name, tmp_object->Name()) && CAN_SEE_OBJ(this, tmp_object))
+    else if (isexact(name, tmp_object->name()) && CAN_SEE_OBJ(this, tmp_object))
     {
       found = true;
       do_give({name, target});
@@ -1552,9 +1542,9 @@ command_return_t Character::do_givealldot(QString name, QString target, cmd_t cm
 command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
-  command_return_t retval{};
-  Character *vict{};
-  class Object *obj{};
+  command_return_t retval = {};
+  CharacterPtr vict = {};
+  ObjectPtr obj = {};
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
@@ -1623,8 +1613,8 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
              return ReturnValue::eFAILURE;
           }
     */
-    sendln(QStringLiteral("You give %1 coin%2 to %3.").arg(amount).arg(amount == 1 ? "" : "s").arg(GET_SHORT(vict)));
-    logobjects(QStringLiteral("%1 gives %2 coin%3 to %4").arg(GET_NAME(this)).arg(amount).arg(pluralize(amount)).arg(GET_NAME(vict)));
+    sendln(QStringLiteral("You give %1 coin%2 to %3.").arg(amount).arg(amount == 1 ? "" : "s").arg(qPrintable(vict->shortdesc_or_name())));
+    logobjects(QStringLiteral("%1 gives %2 coin%3 to %4").arg(qPrintable(this->name())).arg(amount).arg(pluralize(amount)).arg(qPrintable(vict->name())));
     act(QStringLiteral("%1 gives you %2 $B$5gold$R coin%3.").arg(PERS(this, vict)).arg(amount).arg(amount == 1 ? "" : "s"), this, 0, vict, TO_VICT, INVIS_NULL);
     act("$n gives some gold to $N.", this, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
 
@@ -1632,7 +1622,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
     if (this->isNonPlayer() && (!IS_AFFECTED(this, AFF_CHARM) || getLevel() > 50))
     {
-      special_log(QString(QStringLiteral("%1 (mob) giving %2 gold to %3 in room %4.")).arg(getName()).arg(amount).arg(vict->getName()).arg(in_room));
+      special_log(QString(QStringLiteral("%1 (mob) giving %2 gold to %3 in room %4.")).arg(name()).arg(amount).arg(vict->name()).arg(in_room));
     }
 
     if (getGold() < 0)
@@ -1641,7 +1631,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
       sendln("Warning:  You are giving out more $B$5gold$R than you had.");
       if (getLevel() < IMPLEMENTER)
       {
-        special_log(QString(QStringLiteral("%1 gives %2 coins to %3 (negative!) in room %4.")).arg(getName()).arg(amount).arg(vict->getName()).arg(in_room));
+        special_log(QString(QStringLiteral("%1 gives %2 coins to %3 (negative!) in room %4.")).arg(name()).arg(amount).arg(vict->name()).arg(in_room));
       }
     }
     vict->addGold(amount);
@@ -1673,7 +1663,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   {
     bool found = false;
     follow_type *k;
-    int org_room = in_room;
+    qint32 org_room = in_room;
     if (followers)
       for (k = followers; k && k != (follow_type *)0x95959595; k = k->next)
       {
@@ -1848,14 +1838,14 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     if (search_char_for_item(vict, obj->item_number, false))
     {
       sendln("The item's uniqueness prevents it.");
-      csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(this));
+      vict->send(QStringLiteral("%s tried to give you an item but was unable.\r\n").arg(qPrintable(this->shortdesc_or_name())));
       return ReturnValue::eFAILURE;
     }
   }
   if (contents_cause_unique_problem(obj, vict))
   {
     sendln("The uniqueness of something inside it prevents it.");
-    csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(this));
+    vict->send(QStringLiteral("%s tried to give you an item but was unable.\r\n").arg(qPrintable(this->shortdesc_or_name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -1864,10 +1854,10 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   act("$n gives you $p.", this, obj, vict, TO_VICT, 0);
   act("You give $p to $N.", this, obj, vict, TO_CHAR, 0);
 
-  logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->Name()).arg(GET_NAME(vict)));
-  for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+  logobjects(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(this->name())).arg(obj->name()).arg(qPrintable(vict->name())));
+  for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
-         obj->short_description,
+         qPrintable(obj->short_description()),
          DC::getInstance()->obj_index[obj->item_number].vnum(),
          loop_obj->short_description,
          DC::getInstance()->obj_index[loop_obj->item_number].vnum());
@@ -1886,7 +1876,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   // otherwise it defeats the purpose of no_trade:)
 
   retval = mprog_give_trigger(vict, this, obj);
-  bool objExists(Object * obj);
+  bool objExists(ObjectPtr obj);
   if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && vict->isNonPlayer() &&
       objExists(obj))
     extract_obj(obj);
@@ -1902,12 +1892,12 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
 // Find an item on a character (in inv, or containers in inv (NOT WORN!))
 // and try to put it in his inv.  If sucessful, return pointer to the item.
-class Object *bring_type_to_front(Character *ch, int item_type)
+ObjectPtr bring_type_to_front(CharacterPtr ch, qint32 item_type)
 {
-  class Object *item_carried = nullptr;
-  class Object *container_item = nullptr;
+  ObjectPtr item_carried = {};
+  ObjectPtr container_item = {};
 
-  std::queue<Object *> container_queue;
+  QQueue<ObjectPtr> container_queue;
 
   for (item_carried = ch->carrying; item_carried; item_carried = item_carried->next_content)
   {
@@ -1933,17 +1923,17 @@ class Object *bring_type_to_front(Character *ch, int item_type)
       }
     }
   }
-  return nullptr;
+  return {};
 }
 
 // Find an item on a character
-class Object *search_char_for_item(Character *ch, int16_t item_number, bool wearonly)
+ObjectPtr search_char_for_item(CharacterPtr ch, qint16 item_number, bool wearonly)
 {
-  class Object *i = nullptr;
-  class Object *j = nullptr;
-  int k;
+  ObjectPtr i = {};
+  ObjectPtr j = {};
+  qint32 k;
 
-  for (k = 0; k < MAX_WEAR; k++)
+  for (k = {}; k < MAX_WEAR; k++)
   {
     if (ch->equipment[k])
     {
@@ -1975,18 +1965,18 @@ class Object *search_char_for_item(Character *ch, int16_t item_number, bool wear
         }
       }
     }
-  return nullptr;
+  return {};
 }
 
 // Find out how many of an item exists on character
-int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly)
+qint32 search_char_for_item_count(CharacterPtr ch, qint16 item_number, bool wearonly)
 {
-  class Object *i = nullptr;
-  class Object *j = nullptr;
-  int k;
-  int count = 0;
+  ObjectPtr i = {};
+  ObjectPtr j = {};
+  qint32 k;
+  qint32 count = {};
 
-  for (k = 0; k < MAX_WEAR; k++)
+  for (k = {}; k < MAX_WEAR; k++)
   {
     if (ch->equipment[k])
     {
@@ -2023,7 +2013,7 @@ int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly
   return count;
 }
 
-bool search_container_for_item(Object *obj, int item_number)
+bool search_container_for_item(ObjectPtr obj, qint32 item_number)
 {
   if (obj == nullptr)
   {
@@ -2035,7 +2025,7 @@ bool search_container_for_item(Object *obj, int item_number)
     return false;
   }
 
-  for (Object *i = obj->contains; i; i = i->next_content)
+  for (ObjectPtr i = obj->contains; i; i = i->next_content)
   {
     if (i->item_number == item_number)
     {
@@ -2046,7 +2036,7 @@ bool search_container_for_item(Object *obj, int item_number)
   return false;
 }
 
-bool search_container_for_vnum(Object *obj, int vnum)
+bool search_container_for_vnum(ObjectPtr obj, qint32 vnum)
 {
   if (obj == nullptr)
   {
@@ -2058,7 +2048,7 @@ bool search_container_for_vnum(Object *obj, int vnum)
     return false;
   }
 
-  for (Object *i = obj->contains; i; i = i->next_content)
+  for (ObjectPtr i = obj->contains; i; i = i->next_content)
   {
     if (DC::getInstance()->obj_index[i->item_number].vnum() == vnum)
     {
@@ -2069,10 +2059,10 @@ bool search_container_for_vnum(Object *obj, int vnum)
   return false;
 }
 
-int find_door(Character *ch, char *type, char *dir)
+qint32 find_door(CharacterPtr ch, char *type, char *dir)
 {
-  int door;
-  const char *dirs[] =
+  qint32 door;
+  const QStringList dirs =
       {
           "north",
           "east",
@@ -2107,7 +2097,7 @@ int find_door(Character *ch, char *type, char *dir)
   }
   else // try to locate the keyword
   {
-    for (door = 0; door <= 5; door++)
+    for (door = {}; door <= 5; door++)
       if (EXIT(ch, door))
         if (EXIT(ch, door)->keyword)
           if (isexact(type, EXIT(ch, door)->keyword))
@@ -2121,7 +2111,7 @@ int find_door(Character *ch, char *type, char *dir)
 in_room == exit->in_room
 
 */
-bool is_bracing(Character *bracee, room_direction_data *exit)
+bool is_bracing(CharacterPtr bracee, room_direction_data *exit)
 {
   // this could happen on a repop of the zone
   if (!isSet(exit->exit_info, EX_CLOSED))
@@ -2139,7 +2129,7 @@ bool is_bracing(Character *bracee, room_direction_data *exit)
   if (bracee->brace_at != exit && bracee->brace_exit != exit)
     return false;
 
-  for (int i = 0; i < 6; i++)
+  for (qint32 i = {}; i < 6; i++)
     if (DC::getInstance()->world[bracee->in_room].dir_option[i] == exit)
       return true;
 
@@ -2152,21 +2142,19 @@ bool is_bracing(Character *bracee, room_direction_data *exit)
   return false;
 }
 
-int do_open(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
 {
-  bool found = false;
-  int door, other_room, retval;
-  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-  room_direction_data *back;
-  class Object *obj;
-  Character *victim;
-  Character *next_vict;
+  bool found{};
+  qint32 door{}, other_room{}, retval{};
+  room_direction_data *back{};
+  ObjectPtr obj{};
+  CharacterPtr victim{};
+  CharacterPtr next_vict{};
 
-  int do_fall(Character * ch, short dir);
+  qint32 do_fall(CharacterPtr ch, short dir);
 
-  retval = 0;
-
-  argument_interpreter(argument, type, dir);
+  auto type = arguments.value(0);
+  auto dir = arguments.value(1);
 
   if (!*type)
   {
@@ -2190,19 +2178,19 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
       {
         if (EXIT(ch, door)->bracee->in_room == ch->in_room)
         {
-          csendf(ch, "%s is holding the %s shut.\r\n", EXIT(ch, door)->bracee->getNameC(), fname(EXIT(ch, door)->keyword).toStdString().c_str());
-          csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as %s attempts to force their way through.\r\n", fname(EXIT(ch, door)->keyword).toStdString().c_str(), ch);
+          ch->sendln(QStringLiteral("%1 is holding the %2 shut.").arg(EXIT(ch, door)->bracee->name()).arg(fname(EXIT(ch, door)->keyword)));
+          EXIT(ch, door)->bracee->sendln(QStringLiteral("The %1 quivers slightly but holds as %2 attempts to force their way through.").arg(fname(EXIT(ch, door)->keyword).arg(ch->name()));
         }
         else
         {
-          csendf(ch, "The %s seems to be barred from the other side.\r\n", fname(EXIT(ch, door)->keyword).toStdString().c_str());
-          csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as someone attempts to force their way through.\r\n", fname(EXIT(ch, door)->keyword).toStdString().c_str());
+          ch->sendln(QStringLiteral("The %1 seems to be barred from the other side.").arg(fname(EXIT(ch, door)->keyword)));
+          EXIT(ch, door)->bracee->sendln(QStringLiteral("The %1 quivers slightly but holds as someone attempts to force their way through.").arg(fname(EXIT(ch, door)->keyword)));
         }
       }
       else
       {
         do_brace(EXIT(ch, door)->bracee, "");
-        return do_open(ch, argument, cmd);
+        return ch->do_open(argument.split(' '), cmd);
       }
     }
     else if (isSet(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && !ch->isImmortalPlayer())
@@ -2216,7 +2204,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
         if (EXIT(ch, door)->keyword)
         {
           act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
-          csendf(ch, "You reveal a hidden %s!\r\n", fname((char *)EXIT(ch, door)->keyword).toStdString().c_str());
+          ch->send(QStringLiteral("You reveal a hidden %s!\r\n").arg(qPrintable(fname((char *)EXIT(ch).arg(door)->keyword))));
         }
         else
         {
@@ -2243,7 +2231,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
             REMOVE_BIT(back->exit_info, EX_CLOSED);
             if ((back->keyword) && !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
-              sprintf(buf, "The %s is opened from the other side.\r\n", fname(back->keyword).toStdString().c_str());
+              sprintf(buf, "The %s is opened from the other side.\r\n", qPrintable(fname(back->keyword)));
               send_to_room(buf, EXIT(ch, door)->to_room, true);
             }
             else
@@ -2258,7 +2246,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
           (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
           (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
       {
-        int success = 0;
+        qint32 success = {};
 
         // opened the door that kept them from falling out
         for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
@@ -2310,14 +2298,14 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_close(Character *ch, char *argument, cmd_t cmd)
+qint32 do_close(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool found = false;
-  int door, other_room;
+  qint32 door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   room_direction_data *back;
-  class Object *obj;
-  Character *victim;
+  ObjectPtr obj;
+  CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
 
@@ -2352,7 +2340,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
             if ((back->keyword) &&
                 !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
-              sprintf(buf, "The %s closes quietly.\r\n", fname(back->keyword).toStdString().c_str());
+              sprintf(buf, "The %s closes quietly.\r\n", qPrintable(fname(back->keyword)));
               send_to_room(buf, EXIT(ch, door)->to_room, true);
             }
             else
@@ -2386,7 +2374,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-bool has_key(Character *ch, int key)
+bool has_key(CharacterPtr ch, qint32 key)
 {
   // if key vnum is 0, there is no key
   if (key == 0)
@@ -2394,7 +2382,7 @@ bool has_key(Character *ch, int key)
     return false;
   }
 
-  Object *obj = ch->equipment[WEAR_HOLD];
+  ObjectPtr obj = ch->equipment[WEAR_HOLD];
   if (obj && IS_KEY(obj))
   {
     if (DC::getInstance()->obj_index[obj->item_number].vnum() == key)
@@ -2419,13 +2407,13 @@ bool has_key(Character *ch, int key)
   return false;
 }
 
-int do_lock(Character *ch, char *argument, cmd_t cmd)
+qint32 do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int door, other_room;
+  qint32 door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
-  class Object *obj;
-  Character *victim;
+  ObjectPtr obj;
+  CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
 
@@ -2492,13 +2480,13 @@ int do_lock(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_unlock(Character *ch, char *argument, cmd_t cmd)
+qint32 do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  int door, other_room;
+  qint32 door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
-  class Object *obj;
-  Character *victim;
+  ObjectPtr obj;
+  CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
 
@@ -2566,8 +2554,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
       }
 
       ch->sendln(QStringLiteral("You open the %1.").arg(door_keyword));
-      auto copy_of_door_keyword = strdup(qPrintable(QStringLiteral("%1 %2").arg(door_keyword).arg(dir)));
-      auto rc = do_open(ch, copy_of_door_keyword);
+      auto rc = ch->do_open({door_keyword, dir});
       free(copy_of_door_keyword);
       return rc;
     }
@@ -2577,7 +2564,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent)
+qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
 
@@ -2611,20 +2598,20 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       return ReturnValue::eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
 
-    Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item);
+    ObjectPtr o = static_cast<ObjectPtr>(DC::getInstance()->obj_index[obj_object->item_number].item);
 
     if (o && o->short_description)
-      send_info(QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(o->short_description));
+      send_info(QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(qPrintable(ch->name())).arg(o->short_description()));
     else
-      send_info(QStringLiteral("\r\n##%1 has just picked up the Champion Flag!\r\n").arg(GET_NAME(ch)));
+      send_info(QStringLiteral("\r\n##%1 has just picked up the Champion Flag!\r\n").arg(qPrintable(ch->name())));
   }
 
   if (sub_object)
   {
-    sprintf(buffer, "%s_consent", GET_NAME(ch));
+    sprintf(buffer, "%s_consent", qPrintable(ch->name()));
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      if (isexact("lootable", sub_object->Name()) && !isexact(buffer, sub_object->Name()))
+      if (isexact("lootable", sub_object->name()) && !isexact(buffer, sub_object->name()))
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
@@ -2634,7 +2621,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
         pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
         pthiefaf.duration = 10;
-        pthiefaf.modifier = 0;
+        pthiefaf.modifier = {};
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
 
@@ -2647,15 +2634,15 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->Name()))
+    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name()))
     {
-      if (isexact("lootable", sub_object->Name()))
+      if (isexact("lootable", sub_object->name()))
       {
         affected_type pthiefaf;
 
         pthiefaf.type = Character::PLAYER_GOLD_THIEF;
         pthiefaf.duration = 10;
-        pthiefaf.modifier = 0;
+        pthiefaf.modifier = {};
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -2675,19 +2662,19 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   char log_buf[MAX_STRING_LENGTH] = {};
   if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
-    //"%s palms %s[%d] from %s", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->Name()));
+    //"%s palms %s[%d] from %s", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->name()));
 
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-    for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].vnum());
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
-    sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+    sprintf(log_buf, "%s palms %s[%d] from room %d", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(),
             ch->in_room);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-    for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].vnum());
   }
@@ -2718,10 +2705,9 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                                                         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
-      int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
+      qint32 cgold = (qint32)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name, cgold,
-             obj_object->obj_flags.value[0]);
+      ch->send(QStringLiteral("Clan %s collects %d bounty, leaving %d for you.\r\n").arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
     }
 
