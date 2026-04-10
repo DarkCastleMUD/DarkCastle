@@ -49,7 +49,7 @@ void mobile_activity(void)
 {
   CharacterPtr tmp_ch, pch;
   ObjectPtr obj, best_obj;
-  char buf[1000];
+  QString buf;
   qint32 door, max;
   qint32 done;
   qint32 tmp_race, tmp_bitv;

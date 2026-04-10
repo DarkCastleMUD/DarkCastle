@@ -628,10 +628,10 @@ quint64 Character::meta_get_ki_plat_cost(void)
   return static_cast<quint64>(cost * 0.9);
 }
 
-qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                  CharacterPtr owner)
 {
-  char argument[MAX_INPUT_LENGTH];
+  QString argument;
 
   qint32 stat;
   qint32 choice;
@@ -677,7 +677,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   if (cmd == cmd_t::ESTIMATE)
   {
     // Estimate costs
-    char arg2[MAX_INPUT_LENGTH];
+    QString arg2;
     arg = one_argument(arg, argument);
     one_argument(arg, arg2);
 
@@ -1549,9 +1549,9 @@ qint32 changecost(qint32 oldrace, qint32 newrace)
   return 100000;
 }
 
-char *Character::race_message(qint32 race)
+QString Character::race_message(qint32 race)
 {
-  static char buf[MAX_STRING_LENGTH];
+  static QString buf;
   if (this->race == race)
     return "You are already of this race.";
   else if (!is_race_applicable(race))
@@ -1605,7 +1605,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
   }
   else if (cmd == cmd_t::BUY) // buy
   {
-    char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+    QString arg, arg2[MAX_INPUT_LENGTH];
     argument = one_argument(argument, arg);
     argument = one_argument(argument, arg2);
     qint32 choice = atoi(arg);

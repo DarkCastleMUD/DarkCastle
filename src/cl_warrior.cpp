@@ -146,10 +146,10 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-qint32 do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 dam, attacktype;
   qint32 retval;
   qint32 failchance = 25;
@@ -217,7 +217,7 @@ qint32 do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
 
   qint32 to_dam = GET_DAMROLL(ch);
   if (victim->isNonPlayer())
-    to_dam = (qint32)((float)to_dam * .8);
+    to_dam = (qint32)((qreal)to_dam * .8);
 
   dam = dice(ch->equipment[WEAR_WIELD]->obj_flags.value[1],
              ch->equipment[WEAR_WIELD]->obj_flags.value[2]);
@@ -262,10 +262,10 @@ qint32 do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 attempt;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   // Azrack -- retval should be initialized to something
   qint32 retval = {};
   CharacterPtr chTemp, loop_ch;
@@ -366,7 +366,7 @@ qint32 do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer() && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
@@ -428,10 +428,10 @@ qint32 do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 retval;
   qint32 hit = {};
 
@@ -612,10 +612,10 @@ qint32 do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
 
   if (!ch->canPerform(SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
     return ReturnValue::eFAILURE;
@@ -677,12 +677,12 @@ qint32 do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   ObjectPtr wielded;
 
-  char name[256];
+  QString name;
   ObjectPtr obj;
   qint32 retval = {};
 
@@ -893,7 +893,7 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
   qint32 duration = 12;
@@ -1038,7 +1038,7 @@ void start_guarding(CharacterPtr guard, CharacterPtr victim)
 
 void stop_guarding_me(CharacterPtr victim)
 {
-  char buf[200];
+  QString buf;
   follow_type *curr = victim->guarded_by;
   follow_type *last;
 
@@ -1057,9 +1057,9 @@ void stop_guarding_me(CharacterPtr victim)
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
 
-qint32 do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_INPUT_LENGTH];
+  QString name;
   CharacterPtr victim = {};
 
   if (!ch->isNonPlayer() && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
@@ -1107,7 +1107,7 @@ qint32 do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1184,7 +1184,7 @@ qint32 do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i, next_i;
   qint32 learned = ch->has_skill(SKILL_MAKE_CAMP);
@@ -1289,7 +1289,7 @@ qint32 do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_TRIAGE);
   affected_type af;
@@ -1346,7 +1346,7 @@ qint32 do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_BATTLESENSE);
   affected_type af;
@@ -1386,10 +1386,10 @@ qint32 do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
-  char name[MAX_STRING_LENGTH];
+  QString name;
   qint32 learned = ch->has_skill(SKILL_SMITE);
   affected_type af;
 
@@ -1472,7 +1472,7 @@ qint32 do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
   return ch->fighting ? ReturnValue::eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
 }
 
-qint32 do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_LEADERSHIP);
   affected_type af;
@@ -1531,7 +1531,7 @@ qint32 do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_PERSEVERANCE);
   affected_type af;
@@ -1571,7 +1571,7 @@ qint32 do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   qint32 learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
@@ -1616,7 +1616,7 @@ qint32 do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_ONSLAUGHT);
   affected_type af;

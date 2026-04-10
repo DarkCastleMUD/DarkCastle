@@ -147,9 +147,9 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
 //   }
 //}
 
-qint32 do_unstable(CharacterPtr ch)
+command_return_t do_unstable(CharacterPtr ch)
 {
-  char death_log[MAX_STRING_LENGTH];
+  QString death_log;
   qint32 retval;
 
   if (ch->isNonPlayer())
@@ -181,10 +181,10 @@ qint32 do_unstable(CharacterPtr ch)
     return ReturnValue::eSUCCESS;
 }
 
-qint32 do_fall(CharacterPtr ch, short dir)
+command_return_t do_fall(CharacterPtr ch, short dir)
 {
   qint32 target;
-  char damage[MAX_STRING_LENGTH];
+  QString damage;
   qint32 retval;
   qint32 dam = number(50, 100);
 
@@ -318,9 +318,9 @@ qint32 do_fall(CharacterPtr ch, short dir)
 // Assumes
 // 1. No master and no followers.
 // 2. That the direction exists.
-qint32 do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
+command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 {
-  char tmp[80];
+  QString tmp;
   qint32 was_in;
   qint32 need_movement, learned, mvinroom = 0, mvtoroom = {};
   qint32 retval;
@@ -505,11 +505,11 @@ qint32 do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     if ((DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_NOSWIM) || (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_WATER_NOSWIM))
     {
       has_boat = false;
-      // See if char is carrying a boat
+      // See if character is carrying a boat
       for (obj = ch->carrying; obj; obj = obj->next_content)
         if (obj->obj_flags.type_flag == ITEM_BOAT)
           has_boat = true;
-      // See if char is wearing a boat (boat ring, etc)
+      // See if character is wearing a boat (boat ring, etc)
       if (!has_boat)
         for (qint32 x = {}; x < MAX_WEAR; x++)
           if (ch->equipment[x])
@@ -657,7 +657,7 @@ qint32 do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   // Sneaking
   else if (IS_AFFECTED(ch, AFF_SNEAK))
   {
-    char tmp[100];
+    QString tmp;
     if (!skill_success(ch, nullptr, SKILL_SNEAK))
     {
       sprintf(tmp, "$n leaves %s.", dirs[dir]);
@@ -858,7 +858,7 @@ qint32 do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
 qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
 {
-  char tmp[80];
+  QString tmp;
   qint32 return_val;
   qint32 was_in = ch->in_room;
   follow_type *k, *next_dude;
@@ -994,7 +994,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
           strcpy(tmp, "You follow someone.\r\n\r\n");
         k->follower->send(tmp);
         // do_move(k->follower, "", cmd + 1);
-        char tempcommand[32];
+        QString tempcommand;
         strcpy(tempcommand, dirs[dir]);
         if (k->follower->fighting)
           stop_fighting(k->follower);
@@ -1025,15 +1025,15 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
 //   1 : If success.
 //   0 : If fail
 //  -1 : If dead.
-qint32 do_move(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_move(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   return attempt_move(ch, cmd);
 }
 
-qint32 do_leave(CharacterPtr ch, char *arguement, cmd_t cmd)
+command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
 {
   ObjectPtr k;
-  char buf[200];
+  QString buf;
   qint32 retval;
 
   for (k = DC::getInstance()->object_list; k; k = k->next)
@@ -1070,9 +1070,9 @@ qint32 do_leave(CharacterPtr ch, char *arguement, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 retval;
 
   CharacterPtr sesame;
@@ -1237,7 +1237,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
 
   if (ch->in_room != DC::NOWHERE)
   {
-    // Couldn't move char from the room
+    // Couldn't move character from the room
     if (char_from_room(ch, stop_all_fighting) == 0)
     {
       logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
@@ -1246,7 +1246,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     }
   }
 
-  // Couldn't move char to new room
+  // Couldn't move character to new room
   if (char_to_room(ch, dest, stop_all_fighting) == 0)
   {
     // Now we have real problems
@@ -1262,9 +1262,9 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   ObjectPtr obj = {};
 
   one_argument(argument, buf);

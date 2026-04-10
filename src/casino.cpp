@@ -49,7 +49,6 @@ cDeck *create_deck(qint32 decks)
 
 void freeDeck(cDeck *deck)
 {
-  delete[] deck->cards;
   deck = {};
 }
 
@@ -191,7 +190,7 @@ void shuffle_deck(cDeck *tDeck)
   // shuffled
 }
 
-char suit(qint32 card)
+QChar suit(qint32 card)
 {
   if (card < 14)
     return 'h';
@@ -203,7 +202,7 @@ char suit(qint32 card)
     return 's';
 }
 
-const char *suitcol(qint32 card)
+const QString suitcol(qint32 card)
 {
   if (card < 14)
     return BOLD RED;
@@ -221,7 +220,7 @@ qint32 val(qint32 card)
   return card;
 }
 
-const char *valstri(qint32 card)
+const QString valstri(qint32 card)
 {
   while (card > 13)
     card -= 13;
@@ -420,7 +419,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
     timer->function = check_active;
     timer->timeleft = 10;
     addtimer(timer);
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "The dealer nudges %s.\r\n", qPrintable(plr->ch->name()));
     send_to_table(buf, plr->table, plr);
     plr->ch->sendln("The dealer nudges you.");
@@ -430,7 +429,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
     table_data *tbl = plr->table;
     CharacterPtr ch = plr->ch;
 
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "Security removes a sleepy %s from the table.\r\n", qPrintable(plr->ch->name()));
     send_to_table(buf, tbl, plr);
     player_data *tmp, *tnext;
@@ -536,7 +535,7 @@ void check_winner(table_data *tbl)
   player_data *plr, *next;
   if (tbl->hand_data[2] == 0)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "The dealer has %d!\r\n", hand_strength(tbl));
     send_to_table(buf, tbl);
   }
@@ -559,7 +558,7 @@ void check_winner(table_data *tbl)
       continue;
     if (dealer == hand_strength(plr))
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       sprintf(buf, "It's a PUSH!\r\nThe dealer takes your cards and gives you %d %s coins.\r\n",
               plr->bet, plr->table->gold ? "gold" : "platinum");
       plr->ch->send(buf);
@@ -577,7 +576,7 @@ void check_winner(table_data *tbl)
 
     if (dealer > 21 || (hand_strength(plr) > dealer && hand_strength(plr) <= 21))
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       plr->ch->sendln("$BYou WIN!$R");
       sprintf(buf, "The dealer takes your cards and gives you %d %s coins.\r\n",
               plr->bet * 2, plr->table->gold ? "gold" : "platinum");
@@ -608,7 +607,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
 {
   table_data *tbl = arg1.table;
   qint32 a = (qint64)arg2;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   if (a && tbl->handnr != a)
     return; // handled earlier
   bool cont = false;
@@ -712,7 +711,7 @@ void check_blackjacks(table_data *tbl)
       //        	nextturn(plr->table);
       if (tbl->plr == plr && !plr->next)
       { // all players blackjacked
-        char buf[MAX_STRING_LENGTH];
+        QString buf;
         sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
                 suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
                 NTEXT);
@@ -767,11 +766,11 @@ void check_insurance(table_data *tbl)
     pulse_table_bj(tbl);
   }
 }
-const char *hand_thing(player_data *plr)
+const QString hand_thing(player_data *plr)
 {
   if (hands(plr) <= 1)
     return "";
-  static char buf[MAX_STRING_LENGTH];
+  static QString buf;
   sprintf(buf, " for hand %d", hand_number(plr));
   return &buf[0];
 }
@@ -787,7 +786,7 @@ void pulse_table_bj(table_data *tbl, qint32 recall)
 
   if (tbl->cr)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$B$7The dealer says 'It's your turn, %s, what would you like to do%s?'$R\r\n",
             qPrintable(tbl->cr->ch->name()), hand_thing(tbl->cr));
     send_to_table(buf, tbl);
@@ -874,15 +873,15 @@ qint32 players(table_data *tbl)
   return i;
 }
 
-char tempBuf[MAX_STRING_LENGTH];
-char lineTwo[MAX_STRING_LENGTH];
-char lineTop[MAX_STRING_LENGTH];
+QString tempBuf;
+QString lineTwo;
+QString lineTop;
 qint32 padnext = {};
 // Not pretty, but don't feel like redoing the prompt functions, so whatever.
 
-char *show_hand(qint32 hand_data[21], qint32 hide, bool ascii, bool showColor)
+QString show_hand(qint32 hand_data[21], qint32 hide, bool ascii, bool showColor)
 {
-  static char buf[MAX_STRING_LENGTH];
+  static QString buf;
   qint32 i = {};
   buf[0] = '\0';
   sprintf(lineTwo, "%s%*s", lineTwo, (qint32)strlen(tempBuf) + padnext, " ");
@@ -972,7 +971,7 @@ QString Character::createBlackjackPrompt(void)
     return {};
   // Prompt-time
   qint32 plrsdone = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   buf[0] = '\0';
   lineTwo[0] = '\0';
   lineTop[0] = '\0';
@@ -986,7 +985,7 @@ QString Character::createBlackjackPrompt(void)
       continue;
     if (plr->ch == this)
     {
-      char buf2[MAX_STRING_LENGTH];
+      QString buf2;
       buf2[0] = '\0';
       if (plr->table->cr == plr)
       {
@@ -1118,7 +1117,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     showColor = true;
   }
 
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   arg = one_argument(arg, arg1);
   if (!isCommandTypeCasino(cmd))
   {
@@ -1196,7 +1195,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     else
       GET_PLATINUM(ch) -= amt;
     ch->sendln("The dealer accepts your bet.");
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "%s bets %d.\r\n", qPrintable(ch->name()), amt);
     send_to_table(buf, obj->table, plr);
     if (obj->table->state == 0)
@@ -1255,7 +1254,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     }
     plr->table->handnr++;
     plr->insurance = true;
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     if (plr->table->gold)
       ch->removeGold(plr->bet / 2);
     else
@@ -1294,7 +1293,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     plr->bet *= 2;
     plr->doubled = true;
     plr->table->handnr++;
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "%s doubles %s bet.\r\n", qPrintable(ch->name()), HSHR(ch));
     send_to_table(buf, plr->table, plr);
     ch->sendln("You double your bet.");
@@ -1310,7 +1309,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
 
     if (hand_strength(plr) > 21) // busted
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
       send_to_table(buf, plr->table, plr);
       ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
@@ -1338,7 +1337,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       ch->sendln("It is not currently your turn.");
       return ReturnValue::eSUCCESS;
     }
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     plr->table->handnr++;
     sprintf(buf, "%s stays.\r\n", qPrintable(ch->name()));
     send_to_table(buf, plr->table);
@@ -1376,7 +1375,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     nw->hand_data[1] = pickCard(plr->table->deck);
     nw->doubled = plr->doubled;
     ch->sendln("You split your hand.");
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "%s splits %s hand.\r\n", qPrintable(ch->name()), HSHR(ch));
     send_to_table(buf, plr->table, plr);
     pulse_table_bj(plr->table);
@@ -1399,7 +1398,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       if (plr->hand_data[i] == 0)
         break;
     plr->hand_data[i] = pickCard(plr->table->deck);
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "%s hits and receives a %s%s%c%s.\r\n", qPrintable(ch->name()),
             showColor ? suitcol(plr->hand_data[i]) : "", valstri(plr->hand_data[i]),
             suit(plr->hand_data[i]), showColor ? NTEXT : "");
@@ -1410,7 +1409,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     ch->send(buf);
     if (hand_strength(plr) > 21) // busted
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
       send_to_table(buf, plr->table, plr);
       ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
@@ -1476,7 +1475,7 @@ qint32 has_seat(ttable *ttbl)
   return -1;
 }
 
-bool findcard(qint32 hand[5], qint32 valu, char su, qint32 num = 1)
+bool findcard(qint32 hand[5], qint32 valu, QChar su, qint32 num = 1)
 {
   qint32 i;
   for (i = {}; i < 5; i++)
@@ -1616,7 +1615,7 @@ qint32 has_pair(qint32 hand[5])
   return false;
 }
 
-const char *cardname(qint32 card)
+const QString cardname(qint32 card)
 {
   switch (card)
   {
@@ -1650,7 +1649,7 @@ const char *cardname(qint32 card)
 
 QString hand_name(qint32 hand[5])
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   buf[0] = '\0';
   qint32 i = {};
   if (has_rsf(hand))
@@ -1778,13 +1777,13 @@ qint32 handcompare(qint32 hand1[5], qint32 hand2[5])
   return -1;
 }
 
-qint32 do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   one_argument(argument, arg);
   //  qint32 i = atoi(arg);
   //  qint32 z = get_hand(i);
-  // char buf[MAX_STRING_LENGTH];
+  // QString buf;
   // sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
   //	hand[0][z],hand[1][z],
   //	hand[2][z],hand[3][z],
@@ -1896,7 +1895,7 @@ public:
   uint cost;
   uint lastwin;
   qint32 bet;
-  float jackpot;
+  qreal jackpot;
   qint32 linkedto;
   bool busy;
   bool gold;
@@ -1977,8 +1976,8 @@ void save_slot_machines()
   }
 
   world_file_list_item *curr;
-  char buf[180];
-  char buf2[180];
+  QString buf;
+  QString buf2;
 
   curr = DC::getInstance()->obj_file_list;
   while (curr && curr->filename != "21900-21999.obj")
@@ -2031,7 +2030,7 @@ bool verify_slot(machine_data *machine)
 
 void update_linked_slots(machine_data *machine)
 {
-  char ldesc[MAX_STRING_LENGTH];
+  QString ldesc;
 
   snprintf(ldesc, MAX_STRING_LENGTH,
            "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.",
@@ -2088,7 +2087,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
   qint32 stop1 = (qint64)arg2;
   qint32 stop2 = (qint64)arg3;
 
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (stop1 < 0 && charExists(machine->ch) && verify_slot(machine))
   {
@@ -2133,7 +2132,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       payout = 2;
     else
     {
-      machine->jackpot += (float)machine->cost * (float)machine->bet * 0.04;
+      machine->jackpot += (qreal)machine->cost * (qreal)machine->bet * 0.04;
       machine->jackpot = MIN<float>(machine->jackpot, 2000000000.0); // NEVER AGAIN!!! :P
       if (machine->linkedto)
       {
@@ -2204,7 +2203,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
 
 qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (cmd != cmd_t::PULL && cmd != cmd_t::BET && cmd != cmd_t::PUSH) // pull or bet or push
     return ReturnValue::eFAILURE;
@@ -2507,7 +2506,7 @@ quint32 check_roulette_wins(roulette_player *plr, qint32 num)
 
 void send_roulette_message(wheel_data *wheel)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   const QStringList introbuf = {
       "A silver blur rounds the outside of the wheel as it spins.\r\n",
@@ -2539,7 +2538,7 @@ void wheel_stop(wheel_data *wheel)
 {
   qint32 num = number(0, 36);
   quint32 payout = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   sprintf(buf, "The ball lands on %s!\r\n", roulette_display[num]);
   send_to_room(buf, wheel->obj->in_room);
@@ -2588,7 +2587,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
 {
   wheel_data *wheel = arg1.wheel;
   qint32 spin = (qint64)arg2;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (wheel->countdown <= 0 && !spin)
   {
@@ -2621,7 +2620,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
 
 qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+  QString arg1, arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
   quint32 bet = {};
   qint32 i = {};
   bool playing = false;

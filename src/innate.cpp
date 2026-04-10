@@ -40,7 +40,7 @@ qint32 innate_fly(CharacterPtr ch, QString argument, cmd_t cmd);
 class in_skills
 {
 public:
-  const char *name;
+  const QString name;
   qint32 race;
   DO_FUN *func;
 };
@@ -57,7 +57,7 @@ const in_skills innates[] = {
     {"fly", RACE_PIXIE, innate_fly},
     {"\n", 0, nullptr}};
 
-const char *innate_skills[] =
+const QStringList innate_skills =
     {
         "powerwield",
         "focus",
@@ -73,7 +73,7 @@ const char *innate_skills[] =
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
-qint32 do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (ch && ch->in_room > 0 &&
@@ -85,7 +85,7 @@ qint32 do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
 
   bool found = false;
   qint32 i;
-  char buf[512];
+  QString buf;
   arg = one_argument(arg, buf);
   for (i = {}; *innates[i].name != '\n'; i++)
   {
@@ -239,7 +239,7 @@ qint32 innate_bloodlust(CharacterPtr ch, QString arg, cmd_t cmd)
 qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ObjectPtr obj;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 i, chance = 60 - ch->getLevel();
   bool found = false;
   arg = one_argument(arg, buf);

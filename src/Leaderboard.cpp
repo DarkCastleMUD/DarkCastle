@@ -1200,26 +1200,22 @@ qint32 Leaderboard::pdscore(CharacterPtr ch)
  things, otherwise renames will crash the server hard.
  */
 
-qint32 do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   class Connection *d;
   FILE *fl;
-  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+  QString buf, buf2[MAX_STRING_LENGTH];
   qint32 i, j, k, validclass = {};
-  char *hponlinename[5], *mnonlinename[5], *kionlinename[5], *pkonlinename[5],
-      *pdonlinename[5], *rdonlinename[5], *mvonlinename[5];
+  QStringList hponlinename, mnonlinename, kionlinename, pkonlinename, pdonlinename, rdonlinename, mvonlinename;
   qint32 hponline[] = {0, 0, 0, 0, 0}, mnonline[] = {0, 0, 0, 0, 0},
          kionline[] = {0, 0, 0, 0, 0}, pkonline[] = {0, 0, 0, 0, 0},
          pdonline[] = {0, 0, 0, 0, 0}, rdonline[] = {0, 0, 0, 0, 0},
          mvonline[] = {0, 0, 0, 0, 0};
-  char *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5],
-      *pdactivename[5], *rdactivename[5], *mvactivename[5];
-  qint32 hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5],
-      rdactive[5], mvactive[5];
+  QStringList hpactivename, mnactivename, kiactivename, pkactivename, pdactivename, rdactivename, mvactivename;
+  qint32 hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5], mvactive[5];
   qint32 placea = 1, placeb = 1, placec = 1, placed = 1;
   qint32 skippeda = 0, skippedb = 0, skippedc = 0, skippedd = {};
-  char *clss_types[] = {"mage", "cleric", "thief", "warrior", "antipaladin",
-                        "paladin", "barbarian", "monk", "ranger", "bard", "druid", "\n"};
+  QStringList clss_types = {"mage", "cleric", "thief", "warrior", "antipaladin", "paladin", "barbarian", "monk", "ranger", "bard", "druid"};
 
   if (ch->isPlayer() && ch->getLevel() >= IMPLEMENTER)
   {

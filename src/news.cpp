@@ -99,7 +99,7 @@ void loadnews()
     nnews->addedby = fread_string(fl, 0);
     nnews->news = fread_string(fl, 0);
     qint32 i, v = {};
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     for (i = {}; i < (qint32)strlen(nnews->news); i++)
     {
       buf[v++] = *(nnews->news + i);
@@ -111,9 +111,9 @@ void loadnews()
   fclose(fl);
 }
 
-const char *newsify(char *string)
+const QString newsify(QString string)
 {
-  static char tmp[MAX_STRING_LENGTH * 2];
+  static QString tmp;
   qint32 i, a = {};
   tmp[0] = '\0';
   for (i = {}; *(string + i) != '\0'; i++)
@@ -132,7 +132,7 @@ const char *newsify(char *string)
   //  return (tmp);
 }
 
-qint32 do_news(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool up;
   if (ch->isNonPlayer())
@@ -140,11 +140,11 @@ qint32 do_news(CharacterPtr ch, QString argument, cmd_t cmd)
   else
     up = !isSet(ch->player->toggles, Player::PLR_NEWS);
   news_data *tnews;
-  char buf[MAX_STRING_LENGTH * 2], old[MAX_STRING_LENGTH * 2];
-  char timez[15];
+  QString buf, old[MAX_STRING_LENGTH * 2];
+  QString timez;
   buf[0] = '\0';
   time_t thetime;
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   one_argument(argument, arg);
   if (str_cmp(arg, "all"))
     thetime = time(nullptr) - 604800;
@@ -160,7 +160,7 @@ qint32 do_news(CharacterPtr ch, QString argument, cmd_t cmd)
     strftime(&timez[0], 10, "%d/%b/%y", gmtime(&tnews->time));
 
     strcpy(old, buf);
-    const char *newsstring = tnews->news;
+    const QString newsstring = tnews->news;
     if (up)
       sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
               newsstring);
@@ -183,7 +183,7 @@ qint32 do_news(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (!ch->has_skill(COMMAND_ADDNEWS))
@@ -200,7 +200,7 @@ qint32 do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
                  ch);
     return ReturnValue::eFAILURE;
   }
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   time_t thetime;
   one_argument(argument, arg);
   if (!str_cmp(arg, "save"))

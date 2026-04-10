@@ -135,9 +135,9 @@ void AreaData::GetAreaData(zone_t zone, qint32 mob, qint64 xps, qint64 gold)
 
 AreaData areaData;
 
-qint32 do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   argument = one_argument(argument, buf);
   if (!*buf)

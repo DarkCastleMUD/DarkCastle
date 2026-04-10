@@ -1,12 +1,9 @@
-#include "DC/utility.h"
 #include <QTest>
-
 #include <QString>
-#include <memory>
 
 using namespace std::literals;
 
-#define STRING_LITERAL1 "$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"
+const auto STRING_LITERAL1 = QStringLiteral("$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$");
 
 class BenchmarkUtility : public QObject
 {
@@ -44,7 +41,7 @@ private slots:
     {
       QBENCHMARK
       {
-        result = nocolor_strlen(QStringLiteral(STRING_LITERAL1));
+        auto result = nocolor_strlen(QStringLiteral(STRING_LITERAL1));
       }
     }
     Q_UNUSED(result);
@@ -54,7 +51,7 @@ private slots:
   {
     QBENCHMARK
     {
-      std::unique_ptr<char, decltype(std::free) *> result = {0(STRING_LITERAL1), std::free};
+      auto result = QStringLiteral(STRING_LITERAL1);
     }
   }
 
@@ -62,7 +59,7 @@ private slots:
   {
     QBENCHMARK
     {
-      std::unique_ptr<char, decltype(std::free) *> result = {(STRING_LITERAL1), std::free};
+      auto result = QStringLiteral(STRING_LITERAL1);
     }
   }
 
@@ -71,7 +68,7 @@ private slots:
     qint32 result = {};
     QBENCHMARK
     {
-      result = str_cmp("ABC123", "abc123");
+      result = QStringLiteral("ABC123") != QStringLiteral("abc123");
     }
     Q_UNUSED(result);
   }

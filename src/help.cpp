@@ -18,27 +18,27 @@
 #include <algorithm>
 
 // Externs
-extern void skip_spaces(const char **s);
+extern void skip_spaces(const QString *s);
 extern help_index_element_new *new_help_table;
-qint32 get_line(FILE *fl, char *buf);
-qint32 is_abbrev(const char *arg1, const char *arg2);
-void help_string_to_file(FILE *f, char *string);
+qint32 get_line(FILE *fl, QString buf);
+qint32 is_abbrev(const QString arg1, const QString arg2);
+void help_string_to_file(FILE *f, QString string);
 
 // locals
 help_index_element_new *find_help(QString keyword);
-qint32 strn_cmp(char *arg1, char *arg2, qint32 n);
+qint32 strn_cmp(QString arg1, QString arg2, qint32 n);
 qint32 count_hash_records(FILE *fl);
 void show_hedit_usage(CharacterPtr ch);
 void save_help(CharacterPtr ch);
-qint32 get_line_with_space(FILE *fl, char *buf);
+qint32 get_line_with_space(FILE *fl, QString buf);
 qint32 show_one_help_entry(qint32 entry, CharacterPtr ch, qint32 count);
 void show_help_header(CharacterPtr ch);
 void show_help_bar(CharacterPtr ch);
 
 // da functions
-qint32 do_mortal_help(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mortal_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  extern char new_help[MAX_STRING_LENGTH];
+  extern QString new_help;
   ch->send(new_help);
   return ReturnValue::eSUCCESS;
 }
@@ -52,7 +52,7 @@ public:
   }
 };
 
-qint32 levenshtein(const char *s, const char *t)
+qint32 levenshtein(const QString s, const QString t)
 {
   quint32 i, j, n, m, cost;
   quint32 d[MAX_INPUT_LENGTH + 1][MAX_HELP_KEYWORD_LENGTH + 1];
@@ -86,14 +86,14 @@ qint32 levenshtein(const char *s, const char *t)
   return d[m][n];
 }
 
-qint32 do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  char buf[256];
-  extern char new_help[MAX_STRING_LENGTH];
-  extern char new_ihelp[MAX_STRING_LENGTH];
+  QString buf;
+  extern QString new_help;
+  extern QString new_ihelp;
   help_index_element_new *this_help;
-  char entry[MAX_STRING_LENGTH];
-  char key1[256], key2[256], key3[256], key4[256], key5[256], rec_level[256];
+  QString entry;
+  QString key1, key2[256], key3[256], key4[256], key5[256], rec_level[256];
 
   if (!ch->desc)
     return ReturnValue::eFAILURE;
@@ -129,8 +129,8 @@ qint32 do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
     qint32 h;
     quint32 l;
     quint32 argSize = strlen(argument);
-    std::multimap<quint32, char *, ltstr> ltable;
-    std::multimap<quint32, char *, ltstr>::iterator cur;
+    std::multimap<quint32, QString, ltstr> ltable;
+    std::multimap<quint32, QString, ltstr>::iterator cur;
 
     qint32 level = ch->getLevel() == 0 ? 1 : ch->getLevel();
 
@@ -144,31 +144,31 @@ qint32 do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
       if (!new_help_table[h].keyword1.isEmpty())
       {
         l = levenshtein(argument, new_help_table[h].keyword1);
-        ltable.insert(std::pair<qint32, char *>(l, new_help_table[h].keyword1));
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword1));
       }
 
       if (!new_help_table[h].keyword2.isEmpty())
       {
         l = levenshtein(argument, new_help_table[h].keyword2);
-        ltable.insert(std::pair<qint32, char *>(l, new_help_table[h].keyword2));
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword2));
       }
 
       if (!new_help_table[h].keyword3.isEmpty())
       {
         l = levenshtein(argument, new_help_table[h].keyword3);
-        ltable.insert(std::pair<qint32, char *>(l, new_help_table[h].keyword3));
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword3));
       }
 
       if (!new_help_table[h].keyword4.isEmpty())
       {
         l = levenshtein(argument, new_help_table[h].keyword4);
-        ltable.insert(std::pair<qint32, char *>(l, new_help_table[h].keyword4));
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword4));
       }
 
       if (!new_help_table[h].keyword5.isEmpty())
       {
         l = levenshtein(argument, new_help_table[h].keyword5);
-        ltable.insert(std::pair<qint32, char *>(l, new_help_table[h].keyword5));
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword5));
       }
     }
 
@@ -176,7 +176,7 @@ qint32 do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
     {
     }
 
-    QList<char *> results;
+    QList<QString> results;
     for (cur = ltable.begin(); cur != ltable.end(); cur++)
     {
       if (find(results.begin(), results.end(), (*cur).second) == results.end())
@@ -278,7 +278,7 @@ constexpr auto ENTRY_MAX = 32384;
 
 qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
 {
-  char entry[ENTRY_MAX], line[READ_SIZE + 1], tmpentry[ENTRY_MAX], buf[256], tmpbuffer[ENTRY_MAX];
+  QString entry, line, tmpentry, buf, tmpbuffer;
   help_index_element_new new_help;
   qint32 version = 0, level = -1, linenum = {};
 
@@ -375,18 +375,18 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   strcpy(arg, "areas");
   return do_new_help(ch, arg, cmd);
 }
 
-char help_buf[MAX_STRING_LENGTH * 4];
+QString help_buf;
 
-qint32 do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i, minlen, count = {};
-  char arg[256];
+  QString arg;
 
   half_chop(argument, argument, arg);
   if (!*argument)
@@ -410,7 +410,7 @@ qint32 do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
     if ((*(argument + 1) == 'l' || *(argument + 1) == 'L'))
     { // show help based on level range, excluded all level 1's
       // half_chop(arg, argument, arg);
-      char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+      QString arg2, arg3[MAX_INPUT_LENGTH];
       argument = &arg[0];
       argument = one_argument(argument, arg2);
       argument = one_argument(argument, arg3);
@@ -529,10 +529,10 @@ qint32 do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_index(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i, minlen, count = {};
-  char arg[256];
+  QString arg;
 
   half_chop(argument, argument, arg);
   if (!*argument)
@@ -642,7 +642,7 @@ void show_help_bar(CharacterPtr ch)
 /* strn_cmp: a case-insensitive version of strncmp */
 /* returns: 0 if equal, 1 if arg1 > arg2, -1 if arg1 < arg2  */
 /* scan 'till found different, end of both, or n reached     */
-qint32 strn_cmp(char *arg1, char *arg2, qint32 n)
+qint32 strn_cmp(QString arg1, QString arg2, qint32 n)
 {
   qint32 chk, i;
 
@@ -659,7 +659,7 @@ qint32 strn_cmp(char *arg1, char *arg2, qint32 n)
   return (0);
 }
 
-qint32 do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   FILE *new_help_fl;
@@ -683,7 +683,6 @@ qint32 do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  delete[] new_help_table;
   DC::getInstance()->new_top_of_helpt = {};
   new_help_table = new help_index_element_new[help_rec_count];
   ret = load_new_help(new_help_fl, 1, ch);
@@ -699,9 +698,9 @@ qint32 do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[200], buf2[200], field[200], buf3[200], value[200];
+  QString buf, buf2[200], field[200], buf3[200], value[200];
   help_index_element_new new_help;
   qint32 help_id = -1, i, key_id = -1, level = -1;
 
@@ -895,7 +894,7 @@ void show_hedit_usage(CharacterPtr ch)
 void save_help(CharacterPtr ch)
 {
   qint32 i;
-  char file[256], buf[256];
+  QString file, buf[256];
 
   sprintf(file, "%s", NEW_HELP_FILE);
   LegacyFile lf(".", file, "Couldn't open help file '%1' for saving.");
@@ -964,17 +963,17 @@ void save_help(CharacterPtr ch)
   }
 }
 
-void help_string_to_file(FILE *f, char *str)
+void help_string_to_file(FILE *f, QString str)
 {
-  char *newbuf = new char[strlen(str) + 1];
+  QString newbuf;
   strcpy(newbuf, str);
 
   // remove all \r's
-  for (char *curr = newbuf; *curr != '\0'; curr++)
+  for (QString curr = newbuf; *curr != '\0'; curr++)
   {
     if (*curr == '\r')
     {
-      for (char *blah = curr; *blah != '\0'; blah++) // shift the rest of the QString 1 left
+      for (QString blah = curr; *blah != '\0'; blah++) // shift the rest of the QString 1 left
         *blah = *(blah + 1);
       curr--; // (to check for \r\r cases)
     }
@@ -984,12 +983,11 @@ void help_string_to_file(FILE *f, char *str)
     newbuf[strlen(newbuf) - 1] = '\0';
 
   qfprintf(f, "%s\n", newbuf);
-  delete[] newbuf;
 }
 
-qint32 get_line_with_space(FILE *fl, char *buf)
+qint32 get_line_with_space(FILE *fl, QString buf)
 {
-  char temp[256];
+  QString temp;
   qint32 lines = {};
 
   do

@@ -17,27 +17,29 @@
 |   strings.  Maybe we'll fix it some day.
 */
 #include <QString>
-const auto BLACK = QStringLiteral("[30m");
-const auto RED = QStringLiteral("[31m");
-const auto GREEN = QStringLiteral("[32m");
-const auto YELLOW = QStringLiteral("[33m");
-const auto BLUE = QStringLiteral("[34m");
-const auto PURPLE = QStringLiteral("[35m");
-const auto CYAN = QStringLiteral("[36m");
-const auto GREY = QStringLiteral("[37m");
 
-const auto EEEE = QStringLiteral("#8");    /* Turns screen to EEEEs */
-const auto CLRSCR = QStringLiteral("[2j"); /* Clear screen          */
-const auto CLREOL = QStringLiteral("[");   /* Clear to end of line  */
+using namespace Qt::StringLiterals;
+const auto BLACK = "[30m"_ba;
+const auto RED = "[31m"_ba;
+const auto GREEN = "[32m"_ba;
+const auto YELLOW = "[33m"_ba;
+const auto BLUE = "[34m"_ba;
+const auto PURPLE = "[35m"_ba;
+const auto CYAN = "[36m"_ba;
+const auto GREY = "[37m"_ba;
 
-const auto UPARR = QStringLiteral("[A");
-const auto DOWNARR = QStringLiteral("[B");
-const auto RIGHTARR = QStringLiteral("[C");
-const auto LEFTARR = QStringLiteral("[D");
-const auto HOMEPOS = QStringLiteral("[H");
+const auto EEEE = "#8"_ba;    /* Turns screen to EEEEs */
+const auto CLRSCR = "[2j"_ba; /* Clear screen          */
+const auto CLREOL = "["_ba;   /* Clear to end of line  */
 
-const auto FLASH = QStringLiteral("[4m");
-const auto BLINK = QStringLiteral("[5m");
-const auto BOLD = QStringLiteral("[1m");
-const auto INVERSE = QStringLiteral("[7m");
-const auto NTEXT = QStringLiteral("[0m[37m"); /* Makes it normal */
+const auto UPARR = "[A"_ba;
+const auto DOWNARR = "[B"_ba;
+const auto RIGHTARR = "[C"_ba;
+const auto LEFTARR = "[D"_ba;
+const auto HOMEPOS = "[H"_ba;
+
+const auto FLASH = "[4m"_ba;
+const auto BLINK = "[5m"_ba;
+const auto BOLD = "[1m"_ba;
+const auto INVERSE = "[7m"_ba;
+const auto NTEXT = "[0m[37m"_ba; /* Makes it normal */

@@ -20,7 +20,7 @@
 #include "DC/const.h"
 #include "DC/utility.h"
 
-qint32 do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE; // just in case
@@ -134,9 +134,9 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
+  QString arg;
   CharacterPtr victim;
 
   one_argument(argument, arg);
@@ -184,10 +184,10 @@ qint32 do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[256];
-  char arg[MAX_STRING_LENGTH];
+  QString buf;
+  QString arg;
   CharacterPtr victim;
 
   one_argument(argument, arg);
@@ -243,10 +243,10 @@ qint32 do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
-qint32 do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[256];
-  char arg[MAX_STRING_LENGTH];
+  QString buf;
+  QString arg;
   CharacterPtr victim;
 
   one_argument(argument, arg);

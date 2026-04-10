@@ -20,7 +20,7 @@ one liner quest shit
 
 quest_list_t quest_list;
 
-const char *valid_fields[] = {
+const QStringList valid_fields = {
     "name",
     "level",
     "objnum",
@@ -127,7 +127,7 @@ quest_info *get_quest_(qint32 num)
   return 0;
 }
 
-quest_info *get_quest_(char *name)
+quest_info *get_quest_(QString name)
 {
   if (name == nullptr || !*name)
     return 0;
@@ -153,7 +153,7 @@ quest_info *get_quest_(char *name)
   return 0;
 }
 
-qint32 do_add_quest(CharacterPtr ch, char *name)
+command_return_t do_add_quest(CharacterPtr ch, QString name)
 {
   auto quest = new quest_info;
 
@@ -187,7 +187,7 @@ qint32 do_add_quest(CharacterPtr ch, char *name)
 
 void list_quests(CharacterPtr ch, qint32 lownum, qint32 highnum)
 {
-  char buffer[MAX_STRING_LENGTH];
+  QString buffer;
   quest_info *quest;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
@@ -482,7 +482,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
   quint16 price;
   ObjectPtr obj, brownie = {};
   CharacterPtr mob;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   CharacterPtr qmaster = get_mob_vnum(QUEST_MASTER);
 
   if (check_quest_current(ch, quest->number))
@@ -620,7 +620,7 @@ qint32 complete_quest(CharacterPtr ch, quest_info *quest)
 {
   qint32 count = {};
   ObjectPtr obj;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (!quest)
     return ReturnValue::eEXTRA_VALUE;
@@ -661,7 +661,7 @@ qint32 stop_current_quest(CharacterPtr ch, quest_info *quest)
 {
   qint32 count = {};
   ObjectPtr obj;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (!quest)
     return ReturnValue::eFAILURE;
@@ -714,7 +714,7 @@ qint32 stop_all_quests(CharacterPtr ch)
 
 void quest_update()
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   CharacterPtr mob;
   ObjectPtr obj;
   quest_info *quest;
@@ -766,10 +766,10 @@ void quest_update()
   DC::getInstance()->removeDead();
 }
 
-qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, char *name)
+qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString name)
 {
   qint32 retval = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   quest_info *quest;
 
   if (cmd != cmd_t::QUEST_LIST)
@@ -880,10 +880,10 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, char *nam
 }
 
 // Not used currently. Use quest list or quest start <name> instead of list or buy.
-qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg, CharacterPtr owner)
+qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
   qint32 choice;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY))
     return ReturnValue::eFAILURE;
@@ -923,11 +923,11 @@ qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg, Charac
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 retval = {};
-  char name[MAX_STRING_LENGTH];
-  char new_arg[MAX_STRING_LENGTH] = " ";
+  QString name;
+  QString new_arg = " ";
   CharacterPtr qmaster = get_mob_vnum(QUEST_MASTER);
 
   if (arg && strlen(arg) > 0 && arg[0] != ' ')
@@ -1080,11 +1080,11 @@ qint32 do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
-  char field[MAX_STRING_LENGTH];
-  char value[MAX_STRING_LENGTH];
+  QString arg;
+  QString field;
+  QString value;
   qint32 holdernum;
   qint32 i, lownum, highnum;
   quest_info *quest = {};
@@ -1111,7 +1111,7 @@ qint32 do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
     // Display all of qedit's valid fields in rows of 4 columns
     //
-    char **tmp = valid_fields;
+    QString *tmp = valid_fields;
     qint32 i = {};
     while (*tmp != nullptr)
     {
@@ -1428,7 +1428,7 @@ qint32 do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
 qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 rnum = {};
 
   // list & buy & sell
@@ -1498,7 +1498,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   }
   else if (cmd == cmd_t::BUY)
   { /* buy */
-    char arg2[MAX_INPUT_LENGTH];
+    QString arg2;
     one_argument(arg, arg2);
 
     if (!is_number(arg2))
@@ -1603,7 +1603,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   }
   else if (cmd == cmd_t::SELL)
   { /* Sell */
-    char arg2[MAX_INPUT_LENGTH];
+    QString arg2;
     one_argument(arg, arg2);
 
     ObjectPtr obj = get_obj_in_list_vis(ch, arg2, ch->carrying);

@@ -96,7 +96,7 @@ qint16 use_ki(CharacterPtr ch, qint32 kn)
   return (ki_info[kn].min_useski());
 }
 
-qint32 do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->getLevel() < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
   {
@@ -372,7 +372,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   qint32 exit = number(0, 5); /* Chooses an exit */
 
   extern QStringList dirswards;
-  char buf[200];
+  QString buf;
 
   if (!vict)
   {
@@ -435,7 +435,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   }
   else /* There is no exit there */
   {
-    char buf[MAX_STRING_LENGTH], name[100];
+    QString buf, name[100];
     qint32 prev = vict->getHP();
 
     strcpy(name, qPrintable(vict->shortdesc_or_name()));
@@ -554,7 +554,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
     }
   if (number(1, 4) == 4 && !ch->fighting)
   {
-    char dammsg[MAX_STRING_LENGTH];
+    QString dammsg;
     sprintf(dammsg, "$B%d$R", dam);
     if (dam + ch->getHP() > GET_MAX_HIT(ch))
       dam = GET_MAX_HIT(ch) - ch->getHP();
@@ -1173,7 +1173,7 @@ qint32 ki_meditation(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vi
 
 qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim)
 {
-  char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+  QString amt, type[MAX_STRING_LENGTH];
   qint32 amount, temp = {};
   affected_type af;
 

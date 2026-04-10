@@ -8,7 +8,7 @@
 */
 #include <QtTypes>
 #include <cstdio>
-char *str_str(char *first, char *second);
+QString str_str(QString first, QString second);
 void setup_dir(FILE *fl, qint32 room, qint32 dir);
 qint32 real_roomb(qint32 virt);
 void save_ban_list(void);

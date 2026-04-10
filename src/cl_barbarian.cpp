@@ -26,12 +26,12 @@
 
 extern qint32 rev_dir[];
 
-qint32 do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool battervbrace = false;
   bool batterwins = false;
-  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], dammsg[20];
+  QString type, dir[MAX_INPUT_LENGTH];
+  QString buf, buf2[MAX_STRING_LENGTH], dammsg[20];
   room_direction_data *exit, *back;
   qint32 other_room, door, dam, skill, retval;
 
@@ -218,11 +218,11 @@ qint32 do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
   room_direction_data *back, *exit;
-  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+  QString type, dir[MAX_INPUT_LENGTH];
 
   argument_interpreter(argument, type, dir);
 
@@ -425,7 +425,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   follow_type *f = {};
 
@@ -497,10 +497,10 @@ qint32 do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 bSuccess = {};
   qint32 retval = {};
 
@@ -620,10 +620,10 @@ qint32 do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 retval = {};
 
   if (!ch->canPerform(SKILL_HEADBUTT,
@@ -766,10 +766,10 @@ qint32 do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
-  float modifier;
+  qreal modifier;
   qint32 duration = 42;
 
   if (!ch->canPerform(SKILL_BLOOD_FURY,
@@ -804,7 +804,7 @@ qint32 do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
 
     modifier = .2 + (.00375 * ch->has_skill(SKILL_BLOOD_FURY)); // mod = .2 - .5
 
-    ch->addHP((float)GET_MAX_HIT(ch) * modifier);
+    ch->addHP((qreal)GET_MAX_HIT(ch) * modifier);
 
     duration = 36 - (ch->getLevel() / 6);
   }
@@ -820,7 +820,7 @@ qint32 do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_crazedassault(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_crazedassault(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
   qint32 duration = 20;
@@ -873,10 +873,10 @@ void rush_reset(varg_t arg1, void *arg2, void *arg3)
   REMBIT(ch->affected_by, AFF_RUSH_CD);
 }
 
-qint32 do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char direction[MAX_INPUT_LENGTH];
-  char who[MAX_INPUT_LENGTH];
+  QString direction;
+  QString who;
   qint32 dir = {};
   qint32 retval;
   CharacterPtr victim;
@@ -982,7 +982,7 @@ qint32 do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-qint32 do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1068,10 +1068,10 @@ void barb_magic_resist(CharacterPtr ch, qint32 old, qint32 nw)
       ch->saves[i] += bonus;
 }
 
-qint32 do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
+  QString buf, where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
   qint32 dir = {};
   qint32 retval, dam, dampercent, learned;
 
@@ -1192,7 +1192,7 @@ qint32 do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 
   dam = (qint32)(dam * (1.0 + dampercent / 100.0));
 
-  char buf2[MAX_STRING_LENGTH], dammsg[20];
+  QString buf2, dammsg[20];
   qint32 prevhps = victim->getHP();
 
   if (!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0 - (learned / 4 * 3)))
@@ -1236,7 +1236,7 @@ qint32 do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     // need to do more checks on if the victim can actually be knocked into
     // the room?
-    char temp[256]; // what did my innocent bugfix ever do to you?
+    QString temp; // what did my innocent bugfix ever do to you?
     sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
     retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
@@ -1285,7 +1285,7 @@ qint32 do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    char temp[256];
+    QString temp;
     sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
     retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
@@ -1312,7 +1312,7 @@ qint32 do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1379,7 +1379,7 @@ qint32 do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_pursue(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_pursue(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (!ch->has_skill(SKILL_PURSUIT))
   {

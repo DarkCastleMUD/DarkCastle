@@ -20,11 +20,11 @@
 
 qint32 getRealSpellDamage(CharacterPtr ch);
 
-qint32 number_or_name(char **name, qint32 *num)
+qint32 number_or_name(QString *name, qint32 *num)
 {
   qint32 i;
-  char *ppos;
-  char number[MAX_INPUT_LENGTH];
+  QString ppos;
+  QString number;
 
   if ((ppos = index(*name, '.')) != nullptr)
   {
@@ -47,11 +47,11 @@ qint32 number_or_name(char **name, qint32 *num)
 }
 
 #if (0)
-qint32 number_or_name(char **name, qint32 *num)
+qint32 number_or_name(QString *name, qint32 *num)
 {
   quint32 i;
-  char *ppos = {};
-  char number[MAX_INPUT_LENGTH];
+  QString ppos = {};
+  QString number;
 
   for (i = {}; i < strlen(*name); i++)
   {
@@ -87,7 +87,7 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
   if (!ch)
     return;
   CharacterPtr mob = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 i;
   if (cnt == 0)
     cnt = 1;
@@ -197,7 +197,7 @@ obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
 void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
 {
   ObjectPtr obj = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 i;
 
   if (cnt == 0)
@@ -264,8 +264,8 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
 void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 {
   qint32 i, i2;
-  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-  char buf3[MAX_STRING_LENGTH];
+  QString buf, buf2[MAX_STRING_LENGTH];
+  QString buf3;
   follow_type *fol;
   ObjectPtr j = {};
   affected_type *aff;
@@ -302,7 +302,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
           GET_MANA(k), mana_limit(k), k->mana_gain_lookup());
   /* end of the first sprintf */
 
-  ch->send(buf); // this sends to char, now we can overwrite buf
+  ch->send(buf); // this sends to character, now we can overwrite buf
 
   if (k->isNonPlayer())
   {
@@ -563,10 +563,10 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   }
 
   qint32 i;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   follow_type *fol;
   qint32 i2;
-  char buf2[MAX_STRING_LENGTH];
+  QString buf2;
   ObjectPtr j = {};
   affected_type *aff;
 
@@ -949,10 +949,10 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 void obj_stat(CharacterPtr ch, ObjectPtr j)
 {
   ObjectPtr j2 = {};
-  char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  char buf3[MAX_STRING_LENGTH];
-  char buf4[MAX_STRING_LENGTH];
+  QString buf;
+  QString buf2;
+  QString buf3;
+  QString buf4;
   extra_descr_data *desc;
   bool found;
   qint32 i, virt;
@@ -1077,7 +1077,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   case ITEM_WEAPON:
     qint32 get_weapon_damage_type(ObjectPtr wielded);
     its = get_weapon_damage_type(j) - 1000;
-    extern char *strs_damage_types[];
+    extern QStringList strs_damage_types;
     sprintf(buf, "$3Unused(v1)$R: %d (make 0)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
@@ -1309,7 +1309,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     strcpy(buf, "$3Contains$R : Nothing\r\n");
   ch->send(buf);
 
-  ch->sendln("$3Can affect char$R :");
+  ch->sendln("$3Can affect character$R :");
   for (i = {}; i < j->num_affects; i++)
   {
     //      sprinttype(j->affected[i].location,apply_types,buf2);
@@ -1327,7 +1327,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
 
 void do_start(CharacterPtr ch)
 {
-  char buf[256];
+  QString buf;
 
   ch->sendln("This is now your character in Dark Castle MUD");
 
@@ -1419,9 +1419,9 @@ command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 zone = DC::getInstance()->world[ch->in_room].zone;
 
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
@@ -1466,10 +1466,10 @@ qint32 do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x = {};
-  char buf[100];
+  QString buf;
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)
@@ -1493,10 +1493,10 @@ qint32 do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   CharacterPtr vict;
 
   if (ch->isNonPlayer())
@@ -1517,10 +1517,10 @@ qint32 do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char buf[100];
+  QString buf;
   class Connection *i;
 
   void update_pos(CharacterPtr victim);
@@ -1625,7 +1625,7 @@ class hunt_data
 {
 public:
   hunt_data *next;
-  char *huntname;
+  QString huntname;
   qint32 itemnum;
   qint32 time;
   qint32 itemsAvail[50];
@@ -1637,7 +1637,7 @@ public:
   hunt_items *next;
   hunt_data *hunt;
   ObjectPtr obj;
-  char *mobname;
+  QString mobname;
 };
 
 hunt_data *hunt_list = {};
@@ -1671,7 +1671,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
     }
     p = i;
   }
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   if (items == 0)
   {
     if (!forced)
@@ -1722,9 +1722,9 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
   }
 }
 
-qint32 do_huntclear(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_huntclear(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   arg = one_argument(arg, arg1);
 
   if (str_cmp(arg1, "doit"))
@@ -1814,10 +1814,10 @@ void init_random_hunt_items(hunt_data *h)
   fclose(f);
 }
 
-char *last_hunt_time(char *last_hunt)
+QString last_hunt_time(QString last_hunt)
 {
-  static char *time_of_last_hunt = {};
-  char buf[MAX_STRING_LENGTH];
+  static QString time_of_last_hunt = {};
+  QString buf;
 
   if (!time_of_last_hunt)
   {
@@ -1831,10 +1831,10 @@ char *last_hunt_time(char *last_hunt)
   return time_of_last_hunt;
 }
 
-void begin_hunt(qint32 item, qint32 duration, qint32 amount, char *huntname)
+void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
 { // time, itme, item
   hunt_data *n;
-  char *tmp;
+  QString tmp;
   tm *pTime = {};
   time_t ct;
 
@@ -1929,7 +1929,7 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, char *huntname)
 void pick_up_item(CharacterPtr ch, ObjectPtr obj)
 {
   hunt_items *i, *p = {}, *in;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 gold = {};
   for (i = hunt_items_list; i; i = in)
   {
@@ -2052,7 +2052,7 @@ void pulse_hunts()
   }
 }
 
-qint32 do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   hunt_data *h;
@@ -2100,9 +2100,9 @@ qint32 do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+  QString arg, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 #ifdef TWITTER
   twitCurl twitterObj;
   QString authUrl, replyMsg;
@@ -2170,7 +2170,7 @@ qint32 do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("A hunt for that item is already ongoing!");
       return ReturnValue::eSUCCESS;
     }
-  char huntname[200];
+  QString huntname;
   if (argument && *argument)
   {
     strcpy(huntname, argument);

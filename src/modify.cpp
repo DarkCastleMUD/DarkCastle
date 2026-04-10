@@ -39,23 +39,23 @@ constexpr auto TP_OBJ = 1;
 constexpr auto TP_ERROR = 2;
 
 void check_for_awaymsgs(CharacterPtr ch);
-void page_string_dep(class Connection *d, const char *str, qint32 keep_internal);
+void page_string_dep(class Connection *d, const QString str, qint32 keep_internal);
 
-const char *string_fields[] = {"name", "short", "long", "description", "title", "delete-description", "\n"};
+const QStringList string_fields = {"name", "short", "long", "description", "title", "delete-description", "\n"};
 
 // maximum length for text field x+1
 qint32 length[] = {40, 60, 256, 240, 60};
 
-const char *skill_fields[] = {"learned", "recognize", "\n"};
+const QStringList skill_fields = {"learned", "recognize", "\n"};
 
 // TODO - I'd like to put together some sort of "post office" for sending "mail"
 //  to players that are offline.  (they get notified when they login, and have to
 //  go pick it up)  Note:  There's a "CON_SEND_MAIL" already defined....not sure
 //  why...
 
-void string_hash_add(class Connection *d, char *str)
+void string_hash_add(class Connection *d, QString str)
 {
-  char *scan;
+  QString scan;
   qint32 terminator = {};
   CharacterPtr ch = conn->character;
 
@@ -79,9 +79,9 @@ void string_hash_add(class Connection *d, char *str)
       terminator = 1;
     }
 #ifdef LEAK_CHECK
-    (*conn->hashstr) = (char *)calloc(strlen(str) + 3, sizeof(char));
+    (*conn->hashstr) = calloc(strlen(str) + 3, sizeof(QChar));
 #else
-    (*conn->hashstr) = (char *)dc_alloc(strlen(str) + 3, sizeof(char));
+    (*conn->hashstr) = dc_alloc(strlen(str) + 3, sizeof(QChar));
 #endif
     strcpy(*conn->hashstr, str);
   }
@@ -96,7 +96,7 @@ void string_hash_add(class Connection *d, char *str)
 
     else
     {
-      if (!(*conn->hashstr = (char *)realloc(*conn->hashstr, strlen(*conn->hashstr) + strlen(str) + 3)))
+      if (!(*conn->hashstr = realloc(*conn->hashstr, strlen(*conn->hashstr) + strlen(str) + 3)))
       {
         perror("string_hash_add: ");
         abort();
@@ -124,13 +124,13 @@ void string_hash_add(class Connection *d, char *str)
 #undef MAX_STR
 
 /* interpret an argument for do_string */
-void quad_arg(char *arg, qint32 *type, char *name, qint32 *field, char *string)
+void quad_arg(QString arg, qint32 *type, QString name, qint32 *field, QString string)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   /* determine type */
   arg = one_argument(arg, buf);
-  if (is_abbrev(buf, "char"))
+  if (is_abbrev(buf, "character"))
     *type = TP_MOB;
   else if (is_abbrev(buf, "obj"))
     *type = TP_OBJ;
@@ -155,10 +155,10 @@ void quad_arg(char *arg, qint32 *type, char *name, qint32 *field, char *string)
     ;
 }
 
-qint32 do_string(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
-  char message[100];
+  QString name, string[MAX_STRING_LENGTH];
+  QString message;
   qint32 field, type, ctr;
   CharacterPtr mob = {};
   ObjectPtr obj;
@@ -171,7 +171,7 @@ qint32 do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (type == TP_ERROR)
   {
-    send_to_char("Syntax:\r\nstring ('obj'|'char') <name> <field>"
+    send_to_char("Syntax:\r\nstring ('obj'|'character') <name> <field>"
                  " [<string>].\r\n",
                  ch);
     return 1;
@@ -412,15 +412,15 @@ qint32 do_string(CharacterPtr ch, QString arg, cmd_t cmd)
                  ch);
     if (type == TP_MOB && mob->isPlayer())
 #ifdef LEAK_CHECK
-      (*ch->desc->strnew) = (char *)calloc(length[field - 1], sizeof(char));
+      (*ch->desc->strnew) = calloc(length[field - 1], sizeof(QChar));
 #else
-      (*ch->desc->strnew) = (char *)dc_alloc(length[field - 1], sizeof(char));
+      (*ch->desc->strnew) = dc_alloc(length[field - 1], sizeof(QChar));
 #endif
     else
 #ifdef LEAK_CHECK
-      (*ch->desc->hashstr) = (char *)calloc(length[field - 1], sizeof(char));
+      (*ch->desc->hashstr) = calloc(length[field - 1], sizeof(QChar));
 #else
-      (*ch->desc->hashstr) = (char *)dc_alloc(length[field - 1], sizeof(char));
+      (*ch->desc->hashstr) = dc_alloc(length[field - 1], sizeof(QChar));
 #endif
     ch->desc->max_str = length[field - 1];
     ch->desc->connected = Connection::states::EDITING;
@@ -433,7 +433,7 @@ qint32 do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 /* One_Word is like one_argument, execpt that words in quotes "" are */
 /* regarded as ONE word                                              */
 
-char *one_word(char *argument, char *first_arg)
+QString one_word(QString argument, QString first_arg)
 {
   qint32 begin, look_at;
 
@@ -545,7 +545,7 @@ constexpr auto PAGE_WIDTH = 80;
 /* Traverse down the string until the beginning of the next page has been
  * reached.  Return nullptr if this is the last page of the string.
  */
-const char *next_page(const char *str)
+const QString next_page(const QString str)
 {
   qint32 col = 1, line = 1, spec_code = false;
   qint32 chars = {};
@@ -566,7 +566,7 @@ const char *next_page(const char *str)
         return {};
       }
       str++; // skip the $
-             // This causes the next char to get skipped in the loop iteration
+             // This causes the next character to get skipped in the loop iteration
       chars += 7;
     }
     // Check for the begining of an ANSI color code block.
@@ -609,7 +609,7 @@ const char *next_page(const char *str)
 }
 
 // Function that returns the number of pages in the string.
-qint32 count_pages(const char *str)
+qint32 count_pages(const QString str)
 {
   qint32 pages;
 
@@ -622,7 +622,7 @@ qint32 count_pages(const char *str)
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string(const char *str, class Connection *d)
+void paginate_string(const QString str, class Connection *d)
 {
   qint32 i;
 
@@ -635,7 +635,7 @@ void paginate_string(const char *str, class Connection *d)
   conn->showstr_page = {};
 }
 
-void page_string(class Connection *d, const char *str, qint32 keep_internal)
+void page_string(class Connection *d, const QString str, qint32 keep_internal)
 {
   if (!d || !(conn->character))
     return;
@@ -674,7 +674,7 @@ void page_string(class Connection *d, const char *str, qint32 keep_internal)
 }
 
 /* The depreciated call that gets the paging ball rolling... */
-void page_string_dep(class Connection *d, const char *str, qint32 keep_internal)
+void page_string_dep(class Connection *d, const QString str, qint32 keep_internal)
 {
   if (!d)
     return;
@@ -684,7 +684,7 @@ void page_string_dep(class Connection *d, const char *str, qint32 keep_internal)
     return;
   }
 
-  CREATE(conn->showstr_vector, const char *, conn->showstr_count = count_pages(str));
+  CREATE(conn->showstr_vector, const QString, conn->showstr_count = count_pages(str));
 
   if (keep_internal)
   {
@@ -698,10 +698,10 @@ void page_string_dep(class Connection *d, const char *str, qint32 keep_internal)
 }
 
 /* The call that displays the next page. */
-void show_string(class Connection *d, const char *input)
+void show_string(class Connection *d, const QString input)
 {
-  char buffer[MAX_STRING_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  QString buffer;
+  QString buf;
   qint32 diff;
 
   one_argument(input, buf);

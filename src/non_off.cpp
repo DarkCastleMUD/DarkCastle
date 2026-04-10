@@ -55,10 +55,10 @@ void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
   }
 }
 
-qint32 do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj;
-  char name[MAX_INPUT_LENGTH + 1];
+  QString name;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -145,7 +145,7 @@ qint32 do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
@@ -166,11 +166,11 @@ qint32 do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj = {};
-  char name[MAX_INPUT_LENGTH + 1] = {};
-  char buf[MAX_STRING_LENGTH] = {};
+  QString name;
+  QString buf = {};
   qint32 location = {};
   qint32 room = 3099;
   qint32 origin = {};
@@ -301,7 +301,7 @@ qint32 do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
-    char log_buf[MAX_STRING_LENGTH] = {};
+    QString log_buf = {};
     sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), DC::getInstance()->obj_index[obj->item_number].vnum());
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -333,9 +333,9 @@ auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_title(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[100];
+  QString buf;
   qint32 ctr;
 
   if (!*argument)
@@ -580,14 +580,14 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
     }
     else if (key == "mode")
     {
-      if (value.startsWith("char"))
+      if (value.startsWith("character"))
       {
         telnet_sga(desc);
         telnet_echo_off(desc);
       }
       else if (value.startsWith("line") == false)
       {
-        send("Valid telnet modes are line for linemode or char for character mode.\r\n");
+        send("Valid telnet modes are line for linemode or character for character mode.\r\n");
         return ReturnValue::eFAILURE;
       }
     }
@@ -1022,7 +1022,7 @@ command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   switch (GET_POS(ch))
   {
@@ -1074,7 +1074,7 @@ qint32 do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1128,7 +1128,7 @@ qint32 do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1180,7 +1180,7 @@ qint32 do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type *paf;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1361,9 +1361,9 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 // global tag var
 CharacterPtr tagged_person;
 
-qint32 do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_INPUT_LENGTH];
+  QString name;
   CharacterPtr victim;
 
   one_argument(name, argument);
@@ -1379,7 +1379,7 @@ qint32 do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void CVoteData::DisplayVote(CharacterPtr ch)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   QList<SVoteData>::iterator answer_it;
   qint32 i = 1;
   if (vote_question.empty())
@@ -1613,7 +1613,7 @@ void CVoteData::SetQuestion(CharacterPtr ch, QString question)
 CVoteData::CVoteData()
     : active(false), total_votes(0)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   FILE *the_file = {};
   ;
   qint32 num = {};
@@ -1693,7 +1693,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading char names from vote file."), 0, DC::LogChannel::LOG_MISC);
+      logentry(QStringLiteral("Error reading character names from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1711,9 +1711,9 @@ CVoteData::~CVoteData()
 {
 }
 
-qint32 do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 vote;
   arg = one_argument(arg, buf);
 
@@ -1747,9 +1747,9 @@ qint32 do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_random(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_random(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 i = {};
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))

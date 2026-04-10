@@ -45,12 +45,12 @@ qint32 count_rooms(qint32 start, qint32 end)
   return count;
 }
 
-qint32 do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
+  QString buf1;
+  QString buf2;
   class Connection *i;
-  char buf3[MAX_INPUT_LENGTH];
+  QString buf3;
 
   if (ch->isPlayer() && ch->player->wizinvis)
     sprintf(buf3, "someone");
@@ -93,7 +93,7 @@ qint32 do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -113,17 +113,17 @@ qint32 do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_load(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char type[MAX_INPUT_LENGTH] = {0};
-  char name[MAX_INPUT_LENGTH] = {0};
-  char arg2[MAX_INPUT_LENGTH] = {0};
-  char arg3[MAX_INPUT_LENGTH] = {0};
-  char qty[MAX_INPUT_LENGTH] = {0};
-  char random[MAX_INPUT_LENGTH] = {0};
-  char buf[MAX_STRING_LENGTH] = {0};
+  QString type = {0};
+  QString name = {0};
+  QString arg2 = {0};
+  QString arg3 = {0};
+  QString qty = {0};
+  QString random = {0};
+  QString buf = {0};
 
-  char *c;
+  QString c;
   qint32 x, number = 0, num = 0, cnt = 1;
 
   QStringList types = {
@@ -325,12 +325,12 @@ qint32 do_load(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict, next_v;
   ObjectPtr obj, next_o;
 
-  char name[100], buf[300];
+  QString name, buf[300];
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -338,7 +338,7 @@ qint32 do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
   one_argument(argument, name);
 
   if (*name)
-  { /* argument supplied. destroy single object or char */
+  { /* argument supplied. destroy single object or chararacter */
     if ((vict = ch->get_char_room_vis(name)) && (ch->getLevel() > G_POWER))
     {
       if (vict->isPlayer() && (ch->getLevel() <= vict->getLevel()))
@@ -406,7 +406,7 @@ qint32 do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-char *dirNumToChar(qint32 dir)
+QString dirNumToChar(qint32 dir)
 {
   switch (dir)
   {
@@ -435,7 +435,7 @@ char *dirNumToChar(qint32 dir)
 
 qint32 Zone::show_info(CharacterPtr ch)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   QString continent_name;
   if (continent && (quint32)continent < continent_names.size())
@@ -482,7 +482,7 @@ qint32 Zone::show_info(CharacterPtr ch)
 
 qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quint64 num_to_show, bool stats)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 k = {};
 
   if (start < 0)
@@ -676,12 +676,12 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       break;
     case 'X':
     {
-      char xstrone[] = "Set all if-flags to 'unsure' state.";
-      char xstrtwo[] = "Set mob if-flag to 'unsure' state.";
-      char xstrthree[] = "Set obj if-flag to 'unsure' state.";
-      char xstrfour[] = "Set %% if-flag to 'unsure' state.";
-      char xstrerror[] = "Illegal value in arg1.";
-      char *xresultstr;
+      QString xstrone = "Set all if-flags to 'unsure' state.";
+      QString xstrtwo = "Set mob if-flag to 'unsure' state.";
+      QString xstrthree = "Set obj if-flag to 'unsure' state.";
+      QString xstrfour = "Set %% if-flag to 'unsure' state.";
+      QString xstrerror = "Illegal value in arg1.";
+      QString xresultstr;
 
       switch (zone.cmd[j]->arg1)
       {
@@ -792,12 +792,12 @@ void show_legacy_files(CharacterPtr ch, world_file_list_item *head)
   }
 }
 
-qint32 do_show(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_INPUT_LENGTH], buf[200];
-  char beginrange[MAX_INPUT_LENGTH];
-  char endrange[MAX_INPUT_LENGTH];
-  char type[MAX_INPUT_LENGTH];
+  QString name, buf[200];
+  QString beginrange;
+  QString endrange;
+  QString type;
   world_file_list_item *curr = {};
   qint32 i;
   qint32 nr;
@@ -1137,7 +1137,7 @@ qint32 do_show(CharacterPtr ch, QString argument, cmd_t cmd)
   } // zone
   else if (is_abbrev(type, "rsearch") && has_range)
   {
-    char arg1[MAX_INPUT_LENGTH];
+    QString arg1;
     qint32 zon, bits = 0, sector = {};
     argument = one_argument(argument, arg1);
     if (!is_number(arg1))
@@ -1186,7 +1186,7 @@ qint32 do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
       return ReturnValue::eFAILURE;
     }
-    char buf[MAX_INPUT_LENGTH];
+    QString buf;
     for (i = DC::getInstance()->zones.value(zon).getRealBottom(); i < DC::getInstance()->zones.value(zon).getRealTop();
          i++)
     {
@@ -1204,7 +1204,7 @@ qint32 do_show(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (is_abbrev(type, "msearch") && has_range)
   { // Mobile search.
-    char arg1[MAX_STRING_LENGTH];
+    QString arg1;
     quint32 affect[AFF_MAX / ASIZE + 1] = {};
     quint32 act[ACT_MAX / ASIZE + 1] = {};
     qint32 clas = 0, levlow = -555, levhigh = -555, immune = 0, race = -1,
@@ -1408,7 +1408,7 @@ qint32 do_show(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (is_abbrev(type, "search"))
   { // Object search.
-    char arg1[MAX_STRING_LENGTH];
+    QString arg1;
     qint32 affect = 0, size = 0, extra = 0, more = 0, wear = 0, type = {};
     qint32 levlow = -555, levhigh = -555, dam = 0, lweight = -555, hweight = -555;
     qint32 any = {};
@@ -1844,10 +1844,10 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim, target_mob, pers;
-  char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
+  QString person, room[MAX_INPUT_LENGTH];
   qint32 target;
   qint32 loop;
 
@@ -1931,18 +1931,18 @@ qint32 do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
   ch->send(QStringLiteral("Moving %s from %d to %d.\r\n").arg(qPrintable(victim->name())).arg(DC::getInstance()->world[victim->in_room].number).arg(DC::getInstance()->world[target].number));
   move_char(victim, target);
   act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-  act("$n has teleported you!", ch, 0, (char *)victim, TO_VICT, 0);
+  act("$n has teleported you!", ch, 0, victim, TO_VICT, 0);
   do_look(victim, "");
   ch->sendln("Teleport completed.");
 
   return ReturnValue::eSUCCESS;
 } /* do_teleport */
 
-qint32 do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   // class Connection *i;
   CharacterPtr victim;
-  char buf[100];
+  QString buf;
   qint32 target;
   follow_type *k, *next_dude;
 
@@ -1995,7 +1995,7 @@ qint32 do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-const char *oprog_type_to_name(qint32 type)
+const QString oprog_type_to_name(qint32 type)
 {
   switch (type)
   {
@@ -2030,7 +2030,7 @@ void opstat(CharacterPtr ch, qint32 vnum)
 {
   qint32 num = real_object(vnum);
   ObjectPtr obj;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   if (num < 0)
   {
     ch->sendln("Error, non-existant object.");
@@ -2048,7 +2048,7 @@ void opstat(CharacterPtr ch, qint32 vnum)
   ch->sendln("");
   mob_prog_data *mprg = {};
   qint32 i = {};
-  char buf2[MAX_STRING_LENGTH] = {};
+  QString buf2 = {};
   for (mprg = DC::getInstance()->obj_index[num].mobprogs, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
@@ -2065,9 +2065,9 @@ void opstat(CharacterPtr ch, qint32 vnum)
   }
 }
 
-qint32 do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 vnum = -1;
 
   if (!*argument)
@@ -2107,10 +2107,10 @@ void update_objprog_bits(qint32 num)
   }
 }
 
-qint32 do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 num = -1, vnum = -1, i = -1, a = -1;
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   argument = one_argument(argument, arg);
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -2213,7 +2213,7 @@ qint32 do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       ch->sendln("$3Syntax$R: opedit [obj_num] type <prog> <type>");
       ch->sendln("$3Valid types are$R:");
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       for (i = {}; *obj_types[i] != '\n'; i++)
       {
         sprintf(buf, " %2d - %15s\r\n",
@@ -2279,7 +2279,7 @@ qint32 do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (!str_cmp(arg, "arglist"))
   {
-    //    char arg1[MAX_INPUT_LENGTH];
+    //    QString arg1;
     argument = one_argument(argument, arg);
     //    argument = one_argument(argument, arg1);
     if (!*arg || !argument || !*argument || !isdigit(*arg))
@@ -2359,15 +2359,15 @@ qint32 do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
                "The field must be one of the following:\r\n"
                "\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",
                ch);
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   sprintf(buf, "$3Current object set to: %lu\r\n", ch->player->last_obj_vnum);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
@@ -2439,9 +2439,9 @@ qint32 do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
@@ -2466,7 +2466,7 @@ qint32 do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (dst < 0)
   {
-    char buf[30];
+    QString buf;
     sprintf(buf, "new %d", vdst);
     qint32 retval = do_medit(ch, buf);
     if (!isSet(retval, ReturnValue::eSUCCESS))

@@ -59,7 +59,7 @@ auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 
 auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
 {
-  char buf[256];
+  QString buf;
   qint32 send_to = DC::NOWHERE;
   affected_type *af, *next_af;
   qint32 pot_low = 6362;

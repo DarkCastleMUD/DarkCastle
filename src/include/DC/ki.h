@@ -22,5 +22,5 @@ constexpr auto DIVINE = 1;
 constexpr auto MIRACLE = 2;
 constexpr auto MAJOR_EFFECT = 3;
 constexpr auto MINOR_EFFECT = 4;
-const char *skip_spaces(const char *s);
-qint32 find_skill_num(char *name);
+const QString skip_spaces(const QString s);
+qint32 find_skill_num(QString name);

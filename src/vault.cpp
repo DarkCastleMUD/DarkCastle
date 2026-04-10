@@ -27,8 +27,8 @@
 #include "DC/inventory.h"
 
 /*
-  void vault_withdraw(quint32 amount, char *owner);
-  void vault_deposit(quint32 amount, char *owner);
+  void vault_withdraw(quint32 amount, QString owner);
+  void vault_deposit(quint32 amount, QString owner);
   void vault_get(QString object_keyword, QString owner);
   void vault_put(QString object_keyword, QString owner);
   void my_vault_access(void);
@@ -59,10 +59,10 @@ vault_search_parameter::~vault_search_parameter()
 }
 
 qint32 total_vaults = {};
-qint32 get_line(FILE *fl, char *buf);
+qint32 get_line(FILE *fl, QString buf);
 
 CharacterPtr find_owner(QString name);
-void vault_log(CharacterPtr ch, char *owner);
+void vault_log(CharacterPtr ch, QString owner);
 QString clanVName(quint64 clan_id);
 void vault_search_usage(CharacterPtr ch);
 
@@ -240,18 +240,18 @@ void Character::vault_balance(QString owner)
     send(QStringLiteral("There are %1 $B$5gold$R coins in %2's vault.\r\n").arg(vault->gold).arg(owner));
 }
 
-const char *vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
-                          "        vault <put | get> <object> [vault owner]\r\n"
-                          "        vault <deposit | withdraw> <amount>\r\n"
-                          "        vault <access | myaccess> [name to add/remove access]\r\n"
-                          "        vault log [vault owner]\r\n"
-                          "        vault search [ keyword <keyword> ] | [ level <levels> ] | ...\r\n";
+const QString vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
+                            "        vault <put | get> <object> [vault owner]\r\n"
+                            "        vault <deposit | withdraw> <amount>\r\n"
+                            "        vault <access | myaccess> [name to add/remove access]\r\n"
+                            "        vault log [vault owner]\r\n"
+                            "        vault search [ keyword <keyword> ] | [ level <levels> ] | ...\r\n";
 
-const char *imm_vault_usage = "        vault <stats> [name]\r\n";
+const QString imm_vault_usage = "        vault <stats> [name]\r\n";
 
-qint32 do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH]{}, arg1[MAX_INPUT_LENGTH]{}, arg2[MAX_INPUT_LENGTH] = {};
+  QString arg{}, arg1[MAX_INPUT_LENGTH]{}, arg2[MAX_INPUT_LENGTH] = {};
 
   half_chop(argument, arg, arg1);
 
@@ -463,7 +463,7 @@ void Character::vault_stats(QString name)
   vault_access_data *access;
   ObjectPtr obj;
   qint32 items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = {};
-  char buf[MAX_STRING_LENGTH * 4], buf1[MAX_STRING_LENGTH];
+  QString buf, buf1[MAX_STRING_LENGTH];
 
   sprintf(buf, "###) Character Name        Gold     Items (Unique) Item Weight/Vault Weight/Vault Max Weight Access   Errors\r\n");
   for (vault = vault_table; vault; vault = vault->next, num++)
@@ -605,9 +605,9 @@ void rename_vault_owner(QString oldname, QString newname)
 
 void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
 {
-  char src_filename[256];
-  char dst_dir[256] = {0};
-  char syscmd[512];
+  QString src_filename;
+  QString dst_dir = {0};
+  QString syscmd;
   struct stat statbuf;
 
   if (name.isEmpty())
@@ -688,8 +688,8 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
   vault_items_data *items, *titems;
   vault_access_data *access, *taccess;
 
-  char buf[MAX_INPUT_LENGTH];
-  char h[MAX_INPUT_LENGTH];
+  QString buf;
+  QString h;
 
   snprintf(h, sizeof(h), "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, qPrintable(name), VAULT_INDEX_FILE_TMP);
   system(h);
@@ -974,9 +974,9 @@ void DC::load_vaults(void)
   FILE *fl = {}, *index = {};
   qint32 vnum = 0, full = 0, count = {};
   quint64 gold = {};
-  char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, filename[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
+  QString value = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, filename[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
   bool saveChanges = false;
-  char src_filename[256] = {};
+  QString src_filename = {};
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
@@ -1047,7 +1047,7 @@ void DC::load_vaults(void)
             logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
             FILE *oldfl;
-            char oldfname[MAX_INPUT_LENGTH], oldtype[MAX_INPUT_LENGTH];
+            QString oldfname, oldtype[MAX_INPUT_LENGTH];
 
             sprintf(oldfname, "../vaults.old/%c/%s.vault", UPPER(*line), line);
             if(!(oldfl = fopen(oldfname, "r"))) {
@@ -1094,7 +1094,7 @@ void DC::load_vaults(void)
         }
         else
         {
-          char tmp[MAX_INPUT_LENGTH];
+          QString tmp;
           get_line(fl, tmp);
           obj = read_object(real_object(vnum), fl, true);
           items->obj = obj;
@@ -1312,7 +1312,7 @@ bool DC::has_vault_access(QString name, Vault &vault)
   return ch_has_vault_access;
 }
 
-vault_items_data *get_unique_item_in_vault(Vault *vault, char *object, qint32 num)
+vault_items_data *get_unique_item_in_vault(Vault *vault, QString object, qint32 num)
 {
   vault_items_data *items;
   ObjectPtr obj;
@@ -1333,7 +1333,7 @@ vault_items_data *get_unique_item_in_vault(Vault *vault, char *object, qint32 nu
   return 0;
 }
 
-ObjectPtr get_unique_obj_in_vault(Vault *vault, char *object, qint32 num)
+ObjectPtr get_unique_obj_in_vault(Vault *vault, QString object, qint32 num)
 {
   vault_items_data *items;
   ObjectPtr obj;
@@ -1355,7 +1355,7 @@ ObjectPtr get_unique_obj_in_vault(Vault *vault, char *object, qint32 num)
   return 0;
 }
 
-vault_items_data *get_item_in_vault(Vault *vault, char *object, qint32 num)
+vault_items_data *get_item_in_vault(Vault *vault, QString object, qint32 num)
 {
   vault_items_data *items;
   ObjectPtr obj;
@@ -1431,7 +1431,7 @@ ObjectPtr exists_in_vault(Vault *vault, ObjectPtr obj)
 void vault_get(CharacterPtr ch, QString object, QString owner)
 {
   QString sbuf;
-  char obj_list[50][100];
+  QString obj_list[100];
   ObjectPtr obj, tmp_obj;
   vault_items_data *items;
   Vault *vault;
@@ -1707,12 +1707,12 @@ qint32 search_vault_by_vnum(qint32 vnum, Vault &vault)
   return 0;
 }
 
-void vault_deposit(CharacterPtr ch, quint32 amount, char *owner)
+void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
 {
   if (!ch)
     return;
   Vault *vault;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   qint32 self = {};
 
   owner[0] = UPPER(owner[0]);
@@ -1768,7 +1768,7 @@ void Character::vault_withdraw(quint32 amount, QString owner)
   if (!ch)
     return;
   Vault *vault;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   qint32 self = {};
 
   owner[0] = UPPER(owner[0]);
@@ -1889,7 +1889,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
 
   ObjectPtr obj, tmp_obj;
   Vault *vault;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   qint32 self = {};
 
   if (!owner.isEmpty())
@@ -2180,11 +2180,11 @@ void Character::vault_list(QString owner)
   }
 }
 
-void add_new_vault(const char *name, qint32 indexonly)
+void add_new_vault(const QString name, qint32 indexonly)
 {
   FILE *vfl, *tvfl, *pvfl;
   Vault *vault;
-  char filename[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+  QString filename, line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
     logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -2278,10 +2278,10 @@ CharacterPtr find_owner(QString name)
   return {};
 }
 
-void vault_log(CharacterPtr ch, char *owner)
+void vault_log(CharacterPtr ch, QString owner)
 {
-  char buf[MAX_STRING_LENGTH];
-  char fname[256];
+  QString buf;
+  QString fname;
 
   if (!strcmp(owner, qPrintable(clanVName(ch->clan))))
   {
@@ -2301,7 +2301,7 @@ void vault_log(CharacterPtr ch, char *owner)
   buffer << buf;
   buffer << fin.rdbuf();
 
-  page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
+  page_string(ch->desc, const_cast<QString>(buffer.str().c_str()), 1);
 }
 
 void logvault(QString message, QString name)
@@ -2309,10 +2309,10 @@ void logvault(QString message, QString name)
   tm *tm = {};
   time_t ct;
   FILE *ofile, *nfile;
-  char buf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
-  char fname[256], nfname[256];
+  QString buf, line[MAX_INPUT_LENGTH];
+  QString fname, nfname[256];
   qint32 lines = 1;
-  char mins[5], hours[5];
+  QString mins, hours[5];
 
   static const QStringList months = {
       "Jan",
@@ -2391,14 +2391,14 @@ void logvault(QString message, QString name)
   // system(cmd);
 }
 
-qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                         CharacterPtr owner)
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
     return ReturnValue::eFAILURE;
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
-  char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+  QString arg1, buf[MAX_STRING_LENGTH];
   arg = one_argument(arg, arg1);
 
   Vault *vault = has_vault(qPrintable(ch->name()));
@@ -2533,7 +2533,7 @@ void vault_search_usage(CharacterPtr ch)
   ch->sendln("vault search keyword staff level 40-60.\r\n");
 }
 
-qint32 vault_search(CharacterPtr ch, const char *args)
+qint32 vault_search(CharacterPtr ch, const QString args)
 {
   qint32 objects = {};
   bool owner_shown = false;

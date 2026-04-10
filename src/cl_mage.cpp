@@ -82,7 +82,7 @@ qint32 spellcraft(CharacterPtr ch, qint32 spell)
   return false;
 }
 
-qint32 do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   // quint8 percent;
   affected_type af;
@@ -129,9 +129,9 @@ qint32 do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 lvl = ch->has_skill(SKILL_IMBUE);
   qint32 charges = 0, manacost = {};
   ObjectPtr wand;
@@ -283,7 +283,7 @@ qint32 do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
 {
   CharacterPtr i, next_i, ally, next_ally;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 retval;
 
   // Moving, and act() calls both happen a lot, so we want to get out of here as fast as possible if

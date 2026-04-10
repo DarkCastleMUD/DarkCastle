@@ -26,13 +26,13 @@ constexpr auto SUPPRESS_ALL = (SUPPRESS_CONSEQUENCES | SUPPRESS_MESSAGES);
 /* utility */
 
 QString fname(QString namelist);
-qint32 isprefix(const char *str, const char *namel);
+qint32 isprefix(const QString str, const QString namel);
 // END TIMERS
 /* ******** objects *********** */
 
 /* Generic Find */
 
-qint32 get_number(char **name);
+qint32 get_number(QString *name);
 qint32 get_number(QString &name);
 qint32 get_number(QString &name);
 

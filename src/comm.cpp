@@ -69,7 +69,7 @@ public:
 extern bool MOBtrigger;
 
 // This is turned on right before we call game_loop
-qint32 do_not_save_corpses = 1;
+command_return_t do_not_save_corpses = 1;
 qint32 try_to_hotboot_on_crash = {};
 qint32 was_hotboot = {};
 qint32 died_from_sigsegv = {};
@@ -84,8 +84,8 @@ extern qint32 restrict;
 // extern qint32 no_rent_check;
 
 /* In db.c */
-extern const char *sector_types[];
-extern char *sky_look[];
+extern const QStringList sector_types;
+extern QStringList sky_look;
 
 void check_champion_and_website_who_list(void);
 void save_slot_machines(void);
@@ -121,15 +121,15 @@ Database db;
 /* functions in this file */
 void update_characters(void);
 void short_activity();
-void skip_spaces(const char **s);
-char *any_one_arg(char *argument, char *first_arg);
-const char *calc_color(qint32 hit, qint32 max_hit);
+void skip_spaces(const QString *s);
+QString any_one_arg(QString argument, QString first_arg);
+const QString calc_color(qint32 hit, qint32 max_hit);
 QString get_from_q(QQueue<QString> &input_queue);
 void signal_setup(void);
 qint32 new_descriptor(qint32 s);
 qint32 process_input(class Connection *t);
 void flush_queues(class Connection *d);
-qint32 perform_subst(class Connection *t, char *orig, char *subst);
+qint32 perform_subst(class Connection *t, QString orig, QString subst);
 
 void check_idle_passwords(void);
 void init_heartbeat();
@@ -144,7 +144,7 @@ void food_update(void);  /* In limits.c */
 void mobile_activity(void);
 void object_activity(quint64 pulse_type);
 void update_corpses_and_portals(void);
-void string_hash_add(class Connection *d, char *str);
+void string_hash_add(class Connection *d, QString str);
 void perform_violence(void);
 void time_update();
 void weather_update();
@@ -152,10 +152,10 @@ void send_hint();
 extern void pulse_command_lag();
 void checkConsecrate(qint32);
 
-// extern char greetings1[MAX_STRING_LENGTH];
-// extern char greetings2[MAX_STRING_LENGTH];
-// extern char greetings3[MAX_STRING_LENGTH];
-// extern char greetings4[MAX_STRING_LENGTH];
+// extern QString greetings1;
+// extern QString greetings2;
+// extern QString greetings3;
+// extern QString greetings4;
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
@@ -212,7 +212,7 @@ qint32 DC::write_hotboot_file(void)
 
   chdir("../bin/");
 
-  char *cwd = get_current_dir_name();
+  QString cwd = get_current_dir_name();
   if (cwd != nullptr)
   {
     logentry(QStringLiteral("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
@@ -222,7 +222,7 @@ qint32 DC::write_hotboot_file(void)
   ssh.close();
   if (execv(qPrintable(applicationFilePath()), cf.argv_) == -1)
   {
-    char execv_strerror[1024] = {};
+    QString execv_strerror = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
 
     logentry(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(applicationFilePath()).arg(execv_strerror), 0, DC::LogChannel::LOG_MISC);
@@ -230,7 +230,7 @@ qint32 DC::write_hotboot_file(void)
     // wipe the file since we can't use it anyway
     if (unlink("hotboot") == -1)
     {
-      char unlink_strerror[1024] = {};
+      QString unlink_strerror = {};
       strerror_r(errno, unlink_strerror, sizeof(unlink_strerror));
 
       logentry(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror), 0, DC::LogChannel::LOG_MISC);
@@ -378,7 +378,7 @@ vnum_t DC::getObjectVNUM(rnum_t nr, bool *ok)
 void DC::finish_hotboot(void)
 {
   class Connection *d;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   for (auto &conn : DC::getInstance()->connections_)
   {
@@ -387,7 +387,7 @@ void DC::finish_hotboot(void)
     auto result = load_char_obj(conn->output);
     if (!result || !result.value())
     {
-      logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(conn->output));
+      logmisc(QStringLiteral("Could not load character '%1' in hotboot.").arg(conn->output));
       write_to_descriptor(conn->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
@@ -516,14 +516,14 @@ qint32 DC::init_socket(in_port_t port)
   }
 
   opt = LARGE_BUFSIZE + GARBAGE_SPACE;
-  if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char *)&opt, sizeof(opt)) < 0)
+  if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &opt, sizeof(opt)) < 0)
   {
     perror("setsockopt SNDBUF");
     exit(1);
   }
 
   opt = 1;
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0)
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
   {
     perror("setsockopt REUSEADDR");
     exit(1);
@@ -532,7 +532,7 @@ qint32 DC::init_socket(in_port_t port)
   struct linger ld;
   ld.l_onoff = {};
   ld.l_linger = {};
-  if (setsockopt(fd, SOL_SOCKET, SO_LINGER, (char *)&ld, sizeof(ld)) < 0)
+  if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &ld, sizeof(ld)) < 0)
   {
     perror("setsockopt LINGER");
     exit(1);
@@ -604,7 +604,7 @@ void DC::game_loop(void)
   // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
   // otherwise an alias'd command could easily overrun the buffer
   QString comm = {};
-  char buf[128] = {};
+  QString buf = {};
   class Connection *d = {};
   qint32 maxdesc = {};
   qint32 aliased = false;
@@ -776,7 +776,7 @@ void DC::game_loop(void)
     {
 
       comm = get_from_q(conn->input);
-      /* reset the idle timer & pull char back from void if necessary */
+      /* reset the idle timer & pull character back from void if necessary */
       conn->wait = 1;
       conn->prompt_mode = 1;
 
@@ -802,7 +802,7 @@ void DC::game_loop(void)
         }
         PerfTimers["command"].start();
         // Azrack's a chode.  Don't forget to check
-        // ->snooping before you check snooping->char:P
+        // ->snooping before you check snooping->character:P
         if (!comm.empty() && comm[0] == '%' && conn->snooping && conn->snooping->character)
         {
           conn->snooping->character->command_interpreter(comm.substr(1).c_str());
@@ -941,7 +941,7 @@ void DC::game_loop_init(void)
 
                  auto future = QtConcurrent::run([]() {});
 
-                 qint32 do_not_save_corpses = 1;
+                 command_return_t do_not_save_corpses = 1;
 
                  QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
@@ -991,8 +991,8 @@ void DC::game_test_init(void)
   assert(remove_non_color_codes(QStringLiteral("$B123$R")) == "$B123$R");
   assert(nocolor_strlen(QStringLiteral("$B123$R")) == 3);
 
-  char arg[] = " start 1";
-  char name[MAX_STRING_LENGTH] = {};
+  QString arg = " start 1";
+  QString name = {};
   half_chop(arg, arg, name);
   assert(!strcmp(arg, "start"));
   assert(!strcmp(name, "1"));
@@ -1240,12 +1240,12 @@ void DC::heartbeat(void)
  */
 void telnet_echo_off(class Connection *d)
 {
-  char off_string[] =
+  QString off_string =
       {
-          (char)IAC,
-          (char)WILL,
-          (char)TELOPT_ECHO,
-          (char)0,
+          (QChar)IAC,
+          (QChar)WILL,
+          (QChar)TELOPT_ECHO,
+          (QChar)0,
       };
 
   write_to_output(off_string, d);
@@ -1256,14 +1256,14 @@ void telnet_echo_off(class Connection *d)
  */
 void telnet_echo_on(class Connection *d)
 {
-  char on_string[] =
+  QString on_string =
       {
-          (char)IAC,
-          (char)WONT,
-          (char)TELOPT_ECHO,
-          (char)TELOPT_NAOFFD,
-          (char)TELOPT_NAOCRD,
-          (char)0,
+          (QChar)IAC,
+          (QChar)WONT,
+          (QChar)TELOPT_ECHO,
+          (QChar)TELOPT_NAOFFD,
+          (QChar)TELOPT_NAOCRD,
+          (QChar)0,
       };
 
   write_to_output(on_string, d);
@@ -1271,17 +1271,17 @@ void telnet_echo_on(class Connection *d)
 
 void telnet_sga(Connection *d)
 {
-  const char suppress_go_ahead[] = {(char)IAC, (char)WILL, (char)TELOPT_SGA, (char)0};
+  const QString suppress_go_ahead = {(QChar)IAC, (QChar)WILL, (QChar)TELOPT_SGA, (QChar)0};
   write_to_output(QByteArray(suppress_go_ahead), d);
 }
 
 void telnet_ga(Connection *d)
 {
-  const char go_ahead[] = {(char)IAC, (char)GA, (char)0};
+  const QString go_ahead = {(QChar)IAC, (QChar)GA, (QChar)0};
   write_to_output(QByteArray(go_ahead), d);
 }
 
-qint32 do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->getLastPrompt().isEmpty())
     ch->sendln("Last prompt: unset");
@@ -1291,7 +1291,7 @@ qint32 do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1330,7 +1330,7 @@ qint32 do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-const char *calc_color_align(qint32 align)
+const QString calc_color_align(qint32 align)
 {
   if (align <= -351)
     return BOLD RED;
@@ -1343,7 +1343,7 @@ const char *calc_color_align(qint32 align)
   return BOLD GREEN;
 }
 
-const char *calc_color(qint32 hit, qint32 max_hit)
+const QString calc_color(qint32 hit, qint32 max_hit)
 {
   /* damn whiney players
   qint32 percentage = hit * 100 / max_hit;
@@ -1372,7 +1372,7 @@ const char *calc_color(qint32 hit, qint32 max_hit)
   return GREEN;
 }
 
-const char *cond_txtz[] = {
+const QStringList cond_txtz = {
     "excellent condition",
     "a few scratches",
     "slightly hurt",
@@ -1382,7 +1382,7 @@ const char *cond_txtz[] = {
     "near death",
     "dead as a doornail"};
 
-const char *cond_txtc[] = {
+const QStringList cond_txtc = {
     BOLD GREEN "excellent condition" NTEXT,
     GREEN "a few scratches" NTEXT,
     BOLD YELLOW "slightly hurt" NTEXT,
@@ -1392,10 +1392,10 @@ const char *cond_txtc[] = {
     BOLD GREY "near death" NTEXT,
     "dead as a doornail"};
 
-char *calc_condition(CharacterPtr ch, bool colour)
+QString calc_condition(CharacterPtr ch, bool colour)
 {
   qint32 percent;
-  char *cond_txt[8]; // = cond_txtz;
+  QStringList cond_txt; // = cond_txtz;
 
   if (colour)
     memcpy(cond_txt, cond_txtc, sizeof(cond_txtc));
@@ -1536,7 +1536,7 @@ void scramble_text(QString &txt)
     // only scramble letters, but not 'm' cause 'm' is used in ansi codes
     if (number(1, 5) == 5 && ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z')) && curr != 'm')
     {
-      curr = number(0, 1) ? (char)number('a', 'z') : (char)number('A', 'Z');
+      curr = number(0, 1) ? (QChar)number('a', 'z') : (QChar)number('A', 'Z');
     }
   }
 }
@@ -1548,14 +1548,14 @@ QString scramble_text(QString input)
     // only scramble letters, but not 'm' cause 'm' is used in ansi codes
     if (number(1, 5) == 5 && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) && c != 'm')
     {
-      c = number(0, 1) ? (char)number('a', 'z') : (char)number('A', 'Z');
+      c = number(0, 1) ? (QChar)number('a', 'z') : (QChar)number('A', 'Z');
     }
   }
 
   return input;
 }
 
-void write_to_output(const char *txt, class Connection *t)
+void write_to_output(const QString txt, class Connection *t)
 {
   if (txt)
   {
@@ -1607,7 +1607,7 @@ qint32 new_descriptor(qint32 s)
   static qint32 last_desc = {}; /* last descriptor number */
   class Connection *newd = {};
   struct sockaddr_in peer = {};
-  char buf[MAX_STRING_LENGTH] = {};
+  QString buf = {};
 
   /* accept the new connection */
   i = sizeof(peer);
@@ -1699,9 +1699,9 @@ qint32 Connection::process_output(void)
   i += qUtf8Printable(createPrompt());
 
   // As long as we're not in telnet character mode then send IAC GA
-  if (character && character->getSetting("mode").startsWith("char") == false)
+  if (character && character->getSetting("mode").startsWith("character") == false)
   {
-    char go_ahead[] = {(char)IAC, (char)GA, (char)0};
+    QString go_ahead = {(QChar)IAC, (QChar)GA, (QChar)0};
     i += go_ahead;
   }
 
@@ -1775,7 +1775,7 @@ enum telnet
 
 void process_iac(Connection *t)
 {
-  char prev = '\0';
+  QChar prev = '\0';
 
   size_t iac_pos = t->inbuf.find(telnet::iac);
   if (iac_pos != t->inbuf.npos)
@@ -1924,7 +1924,7 @@ qint32 process_input(class Connection *t)
 
   do
   {
-    char c_buffer[8193] = {};
+    QString c_buffer = {};
     if ((bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1)) < 0)
     {
 #ifdef EWOULDBLOCK
@@ -2161,11 +2161,11 @@ qint32 process_input(class Connection *t)
  * orig is the orig QString (conn->e. the one being modified.
  * subst contains the substition QString, conn->e. "^telm^tell"
  */
-qint32 perform_subst(class Connection *t, char *orig, char *subst)
+qint32 perform_subst(class Connection *t, QString orig, QString subst)
 {
-  char new_subst[MAX_INPUT_LENGTH + 5];
+  QString new_subst;
 
-  char *first, *second, *strpos;
+  QString first, *second, *strpos;
 
   /*
    * first is the position of the beginning of the first QString (the one
@@ -2215,7 +2215,7 @@ qint32 perform_subst(class Connection *t, char *orig, char *subst)
 // return 0 if we quit everyone out at the bottom
 qint32 close_socket(class Connection *d)
 {
-  char buf[128], idiotbuf[128];
+  QString buf, idiotbuf[128];
   class Connection *temp;
   // qint32 target_idnum = -1;
   if (!d)
@@ -2286,7 +2286,7 @@ qint32 close_socket(class Connection *d)
   }
   //   Removed this log caues it's so fricken annoying
   //   else
-  //    logentry(QStringLiteral("Losing descriptor without char."), ANGEL, DC::LogChannel::LOG_SOCKET);
+  //    logentry(QStringLiteral("Losing descriptor without character."), ANGEL, DC::LogChannel::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (conn->original && conn->original->desc)
@@ -2495,8 +2495,8 @@ void signal_handler(qint32 signal, siginfo_t *si, void *)
   }
   if (signal == SIGHUP)
   {
-    char **new_argv = {};
-    extern qint32 do_not_save_corpses;
+    QString *new_argv = {};
+    extern command_return_t do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
     logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
@@ -2567,7 +2567,7 @@ void send_to_char_regardless(QString messg, CharacterPtr ch)
   }
 }
 
-void send_to_char_nosp(const char *messg, CharacterPtr ch)
+void send_to_char_nosp(const QString messg, CharacterPtr ch)
 {
   auto tmp = str_nospace(messg);
   ch->send(tmp);
@@ -2590,7 +2590,7 @@ void record_msg(QString messg, CharacterPtr ch)
   }
 }
 
-qint32 do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 lines = {};
   QString tmp;
@@ -2684,7 +2684,7 @@ void send_to_all(QString message)
   }
 }
 
-void ansi_color(const char *txt, CharacterPtr ch)
+void ansi_color(const QString txt, CharacterPtr ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
@@ -2715,7 +2715,7 @@ void send_info(QString messg)
   send_info(messg.c_str());
 }
 
-void send_info(const char *messg)
+void send_info(const QString messg)
 {
   class Connection *i;
 
@@ -2730,7 +2730,7 @@ void send_info(const char *messg)
     }
 }
 
-void send_to_outdoor(char *messg)
+void send_to_outdoor(QString messg)
 {
   class Connection *i;
 
@@ -2741,7 +2741,7 @@ void send_to_outdoor(char *messg)
           write_to_output(messg, i);
 }
 
-void send_to_zone(const char *messg, qint32 zone)
+void send_to_zone(const QString messg, qint32 zone)
 {
   class Connection *i = {};
   if (messg)
@@ -2802,13 +2802,13 @@ QString Player::perform_alias(QString orig)
   return arguments.join(' ');
 }
 
-void skip_spaces(const char **s)
+void skip_spaces(const QString *s)
 {
   for (; **s && isspace(**s); (*s)++)
     ;
 }
 
-const char *any_one_arg(const QString argument, char *first_arg)
+const QString any_one_arg(const QString argument, QString first_arg)
 {
   skip_spaces(&argument);
 
@@ -2833,7 +2833,7 @@ bool is_multi(CharacterPtr ch)
 
 void warn_if_duplicate_ip(CharacterPtr ch)
 {
-  char buf[256];
+  QString buf;
   qint32 highlev = 51;
 
   std::list<multiplayer> multi_list;
@@ -2872,9 +2872,9 @@ void warn_if_duplicate_ip(CharacterPtr ch)
   }
 }
 
-qint32 do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (argument == 0)
     return ReturnValue::eFAILURE;
 

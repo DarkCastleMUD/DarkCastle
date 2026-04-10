@@ -15,7 +15,7 @@
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 
-DC::DC(qint32 &argc, char **argv)
+DC::DC(qint32 &argc, QString *argv)
     : QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), TheAuctionHouse("auctionhouse")
 {
   setup();
@@ -509,11 +509,11 @@ const QString DC::menu = QStringLiteral(
     "4) Delete this character.\r\n\r\n"
     "   Make your choice: ");
 
-const char Combinables::Scribe::RECIPES_FILENAME[] = "scribe.dat";
+const QString Combinables::Scribe::RECIPES_FILENAME = "scribe.dat";
 QMap<Combinables::Scribe::recipe, qint32> Combinables::Scribe::recipes;
 bool Combinables::Scribe::initialized = false;
 
-qint32 qfprintf(FILE *stream, const char *format, ...)
+qint32 qfprintf(FILE *stream, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);
@@ -530,7 +530,7 @@ LegacyFileWorld::~LegacyFileWorld()
   }
 }
 
-qint32 sprintf(QString &str, const char *format, ...)
+qint32 sprintf(QString &str, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);

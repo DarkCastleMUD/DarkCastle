@@ -167,9 +167,9 @@ command_return_t do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
+  QString buf1;
   class Connection *i;
 
   if (ch->isNonPlayer())
@@ -220,9 +220,9 @@ qint32 do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  char buf2[MAX_STRING_LENGTH];
+  QString buf2;
   class Connection *i;
   ObjectPtr tmp_obj;
   bool silence = false;
@@ -428,10 +428,10 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
+  QString buf1;
+  QString buf2;
   class Connection *i;
   ObjectPtr tmp_obj;
   bool silence = false;
@@ -505,10 +505,10 @@ qint32 do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
+  QString buf1;
+  QString buf2;
   class Connection *i;
   ObjectPtr tmp_obj;
   bool silence = false;
@@ -607,10 +607,10 @@ qint32 do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf1[MAX_STRING_LENGTH] = {0};
-  char buf2[MAX_STRING_LENGTH] = {0};
+  QString buf1 = {0};
+  QString buf2 = {0};
   class Connection *i = {};
   qint32 ctr = {};
 
@@ -981,11 +981,10 @@ command_return_t do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
-  char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
-      buf[MAX_STRING_LENGTH];
+  QString name, message, buf;
 
   ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -1026,10 +1025,10 @@ qint32 do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
-  char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
+  QString name, message, buf;
 
   ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -1040,8 +1039,6 @@ qint32 do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
   half_chop(argument, name, message);
-  name[MAX_INPUT_LENGTH] = '\0';
-  message[MAX_INPUT_LENGTH] = '\0';
 
   if (!*name || !*message)
     ch->sendln("Who do you want to ask something, and what??");
@@ -1071,9 +1068,9 @@ qint32 do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   CharacterPtr k;
   follow_type *f;
   ObjectPtr tmp_obj;
@@ -1167,10 +1164,10 @@ qint32 do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
+  QString buf1;
+  QString buf2;
   class Connection *i;
   ObjectPtr tmp_obj;
   bool silence = false;

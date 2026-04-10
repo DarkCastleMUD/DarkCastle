@@ -414,7 +414,7 @@ bool AuctionHouse::IsSlot(QString slot, qint32 vnum)
   if (keyword == -1)
     return false;
 
-  //   char out_buf[MAX_STRING_LENGTH];
+  //   QString out_buf;
   //  sprintf(out_buf, "%s is an unknown body location.\r\n", buf);
   // ch->send(out_buf);
 
@@ -659,14 +659,14 @@ void AuctionHouse::Load()
   FILE *the_file;
   quint32 num_rooms, num_items, ticket, i, state;
   qint32 room;
-  char *nl;
-  char buf[MAX_STRING_LENGTH];
+  QString nl;
+  QString buf;
   AuctionTicket InTicket;
   the_file = fopen(qPrintable(file_name), "r");
 
   if (!the_file)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "Unable to open the save file \"%s\" for Auction files!!", qPrintable(file_name));
     logentry(buf, 0, DC::LogChannel::LOG_MISC);
     return;
@@ -743,7 +743,7 @@ void AuctionHouse::Save()
 
   if (!the_file)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "Unable to open/create the save file \"%s\" for Auction files!!", qPrintable(file_name));
     logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
@@ -959,7 +959,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   ObjectPtr obj;
   CharacterPtr vict;
   FILE *fl;
-  char *buf[10];
+  QString buf;
   qint32 i = {};
 
   Item_it = Items_For_Sale.find(ticket);
@@ -997,7 +997,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
   if (rnum < 0)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "Major screw up in auction(buy)! Item %s[VNum %d] belonging to %s could not be created!",
             qPrintable(Item_it->item_name), Item_it->vitem, qPrintable(Item_it->seller));
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -1008,7 +1008,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
   if (!obj)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "Major screw up in auction(buy)! Item %s[RNum %d] belonging to %s could not be created!",
             qPrintable(Item_it->item_name), rnum, qPrintable(Item_it->seller));
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -1074,7 +1074,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   Item_it->buyer = qPrintable(ch->name());
 
   Save();
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n", qPrintable(ch->name()), qPrintable(Item_it->seller), qPrintable(Item_it->item_name), Item_it->vitem, Item_it->price);
   logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   obj_to_char(obj, ch);
@@ -1221,7 +1221,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     Revenue -= fee;
     UncollectedGold -= Item_it->price;
     ch->addGold(Item_it->price - fee);
-    char log_buf[MAX_STRING_LENGTH] = {};
+    QString log_buf = {};
     sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\r\n",
             qPrintable(ch->name()), Item_it->price, qPrintable(Item_it->item_name), ticket);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
@@ -1237,7 +1237,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       ItemsActive -= 1; // this is removed during expiration check
     if (rnum < 0)
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!",
               qPrintable(Item_it->item_name), Item_it->vitem, qPrintable(Item_it->seller));
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -1253,7 +1253,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     obj = ticket_object_load(Item_it, ticket);
     if (!obj)
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       sprintf(buf, "Major screw up in auction(RemoveTicket)! Item %s[RNum %d] belonging to %s could not be created!",
               qPrintable(Item_it->item_name), rnum, qPrintable(Item_it->seller));
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -1261,7 +1261,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     }
 
     ch->send(QStringLiteral("The Consignment Broker retrieves %1 and returns it to you.\r\n").arg(obj->short_description()));
-    char log_buf[MAX_STRING_LENGTH] = {};
+    QString log_buf = {};
     sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
             qPrintable(ch->name()), ticket, qPrintable(Item_it->item_name), Item_it->price);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
@@ -1270,7 +1270,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
   break;
   case AUC_DELETED:
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "%s just tried to cheat and collect ticket %u which didn't get erased properly!", qPrintable(ch->name()), ticket);
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     Items_For_Sale.remove(ticket);
@@ -1299,7 +1299,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
 
   if (1 != Items_For_Sale.remove(ticket))
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "Major screw up in auction(cancel)! Ticket %d belonging to %s could not be removed!",
             ticket, qPrintable(Item_it->seller));
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -1330,7 +1330,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
   qint32 i;
   QString output_buf;
   QString state_output;
-  char buf[MAX_STRING_LENGTH] = {0};
+  QString buf = {0};
 
   if (options == LIST_MINE)
     ch->sendln("Ticket-Buyer--------Price------Status--T--Item---------------------------");
@@ -1597,7 +1597,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
 
   if (advertise == true && NewTicket.buyer.isEmpty())
   {
-    char auc_buf[MAX_STRING_LENGTH];
+    QString auc_buf;
     auto Broker = find_mob_in_room(ch, 5258);
     if (!Broker)
     {
@@ -1615,7 +1615,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     }
   }
 
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   if (NewTicket.buyer.isEmpty())
   {
     sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\r\n", qPrintable(ch->name()), qPrintable(obj->short_description()), price);
@@ -1639,9 +1639,9 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
   ch->save();
 }
 
-qint32 do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   ObjectPtr obj;
   quint32 price;
 

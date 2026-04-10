@@ -87,7 +87,7 @@ void boot_clans(void)
   }
   QTextStream out(&file);
 
-  char a;
+  QChar a;
   while ((a = fread_char(out)) != '~')
   {
     out.ungetChar(a);
@@ -109,7 +109,7 @@ void boot_clans(void)
       skip_clan = true;
     }
 
-    char b;
+    QChar b;
     while (true) /* I see clan rooms! */
     {
       b = fread_char(fl);
@@ -124,7 +124,7 @@ void boot_clans(void)
       new_new_clan->rooms = new_new_room;
     }
 
-    char a;
+    QChar a;
     while ((a = fread_char(fl)) != '~')
     {
       if (a != ' ' && a != '\n')
@@ -582,7 +582,7 @@ QString get_clan_name(Clan *clan)
   return "no clan";
 }
 
-void message_to_clan(CharacterPtr ch, char buf[])
+void message_to_clan(CharacterPtr ch, QString buf)
 {
   CharacterPtr pch;
 
@@ -610,10 +610,10 @@ void clan_death(CharacterPtr ch, CharacterPtr killer)
   if (!ch || ch->clan == 0)
     return;
 
-  char buf[400];
-  char secondbuf[400];
+  QString buf;
+  QString secondbuf;
   Clan *clan;
-  char *curr = {};
+  QString curr = {};
 
   if (!(clan = get_clan(ch->clan)))
   {
@@ -655,9 +655,9 @@ void clan_login(CharacterPtr ch)
   if (ch->clan == 0)
     return;
 
-  char buf[400];
+  QString buf;
   Clan *clan;
-  char *curr = {};
+  QString curr = {};
 
   if (!(clan = get_clan(ch->clan)))
   {
@@ -700,9 +700,9 @@ void clan_logout(CharacterPtr ch)
   if (ch->clan == 0)
     return;
 
-  char buf[400];
+  QString buf;
   Clan *clan;
-  char *curr = {};
+  QString curr = {};
 
   if (!(clan = get_clan(ch->clan)))
   {
@@ -732,11 +732,11 @@ void clan_logout(CharacterPtr ch)
   message_to_clan(ch, buf);
 }
 
-qint32 do_accept(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_accept(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   Clan *clan;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   while (isspace(*arg))
     arg++;
@@ -893,11 +893,11 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_cpromote(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_cpromote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   Clan *clan;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   while (isspace(*arg))
     arg++;
@@ -958,8 +958,8 @@ qint32 clan_desc(CharacterPtr ch, QString arg)
 {
   Clan *clan = {};
 
-  char buf[MAX_STRING_LENGTH];
-  char text[MAX_INPUT_LENGTH];
+  QString buf;
+  QString text;
 
   clan = get_clan(ch);
   arg = one_argumentnolow(arg, text);
@@ -1007,8 +1007,8 @@ qint32 clan_motd(CharacterPtr ch, QString arg)
 {
   Clan *clan = {};
 
-  char buf[MAX_STRING_LENGTH];
-  char text[MAX_INPUT_LENGTH];
+  QString buf;
+  QString text;
 
   clan = get_clan(ch);
   arg = one_argumentnolow(arg, text);
@@ -1061,7 +1061,7 @@ qint32 clan_death_message(CharacterPtr ch, QString arg)
 {
   Clan *clan = {};
 
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   clan = get_clan(ch);
   if (!*arg)
@@ -1089,7 +1089,7 @@ qint32 clan_death_message(CharacterPtr ch, QString arg)
     return 0;
   }
 
-  char *curr;
+  QString curr;
 
   if (!(curr = strstr(arg, "%")))
   {
@@ -1129,7 +1129,7 @@ qint32 clan_logout_message(CharacterPtr ch, QString arg)
 {
   Clan *clan = {};
 
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   clan = get_clan(ch);
   if (!*arg)
@@ -1157,7 +1157,7 @@ qint32 clan_logout_message(CharacterPtr ch, QString arg)
     return 0;
   }
 
-  char *curr;
+  QString curr;
 
   if (!(curr = strstr(arg, "%")))
   {
@@ -1185,7 +1185,7 @@ qint32 clan_login_message(CharacterPtr ch, QString arg)
 {
   Clan *clan = {};
 
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   clan = get_clan(ch);
   if (!*arg)
@@ -1213,7 +1213,7 @@ qint32 clan_login_message(CharacterPtr ch, QString arg)
     return 0;
   }
 
-  char *curr;
+  QString curr;
 
   if (!(curr = strstr(arg, "%")))
   {
@@ -1241,8 +1241,8 @@ qint32 clan_email(CharacterPtr ch, QString arg)
 {
   Clan *clan = {};
 
-  char buf[MAX_STRING_LENGTH];
-  char text[MAX_INPUT_LENGTH];
+  QString buf;
+  QString text;
 
   clan = get_clan(ch);
   arg = one_argumentnolow(arg, text);
@@ -1280,11 +1280,11 @@ qint32 clan_email(CharacterPtr ch, QString arg)
   return 1;
 }
 
-qint32 do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr pch;
   class Connection *desc;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (!ch->clan)
   {
@@ -1410,7 +1410,7 @@ void do_clan_member_list(CharacterPtr ch)
   ClanMember *pmember = {};
   Clan *pclan = {};
   qint32 column = 1;
-  char buf[200], buf2[200];
+  QString buf, buf2[200];
 
   if (!(pclan = get_clan(ch->clan)))
   {
@@ -1458,12 +1458,12 @@ void do_clan_rights(CharacterPtr ch, QString arg)
 {
   ClanMember *pmember = {};
   CharacterPtr victim = {};
-  // extern char * clan_rights[]~;
+  // extern QString clan_rights
 
-  char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  char name[MAX_INPUT_LENGTH];
-  char last[MAX_INPUT_LENGTH];
+  QString buf;
+  QString buf2;
+  QString name;
+  QString last;
   qint32 bit = -1;
 
   half_chop(arg, name, last);
@@ -1541,11 +1541,11 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
   clan_room_data *newroom = {};
   clan_room_data *lastroom = {};
 
-  char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  char select[MAX_INPUT_LENGTH];
-  char text[MAX_INPUT_LENGTH];
-  char last[MAX_INPUT_LENGTH];
+  QString buf;
+  QString buf2;
+  QString select;
+  QString text;
+  QString last;
 
   qint32 i;
   qint32 x;
@@ -2116,10 +2116,10 @@ void do_leader_clans(CharacterPtr ch, QString arg, cmd_t cmd)
   //  clan_room_data * newroom = {};
   //  clan_room_data * lastroom = {};
 
-  char buf[MAX_STRING_LENGTH];
-  char select[MAX_STRING_LENGTH];
-  //  char text[MAX_STRING_LENGTH];
-  //  char last[MAX_STRING_LENGTH];
+  QString buf;
+  QString select;
+  //  QString text;
+  //  QString last;
 
   qint32 i, j, leader;
   //  qint32 x;
@@ -2353,7 +2353,7 @@ void show_clan_log(CharacterPtr ch)
     }
   }
 
-  page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
+  page_string(ch->desc, const_cast<QString>(buffer.str().c_str()), 1);
 }
 
 qint32 needs_clan_command(CharacterPtr ch)
@@ -2366,12 +2366,12 @@ qint32 needs_clan_command(CharacterPtr ch)
   return 0;
 }
 
-qint32 do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   Clan *clan = {};
-  char *tmparg;
+  QString tmparg;
 
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   tmparg = one_argument(arg, buf);
 
   if (!strcmp(buf, "rights"))
@@ -2418,11 +2418,11 @@ qint32 do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   Clan *clan;
   qint32 nClan;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (!*arg)
   {
@@ -2475,19 +2475,19 @@ qint32 do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   Clan *clan;
   class Connection *desc;
   CharacterPtr pch;
-  char buf[100];
+  QString buf;
   qint32 found;
 
   send_to_char("                  O N L I N E   C L A N   "
                "M E M B E R S\r\n\r\n",
                ch);
 
-  char buf2[MAX_INPUT_LENGTH];
+  QString buf2;
   one_argument(arg, buf2);
   qint32 clan_num = {};
 
@@ -2522,7 +2522,7 @@ qint32 do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_cmotd(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_cmotd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   Clan *clan;
 
@@ -2542,9 +2542,9 @@ qint32 do_cmotd(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_ctax(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_ctax(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (!ch->clan)
   {
     ch->sendln("You not a member of a clan.");
@@ -2641,9 +2641,9 @@ command_return_t Character::do_cdeposit(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (!ch->clan)
   {
     ch->sendln("You not a member of a clan.");
@@ -2685,7 +2685,7 @@ qint32 do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
   save_clans();
   ch->save();
 
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   if (wdraw == 1)
   {
     snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 $B$5gold$R coin from the clan bank account.\r\n", qPrintable(ch->name()));
@@ -2703,7 +2703,7 @@ qint32 do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_cbalance(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_cbalance(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (!ch->clan)
   {
@@ -2886,7 +2886,7 @@ void takeover_pause(qint32 clan, qint32 zone)
 
 void claimArea(qint32 clan, bool defend, bool challenge, qint32 clan2, qint32 zone)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (challenge)
   {
@@ -2996,7 +2996,7 @@ void check_victory(takeover_pulse_data *take)
 void check_quitter(varg_t arg1, void *arg2, void *arg3)
 {
   qint32 clan = arg1.clan;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   if (count_controlled_areas(clan) > online_clan_members(clan))
   { // One needs to go.
     qint32 i = number(1, count_controlled_areas(clan));
@@ -3104,7 +3104,7 @@ void pulse_takeover()
       continue; // first two pulses nothing happens
     if (take->pulse > 60 && take->clan2 != -2 && can_lose(take))
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       std::sprintf(buf, "\r\n##Control of%s has been lost!\r\n", qPrintable(DC::getInstance()->zones.value(take->zone).name()));
       send_info(buf);
       DC::setZoneClanOwner(take->zone, 0);
@@ -3250,7 +3250,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
         return ReturnValue::eSUCCESS;
       }
     this->sendln("You yield the area on behalf of your clan.");
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n", qPrintable(get_clan(clan)->name()), qPrintable(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).name()));
     send_info(buf);
     DC::setZoneClanOwner(DC::getInstance()->world[in_room].zone, 0);
@@ -3359,7 +3359,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     pl->pulse = {};
     pl->zone = DC::getInstance()->world[in_room].zone;
     pulse_list = pl;
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     if (!clanless_challenge)
       sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n", qPrintable(get_clan(this)->name()), qPrintable(get_clan(pl->clan1)->name()), qPrintable(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).name()));
     else

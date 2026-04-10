@@ -55,22 +55,22 @@ void show_question_race(Connection *d);
 
 bool wizlock = false;
 
-extern char greetings1[MAX_STRING_LENGTH];
-extern char greetings2[MAX_STRING_LENGTH];
-extern char greetings3[MAX_STRING_LENGTH];
-extern char greetings4[MAX_STRING_LENGTH];
-extern char webpage[MAX_STRING_LENGTH];
-extern char motd[MAX_STRING_LENGTH];
-extern char imotd[MAX_STRING_LENGTH];
+extern QString greetings1;
+extern QString greetings2;
+extern QString greetings3;
+extern QString greetings4;
+extern QString webpage;
+extern QString motd;
+extern QString imotd;
 
 extern ObjectPtr object_list;
 
-qint32 _parse_email(char *arg);
-bool check_deny(class Connection *d, char *name);
+qint32 _parse_email(QString arg);
+bool check_deny(class Connection *d, QString name);
 void isr_set(CharacterPtr ch);
 bool check_reconnect(class Connection *d, QString name, bool fReconnect);
 bool check_playing(class Connection *d, QString name);
-char *str_str(char *first, char *second);
+QString str_str(QString first, QString second);
 bool apply_race_attributes(CharacterPtr ch, qint32 race = 0);
 bool check_race_attributes(CharacterPtr ch, qint32 race = 0);
 bool handle_get_race(Connection *d, QString arg);
@@ -647,7 +647,7 @@ void Character::do_on_login_stuff(void)
     todelete.pop();
   }
 
-  if (this->getSetting("mode").startsWith("char"))
+  if (this->getSetting("mode").startsWith("character"))
   {
     telnet_echo_off(this->desc);
     telnet_sga(this->desc);
@@ -774,16 +774,16 @@ void Character::set_hw(void)
 // Deal with sockets that haven't logged in yet.
 void DC::nanny(class Connection *d, QString arg)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   std::stringstream str_tmp;
-  char tmp_name[20];
-  char *password;
+  QString tmp_name;
+  QString password;
   CharacterPtr ch;
   qint32 y;
-  char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> ";
+  QString badclssmsg = "You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> ";
   quint32 selection = {};
   auto &character_list = DC::getInstance()->character_list;
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   QString buffer;
 
   ch = conn->character;
@@ -972,7 +972,7 @@ void DC::nanny(class Connection *d, QString arg)
     // Default is to authenticate against character password
     password = ch->player->pwd;
 
-    // If -P option passed and one of your other characters is an imp, allow this char with that imp's password
+    // If -P option passed and one of your other characters is an imp, allow this character with that imp's password
     if (DC::getInstance()->cf.allow_imp_password && DC::getInstance()->isAllowedHost(conn->getPeerOriginalAddress()))
     {
       for (Connection *ad = DC::getInstance()->connections_; ad && ad != (Connection *)0x95959595; ad = ad->next)
@@ -1118,8 +1118,7 @@ void DC::nanny(class Connection *d, QString arg)
       return;
     }
 
-    strncpy(ch->player->pwd, crypt(arg.c_str(), qPrintable(ch->name())), PASSWORD_LEN);
-    ch->player->pwd[PASSWORD_LEN] = '\0';
+    ch->player->pwd = crypt(qPrintable(arg), qPrintable(ch->name()));
     write_to_output("Please retype password: ", d);
     telnet_ga(d);
     conn->connected = Connection::states::CONFIRM_NEW_PASSWORD;
@@ -1887,8 +1886,7 @@ void DC::nanny(class Connection *d, QString arg)
       telnet_ga(d);
       return;
     }
-    strncpy(ch->player->pwd, crypt(arg.c_str(), qPrintable(ch->name())), PASSWORD_LEN);
-    ch->player->pwd[PASSWORD_LEN] = '\0';
+    ch->player->pwd = crypt(qPrintable(arg), qPrintable(ch->name()));
     write_to_output("Please retype password: ", d);
     telnet_ga(d);
     conn->connected = Connection::states::CONFIRM_RESET_PASSWORD;
@@ -1910,7 +1908,7 @@ void DC::nanny(class Connection *d, QString arg)
     conn->connected = Connection::states::SELECT_MENU;
     if (ch->getLevel() > 1)
     {
-      char blah1[50], blah2[50];
+      QString blah1, blah2[50];
       // this prevents a dupe bug
       strcpy(blah1, qPrintable(ch->name()));
       strcpy(blah2, ch->player->pwd);
@@ -1933,7 +1931,7 @@ void DC::nanny(class Connection *d, QString arg)
 
 // This is mostly just to keep people from putting meta-chars
 // into their email address.
-qint32 _parse_email(char *arg)
+qint32 _parse_email(QString arg)
 {
   if (strlen(arg) < 4)
     return 0;
@@ -1947,7 +1945,7 @@ qint32 _parse_email(char *arg)
 }
 
 // Parse a name for acceptability.
-qint32 _parse_name(const char *arg, char *name)
+qint32 _parse_name(const QString arg, QString name)
 {
   qint32 i;
 
@@ -1971,18 +1969,18 @@ qint32 _parse_name(const char *arg, char *name)
 }
 
 // Check for denial of service.
-bool check_deny(class Connection *d, char *name)
+bool check_deny(class Connection *d, QString name)
 {
   FILE *fpdeny = {};
-  char strdeny[MAX_INPUT_LENGTH];
-  char bufdeny[MAX_STRING_LENGTH];
+  QString strdeny;
+  QString bufdeny;
 
   sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
   if ((fpdeny = fopen(strdeny, "rb")) == nullptr)
     return false;
   fclose(fpdeny);
 
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   sprintf(log_buf, "Denying access to player %s@%s.", name, conn->getPeerOriginalAddress().toString(qPrintable()));
   logentry(log_buf, ARCHANGEL, DC::LogChannel::LOG_MORTAL);
   file_to_string(strdeny, bufdeny);
@@ -2040,7 +2038,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 
       conn->connected = Connection::states::PLAYING;
 
-      if (tmp_ch->getSetting("mode").startsWith("char"))
+      if (tmp_ch->getSetting("mode").startsWith("character"))
       {
         telnet_echo_off(d);
         telnet_sga(d);
@@ -2093,9 +2091,9 @@ bool check_playing(class Connection *d, QString name)
   return 0;
 }
 
-char *str_str(char *first, char *second)
+QString str_str(QString first, QString second)
 {
-  char *pstr;
+  QString pstr;
 
   for (pstr = first; *pstr; pstr++)
     *pstr = LOWER(*pstr);
@@ -2134,7 +2132,7 @@ void remove_command_lag(CharacterPtr ch)
 void update_characters()
 {
   qint32 tmp, retval;
-  char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
+  QString log_msg, dammsg[MAX_STRING_LENGTH];
   affected_type af;
 
   const auto &character_list = DC::getInstance()->character_list;
@@ -2253,7 +2251,7 @@ void checkConsecrate(qint32 pulseType)
   ObjectPtr obj, tmp_obj;
   CharacterPtr ch = {}, tmp_ch, next_ch;
   qint32 align, amount, spl = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (pulseType == DC::PULSE_REGEN)
   {
@@ -2460,10 +2458,10 @@ void checkConsecrate(qint32 pulseType)
 }
 
 /* check name to see if it is listed in the file of forbidden player names */
-bool on_forbidden_name_list(const char *name)
+bool on_forbidden_name_list(const QString name)
 {
   FILE *nameList;
-  char buf[MAX_STRING_LENGTH + 1];
+  QString buf;
   bool found = false;
   qint32 i;
 

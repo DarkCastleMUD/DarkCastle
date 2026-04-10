@@ -12,7 +12,7 @@
 
 constexpr auto GLOBE_OF_DARKNESS_OBJECT = 101;
 
-typedef qint32 (*SPELL_POINTER)(quint8, CharacterPtr, char *, qint32, CharacterPtr, ObjectPtr, qint32);
+typedef qint32 (*SPELL_POINTER)(quint8, CharacterPtr, QString, qint32, CharacterPtr, ObjectPtr, qint32);
 
 bool resist_spell(qint32 perc);
 bool resist_spell(CharacterPtr ch, qint32 skill);

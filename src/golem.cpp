@@ -32,11 +32,11 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
 class golem_data
 { // This is how a golem looks.
 public:
-  const char *keyword;
-  const char *name;
-  const char *short_desc;
-  const char *long_desc;
-  const char *description;
+  const QString keyword;
+  const QString name;
+  const QString short_desc;
+  const QString long_desc;
+  const QString description;
   qint32 max_hp;
   qint32 roll1, roll2;  // Damage maxes
   qint32 dam, hit;      // bonus maxes
@@ -44,9 +44,9 @@ public:
   qint32 special_aff;   // Special affect(s). (iron)
   qint32 special_res;   // Resists(stone).
   qint32 ac;            // armor
-  const char *creation_message;
-  const char *shatter_message;
-  const char *release_message;
+  const QString creation_message;
+  const QString shatter_message;
+  const QString release_message;
 };
 
 const golem_data golem_list[] = {
@@ -95,7 +95,7 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
   // check_components didn't suit me.
   qint32 i;
   ObjectPtr curr, next_content;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   SET_BIT(retval, ReturnValue::eSUCCESS);
   for (i = {}; i < 5; i++)
   {
@@ -147,7 +147,7 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
 
 void save_golem_data(CharacterPtr ch)
 {
-  char file[200];
+  QString file;
   FILE *fpfile = {};
   qint32 golemtype = {};
   if (ch->isNonPlayer() || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
@@ -171,7 +171,7 @@ void save_golem_data(CharacterPtr ch)
 
 void save_charmie_data(CharacterPtr ch)
 {
-  char file[200];
+  QString file;
   FILE *fpfile = {};
 
   if (ch->isNonPlayer() || ch->followers == nullptr)
@@ -255,7 +255,7 @@ void set_golem(CharacterPtr golem, qint32 golemtype)
 
 void Character::load_golem_data(qint32 golemtype)
 {
-  char file[200];
+  QString file;
   FILE *fpfile = {};
   CharacterPtr golem;
   if (this->isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
@@ -296,7 +296,7 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
 {
   CharacterPtr golem;
   qint32 i;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   arg = one_argument(arg, buf);
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -343,12 +343,12 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eSUCCESS;
 }
 
-extern char frills[];
+extern QString frills;
 
-qint32 do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
 { /* Pretty much a rip of score */
-  char race[100];
-  char buf[MAX_STRING_LENGTH], scratch;
+  QString race;
+  QString buf, scratch;
   qint32 level = {};
   qint32 to_dam, to_hit;
   CharacterPtr master = ch;

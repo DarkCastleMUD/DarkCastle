@@ -24,7 +24,7 @@ game_portal game_portals[MAX_GAME_PORTALS];
 |   hard coded!
 */
 
-const char *portal_bits[] = {
+const QStringList portal_bits = {
     "NO_LEAVE",
     "NO_ENTER",
     "\n"};
@@ -35,7 +35,7 @@ void load_game_portals()
   // TODO - make this a read which portals from a file like it should instead of
   // being hard coded
 
-  const char *portal_files[MAX_GAME_PORTALS] =
+  const QStringList portal_files =
       {
           "portal/portal.wagon",
           "portal/portal.tower",
@@ -52,8 +52,8 @@ void load_game_portals()
   qint32 num_lines = {}; /* Temporary to count lines */
   qint32 file_pos;       /* Used to store position before counting length */
   FILE *cur_file;
-  char buf[256]; /* Stores temp file names */
-  char log_buf[256];
+  QString buf; /* Stores temp file names */
+  QString log_buf;
 
   for (i = {}; i < MAX_GAME_PORTALS; i++)
   {
@@ -107,7 +107,6 @@ void DC::free_game_portals_from_memory(void)
   {
     if (game_portals[i].from_rooms)
     {
-      delete[] game_portals[i].from_rooms;
       game_portals[i].from_rooms = {};
     }
   }
@@ -147,7 +146,7 @@ void process_portals()
               game_portals[i].obj_num,
               game_portals[i].max_timer) == 0)
       {
-        char log_buf[MAX_STRING_LENGTH] = {};
+        QString log_buf = {};
         sprintf(log_buf, "Making portal from %d to %llu failed.", from_room,
                 game_portals[i].to_room);
         logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
@@ -171,7 +170,7 @@ void process_portals()
 qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer)
 {
 
-  char log_buf[256];
+  QString log_buf;
 
   auto from_portal = new Object;
   clear_object(from_portal);

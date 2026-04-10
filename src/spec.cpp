@@ -13,8 +13,8 @@
 class spec_data
 {
 public:
-  const char *name = {};
-  const char *description = {};
+  const QString name = {};
+  const QString description = {};
   qint32 pcclass = {};
   qint32 skills[10] = {};
 };
@@ -24,10 +24,10 @@ const spec_data spec_list[] =
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
-qint32 do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
-  char arg[MAX_INPUT_LENGTH];
+  QString buf;
+  QString arg;
   argument = one_argument(argument, arg);
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;

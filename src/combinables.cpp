@@ -88,7 +88,7 @@ trade_data_type poison_vial_data[] =
 class thief_poison_data
 {
 public:
-  const char *poison_type;
+  const QString poison_type;
 };
 
 thief_poison_data poison_vial_combat_data[] =
@@ -108,7 +108,7 @@ thief_poison_data poison_vial_combat_data[] =
 ////////////////////////////////////////////////////////////////////////////
 // command functions
 
-qint32 do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_TRADE_POISON);
 
@@ -184,7 +184,7 @@ qint32 do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
@@ -192,7 +192,7 @@ qint32 do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  char vialarg[MAX_INPUT_LENGTH];
+  QString vialarg;
 
   one_argument(argument, vialarg);
 
@@ -388,9 +388,9 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
   return retval;
 }
 
-qint32 do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
+  QString arg1, liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
   ObjectPtr herbobj, *liquidobj, containerobj;
   affected_type af;
   Brew b;
@@ -539,7 +539,7 @@ qint32 do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
-  const char *potion_color;
+  const QString potion_color;
   // Determine color to use in message based on herb used
   switch (DC::getInstance()->obj_index[herbobj->item_number].vnum())
   {
@@ -628,7 +628,7 @@ qint32 do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     auto container_key = containerobj->name().split(' ').value(2);
 
     // Find liquid key (salty, milk, strong)
-    const char *liquid_key;
+    const QString liquid_key;
     switch (liquidobj->obj_flags.value[2])
     {
     case LIQ_MILK:
@@ -760,7 +760,7 @@ void Brew::save(void)
 
 void Brew::list(CharacterPtr ch)
 {
-  char buffer[MAX_STRING_LENGTH] = {};
+  QString buffer = {};
   qint32 i = {};
 
   if (!ch)
@@ -779,11 +779,11 @@ void Brew::list(CharacterPtr ch)
   }
 }
 
-qint32 Brew::add(CharacterPtr ch, char *argument)
+qint32 Brew::add(CharacterPtr ch, QString argument)
 {
   vnum_t herb_vnum = {}, container_vnum = {};
   qint32 liquid_type = {}, spell = {};
-  char arg1[MAX_INPUT_LENGTH] = {}, arg2[MAX_INPUT_LENGTH] = {}, arg3[MAX_INPUT_LENGTH] = {}, arg4[MAX_INPUT_LENGTH] = {};
+  QString arg1 = {}, arg2[MAX_INPUT_LENGTH] = {}, arg3[MAX_INPUT_LENGTH] = {}, arg4[MAX_INPUT_LENGTH] = {};
 
   if (!ch)
   {
@@ -843,7 +843,7 @@ qint32 Brew::add(CharacterPtr ch, char *argument)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 Brew::remove(CharacterPtr ch, char *argument)
+qint32 Brew::remove(CharacterPtr ch, QString argument)
 {
   if (!ch)
   {
@@ -892,9 +892,9 @@ qint32 Brew::find(Brew::recipe r)
   return spell;
 }
 
-qint32 do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
+  QString arg1, dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
   ObjectPtr inkobj, *dustobj, *penobj, paperobj;
   affected_type af;
   Scribe s;
@@ -1210,7 +1210,7 @@ void Scribe::save(void)
 
 void Scribe::list(CharacterPtr ch)
 {
-  char buffer[MAX_STRING_LENGTH];
+  QString buffer;
   qint32 i = {};
 
   if (ch == 0)
@@ -1229,11 +1229,11 @@ void Scribe::list(CharacterPtr ch)
   }
 }
 
-qint32 Scribe::add(CharacterPtr ch, char *argument)
+qint32 Scribe::add(CharacterPtr ch, QString argument)
 {
   vnum_t ink_vnum = {}, dust_vnum = {}, pen_vnum = {}, paper_vnum = {};
   qint32 spell = {};
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
+  QString arg1, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
 
   if (!ch)
   {
@@ -1295,7 +1295,7 @@ qint32 Scribe::add(CharacterPtr ch, char *argument)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 Scribe::remove(CharacterPtr ch, char *argument)
+qint32 Scribe::remove(CharacterPtr ch, QString argument)
 {
   if (!ch)
   {
@@ -1344,6 +1344,6 @@ qint32 Scribe::find(Scribe::recipe r)
   return spell;
 }
 
-const char Brew::RECIPES_FILENAME[] = "brewables.dat";
+const QString Brew::RECIPES_FILENAME = "brewables.dat";
 QMap<Brew::recipe, qint32> Brew::recipes;
 bool Brew::initialized = false;

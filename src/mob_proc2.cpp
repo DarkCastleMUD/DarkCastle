@@ -36,7 +36,7 @@ extern qint32 size_restricted(CharacterPtr ch, ObjectPtr obj);
 
 void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
 {
-  char buf[256];
+  QString buf;
 
   ch->removeGold(price);
   eq_remove_damage(obj);
@@ -51,7 +51,7 @@ void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, qint32 price, Objec
 
 void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
 {
-  char buf[256];
+  QString buf;
 
   do_say(owner, "Trying to sucker me for a free repair job?");
   sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, qPrintable(obj->short_description()));
@@ -62,7 +62,7 @@ void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, qint32 pr
 
 void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
 {
-  char buf[256];
+  QString buf;
 
   sprintf(buf, "It will only cost you %d coins to repair %s.'", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
@@ -72,7 +72,7 @@ void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, qint32 price, 
 
 qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
-  char item[256];
+  QString item;
   qint32 value0, cost, price;
   qint32 percent, eqdam;
 
@@ -150,7 +150,7 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
 qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
-  char item[256];
+  QString item;
   qint32 value0, value2, cost, price;
   qint32 percent, eqdam;
 
@@ -251,7 +251,7 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 // Fingers
 qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
-  char item[256];
+  QString item;
   qint32 value0, value2, cost, price;
   qint32 percent, eqdam;
 
@@ -404,7 +404,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
 {
   qint32 x = 0, cost = 0, which;
   qint32 count = {};
-  char buf[100];
+  QString buf;
 
   if (cmd != cmd_t::BUY && cmd != cmd_t::LIST && cmd != cmd_t::VALUE)
     return ReturnValue::eFAILURE;
@@ -658,7 +658,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
 
   qint32 mobvnum = DC::getInstance()->mob_index[owner->mobdata->nr].vnum();
   qint32 o;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   //  return ReturnValue::eFAILURE; //disabled for now
   if (cmd == cmd_t::LIST)
   {
@@ -696,7 +696,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     for (o = {}; platsmith_list[o].vnum != 0; o++)
       if (mobvnum == platsmith_list[o].vnum)
         break;
-    char buf[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
+    QString buf, arg2[MAX_INPUT_LENGTH];
     one_argument(arg, arg2);
     if (platsmith_list[o].vnum == 0)
     {
@@ -739,7 +739,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   else if (cmd == cmd_t::SELL)
   {
     ObjectPtr obj;
-    char arg2[MAX_INPUT_LENGTH];
+    QString arg2;
     one_argument(arg, arg2);
     obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
     if (!CAN_SEE(owner, ch))
@@ -778,7 +778,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
 // gl_repair_guy
 qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
-  char item[256];
+  QString item;
   qint32 value0, value2, cost, price;
   qint32 percent, eqdam;
 

@@ -12,7 +12,7 @@
 
 void rebuild_rnum_references(qint32 startAt, qint32 type);
 
-char *mprog_next_command(char *clist);
+QString mprog_next_command(QString clist);
 
 constexpr auto BASE_STAT = 0;
 
@@ -72,17 +72,17 @@ extern selfpurge_t selfpurge;
 class race_data
 {
 public:
-  const char *singular_name; /* Dwarf, Elf, etc.     */
-  QString lowercase_name;    /* dwarf, elf, etc.     */
-  const char *plural_name;   /* dwarves, elves, etc. */
-  bool playable;             /* Can a player play as this race? */
-  qint32 body_parts;         /* bitvector for body parts       */
-  qint32 immune;             /* bitvector for immunities       */
-  qint32 resist;             /* bitvector for resistances      */
-  qint32 suscept;            /* bitvector for susceptibilities */
-  qint32 hate_fear;          /* bitvector for hate/fear        */
-  qint32 friendly;           /* bitvector for friendliness     */
-  qint32 min_weight;         /* min weight */
+  const QString singular_name; /* Dwarf, Elf, etc.     */
+  QString lowercase_name;      /* dwarf, elf, etc.     */
+  const QString plural_name;   /* dwarves, elves, etc. */
+  bool playable;               /* Can a player play as this race? */
+  qint32 body_parts;           /* bitvector for body parts       */
+  qint32 immune;               /* bitvector for immunities       */
+  qint32 resist;               /* bitvector for resistances      */
+  qint32 suscept;              /* bitvector for susceptibilities */
+  qint32 hate_fear;            /* bitvector for hate/fear        */
+  qint32 friendly;             /* bitvector for friendliness     */
+  qint32 min_weight;           /* min weight */
   qint32 max_weight;
 
   qint32 min_height;
@@ -108,8 +108,8 @@ public:
   quint32 max_wis;
   qint32 mod_wis;
 
-  qint32 affects;      /* automatically added affects   */
-  const char *unarmed; // unarmed attack message
+  qint32 affects;        /* automatically added affects   */
+  const QString unarmed; // unarmed attack message
 };
 
 class mob_matrix_data

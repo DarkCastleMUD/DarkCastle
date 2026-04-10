@@ -7,7 +7,7 @@
 */
 #include "DC/db.h"
 
-bool on_forbidden_name_list(const char *name);
+bool on_forbidden_name_list(const QString name);
 QString color_to_code(QString color);
 
 constexpr auto MAX_GOLEMS = 2; // amount of golems above +1
@@ -80,7 +80,7 @@ public:
   quint32 misc; // channel flags
 
   qint16 clan;
-  qint32 load_room; // Which room to place char in
+  qint32 load_room; // Which room to place character in
 
   quint32 acmetas;
   qint32 agemetas;

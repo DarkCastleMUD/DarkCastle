@@ -6,9 +6,9 @@
 
 #include "DC/interp.h"
 
-qint32 do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[50];
+  QString name;
   CharacterPtr victim;
 
   argument = one_argument(argument, name);
@@ -43,9 +43,9 @@ qint32 do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[50];
+  QString name;
   argument = one_argument(argument, name);
   name[0] = toupper(name[0]);
   util_unarchive(name, ch);
@@ -161,7 +161,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -184,11 +184,11 @@ qint32 do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_send(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_send(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   CharacterPtr vict;
-  char name[100], message[200], buf[350];
+  QString name, message[200], buf[350];
 
   half_chop(argument, name, message);
   name[99] = '\0';

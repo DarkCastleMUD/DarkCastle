@@ -11,13 +11,13 @@
 #include <QString>
 #include "DC/const.h"
 
-qint32 get_number(char **name);
+qint32 get_number(QString *name);
 
-qint32 do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //  try
   // {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   QString output = "";
   room_direction_data *curExits;
   qint32 curZone = DC::getInstance()->world[(ch)->in_room].zone;
@@ -132,7 +132,7 @@ qint32 do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 
   send_to_char(output.c_str(), ch);
   // }
-  // catch(char *errmsg)
+  // catch(QString errmsg)
   // {
   //   ch->send(QStringLiteral("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
   //   ch->sendln("Ask Rubicon if it needs fixed...");
@@ -142,9 +142,9 @@ qint32 do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char bufName[200], *pBuf;
+  QString bufName, *pBuf;
   ObjectPtr k;
   qint32 j, nIndex = {};
 
@@ -253,7 +253,7 @@ qint32 do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_set(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //   renamed the command "setup" so don't need this anymore
   //    void do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd);
@@ -272,7 +272,7 @@ qint32 do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
       "manameta", "movemeta", "armor", "profession", "\n"};
   CharacterPtr vict;
-  char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
+  QString name, buf2[100], buf[100], help[MAX_STRING_LENGTH];
   qint32 skill, value, i, x;
 
   if (ch->isNonPlayer())

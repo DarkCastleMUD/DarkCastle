@@ -548,7 +548,7 @@ void Character::display_string_list(QStringList list)
 
 void Character::display_string_list(const QStringList list)
 {
-  char buf[MAX_STRING_LENGTH] = {};
+  QString buf = {};
   *buf = '\0';
 
   for (qint32 i = 1; *list[i - 1] != '\n'; i++)
@@ -998,7 +998,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
   }
   else if (variable == "weather")
   {
-    extern char *sky_look[];
+    extern QStringList sky_look;
     if (OUTSIDE(this))
       value = sky_look[weather_info.sky];
     else

@@ -99,14 +99,14 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
-void half_chop(const char *str, char *arg1, char *arg2);
+void half_chop(const QString str, QString arg1, QString arg2);
 world_file_list_item *new_mob_file_item(QString filename, qint32 room_nr);
 world_file_list_item *new_obj_file_item(QString filename, qint32 room_nr);
 
 QString read_next_worldfile_name(FILE *flWorldIndex);
 
 void fix_shopkeepers_inventory();
-qint32 file_to_string(const char *name, char *buf);
+qint32 file_to_string(const QString name, QString buf);
 void reset_time(void);
 void clear_char(CharacterPtr ch);
 
@@ -398,7 +398,7 @@ void funny_boot_message()
   if (!was_hotboot)
     return;
 
-  qint32 num = sizeof(funnybootmessages) / sizeof(char *);
+  qint32 num = sizeof(funnybootmessages) / sizeof;
 
   num = number(0, num - 1);
 
@@ -410,7 +410,7 @@ void funny_boot_message()
  It checks if ch exists everywhere it is used,
  so this can be called from other places without
  a character attached. */
-qint32 do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   skill_quest *curr;
   FILE *fl;
@@ -452,7 +452,7 @@ void load_skillquests()
     newsq->num = i;
     if (find_sq(i))
     {
-      char buf[512];
+      QString buf;
       sprintf(buf, "%d duplicate.", i);
       logentry(buf, 0, DC::LogChannel::LOG_BUG);
     }
@@ -645,7 +645,7 @@ void DC::boot_db(void)
 }
 
 /*
- qint32 do_motdload(CharacterPtr ch, QString argument, cmd_t cmd)
+ command_return_t do_motdload(CharacterPtr ch, QString argument, cmd_t cmd)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
@@ -698,7 +698,7 @@ void DC::write_wizlist(QString filename)
   write_wizlist(filename.c_str());
 }
 
-void DC::write_wizlist(const char filename[])
+void DC::write_wizlist(const QString filename)
 {
   QFile wizlist_file(filename);
   auto file_opened = wizlist_file.open(QIODeviceBase::WriteOnly);
@@ -765,9 +765,9 @@ void DC::update_wizlist(CharacterPtr ch)
   write_wizlist(ssbuffer.str().c_str());
 }
 
-qint32 do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH], lines[500], space[80];
+  QString buf, lines[500], space[80];
   qint32 x{}, z{1};
   level_t current_level = {};
   qint32 gods_each_level[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -935,12 +935,12 @@ void reset_time(void)
 index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
 {
   qint32 i = {};
-  char buf[82];
-  char log_buf[256];
+  QString buf;
+  QString log_buf;
   FILE *flMobIndex;
   FILE *fl;
   QString temp;
-  char endfile[180];
+  QString endfile;
   world_file_list_item *pItem = {};
   //  extern short code_testing_mode;
 
@@ -1023,7 +1023,7 @@ index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
       }
       else
       {
-        sprintf(endfile, "Bad char (%s)", buf);
+        sprintf(endfile, "Bad chararacter (%s)", buf);
         logentry(endfile, 0, DC::LogChannel::LOG_MISC);
         abort();
       }
@@ -1248,12 +1248,12 @@ void DC::remove_all_objs_from_world()
 index_data *DC::generate_obj_indices(qint32 *top, index_data *index)
 {
   qint32 i = {};
-  char buf[82];
-  char log_buf[256];
+  QString buf;
+  QString log_buf;
   FILE *fl;
   FILE *flObjIndex;
   QString temp;
-  char endfile[180];
+  QString endfile;
   world_file_list_item *pItem = {};
 
   //  if (!bport) {
@@ -1414,8 +1414,8 @@ void write_one_room(LegacyFile &lf, qint32 a)
 
 qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
 {
-  char *temp = {};
-  char ch = {};
+  QString temp = {};
+  QChar ch = {};
   qint32 dir = {};
   extra_descr_data *new_new_descr = {};
   zone_t zone_nr = {};
@@ -1456,7 +1456,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       DC::getInstance()->world[room_nr].number = room_nr;
       DC::getInstance()->world[room_nr].name = temp;
     }
-    char *description = fread_string(fl, 0);
+    QString description = fread_string(fl, 0);
     if (room_nr)
     {
       DC::getInstance()->world[room_nr].description = description;
@@ -1604,7 +1604,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
     return true;
   } // if == $
     //  delete temp; /* cleanup the area containing the terminal $  */
-    // we no longer free temp, cause it's no longer used as a terminating char
+    // we no longer free temp, cause it's no longer used as a terminating character
   return false;
 }
 
@@ -1917,7 +1917,7 @@ void DC::boot_world(void)
   FILE *flWorldIndex;
   qint32 room_nr = {};
   QString temp;
-  char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
+  QString endfile;
   world_file_list_item *pItem = {};
 
   DC::getInstance()->object_list = {};
@@ -1997,7 +1997,7 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir)
 
   if (room && DC::getInstance()->world[room].dir_option[dir])
   {
-    char buf[200];
+    QString buf;
     sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
     logentry(buf, 0, DC::LogChannel::LOG_WORLD);
     if (DC::getInstance()->world[room].dir_option[dir]->general_description)
@@ -2012,12 +2012,12 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir)
   {
     DC::getInstance()->world[room].dir_option[dir] = new room_direction_data;
   }
-  char *general_description = fread_string(fl, 0);
+  QString general_description = fread_string(fl, 0);
 
   if (room)
     DC::getInstance()->world[room].dir_option[dir]->general_description = general_description;
 
-  char *keyword = fread_string(fl, 0);
+  QString keyword = fread_string(fl, 0);
   if (room)
     DC::getInstance()->world[room].dir_option[dir]->keyword = keyword;
 
@@ -2054,7 +2054,7 @@ qint32 DC::create_one_room(CharacterPtr ch, qint32 vnum)
   Room *rp = {};
   qint32 x = {};
 
-  char buf[256] = {};
+  QString buf = {};
 
   if (rooms.contains(vnum))
     return 0;
@@ -2091,8 +2091,8 @@ qint32 DC::create_one_room(CharacterPtr ch, qint32 vnum)
   rp->tracks = {};
   rp->last_track = {};
   sprintf(buf, "Room %d", vnum);
-  rp->name = (char *)(buf);
-  rp->description = (char *)QStringLiteral("Empty description.\r\n");
+  rp->name = (buf);
+  rp->description = QStringLiteral("Empty description.\r\n");
   return 1;
 }
 
@@ -2205,7 +2205,7 @@ void renum_zone_table(void)
         // J = junk.  Just a temp holder for an empty command, ignore it
         break;
       default:
-        logentry(QStringLiteral("Illegal char hit in renum_zone_table"), 0, DC::LogChannel::LOG_WORLD);
+        logentry(QStringLiteral("Illegal character hit in renum_zone_table"), 0, DC::LogChannel::LOG_WORLD);
         break;
       }
     }
@@ -2301,9 +2301,9 @@ zone_t DC::read_one_zone(FILE *fl)
 {
   static room_t last_top_vnum = {};
   zone_commands_t reset_tab;
-  char *check, buf[161], ch;
+  QString check, buf[161], ch;
   qint32 reset_top, i, tmp;
-  char *skipper = {};
+  QString skipper = {};
   qint32 version = 1;
   bool modified = false;
 
@@ -2466,7 +2466,7 @@ void DC::boot_zones(void)
   FILE *fl;
   FILE *flZoneIndex;
   QString temp;
-  char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
+  QString endfile;
 
   DC::config &cf = DC::getInstance()->cf;
 
@@ -2528,11 +2528,11 @@ void DC::boot_zones(void)
 /* read a mobile from MOB_FILE */
 CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
 {
-  char buf[200];
+  QString buf;
   qint32 i, j;
   qint32 tmp, tmp2, tmp3;
   CharacterPtr mob;
-  char letter;
+  QChar letter;
 
   i = nr;
 
@@ -2578,7 +2578,7 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
   mob->alignment = fread_int(fl, -2147483467, 2147483467);
 
   tmp = fread_int(fl, 0, MAX_RACE);
-  mob->race = (char)tmp;
+  mob->race = (QChar)tmp;
 
   mob->raw_str = mob->str = BASE_STAT + mob_race_mod[mob->race][0];
   mob->raw_dex = mob->dex = BASE_STAT + mob_race_mod[mob->race][1];
@@ -3050,7 +3050,7 @@ void handle_automatic_mob_settings(CharacterPtr mob)
   if (mob->getLevel() > 110)
     return;
   qint32 baselevel = mob->getLevel();
-  float alevel = (float)mob->getLevel();
+  qreal alevel = (qreal)mob->getLevel();
 
   qint32 percent = number(-3, 3);
 
@@ -3172,7 +3172,7 @@ void handle_automatic_mob_settings(CharacterPtr mob)
     mob->setGold(mob_matrix[baselevel].gold + number(0 - (mob_matrix[baselevel].gold / 10), mob_matrix[baselevel].gold / 10));
   mob->exp = mob_matrix[baselevel].experience + ((mob_matrix[baselevel].experience / 100) * percent);
 
-  mob->alignment = (qint32)((float)mob->alignment * (1 + (((float)number(0, 30) - 15) / 100)));
+  mob->alignment = (qint32)((qreal)mob->alignment * (1 + (((qreal)number(0, 30) - 15) / 100)));
 
   qint32 temp = mob->immune;
   for (; temp; temp <<= 1)
@@ -3227,7 +3227,7 @@ CharacterPtr DC::clone_mobile(qint32 nr)
   mob->next_in_room = {};
 
   handle_automatic_mob_settings(mob);
-  float mult = 1.0;
+  qreal mult = 1.0;
   if (!ISSET(mob->mobdata->actflags, ACT_NOMATRIX))
   {
     if (mob->getLevel() > 100)
@@ -3813,7 +3813,7 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
 {
   qint32 loc, mod;
 
-  char chk;
+  QChar chk;
   extra_descr_data *new_new_descr;
 
   if (nr < 0)
@@ -3830,7 +3830,7 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
   // read it, add it to the hsh table, free it
   // that way, we only have one copy of it in memory at any time
   obj->name(fread_string(fl, 1));
-  char *tmpptr;
+  QString tmpptr;
 
   tmpptr = fread_string(fl, 1);
 
@@ -3885,7 +3885,7 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
   /* *** other flags *** */
 
   fscanf(fl, "%c\n", &chk);
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   while (chk != 'S')
   {
     switch (chk)
@@ -3959,7 +3959,7 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
 {
   qint32 loc, mod, nr;
 
-  char chk, c;
+  QChar chk, c;
   extra_descr_data *new_new_descr;
 
   if (obj == nullptr)
@@ -4012,7 +4012,7 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
 
   in >> chk;
 
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   while (chk != 'S')
   {
     switch (chk)
@@ -4192,7 +4192,7 @@ QString quotequotes(QString s1)
   return s1;
 }
 
-QString quotequotes(const char *str)
+QString quotequotes(const QString str)
 {
   QString s1(str);
 
@@ -4237,7 +4237,7 @@ void write_bitvector_csv(quint32 vector, QStringList names, std::ofstream &fout)
   }
 }
 
-void write_bitvector_csv(quint32 vector, const char *const *array, std::ofstream &fout)
+void write_bitvector_csv(quint32 vector, const QStringList array, std::ofstream &fout)
 {
   qint32 nr = {};
   while (*array[nr] != '\n')
@@ -4276,7 +4276,7 @@ void write_object_csv(ObjectPtr obj, std::ofstream &fout)
     write_bitvector_csv(obj->obj_flags.extra_flags, Object::extra_bits, fout);
     write_bitvector_csv(obj->obj_flags.more_flags, Object::more_obj_bits, fout);
 
-    char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+    QString buf, buf2[MAX_STRING_LENGTH];
     for (qint32 i = {}; i < obj->num_affects; i++)
     {
       if (obj->affected[i].location < 1000)
@@ -4602,8 +4602,8 @@ void Zone::reset(ResetType reset_type)
   ObjectPtr obj, obj_to;
   last_cmd = last_mob = last_obj = last_percent = -1;
 
-  char buf[MAX_STRING_LENGTH];
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString buf;
+  QString log_buf = {};
 
   if (died_this_tick == 0 && isEmpty())
   {
@@ -4742,7 +4742,7 @@ void Zone::reset(ResetType reset_type)
         }
         break;
 
-      case 'G': /* obj_to_char */
+      case 'G': /* object to character */
         if (mob == nullptr)
         {
           // sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_, reset_cmd_index + 1);
@@ -5079,7 +5079,7 @@ QString fread_qstring(QTextStream &stream, bool *ok)
 
 QString fread_qstring(FILE *stream, bool *ok)
 {
-  char *lineptr = {};
+  QString lineptr = {};
   size_t n = {};
 
   ssize_t bytes_read = getdelim(&lineptr, &n, '~', stream);
@@ -5094,12 +5094,12 @@ QString fread_qstring(FILE *stream, bool *ok)
 }
 
 /* read and allocate space for a '~'-terminated string from a given file */
-char *fread_string(FILE *fl, qint32 hasher)
+QString fread_string(FILE *fl, qint32 hasher)
 {
-  char buf[MAX_STRING_LENGTH] = {};
-  char *pAlloc = {};
-  char *pBufLast = {};
-  char *temp = {};
+  QString buf = {};
+  QString pAlloc = {};
+  QString pBufLast = {};
+  QString temp = {};
 
   for (pBufLast = buf; pBufLast < &buf[MAX_STRING_LENGTH - 2];)
   {
@@ -5134,7 +5134,7 @@ char *fread_string(FILE *fl, qint32 hasher)
       {
         *pBufLast++ = '\0';
 
-        pAlloc = new char[pBufLast - buf];
+        pAlloc = {};
         memcpy(pAlloc, buf, pBufLast - buf);
         temp = QStringLiteral(pAlloc);
         pAlloc = {};
@@ -5143,12 +5143,12 @@ char *fread_string(FILE *fl, qint32 hasher)
       else
       {
         *pBufLast++ = '\0';
-        pAlloc = new char[pBufLast - buf];
+        pAlloc = {};
         memcpy(pAlloc, buf, pBufLast - buf);
       }
       return pAlloc;
       // end of ~ case
-    case (char)EOF:
+    case (QChar)EOF:
       perror("fread_string: EOF");
       throw error_eof();
       break;
@@ -5168,13 +5168,13 @@ QString fread_word(QTextStream &fl)
 }
 
 /* read and allocate space for a whitespace-terminated QString from a given file */
-char *fread_word(FILE *fl, qint32 hasher)
+QString fread_word(FILE *fl, qint32 hasher)
 {
-  char buf[MAX_STRING_LENGTH];
-  char *pAlloc;
-  char *pBufLast;
-  char *temp;
-  char tmp;
+  QString buf;
+  QString pAlloc;
+  QString pBufLast;
+  QString temp;
+  QChar tmp;
   while ((tmp = getc(fl)) == ' ')
     ;
   ungetc(tmp, fl);
@@ -5188,7 +5188,7 @@ char *fread_word(FILE *fl, qint32 hasher)
       pBufLast++;
       break;
 
-    case (char)EOF:
+    case (QChar)EOF:
       perror("fread_word: EOF");
       abort();
       break;
@@ -5206,16 +5206,15 @@ char *fread_word(FILE *fl, qint32 hasher)
       else if (hasher)
       {
         *pBufLast++ = '\0';
-        pAlloc = new char[pBufLast - buf];
+        pAlloc = {};
         memcpy(pAlloc, buf, pBufLast - buf);
         temp = QStringLiteral(pAlloc);
-        delete[] pAlloc;
         pAlloc = temp;
       }
       else
       {
         *pBufLast++ = '\0';
-        pAlloc = new char[pBufLast - buf];
+        pAlloc = {};
         memcpy(pAlloc, buf, pBufLast - buf);
       }
       return pAlloc;
@@ -5234,7 +5233,7 @@ char *fread_word(FILE *fl, qint32 hasher)
 
 qint32 fread_bitvector(FILE *fl, qint32 beg_range, qint32 end_range)
 {
-  char buf[200];
+  QString buf;
   qint32 ch;
   qint32 i = {};
 
@@ -5255,7 +5254,7 @@ qint32 fread_bitvector(FILE *fl, qint32 beg_range, qint32 end_range)
   // check if we're dealing with numbers, or letters
   if (isdigit(ch) || ch == '-')
   {
-    // It's a digit, so put the char back and let fread_int handle it
+    // It's a digit, so put the chararacter back and let fread_int handle it
     ungetc(ch, fl);
     return fread_int(fl, beg_range, end_range);
   }
@@ -5319,7 +5318,7 @@ qint32 fread_bitvector(std::ifstream &in, qint32 beg_range, qint32 end_range)
     // check if we're dealing with numbers, or letters
     if (isdigit(ch) || ch == '-')
     {
-      // It's a digit, so put the char back and let fread_int handle it
+      // It's a digit, so put the character back and let fread_int handle it
       in.unget();
       qint32 n = fread_int(in, beg_range, end_range);
       in.exceptions(orig_exceptions);
@@ -5368,8 +5367,8 @@ qint32 fread_bitvector(std::ifstream &in, qint32 beg_range, qint32 end_range)
 
 quint64 fread_uint(FILE *fl, quint64 beg_range, quint64 end_range)
 {
-  char buf[MAX_STRING_LENGTH];
-  char *pBufLast;
+  QString buf;
+  QString pBufLast;
   qint32 ch;
   quint64 i;
 
@@ -5431,7 +5430,7 @@ quint64 fread_uint(FILE *fl, quint64 beg_range, quint64 end_range)
       }
       break;
 
-    case (char)EOF:
+    case (QChar)EOF:
       perror("fread_int: EOF");
       abort();
       break;
@@ -5464,13 +5463,13 @@ qint64 fread_int(std::ifstream &in, qint64 beg_range, qint64 end_range)
 
 /*
  fread_int has the nasty habit of reading on white
- space char after the qint32 it reads.  This can goof
+ space character after the qint32 it reads.  This can goof
  up stuff like comments in the zone file.
  */
 qint64 fread_int(FILE *fl, qint64 beg_range, qint64 end_range)
 {
-  char buf[MAX_STRING_LENGTH];
-  char *pBufLast;
+  QString buf;
+  QString pBufLast;
   qint32 ch;
   qint64 i;
 
@@ -5540,7 +5539,7 @@ qint64 fread_int(FILE *fl, qint64 beg_range, qint64 end_range)
       }
       break;
 
-    case (char)EOF:
+    case (QChar)EOF:
       perror("fread_int: EOF");
       abort();
       break;
@@ -5552,7 +5551,7 @@ qint64 fread_int(FILE *fl, qint64 beg_range, qint64 end_range)
   return (0);
 }
 
-char fread_char(QTextStream &fl)
+QChar fread_char(QTextStream &fl)
 {
 
   if (fl.atEnd())
@@ -5562,13 +5561,13 @@ char fread_char(QTextStream &fl)
     abort();
   }
 
-  char c;
+  QChar c;
   fl >> c;
 
   return c;
 }
 
-char fread_char(FILE *fl)
+QChar fread_char(FILE *fl)
 {
   qint32 ch;
 
@@ -5588,7 +5587,7 @@ char fread_char(FILE *fl)
   return ch;
 }
 
-/* release memory allocated for a char  */
+/* release memory allocated for a character  */
 void free_char(CharacterPtr ch, Trace trace)
 {
   qint32 iWear;
@@ -5623,7 +5622,7 @@ void free_char(CharacterPtr ch, Trace trace)
   {
     if (ch->player)
     {
-      // these won't be here if you free an unloaded char
+      // these won't be here if you free an unloaded character
       ch->player->skillchange = {};
       if (!ch->player->ignoring.empty())
         ch->player->ignoring.clear();
@@ -5691,10 +5690,10 @@ void free_obj(ObjectPtr obj)
 }
 
 /* read contents of a text file, and place in buf */
-qint32 file_to_string(const char *name, char *buf)
+qint32 file_to_string(const QString name, QString buf)
 {
   FILE *fl;
-  char tmp[100];
+  QString tmp;
 
   *buf = '\0';
 
@@ -5730,7 +5729,7 @@ qint32 file_to_string(const char *name, char *buf)
   return (0);
 }
 
-/* clear some of the the working variables of a char */
+/* clear some of the the working variables of a chararacter */
 void reset_char(CharacterPtr ch)
 {
   qint32 i;
@@ -6072,7 +6071,7 @@ qint32 real_object(qint32 virt)
  |  db, I'm going to put them here.
  | -- morc
  */
-qint32 obj_in_index(char *name, qint32 index)
+qint32 obj_in_index(QString name, qint32 index)
 {
   qint32 i, j;
 
@@ -6089,7 +6088,7 @@ qint32 obj_in_index(char *name, qint32 index)
   return -1;
 }
 
-qint32 mob_in_index(char *name, qint32 index)
+qint32 mob_in_index(QString name, qint32 index)
 {
   qint32 i, j;
 
@@ -6164,12 +6163,12 @@ qint32 mprog_name_to_type(QString name)
 
 /* This routine reads in scripts of MOBprograms from a file */
 
-void mprog_file_read(char *f, qint32 i)
+void mprog_file_read(QString f, qint32 i)
 {
   mob_prog_data *mprog = {};
   FILE *fp = {};
-  char letter = {};
-  char name[128] = {};
+  QChar letter = {};
+  QString name = {};
   qint32 type = {};
 
   sprintf(name, "%s%s", MOB_DIR, f);
@@ -6209,7 +6208,7 @@ void mprog_file_read(char *f, qint32 i)
 
 void load_mobprogs(FILE *fp)
 {
-  char letter;
+  QChar letter;
   qint32 value;
 
   for (;;)
@@ -6237,7 +6236,7 @@ void load_mobprogs(FILE *fp)
 void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
 {
   mob_prog_data *mprog = {};
-  char letter;
+  QChar letter;
   qint32 type;
   mob_prog_data lmprog;
   for (;;)
@@ -6246,7 +6245,7 @@ void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
       break;
     else if (letter != '>' && letter != '\\')
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG char", i);
+      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG character", i);
       ungetc(letter, fp);
       return;
     }
@@ -6297,7 +6296,7 @@ void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
 void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
 {
   mob_prog_data *mprog = {};
-  char letter = {};
+  QChar letter = {};
   qint32 type = {};
   mob_prog_data lmprog = {};
   for (;;)
@@ -6310,7 +6309,7 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
     }
     else if (letter != '>' && letter != '\\')
     {
-      logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG char").arg(i));
+      logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG character").arg(i));
       return;
     }
     QString word = fread_word(fp);

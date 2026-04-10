@@ -274,7 +274,7 @@ void get_instrument_bonus(CharacterPtr ch, qint32 &comb, qint32 &non_comb)
   non_comb = ch->equipment[WEAR_HOLD]->obj_flags.value[0];
 }
 
-qint32 do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->isPlayer() && GET_CLASS(ch) != CLASS_BARD && !ch->isImmortalPlayer())
   {
@@ -1046,7 +1046,7 @@ qint32 song_whistle_sharp(quint8 level, CharacterPtr ch, QString arg, CharacterP
     dam /= 2;
   }
 
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   strcpy(buf, victim->short_desc);
 
   retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_WHISTLE_SHARP);
@@ -1141,7 +1141,7 @@ qint32 execute_song_healing_melody(quint8 level, CharacterPtr ch, QString arg, C
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -1175,7 +1175,7 @@ qint32 execute_song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg
 {
   CharacterPtr i;
   Room *room;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   QStringList direction = {
       "to the North",
       "to the East",
@@ -1246,7 +1246,7 @@ qint32 execute_song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*k).song_number).toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*k).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -1280,7 +1280,7 @@ qint32 execute_song_note_of_knowledge(quint8 level, CharacterPtr ch, QString arg
   ObjectPtr obj = {};
   CharacterPtr vict = {};
   ObjectPtr corpse = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1362,7 +1362,7 @@ qint32 execute_song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, Ch
     act("You resist $n's terrible clef!", ch, nullptr, victim, TO_VICT, 0);
     dam /= 2;
   }
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   strcpy(buf, victim->short_desc);
   retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_TERRIBLE_CLEF);
   if (isSet(retval, ReturnValue::eCH_DIED))
@@ -1384,7 +1384,7 @@ qint32 execute_song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, Ch
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names[(*i).song_number].toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names[(*i).song_number].toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -1396,7 +1396,7 @@ qint32 execute_song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, Ch
 
 qint32 song_listsongs(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
-  char buf[200];
+  QString buf;
 
   ch->sendln("Available Songs\r\n---------------");
   for (qsizetype i = {}; i < Character::song_names.length(); i++)
@@ -1428,7 +1428,7 @@ qint32 song_soothing_remembrance(quint8 level, CharacterPtr ch, QString arg, Cha
 qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   qint32 heal = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1481,7 +1481,7 @@ qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString 
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -1515,7 +1515,7 @@ qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, 
 {
   qint32 heal;
   affected_type af;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   qint32 combat, non_combat;
   get_instrument_bonus(ch, combat, non_combat);
@@ -1579,7 +1579,7 @@ qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, 
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -1775,7 +1775,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
           ch->sendln("You don't posses the energy to travel that far.");
           GET_KI(ch) += use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
 
-          // free our stored char name
+          // free our stored character name
           if ((*i).song_data)
           {
             (*i).song_data = {};
@@ -1807,7 +1807,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
     }
   }
 
-  // free our stored char name
+  // free our stored character name
   if ((*i).song_data)
   {
     (*i).song_data = {};
@@ -2117,7 +2117,7 @@ qint32 song_searching_song(quint8 level, CharacterPtr ch, QString arg, Character
 
   (*i).song_timer = song_info[(*i).song_number].beats();
 
-  // store the char name here, cause A, we don't pass tar_char
+  // store the character name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
   (*i).song_data = (arg);
 
@@ -2127,7 +2127,7 @@ qint32 song_searching_song(quint8 level, CharacterPtr ch, QString arg, Character
 qint32 execute_song_searching_song(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   CharacterPtr target = {};
-  char buf[200];
+  QString buf;
   QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2208,7 +2208,7 @@ qint32 song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, Characte
   return ReturnValue::eSUCCESS;
 }
 
-qint32 song_fanatical_fanfare(quint8 level, CharacterPtr ch, char *Aag, CharacterPtr victim, qint32 skill)
+qint32 song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString Aag, CharacterPtr victim, qint32 skill)
 {
   QList<songInfo>::iterator i;
 
@@ -2223,7 +2223,7 @@ qint32 song_fanatical_fanfare(quint8 level, CharacterPtr ch, char *Aag, Characte
 
   return ReturnValue::eSUCCESS;
 }
-qint32 song_summon_song(quint8 level, CharacterPtr ch, char *Aag, CharacterPtr victim, qint32 skill)
+qint32 song_summon_song(quint8 level, CharacterPtr ch, QString Aag, CharacterPtr victim, qint32 skill)
 {
   QList<songInfo>::iterator i;
 
@@ -2261,7 +2261,7 @@ qint32 execute_song_summon_song(quint8 level, CharacterPtr ch, QString arg, Char
   }
   return ReturnValue::eSUCCESS;
 }
-qint32 song_mking_charge(quint8 level, CharacterPtr ch, char *Aag, CharacterPtr victim, qint32 skill)
+qint32 song_mking_charge(quint8 level, CharacterPtr ch, QString Aag, CharacterPtr victim, qint32 skill)
 {
   QList<songInfo>::iterator i;
 
@@ -2335,7 +2335,7 @@ qint32 execute_song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, 
   {
     (*i).song_timer = -1;
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -2472,7 +2472,7 @@ qint32 execute_song_mking_charge(quint8 level, CharacterPtr ch, QString arg, Cha
   {
     (*i).song_timer = -1;
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -2737,7 +2737,7 @@ qint32 execute_song_bountiful_sonnet(quint8 level, CharacterPtr ch, QString arg,
 qint32 execute_song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   CharacterPtr target = {};
-  // char buf[400];
+  // QString buf;
   QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2852,7 +2852,7 @@ qint32 song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg, Charac
   if ((*i).song_timer < 1)
     (*i).song_timer = 1;
 
-  // store the char name here, cause A, we don't pass tar_char
+  // store the character name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
   (*i).song_data = (arg);
 
@@ -2874,7 +2874,7 @@ qint32 song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg, Charac
   if ((*i).song_timer < 1)
     (*i).song_timer = 1;
 
-  // store the char name here, cause A, we don't pass tar_char
+  // store the character name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
   (*i).song_data = (arg);
 
@@ -2884,7 +2884,7 @@ qint32 song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg, Charac
 qint32 execute_song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, qint32 skill)
 {
   CharacterPtr target = {};
-  char buf[400];
+  QString buf;
   QList<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2972,7 +2972,7 @@ qint32 song_sticky_lullaby(quint8 level, CharacterPtr ch, QString arg, Character
   if (ch->getLevel() < 40)
     (*i).song_timer += 2;
 
-  // store the char name here, cause A, we don't pass tar_char
+  // store the character name here, cause A, we don't pass tar_char
   // and B, there's no place to save it before we execute
   (*i).song_data = (arg);
 
@@ -3102,7 +3102,7 @@ qint32 execute_song_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, C
   {
     (*i).song_timer = -1;
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
@@ -3167,7 +3167,7 @@ void make_person_dance(CharacterPtr ch)
                         "\n"};
 
   qint32 numdances = 5;
-  char dothis[50];
+  QString dothis;
 
   strcpy(dothis, dances[number(0, numdances)]);
 
@@ -3269,9 +3269,9 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
   dam = ((ch->has_skill(SKILL_SONG_CRUSHING_CRESCENDO)) + 25);
   for (j = {}; j < (qint64)(*i).song_data; j++)
     dam = dam * 2;
-  dam += combat * 5;                                     // Make it hurt some more.
-                                                         //   if ((qint32)(*i).song_data < 3) // Doesn't help beyond that.
-  (*i).song_data = (char *)((qint64)(*i).song_data + 1); // Add one round.
+  dam += combat * 5;                             // Make it hurt some more.
+                                                 //   if ((qint32)(*i).song_data < 3) // Doesn't help beyond that.
+  (*i).song_data = ((qint64)(*i).song_data + 1); // Add one round.
   // Bleh, C allows easier pointer manipulation
   if (isSet(victim->immune, ISR_SONG))
   {
@@ -3288,7 +3288,7 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
       act("You resist $n's crushing crescendo!", ch, nullptr, victim, TO_VICT, 0);
       dam /= 2;
     }
-    char dmgmsg[MAX_STRING_LENGTH];
+    QString dmgmsg;
     sprintf(dmgmsg, "$B%d$R", dam);
     switch ((qint64)(*i).song_data)
     {
@@ -3324,7 +3324,7 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
   }
 
   bool ispc = victim->isPlayer();
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   strcpy(buf, victim->short_desc);
 
   retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_CRUSHING_CRESCENDO);
@@ -3333,7 +3333,7 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
 
   if (isSet(retval, ReturnValue::eVICT_DIED))
   {
-    char buf2[MAX_STRING_LENGTH];
+    QString buf2;
     sprintf(buf2, "$n's crushing crescendo has completely crushed %s and they are no more.", buf);
     act(buf2, ch, nullptr, victim, TO_ROOM, NOTVICT);
     if (ispc)

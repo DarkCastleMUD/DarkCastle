@@ -355,11 +355,11 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char inout[100], buf[100];
+  QString inout, buf[100];
   qint32 ctr, nope;
-  char _convert[2];
+  QString _convert;
 
   if (ch->isNonPlayer())
   {
@@ -457,9 +457,9 @@ qint32 do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_at(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
+  QString command, loc_str[MAX_INPUT_LENGTH];
   qint32 loc_nr, location, original_loc;
   CharacterPtr target_mob;
   ObjectPtr target_obj;
@@ -529,10 +529,10 @@ qint32 do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char buf[200];
+  QString buf;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -563,7 +563,7 @@ qint32 do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -586,9 +586,9 @@ qint32 do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[200];
+  QString buf;
 
   qint32 arg1;
 
@@ -623,7 +623,7 @@ qint32 do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -733,7 +733,7 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
@@ -774,14 +774,14 @@ qint32 do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
       if (amt > max)
       {
         ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        QString buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
         free(buffer);
       }
       else
       {
         ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        QString buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
         free(buffer);
       }
@@ -790,9 +790,9 @@ qint32 do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   argument = one_argument(argument, arg);
   CharacterPtr vict;
 
@@ -801,7 +801,7 @@ qint32 do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Target not found.");
     return ReturnValue::eFAILURE;
   }
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   buf[0] = '\0';
   tempvariable *eh;
   for (eh = vict->tempVariable; eh; eh = eh->next)

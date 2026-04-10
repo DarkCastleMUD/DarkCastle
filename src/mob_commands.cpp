@@ -95,7 +95,7 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
 
 /* prints the argument to all the rooms aroud the mobile */
 
-qint32 do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   qint32 was_in_room;
@@ -134,9 +134,9 @@ qint32 do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* lets the mobile kill any player or mobile without murder*/
 
-qint32 do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   CharacterPtr victim;
 
   if (ch->isPlayer())
@@ -180,9 +180,9 @@ qint32 do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-qint32 do_mphit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mphit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   CharacterPtr victim;
 
   if (ch->isPlayer())
@@ -226,10 +226,10 @@ qint32 do_mphit(CharacterPtr ch, QString argument, cmd_t cmd)
   return one_hit(ch, victim, TYPE_UNDEFINED, WEAR_WIELD);
 }
 
-qint32 do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg;
+  QString arg1;
   CharacterPtr victim;
 
   if (ch->isPlayer())
@@ -265,13 +265,13 @@ qint32 do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
    it can also destroy a worn object and it can destroy
    just plain everything  */
 
-qint32 do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   ObjectPtr obj;
   qint32 location;
   bool dot = false;
-  char dotbuf[MAX_INPUT_LENGTH];
+  QString dotbuf;
   if (ch->isPlayer())
   {
     ch->sendln("Huh?");
@@ -323,9 +323,9 @@ qint32 do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* prints the message to everyone in the room other than the mob and victim */
 
-qint32 do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   CharacterPtr victim;
 
   if (ch->isPlayer())
@@ -352,9 +352,9 @@ qint32 do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
+  QString arg, arg1[MAX_INPUT_LENGTH];
   CharacterPtr victim, victim2;
 
   if (ch->isPlayer())
@@ -389,9 +389,9 @@ qint32 do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* prints the message to only the victim */
 
-qint32 do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   CharacterPtr victim;
 
   if (ch->isPlayer())
@@ -420,7 +420,7 @@ qint32 do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* prints the message to the room at large */
 
-qint32 do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -442,9 +442,9 @@ qint32 do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
 are loaded into inventory.  you can specify a level with
 the load object portion as well. */
 
-qint32 do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   qint32 realnum;
   CharacterPtr victim;
 
@@ -476,11 +476,11 @@ qint32 do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
-  char arg1[MAX_INPUT_LENGTH] = {0};
-  char arg2[MAX_INPUT_LENGTH] = {0};
+  QString arg1 = {0};
+  QString arg2 = {0};
   ObjectPtr obj;
   qint32 realnum;
 
@@ -533,9 +533,9 @@ qint32 do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
    itself, but this had best be the last command in the MOBprogram
    otherwise ugly stuff will happen */
 
-qint32 do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   CharacterPtr victim;
   ObjectPtr obj;
 
@@ -618,9 +618,9 @@ qint32 do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* lets the mobile goto any location it wishes that is not private */
 
-qint32 do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   qint32 location = -1;
 
   if (ch->isPlayer())
@@ -703,9 +703,9 @@ qint32 do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* lets the mobile do a command at another location. Very useful */
 
-qint32 do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   qint32 location;
   qint32 original;
   qint32 result;
@@ -769,10 +769,10 @@ qint32 do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // Reward the player with some XP
 // Also works with -xp to penalize
-qint32 do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
+  QString arg;
+  QString buf;
   qint32 reward;
   CharacterPtr vict;
 
@@ -812,10 +812,10 @@ qint32 do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
 /* lets the mobile transfer people.  the all argument transfers
    everyone in the current room to the specified location */
 
-qint32 do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
+  QString arg1;
+  QString arg2;
   qint32 location;
   Connection *d;
   CharacterPtr victim;
@@ -840,7 +840,7 @@ qint32 do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (conn->connected == Connection::states::PLAYING && conn->character != ch && conn->character->in_room == ch->in_room && CAN_SEE(ch, conn->character))
       {
-        char buf[MAX_STRING_LENGTH];
+        QString buf;
         sprintf(buf, "%s %s", qPrintable(conn->character->name()), arg2);
         do_mptransfer(ch, buf, cmd);
       }
@@ -897,9 +897,9 @@ qint32 do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
 /* lets the mobile force someone to do something.  must be mortal level
    and the all argument only affects those in the room with the mobile */
 
-qint32 do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
 
   if (ch->isPlayer())
   {
@@ -960,17 +960,17 @@ qint32 do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
 // "Throw" a message to another mob.  Right now, it's only an qint32 specifying which
 // 'catch' should handle it
 // argument should be <mob> <catchnum> <delay>
-qint32 do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 mob_num;
   qint32 catch_num;
   qint32 delay;
 
-  char first[MAX_INPUT_LENGTH];
-  char second[MAX_INPUT_LENGTH];
-  char third[MAX_INPUT_LENGTH];
-  char fourth[MAX_INPUT_LENGTH];
-  char fifth[MAX_INPUT_LENGTH];
+  QString first;
+  QString second;
+  QString third;
+  QString fourth;
+  QString fifth;
   // locate and validate argument to find target
   argument = one_argument(argument, first);
   argument = one_argument(argument, second);
@@ -1036,10 +1036,10 @@ qint32 do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
-  char skill[MAX_INPUT_LENGTH];
+  QString arg;
+  QString skill;
 
   if (ch->isPlayer())
   {
@@ -1113,9 +1113,9 @@ qint32 do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 determine_attack_type(char *attacktype)
+qint32 determine_attack_type(QString attacktype)
 {
-  extern char *strs_damage_types[];
+  extern QStringList strs_damage_types;
 
   for (qint32 i = 10; *strs_damage_types[i] != '\n'; i++)
     if (!strcmp(strs_damage_types[i], attacktype))
@@ -1206,10 +1206,10 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
+  QString arg, align[MAX_INPUT_LENGTH];
   if (ch->isPlayer())
   {
     ch->sendln("Huh?");
@@ -1233,7 +1233,7 @@ class damage_list
 {
 public:
   damage_list *next;
-  char name[512];
+  QString name;
   qint32 damage; // Damage #
 };
 
@@ -1272,12 +1272,12 @@ void add_dmg(CharacterPtr ch, qint32 dmg)
   dmg_list = c;
 }
 
-qint32 do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
-  char temp[MAX_INPUT_LENGTH];
-  char damroll[MAX_INPUT_LENGTH];
-  char attacktype[MAX_INPUT_LENGTH];
+  QString arg;
+  QString temp;
+  QString damroll;
+  QString attacktype;
   qint32 hitpoints = {};
 
   free_dmg_list();
@@ -1320,7 +1320,7 @@ qint32 do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
     qint32 numdice, sizedice;
     numdice = sizedice = {};
     bool perc = true;
-    char t, l, o;
+    QChar t, l, o;
     qint32 plus = {};
     bool plusPerc = true;
 
@@ -1484,16 +1484,16 @@ qint32 do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 mob_num;
   qint32 catch_num;
   qint32 delay;
 
-  char first[MAX_INPUT_LENGTH];
-  char second[MAX_INPUT_LENGTH];
-  char third[MAX_INPUT_LENGTH];
-  char fourth[MAX_INPUT_LENGTH];
+  QString first;
+  QString second;
+  QString third;
+  QString fourth;
   // locate and validate argument to find target
   argument = one_argument(argument, first);
   argument = one_argument(argument, second);
@@ -1567,9 +1567,9 @@ qint32 skill_aff[] =
         SPELL_KNOW_ALIGNMENT, 0, SPELL_WATER_BREATHING, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-qint32 do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
+  QString arg, arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
   CharacterPtr victim, owner = {};
   if (ch->isPlayer())
@@ -1658,7 +1658,7 @@ qint32 do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // simulate a pause in proc execution
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
-qint32 do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1666,8 +1666,8 @@ qint32 do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   qint32 delay;
-  char first[MAX_INPUT_LENGTH];
-  char second[MAX_INPUT_LENGTH];
+  QString first;
+  QString second;
 
   argument = one_argument(argument, first);
   mprog_throw_type *throwitem{};
@@ -1723,9 +1723,9 @@ qint32 do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
   throwitem->vo = activeVo;
   throwitem->rndm = activeRndm;
 
-  extern char *activeProg;
-  extern char *activePos;
-  extern char *activeProgTmpBuf;
+  extern QString activeProg;
+  extern QString activePos;
+  extern QString activeProgTmpBuf;
   throwitem->orig = (activeProg);
 
   extern qint32 cIfs[256];
@@ -1742,10 +1742,10 @@ qint32 do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS | ReturnValue::eDELAYED_EXEC;
 }
 
-qint32 do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+  QString person, type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   room_t to_room = {};
 
   if (ch->isPlayer() && ch->getLevel() < 110)
@@ -1824,14 +1824,14 @@ qint32 do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
     ch->sendln("Huh?");
     return ReturnValue::eSUCCESS;
   }
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   argument = one_argument(argument, arg);
 
   CharacterPtr rch, vict = {};
@@ -1860,7 +1860,7 @@ qint32 do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1873,7 +1873,7 @@ qint32 do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd)
           "true",
           "false",
           "\n"};
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   one_argument(argument, arg);
   qint32 retval = ReturnValue::eSUCCESS;
 
@@ -1885,10 +1885,10 @@ qint32 do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // Yes, I'm sure there's a better way to do this. Stop whining.
-qint32 process_math(CharacterPtr ch, char *string)
+qint32 process_math(CharacterPtr ch, QString string)
 {
   qint32 result = 0, curr = {};
-  char lastsign = '\0';
+  QChar lastsign = '\0';
   bool numproc = false;
   if (!string)
     return -9839;
@@ -1954,22 +1954,22 @@ qint32 process_math(CharacterPtr ch, char *string)
 }
 
 // Unreadable code > you
-char *expand_data(CharacterPtr ch, char *orig)
+QString expand_data(CharacterPtr ch, QString orig)
 {
-  static char buf[MAX_STRING_LENGTH];
-  char buf1[MAX_STRING_LENGTH];
+  static QString buf;
+  QString buf1;
   while (*orig == ' ')
     orig++;
   strcpy(buf1, orig);
   orig = &buf1[0];
   buf[0] = '\0';
-  char *ptr;
+  QString ptr;
   qint32 i = 0, l, r, z = 0, o;
-  char c;
+  QChar c;
   while (1)
   {
-    char left[MAX_INPUT_LENGTH];
-    char right[MAX_INPUT_LENGTH];
+    QString left;
+    QString right;
     ptr = strchr(orig, '.');
     if (ptr == orig)
       break;
@@ -2009,7 +2009,7 @@ char *expand_data(CharacterPtr ch, char *orig)
 
     qint16 *lvali = {};
     quint32 *lvalui = {};
-    char **lvalstr = {};
+    QString *lvalstr = {};
     QString lvalqstr;
     qint64 *lvali64 = {};
     quint64 *lvalui64 = {};
@@ -2029,7 +2029,7 @@ char *expand_data(CharacterPtr ch, char *orig)
       buf[i++] = *(orig + o);
     }
     buf[i] = '\0';
-    char tmp[MAX_INPUT_LENGTH];
+    QString tmp;
     if (lvali)
       sprintf(tmp, "%d", *lvali);
     if (lvalui)
@@ -2054,7 +2054,7 @@ char *expand_data(CharacterPtr ch, char *orig)
 const QStringList allowedData = {
     "hitpoints", "mana", "move", nullptr};
 
-qint32 do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -2067,10 +2067,10 @@ qint32 do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
   //  vict = get_pc("Urizen");
   //  if (vict) vict->send(QStringLiteral("{%1}\r\n").arg(arg));
 
-  char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
+  QString arg1;
+  QString arg2;
   arg = one_argument(arg, arg1);
-  char *r = {};
+  QString r = {};
 
   if ((r = strchr(arg1, '.')) != nullptr)
   {
@@ -2087,7 +2087,7 @@ qint32 do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
 
   qint16 *lvali = {};
   quint32 *lvalui = {};
-  char **lvalstr = {};
+  QString *lvalstr = {};
   QString lvalqstr;
   qint64 *lvali64 = {};
   quint64 *lvalui64 = {};
@@ -2115,7 +2115,7 @@ qint32 do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (lvalstr)
   {
-    char nw[MAX_INPUT_LENGTH];
+    QString nw;
     arg = one_argument(arg, nw);
     if (!nw[0])
     {
@@ -2131,7 +2131,7 @@ qint32 do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  char *fixed = expand_data(ch, arg);
+  QString fixed = expand_data(ch, arg);
 
   qint32 i = process_math(ch, fixed);
 

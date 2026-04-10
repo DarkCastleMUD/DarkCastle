@@ -71,10 +71,10 @@ qint32 charm_levels(CharacterPtr ch)
   return i;
 }
 
-qint32 do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim = {};
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
   {
@@ -119,11 +119,11 @@ qint32 do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
   CharacterPtr victim;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
 
   while (*arg == ' ')
     arg++;
@@ -245,11 +245,11 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 {
   qint32 x, y;
   qint32 retval, how_deep, learned;
-  char buf[300];
-  char race[40];
-  char sex[20];
-  char condition[60];
-  char weight[40];
+  QString buf;
+  QString race;
+  QString sex;
+  QString condition;
+  QString weight;
 
   CharacterPtr quarry;
   CharacterPtr tmp_ch = {}; // For checking room stuff
@@ -705,7 +705,7 @@ forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
      {28301, {36, 34, 32, 30}}},
 };
 
-qint32 do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 learned;
   ObjectPtr new_obj = {};
@@ -808,11 +808,11 @@ qint32 do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-/* this is sent the arrow char QString, and return the arrow type.
-   also, checks level to make sure char is high enough
+/* this is sent the arrow QString, and return the arrow type.
+   also, checks level to make sure character is high enough
    return 0 for failure */
 
-qint32 parse_arrow(CharacterPtr ch, char *arrow)
+qint32 parse_arrow(CharacterPtr ch, QString arrow)
 {
 
   if (GET_CLASS(ch) != CLASS_RANGER && ch->getLevel() < 100)
@@ -840,7 +840,7 @@ ObjectPtr find_arrow(ObjectPtr quiver)
 {
   ObjectPtr target;
 
-  ObjectPtr get_obj_in_list(char *, ObjectPtr);
+  ObjectPtr get_obj_in_list(QString, ObjectPtr);
 
   target = get_obj_in_list(QStringLiteral("arrow"), quiver->contains);
 
@@ -855,7 +855,7 @@ ObjectPtr find_arrow(ObjectPtr quiver)
 
 void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, qint32 dir, ObjectPtr found)
 {
-  char buf[200];
+  QString buf;
 
   switch (number(1, 6))
   {
@@ -1023,11 +1023,11 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
 }
 
 /* no need anymore
-qint32 do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
+command_return_t do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
                      qint32 dir, qint32 dam, qint32 artype,
                      ObjectPtr found)
 {
-  char buf[200];
+  QString buf;
   qint32 retval;
 
   void inform_victim(CharacterPtr , CharacterPtr , qint32);
@@ -1110,13 +1110,13 @@ qint32 do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
 }
 */
 
-qint32 do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   qint32 dam, dir = -1, artype, cost, retval, victroom;
   ObjectPtr found;
   quint32 cur_room, new_room = {};
-  char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH],
+  QString direct, arrow[MAX_STRING_LENGTH],
       target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH],
       buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
       victhshr[MAX_STRING_LENGTH];
@@ -1341,7 +1341,7 @@ qint32 do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
           victim = ch->get_char_room_vis(target);
         }
       }
-      /* put char back */
+      /* put chararacter back */
       char_from_room(ch, false);
       char_to_room(ch, cur_room);
     }
@@ -1588,7 +1588,7 @@ qint32 do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
       }
     }
 
-    char buffer[100];
+    QString buffer;
     if (!SOMEONE_DIED(retval))
     {
       switch (artype)
@@ -1702,9 +1702,9 @@ qint32 do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   return retval;
 }
 
-qint32 do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[1000];
+  QString buf;
   CharacterPtr target = {};
   //  qint32 learned, specialization;
 
@@ -1768,10 +1768,10 @@ void check_eq(CharacterPtr ch)
   }
 }
 
-qint32 do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 i;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   affected_type af, *cur;
 
   one_argument(arg, buf);

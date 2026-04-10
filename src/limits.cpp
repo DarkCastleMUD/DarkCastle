@@ -111,7 +111,7 @@ qint32 Character::mana_gain_lookup(void)
   {
     //    gain = graf(age().year, 2,3,4,6,7,8,9);
 
-    gain = (qint32)(this->max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
+    gain = (qint32)(this->max_mana * (qreal)mana_regens[GET_CLASS(this)] / 100);
     switch (GET_POS(this))
     {
     case position_t::SLEEPING:
@@ -153,7 +153,7 @@ qint32 Character::mana_gain_lookup(void)
   gain += MIN(age().year, 100) / 5;
   if (this->getLevel() < 50)
 
-    gain = (qint32)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+    gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
 
   if (this->mana_regen > 0)
     gain += this->mana_regen;
@@ -185,7 +185,7 @@ qint32 Character::hit_gain(position_t position, bool improve)
   /* PC's */
   else
   {
-    gain = (qint32)(this->max_hit * (float)hit_regens[GET_CLASS(this)] / 100);
+    gain = (qint32)(this->max_hit * (qreal)hit_regens[GET_CLASS(this)] / 100);
 
     /* Position calculations    */
 
@@ -213,10 +213,10 @@ qint32 Character::hit_gain(position_t position, bool improve)
 
     // con multiplier modifier 15 = 1.0  30 = 1.45 (.03 increments)
     /*    if(GET_CON(this) > 15)
-     gain = (qint32)(gain * ((float)1+ (.03 * (GET_CON(this) - 15.0))));
+     gain = (qint32)(gain * ((qreal)1+ (.03 * (GET_CON(this) - 15.0))));
 
      if(GET_CLASS(this) == CLASS_MAGIC_USER || GET_CLASS(this) == CLASS_CLERIC || GET_CLASS(this) == CLASS_DRUID)
-     gain = (qint32)((float)gain * 0.7);*/
+     gain = (qint32)((qreal)gain * 0.7);*/
 
     if (GET_CON(this) < 0)
       gain += con_app[0].hp_regen;
@@ -241,7 +241,7 @@ qint32 Character::hit_gain(position_t position, bool improve)
   if (this->hit_regen > 0)
     gain += this->hit_regen;
   if (this->getLevel() < 50)
-    gain = (qint32)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+    gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
 
   if (this->in_room >= 0)
     if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
@@ -306,7 +306,7 @@ qint32 Character::move_gain_lookup(qint32 extra)
     gain += 3 + learned / 10;
 
   if (this->getLevel() < 50)
-    gain = (qint32)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
+    gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
 
   if (this->in_room >= 0)
     if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
@@ -430,7 +430,7 @@ void advance_level(CharacterPtr ch, qint32 is_conversion)
   qint32 add_ki = {};
   qint32 add_practices;
   qint32 i;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   auto effective_level = MAX(ch->getLevel(), 1);
   auto effective_con = MAX(GET_CON(ch), 2);
@@ -818,7 +818,7 @@ void point_update(void)
 
 void update_corpses_and_portals(void)
 {
-  // char buf[256];
+  // QString buf;
   ObjectPtr j, next_thing;
   ObjectPtr jj, next_thing2;
   qint32 proc = {}; // Processed items. Debugging.

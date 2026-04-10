@@ -52,21 +52,21 @@
 
 /* extern variables */
 
-extern char credits[MAX_STRING_LENGTH];
-extern char info[MAX_STRING_LENGTH];
-extern char story[MAX_STRING_LENGTH];
+extern QString credits;
+extern QString info;
+extern QString story;
 extern QStringList where;
-extern char *color_liquid[];
+extern QStringList color_liquid;
 extern QStringList fullness;
-extern char *sky_look[];
-extern const char *temp_room_bits[];
+extern QStringList sky_look;
+extern const QStringList temp_room_bits;
 
 /* Used for "who" */
 extern qint32 max_who;
 
 /* extern functions */
 
-void page_string(class Connection *d, const char *str, qint32 keep_internal);
+void page_string(class Connection *d, const QString str, qint32 keep_internal);
 Clan *get_clan(CharacterPtr);
 extern qint32 getRealSpellDamage(CharacterPtr ch);
 
@@ -102,7 +102,7 @@ qint32 get_saves(CharacterPtr ch, qint32 savetype)
 
 /* Procedures related to 'look' */
 
-void argument_split_3(const QString argument, char *first_arg, char *second_arg, char *third_arg)
+void argument_split_3(const QString argument, QString first_arg, QString second_arg, QString third_arg)
 {
   qint32 look_at, begin;
   begin = {};
@@ -144,11 +144,11 @@ void argument_split_3(const QString argument, char *first_arg, char *second_arg,
   begin += look_at;
 }
 
-ObjectPtr Character::get_object_in_equip_vis(char *arg, ObjectPtr equipment[], qint32 *j, bool blindfighting)
+ObjectPtr Character::get_object_in_equip_vis(QString arg, ObjectPtr equipment[], qint32 *j, bool blindfighting)
 {
   qint32 k, num;
-  char tmpname[MAX_STRING_LENGTH];
-  char *tmp;
+  QString tmpname;
+  QString tmp;
 
   strcpy(tmpname, arg);
   tmp = tmpname;
@@ -168,7 +168,7 @@ ObjectPtr Character::get_object_in_equip_vis(char *arg, ObjectPtr equipment[], q
   return (0);
 }
 
-QString find_ex_description(char *word, extra_descr_data *list)
+QString find_ex_description(QString word, extra_descr_data *list)
 {
   extra_descr_data *i;
 
@@ -179,9 +179,9 @@ QString find_ex_description(char *word, extra_descr_data *list)
   return {};
 }
 
-const char *item_condition(ObjectPtr object)
+const QString item_condition(ObjectPtr object)
 {
-  qint32 percent = 100 - (qint32)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
+  qint32 percent = 100 - (qint32)(100 * ((qreal)eq_current_damage(object) / (qreal)eq_max_damage(object)));
 
   if (percent >= 100)
     return " [$B$2Excellent$R]";
@@ -201,8 +201,8 @@ const char *item_condition(ObjectPtr object)
 
 void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
 {
-  char buffer[MAX_STRING_LENGTH];
-  char flagbuf[MAX_STRING_LENGTH];
+  QString buffer;
+  QString flagbuf;
   qint32 found = {};
   //   qint32 percent;
 
@@ -306,7 +306,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
         object->obj_flags.type_flag == ITEM_LIGHT)
     {
       strcat(buffer, item_condition(object)); /*
-            percent = 100 - (qint32)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
+            percent = 100 - (qint32)(100 * ((qreal)eq_current_damage(object) / (qreal)eq_max_damage(object)));
 
             if (percent >= 100)
                strcat(buffer, " [$B$2Excellent$R]");
@@ -337,7 +337,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       }
       else
       {
-        char timebuffer[100];
+        QString timebuffer;
         snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
         strcat(buffer, timebuffer);
       }
@@ -353,7 +353,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       }
       else
       {
-        char timebuffer[101] = {};
+        QString timebuffer = {};
 
         snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
         strcat(buffer, timebuffer);
@@ -364,7 +364,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
     {
       if (object->obj_flags.timer)
       {
-        char timebuffer[101] = {};
+        QString timebuffer = {};
         snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->obj_flags.timer);
         strcat(buffer, timebuffer);
       }
@@ -384,7 +384,7 @@ void Character::list_obj_to_char(ObjectPtr list, qint32 mode, bool show)
   bool found = false;
   qint32 number = 1;
   qint32 can_see;
-  char buf[50];
+  QString buf;
 
   for (i = list; i; i = i->next_content)
   {
@@ -502,7 +502,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
 
     if (i->long_description().isEmpty() || (i->isNonPlayer() && (GET_POS(i) != i->mobdata->default_pos)))
     {
-      /* A char without long descr, or not in default pos. */
+      /* A character without long descr, or not in default pos. */
       if (i->isPlayer())
       {
         if (!i->desc)
@@ -887,7 +887,7 @@ void Character::list_char_to_char(CharacterPtr list, qint32 mode)
 }
 
 void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
-                                char *container)
+                                QString container)
 {
   ObjectPtr obj = {};
   ObjectPtr cont = {};
@@ -912,7 +912,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
     return;
   }
 
-  char buf[200];
+  QString buf;
   sprintf(buf, "You attempt to peek into the %s.\r\n", qPrintable(cont->short_description()));
   ch->send(buf);
 
@@ -995,7 +995,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     return false;
   }
 
-  char buf[MAX_STRING_LENGTH] = {0}, buf2[256] = {0};
+  QString buf = {0}, buf2[256] = {0};
   qint32 i = 0, value = 0, bits = {};
   bool found = false;
 
@@ -1121,7 +1121,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
 
     qint32 get_weapon_damage_type(ObjectPtr  wielded);
     bits = get_weapon_damage_type(obj) - 1000;
-    extern char *strs_damage_types[];
+    extern QStringList strs_damage_types;
     ch->send(QStringLiteral("$3Damage type$R: %s\r\n").arg(strs_damage_types[bits]));
     break;
 
@@ -1276,13 +1276,13 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  char buffer[MAX_STRING_LENGTH] = {0};
-  char arg1[MAX_STRING_LENGTH] = {0};
-  char arg2[MAX_STRING_LENGTH] = {0};
-  char arg3[MAX_STRING_LENGTH] = {0};
-  char tmpbuf[MAX_STRING_LENGTH] = {0};
+  QString buffer = {0};
+  QString arg1 = {0};
+  QString arg2 = {0};
+  QString arg3 = {0};
+  QString tmpbuf = {0};
   qint32 keyword_no = {};
   qint32 j = 0, bits = 0, temp = {};
   qint32 door = 0, original_loc = {};
@@ -1697,9 +1697,9 @@ qint32 do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       /* look ''		*/
     case 10:
     {
-      char sector_buf[50];
-      char rflag_buf[MAX_STRING_LENGTH];
-      char tempflag_buf[MAX_STRING_LENGTH];
+      QString sector_buf;
+      QString rflag_buf;
+      QString tempflag_buf;
 
       ansi_color(GREY, ch);
       ansi_color(BOLD, ch);
@@ -1794,9 +1794,9 @@ qint32 do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
 /* end of look */
 
-qint32 do_read(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_read(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[200];
+  QString buf;
 
   // This is just for now - To be changed later.!
 
@@ -1806,9 +1806,9 @@ qint32 do_read(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[200], buf[200];
+  QString name, buf[200];
   CharacterPtr tmp_char;
   ObjectPtr tmp_object;
 
@@ -1837,10 +1837,10 @@ qint32 do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   const QStringList exits = {
       "North",
       "East ",
@@ -1887,16 +1887,16 @@ qint32 do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-char frills[] = {
+QList<QChar> frills = {
     'o',
     '/',
     '~',
     '\\'};
 
-qint32 do_score(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char race[100];
-  char buf[MAX_STRING_LENGTH], scratch;
+  QString race;
+  QString buf, scratch;
   qint32 level = {};
   qint32 to_dam, to_hit, spell_dam;
   // qint32 flying = {};
@@ -2265,17 +2265,17 @@ qint32 do_score(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_time(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[100];
-  char const *suf;
+  QString buf;
+  QString suf;
   qint32 weekday, day;
   time_t timep;
   qint32 h, m;
   // qint32 s;
   extern time_info_data time_info;
   extern QStringList weekdays;
-  extern char *month_name[];
+  extern QStringList month_name;
   tm *pTime = {};
 
   /* 35 days in a month */
@@ -2349,10 +2349,10 @@ qint32 do_time(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern weather_data weather_info;
-  char buf[256];
+  QString buf;
 
   if (GET_POS(ch) <= position_t::SLEEPING)
   {
@@ -2377,13 +2377,13 @@ qint32 do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_help(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern FILE *help_fl;
-  extern char help[MAX_STRING_LENGTH];
+  extern QString help;
 
   qint32 chk, bot, top, mid;
-  char buf[90], buffer[MAX_STRING_LENGTH];
+  QString buf, buffer[MAX_STRING_LENGTH];
 
   if (!ch->desc)
     return ReturnValue::eFAILURE;
@@ -2439,7 +2439,7 @@ qint32 do_help(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_count(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   class Connection *d;
   CharacterPtr i;
@@ -2476,14 +2476,14 @@ qint32 do_count(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_inventory(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_inventory(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln("You are carrying:");
   ch->list_obj_to_char(ch->carrying, 1, true);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 j;
   bool found;
@@ -2519,35 +2519,35 @@ qint32 do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_credits(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_credits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->desc, credits, 0);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_story(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_story(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->desc, story, 0);
   return ReturnValue::eSUCCESS;
 }
 /*
-qint32 do_news(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
    page_string(ch->desc, news, 0);
    return ReturnValue::eSUCCESS;
 }
 
 */
-qint32 do_info(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_info(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->desc, info, 0);
   return ReturnValue::eSUCCESS;
 }
 
 /*********------------ locate objects -----------------***************/
-qint32 do_olocate(CharacterPtr ch, char *name, cmd_t cmd)
+command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
-  char buf[300], buf2[MAX_STRING_LENGTH];
+  QString buf, buf2[MAX_STRING_LENGTH];
   ObjectPtr k;
   qint32 in_room = 0, count = {};
   qint32 vnum = {};
@@ -2664,9 +2664,9 @@ qint32 do_olocate(CharacterPtr ch, char *name, cmd_t cmd)
 
 /* -----------------   MOB LOCATE FUNCTION ---------------------------- */
 // locates ONLY mobiles.  If cmd == 18, it locates pc's AND mobiles
-qint32 do_mlocate(CharacterPtr ch, char *name, cmd_t cmd)
+command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
-  char buf[300], buf2[MAX_STRING_LENGTH];
+  QString buf, buf2[MAX_STRING_LENGTH];
   qint32 count = {};
   qint32 vnum = {};
   qint32 searchnum = {};
@@ -2721,15 +2721,15 @@ qint32 do_mlocate(CharacterPtr ch, char *name, cmd_t cmd)
 }
 /* --------------------- End of Mob locate function -------------------- */
 
-qint32 do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 mod = {};
   qint32 percent, x, y;
   qint32 Learned;
 
-  const char *level_messages[] = {
+  const QStringList level_messages = {
       "You can kill %s naked and weaponless.\r\n",
       "%s is no match for you.\r\n",
       "%s looks like an easy kill.\r\n",
@@ -2740,7 +2740,7 @@ qint32 do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       "%s laughs at you mercilessly.\r\n",
       "%s will tear your head off and piss on your dead skull.\r\n"};
 
-  const char *ac_messages[] = {
+  const QStringList ac_messages = {
       "looks impenetrable.",
       "is heavily armored.",
       "is very well armored.",
@@ -2753,7 +2753,7 @@ qint32 do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       "is enticingly dressed.",
       "is pretty much naked."};
 
-  const char *hplow_messages[] = {
+  const QStringList hplow_messages = {
       "wouldn't be worth your time",
       "wouldn't stand a snowball's chance in hell against you",
       "definitely wouldn't last too long against you",
@@ -2766,7 +2766,7 @@ qint32 do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       "can handle nearly as much damage as you",
       "can handle just as much damage as you"};
 
-  const char *hphigh_messages[] = {
+  const QStringList hphigh_messages = {
       "can definitely take anything you can dish out",
       "can probably take anything you can dish out",
       "takes a licking and keeps on ticking",
@@ -2779,7 +2779,7 @@ qint32 do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       "can handle a bit more damage than you",
       "can handle just as much damage as you"};
 
-  const char *dam_messages[] = {
+  const QStringList dam_messages = {
       "hits like my grandmother",
       "will probably graze you pretty good",
       "can hit pretty hard",
@@ -2793,7 +2793,7 @@ qint32 do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       "could make Sylvester Stallone cry for his mommy",
       "is a *very* tough mobile.  Be careful"};
 
-  const char *thief_messages[] = {
+  const QStringList thief_messages = {
       "At least they'll hang you quickly.",
       "Bards will sing of your bravery, rogues will snicker at\r\nyour stupidity.",
       "Don't plan on sending your kids to college.",
@@ -3104,7 +3104,7 @@ qint32 do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 /* Shows characters in adjacent rooms -- Sadus */
-qint32 do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   CharacterPtr vict;
@@ -3235,10 +3235,10 @@ qint32 do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 ntick;
-  char buf[256];
+  QString buf;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -3373,7 +3373,7 @@ void check_champion_and_website_who_list()
   flwo.close();
 }
 
-qint32 do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString art = "a";
 
@@ -3396,7 +3396,7 @@ qint32 do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_version(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_version(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch)
   {
@@ -4576,7 +4576,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       /*
                qint32 get_weapon_damage_type(ObjectPtr  wielded);
                bits = get_weapon_damage_type(obj) - 1000;
-               extern char *strs_damage_types[];
+               extern QStringList strs_damage_types;
                ch->send(QStringLiteral("$3Damage type$R: %s\r\n").arg(strs_damage_types[bits]));
       */
     }

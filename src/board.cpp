@@ -80,12 +80,12 @@ public:
 
 void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
 qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-char *fread_string(FILE *fl, qint32 hasher);
+QString fread_string(FILE *fl, qint32 hasher);
 qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
 void board_save_board(QMap<QString, BOARD_INFO>::iterator board);
 void board_load_board();
 qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-qint32 fwrite_string(const char *buf, FILE *fl);
+qint32 fwrite_string(const QString buf, FILE *fl);
 void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort);
 
 constexpr auto ANY_BOARD = 0;
@@ -116,7 +116,7 @@ constexpr auto CLAN_SINDICATE = 20;
 class RESERVATION_DATA
 {
 public:
-  char *buf;
+  QString buf;
   message new_post;
   QMap<QString, BOARD_INFO>::iterator board;
 };
@@ -568,8 +568,8 @@ qint32 save_boards()
     qfprintf(the_file, " %d ", board_it->second.min_remove_level);
     qfprintf(the_file, " %d ", board_it->second.type);
     qfprintf(the_file, " %d ", board_it->second.owner);
-    fwrite_string((char *)board_it->second.save_file.c_str(), the_file);
-    fwrite_string((char *)board_it->first.c_str(), the_file);
+    fwrite_string(board_it->second.save_file.c_str(), the_file);
+    fwrite_string(board_it->first.c_str(), the_file);
   }
   fclose(the_file);
   return ReturnValue::eSUCCESS;
@@ -612,7 +612,7 @@ qint32 board(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
   if (board == board_db.end())
     return ReturnValue::eFAILURE;
 
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   one_argument(arg, arg1);
 
   if (!isexact(arg1, obj->name()) && cmd == cmd_t::LOOK)
@@ -690,9 +690,9 @@ void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort)
 
 void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   time_t timep; // clock time
-  char *tmstr;
+  QString tmstr;
 
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
@@ -770,7 +770,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
 qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
   quint32 ind, tmessage;
-  char buf[256], number[MAX_INPUT_LENGTH + 1];
+  QString buf, number[MAX_INPUT_LENGTH + 1];
 
   one_argument(arg, number);
 
@@ -871,16 +871,16 @@ void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
   for (ind = {}; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me.c_str(), the_file);
 
     write_me = remove_slashr(board->second.msgs[ind].author);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me.c_str(), the_file);
 
     write_me = remove_slashr(board->second.msgs[ind].date);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me.c_str(), the_file);
 
     write_me = remove_slashr(board->second.msgs[ind].text);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me.c_str(), the_file);
   }
   fclose(the_file);
 }
@@ -935,7 +935,7 @@ void board_load_board()
 
 qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
-  char buf[MAX_STRING_LENGTH], number[MAX_INPUT_LENGTH + 1];
+  QString buf, number[MAX_INPUT_LENGTH + 1];
   QString board_msg;
   one_argument(arg, number);
   quint32 tmessage;
@@ -1037,7 +1037,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
 {
   qint32 i;
   QString board_msg;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
     if (ch->clan != board->second.owner)
@@ -1100,7 +1100,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   return ReturnValue::eSUCCESS;
 }
 
-qint32 fwrite_string(const char *buf, FILE *fl)
+qint32 fwrite_string(const QString buf, FILE *fl)
 {
   return (qfprintf(fl, "%s~\n", buf));
 }

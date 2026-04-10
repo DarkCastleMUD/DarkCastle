@@ -21,12 +21,12 @@ qint32 max_who = {};
 
 /* extern functions */
 
-void page_string(class Connection *d, const char *str, qint32 keep_internal);
+void page_string(class Connection *d, const QString str, qint32 keep_internal);
 
-qint32 do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (ch->isNonPlayer())
   {

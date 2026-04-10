@@ -22,19 +22,19 @@
 #undef DEBUG_TOKEN
 
 /************************************************************************
-| TokenList::TokenList(char *str)
+| TokenList::TokenList(QString str)
 | Preconditions: str != 0
 | Postconditions: TokenList is ready to go: the tokens have been assigned,
 |   the types set, &c..
 | Returns: Nothing
 */
-TokenList::TokenList(const char *str) : head(0), current(0)
+TokenList::TokenList(const QString str) : head(0), current(0)
 {
 
   qint32 i, stri = {};
-  const char *strp = str;  // Keeps track of current position
-  Token *cur_token;        // Current token
-  char temp_str[_MAX_STR]; // Temporary QString
+  const QString strp = str; // Keeps track of current position
+  Token *cur_token;         // Current token
+  QString temp_str;         // Temporary QString
 
   while (strp[stri] != 0 && stri < _MAX_STR)
   {
@@ -123,7 +123,7 @@ void TokenList::Next()
 }
 
 /************************************************************************
-| const char * TokenList::Interpret()
+| const QString TokenList::Interpret()
 | Description:  This function interprets the tokens in the list for
 |   the given character/victim/send_to combination and then returns
 |   the interpreted QString.  This QString should not be deallocated.
@@ -482,14 +482,14 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, C
               case 'T':
                 if (vict_obj != nullptr)
                 {
-                  interp += (char *)vict_obj;
+                  interp += vict_obj;
                 }
                 break;
 
               case 'F':
                 if (vict_obj != nullptr)
                 {
-                  interp += fname(QString((char *)vict_obj)).toStdString();
+                  interp += fname(QString(vict_obj)).toStdString();
                 }
                 break;
 
@@ -518,10 +518,10 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, C
 }
 
 /************************************************************************
-| TokenList::Token::Token(char *tok_str)
+| TokenList::Token::Token(QString tok_str)
 | Description:  Used to create a new token
 */
-Token::Token(char *tok_str) : buf(0), type(0), next(0)
+Token::Token(QString tok_str) : buf(0), type(0), next(0)
 {
   SetBuf(tok_str);
 }
@@ -533,20 +533,16 @@ Token::Token(char *tok_str) : buf(0), type(0), next(0)
 */
 Token::~Token()
 {
-  if (buf)
-    delete[] buf;
   buf = {};
 }
 
 /************************************************************************
-| TokenList::Token::SetBuf(char *rhs)
+| TokenList::Token::SetBuf(QString rhs)
 | Description: Used to set the buffer
 */
-void Token::SetBuf(char *rhs)
+void Token::SetBuf(QString rhs)
 {
-  if (buf)
-    delete[] buf;
-  buf = new char[strlen(rhs) + 1];
+  buf = {};
 
   strcpy(buf, rhs);
 

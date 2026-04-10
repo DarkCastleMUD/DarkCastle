@@ -21,10 +21,10 @@
 /************************************************************************
 | OFFENSIVE commands.
 */
-qint32 do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[MAX_INPUT_LENGTH];
+  QString name;
   qint32 dam;
   qint32 retval;
   time_t time_raw_format;
@@ -116,12 +116,12 @@ qint32 do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
 
   affected_type af;
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 dam, retval;
   qint32 duration = 100;
 
@@ -223,10 +223,10 @@ qint32 do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 retval;
 
   if (!ch->canPerform(SKILL_STUN, "Your lack of knowledge is stunning...\r\n"))

@@ -7,10 +7,10 @@
 QMap<QString, Command> Commands::qstring_command_map_ = {};
 QMap<cmd_t, Command> Commands::cmd_t_command_map_ = {};
 
-// The last integer will affect a char being removed from hide when they perform the command.
-// 0  - char will always become visibile.
-// 1  - char will not become visible when using this command.
-// 2+ - char has a greater chance of breaking hide as this increases.
+// The last integer will affect a character being removed from hide when they perform the command.
+// 0  - character will always become visibile.
+// 1  - character will not become visible when using this command.
+// 2+ - character has a greater chance of breaking hide as this increases.
 QList<Command> Commands::commands_ =
     {
         // Movement commands

@@ -14,7 +14,7 @@ namespace SSH
 
   void SSH::setup(void)
   {
-    char buffer[NAME_MAX] = {};
+    QString buffer = {};
     getcwd(buffer, NAME_MAX - 1);
     logf(0, DC::LogChannel::LOG_BUG, "cwd is %s", buffer);
     chdir("../lib");
@@ -32,7 +32,7 @@ namespace SSH
       logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);
     }
 
-    const char rsahostkeyfilename[] = "ssh_host_rsa_key";
+    const QString rsahostkeyfilename = "ssh_host_rsa_key";
     if (qint32 rc = ssh_bind_options_set(sshbind, ssh_bind_options_e::SSH_BIND_OPTIONS_RSAKEY, &rsahostkeyfilename) < 0)
     {
       logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);

@@ -64,9 +64,9 @@ CharacterPtr activeTarget = {};
 ObjectPtr activeObj = {};
 void *activeVo = {};
 
-char *activeProg;
-char *activePos;
-char *activeProgTmpBuf;
+QString activeProg;
+QString activePos;
+QString activeProgTmpBuf;
 // Global defined here
 
 bool MOBtrigger;
@@ -116,18 +116,18 @@ qint32 mprog_line_num = {};
  * Local function prototypes
  */
 
-qint32 mprog_veval(qint64 lhs, char *opr, qint64 rhs);
-qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob,
+qint32 mprog_veval(qint64 lhs, QString opr, qint64 rhs);
+qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob,
                        CharacterPtr actor, ObjectPtr obj,
                        void *vo, CharacterPtr rndm);
-char *mprog_process_if(char *ifchck, char *com_list,
-                       CharacterPtr mob, CharacterPtr actor,
-                       ObjectPtr obj, void *vo,
-                       CharacterPtr rndm, mprog_throw_type *thrw = {});
-void mprog_translate(char ch, char *t, CharacterPtr mob,
+QString mprog_process_if(QString ifchck, QString com_list,
+                         CharacterPtr mob, CharacterPtr actor,
+                         ObjectPtr obj, void *vo,
+                         CharacterPtr rndm, mprog_throw_type *thrw = {});
+void mprog_translate(character ch, QString t, CharacterPtr mob,
                      CharacterPtr actor, ObjectPtr obj,
                      void *vo, CharacterPtr rndm);
-qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob,
+qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob,
                           CharacterPtr actor, ObjectPtr obj,
                           void *vo, CharacterPtr rndm);
 
@@ -139,10 +139,10 @@ qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob,
  * Thus its like one_argument(), but a trifle different. It is deive
  * to the multi line QString argument, and thus clist must not be shared.
  */
-char *mprog_next_command(char *clist)
+QString mprog_next_command(QString clist)
 {
   bool open = false;
-  char *pointer = clist;
+  QString pointer = clist;
 
   for (; *pointer != '\0'; pointer++)
   {
@@ -174,7 +174,7 @@ char *mprog_next_command(char *clist)
  *  still have trailing spaces so be careful when editing since:
  *  "guard" and "guard " are not equal.
  */
-bool Character::mprog_seval(const char *lhs, const char *opr, const char *rhs)
+bool Character::mprog_seval(const QString lhs, const QString opr, const QString rhs)
 {
   if (!lhs || !rhs)
     return false;
@@ -212,7 +212,7 @@ bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
 }
 
 /*
-qint32 mprog_veval( qint32 lhs, char *opr, qint32 rhs )
+qint32 mprog_veval( qint32 lhs, QString opr, qint32 rhs )
 {
 
   if ( !str_cmp( opr, "==" ) )
@@ -237,7 +237,7 @@ qint32 mprog_veval( qint32 lhs, char *opr, qint32 rhs )
 
 }
 */
-qint32 mprog_veval(qint64 lhs, char *opr, qint64 rhs)
+qint32 mprog_veval(qint64 lhs, QString opr, qint64 rhs)
 {
 
   if (!str_cmp(opr, "=="))
@@ -261,7 +261,7 @@ qint32 mprog_veval(qint64 lhs, char *opr, qint64 rhs)
   return 0;
 }
 /*
-qint32 mprog_veval( quint64 lhs, char *opr, quint64 rhs )
+qint32 mprog_veval( quint64 lhs, QString opr, quint64 rhs )
 {
   if ( !str_cmp( opr, "==" ) )
         return ( lhs == rhs );
@@ -296,8 +296,8 @@ bool Character::isTank(void)
   return false;
 }
 
-void translate_value(char *leftptr, char *rightptr, qint16 **vali,
-                     quint32 **valui, char ***valstr, qint64 **vali64, quint64 **valui64, qint8 **valb,
+void translate_value(QString leftptr, QString rightptr, qint16 **vali,
+                     quint32 **valui, QString **valstr, qint64 **vali64, quint64 **valui64, qint8 **valb,
                      CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo,
                      CharacterPtr rndm, QString &valqstr)
 {
@@ -323,7 +323,7 @@ void translate_value(char *leftptr, char *rightptr, qint16 **vali,
   }
 
   activeTarget = {};
-  char *tmp, half[MAX_INPUT_LENGTH];
+  QString tmp, half[MAX_INPUT_LENGTH];
   half[0] = '\0';
   if ((tmp = strchr(leftptr, ',')) != nullptr)
   {
@@ -333,13 +333,13 @@ void translate_value(char *leftptr, char *rightptr, qint16 **vali,
   }
 
   // Less nitpicky about the mobprogs with this stuff below in.
-  char larr[MAX_INPUT_LENGTH];
+  QString larr;
   one_argument(leftptr, larr);
-  char *left = &larr[0];
+  QString left = &larr[0];
 
-  char rarr[MAX_INPUT_LENGTH];
+  QString rarr;
   one_argument(rightptr, rarr);
-  char *right = &rarr[0];
+  QString right = &rarr[0];
   bool silent = false;
 
   if (!str_prefix("world_", left))
@@ -474,7 +474,7 @@ void translate_value(char *leftptr, char *rightptr, qint16 **vali,
         target = mob->fighting;
       break;
     case 'v':
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       buf[0] = '\0';
       qint32 i;
       for (i = 2; *(left + i); i++)
@@ -546,7 +546,7 @@ void translate_value(char *leftptr, char *rightptr, qint16 **vali,
   // more boring code. FUCK.
   qint16 *intval = {};
   quint32 *uintval = {};
-  char **stringval = {};
+  QString *stringval = {};
   QString *qstringval = {};
   qint64 *llval = {};
   quint64 *ullval = {};
@@ -1479,22 +1479,22 @@ QMap<QString, mprog_ifs> load_ifchecks()
 
 QMap<QString, mprog_ifs> ifcheck = load_ifchecks();
 
-qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
+qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
                        ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
 
-  char buf[MAX_INPUT_LENGTH];
-  char arg[MAX_INPUT_LENGTH];
-  char opr[MAX_INPUT_LENGTH];
-  char val[MAX_INPUT_LENGTH];
-  char val2[MAX_INPUT_LENGTH]; // used for non-traditional
+  QString buf;
+  QString arg;
+  QString opr;
+  QString val;
+  QString val2; // used for non-traditional
   CharacterPtr vict = (CharacterPtr)vo;
   ObjectPtr v_obj = (ObjectPtr)vo;
-  char *bufpt = buf;
-  char *argpt = arg;
-  char *oprpt = opr;
-  char *valpt = val;
-  char *point = ifchck;
+  QString bufpt = buf;
+  QString argpt = arg;
+  QString oprpt = opr;
+  QString valpt = val;
+  QString point = ifchck;
   val2[0] = '\0';
 
   if (*point == '\0')
@@ -1619,7 +1619,7 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
   if (arg[0] == '$' && arg[1] == 'v')
   {
     tempvariable *eh = mob->tempVariable;
-    char buf1[MAX_STRING_LENGTH];
+    QString buf1;
     buf1[0] = '\0';
     qint32 i;
     for (i = 2; arg[i]; i++)
@@ -1664,7 +1664,7 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
 
   qint16 *lvali = {};
   quint32 *lvalui = {};
-  char **lvalstr = {};
+  QString *lvalstr = {};
   QString lvalqstr;
   qint64 *lvali64 = {};
   quint64 *lvalui64 = {};
@@ -1699,7 +1699,7 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     qint16 *rvali = {};
     quint32 *rvalui = {};
-    char **rvalstr = {};
+    QString *rvalstr = {};
     QString rvalqstr;
     qint64 *rvali64 = {};
     quint64 *rvalui64 = {};
@@ -2350,7 +2350,7 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eISSPELLED:
   {
-    qint32 find_skill_num(char *name);
+    qint32 find_skill_num(QString name);
 
     if (!str_cmp(val, "fly")) // needs special check.. sigh..
     {
@@ -2550,8 +2550,8 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     ObjectPtr obj = {};
     CharacterPtr take;
-    char bufeh[MAX_STRING_LENGTH];
-    char *valu = one_argument(val, bufeh);
+    QString bufeh;
+    QString valu = one_argument(val, bufeh);
 
     if (fvict)
     {
@@ -2621,8 +2621,8 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     ObjectPtr obj = {};
     CharacterPtr take;
-    char bufeh[MAX_STRING_LENGTH];
-    char *valu = one_argument(val, bufeh);
+    QString bufeh;
+    QString valu = one_argument(val, bufeh);
     if (fvict)
     {
       obj = search_char_for_item(fvict, real_object(atoi(valu)), false);
@@ -2785,7 +2785,7 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eTEMPVAR:
   {
-    char buf4[MAX_STRING_LENGTH], *buf4pt;
+    QString buf4, *buf4pt;
     if (arg[2] != '[')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
@@ -2998,7 +2998,7 @@ qint32 mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor,
  */
 // Null is kept globally so it doesn't go out of scope when we return in
 // -pir 11/18/01
-char null[1];
+QString null;
 // Mprog_cur_result holds the current status of the mob that is acting.
 // It will hold ReturnValue::eCH_DIED if the mob died doing it's proc.  We need to
 // make sure this is not true when returning from an if check or the
@@ -3006,14 +3006,14 @@ char null[1];
 qint32 mprog_cur_result;
 #define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
-char *mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
-                       CharacterPtr actor, ObjectPtr obj, void *vo,
-                       CharacterPtr rndm, mprog_throw_type *thrw)
+QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
+                         CharacterPtr actor, ObjectPtr obj, void *vo,
+                         CharacterPtr rndm, mprog_throw_type *thrw)
 {
 
-  char buf[MAX_INPUT_LENGTH];
-  char *morebuf = {};
-  char *cmnd = {};
+  QString buf;
+  QString morebuf = {};
+  QString cmnd = {};
   bool loopdone = false;
   bool flag = false;
   qint32 legal;
@@ -3307,7 +3307,7 @@ char *mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
  * would be to change act() so that vo becomes vict & v_obj.
  * but this would require a lot of small changes all over the code.
  */
-void mprog_translate(char ch, char *t, CharacterPtr mob, CharacterPtr actor,
+void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr actor,
                      ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   static const QStringList he_she = {"it", "he", "she"};
@@ -3529,7 +3529,7 @@ void mprog_translate(char ch, char *t, CharacterPtr mob, CharacterPtr actor,
                          : strcpy(t, "someone's");
     break;
   case 'q':
-    char buf[15];
+    QString buf;
     sprintf(buf, "%d", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
     strcpy(t, buf);
     break;
@@ -3629,7 +3629,7 @@ void mprog_translate(char ch, char *t, CharacterPtr mob, CharacterPtr actor,
   }
 }
 
-bool do_bufs(char *bufpt, char *argpt, char *point)
+bool do_bufs(QString bufpt, QString argpt, QString point)
 {
   bool traditional = false;
 
@@ -3687,14 +3687,14 @@ void debugpoint() {};
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
  */
-qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor,
+qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
                           ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
-  char buf[MAX_INPUT_LENGTH * 2];
-  char tmp[MAX_INPUT_LENGTH * 2];
-  char *str;
-  char *i;
-  char *point;
+  QString buf[MAX_INPUT_LENGTH * 2];
+  QString tmp[MAX_INPUT_LENGTH * 2];
+  QString str;
+  QString i;
+  QString point;
 
   point = buf;
   str = cmnd;
@@ -3708,7 +3708,7 @@ qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor,
            {
             qint16 *lvali = {};
             quint32 *lvalui = {};
-            char **lvalstr = {};
+            QString *lvalstr = {};
             qint64 *lvali64 = {};
             qint8 *lvalb = {};
             *str = '\0';
@@ -3723,7 +3723,7 @@ qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor,
             if (do_bufs(&buf[0], &tmp[0], str))
                   translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
             else strcpy(right, str);
-          char buf[MAX_STRING_LENGTH];
+          QString buf;
           buf[0] = '\0';
           if (lvali)
             sprintf(buf, "%sLvali: %d\n", buf,*lvali);
@@ -3758,18 +3758,18 @@ qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor,
     {
       qint16 *lvali = {};
       quint32 *lvalui = {};
-      char **lvalstr = {};
+      QString *lvalstr = {};
       QString lvalqstr;
       qint64 *lvali64 = {};
       quint64 *lvalui64 = {};
       qint8 *lvalb = {};
-      char left[MAX_INPUT_LENGTH], right[MAX_INPUT_LENGTH];
+      QString left, right[MAX_INPUT_LENGTH];
       left[0] = '$';
       left[1] = *str;
       left[2] = '\0';
       str = one_argument(str + 2, right);
       translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       buf[0] = '\0';
       if (lvali)
         sprintf(buf, "%d", *lvali);
@@ -3790,11 +3790,11 @@ qint32 mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor,
 
     if (LOWER(*str) == 'v' || LOWER(*str) == 'w')
     {
-      char a = *str;
+      QChar a = *str;
       str++;
       if (*str == '[')
       {
-        char *tmp1 = &tmp[0];
+        QString tmp1 = &tmp[0];
         str++;
         while (*str != ']' && *str != '\0')
           *tmp1++ = *str++;
@@ -3857,13 +3857,13 @@ bool objExists(ObjectPtr obj)
  *  the command list and figuring out what to do. However, like all
  *  complex procedures, everything is farmed out to the other guys.
  */
-void mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, mprog_throw_type *thrw, CharacterPtr rndm)
+void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, mprog_throw_type *thrw, CharacterPtr rndm)
 {
-  char tmpcmndlst[MAX_STRING_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
-  char *morebuf;
-  char *command_list;
-  char *cmnd;
+  QString tmpcmndlst;
+  QString buf;
+  QString morebuf;
+  QString command_list;
+  QString cmnd;
   // CharacterPtr rndm  = {};
   CharacterPtr vch = {};
   qint32 count = {};
@@ -3996,15 +3996,15 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE WEAR_WIELD WORD
 {
 
-  char temp1[MAX_STRING_LENGTH] = {};
-  char temp2[MAX_STRING_LENGTH] = {};
-  char word[MAX_INPUT_LENGTH] = {};
+  QString temp1 = {};
+  QString temp2 = {};
+  QString word = {};
   mob_prog_data *mprg = {};
   mob_prog_data *next = {};
-  char *list = {};
-  char *start = {};
-  char *dupl = {};
-  char *end = {};
+  QString list = {};
+  QString start = {};
+  QString dupl = {};
+  QString end = {};
   qint32 i = {};
   qint32 retval = {};
   bool done = {};
@@ -4283,7 +4283,7 @@ qint32 mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch)
 qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
 {
 
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   mob_prog_data *mprg = {};
   mob_prog_data *next = {};
   bool done = false, okay = false;
@@ -4445,7 +4445,7 @@ qint32 Character::mprog_can_see_trigger(CharacterPtr mob)
   return mprog_cur_result;
 }
 
-qint32 Character::mprog_speech_trigger(const char *txt)
+qint32 Character::mprog_speech_trigger(const QString txt)
 {
   if (isDead() || isNowhere())
   {
@@ -4466,7 +4466,7 @@ qint32 Character::mprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, char *var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
+qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4661,7 +4661,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
   //  temp->master = ch;
   // temp->short_desc={};
   temp->short_desc = QStringLiteral(obj->short_description);
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   sprintf(buf, "%s", qPrintable(obj->name()));
   for (qint32 i = strlen(buf) - 1; i > 0; i--)
     if (buf[i] == ' ')
@@ -4719,7 +4719,7 @@ qint32 Character::oprog_can_see_trigger(ObjectPtr item)
   return mprog_cur_result;
 }
 
-qint32 Character::oprog_speech_trigger(const char *txt)
+qint32 Character::oprog_speech_trigger(const QString txt)
 {
   if (isDead() || isNowhere())
   {
@@ -4768,7 +4768,7 @@ qint32 Character::oprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, char *var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm)
+qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm)
 {
   mob_prog_data *mprg = {};
   qint32 curr_catch;

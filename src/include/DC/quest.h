@@ -7,13 +7,13 @@ class quest_info
 {
 public:
   qint32 number;
-  char *name;
-  char *hint1;
-  char *hint2;
-  char *hint3;
-  char *objshort;
-  char *objlong;
-  char *objkey;
+  QString name;
+  QString hint1;
+  QString hint2;
+  QString hint3;
+  QString objshort;
+  QString objlong;
+  QString objkey;
   qint32 level;
   qint32 objnum;
   qint32 mobnum;
@@ -28,5 +28,5 @@ public:
 qint32 load_quests();
 qint32 save_quests();
 quest_info *get_quest_struct(qint32);
-quest_info *get_quest_struct(char *);
+quest_info *get_quest_struct(QString);
 void quest_update();

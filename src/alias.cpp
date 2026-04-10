@@ -130,7 +130,7 @@ QString pet_info(CharacterPtr ch, QString type, quint32 victim_count)
 
   auto bare_damage_str = QStringLiteral("$7$B%1$Rd$7$B%2$R").arg(ch->mobdata->damnodice).arg(ch->mobdata->damsizedice);
 
-  char buffer[MAX_STRING_LENGTH] = {};
+  QString buffer = {};
   sprintbit(ch->affected_by, affected_bits, buffer);
   QString affected_by_str = QString(buffer).trimmed();
 

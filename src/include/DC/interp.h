@@ -26,17 +26,17 @@ QString remove_trailing_spaces(QString arg);
 qsizetype search_list(QString argument, const QStringList list);
 qsizetype old_search_block(QString argument, qint32 begin, qint32 length, const QStringList list, qint32 mode);
 
-void argument_interpreter(QString argument, char *first_arg, char *second_arg);
-char *one_argumentnolow(QString argument, char *first_arg);
-void half_chop(const char *str, char *arg1, char *arg2);
+void argument_interpreter(QString argument, QString first_arg, QString second_arg);
+QString one_argumentnolow(QString argument, QString first_arg);
+void half_chop(const QString str, QString arg1, QString arg2);
 std::tuple<QString, QString> last_argument(QString arguments);
-std::tuple<QString, QString> half_chop(QString arguments, const char token = ' ');
-std::tuple<QString, QString> half_chop(const char *c_arg, const char token = ' ');
-void chop_half(char *str, char *arg1, char *arg2);
+std::tuple<QString, QString> half_chop(QString arguments, const QChar token = ' ');
+std::tuple<QString, QString> half_chop(const QString c_arg, const QChar token = ' ');
+void chop_half(QString str, QString arg1, QString arg2);
 void update_max_who(void);
 bool is_abbrev(QString abbrev, QString word);
 // bool is_abbrev(const QString &abbrev, const QString &word);
-// bool is_abbrev(const char *arg1, const char *arg2);
+// bool is_abbrev(const QString arg1, const QString arg2);
 
 QString ltrim(QString str);
 QString rtrim(QString str);

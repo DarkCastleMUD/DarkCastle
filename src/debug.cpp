@@ -18,7 +18,7 @@
 #include "DC/DC.h"
 #include "DC/interp.h"
 
-void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
+void load_char_obj_error(FILE *fpsave, QString strsave);
 void store_to_char(char_file_u4 *st, CharacterPtr ch);
 qint32 store_to_char_variable_data(CharacterPtr ch, FILE *fpsave);
 ObjectPtr my_obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
@@ -42,7 +42,7 @@ void test_handle_ansi(QString test)
 
   // QString str1 = "$b$B$1test$R $ $$ $$$ $$$";
   QString str1 = test;
-  char *str2 = new char[1024];
+  QString str2;
   memset(str2, 1024, 0);
   strncpy(str2, str1.toStdString().c_str(), 1024);
   QString result1 = handle_ansi(str1, ch);
@@ -50,7 +50,6 @@ void test_handle_ansi(QString test)
   // std::cerr <<  "Result1: [" << result1 << "]" << std::endl;
   // std::cerr <<  "Result2: [" << result2 << "]" << std::endl;
   assert(handle_ansi(str1, ch) == QString(handle_ansi_(str2, ch)));
-  delete[] str2;
 }
 
 bool test_rolls(quint8 total)
@@ -84,7 +83,7 @@ bool test_rolls(quint8 total)
       {
         // std::cerr <<  "Total = " << total << std::endl;
         // std::cerr <<  "Took " << attempts << " attempts." << std::endl;
-        // std::cerr <<  (float)attempts / 4 / 60.0 / 60.0 << " hours" << std::endl;
+        // std::cerr <<  (qreal)attempts / 4 / 60.0 / 60.0 << " hours" << std::endl;
         return 0;
       }
     }
@@ -158,7 +157,7 @@ QString showObjectVault(ObjectPtr obj)
 void showObject(CharacterPtr ch, ObjectPtr obj)
 {
   // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].vnum() << ":";
-  char buf[255];
+  QString buf;
 
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
   // std::cerr <<  buf << ":";
@@ -189,7 +188,7 @@ void testStrings(void)
   test_handle_ansi("$x");
   test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
 
-  char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
+  QString c_arg1 = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
   QString arg1 = {}, remainder = "charm sleep ";
   do
   {
@@ -208,11 +207,11 @@ void testStrings(void)
   std::cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << std::endl;
 }
 
-qint32 main(qint32 argc, char **argv)
+qint32 main(qint32 argc, QString *argv)
 {
   DC debug(argc, argv);
 
-  // char namelist[] = "chief enforcer bob";
+  // QString namelist = "chief enforcer bob";
   // qDebug() << isexact("enf", namelist) << isprefix("enf", namelist);
   // debug.db().table("shops").column("name", "text").column("name2", "bigint");
   // exit(1);
@@ -312,7 +311,7 @@ qint32 main(qint32 argc, char **argv)
     qDebug("\n");
 
     qsizetype size_bits = 8 * sizeof(ch->player->toggles);
-    const char *data = reinterpret_cast<const char *>(&ch->player->toggles);
+    const QString data = reinterpret_cast<const QString>(&ch->player->toggles);
     QBitArray ba;
     if (data)
     {

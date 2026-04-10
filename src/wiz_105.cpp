@@ -18,10 +18,10 @@
 
 #include <cstdio>
 
-qint32 do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool found = false;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   CharacterPtr victim;
   affected_type *af, *afpk;
   ObjectPtr dummy;
@@ -63,7 +63,7 @@ qint32 do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   DC::getInstance()->free_help_from_memory();
   QFile help_keyword_file(HELP_KWRD_FILE);
@@ -79,12 +79,12 @@ qint32 do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_log(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   ObjectPtr dummy;
-  char buf[MAX_INPUT_LENGTH];
-  char buf2[MAX_INPUT_LENGTH];
+  QString buf;
+  QString buf2;
 
   if (ch->isNonPlayer() || !ch->has_skill(COMMAND_LOG))
   {
@@ -121,15 +121,15 @@ qint32 do_log(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char person[MAX_INPUT_LENGTH];
+  QString person;
   CharacterPtr victim;
   one_argument(argument, person);
 
   if (!*person)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &victim : character_list)
     {
@@ -228,7 +228,7 @@ qint32 do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_debug(CharacterPtr ch, char *args, cmd_t cmd)
+command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
 {
   QString arg1, arg2, arg3;
   QString remainder;
@@ -370,10 +370,10 @@ qint32 do_debug(CharacterPtr ch, char *args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char person[MAX_INPUT_LENGTH];
-  char flag[MAX_INPUT_LENGTH];
+  QString person;
+  QString flag;
   CharacterPtr victim;
 
   if (ch->isNonPlayer())
@@ -428,16 +428,16 @@ qint32 do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ch->sendln("Done.");
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   sprintf(log_buf, "%s pardons %s for %s.",
           qPrintable(ch->name()), qPrintable(victim->name()), flag);
   logentry(log_buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   ObjectPtr obj_object;
   qint32 eqdam;
 
@@ -497,9 +497,9 @@ skill_quest *find_sq(qint32 sq)
   return {};
 }
 
-qint32 do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char command[MAX_INPUT_LENGTH];
+  QString command;
   argument = one_argument(argument, command);
   qint32 clas = 1;
 
@@ -530,12 +530,12 @@ qint32 do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 i;
   for (i = {};; i++)
   {
-    if (!str_cmp((char *)fields[i], command) ||
-        !str_cmp((char *)fields[i], "\n"))
+    if (!str_cmp(fields[i], command) ||
+        !str_cmp(fields[i], "\n"))
       break;
   }
 
-  if (!str_cmp((char *)fields[i], "\n"))
+  if (!str_cmp(fields[i], "\n"))
   {
 
     send_to_char("$3Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
@@ -545,7 +545,7 @@ qint32 do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("$3Syntax:$R sqedit save.");
     return ReturnValue::eFAILURE;
   }
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
+  QString arg1, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
   bool done = false;
   argument = one_argument(argument, arg1);
   skill_quest *skill = {};
@@ -734,10 +734,10 @@ qint32 wear_bitv[MAX_WEAR] = {
     1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072,
     262144, 262144};
 
-qint32 do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   qint32 a = 0, o;
   argument = one_argument(argument, arg);
   extern qint32 class_restricted(CharacterPtr ch, ObjectPtr obj);
@@ -825,7 +825,7 @@ qint32 do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
         }
     }
   }
-  char buf1[MAX_STRING_LENGTH];
+  QString buf1;
   qint32 tot = {};
   for (i = 1; i < MAX_WEAR; i++)
   {
@@ -851,22 +851,22 @@ qint32 do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  extern char motd[MAX_STRING_LENGTH];
-  extern char imotd[MAX_STRING_LENGTH];
-  extern char new_help[MAX_STRING_LENGTH];
-  extern char new_ihelp[MAX_STRING_LENGTH];
-  extern char credits[MAX_STRING_LENGTH];
-  extern char story[MAX_STRING_LENGTH];
-  extern char webpage[MAX_STRING_LENGTH];
-  extern char info[MAX_STRING_LENGTH];
-  extern char greetings1[MAX_STRING_LENGTH];
-  extern char greetings2[MAX_STRING_LENGTH];
-  extern char greetings3[MAX_STRING_LENGTH];
-  extern char greetings4[MAX_STRING_LENGTH];
+  extern QString motd;
+  extern QString imotd;
+  extern QString new_help;
+  extern QString new_ihelp;
+  extern QString credits;
+  extern QString story;
+  extern QString webpage;
+  extern QString info;
+  extern QString greetings1;
+  extern QString greetings2;
+  extern QString greetings3;
+  extern QString greetings4;
 
-  char arg[256];
+  QString arg;
 
   one_argument(argument, arg);
 
@@ -929,9 +929,9 @@ qint32 do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg, arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   qint32 start, i, end, tot;
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg1);
@@ -946,7 +946,7 @@ qint32 do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   mob = !str_cmp(arg, "mob"); // typoed mob means obj. who cares.
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   buf[0] = '\0';
   for (i = start, tot = 1; i <= end; i++)
   {

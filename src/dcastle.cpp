@@ -10,13 +10,13 @@
 
 quint16 DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 
-DC::config parse_arguments(qint32 argc, char **argv);
+DC::config parse_arguments(qint32 argc, QString *argv);
 
 /**********************************************************************
  *  main game loop and related stuff                                  *
  **********************************************************************/
 
-qint32 main(qint32 argc, char **argv)
+qint32 main(qint32 argc, QString *argv)
 {
   DC dcastle(parse_arguments(argc, argv));
   QThread::currentThread()->setObjectName("Main Thread");
@@ -43,8 +43,8 @@ qint32 main(qint32 argc, char **argv)
 
   if (chdir(dcastle.cf.library_directory.toStdString().c_str()) < 0)
   {
-    char strerror_buffer[512];
-    const char *strerror_result = strerror_r(errno, strerror_buffer, sizeof(strerror_buffer));
+    QString strerror_buffer;
+    const QString strerror_result = strerror_r(errno, strerror_buffer, sizeof(strerror_buffer));
     logentry(QStringLiteral("Error changing current directory to %1: %2").arg(dcastle.cf.library_directory).arg(strerror_result));
     exit(EXIT_FAILURE);
   }
@@ -64,7 +64,7 @@ qint32 main(qint32 argc, char **argv)
   return 0;
 }
 
-DC::config parse_arguments(qint32 argc, char **argv)
+DC::config parse_arguments(qint32 argc, QString *argv)
 {
   qint32 opt = {};
   quint32 port = {};

@@ -22,11 +22,11 @@
 
 // Note that most of the (anti)paladin skills are already in "cl_warrior.C"
 
-qint32 do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   // CharacterPtr tmp_ch;
-  char victim_name[MAX_INPUT_LENGTH];
+  QString victim_name;
   affected_type af;
   qint32 retval = ReturnValue::eSUCCESS, dam;
 
@@ -89,7 +89,7 @@ qint32 do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (ch->has_skill(SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
       {
-        char dammsg[MAX_STRING_LENGTH];
+        QString dammsg;
         qint32 amount = ch->getLevel() * 10;
         if (amount + ch->getHP() > GET_MAX_HIT(ch))
           amount = GET_MAX_HIT(ch) - ch->getHP();
@@ -116,11 +116,11 @@ qint32 do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // Again note that alot of them are in cl_warrior.C
 
-qint32 do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   // CharacterPtr tmp_ch;
-  char victim_name[240];
+  QString victim_name;
   affected_type af;
   qint32 duration = 24;
   one_argument(argument, victim_name);
@@ -169,7 +169,7 @@ qint32 do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    char dammsg[MAX_STRING_LENGTH];
+    QString dammsg;
     qint32 amount = 500 + (ch->has_skill(SKILL_LAY_HANDS) * 10);
     if (amount + victim->getHP() > GET_MAX_HIT(victim))
       amount = GET_MAX_HIT(victim) - victim->getHP();
@@ -192,13 +192,13 @@ qint32 do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   double modifier = 0.0;
   double enemy_hp = 0.0;
   qint32 chance = {};
   qint32 retval = ReturnValue::eSUCCESS;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   CharacterPtr vict;
 
   one_argument(argument, buf);

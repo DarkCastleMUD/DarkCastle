@@ -325,7 +325,7 @@ QList<profession> fill_professions(void)
 QList<profession> professions = fill_professions();
 
 // Obj proc types
-const char *obj_types[] = {
+const QStringList obj_types = {
     "act_prog",
     "speech_prog",
     "rand_prog",
@@ -339,7 +339,7 @@ const char *obj_types[] = {
     "can_see_prog",
     "\n"};
 
-const char *utility_item_types[]{
+const QStringList utility_item_types{
     "Nothing - Useless",
     "CatStink - Track remover",
     "ExitTrap - Do Not Use",
@@ -348,7 +348,7 @@ const char *utility_item_types[]{
     "\n"};
 
 // every spell needs an entry in here
-const char *spell_wear_off_msg[] =
+const QStringList spell_wear_off_msg =
     {
         "RESERVED DB.C", /* 0 */
         "Your magical armour fades to nothing.",
@@ -406,7 +406,7 @@ const char *spell_wear_off_msg[] =
         "!Identify!",
         "!Animate Dead!",
         "!Fear!.", /* 55 */
-        "You slowly float to the ground.",
+        "You slowly qreal to the ground.",
         "Your light slowly fizzes into nothing.",
         "You can no longer sense the auras of others.",
         "!Dispel Magic!",
@@ -467,7 +467,7 @@ const char *spell_wear_off_msg[] =
         "!Sparks!", // 114
         "Your $2c$7a$0$Bmo$Ru$2fl$7a$0$Bg$R$7e$R has worn off.",
         "Your farsight ability has expired.",
-        "You slowly float down to the ground.",
+        "You slowly qreal down to the ground.",
         "You are able to sleep once again.",
         "You step out of the shadows.",
         "The $5yellow$R in your skin fades.", // 120
@@ -579,7 +579,7 @@ const QStringList dirswards =
         "downward",
         "\n"};
 
-const char *weekdays[7] =
+const QStringList weekdays =
     {
         "Aetherday",
         "the Day of Firesong",
@@ -589,7 +589,7 @@ const char *weekdays[7] =
         "the Day of Balance",
         "Praiseday"};
 
-const char *month_name[17] =
+const QStringList month_name =
     {
         "Month of the Whistling Wind", /* 0 */
         "Month of the Frozen Sky",
@@ -636,7 +636,7 @@ const QStringList where =
         "<in right ear>  ",
         "<on penis>      "};
 
-const char *strs_damage_types[] =
+const QStringList strs_damage_types =
     {
         "hit",
         "bludgeon",
@@ -729,7 +729,7 @@ qint32 drink_aff[][3] =
         {0, 1, 10},
         {0, 1, 10}};
 
-const char *color_liquid[] =
+const QStringList color_liquid =
     {
         "clear",
         "brown",
@@ -828,7 +828,7 @@ qint32 exp_table[] =
 #undef K
 #undef L
 
-const char *mob_types[] =
+const QStringList mob_types =
     {
         "NORMAL",
         "GUARD",
@@ -874,7 +874,7 @@ item_types_t item_types =
         "KEYRING",
         "\n"};
 
-const char *zone_modes[] =
+const QStringList zone_modes =
     {
         "Don't_Update",
         "RepopIfEmpty",
@@ -958,7 +958,7 @@ const QStringList Object::more_obj_bits =
         "POOF_AFTER_24H",
         "POOF_NEVER"};
 
-const char *size_bitfields[] =
+const QStringList size_bitfields =
     {
         "ANY",
         "SMALL",
@@ -973,7 +973,7 @@ const QStringList Object::size_bits =
         "Medium races",
         "Large races"};
 
-const char *room_bits[] =
+const QStringList room_bits =
     {
         "dark",
         "nohome",
@@ -1008,12 +1008,12 @@ const char *room_bits[] =
         "light",
         "\n"};
 
-const char *temp_room_bits[] =
+const QStringList temp_room_bits =
     {
         "ETHEREAL_FOCUS",
         "\n"};
 
-const char *exit_bits[] =
+const QStringList exit_bits =
     {
         "IS-DOOR",
         "CLOSED",
@@ -1024,7 +1024,7 @@ const char *exit_bits[] =
         "BROKEN",
         "\n"};
 
-const char *sector_types[] =
+const QStringList sector_types =
     {
         "inside",
         "city",
@@ -1044,7 +1044,7 @@ const char *sector_types[] =
         "arctic",
         "\n"};
 
-const char *time_look[] =
+const QStringList time_look =
     {
         "night time",
         "sun rise",
@@ -1052,7 +1052,7 @@ const char *time_look[] =
         "sun set",
         "/n"};
 
-const char *sky_look[] =
+const QStringList sky_look =
     {
         "cloudless",
         "cloudy",
@@ -1061,7 +1061,7 @@ const char *sky_look[] =
         "lit by flashes of lightning",
         "/n"};
 
-const char *equipment_types[] =
+const QStringList equipment_types =
     {
         "Special",
         "Worn Right finger",
@@ -1090,7 +1090,7 @@ const char *equipment_types[] =
         "\n"};
 
 /* Should be in exact correlation as the AFF types -Kahn */
-const char *affected_bits[] =
+const QStringList affected_bits =
     { // When you modify this, modify skill_aff in mob_commands
         "BLIND",
         "INVISIBLE",
@@ -1169,7 +1169,7 @@ const char *affected_bits[] =
 
 /* Should be in exact correlation as the APPLY types -Kahn */
 
-const char *apply_types[] =
+const QStringList apply_types =
     {
         "NONE", // 0
         "STR",
@@ -1283,7 +1283,7 @@ const char *apply_types[] =
         "WILD MAGIC",
         "\n"};
 
-const char *pc_clss_types[] =
+const QStringList pc_clss_types =
     {
         "UNDEFINED",
         "Mage",
@@ -1301,7 +1301,7 @@ const char *pc_clss_types[] =
         "Necromancer",
         "\n"};
 
-const char *pc_clss_types2[] =
+const QStringList pc_clss_types2 =
     {
         "UNDEFINED",
         "Mage",
@@ -1319,7 +1319,7 @@ const char *pc_clss_types2[] =
         "Necromancer",
         "\n"};
 
-const char *pc_clss_types3[] =
+const QStringList pc_clss_types3 =
     {
         "UNDEFINED",
         "mage",
@@ -1337,7 +1337,7 @@ const char *pc_clss_types3[] =
         "necromancer",
         "\n"};
 
-const char *pc_clss_abbrev[] =
+const QStringList pc_clss_abbrev =
     {
         "Und",
         "Mag",
@@ -1355,7 +1355,7 @@ const char *pc_clss_abbrev[] =
         "Nec",
         "\n"};
 
-const char *class_tree_name[11][3] = {
+const QString class_tree_name[11][3] = {
     {"Warmage", "Spellbinder", "MAGE3"},
     {"Zealot", "Ritualist", "CLERIC3"},
     {"Pilferer", "Assassin", "THIEF3"},
@@ -1936,7 +1936,7 @@ const QStringList languages =
         "deity",
         "\n"};
 
-const char *race_types[] =
+const QStringList race_types =
     {
         "Undefined",
         "Human",
@@ -1950,7 +1950,7 @@ const char *race_types[] =
         "Troll",
         "\n"};
 
-const char *race_abbrev[] =
+const QStringList race_abbrev =
     {
         "Und",
         "Hum",
@@ -1990,8 +1990,8 @@ const char *race_abbrev[] =
 class race_shit
 {
 public:
-  char *singular_name;  // dwarf, elf, etc.
-  char *plural_name;     // dwarves, elves, etc.
+  QString singular_name;  // dwarf, elf, etc.
+  QString plural_name;     // dwarves, elves, etc.
 
   qint32 body_parts;  // bitvector for body parts
   qint32 immune;      // bitvector for immunities
@@ -2082,49 +2082,48 @@ qint32 mob_race_mod[][5] =
         {16, 24, 20, 15, 15}, // feline
 };
 
-const char
-    *action_bits[] = {
-        "SPEC",
-        "SENTINEL",
-        "SCAVENGER",
-        "NOTRACK",
-        "NICE-THIEF",
-        "AGGRESSIVE",
-        "STAY_ZONE",
-        "WIMPY",
-        "2ND_ATTACK",
-        "3RD_ATTACK",
-        "4TH_ATTACK",
-        "AGGRESSIVE_EVIL",
-        "AGGRESSIVE_GOOD",
-        "AGGRESSIVE_NEUTRAL",
-        "IS_UNDEAD",
-        "IS_STUPID",
-        "CHARMABLE",
-        "IS_HUGE",
-        "CAN_DODGE",
-        "CAN_PARRY",
-        "RACIST",
-        "FRIENDLY",
-        "STAY_NO_TOWN",
-        "NOMAGIC",
-        "DRAINY",
-        "BARDCHARM",
-        "NOKI",
-        "NOMATRIX",
-        "BOSS",
-        "NOHEADBUTT",
-        "NOATTACKS",
-        "nodontuse",
-        "IS_SWARM",
-        "IS_TINY",
-        "NODISPEL",
-        "POISONOUS",
-        "NO_GOLD_BONUS",
-        "NO_HUNT",
-        "\n"};
+const QStringList action_bits = {
+    "SPEC",
+    "SENTINEL",
+    "SCAVENGER",
+    "NOTRACK",
+    "NICE-THIEF",
+    "AGGRESSIVE",
+    "STAY_ZONE",
+    "WIMPY",
+    "2ND_ATTACK",
+    "3RD_ATTACK",
+    "4TH_ATTACK",
+    "AGGRESSIVE_EVIL",
+    "AGGRESSIVE_GOOD",
+    "AGGRESSIVE_NEUTRAL",
+    "IS_UNDEAD",
+    "IS_STUPID",
+    "CHARMABLE",
+    "IS_HUGE",
+    "CAN_DODGE",
+    "CAN_PARRY",
+    "RACIST",
+    "FRIENDLY",
+    "STAY_NO_TOWN",
+    "NOMAGIC",
+    "DRAINY",
+    "BARDCHARM",
+    "NOKI",
+    "NOMATRIX",
+    "BOSS",
+    "NOHEADBUTT",
+    "NOATTACKS",
+    "nodontuse",
+    "IS_SWARM",
+    "IS_TINY",
+    "NODISPEL",
+    "POISONOUS",
+    "NO_GOLD_BONUS",
+    "NO_HUNT",
+    "\n"};
 
-const char *player_bits[] =
+const QStringList player_bits =
     {
         "BRIEF",
         "COMPACT",
@@ -2158,7 +2157,7 @@ const char *player_bits[] =
         "REMORTED",
         "\n"};
 
-const char *punish_bits[] =
+const QStringList punish_bits =
     {
         "Silenced",
         "NoEmote",
@@ -2171,7 +2170,7 @@ const char *punish_bits[] =
         "NoArena",
         "\n"};
 
-const char *combat_bits[] =
+const QStringList combat_bits =
     {
         "Shocked",
         "Bash1",
@@ -2198,7 +2197,7 @@ const char *combat_bits[] =
         "CrushBlow",
         "\n"};
 
-const char *isr_bits[] =
+const QStringList isr_bits =
     {
         "PIERCE",
         "SLASH",
@@ -2239,7 +2238,7 @@ const QStringList Character::position_types =
         "Fighting",
         "Standing"};
 
-const char *connected_types[] =
+const QStringList connected_types =
     {
         "Playing",
         "Get name",
@@ -2261,7 +2260,7 @@ const char *connected_types[] =
         "Delete character screen",
         "Choose stats",
         "Pfile wipe",
-        "Archive char screen", // 20
+        "Archive character screen", // 20
         "Closing",
         "Confirm password change",
         "Editing mprog",

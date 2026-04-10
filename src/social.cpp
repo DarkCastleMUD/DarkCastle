@@ -127,9 +127,9 @@ command_return_t Character::check_social(QString pcomm)
   return SOCIAL_true_WITH_NOISE;
 }
 
-char *fread_social_string(FILE *fl)
+QString fread_social_string(FILE *fl)
 {
-  char buf[MAX_STRING_LENGTH], *rslt;
+  QString buf, *rslt;
 
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl))
@@ -247,7 +247,7 @@ void DC::clean_socials_from_memory()
   soc_mess_list.clear();
 }
 
-qint32 do_social(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_social(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 i{};

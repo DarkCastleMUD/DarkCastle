@@ -78,15 +78,15 @@ qint32 get_max_stat_bonus(CharacterPtr ch, qint32 attrs)
 }
 
 // List skill maxes.
-qint32 do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg, arg2[MAX_INPUT_LENGTH];
   CharacterClassSkill *classskill;
   argument = one_argument(argument, arg);
   one_argument(argument, arg2);
   qint32 oclass = GET_CLASS(ch); // old class.
 
-  // get_skill_list uses a char argument, and so to keep upkeep
+  // get_skill_list uses a character argument, and so to keep upkeep
   // at a min I'm just modifying this here.
   qint32 i;
   for (i = {}; pc_clss_types2[i][0] != '\n'; i++)
@@ -112,12 +112,12 @@ qint32 do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         qint32 max = classskill[i].maximum;
 
-        float percent = max * 0.75;
+        qreal percent = max * 0.75;
         if (classskill[i].attrs)
         {
           percent += max / 100.0 * get_max_stat_bonus(ch, classskill[i].attrs);
         }
-        percent = MIN((float)max, percent);
+        percent = MIN((qreal)max, percent);
         percent = MAX((double)max * 0.75, (double)percent);
         ch->send(QStringLiteral("%s: %d\r\n").arg(classskill[i].skillname).arg((qint32)percent));
       }
@@ -203,11 +203,11 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 }
 
 // take away a command from a god
-qint32 do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr vict = {};
-  char buf[MAX_INPUT_LENGTH];
-  char command[MAX_INPUT_LENGTH];
+  QString buf;
+  QString command;
   qint32 i;
 
   half_chop(arg, arg, command);
@@ -274,20 +274,20 @@ qint32 do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 
 /* Thunder is currently in wiz_104.c */
 
-qint32 do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   wizlock = !wizlock;
 
   if (wizlock)
   {
-    char log_buf[MAX_STRING_LENGTH] = {};
+    QString log_buf = {};
     sprintf(log_buf, "Game has been wizlocked by %s.", qPrintable(ch->name()));
     logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game wizlocked.");
   }
   else
   {
-    char log_buf[MAX_STRING_LENGTH] = {};
+    QString log_buf = {};
     sprintf(log_buf, "Game has been un-wizlocked by %s.", qPrintable(ch->name()));
     logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game un-wizlocked.");
@@ -302,10 +302,10 @@ qint32 do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 | Side effects: None
 | Returns: None
 */
-qint32 do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[100], buf[50];
+  QString name, buf[50];
 
   /* Verify preconditions */
   assert(ch != 0);
@@ -334,17 +334,16 @@ qint32 do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  strncpy(victim->player->pwd, (char *)crypt(name, qPrintable(victim->name())), PASSWORD_LEN);
-  victim->player->pwd[PASSWORD_LEN] = '\0';
+  victim->player->pwd = crypt(qPrintable(name), qPrintable(victim->name()));
 
   ch->sendln("Ok.");
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char command[MAX_INPUT_LENGTH];
-  char lev_str[MAX_INPUT_LENGTH];
+  QString command;
+  QString lev_str;
   quint64 lev_nr = 110;
 
   if (ch->isNonPlayer())
@@ -406,7 +405,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  // +1 cause you can actually have 13 char names
+  // +1 cause you can actually have 13 character names
   if (newname.length() > (MAX_NAME_LENGTH + 1))
   {
     send(QStringLiteral("New name too long. Maximum allowed length is %1 characters.\r\n").arg(MAX_NAME_LENGTH + 1));
@@ -589,9 +588,9 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   return ReturnValue::eSUCCESS;
 }
-qint32 do_install(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[256], type[256], arg1[256], err[256], arg2[256];
+  QString buf, type[256], arg1[256], err[256], arg2[256];
   qint32 range = 0, type_ok = 0, numrooms = {};
   qint32 ret;
 
@@ -690,7 +689,7 @@ qint32 do_install(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_range(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (!ch->has_skill(COMMAND_RANGE))
   {
@@ -776,9 +775,9 @@ qint32 do_range(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   CharacterPtr victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
@@ -786,7 +785,7 @@ qint32 do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("metastat who?");
     return ReturnValue::eFAILURE;
   }
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   sprintf(buf, "Hps metad: %d Mana metad: %d Moves Metad: %d\r\n",
           GET_HP_METAS(victim), GET_MANA_METAS(victim), GET_MOVE_METAS(ch));
@@ -822,9 +821,9 @@ qint32 do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
+  QString arg;
   argument = one_argument(argument, arg);
 
   if (!arg[0])
@@ -845,7 +844,7 @@ qint32 do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
   i = 1 << i;
   qint32 r, o = 1;
   ObjectPtr obj;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   for (r = {}; r < top_of_objt; r++)
   {
     obj = (ObjectPtr)DC::getInstance()->obj_index[r].item;
@@ -870,9 +869,9 @@ qint32 do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  QString arg1, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
   argument = one_argument(argument, arg3);
@@ -883,7 +882,7 @@ qint32 do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   qint32 toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
-  float lvldiff = level - tlevel;
+  qreal lvldiff = level - tlevel;
   if (lvldiff > 15 && lvldiff < 25)
     toHit += 25;
   else if (lvldiff > 5)
@@ -893,27 +892,27 @@ qint32 do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (lvldiff >= -5)
     toHit += 5;
 
-  float lvl = (50.0 - level - tlevel / 2.0) / 10.0;
+  qreal lvl = (50.0 - level - tlevel / 2.0) / 10.0;
 
   if (lvl >= 1.0)
     toHit = (qint32)(toHit * lvl);
 
   for (qint32 AC = 100; AC > -1010; AC -= 10)
   {
-    float num1 = 1.0 - (-300.0 - (float)AC) * 4.761904762 * 0.0001;
-    float num2 = 20.0 + (-300.0 - (float)AC) * 0.0095238095;
+    float num1 = 1.0 - (-300.0 - (qreal)AC) * 4.761904762 * 0.0001;
+    float num2 = 20.0 + (-300.0 - (qreal)AC) * 0.0095238095;
 
-    float percent = 30 + num1 * (float)(toHit)-num2;
+    qreal percent = 30 + num1 * (qreal)(toHit)-num2;
 
     ch->send(QStringLiteral("%d AC - %f%% chance to hit\r\n").arg(AC).arg(percent));
   }
   return ReturnValue::eSUCCESS;
 }
 
-void write_array_csv(const char *const *array, std::ofstream &fout)
+void write_array_csv(QStringList array, std::ofstream &fout)
 {
   qint32 index = {};
-  const char *ptr = array[index];
+  const QString ptr = array[index];
   while (*ptr != '\n')
   {
     fout << ptr << ",";
@@ -929,9 +928,9 @@ void write_array_csv(QStringList names, std::ofstream &fout)
   }
 }
 
-qint32 do_export(CharacterPtr ch, char *args, cmd_t cmd)
+command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
 {
-  char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
+  QString export_type, filename[MAX_INPUT_LENGTH];
   world_file_list_item *curr = DC::getInstance()->obj_file_list;
 
   args = one_argument(args, export_type);
@@ -1000,7 +999,7 @@ command_return_t do_world(CharacterPtr ch, QString args, cmd_t cmd)
         if (rename(qPrintable(world->filename), qPrintable(potential_filename)) == -1)
         {
           auto rename_errno = errno;
-          char *errStr = strerror(rename_errno);
+          QString errStr = strerror(rename_errno);
           if (errStr != nullptr)
           {
             ch->send(QStringLiteral("Error renaming %1 to %2 was %3 %4\r\n").arg(world->filename).arg(potential_filename).arg(rename_errno).arg(errStr));

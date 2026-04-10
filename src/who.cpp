@@ -15,7 +15,7 @@
 
 Clan *get_clan(CharacterPtr);
 
-qint32 do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto arguments = QString(argument).split(' ');
   Connection *d{};
@@ -129,7 +129,7 @@ qint32 do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto arguments = QString(argument).split(' ');
   auto target = arguments.value(0);
@@ -498,7 +498,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 count = {};
   Clan *clan;
@@ -551,11 +551,11 @@ qint32 do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_where(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   class Connection *d;
   qint32 zonenumber;
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
 
   one_argument(argument, buf);
 

@@ -6,12 +6,12 @@
 #include "DC/interp.h"
 #include <fmt/format.h>
 
-qint32 do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i;
   class Connection *d;
-  char arg[100];
-  char buf[100];
+  QString arg;
+  QString buf;
   qint32 minamt;
 
   one_argument(argument, arg);
@@ -194,7 +194,7 @@ QString rc_to_qstring(const command_return_t &rc)
   return strings.join(',');
 }
 
-void run_check(CharacterPtr ch, command_return_t *rc, auto *function, char *arguments = {}, cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, auto *function, QString arguments = {}, cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc = {};
   if (ch)

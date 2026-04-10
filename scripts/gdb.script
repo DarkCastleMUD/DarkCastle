@@ -3,7 +3,7 @@ define p_character_list
  while ((char_data *)$list->next != 0 && (char_data *)$list->next != 0x95959595)
    set $list = (char_data *)$list->next
    if (char_data *)$list->next == 0xc279798
-      p (char *)(char_data *)$list->name
+      p (char_data *)$list->name
    end
  end
 end

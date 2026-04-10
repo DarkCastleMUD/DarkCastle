@@ -71,14 +71,14 @@ void rebuild_rnum_references(qint32 startAt, qint32 type)
       case 'J':
         break;
       default:
-        logentry(QStringLiteral("Illegal char hit in rebuild_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
+        logentry(QStringLiteral("Illegal character hit in rebuild_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
         break;
       }
     }
   }
 }
 
-qint32 do_check(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
 {
 
   auto arguments = QString(arg).trimmed().split(' ');
@@ -170,17 +170,17 @@ qint32 do_check(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_find(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_find(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char type[MAX_INPUT_LENGTH];
-  char name[MAX_INPUT_LENGTH];
+  QString type;
+  QString name;
   CharacterPtr vict;
   qint32 x;
 
   const QStringList types = {
       "mob",
       "pc",
-      "char",
+      "character",
       "obj",
       "\n"};
 
@@ -196,7 +196,7 @@ qint32 do_find(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!*type || !*name)
   {
-    ch->sendln("Usage:  find <mob|pc|char|obj> <name>");
+    ch->sendln("Usage:  find <mob|pc|character|obj> <name>");
     return ReturnValue::eFAILURE;
   }
 
@@ -204,7 +204,7 @@ qint32 do_find(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (x == 4)
     {
-      ch->sendln("Type must be one of these: mob, pc, char, obj.");
+      ch->sendln("Type must be one of these: mob, pc, character, obj.");
       return ReturnValue::eFAILURE;
     }
     if (is_abbrev(type, types[x]))
@@ -237,14 +237,14 @@ qint32 do_find(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   class Connection d;
   CharacterPtr vict;
   ObjectPtr obj;
-  char type[MAX_INPUT_LENGTH];
-  char name[MAX_INPUT_LENGTH];
-  char *c;
+  QString type;
+  QString name;
+  QString c;
   qint32 x;
 
   const QStringList types = {
@@ -264,7 +264,7 @@ qint32 do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!*type || !*name)
   {
-    ch->sendln("Usage:  stat <mob|obj|char> <name>");
+    ch->sendln("Usage:  stat <mob|obj|character> <name>");
     return ReturnValue::eFAILURE;
   }
 
@@ -348,10 +348,10 @@ qint32 do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mpstat(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_mpstat(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr vict;
-  char name[MAX_INPUT_LENGTH];
+  QString name;
   qint32 x;
 
   void mpstat(CharacterPtr ch, CharacterPtr victim);
@@ -547,7 +547,7 @@ command_return_t zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
   {
     if (isexact(select, "type"))
     {
-      char result = last.at(0).toUpper().toLatin1();
+      auto result = last.at(0).toUpper().toLatin1();
 
       switch (result)
       {
@@ -928,7 +928,7 @@ command_return_t zedit_help(CharacterPtr ch)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, text, arg;
   quint64 i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = {};
@@ -936,7 +936,7 @@ qint32 do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
   vnum_t robj = {}, rmob = {};
   bool ok = false;
   QSharedPointer<ResetCommand> tmp = {}, temp_com = {};
-  char *str = {};
+  QString str = {};
 
   QStringList arguments = QString(argument).trimmed().split(' ');
 
@@ -1305,7 +1305,7 @@ qint32 do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString select;
@@ -1320,7 +1320,7 @@ qint32 do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
   qint16 learned = {};
   qint32 i = {};
 
-  const char *sedit_values[] = {
+  const QStringList sedit_values = {
       "add",
       "remove",
       "set",
@@ -1514,12 +1514,12 @@ qint32 do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, char *buf)
+qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
 {
-  char type[MAX_INPUT_LENGTH];
-  char buf2[MAX_INPUT_LENGTH];
-  char select[MAX_INPUT_LENGTH];
-  char value[MAX_INPUT_LENGTH];
+  QString type;
+  QString buf2;
+  QString select;
+  QString value;
   qint32 x;
   ObjectPtr obj = {};
   qint32 num;
@@ -1704,12 +1704,12 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, char *buf)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 oedit_affects(CharacterPtr ch, qint32 item_num, char *buf)
+qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
 {
-  char type[MAX_INPUT_LENGTH];
-  char buf2[MAX_INPUT_LENGTH];
-  char select[MAX_INPUT_LENGTH];
-  char value[MAX_INPUT_LENGTH];
+  QString type;
+  QString buf2;
+  QString select;
+  QString value;
   qint32 x;
   ObjectPtr obj = {};
   qint32 num;
@@ -1950,10 +1950,10 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, char *buf)
 
 command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH] = {};
-  char buf2[MAX_INPUT_LENGTH] = {};
-  char buf3[MAX_INPUT_LENGTH] = {};
-  char buf4[MAX_INPUT_LENGTH] = {};
+  QString buf = {};
+  QString buf2 = {};
+  QString buf3 = {};
+  QString buf4 = {};
   qint32 rnum = {};
   vnum_t vnum = {};
   qint32 intval = {};
@@ -2589,12 +2589,12 @@ void update_mobprog_bits(qint32 mob_num)
   }
 }
 
-qint32 do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH] = {};
-  char buf2[MAX_INPUT_LENGTH] = {};
-  char buf3[MAX_STRING_LENGTH] = {};
-  char buf4[MAX_INPUT_LENGTH] = {};
+  QString buf = {};
+  QString buf2 = {};
+  QString buf3 = {};
+  QString buf4 = {};
   qint32 mob_num = -1;
   qint32 intval = {};
   qint32 x{}, i = {};
@@ -2978,9 +2978,9 @@ qint32 do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   qint32 mob_num = -1;
 
   void boro_mob_stat(CharacterPtr ch, CharacterPtr k);
@@ -3007,16 +3007,16 @@ qint32 do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (!ch || !argument)
   {
     return ReturnValue::eFAILURE;
   }
-  char buf[MAX_INPUT_LENGTH] = {};
-  char buf2[MAX_INPUT_LENGTH] = {};
-  char buf3[MAX_INPUT_LENGTH] = {};
-  char buf4[MAX_INPUT_LENGTH] = {};
+  QString buf = {};
+  QString buf2 = {};
+  QString buf3 = {};
+  QString buf4 = {};
   vnum_t mob_num = {};
   qint32 intval = {};
   qint32 x = {}, i = {};
@@ -4062,14 +4062,14 @@ qint32 do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, remainder_args;
   qint32 x, a, b, c, d = {};
   extra_descr_data *extra;
   extra_descr_data *ext;
 
-  const char *return_directions[] =
+  const QStringList return_directions =
       {
           "south",
           "west",
@@ -4368,7 +4368,7 @@ qint32 do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
                           return_directions[x], DC::getInstance()->world[ch->in_room].number,
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
         SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
-        char *tmp = strdup(buf.c_str());
+        QString tmp = strdup(buf.c_str());
         do_at(ch, tmp);
         free(tmp);
         REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
@@ -4657,10 +4657,10 @@ qint32 do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x;
-  char buf[50], buf2[50];
+  QString buf, buf2[50];
   extra_descr_data *i, *extra;
 
   half_chop(arg, buf, buf2);
@@ -4782,7 +4782,7 @@ qint32 do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_oneway(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_oneway(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -4865,7 +4865,7 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_rsave(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_rsave(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   world_file_list_item *curr;
 
@@ -4908,11 +4908,11 @@ qint32 do_rsave(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_msave(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_msave(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   world_file_list_item *curr;
-  char buf[180];
-  char buf2[180];
+  QString buf;
+  QString buf2;
 
   if (ch->player->last_mob_edit <= 0)
   {
@@ -4963,11 +4963,11 @@ qint32 do_msave(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   world_file_list_item *curr;
-  char buf[180];
-  char buf2[180];
+  QString buf;
+  QString buf2;
 
   if (ch->player->last_obj_vnum < 1)
   {
@@ -5015,10 +5015,10 @@ qint32 do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   FILE *fl;
-  char buf[200], bufl[200] /*,buf2[200],buf3[200]*/;
+  QString buf, bufl[200] /*,buf2[200],buf3[200]*/;
   qint32 room = 1, x, door /*,direction*/;
   qint32 pos;
   qint32 value;
@@ -5319,11 +5319,11 @@ qint32 do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH];
-  char buf[MAX_STRING_LENGTH * 2];
-  char buf2[MAX_STRING_LENGTH];
+  QString arg1;
+  QString buf;
+  QString buf2;
   Room *rm = {};
   CharacterPtr k = {};
   ObjectPtr j = {};
@@ -5431,7 +5431,7 @@ qint32 do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
   buffer += "\r\n";
-  send_to_char(const_cast<char *>(buffer.c_str()), ch);
+  send_to_char(const_cast<QString>(buffer.c_str()), ch);
 
   ch->sendln("------- Exits defined -------");
   for (i = {}; i <= 5; i++)
@@ -5457,11 +5457,11 @@ qint32 do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
+  QString arg;
   CharacterPtr victim;
-  char buf[200];
+  QString buf;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -5527,7 +5527,7 @@ qint32 do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_return(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_return(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   //    if(ch->isNonPlayer())
@@ -5597,11 +5597,11 @@ command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  void send_info(char *);
+  QString buf;
+  QString buf2;
+  void send_info(QString);
   half_chop(arg, buf, buf2);
 
   if (!*buf)
@@ -5655,9 +5655,9 @@ qint32 do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char name[100], buf[150];
+  QString name, buf[150];
   CharacterPtr vict;
 
   qint32 i;
@@ -5673,7 +5673,7 @@ qint32 do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
   if (!*name)
   {
     ch->sendln("Punish who?");
-    send_to_char("\r\nusage: punish <char> [stupid silence freeze noemote "
+    send_to_char("\r\nusage: punish <character> [stupid silence freeze noemote "
                  "notell noname noarena notitle nopray]\r\n",
                  ch);
     return ReturnValue::eFAILURE;
@@ -5895,7 +5895,7 @@ qint32 do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
 
 void display_punishes(CharacterPtr ch, CharacterPtr vict)
 {
-  char buf[100];
+  QString buf;
 
   sprintf(buf, "$3Punishments for %s$R: ", qPrintable(vict->name()));
   ch->send(buf);
@@ -5939,9 +5939,9 @@ void display_punishes(CharacterPtr ch, CharacterPtr vict)
   ch->sendln("");
 }
 
-qint32 do_colors(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_colors(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[200];
+  QString buf;
 
   send_to_char("Color codes are a $$ followed by a code.\r\n\r\n"
                " Code   Bold($$B)  Inverse($$I)  Both($$B$$I)\r\n",

@@ -1,35 +1,23 @@
-#include <cstring>
-#include <memory>
-#include <iostream>
-
 #include <QTest>
 #include <QtLogging>
 #include <qhashfunctions.h>
-
-#include "DC/comm.h"
-#include "DC/handler.h"
-#include "DC/db.h"
-#include "DC/spells.h"
 #include "DC/DC.h"
+#include "DC/comm.h"
+#include "DC/db.h"
 #include "DC/terminal.h"
-#include "DC/connect.h"
 
-using namespace std::literals;
+using namespace Qt::StringLiterals;
+const auto STRING_LITERAL1 = u"$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"_s;
+const auto STRING_LITERAL1_NOCOLOR = u"0123456789IL*RB$"_s;
+const auto STRING_LITERAL1_COLOR = BLACK + "0"_ba + BLUE + "1"_ba + GREEN + "2"_ba + CYAN + "3"_ba + RED + "4"_ba + YELLOW + "5"_ba + PURPLE + "6"_ba + GREY + "7"_ba + "8"_ba + "9"_ba + INVERSE + "I"_ba + FLASH + "L"_ba + "*"_ba + NTEXT + "R"_ba + BOLD + "B"_ba + "$"_ba;
+const auto STRING_LITERAL2 = u"$0$1$2$3$4$5$6$7$8$9$I$L$*$R$B"_s;
+const auto STRING_LITERAL3 = u""_s;
+const auto STRING_LITERAL4 = u"$"_s;
+const auto STRING_LITERAL5 = u"test"_s;
+const auto STRING_LITERAL6 = u"$z$>$;"_s;
 
-#define STRING_LITERAL1 "$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"
-#define STRING_LITERAL1_NOCOLOR "0123456789IL*RB$"
-#define STRING_LITERAL1_COLOR BLACK "0" BLUE "1" GREEN "2" CYAN "3" RED "4" YELLOW "5" PURPLE "6" GREY "7" \
-                                    "8"                                                                    \
-                                    "9" INVERSE "I" FLASH "L"                                              \
-                                    "*" NTEXT "R" BOLD "B"                                                 \
-                                    "$"
-#define STRING_LITERAL2 "$0$1$2$3$4$5$6$7$8$9$I$L$*$R$B"
-#define STRING_LITERAL3 ""
-#define STRING_LITERAL4 "$"
-#define STRING_LITERAL5 "test"
-#define STRING_LITERAL6 "$z$>$;"
-
-QString Character::get_parsed_legacy_prompt_variable(QString var)
+QString
+Character::get_parsed_legacy_prompt_variable(QString var)
 {
   auto saved_prompt = getPrompt();
 
@@ -124,29 +112,12 @@ private slots:
     ch->setType(Character::Type::Player);
     ch->do_toggle({"ansi"});
     QVERIFY(isSet(ch->player->toggles, Player::PLR_ANSI));
-    QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_COLOR));
+    auto ansi = handle_ansi(STRING_LITERAL1, ch.get());
+    QCOMPARE(ansi, STRING_LITERAL1_COLOR);
 
     ch->do_toggle({"ansi"});
     QVERIFY(!isSet(ch->player->toggles, Player::PLR_ANSI));
-    QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_NOCOLOR));
-  }
-
-  void test_0()
-  {
-    std::unique_ptr<char, decltype(std::free) *> new_string = {0(STRING_LITERAL1), std::free};
-    QVERIFY(new_string.get() != nullptr);
-    QCOMPARE(strlen(new_string.get()), strlen(STRING_LITERAL1));
-
-    QCOMPARE(nullptr), nullptr;
-  }
-
-  void test_()
-  {
-    std::unique_ptr<char, decltype(std::free) *> new_string = {(STRING_LITERAL1), std::free};
-    QVERIFY(new_string.get() != nullptr);
-    QCOMPARE(strlen(new_string.get()), strlen(STRING_LITERAL1));
-    // causes expected crash
-    // QCOMPARE((nullptr), nullptr);
+    QCOMPARE(handle_ansi(STRING_LITERAL1, ch.get()), STRING_LITERAL1_NOCOLOR);
   }
 
   void test_dice()
@@ -175,9 +146,9 @@ private slots:
 
   void test_str_nospace()
   {
-    std::unique_ptr<char, decltype(std::free) *> result = {str_nospace("  this is a test  "), std::free};
-    QVERIFY(result.get());
-    QCOMPARE(result.get(), "__this_is_a_test__");
+    auto result = str_nospace("  this is a test  ");
+    QVERIFY(!result.isEmpty());
+    QCOMPARE(result, "__this_is_a_test__");
   }
 
   void test_str_nosp_cmp_c_string()
@@ -1435,7 +1406,7 @@ private slots:
     }
 
     QList<QChar> prompt_variables;
-    for (char c = ' '; c <= '~'; ++c)
+    for (character c = ' '; c <= '~'; ++c)
       prompt_variables.append(c);
 
     QMap<QString, QString> parsed_prompt_variables;

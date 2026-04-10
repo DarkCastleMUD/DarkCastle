@@ -35,7 +35,7 @@ extern mprog_throw_type *g_mprog_throw_list;
 class obj_emote_data
 {
 public:
-  char *emote_text;
+  QString emote_text;
   obj_emote_data *next;
 };
 
@@ -90,7 +90,7 @@ void load_emoting_objects()
   obj_emote_data *data_cursor = {};
   FILE *fl;
   // short i;
-  char fromfile;
+  QChar fromfile;
   bool done = false,
        done2 = false;
   short offset;
@@ -116,7 +116,7 @@ void load_emoting_objects()
       // Why are we dc_alloc'ing the space when fread_string is returning us
       // a pointer to the space IT allocs?  Azrack you silly goose.  I fixed it.
       // -pir 05/03/00
-      // data_cursor->emote_text = (char *)dc_alloc(100, sizeof(char));
+      // data_cursor->emote_text = dc_alloc(100, sizeof(QChar));
       data_cursor->emote_text = fread_string(fl, 0);
       index_cursor->emote_index_length++;
       if ((offset = 1) && ((fromfile = fgetc(fl)) == 'S') && ((offset = 2) && (fromfile = fgetc(fl)) == '\n'))
@@ -128,9 +128,9 @@ void load_emoting_objects()
         data_cursor->next = new obj_emote_data;
         data_cursor = data_cursor->next;
         data_cursor->next = {};
-        // Azrack -- fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
+        // Azrack -- fseek had a -1 * offset * sizeof(QChar) which is going to send us to EOF immmediately
         // because fseek takes an quint32.
-        fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
+        fseek(fl, (-1 * offset * sizeof(QChar)), SEEK_CUR);
       }
     }
     if ((fromfile = fgetc(fl)) == '$')
@@ -139,7 +139,7 @@ void load_emoting_objects()
     }
     else
     {
-      fseek(fl, (1 * sizeof(char)), SEEK_CUR);
+      fseek(fl, (1 * sizeof(QChar)), SEEK_CUR);
       index_cursor->next = new obj_emote_index;
       index_cursor = index_cursor->next;
       index_cursor->next = {};
@@ -154,7 +154,7 @@ void load_emoting_objects()
   fclose(fl);
 }
 
-qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
   obj_emote_index *index_cursor = {};
@@ -201,7 +201,7 @@ qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg
   return ReturnValue::eFAILURE;
 }
 
-qint32 barbweap(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 barbweap(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                 CharacterPtr invoker)
 { // Cestus
   if (cmd != cmd_t::PUSH)
@@ -222,7 +222,7 @@ qint32 barbweap(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   }
   return ReturnValue::eFAILURE;
 }
-qint32 souldrainer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 souldrainer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                    CharacterPtr invoker)
 {
   // ObjectPtr wielded;
@@ -281,7 +281,7 @@ qint32 souldrainer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 pushwand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 pushwand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                 CharacterPtr invoker)
 {
   if (cmd != cmd_t::SAY && cmd != cmd_t::PUSH)
@@ -398,7 +398,7 @@ qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   if (obj->equipped_by == nullptr || !obj->equipped_by->in_room)
     return ReturnValue::eFAILURE;
   ch = obj->equipped_by;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET)))
     return ReturnValue::eFAILURE;
 
@@ -445,8 +445,8 @@ qint32 lilithring(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 {
   if (cmd != cmd_t::SAY)
     return ReturnValue::eFAILURE;
-  char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
+  QString arg1;
+  QString arg2;
   arg = one_argument(arg, arg1);
   arg = one_argument(arg, arg2);
   if (str_cmp(arg1, "ateni"))
@@ -596,7 +596,7 @@ qint32 orrowand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Characte
   return ReturnValue::eSUCCESS;
 }
 
-qint32 holyavenger(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 holyavenger(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                    CharacterPtr invoker)
 {
   // ObjectPtr wielded;
@@ -664,7 +664,7 @@ qint32 holyavenger(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 }
 
 qint32 hooktippedsteelhalberd(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                              const char *arg, CharacterPtr invoker)
+                              const QString arg, CharacterPtr invoker)
 {
   CharacterPtr victim;
   if (!(victim = ch->fighting))
@@ -698,7 +698,7 @@ qint32 hooktippedsteelhalberd(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 }
 
 // TODO - I think we actually used this for a while but it was too powerful
-qint32 drainingstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 drainingstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                      CharacterPtr invoker)
 {
   CharacterPtr vict;
@@ -745,10 +745,10 @@ qint32 drainingstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
             CharacterPtr invoker)
 {
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   qint32 x;
 
   if (cmd != cmd_t::BALANCE && cmd != cmd_t::DEPOSIT && cmd != cmd_t::WITHDRAW)
@@ -812,10 +812,10 @@ qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                   CharacterPtr invoker)
 {
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   qint32 x;
 
   if (cmd != cmd_t::BALANCE && cmd != cmd_t::DEPOSIT && cmd != cmd_t::WITHDRAW)
@@ -862,7 +862,7 @@ qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 // where the exit is supposed to go
 // I should probably just change the exit temporarily to point to the "bad" room
 // and then change it back after the move.
-qint32 returner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 returner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                 CharacterPtr invoker)
 {
 
@@ -897,9 +897,9 @@ constexpr auto MAX_GEM_ASSEMBLER_ITEM = 10;
 class assemble_item
 {
 public:
-  const char *finish_to_char{};
-  const char *finish_to_room{};
-  const char *missing_to_char{};
+  const QString finish_to_char{};
+  const QString finish_to_room{};
+  const QString missing_to_char{};
   qint32 components[MAX_GEM_ASSEMBLER_ITEM]{};
   qint32 item{};
 };
@@ -974,13 +974,13 @@ assemble_item assemble_items[] = {
 
 };
 
-qint32 hellmouth_thing(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 hellmouth_thing(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                        CharacterPtr invoker)
 {
   if (cmd != cmd_t::SAY)
     return ReturnValue::eFAILURE;
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString junk;
+  QString arg1;
 
   half_chop(arg, arg1, junk);
   if (*junk)
@@ -1133,11 +1133,11 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
   return true;
 }
 
-qint32 do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool different_item_components = false;
   qint32 vnum, item_index = -1, last_item_index = -1;
-  char arg1[MAX_INPUT_LENGTH + 1];
+  QString arg1;
   ObjectPtr obj;
 
   one_argument(argument, arg1);
@@ -1229,13 +1229,13 @@ qint32 do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 stupid_button(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 stupid_button(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                      CharacterPtr invoker)
 {
   if (cmd != cmd_t::PUSH)
     return ReturnValue::eFAILURE;
 
-  char vict[MAX_STRING_LENGTH];
+  QString vict;
 
   one_argument(arg, vict);
   if (strcmp(vict, "button") && strcmp(vict, "red") && strcmp(vict, "big"))
@@ -1252,11 +1252,11 @@ qint32 stupid_button(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 }
 
 // Fear gaze.
-qint32 gazeofgaiot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 gazeofgaiot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                    CharacterPtr invoker)
 {
   CharacterPtr victim;
-  char vict[MAX_INPUT_LENGTH]; // buffer overflow fix
+  QString vict; // buffer overflow fix
 
   one_argument(arg, vict);
   if (cmd != cmd_t::GAZE)
@@ -1309,12 +1309,12 @@ qint32 gazeofgaiot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 pfe_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 pfe_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                 CharacterPtr invoker)
 {
-  // char buf[MAX_INPUT_LENGTH];
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  // QString buf;
+  QString junk;
+  QString arg1;
   ObjectPtr obj_object;
   qint32 j;
 
@@ -1404,12 +1404,12 @@ qint32 pfe_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 devilsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 devilsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                   CharacterPtr invoker)
 {
-  // char buf[MAX_INPUT_LENGTH];
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  // QString buf;
+  QString junk;
+  QString arg1;
   // ObjectPtr obj_object;
   // qint32 j;
 
@@ -1477,7 +1477,7 @@ void remove_eliara(CharacterPtr ch)
   REMBIT(ch->affected_by, AFF_SANCTUARY);
 }
 
-qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                  CharacterPtr invoker)
 {
   if (cmd == cmd_t::UNDEFINED || cmd != cmd_t::SAY || !ch || !ch->in_room || str_cmp(arg, " just dance"))
@@ -1490,7 +1490,7 @@ qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
     ch->sendln("The vest remains silent.");
     return ReturnValue::eSUCCESS;
   }
-  const char *command_list[] =
+  const QStringList command_list =
       {
           "dance", // 0
           "shuffle",
@@ -1512,7 +1512,7 @@ qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
       continue;
     }
     v->sendln("As phantom music swells around you, you are helpless to resist.  You must obey.");
-    char tmp_command[32];
+    QString tmp_command;
     strcpy(tmp_command, command_list[number(0, 9)]);
     v->command_interpreter(tmp_command);
   }
@@ -1520,7 +1520,7 @@ qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                 CharacterPtr invoker)
 {
 
@@ -1581,7 +1581,7 @@ qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 }
 
 // When fighting an evil opponent, sancts PC
-qint32 eliara_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 eliara_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                      CharacterPtr invoker)
 {
 
@@ -1614,7 +1614,7 @@ qint32 eliara_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 eliara_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 eliara_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
 
@@ -1635,7 +1635,7 @@ qint32 eliara_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   return ReturnValue::eFAILURE;
 }
 
-qint32 carriage(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 carriage(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                 CharacterPtr invoker)
 {
   // this ain't done yet...it's natashas half written proc
@@ -1660,7 +1660,7 @@ qint32 carriage(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 arenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 arenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                    CharacterPtr invoker)
 {
   // only go off when a player types a command
@@ -1695,7 +1695,7 @@ qint32 arenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                          CharacterPtr invoker)
 {
   qint32 room = 17840;
@@ -1736,11 +1736,11 @@ qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                         CharacterPtr invoker)
 {
-  char name[MAX_INPUT_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
+  QString name;
+  QString buf;
   ObjectPtr target_obj = {};
 
   if (cmd != cmd_t::RESTRING)
@@ -1789,9 +1789,9 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *a
   GET_PLATINUM(ch) -= (ch->getLevel());
 
   //  target_obj->short_description={};
-  //  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
+  //  target_obj->short_description =  dc_alloc(strlen(buf)+1, sizeof(QChar));
   //  strcpy(target_obj->short_description, buf);
-  char zarg[MAX_STRING_LENGTH];
+  QString zarg;
   sprintf(zarg, "$B$7%s$R", buf);
   target_obj->short_description(zarg);
 
@@ -1805,7 +1805,7 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-qint32 weenie_weedy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 weenie_weedy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                     CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -1827,7 +1827,7 @@ qint32 weenie_weedy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 // this should really be a azrack megaphone, but i'm too lazy to figure out how they
 // work right now
 // TODO - figure out how azrack's megaphone's work
-qint32 stupid_message(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 stupid_message(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -1850,7 +1850,7 @@ qint32 stupid_message(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg
 
 // If there is a player in rooms 8695-8699 (the pillars), then they cause a
 // "balance" and we can remove the imp_only flag from the target room
-qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -1890,7 +1890,7 @@ qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg
 }
 
 // If players enter the room, pop a "imp_only" flag back on the room.
-qint32 pagoda_shield_restorer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 pagoda_shield_restorer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                               CharacterPtr invoker)
 {
   if (cmd == cmd_t::UNDEFINED)
@@ -1906,7 +1906,7 @@ qint32 pagoda_shield_restorer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const c
 }
 
 // stupid little item I made for an ex-gf so she could find me when she logged in
-qint32 phish_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 phish_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                      CharacterPtr invoker)
 {
   CharacterPtr victim = {};
@@ -1931,7 +1931,7 @@ qint32 phish_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
   CharacterPtr victim;
@@ -1966,11 +1966,11 @@ qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-qint32 portal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 portal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                    CharacterPtr invoker)
 {
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString junk;
+  QString arg1;
   CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
@@ -2026,11 +2026,11 @@ qint32 portal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 full_heal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 full_heal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                       CharacterPtr invoker)
 {
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString junk;
+  QString arg1;
   CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
@@ -2089,7 +2089,7 @@ qint32 full_heal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 mana_box(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 mana_box(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                 CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -2109,11 +2109,11 @@ qint32 mana_box(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 fireshield_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 fireshield_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                        CharacterPtr invoker)
 {
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString junk;
+  QString arg1;
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2163,11 +2163,11 @@ qint32 fireshield_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                      CharacterPtr invoker)
 {
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString junk;
+  QString arg1;
   CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
@@ -2230,11 +2230,11 @@ qint32 teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 alignment_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 alignment_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                       CharacterPtr invoker)
 {
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString junk;
+  QString arg1;
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2292,11 +2292,11 @@ qint32 alignment_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 protection_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 protection_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                        CharacterPtr invoker)
 {
-  char junk[MAX_INPUT_LENGTH];
-  char arg1[MAX_INPUT_LENGTH];
+  QString junk;
+  QString arg1;
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2398,11 +2398,11 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   // 30097
   if (cmd != cmd_t::UNDEFINED && cmd == cmd_t::EXAMINE)
   {
-    char target[MAX_INPUT_LENGTH];
+    QString target;
     one_argument(arg, target);
     if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
     {
-      char buf[2000];
+      QString buf;
       sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
@@ -2572,9 +2572,9 @@ qint32 szrildor_pass_checks(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
 }
 
 qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                      const char *arg, CharacterPtr invoker)
+                      const QString arg, CharacterPtr invoker)
 {
-  char msg1[MAX_STRING_LENGTH], msg2[MAX_STRING_LENGTH];
+  QString msg1, msg2[MAX_STRING_LENGTH];
   qint32 low, high, room, time, sector = {};
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2686,7 +2686,7 @@ qint32 no_magic_while_alive(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
 }
 
 // Send a message to all rooms on a boat
-void send_to_boat(qint32 boat, const char *message)
+void send_to_boat(qint32 boat, const QString message)
 {
   switch (boat)
   {
@@ -2981,7 +2981,7 @@ qint32 hornoplenty(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-qint32 gl_dragon_fire(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 gl_dragon_fire(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                       CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3001,7 +3001,7 @@ qint32 gl_dragon_fire(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return cast_fire_breath(10, ch, QStringLiteral(""), SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
 
-qint32 dk_rend(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 dk_rend(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3025,7 +3025,7 @@ qint32 dk_rend(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 magic_missile_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 magic_missile_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                            CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3045,7 +3045,7 @@ qint32 magic_missile_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
   return spell_magic_missile((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
 }
 
-qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                            CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3089,7 +3089,7 @@ qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char
   return ReturnValue::eFAILURE;
 }
 
-qint32 generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                              CharacterPtr invoker)
 {
   extern qint32 top_of_objt;
@@ -3134,7 +3134,7 @@ qint32 generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *ar
 }
 
 // item players can buy to find the ToHS
-qint32 TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                     CharacterPtr invoker)
 {
   ObjectPtr victim = {};
@@ -3169,7 +3169,7 @@ qint32 TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-/*qint32 no_magic_item(CharacterPtr ch, ObjectPtr obj, cmd, char
+/*qint32 no_magic_item(CharacterPtr ch, ObjectPtr obj, cmd, character
 *arg, CharacterPtr invoker)
 { // mobdata last_direction
    if (cmd != cmd_t::UNDEFINED)  // Not activated through commands..
@@ -3177,7 +3177,7 @@ qint32 TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 //   if (
 }
 */
-qint32 gotta_dance_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 gotta_dance_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
   void make_person_dance(CharacterPtr ch);
@@ -3202,7 +3202,7 @@ qint32 gotta_dance_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-qint32 random_dir_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 random_dir_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                         CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3217,7 +3217,7 @@ qint32 random_dir_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *a
   act("$n boots just keep on going!", obj->equipped_by, 0, 0, TO_ROOM, INVIS_NULL);
   obj->equipped_by->sendln("Your boots just keep on running!");
 
-  char dothis[32];
+  QString dothis;
 
   strcpy(dothis, dirs[number(0, 5)]);
 
@@ -3226,7 +3226,7 @@ qint32 random_dir_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *a
 
 // WARNING - uses obj_flags.value[3] to store stuff
 
-qint32 noremove_eq(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 noremove_eq(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                    CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED && cmd != cmd_t::REMOVE)
@@ -3256,7 +3256,7 @@ qint32 noremove_eq(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                           CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3418,7 +3418,7 @@ void do_talking_init()
   sword_combat.push_back(buf);
 }
 
-qint32 chaosblade(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 chaosblade(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                   CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3440,7 +3440,7 @@ qint32 chaosblade(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
     }
     if (dam > 0)
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       sprintf(buf, "%d", dam);
       send_damage("The Chaos Blade hungers!  You are drained for | damage.", obj->equipped_by, 0, 0, buf, "The Chaos Blade hungers!  You feel your life force being drained!", TO_CHAR);
       send_damage("The katana in $n's hand pulses with a dull red glow as it drains their life force for | damage!", obj->equipped_by, 0, 0, buf, "The katana in $n's hand pulses with a dull red glow as it drains their life force!", TO_ROOM);
@@ -3450,7 +3450,7 @@ qint32 chaosblade(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 rubybrooch(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 rubybrooch(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                   CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3477,7 +3477,7 @@ qint32 rubybrooch(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
     }
     if (dam > 0)
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       sprintf(buf, "%d", dam);
       send_damage("The ruby brooch squeezes your neck painfully for | damage!", obj->equipped_by, 0, 0, buf, "The ruby brooch squeezes your neck painfully!", TO_CHAR);
       send_damage("A ruby brooch constricts $n's neck for | damage and they cough violently.", obj->equipped_by, 0, 0, buf, "A ruby brooch constricts $n's neck and they cough violently.", TO_ROOM);
@@ -3487,7 +3487,7 @@ qint32 rubybrooch(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                      CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3519,7 +3519,7 @@ qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                     CharacterPtr invoker)
 {
   CharacterPtr vict = {};
@@ -3529,7 +3529,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   {
     if (cmd == cmd_t::GAG && (!str_cmp(arg, " sword") || !str_cmp(arg, " ghaerad")) && obj->equipped_by)
     {
-      char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
+      QString buf2 = "$B$7Ghaerad, Sword of Legends says, '";
 
       if (isSet(obj->obj_flags.more_flags, ITEM_TOGGLE))
       {
@@ -3695,7 +3695,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
     if (!tmp.empty())
     {
       qint32 rnd = number((quint64)0, (quint64)tmp.size() - 1);
-      char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
+      QString buf2 = "$B$7Ghaerad, Sword of Legends says, '";
       strcat(buf2, tmp[rnd].c_str());
       strcat(buf2, "'$R\r\n");
       send_to_room(buf2, vict->in_room, true);
@@ -3736,7 +3736,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 
 // Fun item to give to mortals...ticks for a while and then when it blows
 // up BOOM!!!
-qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                   CharacterPtr invoker)
 {
   auto &arena = DC::getInstance()->arena_;
@@ -3814,12 +3814,12 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   if (cmd == cmd_t::GIVE)
   {
     // make sure vict for GIVE/SLIP is a pc
-    char obj[MAX_INPUT_LENGTH];
-    char target[MAX_INPUT_LENGTH];
+    QString obj;
+    QString target;
     half_chop(arg, obj, target);
     CharacterPtr give_vict;
     if (!(give_vict = ch->get_char_room_vis(target)))
-      return ReturnValue::eFAILURE; // Not giving to char/mob, so ok
+      return ReturnValue::eFAILURE; // Not giving to character/mob, so ok
     if (give_vict->isNonPlayer() && vict->isMortalPlayer())
     {
       vict->sendln("You can only give things to other players when you have a hot potato!");
@@ -3915,7 +3915,7 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   qint32 dam = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   CharacterPtr victim = {};
   CharacterPtr next_v = {};
 
@@ -3958,7 +3958,7 @@ qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QStrin
 
 // 565
 qint32 godload_banshee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                       const char *arg, CharacterPtr invoker)
+                       const QString arg, CharacterPtr invoker)
 {
   CharacterPtr vict;
   if (cmd != cmd_t::UNDEFINED)
@@ -3973,7 +3973,7 @@ qint32 godload_banshee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 }
 // 511
 qint32 godload_claws(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                     char *arg, CharacterPtr invoker)
+                     QString arg, CharacterPtr invoker)
 {
   CharacterPtr vict;
   if (cmd != cmd_t::UNDEFINED)
@@ -3989,10 +3989,10 @@ qint32 godload_claws(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 
 // 556
 qint32 godload_defender(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                        const char *arg,
+                        const QString arg,
                         CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4010,10 +4010,10 @@ qint32 godload_defender(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 
 // 500
 qint32 godload_stargazer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                         const char *arg,
+                         const QString arg,
                          CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4033,10 +4033,10 @@ qint32 godload_stargazer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 
 // 534
 qint32 godload_cassock(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                       const char *arg,
+                       const QString arg,
                        CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4056,9 +4056,9 @@ qint32 godload_cassock(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 
 // 526
 qint32 godload_armbands(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                        const char *arg, CharacterPtr invoker)
+                        const QString arg, CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4077,10 +4077,10 @@ qint32 godload_armbands(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 
 // 548
 qint32 godload_gaze(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
-                    const char *arg,
+                    const QString arg,
                     CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4097,10 +4097,10 @@ qint32 godload_gaze(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 }
 
 // 514
-qint32 godload_wailka(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_wailka(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4125,10 +4125,10 @@ qint32 godload_wailka(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg
 }
 
 // 517
-qint32 godload_choker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_choker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4146,10 +4146,10 @@ qint32 godload_choker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg
 }
 
 // 519
-qint32 godload_lorne(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_lorne(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                      CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4167,7 +4167,7 @@ qint32 godload_lorne(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 }
 
 // 528
-qint32 godload_leprosy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
+qint32 godload_leprosy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
                        CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -4188,10 +4188,10 @@ qint32 godload_leprosy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
 }
 
 // 540
-qint32 godload_quiver(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_quiver(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4230,10 +4230,10 @@ qint32 godload_quiver(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg
   return ReturnValue::eSUCCESS;
 }
 
-qint32 godload_aligngood(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_aligngood(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4253,10 +4253,10 @@ qint32 godload_aligngood(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-qint32 godload_alignevil(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_alignevil(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4276,10 +4276,10 @@ qint32 godload_alignevil(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-qint32 godload_tovmier(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_tovmier(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                        CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   if (cmd != cmd_t::PULL || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4303,7 +4303,7 @@ qint32 godload_tovmier(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *ar
   return ReturnValue::eSUCCESS;
 }
 
-qint32 godload_hammer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_hammer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
   if (cmd != cmd_t::TREMOR || !ch)
@@ -4329,7 +4329,7 @@ qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 {
   if (cmd != cmd_t::OPEN || ch->in_room != 29263)
     return ReturnValue::eFAILURE;
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   arg = one_argument(arg, arg1);
 
   if (str_cmp(arg1, "door"))
@@ -4357,7 +4357,7 @@ qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
 qint32 godload_phyraz(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4397,9 +4397,9 @@ void destroy_spellcraft_glyphs(CharacterPtr ch)
   ch->spellcraftglyph = {};
 }
 
-qint32 spellcraft_glyphs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *argi, CharacterPtr invoker)
+qint32 spellcraft_glyphs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argi, CharacterPtr invoker)
 {
-  char target[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
+  QString target, arg[MAX_STRING_LENGTH];
   ObjectPtr sunglyph, *bookglyph, heartglyph;
 
   if (cmd != cmd_t::PUT)
@@ -4537,7 +4537,7 @@ qint32 spellcraft_glyphs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-qint32 godload_grathelok(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_grathelok(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
   CharacterPtr vict;
@@ -4568,7 +4568,7 @@ qint32 godload_grathelok(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   fight_kill(ch, vict, TYPE_CHOOSE, 0);
   return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
 }
-qint32 goldenbatleth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 goldenbatleth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                      CharacterPtr invoker)
 {
   CharacterPtr vict;
@@ -4600,7 +4600,7 @@ qint32 goldenbatleth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
 }
 
-qint32 godload_jaelgreth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_jaelgreth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -4656,7 +4656,7 @@ qint32 godload_jaelgreth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-qint32 godload_foecrusher(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_foecrusher(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                           CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -4709,7 +4709,7 @@ qint32 godload_foecrusher(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char 
   return ReturnValue::eSUCCESS;
 }
 
-qint32 godload_hydratail(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
+qint32 godload_hydratail(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr invoker)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -4724,7 +4724,7 @@ qint32 godload_hydratail(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *
     return ReturnValue::eFAILURE;
 
   qint32 damtype = {};
-  char dammsg[MAX_STRING_LENGTH];
+  QString dammsg;
   qint32 dam = number(50, 100);
   QString damtypeStr;
   sprintf(dammsg, "$B%d$R", dam);

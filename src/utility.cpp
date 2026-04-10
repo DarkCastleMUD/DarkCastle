@@ -122,7 +122,7 @@ std::size_t nocolor_strlen(const QStringView str)
 }
 
 // tested in TestUtility::test_nocolor_strlen_c
-size_t nocolor_strlen(const char *s)
+size_t nocolor_strlen(const QString s)
 {
   if (!s)
   {
@@ -385,7 +385,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr 
 
   time_t t = time(0);
   const tm *lt = localtime(&t);
-  char *tmstr = asctime(lt);
+  QString tmstr = asctime(lt);
   *(tmstr + strlen(tmstr) - 1) = '\0';
 
   if (stream == STDIN_FILENO || type == DC::LogChannel::LOG_BUG)
@@ -497,7 +497,7 @@ void logworld(QString message)
 
 // function for new SETBIT et al. commands
 // leading space until all calling functions cleaned up
-void sprintbit(uint value[], const QStringList names, char *result)
+void sprintbit(uint value[], const QStringList names, QString result)
 {
   qint32 i;
   *result = '\0';
@@ -551,7 +551,7 @@ QString sprintbit(uint value[], const QStringList names)
 }
 
 // leading space until all calling functions cleaned up
-void sprintbit(quint32 vektor, const QStringList names, char *result)
+void sprintbit(quint32 vektor, const QStringList names, QString result)
 {
   qint32 nr;
 
@@ -585,7 +585,7 @@ void sprintbit(quint32 vektor, const QStringList names, char *result)
 }
 
 // leading space until all calling functions cleaned up
-void sprintbit(quint32 vektor, QStringList names, char *result)
+void sprintbit(quint32 vektor, QStringList names, QString result)
 {
   qint32 nr;
 
@@ -698,7 +698,7 @@ QString sprintbit(quint32 vektor, const QStringList names)
   return result;
 }
 
-void sprinttype(quint64 type, QStringList names, char *result)
+void sprinttype(quint64 type, QStringList names, QString result)
 {
   if (result)
   {
@@ -728,7 +728,7 @@ QString sprinttype(qint32 type, item_types_t names)
   return names.value(type, "Undefined").toStdString();
 }
 
-qint32 consttype(char *search_str, const QStringList names)
+qint32 consttype(QString search_str, const QStringList names)
 {
   qint32 nr;
 
@@ -791,7 +791,7 @@ time_info_data Character::age(void)
   return player_age;
 }
 
-bool file_exists(const char *filename)
+bool file_exists(const QString filename)
 {
   FILE *fp;
 
@@ -804,10 +804,10 @@ bool file_exists(const char *filename)
   return true;
 }
 
-void util_archive(const char *char_name, CharacterPtr caller)
+void util_archive(const QString char_name, CharacterPtr caller)
 {
-  char buf[256];
-  char buf2[256];
+  QString buf;
+  QString buf2;
   qint32 i;
 
   // Ok, ok, we'll do some sanity checking on the
@@ -826,7 +826,7 @@ void util_archive(const char *char_name, CharacterPtr caller)
       }
       else
       {
-        sprintf(buf, "Someone got a weird char name in there: %s.", char_name);
+        sprintf(buf, "Someone got a weird character name in there: %s.", char_name);
         logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
@@ -840,7 +840,7 @@ void util_archive(const char *char_name, CharacterPtr caller)
     if (caller)
       caller->sendln("That character does not exist.");
     else
-      logentry(QStringLiteral("Attempt to archive a non-existent char."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("Attempt to archive a non-existent character."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
   sprintf(buf, "gzip -9 %s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -862,10 +862,10 @@ void util_archive(const char *char_name, CharacterPtr caller)
   logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
-void util_unarchive(char *char_name, CharacterPtr caller)
+void util_unarchive(QString char_name, CharacterPtr caller)
 {
-  char buf[256];
-  char buf2[256];
+  QString buf;
+  QString buf2;
   qint32 i;
 
   for (i = {}; (quint32)i < strlen(char_name); i++)
@@ -881,7 +881,7 @@ void util_unarchive(char *char_name, CharacterPtr caller)
       }
       else
       {
-        sprintf(buf, "Someone got a weird char name in there: %s.",
+        sprintf(buf, "Someone got a weird character name in there: %s.",
                 char_name);
         logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
@@ -1041,7 +1041,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 
   if (!obj->isNonPlayer())
   {
-    if (!obj->player) // noncreated char
+    if (!obj->player) // noncreated character
       return true;
 
     if (sub->getLevel() < obj->player->wizinvis)
@@ -1207,10 +1207,10 @@ bool check_blind(CharacterPtr ch)
   return false;
 }
 
-qint32 do_order(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
-  char buf[256];
+  QString name, message[MAX_INPUT_LENGTH];
+  QString buf;
   bool found = false;
   qint32 org_room;
   qint32 retval;
@@ -1285,10 +1285,10 @@ qint32 do_order(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   FILE *fl;
-  char str[MAX_STRING_LENGTH];
+  QString str;
 
   if (ch->isNonPlayer())
   {
@@ -1320,10 +1320,10 @@ qint32 do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   FILE *fl;
-  char str[MAX_STRING_LENGTH];
+  QString str;
 
   if (ch->isNonPlayer())
   {
@@ -1356,10 +1356,10 @@ qint32 do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   FILE *fl;
-  char str[MAX_STRING_LENGTH];
+  QString str;
 
   if (ch->isNonPlayer())
   {
@@ -1396,7 +1396,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   qint32 location = {}, level = {}, cost = {}, x = {};
   CharacterPtr victim = {};
   CharacterPtr loop_ch = {};
-  float cf = {};
+  qreal cf = {};
   QString name;
   Clan *clan = {};
   clan_room_data *room;
@@ -1604,20 +1604,20 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-qint32 do_qui(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_qui(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln("You have to write quit - no less, to quit!");
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 iWear;
   follow_type *k;
   Clan *clan;
   clan_room_data *room;
   qint32 found = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   ObjectPtr obj, tmp_obj;
 
   void find_and_remove_player_portal(CharacterPtr ch);
@@ -1627,7 +1627,7 @@ qint32 do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   */
   if (ch == 0)
   {
-    logentry(QStringLiteral("do_quit received null char - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("do_quit received null character - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1642,8 +1642,8 @@ qint32 do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 
   // If ch has follower, cant quit
   // NOTE: If we sent a 666 to do_quit, then it came from a zap or a boot
-  // at this point, we've set the char back to level 1 (if from a zap), so
-  // we'll end up with a fully equipped char with huge stats reset to level
+  // at this point, we've set the character back to level 1 (if from a zap), so
+  // we'll end up with a fully equipped character with huge stats reset to level
   // 1
 
   if (cmd != cmd_t::SAVE_SILENTLY)
@@ -1868,7 +1868,7 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
   return save(cmd);
 }
 
-qint32 do_home(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_home(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   Clan *clan;
   clan_room_data *room;
@@ -1941,7 +1941,7 @@ command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_beep(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_beep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln("Beep!\a");
   return ReturnValue::eSUCCESS;
@@ -1970,9 +1970,9 @@ QString get_skill_name(qint32 skillnum)
   return {};
 }
 
-// convert char QString to qint32
+// convert character QString to qint32
 // return true if successful, false if error
-bool check_valid_and_convert(qint32 &value, char *buf)
+bool check_valid_and_convert(qint32 &value, QString buf)
 {
   value = atoi(buf);
   if (value == 0 && strcmp(buf, "0"))
@@ -2066,7 +2066,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, CharacterPtr ch, 
   }
 }
 
-void parse_bitstrings_into_int(const QStringList bits, const char *remainder_args, CharacterPtr ch, uint value[])
+void parse_bitstrings_into_int(const QStringList bits, const QString remainder_args, CharacterPtr ch, uint value[])
 {
   return parse_bitstrings_into_int(bits, QString(remainder_args), ch, value);
 }
@@ -2123,7 +2123,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
   }
 }
 
-void parse_bitstrings_into_int(const QStringList bits, const char *remainder_args, CharacterPtr ch, quint16 &value)
+void parse_bitstrings_into_int(const QStringList bits, const QString remainder_args, CharacterPtr ch, quint16 &value)
 {
   return parse_bitstrings_into_int(bits, QString(remainder_args), ch, value);
 }
@@ -2182,7 +2182,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
     ch->send("No matching bits found.\n\n");
 }
 
-void parse_bitstrings_into_int(const QStringList bits, const char *remainder_args, CharacterPtr ch, quint32 &value)
+void parse_bitstrings_into_int(const QStringList bits, const QString remainder_args, CharacterPtr ch, quint32 &value)
 {
   return parse_bitstrings_into_int(bits, QString(remainder_args), ch, value);
 }
@@ -2212,9 +2212,9 @@ void check_timer()
   DC::getInstance()->removeDead();
 }
 
-qint32 get_line(FILE *fl, char *buf)
+qint32 get_line(FILE *fl, QString buf)
 {
-  char temp[256] = {};
+  QString temp = {};
   qint32 lines = {};
 
   do
@@ -2245,7 +2245,7 @@ qint32 number(qint32 from, qint32 to)
 
   if (from > to)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
     logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     produce_coredump();
@@ -2329,7 +2329,7 @@ void produce_coredump(void *ptr)
   }
 }
 
-const char *pluralize(qint32 qty, const char *ending)
+const QString pluralize(qint32 qty, const QString ending)
 {
   if (qty == 0 || qty > 1)
   {
@@ -2343,9 +2343,9 @@ const char *pluralize(qint32 qty, const char *ending)
 
 void remove_character(QString name, BACKUP_TYPE backup)
 {
-  char src_filename[256];
-  char dst_dir[256] = {0};
-  char syscmd[512];
+  QString src_filename;
+  QString dst_dir = {0};
+  QString syscmd;
   struct stat statbuf;
 
   if (name.isEmpty())
@@ -2420,9 +2420,9 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
 void remove_familiars(QString name, BACKUP_TYPE backup)
 {
-  char src_filename[256];
-  char dst_dir[256] = {0};
-  char syscmd[512];
+  QString src_filename;
+  QString dst_dir = {0};
+  QString syscmd;
   struct stat statbuf;
 
   if (name.isEmpty())
@@ -2984,7 +2984,7 @@ bool file_exists(QString filename)
 
 bool char_file_exists(QString name)
 {
-  if (all_of(name.begin(), name.end(), [](char i)
+  if (all_of(name.begin(), name.end(), [](character i)
              { return isalpha(i); }) == 0)
   {
     return false;
@@ -3037,7 +3037,7 @@ void Character::setPlayerLastMob(vnum_t mob_vnum)
  * Return true if astr not a prefix of bstr
  *   (compatibility with historical functions).
  */
-bool str_prefix(const char *astr, const char *bstr)
+bool str_prefix(const QString astr, const QString bstr)
 {
   if (astr == nullptr)
   {

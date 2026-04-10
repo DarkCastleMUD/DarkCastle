@@ -185,7 +185,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                                                         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
-      qint32 cgold = (qint32)((float)(obj_object->obj_flags.value[0]) * 0.1);
+      qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
       if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
@@ -205,7 +205,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
         get_clan(ch)->tax &&
         !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     {
-      qint32 cgold = (qint32)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax) / 100.0));
+      qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * (qreal)((qreal)(get_clan(ch)->tax) / 100.0));
       obj_object->obj_flags.value[0] -= cgold;
       ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
@@ -253,11 +253,11 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
 // code at the end that would affect any attempted 'get' it looks really nasty and
 // is never utilized.  Restructure it so it is clear.  Pay proper attention to 'saving'
 // however so as not to introduce a potential dupe-bug.
-qint32 do_get(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH];
-  char arg2[MAX_STRING_LENGTH];
-  char buffer[MAX_STRING_LENGTH];
+  QString arg1;
+  QString arg2;
+  QString buffer;
   ObjectPtr sub_object;
   ObjectPtr obj_object;
   ObjectPtr next_obj;
@@ -267,7 +267,7 @@ qint32 do_get(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 type = 3;
   bool alldot = false;
   bool inventorycontainer = false, blindlag = false;
-  char allbuf[MAX_STRING_LENGTH];
+  QString allbuf;
 
   argument_interpreter(argument, arg1, arg2);
 
@@ -856,7 +856,7 @@ qint32 do_get(CharacterPtr ch, QString argument, cmd_t cmd)
                 {
                   ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description()));
 
-                  char log_buf[MAX_STRING_LENGTH] = {};
+                  QString log_buf = {};
                   sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
                           qPrintable(ch->name()),
                           obj_object->short_description,
@@ -950,7 +950,7 @@ qint32 do_get(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_consent(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_consent(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ObjectPtr obj = {};
   CharacterPtr vict = {};
@@ -1050,15 +1050,15 @@ qint32 contains_no_trade_item(ObjectPtr obj)
   return false;
 }
 
-qint32 do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
+  QString arg;
   qint32 amount;
-  char buffer[MAX_STRING_LENGTH];
+  QString buffer;
   ObjectPtr tmp_object;
   ObjectPtr next_obj;
   bool test = false, blindlag = false;
-  char alldot[MAX_STRING_LENGTH];
+  QString alldot;
 
   alldot[0] = '\0';
 
@@ -1154,7 +1154,7 @@ qint32 do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
 
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
-            char log_buf[MAX_STRING_LENGTH] = {};
+            QString log_buf = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -1222,7 +1222,7 @@ qint32 do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
-            char log_buf[MAX_STRING_LENGTH] = {};
+            QString log_buf = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -1248,11 +1248,11 @@ qint32 do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-void do_putalldot(CharacterPtr ch, char *name, char *target, cmd_t cmd)
+void do_putalldot(CharacterPtr ch, QString name, QString target, cmd_t cmd)
 {
   ObjectPtr tmp_object;
   ObjectPtr next_object;
-  char buf[200];
+  QString buf;
   bool found = false;
 
   /* If "put all.object bag", get all carried items
@@ -1291,16 +1291,16 @@ qint32 weight_in(ObjectPtr obj)
   return w;
 }
 
-qint32 do_put(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buffer[MAX_STRING_LENGTH];
-  char arg1[MAX_STRING_LENGTH];
-  char arg2[MAX_STRING_LENGTH];
+  QString buffer;
+  QString arg1;
+  QString arg2;
   ObjectPtr obj_object;
   ObjectPtr sub_object;
   CharacterPtr tmp_char;
   qint32 bits;
-  char allbuf[MAX_STRING_LENGTH];
+  QString allbuf;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -1783,7 +1783,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   if (!this->isNonPlayer() && isPlayerObjectThief() && !vict->desc)
   {
-    sendln("Now WHY would a thief give something to a linkdead char..?");
+    sendln("Now WHY would a thief give something to a linkdead character..?");
     return ReturnValue::eFAILURE;
   }
 
@@ -2059,7 +2059,7 @@ bool search_container_for_vnum(ObjectPtr obj, qint32 vnum)
   return false;
 }
 
-qint32 find_door(CharacterPtr ch, char *type, char *dir)
+qint32 find_door(CharacterPtr ch, QString type, QString dir)
 {
   qint32 door;
   const QStringList dirs =
@@ -2151,7 +2151,7 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
   CharacterPtr victim{};
   CharacterPtr next_vict{};
 
-  qint32 do_fall(CharacterPtr ch, short dir);
+  command_return_t do_fall(CharacterPtr ch, short dir);
 
   auto type = arguments.value(0);
   auto dir = arguments.value(1);
@@ -2204,7 +2204,7 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
         if (EXIT(ch, door)->keyword)
         {
           act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
-          ch->send(QStringLiteral("You reveal a hidden %s!\r\n").arg(qPrintable(fname((char *)EXIT(ch).arg(door)->keyword))));
+          ch->send(QStringLiteral("You reveal a hidden %s!\r\n").arg(qPrintable(fname(EXIT(ch).arg(door)->keyword))));
         }
         else
         {
@@ -2298,11 +2298,11 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_close(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool found = false;
   qint32 door, other_room;
-  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+  QString type, dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -2407,10 +2407,10 @@ bool has_key(CharacterPtr ch, qint32 key)
   return false;
 }
 
-qint32 do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
-  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+  QString type, dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -2480,10 +2480,10 @@ qint32 do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
-  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+  QString type, dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -2566,7 +2566,7 @@ qint32 do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
 
 qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent)
 {
-  char buffer[MAX_STRING_LENGTH];
+  QString buffer;
 
   if (!ch->has_skill(SKILL_PALM) && ch->isPlayer())
   {
@@ -2659,7 +2659,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
     }
   }
   move_obj(obj_object, ch);
-  char log_buf[MAX_STRING_LENGTH] = {};
+  QString log_buf = {};
   if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
     //"%s palms %s[%d] from %s", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->name()));
@@ -2705,7 +2705,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                                                         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
-      qint32 cgold = (qint32)((float)(obj_object->obj_flags.value[0]) * 0.1);
+      qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       ch->send(QStringLiteral("Clan %s collects %d bounty, leaving %d for you.\r\n").arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);

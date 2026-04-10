@@ -24,10 +24,10 @@
 
 extern bool MOBtrigger;
 
-qint32 do_report(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[256];
-  char report[200];
+  QString buf;
+  QString report;
 
   assert(ch != 0);
   if (ch->in_room == DC::NOWHERE)
@@ -213,7 +213,7 @@ qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   return (1);
 }
 
-qint32 do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
+command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
 {
   qint32 x;
   qint32 y = {};
@@ -456,10 +456,10 @@ qint32 is_ignoring(const CharacterPtr const ch, const CharacterPtr const victim)
 
 constexpr auto MAX_NOTE_LENGTH = 1000; /* arbitrary */
 
-qint32 do_write(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr paper = 0, pen = {};
-  char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
+  QString papername, penname[MAX_INPUT_LENGTH],
       buf[MAX_STRING_LENGTH];
 
   argument_interpreter(argument, papername, penname);
@@ -557,10 +557,10 @@ qint32 do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
-qint32 do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[100];
-  char arg[MAX_STRING_LENGTH];
+  QString buf;
+  QString arg;
   CharacterPtr victim;
 
   one_argument(argument, arg);
@@ -613,10 +613,10 @@ qint32 do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_emote(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_emote(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 i;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
 
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
@@ -683,7 +683,7 @@ void DC::load_hints(void)
     {
       fread_uint(fl, 0, 32768); // ignored
 
-      char *buffer = fread_string(fl, 0);
+      QString buffer = fread_string(fl, 0);
       if (buffer != nullptr)
       {
         hints_.push_back(buffer);

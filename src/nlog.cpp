@@ -18,7 +18,7 @@
 class hash_info
 {
 public:
-  char *name;
+  QString name;
   hash_info *left;
   hash_info *right;
 };
@@ -47,7 +47,7 @@ void DC::free_hsh_tree_from_memory()
   tree = {"m", 0, 0};
 }
 
-bool ishashed(char *arg)
+bool ishashed(QString arg)
 {
   hash_info *current = &tree;
   for (; current; current = current->right)
@@ -71,14 +71,14 @@ void logf(qint32 level, DC::LogChannel type, QString cformat, ...)
   logentry(s, level, type);
 }
 
-char *handle_ansi_(char *s, CharacterPtr ch)
+QString handle_ansi_(QString s, CharacterPtr ch)
 {
-  char *t;
-  char *tp, *sp;
-  const char *i;
+  QString t;
+  QString tp, *sp;
+  const QString i;
 
-  char nullstring[] = "";
-  char dollarstring[] = "$";
+  QString nullstring = "";
+  QString dollarstring = "$";
 
   // Worse case scenario is a QString of color codes that are all $R's.  These take up
   // 11 characters each.  So to handle that, we'll count the number of $'s and multiply
@@ -93,7 +93,7 @@ char *handle_ansi_(char *s, CharacterPtr ch)
     t++;
   }
 
-  t = new char[(strlen(s) + numdollars * 11 + 1)];
+  t = {};
   *t = '\0';
 
   i = nullstring;
@@ -165,7 +165,7 @@ char *handle_ansi_(char *s, CharacterPtr ch)
           i = dollarstring;
           break;
         case '\0': // this happens if we end a line with $
-          sp--;    // back up to the $ char so we don't go past our \0
+          sp--;    // back up to the $ character so we don't go past our \0
                    // no break here so the default catchs it and uses a nullstring
         default:
           i = nullstring;
@@ -199,7 +199,7 @@ QString handle_ansi(QString haystack, CharacterPtr ch)
 QByteArray handle_ansi(QByteArray haystack, CharacterPtr ch)
 {
   QMap<size_t, bool> ignore;
-  QMap<char, QPair<QByteArray, QByteArray>> rep;
+  QMap<QChar, QPair<QByteArray, QByteArray>> rep;
   rep['$'] = {"$", "$"};
   rep['0'] = {BLACK, ""};
   rep['1'] = {BLUE, ""};
@@ -217,7 +217,7 @@ QByteArray handle_ansi(QByteArray haystack, CharacterPtr ch)
 
   QByteArray result;
   bool code = false;
-  for (const char &c : haystack)
+  for (const auto &c : haystack)
   {
     if (code == true)
     {

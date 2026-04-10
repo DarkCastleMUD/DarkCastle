@@ -23,15 +23,15 @@
 
 extern qint32 rev_dir[];
 
-qint32 find_door(CharacterPtr ch, char *type, char *dir);
+qint32 find_door(CharacterPtr ch, QString type, QString dir);
 qint32 get_weapon_damage_type(ObjectPtr wielded);
 qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0);
 qint32 check_joincharmie(CharacterPtr ch, qint32 skill = 0);
 
-qint32 do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[256];
+  QString name;
   qint32 level = ch->has_skill(SKILL_EYEGOUGE);
 
   if (ch->isNonPlayer())
@@ -330,7 +330,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-qint32 do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   qint32 retval;
@@ -433,7 +433,7 @@ qint32 do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
   act("$n circles around $s target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
-  char buffer[255];
+  QString buffer;
   sprintf(buffer, "%s", qPrintable(victim->name()));
 
   if (AWAKE(victim) && !skill_success(ch, victim, SKILL_CIRCLE))
@@ -494,10 +494,10 @@ qint32 do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
-  char name[256];
+  QString name;
   qint32 retval;
 
   if (!ch->canPerform(SKILL_TRIP))
@@ -606,7 +606,7 @@ qint32 do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   auto &arena = DC::getInstance()->arena_;
@@ -653,9 +653,9 @@ qint32 do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_STRING_LENGTH];
+  QString name;
   CharacterPtr leader;
 
   if (!ch->canPerform(SKILL_STALK))
@@ -713,7 +713,7 @@ qint32 do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (!ch->canPerform(SKILL_HIDE))
@@ -789,14 +789,14 @@ qint32 max_level(CharacterPtr ch)
 }
 
 // steal an ITEM... not gold
-qint32 do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   ObjectPtr obj, *loop_obj, next_obj;
   affected_type pthiefaf, *paf;
-  char victim_name[240];
-  char obj_name[240];
-  char buf[240];
+  QString victim_name;
+  QString obj_name;
+  QString buf;
   qint32 eq_pos;
   qint32 _exp;
   qint32 retval;
@@ -998,7 +998,7 @@ qint32 do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           }
           if (victim->isPlayer())
           {
-            char log_buf[MAX_STRING_LENGTH] = {};
+            QString log_buf = {};
             sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), DC::getInstance()->obj_index[obj->item_number].vnum(), qPrintable(victim->name()));
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -1251,12 +1251,12 @@ qint32 do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // Steal gold
-qint32 do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   affected_type pthiefaf;
-  char victim_name[240];
-  char buf[240];
+  QString victim_name;
+  QString buf;
   qint32 gold;
   qint32 _exp;
   qint32 retval;
@@ -1370,7 +1370,7 @@ qint32 do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
     qint32 percent = 7 + (learned > 40) + (learned > 60) + (learned > 80);
 
     // Steal some gold coins
-    gold = (qint32)((float)(victim->getGold()) * (float)((float)percent / 100.0));
+    gold = (qint32)((qreal)(victim->getGold()) * (qreal)((qreal)percent / 100.0));
     gold = MIN(10000000, gold);
     if (gold > 0)
     {
@@ -1434,10 +1434,10 @@ qint32 do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room, j;
-  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+  QString type, dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -1582,10 +1582,10 @@ qint32 do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char obj_name[200], vict_name[200], buf[200];
-  char arg[MAX_INPUT_LENGTH];
+  QString obj_name, vict_name[200], buf[200];
+  QString arg;
   qint32 amount;
   CharacterPtr vict;
   ObjectPtr obj, *tmp_object, container;
@@ -1893,7 +1893,7 @@ qint32 do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1952,7 +1952,7 @@ qint32 do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -2032,7 +2032,7 @@ qint32 do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 retval = ReturnValue::eFAILURE, learned;
 
@@ -2054,7 +2054,7 @@ qint32 do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  char arg[MAX_INPUT_LENGTH];
+  QString arg;
   one_argument(argument, arg);
   CharacterPtr victim;
 
@@ -2182,12 +2182,12 @@ qint32 do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 }
 
-qint32 do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
   ObjectPtr obj = {};
-  char name[MAX_STRING_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
-  char item[MAX_STRING_LENGTH] = {};
+  QString name = {}, buf[MAX_STRING_LENGTH] = {};
+  QString item = {};
   qint32 appraised = {}, bits = {}, learned = {};
   bool found = false, weight = false;
 
@@ -2325,10 +2325,10 @@ qint32 do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
-  char name[MAX_STRING_LENGTH];
+  QString name;
   qint32 skill;
 
   one_argument(argument, name);

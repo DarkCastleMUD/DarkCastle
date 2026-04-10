@@ -42,7 +42,7 @@ extern time_info_data time_info;
 qint32 max_shop;
 
 // extern function
-qint32 fwrite_string(const char *buf, FILE *fl);
+qint32 fwrite_string(const QString buf, FILE *fl);
 
 QMap<QString, reroll_t> reroll_sessions = {};
 
@@ -51,7 +51,7 @@ QMap<QString, reroll_t> reroll_sessions = {};
  */
 qint32 is_ok(CharacterPtr keeper, CharacterPtr ch, qint32 shop_nr)
 {
-  char buf[240];
+  QString buf;
 
   // Undesirables.
   // TODO - Figure out if KILLER does anything we want to kill...
@@ -139,7 +139,7 @@ qint32 unlimited_supply(ObjectPtr item, qint32 shop_nr)
 void restock_keeper(CharacterPtr keeper, qint32 shop_nr)
 {
   ObjectPtr obj, obj2;
-  char buf[50];
+  QString buf;
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
   logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
@@ -154,11 +154,11 @@ void restock_keeper(CharacterPtr keeper, qint32 shop_nr)
 /*
  * Buy an item from a shop.
  */
-void shopping_buy(const char *arg, CharacterPtr ch,
+void shopping_buy(const QString arg, CharacterPtr ch,
                   CharacterPtr keeper, qint32 shop_nr)
 {
-  char buf[MAX_STRING_LENGTH];
-  char argm[MAX_INPUT_LENGTH + 1];
+  QString buf;
+  QString argm;
   ObjectPtr obj;
   quint32 cost;
 
@@ -260,11 +260,11 @@ void shopping_buy(const char *arg, CharacterPtr ch,
 /*
  * Sell an item to a shop keeper.
  */
-void shopping_sell(const char *arg, CharacterPtr ch,
+void shopping_sell(const QString arg, CharacterPtr ch,
                    CharacterPtr keeper, qint32 shop_nr)
 {
-  char buf[MAX_STRING_LENGTH];
-  char argm[MAX_INPUT_LENGTH + 1];
+  QString buf;
+  QString argm;
   ObjectPtr obj;
   quint32 cost;
 
@@ -363,11 +363,11 @@ void shopping_sell(const char *arg, CharacterPtr ch,
 /*
  * Value an item.
  */
-void shopping_value(const char *arg, CharacterPtr ch,
+void shopping_value(const QString arg, CharacterPtr ch,
                     CharacterPtr keeper, qint32 shop_nr)
 {
-  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-  char argm[MAX_INPUT_LENGTH + 1];
+  QString buf, buf2[MAX_STRING_LENGTH];
+  QString argm;
   ObjectPtr obj;
   qint32 cost;
   bool keeperhas = false;
@@ -595,10 +595,10 @@ void shopping_value(const char *arg, CharacterPtr ch,
 /*
  * List available items.
  */
-void shopping_list(const char *arg, CharacterPtr ch,
+void shopping_list(const QString arg, CharacterPtr ch,
                    CharacterPtr keeper, qint32 shop_nr)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   ObjectPtr obj, tobj;
   qint32 cost;
   //    extern QStringList drinks;
@@ -729,7 +729,7 @@ LFound2:
 
 void boot_the_shops()
 {
-  char *buf;
+  QString buf;
   qint32 temp;
   qint32 count;
   FILE *fp;
@@ -816,7 +816,7 @@ void boot_the_shops()
 
     if (real_room(temp) == DC::NOWHERE)
     {
-      char log_buf[MAX_STRING_LENGTH] = {};
+      QString log_buf = {};
       sprintf(log_buf, "BAD SHOP IN missing ROOM %d -- FIX THIS!", temp);
       DC::getInstance()->logverbose(log_buf);
       continue;
@@ -874,18 +874,18 @@ void fix_shopkeepers_inventory()
 player_shop *read_one_player_shop(FILE *fp)
 {
   qint32 count;
-  char code[4];
+  QString code;
 
   player_shop_item *item = {};
   auto shop = new player_shop;
 
-  fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
+  fread(&shop->owner, sizeof(QChar), PC_SHOP_OWNER_SIZE, fp);
   fread(&shop->room_num, sizeof(qint32), 1, fp);
-  fread(&shop->sell_message, sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
+  fread(&shop->sell_message, sizeof(QChar), PC_SHOP_SELL_MESS_SIZE, fp);
   fread(&shop->money_on_hand, sizeof(qint32), 1, fp);
 
   code[3] = '\0';
-  fread(&code, sizeof(char), 3, fp);
+  fread(&code, sizeof(QChar), 3, fp);
 
   while (strcmp(code, "END"))
   {
@@ -905,7 +905,7 @@ player_shop *read_one_player_shop(FILE *fp)
 
     fread(&item->item_vnum, sizeof(qint32), 1, fp);
     fread(&item->price, sizeof(qint32), 1, fp);
-    fread(&code, sizeof(char), 3, fp);
+    fread(&code, sizeof(QChar), 3, fp);
     // code junk right now.  Add future stuff before it if needed
     item->next = shop->sale_list;
     shop->sale_list = item;
@@ -920,7 +920,7 @@ void write_one_player_shop(player_shop *shop)
 {
   FILE *fp;
   player_shop_item *item;
-  char buf[80];
+  QString buf;
   qint32 count = {};
 
   sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, shop->owner);
@@ -931,14 +931,14 @@ void write_one_player_shop(player_shop *shop)
     return;
   }
 
-  fwrite(&(shop->owner), sizeof(char), PC_SHOP_OWNER_SIZE, fp);
+  fwrite(&(shop->owner), sizeof(QChar), PC_SHOP_OWNER_SIZE, fp);
   fwrite(&(shop->room_num), sizeof(qint32), 1, fp);
-  fwrite(&(shop->sell_message), sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
+  fwrite(&(shop->sell_message), sizeof(QChar), PC_SHOP_SELL_MESS_SIZE, fp);
   fwrite(&(shop->money_on_hand), sizeof(qint32), 1, fp);
 
   // add stuff later here with 3 digit code
   // end of variable data
-  fwrite("END", sizeof(char), 3, fp);
+  fwrite("END", sizeof(QChar), 3, fp);
 
   for (item = shop->sale_list; item; item = item->next)
     count++;
@@ -949,7 +949,7 @@ void write_one_player_shop(player_shop *shop)
   {
     fwrite(&(item->item_vnum), sizeof(qint32), 1, fp);
     fwrite(&(item->price), sizeof(qint32), 1, fp);
-    fwrite("END", sizeof(char), 3, fp);
+    fwrite("END", sizeof(QChar), 3, fp);
   }
 
   fclose(fp);
@@ -977,7 +977,7 @@ void save_shop_list()
 void save_player_shop_world_range()
 {
   world_file_list_item *curr;
-  char buf[180];
+  QString buf;
 
   curr = DC::getInstance()->world_file_list;
   while (curr && curr->firstnum != 23000)
@@ -1006,8 +1006,8 @@ void boot_player_shops()
   FILE *fp;
   FILE *shopfp;
   player_shop *shop;
-  char *filename;
-  char buf[80];
+  QString filename;
+  QString buf;
 
   g_playershops = {};
 
@@ -1055,7 +1055,7 @@ player_shop *find_player_shop(CharacterPtr keeper)
 }
 
 // put an item up for sale
-void player_shopping_stock(const char *arg, CharacterPtr ch, CharacterPtr keeper)
+void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
@@ -1070,8 +1070,8 @@ void player_shopping_stock(const char *arg, CharacterPtr ch, CharacterPtr keeper
     return;
   }
 
-  char item[MAX_INPUT_LENGTH];
-  char price[MAX_INPUT_LENGTH];
+  QString item;
+  QString price;
 
   half_chop(arg, item, price);
 
@@ -1125,7 +1125,7 @@ void player_shopping_stock(const char *arg, CharacterPtr ch, CharacterPtr keeper
   write_one_player_shop(shop);
 }
 
-void player_shopping_buy(const char *arg, CharacterPtr ch, CharacterPtr keeper)
+void player_shopping_buy(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
@@ -1134,7 +1134,7 @@ void player_shopping_buy(const char *arg, CharacterPtr ch, CharacterPtr keeper)
     return;
   }
 
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
 
   one_argument(arg, buf);
   if (!*buf)
@@ -1204,7 +1204,7 @@ void player_shopping_buy(const char *arg, CharacterPtr ch, CharacterPtr keeper)
   write_one_player_shop(shop);
 }
 
-void player_shopping_withdraw(const char *arg, CharacterPtr ch, CharacterPtr keeper)
+void player_shopping_withdraw(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
@@ -1219,7 +1219,7 @@ void player_shopping_withdraw(const char *arg, CharacterPtr ch, CharacterPtr kee
     return;
   }
 
-  char price[MAX_INPUT_LENGTH];
+  QString price;
   one_argument(arg, price);
 
   if (!*price)
@@ -1248,16 +1248,16 @@ void player_shopping_withdraw(const char *arg, CharacterPtr ch, CharacterPtr kee
   write_one_player_shop(shop);
 }
 
-void player_shopping_design(const char *arg, CharacterPtr ch, CharacterPtr keeper)
+void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
-  char select[MAX_INPUT_LENGTH];
-  char text[MAX_INPUT_LENGTH];
+  QString select;
+  QString text;
   qint16 skill;
 
   if (ch->isNonPlayer())
     return;
 
-  const char *pdesign_values[] = {
+  const QStringList pdesign_values = {
       "sellmessage",
       "roomname",
       "roomdesc",
@@ -1348,17 +1348,17 @@ void player_shopping_design(const char *arg, CharacterPtr ch, CharacterPtr keepe
   }
 }
 
-void player_shopping_sell(const char *arg, CharacterPtr ch, CharacterPtr keeper)
+void player_shopping_sell(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
   ch->sendln("These shop keeper's don't buy stuff.");
 }
 
-void player_shopping_value(const char *arg, CharacterPtr ch, CharacterPtr keeper)
+void player_shopping_value(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
   ch->sendln("These shop keeper's don't buy stuff.");
 }
 
-void player_shopping_list(const char *arg, CharacterPtr ch, CharacterPtr keeper)
+void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
   qint32 count = {};
   qint32 robj;
@@ -1433,11 +1433,11 @@ qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
   return ReturnValue::eSUCCESS;
 }
 /*
-qint32 do_pshopedit(CharacterPtr  ch, char * arg, cmd_t cmd)
+command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
-  char select[MAX_INPUT_LENGTH];
-  char text[MAX_INPUT_LENGTH];
+  QString buf;
+  QString select;
+  QString text;
   qint16 skill, i;
   player_shop * shop;
 
@@ -1449,11 +1449,10 @@ qint32 do_pshopedit(CharacterPtr  ch, char * arg, cmd_t cmd)
         return ReturnValue::eFAILURE;
   }
 
-  char * pshopedit_values [] = {
+  QStringList pshopedit_values [] = {
     "new",
     "delete",
-    "list",
-    "\n"
+    "list"
   };
 
   arg = one_argumentnolow(arg, select);
@@ -1620,9 +1619,9 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
     qint32 last_vnum = {};
     for (qint32 i = {}; i < MAX_EDDIE_ITEMS; i++)
     {
-      char buf[1024] = {};
-      char item_buf[1024] = {};
-      char cost_buf[1024] = {};
+      QString buf = {};
+      QString item_buf = {};
+      QString cost_buf = {};
       if (eddie[i].item_vnum > 0)
       {
         strncpy(item_buf, qPrintable(((ObjectPtr)DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description()), 1024);
@@ -1697,8 +1696,8 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
   }
   else if (cmd == cmd_t::BUY)
   {
-    char arg1[MAX_STRING_LENGTH];
-    char buf[MAX_STRING_LENGTH];
+    QString arg1;
+    QString buf;
 
     one_argument(arg, arg1);
 

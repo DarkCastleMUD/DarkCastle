@@ -179,7 +179,7 @@ void DC::object_activity(quint64 pulse_type)
   removeDead();
 }
 
-qint32 do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ObjectPtr between;
 
@@ -222,9 +222,9 @@ qint32 do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
+  QString buf;
   ObjectPtr temp;
   qint32 i /*,j*/;
   bool equipped;
@@ -323,9 +323,9 @@ qint32 do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-qint32 do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
+  QString buf;
   ObjectPtr scroll, obj;
   CharacterPtr victim;
   qint32 i, bits;
@@ -462,7 +462,7 @@ constexpr auto GOD_TRAP_ITEM = 193;
 
 void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
 {
-  char buf[200];
+  QString buf;
   ObjectPtr trap_obj = {};
 
   sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", qPrintable(obj->short_description()));
@@ -481,9 +481,9 @@ void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
   obj_to_room(trap_obj, ch->in_room);
 }
 
-void set_exit_trap(CharacterPtr ch, ObjectPtr obj, char *arg)
+void set_exit_trap(CharacterPtr ch, ObjectPtr obj, QString arg)
 {
-  char buf[200];
+  QString buf;
   ObjectPtr trap_obj = {};
 
   sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", qPrintable(obj->short_description()));
@@ -506,10 +506,10 @@ constexpr auto MORTAR_ROUND_OBJECT_ID = 113;
 
 // Return false if there was a command problem
 // Return true if it went off
-bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, char *arg)
+bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
 {
-  char direct[MAX_INPUT_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  QString direct;
+  QString buf;
   ObjectPtr trap_obj = {};
   qint32 dir;
 
@@ -582,8 +582,8 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, char *arg)
 // With catstink, the value[1] is the sector type it was designed for
 void set_catstink(CharacterPtr ch, ObjectPtr obj)
 {
-  char buf[200];
-  extern const char *sector_types[];
+  QString buf;
+  extern const QStringList sector_types;
 
   sprintf(buf, "You sprinkle the %s all around you.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
@@ -612,7 +612,7 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
   DC::getInstance()->world[ch->in_room].tracks_.clear();
 }
 
-void set_utility_item(CharacterPtr ch, ObjectPtr obj, char *argument)
+void set_utility_item(CharacterPtr ch, ObjectPtr obj, QString argument)
 {
   qint32 class_restricted(CharacterPtr ch, ObjectPtr obj);
 
@@ -647,11 +647,11 @@ void set_utility_item(CharacterPtr ch, ObjectPtr obj, char *argument)
   extract_obj(obj);
 }
 
-qint32 do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj = {};
-  char arg[MAX_INPUT_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  QString arg;
+  QString buf;
 
   argument = one_argument(argument, arg);
 
@@ -683,11 +683,11 @@ qint32 do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_use(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
-  char targ[MAX_INPUT_LENGTH + 1];
-  char xtra_arg[MAX_INPUT_LENGTH + 1];
+  QString buf;
+  QString targ;
+  QString xtra_arg;
   CharacterPtr tmp_char;
   ObjectPtr tmp_object, stick;
   qint32 lvl;
@@ -793,7 +793,7 @@ qint32 do_use(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // Allows a player to change his "name" (short_desc) (Sadus)
-qint32 do_name(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_name(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   auto arguments = QString(arg).trimmed().split(' ');
   if (arguments.isEmpty())
@@ -1046,11 +1046,11 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH];
-  char arg2[MAX_STRING_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  QString arg1;
+  QString arg2;
+  QString buf;
   ObjectPtr from_obj;
   ObjectPtr to_obj;
   qint32 amount;
@@ -1164,10 +1164,10 @@ qint32 do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  QString arg;
+  QString buf;
   ObjectPtr temp;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1227,9 +1227,9 @@ qint32 do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
+  QString arg;
   ObjectPtr temp;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1550,7 +1550,7 @@ qint32 will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, qint32 add)
 void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
 {
   ObjectPtr obj;
-  char buffer[MAX_STRING_LENGTH];
+  QString buffer;
   if (!obj_object)
     return;
 
@@ -2174,12 +2174,12 @@ bool Object::TypeString(QString type)
     return false;
 }
 
-qint32 do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH];
-  char arg2[MAX_STRING_LENGTH];
-  char buf[256];
-  char buffer[MAX_STRING_LENGTH];
+  QString arg1;
+  QString arg2;
+  QString buf;
+  QString buffer;
   ObjectPtr obj_object, *tmp_object, next_obj;
   qint32 keyword;
   bool blindlag = false;
@@ -2269,11 +2269,11 @@ qint32 do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH];
-  char arg2[MAX_STRING_LENGTH];
-  char buffer[MAX_STRING_LENGTH];
+  QString arg1;
+  QString arg2;
+  QString buffer;
   ObjectPtr obj_object;
   bool blindlag = false;
   qint32 keyword = 12;
@@ -2319,11 +2319,11 @@ qint32 do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH];
-  char arg2[MAX_STRING_LENGTH];
-  char buffer[MAX_STRING_LENGTH];
+  QString arg1;
+  QString arg2;
+  QString buffer;
   ObjectPtr obj_object;
   bool blindlag = false;
 
@@ -2413,9 +2413,9 @@ qint32 Character::hands_are_free(qint32 number)
     return (0);
 }
 
-qint32 do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_STRING_LENGTH];
+  QString arg1;
   ObjectPtr obj_object;
   bool blindlag = false;
   qint32 j;
@@ -2575,7 +2575,7 @@ bool fullSave(ObjectPtr obj)
   ObjectPtr tmp_obj = get_obj(GET_OBJ_VNUM(obj));
   if (!tmp_obj)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
     sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", qPrintable(obj->name()));
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return 0;

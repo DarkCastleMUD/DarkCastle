@@ -71,11 +71,11 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   FILE *fl;
-  char *tmp;
-  char buf[100];
+  QString tmp;
+  QString buf;
 
   strcpy(buf, "ps -ux > ../lib/whassup.txt");
 
@@ -106,7 +106,6 @@ qint32 do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
   fclose(fl);
 
   ch->send(tmp);
-  delete[] tmp;
   return ReturnValue::eSUCCESS;
 }
 
@@ -147,10 +146,10 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[100], level[100], buf[300], passwd[100];
+  QString name, level[100], buf[300], passwd[100];
   qint32 new_newlevel;
 
   void gain_exp(CharacterPtr ch, qint32 gain);
@@ -341,10 +340,10 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_global(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_global(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   class Connection *point;
 
   if (ch->isNonPlayer())
@@ -369,8 +368,8 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 {
   extern qint32 _shutdown;
   extern qint32 try_to_hotboot_on_crash;
-  extern qint32 do_not_save_corpses;
-  char **new_argv = {};
+  extern command_return_t do_not_save_corpses;
+  QString *new_argv = {};
 
   if (this->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -520,11 +519,11 @@ command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 errnosave = {};
   static pid_t child = {};
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
 
   if (ch == nullptr)
   {
@@ -573,14 +572,14 @@ qint32 do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
-  char savefile[255];
-  char bsavefile[255];
-  char command[512];
-  char username[20];
+  QString arg1;
+  QString arg2;
+  QString savefile;
+  QString bsavefile;
+  QString command;
+  QString username;
 
   if (ch == nullptr)
   {
@@ -652,19 +651,19 @@ qint32 do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 #ifdef BANDWIDTH
-qint32 do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->send(QStringLiteral("Bytes sent in %ld seconds: %ld\r\n").arg(get_bandwidth_start()).arg(get_bandwidth_amount()));
   return ReturnValue::eSUCCESS;
 }
 #endif
 
-qint32 do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[MAX_INPUT_LENGTH];
-  char type[MAX_INPUT_LENGTH];
-  char value[MAX_INPUT_LENGTH];
+  QString name;
+  QString type;
+  QString value;
 
   if (!(*argument))
   {

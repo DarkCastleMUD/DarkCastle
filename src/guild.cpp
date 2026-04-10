@@ -20,7 +20,7 @@
 
 extern QList<profession> professions;
 
-qint32 do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   /* Call "guild" with a null QString for an argument.
      This displays the character's skills. */
@@ -36,7 +36,7 @@ qint32 do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_profession(CharacterPtr ch, char *args, cmd_t cmd)
+command_return_t do_profession(CharacterPtr ch, QString args, cmd_t cmd)
 {
   // Command is enabled by giving someone the profession skill
   if (!ch->has_skill(SKILL_PROFESSION))
@@ -53,7 +53,7 @@ qint32 do_profession(CharacterPtr ch, char *args, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  char arg1[MAX_INPUT_LENGTH];
+  QString arg1;
   one_argument(args, arg1);
 
   // Show syntax if no argument is given
@@ -102,7 +102,7 @@ qint32 do_profession(CharacterPtr ch, char *args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-const char *per_col(qint32 percent)
+const QString per_col(qint32 percent)
 {
   if (percent == 0)
     return ("$B$0");
@@ -135,7 +135,7 @@ const char *per_col(qint32 percent)
   return ("$B$1");
 }
 
-const char *how_good(qint32 percent)
+const QString how_good(qint32 percent)
 {
   if (percent == 0)
     return (" not learned$R");
@@ -212,7 +212,7 @@ qint32 search_skills2(qint32 arg, CharacterClassSkill *list_skills)
   return -1;
 }
 
-qint32 search_skills(const char *arg, CharacterClassSkill *list_skills)
+qint32 search_skills(const QString arg, CharacterClassSkill *list_skills)
 {
   for (qint32 i = {}; *list_skills[i].skillname != '\n'; i++)
     if (is_abbrev(arg, list_skills[i].skillname))
@@ -266,7 +266,7 @@ CharacterClassSkill *Character::get_skill_list(void)
   return skilllist;
 }
 
-const char *attrstring(qint32 attr)
+const QString attrstring(qint32 attr)
 {
   switch (attr)
   {
@@ -295,7 +295,7 @@ const char *attrstring(qint32 attr)
   }
 }
 
-const char *attrname(qint32 clss, qint32 attr)
+const QString attrname(qint32 clss, qint32 attr)
 {
   switch (attr)
   {
@@ -474,7 +474,7 @@ qint32 Character::skillmax(qint32 skill, qint32 eh)
   return eh;
 }
 
-char Character::charthing(qint32 known, qint32 skill, qint32 maximum)
+QChar Character::charthing(qint32 known, qint32 skill, qint32 maximum)
 {
   if (get_max(skill) <= known)
     return '*';
@@ -486,7 +486,7 @@ char Character::charthing(qint32 known, qint32 skill, qint32 maximum)
 void Character::output_praclist(CharacterClassSkill *skilllist)
 {
   qint32 known, last_profession = {};
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   for (qint32 i = {}; *skilllist[i].skillname != '\n'; i++)
   {
     known = has_skill(skilllist[i].skillnum);
@@ -613,9 +613,9 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
   }
 }
 
-qint32 Character::skills_guild(const char *arg, CharacterPtr owner)
+qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
 {
-  char buf[160];
+  QString buf;
   qint32 known, x;
   qint32 skillnumber;
   qint32 percent;
@@ -743,7 +743,7 @@ qint32 Character::skills_guild(const char *arg, CharacterPtr owner)
     sendln("You are already learned in this area.");
     return ReturnValue::eSUCCESS;
   }
-  float maxlearn = (float)skilllist[skillnumber].maximum;
+  qreal maxlearn = (qreal)skilllist[skillnumber].maximum;
   maxlearn *= 0.5;
 
   if (known >= (getLevel() * 2))
@@ -910,7 +910,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     qint32 bonus = (ch->getLevel() - 50) * 250;
     if (bonus > 0 && DC::MAX_MORTAL_LEVEL == 60)
     {
-      char buf[MAX_STRING_LENGTH];
+      QString buf;
       if (ch->getLevel() == 60)
       {
         sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
@@ -1010,7 +1010,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
 
 qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 number, i, percent;
   qint32 learned = {};
   CharacterClassSkill *skilllist = ch->get_skill_list();
@@ -1066,7 +1066,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   }
   if (cmd == cmd_t::LIST)
   {
-    char buf[MAX_STRING_LENGTH];
+    QString buf;
 
     snprintf(buf, sizeof(buf), "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", qPrintable(get_skill_name(skl)));
     ch->send(buf);
@@ -1340,7 +1340,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     return;
   }
 
-  float percent = maximum * 0.75;
+  qreal percent = maximum * 0.75;
 
   if (skilllist[i].attrs)
   {
@@ -1458,7 +1458,7 @@ qint32 Character::get_max(qint32 skill)
       }
   }
 
-  float percent = maximum * 0.75;
+  qreal percent = maximum * 0.75;
 
   if (maximum && skilllist[i].attrs)
     percent += maximum / 100.0 * get_stat_bonus(skilllist[i].attrs);
@@ -1480,7 +1480,7 @@ void Character::check_maxes(void)
   for (i = {}; *skilllist[i].skillname != '\n'; i++)
   {
     maximum = skilllist[i].maximum;
-    float percent = maximum * 0.75;
+    qreal percent = maximum * 0.75;
     if (skilllist[i].attrs)
       percent += maximum / 100.0 * get_stat_bonus(skilllist[i].attrs);
 
@@ -1502,7 +1502,7 @@ void Character::check_maxes(void)
   for (i = {}; *skilllist[i].skillname != '\n'; i++)
   {
     maximum = skilllist[i].maximum;
-    float percent = maximum * 0.75;
+    qreal percent = maximum * 0.75;
     if (skilllist[i].attrs)
       percent += maximum / 100.0 * get_stat_bonus(skilllist[i].attrs);
 

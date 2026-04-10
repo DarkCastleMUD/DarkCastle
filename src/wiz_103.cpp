@@ -15,10 +15,10 @@
 
 #include <fmt/format.h>
 
-qint32 do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
-  char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
+  QString name, type[MAX_INPUT_LENGTH], buf[500];
 
   half_chop(arg, name, type);
 
@@ -153,10 +153,10 @@ qint32 do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char arg[MAX_STRING_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  QString arg;
+  QString buf;
   class Connection *d;
   quint32 sdesc;
 
@@ -196,7 +196,7 @@ qint32 do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString name = {}, buf = {};
@@ -233,19 +233,19 @@ qint32 do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   const qint32 CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
   CharacterPtr i;
   bool arenaONLY = false;
   qint32 countFighters = {};
-  char buf[80];
-  char arg[MAX_STRING_LENGTH];
+  QString buf;
+  QString arg;
   Clan *ch_clan = {};
-  char ch_clan_name[CLANTAG_LEN];
+  QString ch_clan_name;
   ch_clan_name[0] = {};
   Clan *victim_clan = {};
-  char victim_clan_name[CLANTAG_LEN];
+  QString victim_clan_name;
   victim_clan_name[0] = {};
 
   one_argument(argument, arg);
@@ -290,7 +290,7 @@ qint32 do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr rch;
 
@@ -306,20 +306,20 @@ qint32 do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  QString buf;
   qint32 i = {};
   buf[0] = '\0';
   for (; i < MAX_RACE; i++)
   {
-    char immbuf[MAX_STRING_LENGTH], resbuf[MAX_STRING_LENGTH], susbuf[MAX_STRING_LENGTH];
+    QString immbuf, resbuf[MAX_STRING_LENGTH], susbuf[MAX_STRING_LENGTH];
     immbuf[0] = resbuf[0] = susbuf[0] = '\0';
     sprintbit(races[i].immune, isr_bits, immbuf);
     sprintbit(races[i].resist, isr_bits, resbuf);
     sprintbit(races[i].suscept, isr_bits, susbuf);
 
-    char hatbuf[MAX_STRING_LENGTH], fribuf[MAX_STRING_LENGTH];
+    QString hatbuf, fribuf[MAX_STRING_LENGTH];
     hatbuf[0] = fribuf[0] = '\0';
     sprintbit(races[i].hate_fear << 1, race_abbrev, hatbuf);
     sprintbit(races[i].friendly << 1, race_abbrev, fribuf);
@@ -331,7 +331,7 @@ qint32 do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 lookupClass(CharacterPtr ch, char *str)
+qint32 lookupClass(CharacterPtr ch, QString str)
 {
   qint32 c_class;
 
@@ -360,7 +360,7 @@ qint32 lookupClass(CharacterPtr ch, char *str)
   return -1;
 }
 
-qint32 lookupRoom(CharacterPtr ch, char *str)
+qint32 lookupRoom(CharacterPtr ch, QString str)
 {
   if (str == 0)
     return -1;
@@ -380,11 +380,11 @@ qint32 lookupRoom(CharacterPtr ch, char *str)
   return room;
 }
 
-qint32 do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 c_class = 0, room = 0, old_room = {};
-  char arg1[MAX_STRING_LENGTH] = {0};
-  char arg2[MAX_STRING_LENGTH] = {0};
+  QString arg1 = {0};
+  QString arg2 = {0};
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;

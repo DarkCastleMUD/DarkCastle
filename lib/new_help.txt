@@ -13826,7 +13826,7 @@ endif
 
 Ok... time to translate... the trigger will only happen when the mobile 
 gets the message "... pokes you in the ..." If the offender (recall the 
-$$n and $$N refer to the char who did the poking...) is an NPC, then the 
+$$n and $$N refer to the chararacter who did the poking...) is an NPC, then the 
 mobile merely chuckles and pokes back. If the offender was a PC then 
 good and low level characters get a warning, high level chars get 
 attacked, and midlevel chars get slapped and whined at.
@@ -14779,7 +14779,7 @@ n    the name of whomever caused the trigger to happen.
 N    the name and title of whomever caused the trigger to happen.
 t    the name of a secondary character target (i.e A smiles at B)
 T    the short description, or name and title of target (NPC vs PC)
-r    the name of a random PC char in the room with the mobile 
+r    the name of a random PC chararacter in the room with the mobile 
 R    the short description, or name and title of the random char
 f    whoever the person ($$n) who activates the proc is fighting.
 g    whoever the mob ($$i) who owns the program is fighting.
@@ -15478,7 +15478,7 @@ SHORT, LONG, AND NAME (keywords) descriptions$R.  Details below:
  
 Type is either 'obj' or 'char'.
 Field is one of the following(the names may be abbreviated):
-Name                  (the call-name of an obj/char - kill giant)
+Name                  (the call-name of an obj/chararacter - kill giant)
 Short                 (for inventory lists (obj's) and actions (char's))
 Long                  (for when obj/character is seen in room)
 Title                 (for players)

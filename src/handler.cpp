@@ -50,7 +50,7 @@
 void huntclear_item(ObjectPtr obj);
 
 /* External procedures */
-qint32 do_fall(CharacterPtr ch, short dir);
+command_return_t do_fall(CharacterPtr ch, short dir);
 
 // TIMERS
 
@@ -121,7 +121,7 @@ qint32 isexact(QString arg, QStringList namelist)
   return false;
 }
 
-qint32 isexact(const char *arg, QStringList namelist)
+qint32 isexact(const QString arg, QStringList namelist)
 {
   for (joining_t::const_iterator i = namelist.begin(); i != namelist.end(); ++i)
   {
@@ -141,7 +141,7 @@ qint32 isexact(const char *arg, QStringList namelist)
 | Side Effects: None
 | Returns: One if it's in the namelist, zero otherwise
 */
-qint32 isexact(const char *str, const char *namelist)
+qint32 isexact(const QString str, const QString namelist)
 {
 #if 0
 	QString haystack(namelist);
@@ -152,7 +152,7 @@ qint32 isexact(const char *str, const char *namelist)
 	return 0;
 
 #endif
-  const char *curname, *curstr;
+  const QString curname, *curstr;
 
   if (!str || !namelist)
   {
@@ -179,7 +179,7 @@ qint32 isexact(const char *str, const char *namelist)
       if (!*curstr || *curname == ' ')
         break;
 
-      if (LOWER<char>(*curstr) != LOWER<char>(*curname))
+      if ((*curstr).toLower() != curname.toLower())
         break;
     }
 
@@ -189,7 +189,7 @@ qint32 isexact(const char *str, const char *namelist)
       ;
     if (!*curname)
       return (0);
-    curname++; /* first char of new_new name */
+    curname++; /* first character of new_new name */
   }
 
   return 0;
@@ -830,7 +830,7 @@ void check_weapon_weights(CharacterPtr ch)
 
 void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool add, qint32 flag)
 {
-  char log_buf[256];
+  QString log_buf;
   qint32 i;
 
   if (add && ch->isPlayer())
@@ -1612,13 +1612,13 @@ void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type)
   affect_modify(ch, af->location, af->modifier, af->bitvector, true);
 }
 
-/* Remove an affected_type structure from a char (called when duration
+/* Remove an affected_type structure from a character (called when duration
  reaches zero). Pointer *af must never be NIL! Frees mem and calls
  affect_location_apply                                                */
 void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
 {
   affected_type *hjp;
-  char buf[200];
+  QString buf;
   short dir;
   bool char_died = false;
   follow_type *f, *next_f;
@@ -2104,7 +2104,7 @@ void affect_from_char(CharacterPtr ch, qint32 skill, qint32 flags)
 }
 
 /*
- * Return if a char is affected by a spell (SPELL_XXX), nullptr indicates
+ * Return if a character is affected by a spell (SPELL_XXX), nullptr indicates
  * not affected.
  */
 affected_type *Character::affected_by_spell(quint32 skill)
@@ -2456,7 +2456,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     }
     else
     {
-      logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping character."), 0, DC::LogChannel::LOG_BUG);
     }
   }
 
@@ -2669,12 +2669,12 @@ qint32 get_number(QString &name)
   }
 }
 
-qint32 get_number(char **name)
+qint32 get_number(QString *name)
 {
   quint32 i;
-  char *ppos = {};
-  char number[MAX_INPUT_LENGTH];
-  char buffer[MAX_INPUT_LENGTH];
+  QString ppos = {};
+  QString number;
+  QString buffer;
 
   if ((ppos = index(*name, '.')) != nullptr)
   {
@@ -2700,12 +2700,12 @@ qint32 get_number(char **name)
 }
 
 /* Search a given list for an object, and return a pointer to that object */
-ObjectPtr get_obj_in_list(char *name, ObjectPtr list)
+ObjectPtr get_obj_in_list(QString name, ObjectPtr list)
 {
   ObjectPtr i;
   qint32 j, number;
-  char tmpname[MAX_INPUT_LENGTH];
-  char *tmp;
+  QString tmpname;
+  QString tmp;
 
   strcpy(tmpname, name);
   tmp = tmpname;
@@ -2772,14 +2772,14 @@ ObjectPtr get_obj_num(qint32 nr)
 
   return (0);
 }
-/* search a room for a char, and return a pointer if found..  */
-CharacterPtr get_char_room(const char *name, room_t room, bool careful)
+/* search a room for a character, and return a pointer if found..  */
+CharacterPtr get_char_room(const QString name, room_t room, bool careful)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
   qint32 j, number;
-  char tmpname[MAX_INPUT_LENGTH];
-  char *tmp;
+  QString tmpname;
+  QString tmp;
 
   partial_match = {};
 
@@ -2821,7 +2821,7 @@ CharacterPtr get_char_room(const char *name, room_t room, bool careful)
   return (partial_match);
 }
 
-/* search all over the world for a char, and return a pointer if found */
+/* search all over the world for a character, and return a pointer if found */
 CharacterPtr get_char(QString name)
 {
   CharacterPtr partial_match = {};
@@ -2872,7 +2872,7 @@ CharacterPtr get_char(QString name)
 }
 
 /* search all over the world for a mob, and return a pointer if found */
-CharacterPtr get_mob(char *name)
+CharacterPtr get_mob(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
@@ -2893,7 +2893,7 @@ CharacterPtr get_mob(char *name)
   return 0;
 }
 
-/* search all over the world for a char num, and return a pointer if found */
+/* search all over the world for a character num, and return a pointer if found */
 CharacterPtr get_char_num(qint32 nr)
 {
   const auto &character_list = DC::getInstance()->character_list;
@@ -3086,7 +3086,7 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
   ObjectPtr contained_by = {};
   CharacterPtr carried_by = {};
 
-  //  char buffer[300];
+  //  QString buffer;
 
   if (!obj)
   {
@@ -3177,7 +3177,7 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
   return 1;
 }
 
-// give an object to a char
+// give an object to a character
 // 1 if success, 0 if failure
 qint32 obj_to_char(ObjectPtr object, CharacterPtr ch)
 {
@@ -3226,7 +3226,7 @@ qint32 obj_to_char(ObjectPtr object, CharacterPtr ch)
    */
 }
 
-// take an object from a char
+// take an object from a character
 qint32 obj_from_char(ObjectPtr object)
 {
   ObjectPtr tmp;
@@ -3469,7 +3469,7 @@ qint32 obj_from_obj(ObjectPtr obj)
 
     GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
 
-    // Subtract weight from char that carries the object
+    // Subtract weight from character that carries the object
     if (tmp->carried_by)
       IS_CARRYING_W(tmp->carried_by) -= GET_OBJ_WEIGHT(obj);
   }
@@ -3743,7 +3743,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
   if (ch->guarded_by)
     stop_guarding_me(ch);
 
-  // make sure no eq left on char.  But only if pulling completely
+  // make sure no eq left on character.  But only if pulling completely
   if (pull)
   {
     for (l = {}; l < MAX_WEAR; l++)
@@ -4024,13 +4024,13 @@ CharacterPtr get_char_room_vis(CharacterPtr ch, QString name)
   return ch->get_char_room_vis(name);
 }
 
-CharacterPtr get_mob_room_vis(CharacterPtr ch, const char *name)
+CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
   qint32 j, number;
-  char tmpname[MAX_INPUT_LENGTH];
-  char *tmp;
+  QString tmpname;
+  QString tmp;
 
   partial_match = {};
 
@@ -4231,14 +4231,14 @@ CharacterPtr get_char_vis(CharacterPtr ch, const QString &name)
   return get_char_vis(ch, qPrintable(name));
 }
 
-CharacterPtr get_char_vis(CharacterPtr ch, const char *name)
+CharacterPtr get_char_vis(CharacterPtr ch, const QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
 
   qint32 j = 0, number = {};
-  char tmpname[MAX_INPUT_LENGTH];
-  char *tmp;
+  QString tmpname;
+  QString tmp;
 
   /* check location */
   if ((i = ch->get_char_room_vis(name)) != 0)
@@ -4347,7 +4347,7 @@ CharacterPtr get_active_pc(QString name)
 }
 
 CharacterPtr
-get_active_pc(const char *name)
+get_active_pc(const QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
@@ -4377,7 +4377,7 @@ get_active_pc(const char *name)
   return (partial_match);
 }
 
-CharacterPtr get_all_pc(char *name)
+CharacterPtr get_all_pc(QString name)
 {
   CharacterPtr i;
   class Connection *d;
@@ -4423,7 +4423,7 @@ CharacterPtr get_pc_vis(CharacterPtr ch, QString name)
   return get_pc_vis(ch, qPrintable(name));
 }
 
-CharacterPtr get_pc_vis(CharacterPtr ch, const char *name)
+CharacterPtr get_pc_vis(CharacterPtr ch, const QString name)
 {
   CharacterPtr partial_match = {};
 
@@ -4556,12 +4556,12 @@ ObjectPtr get_obj_vis(CharacterPtr ch, QString name, bool loc)
 }
 
 /*search the entire world for an object, and return a pointer  */
-ObjectPtr get_obj_vis(CharacterPtr ch, const char *name, bool loc)
+ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc)
 {
   ObjectPtr i;
   qint32 j, number;
-  char tmpname[MAX_INPUT_LENGTH];
-  char *tmp;
+  QString tmpname;
+  QString tmp;
 
   /* scan items carried */
   if ((i = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
@@ -4661,12 +4661,12 @@ ObjectPtr create_money(qint32 amount)
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
 
-qint32 generic_find(const char *arg, qint32 bitvector, CharacterPtr ch, CharacterPtr *tar_ch, ObjectPtr *tar_obj, bool verbose)
+qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, CharacterPtr *tar_ch, ObjectPtr *tar_obj, bool verbose)
 {
   static const QStringList ignore = {"the", "in", "\n"};
 
   qint32 i;
-  char name[256] = {'\0'};
+  QString name = {'\0'};
   bool found;
 
   found = false;
@@ -4890,10 +4890,10 @@ qint32 fears_someone(CharacterPtr ch)
   return (ch->mobdata->fears != nullptr);
 }
 
-void remove_memory(CharacterPtr ch, char type, CharacterPtr vict)
+void remove_memory(CharacterPtr ch, QChar type, CharacterPtr vict)
 {
-  char *temp = {};
-  char *curr = {};
+  QString temp = {};
+  QString curr = {};
 
   if (type == 't')
     ch->hunting = {};
@@ -4934,7 +4934,7 @@ void room_mobs_only_hate(CharacterPtr ch)
 		} });
 }
 
-void remove_memory(CharacterPtr ch, char type)
+void remove_memory(CharacterPtr ch, QChar type)
 {
   if (type == 't')
     ch->hunting = {};
@@ -4952,7 +4952,7 @@ void remove_memory(CharacterPtr ch, char type)
     ch->mobdata->fears = {};
 }
 
-void Character::add_memory(QString victim_name, char type)
+void Character::add_memory(QString victim_name, QChar type)
 {
   // pets don't know to hate people
   if (!isNonPlayer() || IS_AFFECTED(this, AFF_CHARM) || IS_AFFECTED(this, AFF_FAMILIAR))
@@ -5193,7 +5193,7 @@ skill_results_t find_skills_by_name(QString name)
   return results;
 }
 
-qint32 find_skill_num(char *name)
+qint32 find_skill_num(QString name)
 {
   qint32 i;
   quint32 name_length = strlen(name);

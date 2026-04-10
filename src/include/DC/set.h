@@ -3,11 +3,11 @@
 class set_data
 {
 public:
-  const char *SetName = {};
+  const QString SetName = {};
   qint32 amount = {};
   qint32 vnum[19] = {};
-  const char *Set_Wear_Message = {};
-  const char *Set_Remove_Message = {};
+  const QString Set_Wear_Message = {};
+  const QString Set_Remove_Message = {};
 };
 
 constexpr auto BASE_SETS = 1400;

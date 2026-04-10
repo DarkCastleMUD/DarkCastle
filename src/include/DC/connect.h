@@ -8,7 +8,7 @@
 #include <QHostAddress>
 #include <QMap>
 
-// if you change, make sure you update char *connected_states[] in const.C
+// if you change, make sure you update QStringList connected_states in const.C
 // also update connected_types[]
 
 constexpr auto MAX_RAW_INPUT_LENGTH = 512;

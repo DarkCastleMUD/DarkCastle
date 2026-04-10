@@ -59,17 +59,17 @@ const QStringList fillwords =
         "at",
         "to"};
 
-qint32 do_motd(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_motd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  extern char motd[];
+  extern QString motd;
 
   page_string(ch->desc, motd, 1);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_imotd(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_imotd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  extern char imotd[];
+  extern QString imotd;
 
   page_string(ch->desc, imotd, 1);
   return ReturnValue::eSUCCESS;
@@ -456,7 +456,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       return logcmd.setReturn(ReturnValue::eSUCCESS, QStringLiteral("ReturnValue::eSUCCESS"));
   }
 
-  // Unknown command (or char too low level)
+  // Unknown command (or character too low level)
   this->sendln("Huh?");
   return logcmd.setReturn(ReturnValue::eSUCCESS, QStringLiteral("ReturnValue::eSUCCESS"));
 }
@@ -474,9 +474,9 @@ qsizetype search_list(QString arg, const QStringList list)
   return -1;
 }
 
-qint32 do_boss(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_boss(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[200];
+  QString buf;
   qint32 x;
 
   for (x = {}; x <= 60; x++)
@@ -525,7 +525,7 @@ qint32 old_search_block(const QString argument, qint32 begin, qint32 length, con
   return (found ? guess : -1);
 }
 
-qint32 old_search_block(const QString argument, qint32 begin, qint32 length, const char **list, qint32 mode)
+qint32 old_search_block(const QString argument, qint32 begin, qint32 length, const QString *list, qint32 mode)
 {
   qint32 guess, found, search;
 
@@ -560,7 +560,7 @@ qint32 old_search_block(const QString argument, qint32 begin, qint32 length, con
   return (found ? guess : -1);
 }
 
-void argument_interpreter(const QString argument, char *first_arg, char *second_arg)
+void argument_interpreter(const QString argument, QString first_arg, QString second_arg)
 {
   qint32 look_at, begin;
 
@@ -595,7 +595,7 @@ void argument_interpreter(const QString argument, char *first_arg, char *second_
 
 // If the QString is ALL numbers, return true
 // If there is a non-numeric in QString, return false
-bool is_number(const char *str)
+bool is_number(const QString str)
 {
   qint32 look_at;
 
@@ -641,7 +641,7 @@ QString one_argument(QString arguments, QString &arg1)
   return {};
 }
 
-char *one_argumentnolow(char *argument, char *first_arg)
+QString one_argumentnolow(QString argument, QString first_arg)
 {
   qint32 begin, look_at;
   begin = {};
@@ -662,10 +662,10 @@ char *one_argumentnolow(char *argument, char *first_arg)
   return (argument + begin);
 }
 
-void automail(char *name)
+void automail(QString name)
 {
   FILE *blah;
-  char buf[100];
+  QString buf;
 
   blah = fopen("../lib/whassup.txt", "w");
   qfprintf(blah, "%s", name);
@@ -682,7 +682,7 @@ bool is_abbrev(const QString &aabrev, const QString &word)
   }
 
   return equal(aabrev.begin(), aabrev.end(), word.begin(),
-               [](char a, char w)
+               [](QChar a, QChar w)
                {
                  return tolower(a) == tolower(w);
                });
@@ -699,7 +699,7 @@ bool is_abbrev(QString aabrev, QString word)
 }
 
 /* determine if a given QString is an abbreviation of another */
-bool is_abbrev(const char *arg1, const char *arg2) /* arg1 is short, arg2 is long */
+bool is_abbrev(const QString arg1, const QString arg2) /* arg1 is short, arg2 is long */
 {
   if (!*arg1)
     return false;
@@ -754,7 +754,7 @@ QString rtrim(QString str)
 
   return str;
 }
-std::tuple<QString, QString> half_chop(QString arguments, const char token)
+std::tuple<QString, QString> half_chop(QString arguments, const QChar token)
 {
   QStringList namelist = arguments.trimmed().split(token);
 
@@ -770,7 +770,7 @@ std::tuple<QString, QString> half_chop(QString arguments, const char token)
   return std::tuple<QString, QString>(arg1, remainder);
 }
 
-std::tuple<QString, QString> half_chop(const char *c_arg, const char token)
+std::tuple<QString, QString> half_chop(const QString c_arg, const QChar token)
 {
   QString arguments;
   if (c_arg)
@@ -814,7 +814,7 @@ std::tuple<QString, QString> last_argument(QString arguments)
 }
 
 /* return first 'word' plus trailing substring of input QString */
-void half_chop(const char *str, char *arg1, char *arg2)
+void half_chop(const QString str, QString arg1, QString arg2)
 {
   // strip leading whitespace from original
   for (; isspace(*str); str++)
@@ -837,7 +837,7 @@ void half_chop(const char *str, char *arg1, char *arg2)
 }
 
 /* return last 'word' plus leading substring of input str */
-void chop_half(char *str, char *arg1, char *arg2)
+void chop_half(QString str, QString arg1, QString arg2)
 {
   qint32 i, j;
 

@@ -43,15 +43,15 @@ ObjectPtr create_obj_new(void);
 void save_corpses(void);
 qint32 corpse_save(ObjectPtr obj, FILE *fp, qint32 location, bool recurse_this_tree);
 qint32 write_corpse_to_disk(FILE *fp, ObjectPtr obj, qint32 locate);
-void clean_string(char *buffer);
-qint32 get_line_new(FILE *fl, char *buf);
+void clean_string(QString buffer);
+qint32 get_line_new(FILE *fl, QString buf);
 QString fread_string_new(FILE *fl);
 
 /* Tada! THE FUNCTIONS ! Yaaa! */
 
-void clean_string(char *buffer)
+void clean_string(QString buffer)
 {
-  char *ptr, *str;
+  QString ptr, *str;
 
   ptr = buffer;
   str = ptr;
@@ -113,8 +113,8 @@ qint32 write_corpse_to_disk(FILE *fp, ObjectPtr obj, qint32 locate)
 
   qint32 counter;
   extra_descr_data *ex_desc;
-  char buf1[MAX_STRING_LENGTH + 1] = {};
-  // char buf2[256];
+  QString buf1 = {};
+  // QString buf2;
 
   if (!obj->ActionDescription().isEmpty())
   {
@@ -195,8 +195,8 @@ void save_corpses(void)
   FILE *fp;
   ObjectPtr i, next;
   qint32 location = {};
-  char buf1[256] = {0};
-  extern qint32 do_not_save_corpses;
+  QString buf1 = {0};
+  extern command_return_t do_not_save_corpses;
 
   if (do_not_save_corpses == 1)
     return;
@@ -243,12 +243,12 @@ void DC::load_corpses(void)
   /* Oh, and a bunch of this code is from Patricks XAP obj's code    */
 
   FILE *fp;
-  char line[256] = {0};
+  QString line = {0};
   qint32 t[15], zwei = {};
   qint32 nr, num_objs = {};
   ObjectPtr temp = {}, *obj = {}, next_obj = {};
   extra_descr_data *new_descr;
-  char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
+  QString buf1 = {0}, buf2[256] = {0}, buf3[256] = {0};
   bool end = false;
   qint32 number = -1;
   ObjectPtr money;
@@ -523,16 +523,16 @@ void DC::load_corpses(void)
   fclose(fp);
 }
 
-qint32 get_line_new(FILE *fl, char *buf)
+qint32 get_line_new(FILE *fl, QString buf)
 {
-  char temp[256] = {0};
+  QString temp = {0};
   qint32 lines = 0, a = {};
 
   while (!feof(fl))
   {
     switch ((temp[a++] = fgetc(fl)))
     {
-    case (char)EOF:
+    case (QChar)EOF:
       return 0;
     case '|':
     case '\n':
@@ -608,7 +608,7 @@ QString fread_string_new(FILE *fl)
 
 qint32 count_hash_records(FILE *fl)
 {
-  char buf[128];
+  QString buf;
   qint32 count = {};
 
   while (fgets(buf, 128, fl))

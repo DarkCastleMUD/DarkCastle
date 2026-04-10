@@ -19,10 +19,10 @@
 #include "DC/comm.h"
 #include "DC/utility.h"
 
-qint32 do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr k;
-  char buf[MAX_INPUT_LENGTH + 1];
+  QString buf;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -69,9 +69,9 @@ qint32 do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_found(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_found(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
+  QString buf;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -212,7 +212,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
     if (k->clan && get_clan(k)->tax && !isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
         (k->clan != clan || (k->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
     {
-      lost = (qint32)((float)share * (float)((float)get_clan(k)->tax / 100));
+      lost = (qint32)((qreal)share * (qreal)((qreal)get_clan(k)->tax / 100));
       k->send(QStringLiteral("Your clan taxes %L1 $B$5gold$R of your share.\r\n").arg(lost));
       get_clan(k)->cdeposit(lost);
       save_clans();
@@ -231,7 +231,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
       if (f->follower->clan && get_clan(f->follower)->tax && !isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
           (f->follower->clan != clan || (f->follower->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
       {
-        lost = (qint32)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
+        lost = (qint32)((qreal)share * (qreal)((qreal)get_clan(f->follower)->tax / 100));
         f->follower->send(QStringLiteral("Your clan taxes %L1 gold of your share.\r\n").arg(lost));
         get_clan(f->follower)->cdeposit(lost);
         save_clans();
@@ -242,7 +242,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void setup_group_buf(char *report, CharacterPtr j, CharacterPtr i)
+void setup_group_buf(QString report, CharacterPtr j, CharacterPtr i)
 {
   if (j->isNonPlayer() || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
   {
@@ -304,10 +304,10 @@ void setup_group_buf(char *report, CharacterPtr j, CharacterPtr i)
   }
 }
 
-qint32 do_group(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[256];
-  char buf[256], report[256];
+  QString name;
+  QString buf, report[256];
   CharacterPtr victim, k, j;
   follow_type *f;
   bool found;
@@ -420,10 +420,10 @@ qint32 do_group(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_INPUT_LENGTH + 1];
-  char buf[250];
+  QString name;
+  QString buf;
   CharacterPtr new_new_leader, k;
   follow_type *f, *next_f;
 
@@ -525,10 +525,10 @@ qint32 do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_INPUT_LENGTH + 1];
-  char buf[200];
+  QString name[MAX_INPUT_LENGTH + 1];
+  QString buf;
   CharacterPtr adios, k;
   follow_type *f, *next_f;
 
@@ -629,9 +629,9 @@ qint32 do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  char name[MAX_INPUT_LENGTH + 1];
+  QString name[MAX_INPUT_LENGTH + 1];
   CharacterPtr leader;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))

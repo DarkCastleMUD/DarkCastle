@@ -3,7 +3,7 @@
 
 void setup_bandwidth();
 void add_bandwidth(qint32 amount);
-bandwidth_type read_bandwidth(const char *file);
+bandwidth_type read_bandwidth(const QString file);
 qint32 write_bandwidth();
 
 qint32 get_bandwidth_start();

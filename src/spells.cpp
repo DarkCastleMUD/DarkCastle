@@ -56,7 +56,7 @@ extern CharacterClassSkill k_skills[];
 extern CharacterClassSkill u_skills[];
 extern CharacterClassSkill c_skills[];
 extern CharacterClassSkill m_skills[];
-extern char *spell_wear_off_msg[];
+extern QStringList spell_wear_off_msg;
 
 // Functions used in spells.C
 qint32 spl_lvl(qint32 lev);
@@ -1028,7 +1028,7 @@ void affect_update(qint32 duration_type)
 // Sets any ISR's that go with a spell..  (ISR's arent saved)
 void isr_set(CharacterPtr ch)
 {
-  // char buf[100];
+  // QString buf;
   static affected_type *afisr;
 
   if (!ch)
@@ -1279,8 +1279,8 @@ void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reaso
 
 qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
 {
-  char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
+  QString buf, splwd[MAX_BUF_LENGTH];
+  QString buf2;
 
   qint32 j, offs, retval = {};
   CharacterPtr temp_char;
@@ -1288,8 +1288,8 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
   class syllable
   {
   public:
-    char org[10];
-    char new_new[10];
+    QString org;
+    QString new_new;
   };
 
   syllable syls[] = {
@@ -1457,7 +1457,7 @@ qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16
   return (qint32)(save - spell_base);
 }
 
-const char *skip_spaces(const char *s)
+const QString skip_spaces(const QString s)
 {
   for (; *s && (*s) == ' '; s++)
     ;
@@ -1468,7 +1468,7 @@ const char *skip_spaces(const char *s)
 /*
     Release command.
 */
-qint32 do_release(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type *aff, *aff_next;
   bool printed = false;
@@ -1543,7 +1543,7 @@ qint32 do_release(CharacterPtr ch, QString argument, cmd_t cmd)
 
       ch->decrementMove(25);
       ch->sendln(QStringLiteral("You release the spell effect '%1'.").arg(get_skill_name(aff->type)));
-      char buffer[255];
+      QString buffer;
       qint32 aftype = aff->type;
 
       if (*spell_wear_off_msg[aff->type])
@@ -1786,11 +1786,11 @@ bool check_conc_loss(CharacterPtr ch, qint32 spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-qint32 do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
+command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr tar_obj;
   CharacterPtr tar_char;
-  char name[MAX_STRING_LENGTH], filter[MAX_STRING_LENGTH];
+  QString name, filter[MAX_STRING_LENGTH];
   qint32 qend, spl, i, learned;
   bool target_ok;
 
@@ -2071,7 +2071,7 @@ qint32 do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             ok_self = true;
             tar_char = ch;
             target_ok = true;
-            argument = (char *)i;
+            argument = i;
             break;
           }
         }
@@ -2082,7 +2082,7 @@ qint32 do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       } // end spell immunity
       qint32 fil = {};
-      float rel = 1;
+      qreal rel = 1;
       qint32 fillvl = ch->has_skill(SKILL_ELEMENTAL_FILTER);
       if (cmd == cmd_t::FILTER && fillvl)
       {
@@ -2576,7 +2576,7 @@ qint32 do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
         quint8 level = ch->getLevel();
-        char *argument_ptr = {};
+        QString argument_ptr = {};
 
         if (group_spell)
         {
@@ -2649,7 +2649,7 @@ qint32 do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
           if (spl == SPELL_LIGHTNING_BOLT)
           {
-            char buffer[MAX_STRING_LENGTH];
+            QString buffer;
             strcpy(buffer, "$n unleashes a bolt of $B$5lightning$R to the ");
             switch (dir)
             {
@@ -2688,10 +2688,10 @@ qint32 do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-qint32 do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[16384];
-  char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+  QString buf;
+  QString buf2, buf3[MAX_STRING_LENGTH];
   qint32 mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -2909,9 +2909,9 @@ qint32 do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[16384];
+  QString buf;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -2936,10 +2936,10 @@ qint32 do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
+command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  char buf[16384];
-  char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+  QString buf;
+  QString buf2, buf3[MAX_STRING_LENGTH];
   qint32 mage, cleric, anti, pal, ranger, druid;
 
   if (ch->isNonPlayer())
