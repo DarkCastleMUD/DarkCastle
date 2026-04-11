@@ -1033,13 +1033,13 @@ void isr_set(CharacterPtr ch)
 
   if (!ch)
   {
-    logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
     return;
   }
 
   /*  why do we need this spamming the logs?
-     sprintf(buf, "isr_set ch %s", qPrintable(ch->name()));
-     logentry(buf, 0, DC::LogChannel::LOG_BUG);
+     dc_sprintf(buf, "isr_set ch %s", qPrintable(ch->name()));
+     DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_BUG);
   */
   for (afisr = ch->affected; afisr; afisr = afisr->next)
   {
@@ -1121,7 +1121,7 @@ void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 
   if (ch->master == nullptr)
   {
-    logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   /*
@@ -1361,8 +1361,8 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
       }
   }
 
-  sprintf(buf2, "$n utters the words, '%s'", buf);
-  sprintf(buf, "$n utters the words, '%s'", spells[si - 1]);
+  dc_sprintf(buf2, "$n utters the words, '%s'", buf);
+  dc_sprintf(buf, "$n utters the words, '%s'", spells[si - 1]);
 
   CharacterPtr people;
   if (room > 0)
@@ -1457,12 +1457,9 @@ qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16
   return (qint32)(save - spell_base);
 }
 
-const QString skip_spaces(const QString s)
+QString skip_spaces(QString s)
 {
-  for (; *s && (*s) == ' '; s++)
-    ;
-
-  return s;
+  return s.trimmed();
 }
 
 /*
@@ -2476,9 +2473,9 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           /*
           if (!strcmp(tar_char->desc->getPeerOriginalAddress().toString(qPrintable()), ch->desc->getPeerOriginalAddress().toString(qPrintable())))
           {
-            sprintf(log_buf, "Multi: %s casted '%s' on %s", qPrintable(ch->name()),
+            dc_sprintf(log_buf, "Multi: %s casted '%s' on %s", qPrintable(ch->name()),
                     get_skill_name(spl), qPrintable(tar_char->name()));
-            logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
+            DC::getInstance()->logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
           }*/
 
           // Wizard's eye (88) is ok to cast
@@ -2489,23 +2486,23 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
-                   qPrintable(ch->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
+                                      qPrintable(ch->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
               return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", qPrintable(ch->name()),
-                   qPrintable(ch->fighting->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", qPrintable(ch->name()),
+                                      qPrintable(ch->fighting->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
               return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", qPrintable(ch->name()),
-                   get_skill_name(qPrintable(spl)), qPrintable(tar_char->name()), qPrintable(tar_char->fighting->name()));
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", qPrintable(ch->name()),
+                                      get_skill_name(qPrintable(spl)), qPrintable(tar_char->name()), qPrintable(tar_char->fighting->name()));
               return ReturnValue::eFAILURE;
             }
           }
@@ -2517,29 +2514,29 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
-                   qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
+                                      qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
-                   qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
-                   qPrintable(ch->fighting->name()), get_clan_name(ch->fighting),
-                   get_skill_name(qPrintable(spl)),
-                   qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
+                                      qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
+                                      qPrintable(ch->fighting->name()), get_clan_name(ch->fighting),
+                                      get_skill_name(qPrintable(spl)),
+                                      qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
-                   qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
-                   get_skill_name(qPrintable(spl)),
-                   qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)),
-                   qPrintable(tar_char->fighting->name()), get_clan_name(tar_char->fighting));
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
+                                      qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
+                                      get_skill_name(qPrintable(spl)),
+                                      qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)),
+                                      qPrintable(tar_char->fighting->name()), get_clan_name(tar_char->fighting));
               return ReturnValue::eFAILURE;
             }
           }
@@ -2717,7 +2714,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
+        dc_sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2728,7 +2725,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
+        dc_sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2740,7 +2737,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         thief = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Thi(%llu)", t_skills[j].levelavailable);
+        dc_sprintf(buf3, "Thi(%llu)", t_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2752,7 +2749,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         warrior = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "War(%llu)", w_skills[j].levelavailable);
+        dc_sprintf(buf3, "War(%llu)", w_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2764,7 +2761,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
+        dc_sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2776,7 +2773,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
+        dc_sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2788,7 +2785,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         barb = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Bar(%llu)", b_skills[j].levelavailable);
+        dc_sprintf(buf3, "Bar(%llu)", b_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2800,7 +2797,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         monk = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Mon(%llu)", k_skills[j].levelavailable);
+        dc_sprintf(buf3, "Mon(%llu)", k_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2812,7 +2809,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
+        dc_sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2824,7 +2821,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         bard = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Brd(%llu)", d_skills[j].levelavailable);
+        dc_sprintf(buf3, "Brd(%llu)", d_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2836,65 +2833,65 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
+        dc_sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
     }
     if (mage)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, skill_cost.find(i)->second);
     }
     else if (cleric)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, skill_cost.find(i)->second);
     }
     else if (thief)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*t_skills[thief].skillname), t_skills[thief].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*t_skills[thief].skillname), t_skills[thief].skillname + 1, skill_cost.find(i)->second);
     }
     else if (warrior)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*w_skills[warrior].skillname), w_skills[warrior].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*w_skills[warrior].skillname), w_skills[warrior].skillname + 1, skill_cost.find(i)->second);
     }
     else if (anti)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, skill_cost.find(i)->second);
     }
     else if (pal)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, skill_cost.find(i)->second);
     }
     else if (barb)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*b_skills[barb].skillname), b_skills[barb].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*b_skills[barb].skillname), b_skills[barb].skillname + 1, skill_cost.find(i)->second);
     }
     else if (monk)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*k_skills[monk].skillname), k_skills[monk].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*k_skills[monk].skillname), k_skills[monk].skillname + 1, skill_cost.find(i)->second);
     }
     else if (ranger)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, skill_cost.find(i)->second);
     }
     else if (bard)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*d_skills[bard].skillname), d_skills[bard].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*d_skills[bard].skillname), d_skills[bard].skillname + 1, skill_cost.find(i)->second);
     }
     else if (druid)
     {
-      sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
-              UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, skill_cost.find(i)->second);
+      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+                 UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, skill_cost.find(i)->second);
     }
     else
       continue;
@@ -2922,10 +2919,10 @@ command_return_t do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX)
     {
-      sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%llu)",
-              UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
-              song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
-              "Brd", d_skills[i].levelavailable);
+      dc_sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%llu)",
+                 UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
+                 song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
+                 "Brd", d_skills[i].levelavailable);
       strcat(buf, "\r\n");
     }
   }
@@ -2961,7 +2958,7 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
+        dc_sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2972,7 +2969,7 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
+        dc_sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2984,7 +2981,7 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
+        dc_sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2996,7 +2993,7 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
+        dc_sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3008,7 +3005,7 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
+        dc_sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3020,40 +3017,40 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
+        dc_sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
     }
     if (mage)
     {
-      sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, spell_info[mage].min_usesmana());
+      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+                 UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, spell_info[mage].min_usesmana());
     }
     else if (cleric)
     {
-      sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, spell_info[cleric].min_usesmana());
+      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+                 UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, spell_info[cleric].min_usesmana());
     }
     else if (anti)
     {
-      sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, spell_info[anti].min_usesmana());
+      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+                 UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, spell_info[anti].min_usesmana());
     }
     else if (pal)
     {
-      sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, spell_info[pal].min_usesmana());
+      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+                 UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, spell_info[pal].min_usesmana());
     }
     else if (ranger)
     {
-      sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, spell_info[ranger].min_usesmana());
+      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+                 UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, spell_info[ranger].min_usesmana());
     }
     else if (druid)
     {
-      sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, spell_info[druid].min_usesmana());
+      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+                 UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, spell_info[druid].min_usesmana());
     }
     else
       continue;

@@ -149,7 +149,7 @@ command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("$Bareastats topgold$R");
     return ReturnValue::eSUCCESS;
   }
-  if (!strcmp(buf, "area"))
+  if (buf == u"area"_s)
   {
     argument = one_argument(argument, buf);
     if (!*buf)
@@ -160,17 +160,17 @@ command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
     areaData.DisplaySingleArea(ch, atoi(buf));
     return ReturnValue::eSUCCESS;
   }
-  if (!strcmp(buf, "all"))
+  if (buf == u"all"_s)
   {
     areaData.DisplayAreaData(ch);
     return ReturnValue::eSUCCESS;
   }
-  if (!strcmp(buf, "topxps"))
+  if (buf == u"topxps"_s)
   {
     areaData.SortAreaData(ch, SORT_XP);
     return ReturnValue::eSUCCESS;
   }
-  if (!strcmp(buf, "topgold"))
+  if (buf == u"topgold"_s)
   {
     areaData.SortAreaData(ch, SORT_GOLD);
     return ReturnValue::eSUCCESS;

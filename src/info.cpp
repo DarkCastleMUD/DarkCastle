@@ -153,7 +153,7 @@ ObjectPtr Character::get_object_in_equip_vis(QString arg, ObjectPtr equipment[],
   strcpy(tmpname, arg);
   tmp = tmpname;
   if ((num = get_number(&tmp)) < 0)
-    return (0);
+    return {};
 
   for ((*j) = 0, k = 1; ((*j) < MAX_WEAR) && (k <= num); (*j)++)
     if (equipment[(*j)])
@@ -165,7 +165,7 @@ ObjectPtr Character::get_object_in_equip_vis(QString arg, ObjectPtr equipment[],
           k++;
         }
 
-  return (0);
+  return {};
 }
 
 QString find_ex_description(QString word, extra_descr_data *list)
@@ -338,7 +338,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       else
       {
         QString timebuffer;
-        snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
+        dc_snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
         strcat(buffer, timebuffer);
       }
     }
@@ -355,7 +355,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       {
         QString timebuffer = {};
 
-        snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
+        dc_snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
         strcat(buffer, timebuffer);
       }
     }
@@ -365,7 +365,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       if (object->obj_flags.timer)
       {
         QString timebuffer = {};
-        snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->obj_flags.timer);
+        dc_snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->obj_flags.timer);
         strcat(buffer, timebuffer);
       }
     }
@@ -398,7 +398,7 @@ void Character::list_obj_to_char(ObjectPtr list, qint32 mode, bool show)
     {
       if (number > 1)
       {
-        sprintf(buf, "[%d] ", number);
+        dc_sprintf(buf, "[%d] ", number);
         this->send(buf);
       }
       show_obj_to_char(i, mode);
@@ -900,7 +900,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
   }
 
   if (!(cont = get_obj_in_list_vis(ch, container, vict->carrying)) ||
-      number(level_t(0), MORTAL + 30) > ch->getLevel())
+      number(level_(0), MORTAL + 30) > ch->getLevel())
   {
     ch->sendln("You cannot see a container named that to peek into.");
     return;
@@ -913,7 +913,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
   }
 
   QString buf;
-  sprintf(buf, "You attempt to peek into the %s.\r\n", qPrintable(cont->short_description()));
+  dc_sprintf(buf, "You attempt to peek into the %s.\r\n", qPrintable(cont->short_description()));
   ch->send(buf);
 
   if (isSet(cont->obj_flags.value[1], CONT_CLOSED))
@@ -923,7 +923,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
   }
 
   for (obj = cont->contains; obj; obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj) && number(level_t(0), MORTAL + 30) < ch->getLevel())
+    if (CAN_SEE_OBJ(ch, obj) && number(level_(0), MORTAL + 30) < ch->getLevel())
     {
       ch->show_obj_to_char(obj, 1);
       found = true;
@@ -1090,12 +1090,12 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
 
   case ITEM_WAND:
   case ITEM_STAFF:
-    sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\r\n",
-            obj->obj_flags.value[1],
-            obj->obj_flags.value[2]);
+    dc_sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\r\n",
+               obj->obj_flags.value[1],
+               obj->obj_flags.value[2]);
     ch->send(buf);
 
-    sprintf(buf, "$3Level $R%d$3 spell of:$R\r\n", obj->obj_flags.value[0]);
+    dc_sprintf(buf, "$3Level $R%d$3 spell of:$R\r\n", obj->obj_flags.value[0]);
     ch->send(buf);
 
     if (obj->obj_flags.value[3] >= 1)
@@ -1126,14 +1126,14 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     break;
 
   case ITEM_INSTRUMENT:
-    sprintf(buf, "$3Affects non-combat singing by '$R%d$3'$R\r\n$3Affects combat singing by '$R%d$3'$R\r\n",
+    dc_sprintf(buf, "$3Affects non-combat singing by '$R%d$3'$R\r\n$3Affects combat singing by '$R%d$3'$R\r\n",
             obj->obj_flags.value[0],
             obj->obj_flags.value[1]);
     ch->send(buf);
     break;
 
   case ITEM_MISSILE:
-    sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
+    dc_sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
             obj->obj_flags.value[0],
             obj->obj_flags.value[1],
             obj->obj_flags.value[2],
@@ -1142,7 +1142,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     break;
 
   case ITEM_FIREWEAPON:
-    sprintf(buf, "$3Bow is +$R%d$3 to arrow hit and +$R%d$3 to arrow damage.$R\r\n",
+    dc_sprintf(buf, "$3Bow is +$R%d$3 to arrow hit and +$R%d$3 to arrow damage.$R\r\n",
             obj->obj_flags.value[0],
             obj->obj_flags.value[1]);
     ch->send(buf);
@@ -1159,7 +1159,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
       value = obj->obj_flags.value[0];
     }
 
-    sprintf(buf, "$3AC-apply is $R%d (", value);
+    dc_sprintf(buf, "$3AC-apply is $R%d (", value);
     ch->send(buf);
     if (vobj != nullptr)
     {
@@ -1359,7 +1359,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
         if (isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
         {
-          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(EXIT(ch, keyword_no)->keyword)));
+          dc_sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(EXIT(ch, keyword_no)->keyword)));
           ch->send(buffer);
         }
         else
@@ -1367,7 +1367,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
           if (isSet(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
               EXIT(ch, keyword_no)->keyword)
           {
-            sprintf(buffer, "The %s is open.\r\n", qPrintable(fname(EXIT(ch, keyword_no)->keyword)));
+            dc_sprintf(buffer, "The %s is open.\r\n", qPrintable(fname(EXIT(ch, keyword_no)->keyword)));
             ch->send(buffer);
           }
         }
@@ -1401,19 +1401,19 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               temp = ((tmp_object->obj_flags.value[1] * 3) / tmp_object->obj_flags.value[0]);
               if (temp > 3)
               {
-                logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                     "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                     DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
-                     tmp_object->obj_flags.value[1],
-                     tmp_object->obj_flags.value[0]);
+                DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
+                                        "Bug in object %d. v2: %d > v1: %d. Resetting.",
+                                        DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
+                                        tmp_object->obj_flags.value[1],
+                                        tmp_object->obj_flags.value[0]);
                 tmp_object->obj_flags.value[1] =
                     tmp_object->obj_flags.value[0];
                 temp = 3;
               }
 
-              sprintf(buffer, "It's %sfull of a %s liquid.\r\n",
-                      fullness[temp],
-                      color_liquid[tmp_object->obj_flags.value[2]]);
+              dc_sprintf(buffer, "It's %sfull of a %s liquid.\r\n",
+                         fullness[temp],
+                         color_liquid[tmp_object->obj_flags.value[2]]);
               ch->send(buffer);
             }
           }
@@ -1456,11 +1456,11 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               else if (temp > 3)
               {
                 temp = 3;
-                logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                     "Bug in object %d. Weight: %d v1: %d",
-                     DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
-                     tmp_object->obj_flags.weight,
-                     tmp_object->obj_flags.value[0]);
+                DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
+                                        "Bug in object %d. Weight: %d v1: %d",
+                                        DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
+                                        tmp_object->obj_flags.weight,
+                                        tmp_object->obj_flags.value[0]);
               }
 
               if (NOT_KEYRING(tmp_object))
@@ -1669,7 +1669,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
             {
               if (tmp_object->isPortalTypePlayer() || tmp_object->isPortalTypePermanentNoLook())
               {
-                sprintf(tmpbuf, "You look through %s but it seems to be opaque.\r\n", qPrintable(tmp_object->short_description()));
+                dc_sprintf(tmpbuf, "You look through %s but it seems to be opaque.\r\n", qPrintable(tmp_object->short_description()));
                 ch->send(tmpbuf);
                 return ReturnValue::eFAILURE;
               }
@@ -1757,15 +1757,15 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         if (ch->isNonPlayer() || ch->player->holyLite)
         {
           if (is_closed && is_hidden)
-            sprintf(buffer + strlen(buffer), "$B($R%s-closed$B)$R ",
-                    keywords[door]);
+            dc_sprintf(buffer + strlen(buffer), "$B($R%s-closed$B)$R ",
+                       keywords[door]);
           else
-            sprintf(buffer + strlen(buffer), "%s%s ",
-                    keywords[door], is_closed ? "-closed" : "");
+            dc_sprintf(buffer + strlen(buffer), "%s%s ",
+                       keywords[door], is_closed ? "-closed" : "");
         }
         else if (!(is_closed && is_hidden))
-          sprintf(buffer + strlen(buffer), "%s%s ", keywords[door],
-                  is_closed ? "-closed" : "");
+          dc_sprintf(buffer + strlen(buffer), "%s%s ", keywords[door],
+                     is_closed ? "-closed" : "");
       }
       ansi_color(NTEXT, ch);
       ch->send("Exits: ");
@@ -1801,7 +1801,7 @@ command_return_t do_read(CharacterPtr ch, QString arg, cmd_t cmd)
   // This is just for now - To be changed later.!
 
   // yeah right.  -Sadus
-  sprintf(buf, "at %s", arg);
+  dc_sprintf(buf, "at %s", arg);
   do_look(ch, buf);
   return ReturnValue::eSUCCESS;
 }
@@ -1812,7 +1812,7 @@ command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
   CharacterPtr tmp_char;
   ObjectPtr tmp_object;
 
-  sprintf(buf, "at %s", argument);
+  dc_sprintf(buf, "at %s", argument);
   do_look(ch, buf);
 
   one_argument(argument, name);
@@ -1830,7 +1830,7 @@ command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
     if (GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON || ARE_CONTAINERS(tmp_object))
     {
       ch->sendln("When you look inside, you see:");
-      sprintf(buf, "in %s", argument);
+      dc_sprintf(buf, "in %s", argument);
       do_look(ch, buf);
     }
   }
@@ -1860,21 +1860,21 @@ command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
       continue;
 
     if (!ch->isNonPlayer() && ch->player->holyLite)
-      sprintf(buf + strlen(buf), "%s - %s [%d]\r\n", exits[door],
-              DC::getInstance()->world[EXIT(ch, door)->to_room].name,
-              DC::getInstance()->world[EXIT(ch, door)->to_room].number);
+      dc_sprintf(buf + strlen(buf), "%s - %s [%d]\r\n", exits[door],
+                 DC::getInstance()->world[EXIT(ch, door)->to_room].name,
+                 DC::getInstance()->world[EXIT(ch, door)->to_room].number);
     else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
       if (isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
         continue;
       else
-        sprintf(buf + strlen(buf), "%s - (Closed)\r\n", exits[door]);
+        dc_sprintf(buf + strlen(buf), "%s - (Closed)\r\n", exits[door]);
     }
     else if (IS_DARK(EXIT(ch, door)->to_room))
-      sprintf(buf + strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
+      dc_sprintf(buf + strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
     else
-      sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
-              DC::getInstance()->world[EXIT(ch, door)->to_room].name);
+      dc_sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
+                 DC::getInstance()->world[EXIT(ch, door)->to_room].name);
   }
 
   ch->sendln("You scan around the exits to see where they lead.");
@@ -1910,35 +1910,35 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
   QString isrString;
   // qint32 i;
 
-  sprintf(race, "%s", races[(qint32)ch->race].singular_name);
+  dc_sprintf(race, "%s", races[(qint32)ch->race].singular_name);
   exp_needed = (exp_table[(qint32)ch->getLevel() + 1] - ch->exp);
 
   to_hit = GET_REAL_HITROLL(ch);
   to_dam = GET_REAL_DAMROLL(ch);
   spell_dam = getRealSpellDamage(ch);
 
-  sprintf(buf, "$7($5:$7)================================================="
-               "========================($5:$7)\r\n"
-               "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\r\n"
-               "($5:$7)=============================($5:$7)================="
-               "========================($5:$7)\r\n",
-          qPrintable(ch->shortdesc_or_name()));
+  dc_sprintf(buf, "$7($5:$7)================================================="
+                  "========================($5:$7)\r\n"
+                  "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\r\n"
+                  "($5:$7)=============================($5:$7)================="
+                  "========================($5:$7)\r\n",
+             qPrintable(ch->shortdesc_or_name()));
 
   ch->send(buf);
 
-  sprintf(buf, "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
-               "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
-               "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3llu        $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
-               "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
-               "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\r\n"
-               "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
-          GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
-          GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(qint32)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
-          GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
-          GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
-          GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), ch->isNonPlayer() ? 0 : GET_RDEATHS(ch), ch->hit_gain_lookup(),
-          ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
-          GET_ALIGNMENT(ch));
+  dc_sprintf(buf, "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
+                  "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
+                  "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3llu        $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
+                  "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
+                  "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\r\n"
+                  "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
+             GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
+             GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(qint32)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
+             GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
+             GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
+             GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), ch->isNonPlayer() ? 0 : GET_RDEATHS(ch), ch->hit_gain_lookup(),
+             ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
+             GET_ALIGNMENT(ch));
   ch->send(buf);
 
   if (ch->isPlayer()) // mobs can't view this part
@@ -2004,8 +2004,8 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                scratch, "Immunity", isrString.c_str(), scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+                   scratch, "Immunity", isrString.c_str(), scratch);
         ch->send(buf);
         found = true;
         isrString = QString();
@@ -2022,8 +2022,8 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                scratch, "Susceptibility", isrString.c_str(), scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+                   scratch, "Susceptibility", isrString.c_str(), scratch);
         ch->send(buf);
         found = true;
         isrString = QString();
@@ -2040,8 +2040,8 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                scratch, "Resistibility", isrString.c_str(), scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+                   scratch, "Resistibility", isrString.c_str(), scratch);
         ch->send(buf);
         found = true;
         isrString = QString();
@@ -2198,7 +2198,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   /*  if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
       scratch = frills[level];
-      sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\r\n",
+      dc_sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\r\n",
               scratch, scratch);
       ch->send(buf);
       found = true;
@@ -2229,11 +2229,11 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       scratch = frills[level];
 
       if (aff_idx != AFF_REFLECT)
-        sprintf(buf, "|%c| Affected by %-25s          Modifier NONE            |%c|\r\n",
-                scratch, affected_bits[aff_idx - 1], scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier NONE            |%c|\r\n",
+                   scratch, affected_bits[aff_idx - 1], scratch);
       else
-        sprintf(buf, "|%c| Affected by %-25s          Modifier (%3d)           |%c|\r\n",
-                scratch, affected_bits[aff_idx - 1], ch->spell_reflect, scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier (%3d)           |%c|\r\n",
+                   scratch, affected_bits[aff_idx - 1], ch->spell_reflect, scratch);
       ch->send(buf);
     }
   }
@@ -2248,16 +2248,16 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (ch->player->buildLowVnum == ch->player->buildOLowVnum &&
           ch->player->buildLowVnum == ch->player->buildMLowVnum)
       {
-        sprintf(buf, "CREATION RANGE: %d-%d\r\n", ch->player->buildLowVnum, ch->player->buildHighVnum);
+        dc_sprintf(buf, "CREATION RANGE: %d-%d\r\n", ch->player->buildLowVnum, ch->player->buildHighVnum);
         ch->send(buf);
       }
       else
       {
-        sprintf(buf, "ROOM RANGE: %d-%d\r\n", ch->player->buildLowVnum, ch->player->buildHighVnum);
+        dc_sprintf(buf, "ROOM RANGE: %d-%d\r\n", ch->player->buildLowVnum, ch->player->buildHighVnum);
         ch->send(buf);
-        sprintf(buf, "MOB RANGE: %d-%d\r\n", ch->player->buildMLowVnum, ch->player->buildMHighVnum);
+        dc_sprintf(buf, "MOB RANGE: %d-%d\r\n", ch->player->buildMLowVnum, ch->player->buildMHighVnum);
         ch->send(buf);
-        sprintf(buf, "OBJ RANGE: %d-%d\r\n", ch->player->buildOLowVnum, ch->player->buildOHighVnum);
+        dc_sprintf(buf, "OBJ RANGE: %d-%d\r\n", ch->player->buildOLowVnum, ch->player->buildOHighVnum);
         ch->send(buf);
       }
     }
@@ -2281,10 +2281,10 @@ command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd)
   /* 35 days in a month */
   weekday = ((35 * time_info.month) + time_info.day + 1) % 7;
 
-  sprintf(buf, "It is %d o'clock %s, on %s.\r\n",
-          ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)),
-          ((time_info.hours >= 12) ? "pm" : "am"),
-          weekdays[weekday]);
+  dc_sprintf(buf, "It is %d o'clock %s, on %s.\r\n",
+             ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)),
+             ((time_info.hours >= 12) ? "pm" : "am"),
+             weekdays[weekday]);
 
   ch->send(buf);
 
@@ -2307,11 +2307,11 @@ command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd)
   else
     suf = "th";
 
-  sprintf(buf, "The %d%s Day of the %s, Year %d.  (game time)\r\n",
-          day,
-          suf,
-          month_name[time_info.month],
-          time_info.year);
+  dc_sprintf(buf, "The %d%s Day of the %s, Year %d.  (game time)\r\n",
+             day,
+             suf,
+             month_name[time_info.month],
+             time_info.year);
 
   ch->send(buf);
 
@@ -2320,7 +2320,7 @@ command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd)
   timep = time(0);
   if (ch->getLevel() > IMMORTAL)
   {
-    sprintf(buf, "The system time is %ld.\r\n", timep);
+    dc_sprintf(buf, "The system time is %ld.\r\n", timep);
 
     ch->send(buf);
   }
@@ -2329,22 +2329,22 @@ command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!pTime)
     return ReturnValue::eFAILURE;
 
-  sprintf(buf, "The system time is %d/%d/%d (%d:%02d) %s\r\n",
-          pTime->tm_mon + 1,
-          pTime->tm_mday,
-          pTime->tm_year + 1900,
-          pTime->tm_hour,
-          pTime->tm_min,
-          pTime->tm_zone);
+  dc_sprintf(buf, "The system time is %d/%d/%d (%d:%02d) %s\r\n",
+             pTime->tm_mon + 1,
+             pTime->tm_mday,
+             pTime->tm_year + 1900,
+             pTime->tm_hour,
+             pTime->tm_min,
+             pTime->tm_zone);
   ch->send(buf);
 
   timep -= start_time;
   h = timep / 3600;
   m = (timep % 3600) / 60;
   // 	s = timep % 60;
-  // 	sprintf (buf, "The mud has been running for: %02li:%02li:%02li \r\n",
+  // 	dc_sprintf (buf, "The mud has been running for: %02li:%02li:%02li \r\n",
   // 			h,m,s);
-  sprintf(buf, "The mud has been running for: %02i:%02i \r\n", h, m);
+  dc_sprintf(buf, "The mud has been running for: %02i:%02i \r\n", h, m);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -2361,9 +2361,9 @@ command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (OUTSIDE(ch))
   {
-    sprintf(buf, "The sky is %s and %s.\r\n",
-            sky_look[weather_info.sky],
-            (weather_info.change >= 0 ? "you feel a warm wind from south" : "your foot tells you bad weather is due"));
+    dc_sprintf(buf, "The sky is %s and %s.\r\n",
+               sky_look[weather_info.sky],
+               (weather_info.change >= 0 ? "you feel a warm wind from south" : "your foot tells you bad weather is due"));
     act(buf, ch, 0, 0, TO_CHAR, 0);
   }
   else
@@ -2616,9 +2616,9 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
     count++;
 
     if (in_room != DC::NOWHERE)
-      sprintf(buf, "[%2d] %-26s %d", count, qPrintable(k->short_description()), in_room);
+      dc_sprintf(buf, "[%2d] %-26s %d", count, qPrintable(k->short_description()), in_room);
     else
-      sprintf(buf, "[%2d] %-26s %s", count, qPrintable(k->short_description()), "(Item at DC::NOWHERE.)");
+      dc_sprintf(buf, "[%2d] %-26s %s", count, qPrintable(k->short_description()), "(Item at DC::NOWHERE.)");
 
     if (k->in_obj)
     {
@@ -2704,7 +2704,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 
     count++;
     *buf = '\0';
-    sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), DC::getInstance()->world[i->in_room].number);
+    dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), DC::getInstance()->world[i->in_room].number);
     if (strlen(buf) + strlen(buf2) + 3 >= MAX_STRING_LENGTH)
     {
       ch->sendln("LIST TRUNCATED...TOO LONG");
@@ -3264,9 +3264,9 @@ command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
     ntick = atoi(argument);
 
   if (ntick == 1)
-    sprintf(buf, "$n is waiting for one tick.");
+    dc_sprintf(buf, "$n is waiting for one tick.");
   else
-    sprintf(buf, "$n is waiting for %d ticks.", ntick);
+    dc_sprintf(buf, "$n is waiting for %d ticks.", ntick);
 
   act(buf, ch, 0, 0, TO_CHAR, INVIS_NULL);
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -3284,7 +3284,7 @@ command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  level_t next_level = level_;
+  level_ next_level = level_;
   qint64 experience_remaining = {};
 
   do
@@ -3346,7 +3346,7 @@ void check_champion_and_website_who_list()
     }
     else
     {
-      logentry(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."), 0, DC::LogChannel::LOG_MISC);
     }
   }
 

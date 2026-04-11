@@ -196,7 +196,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
   this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(qPrintable(victim->name())).arg(bc->name));
   this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(name()).arg(bc->name));
   return ReturnValue::eSUCCESS;
@@ -223,23 +223,23 @@ command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(vict = get_pc_vis(ch, arg)))
   {
-    sprintf(buf, "You don't see anyone named '%s'.", arg);
+    dc_sprintf(buf, "You don't see anyone named '%s'.", arg);
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
 
   char_skill_data *last = {};
 
-  if (!strcmp(command, "all"))
+  if (command == u"all"_s)
   {
     vict->skills.clear();
 
-    sprintf(buf, "%s has had all comands revoked.\r\n", qPrintable(vict->name()));
+    dc_sprintf(buf, "%s has had all comands revoked.\r\n", qPrintable(vict->name()));
     ch->send(buf);
-    sprintf(buf, "%s has had all commands revoked by %s.\r\n", qPrintable(vict->name()),
-            qPrintable(ch->name()));
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-    sprintf(buf, "%s has revoked all commands from you.\r\n", qPrintable(ch->name()));
+    dc_sprintf(buf, "%s has had all commands revoked by %s.\r\n", qPrintable(vict->name()),
+               qPrintable(ch->name()));
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "%s has revoked all commands from you.\r\n", qPrintable(ch->name()));
     vict->send(buf);
     return ReturnValue::eSUCCESS;
   }
@@ -250,24 +250,24 @@ command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (i == DC::bestowable_god_commands.size())
   {
-    sprintf(buf, "There is no god command named '%s'.\r\n", command);
+    dc_sprintf(buf, "There is no god command named '%s'.\r\n", command);
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
-    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name));
+    dc_snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name));
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name));
+  dc_snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name));
   ch->send(buf);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name), qPrintable(ch->name()));
-  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", qPrintable(ch->name()), qPrintable(DC::bestowable_god_commands[i].name));
+  dc_snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name), qPrintable(ch->name()));
+  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", qPrintable(ch->name()), qPrintable(DC::bestowable_god_commands[i].name));
   vict->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -281,15 +281,15 @@ command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
   if (wizlock)
   {
     QString log_buf = {};
-    sprintf(log_buf, "Game has been wizlocked by %s.", qPrintable(ch->name()));
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_sprintf(log_buf, "Game has been wizlocked by %s.", qPrintable(ch->name()));
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game wizlocked.");
   }
   else
   {
     QString log_buf = {};
-    sprintf(log_buf, "Game has been un-wizlocked by %s.", qPrintable(ch->name()));
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_sprintf(log_buf, "Game has been un-wizlocked by %s.", qPrintable(ch->name()));
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game un-wizlocked.");
   }
   return ReturnValue::eSUCCESS;
@@ -367,7 +367,7 @@ command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  send_to_gods(command, lev_nr, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->send_to_gods(command, lev_nr, DC::LogChannel::LOG_BUG);
   return ReturnValue::eSUCCESS;
 }
 
@@ -425,7 +425,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       GET_PLATINUM(victim) -= 500;
       send(QStringLiteral("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(qPrintable(victim->shortdesc_or_name())).arg(GET_PLATINUM(victim)));
       victim->send(QStringLiteral("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
+      DC::getInstance()->logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
     }
   }
 
@@ -554,7 +554,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   }
 
   buffer = QStringLiteral("%1 renamed to %2.").arg(qPrintable(victim->name())).arg(newname);
-  logentry(buffer, level_, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buffer, level_, DC::LogChannel::LOG_GOD);
 
   // handle the renames
   DC::getInstance()->TheAuctionHouse.HandleRename(this, qPrintable(victim->name()), newname);
@@ -604,16 +604,16 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!*arg1 || !*type || !*arg2)
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
+    dc_sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
+                    "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
   }
 
   if (!(range = atoi(arg1)))
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
+    dc_sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
+                    "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
   }
@@ -626,8 +626,8 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(numrooms = atoi(arg2)))
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
+    dc_sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
+                    "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
   }
@@ -659,31 +659,31 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (type_ok != 1)
   {
-    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
+    dc_sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
+                    "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::getInstance()->cf.bport == true ? "b" : "n");
+  dc_sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::getInstance()->cf.bport == true ? "b" : "n");
   ret = system(buf);
   // ret = bits, but I didn't use bits because I'm lazy and it only returns 2 values I gives a flyging fuck about!
   // if you change the script, you gotta change this too. - Rahz
 
   if (ret == 0)
   {
-    sprintf(err, "Range %d Installed!  These changes will not take effect until the next reboot!\r\n", range);
+    dc_sprintf(err, "Range %d Installed!  These changes will not take effect until the next reboot!\r\n", range);
   }
   else if (ret == 256)
   {
-    sprintf(err, "That range would overlap another range!\r\n");
+    dc_sprintf(err, "That range would overlap another range!\r\n");
   }
   else
   {
-    sprintf(err, "Error Code: %d\r\n"
-                 "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n",
-            ret);
+    dc_sprintf(err, "Error Code: %d\r\n"
+                    "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
+                    "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n",
+               ret);
   }
   ch->send(err);
   return ReturnValue::eSUCCESS;
@@ -787,26 +787,26 @@ command_return_t do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   QString buf;
 
-  sprintf(buf, "Hps metad: %d Mana metad: %d Moves Metad: %d\r\n",
-          GET_HP_METAS(victim), GET_MANA_METAS(victim), GET_MOVE_METAS(ch));
+  dc_sprintf(buf, "Hps metad: %d Mana metad: %d Moves Metad: %d\r\n",
+             GET_HP_METAS(victim), GET_MANA_METAS(victim), GET_MOVE_METAS(ch));
   ch->send(buf);
 
-  sprintf(buf, "Hit points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
-          GET_RAW_HIT(victim), victim->hps_exp_spent(), victim->hps_plats_spent(),
-          r_new_meta_platinum_cost(0, victim->hps_plats_spent()) + GET_RAW_HIT(victim) - GET_HP_METAS(victim),
-          r_new_meta_exp_cost(0, victim->hps_exp_spent()) + GET_RAW_HIT(victim) - GET_HP_METAS(victim));
+  dc_sprintf(buf, "Hit points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+             GET_RAW_HIT(victim), victim->hps_exp_spent(), victim->hps_plats_spent(),
+             r_new_meta_platinum_cost(0, victim->hps_plats_spent()) + GET_RAW_HIT(victim) - GET_HP_METAS(victim),
+             r_new_meta_exp_cost(0, victim->hps_exp_spent()) + GET_RAW_HIT(victim) - GET_HP_METAS(victim));
   ch->send(buf);
 
-  sprintf(buf, "Mana points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
-          GET_RAW_MANA(victim), victim->mana_exp_spent(), victim->mana_plats_spent(),
-          r_new_meta_platinum_cost(0, victim->mana_plats_spent()) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim),
-          r_new_meta_exp_cost(0, victim->mana_exp_spent()) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim));
+  dc_sprintf(buf, "Mana points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+             GET_RAW_MANA(victim), victim->mana_exp_spent(), victim->mana_plats_spent(),
+             r_new_meta_platinum_cost(0, victim->mana_plats_spent()) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim),
+             r_new_meta_exp_cost(0, victim->mana_exp_spent()) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim));
   ch->send(buf);
 
-  sprintf(buf, "Move points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
-          GET_RAW_MOVE(victim), victim->moves_exp_spent(), victim->moves_plats_spent(),
-          r_new_meta_platinum_cost(0, victim->moves_plats_spent()) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim),
-          r_new_meta_exp_cost(0, victim->moves_exp_spent()) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim));
+  dc_sprintf(buf, "Move points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+             GET_RAW_MOVE(victim), victim->moves_exp_spent(), victim->moves_plats_spent(),
+             r_new_meta_platinum_cost(0, victim->moves_plats_spent()) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim),
+             r_new_meta_exp_cost(0, victim->moves_exp_spent()) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim));
   ch->send(buf);
 
   buf[0] = '\0';
@@ -814,8 +814,8 @@ command_return_t do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
   for (qsizetype i = {}; i < Commands::commands_.length(); i++)
   {
     if ((l++ % 10) == 0)
-      sprintf(buf, "%s\r\n", buf);
-    sprintf(buf, "%s%d ", buf, Commands::commands_[i].getNumber());
+      dc_sprintf(buf, "%s\r\n", buf);
+    dc_sprintf(buf, "%s%d ", buf, Commands::commands_[i].getNumber());
   }
   ch->send(buf);
   return ReturnValue::eSUCCESS;
@@ -856,8 +856,8 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
     for (qint32 z = {}; z < obj->num_affects; z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
-    sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), DC::getInstance()->obj_index[r].vnum(), ac);
+    dc_sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
+               o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), DC::getInstance()->obj_index[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)
@@ -974,10 +974,10 @@ command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
   {
     std::stringstream errormsg;
     errormsg << "Exception while writing to " << filename << ".";
-    logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
   }
 
-  logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
+  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
 
   return ReturnValue::eSUCCESS;
 }

@@ -194,7 +194,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if ((mob->getLevel() > ch->getLevel()) && mob->isPlayer())
     {
-      sprintf(message, "%s can string himself, thank you.\r\n", qPrintable(mob->shortdesc_or_name()));
+      dc_sprintf(message, "%s can string himself, thank you.\r\n", qPrintable(mob->shortdesc_or_name()));
       ch->send(message);
       return 1;
     }
@@ -209,7 +209,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       }
 
       ch->sendln("This is broken.");
-      logentry(QStringLiteral("do_string: broken"));
+      DC::getInstance()->logentry(QStringLiteral("do_string: broken"));
       /*
       TODO
       if (mob->isNonPlayer())
@@ -227,8 +227,8 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
         ch->sendln("You must be a God to do that.");
         return 1;
       }
-      sprintf(message, "%s just restrung short on %s", qPrintable(ch->name()), qPrintable(mob->name()));
-      logentry(message, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+      dc_sprintf(message, "%s just restrung short on %s", qPrintable(ch->name()), qPrintable(mob->name()));
+      DC::getInstance()->logentry(message, IMPLEMENTER, DC::LogChannel::LOG_GOD);
       if (mob->isNonPlayer())
         ch->desc->hashstr = &mob->short_desc;
       else
@@ -561,7 +561,7 @@ const QString next_page(const QString str)
     {
       if (*(str + 1) == '\0')
       { // this should never happen
-        logentry(QStringLiteral("String ended in $ in next_page"), ANGEL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("String ended in $ in next_page"), ANGEL, DC::LogChannel::LOG_BUG);
         //*str = '\0'; // overwrite the $ so it doesn't mess up anything
         return {};
       }

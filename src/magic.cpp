@@ -123,8 +123,8 @@ bool malediction_res(CharacterPtr ch, CharacterPtr victim, qint32 spell)
     mod = 30; // Tweak this if paralyze needs adjusting
     break;
   default:
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in malediction_res(), sent spell %d.",
-         spell);
+    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in malediction_res(), sent spell %d.",
+                            spell);
     return true; // It's safer to have the victim resist an unknown spell
     break;
   }
@@ -450,7 +450,7 @@ qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   GET_MANA(victim) -= mana;
   GET_MANA(ch) += mana;
   QString buf;
-  sprintf(buf, "$B%d$R", mana);
+  dc_sprintf(buf, "$B%d$R", mana);
   send_damage("You drain $N's very soul for | mana!", ch, 0, victim, buf, "You drain $N's very soul!", TO_CHAR);
   send_damage("You feel your very soul being drained by $n for | mana!", ch, 0, victim, buf, "You feel your very soul being drained by $n!", TO_VICT);
   send_damage("$N's soul is drained away by $n for | mana!", ch, 0, victim, buf, "$N's soul is drained away by $n!", TO_ROOM);
@@ -687,7 +687,7 @@ qint32 spell_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   qint32 duration, modifier;
   if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
   {
-    sprintf(buf, "%s is already surrounded by a greater stoneshield.\r\n", qPrintable(victim->shortdesc_or_name()));
+    dc_sprintf(buf, "%s is already surrounded by a greater stoneshield.\r\n", qPrintable(victim->shortdesc_or_name()));
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
@@ -741,7 +741,7 @@ qint32 cast_stone_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_stone_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in stone_shield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in stone_shield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -752,7 +752,7 @@ qint32 cast_iridescent_aura(quint8 level, CharacterPtr ch, QString arg, qint32 t
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -811,7 +811,7 @@ qint32 cast_iridescent_aura(quint8 level, CharacterPtr ch, QString arg, qint32 t
     return spell_iridescent_aura(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in iridesent_aura!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in iridesent_aura!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -826,7 +826,7 @@ qint32 spell_greater_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr vi
   qint32 duration, modifier;
   if (victim->affected_by_spell(SPELL_STONE_SHIELD))
   {
-    sprintf(buf, "%s is already surrounded by a stone shield.\r\n", qPrintable(victim->shortdesc_or_name()));
+    dc_sprintf(buf, "%s is already surrounded by a stone shield.\r\n", qPrintable(victim->shortdesc_or_name()));
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
@@ -880,7 +880,7 @@ qint32 cast_greater_stone_shield(quint8 level, CharacterPtr ch, QString arg, qin
     return spell_greater_stone_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in stone_shield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in stone_shield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -1063,7 +1063,7 @@ void do_solar_blind(CharacterPtr ch, CharacterPtr tmp_victim, qint32 skill)
   affected_type af;
   if (!ch || !tmp_victim)
   {
-    logentry(QStringLiteral("Null ch or vict in solar_blind"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict in solar_blind"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
   if (tmp_victim->in_room != ch->in_room)
@@ -1170,7 +1170,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
         {
           QString buf;
           dam = 360; // dice(level, 10) + skill/2;
-          sprintf(buf, "You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.", desc_dirs[i]);
+          dc_sprintf(buf, "You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.", desc_dirs[i]);
           act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
           retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
@@ -1265,7 +1265,7 @@ qint32 spell_group_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     {
       if (!tmp_victim)
       {
-        logentry(QStringLiteral("Bad character in character_list in magic.c in group-recall!"), ANGEL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("Bad character in character_list in magic.c in group-recall!"), ANGEL, DC::LogChannel::LOG_BUG);
         return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
       if (number(1, 101) > chance)
@@ -1298,7 +1298,7 @@ qint32 spell_group_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     {
       if (!tmp_victim)
       {
-        logentry(QStringLiteral("Bad tmp_victim in character_list in group fly!"), ANGEL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("Bad tmp_victim in character_list in group fly!"), ANGEL, DC::LogChannel::LOG_BUG);
         return ReturnValue::eFAILURE;
       }
       spell_fly(level, ch, tmp_victim, obj, skill);
@@ -1358,7 +1358,7 @@ qint32 spell_group_sanc(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
     {
       if (!tmp_victim)
       {
-        logentry(QStringLiteral("Bad tmp_victim in character_list in group fly!"), ANGEL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("Bad tmp_victim in character_list in group fly!"), ANGEL, DC::LogChannel::LOG_BUG);
         return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
       spell_sanctuary(level, ch, tmp_victim, obj, skill);
@@ -1640,7 +1640,7 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to teleport!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to teleport!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1662,7 +1662,7 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     ch->sendln("You find yourself unable to.");
     if (ch != victim)
     {
-      sprintf(buf, "%s just tried to teleport you.\r\n", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf, "%s just tried to teleport you.\r\n", qPrintable(ch->shortdesc_or_name()));
       victim->send(buf);
     }
     return ReturnValue::eFAILURE;
@@ -1726,7 +1726,7 @@ qint32 spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   affected_type af;
   if (!ch && (!victim || !obj))
   {
-    logentry(QStringLiteral("Null ch or victim and obj in bless."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or victim and obj in bless."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1837,7 +1837,7 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (victim->isNonPlayer() && (victim->getLevel() == 0))
   {
-    logentry(QStringLiteral("Null victim level in spell_paralyze."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim level in spell_paralyze."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1887,8 +1887,8 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (victim->isPlayer())
   {
-    sprintf(buf, "%s was just paralyzed.", qPrintable(victim->name()));
-    logentry(buf, OVERSEER, DC::LogChannel::LOG_MORTAL);
+    dc_sprintf(buf, "%s was just paralyzed.", qPrintable(victim->name()));
+    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_MORTAL);
   }
 
   af.type = SPELL_PARALYZE;
@@ -2000,7 +2000,7 @@ qint32 spell_create_water(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   qint32 water;
   if (!ch || !obj)
   {
-    logentry(QStringLiteral("Null ch or obj in create_water."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or obj in create_water."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -2034,7 +2034,7 @@ qint32 spell_remove_paralysis(quint8 level, CharacterPtr ch, CharacterPtr victim
 {
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim in remove_paralysis!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim in remove_paralysis!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2057,7 +2057,7 @@ qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 {
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim in remove_blind!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim in remove_blind!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2109,7 +2109,7 @@ qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim in cure_critic."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim in cure_critic."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2148,22 +2148,22 @@ qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   update_pos(victim);
 
-  sprintf(dammsg, "$B%d$R damage", healpoints);
+  dc_sprintf(dammsg, "$B%d$R damage", healpoints);
 
   if (ch != victim)
   {
-    sprintf(buf, "You heal %s of the more critical wounds on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "You heal %s of the more critical wounds on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n heals %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "$n heals %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "$n heals | of the more critical wounds on $N.");
+    dc_sprintf(buf, "$n heals | of the more critical wounds on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more critical wounds on $N.", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You heal %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "You heal %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "$n heals | of $s more critical wounds.");
+    dc_sprintf(buf, "$n heals | of $s more critical wounds.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more critical wounds.", TO_ROOM);
   }
 
@@ -2179,7 +2179,7 @@ qint32 spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("Null ch or victim in cure_light!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or victim in cure_light!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2215,22 +2215,22 @@ qint32 spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   update_pos(victim);
 
-  sprintf(dammsg, "$B%d$R damage", healpoints);
+  dc_sprintf(dammsg, "$B%d$R damage", healpoints);
 
   if (ch != victim)
   {
-    sprintf(buf, "You heal %s small cuts and scratches on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "You heal %s small cuts and scratches on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n heals %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "$n heals %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "$n heals | of small cuts and scratches on $N.");
+    dc_sprintf(buf, "$n heals | of small cuts and scratches on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several small cuts and scratches on $N.", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You heal %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "You heal %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "$n heals | of $s small cuts and scratches.");
+    dc_sprintf(buf, "$n heals | of $s small cuts and scratches.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s small cuts and scratches.", TO_ROOM);
   }
   return ReturnValue::eSUCCESS;
@@ -2373,7 +2373,7 @@ qint32 spell_detect_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim in detect evil!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim in detect evil!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2406,7 +2406,7 @@ qint32 spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2439,7 +2439,7 @@ qint32 spell_true_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2468,7 +2468,7 @@ qint32 spell_detect_invisibility(quint8 level, CharacterPtr ch, CharacterPtr vic
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2499,7 +2499,7 @@ qint32 spell_infravision(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2531,7 +2531,7 @@ qint32 spell_detect_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to detect_magic."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to detect_magic."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2559,7 +2559,7 @@ qint32 spell_haste(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to haste"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to haste"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2587,7 +2587,7 @@ qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 {
   if (!ch && (!victim || !obj))
   {
-    logentry(QStringLiteral("Null ch or victim and obj in bless."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or victim and obj in bless."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2666,7 +2666,7 @@ qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 {
   if (!ch || !obj)
   {
-    logentry(QStringLiteral("Null ch or obj in enchant_weapon!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or obj in enchant_weapon!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2724,7 +2724,7 @@ qint32 spell_mana(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to mana!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to mana!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   mana = victim->getLevel() * 4;
@@ -2747,7 +2747,7 @@ qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to heal!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to heal!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   /* Adding paladin ability to heal others back in.
@@ -2789,22 +2789,22 @@ qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 
   update_pos(victim);
 
-  sprintf(dammsg, " of $B%d$R damage", healy);
+  dc_sprintf(dammsg, " of $B%d$R damage", healy);
 
   if (ch != victim)
   {
-    sprintf(buf, "Your incantation heals $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "Your incantation heals $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth an incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "$n calls forth an incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "$n calls forth an incantation that heals $N|.");
+    dc_sprintf(buf, "$n calls forth an incantation that heals $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "Your incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "Your incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth an incantation that heals $m|.");
+    dc_sprintf(buf, "$n calls forth an incantation that heals $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   return ReturnValue::eSUCCESS;
@@ -2819,7 +2819,7 @@ qint32 spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to power heal!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to power heal!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -2854,22 +2854,22 @@ qint32 spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   update_pos(victim);
 
-  sprintf(dammsg, " of $B%d$R damage", healy);
+  dc_sprintf(dammsg, " of $B%d$R damage", healy);
 
   if (ch != victim)
   {
-    sprintf(buf, "Your powerful incantation heals $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "Your powerful incantation heals $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth a powerful incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "$n calls forth a powerful incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "$n calls forth a powerful incantation that heals $N|.");
+    dc_sprintf(buf, "$n calls forth a powerful incantation that heals $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "Your powerful incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "Your powerful incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth a powerful incantation that heals $m|.");
+    dc_sprintf(buf, "$n calls forth a powerful incantation that heals $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
 
@@ -2921,22 +2921,22 @@ qint32 spell_full_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   update_pos(victim);
 
-  sprintf(dammsg, " of $B%d$R damage", healamount);
+  dc_sprintf(dammsg, " of $B%d$R damage", healamount);
 
   if (ch != victim)
   {
-    sprintf(buf, "You call forth the magic of the gods to restore $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "You call forth the magic of the gods to restore $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "$n calls forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "$n calls forth the magic of the gods to restore $N|.");
+    dc_sprintf(buf, "$n calls forth the magic of the gods to restore $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You call forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+    dc_sprintf(buf, "You call forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth the magic of the gods to restore $m|.");
+    dc_sprintf(buf, "$n calls forth the magic of the gods to restore $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
 
@@ -3090,23 +3090,23 @@ qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, Character
     {
       if (i->carried_by)
       {
-        sprintf(buf, "%s carried by %s.\r\n", i->short_description,
-                PERS(i->carried_by, ch));
+        dc_sprintf(buf, "%s carried by %s.\r\n", i->short_description,
+                   PERS(i->carried_by, ch));
       }
       else if (i->in_obj)
       {
-        sprintf(buf, "%s is in %s.\r\n", i->short_description,
-                i->in_obj->short_description);
+        dc_sprintf(buf, "%s is in %s.\r\n", i->short_description,
+                   i->in_obj->short_description);
       }
       else if (i->in_room != DC::NOWHERE)
       {
-        sprintf(buf, "%s is in %s.\r\n", i->short_description,
-                DC::getInstance()->world[i->in_room].name);
+        dc_sprintf(buf, "%s is in %s.\r\n", i->short_description,
+                   DC::getInstance()->world[i->in_room].name);
       }
       else if (i->equipped_by != nullptr)
       {
-        sprintf(buf, "%s is equipped by someone.\r\n",
-                i->short_description);
+        dc_sprintf(buf, "%s is equipped by someone.\r\n",
+                   i->short_description);
       }
       else
       {
@@ -3535,7 +3535,7 @@ qint32 spell_mend_golem(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
         heal += GET_MAX_HIT(fol->follower) - GET_HIT(fol->follower);
         fol->follower->fillHP();
       }
-      sprintf(dammsg, "$B%d$R", heal);
+      dc_sprintf(dammsg, "$B%d$R", heal);
 
       send_damage("$n focuses $s magical energy and | of the scratches on $s golem are fixed.", ch, 0, 0,
                   dammsg, "$n focuses $s magical energy and many of the scratches on $s golem are fixed.", TO_ROOM);
@@ -3579,7 +3579,7 @@ qint32 cast_camouflague(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_camouflague!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_camouflague!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -3617,7 +3617,7 @@ qint32 cast_farsight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_farsight!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_farsight!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eSUCCESS;
@@ -3656,7 +3656,7 @@ qint32 cast_freefloat(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_freefloat!"), ANGEL, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_freefloat!"), ANGEL, DC::LogChannel::LOG_MISC);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -3693,7 +3693,7 @@ qint32 cast_insomnia(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_insomnia!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_insomnia!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -3731,7 +3731,7 @@ qint32 cast_shadowslip(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serios screw-up in cast_shadowslip!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serios screw-up in cast_shadowslip!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -3755,7 +3755,7 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       ch->sendln("You can only cast this spell on yourself.");
       return ReturnValue::eFAILURE;
     }
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -3817,7 +3817,7 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in sanctuary!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in sanctuary!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -4042,9 +4042,9 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   if (level < victim->getLevel())
   {
-    snprintf(buf, 100, "%s laughs in your face at your feeble attempt.\r\n", qPrintable(victim->shortdesc_or_name()));
+    dc_snprintf(buf, 100, "%s laughs in your face at your feeble attempt.\r\n", qPrintable(victim->shortdesc_or_name()));
     ch->send(buf);
-    snprintf(buf, 100, "%s tries to make you sleep, but fails miserably.\r\n", qPrintable(ch->shortdesc_or_name()));
+    dc_snprintf(buf, 100, "%s tries to make you sleep, but fails miserably.\r\n", qPrintable(ch->shortdesc_or_name()));
     victim->send(buf);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
     retval = SWAP_CH_VICT(retval);
@@ -4162,7 +4162,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     ch->sendln("You find yourself unable to.");
     if (ch != victim)
     {
-      sprintf(buf, "%s just tried to recall you.\r\n", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf, "%s just tried to recall you.\r\n", qPrintable(ch->shortdesc_or_name()));
       victim->send(buf);
     }
     return ReturnValue::eFAILURE;
@@ -4657,7 +4657,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     ch->sendln("You feel informed:");
 
-    sprintf(buf, "Object '%s', Item type: ", qPrintable(obj->name()));
+    dc_sprintf(buf, "Object '%s', Item type: ", qPrintable(obj->name()));
     sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
     strcat(buf, buf2);
     strcat(buf, "\r\n");
@@ -4676,7 +4676,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     strcat(buf, "\r\n");
     ch->send(buf);
 
-    sprintf(buf, "Weight: %d, Value: %d, Level: %llu\r\n", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
+    dc_sprintf(buf, "Weight: %d, Value: %d, Level: %llu\r\n", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
     ch->send(buf);
 
     switch (GET_ITEM_TYPE(obj))
@@ -4684,7 +4684,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     case ITEM_SCROLL:
     case ITEM_POTION:
-      sprintf(buf, "Level %d spells of:\r\n", obj->obj_flags.value[0]);
+      dc_sprintf(buf, "Level %d spells of:\r\n", obj->obj_flags.value[0]);
       ch->send(buf);
       if (obj->obj_flags.value[1] >= 1)
       {
@@ -4708,12 +4708,12 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     case ITEM_WAND:
     case ITEM_STAFF:
-      sprintf(buf, "Has %d charges, with %d charges left.\r\n",
-              obj->obj_flags.value[1],
-              obj->obj_flags.value[2]);
+      dc_sprintf(buf, "Has %d charges, with %d charges left.\r\n",
+                 obj->obj_flags.value[1],
+                 obj->obj_flags.value[2]);
       ch->send(buf);
 
-      sprintf(buf, "Level %d spell of:\r\n", obj->obj_flags.value[0]);
+      dc_sprintf(buf, "Level %d spell of:\r\n", obj->obj_flags.value[0]);
       ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
@@ -4725,32 +4725,32 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       break;
 
     case ITEM_WEAPON:
-      sprintf(buf, "Damage Dice are '%dD%d'\r\n",
-              obj->obj_flags.value[1],
-              obj->obj_flags.value[2]);
+      dc_sprintf(buf, "Damage Dice are '%dD%d'\r\n",
+                 obj->obj_flags.value[1],
+                 obj->obj_flags.value[2]);
       ch->send(buf);
       break;
 
     case ITEM_INSTRUMENT:
-      sprintf(buf, "Affects non-combat singing by '%d'\r\nAffects combat singing by '%d'\r\n",
-              obj->obj_flags.value[0],
-              obj->obj_flags.value[1]);
+      dc_sprintf(buf, "Affects non-combat singing by '%d'\r\nAffects combat singing by '%d'\r\n",
+                 obj->obj_flags.value[0],
+                 obj->obj_flags.value[1]);
       ch->send(buf);
       break;
 
     case ITEM_MISSILE:
-      sprintf(buf, "Damage Dice are '%dD%d'\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
-              obj->obj_flags.value[0],
-              obj->obj_flags.value[1],
-              obj->obj_flags.value[2],
-              obj->obj_flags.value[3]);
+      dc_sprintf(buf, "Damage Dice are '%dD%d'\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
+                 obj->obj_flags.value[0],
+                 obj->obj_flags.value[1],
+                 obj->obj_flags.value[2],
+                 obj->obj_flags.value[3]);
       ch->send(buf);
       break;
 
     case ITEM_FIREWEAPON:
-      sprintf(buf, "Bow is +%d to arrow hit and +%d to arrow damage.\r\n",
-              obj->obj_flags.value[0],
-              obj->obj_flags.value[1]);
+      dc_sprintf(buf, "Bow is +%d to arrow hit and +%d to arrow damage.\r\n",
+                 obj->obj_flags.value[0],
+                 obj->obj_flags.value[1]);
       ch->send(buf);
       break;
 
@@ -4765,8 +4765,8 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
         value = obj->obj_flags.value[0];
       }
 
-      sprintf(buf, "AC-apply is %d     Resistance to damage is %d\r\n",
-              value, obj->obj_flags.value[2]);
+      dc_sprintf(buf, "AC-apply is %d     Resistance to damage is %d\r\n",
+                 value, obj->obj_flags.value[2]);
       ch->send(buf);
       break;
     }
@@ -4790,7 +4790,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
           strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
         else
           strcpy(buf2, "Invalid");
-        sprintf(buf, "    Affects : %s By %d\r\n", buf2, obj->affected[i].modifier);
+        dc_sprintf(buf, "    Affects : %s By %d\r\n", buf2, obj->affected[i].modifier);
         ch->send(buf);
       }
     }
@@ -4800,29 +4800,29 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     if (victim->isPlayer())
     {
-      sprintf(buf, "%d Years,  %d Months,  %d Days,  %d Hours old.\r\n",
-              victim->age().year, victim->age().month,
-              victim->age().day, victim->age().hours);
+      dc_sprintf(buf, "%d Years,  %d Months,  %d Days,  %d Hours old.\r\n",
+                 victim->age().year, victim->age().month,
+                 victim->age().day, victim->age().hours);
       ch->send(buf);
 
-      sprintf(buf, "Race: ");
+      dc_sprintf(buf, "Race: ");
       sprinttype(victim->race, race_types, buf2);
       strcat(buf, buf2);
       ch->send(buf);
 
-      sprintf(buf, "   Height %dcm  Weight %dpounds \r\n",
-              GET_HEIGHT(victim), GET_WEIGHT(victim));
+      dc_sprintf(buf, "   Height %dcm  Weight %dpounds \r\n",
+                 GET_HEIGHT(victim), GET_WEIGHT(victim));
       ch->send(buf);
 
       if (victim->getLevel() > 9)
       {
 
-        sprintf(buf, "Str%d,  Int %d,  Wis %d,  Dex %d,  Con %d\r\n",
-                GET_STR(victim),
-                GET_INT(victim),
-                GET_WIS(victim),
-                GET_DEX(victim),
-                GET_CON(victim));
+        dc_sprintf(buf, "Str%d,  Int %d,  Wis %d,  Dex %d,  Con %d\r\n",
+                   GET_STR(victim),
+                   GET_INT(victim),
+                   GET_WIS(victim),
+                   GET_DEX(victim),
+                   GET_CON(victim));
         ch->send(buf);
       }
     }
@@ -5141,7 +5141,7 @@ qint32 spell_refresh(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   qint32 dam;
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("nullptr ch or victim sent to spell_refresh!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch or victim sent to spell_refresh!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -5154,7 +5154,7 @@ qint32 spell_refresh(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   victim->incrementMove(dam);
 
   QString buf;
-  sprintf(buf, "$B%d$R", dam);
+  dc_sprintf(buf, "$B%d$R", dam);
 
   if (ch != victim)
     send_damage("Your magic flows through $N and $E looks less tired by | fatigue points.", ch, 0, victim, buf, "Your magic flows through $N and $E looks less tired.", TO_CHAR);
@@ -5173,7 +5173,7 @@ qint32 spell_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr o
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("nullptr ch or victim sent to spell_fly!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch or victim sent to spell_fly!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -5206,7 +5206,7 @@ qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!ch)
   {
-    logentry(QStringLiteral("nullptr ch sent to cont_light!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch sent to cont_light!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -5323,18 +5323,18 @@ qint32 spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   // set up descriptions and such
   // all in the mob now, no need
-  //   sprintf(buf, "%s %s", corpse->name, mob->name);
+  //   dc_sprintf(buf, "%s %s", corpse->name, mob->name);
   //   mob->name = QStringLiteral(buf);
 
   //  mob->short_desc = QStringLiteral(corpse->short_description);
 
   //  if (GET_ALIGNMENT(ch) < 0)
   //{
-  // sprintf(buf, "%s slowly staggers around.\r\n", corpse->short_description);
+  // dc_sprintf(buf, "%s slowly staggers around.\r\n", corpse->short_description);
   //    mob->long_desc = QStringLiteral(buf);
   //}
   //  else
-  // sprintf(buf, "%s hovers above the ground here.\r\n",corpse->short_description);
+  // dc_sprintf(buf, "%s hovers above the ground here.\r\n",corpse->short_description);
 
   if (GET_ALIGNMENT(ch) < 0)
   {
@@ -5382,7 +5382,7 @@ qint32 spell_know_alignment(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (!ch)
   {
-    logentry(QStringLiteral("nullptr ch sent to know_alignment!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch sent to know_alignment!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -5469,7 +5469,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   qint32 spell = (qint64)obj;
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("Null ch or victim sent to dispel_minor!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or victim sent to dispel_minor!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -5718,7 +5718,7 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("Null ch or victim sent to dispel_magic!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or victim sent to dispel_magic!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -5956,7 +5956,7 @@ qint32 spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("Null ch or victim sent to cure_serious!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or victim sent to cure_serious!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -5994,22 +5994,22 @@ qint32 spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   update_pos(victim);
 
-  sprintf(dammsg, "$B%d$R damage", healpoints);
+  dc_sprintf(dammsg, "$B%d$R damage", healpoints);
 
   if (ch != victim)
   {
-    sprintf(buf, "You heal %s of the more serious wounds on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "You heal %s of the more serious wounds on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n heals %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "$n heals %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "$n heals | of the more serious wounds on $N.");
+    dc_sprintf(buf, "$n heals | of the more serious wounds on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more serious wounds on $N.", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You heal %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
+    dc_sprintf(buf, "You heal %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "$n heals | of $s more serious wounds.");
+    dc_sprintf(buf, "$n heals | of $s more serious wounds.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more serious wounds.", TO_ROOM);
   }
 
@@ -6025,7 +6025,7 @@ qint32 spell_cause_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("Null ch or victim sent to cause_light"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or victim sent to cause_light"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6043,7 +6043,7 @@ qint32 spell_cause_critical(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("nullptr ch or victim sent to cause_critical!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch or victim sent to cause_critical!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6061,7 +6061,7 @@ qint32 spell_cause_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   qint32 dam;
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("nullptr ch or victim sent to cause_serious!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch or victim sent to cause_serious!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6081,7 +6081,7 @@ qint32 spell_flamestrike(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("nullptr ch or victim sent to flamestrike!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch or victim sent to flamestrike!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6108,7 +6108,7 @@ qint32 spell_flamestrike(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
       kamount = GET_KI(victim);
     GET_MANA(victim) -= mamount;
     GET_KI(victim) -= kamount;
-    sprintf(buf, "$B%d$R mana and $B%d$R ki", mamount, kamount);
+    dc_sprintf(buf, "$B%d$R mana and $B%d$R ki", mamount, kamount);
     send_damage("$n's fires $4burn$R into your soul tearing away at your being for |.", ch, 0, victim, buf, "The fires $4burn$R into your soul tearing away at your being.", TO_VICT);
     send_damage("Your fires $4burn$R into $N's soul, tearing away at $S being for |.", ch, 0, victim, buf, "Your fires $4burn$R $N's soul, tearing away at $S being.", TO_CHAR);
   }
@@ -6289,7 +6289,7 @@ qint32 spell_stone_skin(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!ch)
   {
-    logentry(QStringLiteral("nullptr ch sent to cause_serious!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch sent to cause_serious!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6321,7 +6321,7 @@ qint32 spell_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("nullptr ch or victim sent to shield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch or victim sent to shield!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6361,7 +6361,7 @@ qint32 spell_weaken(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
   if (!ch || !victim)
   {
-    logentry(QStringLiteral("nullptr ch or victim sent to weaken!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch or victim sent to weaken!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6483,7 +6483,7 @@ qint32 spell_mass_invis(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!ch)
   {
-    logentry(QStringLiteral("nullptr ch sent to mass_invis!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr ch sent to mass_invis!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -6557,9 +6557,9 @@ void make_portal(CharacterPtr ch, CharacterPtr vict)
   vict_portal->in_room = DC::NOWHERE;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
-    sprintf(buf, "pcportal portal cleric %s", qPrintable(ch->name()));
+    dc_sprintf(buf, "pcportal portal cleric %s", qPrintable(ch->name()));
   else
-    sprintf(buf, "pcportal portal only %s %s", qPrintable(ch->name()), qPrintable(vict->name()));
+    dc_sprintf(buf, "pcportal portal only %s %s", qPrintable(ch->name()), qPrintable(vict->name()));
 
   ch_portal->name(buf);
   vict_portal->name(buf);
@@ -6622,8 +6622,8 @@ void make_portal(CharacterPtr ch, CharacterPtr vict)
                "into existence.\r\n",
                ch->in_room);
 
-  sprintf(buf, "The space in front of you warps itself to %s's iron will.\r\n",
-          qPrintable(ch->shortdesc_or_name()));
+  dc_sprintf(buf, "The space in front of you warps itself to %s's iron will.\r\n",
+             qPrintable(ch->shortdesc_or_name()));
   send_to_room(buf, vict->in_room);
   send_to_room("There is a violent flash of light as a portal shimmers "
                "into existence.\r\n",
@@ -6754,7 +6754,7 @@ qint32 cast_burning_hands(quint8 level, CharacterPtr ch, QString arg, qint32 typ
       return spell_burning_hands(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in burning hands!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in burning hands!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6808,7 +6808,7 @@ qint32 cast_call_lightning(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     }
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in call lightning!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in call lightning!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6836,7 +6836,7 @@ qint32 cast_chill_touch(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_chill_touch(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in chill touch!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in chill touch!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6863,7 +6863,7 @@ qint32 cast_shocking_grasp(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       return spell_shocking_grasp(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in shocking grasp!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in shocking grasp!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6889,7 +6889,7 @@ qint32 cast_colour_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type
       return spell_colour_spray(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in colour spray!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in colour spray!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6918,7 +6918,7 @@ qint32 cast_drown(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_drown(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in drown!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in drown!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6937,7 +6937,7 @@ qint32 cast_earthquake(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_earthquake(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in earthquake!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in earthquake!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6956,7 +6956,7 @@ qint32 cast_life_leech(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_life_leech(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_life_leach!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_life_leach!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6977,7 +6977,7 @@ qint32 cast_heroes_feast(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_heroes_feast(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_heroes_feast!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_heroes_feast!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -6996,7 +6996,7 @@ qint32 cast_heal_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_heal_spray(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_heal_spray!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_heal_spray!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7015,7 +7015,7 @@ qint32 cast_group_sanc(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_group_sanc(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_group_sanc!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_group_sanc!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7034,7 +7034,7 @@ qint32 cast_group_recall(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_group_recall(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_group_recall!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_group_recall!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7053,7 +7053,7 @@ qint32 cast_group_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_group_fly(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_group_fly!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_group_fly!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7072,7 +7072,7 @@ qint32 cast_firestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_firestorm(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_firestorm!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_firestorm!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7091,7 +7091,7 @@ qint32 cast_solar_gate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_solar_gate(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_firestorm!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_firestorm!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7138,7 +7138,7 @@ qint32 cast_energy_drain(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in energy drain!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in energy drain!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7185,7 +7185,7 @@ qint32 cast_souldrain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in souldrain!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in souldrain!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7212,7 +7212,7 @@ qint32 cast_vampiric_touch(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       return spell_vampiric_touch(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in vampiric touch!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in vampiric touch!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7239,7 +7239,7 @@ qint32 cast_meteor_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type
       return spell_meteor_swarm(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in meteor swarm!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in meteor swarm!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7266,7 +7266,7 @@ qint32 cast_fireball(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_fireball(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in fireball!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in fireball!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7293,7 +7293,7 @@ qint32 cast_sparks(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_sparks(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in sparks!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in sparks!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7320,7 +7320,7 @@ qint32 cast_howl(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_howl(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in howl!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in howl!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7363,7 +7363,7 @@ qint32 cast_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in harm!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in harm!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7411,7 +7411,7 @@ qint32 cast_power_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in power_harm!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in power_harm!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7448,7 +7448,7 @@ qint32 cast_divine_fury(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in divine fury!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in divine fury!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7475,7 +7475,7 @@ qint32 cast_lightning_bolt(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       return spell_lightning_bolt(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in lightning bolt!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in lightning bolt!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7502,7 +7502,7 @@ qint32 cast_magic_missile(quint8 level, CharacterPtr ch, QString arg, qint32 typ
       return spell_magic_missile(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in magic missile!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in magic missile!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7516,7 +7516,7 @@ qint32 cast_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -7586,7 +7586,7 @@ qint32 cast_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_armor(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in armor!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in armor!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7622,7 +7622,7 @@ qint32 cast_aegis(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_aegis(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in aegis!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in aegis!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7675,7 +7675,7 @@ qint32 cast_teleport(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     break;
 
   default:
-    logentry(QStringLiteral("Serious screw-up in teleport!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in teleport!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7702,7 +7702,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     else
     { /* Then it is a PC | NPC */
 
-      if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+      if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
       {
         qint32 retval = ReturnValue::eFAILURE;
         CharacterPtr leader;
@@ -7807,7 +7807,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     }
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in bless!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in bless!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7871,7 +7871,7 @@ qint32 cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in paralyze!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in paralyze!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7939,7 +7939,7 @@ qint32 cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in blindness!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in blindness!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -7979,7 +7979,7 @@ qint32 cast_control_weather(quint8 level, CharacterPtr ch, QString arg, qint32 t
     }
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in control weather!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in control weather!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8010,7 +8010,7 @@ qint32 cast_create_food(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_create_food(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in create food!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in create food!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8045,7 +8045,7 @@ qint32 cast_create_water(quint8 level, CharacterPtr ch, QString arg, qint32 type
     break;
 
   default:
-    logentry(QStringLiteral("Serious screw-up in create water!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in create water!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8087,7 +8087,7 @@ qint32 cast_remove_paralysis(quint8 level, CharacterPtr ch, QString arg, qint32 
     }
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in remove paralysis!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in remove paralysis!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8120,7 +8120,7 @@ qint32 cast_remove_blind(quint8 level, CharacterPtr ch, QString arg, qint32 type
       spell_remove_blind(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw up in remove blind!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw up in remove blind!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8134,7 +8134,7 @@ qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -8192,7 +8192,7 @@ qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cure critic!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cure critic!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8204,7 +8204,7 @@ qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -8266,7 +8266,7 @@ qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cure light!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cure light!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8326,7 +8326,7 @@ qint32 cast_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       }
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in curse!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in curse!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8357,7 +8357,7 @@ qint32 cast_detect_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_detect_evil(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in detect evil!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in detect evil!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8391,7 +8391,7 @@ qint32 cast_true_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_true_sight(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in true sight!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in true sight!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8422,7 +8422,7 @@ qint32 cast_detect_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_detect_good(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in detect good!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in detect good!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8434,7 +8434,7 @@ qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -8495,7 +8495,7 @@ qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint
       spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in detect invisibility!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in detect invisibility!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8507,7 +8507,7 @@ qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -8565,7 +8565,7 @@ qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
       spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in detect magic!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in detect magic!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8604,7 +8604,7 @@ qint32 cast_haste(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         spell_haste(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in haste!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in haste!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8616,7 +8616,7 @@ qint32 cast_detect_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -8670,7 +8670,7 @@ qint32 cast_detect_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     return spell_detect_poison(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in detect poison!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in detect poison!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8727,7 +8727,7 @@ qint32 cast_dispel_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     break;
 
   default:
-    logentry(QStringLiteral("Serious screw-up in dispel evil!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in dispel evil!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8783,7 +8783,7 @@ qint32 cast_dispel_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in dispel good!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in dispel good!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8804,7 +8804,7 @@ qint32 cast_enchant_armor(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     return spell_enchant_armor(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in enchant weapon!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in enchant weapon!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8825,7 +8825,7 @@ qint32 cast_enchant_weapon(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return spell_enchant_weapon(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in enchant weapon!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in enchant weapon!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8855,7 +8855,7 @@ qint32 cast_mana(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_mana(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in mana!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in mana!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8890,7 +8890,7 @@ qint32 cast_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_heal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in heal!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in heal!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8925,7 +8925,7 @@ qint32 cast_power_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in power_heal!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in power_heal!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -8953,7 +8953,7 @@ qint32 cast_full_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_full_heal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in full_heal!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in full_heal!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9011,7 +9011,7 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
       spell_invisibility(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in invisibility!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in invisibility!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9031,7 +9031,7 @@ qint32 cast_locate_object(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     return spell_locate_object(level, ch, arg, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in locate object!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in locate object!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9076,7 +9076,7 @@ qint32 cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     break;
 
   default:
-    logentry(QStringLiteral("Serious screw-up in poison!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in poison!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9102,7 +9102,7 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
     else
     {
 
-      if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+      if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
       {
         qint32 retval = ReturnValue::eFAILURE;
         CharacterPtr leader;
@@ -9165,7 +9165,7 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
       spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in protection from evil!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in protection from evil!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9190,7 +9190,7 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
     }
     else
     {
-      if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+      if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
       {
         qint32 retval = ReturnValue::eFAILURE;
         CharacterPtr leader;
@@ -9253,7 +9253,7 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
       spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in protection from good!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in protection from good!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9294,7 +9294,7 @@ qint32 cast_remove_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type
       spell_remove_curse(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in remove curse!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in remove curse!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9306,7 +9306,7 @@ qint32 cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char;
@@ -9353,7 +9353,7 @@ qint32 cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
       spell_remove_poison(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in remove poison!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in remove poison!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -9386,7 +9386,7 @@ qint32 cast_fireshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_fireshield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in fireshield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in fireshield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9438,7 +9438,7 @@ qint32 cast_sleep(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in sleep!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in sleep!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9470,7 +9470,7 @@ qint32 cast_strength(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_strength(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in strength!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in strength!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9486,24 +9486,24 @@ qint32 cast_ventriloquate(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   if (type != SPELL_TYPE_SPELL)
   {
-    logentry(QStringLiteral("Attempt to ventriloquate by non-cast-spell."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Attempt to ventriloquate by non-cast-spell."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   for (; *arg && (*arg == ' '); arg++)
     ;
   if (tar_obj)
   {
-    sprintf(buf1, "The %s says '%s'\r\n", qPrintable(fname(tar_obj->name())), arg);
-    sprintf(buf2, "Someone makes it sound like the %s says '%s'.\r\n", qPrintable(fname(tar_obj->name())), arg);
+    dc_sprintf(buf1, "The %s says '%s'\r\n", qPrintable(fname(tar_obj->name())), arg);
+    dc_sprintf(buf2, "Someone makes it sound like the %s says '%s'.\r\n", qPrintable(fname(tar_obj->name())), arg);
   }
   else
   {
-    sprintf(buf1, "%s says '%s'\r\n", qPrintable(tar_ch->shortdesc_or_name()), arg);
-    sprintf(buf2, "Someone makes it sound like %s says '%s'\r\n",
-            qPrintable(tar_ch->shortdesc_or_name()), arg);
+    dc_sprintf(buf1, "%s says '%s'\r\n", qPrintable(tar_ch->shortdesc_or_name()), arg);
+    dc_sprintf(buf2, "Someone makes it sound like %s says '%s'\r\n",
+               qPrintable(tar_ch->shortdesc_or_name()), arg);
   }
 
-  sprintf(buf3, "Someone says, '%s'\r\n", arg);
+  dc_sprintf(buf3, "Someone says, '%s'\r\n", arg);
 
   for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch;
        tmp_ch = tmp_ch->next_in_room)
@@ -9570,7 +9570,7 @@ qint32 cast_word_of_recall(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     }
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in word of recall!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in word of recall!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9585,7 +9585,7 @@ qint32 cast_wizard_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_wizard_eye(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in wizard eye!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in wizard eye!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9600,8 +9600,8 @@ qint32 cast_eagle_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_eagle_eye(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in eagle eye!"),
-             ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in eagle eye!"),
+                                ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9616,7 +9616,7 @@ qint32 cast_summon(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_summon(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in summon!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in summon!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9654,7 +9654,7 @@ qint32 cast_charm_person(quint8 level, CharacterPtr ch, QString arg, qint32 type
     break;
 
   default:
-    logentry(QStringLiteral("Serious screw-up in charm person!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in charm person!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9684,7 +9684,7 @@ qint32 cast_sense_life(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_sense_life(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in sense life!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in sense life!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9702,7 +9702,7 @@ qint32 cast_identify(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_identify(level, ch, tar_ch, tar_obj, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in identify!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in identify!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9717,7 +9717,7 @@ qint32 cast_frost_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_frost_breath(level, ch, tar_ch, 0, skill);
     break; /* It's a spell.. But people can't cast it! */
   default:
-    logentry(QStringLiteral("Serious screw-up in frostbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in frostbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9732,7 +9732,7 @@ qint32 cast_acid_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_acid_breath(level, ch, tar_ch, 0, skill);
     break; /* It's a spell.. But people can't cast it! */
   default:
-    logentry(QStringLiteral("Serious screw-up in acidbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in acidbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9748,7 +9748,7 @@ qint32 cast_fire_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     break;
     /* THIS ONE HURTS!! */
   default:
-    logentry(QStringLiteral("Serious screw-up in firebreath!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in firebreath!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9764,7 +9764,7 @@ qint32 cast_gas_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     break;
     /* THIS ONE HURTS!! */
   default:
-    logentry(QStringLiteral("Serious screw-up in gasbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in gasbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9779,7 +9779,7 @@ qint32 cast_lightning_breath(quint8 level, CharacterPtr ch, QString arg, qint32 
     return spell_lightning_breath(level, ch, tar_ch, 0, skill);
     break; /* It's a spell.. But people can't cast it! */
   default:
-    logentry(QStringLiteral("Serious screw-up in lightningbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in lightningbreath!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9829,7 +9829,7 @@ qint32 cast_fear(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in fear!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in fear!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9841,7 +9841,7 @@ qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -9906,7 +9906,7 @@ qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_refresh(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in refresh!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in refresh!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -9918,7 +9918,7 @@ qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -9983,7 +9983,7 @@ qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_fly(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in fly!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in fly!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10001,7 +10001,7 @@ qint32 cast_cont_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cont_light(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cont_light"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cont_light"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10038,7 +10038,7 @@ qint32 cast_know_alignment(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in know alignment!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in know alignment!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10098,7 +10098,7 @@ qint32 cast_dispel_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
       spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in dispel magic!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in dispel magic!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10157,7 +10157,7 @@ qint32 cast_dispel_minor(quint8 level, CharacterPtr ch, QString arg, qint32 type
       spell_dispel_minor(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in dispel minor!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in dispel minor!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10332,32 +10332,32 @@ bool elemental_score(CharacterPtr ch, qint32 level)
   extern QList<QChar> frills;
   if (fire)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-            frills[level], "Enhanced Fire Aura", "NONE", frills[level]);
+    dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+               frills[level], "Enhanced Fire Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
       level = {};
   }
   if (ice)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-            frills[level], "Enhanced Cold Aura", "NONE", frills[level]);
+    dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+               frills[level], "Enhanced Cold Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
       level = {};
   }
   if (energy)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-            frills[level], "Enhanced Energy Aura", "NONE", frills[level]);
+    dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+               frills[level], "Enhanced Energy Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
       level = {};
   }
   if (earth)
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-            frills[level], "Enhanced Physical Aura", "NONE", frills[level]);
+    dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+               frills[level], "Enhanced Physical Aura", "NONE", frills[level]);
     ch->send(buf);
     if (++level == 4)
       level = {};
@@ -10378,7 +10378,7 @@ qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -10442,7 +10442,7 @@ qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cure serious!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cure serious!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10492,7 +10492,7 @@ qint32 cast_cause_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cause_light(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cause light!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cause light!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10542,7 +10542,7 @@ qint32 cast_cause_critical(quint8 level, CharacterPtr ch, QString arg,
     return spell_cause_critical(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cause critical!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cause critical!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10592,7 +10592,7 @@ qint32 cast_cause_serious(quint8 level, CharacterPtr ch, QString arg,
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cause serious!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cause serious!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10639,7 +10639,7 @@ qint32 cast_flamestrike(quint8 level, CharacterPtr ch, QString arg,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in flamestrike!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in flamestrike!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10666,7 +10666,7 @@ qint32 cast_resist_cold(quint8 level, CharacterPtr ch, QString arg,
     return spell_resist_cold(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in resist_cold!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in resist_cold!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10693,7 +10693,7 @@ qint32 cast_staunchblood(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_staunchblood(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_staunchblood!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_staunchblood!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10719,7 +10719,7 @@ qint32 cast_resist_energy(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     return spell_resist_energy(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in resist energy!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in resist energy!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10746,7 +10746,7 @@ qint32 cast_resist_fire(quint8 level, CharacterPtr ch, QString arg,
     return spell_resist_fire(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in resist_fire!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in resist_fire!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10759,7 +10759,7 @@ qint32 cast_resist_magic(quint8 level, CharacterPtr ch, QString arg,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!strcmp(arg, "communegroupspell") && ch->has_skill(SKILL_COMMUNE))
+    if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
@@ -10812,7 +10812,7 @@ qint32 cast_resist_magic(quint8 level, CharacterPtr ch, QString arg,
     return spell_resist_magic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in resist_magic!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in resist_magic!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10839,7 +10839,7 @@ qint32 cast_stone_skin(quint8 level, CharacterPtr ch, QString arg,
     return spell_stone_skin(level, tar_ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in stone skin!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in stone skin!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10877,7 +10877,7 @@ qint32 cast_shield(quint8 level, CharacterPtr ch, QString arg,
       spell_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in shield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in shield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10937,7 +10937,7 @@ qint32 cast_weaken(quint8 level, CharacterPtr ch, QString arg,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in weaken!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in weaken!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -10961,7 +10961,7 @@ qint32 cast_mass_invis(quint8 level, CharacterPtr ch, QString arg,
     return spell_mass_invis(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in mass invis!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in mass invis!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11016,7 +11016,7 @@ qint32 cast_acid_blast(quint8 level, CharacterPtr ch, QString arg,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in acid blast!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in acid blast!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11065,7 +11065,7 @@ qint32 cast_hellstream(quint8 level, CharacterPtr ch, QString arg,
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in hell stream!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in hell stream!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11095,7 +11095,7 @@ qint32 cast_portal(quint8 level, CharacterPtr ch, QString arg,
     return spell_portal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in portal!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in portal!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11134,7 +11134,7 @@ qint32 cast_infravision(quint8 level, CharacterPtr ch, QString arg,
       spell_infravision(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in infravision!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in infravision!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11155,7 +11155,7 @@ qint32 cast_animate_dead(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_animate_dead(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in Animate Dead!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in Animate Dead!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11222,7 +11222,7 @@ qint32 cast_bee_sting(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_POTION:
     return spell_bee_sting(level, ch, ch, 0, skill);
   default:
-    logentry(QStringLiteral("Serious screw-up in bee sting!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in bee sting!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11253,7 +11253,7 @@ qint32 cast_bee_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_bee_swarm(level, ch, ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in bee swarm!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in bee swarm!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11430,7 +11430,7 @@ qint32 cast_barkskin(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_POTION:
     return spell_barkskin(level, ch, ch, 0, skill);
   default:
-    logentry(QStringLiteral("Serious screw-up in barkskin!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in barkskin!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11508,23 +11508,23 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
     update_pos(victim);
 
-    sprintf(dammsg, " of $B%d$R damage", healamount);
+    dc_sprintf(dammsg, " of $B%d$R damage", healamount);
 
     if (ch != victim)
     {
-      sprintf(buf, "Your herbs heal $N%s and makes $m...hungry?", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+      dc_sprintf(buf, "Your herbs heal $N%s and makes $m...hungry?", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, victim, TO_CHAR, 0);
-      sprintf(buf, "$n's magic herbs heal $N| and make $M look...hungry?");
+      dc_sprintf(buf, "$n's magic herbs heal $N| and make $M look...hungry?");
       send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
-      sprintf(dammsg, ", healing you of $B%d$R damage", healamount);
-      sprintf(buf, "$n magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+      dc_sprintf(dammsg, ", healing you of $B%d$R damage", healamount);
+      dc_sprintf(buf, "$n magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, victim, TO_VICT, 0);
     }
     else
     {
-      sprintf(buf, "Your magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
+      dc_sprintf(buf, "Your magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, 0, TO_CHAR, 0);
-      sprintf(buf, "$n magic herbs heal $m| and make $m look...hungry?");
+      dc_sprintf(buf, "$n magic herbs heal $m| and make $m look...hungry?");
       send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
     }
   }
@@ -11770,7 +11770,7 @@ qint32 cast_entangle(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_entangle(level, ch, ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in entangle!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in entangle!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11834,7 +11834,7 @@ qint32 cast_eyes_of_the_owl(quint8 level, CharacterPtr ch, QString arg, qint32 t
       return spell_eyes_of_the_owl(level, ch, ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in eyes of the owl!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in eyes of the owl!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11888,7 +11888,7 @@ qint32 cast_feline_agility(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   case SPELL_TYPE_POTION:
     return spell_feline_agility(level, ch, ch, 0, skill);
   default:
-    logentry(QStringLiteral("Serious screw-up in feline agility!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in feline agility!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -11948,7 +11948,7 @@ qint32 cast_oaken_fortitude(quint8 level, CharacterPtr ch, QString arg, qint32 t
   case SPELL_TYPE_POTION:
     return spell_oaken_fortitude(level, ch, ch, 0, skill);
   default:
-    logentry(QStringLiteral("Serious screw-up in oaken fortitude!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in oaken fortitude!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -12091,33 +12091,33 @@ qint32 cast_companion(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
   switch (dice(1, 4))
   {
   case 1:
-    sprintf(desc, "%s's very powerful fire elemental", qPrintable(ch->name()));
-    sprintf(name, "fire ");
+    dc_sprintf(desc, "%s's very powerful fire elemental", qPrintable(ch->name()));
+    dc_sprintf(name, "fire ");
     mob->max_hit += 300;
     if (dice(1, 100) == 1) // they got the .25% chance - very lucky
       SETBIT(mob->affected_by, AFF_FIRESHIELD);
     SET_BIT(mob->resist, ISR_FIRE);
     break;
   case 2:
-    sprintf(desc, "%s's very powerful air elemental", qPrintable(ch->name()));
-    sprintf(name, "air ");
+    dc_sprintf(desc, "%s's very powerful air elemental", qPrintable(ch->name()));
+    dc_sprintf(name, "air ");
     mob->max_hit += 200;
     SET_BIT(mob->resist, ISR_SLASH);
     break;
   case 3:
-    sprintf(desc, "%s's very powerful water elemental", qPrintable(ch->name()));
-    sprintf(name, "water ");
+    dc_sprintf(desc, "%s's very powerful water elemental", qPrintable(ch->name()));
+    dc_sprintf(name, "water ");
     mob->max_hit += 200;
     SET_BIT(mob->resist, ISR_HIT);
     break;
   case 4:
-    sprintf(desc, "%s's very powerful earth elemental", qPrintable(ch->name()));
-    sprintf(name, "earth ");
+    dc_sprintf(desc, "%s's very powerful earth elemental", qPrintable(ch->name()));
+    dc_sprintf(name, "earth ");
     mob->max_hit += 500;
     SET_BIT(mob->resist, ISR_PIERCE);
     break;
   default:
-    sprintf(desc, "%s's very powerful GAME MESSUP", qPrintable(ch->name()));
+    dc_sprintf(desc, "%s's very powerful GAME MESSUP", qPrintable(ch->name()));
     mob->max_hit += 1000;
     break;
   } // of switch
@@ -12164,7 +12164,7 @@ qint32 check_components(CharacterPtr ch, qint32 destroy, qint32 item_one = 0,
 
   if (!ch)
   {
-    logentry(QStringLiteral("No ch sent to check spell components"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("No ch sent to check spell components"), ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -12321,8 +12321,8 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   mob->exp = {};
   mob->name("golem");
-  sprintf(buf, "The golem seems to be a mishmash of other creatures binded by magic.\r\nIt appears to have pieces of %s in it.\r\n",
-          qPrintable(victim->shortdesc_or_name()));
+  dc_sprintf(buf, "The golem seems to be a mishmash of other creatures binded by magic.\r\nIt appears to have pieces of %s in it.\r\n",
+             qPrintable(victim->shortdesc_or_name()));
   mob->description = QStringLiteral(buf);
   GET_SHORT_ONLY(mob) = QStringLiteral("A gruesome golem");
   mob->long_desc = QStringLiteral("A golem created of twisted magic, stands here motionless.\r\n");
@@ -12420,7 +12420,7 @@ qint32 cast_create_golem( quint8 level, CharacterPtr ch, QString arg, qint32 typ
       return spell_create_golem(level, ch, tar_ch, 0, skill);
       break;
     default :
-      logentry(QStringLiteral("Serious screw-up in create golem!"), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Serious screw-up in create golem!"), ANGEL, DC::LogChannel::LOG_BUG);
       break;
   }
   return ReturnValue::eFAILURE;
@@ -12637,7 +12637,7 @@ qint32 choose_druid_familiar(CharacterPtr ch, QString arg)
 
   one_argument(arg, buf);
 
-  if (!strcmp(buf, "chipmunk"))
+  if (buf == u"chipmunk"_s)
   {
     if (!check_components(ch, true, 27800))
     {
@@ -12647,7 +12647,7 @@ qint32 choose_druid_familiar(CharacterPtr ch, QString arg)
     }
     return FAMILIAR_MOB_CHIPMUNK;
   }
-  if (!strcmp(buf, "owl"))
+  if (buf == u"owl"_s)
   {
     if (!check_components(ch, true, 44))
     {
@@ -12669,7 +12669,7 @@ qint32 choose_mage_familiar(CharacterPtr ch, QString arg)
 
   one_argument(arg, buf);
 
-  if (!strcmp(buf, "imp"))
+  if (buf == u"imp"_s)
   {
     if (!check_components(ch, true, 4))
     {
@@ -12679,7 +12679,7 @@ qint32 choose_mage_familiar(CharacterPtr ch, QString arg)
     }
     return FAMILIAR_MOB_IMP;
   }
-  if (!strcmp(buf, "gremlin"))
+  if (buf == u"gremlin"_s)
   {
     if (!check_components(ch, true, 43))
     {
@@ -12796,19 +12796,19 @@ qint32 cast_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 t
     return spell_summon_familiar(level, ch, arg, SPELL_TYPE_SPELL, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
-    logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
     break;
   case SPELL_TYPE_SCROLL:
-    logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
     break;
   case SPELL_TYPE_WAND:
-    logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in summon_familiar!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in summon_familiar!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -12836,10 +12836,10 @@ qint32 spell_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   while (ptrack)
   {
-    sprintf(buf, "A %s called %s headed %s...\r\n",
-            races[ptrack->race].singular_name,
-            qPrintable(ptrack->trackee),
-            dirs[ptrack->direction]);
+    dc_sprintf(buf, "A %s called %s headed %s...\r\n",
+               races[ptrack->race].singular_name,
+               qPrintable(ptrack->trackee),
+               dirs[ptrack->direction]);
     ch->send(buf);
     ptrack = ptrack->next;
   }
@@ -12875,7 +12875,7 @@ qint32 cast_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_lighted_path(level, ch, "", SPELL_TYPE_SPELL, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in lighted_path! (unknown)"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in lighted_path! (unknown)"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -12932,7 +12932,7 @@ qint32 cast_resist_acid(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_resist_acid(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in resist acid!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in resist acid!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13010,7 +13010,7 @@ qint32 cast_sun_ray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     }
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in sun ray!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in sun ray!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13087,7 +13087,7 @@ qint32 cast_rapid_mend(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_rapid_mend(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in rapid_mend!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in rapid_mend!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13151,7 +13151,7 @@ qint32 cast_iron_roots(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_iron_roots(level, tar_ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in iron_roots!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in iron_roots!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13214,7 +13214,7 @@ qint32 cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in acid shield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in acid shield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13268,7 +13268,7 @@ qint32 cast_water_breathing(quint8 level, CharacterPtr ch, QString arg, qint32 t
       spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in water breathing!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in water breathing!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13361,7 +13361,7 @@ qint32 cast_globe_of_darkness(quint8 level, CharacterPtr ch, QString arg, qint32
       spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in globe_of_darkness!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in globe_of_darkness!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13389,7 +13389,7 @@ qint32 cast_eyes_of_the_eagle(quint8 level, CharacterPtr ch, QString arg, qint32
   case SPELL_TYPE_STAFF:
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in eyes_of_the_eagle!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in eyes_of_the_eagle!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13502,7 +13502,7 @@ qint32 cast_icestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in icestorm!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in icestorm!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13557,7 +13557,7 @@ qint32 cast_lightning_shield(quint8 level, CharacterPtr ch, QString arg, qint32 
       spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in lightning shield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in lightning shield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13654,7 +13654,7 @@ qint32 cast_blue_bird(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in blue_bird!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in blue_bird!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13777,7 +13777,7 @@ qint32 cast_debility(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in debility!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in debility!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13899,7 +13899,7 @@ qint32 cast_attrition(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in attrition!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in attrition!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -13954,7 +13954,7 @@ qint32 cast_vampiric_aura(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     return spell_vampiric_aura(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in vampiric aura!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in vampiric aura!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14048,7 +14048,7 @@ qint32 cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in holy aura!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in holy aura!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14107,7 +14107,7 @@ qint32 cast_dismiss_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
       spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in dismiss_familiar!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in dismiss_familiar!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14164,7 +14164,7 @@ qint32 cast_dismiss_corpse(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in dismiss_corpse!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in dismiss_corpse!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14206,7 +14206,7 @@ qint32 spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victi
     act("Rocks fly everywhere as $n returns to its own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in spell_release_elemental!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in spell_release_elemental!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -14239,7 +14239,7 @@ qint32 cast_release_elemental(quint8 level, CharacterPtr ch, QString arg, qint32
       spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in cast_release_elemental!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in cast_release_elemental!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14290,7 +14290,7 @@ qint32 cast_visage_of_hate(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return spell_visage_of_hate(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in visage_of_hate!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in visage_of_hate!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14341,7 +14341,7 @@ qint32 cast_blessed_halo(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_blessed_halo(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in blessed_halo!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in blessed_halo!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14414,7 +14414,7 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   qint32 mobile;
   if ((mobile = real_mobile(vnum)) < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum);
     ch->sendln("\"Spirit\" for this sector not yet implented.");
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
@@ -14442,7 +14442,7 @@ qint32 cast_ghost_walk(quint8 level, CharacterPtr ch, QString arg, qint32 type, 
     return spell_ghost_walk(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in ghost_walk!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in ghost_walk!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14579,7 +14579,7 @@ qint32 cast_mend_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, 
     return spell_mend_golem(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in ghost_walk!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in ghost_walk!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14627,7 +14627,7 @@ qint32 cast_divine_intervention(quint8 level, CharacterPtr ch, QString arg, qint
     return spell_divine_intervention(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in divine intervention!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in divine intervention!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14674,14 +14674,14 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       continue; // save for last
 
     dam = victim->getLevel() * 10 + skill * 2;
-    sprintf(buf, "$B%d$R", dam_percent(skill, dam));
+    dc_sprintf(buf, "$B%d$R", dam_percent(skill, dam));
     send_damage("The holy tempest damages you for | hitpoints!", victim, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
     retval &= damage(ch, victim, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
   }
 
   // damage the caster!!
   dam = ch->getLevel() * 10 + skill * 2;
-  sprintf(buf, "$B%d$R", dam_percent(skill, dam));
+  dc_sprintf(buf, "$B%d$R", dam_percent(skill, dam));
   send_damage("The holy tempest damages you for | hitpoints!", ch, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
   retval &= damage(ch, ch, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
 
@@ -14699,7 +14699,7 @@ qint32 cast_wrath_of_god(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_wrath_of_god(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in wrath of god!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in wrath of god!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14745,7 +14745,7 @@ qint32 cast_atonement(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     return spell_atonement(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in atonement!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in atonement!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14790,7 +14790,7 @@ qint32 cast_silence(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
     return spell_silence(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in silence!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in silence!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14845,7 +14845,7 @@ qint32 cast_immunity(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return spell_immunity(level, ch, (CharacterPtr)arg, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in immunity!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in immunity!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14887,7 +14887,7 @@ qint32 cast_boneshield(quint8 level, CharacterPtr ch, QString arg, qint32 type, 
     return spell_boneshield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in boneshield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in boneshield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -14909,7 +14909,7 @@ qint32 spell_channel(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   GET_MANA(ch) -= heal * 2 - 100;
   victim->addHP(heal);
 
-  sprintf(buf, "$B%d$R", heal);
+  dc_sprintf(buf, "$B%d$R", heal);
   send_damage("You channel the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "You channel the power of the gods to heal $N of $S injuries.", TO_CHAR);
   send_damage("$n channels the power of the gods to heal you of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal you of your injuries.", TO_VICT);
   send_damage("$n channels the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal $N of $S injuries.", TO_ROOM);
@@ -14928,7 +14928,7 @@ qint32 cast_channel(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
     return spell_channel(level, ch, tar_ch, 0, skill, atoi(arg));
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in channel!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in channel!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15052,7 +15052,7 @@ qint32 cast_solidity(quint8 level, CharacterPtr ch, QString arg,
       spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in solidity!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in solidity!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15103,7 +15103,7 @@ qint32 cast_stability(quint8 level, CharacterPtr ch, QString arg,
       tar_ch = ch;
     return spell_stability(level, ch, tar_ch, 0, skill);
   default:
-    logentry(QStringLiteral("Serious screw-up in stability!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in stability!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15152,7 +15152,7 @@ qint32 cast_frostshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_frostshield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in frostshield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in frostshield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15368,7 +15368,7 @@ qint32 cast_wild_magic(quint8 level, CharacterPtr ch, QString arg,
   if (spell_to_cast)
     return (*spell_to_cast)(level, ch, arg, type, tar_ch, tar_obj, skill);
 
-  logentry(QStringLiteral("Null spell passed to cast_wild_magic. Needs fixed asap."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Null spell passed to cast_wild_magic. Needs fixed asap."), ANGEL, DC::LogChannel::LOG_BUG);
   return ReturnValue::eFAILURE;
 }
 
@@ -15421,7 +15421,7 @@ qint32 cast_spirit_shield(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     return spell_spirit_shield(level, ch, victim, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in spirit shield!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in spirit shield!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15474,7 +15474,7 @@ qint32 cast_villainy(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return spell_villainy(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in villainy!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in villainy!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15527,7 +15527,7 @@ qint32 cast_heroism(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
     return spell_heroism(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in heroism!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in heroism!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15682,7 +15682,7 @@ qint32 cast_consecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_consecrate(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in consecrate!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in consecrate!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -15807,8 +15807,8 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");
     return ReturnValue::eFAILURE;
   }
-  sprintf(buf, "%s",
-          "A circle of ominously humming blood runes are etched upon the ground here.");
+  dc_sprintf(buf, "%s",
+             "A circle of ominously humming blood runes are etched upon the ground here.");
   cItem->long_description = QStringLiteral(buf);
   cItem->obj_flags.value[0] = spl;
   cItem->obj_flags.value[1] = 2 + skill / 50;
@@ -15843,7 +15843,7 @@ qint32 cast_desecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_desecrate(level, ch, 0, 0, skill);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in desecrate!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in desecrate!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -15869,7 +15869,7 @@ qint32 cast_elemental_wall(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   case SPELL_TYPE_SCROLL:
   case SPELL_TYPE_POTION:
   default:
-    logentry(QStringLiteral("Serious screw-up in elemental_wall!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in elemental_wall!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;
@@ -15930,7 +15930,7 @@ qint32 cast_ethereal_focus(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   case SPELL_TYPE_SCROLL:
   case SPELL_TYPE_WAND:
   default:
-    logentry(QStringLiteral("Serious screw-up in ethereal_focus!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in ethereal_focus!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
   return ReturnValue::eFAILURE;

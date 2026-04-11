@@ -71,7 +71,7 @@ void rebuild_rnum_references(qint32 startAt, qint32 type)
       case 'J':
         break;
       default:
-        logentry(QStringLiteral("Illegal character hit in rebuild_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
+        DC::getInstance()->logentry(QStringLiteral("Illegal character hit in rebuild_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
         break;
       }
     }
@@ -215,7 +215,7 @@ command_return_t do_find(CharacterPtr ch, QString arg, cmd_t cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_find.");
-    logentry(QStringLiteral("Default in do_find...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Default in do_find...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: // mobile
     return do_mlocate(ch, name);
@@ -285,7 +285,7 @@ command_return_t do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_stat.");
-    logentry(QStringLiteral("Default in do_stat...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Default in do_stat...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: // mobile
     if ((vict = get_mob_vis(ch, name)))
@@ -1419,7 +1419,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
     vict->learn_skill(skillnum, 1, 1);
 
     buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", qPrintable(vict->name()), text, skillnum, qPrintable(ch->name()));
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->send(fmt::format("'{}' has been given skill '{}' ({}) by {}.\r\n", qPrintable(vict->name()), text, skillnum, qPrintable(ch->name())));
     break;
   }
@@ -1437,7 +1437,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->skills.erase(skillnum);
 
       buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, qPrintable(vict->name()), qPrintable(ch->name()));
-      logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+      DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
       ch->send(fmt::format("Skill '{}' ({}) removed from {}.\r\n", text, skillnum, qPrintable(vict->name())));
     }
     else
@@ -1469,7 +1469,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
     vict->learn_skill(skillnum, i, i);
 
     buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", qPrintable(vict->name()), text, i, learned, qPrintable(ch->name()));
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->send(fmt::format("'{}' skill '{}' set to {} from {}.\r\n", qPrintable(vict->name()), text, i, learned));
     break;
   }
@@ -1783,13 +1783,13 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      dc_sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
-      sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
+      dc_sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1818,8 +1818,8 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
       else if (!get_skill_name(obj->affected[x].location / 1000).isEmpty())
         strcpy(buf2, get_skill_name(obj->affected[x].location / 1000).toStdString().c_str());
 
-      sprintf(buf, "%2d$3)$R %s$3($R%d$3)$R by %d.\r\n", x + 1, buf2,
-              obj->affected[x].location, obj->affected[x].modifier);
+      dc_sprintf(buf, "%2d$3)$R %s$3($R%d$3)$R by %d.\r\n", x + 1, buf2,
+                 obj->affected[x].location, obj->affected[x].modifier);
       ch->send(buf);
     }
     return ReturnValue::eSUCCESS; // return so we don't mark as changed
@@ -1836,7 +1836,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
                    ch);
       for (x = {}; x <= APPLY_MAXIMUM_VALUE; x++)
       {
-        sprintf(buf, "%3d$3)$R %s\r\n", x, apply_types[x]);
+        dc_sprintf(buf, "%3d$3)$R %s\r\n", x, apply_types[x]);
         ch->send(buf);
       }
       ch->sendln("Make $B$5sure$R you don't use a spell that is restricted.  See builder guide.");
@@ -1844,26 +1844,26 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      dc_sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
-      sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
+      dc_sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
     num -= 1; // since arrays start at 0
     if (!check_range_valid_and_convert(modifier, value, APPLY_NONE, APPLY_MAXIMUM_VALUE))
     {
-      sprintf(buf, "You must select between %d and %d.\r\n", APPLY_NONE, APPLY_MAXIMUM_VALUE);
+      dc_sprintf(buf, "You must select between %d and %d.\r\n", APPLY_NONE, APPLY_MAXIMUM_VALUE);
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
     obj->affected[num].location = modifier;
-    sprintf(buf, "Affect %d changed to %s by %d.\r\n", num + 1,
-            apply_types[obj->affected[num].location], obj->affected[num].modifier);
+    dc_sprintf(buf, "Affect %d changed to %s by %d.\r\n", num + 1,
+               apply_types[obj->affected[num].location], obj->affected[num].modifier);
     ch->send(buf);
     break;
   }
@@ -1881,15 +1881,15 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].vnum());
+      dc_sprintf(buf, "Object %d has no affects to modify.\r\n",
+                 DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
-      sprintf(buf, "You must select between 1 and %d.\r\n",
-              obj->num_affects);
+      dc_sprintf(buf, "You must select between 1 and %d.\r\n",
+                 obj->num_affects);
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1922,15 +1922,15 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].vnum());
+      dc_sprintf(buf, "Object %d has no affects to modify.\r\n",
+                 DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
-      sprintf(buf, "You must select between 1 and %d.\r\n",
-              obj->num_affects);
+      dc_sprintf(buf, "You must select between 1 and %d.\r\n",
+                 obj->num_affects);
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -2052,7 +2052,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     // put the buffs where they should be
     if (*buf4)
     {
-      sprintf(buf2, "%s %s", buf3, buf4);
+      dc_sprintf(buf2, "%s %s", buf3, buf4);
     }
     else
     {
@@ -2101,7 +2101,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->name(buf4);
-    sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
+    dc_sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
     send(buf);
   }
   break;
@@ -2115,7 +2115,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->long_description = QStringLiteral(buf4);
-    sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
+    dc_sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
     send(buf);
   }
   break;
@@ -2129,7 +2129,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->short_description = QStringLiteral(buf4);
-    sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
+    dc_sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
     send(buf);
   }
   break;
@@ -2143,7 +2143,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->ActionDescription(buf4);
-    sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
+    dc_sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
     send(buf);
   }
   break;
@@ -2156,7 +2156,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       send_to_char("$3Syntax$R: oedit [item_num] type <>\r\n"
                    "$3Current$R: ",
                    this);
-      snprintf(buf, sizeof(buf), "%s\n", item_types[((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag].toStdString().c_str());
+      dc_snprintf(buf, sizeof(buf), "%s\n", item_types[((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag].toStdString().c_str());
       send(buf);
       sendln("\r\n$3Valid types$R:");
 
@@ -2180,7 +2180,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[2] = {};
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag = intval;
-    sprintf(buf, "Item type set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item type set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2221,7 +2221,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("\r\n$3Valid types$R:");
       for (i = {}; *size_bitfields[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\r\n", size_bitfields[i]);
+        dc_sprintf(buf, "  %s\r\n", size_bitfields[i]);
         send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -2266,7 +2266,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.weight = intval;
-    sprintf(buf, "Item weight set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item weight set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2285,7 +2285,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.cost = intval;
-    sprintf(buf, "Item value set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item value set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2325,7 +2325,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.eq_level = intval;
-    sprintf(buf, "Item minimum level set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item minimum level set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2344,7 +2344,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[0] = intval;
-    sprintf(buf, "Item value 1 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item value 1 set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2363,7 +2363,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[1] = intval;
-    sprintf(buf, "Item value 2 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item value 2 set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2382,7 +2382,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[2] = intval;
-    sprintf(buf, "Item value 3 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item value 3 set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2401,7 +2401,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[3] = intval;
-    sprintf(buf, "Item value 4 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Item value 4 set to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2505,7 +2505,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
             void item_remove(ObjectPtr obj, Vault & vault);
             item_remove(obj, vault);
             // items->obj = {};
-            logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, qPrintable(vault->owner));
+            DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, qPrintable(vault->owner));
           }
         }
       }
@@ -2546,7 +2546,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ((ObjectPtr)DC::getInstance()->obj_index[rnum].item)->obj_flags.timer = intval;
-    sprintf(buf, "Item timer to %d.\r\n", intval);
+    dc_sprintf(buf, "Item timer to %d.\r\n", intval);
     send(buf);
   }
   break;
@@ -2627,7 +2627,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
                  "  The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
-    sprintf(buf2, "\r\n$3Current mob vnum set to$R: %d\r\n", ch->player->last_mob_edit);
+    dc_sprintf(buf2, "\r\n$3Current mob vnum set to$R: %d\r\n", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return ReturnValue::eFAILURE;
   }
@@ -2655,7 +2655,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     // put the buffs where they should be
-    sprintf(buf2, "%s %s", buf3, buf4);
+    dc_sprintf(buf2, "%s %s", buf3, buf4);
     strcpy(buf4, buf2);
     strcpy(buf3, buf);
   }
@@ -3079,7 +3079,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     // put the buffs where they should be
     if (*buf4)
-      sprintf(buf2, "%s %s", buf3, buf4);
+      dc_sprintf(buf2, "%s %s", buf3, buf4);
     else
       strcpy(buf2, buf3);
 
@@ -3129,7 +3129,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->name(buf4);
-    sprintf(buf, "Mob keywords set to '%s'.\r\n", buf4);
+    dc_sprintf(buf, "Mob keywords set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
   break;
@@ -3143,7 +3143,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->short_desc = QStringLiteral(buf4);
-    sprintf(buf, "Mob shortdesc set to '%s'.\r\n", buf4);
+    dc_sprintf(buf, "Mob shortdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
   break;
@@ -3158,7 +3158,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     strcat(buf4, "\r\n");
     mob->long_desc = QStringLiteral(buf4);
-    sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
+    dc_sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
   break;
@@ -3224,13 +3224,13 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] class <class>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%s\n",
-              pc_clss_types[mob->c_class]);
+      dc_sprintf(buf, "%s\n",
+                 pc_clss_types[mob->c_class]);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = {}; *pc_clss_types[i] != '\n'; i++)
       {
-        sprintf(buf, "  %d) %s\r\n", i, pc_clss_types[i]);
+        dc_sprintf(buf, "  %d) %s\r\n", i, pc_clss_types[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -3241,7 +3241,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->c_class = intval;
-    sprintf(buf, "Mob class set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob class set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3254,9 +3254,9 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] race <racetype>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%s\r\n\r\n"
-                   "Available types:\r\n",
-              races[mob->race].singular_name);
+      dc_sprintf(buf, "%s\r\n\r\n"
+                      "Available types:\r\n",
+                 races[mob->race].singular_name);
       ch->send(buf);
       for (i = {}; i <= MAX_RACE; i++)
         ch->send(QStringLiteral("  %s\r\n").arg(races[i].singular_name));
@@ -3295,8 +3295,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->getLevel());
+      dc_sprintf(buf, "%d\n",
+                 mob->getLevel());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -3306,7 +3306,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->setLevel(intval);
-    sprintf(buf, "Mob level set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob level set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3319,8 +3319,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] alignment <alignnum>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->alignment);
+      dc_sprintf(buf, "%d\n",
+                 mob->alignment);
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -3330,7 +3330,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->alignment = intval;
-    sprintf(buf, "Mob alignment set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob alignment set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3422,7 +3422,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       mobdata->default_pos = position_t::SLEEPING;
       break;
     }
-    snprintf(buf, sizeof(buf), "Mob default position set to %s.\r\n", Character::position_to_string(qPrintable(mobdata->default_pos)));
+    dc_snprintf(buf, sizeof(buf), "Mob default position set to %s.\r\n", Character::position_to_string(qPrintable(mobdata->default_pos)));
     ch->send(buf);
   }
   break;
@@ -3443,7 +3443,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = {}; *action_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\r\n", action_bits[i]);
+        dc_sprintf(buf, "  %s\r\n", action_bits[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -3489,7 +3489,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = {}; *affected_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\r\n", affected_bits[i]);
+        dc_sprintf(buf, "  %s\r\n", affected_bits[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -3508,8 +3508,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] numdamdice <amount>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->mobdata->damnodice);
+      dc_sprintf(buf, "%d\n",
+                 mob->mobdata->damnodice);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 400");
       return ReturnValue::eFAILURE;
@@ -3520,7 +3520,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->mobdata->damnodice = intval;
-    sprintf(buf, "Mob number dice for damage set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob number dice for damage set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3533,8 +3533,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] sizedamdice <amount>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->mobdata->damsizedice);
+      dc_sprintf(buf, "%d\n",
+                 mob->mobdata->damsizedice);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 400");
       return ReturnValue::eFAILURE;
@@ -3545,7 +3545,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->mobdata->damsizedice = intval;
-    sprintf(buf, "Mob size dice for damage set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob size dice for damage set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3558,8 +3558,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] damroll <damrollnum>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->damroll);
+      dc_sprintf(buf, "%d\n",
+                 mob->damroll);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: -50 to 400");
       return ReturnValue::eFAILURE;
@@ -3570,7 +3570,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->damroll = intval;
-    sprintf(buf, "Mob damroll set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob damroll set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3583,8 +3583,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] hitroll <levelnum>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->hitroll);
+      dc_sprintf(buf, "%d\n",
+                 mob->hitroll);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: -50 to 100");
       return ReturnValue::eFAILURE;
@@ -3595,7 +3595,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->hitroll = intval;
-    sprintf(buf, "Mob hitroll set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob hitroll set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3608,8 +3608,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->raw_hit);
+      dc_sprintf(buf, "%d\n",
+                 mob->raw_hit);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 64000");
       return ReturnValue::eFAILURE;
@@ -3621,7 +3621,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     mob->raw_hit = intval;
     mob->max_hit = intval;
-    sprintf(buf, "Mob hitpoints set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob hitpoints set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3634,8 +3634,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%lu\n",
-              mob->getGold());
+      dc_sprintf(buf, "%lu\n",
+                 mob->getGold());
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 0 to 10000000");
       return ReturnValue::eFAILURE;
@@ -3651,7 +3651,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->setGold(intval);
-    sprintf(buf, "Mob gold set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob gold set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3665,8 +3665,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
           "$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\r\n"
           "$3Current$R: ",
           ch);
-      sprintf(buf, "%d\n",
-              (qint32)mob->exp);
+      dc_sprintf(buf, "%d\n",
+                 (qint32)mob->exp);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 0 to 20000000");
       return ReturnValue::eFAILURE;
@@ -3677,7 +3677,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->exp = intval;
-    sprintf(buf, "Mob experience set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob experience set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3696,7 +3696,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = {}; *isr_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\r\n", isr_bits[i]);
+        dc_sprintf(buf, "  %s\r\n", isr_bits[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -3720,7 +3720,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = {}; *isr_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\r\n", isr_bits[i]);
+        dc_sprintf(buf, "  %s\r\n", isr_bits[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -3744,7 +3744,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = {}; *isr_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\r\n", isr_bits[i]);
+        dc_sprintf(buf, "  %s\r\n", isr_bits[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -3762,8 +3762,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->armor);
+      dc_sprintf(buf, "%d\n",
+                 mob->armor);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 100 to $B-$R2000");
       return ReturnValue::eFAILURE;
@@ -3774,7 +3774,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->armor = intval;
-    sprintf(buf, "Mob armorclass(ac) set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob armorclass(ac) set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3793,8 +3793,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] strength <str>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->raw_str);
+      dc_sprintf(buf, "%d\n",
+                 mob->raw_str);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return ReturnValue::eFAILURE;
@@ -3805,7 +3805,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->raw_str = intval;
-    sprintf(buf, "Mob raw strength set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob raw strength set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3817,8 +3817,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->raw_dex);
+      dc_sprintf(buf, "%d\n",
+                 mob->raw_dex);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return ReturnValue::eFAILURE;
@@ -3829,7 +3829,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->raw_dex = intval;
-    sprintf(buf, "Mob raw dexterity set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob raw dexterity set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3841,8 +3841,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] intelligence <qint32>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->raw_intel);
+      dc_sprintf(buf, "%d\n",
+                 mob->raw_intel);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return ReturnValue::eFAILURE;
@@ -3853,7 +3853,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->raw_intel = intval;
-    sprintf(buf, "Mob raw intelligence set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob raw intelligence set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3865,8 +3865,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->raw_wis);
+      dc_sprintf(buf, "%d\n",
+                 mob->raw_wis);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return ReturnValue::eFAILURE;
@@ -3877,7 +3877,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->raw_wis = intval;
-    sprintf(buf, "Mob raw wisdom set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob raw wisdom set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3889,8 +3889,8 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              mob->raw_con);
+      dc_sprintf(buf, "%d\n",
+                 mob->raw_con);
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return ReturnValue::eFAILURE;
@@ -3901,7 +3901,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->raw_con = intval;
-    sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3958,13 +3958,13 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_vnum] type <type id>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%s\n",
-              mob_types[mob->mobdata->mob_flags.type]);
+      dc_sprintf(buf, "%s\n",
+                 mob_types[mob->mobdata->mob_flags.type]);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = {}; *mob_types[i] != '\n'; i++)
       {
-        sprintf(buf, "  %d) %s\r\n", i, mob_types[i]);
+        dc_sprintf(buf, "  %d) %s\r\n", i, mob_types[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -3978,7 +3978,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     mob->mobdata->mob_flags.type =
         (mob_type_t)intval;
-    sprintf(buf, "Mob type set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob type set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -3996,7 +3996,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->mobdata->mob_flags.value[0] = intval;
-    sprintf(buf, "Mob value 1 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob value 1 set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -4015,7 +4015,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->mobdata->mob_flags.value[1] = intval;
-    sprintf(buf, "Mob value 2 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob value 2 set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -4034,7 +4034,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->mobdata->mob_flags.value[2] = intval;
-    sprintf(buf, "Mob value 3 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob value 3 set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -4053,7 +4053,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob->mobdata->mob_flags.value[3] = intval;
-    sprintf(buf, "Mob value 4 set to %d.\r\n", intval);
+    dc_sprintf(buf, "Mob value 4 set to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
@@ -5059,7 +5059,7 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "../lib/builder/%s.zon", qPrintable(ch->name()));
+  dc_sprintf(buf, "../lib/builder/%s.zon", qPrintable(ch->name()));
 
   if ((fl = fopen(buf, "w")) == nullptr)
   {
@@ -5077,7 +5077,7 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   qfprintf(fl, "#%d\n", DC::getInstance()->world[room].zone);
-  sprintf(buf, "%s's Area.", qPrintable(ch->name()));
+  dc_sprintf(buf, "%s's Area.", qPrintable(ch->name()));
   string_to_file(fl, buf);
   qfprintf(fl, "~\n");
   qfprintf(fl, "%d 30 2\n", high);
@@ -5143,7 +5143,7 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
           qfprintf(fl, "O 0 %d %d %d",
                    DC::getInstance()->obj_index[obj->item_number].vnum(), count,
                    DC::getInstance()->world[room].number);
-          sprintf(buf, "           %s\n", qPrintable(obj->short_description()));
+          dc_sprintf(buf, "           %s\n", qPrintable(obj->short_description()));
           string_to_file(fl, buf);
 
           if (obj->contains)
@@ -5163,9 +5163,9 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
               qfprintf(fl, "P 1 %d %d %d",
                        DC::getInstance()->obj_index[tmp_obj->item_number].vnum(), count,
                        DC::getInstance()->obj_index[obj->item_number].vnum());
-              sprintf(buf, "     %s placed inside %s\n",
-                      tmp_obj->short_description,
-                      qPrintable(obj->short_description()));
+              dc_sprintf(buf, "     %s placed inside %s\n",
+                         tmp_obj->short_description,
+                         qPrintable(obj->short_description()));
               string_to_file(fl, buf);
             } /*  for loop */
           } /* end of the object's contents... */
@@ -5205,7 +5205,7 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
         qfprintf(fl, "M 0 %d %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].vnum(),
                  count, DC::getInstance()->world[room].number);
-        sprintf(buf, "           %s\n", mob->short_desc);
+        dc_sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
 
         for (pos = {}; pos < MAX_WEAR; pos++)
@@ -5228,8 +5228,8 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
               qfprintf(fl, "E 1 %d %d %d",
                        DC::getInstance()->obj_index[obj->item_number].vnum(), count,
                        pos);
-              sprintf(buf, "      Equip %s with %s\n",
-                      mob->short_desc, qPrintable(obj->short_description()));
+              dc_sprintf(buf, "      Equip %s with %s\n",
+                         mob->short_desc, qPrintable(obj->short_description()));
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5250,9 +5250,9 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
                            DC::getInstance()->obj_index[tmp_obj->item_number].vnum(),
                            count,
                            DC::getInstance()->obj_index[obj->item_number].vnum());
-                  sprintf(buf, "     %s placed inside %s\n",
-                          tmp_obj->short_description,
-                          qPrintable(obj->short_description()));
+                  dc_sprintf(buf, "     %s placed inside %s\n",
+                             tmp_obj->short_description,
+                             qPrintable(obj->short_description()));
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5278,8 +5278,8 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
             {
               qfprintf(fl, "G 1 %d %d",
                        DC::getInstance()->obj_index[obj->item_number].vnum(), count);
-              sprintf(buf, "      Give %s %s\n", mob->short_desc,
-                      qPrintable(obj->short_description()));
+              dc_sprintf(buf, "      Give %s %s\n", mob->short_desc,
+                         qPrintable(obj->short_description()));
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5300,9 +5300,9 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
                            DC::getInstance()->obj_index[tmp_obj->item_number].vnum(),
                            count,
                            DC::getInstance()->obj_index[obj->item_number].vnum());
-                  sprintf(buf, "     %s placed inside %s\n",
-                          tmp_obj->short_description,
-                          qPrintable(obj->short_description()));
+                  dc_sprintf(buf, "     %s placed inside %s\n",
+                             tmp_obj->short_description,
+                             qPrintable(obj->short_description()));
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5354,16 +5354,16 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   if (isSet(rm->room_flags, CLAN_ROOM) && ch->getLevel() < PATRON)
   {
     ch->sendln("And you are rstating a clan room because?");
-    sprintf(buf, "%s just rstat'd clan room %d.", qPrintable(ch->name()), rm->number);
-    logentry(buf, PATRON, DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "%s just rstat'd clan room %d.", qPrintable(ch->name()), rm->number);
+    DC::getInstance()->logentry(buf, PATRON, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
-  sprintf(buf, "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\r\n",
-          rm->name, rm->zone, rm->number, ch->in_room);
+  dc_sprintf(buf, "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\r\n",
+             rm->name, rm->zone, rm->number, ch->in_room);
   ch->send(buf);
 
   sprinttype(rm->sector_type, sector_types, buf2);
-  sprintf(buf, "Sector type : %s ", buf2);
+  dc_sprintf(buf, "Sector type : %s ", buf2);
   ch->send(buf);
 
   strcpy(buf, "Special procedure : ");
@@ -5438,8 +5438,8 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (rm->dir_option[i])
     {
-      sprintf(buf, "Direction %s . Keyword : %s\r\n",
-              dirs[i], rm->dir_option[i]->keyword);
+      dc_sprintf(buf, "Direction %s . Keyword : %s\r\n",
+                 dirs[i], rm->dir_option[i]->keyword);
       ch->send(buf);
       strcpy(buf, "Description:\r\n  ");
       if (rm->dir_option[i]->general_description)
@@ -5448,9 +5448,9 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
         strcat(buf, "UNDEFINED\r\n");
       ch->send(buf);
       sprintbit(rm->dir_option[i]->exit_info, exit_bits, buf2);
-      sprintf(buf, "Exit flag: %s \r\nKey no: %d\r\nTo room (V-Number): %d\r\n",
-              buf2, rm->dir_option[i]->key,
-              rm->dir_option[i]->to_room);
+      dc_sprintf(buf, "Exit flag: %s \r\nKey no: %d\r\nTo room (V-Number): %d\r\n",
+                 buf2, rm->dir_option[i]->key,
+                 rm->dir_option[i]->to_room);
       ch->send(buf);
     }
   }
@@ -5494,7 +5494,7 @@ command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
         if (ch->desc->snoop_by)
         {
           ch->desc->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
-          sprintf(buf, "Your victim is now trying to possess: %s\n", qPrintable(victim->name()));
+          dc_sprintf(buf, "Your victim is now trying to possess: %s\n", qPrintable(victim->name()));
           ch->desc->snoop_by->character->send(buf);
           ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->name().split(' '));
         }
@@ -5513,8 +5513,8 @@ command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
       else
       {
         ch->sendln("Ok.");
-        sprintf(buf, "%s possessed %s", qPrintable(ch->name()), qPrintable(victim->name()));
-        logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+        dc_sprintf(buf, "%s possessed %s", qPrintable(ch->name()), qPrintable(victim->name()));
+        DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
         ch->player->possesing = 1;
         ch->desc->character = victim;
         ch->desc->original = ch;
@@ -5611,19 +5611,19 @@ command_return_t do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   auto dc = DC::getInstance();
-  if (!strcmp(buf, "start"))
+  if (buf == u"start"_s)
   {
     dc->DCVote.StartVote(ch);
     return ReturnValue::eSUCCESS;
   }
 
-  if (!strcmp(buf, "clear"))
+  if (buf == u"clear"_s)
   {
     dc->DCVote.Reset(ch);
     return ReturnValue::eSUCCESS;
   }
 
-  if (!strcmp(buf, "end"))
+  if (buf == u"end"_s)
   {
     dc->DCVote.EndVote(ch);
     return ReturnValue::eSUCCESS;
@@ -5635,17 +5635,17 @@ command_return_t do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!strcmp(buf, "question"))
+  if (buf == u"question"_s)
   {
     dc->DCVote.SetQuestion(ch, buf2);
     return ReturnValue::eSUCCESS;
   }
-  if (!strcmp(buf, "add"))
+  if (buf == u"add"_s)
   {
     dc->DCVote.AddAnswer(ch, buf2);
     return ReturnValue::eSUCCESS;
   }
-  if (!strcmp(buf, "remove"))
+  if (buf == u"remove"_s)
   {
     dc->DCVote.RemoveAnswer(ch, (quint32)atoi(buf2));
     return ReturnValue::eSUCCESS;
@@ -5681,7 +5681,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(vict = get_pc_vis(ch, name)))
   {
-    snprintf(buf, sizeof(buf), "%s not found.\r\n", name);
+    dc_snprintf(buf, sizeof(buf), "%s not found.\r\n", name);
     ch->send(buf);
     return ReturnValue::eFAILURE;
   }
@@ -5710,8 +5710,8 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       vict->sendln("You feel a sudden onslaught of wisdom!");
       ch->sendln("STUPID removed.");
-      sprintf(buf, "%s removes %s's stupid", qPrintable(ch->name()), qPrintable(vict->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s removes %s's stupid", qPrintable(ch->name()), qPrintable(vict->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
       REMOVE_BIT(vict->player->punish, PUNISH_STUPID);
       REMOVE_BIT(vict->player->punish, PUNISH_SILENCED);
       REMOVE_BIT(vict->player->punish, PUNISH_NOEMOTE);
@@ -5722,11 +5722,11 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       vict->sendln("You suddenly feel dumb as a rock!");
       vict->sendln("You can't remember how to do basic things!");
-      sprintf(buf, "You have been lobotomized by %s!\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "You have been lobotomized by %s!\r\n", qPrintable(ch->name()));
       vict->send(buf);
       ch->sendln("STUPID set.");
-      sprintf(buf, "%s lobotimized %s", qPrintable(ch->name()), qPrintable(vict->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s lobotimized %s", qPrintable(ch->name()), qPrintable(vict->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
       SET_BIT(vict->player->punish, PUNISH_STUPID);
       SET_BIT(vict->player->punish, PUNISH_SILENCED);
       SET_BIT(vict->player->punish, PUNISH_NOEMOTE);
@@ -5740,16 +5740,16 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       vict->sendln("The gods take pity on you and lift your silence.");
       ch->sendln("SILENCE removed.");
-      sprintf(buf, "%s removes %s's silence", qPrintable(ch->name()), qPrintable(vict->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s removes %s's silence", qPrintable(ch->name()), qPrintable(vict->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     else
     {
-      sprintf(buf, "You have been silenced by %s!\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "You have been silenced by %s!\r\n", qPrintable(ch->name()));
       vict->send(buf);
       ch->sendln("SILENCE set.");
-      sprintf(buf, "%s silenced %s", qPrintable(ch->name()), qPrintable(vict->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s silenced %s", qPrintable(ch->name()), qPrintable(vict->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_SILENCED);
   }
@@ -5759,16 +5759,16 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       vict->sendln("You now can do things again.");
       ch->sendln("FREEZE removed.");
-      sprintf(buf, "%s unfrozen by %s", qPrintable(vict->name()), qPrintable(ch->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s unfrozen by %s", qPrintable(vict->name()), qPrintable(ch->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to....\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s takes away your ability to....\r\n", qPrintable(ch->name()));
       vict->send(buf);
       ch->sendln("FREEZE set.");
-      sprintf(buf, "%s frozen by %s", qPrintable(vict->name()), qPrintable(ch->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s frozen by %s", qPrintable(vict->name()), qPrintable(ch->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_FREEZE);
   }
@@ -5781,7 +5781,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to join arenas!\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s takes away your ability to join arenas!\r\n", qPrintable(ch->name()));
       ch->sendln("NOARENA set.");
       vict->send(buf);
     }
@@ -5796,7 +5796,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to emote!\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s takes away your ability to emote!\r\n", qPrintable(ch->name()));
       vict->send(buf);
       ch->sendln("NOEMOTE set.");
     }
@@ -5811,7 +5811,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to use telepathic communication!\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s takes away your ability to use telepathic communication!\r\n", qPrintable(ch->name()));
       vict->send(buf);
       ch->sendln("NOTELL set.");
     }
@@ -5826,7 +5826,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s removes your ability to set your name!\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s removes your ability to set your name!\r\n", qPrintable(ch->name()));
       ch->sendln("NONAME set.");
       vict->send(buf);
     }
@@ -5842,7 +5842,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "%s removes your ability to set your title!\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s removes your ability to set your title!\r\n", qPrintable(ch->name()));
       ch->sendln("NOTITLE set.");
       vict->send(buf);
     }
@@ -5856,19 +5856,19 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
       if (!ch->player->stealth)
         vict->sendln("The gods remove your poor luck.");
       ch->sendln("UNLUCKY removed.");
-      sprintf(buf, "%s removes %s's unlucky.", qPrintable(ch->name()), qPrintable(vict->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s removes %s's unlucky.", qPrintable(ch->name()), qPrintable(vict->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     else
     {
       if (!ch->player->stealth)
       {
-        sprintf(buf, "%s curses you with god-given bad luck!\r\n", qPrintable(ch->name()));
+        dc_sprintf(buf, "%s curses you with god-given bad luck!\r\n", qPrintable(ch->name()));
         ch->sendln("UNLUCKY set.");
       }
       vict->send(buf);
-      sprintf(buf, "%s makes %s unlucky.", qPrintable(ch->name()), qPrintable(vict->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s makes %s unlucky.", qPrintable(ch->name()), qPrintable(vict->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_UNLUCKY);
   }
@@ -5897,7 +5897,7 @@ void display_punishes(CharacterPtr ch, CharacterPtr vict)
 {
   QString buf;
 
-  sprintf(buf, "$3Punishments for %s$R: ", qPrintable(vict->name()));
+  dc_sprintf(buf, "$3Punishments for %s$R: ", qPrintable(vict->name()));
   ch->send(buf);
 
   if (isSet(vict->player->punish, PUNISH_NONAME))
@@ -5950,7 +5950,7 @@ command_return_t do_colors(CharacterPtr ch, QString argument, cmd_t cmd)
   ch->sendln("  $$0$0)   $B********$R  $0$I***********$R  $0$B$I**********$R (plain 0 can't be seen normally)");
   for (qint32 i = 1; i < 8; i++)
   {
-    sprintf(buf, "  $$$%d%d)   $B********$R  $%d$I***********$R  $%d$B$I**********$R\r\n", i, i, i, i);
+    dc_sprintf(buf, "  $$$%d%d)   $B********$R  $%d$I***********$R  $%d$B$I**********$R\r\n", i, i, i, i);
     ch->send(buf);
   }
   send_to_char("\r\nTo return to 'normal' color use $$R.\r\n\r\n"

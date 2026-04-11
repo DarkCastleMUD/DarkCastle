@@ -53,9 +53,9 @@ command_return_t do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   k = ch->master;
 
-  sprintf(buf, "You abandon: %s\r\n", k->group_name);
+  dc_sprintf(buf, "You abandon: %s\r\n", k->group_name);
   ch->send(buf);
-  sprintf(buf, "%s abandons: %s", qPrintable(ch->shortdesc_or_name()), k->group_name);
+  dc_sprintf(buf, "%s abandons: %s", qPrintable(ch->shortdesc_or_name()), k->group_name);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
   if (ch->isPlayer())
@@ -108,9 +108,9 @@ command_return_t do_found(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ch->group_name_ = argument;
-  sprintf(buf, "You found: %s\r\n", argument);
+  dc_sprintf(buf, "You found: %s\r\n", argument);
   ch->send(buf);
-  sprintf(buf, "%s founds: %s", qPrintable(ch->shortdesc_or_name()), argument);
+  dc_sprintf(buf, "%s founds: %s", qPrintable(ch->shortdesc_or_name()), argument);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
   if (ch->isPlayer())
@@ -247,59 +247,59 @@ void setup_group_buf(QString report, CharacterPtr j, CharacterPtr i)
   if (j->isNonPlayer() || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
   {
     if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-      sprintf(report, "[-====-|      %3d%%    hp     %3d%%   k     %3d%%   mv]",
-              MAX(1, j->getHP()) * 100 / MAX(1, GET_MAX_HIT(j)),
-              MAX(1, GET_KI(j)) * 100 / MAX(1, GET_MAX_KI(j)),
-              MAX(1, GET_MOVE(j)) * 100 / MAX(1, GET_MAX_MOVE(j)));
+      dc_sprintf(report, "[-====-|      %3d%%    hp     %3d%%   k     %3d%%   mv]",
+                 MAX(1, j->getHP()) * 100 / MAX(1, GET_MAX_HIT(j)),
+                 MAX(1, GET_KI(j)) * 100 / MAX(1, GET_MAX_KI(j)),
+                 MAX(1, GET_MOVE(j)) * 100 / MAX(1, GET_MAX_MOVE(j)));
     else if (GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
              GET_CLASS(j) == CLASS_BARBARIAN)
-      sprintf(report, "[-====-|      %3d%%    hp    -====-        %3d%%   mv]",
-              MAX(1, j->getHP()) * 100 / MAX(1, GET_MAX_HIT(j)),
-              MAX(1, GET_MOVE(j)) * 100 / MAX(1, GET_MAX_MOVE(j)));
+      dc_sprintf(report, "[-====-|      %3d%%    hp    -====-        %3d%%   mv]",
+                 MAX(1, j->getHP()) * 100 / MAX(1, GET_MAX_HIT(j)),
+                 MAX(1, GET_MOVE(j)) * 100 / MAX(1, GET_MAX_MOVE(j)));
     else
-      sprintf(report, "[-====-|      %3d%%    hp     %3d%%   m     %3d%%   mv]",
-              MAX(1, j->getHP()) * 100 / MAX(1, GET_MAX_HIT(j)),
-              MAX(1, GET_MANA(j)) * 100 / MAX(1, GET_MAX_MANA(j)),
-              MAX(1, GET_MOVE(j)) * 100 / MAX(1, GET_MAX_MOVE(j)));
+      dc_sprintf(report, "[-====-|      %3d%%    hp     %3d%%   m     %3d%%   mv]",
+                 MAX(1, j->getHP()) * 100 / MAX(1, GET_MAX_HIT(j)),
+                 MAX(1, GET_MANA(j)) * 100 / MAX(1, GET_MAX_MANA(j)),
+                 MAX(1, GET_MOVE(j)) * 100 / MAX(1, GET_MAX_MOVE(j)));
   }
   else
   {
     if (i->isPlayer() && isSet(i->player->toggles, Player::PLR_ANSI))
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
-                j->getLevel(),
-                calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
-                calc_color(GET_KI(j), GET_MAX_KI(j)), GET_KI(j), NTEXT, GET_MAX_KI(j),
-                calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
+        dc_sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
+                   j->getLevel(),
+                   calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
+                   calc_color(GET_KI(j), GET_MAX_KI(j)), GET_KI(j), NTEXT, GET_MAX_KI(j),
+                   calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
       else if (GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
                GET_CLASS(j) == CLASS_BARBARIAN)
-        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp    -====-    %s%5d%s/%-5dmv]",
-                j->getLevel(),
-                calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
-                calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
+        dc_sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp    -====-    %s%5d%s/%-5dmv]",
+                   j->getLevel(),
+                   calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
+                   calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
       else
-        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dm %s%5d%s/%-5dmv]",
-                j->getLevel(),
-                calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
-                calc_color(GET_MANA(j), GET_MAX_MANA(j)), GET_MANA(j), NTEXT, GET_MAX_MANA(j),
-                calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
+        dc_sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dm %s%5d%s/%-5dmv]",
+                   j->getLevel(),
+                   calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
+                   calc_color(GET_MANA(j), GET_MAX_MANA(j)), GET_MANA(j), NTEXT, GET_MAX_MANA(j),
+                   calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
     }
     else
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-        sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
-                j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_KI(j),
-                GET_MAX_KI(j), GET_MOVE(j), GET_MAX_MOVE(j));
+        dc_sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
+                   j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_KI(j),
+                   GET_MAX_KI(j), GET_MOVE(j), GET_MAX_MOVE(j));
       else if (GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
                GET_CLASS(j) == CLASS_BARBARIAN)
-        sprintf(report, "[Lv %3llu| %6d/%-6dhp    -====-    %5d/%-5dmv]",
-                j->getLevel(), j->getHP(), GET_MAX_HIT(j),
-                GET_MOVE(j), GET_MAX_MOVE(j));
+        dc_sprintf(report, "[Lv %3llu| %6d/%-6dhp    -====-    %5d/%-5dmv]",
+                   j->getLevel(), j->getHP(), GET_MAX_HIT(j),
+                   GET_MOVE(j), GET_MAX_MOVE(j));
       else
-        sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
-                j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_MANA(j),
-                GET_MAX_MANA(j), GET_MOVE(j), GET_MAX_MOVE(j));
+        dc_sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
+                   j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_MANA(j),
+                   GET_MAX_MANA(j), GET_MOVE(j), GET_MAX_MOVE(j));
     }
   }
 }
@@ -327,7 +327,7 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
         k = ch;
 
       setup_group_buf(report, k, ch);
-      sprintf(buf, "%s    $N (Leader)", report);
+      dc_sprintf(buf, "%s    $N (Leader)", report);
 
       if (IS_AFFECTED(k, AFF_GROUP))
         act(buf, ch, 0, k, TO_CHAR, ASLEEP);
@@ -338,7 +338,7 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           j = f->follower;
           setup_group_buf(report, j, ch);
-          sprintf(buf, "%s    $N", report);
+          dc_sprintf(buf, "%s    $N", report);
           act(buf, ch, 0, f->follower, TO_CHAR, ASLEEP);
         }
       }
@@ -474,18 +474,18 @@ command_return_t do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
-          qPrintable(new_new_leader->shortdesc_or_name()));
+  dc_sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
+             qPrintable(new_new_leader->shortdesc_or_name()));
   ch->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints YOU as "
-               "the New Leader of: %s\r\n",
-          qPrintable(ch->shortdesc_or_name()), ch->group_name,
-          qPrintable(ch->shortdesc_or_name()), ch->group_name);
+  dc_sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints YOU as "
+                  "the New Leader of: %s\r\n",
+             qPrintable(ch->shortdesc_or_name()), ch->group_name,
+             qPrintable(ch->shortdesc_or_name()), ch->group_name);
   new_new_leader->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints %s as "
-               "the New Leader of: %s",
-          qPrintable(ch->shortdesc_or_name()), ch->group_name,
-          qPrintable(ch->shortdesc_or_name()), qPrintable(new_new_leader->shortdesc_or_name()), ch->group_name);
+  dc_sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints %s as "
+                  "the New Leader of: %s",
+             qPrintable(ch->shortdesc_or_name()), ch->group_name,
+             qPrintable(ch->shortdesc_or_name()), qPrintable(new_new_leader->shortdesc_or_name()), ch->group_name);
   act(buf, ch, 0, new_new_leader, TO_ROOM, NOTVICT);
 
   if (ch->isPlayer() && new_new_leader->isPlayer())
@@ -562,9 +562,9 @@ command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
   if (isexact(name, "all"))
   {
     k = ch;
-    sprintf(buf, "You disband your group: %s", k->group_name);
+    dc_sprintf(buf, "You disband your group: %s", k->group_name);
     act(buf, k, 0, 0, TO_CHAR, 0);
-    sprintf(buf, "$n disbands $s group: %s", k->group_name);
+    dc_sprintf(buf, "$n disbands $s group: %s", k->group_name);
     act(buf, k, 0, 0, TO_ROOM, 0);
 
     k->group_name = {};

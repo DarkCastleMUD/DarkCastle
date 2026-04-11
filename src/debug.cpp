@@ -228,25 +228,25 @@ qint32 main(qint32 argc, QString *argv)
     }
   }
 
-  logentry(QStringLiteral("Loading the zones"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(QStringLiteral("Loading the zones"), 0, DC::LogChannel::LOG_MISC);
   debug.boot_zones();
 
-  logentry(QStringLiteral("Loading the world."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(QStringLiteral("Loading the world."), 0, DC::LogChannel::LOG_MISC);
 
   debug.top_of_world_alloc = 2000;
 
   debug.boot_world();
 
-  logentry(QStringLiteral("Renumbering the world."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(QStringLiteral("Renumbering the world."), 0, DC::LogChannel::LOG_MISC);
   renum_world();
 
-  logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
   debug.generate_obj_indices(&top_of_objt, debug.obj_index);
 
-  logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
   debug.generate_mob_indices(&top_of_mobt, debug.mob_index);
 
-  logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
 
   class Connection *d = new Connection;

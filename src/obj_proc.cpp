@@ -425,7 +425,7 @@ qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
       }
       else
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", qPrintable(ch->name()), heal);
+        dc_sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", qPrintable(ch->name()), heal);
         tmp_char->send(buf);
       }
     }
@@ -1018,7 +1018,7 @@ qint32 search_assemble_items(qint32 vnum)
   // This should never happen
   if (vnum < 1)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\r\n", vnum);
+    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\r\n", vnum);
     produce_coredump();
     return -1;
   }
@@ -1044,7 +1044,7 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
   // This should never happen
   if (item_index < 0)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\r\n", item_index);
+    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\r\n", item_index);
     produce_coredump();
     return false;
   }
@@ -1062,8 +1062,8 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
     qint32 component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
-           item_index, component_index, component_real, component_virt);
+      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
+                              item_index, component_index, component_real, component_virt);
 
       ch->sendln("There was an internal malfunction assembling your item. Contact an Immortal.");
       produce_coredump();
@@ -1107,8 +1107,8 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
     qint32 component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
-           item_index, component_index, component_real, component_virt);
+      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
+                              item_index, component_index, component_real, component_virt);
 
       ch->sendln("There was an internal malfunction assembling your item. Contact an Immortal.");
       return true;
@@ -1123,7 +1123,7 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
   ObjectPtr reward_item = clone_object(item_real);
   if (reward_item == 0)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
+    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
     ch->sendln("There was an internal malfunction cloning the new item. Contact an Immortal.");
     return true;
   }
@@ -1792,7 +1792,7 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   //  target_obj->short_description =  dc_alloc(strlen(buf)+1, sizeof(QChar));
   //  strcpy(target_obj->short_description, buf);
   QString zarg;
-  sprintf(zarg, "$B$7%s$R", buf);
+  dc_sprintf(zarg, "$B$7%s$R", buf);
   target_obj->short_description(zarg);
 
   send_to_char("\r\n'Beginning magical transformation process. *beep*'\r\n"
@@ -1959,7 +1959,7 @@ qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
 
   default:
     ch->sendln("Whatever you pushed doesn't have an entry in the button push table.  Tell a god.");
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
     break;
   }
 
@@ -2385,7 +2385,7 @@ qint32 pull_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     break;
   default:
     ch->sendln("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.");
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
     break;
   }
 
@@ -2403,7 +2403,7 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
     {
       QString buf;
-      sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
+      dc_sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -2591,15 +2591,15 @@ qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
     high = 11599;
     time = 60;
     sector = SECT_WATER_NOSWIM;
-    sprintf(msg1, "The ship sails off into the distance.");
-    sprintf(msg2, "A ship sails in.");
+    dc_sprintf(msg1, "The ship sails off into the distance.");
+    dc_sprintf(msg2, "A ship sails in.");
     break;
   case 5911: // Carnival gates
     low = 18100;
     high = 18213;
     time = 75;
-    sprintf(msg1, "The carnival breaks off and moves off into the distance.");
-    sprintf(msg2, "A band of wagons enter, and set up a carnival here.");
+    dc_sprintf(msg1, "The carnival breaks off and moves off into the distance.");
+    dc_sprintf(msg2, "A band of wagons enter, and set up a carnival here.");
     break;
   default:
     return ReturnValue::eFAILURE;
@@ -2730,7 +2730,7 @@ qint32 boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     boat_list = dk_boat;
     break;
   default:
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     break;
   }
 
@@ -2837,7 +2837,7 @@ qint32 leave_boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, C
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     break;
   }
 
@@ -2971,7 +2971,7 @@ qint32 hornoplenty(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   qint32 objnum = real_object(3170); // chewy tuber
   if (objnum < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Horn o plenty load obj incorrent.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Horn o plenty load obj incorrent.");
     return ReturnValue::eFAILURE;
   }
 
@@ -3104,7 +3104,7 @@ qint32 generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString 
 
   if (obj->item_number < 0 || obj->item_number > top_of_objt)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
     return ReturnValue::eFAILURE;
   }
 
@@ -3441,7 +3441,7 @@ qint32 chaosblade(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (dam > 0)
     {
       QString buf;
-      sprintf(buf, "%d", dam);
+      dc_sprintf(buf, "%d", dam);
       send_damage("The Chaos Blade hungers!  You are drained for | damage.", obj->equipped_by, 0, 0, buf, "The Chaos Blade hungers!  You feel your life force being drained!", TO_CHAR);
       send_damage("The katana in $n's hand pulses with a dull red glow as it drains their life force for | damage!", obj->equipped_by, 0, 0, buf, "The katana in $n's hand pulses with a dull red glow as it drains their life force!", TO_ROOM);
       obj->equipped_by->removeHP(dam);
@@ -3478,7 +3478,7 @@ qint32 rubybrooch(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (dam > 0)
     {
       QString buf;
-      sprintf(buf, "%d", dam);
+      dc_sprintf(buf, "%d", dam);
       send_damage("The ruby brooch squeezes your neck painfully for | damage!", obj->equipped_by, 0, 0, buf, "The ruby brooch squeezes your neck painfully!", TO_CHAR);
       send_damage("A ruby brooch constricts $n's neck for | damage and they cough violently.", obj->equipped_by, 0, 0, buf, "A ruby brooch constricts $n's neck and they cough violently.", TO_ROOM);
       obj->equipped_by->removeHP(dam);
@@ -3924,7 +3924,7 @@ qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QStrin
 
   if (obj->in_room <= 0)
   {
-    logentry(QStringLiteral("Mortar round without a room?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Mortar round without a room?"), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_obj(obj);
     return ReturnValue::eFAILURE;
   }
@@ -3943,7 +3943,7 @@ qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QStrin
 
     dam = dice(obj->obj_flags.value[1], obj->obj_flags.value[2]);
     victim->removeHP(dam);
-    sprintf(buf, "Pieces of shrapnel rip through your skin inflicting %d damage!\r\n", dam);
+    dc_sprintf(buf, "Pieces of shrapnel rip through your skin inflicting %d damage!\r\n", dam);
     victim->send(buf);
     if (victim->getHP() < 1)
     {
@@ -4727,7 +4727,7 @@ qint32 godload_hydratail(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   QString dammsg;
   qint32 dam = number(50, 100);
   QString damtypeStr;
-  sprintf(dammsg, "$B%d$R", dam);
+  dc_sprintf(dammsg, "$B%d$R", dam);
 
   switch (number(1, 4))
   {

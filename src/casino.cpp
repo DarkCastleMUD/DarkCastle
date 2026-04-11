@@ -146,7 +146,7 @@ bool verify(player_data *plr)
 
   const auto &character_list = DC::getInstance()->character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(), [&plr](CharacterPtr const &ch)
+  auto result = std::std::find_if(character_list.begin(), character_list.end(), [&plr](CharacterPtr const &ch)
                         {
 	  if (ch == plr->ch) {
 		  return true;
@@ -159,8 +159,8 @@ bool verify(player_data *plr)
     if (result != character_list.end())
     {
       QString buf;
-      buf = fmt::format("{} folds as {} leaves the room.\r\n", qPrintable(plr->ch->name()), HSSH(plr->ch));
-      send_to_table(buf.c_str(), plr->table);
+      buf = QStringLiteral("%1 folds as %2 leaves the room.\r\n").arg(plr->ch->name()).arg(HSSH(plr->ch));
+      send_to_table(buf, plr->table);
       plr->ch->sendln("Your hand is folded as you leave the room.");
     }
     free_player(plr);
@@ -420,7 +420,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
     timer->timeleft = 10;
     addtimer(timer);
     QString buf;
-    sprintf(buf, "The dealer nudges %s.\r\n", qPrintable(plr->ch->name()));
+    dc_sprintf(buf, "The dealer nudges %s.\r\n", qPrintable(plr->ch->name()));
     send_to_table(buf, plr->table, plr);
     plr->ch->sendln("The dealer nudges you.");
   }
@@ -430,7 +430,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
     CharacterPtr ch = plr->ch;
 
     QString buf;
-    sprintf(buf, "Security removes a sleepy %s from the table.\r\n", qPrintable(plr->ch->name()));
+    dc_sprintf(buf, "Security removes a sleepy %s from the table.\r\n", qPrintable(plr->ch->name()));
     send_to_table(buf, tbl, plr);
     player_data *tmp, *tnext;
     for (tmp = tbl->plr; tmp; tmp = tnext)
@@ -536,7 +536,7 @@ void check_winner(table_data *tbl)
   if (tbl->hand_data[2] == 0)
   {
     QString buf;
-    sprintf(buf, "The dealer has %d!\r\n", hand_strength(tbl));
+    dc_sprintf(buf, "The dealer has %d!\r\n", hand_strength(tbl));
     send_to_table(buf, tbl);
   }
   for (plr = tbl->plr; plr; plr = next)
@@ -559,12 +559,12 @@ void check_winner(table_data *tbl)
     if (dealer == hand_strength(plr))
     {
       QString buf;
-      sprintf(buf, "It's a PUSH!\r\nThe dealer takes your cards and gives you %d %s coins.\r\n",
-              plr->bet, plr->table->gold ? "gold" : "platinum");
+      dc_sprintf(buf, "It's a PUSH!\r\nThe dealer takes your cards and gives you %d %s coins.\r\n",
+                 plr->bet, plr->table->gold ? "gold" : "platinum");
       plr->ch->send(buf);
-      sprintf(buf, "The dealer gives %s %d coins.\r\n", qPrintable(plr->ch->name()),
-              plr->bet); //, plr->table->gold?"gold":"platinum");
-                         //		plr->bet);
+      dc_sprintf(buf, "The dealer gives %s %d coins.\r\n", qPrintable(plr->ch->name()),
+                 plr->bet); //, plr->table->gold?"gold":"platinum");
+                            //		plr->bet);
       send_to_table(buf, tbl, plr);
       if (plr->table->gold)
         plr->ch->addGold(plr->bet);
@@ -578,11 +578,11 @@ void check_winner(table_data *tbl)
     {
       QString buf;
       plr->ch->sendln("$BYou WIN!$R");
-      sprintf(buf, "The dealer takes your cards and gives you %d %s coins.\r\n",
-              plr->bet * 2, plr->table->gold ? "gold" : "platinum");
+      dc_sprintf(buf, "The dealer takes your cards and gives you %d %s coins.\r\n",
+                 plr->bet * 2, plr->table->gold ? "gold" : "platinum");
       plr->ch->send(buf);
-      sprintf(buf, "The dealer gives %s %d %s coins.\r\n", qPrintable(plr->ch->name()),
-              plr->bet * 2, plr->table->gold ? "gold" : "platinum");
+      dc_sprintf(buf, "The dealer gives %s %d %s coins.\r\n", qPrintable(plr->ch->name()),
+                 plr->bet * 2, plr->table->gold ? "gold" : "platinum");
       send_to_table(buf, tbl, plr);
       if (plr->table->gold)
         plr->ch->addGold(plr->bet * 2);
@@ -617,9 +617,9 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
   case 2:
     send_to_table("It is now the dealer's turn.\r\n", tbl);
     tbl->state++;
-    sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
-            suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
-            NTEXT);
+    dc_sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
+               suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
+               NTEXT);
     send_to_table(buf, tbl);
     player_data *plr, *pnext;
     for (plr = tbl->plr; plr; plr = pnext)
@@ -636,7 +636,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
     //        add_timer_bj_dealer(tbl);
     // no break;
   case 3:
-    //	sprintf(buf, "The dealer has %d.\r\n",hand_strength(tbl));
+    //	dc_sprintf(buf, "The dealer has %d.\r\n",hand_strength(tbl));
     //	send_to_table(buf, tbl);
     tbl->handnr++;
     if (hand_strength(tbl) < 17)
@@ -647,8 +647,8 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
           break;
       tbl->hand_data[i] = nc;
 
-      sprintf(buf, "The dealer takes a new card, revealing a %s%s%c%s! The dealer has %d!\r\n", suitcol(nc), valstri(nc),
-              suit(nc), NTEXT, hand_strength(tbl));
+      dc_sprintf(buf, "The dealer takes a new card, revealing a %s%s%c%s! The dealer has %d!\r\n", suitcol(nc), valstri(nc),
+                 suit(nc), NTEXT, hand_strength(tbl));
       send_to_table(buf, tbl);
       add_timer_bj_dealer(tbl);
     }
@@ -712,11 +712,11 @@ void check_blackjacks(table_data *tbl)
       if (tbl->plr == plr && !plr->next)
       { // all players blackjacked
         QString buf;
-        sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
-                suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
-                NTEXT);
+        dc_sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
+                   suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
+                   NTEXT);
         send_to_table(buf, tbl);
-        sprintf(buf, "The dealer has %d!\r\n", hand_strength(tbl));
+        dc_sprintf(buf, "The dealer has %d!\r\n", hand_strength(tbl));
         send_to_table(buf, tbl);
         free_player(plr);
         reset_table(tbl);
@@ -771,7 +771,7 @@ const QString hand_thing(player_data *plr)
   if (hands(plr) <= 1)
     return "";
   static QString buf;
-  sprintf(buf, " for hand %d", hand_number(plr));
+  dc_sprintf(buf, " for hand %d", hand_number(plr));
   return &buf[0];
 }
 
@@ -787,8 +787,8 @@ void pulse_table_bj(table_data *tbl, qint32 recall)
   if (tbl->cr)
   {
     QString buf;
-    sprintf(buf, "$B$7The dealer says 'It's your turn, %s, what would you like to do%s?'$R\r\n",
-            qPrintable(tbl->cr->ch->name()), hand_thing(tbl->cr));
+    dc_sprintf(buf, "$B$7The dealer says 'It's your turn, %s, what would you like to do%s?'$R\r\n",
+               qPrintable(tbl->cr->ch->name()), hand_thing(tbl->cr));
     send_to_table(buf, tbl);
     tbl->handnr++;
     add_timer(tbl->cr);
@@ -884,8 +884,8 @@ QString show_hand(qint32 hand_data[21], qint32 hide, bool ascii, bool showColor)
   static QString buf;
   qint32 i = {};
   buf[0] = '\0';
-  sprintf(lineTwo, "%s%*s", lineTwo, (qint32)strlen(tempBuf) + padnext, " ");
-  sprintf(lineTop, "%s%*s", lineTop, (qint32)strlen(tempBuf) + padnext, " ");
+  dc_sprintf(lineTwo, "%s%*s", lineTwo, (qint32)strlen(tempBuf) + padnext, " ");
+  dc_sprintf(lineTop, "%s%*s", lineTop, (qint32)strlen(tempBuf) + padnext, " ");
   if (padnext)
     padnext = {};
   while (hand_data[i] > 0)
@@ -893,24 +893,24 @@ QString show_hand(qint32 hand_data[21], qint32 hide, bool ascii, bool showColor)
     if (!ascii)
     {
       if (i == 1 && hide)
-        sprintf(buf, "%s %sDC%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "");
+        dc_sprintf(buf, "%s %sDC%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "");
       else
-        sprintf(buf, "%s %s%s%c%s", buf, showColor ? suitcol(hand_data[i]) : "", valstri(hand_data[i]), suit(hand_data[i]), showColor ? NTEXT : "");
+        dc_sprintf(buf, "%s %s%s%c%s", buf, showColor ? suitcol(hand_data[i]) : "", valstri(hand_data[i]), suit(hand_data[i]), showColor ? NTEXT : "");
       i++;
     }
     else
     {
       if (i == 1 && hide)
       {
-        sprintf(buf, "%s%s| D |%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "");
-        sprintf(lineTwo, "%s%s| C |%s", lineTwo, showColor ? BOLD : "", showColor ? NTEXT : "");
-        sprintf(lineTop, "%s%s,---,%s", lineTop, showColor ? BOLD : "", showColor ? NTEXT : "");
+        dc_sprintf(buf, "%s%s| D |%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "");
+        dc_sprintf(lineTwo, "%s%s| C |%s", lineTwo, showColor ? BOLD : "", showColor ? NTEXT : "");
+        dc_sprintf(lineTop, "%s%s,---,%s", lineTop, showColor ? BOLD : "", showColor ? NTEXT : "");
       }
       else
       {
-        sprintf(buf, "%s%s|%s %s%s%s %s|%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "", showColor ? suitcol(hand_data[i]) : "", valstri(hand_data[i]), showColor ? NTEXT : "", showColor ? BOLD : "", showColor ? NTEXT : "");
-        sprintf(lineTwo, "%s%s|%s %s%c%s %s|%s", lineTwo, showColor ? BOLD : "", showColor ? NTEXT : "", showColor ? suitcol(hand_data[i]) : "", suit(hand_data[i]), showColor ? NTEXT : "", showColor ? BOLD : "", showColor ? NTEXT : "");
-        sprintf(lineTop, "%s%s,---,%s", lineTop, showColor ? BOLD : "", showColor ? NTEXT : "");
+        dc_sprintf(buf, "%s%s|%s %s%s%s %s|%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "", showColor ? suitcol(hand_data[i]) : "", valstri(hand_data[i]), showColor ? NTEXT : "", showColor ? BOLD : "", showColor ? NTEXT : "");
+        dc_sprintf(lineTwo, "%s%s|%s %s%c%s %s|%s", lineTwo, showColor ? BOLD : "", showColor ? NTEXT : "", showColor ? suitcol(hand_data[i]) : "", suit(hand_data[i]), showColor ? NTEXT : "", showColor ? BOLD : "", showColor ? NTEXT : "");
+        dc_sprintf(lineTop, "%s%s,---,%s", lineTop, showColor ? BOLD : "", showColor ? NTEXT : "");
       }
       i++;
     }
@@ -1007,14 +1007,14 @@ QString Character::createBlackjackPrompt(void)
       }
       if (hands(plr) > 1)
       {
-        sprintf(tempBuf, "%s, hand %d: ", qPrintable(plr->ch->name()), hand_number(plr));
-        sprintf(buf, "%s%s%s%s, hand %d%s: %s = %d   ", buf, showColor ? BOLD : "", plr == plr->table->cr && showColor ? GREEN : "", qPrintable(plr->ch->name()), hand_number(plr), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor), hand_strength(plr));
+        dc_sprintf(tempBuf, "%s, hand %d: ", qPrintable(plr->ch->name()), hand_number(plr));
+        dc_sprintf(buf, "%s%s%s%s, hand %d%s: %s = %d   ", buf, showColor ? BOLD : "", plr == plr->table->cr && showColor ? GREEN : "", qPrintable(plr->ch->name()), hand_number(plr), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor), hand_strength(plr));
         padnext = hand_strength(plr) > 9 ? 8 : 7;
       }
       else
       {
-        sprintf(tempBuf, "%s: ", qPrintable(plr->ch->name()));
-        sprintf(buf, "%s%s%s%s%s: %s = %d   ", buf, showColor ? BOLD : "", plr == plr->table->cr && showColor ? GREEN : "", qPrintable(plr->ch->name()), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor), hand_strength(plr));
+        dc_sprintf(tempBuf, "%s: ", qPrintable(plr->ch->name()));
+        dc_sprintf(buf, "%s%s%s%s%s: %s = %d   ", buf, showColor ? BOLD : "", plr == plr->table->cr && showColor ? GREEN : "", qPrintable(plr->ch->name()), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor), hand_strength(plr));
         padnext = hand_strength(plr) > 9 ? 8 : 7;
       }
     }
@@ -1023,14 +1023,14 @@ QString Character::createBlackjackPrompt(void)
     {
       if (hands(plr) > 1)
       {
-        sprintf(tempBuf, "%s, hand %d: ", qPrintable(plr->ch->name()), hand_number(plr));
-        sprintf(buf, "%s%s%s, hand %d%s: %s ", buf, plr == plr->table->cr && showColor ? BOLD GREEN : "", qPrintable(plr->ch->name()), hand_number(plr), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor));
+        dc_sprintf(tempBuf, "%s, hand %d: ", qPrintable(plr->ch->name()), hand_number(plr));
+        dc_sprintf(buf, "%s%s%s, hand %d%s: %s ", buf, plr == plr->table->cr && showColor ? BOLD GREEN : "", qPrintable(plr->ch->name()), hand_number(plr), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor));
         padnext = 1;
       }
       else
       {
-        sprintf(tempBuf, "%s: ", qPrintable(plr->ch->name()));
-        sprintf(buf, "%s%s%s%s: %s ", buf, plr == plr->table->cr && showColor ? BOLD GREEN : "", qPrintable(plr->ch->name()), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor));
+        dc_sprintf(tempBuf, "%s: ", qPrintable(plr->ch->name()));
+        dc_sprintf(buf, "%s%s%s%s: %s ", buf, plr == plr->table->cr && showColor ? BOLD GREEN : "", qPrintable(plr->ch->name()), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor));
         padnext = 1;
       }
     }
@@ -1070,9 +1070,9 @@ QString Character::createBlackjackPrompt(void)
   }
   if (obj->table->hand_data[0])
   {
-    sprintf(tempBuf, "Dealer: ");
-    sprintf(buf, "%s%sDealer%s: %s", buf, showColor ? BOLD YELLOW : "", showColor ? NTEXT : "", obj->table->state < 2 ? show_hand(obj->table->hand_data, 1, ascii, showColor) : show_hand(obj->table->hand_data, 0, ascii, showColor));
-    sprintf(buf, "%s\r\n", buf);
+    dc_sprintf(tempBuf, "Dealer: ");
+    dc_sprintf(buf, "%s%sDealer%s: %s", buf, showColor ? BOLD YELLOW : "", showColor ? NTEXT : "", obj->table->state < 2 ? show_hand(obj->table->hand_data, 1, ascii, showColor) : show_hand(obj->table->hand_data, 0, ascii, showColor));
+    dc_sprintf(buf, "%s\r\n", buf);
   }
   // fixPadding(&buf[0]);
   if (buf[0] != '\0')
@@ -1196,7 +1196,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       GET_PLATINUM(ch) -= amt;
     ch->sendln("The dealer accepts your bet.");
     QString buf;
-    sprintf(buf, "%s bets %d.\r\n", qPrintable(ch->name()), amt);
+    dc_sprintf(buf, "%s bets %d.\r\n", qPrintable(ch->name()), amt);
     send_to_table(buf, obj->table, plr);
     if (obj->table->state == 0)
     {
@@ -1259,7 +1259,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       ch->removeGold(plr->bet / 2);
     else
       GET_PLATINUM(ch) -= plr->bet / 2;
-    sprintf(buf, "%s makes an insurance bet.\r\n", qPrintable(ch->name()));
+    dc_sprintf(buf, "%s makes an insurance bet.\r\n", qPrintable(ch->name()));
     send_to_table(buf, plr->table, plr);
     ch->sendln("You make an insurance bet.");
     return ReturnValue::eSUCCESS;
@@ -1294,23 +1294,23 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     plr->doubled = true;
     plr->table->handnr++;
     QString buf;
-    sprintf(buf, "%s doubles %s bet.\r\n", qPrintable(ch->name()), HSHR(ch));
+    dc_sprintf(buf, "%s doubles %s bet.\r\n", qPrintable(ch->name()), HSHR(ch));
     send_to_table(buf, plr->table, plr);
     ch->sendln("You double your bet.");
 
     plr->hand_data[2] = pickCard(plr->table->deck);
-    sprintf(buf, "%s receives a %s%s%c%s.\r\n", qPrintable(ch->name()),
-            showColor ? suitcol(plr->hand_data[2]) : "", valstri(plr->hand_data[2]),
-            suit(plr->hand_data[2]), showColor ? NTEXT : "");
+    dc_sprintf(buf, "%s receives a %s%s%c%s.\r\n", qPrintable(ch->name()),
+               showColor ? suitcol(plr->hand_data[2]) : "", valstri(plr->hand_data[2]),
+               suit(plr->hand_data[2]), showColor ? NTEXT : "");
     send_to_table(buf, plr->table, plr);
-    sprintf(buf, "You receive a %s%s%c%s.\r\n", showColor ? suitcol(plr->hand_data[2]) : "",
-            valstri(plr->hand_data[2]), suit(plr->hand_data[2]), showColor ? NTEXT : "");
+    dc_sprintf(buf, "You receive a %s%s%c%s.\r\n", showColor ? suitcol(plr->hand_data[2]) : "",
+               valstri(plr->hand_data[2]), suit(plr->hand_data[2]), showColor ? NTEXT : "");
     ch->send(buf);
 
     if (hand_strength(plr) > 21) // busted
     {
       QString buf;
-      sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
       send_to_table(buf, plr->table, plr);
       ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
       nextturn(plr->table);
@@ -1339,7 +1339,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     }
     QString buf;
     plr->table->handnr++;
-    sprintf(buf, "%s stays.\r\n", qPrintable(ch->name()));
+    dc_sprintf(buf, "%s stays.\r\n", qPrintable(ch->name()));
     send_to_table(buf, plr->table);
     nextturn(plr->table);
     return ReturnValue::eSUCCESS;
@@ -1376,7 +1376,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     nw->doubled = plr->doubled;
     ch->sendln("You split your hand.");
     QString buf;
-    sprintf(buf, "%s splits %s hand.\r\n", qPrintable(ch->name()), HSHR(ch));
+    dc_sprintf(buf, "%s splits %s hand.\r\n", qPrintable(ch->name()), HSHR(ch));
     send_to_table(buf, plr->table, plr);
     pulse_table_bj(plr->table);
     return ReturnValue::eSUCCESS;
@@ -1399,18 +1399,18 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
         break;
     plr->hand_data[i] = pickCard(plr->table->deck);
     QString buf;
-    sprintf(buf, "%s hits and receives a %s%s%c%s.\r\n", qPrintable(ch->name()),
-            showColor ? suitcol(plr->hand_data[i]) : "", valstri(plr->hand_data[i]),
-            suit(plr->hand_data[i]), showColor ? NTEXT : "");
+    dc_sprintf(buf, "%s hits and receives a %s%s%c%s.\r\n", qPrintable(ch->name()),
+               showColor ? suitcol(plr->hand_data[i]) : "", valstri(plr->hand_data[i]),
+               suit(plr->hand_data[i]), showColor ? NTEXT : "");
     send_to_table(buf, plr->table, plr);
-    sprintf(buf, "You hit and receive a %s%s%c%s.\r\n",
-            showColor ? suitcol(plr->hand_data[i]) : "", valstri(plr->hand_data[i]),
-            suit(plr->hand_data[i]), showColor ? NTEXT : "");
+    dc_sprintf(buf, "You hit and receive a %s%s%c%s.\r\n",
+               showColor ? suitcol(plr->hand_data[i]) : "", valstri(plr->hand_data[i]),
+               suit(plr->hand_data[i]), showColor ? NTEXT : "");
     ch->send(buf);
     if (hand_strength(plr) > 21) // busted
     {
       QString buf;
-      sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
       send_to_table(buf, plr->table, plr);
       ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
       nextturn(plr->table);
@@ -1656,39 +1656,39 @@ QString hand_name(qint32 hand[5])
     return "Royal Straight Flush";
   else if ((i = has_sf(hand)))
   {
-    sprintf(buf, "%s-high Straight Flush", cardname(i));
+    dc_sprintf(buf, "%s-high Straight Flush", cardname(i));
   }
   else if ((i = has_4kind(hand)))
   {
-    sprintf(buf, "Four of a kind, %ss", cardname(i));
+    dc_sprintf(buf, "Four of a kind, %ss", cardname(i));
   }
   else if ((i = has_fhouse(hand)))
   {
-    sprintf(buf, "Full House, %s over %ss", cardname(i / 1000), cardname(i - (i / 1000) * 1000));
+    dc_sprintf(buf, "Full House, %s over %ss", cardname(i / 1000), cardname(i - (i / 1000) * 1000));
   }
   else if ((i = has_flush(hand)))
   {
-    sprintf(buf, "%s-high Flush", cardname(i));
+    dc_sprintf(buf, "%s-high Flush", cardname(i));
   }
   else if ((i = has_straight(hand)))
   {
-    sprintf(buf, "%s-high Straight", cardname(i));
+    dc_sprintf(buf, "%s-high Straight", cardname(i));
   }
   else if ((i = has_3kind(hand)))
   {
-    sprintf(buf, "Three of a kind, %ss", cardname(i));
+    dc_sprintf(buf, "Three of a kind, %ss", cardname(i));
   }
   else if ((i = has_2pair(hand)))
   {
-    sprintf(buf, "Two Pair, %ss and %ss", cardname(i / 1000), cardname(i - (i / 1000) * 1000));
+    dc_sprintf(buf, "Two Pair, %ss and %ss", cardname(i / 1000), cardname(i - (i / 1000) * 1000));
   }
   else if ((i = has_pair(hand)))
   {
-    sprintf(buf, "Pair of %ss", cardname(i));
+    dc_sprintf(buf, "Pair of %ss", cardname(i));
   }
   else
   {
-    sprintf(buf, "%s high", cardname(highcard(hand)));
+    dc_sprintf(buf, "%s high", cardname(highcard(hand)));
   }
   return buf;
 }
@@ -1772,7 +1772,7 @@ qint32 handcompare(qint32 hand1[5], qint32 hand2[5])
     if (a == b)
       return 3; //
   }
-  logentry(QStringLiteral("Error in handcompare."), 110, DC::LogChannel::LOG_MORTAL);
+  DC::getInstance()->logentry(QStringLiteral("Error in handcompare."), 110, DC::LogChannel::LOG_MORTAL);
 
   return -1;
 }
@@ -1784,7 +1784,7 @@ command_return_t do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
   //  qint32 i = atoi(arg);
   //  qint32 z = get_hand(i);
   // QString buf;
-  // sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
+  // dc_sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
   //	hand[0][z],hand[1][z],
   //	hand[2][z],hand[3][z],
   //	hand[4][z]);
@@ -1985,7 +1985,7 @@ void save_slot_machines()
 
   if (!curr)
   {
-    logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -2032,7 +2032,7 @@ void update_linked_slots(machine_data *machine)
 {
   QString ldesc;
 
-  snprintf(ldesc, MAX_STRING_LENGTH,
+  dc_snprintf(ldesc, MAX_STRING_LENGTH,
            "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.",
            (qint32)machine->jackpot,
            machine->gold ? "coins" : "plats");
@@ -2093,7 +2093,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
   {
     stop1 = number(0, 19);
     send_to_room("You hear a loud clunk as the first stopper snaps into place.\r\n", machine->obj->in_room);
-    sprintf(buf, "%s    |      |\r\n", reel1[stop1]);
+    dc_sprintf(buf, "%s    |      |\r\n", reel1[stop1]);
     machine->ch->send(buf);
     slot_timer(machine, stop1, -1, 2);
   }
@@ -2101,7 +2101,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
   {
     stop2 = number(0, 19);
     send_to_room("You hear a loud clunk as the second stopper snaps into place.\r\n", machine->obj->in_room);
-    sprintf(buf, "%s %s    |\r\n", reel1[stop1], reel2[stop2]);
+    dc_sprintf(buf, "%s %s    |\r\n", reel1[stop1], reel2[stop2]);
     machine->ch->send(buf);
     slot_timer(machine, stop1, stop2, 2);
   }
@@ -2110,7 +2110,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
     qint32 payout = {};
     qint32 stop3 = number(0, 19);
     send_to_room("You hear a loud clunk as the final stopper snaps into place.\r\n", machine->obj->in_room);
-    sprintf(buf, "%s %s %s\r\n", reel1[stop1], reel2[stop2], reel3[stop3]);
+    dc_sprintf(buf, "%s %s %s\r\n", reel1[stop1], reel2[stop2], reel3[stop3]);
     machine->ch->send(buf);
 
     if (stop1 == 6 && stop2 == 3 && stop3 == 14)
@@ -2141,7 +2141,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       else
       {
         ((ObjectPtr)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
-        sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
+        dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);
         ((ObjectPtr)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description(buf);
@@ -2152,11 +2152,11 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
     {
       send_to_room("The jackpot lights flash and loud noises come from all around you!\r\n", machine->obj->in_room);
       machine->ch->send(QStringLiteral("$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\r\n").arg((qint32)machine->jackpot).arg(machine->gold ? "coins" : "plats"));
-      sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
+      dc_sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
       send_info(buf);
 
-      logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
-           qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
+                              qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
       if (machine->gold)
         machine->ch->addGold((qint32)machine->jackpot);
       else
@@ -2169,7 +2169,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       else
       {
         ((ObjectPtr)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
-        sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
+        dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);
         // if(!ishashed(((ObjectPtr )DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description))
@@ -2181,7 +2181,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
     {
       send_to_room("Lights flash and noises emanate from the slot machine!\r\n", machine->obj->in_room);
       machine->lastwin = machine->cost * payout * machine->bet;
-      sprintf(buf, "$BWinner!!$R  You win %d %s!\r\n", machine->lastwin, machine->gold ? "coins" : "plats");
+      dc_sprintf(buf, "$BWinner!!$R  You win %d %s!\r\n", machine->lastwin, machine->gold ? "coins" : "plats");
       if (machine->gold)
         machine->ch->addGold(machine->lastwin);
       else
@@ -2313,7 +2313,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   else
     GET_PLATINUM(ch) -= obj->slot->cost * obj->slot->bet;
   obj->slot->busy = true;
-  sprintf(buf, "You place %d %s into the slot and set the reels spinning!\r\n", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
+  dc_sprintf(buf, "You place %d %s into the slot and set the reels spinning!\r\n", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
   ch->send(buf);
   act("$n reaches for the handle and pulls down.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("   |      |      |");
@@ -2529,7 +2529,7 @@ void send_roulette_message(wheel_data *wheel)
     send_to_room(introbuf[number(0, 1)], wheel->obj->in_room);
   else
   {
-    sprintf(buf, "%s %s %s", middlebuf[number(0, 3)], roulette_display[number(0, 36)], endbuf[number(0, 3)]);
+    dc_sprintf(buf, "%s %s %s", middlebuf[number(0, 3)], roulette_display[number(0, 36)], endbuf[number(0, 3)]);
     send_to_room(buf, wheel->obj->in_room);
   }
 }
@@ -2540,7 +2540,7 @@ void wheel_stop(wheel_data *wheel)
   quint32 payout = {};
   QString buf;
 
-  sprintf(buf, "The ball lands on %s!\r\n", roulette_display[num]);
+  dc_sprintf(buf, "The ball lands on %s!\r\n", roulette_display[num]);
   send_to_room(buf, wheel->obj->in_room);
 
   for (qint32 i = {}; i < 6; i++)
@@ -2600,7 +2600,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
   {
     if (!number(0, 3))
     {
-      sprintf(buf, "$B$7The croupier says 'The wheel will be spun in about %d seconds!'$R\r\n", wheel->countdown * 2);
+      dc_sprintf(buf, "$B$7The croupier says 'The wheel will be spun in about %d seconds!'$R\r\n", wheel->countdown * 2);
       send_to_room(buf, wheel->obj->in_room);
     }
     wheel->countdown -= 1;
@@ -2717,14 +2717,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B$0BLACK$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[0] + bet));
-          sprintf(buf, "$n adds to $s bet on $B$0BLACK$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[0] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B$0BLACK$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[0] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B$0BLACK$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B$0BLACK$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B$0BLACK$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[0] += bet;
@@ -2742,14 +2742,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B$4RED$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[1] + bet));
-          sprintf(buf, "$n adds to $s bet on $B$4RED$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[1] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B$4RED$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[1] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B$4RED$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B$4RED$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B$4RED$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[1] += bet;
@@ -2767,14 +2767,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $BEVEN$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[2] + bet));
-          sprintf(buf, "$n adds to $s bet on $BEVEN$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[2] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $BEVEN$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[2] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $BEVEN$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $BEVEN$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $BEVEN$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[2] += bet;
@@ -2792,14 +2792,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $BODD$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[3] + bet));
-          sprintf(buf, "$n adds to $s bet on $BODD$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[3] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $BODD$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[3] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $BODD$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $BODD$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $BODD$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[3] += bet;
@@ -2817,14 +2817,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B1-12$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[4] + bet));
-          sprintf(buf, "$n adds to $s bet on $B1-12$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[4] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B1-12$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[4] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B1-12$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B1-12$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B1-12$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[4] += bet;
@@ -2842,14 +2842,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B13-24$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[5] + bet));
-          sprintf(buf, "$n adds to $s bet on $B13-24$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[5] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B13-24$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[5] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B13-24$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B13-24$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B13-24$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[5] += bet;
@@ -2867,14 +2867,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B25-36$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[6] + bet));
-          sprintf(buf, "$n adds to $s bet on $B25-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[6] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B25-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[6] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B25-36$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B25-36$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B25-36$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[6] += bet;
@@ -2892,14 +2892,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B1-9$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[1] + bet));
-          sprintf(buf, "$n adds to $s bet on $B1-9$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B1-9$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B1-9$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B1-9$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B1-9$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[7] += bet;
@@ -2917,14 +2917,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B10-18$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[8] + bet));
-          sprintf(buf, "$n adds to $s bet on $B10-18$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B10-18$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B10-18$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B10-18$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B10-18$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[8] += bet;
@@ -2942,14 +2942,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B19-27$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[9] + bet));
-          sprintf(buf, "$n adds to $s bet on $B19-27$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[9] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B19-27$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[9] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B19-27$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B19-27$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B19-27$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[9] += bet;
@@ -2967,14 +2967,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on $B28-36$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[10] + bet));
-          sprintf(buf, "$n adds to $s bet on $B28-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[10] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on $B28-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[10] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %1 on $B28-36$R.\r\n").arg(bet));
-        sprintf(buf, "$n places a bet of %u on $B28-36$R.", bet);
+        dc_sprintf(buf, "$n places a bet of %u on $B28-36$R.", bet);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[10] += bet;
@@ -2993,15 +2993,15 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(QStringLiteral("You add %u to your bet on %s.  The total bet is now %u coins.\r\n").arg(bet).arg(roulette_display[number]).arg(obj->wheel->plr[i]->bet_array[number + 11] + bet));
-          sprintf(buf, "$n adds to $s bet on %s for a total of %u coins.",
-                  roulette_display[number], obj->wheel->plr[i]->bet_array[number + 11] + bet);
+          dc_sprintf(buf, "$n adds to $s bet on %s for a total of %u coins.",
+                     roulette_display[number], obj->wheel->plr[i]->bet_array[number + 11] + bet);
           act(buf, ch, 0, 0, TO_ROOM, 0);
         }
       }
       else
       {
         ch->send(QStringLiteral("You have placed a bet of %u on %s.\r\n").arg(bet).arg(roulette_display[number]));
-        sprintf(buf, "$n places a bet of %u on %s.", bet, roulette_display[number]);
+        dc_sprintf(buf, "$n places a bet of %u on %s.", bet, roulette_display[number]);
         act(buf, ch, 0, 0, TO_ROOM, 0);
       }
       obj->wheel->plr[i]->bet_array[number + 11] += bet;

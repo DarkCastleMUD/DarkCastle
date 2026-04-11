@@ -444,7 +444,7 @@ void Character::do_on_login_stuff(void)
   {
     if (vault.size_ < getLevel() * 10)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", qPrintable(this->name()), vault.size_, this->getLevel() * 10);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", qPrintable(this->name()), vault.size_, this->getLevel() * 10);
       vault.size_ = this->getLevel() * 10;
     }
 
@@ -589,7 +589,7 @@ void Character::do_on_login_stuff(void)
     {
       if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
       {
-        logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(qPrintable(this->name())), IMMORTAL, DC::LogChannel::LOG_PLAYER);
+        DC::getInstance()->logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(qPrintable(this->name())), IMMORTAL, DC::LogChannel::LOG_PLAYER);
         // this->send(fmt::format("Removing skill {}\r\n", curr.first));
         skills_to_delete.push(curr.first);
       }
@@ -642,7 +642,7 @@ void Character::do_on_login_stuff(void)
 
   while (!todelete.empty())
   {
-    logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(qPrintable(this->name())), 0, DC::LogChannel::LOG_MORTAL);
+    DC::getInstance()->logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(qPrintable(this->name())), 0, DC::LogChannel::LOG_MORTAL);
     remove_vault_access(todelete.front(), vault);
     todelete.pop();
   }
@@ -741,23 +741,23 @@ void Character::check_hw(void)
   heightweight(false);
   if (this->height > races[this->race].max_height)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].max_height);
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].max_height);
     this->height = races[this->race].max_height;
   }
   if (this->height < races[this->race].min_height)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].min_height);
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].min_height);
     this->height = races[this->race].min_height;
   }
 
   if (this->weight > races[this->race].max_weight)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].max_weight);
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].max_weight);
     this->weight = races[this->race].max_weight;
   }
   if (this->weight < races[this->race].min_weight)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].min_weight);
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].min_weight);
     this->weight = races[this->race].min_weight;
   }
   heightweight(true);
@@ -766,9 +766,9 @@ void Character::check_hw(void)
 void Character::set_hw(void)
 {
   this->height = number(races[this->race].min_height, races[this->race].max_height);
-  // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
+  // DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
   this->weight = number(races[this->race].min_weight, races[this->race].max_weight);
-  // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
+  // DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
 }
 
 // Deal with sockets that haven't logged in yet.
@@ -807,7 +807,7 @@ void DC::nanny(class Connection *d, QString arg)
   {
 
   default:
-    logentry(QStringLiteral("Nanny: invalid conn->connected == %1").arg(conn->connected), 0, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Nanny: invalid conn->connected == %1").arg(conn->connected), 0, DC::LogChannel::LOG_BUG);
     close_socket(d);
     return;
 
@@ -902,8 +902,8 @@ void DC::nanny(class Connection *d, QString arg)
       return;
 
     // Uncomment this if you think a playerfile may be crashing the mud. -pir
-    //      sprintf(str_tmp, "Trying to login: %s", tmp_name);
-    //    logentry(str_tmp, 0, DC::LogChannel::LOG_MISC);
+    //      dc_sprintf(str_tmp, "Trying to login: %s", tmp_name);
+    //    DC::getInstance()->logentry(str_tmp, 0, DC::LogChannel::LOG_MISC);
 
     // ch is allocated in load_char_obj
     ls = load_char_obj(d, tmp_name);
@@ -952,7 +952,7 @@ void DC::nanny(class Connection *d, QString arg)
         return;
       }
       /* New player */
-      sprintf(buf, "Did I get that right, %s (y/n)? ", tmp_name);
+      dc_sprintf(buf, "Did I get that right, %s (y/n)? ", tmp_name);
       write_to_output(buf, d);
       telnet_ga(d);
       conn->connected = Connection::states::CONFIRM_NEW_NAME;
@@ -982,7 +982,7 @@ void DC::nanny(class Connection *d, QString arg)
           if (ad->character && ad->character->getLevel() == IMPLEMENTER && ad->character->isPlayer())
           {
             password = ad->character->player->pwd;
-            logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", qPrintable(ad->character->name()));
+            DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", qPrintable(ad->character->name()));
             break;
           }
         }
@@ -992,21 +992,21 @@ void DC::nanny(class Connection *d, QString arg)
     if (QString(crypt(arg.c_str(), password)) != password)
     {
       write_to_output("Wrong password.\r\n", d);
-      sprintf(log_buf, "%s wrong password: %s", qPrintable(ch->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
-      logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
+      dc_sprintf(log_buf, "%s wrong password: %s", qPrintable(ch->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
+      DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
       if ((ch = get_pc(qPrintable(conn->character->name()))))
       {
-        sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
-                         //           "Attempt was from %s.$R\r\n"
-                         "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let a god know.)\r\n");
+        dc_sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
+                            //           "Attempt was from %s.$R\r\n"
+                            "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let a god know.)\r\n");
         ch->send(log_buf);
       }
       else
       {
         if (conn->character->player->bad_pw_tries > 100)
         {
-          sprintf(log_buf, "%s has 100+ bad pw tries...", qPrintable(conn->character->name()));
-          logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
+          dc_sprintf(log_buf, "%s has 100+ bad pw tries...", qPrintable(conn->character->name()));
+          DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
         }
         else
         {
@@ -1025,9 +1025,9 @@ void DC::nanny(class Connection *d, QString arg)
 
     buffer = QStringLiteral("%1@%2 has connected.").arg(qPrintable(ch->name())).arg(conn->getPeerOriginalAddress().toString());
     if (ch->getLevel() < ANGEL)
-      logentry(buffer, OVERSEER, DC::LogChannel::LOG_SOCKET);
+      DC::getInstance()->logentry(buffer, OVERSEER, DC::LogChannel::LOG_SOCKET);
     else
-      logentry(buffer, ch->getLevel(), DC::LogChannel::LOG_SOCKET);
+      DC::getInstance()->logentry(buffer, ch->getLevel(), DC::LogChannel::LOG_SOCKET);
 
     warn_if_duplicate_ip(ch);
     //    write_to_output(motd, d);
@@ -1049,7 +1049,7 @@ void DC::nanny(class Connection *d, QString arg)
 
     if (conn->character->player->bad_pw_tries)
     {
-      sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", conn->character->player->bad_pw_tries);
+      dc_sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", conn->character->player->bad_pw_tries);
       write_to_output(buf, d);
     }
     DC::getInstance()->TheAuctionHouse.CheckForSoldItems(conn->character);
@@ -1071,15 +1071,15 @@ void DC::nanny(class Connection *d, QString arg)
 
       if (DC::getInstance()->bans_.is_banned(conn->getPeerOriginalAddress()) >= Ban::NEW)
       {
-        sprintf(buf, "Request for new character %s denied from [%s] (siteban)", qPrintable(conn->character->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
-        logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
+        dc_sprintf(buf, "Request for new character %s denied from [%s] (siteban)", qPrintable(conn->character->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
+        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
         write_to_output("Sorry, new chars are not allowed from your site.\r\n"
                         "Questions may be directed to imps@dcastle.org\r\n",
                         d);
         conn->connected = Connection::states::CLOSE;
         return;
       }
-      sprintf(buf, "New character.\r\nGive me a password for %s: ", qPrintable(ch->name()));
+      dc_sprintf(buf, "New character.\r\nGive me a password for %s: ", qPrintable(ch->name()));
       write_to_output(buf, d);
       telnet_ga(d);
       conn->connected = Connection::states::GET_NEW_PASSWORD;
@@ -1355,12 +1355,12 @@ void DC::nanny(class Connection *d, QString arg)
       ch->desc->stats = {};
       ch->desc->stats = {};
       write_to_output("\r\nChoose a race(races you can select are marked with a *).\r\n", d);
-      sprintf(buf, "  %c1: Human\r\n  %c2: Elf\r\n  %c3: Dwarf\r\n"
-                   "  %c4: Hobbit\r\n  %c5: Pixie\r\n  %c6: Ogre\r\n"
-                   "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
-                   "\r\nSelect a race(Type help <race> for more information)-> ",
-              is_race_eligible(ch, 1) ? '*' : ' ', is_race_eligible(ch, 2) ? '*' : ' ', is_race_eligible(ch, 3) ? '*' : ' ', is_race_eligible(ch, 4) ? '*' : ' ', is_race_eligible(ch, 5) ? '*' : ' ', is_race_eligible(ch, 6) ? '*' : ' ',
-              is_race_eligible(ch, 7) ? '*' : ' ', is_race_eligible(ch, 8) ? '*' : ' ', is_race_eligible(ch, 9) ? '*' : ' ');
+      dc_sprintf(buf, "  %c1: Human\r\n  %c2: Elf\r\n  %c3: Dwarf\r\n"
+                      "  %c4: Hobbit\r\n  %c5: Pixie\r\n  %c6: Ogre\r\n"
+                      "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
+                      "\r\nSelect a race(Type help <race> for more information)-> ",
+                 is_race_eligible(ch, 1) ? '*' : ' ', is_race_eligible(ch, 2) ? '*' : ' ', is_race_eligible(ch, 3) ? '*' : ' ', is_race_eligible(ch, 4) ? '*' : ' ', is_race_eligible(ch, 5) ? '*' : ' ', is_race_eligible(ch, 6) ? '*' : ' ',
+                 is_race_eligible(ch, 7) ? '*' : ' ', is_race_eligible(ch, 8) ? '*' : ' ', is_race_eligible(ch, 9) ? '*' : ' ');
 
       write_to_output(buf, d);
       telnet_ga(d);
@@ -1514,31 +1514,31 @@ void DC::nanny(class Connection *d, QString arg)
 
     ch->set_hw();
     write_to_output("\r\nA '*' denotes a class that fits your chosen stats.\r\n", d);
-    sprintf(buf, " %c 1: Warrior\r\n"
-                 " %c 2: Cleric\r\n"
-                 " %c 3: Mage\r\n"
-                 " %c 4: Thief\r\n"
-                 " %c 5: Anti-Paladin\r\n"
-                 " %c 6: Paladin\r\n"
-                 " %c 7: Barbarian \r\n"
-                 " %c 8: Monk\r\n"
-                 " %c 9: Ranger\r\n"
-                 " %c 10: Bard\r\n"
-                 " %c 11: Druid\r\n"
-                 "\r\nSelect a class(Type help <class> for more information) > ",
-            //           (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
-            '*',
-            (is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_THIEF) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_ANTI_PAL) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_PALADIN) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_BARBARIAN) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_MONK) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_RANGER) ? '*' : ' '),
-            //            '*',
-            (is_clss_eligible(ch, CLASS_BARD) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' '));
+    dc_sprintf(buf, " %c 1: Warrior\r\n"
+                    " %c 2: Cleric\r\n"
+                    " %c 3: Mage\r\n"
+                    " %c 4: Thief\r\n"
+                    " %c 5: Anti-Paladin\r\n"
+                    " %c 6: Paladin\r\n"
+                    " %c 7: Barbarian \r\n"
+                    " %c 8: Monk\r\n"
+                    " %c 9: Ranger\r\n"
+                    " %c 10: Bard\r\n"
+                    " %c 11: Druid\r\n"
+                    "\r\nSelect a class(Type help <class> for more information) > ",
+               //           (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
+               '*',
+               (is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_THIEF) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_ANTI_PAL) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_PALADIN) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_BARBARIAN) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_MONK) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_RANGER) ? '*' : ' '),
+               //            '*',
+               (is_clss_eligible(ch, CLASS_BARD) ? '*' : ' '),
+               (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' '));
     write_to_output(buf, d);
     telnet_ga(d);
     conn->connected = Connection::states::OLD_GET_CLASS;
@@ -1659,8 +1659,8 @@ void DC::nanny(class Connection *d, QString arg)
 
     init_char(ch);
 
-    sprintf(log_buf, "%s@%s new player.", qPrintable(ch->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
-    logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
+    dc_sprintf(log_buf, "%s@%s new player.", qPrintable(ch->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
+    DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
     write_to_output("\r\n", d);
     write_to_output(motd, d);
     write_to_output("\r\nIf you have read this motd, press Return.", d);
@@ -1720,13 +1720,13 @@ void DC::nanny(class Connection *d, QString arg)
       unique_scan(ch);
       if (ch->getGold() > 1000000000)
       {
-        sprintf(log_buf, "%s has more than a billion gold. Bugged?", qPrintable(ch->name()));
-        logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
+        dc_sprintf(log_buf, "%s has more than a billion gold. Bugged?", qPrintable(ch->name()));
+        DC::getInstance()->logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
       if (GET_BANK(ch) > 1000000000)
       {
-        sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", qPrintable(ch->name()));
-        logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
+        dc_sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", qPrintable(ch->name()));
+        DC::getInstance()->logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
       ch->sendln("\r\nWelcome to Dark Castle.");
       character_list.insert(ch);
@@ -1834,8 +1834,8 @@ void DC::nanny(class Connection *d, QString arg)
   case Connection::states::DELETE_CHAR:
     if (arg == "ERASE ME")
     {
-      sprintf(buf, "%s just deleted themself.", conn->qPrintable(character->name()));
-      logentry(buf, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+      dc_sprintf(buf, "%s just deleted themself.", conn->qPrintable(character->name()));
+      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 
       DC::getInstance()->TheAuctionHouse.HandleDelete(conn->character->name());
       // To remove the vault from memory
@@ -1918,8 +1918,8 @@ void DC::nanny(class Connection *d, QString arg)
       ch = conn->character;
       strcpy(ch->player->pwd, blah2);
       ch->save_char_obj();
-      sprintf(log_buf, "%s password changed", qPrintable(ch->name()));
-      logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
+      dc_sprintf(log_buf, "%s password changed", qPrintable(ch->name()));
+      DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
     }
 
     break;
@@ -1975,14 +1975,14 @@ bool check_deny(class Connection *d, QString name)
   QString strdeny;
   QString bufdeny;
 
-  sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
+  dc_sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
   if ((fpdeny = fopen(strdeny, "rb")) == nullptr)
     return false;
   fclose(fpdeny);
 
   QString log_buf = {};
-  sprintf(log_buf, "Denying access to player %s@%s.", name, conn->getPeerOriginalAddress().toString(qPrintable()));
-  logentry(log_buf, ARCHANGEL, DC::LogChannel::LOG_MORTAL);
+  dc_sprintf(log_buf, "Denying access to player %s@%s.", name, conn->getPeerOriginalAddress().toString(qPrintable()));
+  DC::getInstance()->logentry(log_buf, ARCHANGEL, DC::LogChannel::LOG_MORTAL);
   file_to_string(strdeny, bufdeny);
   write_to_output(bufdeny, d);
   close_socket(d);
@@ -2029,11 +2029,11 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 
       if (tmp_ch->isMortalPlayer())
       {
-        logentry(log_buf, COORDINATOR, DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(log_buf, COORDINATOR, DC::LogChannel::LOG_SOCKET);
       }
       else
       {
-        logentry(log_buf, tmp_ch->getLevel(), DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(log_buf, tmp_ch->getLevel(), DC::LogChannel::LOG_SOCKET);
       }
 
       conn->connected = Connection::states::PLAYING;
@@ -2153,7 +2153,7 @@ void update_characters()
     }
     if (IS_AFFECTED(i, AFF_POISON) && !(i->affected_by_spell(SPELL_POISON)))
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", qPrintable(i->name()));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", qPrintable(i->name()));
       REMBIT(i->affected_by, AFF_POISON);
     }
 
@@ -2168,7 +2168,7 @@ void update_characters()
       }
       if (tmp)
       {
-        sprintf(dammsg, "$B%d$R", tmp);
+        dc_sprintf(dammsg, "$B%d$R", tmp);
         send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", i, 0, i, dammsg,
                     "You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
         send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.", i, 0, 0, dammsg,
@@ -2184,13 +2184,13 @@ void update_characters()
     if (i->isPlayer() && i->isMortalPlayer() && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
     {
       tmp = GET_MAX_HIT(i) / 5;
-      sprintf(log_msg, "%s drowned in room %d.", qPrintable(i->name()), DC::getInstance()->world[i->in_room].number);
+      dc_sprintf(log_msg, "%s drowned in room %d.", qPrintable(i->name()), DC::getInstance()->world[i->in_room].number);
       retval = noncombat_damage(i, tmp, "You gasp your last breath and everything goes dark...", "$n stops struggling as $e runs out of oxygen.", log_msg, KILL_DROWN);
       if (SOMEONE_DIED(retval))
         continue;
       else
       {
-        sprintf(dammsg, "$B%d$R", tmp);
+        dc_sprintf(dammsg, "$B%d$R", tmp);
         send_damage("$n thrashes and gasps, struggling vainly for air, taking | damage.", i, 0, 0, dammsg,
                     "$n thrashes and gasps, stuggling vainly for air.", TO_ROOM);
         send_damage("You gasp and fight madly for air; you are drowning and take | damage!", i, 0, 0, dammsg,
@@ -2346,7 +2346,7 @@ void checkConsecrate(qint32 pulseType)
             {
               if (GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch))
                 amount = GET_MAX_HIT(tmp_ch) - GET_HIT(tmp_ch);
-              sprintf(buf, "%d", amount);
+              dc_sprintf(buf, "%d", amount);
               tmp_ch->addHP(amount);
               if (tmp_ch == ch)
                 send_damage("The runes upon the ground glow softly as your holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration heals you. ", TO_CHAR);
@@ -2379,7 +2379,7 @@ void checkConsecrate(qint32 pulseType)
                 fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_DESECRATE);
                 continue;
               }
-              sprintf(buf, "%d", amount);
+              dc_sprintf(buf, "%d", amount);
               tmp_ch->removeHP(amount);
               if (tmp_ch == ch)
                 send_damage("The runes upon the ground hum ominously as your unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration injures you. ", TO_CHAR);
@@ -2401,7 +2401,7 @@ void checkConsecrate(qint32 pulseType)
             {
               if (GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch))
                 amount = GET_MAX_HIT(tmp_ch) - GET_HIT(tmp_ch);
-              sprintf(buf, "%d", amount);
+              dc_sprintf(buf, "%d", amount);
               tmp_ch->addHP(amount);
               if (tmp_ch == ch)
                 send_damage("The runes upon the ground hum ominously as your unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration heals you. ", TO_CHAR);
@@ -2435,7 +2435,7 @@ void checkConsecrate(qint32 pulseType)
                 fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_CONSECRATE);
                 continue;
               }
-              sprintf(buf, "%d", amount);
+              dc_sprintf(buf, "%d", amount);
               tmp_ch->removeHP(amount);
               if (tmp_ch == ch)
                 send_damage("The runes upon the ground glow softly as your holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration injures you. ", TO_CHAR);
@@ -2468,7 +2468,7 @@ bool on_forbidden_name_list(const QString name)
   nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
   if (!nameList)
   {
-    logentry(QStringLiteral("Failed to open forbidden name file!"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Failed to open forbidden name file!"), 0, DC::LogChannel::LOG_MISC);
     return false;
   }
   else

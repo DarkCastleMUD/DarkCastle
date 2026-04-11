@@ -108,15 +108,15 @@ command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     ch->sendln("LOG removed.");
     REMOVE_BIT(vict->player->punish, PUNISH_LOG);
-    sprintf(buf2, "%s removed log on %s.", qPrintable(ch->name()), qPrintable(vict->name()));
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf2, "%s removed log on %s.", qPrintable(ch->name()), qPrintable(vict->name()));
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
     ch->sendln("LOG set.");
     SET_BIT(vict->player->punish, PUNISH_LOG);
-    sprintf(buf2, "%s just logged %s.", qPrintable(ch->name()), qPrintable(vict->name()));
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf2, "%s just logged %s.", qPrintable(ch->name()), qPrintable(vict->name()));
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -135,7 +135,7 @@ command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (victim->isNonPlayer())
         continue;
-      sprintf(buf, "0.%s", qPrintable(victim->name()));
+      dc_sprintf(buf, "0.%s", qPrintable(victim->name()));
       do_showbits(ch, buf, cmd);
     }
     return ReturnValue::eSUCCESS;
@@ -429,9 +429,9 @@ command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   ch->sendln("Done.");
   QString log_buf = {};
-  sprintf(log_buf, "%s pardons %s for %s.",
-          qPrintable(ch->name()), qPrintable(victim->name()), flag);
-  logentry(log_buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_sprintf(log_buf, "%s pardons %s for %s.",
+             qPrintable(ch->name()), qPrintable(victim->name()), flag);
+  DC::getInstance()->logentry(log_buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
@@ -699,7 +699,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     do_write_skillquest(ch, argument, cmd);
     break;
   default:
-    logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, DC::LogChannel::LOG_WORLD);
+    DC::getInstance()->logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, DC::LogChannel::LOG_WORLD);
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eSUCCESS;
@@ -830,23 +830,23 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
   for (i = 1; i < MAX_WEAR; i++)
   {
     buf1[0] = '\0';
-    sprintf(buf1, "%d. ", i);
+    dc_sprintf(buf1, "%d. ", i);
     if (last_vnum[a][0] != -1)
       tot += last_max[a];
     if (last_vnum[a][i] == -1)
-      sprintf(buf1, "%s Nothing\r\n", buf1);
+      dc_sprintf(buf1, "%s Nothing\r\n", buf1);
     else
       for (a = {}; a < 5; a++)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable(((ObjectPtr)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
-        //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
+        dc_sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable(((ObjectPtr)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
+        //    else dc_sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
-    sprintf(buf1, "%s\n", buf1);
+    dc_sprintf(buf1, "%s\n", buf1);
     send_to_char(buf1, ch);
   }
-  sprintf(buf1, "Total %s: %d\r\n", arg, tot);
+  dc_sprintf(buf1, "Total %s: %d\r\n", arg, tot);
   send_to_char(buf1, ch);
   return ReturnValue::eSUCCESS;
 }

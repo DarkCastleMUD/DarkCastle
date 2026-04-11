@@ -143,7 +143,7 @@ void mobile_activity(void)
     }
     catch (...)
     {
-      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -228,7 +228,7 @@ void mobile_activity(void)
         qint32 room_nr_past_door = EXIT(ch, door)->to_room;
         if (room_nr_past_door < 0)
         {
-          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
+          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
         }
         Room room_past_door = DC::getInstance()->world[room_nr_past_door];
@@ -339,7 +339,7 @@ void mobile_activity(void)
           {
             if (!tmp_ch || !ch)
             {
-              logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, DC::LogChannel::LOG_BUG);
+              DC::getInstance()->logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, DC::LogChannel::LOG_BUG);
               break;
             }
             next_aggro = tmp_ch->next_in_room;
@@ -420,9 +420,9 @@ void mobile_activity(void)
           {
             tmp_race = tmp_ch->race;
             if (ch->race == tmp_race)
-              sprintf(buf, "$n screams 'Take heart, fellow %s!'", races[tmp_race].singular_name);
+              dc_sprintf(buf, "$n screams 'Take heart, fellow %s!'", races[tmp_race].singular_name);
             else
-              sprintf(buf, "$n screams 'HEY! Don't be picking on %s!'", races[tmp_race].plural_name);
+              dc_sprintf(buf, "$n screams 'HEY! Don't be picking on %s!'", races[tmp_race].plural_name);
             act(buf, ch, 0, 0, TO_ROOM, 0);
 
             PerfTimers["attack_trigger3"].start();
@@ -553,7 +553,7 @@ void mobile_activity(void)
               // if mob is wimpy, and lower level.. flee
               if (!wimpy || (wimpy && ch->getLevel() >= tmp_ch->getLevel()))
               {
-                sprintf(buf, "$n screams 'Oooo, I HATE %s!'", races[tmp_race].plural_name);
+                dc_sprintf(buf, "$n screams 'Oooo, I HATE %s!'", races[tmp_race].plural_name);
                 act(buf, ch, 0, 0, TO_ROOM, 0);
                 retval = mprog_attack_trigger(ch, tmp_ch);
                 if (SOMEONE_DIED(retval))
@@ -562,7 +562,7 @@ void mobile_activity(void)
               }
               else
               {
-                sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", races[tmp_race].plural_name);
+                dc_sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", races[tmp_race].plural_name);
                 act(buf, ch, 0, 0, TO_ROOM, 0);
                 do_flee(ch, "");
               }
@@ -926,7 +926,7 @@ void scavenge(CharacterPtr ch)
             break;
 
           default:
-            logentry(QStringLiteral("Bad switch in mob_act.C"), 0, DC::LogChannel::LOG_BUG);
+            DC::getInstance()->logentry(QStringLiteral("Bad switch in mob_act.C"), 0, DC::LogChannel::LOG_BUG);
             break;
 
           } /* end switch */

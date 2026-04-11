@@ -85,7 +85,7 @@ void do_champ_flag_death(CharacterPtr victim)
   {
     obj_from_char(obj);
     obj_to_room(obj, CFLAG_HOME);
-    snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], qPrintable(victim->name()));
+    dc_snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], qPrintable(victim->name()));
     send_info(buf);
 
     if (obj && qPrintable(obj->short_description()))
@@ -95,7 +95,7 @@ void do_champ_flag_death(CharacterPtr victim)
   }
   else
   {
-    logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -224,7 +224,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      logentry(QStringLiteral("Error in perform_violence()!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Error in perform_violence()!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
 
@@ -289,9 +289,9 @@ void perform_violence(void)
         {
           if (MOB_WAIT_STATE(ch) > 0)
           {
-            // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", qPrintable(ch->shortdesc_or_name()), MOB_WAIT_STATE(ch));
+            // dc_sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", qPrintable(ch->shortdesc_or_name()), MOB_WAIT_STATE(ch));
             // MOB_WAIT_STATE(ch) -= DC::PULSE_VIOLENCE; // MIKE
-            // logentry(debug, OVERSEER, DC::LogChannel::LOG_BUG);
+            // DC::getInstance()->logentry(debug, OVERSEER, DC::LogChannel::LOG_BUG);
           }
           else
           {
@@ -305,7 +305,7 @@ void perform_violence(void)
       {
         // if this happened, most likely the mob died somehow during the proc and didn't return ReturnValue::eCH_DIED and is
         // now invalid memory.  report what class we were and return
-        logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
+        DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
         break;
       }
       // DEBUG CODE
@@ -347,7 +347,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      logentry(QStringLiteral("Error in perform_violence(), part2!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Error in perform_violence(), part2!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
     bool over = false;
@@ -370,7 +370,7 @@ void perform_violence(void)
         if (dam)
         {
           QString dammsg;
-          sprintf(dammsg, "$B%d$R", dam);
+          dc_sprintf(dammsg, "$B%d$R", dam);
           send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", ch,
                       0, 0, dammsg, "You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
           send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.", ch,
@@ -479,7 +479,7 @@ void generate_skillthreat(CharacterPtr mob, qint32 skill, qint32 damage, Charact
   };
   if (!threat)
   { // Nothing set. Bugger.
-    logf(110, DC::LogChannel::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", qPrintable(get_skill_name(skill)), skill);
+    DC::getInstance()->logf(110, DC::LogChannel::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", qPrintable(get_skill_name(skill)), skill);
     return;
   }
   threat = (qint32)(threat * v); // vary depending on skill
@@ -528,7 +528,7 @@ qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("nullptr Victim or Ch sent to attack!  This crashes us!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr Victim or Ch sent to attack!  This crashes us!"), -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
 
     return ReturnValue::eINTERNAL_ERROR;
@@ -536,7 +536,7 @@ qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    logentry(QStringLiteral("Dead ch sent to attack. Wtf ;)"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Dead ch sent to attack. Wtf ;)"), -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
     stop_fighting(ch);
 
@@ -907,7 +907,7 @@ bool do_frostshield(CharacterPtr ch, CharacterPtr vict)
 {
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("Null ch or vict sent to do_frostshield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict sent to do_frostshield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return (false);
   }
   if (!IS_AFFECTED(vict, AFF_FROSTSHIELD))
@@ -934,7 +934,7 @@ command_return_t do_lightning_shield(CharacterPtr ch, CharacterPtr vict, qint32 
 
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1016,7 +1016,7 @@ command_return_t do_vampiric_aura(CharacterPtr ch, CharacterPtr vict)
 {
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_vampiric_aura!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_vampiric_aura!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1049,7 +1049,7 @@ command_return_t do_fireshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_fireshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_fireshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1138,7 +1138,7 @@ command_return_t do_acidshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_acidshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_acidshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1223,7 +1223,7 @@ command_return_t do_boneshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_boneshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_boneshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1441,7 +1441,7 @@ qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 
   if (!vict || !ch)
   {
-    logentry(QStringLiteral("Null victim or character in one_hit!  This Crashes us!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim or character in one_hit!  This Crashes us!"), -1, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1876,7 +1876,7 @@ void pir_stat_loss(CharacterPtr victim, qint32 chance, bool heh, bool zz)
         GET_STR(victim) -= 1;
         victim->raw_str -= 1;
         victim->sendln("*** You lose one strength point ***");
-        sprintf(log_buf, "%s lost a str too. ouch.", qPrintable(victim->name()));
+        dc_sprintf(log_buf, "%s lost a str too. ouch.", qPrintable(victim->name()));
       }
       break;
     case 2:
@@ -1885,14 +1885,14 @@ void pir_stat_loss(CharacterPtr victim, qint32 chance, bool heh, bool zz)
         GET_WIS(victim) -= 1;
         victim->raw_wis -= 1;
         victim->sendln("*** You lose one wisdom point ***");
-        sprintf(log_buf, "%s lost a wis too. ouch.", qPrintable(victim->name()));
+        dc_sprintf(log_buf, "%s lost a wis too. ouch.", qPrintable(victim->name()));
       }
       break;
     case 3:
       GET_CON(victim) -= 1;
       victim->raw_con -= 1;
       victim->sendln("*** You lose one constitution point ***");
-      sprintf(log_buf, "%s lost a con too. ouch.", qPrintable(victim->name()));
+      dc_sprintf(log_buf, "%s lost a con too. ouch.", qPrintable(victim->name()));
       break;
     case 4:
       if (GET_INT(victim) > 4)
@@ -1900,7 +1900,7 @@ void pir_stat_loss(CharacterPtr victim, qint32 chance, bool heh, bool zz)
         GET_INT(victim) -= 1;
         victim->raw_intel -= 1;
         victim->sendln("*** You lose one intelligence point ***");
-        sprintf(log_buf, "%s lost a qint32 too. ouch.", qPrintable(victim->name()));
+        dc_sprintf(log_buf, "%s lost a qint32 too. ouch.", qPrintable(victim->name()));
       }
       break;
     case 5:
@@ -1909,11 +1909,11 @@ void pir_stat_loss(CharacterPtr victim, qint32 chance, bool heh, bool zz)
         GET_DEX(victim) -= 1;
         victim->raw_dex -= 1;
         victim->sendln("*** You lose one dexterity point ***");
-        sprintf(log_buf, "%s lost a dex too. ouch.", qPrintable(victim->name()));
+        dc_sprintf(log_buf, "%s lost a dex too. ouch.", qPrintable(victim->name()));
       }
       break;
     } // of switch
-    logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
+    DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
     victim->player->statmetas -= 1; // we lost a stat, so don't charge extra meta
   } // of pir's extra stat loss
 }
@@ -2150,35 +2150,35 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     {
     case TYPE_FIRE:
       save = get_saves(victim, SAVE_TYPE_FIRE);
-      sprintf(buf, "$B$4fire$R and sustain");
+      dc_sprintf(buf, "$B$4fire$R and sustain");
       if (learned)
         victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_COLD:
       save = get_saves(victim, SAVE_TYPE_COLD);
-      sprintf(buf, "$B$3cold$R and sustain");
+      dc_sprintf(buf, "$B$3cold$R and sustain");
       if (learned)
         victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_ENERGY:
       save = get_saves(victim, SAVE_TYPE_ENERGY);
-      sprintf(buf, "$B$5energy$R and sustain");
+      dc_sprintf(buf, "$B$5energy$R and sustain");
       if (learned)
         victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_ACID:
       save = get_saves(victim, SAVE_TYPE_ACID);
-      sprintf(buf, "$B$2acid$R and sustain");
+      dc_sprintf(buf, "$B$2acid$R and sustain");
       if (learned)
         victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_MAGIC:
       save = get_saves(victim, SAVE_TYPE_MAGIC);
-      sprintf(buf, "$B$7magic$R and sustain");
+      dc_sprintf(buf, "$B$7magic$R and sustain");
       break;
     case TYPE_POISON:
       save = get_saves(victim, SAVE_TYPE_POISON);
-      sprintf(buf, "$2poison$R and sustain");
+      dc_sprintf(buf, "$2poison$R and sustain");
       if (learned)
         victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_HARD);
       break;
@@ -2203,31 +2203,31 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     if (reflected)
     {
       strcpy(buf3, buf);
-      sprintf(buf2, "s additional damage.");
+      dc_sprintf(buf2, "s additional damage.");
       strcat(buf, buf2);
-      sprintf(buf2, "%s is susceptible to the reflected ", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf2, "%s is susceptible to the reflected ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
-      sprintf(buf2, " additional damage.");
+      dc_sprintf(buf2, " additional damage.");
       strcat(buf3, buf2);
-      sprintf(buf2, "You are susceptible to the reflected ");
+      dc_sprintf(buf2, "You are susceptible to the reflected ");
       strcat(buf2, buf3);
       act(buf2, ch, 0, victim, TO_CHAR, 0);
     }
     else
     {
       strcpy(buf3, buf);
-      sprintf(buf2, "s additional damage.");
+      dc_sprintf(buf2, "s additional damage.");
       strcat(buf, buf2);
-      sprintf(buf2, " additional damage.");
+      dc_sprintf(buf2, " additional damage.");
       strcat(buf3, buf2);
-      sprintf(buf2, "%s is susceptible to %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf2, "%s is susceptible to %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-      sprintf(buf2, "%s is susceptible to your ", qPrintable(victim->shortdesc_or_name()));
+      dc_sprintf(buf2, "%s is susceptible to your ", qPrintable(victim->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_VICT, 0);
-      sprintf(buf2, "You are susceptible to %s's ", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf2, "You are susceptible to %s's ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf3);
       act(buf2, victim, 0, ch, TO_CHAR, 0);
     }
@@ -2240,31 +2240,31 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     if (reflected)
     {
       strcpy(buf3, buf);
-      sprintf(buf2, "s reduced damage.");
+      dc_sprintf(buf2, "s reduced damage.");
       strcat(buf, buf2);
-      sprintf(buf2, "%s resists the reflected ", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf2, "%s resists the reflected ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
-      sprintf(buf2, " reduced damage.");
+      dc_sprintf(buf2, " reduced damage.");
       strcat(buf3, buf2);
-      sprintf(buf2, "You resist the reflected ");
+      dc_sprintf(buf2, "You resist the reflected ");
       strcat(buf2, buf3);
       act(buf2, ch, 0, victim, TO_CHAR, 0);
     }
     else
     {
       strcpy(buf3, buf);
-      sprintf(buf2, "s reduced damage.");
+      dc_sprintf(buf2, "s reduced damage.");
       strcat(buf, buf2);
-      sprintf(buf2, " reduced damage.");
+      dc_sprintf(buf2, " reduced damage.");
       strcat(buf3, buf2);
-      sprintf(buf2, "%s resists %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf2, "%s resists %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-      sprintf(buf2, "%s resists your ", qPrintable(victim->shortdesc_or_name()));
+      dc_sprintf(buf2, "%s resists your ", qPrintable(victim->shortdesc_or_name()));
       strcat(buf2, buf);
       act(buf2, victim, 0, ch, TO_VICT, 0);
-      sprintf(buf2, "You resist %s's ", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf2, "You resist %s's ", qPrintable(ch->shortdesc_or_name()));
       strcat(buf2, buf3);
       act(buf2, victim, 0, ch, TO_CHAR, 0);
     }
@@ -2881,7 +2881,7 @@ qint32 noncombat_damage(CharacterPtr ch, qint32 dam, const QString char_death_ms
     if (room_death_msg)
       act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
     if (death_log_msg)
-      logentry(death_log_msg, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+      DC::getInstance()->logentry(death_log_msg, IMMORTAL, DC::LogChannel::LOG_MORTAL);
     if (type == KILL_BATTER)
       kill_type = TYPE_PKILL;
     fight_kill(nullptr, ch, kill_type, type);
@@ -3062,7 +3062,7 @@ void do_dam_msgs(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 attack
     QString dmgmsg;
     dmgmsg[0] = '\0';
     if (dam > 0)
-      sprintf(dmgmsg, "$B%d$R", dam);
+      dc_sprintf(dmgmsg, "$B%d$R", dam);
     if (!messages)
       return;
     if (victim->isPlayer() && victim->getLevel() >= IMMORTAL)
@@ -3183,7 +3183,7 @@ void fight_kill(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 spec_typ
 {
   if (!vict)
   {
-    logentry(QStringLiteral("Null vict sent to fight_kill()!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null vict sent to fight_kill()!"), -1, DC::LogChannel::LOG_BUG);
     return;
   }
   bool vict_is_attacker = false;
@@ -3244,7 +3244,7 @@ void debug_isHit(const CharacterPtr ch, const CharacterPtr victim, const qint32 
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QStringLiteral("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3252,7 +3252,7 @@ void debug_isHit_toHit(const CharacterPtr ch, const CharacterPtr victim, const q
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QStringLiteral("isHit: toHit=%1").arg(toHit), DIVINITY, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("isHit: toHit=%1").arg(toHit), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3260,7 +3260,7 @@ void debug_isHit_generic(const CharacterPtr ch, const CharacterPtr victim, const
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QStringLiteral("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3544,7 +3544,7 @@ qint32 checkCounterStrike(CharacterPtr ch, CharacterPtr victim)
     act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -3588,7 +3588,7 @@ qint32 doTumblingCounterStrike(CharacterPtr ch, CharacterPtr victim)
     act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -4042,7 +4042,7 @@ void load_messages(const QString file, qint32 base)
     //	 produce_coredump();
     if (i >= MAX_MESSAGES)
     {
-      logentry(QStringLiteral("Too many combat messages."), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Too many combat messages."), ANGEL, DC::LogChannel::LOG_BUG);
       exit(0);
     }
 
@@ -4202,7 +4202,7 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
 
   if (!ch)
   {
-    logentry(QStringLiteral("Null ch in stop_fighting.  This would have crashed us."), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch in stop_fighting.  This would have crashed us."), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -4309,7 +4309,7 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
       ;
     if (!tmp)
     {
-      logentry(QStringLiteral("Stop_fighting: character not found"), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Stop_fighting: character not found"), ANGEL, DC::LogChannel::LOG_BUG);
       // abort();
       return;
     }
@@ -4361,10 +4361,10 @@ void make_scraps(CharacterPtr ch, ObjectPtr obj)
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("scraps"));
 
-  sprintf(buf, "A pile of scraps from %s is lying here.", qPrintable(obj->short_description()));
+  dc_sprintf(buf, "A pile of scraps from %s is lying here.", qPrintable(obj->short_description()));
   corpse->long_description(buf);
 
-  sprintf(buf, "a pile of scraps.");
+  dc_sprintf(buf, "a pile of scraps.");
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4410,28 +4410,28 @@ void make_corpse(CharacterPtr ch)
   if (ch->isNonPlayer())
   {
     corpse->obj_flags.wear_flags = {};
-    sprintf(buf, "corpse %s", qPrintable(ch->name()));
+    dc_sprintf(buf, "corpse %s", qPrintable(ch->name()));
   }
   else if (ch->isPlayerObjectThief())
   {
     corpse->obj_flags.wear_flags = {};
-    sprintf(buf, "corpse %s thiefcorpse", qPrintable(ch->name()));
+    dc_sprintf(buf, "corpse %s thiefcorpse", qPrintable(ch->name()));
   }
   else
   {
     corpse->obj_flags.wear_flags = {TAKE};
 
     if (ch->getLevel() >= 50)
-      sprintf(buf, "corpse %s pc lootable", qPrintable(ch->name()));
+      dc_sprintf(buf, "corpse %s pc lootable", qPrintable(ch->name()));
     else
-      sprintf(buf, "corpse %s pc", qPrintable(ch->name()));
+      dc_sprintf(buf, "corpse %s pc", qPrintable(ch->name()));
   }
   corpse->name(buf);
 
-  sprintf(buf, "the corpse of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "the corpse of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
 
-  sprintf(buf, "the corpse of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "the corpse of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_CONTAINER;
@@ -4568,8 +4568,8 @@ void make_corpse(CharacterPtr ch)
       else
       {
         QString bugmsg;
-        sprintf(bugmsg, "%s was supposed to drop a paper/bottle but was unable to create the item", qPrintable(ch->name()));
-        logentry(bugmsg, IMMORTAL, DC::LogChannel::LOG_BUG);
+        dc_sprintf(bugmsg, "%s was supposed to drop a paper/bottle but was unable to create the item", qPrintable(ch->name()));
+        DC::getInstance()->logentry(bugmsg, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
     }
 
@@ -4693,9 +4693,9 @@ void make_husk(CharacterPtr ch)
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("husk"));
-  sprintf(buf, "The withered husk of %s, its soul drained, flutters here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "The withered husk of %s, its soul drained, flutters here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
-  sprintf(buf, "Husk of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "Husk of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4729,10 +4729,10 @@ void make_head(CharacterPtr ch)
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("head"));
 
-  sprintf(buf, "The head of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "The head of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
 
-  sprintf(buf, "Head of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "Head of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4767,10 +4767,10 @@ void make_arm(CharacterPtr ch)
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("arm"));
 
-  sprintf(buf, "The arm of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "The arm of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
 
-  sprintf(buf, "Arm of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "Arm of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4805,10 +4805,10 @@ void make_leg(CharacterPtr ch)
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("leg"));
 
-  sprintf(buf, "The leg of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "The leg of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
 
-  sprintf(buf, "Leg of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "Leg of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4843,10 +4843,10 @@ void make_bowels(CharacterPtr ch)
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("bowels"));
 
-  sprintf(buf, "The steaming bowels of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "The steaming bowels of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
 
-  sprintf(buf, "Bowels of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "Bowels of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4881,10 +4881,10 @@ void make_blood(CharacterPtr ch)
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("blood"));
 
-  sprintf(buf, "A pool of %s's blood is here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "A pool of %s's blood is here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
 
-  sprintf(buf, "Pooled blood of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
+  dc_sprintf(buf, "Pooled blood of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4922,10 +4922,10 @@ void make_heart(CharacterPtr ch, CharacterPtr vict)
   corpse->in_room = DC::NOWHERE;
   corpse->name(QStringLiteral("heart"));
 
-  sprintf(buf, "%s's heart is laying here.", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
+  dc_sprintf(buf, "%s's heart is laying here.", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
   corpse->long_description(buf);
 
-  sprintf(buf, "the heart of %s", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
+  dc_sprintf(buf, "the heart of %s", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
   corpse->short_description(buf);
 
   corpse->obj_flags.type_flag = ITEM_FOOD;
@@ -5301,7 +5301,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 
   if (!victim)
   {
-    logentry(QStringLiteral("Error in raw_kill()!  Null victim!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Error in raw_kill()!  Null victim!"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -5360,11 +5360,11 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
     {
       if (ch == nullptr)
       {
-        logf(0, DC::LogChannel::LOG_BUG, "selfpurge on nullptr to nullptr");
+        DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on nullptr to nullptr");
       }
       else
       {
-        // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", qPrintable(ch->name()), qPrintable(victim->name()));
+        // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", qPrintable(ch->name()), qPrintable(victim->name()));
       }
       selfpurge = true;
       selfpurge.setOwner(ch, "raw_kill");
@@ -5386,8 +5386,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
     if (number(0, 99) < (victim->getLevel() / 10 + victim->player->golem->getLevel() / 5))
     { /* rk */
       QString buf;
-      sprintf(buf, "%s's golem lost a level!", qPrintable(victim->name()));
-      logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+      dc_sprintf(buf, "%s's golem lost a level!", qPrintable(victim->name()));
+      DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
       shatter_message(victim->player->golem);
       extract_char(victim->player->golem, true);
     }
@@ -5465,23 +5465,23 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %lu (%s)", qPrintable(victim->name()), DC::getInstance()->mob_index[ch->mobdata->nr].vnum(), qPrintable(ch->name()));
+        dc_sprintf(buf, "%s killed by %lu (%s)", qPrintable(victim->name()), DC::getInstance()->mob_index[ch->mobdata->nr].vnum(), qPrintable(ch->name()));
       }
       else
       {
-        sprintf(buf, "%s killed by %s", qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(buf, "%s killed by %s", qPrintable(victim->name()), qPrintable(ch->name()));
       }
     }
     else
     {
-      sprintf(buf, "%s killed by [null killer]", qPrintable(victim->name()));
+      dc_sprintf(buf, "%s killed by [null killer]", qPrintable(victim->name()));
     }
 
     // notify the clan members - clan_death checks for null ch/vict
     clan_death(victim, ch);
     QString log_buf = {};
-    sprintf(log_buf, "%s at %d", buf, DC::getInstance()->world[death_room].number);
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+    dc_sprintf(log_buf, "%s at %d", buf, DC::getInstance()->world[death_room].number);
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
     // update stats
     GET_RDEATHS(victim) += 1;
@@ -5515,8 +5515,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
             victim->sendln("*** You lose one constitution point ***");
             if (victim->isPlayer())
             {
-              sprintf(log_buf, "%s lost a con. ouch.", qPrintable(victim->name()));
-              logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
+              dc_sprintf(log_buf, "%s lost a con. ouch.", qPrintable(victim->name()));
+              DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
           }
@@ -5527,8 +5527,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
             victim->sendln("*** You lose one dexterity point ***");
             if (victim->isPlayer())
             {
-              sprintf(log_buf, "%s lost a dex. ouch.", qPrintable(victim->name()));
-              logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
+              dc_sprintf(log_buf, "%s lost a dex. ouch.", qPrintable(victim->name()));
+              DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
           }
@@ -5561,8 +5561,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s permanently dies.", qPrintable(name));
-        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
+        dc_sprintf(buf2, "%s permanently dies.", qPrintable(name));
+        DC::getInstance()->logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_INT(victim) <= 4)
@@ -5607,8 +5607,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s sees tits.", qPrintable(name));
-        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
+        dc_sprintf(buf2, "%s sees tits.", qPrintable(name));
+        DC::getInstance()->logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_WIS(victim) <= 4)
@@ -5633,8 +5633,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s gets batted to death.", qPrintable(name));
-        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
+        dc_sprintf(buf2, "%s gets batted to death.", qPrintable(name));
+        DC::getInstance()->logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_STR(victim) <= 4)
@@ -5666,8 +5666,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s goes to moose heaven.", qPrintable(name));
-        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
+        dc_sprintf(buf2, "%s goes to moose heaven.", qPrintable(name));
+        DC::getInstance()->logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_DEX(victim) <= 4 && victim->race == RACE_TROLL)
@@ -5709,8 +5709,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
         }
         remove_character(name, CONDEATH);
 
-        sprintf(buf2, "%s permanently dies the horrible dex-death.", qPrintable(name));
-        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
+        dc_sprintf(buf2, "%s permanently dies the horrible dex-death.", qPrintable(name));
+        DC::getInstance()->logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
     }
@@ -5799,7 +5799,7 @@ void group_gain(CharacterPtr ch, CharacterPtr victim)
 
     if (IS_AFFECTED(tmp_ch, AFF_CHAMPION))
       share = (qint32)((double)share * 1.10);
-    sprintf(buf, "You receive %ld exps of %ld total.\r\n", share, base_xp + bonus_xp);
+    dc_sprintf(buf, "You receive %ld exps of %ld total.\r\n", share, base_xp + bonus_xp);
     tmp_ch->send(buf);
     gain_exp(tmp_ch, share);
     total_share += share;
@@ -5923,9 +5923,9 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
 
   if (0 == dam && isSet(modifier, COMBAT_MOD_IGNORE))
   {
-    sprintf(buf1, "$n's pitiful attack is ignored by $N!");
-    sprintf(buf2, "Your pitiful attack is completely ignored by $N!");
-    sprintf(buf3, "You ignore $n's pitiful attack.");
+    dc_sprintf(buf1, "$n's pitiful attack is ignored by $N!");
+    dc_sprintf(buf2, "Your pitiful attack is completely ignored by $N!");
+    dc_sprintf(buf3, "You ignore $n's pitiful attack.");
     act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
     act(buf2, ch, nullptr, victim, TO_CHAR, 0);
     act(buf3, ch, nullptr, victim, TO_VICT, 0);
@@ -6058,7 +6058,7 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
     w_type -= TYPE_HIT;
     if (((quint32)w_type) >= sizeof(attack_table))
     {
-      logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, DC::LogChannel::LOG_BUG);
       w_type = {};
     }
   }
@@ -6125,16 +6125,16 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
     switch (number(0, 3))
     {
     case 0:
-      sprintf(dammsg, " causing $B%d $Rdamage", dam);
+      dc_sprintf(dammsg, " causing $B%d $Rdamage", dam);
       break;
     case 1:
-      sprintf(dammsg, " delivering $B%d$R damage", dam);
+      dc_sprintf(dammsg, " delivering $B%d$R damage", dam);
       break;
     case 2:
-      sprintf(dammsg, " inflicting $B%d$R damage", dam);
+      dc_sprintf(dammsg, " inflicting $B%d$R damage", dam);
       break;
     case 3:
-      sprintf(dammsg, " dealing $B%d$R damage", dam);
+      dc_sprintf(dammsg, " dealing $B%d$R damage", dam);
       break;
     }
   }
@@ -6146,24 +6146,24 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
       switch (number(0, 3))
       {
       case 0:
-        sprintf(shield, "shin");
+        dc_sprintf(shield, "shin");
         break;
       case 1:
-        sprintf(shield, "hand");
+        dc_sprintf(shield, "hand");
         break;
       case 2:
-        sprintf(shield, "foot");
+        dc_sprintf(shield, "foot");
         break;
       case 3:
-        sprintf(shield, "forearm");
+        dc_sprintf(shield, "forearm");
         break;
       default:
-        sprintf(shield, "error");
+        dc_sprintf(shield, "error");
         break;
       }
     }
     else if (victim->equipment[WEAR_SHIELD])
-      sprintf(shield, "%s", qPrintable(victim->equipment[WEAR_SHIELD]->short_description()));
+      dc_sprintf(shield, "%s", qPrintable(victim->equipment[WEAR_SHIELD]->short_description()));
 
     if (GET_CLASS(victim) == CLASS_MONK)
     {
@@ -6171,34 +6171,34 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
       {
         if (!attack)
           attack = races[ch->race].unarmed;
-        sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        dc_sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
+        dc_sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        dc_sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
-        sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        dc_sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
+        dc_sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        dc_sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
     else if (victim->has_skill(SKILL_TUMBLING))
     {
       if (number(0, 1))
       {
-        sprintf(buf1, "$N leaps away from $n's strike, managing to avoid all but a scratch|.");
-        sprintf(dammsg, " for $B%d$R damage", dam);
-        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        dc_sprintf(buf1, "$N leaps away from $n's strike, managing to avoid all but a scratch|.");
+        dc_sprintf(dammsg, " for $B%d$R damage", dam);
+        dc_sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        dc_sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
       }
       else
       {
-        sprintf(buf1, "$N's roll to the side comes a moment too late as $n still manages to land a glancing blow|.");
-        sprintf(dammsg, ", dealing $B%d$R damage", dam);
-        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        dc_sprintf(buf1, "$N's roll to the side comes a moment too late as $n still manages to land a glancing blow|.");
+        dc_sprintf(dammsg, ", dealing $B%d$R damage", dam);
+        dc_sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        dc_sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
       }
     }
     else
@@ -6207,17 +6207,17 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
       {
         if (!attack)
           attack = races[ch->race].unarmed;
-        sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        dc_sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
+        dc_sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        dc_sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
-        sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        dc_sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
+        dc_sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        dc_sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
   }
@@ -6230,17 +6230,17 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
       qint32 a;
       if (ch->isNonPlayer() && (a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum()) < 92 && a > 87)
         attack = elem_type[a - 88];
-      sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      dc_sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
+      dc_sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      dc_sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
     }
     else
     {
       if (!attack)
         attack = attack_table[w_type];
-      sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      dc_sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
+      dc_sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      dc_sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
     }
   }
   //   act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -6345,7 +6345,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -6435,94 +6435,94 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
   if (ch != nullptr)
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", qPrintable(victim->name()));
     else if (type == KILL_MORTAR)
-      sprintf(killer_message, "\r\n##%s just got a FIRE IN THE HOLE!!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##%s just got a FIRE IN THE HOLE!!\r\n", qPrintable(victim->name()));
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\r\n##%s has perished from %s's POISON!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s has perished from %s's POISON!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else if (!str_cmp(qPrintable(ch->name()), qPrintable(victim->name())))
-      sprintf(killer_message, "");
-    //    sprintf(killer_message,"\r\n##%s just commited SUICIDE!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "");
+    //    dc_sprintf(killer_message,"\r\n##%s just commited SUICIDE!\r\n", qPrintable(victim->name()));
     else if (victim->getLevel() < PKILL_COUNT_LIMIT || ch == victim)
-      // sprintf(killer_message,"\r\n##%s just DIED!\r\n", qPrintable(victim->name()));
-      // sprintf(killer_message,"\r\n##%s was just introduced to the warm hospitality of Dark Castle!!\r\n", qPrintable(victim->name()));
-      sprintf(killer_message, "");
+      // dc_sprintf(killer_message,"\r\n##%s just DIED!\r\n", qPrintable(victim->name()));
+      // dc_sprintf(killer_message,"\r\n##%s was just introduced to the warm hospitality of Dark Castle!!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "");
     else if (num == 1000)
-      sprintf(killer_message, "\r\n##%s was just ANALLY PROBED by %s!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just ANALLY PROBED by %s!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master)
-      sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's familiar!\r\n",
-              qPrintable(victim->name()), qPrintable(ch->master->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's familiar!\r\n",
+                 qPrintable(victim->name()), qPrintable(ch->master->name()));
     else if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
-      sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's charmie!\r\n",
-              qPrintable(victim->name()), qPrintable(ch->master->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's charmie!\r\n",
+                 qPrintable(victim->name()), qPrintable(ch->master->name()));
     else if (ch->in_room == real_room(START_ROOM))
-      sprintf(killer_message, "\r\n##%s was just PINGED by %s!\r\n",
-              qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just PINGED by %s!\r\n",
+                 qPrintable(victim->name()), qPrintable(ch->name()));
     else if (ch->in_room == real_room(SECOND_START_ROOM))
-      sprintf(killer_message, "\r\n##%s was just PONGED by %s!\r\n",
-              qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just PONGED by %s!\r\n",
+                 qPrintable(victim->name()), qPrintable(ch->name()));
     else if (IS_ANONYMOUS(ch))
-      sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
-              qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
+                 qPrintable(victim->name()), qPrintable(ch->name()));
     else if (ch->getLevel() > MORTAL)
-      sprintf(killer_message, "\r\n##%s was just SMITED...er..SMOTED..err PKILLED by %s!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just SMITED...er..SMOTED..err PKILLED by %s!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else if (type == KILL_BINGO)
-      sprintf(killer_message, "\r\n##%s was just BINGOED by %s!\r\n",
-              qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just BINGOED by %s!\r\n",
+                 qPrintable(victim->name()), qPrintable(ch->name()));
     else if (type == SPELL_CONSECRATE)
-      sprintf(killer_message, "\r\n##%s was just slain by %s's CONSECRATION!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just slain by %s's CONSECRATION!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else if (type == SPELL_DESECRATE)
-      sprintf(killer_message, "\r\n##%s was just slain by %s's DESECRATION!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
+      dc_sprintf(killer_message, "\r\n##%s was just slain by %s's DESECRATION!\r\n", qPrintable(victim->name()), qPrintable(ch->name()));
     else
       switch (GET_CLASS(ch))
       {
       case CLASS_MAGIC_USER:
-        sprintf(killer_message, "\r\n##%s was just FRIED by %s's magic!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just FRIED by %s's magic!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_CLERIC:
-        sprintf(killer_message, "\r\n##%s was just BANISHED by %s's holiness!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just BANISHED by %s's holiness!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_THIEF:
-        sprintf(killer_message, "\r\n##%s was just ASSASSINATED by %s!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just ASSASSINATED by %s!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_WARRIOR:
-        sprintf(killer_message, "\r\n##%s was just SLAIN by %s's might!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just SLAIN by %s's might!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_ANTI_PAL:
-        sprintf(killer_message, "\r\n##%s was just CONSUMED by %s's darkness!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just CONSUMED by %s's darkness!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_PALADIN:
-        sprintf(killer_message, "\r\n##%s was just VANQUISHED by %s's goodness!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just VANQUISHED by %s's goodness!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_BARBARIAN:
-        sprintf(killer_message, "\r\n##%s was just SHREDDED by %s's crazed fury!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just SHREDDED by %s's crazed fury!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_MONK:
-        sprintf(killer_message, "\r\n##%s was just SHATTERED by %s's karma!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just SHATTERED by %s's karma!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_RANGER:
-        sprintf(killer_message, "\r\n##%s was just PENETRATED by %s's wood!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just PENETRATED by %s's wood!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_BARD:
-        sprintf(killer_message, "\r\n##%s was just MUTED by %s's snazzy rhythm!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just MUTED by %s's snazzy rhythm!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       case CLASS_DRUID:
-        sprintf(killer_message, "\r\n##%s was just VIOLATED by %s's woodland friends!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just VIOLATED by %s's woodland friends!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       default:
-        sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
-                qPrintable(victim->name()), qPrintable(ch->name()));
+        dc_sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
+                   qPrintable(victim->name()), qPrintable(ch->name()));
         break;
       }
     level_diff_t level_spread;
@@ -6648,17 +6648,17 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
   {
     // ch == nullptr
     if (type == KILL_DROWN)
-      sprintf(killer_message, "\r\n##%s just DROWNED!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##%s just DROWNED!\r\n", qPrintable(victim->name()));
     else if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", qPrintable(victim->name()));
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\r\n##%s has perished from POISON!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##%s has perished from POISON!\r\n", qPrintable(victim->name()));
     else if (type == KILL_FALL)
-      sprintf(killer_message, "\r\n##%s has FALLEN to death!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##%s has FALLEN to death!\r\n", qPrintable(victim->name()));
     else if (type == KILL_BATTER)
-      sprintf(killer_message, "\r\n##That's using your head! %s just died attempting to batter a door!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##That's using your head! %s just died attempting to batter a door!\r\n", qPrintable(victim->name()));
     else
-      sprintf(killer_message, "\r\n##%s just DIED!\r\n", qPrintable(victim->name()));
+      dc_sprintf(killer_message, "\r\n##%s just DIED!\r\n", qPrintable(victim->name()));
   }
 
   send_info(killer_message);
@@ -6669,7 +6669,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     ObjectPtr obj = {};
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
-      logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
     if (ch->isNonPlayer() && ch->master)
@@ -6677,20 +6677,20 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
       if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || isSet(DC::getInstance()->world[ch->master->in_room].room_flags, CLAN_ROOM))
       {
         SETBIT(victim->affected_by, AFF_CHAMPION);
-        sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\r\n", qPrintable(ch->master->name()), qPrintable(victim->name()));
+        dc_sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\r\n", qPrintable(ch->master->name()), qPrintable(victim->name()));
       }
       else
       {
         move_obj(obj, ch->master);
         SETBIT(ch->master->affected_by, AFF_CHAMPION);
-        sprintf(killer_message, "##%s has become the new Champion!\r\n", qPrintable(ch->master->name()));
+        dc_sprintf(killer_message, "##%s has become the new Champion!\r\n", qPrintable(ch->master->name()));
       }
     }
     else
     {
       move_obj(obj, ch);
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      sprintf(killer_message, "##%s has become the new Champion!\r\n", qPrintable(ch->name()));
+      dc_sprintf(killer_message, "##%s has become the new Champion!\r\n", qPrintable(ch->name()));
     }
     send_info(killer_message);
   }
@@ -6710,7 +6710,7 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to arena_kill."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to arena_kill."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -6744,50 +6744,50 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
 
     if (type == KILL_BINGO)
     {
-      sprintf(killer_message, "\r\n## %s [%s] just BINGOED %s [%s] in the arena!\r\n", ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
+      dc_sprintf(killer_message, "\r\n## %s [%s] just BINGOED %s [%s] in the arena!\r\n", ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
     }
     else
     {
-      sprintf(killer_message, "\r\n## %s [%s] just SLAUGHTERED %s [%s] in the arena!\r\n", ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
+      dc_sprintf(killer_message, "\r\n## %s [%s] just SLAUGHTERED %s [%s] in the arena!\r\n", ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
     }
 
-    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
-         ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
+                            ((ch->isNonPlayer() && ch->master) ? qPrintable(ch->master->name()) : qPrintable(ch->name())), qPrintable(get_clan_name(ch_clan)), qPrintable(victim->name()), qPrintable(get_clan_name(victim_clan)));
   }
   else if (ch)
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
+      dc_sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else if (type == KILL_MASHED)
-      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", qPrintable(victim->shortdesc_or_name()));
+      dc_sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else
     {
       if (type == KILL_BINGO)
       {
-        sprintf(killer_message, "\r\n## %s just BINGOED %s in the arena!\r\n",
-                (ch->isNonPlayer() && (ch->master) ? qPrintable(ch->master->shortdesc_or_name()) : qPrintable(ch->shortdesc_or_name())), qPrintable(victim->shortdesc_or_name()));
+        dc_sprintf(killer_message, "\r\n## %s just BINGOED %s in the arena!\r\n",
+                   (ch->isNonPlayer() && (ch->master) ? qPrintable(ch->master->shortdesc_or_name()) : qPrintable(ch->shortdesc_or_name())), qPrintable(victim->shortdesc_or_name()));
       }
       else
       {
-        sprintf(killer_message, "\r\n## %s just SLAUGHTERED %s in the arena!\r\n",
-                (ch->isNonPlayer() && (ch->master) ? qPrintable(ch->master->shortdesc_or_name()) : qPrintable(ch->shortdesc_or_name())), qPrintable(victim->shortdesc_or_name()));
+        dc_sprintf(killer_message, "\r\n## %s just SLAUGHTERED %s in the arena!\r\n",
+                   (ch->isNonPlayer() && (ch->master) ? qPrintable(ch->master->shortdesc_or_name()) : qPrintable(ch->shortdesc_or_name())), qPrintable(victim->shortdesc_or_name()));
       }
     }
   }
   else
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
+      dc_sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else if (type == KILL_MASHED)
-      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", qPrintable(victim->shortdesc_or_name()));
+      dc_sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", qPrintable(victim->shortdesc_or_name()));
     else
-      sprintf(killer_message, "\r\n## %s just DIED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
+      dc_sprintf(killer_message, "\r\n## %s just DIED in the arena!\r\n", qPrintable(victim->shortdesc_or_name()));
   }
   send_info(killer_message);
 
   if (ch && victim && (arena.isPrize() || arena.isChaos()))
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", qPrintable(ch->name()), qPrintable(victim->name()));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", qPrintable(ch->name()), qPrintable(victim->name()));
   }
 
   // if it's a chaos, see if the clan was eliminated
@@ -6803,9 +6803,9 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
     }
     if (eliminated)
     {
-      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\r\n", qPrintable(get_clan_name(victim_clan)));
+      dc_sprintf(killer_message, "## [%s] was just eliminated from the chaos!\r\n", qPrintable(get_clan_name(victim_clan)));
       send_info(killer_message);
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", qPrintable(get_clan_name(victim_clan)));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", qPrintable(get_clan_name(victim_clan)));
     }
   }
 
@@ -6889,15 +6889,15 @@ qint32 can_be_attacked(CharacterPtr ch, CharacterPtr vict)
     if (ch->fighting && ch->fighting != vict)
     {
       ch->sendln("You are already fighting someone.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
-           qPrintable(ch->name()), qPrintable(ch->fighting->name()), qPrintable(vict->name()));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
+                              qPrintable(ch->name()), qPrintable(ch->fighting->name()), qPrintable(vict->name()));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch)
     {
       ch->sendln("They are already fighting someone.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
-           qPrintable(ch->name()), qPrintable(vict->name()), qPrintable(vict->fighting->name()));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
+                              qPrintable(ch->name()), qPrintable(vict->name()), qPrintable(vict->fighting->name()));
       return false;
     }
   }
@@ -6908,15 +6908,15 @@ qint32 can_be_attacked(CharacterPtr ch, CharacterPtr vict)
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
       ch->sendln("You are already fighting someone from another clan.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
-           qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(ch->fighting->name()), qPrintable(get_clan_name(ch->fighting)), qPrintable(vict->name()), qPrintable(get_clan_name(vict)));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
+                              qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(ch->fighting->name()), qPrintable(get_clan_name(ch->fighting)), qPrintable(vict->name()), qPrintable(get_clan_name(vict)));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
       ch->sendln("They are already fighting someone.");
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
-           qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(vict->name()), qPrintable(get_clan_name(vict)), qPrintable(vict->fighting->name()), qPrintable(get_clan_name(vict->fighting)));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
+                              qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(vict->name()), qPrintable(get_clan_name(vict)), qPrintable(vict->fighting->name()), qPrintable(get_clan_name(vict->fighting)));
       return false;
     }
   }
@@ -7026,7 +7026,7 @@ qint32 weapon_spells(CharacterPtr ch, CharacterPtr vict, qint32 weapon)
 
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (!weapon)
@@ -7188,7 +7188,7 @@ qint32 weapon_spells(CharacterPtr ch, CharacterPtr vict, qint32 weapon)
       retval = ReturnValue::eSUCCESS;
       // Don't want to log this since a non-spell affect is going to happen all
       // the time (like SAVE_VS_FIRE or HIT-N-DAM for example) -pir
-      // logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
+      // DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
       //     current_affect, DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].vnum());
       break;
     } /* switch statement */
@@ -7576,9 +7576,9 @@ qint32 get_weapon_bit(qint32 weapon_type)
   case TYPE_WATER:
     return (ISR_WATER);
   default:
-    return (0);
+    return {};
   } /* end switch */
-  return (0);
+  return {};
 }
 
 void remove_nosave(CharacterPtr vict)
@@ -7587,7 +7587,7 @@ void remove_nosave(CharacterPtr vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to remove_nosave!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to remove_nosave!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -7622,7 +7622,7 @@ void remove_active_potato(CharacterPtr vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to remove_active_potato!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to remove_active_potato!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -7669,9 +7669,9 @@ qint32 damage_type(qint32 weapon_type)
     return (DAMAGE_TYPE_SONG);
 
   default:
-    return (0);
+    return {};
   } /* end switch */
-  return (0);
+  return {};
 }
 
 qint32 debug_retval(CharacterPtr ch, CharacterPtr victim, qint32 retval)

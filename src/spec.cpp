@@ -37,7 +37,7 @@ command_return_t do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
        for (qint32 i = {}; spec_list[i].name != nullptr; i++)
         {
            if (spec_list[i].pcclass != GET_CLASS(ch)) continue;
-           sprintf(buf, "%d. %s : %s\r\n",i+1, spec_list[i].name,
+           dc_sprintf(buf, "%d. %s : %s\r\n",i+1, spec_list[i].name,
         spec_list[i].description);
         }
     */

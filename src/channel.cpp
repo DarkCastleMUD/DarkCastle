@@ -202,7 +202,7 @@ command_return_t do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", qPrintable(ch->name()), arg);
+  dc_sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", qPrintable(ch->name()), arg);
 
   for (auto &i : DC::getInstance()->connections_)
   {
@@ -298,7 +298,7 @@ command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 
     ChannelMessage msg(ch, DC::LogChannel::CHANNEL_GOSSIP, argument);
 
-    sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
+    dc_sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
     if (ch->isPlayer())
@@ -482,8 +482,8 @@ command_return_t do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
 
   else
   {
-    sprintf(buf1, "$B$n shouts '%s'$R", argument);
-    sprintf(buf2, "$BYou shout '%s'$R", argument);
+    dc_sprintf(buf1, "$B$n shouts '%s'$R", argument);
+    dc_sprintf(buf2, "$BYou shout '%s'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
     for (auto &i : DC::getInstance()->connections_)
@@ -575,13 +575,13 @@ command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->getLevel() >= 102)
   {
-    sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", qPrintable(ch->shortdesc_or_name()), argument);
-    sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument);
+    dc_sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", qPrintable(ch->shortdesc_or_name()), argument);
+    dc_sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument);
   }
   else
   {
-    sprintf(buf1, "$3$B%s answers '%s'$R", qPrintable(ch->shortdesc_or_name()), argument);
-    sprintf(buf2, "$3$BYou answer '%s'$R", argument);
+    dc_sprintf(buf1, "$3$B%s answers '%s'$R", qPrintable(ch->shortdesc_or_name()), argument);
+    dc_sprintf(buf2, "$3$BYou answer '%s'$R", argument);
   }
   act(buf2, ch, 0, 0, TO_CHAR, 0);
 
@@ -664,8 +664,8 @@ command_return_t do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("It must not have been that great!!");
   else
   {
-    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\r\n", qPrintable(ch->shortdesc_or_name()), argument);
-    sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\r\n", argument);
+    dc_sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\r\n", qPrintable(ch->shortdesc_or_name()), argument);
+    dc_sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\r\n", argument);
     send_to_char(buf2, ch);
     for (auto &i : DC::getInstance()->connections_)
     {
@@ -894,7 +894,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        DC::getInstance()->logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
@@ -928,7 +928,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        DC::getInstance()->logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else
@@ -1011,11 +1011,11 @@ command_return_t do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    sprintf(buf, "$1$B$n whispers to you, '%s'$R", message);
+    dc_sprintf(buf, "$1$B$n whispers to you, '%s'$R", message);
     act_return ar = act(buf, ch, 0, vict, TO_VICT, STAYHIDE);
     vict->tell_history(ch, ar.str);
 
-    sprintf(buf, "$1$BYou whisper to $N, '%s'$R", message);
+    dc_sprintf(buf, "$1$BYou whisper to $N, '%s'$R", message);
     ar = act(buf, ch, 0, vict, TO_CHAR, STAYHIDE);
     ch->tell_history(ch, ar.str);
 
@@ -1055,11 +1055,11 @@ command_return_t do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    sprintf(buf, "$B$n asks you, '%s'$R", message);
+    dc_sprintf(buf, "$B$n asks you, '%s'$R", message);
     act_return ar = act(buf, ch, 0, vict, TO_VICT, 0);
     vict->tell_history(ch, ar.str);
 
-    sprintf(buf, "$BYou ask $N, '%s'$R", message);
+    dc_sprintf(buf, "$BYou ask $N, '%s'$R", message);
     ar = act(buf, ch, 0, vict, TO_CHAR, 0);
     ch->tell_history(ch, ar.str);
 
@@ -1120,14 +1120,14 @@ command_return_t do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  sprintf(buf, "$B$1You tell the group, $7'%s'$R", argument);
+  dc_sprintf(buf, "$B$1You tell the group, $7'%s'$R", argument);
   act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE | ASLEEP);
   ch->gtell_history(ch, ar.str);
 
   if (!(k = ch->master))
     k = ch;
 
-  sprintf(buf, "$B$1$n tells the group, $7'%s'$R", argument);
+  dc_sprintf(buf, "$B$1$n tells the group, $7'%s'$R", argument);
 
   if (ch->master)
   {
@@ -1225,8 +1225,8 @@ command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       return ReturnValue::eFAILURE;
     }
-    sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", qPrintable(ch->shortdesc_or_name()), argument);
-    sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
+    dc_sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", qPrintable(ch->shortdesc_or_name()), argument);
+    dc_sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
     newbie_history.push(buf1);

@@ -38,8 +38,8 @@ qint32 move_player(CharacterPtr ch, qint32 room)
   {
     retval = move_char(ch, real_room(START_ROOM));
     if (!isSet(retval, ReturnValue::eSUCCESS))
-      logentry(QStringLiteral("Error in move_player(), Failure moving ch to start room. move_player_home_nofail"),
-               IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Error in move_player(), Failure moving ch to start room. move_player_home_nofail"),
+                                  IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 
   return retval;
@@ -171,7 +171,7 @@ command_return_t do_unstable(CharacterPtr ch)
   act("You fall flat on your ass.", ch, 0, 0, TO_CHAR, 0);
   ch->setSitting();
 
-  sprintf(death_log, "%s slipped to death in room %d.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number);
+  dc_sprintf(death_log, "%s slipped to death in room %d.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number);
   retval = noncombat_damage(ch, GET_MAX_HIT(ch) / 12, "You feel your back snap painfully and all goes dark...",
                             "$n's frail body snaps in half as $e is buffeted about the room.", death_log, KILL_FALL);
 
@@ -280,7 +280,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
     ch->sendln("You fall...");
     break;
   default:
-    logentry(QStringLiteral("Default hit in do_fall"), IMMORTAL, DC::LogChannel::LOG_MORTAL);
+    DC::getInstance()->logentry(QStringLiteral("Default hit in do_fall"), IMMORTAL, DC::LogChannel::LOG_MORTAL);
     break;
   }
 
@@ -294,7 +294,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
 
   do_look(ch, "\0");
 
-  sprintf(damage, "%s's fall from %d was lethal and it killed them.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number);
+  dc_sprintf(damage, "%s's fall from %d was lethal and it killed them.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number);
   retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\r\n", "$n plummets into the room and hits the ground with a wet-sounding splat!",
                             damage, KILL_FALL);
 
@@ -343,7 +343,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
   if (ch == nullptr || ch->in_room < 1 || !valid_dir || DC::getInstance()->world[ch->in_room].dir_option[dir] == nullptr || DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room < 1)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
     ch->send("There was an error performing that movement.\r\n");
     return ReturnValue::eFAILURE;
   }
@@ -651,7 +651,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   // Everyone
   if (!IS_AFFECTED(ch, AFF_SNEAK) && !IS_AFFECTED(ch, AFF_FOREST_MELD))
   {
-    sprintf(tmp, "$n leaves %s.", dirs[dir]);
+    dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
     act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
   }
   // Sneaking
@@ -660,12 +660,12 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     QString tmp;
     if (!skill_success(ch, nullptr, SKILL_SNEAK))
     {
-      sprintf(tmp, "$n leaves %s.", dirs[dir]);
+      dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
       act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
     }
     else
     {
-      sprintf(tmp, "$n sneaks %s.", dirs[dir]);
+      dc_sprintf(tmp, "$n sneaks %s.", dirs[dir]);
       act(tmp, ch, 0, 0, TO_GROUP, INVIS_NULL);
       act(tmp, ch, 0, 0, TO_ROOM, GODS);
     }
@@ -675,14 +675,14 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   {
     if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_FOREST && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_SWAMP)
     {
-      sprintf(tmp, "$n leaves %s.", dirs[dir]);
+      dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
       REMBIT(ch->affected_by, AFF_FOREST_MELD);
       ch->sendln("You detach yourself from the forest.");
       act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
     }
     else
     {
-      sprintf(tmp, "$n sneaks %s.", dirs[dir]);
+      dc_sprintf(tmp, "$n sneaks %s.", dirs[dir]);
       act(tmp, ch, 0, 0, TO_ROOM, GODS);
     }
   }
@@ -908,7 +908,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
     }
     catch (...)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
       return_val = ReturnValue::eFAILURE;
     }
 
@@ -949,7 +949,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
   }
   catch (...)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
     return_val = ReturnValue::eFAILURE;
   }
 
@@ -958,9 +958,9 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
   if (SOMEONE_DIED(return_val) || !isSet(return_val, ReturnValue::eSUCCESS))
   {
     /*
-     sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
+     dc_sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
      qPrintable(ch->name()), SOMEONE_DIED(return_val), return_val);
-     logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
+     DC::getInstance()->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
      */
     return return_val;
   }
@@ -989,7 +989,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
           continue;
         }
         if (CAN_SEE(k->follower, ch))
-          sprintf(tmp, "You follow %s.\r\n\r\n", qPrintable(ch->shortdesc_or_name()));
+          dc_sprintf(tmp, "You follow %s.\r\n\r\n", qPrintable(ch->shortdesc_or_name()));
         else
           strcpy(tmp, "You follow someone.\r\n\r\n");
         k->follower->send(tmp);
@@ -1003,10 +1003,10 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
       else
       {
         /*
-         sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d",
+         dc_sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d",
          qPrintable(k->follower->name()), qPrintable(ch->name()), was_in, k->follower->in_room,
          GET_POS(k->follower), is_retreat);
-         logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
+         DC::getInstance()->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
          */
       }
     }
@@ -1056,7 +1056,7 @@ command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
               return ReturnValue::eFAILURE;
             }
             do_look(ch, "");
-            sprintf(buf, "%s walks out of %s.", qPrintable(ch->name()), k->short_description);
+            dc_sprintf(buf, "%s walks out of %s.", qPrintable(ch->name()), k->short_description);
             act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
             return ambush(ch);
           }
@@ -1103,8 +1103,8 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
   {
-    sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
-    logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
+    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
     ch->sendln("You can't enter that.");
     return ReturnValue::eFAILURE;
   }
@@ -1177,17 +1177,17 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     break;
   case 1:
   case 2:
-    sprintf(buf, "You take a bold step towards %s.\r\n", portal->short_description);
+    dc_sprintf(buf, "You take a bold step towards %s.\r\n", portal->short_description);
     ch->send(buf);
-    sprintf(buf, "%s boldly walks toward %s and disappears.", qPrintable(ch->name()), portal->short_description);
+    dc_sprintf(buf, "%s boldly walks toward %s and disappears.", qPrintable(ch->name()), portal->short_description);
     act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
     break;
   case 3:
     ch->sendln("You cannot enter that.");
     return ReturnValue::eFAILURE;
   default:
-    sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
-    logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
+    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1212,7 +1212,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     break;
   case 1:
   case 2:
-    sprintf(buf, "%s has entered %s.", qPrintable(ch->name()), portal->short_description);
+    dc_sprintf(buf, "%s has entered %s.", qPrintable(ch->name()), portal->short_description);
     act(buf, ch, 0, 0, TO_ROOM, STAYHIDE);
     do_look(ch, "");
     break;
@@ -1229,7 +1229,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
 {
   if (!ch)
   {
-    logentry(QStringLiteral("Error in move_char(), nullptr character"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Error in move_char(), nullptr character"), OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1240,8 +1240,8 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     // Couldn't move character from the room
     if (char_from_room(ch, stop_all_fighting) == 0)
     {
-      logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
-               OVERSEER, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
+                                  OVERSEER, DC::LogChannel::LOG_BUG);
       return ReturnValue::eINTERNAL_ERROR;
     }
   }
@@ -1254,7 +1254,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     {
       qFatal("%s", qUtf8Printable(QStringLiteral("Error in move_char(), character stuck in DC::NOWHERE: %1.\n").arg(qPrintable(ch->name()))));
     }
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", qPrintable(ch->name()), DC::getInstance()->world[dest].number);
+    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", qPrintable(ch->name()), DC::getInstance()->world[dest].number);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1291,13 +1291,13 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (real_room(dest) < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
     ch->sendln("You can't climb that.");
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-  sprintf(buf, "You carefully climb %s.\r\n", qPrintable(obj->short_description()));
+  dc_sprintf(buf, "You carefully climb %s.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
   qint32 retval = move_char(ch, real_room(dest));
 

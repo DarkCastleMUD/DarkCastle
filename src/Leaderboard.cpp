@@ -990,7 +990,7 @@ void Leaderboard::read_file(void)
 
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
-    logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
   }
   else
   {
@@ -1129,11 +1129,11 @@ void Leaderboard::read_file(void)
     }
     catch (error_eof &)
     {
-      logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': eof reached prematurely", LEADERBOARD_FILE);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': eof reached prematurely", LEADERBOARD_FILE);
     }
     catch (error_negative_int &)
     {
-      logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative qint32 found where positive expected", LEADERBOARD_FILE);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative qint32 found where positive expected", LEADERBOARD_FILE);
     }
 
     fclose(fl);
@@ -1152,7 +1152,7 @@ void Leaderboard::write_file(QString filename)
 
   if (!(fl = fopen(qPrintable(filename), "w")))
   {
-    logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
+    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
     return;
   }
   for (i = {}; i < 5; i++)
@@ -1231,7 +1231,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         DC::getInstance()->cf.leaderboard_check = "suspend";
         ch->sendln("Leaderboard writes suspended.");
-        logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
+        DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
@@ -1246,7 +1246,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         DC::getInstance()->cf.leaderboard_check = "";
         ch->sendln("Leaderboard writes resumed.");
-        logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
+        DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
@@ -1288,7 +1288,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
-    logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
     return ReturnValue::eFAILURE;
   }
   for (i = {}; i < 5; i++)
@@ -1535,16 +1535,16 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
       }
     }
   }
-  sprintf(buf, "(*)**************************************************************************(*)\r\n");
+  dc_sprintf(buf, "(*)**************************************************************************(*)\r\n");
   strcat(buf,
          "(*)                          $BDark Castle Leaderboard$R                         (*)\r\n");
   if (validclass)
   {
-    k != 2 ? sprintf(buf2,
-                     "(*)                             $Bfor %11ss$R                             (*)\r\n",
-                     clss_types[k])
-           : sprintf(buf2,
-                     "(*)                             $Bfor      thieves$R                             (*)\r\n");
+    k != 2 ? dc_sprintf(buf2,
+                        "(*)                             $Bfor %11ss$R                             (*)\r\n",
+                        clss_types[k])
+           : dc_sprintf(buf2,
+                        "(*)                             $Bfor      thieves$R                             (*)\r\n");
     strcat(buf, buf2);
   }
   strcat(buf,
@@ -1557,9 +1557,9 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
          "(*)                                                                          (*)\r\n");
   strcat(buf,
          "(*)            $2$BHit Points                               Mana$R                 (*)\r\n");
-  sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
-          hponlinename[0], hpactivename[0], mnonlinename[0], mnactivename[0]);
+  dc_sprintf(buf2,
+             "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
+             hponlinename[0], hpactivename[0], mnonlinename[0], mnactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
@@ -1591,11 +1591,11 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
       skippedd++;
-    sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
-            placea, hponlinename[i], placeb, hpactivename[i],
-            hpactive[0] - hpactive[i], placec, mnonlinename[i], placed,
-            mnactivename[i], mnactive[0] - mnactive[i]);
+    dc_sprintf(buf2,
+               "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
+               placea, hponlinename[i], placeb, hpactivename[i],
+               hpactive[0] - hpactive[i], placec, mnonlinename[i], placed,
+               mnactivename[i], mnactive[0] - mnactive[i]);
     strcat(buf, buf2);
   }
   placea = 1;
@@ -1610,9 +1610,9 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
          "(*)                                                                          (*)\r\n");
   strcat(buf,
          "(*)                $2$BKi                                Movement        $R        (*)\r\n");
-  sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
-          kionlinename[0], kiactivename[0], mvonlinename[0], mvactivename[0]);
+  dc_sprintf(buf2,
+             "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
+             kionlinename[0], kiactivename[0], mvonlinename[0], mvactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
@@ -1644,11 +1644,11 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
       skippedd++;
-    sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
-            placea, kionlinename[i], placeb, kiactivename[i],
-            kiactive[0] - kiactive[i], placec, mvonlinename[i], placed,
-            mvactivename[i], mvactive[0] - mvactive[i]);
+    dc_sprintf(buf2,
+               "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
+               placea, kionlinename[i], placeb, kiactivename[i],
+               kiactive[0] - kiactive[i], placec, mvonlinename[i], placed,
+               mvactivename[i], mvactive[0] - mvactive[i]);
     strcat(buf, buf2);
   }
   placea = 1;
@@ -1663,9 +1663,9 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
          "(*)                                                                          (*)\r\n");
   strcat(buf,
          "(*)         $2$BPlayer Kill Score                   Player Death Score       $R    (*)\r\n");
-  sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
-          pkonlinename[0], pkactivename[0], pdonlinename[0], pdactivename[0]);
+  dc_sprintf(buf2,
+             "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
+             pkonlinename[0], pkactivename[0], pdonlinename[0], pdactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
@@ -1697,11 +1697,11 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
       skippedd++;
-    sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
-            placea, pkonlinename[i], placeb, pkactivename[i],
-            pkactive[0] - pkactive[i], placec, pdonlinename[i], placed,
-            pdactivename[i], pdactive[0] - pdactive[i]);
+    dc_sprintf(buf2,
+               "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
+               placea, pkonlinename[i], placeb, pkactivename[i],
+               pkactive[0] - pkactive[i], placec, pdonlinename[i], placed,
+               pdactivename[i], pdactive[0] - pdactive[i]);
     strcat(buf, buf2);
   }
   // FROM HERE
@@ -1717,9 +1717,9 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
          "(*)                                                                          (*)\r\n");
   strcat(buf,
          "(*)        $2$BReal Deaths (Level 60)                                      $R      (*)\r\n");
-  sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                           (*)\r\n",
-          rdonlinename[0], rdactivename[0]);
+  dc_sprintf(buf2,
+             "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                           (*)\r\n",
+             rdonlinename[0], rdactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
@@ -1747,10 +1747,10 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     //       skippedd = {};
     //     }
     //      else skippedd++;
-    sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                      (*)\r\n",
-            placea, rdonlinename[i], placeb, rdactivename[i],
-            rdactive[0] - rdactive[i]);
+    dc_sprintf(buf2,
+               "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                      (*)\r\n",
+               placea, rdonlinename[i], placeb, rdactivename[i],
+               rdactive[0] - rdactive[i]);
     strcat(buf, buf2);
   }
 
@@ -1849,7 +1849,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
-    logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
     abort();
   }
 
@@ -1873,13 +1873,13 @@ void Leaderboard::rename(QString oldname, QString newname)
 
   if (DC::getInstance()->cf.leaderboard_check == "suspend")
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", qPrintable(oldname), qPrintable(newname));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", qPrintable(oldname), qPrintable(newname));
   }
   else
   {
     if (!(fl = fopen(LEADERBOARD_FILE, "w")))
     {
-      logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
       abort();
     }
 

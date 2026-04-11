@@ -61,10 +61,10 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln("Ok.");
     if (victim->isPlayer())
     {
-      sprintf(buf, "A stream of fire arcs down from the heavens, striking "
-                   "you between the eyes.\r\nYou have been removed from the "
-                   "world by %s.\r\n",
-              qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf, "A stream of fire arcs down from the heavens, striking "
+                      "you between the eyes.\r\nYou have been removed from the "
+                      "world by %s.\r\n",
+                 qPrintable(ch->shortdesc_or_name()));
       victim->send(buf);
     }
 
@@ -73,10 +73,10 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
         "by $N.",
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
-    sprintf(name, "%s has booted %s.", qPrintable(ch->name()), qPrintable(victim->name()));
-    logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_sprintf(name, "%s has booted %s.", qPrintable(ch->name()), qPrintable(victim->name()));
+    DC::getInstance()->logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
-    if (!strcmp(type, "boot"))
+    if (type == u"boot"_s)
     {
       send_to_char(
           "\r\n"
@@ -105,7 +105,7 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
           "              \\__/$R\r\n",
           victim);
     }
-    if (!strcmp(type, "kitty"))
+    if (type == u"kitty"_s)
     {
       send_to_char("\r\n"
                    "                __                             $6$B$I___$R            $6$B$I_yygL$R\r\n"
@@ -177,7 +177,7 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (conn->character && (conn->character->getLevel() > ch->getLevel()))
       {
-        sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", qPrintable(ch->name()));
+        dc_sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", qPrintable(ch->name()));
         conn->character->send(buf);
         ch->sendln("You dummy, can't do that to your elders!");
         close_socket(ch->desc);
@@ -186,7 +186,7 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
       else
       {
         close_socket(d);
-        sprintf(buf, "Closing socket to descriptor #%d\r\n", sdesc);
+        dc_sprintf(buf, "Closing socket to descriptor #%d\r\n", sdesc);
         ch->send(buf);
         return ReturnValue::eFAILURE;
       }
@@ -228,7 +228,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   vict->save();
 
-  logentry(QStringLiteral("%1 just forced %2 to save.").arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(QStringLiteral("%1 just forced %2 to save.").arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return ReturnValue::eSUCCESS;
 }
@@ -249,7 +249,7 @@ command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
   victim_clan_name[0] = {};
 
   one_argument(argument, arg);
-  if (!strcmp(arg, "arena"))
+  if (arg == u"arena"_s)
     arenaONLY = true;
 
   for (i = combat_list; i; i = i->next_fighting)
@@ -268,12 +268,12 @@ command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
     // If they're in a clan
     ch_clan_name[0] = '\0';
     if ((ch_clan = get_clan(i)))
-      snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", ch_clan->name);
+      dc_snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", ch_clan->name);
 
     if ((victim_clan = get_clan(i->fighting)))
-      snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
+      dc_snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
 
-    snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
+    dc_snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
              qPrintable(i->name()), ch_clan_name,
              qPrintable(i->fighting->name()), victim_clan_name,
              DC::getInstance()->world[i->in_room].number);
@@ -324,8 +324,8 @@ command_return_t do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
     sprintbit(races[i].hate_fear << 1, race_abbrev, hatbuf);
     sprintbit(races[i].friendly << 1, race_abbrev, fribuf);
 
-    sprintf(buf, "%s %s - Imm: %s Res: %s Sus: %s\r\n    Hates: %s Friend: %s\r\n",
-            buf, races[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
+    dc_sprintf(buf, "%s %s - Imm: %s Res: %s Sus: %s\r\n    Hates: %s Friend: %s\r\n",
+               buf, races[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
   }
   ch->send(buf);
   return ReturnValue::eSUCCESS;

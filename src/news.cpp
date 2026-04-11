@@ -15,16 +15,13 @@
 
 #include <cstring>
 #include <cstdlib>
-#include "DC/structs.h"
+#include <qdebug.h>
+#include <qiodevicebase.h>
 
 #include "DC/DC.h"
 
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
-#include "DC/connect.h"
-#include "DC/spells.h"
-#include "DC/set.h"
-#include "DC/returnvals.h"
 #include "DC/news.h"
 
 news_data *thenews = {};
@@ -64,7 +61,7 @@ void savenews()
   FILE *fl;
   if (!(fl = fopen("news.data", "w")))
   {
-    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
     abort();
   }
   news_data *tmpnews;
@@ -79,25 +76,27 @@ void savenews()
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
-    logentry(QStringLiteral("Cannot save news file to web dir."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Cannot save news file to web dir."), 0, DC::LogChannel::LOG_MISC);
 }
 
-void loadnews()
+void DC::loadnews(void)
 {
-  FILE *fl;
-  if (!(fl = fopen("news.data", "r")))
+  QFile news_file("news.data");
+
+  if (!news_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
   {
-    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Cannot open news file 'news.data'"));
     return;
   }
+  QTextStream fl(&news_file);
   qint32 i;
   while ((i = fread_int(fl, 0, 2147483467)) != 0)
   {
     news_data *nnews;
     nnews = new news_data;
     nnews->time = i;
-    nnews->addedby = fread_string(fl, 0);
-    nnews->news = fread_string(fl, 0);
+    nnews->addedby = fread_qstring(fl, 0);
+    nnews->news = fread_qstring(fl, 0);
     qint32 i, v = {};
     QString buf;
     for (i = {}; i < (qint32)strlen(nnews->news); i++)
@@ -162,11 +161,11 @@ command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
     strcpy(old, buf);
     const QString newsstring = tnews->news;
     if (up)
-      sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
-              newsstring);
+      dc_sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
+                 newsstring);
     else
-      sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
-              old);
+      dc_sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
+                 old);
     if (strlen(buf) > MAX_STRING_LENGTH - 1000)
       break;
   }

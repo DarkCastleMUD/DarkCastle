@@ -555,8 +555,8 @@ qint32 save_boards()
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
+                                DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -742,7 +742,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
   timep = time(0);
   tmstr = asctime(localtime(&timep));
   *(tmstr + strlen(tmstr) - 1) = '\0';
-  sprintf(buf, "%.10s", tmstr);
+  dc_sprintf(buf, "%.10s", tmstr);
 
   reserve->new_post.date = buf;
 
@@ -825,7 +825,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   board->second.msgs.erase(board->second.msgs.begin() + ind);
 
   ch->sendln("Message erased.");
-  sprintf(buf, "$n just erased message %d.", tmessage);
+  dc_sprintf(buf, "$n just erased message %d.", tmessage);
 
   // Removal message also repaired
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -862,8 +862,8 @@ void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
+                                DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -953,7 +953,7 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
     if (!*number && ch->player->last_mess_read > 0)
     {
       ch->player->last_mess_read++;
-      sprintf(number, "%i", ch->player->last_mess_read);
+      dc_sprintf(number, "%i", ch->player->last_mess_read);
     }
   }
 
@@ -1009,24 +1009,24 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
   if (!ch->isNonPlayer())
     ch->player->last_mess_read = tmessage;
 
-  sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
+  dc_sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
   {
-    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
+    dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
              tmessage, board->second.msgs[tmessage].date.c_str(),
              board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
     board_msg += buf;
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(),
+    dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(),
              board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
     board_msg += buf;
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
+  dc_snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
   board_msg += buf;
 
   page_string(ch->desc, board_msg.c_str(), 1);
@@ -1083,14 +1083,14 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
     for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
       if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
       {
-        snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
+        dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
                  msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
         board_msg += buf;
         //         ch->send(QStringLiteral("(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n").arg(msg_it->date.c_str()).arg(       //                    msg_it->author.c_str(),i--).arg(msg_it->title.c_str()));
       }
       else
       {
-        snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\r\n", msg_it->date.c_str(),
+        dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\r\n", msg_it->date.c_str(),
                  msg_it->author.c_str(), i--, msg_it->title.c_str());
         board_msg += buf;
       }

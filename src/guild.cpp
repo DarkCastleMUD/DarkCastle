@@ -514,14 +514,14 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
       self_learn_max = getLevel() * 2;
     }
 
-    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3llu/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1), per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(skilllist[i].skillnum));
+    dc_sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3llu/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1), per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(skilllist[i].skillnum));
     send(buf);
     if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
     {
       if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(this) == CLASS_CLERIC)
-        sprintf(buf, "Mana: $B%3d$R ", 150);
+        dc_sprintf(buf, "Mana: $B%3d$R ", 150);
       else
-        sprintf(buf, "Mana: $B%3d$R ", use_mana(this, skilllist[i].skillnum));
+        dc_sprintf(buf, "Mana: $B%3d$R ", use_mana(this, skilllist[i].skillnum));
       send(buf);
     }
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
@@ -574,7 +574,7 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
     {
       if (skilllist != g_skills)
       {
-        sprintf(buf, " %s", attrname(GET_CLASS(this), skilllist[i].attrs));
+        dc_sprintf(buf, " %s", attrname(GET_CLASS(this), skilllist[i].attrs));
         send(buf);
       }
       else
@@ -630,7 +630,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
 
   if (!*arg) // display skills that can be learned
   {
-    sprintf(buf, "You have %d practice sessions left.\r\n", player->practices);
+    dc_sprintf(buf, "You have %d practice sessions left.\r\n", player->practices);
     send(buf);
     sendln("You can practice any of these skills:\r\n");
 
@@ -639,7 +639,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
     sendln("--------------------------------------------------------------------------------");
     output_praclist(g_skills);
 
-    sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(this)]), (1 + pc_clss_types[GET_CLASS(this)]));
+    dc_sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(this)]), (1 + pc_clss_types[GET_CLASS(this)]));
     send(buf);
 
     if (GET_CLASS(this) != CLASS_MONK)
@@ -902,7 +902,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     }
 
     ch->sendln("You raise a level!");
-    logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", qPrintable(ch->name()), pc_clss_types3[(qint32)GET_CLASS(ch)], ch->getLevel() + 1);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", qPrintable(ch->name()), pc_clss_types3[(qint32)GET_CLASS(ch)], ch->getLevel() + 1);
 
     ch->incrementLevel();
     advance_level(ch, 0);
@@ -913,17 +913,17 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
       QString buf;
       if (ch->getLevel() == 60)
       {
-        sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
+        dc_sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
         do_say(owner, buf);
         do_say(owner, "As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!");
         //	     ch->send(buf);
       }
       else
       {
-        sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.", pc_clss_types3[GET_CLASS(ch)]);
+        dc_sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.", pc_clss_types3[GET_CLASS(ch)]);
 
         do_say(owner, buf);
-        sprintf(buf, "Your guildmaster gives you %d platinum coins.\r\n", bonus);
+        dc_sprintf(buf, "Your guildmaster gives you %d platinum coins.\r\n", bonus);
         ch->send(buf);
         GET_PLATINUM(ch) += bonus;
       }
@@ -1068,7 +1068,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   {
     QString buf;
 
-    snprintf(buf, sizeof(buf), "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", qPrintable(get_skill_name(skl)));
+    dc_snprintf(buf, sizeof(buf), "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", qPrintable(get_skill_name(skl)));
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
@@ -1102,14 +1102,14 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
     extern void prepare_character_for_sixty(CharacterPtr ch);
     prepare_character_for_sixty(ch);
-    snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", qPrintable(get_skill_name(skl)));
+    dc_snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", qPrintable(get_skill_name(skl)));
     ch->send(buf);
 
     switch (GET_CLASS(ch))
     {
     case CLASS_DRUID:
       ch->learn_skill(SPELL_RELEASE_ELEMENTAL, 1, 1);
-      snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", qPrintable(get_skill_name(SPELL_RELEASE_ELEMENTAL)));
+      dc_snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", qPrintable(get_skill_name(SPELL_RELEASE_ELEMENTAL)));
       ch->send(buf);
       break;
     }
@@ -1118,7 +1118,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (!*arg)
   {
-    sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
+    dc_sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
     ch->send(buf);
     ch->sendln("You can practice any of these skills:");
     for (i = {}; *g_skills[i].skillname != '\n'; i++)
@@ -1126,7 +1126,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       qint32 known = ch->has_skill(g_skills[i].skillnum);
       if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
-      sprintf(buf, " %-20s%14s   (Level %2llu)\r\n", g_skills[i].skillname, how_good(known), g_skills[i].levelavailable);
+      dc_sprintf(buf, " %-20s%14s   (Level %2llu)\r\n", g_skills[i].skillname, how_good(known), g_skills[i].levelavailable);
       ch->send(buf);
     }
     return ReturnValue::eSUCCESS;
@@ -1277,7 +1277,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
 
   if (difficulty < 1)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", qPrintable(name()), difficulty, skill);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", qPrintable(name()), difficulty, skill);
     return; // Skill w/out difficulty.
   }
 
@@ -1395,7 +1395,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     oi -= int_app[GET_INT(this)].hard_bonus;
     break;
   default:
-    logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -1409,7 +1409,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
   if (skillname.isEmpty())
   {
     send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", qPrintable(this->name()), skill, learned, difficulty);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", qPrintable(this->name()), skill, learned, difficulty);
     return;
   }
 

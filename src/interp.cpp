@@ -93,7 +93,7 @@ public:
          (ch_->player->multi && !DC::getInstance()->cf.allow_multi)))
     {
       command_duration_.start();
-      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\"").arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
+      DC::getInstance()->logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\"").arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
       logged_ = true;
     }
   }
@@ -105,7 +105,7 @@ public:
       command_duration_.stop();
       auto timediff = ((command_duration_.getDiff().tv_sec * 1000000.0) + command_duration_.getDiff().tv_usec) / 1000000.0;
       auto timediffStr = QString::number(timediff, 'f');
-      logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6").arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
+      DC::getInstance()->logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6").arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
     }
   }
 
@@ -127,7 +127,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(name()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(name()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     return logcmd.setReturn(ReturnValue::eFAILURE, "cstack exceeded");
   }
@@ -308,12 +308,12 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       if (IS_AFFECTED(this, AFF_HIDE)) {
         if (found->toggle_hide == 0) {
           REMBIT(this->affected_by, AFF_HIDE);
-          sprintf(buf, "You emerge from your hidden position...\r\n");
+          dc_sprintf(buf, "You emerge from your hidden position...\r\n");
           act(buf, this, 0, 0, TO_CHAR, 0);
           }
         if ((found->toggle_hide > 1) && (number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
           REMBIT(this->affected_by, AFF_HIDE);
-          sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
+          dc_sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
           act(buf, this, 0, 0, TO_CHAR, 0);
           }
         }
@@ -481,9 +481,9 @@ command_return_t do_boss(CharacterPtr ch, QString arg, cmd_t cmd)
 
   for (x = {}; x <= 60; x++)
   {
-    sprintf(buf, "NUMBER-CRUNCHER: %d crunched to %d converted to black"
-                 "/white tree node %d\r\n",
-            x, 50 - x, x + x);
+    dc_sprintf(buf, "NUMBER-CRUNCHER: %d crunched to %d converted to black"
+                    "/white tree node %d\r\n",
+               x, 50 - x, x + x);
     ch->send(buf);
   }
 
@@ -670,7 +670,7 @@ void automail(QString name)
   blah = fopen("../lib/whassup.txt", "w");
   qfprintf(blah, "%s", name);
   fclose(blah);
-  sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
+  dc_sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
 }
 
@@ -806,8 +806,8 @@ std::tuple<QString, QString> last_argument(QString arguments)
   }
   catch (...)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
-         arguments.c_str());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
+                            arguments.c_str());
   }
 
   return std::tuple<QString, QString>(QString(), QString());

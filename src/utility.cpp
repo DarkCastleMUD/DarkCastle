@@ -233,7 +233,7 @@ FILE *quest_log = {};
 FILE *vault_log = {};
 
 // writes a QString to the log
-void logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
+void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
   FILE **f = {};
   qint32 stream = 1;
@@ -407,92 +407,92 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr 
   }
 
   if (god_level >= IMMORTAL)
-    send_to_gods(str, god_level, type);
+    DC::getInstance()->send_to_gods(str, god_level, type);
 }
 
 void logarena(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_ARENA);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_ARENA);
 }
 
 void logbug(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
 }
 
 void logclan(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_CLAN);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_CLAN);
 }
 
 void logdatabase(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_DATABASE);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_DATABASE);
 }
 
 void logdebug(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_DEBUG);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_DEBUG);
 }
 
 void loggod(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 void loghelp(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_HELP);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_HELP);
 }
 
 void logmisc(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
 }
 
 void logmortal(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 }
 
 void logobjects(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_OBJECTS);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_OBJECTS);
 }
 
 void logplayer(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_PLAYER);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_PLAYER);
 }
 
 void logprayer(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_PRAYER);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_PRAYER);
 }
 
 void logquest(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_QUEST);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_QUEST);
 }
 
 void logsocket(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
 }
 
 void logvault(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
 }
 
 void logwarning(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_WARNING);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_WARNING);
 }
 
 void logworld(QString message)
 {
-  logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
+  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
 }
 
 // function for new SETBIT et al. commands
@@ -559,7 +559,7 @@ void sprintbit(quint32 vektor, const QStringList names, QString result)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -593,7 +593,7 @@ void sprintbit(quint32 vektor, QStringList names, QString result)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -624,7 +624,7 @@ QString sprintbit(quint32 vektor, QStringList names)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return {};
   }
 
@@ -660,7 +660,7 @@ QString sprintbit(quint32 vektor, const QStringList names)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return result;
   }
 
@@ -819,47 +819,47 @@ void util_archive(const QString char_name, CharacterPtr caller)
     {
       if (caller)
       {
-        sprintf(buf, "Illegal archive attempt: %s by %s.",
-                char_name, qPrintable(caller->name()));
-        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_sprintf(buf, "Illegal archive attempt: %s by %s.",
+                   char_name, qPrintable(caller->name()));
+        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
       else
       {
-        sprintf(buf, "Someone got a weird character name in there: %s.", char_name);
-        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_sprintf(buf, "Someone got a weird character name in there: %s.", char_name);
+        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
     }
   }
 
-  sprintf(buf, "%s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
-  sprintf(buf2, "%s/%s", ARCHIVE_DIR, char_name);
+  dc_sprintf(buf, "%s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
+  dc_sprintf(buf2, "%s/%s", ARCHIVE_DIR, char_name);
   if (!file_exists(buf) || file_exists(buf2))
   {
     if (caller)
       caller->sendln("That character does not exist.");
     else
-      logentry(QStringLiteral("Attempt to archive a non-existent character."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Attempt to archive a non-existent character."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
-  sprintf(buf, "gzip -9 %s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
+  dc_sprintf(buf, "gzip -9 %s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
   if (system(buf))
   {
-    sprintf(buf, "Unsuccessful archive: %s", char_name);
+    dc_sprintf(buf, "Unsuccessful archive: %s", char_name);
     if (caller)
       caller->send(QStringLiteral("%1\r\n").arg(buf));
     else
-      logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
   }
-  sprintf(buf, "%s/%c/%s.gz", SAVE_DIR, UPPER(char_name[0]), char_name);
-  sprintf(buf2, "%s/%s.gz", ARCHIVE_DIR, char_name);
+  dc_sprintf(buf, "%s/%c/%s.gz", SAVE_DIR, UPPER(char_name[0]), char_name);
+  dc_sprintf(buf2, "%s/%s.gz", ARCHIVE_DIR, char_name);
   rename(buf, buf2);
-  sprintf(buf, "Character archived: %s", char_name);
+  dc_sprintf(buf, "Character archived: %s", char_name);
   if (caller)
     caller->send(QStringLiteral("%1\r\n").arg(buf));
-  logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 void util_unarchive(QString char_name, CharacterPtr caller)
@@ -874,22 +874,22 @@ void util_unarchive(QString char_name, CharacterPtr caller)
     {
       if (caller)
       {
-        sprintf(buf, "Illegal unarchive attempt: %s by %s.", char_name,
-                qPrintable(caller->name()));
-        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_sprintf(buf, "Illegal unarchive attempt: %s by %s.", char_name,
+                   qPrintable(caller->name()));
+        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
       else
       {
-        sprintf(buf, "Someone got a weird character name in there: %s.",
-                char_name);
-        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_sprintf(buf, "Someone got a weird character name in there: %s.",
+                   char_name);
+        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
     }
   }
 
-  sprintf(buf, "%s/%s.gz", ARCHIVE_DIR, char_name);
+  dc_sprintf(buf, "%s/%s.gz", ARCHIVE_DIR, char_name);
 
   if (!file_exists(buf))
   {
@@ -897,23 +897,23 @@ void util_unarchive(QString char_name, CharacterPtr caller)
       caller->sendln("Character not archived or already deleted!");
     return;
   }
-  sprintf(buf, "gzip -d %s/%s.gz", ARCHIVE_DIR, char_name);
+  dc_sprintf(buf, "gzip -d %s/%s.gz", ARCHIVE_DIR, char_name);
   if (system(buf))
   {
-    sprintf(buf, "Unsuccessful unarchive: %s", char_name);
+    dc_sprintf(buf, "Unsuccessful unarchive: %s", char_name);
     if (caller)
       caller->send(QStringLiteral("%1\r\n").arg(buf));
     else
-      logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
   }
-  sprintf(buf, "%s/%s", ARCHIVE_DIR, char_name);
-  sprintf(buf2, "%s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
+  dc_sprintf(buf, "%s/%s", ARCHIVE_DIR, char_name);
+  dc_sprintf(buf2, "%s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
   rename(buf, buf2);
-  sprintf(buf, "Character unarchived: %s", char_name);
+  dc_sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
     caller->send(QStringLiteral("%1\r\n").arg(buf));
-  logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj)
@@ -1035,7 +1035,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 
   if (!sub || !obj)
   {
-    logentry(QStringLiteral("Invalid pointer passed to CAN_SEE!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Invalid pointer passed to CAN_SEE!"), ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -1242,7 +1242,7 @@ command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (victim)
     {
-      sprintf(buf, "$N orders you to '%s'", message);
+      dc_sprintf(buf, "$N orders you to '%s'", message);
       act(buf, victim, 0, ch, TO_CHAR, 0);
       act("$n gives $N an order.", ch, 0, victim, TO_ROOM, NOTVICT);
       if ((victim->master != ch) ||
@@ -1257,7 +1257,7 @@ command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     { /* This is order "followers" */
-      sprintf(buf, "$n issues the order '%s'.", message);
+      dc_sprintf(buf, "$n issues the order '%s'.", message);
       act(buf, ch, 0, victim, TO_ROOM, 0);
 
       org_room = ch->in_room;
@@ -1313,7 +1313,7 @@ command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
+  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
@@ -1348,8 +1348,8 @@ command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n",
-          qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
+  dc_sprintf(str, "**%s[%d]: %s\n",
+             qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
@@ -1384,7 +1384,7 @@ command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
+  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.");
@@ -1627,7 +1627,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   */
   if (ch == 0)
   {
-    logentry(QStringLiteral("do_quit received null character - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("do_quit received null character - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -2246,8 +2246,8 @@ qint32 number(qint32 from, qint32 to)
   if (from > to)
   {
     QString buf;
-    sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
-    logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
+    DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     produce_coredump();
     return to;
   }
@@ -2276,7 +2276,7 @@ bool is_in_game(CharacterPtr ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    logentry(QStringLiteral("nullptr args sent to is_pc_playing in utility.c!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr args sent to is_pc_playing in utility.c!"), ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -2302,13 +2302,13 @@ bool is_in_game(CharacterPtr ch)
 
 void produce_coredump(void *ptr)
 {
-  logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
+  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
 
   static qint32 counter = {};
 
   if (++counter > COREDUMP_MAX)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
     return;
   }
 
@@ -2321,11 +2321,11 @@ void produce_coredump(void *ptr)
   else if (pid > 0)
   {
     // Parent process
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
   }
   else
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
   }
 }
 
@@ -2369,24 +2369,24 @@ void remove_character(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
+    dc_snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0].toLatin1(), qPrintable(name));
+    dc_snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
 
   if (0 == stat(src_filename, &statbuf))
   {
     if (dst_dir[0] != 0)
     {
-      snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
+      dc_snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
       system(syscmd);
     }
     else
@@ -2397,18 +2397,18 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
+    dc_snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0].toLatin1(), qPrintable(name));
+    dc_snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
 
   if (0 == stat(src_filename, &statbuf))
   {
     if (dst_dir[0] != 0)
     {
-      snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
+      dc_snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
       system(syscmd);
     }
     else
@@ -2446,19 +2446,19 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
+    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
   for (qint32 i = {}; i < MAX_GOLEMS; i++)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(name)[0], qPrintable(name), i);
+    dc_snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(name)[0], qPrintable(name), i);
 
     if (0 == stat(src_filename, &statbuf))
     {
       if (dst_dir[0] != 0)
       {
-        snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
+        dc_snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
         system(syscmd);
       }
       else
@@ -2689,10 +2689,10 @@ void unique_scan(CharacterPtr victim)
 
   if (!found_items.empty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", qPrintable(victim->name()));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", qPrintable(victim->name()));
     while (!found_items.empty())
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }
@@ -3041,13 +3041,13 @@ bool str_prefix(const QString astr, const QString bstr)
 {
   if (astr == nullptr)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr == nullptr)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 
@@ -3064,13 +3064,13 @@ bool str_prefix(QString astr, QString bstr)
 {
   if (astr.isEmpty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr.isEmpty())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 
@@ -3119,7 +3119,7 @@ void special_log(QString message)
 
   if (!special_logfile.open(QIODevice::Append | QIODevice::Text))
   {
-    logentry(QStringLiteral("Unable to open SPECIAL LOG FILE in special_log."), IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open SPECIAL LOG FILE in special_log."), IMPLEMENTER, DC::LogChannel::LOG_GOD);
     return;
   }
 

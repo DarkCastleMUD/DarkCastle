@@ -48,7 +48,6 @@ void write_to_output(QByteArray txt, class Connection *d);
 void write_to_output(QString txt, class Connection *d);
 void write_to_output(QString txt, class Connection *t);
 qint32 write_to_descriptor(qint32 desc, QByteArray txt);
-void scramble_text(QString txt);
 QString scramble_text(QString txt);
 void send_info(QString messg);
 void send_info(QString messg);

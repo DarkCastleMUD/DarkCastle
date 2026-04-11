@@ -127,7 +127,7 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
-          sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", qPrintable(curr->short_description()));
+          dc_sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", qPrintable(curr->short_description()));
           ch->send(buf);
           obj_from_char(curr);
           extract_obj(curr);
@@ -135,7 +135,7 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
         }
         else
         {
-          sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", qPrintable(curr->short_description()));
+          dc_sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", qPrintable(curr->short_description()));
           ch->send(buf);
           break;
         }
@@ -153,10 +153,10 @@ void save_golem_data(CharacterPtr ch)
   if (ch->isNonPlayer() || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
   golemtype = !IS_AFFECTED(ch->player->golem, AFF_GOLEM); // 0 or 1
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), golemtype);
+  dc_sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   CharacterPtr golem = ch->player->golem; // Just to make the code below cleaner.
@@ -188,11 +188,11 @@ void save_charmie_data(CharacterPtr ch)
       continue;
     }
 
-    // logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, qPrintable(ch->name()));
-    sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), 0);
+    // DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, qPrintable(ch->name()));
+    dc_sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), 0);
     if (!(fpfile = fopen(file, "w")))
     {
-      logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
@@ -262,7 +262,7 @@ void Character::load_golem_data(qint32 golemtype)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(this->name())[0], qPrintable(this->name()), golemtype);
+  dc_sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(this->name())[0], qPrintable(this->name()), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
     golem = dc_->clone_mobile(real_mobile(8));
@@ -427,7 +427,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
+    DC::getInstance()->logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
     return ReturnValue::eFAILURE;
   }
 
@@ -438,10 +438,10 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   quint32 immune = 0, suscept = 0, resist = {};
   QString isrString;
 
-  sprintf(race, "%s", races[(qint32)ch->race].singular_name);
+  dc_sprintf(race, "%s", races[(qint32)ch->race].singular_name);
   if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
-    logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(qPrintable(master->name())).arg(ch->getLevel()).arg(ch->getLevel() + 19));
+    DC::getInstance()->logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(qPrintable(master->name())).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
     return ReturnValue::eSUCCESS;
@@ -451,46 +451,46 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   to_hit = GET_REAL_HITROLL(ch);
   to_dam = GET_REAL_DAMROLL(ch);
 
-  sprintf(buf, "$7($5:$7)================================================="
-               "========================($5:$7)\r\n"
-               "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\r\n"
-               "($5:$7)=============================($5:$7)================="
-               "========================($5:$7)\r\n",
-          qPrintable(ch->shortdesc_or_name()));
+  dc_sprintf(buf, "$7($5:$7)================================================="
+                  "========================($5:$7)\r\n"
+                  "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\r\n"
+                  "($5:$7)=============================($5:$7)================="
+                  "========================($5:$7)\r\n",
+             qPrintable(ch->shortdesc_or_name()));
 
   master->send(buf);
 
-  sprintf(buf, "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
-               "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
-               "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
-               "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
-               "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\r\n"
-               "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
-          GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
-          GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(qint32)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
-          GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
-          GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
-          GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), ch->hit_gain_lookup(),
-          ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
-          GET_ALIGNMENT(ch));
+  dc_sprintf(buf, "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
+                  "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
+                  "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
+                  "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
+                  "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\r\n"
+                  "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
+             GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
+             GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(qint32)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
+             GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
+             GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
+             GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), ch->hit_gain_lookup(),
+             ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
+             GET_ALIGNMENT(ch));
 
   master->send(buf);
 
-  sprintf(buf, "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\r\n"
-               "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\r\n"
-               "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\r\n"
-               "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\r\n"
-               "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10ld       |\\|\r\n"
-               "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10ld       |o|\r\n"
-               "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10lu $3Platinum$7: %-5d |/|\r\n"
-               "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\r\n"
-               "($5:$7)===================================($5:$7)===================================($5:$7)\r\n",
-          GET_ARMOR(ch), 0, IS_CARRYING_N(ch), CAN_CARRY_N(ch),
-          to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
-          to_dam, 0, ch->exp,
-          get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
-          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), ch->getGold(), (qint32)GET_PLATINUM(ch),
-          ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
+  dc_sprintf(buf, "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\r\n"
+                  "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\r\n"
+                  "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\r\n"
+                  "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\r\n"
+                  "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10ld       |\\|\r\n"
+                  "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10ld       |o|\r\n"
+                  "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10lu $3Platinum$7: %-5d |/|\r\n"
+                  "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\r\n"
+                  "($5:$7)===================================($5:$7)===================================($5:$7)\r\n",
+             GET_ARMOR(ch), 0, IS_CARRYING_N(ch), CAN_CARRY_N(ch),
+             to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
+             to_dam, 0, ch->exp,
+             get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
+             get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), ch->getGold(), (qint32)GET_PLATINUM(ch),
+             ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
   master->send(buf);
 
   if ((immune = ch->immune))
@@ -501,8 +501,8 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                scratch, "Immunity", isrString.c_str(), scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+                   scratch, "Immunity", isrString.c_str(), scratch);
         master->send(buf);
         isrString = QString();
         if (++level == 4)
@@ -518,8 +518,8 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                scratch, "Susceptibility", isrString.c_str(), scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+                   scratch, "Susceptibility", isrString.c_str(), scratch);
         master->send(buf);
         isrString = QString();
         if (++level == 4)
@@ -535,8 +535,8 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                scratch, "Resistibility", isrString.c_str(), scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+                   scratch, "Resistibility", isrString.c_str(), scratch);
         master->send(buf);
         isrString = QString();
         if (++level == 4)
@@ -545,18 +545,18 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-          frills[level], "STABILITY", "NONE", frills[level]);
+  dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+             frills[level], "STABILITY", "NONE", frills[level]);
   master->send(buf);
   ++level == 4 ? level = 0 : level;
-  sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-          frills[level], "INFRARED", "NONE", frills[level]);
+  dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+             frills[level], "INFRARED", "NONE", frills[level]);
   master->send(buf);
   ++level == 4 ? level = 0 : level;
   if (ISSET(ch->affected_by, AFF_LIGHTNINGSHIELD))
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-            frills[level], "LIGHTNING SHIELD", "NONE", frills[level]);
+    dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+               frills[level], "LIGHTNING SHIELD", "NONE", frills[level]);
     master->send(buf);
     ++level == 4 ? level = 0 : level;
   }
@@ -603,17 +603,17 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (aff->type == Character::PLAYER_CANTQUIT)
       {
-        sprintf(buf, "|%c| Affected by %-25s (%s) |%s%s|\r\n",
-                scratch, qPrintable(aff_name),
-                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-                apply_types[(qint32)aff->location], aff->caster.c_str());
+        dc_sprintf(buf, "|%c| Affected by %-25s (%s) |%s%s|\r\n",
+                   scratch, qPrintable(aff_name),
+                   ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
+                   apply_types[(qint32)aff->location], aff->caster.c_str());
       }
       else
       {
-        sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\r\n",
-                scratch, qPrintable(aff_name),
-                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-                apply_types[(qint32)aff->location], scratch);
+        dc_sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\r\n",
+                   scratch, qPrintable(aff_name),
+                   ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
+                   apply_types[(qint32)aff->location], scratch);
       }
       master->send(buf);
       if (++level == 4)

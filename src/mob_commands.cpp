@@ -87,7 +87,7 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
     ch->send(buf);
     send_to_char(Program::mprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
+    dc_sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
     ch->send(buf);
     ch->sendRaw(QString(mprg->comlist) + "\r\n");
   }
@@ -599,7 +599,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", qPrintable(ch->name()), qPrintable(victim->name()));
+    // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", qPrintable(ch->name()), qPrintable(victim->name()));
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }
@@ -841,7 +841,7 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
       if (conn->connected == Connection::states::PLAYING && conn->character != ch && conn->character->in_room == ch->in_room && CAN_SEE(ch, conn->character))
       {
         QString buf;
-        sprintf(buf, "%s %s", qPrintable(conn->character->name()), arg2);
+        dc_sprintf(buf, "%s %s", qPrintable(conn->character->name()), arg2);
         do_mptransfer(ch, buf, cmd);
       }
     }
@@ -1093,7 +1093,7 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (!skillname.isEmpty())
-    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\r\n", qPrintable(skillname));
+    dc_snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\r\n", qPrintable(skillname));
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");
@@ -1107,7 +1107,7 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   prepare_character_for_sixty(ch);
 
-  snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", qPrintable(skillname));
+  dc_snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", qPrintable(skillname));
   act(skill, ch, 0, victim, TO_ROOM, NOTVICT);
 
   return ReturnValue::eSUCCESS;
@@ -1149,7 +1149,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
     {
       qint32 num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
 
-      logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
+      DC::getInstance()->logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
     return ReturnValue::eFAILURE;
   }
@@ -1430,7 +1430,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
       }
 
-      if (!strcmp(arg, "allpc") && victim->isNonPlayer())
+      if (arg == u"allpc"_s && victim->isNonPlayer())
       {
         continue;
       }
@@ -1760,7 +1760,7 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = get_char_vis(ch, person)))
   {
-    if (!strcmp(person, "area"))
+    if (person == u"area"_s)
     {
       victim = ch;
     }
@@ -1777,7 +1777,7 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You find yourself unable to.");
     if (ch != victim)
     {
-      snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\r\n", qPrintable(ch->shortdesc_or_name()));
+      dc_snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\r\n", qPrintable(ch->shortdesc_or_name()));
       victim->send(buf);
     }
     return ReturnValue::eFAILURE;
@@ -1790,8 +1790,8 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   do
   {
-    if ((*type && !strcmp(type, "area")) ||
-        (victim == ch && *person && !strcmp(person, "area")))
+    if ((*type && type == u"area"_s) ||
+        (victim == ch && *person && person == u"area"_s))
     {
       to_room = number(low, high);
 
@@ -2031,11 +2031,11 @@ QString expand_data(CharacterPtr ch, QString orig)
     buf[i] = '\0';
     QString tmp;
     if (lvali)
-      sprintf(tmp, "%d", *lvali);
+      dc_sprintf(tmp, "%d", *lvali);
     if (lvalui)
-      sprintf(tmp, "%u", *lvalui);
+      dc_sprintf(tmp, "%u", *lvalui);
     if (lvalb)
-      sprintf(tmp, "%d", *lvalb);
+      dc_sprintf(tmp, "%d", *lvalb);
     strcat(buf, tmp);
     i += strlen(tmp);
     z = (ptr - orig) + r + 1;

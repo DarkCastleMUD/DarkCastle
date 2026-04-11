@@ -423,7 +423,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       // PC corpse
       if ((obj_object->obj_flags.value[3] == 1 && isexact("pc", obj_object->name())) || isexact("thiefcorpse", obj_object->name()))
       {
-        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+        dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
         if ((isexact("thiefcorpse", obj_object->name()) &&
              !isexact(qPrintable(ch->name()), obj_object->name())) ||
             isexact(qPrintable(ch->name()), obj_object->name()) || ch->getLevel() >= OVERSEER)
@@ -457,13 +457,13 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
         if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
             !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
         {
-          sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
+          dc_sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           fail = true;
         }
         else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
         {
-          sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
+          dc_sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           fail = true;
         }
@@ -510,7 +510,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
           obj_object->obj_flags.value[3] == 1 &&
           isexact("pc", obj_object->name()))
       {
-        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+        dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
         if (isexact(qPrintable(ch->name()), obj_object->name()))
           has_consent = true;
         if (!has_consent && !isexact(qPrintable(ch->name()), obj_object->name()))
@@ -531,14 +531,14 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
       {
-        sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
+        dc_sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
         ch->send(buffer);
         fail = true;
       }
       else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
                !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
       {
-        sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
+        dc_sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
         ch->send(buffer);
         fail = true;
       }
@@ -583,7 +583,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      sprintf(buffer, "You do not see a %s here.\r\n", arg1);
+      dc_sprintf(buffer, "You do not see a %s here.\r\n", arg1);
       ch->send(buffer);
       fail = true;
     }
@@ -615,7 +615,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
             isexact("pc", sub_object->name())) ||
            isexact("thiefcorpse", sub_object->name())))
       {
-        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+        dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
         if ((isexact("thiefcorpse", sub_object->name()) && !isexact(qPrintable(ch->name()), sub_object->name())) || isexact(buffer, sub_object->name()) || ch->getLevel() > 105)
           has_consent = true;
         if (!has_consent && !isexact(qPrintable(ch->name()), sub_object->name()))
@@ -628,7 +628,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
+          dc_sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
           return ReturnValue::eFAILURE;
         }
@@ -678,7 +678,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
             if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                 !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
             {
-              sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
+              dc_sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
               ch->send(buffer);
               fail = true;
             }
@@ -732,7 +732,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
               }
               else
               {
-                sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
+                dc_sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
                 ch->send(buffer);
                 fail = true;
               }
@@ -741,21 +741,21 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         if (!found && !fail)
         {
-          sprintf(buffer, "You do not see anything in the %s.\r\n", qPrintable(fname(sub_object->name())));
+          dc_sprintf(buffer, "You do not see anything in the %s.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
           fail = true;
         }
       }
       else
       {
-        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
+        dc_sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
         ch->send(buffer);
         fail = true;
       }
     }
     else
     {
-      sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
+      dc_sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
       ch->send(buffer);
       fail = true;
     }
@@ -790,7 +790,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
             isexact("pc", sub_object->name())) ||
            isexact("thiefcorpse", sub_object->name())))
       {
-        sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+        dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
 
         if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->name()) && !isexact(qPrintable(ch->name()), sub_object->name()))) || isexact(buffer, sub_object->name()))
           has_consent = true;
@@ -808,7 +808,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
+          dc_sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
           return ReturnValue::eFAILURE;
         }
@@ -837,7 +837,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
           else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                    !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
           {
-            sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
+            dc_sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->name())));
             ch->send(buffer);
             fail = true;
           }
@@ -857,17 +857,17 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
                   ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description()));
 
                   QString log_buf = {};
-                  sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
-                          qPrintable(ch->name()),
-                          obj_object->short_description,
-                          DC::getInstance()->obj_index[obj_object->item_number].vnum(),
-                          qPrintable(sub_object->name()),
-                          DC::getInstance()->obj_index[sub_object->item_number].vnum());
-                  logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+                  dc_sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
+                             qPrintable(ch->name()),
+                             obj_object->short_description,
+                             DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+                             qPrintable(sub_object->name()),
+                             DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                  DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
                   fail = true;
-                  sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+                  dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
 
                   if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isexact(buffer, sub_object->name()))
                   {
@@ -916,28 +916,28 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
           }
           else
           {
-            sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
+            dc_sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
             ch->send(buffer);
             fail = true;
           }
         }
         else
         {
-          sprintf(buffer, "The %s does not contain the %s.\r\n", qPrintable(fname(sub_object->name())), arg1);
+          dc_sprintf(buffer, "The %s does not contain the %s.\r\n", qPrintable(fname(sub_object->name())), arg1);
           ch->send(buffer);
           fail = true;
         }
       }
       else
       {
-        sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
+        dc_sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
         ch->send(buffer);
         fail = true;
       }
     }
     else
     {
-      sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
+      dc_sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
       ch->send(buffer);
       fail = true;
     }
@@ -1155,13 +1155,13 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             QString log_buf = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
-            logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+            dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                   tmp_object->short_description,
-                   loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+              DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+                                      tmp_object->short_description,
+                                      loop_obj->short_description,
+                                      DC::getInstance()->obj_index[loop_obj->item_number].vnum());
           }
 
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
@@ -1174,7 +1174,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            sprintf(buffer, "You can't drop %s, it must be CURSED!\r\n", tmp_object->short_description);
+            dc_sprintf(buffer, "You can't drop %s, it must be CURSED!\r\n", tmp_object->short_description);
             ch->send(buffer);
             test = true;
           }
@@ -1223,13 +1223,13 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             QString log_buf = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
-            logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+            dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                   tmp_object->short_description,
-                   loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+              DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+                                      tmp_object->short_description,
+                                      loop_obj->short_description,
+                                      DC::getInstance()->obj_index[loop_obj->item_number].vnum());
           }
 
           move_obj(tmp_object, ch->in_room);
@@ -1264,14 +1264,14 @@ void do_putalldot(CharacterPtr ch, QString name, QString target, cmd_t cmd)
     next_object = tmp_object->next_content;
     if (!name && CAN_SEE_OBJ(ch, tmp_object))
     {
-      sprintf(buf, "%s %s", qPrintable(fname(tmp_object->name())), target);
+      dc_sprintf(buf, "%s %s", qPrintable(fname(tmp_object->name())), target);
       buf[99] = {};
       found = true;
       do_put(ch, buf, cmd);
     }
     else if (isexact(name, tmp_object->name()) && CAN_SEE_OBJ(ch, tmp_object))
     {
-      sprintf(buf, "%s %s", name, target);
+      dc_sprintf(buf, "%s %s", name, target);
       buf[99] = {};
       found = true;
       do_put(ch, buf, cmd);
@@ -1316,7 +1316,7 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, DC::getInstance()->world[ch->in_room].contents)))
       {
-        sprintf(buffer, "You don't have a %s.\r\n", arg2);
+        dc_sprintf(buffer, "You don't have a %s.\r\n", arg2);
         ch->send(buffer);
         return 1;
       }
@@ -1451,23 +1451,23 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
                 {
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
-                       qPrintable(ch->name()),
-                       obj_object->short_description,
-                       DC::getInstance()->obj_index[obj_object->item_number].vnum(),
-                       sub_object->short_description,
-                       DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                  DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+                                          qPrintable(ch->name()),
+                                          obj_object->short_description,
+                                          DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+                                          sub_object->short_description,
+                                          DC::getInstance()->obj_index[sub_object->item_number].vnum());
                 }
                 else
                 {
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
-                       qPrintable(ch->name()),
-                       obj_object->short_description,
-                       DC::getInstance()->obj_index[obj_object->item_number].vnum(),
-                       sub_object->short_description,
-                       DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                  DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+                                          qPrintable(ch->name()),
+                                          obj_object->short_description,
+                                          DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+                                          sub_object->short_description,
+                                          DC::getInstance()->obj_index[sub_object->item_number].vnum());
                 }
 
                 return ReturnValue::eSUCCESS;
@@ -1482,25 +1482,25 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
           }
           else
           {
-            sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
+            dc_sprintf(buffer, "The %s is not a container.\r\n", qPrintable(fname(sub_object->name())));
             ch->send(buffer);
           }
         }
         else
         {
-          sprintf(buffer, "You dont have the %s.\r\n", arg2);
+          dc_sprintf(buffer, "You dont have the %s.\r\n", arg2);
           ch->send(buffer);
         }
       }
       else
       {
-        sprintf(buffer, "You dont have the %s.\r\n", arg1);
+        dc_sprintf(buffer, "You dont have the %s.\r\n", arg1);
         ch->send(buffer);
       }
     } /* if arg2 */
     else
     {
-      sprintf(buffer, "Put %s in what?\r\n", arg1);
+      dc_sprintf(buffer, "Put %s in what?\r\n", arg1);
       ch->send(buffer);
     }
   } /* if arg1 */
@@ -1856,11 +1856,11 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   logobjects(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(this->name())).arg(obj->name()).arg(qPrintable(vict->name())));
   for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
-         qPrintable(obj->short_description()),
-         DC::getInstance()->obj_index[obj->item_number].vnum(),
-         loop_obj->short_description,
-         DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+                            qPrintable(obj->short_description()),
+                            DC::getInstance()->obj_index[obj->item_number].vnum(),
+                            loop_obj->short_description,
+                            DC::getInstance()->obj_index[loop_obj->item_number].vnum());
 
   if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) && vict->isMortalPlayer() &&
       vict->room().isArena() && arena.isPotato() && DC::getInstance()->obj_index[obj->item_number].vnum() == 393)
@@ -2231,7 +2231,7 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
             REMOVE_BIT(back->exit_info, EX_CLOSED);
             if ((back->keyword) && !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
-              sprintf(buf, "The %s is opened from the other side.\r\n", qPrintable(fname(back->keyword)));
+              dc_sprintf(buf, "The %s is opened from the other side.\r\n", qPrintable(fname(back->keyword)));
               send_to_room(buf, EXIT(ch, door)->to_room, true);
             }
             else
@@ -2340,7 +2340,7 @@ command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
             if ((back->keyword) &&
                 !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
-              sprintf(buf, "The %s closes quietly.\r\n", qPrintable(fname(back->keyword)));
+              dc_sprintf(buf, "The %s closes quietly.\r\n", qPrintable(fname(back->keyword)));
               send_to_room(buf, EXIT(ch, door)->to_room, true);
             }
             else
@@ -2608,7 +2608,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
 
   if (sub_object)
   {
-    sprintf(buffer, "%s_consent", qPrintable(ch->name()));
+    dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
       if (isexact("lootable", sub_object->name()) && !isexact(buffer, sub_object->name()))
@@ -2664,19 +2664,19 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
   { // Logging gold gets from corpses would just be too much.
     //"%s palms %s[%d] from %s", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->name()));
 
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                              DC::getInstance()->obj_index[loop_obj->item_number].vnum());
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
-    sprintf(log_buf, "%s palms %s[%d] from room %d", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(),
-            ch->in_room);
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    dc_sprintf(log_buf, "%s palms %s[%d] from room %d", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+               ch->in_room);
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                              DC::getInstance()->obj_index[loop_obj->item_number].vnum());
   }
 
   if (skill_success(ch, nullptr, SKILL_PALM))
@@ -2699,8 +2699,8 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
       (obj_object->obj_flags.value[0] >= 1))
   {
     obj_from_char(obj_object);
-    sprintf(buffer, "There was %d coins.\r\n",
-            obj_object->obj_flags.value[0]);
+    dc_sprintf(buffer, "There was %d coins.\r\n",
+               obj_object->obj_flags.value[0]);
     ch->send(buffer);
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                                                         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)

@@ -32,7 +32,7 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
   assert(ch != 0);
   if (ch->in_room == DC::NOWHERE)
   {
-    logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eSUCCESS;
   }
 
@@ -72,12 +72,12 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
 
-      snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
+      dc_snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
                ch->exp,
                (qint64)(exp_table[(qint32)ch->getLevel() + 1] - (qint64)ch->exp),
                levels_to_gain);
 
-      sprintf(buf, "$n reports '%s'", report);
+      dc_sprintf(buf, "$n reports '%s'", report);
       act(buf, ch, 0, 0, TO_ROOM, 0);
 
       ch->send(QStringLiteral("You report: %1\r\n").arg(report));
@@ -86,21 +86,21 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (ch->isNonPlayer() || IS_ANONYMOUS(ch))
-    snprintf(report, 200, "%d%% hps, %d%% mana, %llu%% movement, and %d%% ki.",
+    dc_snprintf(report, 200, "%d%% hps, %d%% mana, %llu%% movement, and %d%% ki.",
              MAX(1, ch->getHP() * 100) / MAX(1, GET_MAX_HIT(ch)),
              MAX(1, GET_MANA(ch) * 100) / MAX(1, GET_MAX_MANA(ch)),
              MAX<move_t>(1, GET_MOVE(ch) * 100) / MAX<move_t>(1, GET_MAX_MOVE(ch)),
              MAX(1, GET_KI(ch) * 100) / MAX(1, GET_MAX_KI(ch)));
   else
   {
-    snprintf(report, 200, "%d/%d hps, %d/%d mana, %llu/%llu movement, and %d/%d ki.",
+    dc_snprintf(report, 200, "%d/%d hps, %d/%d mana, %llu/%llu movement, and %d/%d ki.",
              ch->getHP(), GET_MAX_HIT(ch),
              GET_MANA(ch), GET_MAX_MANA(ch),
              GET_MOVE(ch), GET_MAX_MOVE(ch),
              GET_KI(ch), GET_MAX_KI(ch));
   }
 
-  sprintf(buf, "$n reports '%s'", report);
+  dc_sprintf(buf, "$n reports '%s'", report);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
   ch->send(QStringLiteral("You report: %1\r\n").arg(report));
@@ -123,14 +123,11 @@ qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   QString typestr;
 
   if (message.isEmpty())
-  {
-    logentry(QStringLiteral("nullptr STRING sent to send_to_gods!"), OVERSEER, DC::LogChannel::LOG_BUG);
-    return (0);
-  }
+    return {};
 
   if ((god_level > IMPLEMENTER) || (god_level < 0))
   { // Outside valid god levels
-    return (0);
+    return {};
   }
 
   switch (type)
@@ -272,7 +269,7 @@ command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
           y = 1;
         else
           y = {};
-        sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
+        dc_sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
     }
@@ -285,7 +282,7 @@ command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
           y = 1;
         else
           y = {};
-        sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
+        dc_sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
     }
@@ -294,14 +291,14 @@ command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
       y = 1;
     else
       y = {};
-    sprintf(buf2, "%-9s%s\r\n", types[22], on_off[y]);
+    dc_sprintf(buf2, "%-9s%s\r\n", types[22], on_off[y]);
     send_to_char(buf2, ch);
 
     if (isSet(ch->misc, 1 << 23))
       y = 1;
     else
       y = {};
-    sprintf(buf2, "%-9s%s\r\n", types[23], on_off[y]);
+    dc_sprintf(buf2, "%-9s%s\r\n", types[23], on_off[y]);
     send_to_char(buf2, ch);
 
     qint32 o = ch->getLevel() == 110 ? 26 : 0;
@@ -311,7 +308,7 @@ command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
         y = 1;
       else
         y = {};
-      sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
+      dc_sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
       send_to_char(buf2, ch);
     }
 
@@ -342,13 +339,13 @@ command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
   }
   if (isSet(ch->misc, (1 << x)))
   {
-    sprintf(buf, "%s channel turned $B$4OFF$R.\r\n", types[x]);
+    dc_sprintf(buf, "%s channel turned $B$4OFF$R.\r\n", types[x]);
     ch->send(buf);
     REMOVE_BIT(ch->misc, (1 << x));
   }
   else
   {
-    sprintf(buf, "%s channel turned $B$2ON$R.\r\n", types[x]);
+    dc_sprintf(buf, "%s channel turned $B$2ON$R.\r\n", types[x]);
     ch->send(buf);
     SET_BIT(ch->misc, (1 << x));
   }
@@ -482,13 +479,13 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
-      sprintf(buf, "You have no %s.\r\n", papername);
+      dc_sprintf(buf, "You have no %s.\r\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
     if (!(pen = get_obj_in_list_vis(ch, penname, ch->carrying)))
     {
-      sprintf(buf, "You have no %s.\r\n", papername);
+      dc_sprintf(buf, "You have no %s.\r\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -497,7 +494,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
-      sprintf(buf, "There is no %s in your inventory.\r\n", papername);
+      dc_sprintf(buf, "There is no %s in your inventory.\r\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -515,7 +512,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     /* one object was found. Now for the other one. */
     if (!ch->equipment[WEAR_HOLD])
     {
-      sprintf(buf, "You can't write with a %s alone.\r\n", papername);
+      dc_sprintf(buf, "You can't write with a %s alone.\r\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -575,7 +572,7 @@ command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (victim != ch)
       {
-        sprintf(buf, "You insult %s.\r\n", qPrintable(victim->shortdesc_or_name()));
+        dc_sprintf(buf, "You insult %s.\r\n", qPrintable(victim->shortdesc_or_name()));
         ch->send(buf);
 
         switch (number(0, 3))
@@ -631,7 +628,7 @@ command_return_t do_emote(CharacterPtr ch, const QString argument, cmd_t cmd)
     ch->sendln("Yes.. But what?");
   else
   {
-    sprintf(buf, "$n %s", argument + i);
+    dc_sprintf(buf, "$n %s", argument + i);
     // don't want players triggering mobs with emotes
     MOBtrigger = false;
     act(buf, ch, 0, 0, TO_ROOM, 0);

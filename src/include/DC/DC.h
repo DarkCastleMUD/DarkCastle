@@ -289,12 +289,12 @@ typedef QMap<skill_t, char_skill_data> skill_list_t;
 class CharacterClassSkill
 {
 public:
-  QString skillname_;       // name of skill
-  qint16 skillnum{};        // ID # of skill
+  QString skillname_;      // name of skill
+  qint16 skillnum{};       // ID # of skill
   level_t levelavailable{}; // what level class can get it
-  qint16 maximum{};         // maximum value PC can train it to (1-100)
-  quint8 group{};           // which class tree group it is assigned
-  qint16 attrs{};           // What attributes the skill is based on
+  qint16 maximum{};        // maximum value PC can train it to (1-100)
+  quint8 group{};          // which class tree group it is assigned
+  qint16 attrs{};          // What attributes the skill is based on
 };
 class MinimumEntity
 {
@@ -317,7 +317,7 @@ class ResetCommand
 {
 public:
   ResetCommand() {};
-  ResetCommand(character comm) : command(comm), active(1) {};
+  ResetCommand(QChar comm) : command(comm), active(1) {};
   QChar command = {};  /* current command                      */
   qint32 if_flag = {}; // 0=always 1=if prev exe'd  2=if prev DIDN'T exe   3=ONLY on reboot
   qint32 arg1 = {};
@@ -606,10 +606,10 @@ public:
     OPENED
   };
 
-  auto Low(void) const -> level_t { return low_; }
-  auto High(void) const -> level_t { return high_; }
-  auto Number(void) const -> quint64 { return number_; }
-  auto CurrentNumber(void) const -> quint64 { return current_number_; }
+  auto Low(void) const { return low_; }
+  auto High(void) const  { return high_; }
+  auto Number(void) const  { return number_; }
+  auto CurrentNumber(void) const { return current_number_; }
   auto IncrementCurrentNumber(void) -> void { current_number_++; }
   auto HPLimit(void) const -> quint64 { return hp_limit_; }
   auto Type(void) const -> Types { return type_; }
@@ -920,7 +920,7 @@ public:
   command_gen2_t command_pointer2_;
   command_gen3_t command_pointer3_;
   position_t minimum_position_; /* Position commander must be in    */
-  level_t minimum_level_;       /* Minimum level needed             */
+  level_t minimum_level_;        /* Minimum level needed             */
   cmd_t command_number_;        /* Passed to function as argument   */
   bool allow_charmie_;
   quint8 toggle_hide_;
@@ -2216,7 +2216,6 @@ public:
   qint32 oprog_load_trigger(void);
   qint32 oprog_weapon_trigger(ObjectPtr item);
   qint32 oprog_armour_trigger(ObjectPtr item);
-  bool mprog_seval(const QString lhs, const QString opr, const QString rhs);
   bool isTank(void);
   void save_char_obj(void);
 
@@ -2835,7 +2834,7 @@ public:
     qint32 num;
   };
 
-  class Path : public QMap<qint32, qint32>
+  class Path
   {
   private:
     bool findRoom(qint32 from, qint32 to, qint32 steps, qint32 leaststeps, QString buf);
@@ -2843,8 +2842,6 @@ public:
     qint32 leastSteps(qint32 from, qint32 to, qint32 val, qint32 *bestval);
 
   public:
-    class Path *next; // main Path list
-
     QString determineRoute(CharacterPtr, qint32, qint32); // ch, from, to
     void addRoom(CharacterPtr, qint32, bool);             // ch, room, IgnoreConnectingIssues
 
@@ -2852,10 +2849,12 @@ public:
     bool isRoomConnected(qint32 room);
     bool isPathConnected(class Path *pa);
     qint32 connectRoom(class Path *);
-    path_data *p;
+
+    class Path *next; // main Path list
+    path_data *p{};
     QString name;
-    qint32 s;
-    Path() : next(nullptr), p(nullptr), name(nullptr), s(0) {}
+    qint32 s{};
+    QMap<qint32, qint32> index_;
   };
 
   Room(DCPtr dc);
@@ -2998,188 +2997,7 @@ private:
 auto &operator<<(auto &out, const Room &room);
 bool operator==(const Room &r1, const Room &r2);
 room_t real_room(room_t virt);
-auto &operator>>(auto &in, Room &room)
-{
-  room_t room_nr = {};
-  QString temp = {};
-  QChar ch = {};
-  qint32 dir = {};
-  extra_descr_data *new_new_descr{};
-  zone_t zone_nr = {};
 
-  ch = fread_char(in);
-
-  if (ch != '$')
-  {
-    room_nr = fread_int(in, 0, 1000000);
-    temp = fread_string(in, 0);
-
-    if (room_nr)
-    {
-      /*
-      DC::getInstance()->currentVNUM(room_nr);
-      DC::getInstance()->currentType("Room");
-      DC::getInstance()->currentName(temp);
-
-      if (room_nr >= DC::getInstance()->top_of_world_alloc)
-      {
-        DC::getInstance()->top_of_world_alloc = room_nr + 200;
-      }
-
-      if (DC::getInstance()->top_of_world < room_nr)
-        DC::getInstance()->top_of_world = room_nr;
-      */
-
-      room.paths_ = {};
-      room.number = room_nr;
-      room.name_ = temp;
-    }
-    QString description = fread_string(in, 0);
-    if (room_nr)
-    {
-      room.description_ = description;
-      room.tracks_ = {};
-      room.denied = {};
-      // DC::getInstance()->total_rooms++;
-    }
-    // Ignore recorded zone number since it may not longer be valid
-    fread_int(in, -1, 64000); // zone nr
-
-    if (room_nr)
-    {
-      // Go through the zone table until room.number is
-      // in the current zone.
-
-      bool found = false;
-      zone_t zone_nr = {};
-      for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
-      {
-        if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
-        {
-          found = true;
-          zone_nr = zone_key;
-          break;
-        }
-      }
-      if (!found)
-      {
-        // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
-        // logentry(error);
-        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
-      }
-      else
-      {
-        auto &zone = DC::getInstance()->zones[zone_nr];
-        if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
-        {
-          if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
-          {
-            zone.setRealBottom(room_nr);
-          }
-          if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
-          {
-            zone.setRealTop(room_nr);
-          }
-        }
-        room.zone = zone_nr;
-      }
-    }
-
-    quint32 room_flags = fread_bitvector(in, -1, 2147483467);
-
-    if (room_nr)
-    {
-      room.room_flags = room_flags;
-      if (isSet(room.room_flags, NO_ASTRAL))
-      {
-        REMOVE_BIT(room.room_flags, NO_ASTRAL);
-      }
-
-      // This bitvector is for runtime and not stored in the files, so just initialize it to 0
-      room.temp_room_flags = {};
-    }
-
-    qint32 sector_type = fread_int(in, -1, 64000);
-
-    if (room_nr)
-    {
-      room.sector_type = sector_type;
-      room.funct = {};
-      room.contents_ = {};
-      room.people_ = {};
-      room.light = {}; /* Zero light sources */
-
-      for (size_t tmp = {}; tmp <= 5; tmp++)
-        room.dir_option[tmp] = {};
-
-      room.ex_description = {};
-    }
-
-    for (;;)
-    {
-      ch = fread_char(in); /* dir field */
-
-      /* direction field */
-      if (ch == 'D')
-      {
-        dir = fread_int(in, 0, 5);
-        setup_dir(in, room_nr, dir);
-      }
-      /* extra description field */
-      else if (ch == 'E')
-      {
-        // strip off the \n after the E
-        if (fread_char(in) != '\n')
-        {
-          fseek(in, -1, SEEK_CUR);
-        }
-
-        new_new_descr = new extra_descr_data;
-        new_new_descr->keyword_ = fread_string(in, 0);
-        new_new_descr->description_ = fread_string(in, 0);
-
-        if (room_nr)
-        {
-          new_new_descr->next = room.ex_description;
-          room.ex_description = new_new_descr;
-        }
-        else
-        {
-          new_new_descr = {};
-        }
-      }
-      else if (ch == 'B')
-      {
-        deny_data *deni;
-
-        deni = new deny_data;
-        deni->vnum = fread_int(in, -1, 2147483467);
-
-        if (room_nr)
-        {
-          deni->next = room.denied;
-          room.denied = deni;
-        }
-        else
-        {
-          deni = {};
-        }
-      }
-      else if (ch == 'S') /* end of current room */
-        break;
-      else if (ch == 'C')
-      {
-        qint32 c_class = fread_int(in, 0, CLASS_MAX);
-        if (room_nr)
-        {
-          room.allow_class[c_class] = true;
-        }
-      }
-    } // of for (;;) (get directions and extra descs)
-  } // if == $
-
-  return in;
-}
 typedef quint16 object_type_t;
 typedef qint32 object_value_t;
 
@@ -3233,7 +3051,7 @@ namespace DCNS
 
 }
 using namespace DCNS;
-qint32 sprintf(QString &str, const QString format, ...);
+qint32 dc_sprintf(QString &str, const QString format, ...);
 
 class obj_flag_data
 {
@@ -3246,7 +3064,7 @@ public:
   qint16 weight = {};       /* Weight what else                 */
   qint32 cost = {};         /* Value when sold (gp.)            */
   quint32 more_flags = {};  /* A second bitvector (extra_flags2)*/
-  level_t eq_level = {};    /* Min level to use it for eq       */
+  level_t eq_level = {};     /* Min level to use it for eq       */
   qint16 timer = {};        /* Timer for object                 */
   CharacterPtr origin = {}; /* Creator of object, previously was stored at value[3] */
   bool Value(qsizetype i, object_value_t v)
@@ -4480,20 +4298,6 @@ void affects_to_file(auto &out, ObjectPtr obj)
   }
 }
 
-void write_object(ObjectPtr obj, auto &out)
-{
-  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].vnum());
-  string_to_file(out, obj->name());
-  string_to_file(out, obj->short_description());
-  string_to_file(out, obj->long_description());
-  string_to_file(out, obj->ActionDescription());
-  out << obj->obj_flags;
-  out << obj->ex_description;
-  affects_to_file(out, obj);
-  out << DC::getInstance()->obj_index[obj->item_number].mobprogs_;
-  out << "S\n";
-}
-
 auto &operator<<(auto &out, const obj_flag_data &of)
 {
   out << of.type_flag << " " << of.extra_flags << " " << of.wear_flags << " " << of.size << "\n";
@@ -5019,7 +4823,7 @@ void stop_grouped_bards(CharacterPtr ch, qint32 action);
 void update_character_singing(CharacterPtr ch);
 void get_instrument_bonus(CharacterPtr ch, qint32 &comb, qint32 &non_comb);
 
-const QString skip_spaces(const QString s);
+QString skip_spaces(QString s);
 SING_FUN song_whistle_sharp;
 SING_FUN song_disrupt;
 SING_FUN song_healing_melody;
@@ -5212,13 +5016,9 @@ qint32 char_from_room(CharacterPtr ch);
 qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting = true);
 
 /* find if character can see */
-CharacterPtr get_active_pc(const QString name);
 CharacterPtr get_active_pc(QString name);
 CharacterPtr get_all_pc(QString name);
-CharacterPtr get_char_vis(CharacterPtr ch, const QString name);
-CharacterPtr get_char_vis(CharacterPtr ch, const QString &name);
-CharacterPtr get_char_vis(CharacterPtr ch, const QString &name);
-CharacterPtr get_pc_vis(CharacterPtr ch, const QString name);
+CharacterPtr get_char_vis(CharacterPtr ch, QString name);
 CharacterPtr get_pc_vis(CharacterPtr ch, QString name);
 CharacterPtr get_pc_vis_exact(CharacterPtr ch, QString name);
 CharacterPtr get_mob_vis(CharacterPtr ch, QString name);
@@ -5232,7 +5032,6 @@ ObjectPtr get_objindex_vnum(QString vnum);
 vnum_t get_vnum(QString vnum_str);
 ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, bool bf = false);
 ObjectPtr get_obj_in_list_vis(CharacterPtr ch, qint32 item_num, ObjectPtr list, bool bf = false);
-ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc = false);
 ObjectPtr get_obj_vis(CharacterPtr ch, QString name, bool loc = false);
 
 void extract_char(CharacterPtr ch, bool pull, Trace t = Trace("unknown"));
@@ -5253,60 +5052,6 @@ void stop_guarding(CharacterPtr guard);
 void remove_memory(CharacterPtr ch, QChar type);
 void remove_memory(CharacterPtr ch, QChar type, CharacterPtr vict);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
-template <typename T>
-T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max())
-{
-  T number;
-
-  QString line = qDebugQTextStreamLine(in, "");
-  QStringList namelist = line.split(' ');
-  QString arg1 = namelist.value(0);
-  in >> number >> Qt::ws;
-
-  bool ok = false;
-  if (std::is_signed<T>::value)
-  {
-    if (arg1.toLongLong(&ok) != number && ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
-    }
-    else if (!ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(minval).name()));
-    }
-  }
-  else if (std::is_unsigned<T>::value)
-  {
-    if (arg1.toULongLong(&ok) != number && ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
-    }
-    else if (!ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(minval).name()));
-    }
-  }
-  else
-  {
-    qFatal("arg1 neither signed nor quint32");
-  }
-
-  if (number < minval)
-  {
-    qDebug("increasing number");
-    number = minval;
-  }
-  else if (number > maxval)
-  {
-    qDebug("decreasing number");
-    number = maxval;
-  }
-
-  // qDebug() << "fread_int returning" << number;
-  // qDebugQTextStreamLine(in, "After fread_int");
-  return number;
-}
-
 void write_object_csv(ObjectPtr obj, std::ofstream &fout);
 ObjectPtr read_object(qint32 nr, FILE *fl, bool zz);
 ObjectPtr read_object(qint32 nr, QTextStream &fl, bool zz);
@@ -6444,11 +6189,6 @@ const auto SECT_ARCTIC = 15;
 const auto SECT_MAX_SECT = 15; // update this if you add more
                                // and; const.c stuff for sectors
 
-bool CAN_GO(auto ch, auto door)
-{
-  return EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
-}
-
 #define GET_ALIGNMENT(ch) ((ch)->alignment)
 #define IS_GOOD(ch) (GET_ALIGNMENT(ch) >= 350)
 #define IS_EVIL(ch) (GET_ALIGNMENT(ch) <= -350)
@@ -6576,31 +6316,6 @@ QString sprintbit(quint32 vektor, const QStringList names);
 void sprintbit(quint32 vektor, QStringList names, QString result);
 QString sprintbit(quint32 vektor, QStringList names);
 
-// void sprinttype(quint64 type, const QStringList names, QString result);
-template <typename T>
-void sprinttype(T type, const QStringList names, QString result)
-{
-  if (!result)
-  {
-    return;
-  }
-
-  qsizetype nr = {};
-  for (; *names[nr] != '\n'; nr++)
-  {
-    ;
-  }
-
-  if (type > -1 && type < nr)
-  {
-    strcpy(result, names[type]);
-  }
-  else
-  {
-    strcpy(result, "Undefined");
-  }
-}
-
 QString sprinttype(qint32 type, const QStringList names);
 
 void sprinttype(qint32 type, QList<const QString>, QString result);
@@ -6615,7 +6330,7 @@ void sprinttype(T type, QStringList names, QString result)
   {
     return;
   }
-  strcpy(result, names.value(static_cast<qsizetype>(type), "Undefined").toStdString().c_str());
+  result = names.value(static_cast<qsizetype>(type), "Undefined");
 }
 
 QString sprinttype(qint32 type, QList<const QString>);
@@ -7842,9 +7557,7 @@ public:
   qint32 create_one_room(CharacterPtr ch, qint32 vnum);
   void update_wizlist(CharacterPtr ch);
   void do_godlist(void);
-  void write_wizlist(std::stringstream &filename);
   void write_wizlist(QString filename);
-  void write_wizlist(const QString filename);
   explicit DC(qint32 &argc, QString *argv);
   explicit DC(config c);
   void setup(void);
@@ -7869,6 +7582,7 @@ public:
   bool authenticate(QString username, QString password, quint64 level = 0);
   bool authenticate(const QHttpServerRequest &request, quint64 level = 0);
   void crash_hotboot(void);
+  void loadnews(void);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
   Database getDatabase(void) { return database_; }
@@ -7956,6 +7670,64 @@ public:
   qint32 oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm);
   qint32 oprog_rand_trigger(ObjectPtr item);
   qint32 oprog_arand_trigger(ObjectPtr item);
+  void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
+  void logf(qint32 level, DC::LogChannel type, QString arg);
+  void logf(qint32 level, DC::LogChannel type, QString cformat, ...);
+  qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
+
+  template <typename T>
+  T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max())
+  {
+    T number;
+
+    QString line = qDebugQTextStreamLine(in, "");
+    QStringList namelist = line.split(' ');
+    QString arg1 = namelist.value(0);
+    in >> number >> Qt::ws;
+
+    bool ok = false;
+    if (std::is_signed<T>::value)
+    {
+      if (arg1.toLongLong(&ok) != number && ok)
+      {
+        logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+      }
+      else if (!ok)
+      {
+        logentry(QStringLiteral("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(minval).name()));
+      }
+    }
+    else if (std::is_unsigned<T>::value)
+    {
+      if (arg1.toULongLong(&ok) != number && ok)
+      {
+        logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+      }
+      else if (!ok)
+      {
+        logentry(QStringLiteral("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(minval).name()));
+      }
+    }
+    else
+    {
+      qFatal("arg1 neither signed nor quint32");
+    }
+
+    if (number < minval)
+    {
+      qDebug("increasing number");
+      number = minval;
+    }
+    else if (number > maxval)
+    {
+      qDebug("decreasing number");
+      number = maxval;
+    }
+
+    // qDebug() << "fread_int returning" << number;
+    // qDebugQTextStreamLine(in, "After fread_int");
+    return number;
+  }
 
   ~DC(void)
   {
@@ -8013,6 +7785,206 @@ private:
   void nanny(Connection *d, QString arg = "");
   void object_activity(quint64 pulse_type);
 };
+bool CAN_GO(auto ch, auto door)
+{
+  return EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
+}
+auto &operator>>(auto &in, Room &room)
+{
+  room_t room_nr = {};
+  QString temp = {};
+  QChar ch = {};
+  qint32 dir = {};
+  extra_descr_data *new_new_descr{};
+  zone_t zone_nr = {};
+
+  ch = fread_char(in);
+
+  if (ch != '$')
+  {
+    room_nr = fread_int(in, 0, 1000000);
+    temp = fread_string(in, 0);
+
+    if (room_nr)
+    {
+      /*
+      DC::getInstance()->currentVNUM(room_nr);
+      DC::getInstance()->currentType("Room");
+      DC::getInstance()->currentName(temp);
+
+      if (room_nr >= DC::getInstance()->top_of_world_alloc)
+      {
+        DC::getInstance()->top_of_world_alloc = room_nr + 200;
+      }
+
+      if (DC::getInstance()->top_of_world < room_nr)
+        DC::getInstance()->top_of_world = room_nr;
+      */
+
+      room.paths_ = {};
+      room.number = room_nr;
+      room.name_ = temp;
+    }
+    QString description = fread_string(in, 0);
+    if (room_nr)
+    {
+      room.description_ = description;
+      room.tracks_ = {};
+      room.denied = {};
+      // DC::getInstance()->total_rooms++;
+    }
+    // Ignore recorded zone number since it may not longer be valid
+    fread_int(in, -1, 64000); // zone nr
+
+    if (room_nr)
+    {
+      // Go through the zone table until room.number is
+      // in the current zone.
+
+      bool found = false;
+      zone_t zone_nr = {};
+      for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+      {
+        if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
+        {
+          found = true;
+          zone_nr = zone_key;
+          break;
+        }
+      }
+      if (!found)
+      {
+        // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
+        // DC::getInstance()->logentry(error);
+        // DC::getInstance()->logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      }
+      else
+      {
+        auto &zone = DC::getInstance()->zones[zone_nr];
+        if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
+        {
+          if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
+          {
+            zone.setRealBottom(room_nr);
+          }
+          if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
+          {
+            zone.setRealTop(room_nr);
+          }
+        }
+        room.zone = zone_nr;
+      }
+    }
+
+    quint32 room_flags = fread_bitvector(in, -1, 2147483467);
+
+    if (room_nr)
+    {
+      room.room_flags = room_flags;
+      if (isSet(room.room_flags, NO_ASTRAL))
+      {
+        REMOVE_BIT(room.room_flags, NO_ASTRAL);
+      }
+
+      // This bitvector is for runtime and not stored in the files, so just initialize it to 0
+      room.temp_room_flags = {};
+    }
+
+    qint32 sector_type = fread_int(in, -1, 64000);
+
+    if (room_nr)
+    {
+      room.sector_type = sector_type;
+      room.funct = {};
+      room.contents_ = {};
+      room.people_ = {};
+      room.light = {}; /* Zero light sources */
+
+      for (size_t tmp = {}; tmp <= 5; tmp++)
+        room.dir_option[tmp] = {};
+
+      room.ex_description = {};
+    }
+
+    for (;;)
+    {
+      ch = fread_char(in); /* dir field */
+
+      /* direction field */
+      if (ch == 'D')
+      {
+        dir = fread_int(in, 0, 5);
+        setup_dir(in, room_nr, dir);
+      }
+      /* extra description field */
+      else if (ch == 'E')
+      {
+        // strip off the \n after the E
+        if (fread_char(in) != '\n')
+        {
+          fseek(in, -1, SEEK_CUR);
+        }
+
+        new_new_descr = new extra_descr_data;
+        new_new_descr->keyword_ = fread_string(in, 0);
+        new_new_descr->description_ = fread_string(in, 0);
+
+        if (room_nr)
+        {
+          new_new_descr->next = room.ex_description;
+          room.ex_description = new_new_descr;
+        }
+        else
+        {
+          new_new_descr = {};
+        }
+      }
+      else if (ch == 'B')
+      {
+        deny_data *deni;
+
+        deni = new deny_data;
+        deni->vnum = fread_int(in, -1, 2147483467);
+
+        if (room_nr)
+        {
+          deni->next = room.denied;
+          room.denied = deni;
+        }
+        else
+        {
+          deni = {};
+        }
+      }
+      else if (ch == 'S') /* end of current room */
+        break;
+      else if (ch == 'C')
+      {
+        qint32 c_class = fread_int(in, 0, CLASS_MAX);
+        if (room_nr)
+        {
+          room.allow_class[c_class] = true;
+        }
+      }
+    } // of for (;;) (get directions and extra descs)
+  } // if == $
+
+  return in;
+}
+void write_object(ObjectPtr obj, auto &out)
+{
+  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].vnum());
+  string_to_file(out, obj->name());
+  string_to_file(out, obj->short_description());
+  string_to_file(out, obj->long_description());
+  string_to_file(out, obj->ActionDescription());
+  out << obj->obj_flags;
+  out << obj->ex_description;
+  affects_to_file(out, obj);
+  out << DC::getInstance()->obj_index[obj->item_number].mobprogs_;
+  out << "S\n";
+}
+
 class ChannelMessage
 {
   QString sender_name_;
@@ -8088,11 +8060,6 @@ public:
   void set_name(const CharacterPtr sender);
 };
 
-void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
-void logf(qint32 level, DC::LogChannel type, const QString arg, ...);
-void logf(qint32 level, DC::LogChannel type, QString arg);
-qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
-
 template <typename T>
 T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
 {
@@ -8104,7 +8071,7 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
   if (from > to)
   {
 
-    logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
+    DC::getInstance()->logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
     produce_coredump();
     return to;
   }

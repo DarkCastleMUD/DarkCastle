@@ -12,7 +12,7 @@
 #include "DC/terminal.h"
 
 /*
- * logf, QStringLiteral, and csendf by Sadus, others by Ysafar.
+ * DC::getInstance()->logf, QStringLiteral, and csendf by Sadus, others by Ysafar.
  */
 
 class hash_info
@@ -58,8 +58,8 @@ bool ishashed(QString arg)
   return false;
 }
 
-/* logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", qPrintable(ch->name())); */
-void logf(qint32 level, DC::LogChannel type, QString cformat, ...)
+/* DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", qPrintable(ch->name())); */
+void DC::logf(level_t level, DC::LogChannel type, QString cformat, ...)
 {
   va_list args;
   QString s;
@@ -68,7 +68,7 @@ void logf(qint32 level, DC::LogChannel type, QString cformat, ...)
   s = QString::vasprintf(qPrintable(cformat), args);
   va_end(args);
 
-  logentry(s, level, type);
+  DC::getInstance()->logentry(s, level, type);
 }
 
 QString handle_ansi_(QString s, CharacterPtr ch)

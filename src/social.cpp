@@ -134,12 +134,12 @@ QString fread_social_string(FILE *fl)
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl))
   {
-    logentry(QStringLiteral("Fread_social_string - unexpected EOF."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Fread_social_string - unexpected EOF."), IMMORTAL, DC::LogChannel::LOG_BUG);
     exit(0);
   }
 
   if (*buf == '#')
-    return (0);
+    return {};
 
   // strip the \n
   *(buf + strlen(buf) - 1) = '\0';

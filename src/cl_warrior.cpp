@@ -1044,7 +1044,7 @@ void stop_guarding_me(CharacterPtr victim)
 
   while (curr)
   {
-    sprintf(buf, "You stop trying to guard %s.\r\n", qPrintable(victim->shortdesc_or_name()));
+    dc_sprintf(buf, "You stop trying to guard %s.\r\n", qPrintable(victim->shortdesc_or_name()));
     curr->follower->send(buf);
     curr->follower->guarding = {};
     last = curr;
@@ -1102,7 +1102,7 @@ command_return_t do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   start_guarding(ch, victim);
-  sprintf(name, "You begin trying to guard %s.\r\n", qPrintable(victim->shortdesc_or_name()));
+  dc_sprintf(name, "You begin trying to guard %s.\r\n", qPrintable(victim->shortdesc_or_name()));
   ch->send(name);
   return ReturnValue::eSUCCESS;
 }

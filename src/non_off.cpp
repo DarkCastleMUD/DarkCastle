@@ -39,19 +39,19 @@ void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
 
   if (!decay)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", qPrintable(ch->name()), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", qPrintable(ch->name()), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((ObjectPtr)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((ObjectPtr)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
-         GET_OBJ_SHORT(obj),
-         GET_OBJ_SHORT(loop_obj),
-         GET_OBJ_VNUM(loop_obj));
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
+                            GET_OBJ_SHORT(obj),
+                            GET_OBJ_SHORT(loop_obj),
+                            GET_OBJ_VNUM(loop_obj));
   }
 }
 
@@ -198,7 +198,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   obj = get_obj_in_list_vis(ch, name, ch->carrying);
   if (obj == nullptr)
   {
-    sprintf(buf, "You don't have any '%s' to donate.", name);
+    dc_sprintf(buf, "You don't have any '%s' to donate.", name);
     act(buf, ch, 0, 0, TO_CHAR, 0);
     return ReturnValue::eFAILURE;
   }
@@ -218,7 +218,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         REMBIT(ch->affected_by, AFF_CHAMPION);
 
-        sprintf(buf, "\r\n##%s has just yielded %s!\r\n", qPrintable(ch->name()), qPrintable(obj->short_description()));
+        dc_sprintf(buf, "\r\n##%s has just yielded %s!\r\n", qPrintable(ch->name()), qPrintable(obj->short_description()));
         send_info(buf);
 
         affected_type af;
@@ -246,8 +246,8 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        sprintf(buf, "%s had %s, but no AFF_CHAMPION.", qPrintable(ch->name()), qPrintable(obj->short_description()));
-        logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+        dc_sprintf(buf, "%s had %s, but no AFF_CHAMPION.", qPrintable(ch->name()), qPrintable(obj->short_description()));
+        DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         return ReturnValue::eFAILURE;
       }
     }
@@ -302,12 +302,12 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     QString log_buf = {};
-    sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), DC::getInstance()->obj_index[obj->item_number].vnum());
-    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    dc_sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), DC::getInstance()->obj_index[obj->item_number].vnum());
+    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj->short_description()),
-           qPrintable(loop_obj->short_description()),
-           DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj->short_description()),
+                              qPrintable(loop_obj->short_description()),
+                              DC::getInstance()->obj_index[loop_obj->item_number].vnum());
   }
 
   location = real_room(room);
@@ -379,7 +379,7 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->title) // this should always be true, but why not check anyway?
     ch->title = {};
   ch->title = (argument);
-  sprintf(buf, "Your title is now: %s\r\n", argument);
+  dc_sprintf(buf, "Your title is now: %s\r\n", argument);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -1562,8 +1562,8 @@ void CVoteData::OutToFile()
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
+                                DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1646,7 +1646,7 @@ CVoteData::CVoteData()
   {
     fclose(the_file);
     this->Reset(nullptr);
-    logentry(QStringLiteral("Error reading question from vote file."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Error reading question from vote file."), 0, DC::LogChannel::LOG_MISC);
     return;
   }
   buf[strlen(buf) - 1] = {};
@@ -1660,7 +1660,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading answers from vote file."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(QStringLiteral("Error reading answers from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1678,7 +1678,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1693,7 +1693,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading character names from vote file."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(QStringLiteral("Error reading character names from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1717,7 +1717,7 @@ command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
   qint32 vote;
   arg = one_argument(arg, buf);
 
-  if (!strcmp(buf, "results"))
+  if (buf == u"results"_s)
   {
     DC::getInstance()->DCVote.DisplayResults(ch);
     return ReturnValue::eSUCCESS;
@@ -1742,7 +1742,7 @@ command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
 
   vote = atoi(buf);
   if (true == DC::getInstance()->DCVote.Vote(ch, vote))
-    logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\r\n", qPrintable(ch->name()), vote);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\r\n", qPrintable(ch->name()), vote);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1760,7 +1760,7 @@ command_return_t do_random(CharacterPtr ch, QString argument, cmd_t cmd)
 
   i = number(1, 100);
   ch->send(QStringLiteral("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
-  sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
+  dc_sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
   act(buf, ch, 0, 0, TO_ROOM, 0);
   return ReturnValue::eSUCCESS;
 }

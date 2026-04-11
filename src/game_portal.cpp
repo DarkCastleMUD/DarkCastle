@@ -61,7 +61,7 @@ void load_game_portals()
     QString portal_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_files[i]);
     if ((cur_file = fopen(qPrintable(portal_filename), "r")) == 0)
     {
-      logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
+      DC::getInstance()->logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
       break;
     }
     /* Now we have a readable file.  Here's the ure:
@@ -79,7 +79,7 @@ void load_game_portals()
                &(game_portals[i].obj_num),
                &(game_portals[i].max_timer)) != 3)
     {
-      logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
+      DC::getInstance()->logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
       break;
     }
     /* Store the current file value and count line feeds */
@@ -147,9 +147,9 @@ void process_portals()
               game_portals[i].max_timer) == 0)
       {
         QString log_buf = {};
-        sprintf(log_buf, "Making portal from %d to %llu failed.", from_room,
-                game_portals[i].to_room);
-        logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+        dc_sprintf(log_buf, "Making portal from %d to %llu failed.", from_room,
+                   game_portals[i].to_room);
+        DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }
       game_portals[i].cur_timer = game_portals[i].max_timer;
     }
@@ -177,17 +177,17 @@ qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate,
 
   if (real_room(from_room) == DC::NOWHERE)
   {
-    sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
+    dc_sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
     from_portal = {};
-    logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
-    return (0);
+    DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    return {};
   }
 
   if (from_room == to_room)
   {
     from_portal = {};
-    logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
-    return (0);
+    DC::getInstance()->logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    return {};
   }
 
   if (duplicate < 0) /* Make a generic portal */
@@ -210,9 +210,9 @@ qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate,
 
     if (!from_portal->isPortal())
     {
-      sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
+      dc_sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       from_portal = {};
-      logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       return 0;
     }
   }

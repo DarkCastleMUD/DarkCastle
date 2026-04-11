@@ -36,7 +36,7 @@ command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
     if (GET_PLATINUM(i) < (quint32)minamt)
       continue;
 
-    sprintf(buf, "%15d - %s - %ld - %d\r\n", GET_PLATINUM(i), qPrintable(i->name()), i->getGold(), GET_BANK(i));
+    dc_sprintf(buf, "%15d - %s - %ld - %d\r\n", GET_PLATINUM(i), qPrintable(i->name()), i->getGold(), GET_BANK(i));
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -73,7 +73,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
       if (getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
         sendln("Now doing that would just tick off the IMPS!");
-        logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
+        DC::getInstance()->logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
         return ReturnValue::eSUCCESS;
       }
       if ((getLevel() <= vict->getLevel()) && vict->isPlayer())
@@ -93,7 +93,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
         buf = fmt::format("{} just forced %s to %s.", qPrintable(name()),
                           qPrintable(vict->name()), to_force);
         vict->command_interpreter(to_force.c_str());
-        logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
+        DC::getInstance()->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
       }
     }
   }
@@ -126,7 +126,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
     }
     sendln("Ok.");
     buf = fmt::format("{} just forced all to {}.", qPrintable(name()), to_force);
-    logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }

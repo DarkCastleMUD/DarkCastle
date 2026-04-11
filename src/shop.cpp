@@ -59,7 +59,7 @@ qint32 is_ok(CharacterPtr keeper, CharacterPtr ch, qint32 shop_nr)
   if (ISSET(ch->affected_by, AFF_KILLER))
   {
     do_say(keeper, "Go away before I call the guards!!");
-    sprintf(buf, "%s the KILLER is over here!\r\n", qPrintable(ch->shortdesc_or_name()));
+    dc_sprintf(buf, "%s the KILLER is over here!\r\n", qPrintable(ch->shortdesc_or_name()));
     do_shout(keeper, buf);
     return false;
   }
@@ -141,8 +141,8 @@ void restock_keeper(CharacterPtr keeper, qint32 shop_nr)
   ObjectPtr obj, obj2;
   QString buf;
 
-  sprintf(buf, "Restocking shop keeper: %d", shop_nr);
-  logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
+  dc_sprintf(buf, "Restocking shop keeper: %d", shop_nr);
+  DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
@@ -168,7 +168,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
   one_argument(arg, argm);
   if (*argm == '\0')
   {
-    sprintf(buf, "%s What do you want to buy?", qPrintable(ch->name()));
+    dc_sprintf(buf, "%s What do you want to buy?", qPrintable(ch->name()));
     keeper->do_tell(QString(buf).split(' '));
     return;
   }
@@ -411,28 +411,28 @@ void shopping_value(const QString arg, CharacterPtr ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Well, %s is able to be used by ", qPrintable(obj->short_description()));
+        dc_sprintf(buf, "Well, %s is able to be used by ", qPrintable(obj->short_description()));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "and it can be wielded by these classes: ");
+        dc_sprintf(buf, "and it can be wielded by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
+        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
-        sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
+        dc_sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
         do_say(keeper, buf);
         for (qint32 i = {}; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0)
           {
-            sprintf(buf, "It increases your hit roll by %d.", obj->affected[i].modifier);
+            dc_sprintf(buf, "It increases your hit roll by %d.", obj->affected[i].modifier);
             do_say(keeper, buf);
           }
           if (obj->affected[i].location == APPLY_DAMROLL && obj->affected[i].modifier != 0)
           {
-            sprintf(buf, "It increases your damage by %d.", obj->affected[i].modifier);
+            dc_sprintf(buf, "It increases your damage by %d.", obj->affected[i].modifier);
             do_say(keeper, buf);
           }
         }
@@ -460,21 +460,21 @@ void shopping_value(const QString arg, CharacterPtr ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
+        dc_sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "and it can be worn by these classes: ");
+        dc_sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
+        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
         for (qint32 i = {}; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
-            sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
+            dc_sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
             do_say(keeper, buf);
             if (obj->affected[i].modifier < 0)
               do_say(keeper, "Don't worry, this is a good thing.");
@@ -504,13 +504,13 @@ void shopping_value(const QString arg, CharacterPtr ch,
     {
       if (obj->obj_flags.value[0] < 20)
       {
-        sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", qPrintable(obj->short_description()), obj->obj_flags.value[0]);
+        dc_sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", qPrintable(obj->short_description()), obj->obj_flags.value[0]);
         do_say(keeper, buf);
         if (GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF)
         {
           if (obj->obj_flags.value[3] >= 1)
           {
-            sprintf(buf, "It is eminating the aura of ");
+            dc_sprintf(buf, "It is eminating the aura of ");
             sprinttype(obj->obj_flags.value[3] - 1, spells, buf2);
             strcat(buf, buf2);
             do_say(keeper, buf);
@@ -526,7 +526,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
         {
           if (obj->obj_flags.value[1] >= 1)
           {
-            sprintf(buf, "I can easily identify the signatures of ");
+            dc_sprintf(buf, "I can easily identify the signatures of ");
             sprinttype(obj->obj_flags.value[1] - 1, spells, buf2);
             strcat(buf, buf2);
             do_say(keeper, buf);
@@ -552,21 +552,21 @@ void shopping_value(const QString arg, CharacterPtr ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
+        dc_sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "and it can be worn by these classes: ");
+        dc_sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
+        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
         for (qint32 i = {}; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
-            sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
+            dc_sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
             do_say(keeper, buf);
             if (obj->affected[i].modifier < 0)
               do_say(keeper, "Don't worry, this is a good thing.");
@@ -644,7 +644,7 @@ void shopping_list(const QString arg, CharacterPtr ch,
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
-                sprintf( buf, "[%3d] [%7d] %s of %s.\r\n",
+                dc_sprintf( buf, "[%3d] [%7d] %s of %s.\r\n",
                     a, cost, qPrintable(obj->short_description()),
                     drinks[obj->obj_flags.value[2]] );
             }
@@ -689,7 +689,7 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -699,7 +699,7 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
     if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
   return ReturnValue::eFAILURE;
 
 LFound2:
@@ -801,7 +801,7 @@ void boot_the_shops()
     qint32 room_nr = real_room(temp);
     if (room_nr < 0 || room_nr > DC::getInstance()->top_of_world)
     {
-      logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
+      DC::getInstance()->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
       room_nr = {};
     }
 
@@ -817,7 +817,7 @@ void boot_the_shops()
     if (real_room(temp) == DC::NOWHERE)
     {
       QString log_buf = {};
-      sprintf(log_buf, "BAD SHOP IN missing ROOM %d -- FIX THIS!", temp);
+      dc_sprintf(log_buf, "BAD SHOP IN missing ROOM %d -- FIX THIS!", temp);
       DC::getInstance()->logverbose(log_buf);
       continue;
       /* This way we don't increment if it was bad */
@@ -891,8 +891,8 @@ player_shop *read_one_player_shop(FILE *fp)
   {
     // add future stuff here
 
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
     exit(1);
   }
 
@@ -923,11 +923,11 @@ void write_one_player_shop(player_shop *shop)
   QString buf;
   qint32 count = {};
 
-  sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, shop->owner);
+  dc_sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, shop->owner);
 
   if ((fp = fopen(buf, "w")) == nullptr)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
   }
 
@@ -986,7 +986,7 @@ void save_player_shop_world_range()
   if (!curr)
   {
     // panic!
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
     exit(1);
   }
 
@@ -1022,7 +1022,7 @@ void boot_player_shops()
   filename = fread_string(fp, 0);
   while (strcmp(filename, "$"))
   {
-    sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, filename);
+    dc_sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, filename);
     if ((shopfp = fopen(buf, "r")) == nullptr)
     {
       perror(buf);
@@ -1313,7 +1313,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
       ch->sendln("That sell message is too long.");
       return;
     }
-    if (!strcmp(text, "none"))
+    if (text == u"none"_s)
       *shop->sell_message = '\0';
     else
       strcpy(shop->sell_message, text);
@@ -1396,7 +1396,7 @@ qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
 
   if (!(keeper = invoker))
   {
-    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1638,12 +1638,12 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       else if (eddie[i].cost_exp > 0)
       {
         QString cost_buf_str = fmt::format(std::locale("en_US.UTF-8"), "{:L} experience", eddie[i].cost_exp);
-        snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
+        dc_snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
       else if (eddie[i].cost_plats > 0)
       {
         QString cost_buf_str = fmt::format(std::locale("en_US.UTF-8"), "{:L} platinum", eddie[i].cost_plats);
-        snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
+        dc_snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
 
       if (last_vnum != 0 && last_vnum != eddie[i].item_vnum)
@@ -1769,8 +1769,8 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
           act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
           act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
 
-          sprintf(buf, "%s gives %s to %s (removed)", qPrintable(ch->name()), qPrintable(obj->name()), qPrintable(owner->name()));
-          logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+          dc_sprintf(buf, "%s gives %s to %s (removed)", qPrintable(ch->name()), qPrintable(obj->name()), qPrintable(owner->name()));
+          DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         }
         else
         {
@@ -1792,8 +1792,8 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
         act("$n gives you $p.", owner, item, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
 
-        sprintf(buf, "%s gives %s to %s (created)", qPrintable(owner->name()), qPrintable(item->name()), qPrintable(ch->name()));
-        logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        dc_sprintf(buf, "%s gives %s to %s (created)", qPrintable(owner->name()), qPrintable(item->name()), qPrintable(ch->name()));
+        DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1925,7 +1925,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -1934,7 +1934,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(r.orig_obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(r.orig_obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1984,7 +1984,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice1_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice1_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
@@ -2001,7 +2001,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice2_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice2_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
@@ -2019,7 +2019,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2047,7 +2047,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
       act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);

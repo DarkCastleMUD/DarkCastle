@@ -34,7 +34,7 @@ qint32 number_or_name(QString *name, qint32 *num)
 
     for (i = {}; *(number + i); i++)
       if (!isdigit(*(number + i)))
-        return (0);
+        return {};
 
     return (atoi(number));
   }
@@ -69,7 +69,7 @@ qint32 number_or_name(QString *name, qint32 *num)
 
     for (i = {}; *(number + i); i++)
       if (!isdigit(*(number + i)))
-        return (0);
+        return {};
 
     return (atoi(number));
   }
@@ -108,11 +108,11 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
     act("$n draws up a swirling column of dust and breathes life into it.",
         ch, 0, 0, TO_ROOM, 0);
     act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
-    sprintf(buf, "You create %i %s!\r\n", cnt, mob->short_desc);
+    dc_sprintf(buf, "You create %i %s!\r\n", cnt, mob->short_desc);
     ch->send(buf);
     if (cnt > 1)
     {
-      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
+      dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
                qPrintable(ch->name()),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
@@ -122,7 +122,7 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
     }
     else
     {
-      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
+      dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
                qPrintable(ch->name()),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
@@ -130,17 +130,17 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
     }
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
+    dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
              qPrintable(ch->name()),
              cnt,
              DC::getInstance()->mob_index[rnum].vnum(),
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
   }
 }
@@ -189,7 +189,7 @@ obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
                     qPrintable(obj->short_description()),
                     DC::getInstance()->world[ch->in_room].number,
                     DC::getInstance()->world[ch->in_room].name);
-  logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return obj_list;
 }
@@ -226,12 +226,12 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
     }
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", qPrintable(obj->short_description()));
+  dc_snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", qPrintable(obj->short_description()));
 
   ch->send(buf);
   if (cnt > 1)
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %lu (%s) at room %d (%s).",
+    dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %lu (%s) at room %d (%s).",
              qPrintable(ch->name()),
              cnt,
              random ? "randomized " : "",
@@ -242,7 +242,7 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %lu (%s) at room %d (%s).",
+    dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %lu (%s) at room %d (%s).",
              qPrintable(ch->name()),
              cnt,
              random ? "randomized " : "",
@@ -251,7 +251,7 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
   }
-  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 }
 
 //
@@ -271,93 +271,93 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   affected_type *aff;
 
   sprinttype(k->c_class, pc_clss_types, buf2);
-  sprintf(buf, "$R(:)========================================================================(:)\r\n"
-               "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5lu $3Room$R: %-5d |=|\r\n"
-               "|=|$3 Short$R: %-50s $3RNUM$R: %-6d |=|\r\n"
-               "|=|$3 Long$R: %s"
-               "(:)====================(:)=================================================(:)\r\n"
-               "|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
-               "|~|  $4Master$R:   %-9s|o|  $1Class$R:  %-10s $1Mana$R:   %5d$1/$R(%5d+%-3d) |\\|\r\n",
+  dc_sprintf(buf, "$R(:)========================================================================(:)\r\n"
+                  "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5lu $3Room$R: %-5d |=|\r\n"
+                  "|=|$3 Short$R: %-50s $3RNUM$R: %-6d |=|\r\n"
+                  "|=|$3 Long$R: %s"
+                  "(:)====================(:)=================================================(:)\r\n"
+                  "|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
+                  "|~|  $4Master$R:   %-9s|o|  $1Class$R:  %-10s $1Mana$R:   %5d$1/$R(%5d+%-3d) |\\|\r\n",
 
-          (k->isPlayer() ? "PC" : "MOB"),
-          qPrintable(k->name()),
-          (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
-          (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
-          /* end of first line */
+             (k->isPlayer() ? "PC" : "MOB"),
+             qPrintable(k->name()),
+             (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
+             (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
+             /* end of first line */
 
-          (!k->short_description().isEmpty() ? qPrintable(k->short_description()) : "None"),
-          (qint32)(k->isNonPlayer() ? k->mobdata->nr : 0),
-          /* end of second line */
+             (!k->short_description().isEmpty() ? qPrintable(k->short_description()) : "None"),
+             (qint32)(k->isNonPlayer() ? k->mobdata->nr : 0),
+             /* end of second line */
 
-          (!k->long_description().isEmpty() ? qPrintable(k->long_description()) : "None"),
-          /* end of third line */
+             (!k->long_description().isEmpty() ? qPrintable(k->long_description()) : "None"),
+             /* end of third line */
 
-          (k->fighting ? qPrintable(k->fighting->name()) : "Nobody"),
-          (races[(qint32)(k->race)].singular_name),
-          k->getHP(), hit_limit(k), k->hit_gain_lookup(),
-          /* end of fourth line */
+             (k->fighting ? qPrintable(k->fighting->name()) : "Nobody"),
+             (races[(qint32)(k->race)].singular_name),
+             k->getHP(), hit_limit(k), k->hit_gain_lookup(),
+             /* end of fourth line */
 
-          (k->master ? qPrintable(k->master->name()) : "Nobody"),
-          buf2, /* this is for the class QString, the sprinttype above inits it. */
-          GET_MANA(k), mana_limit(k), k->mana_gain_lookup());
-  /* end of the first sprintf */
+             (k->master ? qPrintable(k->master->name()) : "Nobody"),
+             buf2, /* this is for the class QString, the sprinttype above inits it. */
+             GET_MANA(k), mana_limit(k), k->mana_gain_lookup());
+  /* end of the first dc_sprintf */
 
   ch->send(buf); // this sends to character, now we can overwrite buf
 
   if (k->isNonPlayer())
   {
-    sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
-    sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
+    dc_sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
+    dc_sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
   }
   else
   {
-    sprintf(buf2, "Nobody");
-    sprintf(buf3, "Nobody");
+    dc_sprintf(buf2, "Nobody");
+    dc_sprintf(buf3, "Nobody");
   }
 
-  sprintf(buf, "|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9llu  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
-               "|o|  $4Fears$R:    %-9s|~|  $1Height$R: %-9d  $1Ki$R:     %5d$1/$R(%5d)     |/|\r\n"
-               "|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
+  dc_sprintf(buf, "|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9llu  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
+                  "|o|  $4Fears$R:    %-9s|~|  $1Height$R: %-9d  $1Ki$R:     %5d$1/$R(%5d)     |/|\r\n"
+                  "|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
 
-          buf2, // who the mob hates
-          k->getLevel(),
-          GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
-          /* end of first line */
+             buf2, // who the mob hates
+             k->getLevel(),
+             GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
+             /* end of first line */
 
-          buf3, // who the mob fears, if anyone
-          GET_HEIGHT(k),
-          GET_KI(k), ki_limit(k),
-          /* end of second line */
+             buf3, // who the mob fears, if anyone
+             GET_HEIGHT(k),
+             GET_KI(k), ki_limit(k),
+             /* end of second line */
 
-          (k->hunting.isEmpty() ? "NOBODY" : qPrintable(k->hunting)),
-          GET_WEIGHT(k),
-          k->alignment);
+             (k->hunting.isEmpty() ? "NOBODY" : qPrintable(k->hunting)),
+             GET_WEIGHT(k),
+             k->alignment);
 
   ch->send(buf);
-  /* end of second sprintf */
+  /* end of second dc_sprintf */
 
   switch (k->sex)
   {
   case SEX_NEUTRAL:
-    sprintf(buf2, "Neutral");
+    dc_sprintf(buf2, "Neutral");
     break;
   case SEX_MALE:
-    sprintf(buf2, "Male");
+    dc_sprintf(buf2, "Male");
     break;
   case SEX_FEMALE:
-    sprintf(buf2, "Female");
+    dc_sprintf(buf2, "Female");
     break;
   default:
-    sprintf(buf2, "ILLEGAL-VALUE");
+    dc_sprintf(buf2, "ILLEGAL-VALUE");
     break;
   }
 
-  sprintf(buf, "|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
-               "(:)====================(:)==========(:)====================================(:)\r\n",
-          k->timer,
-          (ch->isPlayer() ? k->hometown : -1),
-          buf2); /* buf is the sex... */
-  ch->send(buf); /* THIRD sprintf */
+  dc_sprintf(buf, "|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
+                  "(:)====================(:)==========(:)====================================(:)\r\n",
+             k->timer,
+             (ch->isPlayer() ? k->hometown : -1),
+             buf2); /* buf is the sex... */
+  ch->send(buf);    /* THIRD dc_sprintf */
 
   if (k->isNonPlayer())
   {
@@ -372,16 +372,16 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
       strcpy(buf3, "None");
   }
 
-  sprintf(buf, "|/|  $4FIRE$R: %3d  $1COLD$R: %3d $5NRGY$R: %3d |\\| Mob Non-Combat Spec Proc: %-9s|o|\r\n"
-               "|o|  $2$BACID$R: %3d  $3MAGK$R: %3d $2POIS$R: %3d |~| Mob Combat Spec Proc:     %-9s|/|\r\n",
+  dc_sprintf(buf, "|/|  $4FIRE$R: %3d  $1COLD$R: %3d $5NRGY$R: %3d |\\| Mob Non-Combat Spec Proc: %-9s|o|\r\n"
+                  "|o|  $2$BACID$R: %3d  $3MAGK$R: %3d $2POIS$R: %3d |~| Mob Combat Spec Proc:     %-9s|/|\r\n",
 
-          k->saves[SAVE_TYPE_FIRE], k->saves[SAVE_TYPE_COLD], k->saves[SAVE_TYPE_ENERGY],
-          buf2, /* whether nor not they have a non_combat spec proc */
-          /* end of first line */
+             k->saves[SAVE_TYPE_FIRE], k->saves[SAVE_TYPE_COLD], k->saves[SAVE_TYPE_ENERGY],
+             buf2, /* whether nor not they have a non_combat spec proc */
+             /* end of first line */
 
-          k->saves[SAVE_TYPE_ACID], k->saves[SAVE_TYPE_MAGIC], k->saves[SAVE_TYPE_POISON],
-          buf3); /* buf2 = whether or not there is a combat spec proc */
-  /* end of fourth sprintf */
+             k->saves[SAVE_TYPE_ACID], k->saves[SAVE_TYPE_MAGIC], k->saves[SAVE_TYPE_POISON],
+             buf3); /* buf2 = whether or not there is a combat spec proc */
+  /* end of fourth dc_sprintf */
   ch->send(buf);
 
   sprinttype(GET_POS(k), Character::position_types, buf2);
@@ -393,17 +393,17 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
   for (i = 0, j = k->carrying; j; j = j->next_content, ++i)
     ;
-  sprintf(buf, "|\\|  $3Pos$R: %-9s$3DefPos$R: %-9s|/| $1Thirst$R: %-3d $4Hunger$R: %-3d $6Drunk$R: %-3d |~|\r\n"
-               "|/|  $3Dex$R: %2d    $3Con$R: %2d    $3Str$R: %2d  |\\| $3Carried Weight$R: %-4d $3Inv. Items$R: %-3d|o|\r\n",
+  dc_sprintf(buf, "|\\|  $3Pos$R: %-9s$3DefPos$R: %-9s|/| $1Thirst$R: %-3d $4Hunger$R: %-3d $6Drunk$R: %-3d |~|\r\n"
+                  "|/|  $3Dex$R: %2d    $3Con$R: %2d    $3Str$R: %2d  |\\| $3Carried Weight$R: %-4d $3Inv. Items$R: %-3d|o|\r\n",
 
-          buf2, buf3, // pos and default pos respectively
-          k->conditions[THIRST],
-          k->conditions[FULL],
-          k->conditions[DRUNK],
-          // end of first line
+             buf2, buf3, // pos and default pos respectively
+             k->conditions[THIRST],
+             k->conditions[FULL],
+             k->conditions[DRUNK],
+             // end of first line
 
-          GET_DEX(k), GET_CON(k), GET_STR(k),
-          IS_CARRYING_W(k), i);
+             GET_DEX(k), GET_CON(k), GET_STR(k),
+             IS_CARRYING_W(k), i);
   /* END OF WEAR_SECOND_WIELD LINE */
 
   ch->send(buf);
@@ -412,23 +412,23 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
     if (k->equipment[i])
       i2++;
 
-  sprintf(buf, "|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
-          GET_INT(k), GET_WIS(k), GET_ARMOR(k), IS_CARRYING_N(k), i2);
+  dc_sprintf(buf, "|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
+             GET_INT(k), GET_WIS(k), GET_ARMOR(k), IS_CARRYING_N(k), i2);
   ch->send(buf);
 
-  sprintf(buf, "|o| $3 Hitroll$R: %3d     $3Damroll$R: %3d  |~|                                    |/|\r\n"
-               "(:)=================================(:)====================================(:)\r\n",
-          k->hitroll, k->damroll);
+  dc_sprintf(buf, "|o| $3 Hitroll$R: %3d     $3Damroll$R: %3d  |~|                                    |/|\r\n"
+                  "(:)=================================(:)====================================(:)\r\n",
+             k->hitroll, k->damroll);
   ch->send(buf);
 
   sprintbit(k->suscept, isr_bits, buf2);
   sprintbit(k->immune, isr_bits, buf3);
-  sprintf(buf, "|/| $7Immune$R: %-63s|o|\r\n"
-               "|o| $7Susceptible$R: %-58s|/|\r\n",
-          buf2, buf3); // immune and susceptible bits, first and second.
+  dc_sprintf(buf, "|/| $7Immune$R: %-63s|o|\r\n"
+                  "|o| $7Susceptible$R: %-58s|/|\r\n",
+             buf2, buf3); // immune and susceptible bits, first and second.
   ch->send(buf);
   sprintbit(k->affected_by, affected_bits, buf2);
-  sprintf(buf, "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
+  dc_sprintf(buf, "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
   ch->send(buf);
 
   if (k->isNonPlayer()) // AND THIS
@@ -436,15 +436,15 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   else
     strcpy(buf2, "Not a mob");
   sprintbit(k->combat, combat_bits, buf3);
-  sprintf(buf, "|~| $7NPC flags$R: %-60s|\\|\r\n"
-               "|/| $7Combat flags$R: %-57s|o|\r\n",
-          buf2, buf3); // npc flags and combat flags respectively
+  dc_sprintf(buf, "|~| $7NPC flags$R: %-60s|\\|\r\n"
+                  "|/| $7Combat flags$R: %-57s|o|\r\n",
+             buf2, buf3); // npc flags and combat flags respectively
   ch->send(buf);
 
   sprintbit(k->resist, isr_bits, buf2);
-  sprintf(buf, "|o| $7Resistant$R: %-60s|/|\r\n"
-               "(:)========================================================================(:)\r\n",
-          buf2); // the resisted bits
+  dc_sprintf(buf, "|o| $7Resistant$R: %-60s|/|\r\n"
+                  "(:)========================================================================(:)\r\n",
+             buf2); // the resisted bits
   ch->send(buf);
 
   strcpy(buf, "$3Title$R: ");
@@ -466,58 +466,58 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs $3Played$R[%d]secs\r\n",
-            k->player->time.birth,
-            k->player->time.logon,
-            (qint32)(k->player->time.played));
+    dc_sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs $3Played$R[%d]secs\r\n",
+               k->player->time.birth,
+               k->player->time.logon,
+               (qint32)(k->player->time.played));
     ch->send(buf);
 
-    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
-            k->age().year, k->age().month, k->age().day, k->age().hours);
+    dc_sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
+               k->age().year, k->age().month, k->age().day, k->age().hours);
     ch->send(buf);
   }
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\r\n", k->getGold(),
-            k->player->bank);
+    dc_sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\r\n", k->getGold(),
+               k->player->bank);
     ch->send(buf);
   }
 
   if (k->isPlayer())
   {
-    sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\r\n",
-            k->player->saves_mods[SAVE_TYPE_FIRE],
-            k->player->saves_mods[SAVE_TYPE_COLD],
-            k->player->saves_mods[SAVE_TYPE_ENERGY],
-            k->player->saves_mods[SAVE_TYPE_ACID],
-            k->player->saves_mods[SAVE_TYPE_MAGIC],
-            k->player->saves_mods[SAVE_TYPE_POISON]);
+    dc_sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\r\n",
+               k->player->saves_mods[SAVE_TYPE_FIRE],
+               k->player->saves_mods[SAVE_TYPE_COLD],
+               k->player->saves_mods[SAVE_TYPE_ENERGY],
+               k->player->saves_mods[SAVE_TYPE_ACID],
+               k->player->saves_mods[SAVE_TYPE_MAGIC],
+               k->player->saves_mods[SAVE_TYPE_POISON]);
     ch->send(buf);
   }
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
+    dc_sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
     ch->send(buf);
-    sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
+    dc_sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     ch->send(buf);
-    sprintf(buf, "$3Stealth$R:  %s\r\n", ((k->player->stealth) ? "ON" : "OFF"));
+    dc_sprintf(buf, "$3Stealth$R:  %s\r\n", ((k->player->stealth) ? "ON" : "OFF"));
     ch->send(buf);
 
     if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
         (k->player->buildHighVnum == k->player->buildMHighVnum) == k->player->buildOHighVnum)
     {
-      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
+      dc_sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
       ch->send(buf);
     }
     else
     {
-      sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
+      dc_sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
       ch->send(buf);
-      sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->player->buildMLowVnum, k->player->buildMHighVnum);
+      dc_sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->player->buildMLowVnum, k->player->buildMHighVnum);
       ch->send(buf);
-      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
+      dc_sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
       ch->send(buf);
     }
   }
@@ -528,13 +528,13 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
     for (aff = k->affected; aff; aff = aff->next)
     {
-      sprintf(buf, "Spell : '%s'\r\n",
-              aff->type < 300 ? spells[(qint32)aff->type - 1] : skills[(qint32)aff->type - 300]);
+      dc_sprintf(buf, "Spell : '%s'\r\n",
+                 aff->type < 300 ? spells[(qint32)aff->type - 1] : skills[(qint32)aff->type - 300]);
       ch->send(buf);
-      sprintf(buf, "     Modifies %s by %d points\r\n",
-              apply_types[(qint32)aff->location], aff->modifier);
+      dc_sprintf(buf, "     Modifies %s by %d points\r\n",
+                 apply_types[(qint32)aff->location], aff->modifier);
       ch->send(buf);
-      sprintf(buf, "     Expires in %3d hours, Bits set ", aff->duration);
+      dc_sprintf(buf, "     Expires in %3d hours, Bits set ", aff->duration);
       ch->send(buf);
       sprintbit(aff->bitvector, affected_bits, buf);
       strcat(buf, "\r\n");
@@ -572,11 +572,11 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (k->isNonPlayer())
   {
-    sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
-            (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
-            (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
-            (k->isNonPlayer() ? k->mobdata->nr : 0),
-            k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
+    dc_sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
+               (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
+               (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
+               (k->isNonPlayer() ? k->mobdata->nr : 0),
+               k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
     strcat(buf, buf2);
@@ -584,9 +584,9 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   }
   else
   {
-    sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\r\n",
-            (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
-            k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
+    dc_sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\r\n",
+               (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
+               k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
   }
   ch->send(buf);
 
@@ -616,25 +616,25 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   strcat(buf, buf2);
 
-  sprintf(buf2, "   $3Level$R:[%llu] $3Alignment$R:[%d] ", k->getLevel(),
-          k->alignment);
+  dc_sprintf(buf2, "   $3Level$R:[%llu] $3Alignment$R:[%d] ", k->getLevel(),
+             k->alignment);
   strcat(buf, buf2);
   ch->send(buf);
-  sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
+  dc_sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
   ch->send(buf);
-  sprintf(buf, "$3Race$R: %s\r\n", races[(qint32)(k->race)].singular_name);
+  dc_sprintf(buf, "$3Race$R: %s\r\n", races[(qint32)(k->race)].singular_name);
   ch->send(buf);
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs  $3Played$R[%d]secs\r\n",
-            k->player->time.birth,
-            k->player->time.logon,
-            (qint32)(k->player->time.played));
+    dc_sprintf(buf, "$3Birth$R: [%d]secs  $3Logon$R:[%d]secs  $3Played$R[%d]secs\r\n",
+               k->player->time.birth,
+               k->player->time.logon,
+               (qint32)(k->player->time.played));
     ch->send(buf);
 
-    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
-            k->age().year, k->age().month, k->age().day, k->age().hours);
+    dc_sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\r\n",
+               k->age().year, k->age().month, k->age().day, k->age().hours);
     ch->send(buf);
   }
   if (k->isNonPlayer())
@@ -652,7 +652,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
     ch->sendln(QStringLiteral("$3Mobspec$R: %1  $3Progtypes$R: %2").arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
   }
-  sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
+  dc_sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);
 
   switch (k->sex)
@@ -673,42 +673,42 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (ch->isPlayer())
   {
-    sprintf(buf, "$3Hometown$R:[%d]\r\n", k->hometown);
+    dc_sprintf(buf, "$3Hometown$R:[%d]\r\n", k->hometown);
     ch->send(buf);
   }
   else
     ch->sendln("");
 
-  sprintf(buf, "$3Str$R:[%2d]+[%2d]=%2d $3Int$R:[%2d]+[%2d]=%2d $3Wis$R:[%2d]+[%2d]=%2d\r\n"
-               "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\r\n",
-          GET_RAW_STR(k), GET_STR_BONUS(k), GET_STR(k),
-          GET_RAW_INT(k), GET_INT_BONUS(k), GET_INT(k),
-          GET_RAW_WIS(k), GET_WIS_BONUS(k), GET_WIS(k),
-          GET_RAW_DEX(k), GET_DEX_BONUS(k), GET_DEX(k),
-          GET_RAW_CON(k), GET_CON_BONUS(k), GET_CON(k));
+  dc_sprintf(buf, "$3Str$R:[%2d]+[%2d]=%2d $3Int$R:[%2d]+[%2d]=%2d $3Wis$R:[%2d]+[%2d]=%2d\r\n"
+                  "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\r\n",
+             GET_RAW_STR(k), GET_STR_BONUS(k), GET_STR(k),
+             GET_RAW_INT(k), GET_INT_BONUS(k), GET_INT(k),
+             GET_RAW_WIS(k), GET_WIS_BONUS(k), GET_WIS(k),
+             GET_RAW_DEX(k), GET_DEX_BONUS(k), GET_DEX(k),
+             GET_RAW_CON(k), GET_CON_BONUS(k), GET_CON(k));
   ch->send(buf);
 
-  sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\r\n",
-          GET_MANA(k), mana_limit(k), k->mana_gain_lookup(),
-          k->getHP(), hit_limit(k), k->hit_gain_lookup(),
-          GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
-          GET_KI(k), ki_limit(k));
+  dc_sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\r\n",
+             GET_MANA(k), mana_limit(k), k->mana_gain_lookup(),
+             k->getHP(), hit_limit(k), k->hit_gain_lookup(),
+             GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
+             GET_KI(k), ki_limit(k));
   ch->send(buf);
 
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\r\n",
-          GET_ARMOR(k), k->exp, GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
+  dc_sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\r\n",
+             GET_ARMOR(k), k->exp, GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\r\n",
-            GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
+    dc_sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\r\n",
+               GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", qPrintable(k->getPositionQString()),
-          ((k->fighting) ? qPrintable(k->fighting->name())
-                         : "Nobody"));
+  dc_sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", qPrintable(k->getPositionQString()),
+             ((k->fighting) ? qPrintable(k->fighting->name())
+                            : "Nobody"));
   if (k->desc)
   {
     sprinttype(k->desc->connected, connected_types, buf2);
@@ -724,17 +724,17 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
     ch->send(buf);
   }
 
-  sprintf(buf, "  $3Timer$R:[%d] \r\n", k->timer);
+  dc_sprintf(buf, "  $3Timer$R:[%d] \r\n", k->timer);
   ch->send(buf);
 
   if (k->isNonPlayer())
   {
-    sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobdata->actflags[0], k->mobdata->actflags[1]);
+    dc_sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobdata->actflags[0], k->mobdata->actflags[1]);
     sprintbit(k->mobdata->actflags, action_bits, buf2);
   }
   else
   {
-    sprintf(buf, "$3PC flags$R: [%d]", k->player->toggles);
+    dc_sprintf(buf, "$3PC flags$R: [%d]", k->player->toggles);
     sprintbit(k->player->toggles, player_bits, buf2);
   }
   strcat(buf, buf2);
@@ -755,73 +755,73 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (k->isNonPlayer())
   {
-    sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n",
-            k->mobdata->damnodice, k->mobdata->damsizedice);
+    dc_sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n",
+               k->mobdata->damnodice, k->mobdata->damsizedice);
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\r\n",
-          IS_CARRYING_W(k), IS_CARRYING_N(k));
+  dc_sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\r\n",
+             IS_CARRYING_W(k), IS_CARRYING_N(k));
   ch->send(buf);
 
   for (i = 0, j = k->carrying; j; j = j->next_content, i++)
     ;
-  sprintf(buf, "$3Items in inventory$R: %d  ", i);
+  dc_sprintf(buf, "$3Items in inventory$R: %d  ", i);
 
   for (i = 0, i2 = {}; i < MAX_WEAR; i++)
     if (k->equipment[i])
       i2++;
 
-  sprintf(buf2, "$3Items in equipment$R: %d\r\n", i2);
+  dc_sprintf(buf2, "$3Items in equipment$R: %d\r\n", i2);
   strcat(buf, buf2);
   ch->send(buf);
 
-  sprintf(buf, "$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\r\n",
-          k->saves[SAVE_TYPE_FIRE],
-          k->saves[SAVE_TYPE_COLD],
-          k->saves[SAVE_TYPE_ENERGY],
-          k->saves[SAVE_TYPE_ACID],
-          k->saves[SAVE_TYPE_MAGIC],
-          k->saves[SAVE_TYPE_POISON]);
+  dc_sprintf(buf, "$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\r\n",
+             k->saves[SAVE_TYPE_FIRE],
+             k->saves[SAVE_TYPE_COLD],
+             k->saves[SAVE_TYPE_ENERGY],
+             k->saves[SAVE_TYPE_ACID],
+             k->saves[SAVE_TYPE_MAGIC],
+             k->saves[SAVE_TYPE_POISON]);
   ch->send(buf);
 
   if (k->isPlayer())
   {
-    sprintf(buf, "$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\r\n",
-            k->player->saves_mods[SAVE_TYPE_FIRE],
-            k->player->saves_mods[SAVE_TYPE_COLD],
-            k->player->saves_mods[SAVE_TYPE_ENERGY],
-            k->player->saves_mods[SAVE_TYPE_ACID],
-            k->player->saves_mods[SAVE_TYPE_MAGIC],
-            k->player->saves_mods[SAVE_TYPE_POISON]);
+    dc_sprintf(buf, "$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\r\n",
+               k->player->saves_mods[SAVE_TYPE_FIRE],
+               k->player->saves_mods[SAVE_TYPE_COLD],
+               k->player->saves_mods[SAVE_TYPE_ENERGY],
+               k->player->saves_mods[SAVE_TYPE_ACID],
+               k->player->saves_mods[SAVE_TYPE_MAGIC],
+               k->player->saves_mods[SAVE_TYPE_POISON]);
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Thirst$R: %d  $3Hunger$R: %d  $3Drunk$R: %d\r\n",
-          k->conditions[THIRST],
-          k->conditions[FULL],
-          k->conditions[DRUNK]);
+  dc_sprintf(buf, "$3Thirst$R: %d  $3Hunger$R: %d  $3Drunk$R: %d\r\n",
+             k->conditions[THIRST],
+             k->conditions[FULL],
+             k->conditions[DRUNK]);
   ch->send(buf);
-  sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d] $3Reflect$R: [%d]\r\n",
-          k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
+  dc_sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d] $3Reflect$R: [%d]\r\n",
+             k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
   ch->send(buf);
 
-  sprintf(buf, "$3Tracking$R: '%s'\r\n", ((k->hunting.isEmpty()) ? "NOBODY" : qPrintable(k->hunting)));
+  dc_sprintf(buf, "$3Tracking$R: '%s'\r\n", ((k->hunting.isEmpty()) ? "NOBODY" : qPrintable(k->hunting)));
   ch->send(buf);
 
   if (k->isNonPlayer())
   {
-    sprintf(buf, "$3Hates$R: '%s'\r\n",
-            (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
+    dc_sprintf(buf, "$3Hates$R: '%s'\r\n",
+               (k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated)));
     ch->send(buf);
 
-    sprintf(buf, "$3Fears$R: '%s'\r\n",
-            ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
+    dc_sprintf(buf, "$3Fears$R: '%s'\r\n",
+               ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Master$R: '%s'\r\n",
-          ((k->master) ? qPrintable(k->master->name()) : "NOBODY"));
+  dc_sprintf(buf, "$3Master$R: '%s'\r\n",
+             ((k->master) ? qPrintable(k->master->name()) : "NOBODY"));
   ch->send(buf);
   ch->sendln("$3Followers$R:");
   for (fol = k->followers; fol; fol = fol->next)
@@ -848,25 +848,25 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
+    dc_sprintf(buf, "$3WizInvis$R:  %d  ", k->player->wizinvis);
     ch->send(buf);
-    sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
+    dc_sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     ch->send(buf);
-    sprintf(buf, "$3Stealth$R:  %s\r\n", ((k->player->stealth) ? "ON" : "OFF"));
+    dc_sprintf(buf, "$3Stealth$R:  %s\r\n", ((k->player->stealth) ? "ON" : "OFF"));
     ch->send(buf);
     if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
         (k->player->buildHighVnum == k->player->buildMHighVnum) == k->player->buildOHighVnum)
     {
-      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
+      dc_sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
       ch->send(buf);
     }
     else
     {
-      sprintf(buf, "$3R Range$R:  %d-%d  ", k->player->buildLowVnum, k->player->buildHighVnum);
+      dc_sprintf(buf, "$3R Range$R:  %d-%d  ", k->player->buildLowVnum, k->player->buildHighVnum);
       ch->send(buf);
-      sprintf(buf, "$3M Range$R:  %d-%d  ", k->player->buildMLowVnum, k->player->buildMHighVnum);
+      dc_sprintf(buf, "$3M Range$R:  %d-%d  ", k->player->buildMLowVnum, k->player->buildMHighVnum);
       ch->send(buf);
-      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
+      dc_sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
       ch->send(buf);
     }
   }
@@ -897,10 +897,10 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
           aff_name = QStringLiteral("Unknown!!!");
       }
       ch->sendln(QStringLiteral("Spell : '%1' (%2)").arg(aff_name).arg(aff->type));
-      sprintf(buf, "     Modifies %s by %d points\r\n",
-              apply_types[(qint32)aff->location], aff->modifier);
+      dc_sprintf(buf, "     Modifies %s by %d points\r\n",
+                 apply_types[(qint32)aff->location], aff->modifier);
       ch->send(buf);
-      sprintf(buf, "     Expires in %3d hours", aff->duration);
+      dc_sprintf(buf, "     Expires in %3d hours", aff->duration);
       //    strcat(buf,",Bits set ");
       //      ch->send(buf);
       //      sprintbit(aff->bitvector,affected_bits,buf);
@@ -917,27 +917,27 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
     case mob_type_t::MOB_NORMAL:
       break;
     case mob_type_t::MOB_GUARD:
-      sprintf(buf, "$3Guard room (v1)$R: [%d]\r\n"
-                   " $3Direction (v2)$R: [%d]\r\n"
-                   "    $3Unused (v3)$R: [%d]\r\n"
-                   "    $3Unused (v4)$R: [%d]\r\n",
-              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+      dc_sprintf(buf, "$3Guard room (v1)$R: [%d]\r\n"
+                      " $3Direction (v2)$R: [%d]\r\n"
+                      "    $3Unused (v3)$R: [%d]\r\n"
+                      "    $3Unused (v4)$R: [%d]\r\n",
+                 k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+                 k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
       break;
     case mob_type_t::MOB_CLAN_GUARD:
-      sprintf(buf, "$3Guard room (v1)$R: [%d]\r\n"
-                   " $3Direction (v2)$R: [%d]\r\n"
-                   "  $3Clan num (v3)$R: [%d]\r\n"
-                   "    $3Unused (v4)$R: [%d]\r\n",
-              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+      dc_sprintf(buf, "$3Guard room (v1)$R: [%d]\r\n"
+                      " $3Direction (v2)$R: [%d]\r\n"
+                      "  $3Clan num (v3)$R: [%d]\r\n"
+                      "    $3Unused (v4)$R: [%d]\r\n",
+                 k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+                 k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
       break;
     default:
-      sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\r\n",
-              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+      dc_sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\r\n",
+                 k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+                 k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
       break;
     }
@@ -968,17 +968,17 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
 */
 
   virt = (j->item_number >= 0) ? DC::getInstance()->obj_index[j->item_number].vnum() : 0;
-  sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
-          qPrintable(j->name()), j->item_number, virt);
+  dc_sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
+             qPrintable(j->name()), j->item_number, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
   strcat(buf, buf2);
   strcat(buf, "\r\n");
   ch->send(buf);
 
-  sprintf(buf, "$3Short description$R: %s\r\n$3Long description$R:\r\n%s\r\n",
-          ((j->short_description) ? j->short_description : "None"),
-          ((j->long_description) ? j->long_description : "None"));
+  dc_sprintf(buf, "$3Short description$R: %s\r\n$3Long description$R:\r\n%s\r\n",
+             ((j->short_description) ? j->short_description : "None"),
+             ((j->long_description) ? j->long_description : "None"));
   ch->send(buf);
   if (j->ex_description)
   {
@@ -1016,11 +1016,11 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   strcat(buf, "\r\n");
   ch->send(buf);
 
-  sprintf(buf, "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %llu\r\n",
-          j->obj_flags.weight,
-          j->obj_flags.cost,
-          j->obj_flags.timer,
-          j->obj_flags.eq_level);
+  dc_sprintf(buf, "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %llu\r\n",
+             j->obj_flags.weight,
+             j->obj_flags.cost,
+             j->obj_flags.timer,
+             j->obj_flags.eq_level);
   ch->send(buf);
 
   strcpy(buf, "$3In room$R: ");
@@ -1028,7 +1028,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     strcat(buf, "NOWHERE");
   else
   {
-    sprintf(buf2, "%d", DC::getInstance()->world[j->in_room].number);
+    dc_sprintf(buf2, "%d", DC::getInstance()->world[j->in_room].number);
     strcat(buf, buf2);
   }
   strcat(buf, "  $3In object$R: ");
@@ -1041,190 +1041,190 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   switch (j->obj_flags.type_flag)
   {
   case ITEM_LIGHT:
-    sprintf(buf, "$3Colour (v1)$R: %d\r\n"
-                 "$3Type   (v2)$R: %d\r\n"
-                 "$3Hours  (v3)$R: %d\r\n"
-                 "$3Unused (v4)$R: %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[2],
-            j->obj_flags.value[3]);
+    dc_sprintf(buf, "$3Colour (v1)$R: %d\r\n"
+                    "$3Type   (v2)$R: %d\r\n"
+                    "$3Hours  (v3)$R: %d\r\n"
+                    "$3Unused (v4)$R: %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[2],
+               j->obj_flags.value[3]);
     break;
   case ITEM_SCROLL:
     sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
     sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
     sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
-    sprintf(buf, "$3Level(v1)$R  : %d\r\n"
-                 " $3Spells(v2)$R: %d (%s)\r\n"
-                 " $3Spells(v3)$R: %d (%s)\r\n"
-                 " $3Spells(v4)$R: %d (%s)",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1], buf2,
-            j->obj_flags.value[2], buf3,
-            j->obj_flags.value[3], buf4);
+    dc_sprintf(buf, "$3Level(v1)$R  : %d\r\n"
+                    " $3Spells(v2)$R: %d (%s)\r\n"
+                    " $3Spells(v3)$R: %d (%s)\r\n"
+                    " $3Spells(v4)$R: %d (%s)",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1], buf2,
+               j->obj_flags.value[2], buf3,
+               j->obj_flags.value[3], buf4);
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
     sprinttype(j->obj_flags.value[3] - 1, spells, buf2);
-    sprintf(buf, "$3Level(v1)$R: %d  $3Spell(v4)$R: %d - %s\r\n"
-                 "$3Total Charges(v2)$R: %d   $3Current Charges(v3)$R: %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[3],
-            buf2,
-            j->obj_flags.value[1],
-            j->obj_flags.value[2]);
+    dc_sprintf(buf, "$3Level(v1)$R: %d  $3Spell(v4)$R: %d - %s\r\n"
+                    "$3Total Charges(v2)$R: %d   $3Current Charges(v3)$R: %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[3],
+               buf2,
+               j->obj_flags.value[1],
+               j->obj_flags.value[2]);
     break;
   case ITEM_WEAPON:
     qint32 get_weapon_damage_type(ObjectPtr wielded);
     its = get_weapon_damage_type(j) - 1000;
     extern QStringList strs_damage_types;
-    sprintf(buf, "$3Unused(v1)$R: %d (make 0)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[2],
-            j->obj_flags.value[3],
-            strs_damage_types[its]);
+    dc_sprintf(buf, "$3Unused(v1)$R: %d (make 0)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[2],
+               j->obj_flags.value[3],
+               strs_damage_types[its]);
     break;
   case ITEM_MEGAPHONE:
-    sprintf(buf, "Interval(v1): %d\r\nInterval, again(v2): %d", j->obj_flags.value[0], j->obj_flags.value[1]);
+    dc_sprintf(buf, "Interval(v1): %d\r\nInterval, again(v2): %d", j->obj_flags.value[0], j->obj_flags.value[1]);
     break;
   case ITEM_FIREWEAPON:
-    sprintf(buf, "$3Tohit(v1)$R: %d\r\n$3Todam(v2)d<v3)$R: %dD%d\r\n$3Type(v4)$R: %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[2],
-            j->obj_flags.value[3]);
+    dc_sprintf(buf, "$3Tohit(v1)$R: %d\r\n$3Todam(v2)d<v3)$R: %dD%d\r\n$3Type(v4)$R: %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[2],
+               j->obj_flags.value[3]);
     break;
   case ITEM_MISSILE:
-    sprintf(buf, "$3Damage(v1dv2)$R: %d$3/$R%d\r\n$3Tohit(v3)$R: %d\r\n$3Todam(v4)$R: %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[3],
-            j->obj_flags.value[2]);
+    dc_sprintf(buf, "$3Damage(v1dv2)$R: %d$3/$R%d\r\n$3Tohit(v3)$R: %d\r\n$3Todam(v4)$R: %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[3],
+               j->obj_flags.value[2]);
     break;
   case ITEM_ARMOR:
-    sprintf(buf, "$3AC-apply(v1)$R: [%d]\r\n"
-                 "$3Unused  (v2)$R: [%d] (make 0)\r\n"
-                 "$3Unused  (v3)$R: [%d] (make 0)\r\n"
-                 "$3Unused  (v4)$R: [%d] (make 0)",
-            j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
+    dc_sprintf(buf, "$3AC-apply(v1)$R: [%d]\r\n"
+                    "$3Unused  (v2)$R: [%d] (make 0)\r\n"
+                    "$3Unused  (v3)$R: [%d] (make 0)\r\n"
+                    "$3Unused  (v4)$R: [%d] (make 0)",
+               j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
     break;
   case ITEM_POTION:
     sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
     sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
     sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
-    sprintf(buf, "$3Level (v1)$R: %d\r\n"
-                 " $3Spell(v2)$R: %d (%s)\r\n"
-                 " $3Spell(v3)$R: %d (%s)\r\n"
-                 " $3Spell(v4)$R: %d (%s)",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1], buf2,
-            j->obj_flags.value[2], buf3,
-            j->obj_flags.value[3], buf4);
+    dc_sprintf(buf, "$3Level (v1)$R: %d\r\n"
+                    " $3Spell(v2)$R: %d (%s)\r\n"
+                    " $3Spell(v3)$R: %d (%s)\r\n"
+                    " $3Spell(v4)$R: %d (%s)",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1], buf2,
+               j->obj_flags.value[2], buf3,
+               j->obj_flags.value[3], buf4);
     break;
   case ITEM_TRAP:
-    sprintf(buf, "$3Spell(v1)$R    : %d\r\n"
-                 "$3Hitpoints(v2)$R: %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1]);
+    dc_sprintf(buf, "$3Spell(v1)$R    : %d\r\n"
+                    "$3Hitpoints(v2)$R: %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1]);
     break;
   case ITEM_CONTAINER:
-    sprintf(buf, "$3Max-contains(v1)$R : %d\r\n"
-                 "$3Locktype(v2)$R     : %d\r\n"
-                 "$3Key #$R            : %d\r\n"
-                 "$3Corpse(v4)$R       : %s",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[2],
-            j->obj_flags.value[3] ? "Yes" : "No");
+    dc_sprintf(buf, "$3Max-contains(v1)$R : %d\r\n"
+                    "$3Locktype(v2)$R     : %d\r\n"
+                    "$3Key #$R            : %d\r\n"
+                    "$3Corpse(v4)$R       : %s",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[2],
+               j->obj_flags.value[3] ? "Yes" : "No");
     break;
   case ITEM_DRINKCON:
     sprinttype(j->obj_flags.value[2], drinks, buf2);
     //  strcpy(buf2,drinks[j->obj_flags.value[2]]);
-    sprintf(buf, "$3Max-contains(v1)$R: %d\r\n"
-                 "$3Contains    (v2)$R: %d\r\n"
-                 "$3Liquid      (v3)$R: %s (%d)\r\n"
-                 "$3Poisoned    (v4)$R: %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            buf2,
-            j->obj_flags.value[2],
-            j->obj_flags.value[3]);
+    dc_sprintf(buf, "$3Max-contains(v1)$R: %d\r\n"
+                    "$3Contains    (v2)$R: %d\r\n"
+                    "$3Liquid      (v3)$R: %s (%d)\r\n"
+                    "$3Poisoned    (v4)$R: %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               buf2,
+               j->obj_flags.value[2],
+               j->obj_flags.value[3]);
     break;
   case ITEM_NOTE:
-    sprintf(buf, "$3Tounge(v1)$R : %d"
-                 "$3Unused(v2)$R : %d"
-                 "$3Unused(v3)$R : %d"
-                 "$3Unused(v4)$R : %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[2],
-            j->obj_flags.value[3]);
+    dc_sprintf(buf, "$3Tounge(v1)$R : %d"
+                    "$3Unused(v2)$R : %d"
+                    "$3Unused(v3)$R : %d"
+                    "$3Unused(v4)$R : %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[2],
+               j->obj_flags.value[3]);
     break;
   case ITEM_UTILITY:
-    sprintf(buf2, "$3Utility Type(v1)$R : %d (%s)\r\n",
-            j->obj_flags.value[0],
-            j->obj_flags.value[0] >= 0 && j->obj_flags.value[0] <= UTILITY_ITEM_MAX ? utility_item_types[j->obj_flags.value[0]] : "INVALID TYPE");
+    dc_sprintf(buf2, "$3Utility Type(v1)$R : %d (%s)\r\n",
+               j->obj_flags.value[0],
+               j->obj_flags.value[0] >= 0 && j->obj_flags.value[0] <= UTILITY_ITEM_MAX ? utility_item_types[j->obj_flags.value[0]] : "INVALID TYPE");
     if (j->obj_flags.value[0] == UTILITY_CATSTINK)
     {
-      sprintf(buf, "%s"
-                   "$3Sector(v2)$R : %d (%s)\r\n"
-                   "$3Unused(v3)$R : %d "
-                   "$3HowMuchLag(v4)$R : %d",
-              buf2,
-              j->obj_flags.value[1],
-              j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ? sector_types[j->obj_flags.value[1]] : "INVALID SECTOR TYPE",
-              j->obj_flags.value[2],
-              j->obj_flags.value[3]);
+      dc_sprintf(buf, "%s"
+                      "$3Sector(v2)$R : %d (%s)\r\n"
+                      "$3Unused(v3)$R : %d "
+                      "$3HowMuchLag(v4)$R : %d",
+                 buf2,
+                 j->obj_flags.value[1],
+                 j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ? sector_types[j->obj_flags.value[1]] : "INVALID SECTOR TYPE",
+                 j->obj_flags.value[2],
+                 j->obj_flags.value[3]);
     }
     else if (j->obj_flags.value[0] == UTILITY_MORTAR)
     {
-      sprintf(buf, "%s"
-                   "$3NumDice(v2)$R : %d "
-                   "$3DiceSize (v3)$R : %d "
-                   "$3HowMuchLag(v4)$R : %d ",
-              buf2,
-              j->obj_flags.value[1],
-              j->obj_flags.value[2],
-              j->obj_flags.value[3]);
+      dc_sprintf(buf, "%s"
+                      "$3NumDice(v2)$R : %d "
+                      "$3DiceSize (v3)$R : %d "
+                      "$3HowMuchLag(v4)$R : %d ",
+                 buf2,
+                 j->obj_flags.value[1],
+                 j->obj_flags.value[2],
+                 j->obj_flags.value[3]);
     }
     else
     {
-      sprintf(buf, "%s"
-                   "$3Unused(v2)$R : %d "
-                   "$3Unused(v3)$R : %d "
-                   "$3HowMuchLag(v4)$R : %d",
-              buf2,
-              j->obj_flags.value[1],
-              j->obj_flags.value[2],
-              j->obj_flags.value[3]);
+      dc_sprintf(buf, "%s"
+                      "$3Unused(v2)$R : %d "
+                      "$3Unused(v3)$R : %d "
+                      "$3HowMuchLag(v4)$R : %d",
+                 buf2,
+                 j->obj_flags.value[1],
+                 j->obj_flags.value[2],
+                 j->obj_flags.value[3]);
     }
     break;
   case ITEM_KEY:
-    sprintf(buf, "$3Keytype(v1)$R : %d"
-                 "$3Unused (v2)$R : %d"
-                 "$3Unused (v3)$R : %d"
-                 "$3Unused (v4)$R : %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[2],
-            j->obj_flags.value[3]);
+    dc_sprintf(buf, "$3Keytype(v1)$R : %d"
+                    "$3Unused (v2)$R : %d"
+                    "$3Unused (v3)$R : %d"
+                    "$3Unused (v4)$R : %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[2],
+               j->obj_flags.value[3]);
     break;
   case ITEM_FOOD:
-    sprintf(buf, "$3Makes full(v1)$R : %d\r\n"
-                 "$3Poisoned  (v4)$R : %d",
-            j->obj_flags.value[0],
-            j->obj_flags.value[3]);
+    dc_sprintf(buf, "$3Makes full(v1)$R : %d\r\n"
+                    "$3Poisoned  (v4)$R : %d",
+               j->obj_flags.value[0],
+               j->obj_flags.value[3]);
     break;
   case ITEM_INSTRUMENT:
-    sprintf(buf, "$3Song Effect$R:  $3Non-Combat(v1)$R[%d] $3Combat(v2)$R[%d]",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1]);
+    dc_sprintf(buf, "$3Song Effect$R:  $3Non-Combat(v1)$R[%d] $3Combat(v2)$R[%d]",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1]);
     break;
   case ITEM_PORTAL:
-    sprintf(buf, "$3ToRoom (v1)$R : %lu\r\n"
-                 "$3Type   (v2)$R : ",
-            j->getPortalDestinationRoom());
+    dc_sprintf(buf, "$3ToRoom (v1)$R : %lu\r\n"
+                    "$3Type   (v2)$R : ",
+               j->getPortalDestinationRoom());
     switch (j->getPortalType())
     {
     case Object::portal_types_t::Player:
@@ -1246,21 +1246,21 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
       strcat(buf, "Unknown!!!");
       break;
     }
-    sprintf(buf2, "(can be 0-4)\r\n"
-                  "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\r\n"
-                  "$3Flags  (v4)$R : ",
-            j->obj_flags.value[2]);
+    dc_sprintf(buf2, "(can be 0-4)\r\n"
+                     "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\r\n"
+                     "$3Flags  (v4)$R : ",
+               j->obj_flags.value[2]);
     strcat(buf, buf2);
     sprintbit(j->obj_flags.value[3], portal_bits, buf2);
     strcat(buf, buf2);
     strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
     break;
   default:
-    sprintf(buf, "Values 0-3 : [%d] [%d] [%d] [%d]",
-            j->obj_flags.value[0],
-            j->obj_flags.value[1],
-            j->obj_flags.value[2],
-            j->obj_flags.value[3]);
+    dc_sprintf(buf, "Values 0-3 : [%d] [%d] [%d] [%d]",
+               j->obj_flags.value[0],
+               j->obj_flags.value[1],
+               j->obj_flags.value[2],
+               j->obj_flags.value[3]);
     break;
   }
   ch->send(buf);
@@ -1320,7 +1320,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     else
       strcpy(buf2, "Invalid");
 
-    sprintf(buf, "    $3Affects$R : %s By %d\r\n", buf2, j->affected[i].modifier);
+    dc_sprintf(buf, "    $3Affects$R : %s By %d\r\n", buf2, j->affected[i].modifier);
     ch->send(buf);
   }
 }
@@ -1342,10 +1342,10 @@ void do_start(CharacterPtr ch)
     ch->title = QStringLiteral("is a virgin.");
   }
 
-  sprintf(buf, "%s appears with an ear-splitting bang!", qPrintable(ch->shortdesc_or_name()));
+  dc_sprintf(buf, "%s appears with an ear-splitting bang!", qPrintable(ch->shortdesc_or_name()));
   ch->player->poofin = buf;
 
-  sprintf(buf, "%s disappears in a puff of smoke.", qPrintable(ch->shortdesc_or_name()));
+  dc_sprintf(buf, "%s disappears in a puff of smoke.", qPrintable(ch->shortdesc_or_name()));
   ch->player->poofout = buf;
 
   ch->raw_hit = 10;
@@ -1405,14 +1405,14 @@ command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
   {
     ch->sendln("Performing full zone reset!");
     QString buf = fmt::format("{} full repopped zone #{}.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln("Resetting this entire zone!");
     QString buf = fmt::format("{} repopped zone #{}.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
 
@@ -1461,8 +1461,8 @@ command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
   ch->sendln("You have just caused the deion of countless creatures in ths area!");
-  sprintf(buf, "%s just CLEARED zone #%d!", qPrintable(ch->name()), zone);
-  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_sprintf(buf, "%s just CLEARED zone #%d!", qPrintable(ch->name()), zone);
+  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
@@ -1480,11 +1480,11 @@ command_return_t do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
     x++;
 
     if (i->player->possesing)
-      sprintf(buf, "%14s -- [%d] %s  *possessing*\r\n", qPrintable(i->name()),
-              (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+      dc_sprintf(buf, "%14s -- [%d] %s  *possessing*\r\n", qPrintable(i->name()),
+                 (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     else
-      sprintf(buf, "%14s -- [%d] %s\r\n", qPrintable(i->name()),
-              (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+      dc_sprintf(buf, "%14s -- [%d] %s\r\n", qPrintable(i->name()),
+                 (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     ch->send(buf);
   }
 
@@ -1510,7 +1510,7 @@ command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
 
   else
   {
-    sprintf(buf, "\r\n%s\r\n", argument + i);
+    dc_sprintf(buf, "\r\n%s\r\n", argument + i);
     for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       vict->send(buf);
   }
@@ -1562,8 +1562,8 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
     }
 
-    sprintf(buf, "%s restored %s.", qPrintable(ch->name()), qPrintable(victim->name()));
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "%s restored %s.", qPrintable(ch->name()), qPrintable(victim->name()));
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     update_pos(victim);
     redo_hitpoints(victim);
@@ -1581,8 +1581,8 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
     if (ch->getLevel() < OVERSEER)
     {
       ch->sendln("You don't have the ability to do that!");
-      sprintf(buf, "%s tried to do a restore all!", qPrintable(ch->name()));
-      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_sprintf(buf, "%s tried to do a restore all!", qPrintable(ch->name()));
+      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
       return ReturnValue::eFAILURE;
     }
@@ -1612,8 +1612,8 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
             victim, 0, ch, TO_CHAR, 0);
         victim->save();
       }
-    sprintf(buf, "%s did a restore all!", qPrintable(ch->name()));
-    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "%s did a restore all!", qPrintable(ch->name()));
+    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("Trying to be Mister Popularity?");
   }
   return ReturnValue::eSUCCESS;
@@ -1679,27 +1679,27 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       if (h->huntname)
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on hunt '%s' has expired and all unrecovered prizes have been removed.\r\n", h->huntname);
+          dc_sprintf(buf, "\r\n## The time limit on hunt '%s' has expired and all unrecovered prizes have been removed.\r\n", h->huntname);
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on hunt '%s'\r\n", h->huntname);
+          dc_sprintf(buf, "\r\n## All prizes have been recovered on hunt '%s'\r\n", h->huntname);
       }
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     else
     {
       if (h->huntname)
       {
-        sprintf(buf, "\r\n## Hunt '%s' has been ended.\r\n", h->huntname);
+        dc_sprintf(buf, "\r\n## Hunt '%s' has been ended.\r\n", h->huntname);
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+        dc_sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     send_info(buf);
@@ -1821,7 +1821,7 @@ QString last_hunt_time(QString last_hunt)
 
   if (!time_of_last_hunt)
   {
-    sprintf(buf, "There have been no hunts since the last reboot.       \r\n");
+    dc_sprintf(buf, "There have been no hunts since the last reboot.       \r\n");
     time_of_last_hunt = (buf);
   }
 
@@ -1853,14 +1853,14 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
   if (nullptr != pTime)
   {
 #ifdef __CYGWIN__
-    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\r\n",
+    dc_snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\r\n",
              pTime->tm_mon + 1,
              pTime->tm_mday,
              pTime->tm_year + 1900,
              pTime->tm_hour,
              pTime->tm_min);
 #else
-    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\r\n",
+    dc_snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\r\n",
              pTime->tm_mon + 1,
              pTime->tm_mday,
              pTime->tm_year + 1900,
@@ -1941,8 +1941,8 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
       else
         hunt_items_list = in;
       qint32 vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
-      sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
-              qPrintable(obj->short_description()), i->mobname, qPrintable(ch->name()));
+      dc_sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
+                 qPrintable(obj->short_description()), i->mobname, qPrintable(ch->name()));
       send_info(buf);
       hunt_data *h = i->hunt;
       ObjectPtr oitem = {}, citem;
@@ -1956,11 +1956,11 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
         if (r1 > 0)
         {
           oitem = clone_object(r1);
-          sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
-                  qPrintable(obj->short_description()), oitem->short_description);
+          dc_sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
+                     qPrintable(obj->short_description()), oitem->short_description);
           ch->send(buf);
-          sprintf(buf, "## %s turned into %s!\r\n",
-                  qPrintable(obj->short_description()), oitem->short_description);
+          dc_sprintf(buf, "## %s turned into %s!\r\n",
+                     qPrintable(obj->short_description()), oitem->short_description);
           send_info(buf);
           if (isSet(oitem->obj_flags.more_flags, ITEM_UNIQUE))
           {
@@ -2002,8 +2002,8 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
       case 27917:
       case 27918:
         gold = obj->obj_flags.value[0];
-        sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
-                qPrintable(obj->short_description()), gold);
+        dc_sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
+                   qPrintable(obj->short_description()), gold);
         ch->send(buf);
 
         ch->addGold(gold);
@@ -2035,7 +2035,7 @@ void pulse_hunts()
   {
     if (DC::getInstance()->world[6345] == Room())
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
     }
 
@@ -2048,7 +2048,7 @@ void pulse_hunts()
   }
   catch (...)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
   }
 }
 
@@ -2127,14 +2127,14 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
   if (twitterObj.accountVerifyCredGet())
   {
     //    twitterObj.getLastWebResponse( replyMsg );
-    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
-    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 
@@ -2182,7 +2182,7 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
     begin_hunt(vnum, time, num, 0);
   }
 
-  sprintf(buf, "\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n", huntname, num, time);
+  dc_sprintf(buf, "\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n", huntname, num, time);
   send_info(buf);
 
 #ifdef TWITTER
@@ -2198,14 +2198,14 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
   if (twitterObj.statusUpdate(message))
   {
     //    twitterObj.getLastWebResponse( replyMsg );
-    sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
-    sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
+    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 

@@ -240,7 +240,7 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      sprintf(buf, "You focus your arcane powers and imbue them into $p restoring %d charges!", charges);
+      dc_sprintf(buf, "You focus your arcane powers and imbue them into $p restoring %d charges!", charges);
       act(buf, ch, wand, 0, TO_CHAR, 0);
     }
 
@@ -320,7 +320,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
         IS_AFFECTED(i, AFF_PARALYSIS) ||
         (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
     {
-      sprintf(buf, "I see you %s but I can't do anything about it!", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf, "I see you %s but I can't do anything about it!", qPrintable(ch->shortdesc_or_name()));
       do_say(i, buf);
       break;
     }
@@ -331,7 +331,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
     }
     else
     {
-      sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? qPrintable(ch->shortdesc_or_name()) : qPrintable(ch->name()));
+      dc_sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? qPrintable(ch->shortdesc_or_name()) : qPrintable(ch->name()));
       do_say(i, buf);
       set_fighting(i, ch);
       set_fighting(ch, i);
@@ -371,7 +371,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
         if (trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL)
         {
           // Get um!
-          sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? qPrintable(ch->shortdesc_or_name()) : qPrintable(ch->name()));
+          dc_sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? qPrintable(ch->shortdesc_or_name()) : qPrintable(ch->name()));
           do_say(ally, buf);
           set_fighting(ally, ch);
           set_fighting(ch, ally);

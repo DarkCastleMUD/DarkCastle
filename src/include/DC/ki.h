@@ -6,7 +6,7 @@
 /* $Id: ki.h,v 1.9 2009/05/02 22:41:34 shane Exp $ */
 
 #pragma once
-#include <QtTypes>
+#include <QString>
 
 /************************************************************************
 | These are pretty worthless, since I never did anything with them
@@ -22,5 +22,4 @@ constexpr auto DIVINE = 1;
 constexpr auto MIRACLE = 2;
 constexpr auto MAJOR_EFFECT = 3;
 constexpr auto MINOR_EFFECT = 4;
-const QString skip_spaces(const QString s);
 qint32 find_skill_num(QString name);

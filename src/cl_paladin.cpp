@@ -93,7 +93,7 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
         qint32 amount = ch->getLevel() * 10;
         if (amount + ch->getHP() > GET_MAX_HIT(ch))
           amount = GET_MAX_HIT(ch) - ch->getHP();
-        sprintf(dammsg, "$B%d$R", amount);
+        dc_sprintf(dammsg, "$B%d$R", amount);
         send_damage("Your god basks in your worship of pain and infuses you with | life.", ch, 0, victim, dammsg, "You god basks in your worship of pain and infuses you with life.", TO_CHAR);
         ch->addHP(amount);
       }
@@ -174,7 +174,7 @@ command_return_t do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
     if (amount + victim->getHP() > GET_MAX_HIT(victim))
       amount = GET_MAX_HIT(victim) - victim->getHP();
     victim->addHP(amount);
-    sprintf(dammsg, "$B%d$R", amount);
+    dc_sprintf(dammsg, "$B%d$R", amount);
     send_damage("Praying fervently, you lay hands as life force granted by your god streams from your body healing $N for | health.",
                 ch, 0, victim, dammsg, "Praying fervently, you lay hands as life force granted by your god streams from your body into $N.", TO_CHAR);
     send_damage("Your body surges with holy energies as | points of life force granted by $n's god pours into you!",

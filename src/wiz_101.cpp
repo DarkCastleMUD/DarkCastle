@@ -33,7 +33,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
   const auto dc = DC::getInstance();
   QString buffer, bestow_buffer, test_buffer;
   quint64 column{}, bestow_column{}, test_column = {};
-  for (level_t v = level_t(101); v <= getLevel(); ++v)
+  for (level_ v = level_(101); v <= getLevel(); ++v)
   {
     for (auto &command : DC::getInstance()->CMD_.commands_)
     {
@@ -552,12 +552,12 @@ command_return_t do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch == victim)
   {
-    sprintf(buf, "%s conjures a clap of thunder to resound the land!\r\n", qPrintable(ch->shortdesc_or_name()));
+    dc_sprintf(buf, "%s conjures a clap of thunder to resound the land!\r\n", qPrintable(ch->shortdesc_or_name()));
     send_to_all(buf);
   }
   else
   {
-    sprintf(buf, "Time stops for a minute as %s and %s high-five!\r\n", qPrintable(ch->shortdesc_or_name()), qPrintable(victim->shortdesc_or_name()));
+    dc_sprintf(buf, "Time stops for a minute as %s and %s high-five!\r\n", qPrintable(ch->shortdesc_or_name()), qPrintable(victim->shortdesc_or_name()));
     send_to_all(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -806,7 +806,7 @@ command_return_t do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
   tempvariable *eh;
   for (eh = vict->tempVariable; eh; eh = eh->next)
   {
-    snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n", qPrintable(eh->name), qPrintable(eh->data));
+    dc_snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n", qPrintable(eh->name), qPrintable(eh->data));
     ch->send(buf);
   }
   if (buf[0] == '\0')

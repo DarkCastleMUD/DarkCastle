@@ -97,15 +97,15 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
 
-      sprintf(dammsg, "$B%d$R", dam);
-      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", qPrintable(fname(exit->keyword)));
-      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", qPrintable(fname(exit->keyword)));
+      dc_sprintf(dammsg, "$B%d$R", dam);
+      dc_sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", qPrintable(fname(exit->keyword)));
+      dc_sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", qPrintable(fname(exit->keyword)));
       send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", qPrintable(fname(exit->keyword)));
+      dc_sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", qPrintable(fname(exit->keyword)));
       send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
 
-      sprintf(buf, "The %s survived, but you didn't...\r\n", qPrintable(fname(exit->keyword)));
-      sprintf(buf2, "The %s survived, but $n didn't...", qPrintable(fname(exit->keyword)));
+      dc_sprintf(buf, "The %s survived, but you didn't...\r\n", qPrintable(fname(exit->keyword)));
+      dc_sprintf(buf2, "The %s survived, but $n didn't...", qPrintable(fname(exit->keyword)));
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 
       if (SOMEONE_DIED(retval))
@@ -164,16 +164,16 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        sprintf(dammsg, "$B%d$R", dam);
-        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", qPrintable(fname(exit->keyword)));
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", qPrintable(fname(exit->keyword)));
+        dc_sprintf(dammsg, "$B%d$R", dam);
+        dc_sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", qPrintable(fname(exit->keyword)));
+        dc_sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", qPrintable(fname(exit->keyword)));
         send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", qPrintable(fname(exit->keyword)));
+        dc_sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", qPrintable(fname(exit->keyword)));
         send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
       }
 
-      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", qPrintable(fname(exit->keyword)));
-      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", qPrintable(fname(exit->keyword)));
+      dc_sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", qPrintable(fname(exit->keyword)));
+      dc_sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", qPrintable(fname(exit->keyword)));
 
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 
@@ -1237,31 +1237,31 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
     // need to do more checks on if the victim can actually be knocked into
     // the room?
     QString temp; // what did my innocent bugfix ever do to you?
-    sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
+    dc_sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
     retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
-      sprintf(buf, "You smash %s apart!", temp);
+      dc_sprintf(buf, "You smash %s apart!", temp);
       act(buf, ch, 0, 0, TO_CHAR, 0);
-      sprintf(buf, "$n smashes %s to pieces!", temp);
+      dc_sprintf(buf, "$n smashes %s to pieces!", temp);
       act(buf, ch, 0, 0, TO_ROOM, 0);
       return retval; // this too, just in case it gets called from  a
                      // proc later on, it returns correct stuff
     }
     else
     {
-      sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
-      sprintf(buf2, "Your smash for | damage sends %s reeling %s.", qPrintable(victim->shortdesc_or_name()), dirs[dir]);
-      sprintf(buf, "Your smash sends %s reeling %s.", qPrintable(victim->shortdesc_or_name()), dirs[dir]);
+      dc_sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
+      dc_sprintf(buf2, "Your smash for | damage sends %s reeling %s.", qPrintable(victim->shortdesc_or_name()), dirs[dir]);
+      dc_sprintf(buf, "Your smash sends %s reeling %s.", qPrintable(victim->shortdesc_or_name()), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_CHAR);
-      sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", qPrintable(ch->name()), dirs[dir]);
-      sprintf(buf, "%s smashes into you, sending you reeling %s.", qPrintable(ch->name()), dirs[dir]);
+      dc_sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", qPrintable(ch->name()), dirs[dir]);
+      dc_sprintf(buf, "%s smashes into you, sending you reeling %s.", qPrintable(ch->name()), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_VICT);
 
       if (selfpurge)
         return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
-      sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", qPrintable(ch->name()), qPrintable(victim->shortdesc_or_name()), dirs[dir]);
-      sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", qPrintable(ch->name()), qPrintable(victim->shortdesc_or_name()), dirs[dir]);
+      dc_sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", qPrintable(ch->name()), qPrintable(victim->shortdesc_or_name()), dirs[dir]);
+      dc_sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", qPrintable(ch->name()), qPrintable(victim->shortdesc_or_name()), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
 
       if (victim->fighting)
@@ -1286,19 +1286,19 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     QString temp;
-    sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
+    dc_sprintf(temp, "%s", qPrintable(victim->shortdesc_or_name()));
     retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
-      sprintf(buf, "You smash %s apart!", temp);
+      dc_sprintf(buf, "You smash %s apart!", temp);
       act(buf, ch, 0, 0, TO_CHAR, 0);
-      sprintf(buf, "$n smashes %s to pieces!", temp);
+      dc_sprintf(buf, "$n smashes %s to pieces!", temp);
       act(buf, ch, 0, 0, TO_ROOM, 0);
       return retval;
     }
     else
     {
-      sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
+      dc_sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
       send_damage("$N backpeddles across the room due to $n's smash for | damage.", ch, 0, victim, dammsg,
                   "$N backpessles across the room due to $n's smash.", TO_ROOM);
       send_damage("$N barely keeps $S footing, stumbling backwards after your smash and taking | damage.", ch, 0, victim, dammsg,
@@ -1365,7 +1365,7 @@ command_return_t do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
     ch->send("You lose one point of strength.");
-    logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", qPrintable(ch->name()));
+    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", qPrintable(ch->name()));
   }
 
   // rest already set

@@ -523,7 +523,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
     if (!isSet(song_info[spl].targets(), TAR_IGNORE))
       if (!tar_char && !tar_obj)
       {
-        logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
         send_to_char("If you triggered this message, you almost crashed the\r\n"
                      "game.  Tell a god what you did immediately.\r\n",
                      ch);
@@ -864,7 +864,7 @@ qint32 song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg, Charact
 
   if (!victim || !ch)
   {
-    logentry(QStringLiteral("Serious problem in song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious problem in song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, TO_VICT, 0);
@@ -890,7 +890,7 @@ qint32 execute_song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg,
 
   if (!ch || ch->songs.empty())
   {
-    logentry(QStringLiteral("Serious problem in execute_song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious problem in execute_song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -960,7 +960,7 @@ qint32 song_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vic
 {
   if (!victim || !ch)
   {
-    logentry(QStringLiteral("Serious problem in song_disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious problem in song_disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1013,7 +1013,7 @@ qint32 song_whistle_sharp(quint8 level, CharacterPtr ch, QString arg, CharacterP
 
   if (!victim)
   {
-    logentry(QStringLiteral("No vict send to song whistle sharp!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("No vict send to song whistle sharp!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1142,7 +1142,7 @@ qint32 execute_song_healing_melody(quint8 level, CharacterPtr ch, QString arg, C
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -1227,9 +1227,9 @@ qint32 execute_song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg
             continue;
           REMBIT(i->affected_by, AFF_HIDE);
           affect_from_char(i, AFF_FOREST_MELD);
-          sprintf(buf, "$n's song makes you notice $N hiding a little bit %s", direction[j]);
+          dc_sprintf(buf, "$n's song makes you notice $N hiding a little bit %s", direction[j]);
           act(buf, ch, 0, i, TO_ROOM, NOTVICT);
-          sprintf(buf, "Your song makes you notice $N hiding a little bit %s", direction[j]);
+          dc_sprintf(buf, "Your song makes you notice $N hiding a little bit %s", direction[j]);
           act(buf, ch, 0, i, TO_CHAR, 0);
         }
       }
@@ -1247,7 +1247,7 @@ qint32 execute_song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*k).song_number).toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*k).song_number).toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*k).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -1385,7 +1385,7 @@ qint32 execute_song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, Ch
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names[(*i).song_number].toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names[(*i).song_number].toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names[(*i).song_number].toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -1404,7 +1404,7 @@ qint32 song_listsongs(quint8 level, CharacterPtr ch, QString arg, CharacterPtr v
     if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))
       continue;
 
-    sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(qPrintable(i)), song_info[i].min_useski());
+    dc_sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(qPrintable(i)), song_info[i].min_useski());
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -1459,9 +1459,9 @@ qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString 
     if (tmp_char->isPlayer() && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
     {
       if (tmp_char == ch)
-        sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
+        dc_sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
       else
-        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", qPrintable(ch->name()), heal);
+        dc_sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", qPrintable(ch->name()), heal);
       tmp_char->send(buf);
     }
     else
@@ -1482,7 +1482,7 @@ qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString 
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -1560,7 +1560,7 @@ qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, 
       }
       else
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", qPrintable(ch->name()), heal);
+        dc_sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", qPrintable(ch->name()), heal);
         tmp_char->send(buf);
       }
     }
@@ -1580,7 +1580,7 @@ qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, 
   {
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -1667,7 +1667,7 @@ void do_astral_chanty_movement(CharacterPtr victim, CharacterPtr target)
 
   if (!victim || !target)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "do_astral_chanty_movement: nullptr pointer passed.");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "do_astral_chanty_movement: nullptr pointer passed.");
     produce_coredump();
     return;
   }
@@ -2154,40 +2154,40 @@ qint32 execute_song_searching_song(quint8 level, CharacterPtr ch, QString arg, C
     return ReturnValue::eFAILURE;
   }
 
-  snprintf(buf, 200, "Your song finds %s ", qPrintable(target->shortdesc_or_name()));
+  dc_snprintf(buf, 200, "Your song finds %s ", qPrintable(target->shortdesc_or_name()));
 
   switch (GET_POS(target))
   {
   case position_t::STUNNED:
-    sprintf(buf, "%s%s at ", buf, "on the ground, stunned");
+    dc_sprintf(buf, "%s%s at ", buf, "on the ground, stunned");
     break;
   case position_t::DEAD:
-    sprintf(buf, "%s%s at ", buf, "lying dead");
+    dc_sprintf(buf, "%s%s at ", buf, "lying dead");
     break;
   case position_t::STANDING:
-    sprintf(buf, "%s%s at ", buf, "standing around");
+    dc_sprintf(buf, "%s%s at ", buf, "standing around");
     break;
   case position_t::SITTING:
-    sprintf(buf, "%s%s at ", buf, "sitting");
+    dc_sprintf(buf, "%s%s at ", buf, "sitting");
     break;
   case position_t::RESTING:
-    sprintf(buf, "%s%s at ", buf, "resting");
+    dc_sprintf(buf, "%s%s at ", buf, "resting");
     break;
   case position_t::SLEEPING:
-    sprintf(buf, "%s%s at ", buf, "sleeping");
+    dc_sprintf(buf, "%s%s at ", buf, "sleeping");
     break;
   case position_t::FIGHTING:
-    sprintf(buf, "%s%s at ", buf, "fighting");
+    dc_sprintf(buf, "%s%s at ", buf, "fighting");
     break;
   default:
-    sprintf(buf, "%s%s at ", buf, "masturbating");
+    dc_sprintf(buf, "%s%s at ", buf, "masturbating");
     break;
   }
 
   if (target->affected_by_spell(SPELL_DETECT_MAGIC) && target->affected_by_spell(SPELL_DETECT_MAGIC)->modifier > 80)
     target->sendln("You sense you are the target of scrying.");
 
-  sprintf(buf, "%s%s.\r\n", buf, DC::getInstance()->world[target->in_room].name);
+  dc_sprintf(buf, "%s%s.\r\n", buf, DC::getInstance()->world[target->in_room].name);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -2336,7 +2336,7 @@ qint32 execute_song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, 
     (*i).song_timer = -1;
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -2473,7 +2473,7 @@ qint32 execute_song_mking_charge(quint8 level, CharacterPtr ch, QString arg, Cha
     (*i).song_timer = -1;
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -2920,13 +2920,13 @@ qint32 execute_song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
   auto new_hate = target->get_random_hate();
-  sprintf(buf, "%s seems to hate... %s.\r\n", qPrintable(target->shortdesc_or_name()), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
+  dc_sprintf(buf, "%s seems to hate... %s.\r\n", qPrintable(target->shortdesc_or_name()), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
   ch->send(buf);
 
   if (skill > 80)
   {
     sprintbit(target->resist, isr_bits, buf);
-    if (!strcmp(buf, "NoBits"))
+    if (buf == u"NoBits"_s)
     {
       strcpy(buf, "nothing");
     }
@@ -2936,7 +2936,7 @@ qint32 execute_song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg
   if (skill > 85)
   {
     sprintbit(target->immune, isr_bits, buf);
-    if (!strcmp(buf, "NoBits"))
+    if (buf == u"NoBits"_s)
     {
       strcpy(buf, "nothing");
     }
@@ -2946,7 +2946,7 @@ qint32 execute_song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg
   if (skill > 90)
   {
     sprintbit(target->suscept, isr_bits, buf);
-    if (!strcmp(buf, "NoBits"))
+    if (buf == u"NoBits"_s)
     {
       strcpy(buf, "nothing");
     }
@@ -3103,7 +3103,7 @@ qint32 execute_song_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, C
     (*i).song_timer = -1;
     ch->send(QStringLiteral("You miss a note, ruining your orchestration of %s!\r\n").arg(Character::song_names.value((*i).song_number).toStdString().c_str()));
     QString buf;
-    sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
+    dc_sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -3289,7 +3289,7 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
       dam /= 2;
     }
     QString dmgmsg;
-    sprintf(dmgmsg, "$B%d$R", dam);
+    dc_sprintf(dmgmsg, "$B%d$R", dam);
     switch ((qint64)(*i).song_data)
     {
     case 1:
@@ -3334,11 +3334,11 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
   if (isSet(retval, ReturnValue::eVICT_DIED))
   {
     QString buf2;
-    sprintf(buf2, "$n's crushing crescendo has completely crushed %s and they are no more.", buf);
+    dc_sprintf(buf2, "$n's crushing crescendo has completely crushed %s and they are no more.", buf);
     act(buf2, ch, nullptr, victim, TO_ROOM, NOTVICT);
     if (ispc)
       act("$n's song has completely crushed you!", ch, nullptr, victim, TO_VICT, 0);
-    sprintf(buf2, "The power of your song has completely crushed %s!", buf);
+    dc_sprintf(buf2, "The power of your song has completely crushed %s!", buf);
     act(buf2, ch, nullptr, victim, TO_CHAR, 0);
 
     ch->sendln("You dance a small jig on the corpse.");

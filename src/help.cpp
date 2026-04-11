@@ -2,23 +2,17 @@
 #include <cctype>
 #include <cstring>
 
-#include "DC/levels.h"
-#include "DC/structs.h"
 
 #include "DC/DC.h"
 
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
-#include "DC/spells.h"
-#include "DC/returnvals.h"
 #include "DC/help.h"
 
 #include <QMap>
-#include <vector>
 #include <algorithm>
 
 // Externs
-extern void skip_spaces(const QString *s);
 extern help_index_element_new *new_help_table;
 qint32 get_line(FILE *fl, QString buf);
 qint32 is_abbrev(const QString arg1, const QString arg2);
@@ -119,7 +113,7 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
 
   if (!(this_help = find_help(upper_argument)))
   {
-    snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
+    dc_snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
              upper_argument);
     ch->send(buf);
 
@@ -205,9 +199,9 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
     }
 
-    sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
-            upper_argument, qPrintable(ch->name()));
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_HELP);
+    dc_sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
+               upper_argument, qPrintable(ch->name()));
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_HELP);
 
     upper_argument = {};
     return ReturnValue::eFAILURE;
@@ -221,33 +215,33 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(key1, "'%s'", this_help->keyword1);
-  sprintf(key2, "'%s'", this_help->keyword2);
-  sprintf(key3, "'%s'", this_help->keyword3);
-  sprintf(key4, "'%s'", this_help->keyword4);
-  sprintf(key5, "'%s'", this_help->keyword5);
+  dc_sprintf(key1, "'%s'", this_help->keyword1);
+  dc_sprintf(key2, "'%s'", this_help->keyword2);
+  dc_sprintf(key3, "'%s'", this_help->keyword3);
+  dc_sprintf(key4, "'%s'", this_help->keyword4);
+  dc_sprintf(key5, "'%s'", this_help->keyword5);
 
-  sprintf(buf, "%s %s %s %s %s", key1,
-          ((this_help->keyword2 && strcmp(key2, "'NONE'")) ? key2 : " "),
-          ((this_help->keyword3 && strcmp(key3, "'NONE'")) ? key3 : " "),
-          ((this_help->keyword3 && strcmp(key4, "'NONE'")) ? key4 : " "),
-          ((this_help->keyword3 && strcmp(key5, "'NONE'")) ? key5 : " "));
+  dc_sprintf(buf, "%s %s %s %s %s", key1,
+             ((this_help->keyword2 && strcmp(key2, "'NONE'")) ? key2 : " "),
+             ((this_help->keyword3 && strcmp(key3, "'NONE'")) ? key3 : " "),
+             ((this_help->keyword3 && strcmp(key4, "'NONE'")) ? key4 : " "),
+             ((this_help->keyword3 && strcmp(key5, "'NONE'")) ? key5 : " "));
 
-  sprintf(rec_level, "\r\nLevel Required: %d", this_help->min_level);
-  sprintf(entry,
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$1$B| | $B$5Help For: $B$7%-61.61s $1$B| |\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$B$7%s%s$R"
-          "\r\n"
-          "$R%s"
-          "\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$1$B| | $B$5Related Help: $B$7%-57.57s $1$B| |\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n$R",
-          buf, ch->isImmortalPlayer() ? rec_level : " ",
-          ((this_help->min_level < IMMORTAL) ? " " : "\r\nImmortal-only command.\r\n"),
-          this_help->entry, this_help->related);
+  dc_sprintf(rec_level, "\r\nLevel Required: %d", this_help->min_level);
+  dc_sprintf(entry,
+             "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
+             "$1$B| | $B$5Help For: $B$7%-61.61s $1$B| |\r\n"
+             "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
+             "$B$7%s%s$R"
+             "\r\n"
+             "$R%s"
+             "\r\n"
+             "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
+             "$1$B| | $B$5Related Help: $B$7%-57.57s $1$B| |\r\n"
+             "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n$R",
+             buf, ch->isImmortalPlayer() ? rec_level : " ",
+             ((this_help->min_level < IMMORTAL) ? " " : "\r\nImmortal-only command.\r\n"),
+             this_help->entry, this_help->related);
 
   if (cmd != cmd_t::UNDEFINED)
     page_string(ch->desc, entry, 1);
@@ -287,7 +281,7 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
   {
     if (reload == 1)
     {
-      logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, DC::LogChannel::LOG_HELP);
+      DC::getInstance()->logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, DC::LogChannel::LOG_HELP);
       return ReturnValue::eFAILURE;
     }
     else
@@ -336,12 +330,12 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
     {
       if (*line == '\0')
       {
-        snprintf(tmpbuffer, ENTRY_MAX, "%s\r\n", tmpentry);
+        dc_snprintf(tmpbuffer, ENTRY_MAX, "%s\r\n", tmpentry);
         strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
       }
       else
       {
-        snprintf(tmpbuffer, ENTRY_MAX, "%s%s\r\n", tmpentry, line);
+        dc_snprintf(tmpbuffer, ENTRY_MAX, "%s%s\r\n", tmpentry, line);
         strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
       }
       linenum += get_line_with_space(fl, line);
@@ -368,9 +362,9 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
   {
     if (ch)
     {
-      sprintf(buf, "%s just reloaded the help files.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s just reloaded the help files.", qPrintable(ch->name()));
     }
-    logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -427,7 +421,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
           return ReturnValue::eFAILURE;
         }
         if (!*arg)
-          sprintf(arg, "%s", argument); // if they left off the second arg, copy the first, show only one level
+          dc_sprintf(arg, "%s", argument); // if they left off the second arg, copy the first, show only one level
         show_help_header(ch);
         for (i = {}; i < DC::getInstance()->new_top_of_helpt; i++)
         {
@@ -656,7 +650,7 @@ qint32 strn_cmp(QString arg1, QString arg2, qint32 n)
         return (1);
     }
   }
-  return (0);
+  return {};
 }
 
 command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
@@ -670,7 +664,7 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
     return ReturnValue::eFAILURE;
   }
 
@@ -679,7 +673,7 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
     return ReturnValue::eFAILURE;
   }
 
@@ -750,11 +744,11 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
     new_help_table = new help_index_element_new[DC::getInstance()->new_top_of_helpt + 1];
     old_table = {};
     new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
-    sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", DC::getInstance()->new_top_of_helpt, buf2);
+    dc_sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", DC::getInstance()->new_top_of_helpt, buf2);
     ch->send(buf);
     DC::getInstance()->new_top_of_helpt++;
-    sprintf(buf, "%s just created a help file for '%s'.", qPrintable(ch->name()), buf2);
-    logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
+    dc_sprintf(buf, "%s just created a help file for '%s'.", qPrintable(ch->name()), buf2);
+    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
   }
   else if ((help_id = atoi(buf)) || *buf == '0')
   { // Edit a specific help entry
@@ -804,7 +798,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
           return ReturnValue::eFAILURE;
           break;
         }
-        sprintf(buf, "Keyword %d changed to '%s' for ID# %d.\r\n", key_id, value, help_id);
+        dc_sprintf(buf, "Keyword %d changed to '%s' for ID# %d.\r\n", key_id, value, help_id);
         ch->send(buf);
       }
       else
@@ -820,7 +814,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
         if (*buf2 == '0')
           level = {};
         new_help_table[help_id].min_level = level;
-        sprintf(buf, "Level changed to '%d' for ID# %d.\r\n", level, help_id);
+        dc_sprintf(buf, "Level changed to '%d' for ID# %d.\r\n", level, help_id);
         ch->send(buf);
       }
       else
@@ -839,7 +833,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < (qint32)strlen(buf2); i++)
           buf2[i] = UPPER(buf2[i]);
         new_help_table[help_id].related = QStringLiteral(buf2);
-        sprintf(buf, "Related changed to '%s' for ID# %d.\r\n", buf2, help_id);
+        dc_sprintf(buf, "Related changed to '%s' for ID# %d.\r\n", buf2, help_id);
         ch->send(buf);
       }
       else
@@ -896,7 +890,7 @@ void save_help(CharacterPtr ch)
   qint32 i;
   QString file, buf[256];
 
-  sprintf(file, "%s", NEW_HELP_FILE);
+  dc_sprintf(file, "%s", NEW_HELP_FILE);
   LegacyFile lf(".", file, "Couldn't open help file '%1' for saving.");
   if (lf.isOpen())
   {
@@ -927,10 +921,10 @@ void save_help(CharacterPtr ch)
   }
 
   ch->sendln("Saved.");
-  sprintf(buf, "%s just saved the help files.", qPrintable(ch->name()));
-  logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
+  dc_sprintf(buf, "%s just saved the help files.", qPrintable(ch->name()));
+  DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
 
-  sprintf(file, "%s", WEB_HELP_FILE);
+  dc_sprintf(file, "%s", WEB_HELP_FILE);
   LegacyFile lf_web_help(".", file, "Unable to open '%1'");
   if (lf_web_help.isOpen())
   {

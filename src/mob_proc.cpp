@@ -2154,7 +2154,7 @@ qint32 bee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * MAX<level_t>(ch->getLevel(), 1))
+      number(0, 120) < 2 * MAX<level_>(ch->getLevel(), 1))
   {
     act("You sting $N!", ch, 0, ch->fighting, TO_CHAR,
         INVIS_NULL);
@@ -2223,7 +2223,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
     ch->sendln("Available pets are:");
     for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
     {
-      sprintf(buf, "%8ld - %s\r\n", 3 * pet->exp, qPrintable(pet->short_description()));
+      dc_sprintf(buf, "%8ld - %s\r\n", 3 * pet->exp, qPrintable(pet->short_description()));
       ch->send(buf);
     }
     return ReturnValue::eSUCCESS;
@@ -2264,10 +2264,10 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
     /* people were using this to steal plats from people transing in meta */
     if (/* *pet_name */ 0)
     {
-      sprintf(buf, "%s %s", qPrintable(pet->name()), pet_name);
+      dc_sprintf(buf, "%s %s", qPrintable(pet->name()), pet_name);
       pet->name(buf);
 
-      sprintf(buf, "%sA small sign on a chain around the neck says 'My Name is %s'\r\n ", qPrintable(pet->description()), pet_name);
+      dc_sprintf(buf, "%sA small sign on a chain around the neck says 'My Name is %s'\r\n ", qPrintable(pet->description()), pet_name);
       pet->description(buf);
     }
 
@@ -2589,7 +2589,7 @@ qint32 blindingparrot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * MAX<level_t>(ch->getLevel(), 1))
+      number(0, 120) < 2 * MAX<level_>(ch->getLevel(), 1))
   {
     act("You peck $N!", ch, 0, ch->fighting, TO_CHAR,
         INVIS_NULL);
@@ -2826,7 +2826,7 @@ qint32 foggy_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   mob = ch->getDC()->clone_mobile(real_mobile(22026));
   if (!mob)
   {
-    logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   // put it in the room ch is in
@@ -3355,7 +3355,7 @@ qint32 mage_familiar_gremlin_non(CharacterPtr ch, ObjectPtr obj,
     return ReturnValue::eFAILURE;
   if (!ch->master)
   {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3410,7 +3410,7 @@ qint32 mage_familiar_imp_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QS
 
   if (!ch->master)
   {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3498,7 +3498,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
   {
     if (!ch->master)
     {
-      logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
       extract_char(ch, true);
       return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
     }
@@ -3544,7 +3544,7 @@ qint32 druid_familiar_chipmunk_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, co
 
   if (!ch->master)
   {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }

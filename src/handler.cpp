@@ -156,7 +156,7 @@ qint32 isexact(const QString str, const QString namelist)
 
   if (!str || !namelist)
   {
-    return (0);
+    return {};
   }
 
   if (strlen(str) == 0)
@@ -174,7 +174,7 @@ qint32 isexact(const QString str, const QString namelist)
         return (1);
 
       if (!*curname)
-        return (0);
+        return {};
 
       if (!*curstr || *curname == ' ')
         break;
@@ -188,7 +188,7 @@ qint32 isexact(const QString str, const QString namelist)
     for (; isalpha(*curname); curname++)
       ;
     if (!*curname)
-      return (0);
+      return {};
     curname++; /* first character of new_new name */
   }
 
@@ -1535,10 +1535,10 @@ void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool ad
     break;
 
   default:
-    sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
-                     "affect_modify.)",
-            loc);
-    logentry(log_buf, 0, DC::LogChannel::LOG_BUG);
+    dc_sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
+                        "affect_modify.)",
+               loc);
+    DC::getInstance()->logentry(log_buf, 0, DC::LogChannel::LOG_BUG);
     break;
 
   } /* switch */
@@ -1646,9 +1646,9 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
 
     if (hjp->next != af)
     {
-      logentry(QStringLiteral("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"), ANGEL, DC::LogChannel::LOG_BUG);
-      sprintf(buf, "Problem With: %s    Affect type: %d", qPrintable(ch->name()), af->type);
-      logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"), ANGEL, DC::LogChannel::LOG_BUG);
+      dc_sprintf(buf, "Problem With: %s    Affect type: %d", qPrintable(ch->name()), af->type);
+      DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
       return;
     }
     hjp->next = af->next; /* skip the af element */
@@ -2190,7 +2190,7 @@ qint32 char_from_room(CharacterPtr ch, bool stop_all_fighting)
 
   if (ch->in_room == DC::NOWHERE)
   {
-    return (0);
+    return {};
   }
 
   if (ch->fighting && stop_all_fighting)
@@ -2283,11 +2283,11 @@ qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
 {
   CharacterPtr temp;
   if (room == DC::NOWHERE)
-    return (0);
+    return {};
 
   if (DC::getInstance()->world[room].people == ch)
   {
-    logentry(QStringLiteral("Error: DC::getInstance()->world[room].people == ch in char_to_room()."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Error: DC::getInstance()->world[room].people == ch in char_to_room()."), ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -2396,17 +2396,17 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
 
   if (!obj)
   {
-    logentry(QStringLiteral("Null obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
   if (pos < 0 || pos >= MAX_WEAR)
   {
-    logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
   if (equipment[pos])
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", qPrintable(this->name()), pos);
+    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", qPrintable(this->name()), pos);
     produce_coredump();
     return 0;
   }
@@ -2419,13 +2419,13 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
 
   if (obj->carried_by)
   {
-    logentry(QStringLiteral("EQUIP: Obj is carried_by when equip."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("EQUIP: Obj is carried_by when equip."), ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
   if (obj->in_room != DC::NOWHERE)
   {
-    logentry(QStringLiteral("EQUIP: Obj is in_room when equip."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("EQUIP: Obj is in_room when equip."), ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -2456,7 +2456,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     }
     else
     {
-      logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping character."), 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping character."), 0, DC::LogChannel::LOG_BUG);
     }
   }
 
@@ -2710,7 +2710,7 @@ ObjectPtr get_obj_in_list(QString name, ObjectPtr list)
   strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
-    return (0);
+    return {};
 
   for (i = list, j = 1; i && (j <= number); i = i->next_content)
     if (isexact(tmp, i->name()))
@@ -2720,7 +2720,7 @@ ObjectPtr get_obj_in_list(QString name, ObjectPtr list)
       j++;
     }
 
-  return (0);
+  return {};
 }
 
 /* Search a given list for an object number, and return a ptr to that obj */
@@ -2732,7 +2732,7 @@ ObjectPtr get_obj_in_list_num(qint32 num, ObjectPtr list)
     if (i->item_number == num)
       return (i);
 
-  return (0);
+  return {};
 }
 
 /*search the entire world for an object, and return a pointer  */
@@ -2751,7 +2751,7 @@ ObjectPtr get_obj(QString name)
       j++;
     }
 
-  return (0);
+  return {};
 }
 
 ObjectPtr get_obj(qint32 vnum)
@@ -2770,7 +2770,7 @@ ObjectPtr get_obj_num(qint32 nr)
     if (i->item_number == nr)
       return (i);
 
-  return (0);
+  return {};
 }
 /* search a room for a character, and return a pointer if found..  */
 CharacterPtr get_char_room(const QString name, room_t room, bool careful)
@@ -2786,7 +2786,7 @@ CharacterPtr get_char_room(const QString name, room_t room, bool careful)
   strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
-    return (0);
+    return {};
 
   for (i = DC::getInstance()->world[room].people, j = {}; i && (j <= number); i = i->next_in_room)
   {
@@ -2831,10 +2831,10 @@ CharacterPtr get_char(QString name)
   tmpname = name;
   tmp = tmpname;
   if ((number = get_number(tmp)) < 0)
-    return (0);
+    return {};
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
                         {
 		if (number == 0 && i->isNonPlayer()) return false;
 		if (number == 1 || number == 0)
@@ -2875,7 +2875,7 @@ CharacterPtr get_char(QString name)
 CharacterPtr get_mob(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
                         {
 		if(!i->isNonPlayer()) {
 			return false;
@@ -2897,7 +2897,7 @@ CharacterPtr get_mob(QString name)
 CharacterPtr get_char_num(qint32 nr)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&nr](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&nr](CharacterPtr const &i)
                         {
  		if (i->isNonPlayer() && i->mobdata->nr == nr) {
  			return true;
@@ -2922,7 +2922,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
 
   if (!obj)
   {
-    logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -2936,7 +2936,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), DC::getInstance()->world[obj_in_room].number);
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), DC::getInstance()->world[obj_in_room].number);
       return 0;
     }
   }
@@ -2946,7 +2946,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
     if (obj_from_char(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
       return 0;
     }
   }
@@ -2964,7 +2964,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
     if (obj_from_obj(obj) == 0)
     {
       // Couldn't move obj from its container
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
       return 0;
     }
   }
@@ -2989,7 +2989,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
       qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name())));
     }
 
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", qPrintable(obj->name()), DC::getInstance()->world[dest].number);
+    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", qPrintable(obj->name()), DC::getInstance()->world[dest].number);
     return 0;
   }
 
@@ -3007,7 +3007,7 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
 
   if (!obj)
   {
-    logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -3021,7 +3021,7 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), DC::getInstance()->world[obj_in_room].number);
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), DC::getInstance()->world[obj_in_room].number);
       return 0;
     }
   }
@@ -3031,9 +3031,9 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
     if (obj_from_char(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
-                                              "remove it!",
-           qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
+                                                                 "remove it!",
+                              qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
       return 0;
     }
   }
@@ -3043,9 +3043,9 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
     if (obj_from_obj(obj) == 0)
     {
       // Couldn't move obj from its container
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
-                                              "remove it!",
-           qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
+                                                                 "remove it!",
+                              qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
       return 0;
     }
   }
@@ -3070,7 +3070,7 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
       qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name())));
     }
 
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", qPrintable(obj->name()), qPrintable(dest_obj->name()));
+    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", qPrintable(obj->name()), qPrintable(dest_obj->name()));
     return 0;
   }
   add_totem(dest_obj, obj);
@@ -3090,7 +3090,7 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
 
   if (!obj)
   {
-    logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -3104,7 +3104,7 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), DC::getInstance()->world[obj_in_room].number);
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), DC::getInstance()->world[obj_in_room].number);
       return 0;
     }
   }
@@ -3114,9 +3114,9 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
     if (obj_from_char(obj) == 0)
     {
       // Couldn't move obj from the room
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
-                                              "remove it!",
-           qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
+                                                                 "remove it!",
+                              qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
       return 0;
     }
   }
@@ -3129,9 +3129,9 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
     if (obj_from_obj(obj) == 0)
     {
       // Couldn't move obj from its container
-      logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
-                                              "remove it!",
-           qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
+      DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
+                                                                 "remove it!",
+                              qPrintable(obj->name()), qPrintable(obj->carried_by->name()));
       return 0;
     }
   }
@@ -3141,7 +3141,7 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
    // This should make sure we don't have any money items on players
    if(obj->obj_flags.type_flag == ITEM_MONEY &&
    obj->obj_flags.value[0] >= 1 ) {
-   sprintf(buffer,"There was %d coins.\r\n", obj->obj_flags.value[0]);
+   dc_sprintf(buffer,"There was %d coins.\r\n", obj->obj_flags.value[0]);
    send(buffer);
    GET_GOLD(ch) += obj->obj_flags.value[0];
    extract_obj(obj);
@@ -3169,7 +3169,7 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
       qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name())));
     }
 
-    logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", qPrintable(obj->name()), qPrintable(ch->name()));
+    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", qPrintable(obj->name()), qPrintable(ch->name()));
     return 0;
   }
 
@@ -3233,8 +3233,8 @@ qint32 obj_from_char(ObjectPtr object)
 
   if (!object->carried_by)
   {
-    logentry(QStringLiteral("Obj_from_char called on an object no one is carrying!"), OVERSEER,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Obj_from_char called on an object no one is carrying!"), OVERSEER,
+                                DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -3276,7 +3276,7 @@ qint32 obj_to_room(ObjectPtr object, qint32 room)
 
   if (!DC::getInstance()->world[room])
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] is false", room);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] is false", room);
     return 0;
   }
 
@@ -3357,8 +3357,8 @@ qint32 obj_from_room(ObjectPtr object)
 
   if (object->in_room == DC::NOWHERE)
   {
-    logentry(QStringLiteral("obj_from_room called on an object that isn't in a room!"), OVERSEER,
-             DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("obj_from_room called on an object that isn't in a room!"), OVERSEER,
+                                DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -3434,8 +3434,8 @@ qint32 obj_from_obj(ObjectPtr obj)
 
   if (!obj->in_obj)
   {
-    logentry(QStringLiteral("obj_from_obj called on an item that isn't inside another item."),
-             OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("obj_from_obj called on an item that isn't inside another item."),
+                                OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -3659,7 +3659,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
   }
   if (ch->in_room == DC::NOWHERE)
   {
-    logentry(QStringLiteral("Extract_char: DC::NOWHERE"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Extract_char: DC::NOWHERE"), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -3844,7 +3844,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
     {
       std::stringstream ss;
       ss << "extract_char: " << t << std::endl;
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "extract_char: death_list already contained character %p from %s.", ch, ss.str().c_str());
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "extract_char: death_list already contained character %p from %s.", ch, ss.str().c_str());
       produce_coredump(ch);
     }
     else
@@ -4037,7 +4037,7 @@ CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
   strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
-    return (0);
+    return {};
 
   for (i = DC::getInstance()->world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
   {
@@ -4095,10 +4095,10 @@ CharacterPtr get_mob_vis(CharacterPtr ch, QString name)
     return (i);
 
   if ((number = get_number(&name)) < 0)
-    return (0);
+    return {};
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
                         {
 		if (number == 1)
 		{
@@ -4184,7 +4184,7 @@ CharacterPtr get_random_mob_vnum(qint32 vnum)
 
   const auto &character_list = DC::getInstance()->character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&total, &which, &num](CharacterPtr const &i)
                         {
 		if(i->isNonPlayer() && i->mobdata->nr == num)
 		{
@@ -4209,7 +4209,7 @@ CharacterPtr get_mob_vnum(qint32 vnum)
   qint32 number = real_mobile(vnum);
   const auto &character_list = DC::getInstance()->character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(), [&number](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&number](CharacterPtr const &i)
                         {
 		if(i->isNonPlayer() && i->mobdata->nr == number) {
 			return true;
@@ -4221,17 +4221,8 @@ CharacterPtr get_mob_vnum(qint32 vnum)
   }
   return {};
 }
-CharacterPtr get_char_vis(CharacterPtr ch, const QString &name)
-{
-  return get_char_vis(ch, name.c_str());
-}
 
-CharacterPtr get_char_vis(CharacterPtr ch, const QString &name)
-{
-  return get_char_vis(ch, qPrintable(name));
-}
-
-CharacterPtr get_char_vis(CharacterPtr ch, const QString name)
+CharacterPtr get_char_vis(CharacterPtr ch, QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
@@ -4249,10 +4240,10 @@ CharacterPtr get_char_vis(CharacterPtr ch, const QString name)
   strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
-    return (0);
+    return {};
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](CharacterPtr const &i)
                         {
 		if (i->in_room == DC::NOWHERE)
 		{
@@ -4301,7 +4292,7 @@ CharacterPtr get_char_vis(CharacterPtr ch, const QString name)
 CharacterPtr get_pc(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
                         {
 		if(i->isPlayer() && isexact(name, qPrintable(i->name())))
 		return true;
@@ -4428,7 +4419,7 @@ CharacterPtr get_pc_vis(CharacterPtr ch, const QString name)
   CharacterPtr partial_match = {};
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](CharacterPtr const &i)
                         {
 		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
@@ -4458,7 +4449,7 @@ CharacterPtr get_pc_vis(CharacterPtr ch, const QString name)
 CharacterPtr get_pc_vis_exact(CharacterPtr ch, QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](CharacterPtr const &i)
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&ch, &name](CharacterPtr const &i)
                         {
 		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
@@ -4536,7 +4527,7 @@ ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, boo
   QString tmp = tmpname;
 
   if ((number = get_number(tmp)) < 0)
-    return (0);
+    return {};
 
   for (i = list, j = 1; i && (j <= number); i = i->next_content)
     if (isexact(tmp, i->name()))
@@ -4546,7 +4537,7 @@ ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, boo
           return (i);
         j++;
       }
-  return (0);
+  return {};
 }
 
 ObjectPtr get_obj_vis(CharacterPtr ch, QString name, bool loc)
@@ -4574,7 +4565,7 @@ ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc)
   strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
-    return (0);
+    return {};
 
   /* ok.. no luck yet. scan the entire obj list   */
   for (i = DC::getInstance()->object_list, j = 1; i && (j <= number); i = i->next)
@@ -4594,7 +4585,7 @@ ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc)
         j++;
       }
   }
-  return (0);
+  return {};
 }
 
 ObjectPtr create_money(qint32 amount)
@@ -4604,8 +4595,8 @@ ObjectPtr create_money(qint32 amount)
 
   if (amount <= 0)
   {
-    logentry(QStringLiteral("ERROR: Try to create negative money."), ANGEL, DC::LogChannel::LOG_BUG);
-    return (0);
+    DC::getInstance()->logentry(QStringLiteral("ERROR: Try to create negative money."), ANGEL, DC::LogChannel::LOG_BUG);
+    return {};
   }
 
   obj = new Object;
@@ -4687,7 +4678,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
   }
 
   if (!name[0])
-    return (0);
+    return {};
 
   *tar_ch = {};
   *tar_obj = {};
@@ -4843,7 +4834,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
     }
   }
 
-  return (0);
+  return {};
 }
 
 // Return a "somewhat" random person from the mobs hate list

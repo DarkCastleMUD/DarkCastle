@@ -37,7 +37,7 @@ command_return_t do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
   buf[0] = '\0';
 
   for (i = 1; i <= DC::MAX_MORTAL_LEVEL; i++)
-    sprintf(buf + strlen(buf), "[%2d] %9d\r\n", i, exp_table[i]);
+    dc_sprintf(buf + strlen(buf), "[%2d] %9d\r\n", i, exp_table[i]);
 
   page_string(ch->desc, buf, 1);
   return ReturnValue::eSUCCESS;

@@ -434,7 +434,7 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   QString buffer;
-  sprintf(buffer, "%s", qPrintable(victim->name()));
+  dc_sprintf(buffer, "%s", qPrintable(victim->name()));
 
   if (AWAKE(victim) && !skill_success(ch, victim, SKILL_CIRCLE))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, WEAR_WIELD);
@@ -958,7 +958,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (_exp)
           {
             ch->exp += _exp; /* exp for stealing :) */
-            sprintf(buf, "You receive %d experience.\r\n", _exp);
+            dc_sprintf(buf, "You receive %d experience.\r\n", _exp);
             ch->send(buf);
           }
 
@@ -999,10 +999,10 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (victim->isPlayer())
           {
             QString log_buf = {};
-            sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), DC::getInstance()->obj_index[obj->item_number].vnum(), qPrintable(victim->name()));
-            logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+            dc_sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), DC::getInstance()->obj_index[obj->item_number].vnum(), qPrintable(victim->name()));
+            DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+              DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), DC::getInstance()->obj_index[loop_obj->item_number].vnum());
           }
           if (DC::getInstance()->obj_index[obj->item_number].vnum() != 76)
           {
@@ -1162,11 +1162,11 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
         if (GET_POS(victim) <= position_t::SLEEPING)
           _exp = 1;
         ch->exp += _exp; /* exp for stealing :) */
-        sprintf(buf, "You receive %d exps.\r\n", _exp);
+        dc_sprintf(buf, "You receive %d exps.\r\n", _exp);
         ch->send(buf);
-        sprintf(buf, "%s stole %s from %s while victim was asleep",
-                qPrintable(ch->name()), qPrintable(obj->short_description()), qPrintable(victim->name()));
-        logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+        dc_sprintf(buf, "%s stole %s from %s while victim was asleep",
+                   qPrintable(ch->name()), qPrintable(obj->short_description()), qPrintable(victim->name()));
+        DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (!victim->isNonPlayer())
         {
           victim->save(cmd_t::SAVE_SILENTLY);
@@ -1237,7 +1237,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
-      sprintf(buf, "%s is a bloody thief.", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf, "%s is a bloody thief.", qPrintable(ch->shortdesc_or_name()));
       do_shout(victim, buf);
     }
     else
@@ -1384,12 +1384,12 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
       if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = {};
 
-      sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\r\n", gold);
+      dc_sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\r\n", gold);
       ch->send(buf);
       if (_exp && _exp > 1)
       {
         ch->exp += _exp; /* exp for stealing :) */
-        sprintf(buf, "You receive %d experience.\r\n", _exp);
+        dc_sprintf(buf, "You receive %d experience.\r\n", _exp);
         ch->send(buf);
       }
 
@@ -1409,7 +1409,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
             affect_to_char(ch, &pthiefaf);
         }
       }
-      logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", qPrintable(ch->name()), gold, qPrintable(victim->name()), GET_ROOM_VNUM(victim->in_room));
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", qPrintable(ch->name()), gold, qPrintable(victim->name()), GET_ROOM_VNUM(victim->in_room));
     }
     else
     {
@@ -1421,7 +1421,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
-      sprintf(buf, "%s is a bloody thief.", qPrintable(ch->shortdesc_or_name()));
+      dc_sprintf(buf, "%s is a bloody thief.", qPrintable(ch->shortdesc_or_name()));
       do_shout(victim, buf);
     }
     else
@@ -1690,14 +1690,14 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
         special_log(QString(QStringLiteral("%1 slips %2 coins to %3 in room %4!")).arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
       }
 
-      sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
-              amount);
+      dc_sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
+                 amount);
       act(buf, ch, 0, vict, TO_VICT, GODS);
       act("$n slips some $B$5gold$R to $N.", ch, 0, vict, TO_ROOM, GODS | NOTVICT);
 
-      sprintf(buf, "%s slips %d coins to %s", qPrintable(ch->name()), amount,
-              qPrintable(vict->name()));
-      logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      dc_sprintf(buf, "%s slips %d coins to %s", qPrintable(ch->name()), amount,
+                 qPrintable(vict->name()));
+      DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
       if (ch->isNonPlayer() || (ch->getLevel() < DEITY))
         ch->removeGold(amount);

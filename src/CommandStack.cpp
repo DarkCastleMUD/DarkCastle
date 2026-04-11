@@ -6,7 +6,6 @@
  */
 #include "DC/DC.h"
 #include "DC/CommandStack.h"
-#include "DC/levels.h"
 
 quint32 CommandStack::depth = {};
 quint32 CommandStack::max_depth = 5;
@@ -55,7 +54,7 @@ CommandStack::~CommandStack()
   }
   else
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Attempt to decrement CommandStack::depth when already 0");
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Attempt to decrement CommandStack::depth when already 0");
     produce_coredump();
   }
 }

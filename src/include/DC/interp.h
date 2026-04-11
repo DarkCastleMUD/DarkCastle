@@ -31,7 +31,6 @@ QString one_argumentnolow(QString argument, QString first_arg);
 void half_chop(const QString str, QString arg1, QString arg2);
 std::tuple<QString, QString> last_argument(QString arguments);
 std::tuple<QString, QString> half_chop(QString arguments, const QChar token = ' ');
-std::tuple<QString, QString> half_chop(const QString c_arg, const QChar token = ' ');
 void chop_half(QString str, QString arg1, QString arg2);
 void update_max_who(void);
 bool is_abbrev(QString abbrev, QString word);

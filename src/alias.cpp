@@ -159,7 +159,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   auto arg2_level = arg2.toUInt(&arg2_level_ok);
 
   extern qint32 top_of_mobt;
-  QMultiMap<level_t, QString> results;
+  QMultiMap<level_, QString> results;
 
   for (vnum_t vnum = {}; (vnum <= DC::getInstance()->mob_index[top_of_mobt].vnum()); ++vnum)
   {

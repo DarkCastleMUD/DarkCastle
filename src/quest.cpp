@@ -44,7 +44,7 @@ qint32 load_quests(void)
 
   if (!(fl = fopen(QUEST_FILE, "r")))
   {
-    logentry(QStringLiteral("Failed to open quest file for reading!"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Failed to open quest file for reading!"), 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
@@ -85,7 +85,7 @@ qint32 save_quests(void)
 
   if (!(fl = fopen(QUEST_FILE, "w")))
   {
-    logentry(QStringLiteral("Failed to open quest file for writing!"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Failed to open quest file for writing!"), 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
@@ -369,7 +369,7 @@ qint32 show_one_quest(CharacterPtr ch, quest_info *quest, qint32 count)
 
       if (!amount)
       {
-        logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
       }
 
       ch->send(QStringLiteral(" $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\r\n\r\n").arg(quest->level).arg(amount).arg(quest->reward));
@@ -487,7 +487,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
 
   if (check_quest_current(ch, quest->number))
   {
-    sprintf(buf, "q%d", quest->number);
+    dc_sprintf(buf, "q%d", quest->number);
     obj = get_obj(buf);
     if (!obj)
       return 0;
@@ -553,7 +553,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
   obj->short_description(quest->objshort);
   obj->long_description(quest->objlong);
 
-  sprintf(buf, "%s %s q%d", quest->objkey, qPrintable(ch->name()), quest->number);
+  dc_sprintf(buf, "%s %s q%d", quest->objkey, qPrintable(ch->name()), quest->number);
   obj->name(buf);
 
   SET_BIT(obj->obj_flags.extra_flags, ITEM_SPECIAL);
@@ -562,7 +562,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
   obj_to_char(obj, mob);
   wear(mob, obj, obj->keywordfind());
 
-  logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", qPrintable(ch->name()), quest->number, quest->name, quest->cost, quest->brownie);
+  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", qPrintable(ch->name()), quest->number, quest->name, quest->cost, quest->brownie);
 
   ch->player->quest_current[count] = quest->number;
   ch->player->quest_current_ticksleft[count] = quest->timer;
@@ -609,7 +609,7 @@ qint32 cancel_quest(CharacterPtr ch, quest_info *quest)
       return ReturnValue::eEXTRA_VALUE;
   }
 
-  logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", qPrintable(ch->name()), quest->number, quest->name);
+  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", qPrintable(ch->name()), quest->number, quest->name);
 
   ch->player->quest_cancel[count] = quest->number;
 
@@ -635,7 +635,7 @@ qint32 complete_quest(CharacterPtr ch, quest_info *quest)
       return ReturnValue::eEXTRA_VALUE;
     }
   }
-  sprintf(buf, "q%d", quest->number);
+  dc_sprintf(buf, "q%d", quest->number);
   obj = get_obj_in_list(buf, ch->carrying);
 
   if (!obj)
@@ -652,7 +652,7 @@ qint32 complete_quest(CharacterPtr ch, quest_info *quest)
     SETBIT(ch->player->quest_complete, quest->number);
   quest->active = false;
 
-  logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", qPrintable(ch->name()), quest->number, quest->name, quest->reward);
+  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", qPrintable(ch->name()), quest->number, quest->name, quest->reward);
 
   return ReturnValue::eSUCCESS;
 }
@@ -679,7 +679,7 @@ qint32 stop_current_quest(CharacterPtr ch, quest_info *quest)
   ch->player->quest_current[count] = -1;
   ch->player->quest_current_ticksleft[count] = {};
   quest->active = false;
-  sprintf(buf, "q%d", quest->number);
+  dc_sprintf(buf, "q%d", quest->number);
   obj = get_obj(buf);
   if (obj)
     extract_obj(obj);
@@ -737,7 +737,7 @@ void quest_update()
             {
               stop_current_quest(i, quest);
 
-              logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", qPrintable(i->name()), quest->number, quest->name);
+              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", qPrintable(i->name()), quest->number, quest->name);
 
               i->send(QStringLiteral("Time has expired for %1.  This quest has ended.\r\n").arg(quest->name));
             }
@@ -786,7 +786,7 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
   {
   case cmd_t::QUEST_LIST:
     do_emote(qmaster, "looks at his notes and writes a scroll.");
-    sprintf(buf, "%s Here are some currently available quests.", qPrintable(ch->name()));
+    dc_sprintf(buf, "%s Here are some currently available quests.", qPrintable(ch->name()));
     do_psay(qmaster, buf);
     show_available_quests(ch);
     break;
@@ -794,17 +794,17 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
     retval = cancel_quest(ch, quest);
     if (isSet(retval, ReturnValue::eSUCCESS))
     {
-      sprintf(buf, "%s You may begin this quest again if you speak with me.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s You may begin this quest again if you speak with me.", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     else if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     {
-      sprintf(buf, "%s You cannot cancel up any more quests without completing some of them.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s You cannot cancel up any more quests without completing some of them.", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     else
     {
-      sprintf(buf, "%s You weren't doing this quest to begin with.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s You weren't doing this quest to begin with.", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     break;
@@ -814,7 +814,7 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
     {
       if (quest->number)
       {
-        sprintf(buf, "%s Excellent!  Let me write down the quest information for you.", qPrintable(ch->name()));
+        dc_sprintf(buf, "%s Excellent!  Let me write down the quest information for you.", qPrintable(ch->name()));
         do_psay(qmaster, buf);
         do_emote(qmaster, "gives up the scroll.");
         show_quest_header(ch);
@@ -823,9 +823,9 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
       }
       else
       {
-        sprintf(buf, "%s I have placed a token of Phire upon a creature somewhere within the realms.", qPrintable(ch->name()));
+        dc_sprintf(buf, "%s I have placed a token of Phire upon a creature somewhere within the realms.", qPrintable(ch->name()));
         do_psay(qmaster, buf);
-        sprintf(buf, "%s Retrieve it for me within 12 hours for a reward!", qPrintable(ch->name()));
+        dc_sprintf(buf, "%s Retrieve it for me within 12 hours for a reward!", qPrintable(ch->name()));
         do_psay(qmaster, buf);
         show_quest_header(ch);
         show_one_quest(ch, quest, 0);
@@ -834,22 +834,22 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
     }
     else if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     {
-      sprintf(buf, "%s You cannot start any more quests without completing some first.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s You cannot start any more quests without completing some first.", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     else if (isSet(retval, ReturnValue::eEXTRA_VAL2))
     {
-      sprintf(buf, "%s You do not have the required funds to get the clue from me, beggar!", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s You do not have the required funds to get the clue from me, beggar!", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     else if (!retval)
     {
-      sprintf(buf, "%s The quest item has left this world.  It will appear again soon.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s The quest item has left this world.  It will appear again soon.", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     else
     {
-      sprintf(buf, "%s Sorry, you cannot start this quest right now.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s Sorry, you cannot start this quest right now.", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     break;
@@ -857,23 +857,23 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
     retval = complete_quest(ch, quest);
     if (isSet(retval, ReturnValue::eSUCCESS))
     {
-      sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", qPrintable(ch->name()));
       do_psay(qmaster, buf);
       ch->save(cmd_t::SAVE_SILENTLY);
     }
     else if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     {
-      sprintf(buf, "%s You weren't doing this quest to begin with.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s You weren't doing this quest to begin with.", qPrintable(ch->name()));
       do_psay(qmaster, buf);
     }
     else
     {
-      sprintf(buf, "%s You have not yet completed this quest.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s You have not yet completed this quest.", qPrintable(ch->name()));
       do_say(qmaster, buf);
     }
     break;
   default:
-    logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   return retval;
@@ -904,7 +904,7 @@ qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   {
     if ((choice = atoi(arg)) == 0 || choice < 0)
     {
-      sprintf(buf, "%s Try a number from the list.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s Try a number from the list.", qPrintable(ch->name()));
       owner->do_tell(QString(buf).split(' '));
       return ReturnValue::eSUCCESS;
     }
@@ -914,7 +914,7 @@ qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       do_say(owner, "Sure, bum.");
       break;
     default:
-      sprintf(buf, "%s I don't offer that service.", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s I don't offer that service.", qPrintable(ch->name()));
       owner->do_tell(QString(buf).split(' '));
       break;
     }
@@ -1229,8 +1229,8 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
 
-      logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", qPrintable(ch->name()), qPrintable(vict->name()),
-           vict->player->quest_points, atoi(value));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", qPrintable(ch->name()), qPrintable(vict->name()),
+                              vict->player->quest_points, atoi(value));
       ch->send(QStringLiteral("Setting %s's quest points from %d to %d.\r\n").arg(qPrintable(vict->name())).arg(vict->player->quest_points).arg(atoi(value)));
 
       vict->player->quest_points = atoi(value);
@@ -1327,7 +1327,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   switch (i)
   {
   case 0: // name
-    sprintf(field, "%s %s", value, argument);
+    dc_sprintf(field, "%s %s", value, argument);
     oldquest = get_quest_(field);
     if (oldquest)
     {
@@ -1353,19 +1353,19 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     break;
   case 3: // objshort
     ch->send(QStringLiteral("Objshort changed from %1 ").arg(quest->objshort));
-    sprintf(field, "%s %s", value, argument);
+    dc_sprintf(field, "%s %s", value, argument);
     quest->objshort = QStringLiteral(field);
     ch->send(QStringLiteral("to %1.\r\n").arg(quest->objshort));
     break;
   case 4: // objlong
     ch->send(QStringLiteral("Objlong changed from %1 ").arg(quest->objlong));
-    sprintf(field, "%s %s", value, argument);
+    dc_sprintf(field, "%s %s", value, argument);
     quest->objlong = QStringLiteral(field);
     ch->send(QStringLiteral("to %1.\r\n").arg(quest->objlong));
     break;
   case 5: // objkey
     ch->send(QStringLiteral("Objkey changed from %1 ").arg(quest->objkey));
-    sprintf(field, "%s %s", value, argument);
+    dc_sprintf(field, "%s %s", value, argument);
     quest->objkey = QStringLiteral(field);
     ch->send(QStringLiteral("to %1.\r\n").arg(quest->objkey));
     break;
@@ -1385,19 +1385,19 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->send(QStringLiteral("to %1.\r\n").arg(quest->reward));
     break;
   case 9: // hint1
-    sprintf(field, "%s %s", value, argument);
+    dc_sprintf(field, "%s %s", value, argument);
     ch->send(QStringLiteral("Hint #1 changed from %s ").arg(quest->hint1));
     quest->hint1 = QStringLiteral(field);
     ch->send(QStringLiteral("to %s.\r\n").arg(quest->hint1));
     break;
   case 10: // hint2
-    sprintf(field, "%s %s", value, argument);
+    dc_sprintf(field, "%s %s", value, argument);
     ch->send(QStringLiteral("Hint #2 changed from %s ").arg(quest->hint2));
     quest->hint2 = QStringLiteral(field);
     ch->send(QStringLiteral("to %s.\r\n").arg(quest->hint2));
     break;
   case 11: // hint3
-    sprintf(field, "%s %s", value, argument);
+    dc_sprintf(field, "%s %s", value, argument);
     ch->send(QStringLiteral("Hint #3 changed from %s ").arg(quest->hint3));
     quest->hint3 = QStringLiteral(field);
     ch->send(QStringLiteral("to %s.\r\n").arg(quest->hint3));
@@ -1420,7 +1420,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     break;
   default:
-    logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eSUCCESS;
@@ -1566,12 +1566,12 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     obj = clone_object(rnum);
 
     /*      if (class_restricted(ch, obj)) {
-         sprintf(buf, "%s That item is meant for another class.", qPrintable(ch->name()));
+         dc_sprintf(buf, "%s That item is meant for another class.", qPrintable(ch->name()));
          do_tell(owner, buf);
          extract_obj(obj);
          return ReturnValue::eSUCCESS;
           } else if (size_restricted(ch, obj)) {
-         sprintf(buf, "%s That item would not fit you.", qPrintable(ch->name()));
+         dc_sprintf(buf, "%s That item would not fit you.", qPrintable(ch->name()));
          do_tell(owner, buf);
          extract_obj(obj);
          return ReturnValue::eSUCCESS;

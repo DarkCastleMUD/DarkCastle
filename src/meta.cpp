@@ -1239,7 +1239,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_AC(ch) -= 2;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", qPrintable(ch->name()));
+      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1261,7 +1261,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->exp += 2000000;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", qPrintable(ch->name()));
+      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1471,8 +1471,8 @@ void Character::set_heightweight(void)
     this->weight = number(240, 280);
     break;
   }
-  logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
-  logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
+  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
+  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
 }
 
 qint32 changecost(qint32 oldrace, qint32 newrace)
@@ -1557,7 +1557,7 @@ QString Character::race_message(qint32 race)
   else if (!is_race_applicable(race))
     return "You do not qualify for becoming this race.";
 
-  sprintf(buf, "%d platinum coins.", changecost(this->race, race));
+  dc_sprintf(buf, "%d platinum coins.", changecost(this->race, race));
   return &buf[0];
 }
 
@@ -1776,22 +1776,22 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       if (choice == 3)
       {
         ch->height++;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by 1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
+        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by 1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
       }
       if (choice == 4)
       {
         ch->height--;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by -1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
+        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by -1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
       }
       if (choice == 5)
       {
         ch->weight++;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by 1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
+        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by 1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
       }
       if (choice == 6)
       {
         ch->weight--;
-        logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
+        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
       }
       return ReturnValue::eSUCCESS;
     }
@@ -1817,7 +1817,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       GET_AGE_METAS(ch) += 1;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", qPrintable(ch->name()));
+      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1844,7 +1844,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       GET_AGE_METAS(ch) -= 1;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", qPrintable(ch->name()));
+      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;

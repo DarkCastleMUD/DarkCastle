@@ -324,7 +324,7 @@ void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, Charact
 {
   if (cf.verbose_mode)
   {
-    logentry(str, god_level, type, vict);
+    DC::getInstance()->logentry(str, god_level, type, vict);
   }
 }
 
@@ -338,7 +338,7 @@ void close_file(std::FILE *fp)
 
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>
 {
-  // auto it = std::find_if(begin(DC::bestowable_god_commands), end(DC::bestowable_god_commands));
+  // auto it = std::std::find_if(begin(DC::bestowable_god_commands), end(DC::bestowable_god_commands));
 
   for (const auto &bgc : DC::bestowable_god_commands)
   {
@@ -364,22 +364,22 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
   if (!strcmp(arg4, "chaos"))
   {
     arena.type = CHAOS; // -2
-    sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
+    dc_sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
     send_info(buf);
-    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", qPrintable(ch->name()));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", qPrintable(ch->name()));
   }
 
   if (!strcmp(arg4, "potato"))
   {
     arena.type = POTATO; // -3
-    sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
+    dc_sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
     send_info(buf);
   }
 
   if (!strcmp(arg4, "prize"))
   {
     arena.type = PRIZE; // -3
-    sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
+    dc_sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
     send_info(buf);
   }
 
@@ -395,7 +395,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
           arena.hplimit = 1000;
 
     arena.type = HP; // -4
-    sprintf(buf, "##$4$B HP LIMIT Arena!!$R  Any more than %d raw hps, and you have to sit this one out!!\r\n", arena.hplimit);
+    dc_sprintf(buf, "##$4$B HP LIMIT Arena!!$R  Any more than %d raw hps, and you have to sit this one out!!\r\n", arena.hplimit);
     send_info(buf);
   }
 }
@@ -530,7 +530,7 @@ LegacyFileWorld::~LegacyFileWorld()
   }
 }
 
-qint32 sprintf(QString &str, const QString format, ...)
+qint32 dc_sprintf(QString &str, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);

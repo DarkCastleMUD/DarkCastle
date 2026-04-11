@@ -222,7 +222,7 @@ command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim->isImplementerPlayer())
     {
       ch->sendln("You no make ME into chop suey!");
-      sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
+      dc_sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
       victim->send(buf);
       if (ch->isImmortalPlayer())
       {
@@ -289,7 +289,7 @@ command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
       if (victim->getLevel() >= IMPLEMENTER)
       {
         ch->sendln("You no make ME into chop suey!");
-        sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
+        dc_sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
         victim->send(buf);
         if (ch->getLevel() > IMMORTAL)
         {

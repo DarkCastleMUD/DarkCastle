@@ -144,7 +144,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   if (move_char(ch, send_to) == 0)
     return ReturnValue::eFAILURE;
   act("$n appears, preparing for battle.", ch, 0, 0, TO_ROOM, 0);
-  sprintf(buf, "## %s has joined the bloodbath!\r\n", qPrintable(ch->shortdesc_or_name()));
+  dc_sprintf(buf, "## %s has joined the bloodbath!\r\n", qPrintable(ch->shortdesc_or_name()));
   send_info(buf);
   do_look(ch, "");
   return ReturnValue::eSUCCESS;

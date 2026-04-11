@@ -111,7 +111,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   if ((victim->getLevel() > this->getLevel()) && (qPrintable(this->name()) != qPrintable(victim->name())))
   {
     this->sendln("Can't do that. That mob is higher than you!");
-    logentry(QStringLiteral("%1 tried to snoop a higher mob\r\n").arg(qPrintable(this->name())), OVERSEER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(QStringLiteral("%1 tried to snoop a higher mob\r\n").arg(qPrintable(this->name())), OVERSEER, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
 
@@ -123,7 +123,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
       this->desc->snooping->snoop_by = {};
       this->desc->snooping = {};
     }
-    logentry(QStringLiteral("%1 snoops themself.").arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(QStringLiteral("%1 snoops themself.").arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
     return ReturnValue::eSUCCESS;
   }
 
@@ -157,7 +157,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   this->desc->snooping = victim->desc;
   victim->desc->snoop_by = this->desc;
-  logentry(QStringLiteral("%1 snoops %2.").arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(QStringLiteral("%1 snoops %2.").arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
@@ -212,9 +212,9 @@ command_return_t do_send(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You send '%s' to %s.\r\n", message, qPrintable(vict->name()));
+  dc_sprintf(buf, "You send '%s' to %s.\r\n", message, qPrintable(vict->name()));
   ch->send(buf);
-  sprintf(buf, "%s\r\n", message);
+  dc_sprintf(buf, "%s\r\n", message);
   vict->send(buf);
   return ReturnValue::eSUCCESS;
 }

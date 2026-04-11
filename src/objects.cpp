@@ -443,7 +443,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         else
         {
-          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", DC::getInstance()->obj_index[scroll->item_number].vnum(), i, i);
+          DC::getInstance()->logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", DC::getInstance()->obj_index[scroll->item_number].vnum(), i, i);
           continue;
         }
       }
@@ -465,7 +465,7 @@ void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
   QString buf;
   ObjectPtr trap_obj = {};
 
-  sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", qPrintable(obj->short_description()));
+  dc_sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -486,7 +486,7 @@ void set_exit_trap(CharacterPtr ch, ObjectPtr obj, QString arg)
   QString buf;
   ObjectPtr trap_obj = {};
 
-  sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", qPrintable(obj->short_description()));
+  dc_sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -568,9 +568,9 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
   }
   else
   {
-    sprintf(buf, "It flies with great speed %sward.\r\n", dirs[dir]);
+    dc_sprintf(buf, "It flies with great speed %sward.\r\n", dirs[dir]);
     send_to_room(buf, ch->in_room);
-    sprintf(buf, "Something flies into the area with great speed landing at your feet.\r\n");
+    dc_sprintf(buf, "Something flies into the area with great speed landing at your feet.\r\n");
     send_to_room(buf, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
     // set it up in the target room
     obj_to_room(trap_obj, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
@@ -585,7 +585,7 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
   QString buf;
   extern const QStringList sector_types;
 
-  sprintf(buf, "You sprinkle the %s all around you.\r\n", qPrintable(obj->short_description()));
+  dc_sprintf(buf, "You sprinkle the %s all around you.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
   act("$n sprinkles something on the ground around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -599,8 +599,8 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
       return;
     }
 
-    sprintf(buf, "It probably won't work, since %s was designed for the smells of a %s",
-            qPrintable(obj->short_description()), sector_types[obj->obj_flags.value[1]]);
+    dc_sprintf(buf, "It probably won't work, since %s was designed for the smells of a %s",
+               qPrintable(obj->short_description()), sector_types[obj->obj_flags.value[1]]);
     ch->send(buf);
 
     // small chance of success
@@ -663,7 +663,7 @@ command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
-    sprintf(buf, "You do not seem to have a '%s'.\r\n", arg);
+    dc_sprintf(buf, "You do not seem to have a '%s'.\r\n", arg);
     ch->send(buf);
     return ReturnValue::eFAILURE;
   }
@@ -1135,8 +1135,8 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You pour the %s into the %s.\r\n",
-          drinks[from_obj->obj_flags.value[2]], arg2);
+  dc_sprintf(buf, "You pour the %s into the %s.\r\n",
+             drinks[from_obj->obj_flags.value[2]], arg2);
   ch->send(buf);
 
   /* First same type liq. */
@@ -1204,7 +1204,7 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   act("$n sips from the $o", ch, temp, 0, TO_ROOM, INVIS_NULL);
-  sprintf(buf, "It tastes like %s.\r\n", drinks[temp->obj_flags.value[2]]);
+  dc_sprintf(buf, "It tastes like %s.\r\n", drinks[temp->obj_flags.value[2]]);
   ch->send(buf);
 
   gain_condition(ch, DRUNK,
@@ -1491,19 +1491,19 @@ qint32 will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, qint32 add)
   // temporarily affect the person's height
   if (add)
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
   else
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
 
   if (add == 1 && size_restricted(ch, obj))
   {
     // Only have to check the item itself if we're wearing it, not removing
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
     ch->sendln("After modifying your height that item would not fit!");
     return true;
@@ -1525,12 +1525,12 @@ qint32 will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, qint32 add)
   // fix height back to normal
   if (add)
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
   else
   {
-    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
 
@@ -1577,7 +1577,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   {
     if (ch->getLevel() < obj_object->obj_flags.eq_level)
     {
-      sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
+      dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
       act(buffer, ch, obj_object, 0, TO_CHAR, 0);
       return;
     }
@@ -1587,7 +1587,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() != 8)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
-        sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
+        dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
         act(buffer, ch, obj_object, 0, TO_CHAR, 0);
         return;
       }
@@ -1628,14 +1628,14 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_FINGER_L])
         {
-          sprintf(buffer, "You put the %s on your right ring-finger.\r\n", qPrintable(fname(obj_object->name())));
+          dc_sprintf(buffer, "You put the %s on your right ring-finger.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_FINGER_R);
         }
         else
         {
-          sprintf(buffer, "You put the %s on your left ring-finger.\r\n", qPrintable(fname(obj_object->name())));
+          dc_sprintf(buffer, "You put the %s on your left ring-finger.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_FINGER_L);
@@ -1861,13 +1861,13 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_WRIST_L])
         {
-          sprintf(buffer, "You wear the %s around your right wrist.\r\n", qPrintable(fname(obj_object->name())));
+          dc_sprintf(buffer, "You wear the %s around your right wrist.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           ch->equip_char(obj_object, WEAR_WRIST_R);
         }
         else
         {
-          sprintf(buffer, "You wear the %s around your left wrist.\r\n", qPrintable(fname(obj_object->name())));
+          dc_sprintf(buffer, "You wear the %s around your left wrist.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
           ch->equip_char(obj_object, WEAR_WRIST_L);
         }
@@ -2099,19 +2099,19 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
 
   case -1:
   {
-    sprintf(buffer, "Wear %s where?.\r\n", qPrintable(fname(obj_object->name())));
+    dc_sprintf(buffer, "Wear %s where?.\r\n", qPrintable(fname(obj_object->name())));
     ch->send(buffer);
   }
   break;
   case -2:
   {
-    sprintf(buffer, "You can't wear the %s.\r\n", qPrintable(fname(obj_object->name())));
+    dc_sprintf(buffer, "You can't wear the %s.\r\n", qPrintable(fname(obj_object->name())));
     ch->send(buffer);
   }
   break;
   default:
   {
-    logentry(QStringLiteral("Unknown type called in wear."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unknown type called in wear."), ANGEL, DC::LogChannel::LOG_BUG);
   }
   break;
   }
@@ -2246,7 +2246,7 @@ command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
       keyword = search_list(arg2, keywords);
       if (keyword == -1)
       {
-        sprintf(buf, "%s is an unknown body location.\r\n", arg2);
+        dc_sprintf(buf, "%s is an unknown body location.\r\n", arg2);
         ch->send(buf);
       }
       else
@@ -2263,7 +2263,7 @@ command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
+    dc_sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
     ch->send(buffer);
   }
   return ReturnValue::eSUCCESS;
@@ -2308,7 +2308,7 @@ command_return_t do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
+      dc_sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
       ch->send(buffer);
     }
   }
@@ -2354,7 +2354,7 @@ command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
+      dc_sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
       ch->send(buffer);
     }
   }
@@ -2410,7 +2410,7 @@ qint32 Character::hands_are_free(qint32 number)
   else if (number == 2 && hands < 1)
     return (1);
   else
-    return (0);
+    return {};
 }
 
 command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
@@ -2441,7 +2441,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
             obj_object = ch->equipment[j];
             if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
             {
-              sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description()));
+              dc_sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description()));
               send_to_char(arg1, ch);
               continue;
             }
@@ -2484,7 +2484,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
           {
-            sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description()));
+            dc_sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description()));
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }
@@ -2576,8 +2576,8 @@ bool fullSave(ObjectPtr obj)
   if (!tmp_obj)
   {
     QString buf;
-    sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", qPrintable(obj->name()));
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", qPrintable(obj->name()));
+    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 

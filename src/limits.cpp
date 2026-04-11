@@ -512,7 +512,7 @@ void advance_level(CharacterPtr ch, qint32 is_conversion)
     break;
 
   default:
-    logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -554,9 +554,9 @@ void advance_level(CharacterPtr ch, qint32 is_conversion)
   if (!ch->isNonPlayer() && !is_conversion)
     ch->player->practices += add_practices;
 
-  sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
-          GET_MAX_MOVE(ch),
-          ch->isNonPlayer() ? 0 : add_practices, ch->isNonPlayer() ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
+  dc_sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
+             GET_MAX_MOVE(ch),
+             ch->isNonPlayer() ? 0 : add_practices, ch->isNonPlayer() ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
   if (!is_conversion)
     ch->send(buf);
 
@@ -938,7 +938,7 @@ void update_corpses_and_portals(void)
           }
           else
           {
-            logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, DC::LogChannel::LOG_BUG);
+            DC::getInstance()->logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, DC::LogChannel::LOG_BUG);
             return;
           }
         }
@@ -957,8 +957,8 @@ void update_corpses_and_portals(void)
   {
     save_corpses();
   }
-  // sprintf(buf, "DEBUG: Processed Objects: %d", proc);
-  // logentry(buf, 108, DC::LogChannel::LOG_BUG);
+  // dc_sprintf(buf, "DEBUG: Processed Objects: %d", proc);
+  // DC::getInstance()->logentry(buf, 108, DC::LogChannel::LOG_BUG);
   /* Now process the portals */
   // process_portals();
 }

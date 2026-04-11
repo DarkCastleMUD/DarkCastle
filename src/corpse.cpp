@@ -99,7 +99,7 @@ qint32 corpse_save(ObjectPtr obj, FILE *fp, qint32 location, bool recurse_this_t
     //    for (tmp = obj->in_obj; tmp; tmp = tmp->in_obj)
     // No, let's not.      GET_OBJ_WEIGHT(tmp) += GET_OBJ_WEIGHT(obj);
     if (!result)
-      return (0);
+      return {};
   }
   return (true);
 }
@@ -205,7 +205,7 @@ void save_corpses(void)
   if (!(fp = fopen(CORPSE_FILE, "w")))
   {
     if (errno != ENOENT) /* if it fails, NOT because of no file */
-      sprintf(buf1, "SYSERR: checking for corpse file %s : %s", CORPSE_FILE, strerror(errno));
+      dc_sprintf(buf1, "SYSERR: checking for corpse file %s : %s", CORPSE_FILE, strerror(errno));
     perror(buf1);
     return;
   }
@@ -265,7 +265,7 @@ void DC::load_corpses(void)
     get_line_new(fp, line);
   }
   else
-    logentry(QStringLiteral("No corpses in file to load"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("No corpses in file to load"), 0, DC::LogChannel::LOG_MISC);
 
   while (!feof(fp) && !end)
   {
@@ -281,8 +281,8 @@ void DC::load_corpses(void)
       }
       if (debug == 1)
       {
-        sprintf(buf3, " -Loading Object: %d", nr);
-        logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+        dc_sprintf(buf3, " -Loading Object: %d", nr);
+        DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       /* we have the number, check it, load obj. */
       if (nr == -1)
@@ -311,8 +311,8 @@ void DC::load_corpses(void)
       get_line_new(fp, line);
       if (debug == 1)
       {
-        sprintf(buf3, " -LINE: %s", line);
-        logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+        dc_sprintf(buf3, " -LINE: %s", line);
+        DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       sscanf(line, "%d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7);
       GET_OBJ_VAL(temp, 0) = t[1];
@@ -326,14 +326,14 @@ void DC::load_corpses(void)
       get_line_new(fp, line);
       if (debug == 1)
       {
-        sprintf(buf3, " -LINE: %s", line);
-        logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+        dc_sprintf(buf3, " -LINE: %s", line);
+        DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       /* read line check for xap. */
       if (!strcmp("XAP\n", line))
       { /* then this is a Xap Obj, requires special care */
         if (debug == 1)
-          logentry(QStringLiteral("XAP Found"), 0, DC::LogChannel::LOG_MISC);
+          DC::getInstance()->logentry(QStringLiteral("XAP Found"), 0, DC::LogChannel::LOG_MISC);
 
         temp->name(fread_string_new(fp));
         if (temp->name().isEmpty())
@@ -357,8 +357,8 @@ void DC::load_corpses(void)
         {
           if (debug == 1)
           {
-            sprintf(buf3, "   -SHORT: %s\n", qPrintable(temp->short_description()));
-            logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_sprintf(buf3, "   -SHORT: %s\n", qPrintable(temp->short_description()));
+            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
 
@@ -370,8 +370,8 @@ void DC::load_corpses(void)
         {
           if (debug == 1)
           {
-            sprintf(buf3, "   -DESC: %s\n", qPrintable(temp->long_description()));
-            logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_sprintf(buf3, "   -DESC: %s\n", qPrintable(temp->long_description()));
+            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
 
@@ -384,21 +384,21 @@ void DC::load_corpses(void)
         {
           if (debug == 1)
           {
-            snprintf(buf3, sizeof(buf3) - 1, "   -ACT_DESC: %s\n", qPrintable(temp->ActionDescription()));
-            logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_snprintf(buf3, sizeof(buf3) - 1, "   -ACT_DESC: %s\n", qPrintable(temp->ActionDescription()));
+            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
         if (!get_line_new(fp, line) ||
             (sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
         {
-          logentry(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"), 0, DC::LogChannel::LOG_MISC);
+          DC::getInstance()->logentry(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"), 0, DC::LogChannel::LOG_MISC);
         }
         else
         {
           if (debug == 1)
           {
-            sprintf(buf3, "   -FLAGS: %s", line);
-            logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_sprintf(buf3, "   -FLAGS: %s", line);
+            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
         temp->obj_flags.type_flag = t[0];
@@ -408,7 +408,7 @@ void DC::load_corpses(void)
         size_t alloc_num_affects = std::max(0, t[4]);
 
         /* buf2 is error codes pretty much */
-        sprintf(buf2, ", after numeric constants (expecting E/#xxx)");
+        dc_sprintf(buf2, ", after numeric constants (expecting E/#xxx)");
 
         /* we're clearing these for good luck */
 
@@ -461,8 +461,8 @@ void DC::load_corpses(void)
         } /* exit our for loop */
         if (alloc_num_affects != temp->num_affects)
         {
-          logf(0, DC::LogChannel::LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
-               alloc_num_affects, temp->num_affects);
+          DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
+                                  alloc_num_affects, temp->num_affects);
         }
       }
       else
@@ -470,13 +470,13 @@ void DC::load_corpses(void)
         if (nr == -1)
         {
           if (debug == 1)
-            sprintf(buf3, "GOLD FOUND: %d total", t[1]);
+            dc_sprintf(buf3, "GOLD FOUND: %d total", t[1]);
           money = create_money(t[1]);
           obj_to_room(money, real_room(frozen_start_room));
           continue;
         }
         if (debug == 1)
-          logentry(QStringLiteral("XAP NOT Found"), 0, DC::LogChannel::LOG_MISC);
+          DC::getInstance()->logentry(QStringLiteral("XAP NOT Found"), 0, DC::LogChannel::LOG_MISC);
       }
       if (temp != nullptr)
       {

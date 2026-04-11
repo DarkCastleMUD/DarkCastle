@@ -53,9 +53,9 @@ command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf3;
 
   if (ch->isPlayer() && ch->player->wizinvis)
-    sprintf(buf3, "someone");
+    dc_sprintf(buf3, "someone");
   else
-    sprintf(buf3, "%s", qPrintable(ch->shortdesc_or_name()));
+    dc_sprintf(buf3, "%s", qPrintable(ch->shortdesc_or_name()));
 
   for (; *argument == ' '; argument++)
     ;
@@ -65,26 +65,26 @@ command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (cmd == cmd_t::DEFAULT)
-      sprintf(buf2, "$4$BYou thunder '%s'$R", argument);
+      dc_sprintf(buf2, "$4$BYou thunder '%s'$R", argument);
     else
-      sprintf(buf2, "$7$BYou bellow '%s'$R", argument);
+      dc_sprintf(buf2, "$7$BYou bellow '%s'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
     for (auto &i : DC::getInstance()->connections_)
       if (i->character != ch && !i->connected)
       {
         if (ch->isPlayer() && ch->player->wizinvis && i->character->getLevel() < ch->player->wizinvis)
-          sprintf(buf3, "Someone");
+          dc_sprintf(buf3, "Someone");
         else
-          sprintf(buf3, "%s", qPrintable(ch->shortdesc_or_name()));
+          dc_sprintf(buf3, "%s", qPrintable(ch->shortdesc_or_name()));
 
         if (cmd == cmd_t::DEFAULT)
         {
-          sprintf(buf1, "$B$4%s thunders '%s'$R\r\n", buf3, argument);
+          dc_sprintf(buf1, "$B$4%s thunders '%s'$R\r\n", buf3, argument);
         }
         else
         {
-          sprintf(buf1, "$7$B%s bellows '%s'$R\r\n", buf3, argument);
+          dc_sprintf(buf1, "$7$B%s bellows '%s'$R\r\n", buf3, argument);
         }
 
         send_to_char(buf1, i->character);
@@ -167,7 +167,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
       if (isexact("prize", ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->name()))
       {
         cnt++;
-        sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->short_description);
+        dc_sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->short_description);
         ch->send(buf);
       }
 
@@ -224,7 +224,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_load.");
-    logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: /* mobile */
     if ((number = number_or_name(&c, &num)) == 0)
@@ -343,9 +343,9 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (vict->isPlayer() && (ch->getLevel() <= vict->getLevel()))
       {
-        sprintf(buf, "%s is surrounded with scorching flames but is"
-                     " unharmed.\r\n",
-                qPrintable(vict->shortdesc_or_name()));
+        dc_sprintf(buf, "%s is surrounded with scorching flames but is"
+                        " unharmed.\r\n",
+                   qPrintable(vict->shortdesc_or_name()));
         ch->send(buf);
         act("$n tried to purge you.", ch, 0, vict, TO_VICT, 0);
         return ReturnValue::eFAILURE;
@@ -465,15 +465,15 @@ qint32 Zone::show_info(CharacterPtr ch)
 
   sprintbit(zone_flags, Zone::zone_bits, buf);
   ch->send(buf);
-  sprintf(buf, "\r\n"
-               "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
-               "$3DiedThisTick$R: %3d $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
-          num_mob_on_repop,
-          death_counter,
-          counter_mod,
-          died_this_tick,
-          repops_without_deaths,
-          repops_with_bonus);
+  dc_sprintf(buf, "\r\n"
+                  "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
+                  "$3DiedThisTick$R: %3d $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
+             num_mob_on_repop,
+             death_counter,
+             counter_mod,
+             died_this_tick,
+             repops_without_deaths,
+             repops_with_bonus);
   ch->send(buf);
   ch->sendln("");
 
@@ -492,7 +492,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
 
   if (k < start)
   {
-    sprintf(buf, "Last command in this zone is %d.\r\n", k);
+    dc_sprintf(buf, "Last command in this zone is %d.\r\n", k);
     ch->send(buf);
     return ReturnValue::eFAILURE;
   }
@@ -536,43 +536,43 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
     // command 0 from the user's perspective.
     if (zone.cmd[j]->command == '*')
     {
-      sprintf(buf, "[%3d] Comment: ", j + 1);
+      dc_sprintf(buf, "[%3d] Comment: ", j + 1);
     }
     else
       switch (zone.cmd[j]->if_flag)
       {
       case 0:
-        sprintf(buf, "[%3d] Always ", j + 1);
+        dc_sprintf(buf, "[%3d] Always ", j + 1);
         break;
       case 1:
-        sprintf(buf, "[%3d] $B$2OnTrue$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$2OnTrue$R ", j + 1);
         break;
       case 2:
-        sprintf(buf, "[%3d] $4OnFals$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $4OnFals$R ", j + 1);
         break;
       case 3:
-        sprintf(buf, "[%3d] $B$5OnBoot$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$5OnBoot$R ", j + 1);
         break;
       case 4:
-        sprintf(buf, "[%3d] $B$2Ls$1Mb$2Tr$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$2Ls$1Mb$2Tr$R ", j + 1);
         break;
       case 5:
-        sprintf(buf, "[%3d] $B$4Ls$1Mb$4Fl$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$4Ls$1Mb$4Fl$R ", j + 1);
         break;
       case 6:
-        sprintf(buf, "[%3d] $B$2Ls$7Ob$2Tr$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$2Ls$7Ob$2Tr$R ", j + 1);
         break;
       case 7:
-        sprintf(buf, "[%3d] $B$4Ls$7Ob$4Fl$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$4Ls$7Ob$4Fl$R ", j + 1);
         break;
       case 8:
-        sprintf(buf, "[%3d] $B$2Ls$R%%%%$B$2Tr$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$2Ls$R%%%%$B$2Tr$R ", j + 1);
         break;
       case 9:
-        sprintf(buf, "[%3d] $B$4Ls$R%%%%$B$4Fl$R ", j + 1);
+        dc_sprintf(buf, "[%3d] $B$4Ls$R%%%%$B$4Fl$R ", j + 1);
         break;
       default:
-        sprintf(buf, "[%3d] $B$4ERROR(%d)$R", j + 1, zone.cmd[j]->if_flag);
+        dc_sprintf(buf, "[%3d] $B$4ERROR(%d)$R", j + 1, zone.cmd[j]->if_flag);
         break;
       }
     qint32 virt;
@@ -581,62 +581,62 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
     {
     case 'M':
       virt = ZCMD->active ? DC::getInstance()->mob_index[ZCMD->arg1].vnum() : ZCMD->arg1;
-      sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
+      dc_sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         strcat(buf, "(  always ) in room ");
       else
-        sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
-      sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j]->arg3);
-      sprintf(buf, "%s ([%d] [%d] [%s])", buf, zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop), charExists(zone.cmd[j]->lastPop) ? qPrintable(zone.cmd[j]->lastPop->shortdesc_or_name()) : "Unknown");
-      sprintf(buf, "%s\r\n", buf);
+        dc_sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
+      dc_sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j]->arg3);
+      dc_sprintf(buf, "%s ([%d] [%d] [%s])", buf, zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop), charExists(zone.cmd[j]->lastPop) ? qPrintable(zone.cmd[j]->lastPop->shortdesc_or_name()) : "Unknown");
+      dc_sprintf(buf, "%s\r\n", buf);
       break;
     case 'O':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
-      sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
+      dc_sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         strcat(buf, "(  always ) in room ");
       else
-        sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
-      //      sprintf(buf, "%s[%5d].$R\r\n", buf,
+        dc_sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
+      //      dc_sprintf(buf, "%s[%5d].$R\r\n", buf,
       // DC::getInstance()->world[zone.cmd[j]->arg3].number);
-      sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
+      dc_sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
       break;
     case 'P':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
-      sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
+      dc_sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         strcat(buf, "(  always ) in objt ");
       else
-        sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
+        dc_sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg3].vnum() : ZCMD->arg3;
-      sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
+      dc_sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
       break;
     case 'G':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
-      sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
+      dc_sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         strcat(buf, "(  always ) on last mob loaded.$R\r\n");
       else
-        sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
+        dc_sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
       break;
     case 'E':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
-      sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
+      dc_sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         strcat(buf, "(  always ) on last mob on ");
       else
-        sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j]->arg2);
+        dc_sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j]->arg2);
       if (zone.cmd[j]->arg3 > MAX_WEAR - 1 ||
           zone.cmd[j]->arg3 < 0)
-        sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
+        dc_sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
       else
-        sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j]->arg3,
-                equipment_types[zone.cmd[j]->arg3]);
+        dc_sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j]->arg3,
+                   equipment_types[zone.cmd[j]->arg3]);
       break;
     case 'D':
-      sprintf(buf, "%s $3Room [%5d] Dir: [%s]", buf,
-              zone.cmd[j]->arg1,
-              dirNumToChar(zone.cmd[j]->arg2));
+      dc_sprintf(buf, "%s $3Room [%5d] Dir: [%s]", buf,
+                 zone.cmd[j]->arg1,
+                 dirNumToChar(zone.cmd[j]->arg2));
 
       switch (zone.cmd[j]->arg3)
       {
@@ -655,24 +655,24 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       }
       break;
     case '%':
-      sprintf(buf, "%s Consider myself true on %d times out of %d.\r\n", buf,
-              zone.cmd[j]->arg1,
-              zone.cmd[j]->arg2);
+      dc_sprintf(buf, "%s Consider myself true on %d times out of %d.\r\n", buf,
+                 zone.cmd[j]->arg1,
+                 zone.cmd[j]->arg2);
 
       break;
     case 'J':
-      sprintf(buf, "%s Temp Command. [%d] [%d] [%d]\r\n", buf,
-              zone.cmd[j]->arg1,
-              zone.cmd[j]->arg2,
-              zone.cmd[j]->arg3);
+      dc_sprintf(buf, "%s Temp Command. [%d] [%d] [%d]\r\n", buf,
+                 zone.cmd[j]->arg1,
+                 zone.cmd[j]->arg2,
+                 zone.cmd[j]->arg3);
       break;
     case '*':
-      sprintf(buf, "%s %s\r\n", buf,
-              qPrintable(zone.cmd[j]->comment) ? qPrintable(zone.cmd[j]->comment) : "Empty Comment");
+      dc_sprintf(buf, "%s %s\r\n", buf,
+                 qPrintable(zone.cmd[j]->comment) ? qPrintable(zone.cmd[j]->comment) : "Empty Comment");
       break;
     case 'K':
-      sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
-              zone.cmd[j]->arg1);
+      dc_sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
+                 zone.cmd[j]->arg1);
       break;
     case 'X':
     {
@@ -702,23 +702,23 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
         break;
       }
 
-      sprintf(buf, "%s [%d] %s\r\n", buf,
-              zone.cmd[j]->arg1, xresultstr);
+      dc_sprintf(buf, "%s [%d] %s\r\n", buf,
+                 zone.cmd[j]->arg1, xresultstr);
     }
     break;
     default:
-      sprintf(buf, "Illegal Command: %c %d %d %d %d\r\n",
-              zone.cmd[j]->command,
-              zone.cmd[j]->if_flag,
-              zone.cmd[j]->arg1,
-              zone.cmd[j]->arg2,
-              zone.cmd[j]->arg3);
+      dc_sprintf(buf, "Illegal Command: %c %d %d %d %d\r\n",
+                 zone.cmd[j]->command,
+                 zone.cmd[j]->if_flag,
+                 zone.cmd[j]->arg1,
+                 zone.cmd[j]->arg2,
+                 zone.cmd[j]->arg3);
       break;
     } // switch
 
     if (!zone.cmd[j]->comment.isEmpty() && zone.cmd[j]->command != '*')
     {
-      sprintf(buf, "%s       %s\r\n", buf, qPrintable(zone.cmd[j]->comment));
+      dc_sprintf(buf, "%s       %s\r\n", buf, qPrintable(zone.cmd[j]->comment));
     }
 
     ch->send(buf);
@@ -875,9 +875,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if ((nr = real_mobile(begin)) >= 0)
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
-                  ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-                  qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
+          dc_sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
+                     ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
+                     qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
           ch->send(buf);
         }
       }
@@ -890,9 +890,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                  ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-                  qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
+          dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
+                     ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
+                     qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
           ch->send(buf);
 
           if (count > 200)
@@ -916,9 +916,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         if (isexact(name, qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->name())))
         {
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                  ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-                  qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
+          dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
+                     ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
+                     qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
           ch->send(buf);
 
           if (count > 200)
@@ -978,9 +978,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if ((nr = real_object(begin)) >= 0)
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
-                  ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                  qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+          dc_sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
+                     ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
+                     qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
           ch->send(buf);
         }
       }
@@ -993,9 +993,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                  ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                  qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+          dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
+                     ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
+                     qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
           ch->send(buf);
 
           if (count > 200)
@@ -1019,9 +1019,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         if (isexact(name, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->name()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                  ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                  qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+          dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
+                     ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
+                     qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
           ch->send(buf);
         }
 
@@ -1073,8 +1073,8 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (DC::getInstance()->rooms.contains(begin))
         {
-          sprintf(buf, "[  1] [%5d] %s\r\n", begin,
-                  DC::getInstance()->world[begin].name);
+          dc_sprintf(buf, "[  1] [%5d] %s\r\n", begin,
+                     DC::getInstance()->world[begin].name);
           ch->send(buf);
         }
       }
@@ -1085,7 +1085,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
           if (!DC::getInstance()->rooms.contains(i))
             continue;
           count++;
-          sprintf(buf, "[%3d] [%5d] %s\r\n", count, i, DC::getInstance()->world[i].name);
+          dc_sprintf(buf, "[%3d] [%5d] %s\r\n", count, i, DC::getInstance()->world[i].name);
           ch->send(buf);
 
           if (count > 200)
@@ -1198,7 +1198,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (sector)
         if (DC::getInstance()->world[i].sector_type != sector)
           continue;
-      sprintf(buf, "[%3d] %s\r\n", i, DC::getInstance()->world[i].name);
+      dc_sprintf(buf, "[%3d] %s\r\n", i, DC::getInstance()->world[i].name);
       ch->send(buf);
     }
   }
@@ -1398,9 +1398,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c,
-              ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-              qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
+      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c,
+                 ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel(),
+                 qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description()));
       ch->send(buf);
     eheh:
       continue;
@@ -1722,7 +1722,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
       ch->send(buf);
     endLoop:
       continue;
@@ -2037,8 +2037,8 @@ void opstat(CharacterPtr ch, qint32 vnum)
     return;
   }
   obj = (ObjectPtr)DC::getInstance()->obj_index[num].item;
-  sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
-          qPrintable(obj->name()), vnum);
+  dc_sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
+             qPrintable(obj->name()), vnum);
   ch->send(buf);
   if (DC::getInstance()->obj_index[num].progtypes == 0)
   {
@@ -2052,11 +2052,11 @@ void opstat(CharacterPtr ch, qint32 vnum)
   for (mprg = DC::getInstance()->obj_index[num].mobprogs, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
-    sprintf(buf, "$3%d$R>$3$B", i);
+    dc_sprintf(buf, "$3%d$R>$3$B", i);
     ch->send(buf);
     send_to_char(oprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
+    dc_sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
     ch->send(buf);
     if (mprg->comlist != nullptr)
     {
@@ -2216,8 +2216,8 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       QString buf;
       for (i = {}; *obj_types[i] != '\n'; i++)
       {
-        sprintf(buf, " %2d - %15s\r\n",
-                i + 1, obj_types[i]);
+        dc_sprintf(buf, " %2d - %15s\r\n",
+                   i + 1, obj_types[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
@@ -2360,7 +2360,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
                "\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",
                ch);
   QString buf;
-  sprintf(buf, "$3Current object set to: %lu\r\n", ch->player->last_obj_vnum);
+  dc_sprintf(buf, "$3Current object set to: %lu\r\n", ch->player->last_obj_vnum);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -2467,7 +2467,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   if (dst < 0)
   {
     QString buf;
-    sprintf(buf, "new %d", vdst);
+    dc_sprintf(buf, "new %d", vdst);
     qint32 retval = do_medit(ch, buf);
     if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;

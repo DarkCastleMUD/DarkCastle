@@ -237,7 +237,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!tar_char)
       {
-        logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
         send_to_char("If you triggered this message, you almost crashed the\r\ngame.  Tell a god what you did immediately.\r\n", ch);
         return ReturnValue::eFAILURE;
       }
@@ -376,7 +376,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -407,9 +407,9 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       (!IS_AFFECTED(vict, AFF_CHAMPION) || champion_can_go(EXIT(vict, exit)->to_room)) &&
       class_can_go(GET_CLASS(vict), EXIT(vict, exit)->to_room))
   {
-    sprintf(buf, "$N is blasted out of the room %s by $n!", dirswards[exit]);
+    dc_sprintf(buf, "$N is blasted out of the room %s by $n!", dirswards[exit]);
     act(buf, ch, 0, vict, TO_ROOM, NOTVICT);
-    sprintf(buf, "You watch as $N goes flailing out of the room %s!", dirswards[exit]);
+    dc_sprintf(buf, "You watch as $N goes flailing out of the room %s!", dirswards[exit]);
     act(buf, ch, 0, vict, TO_CHAR, 0);
     act("$n's vicious blast throws you out of the room!", ch, 0,
         vict, TO_VICT, 0);
@@ -454,7 +454,7 @@ qint32 ki_punch(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   if (!vict)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -555,7 +555,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   if (number(1, 4) == 4 && !ch->fighting)
   {
     QString dammsg;
-    sprintf(dammsg, "$B%d$R", dam);
+    dc_sprintf(dammsg, "$B%d$R", dam);
     if (dam + ch->getHP() > GET_MAX_HIT(ch))
       dam = GET_MAX_HIT(ch) - ch->getHP();
     ch->addHP(dam);
@@ -571,7 +571,7 @@ qint32 ki_speed(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -602,7 +602,7 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
   if (!arg)
@@ -665,7 +665,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
 {
   if (!victim)
   {
-    logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1223,11 +1223,11 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
     if (GET_KI(victim) > GET_MAX_KI(victim))
       GET_KI(victim) = GET_MAX_KI(victim);
 
-    sprintf(amt, "%d", amount);
+    dc_sprintf(amt, "%d", amount);
     send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.",
                 ch, 0, victim, amt,
                 "You focus intently, bonding briefly with $N's spirit,  transferring a portion of your essence to $M.", TO_CHAR);
-    sprintf(amt, "%d", temp);
+    dc_sprintf(amt, "%d", temp);
     send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | ki of your essence with $s own.",
                 ch, 0, victim, amt,
                 "$n focuses intently, bonding briefly with your spirit, replenishing your essence with $s own.", TO_VICT);

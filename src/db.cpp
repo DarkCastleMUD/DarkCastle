@@ -441,7 +441,7 @@ void load_skillquests()
 
   if (!(fl = fopen(SKILL_QUEST_FILE, "r")))
   {
-    logentry(QStringLiteral("Cannot open skill quest file."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Cannot open skill quest file."), 0, DC::LogChannel::LOG_MISC);
     abort();
   }
 
@@ -453,8 +453,8 @@ void load_skillquests()
     if (find_sq(i))
     {
       QString buf;
-      sprintf(buf, "%d duplicate.", i);
-      logentry(buf, 0, DC::LogChannel::LOG_BUG);
+      dc_sprintf(buf, "%d duplicate.", i);
+      DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_BUG);
     }
     newsq->message = fread_string(fl, 0);
     newsq->clas = fread_int(fl, 0, 32768);
@@ -482,9 +482,9 @@ void DC::boot_db(void)
 
   reset_time();
 
-  logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, DC::LogChannel::LOG_SOCKET);
+  DC::getInstance()->logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, DC::LogChannel::LOG_SOCKET);
   logverbose(QStringLiteral("************** BOOTING THE MUD ***********"), 0, DC::LogChannel::LOG_MISC);
-  logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, DC::LogChannel::LOG_WORLD);
+  DC::getInstance()->logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, DC::LogChannel::LOG_WORLD);
   logverbose(QStringLiteral("Reading aux files."));
   file_to_string(WEBPAGE_FILE, webpage);
   file_to_string(GREETINGS1_FILE, greetings1);
@@ -509,7 +509,6 @@ void DC::boot_db(void)
   boot_clans();
 
   logverbose(QStringLiteral("Loading new news file."));
-  extern void loadnews();
   loadnews();
 
   logverbose(QStringLiteral("Loading new help file."));
@@ -659,7 +658,7 @@ void DC::do_godlist(void)
   QFile wizlist_file("../lib/wizlist.txt");
   if (!wizlist_file.open(QIODeviceBase::ReadOnly))
   {
-    logentry(QStringLiteral("db.c: error reading ../lib/wizlist.txt"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("db.c: error reading ../lib/wizlist.txt"), ANGEL, DC::LogChannel::LOG_BUG);
     wizlist_file.close();
     return;
   }
@@ -669,7 +668,7 @@ void DC::do_godlist(void)
     auto wizlist_file_line = wizlist_file.readLine().split(' ');
     QString immortal_name = wizlist_file_line.value(0);
     bool ok = false;
-    level_t immortal_level = wizlist_file_line.value(1).toULongLong(&ok);
+    level_ immortal_level = wizlist_file_line.value(1).toULongLong(&ok);
     if (!ok)
     {
       immortal_level = {};
@@ -704,7 +703,7 @@ void DC::write_wizlist(const QString filename)
   auto file_opened = wizlist_file.open(QIODeviceBase::WriteOnly);
   if (!file_opened)
   {
-    logentry(QStringLiteral("Unable to open wizlist file: %1").arg(filename));
+    DC::getInstance()->logentry(QStringLiteral("Unable to open wizlist file: %1").arg(filename));
     return;
   }
 
@@ -769,7 +768,7 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, lines[500], space[80];
   qint32 x{}, z{1};
-  level_t current_level = {};
+  level_ current_level = {};
   qint32 gods_each_level[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   qint32 line_length, sp;
 
@@ -806,8 +805,8 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
     sp = 79 - line_length;
     sp /= 2;
     space[sp + 1] = '\0';
-    sprintf(buf + strlen(buf), "\r\n%s%s\r\n", space,
-            names[current_level - IMMORTAL]);
+    dc_sprintf(buf + strlen(buf), "\r\n%s%s\r\n", space,
+               names[current_level - IMMORTAL]);
     space[sp + 1] = ' ';
 
     lines[0] = '\0';
@@ -824,7 +823,7 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
           sp = 79 - line_length;
           sp /= 2;
           space[sp + 1] = '\0';
-          sprintf(buf + strlen(buf), "%s%s", space, lines);
+          dc_sprintf(buf + strlen(buf), "%s%s", space, lines);
           space[sp + 1] = ' ';
           lines[0] = '\0';
         }
@@ -835,15 +834,15 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
 
       if (z++ % 5)
-        sprintf(lines + strlen(lines), "%s, ", qPrintable(DC::getInstance()->wizlist[x].getName()));
+        dc_sprintf(lines + strlen(lines), "%s, ", qPrintable(DC::getInstance()->wizlist[x].getName()));
       else
       {
-        sprintf(lines + strlen(lines), "%s\r\n", qPrintable(DC::getInstance()->wizlist[x].getName()));
+        dc_sprintf(lines + strlen(lines), "%s\r\n", qPrintable(DC::getInstance()->wizlist[x].getName()));
         line_length = strlen(lines) - 2;
         sp = 79 - line_length;
         sp /= 2;
         space[sp + 1] = '\0';
-        sprintf(buf + strlen(buf), "%s%s", space, lines);
+        dc_sprintf(buf + strlen(buf), "%s%s", space, lines);
         space[sp + 1] = ' ';
         lines[0] = '\0';
       }
@@ -949,7 +948,7 @@ index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
   {
     if (!(flMobIndex = fopen(MOB_INDEX_FILE_TINY, "r")))
     {
-      logentry(QStringLiteral("Could not open index file."));
+      DC::getInstance()->logentry(QStringLiteral("Could not open index file."));
       abort();
     }
   }
@@ -957,7 +956,7 @@ index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
   {
     if (!(flMobIndex = fopen(MOB_INDEX_FILE, "r")))
     {
-      logentry(QStringLiteral("Could not open index file."));
+      DC::getInstance()->logentry(QStringLiteral("Could not open index file."));
       abort();
     }
   }
@@ -976,13 +975,13 @@ index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
 
     if (cf.verbose_mode)
     {
-      logentry(temp, 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(temp, 0, DC::LogChannel::LOG_MISC);
     }
 
     if (!(fl = fopen(endfile, "r")))
     {
       perror(endfile);
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
       abort();
     }
 
@@ -1013,8 +1012,8 @@ index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
           if (!(index[i].item = (CharacterPtr)read_mobile(i, fl)))
           {
 
-            sprintf(log_buf, "Unable to load mobile %lu!\r\n", index[i].vnum());
-            logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+            dc_sprintf(log_buf, "Unable to load mobile %lu!\r\n", index[i].vnum());
+            DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
           }
           i++;
         }
@@ -1023,8 +1022,8 @@ index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
       }
       else
       {
-        sprintf(endfile, "Bad chararacter (%s)", buf);
-        logentry(endfile, 0, DC::LogChannel::LOG_MISC);
+        dc_sprintf(endfile, "Bad chararacter (%s)", buf);
+        DC::getInstance()->logentry(endfile, 0, DC::LogChannel::LOG_MISC);
         abort();
       }
     }
@@ -1260,13 +1259,13 @@ index_data *DC::generate_obj_indices(qint32 *top, index_data *index)
 
   if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
   {
-    logentry(QStringLiteral("Cannot open object file index."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("Cannot open object file index."), 0, DC::LogChannel::LOG_MISC);
     abort();
   }
   /*
    } else {
    if (!(flObjIndex = fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
-   logentry(QStringLiteral("Cannot open object file index.(tiny)."),0,DC::LogChannel::LOG_MISC);
+   DC::getInstance()->logentry(QStringLiteral("Cannot open object file index.(tiny)."),0,DC::LogChannel::LOG_MISC);
    abort();
    }
    }
@@ -1284,8 +1283,8 @@ index_data *DC::generate_obj_indices(qint32 *top, index_data *index)
 
     if (!(fl = fopen(endfile, "r")))
     {
-      logentry(QStringLiteral("generate_obj_indices: could not open obj file."), 0, LogChannel::LOG_BUG);
-      logentry(temp, 0, LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("generate_obj_indices: could not open obj file."), 0, LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(temp, 0, LogChannel::LOG_BUG);
       abort();
     }
 
@@ -1311,8 +1310,8 @@ index_data *DC::generate_obj_indices(qint32 *top, index_data *index)
           index[i].progtypes = {};
           if (!(index[i].item = (ObjectPtr)read_object(i, fl, false)))
           {
-            sprintf(log_buf, "Unable to load object %lu!\r\n", index[i].vnum());
-            logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
+            dc_sprintf(log_buf, "Unable to load object %lu!\r\n", index[i].vnum());
+            DC::getInstance()->logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
           }
           i++;
         }
@@ -1488,8 +1487,8 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       if (!found)
       {
         QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
-        logentry(error);
-        logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(error);
+        DC::getInstance()->logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
       }
       else
       {
@@ -1768,7 +1767,7 @@ void DC::set_zone_saved(qint32 modnum, world_file_list_item *list)
 
   if (!curr)
   {
-    logentry(QStringLiteral("ERROR in set_zone_modified: Cannot find room!!!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("ERROR in set_zone_modified: Cannot find room!!!"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1929,7 +1928,7 @@ void DC::boot_world(void)
     if (!(flWorldIndex = fopen(WORLD_INDEX_FILE_TINY, "r")))
     {
       qint32 fopen_errno = errno;
-      logentry(QStringLiteral("boot_world: could not open tiny world index file '%1': %2.").arg(WORLD_INDEX_FILE_TINY).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("boot_world: could not open tiny world index file '%1': %2.").arg(WORLD_INDEX_FILE_TINY).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
       abort();
     }
   }
@@ -1938,12 +1937,12 @@ void DC::boot_world(void)
     if (!(flWorldIndex = fopen(WORLD_INDEX_FILE, "r")))
     {
       qint32 fopen_errno = errno;
-      logentry(QStringLiteral("boot_world: could not open world index file '%1': %2.").arg(WORLD_INDEX_FILE).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("boot_world: could not open world index file '%1': %2.").arg(WORLD_INDEX_FILE).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
       abort();
     }
   }
 
-  // logentry(QStringLiteral("Booting individual world files"), 0, DC::LogChannel::LOG_MISC);
+  // DC::getInstance()->logentry(QStringLiteral("Booting individual world files"), 0, DC::LogChannel::LOG_MISC);
 
   // note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
   for (temp = read_next_worldfile_name(flWorldIndex);
@@ -1956,14 +1955,14 @@ void DC::boot_world(void)
     DC::config &cf = DC::getInstance()->cf;
     if (cf.verbose_mode)
     {
-      logentry(temp, 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(temp, 0, DC::LogChannel::LOG_MISC);
     }
 
     if (!(fl = fopen(endfile, "r")))
     {
       perror("fopen");
-      logentry(QStringLiteral("boot_world: could not open world file."), 0, DC::LogChannel::LOG_BUG);
-      logentry(temp, 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("boot_world: could not open world file."), 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(temp, 0, DC::LogChannel::LOG_BUG);
       abort();
     }
 
@@ -1984,7 +1983,7 @@ void DC::boot_world(void)
 
     fclose(fl);
   }
-  // logentry(QStringLiteral("World Boot done."), 0, DC::LogChannel::LOG_MISC);
+  // DC::getInstance()->logentry(QStringLiteral("World Boot done."), 0, DC::LogChannel::LOG_MISC);
   fclose(flWorldIndex);
 
   top_of_world = --room_nr;
@@ -1998,8 +1997,8 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir)
   if (room && DC::getInstance()->world[room].dir_option[dir])
   {
     QString buf;
-    sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
-    logentry(buf, 0, DC::LogChannel::LOG_WORLD);
+    dc_sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
+    DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_WORLD);
     if (DC::getInstance()->world[room].dir_option[dir]->general_description)
       DC::getInstance()->world[room].dir_option[dir]->general_description = {};
     if (DC::getInstance()->world[room].dir_option[dir]->keyword)
@@ -2090,7 +2089,7 @@ qint32 DC::create_one_room(CharacterPtr ch, qint32 vnum)
   rp->nTracks = {};
   rp->tracks = {};
   rp->last_track = {};
-  sprintf(buf, "Room %d", vnum);
+  dc_sprintf(buf, "Room %d", vnum);
   rp->name = (buf);
   rp->description = QStringLiteral("Empty description.\r\n");
   return 1;
@@ -2205,7 +2204,7 @@ void renum_zone_table(void)
         // J = junk.  Just a temp holder for an empty command, ignore it
         break;
       default:
-        logentry(QStringLiteral("Illegal character hit in renum_zone_table"), 0, DC::LogChannel::LOG_WORLD);
+        DC::getInstance()->logentry(QStringLiteral("Illegal character hit in renum_zone_table"), 0, DC::LogChannel::LOG_WORLD);
         break;
       }
     }
@@ -2330,7 +2329,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
   Zone zone(new_zone_key);
 
-  // logentry(QStringLiteral("Reading zone"), 0, DC::LogChannel::LOG_BUG);
+  // DC::getInstance()->logentry(QStringLiteral("Reading zone"), 0, DC::LogChannel::LOG_BUG);
 
   DC::getInstance()->currentVNUM(tmp);
   DC::getInstance()->currentType("Zone");
@@ -2475,17 +2474,17 @@ void DC::boot_zones(void)
     if (!(flZoneIndex = fopen(ZONE_INDEX_FILE, "r")))
     {
       perror("fopen");
-      logentry(QStringLiteral("boot_world: could not open world index file."), 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("boot_world: could not open world index file."), 0, DC::LogChannel::LOG_BUG);
       abort();
     }
   }
   else if (!(flZoneIndex = fopen(ZONE_INDEX_FILE_TINY, "r")))
   {
     perror("fopen");
-    logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, DC::LogChannel::LOG_BUG);
     abort();
   }
-  // logentry(QStringLiteral("Booting individual zone files"), 0, DC::LogChannel::LOG_MISC);
+  // DC::getInstance()->logentry(QStringLiteral("Booting individual zone files"), 0, DC::LogChannel::LOG_MISC);
 
   for (temp = read_next_worldfile_name(flZoneIndex);
        temp.isEmpty() == false;
@@ -2496,13 +2495,13 @@ void DC::boot_zones(void)
 
     if (cf.verbose_mode)
     {
-      logentry(temp, 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(temp, 0, DC::LogChannel::LOG_MISC);
     }
 
     if (!(fl = fopen(endfile, "r")))
     {
       perror(endfile);
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
       abort();
     }
 
@@ -2514,7 +2513,7 @@ void DC::boot_zones(void)
     fclose(fl);
   }
 
-  // logentry(QStringLiteral("Zone Boot done."), 0, DC::LogChannel::LOG_MISC);
+  // DC::getInstance()->logentry(QStringLiteral("Zone Boot done."), 0, DC::LogChannel::LOG_MISC);
 
   fclose(flZoneIndex);
 
@@ -2682,8 +2681,8 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
     case 'S':
       break;
     default:
-      sprintf(buf, "Mob %s: Invalid additional flag.  (Class, S, etc)", qPrintable(mob->short_description()));
-      logentry(buf, 0, DC::LogChannel::LOG_BUG);
+      dc_sprintf(buf, "Mob %s: Invalid additional flag.  (Class, S, etc)", qPrintable(mob->short_description()));
+      DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_BUG);
       break;
     }
   } while (letter != 'S');
@@ -3684,7 +3683,7 @@ ObjectPtr read_object(qint32 nr, QTextStream &fl, bool ignore)
   obj->short_description(fread_string(fl, 1));
   if (obj->short_description().length() >= MAX_OBJ_SDESC_LENGTH)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].vnum());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].vnum());
   }
 
   obj->long_description(fread_string(fl, 1));
@@ -3693,7 +3692,7 @@ ObjectPtr read_object(qint32 nr, QTextStream &fl, bool ignore)
   fl.skipWhiteSpace();
   if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
   {
-    logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].vnum()).arg(obj->ActionDescription()));
+    DC::getInstance()->logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].vnum()).arg(obj->ActionDescription()));
     obj->ActionDescription(QString());
   }
   obj->table = {};
@@ -3778,7 +3777,7 @@ ObjectPtr read_object(qint32 nr, QTextStream &fl, bool ignore)
       break;
 
     default:
-      logentry(QStringLiteral("Illegal obj addon flag [%1] in obj [%2].").arg(chk).arg(obj->name()), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(QStringLiteral("Illegal obj addon flag [%1] in obj [%2].").arg(chk).arg(obj->name()), IMPLEMENTER, DC::LogChannel::LOG_BUG);
       break;
     } // switch
       // read in next flag
@@ -3841,7 +3840,7 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
     obj->short_description(tmpptr);
     free(tmpptr);
 
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].vnum());
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].vnum());
   }
   else
   {
@@ -3852,7 +3851,7 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
   obj->ActionDescription(fread_string(fl, 1));
   if ((!obj->ActionDescription().isEmpty() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~')) && !obj->ActionDescription()[0].isNull())
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].vnum(), qPrintable(obj->ActionDescription()));
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].vnum(), qPrintable(obj->ActionDescription()));
     obj->ActionDescription(QString());
   }
   obj->table = {};
@@ -4286,7 +4285,7 @@ void write_object_csv(ObjectPtr obj, std::ofstream &fout)
       else
         strcpy(buf2, "Invalid");
 
-      sprintf(buf, "%s by %d", buf2, obj->affected[i].modifier);
+      dc_sprintf(buf, "%s by %d", buf2, obj->affected[i].modifier);
       fout << buf;
 
       if (i + 1 < obj->num_affects)
@@ -4299,7 +4298,7 @@ void write_object_csv(ObjectPtr obj, std::ofstream &fout)
   {
     std::stringstream errormsg;
     errormsg << "Exception while writing in write_obj_csv.";
-    logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
   }
 
   fout << std::endl;
@@ -4623,9 +4622,9 @@ void Zone::reset(ResetType reset_type)
   {
     if (reset_cmd_index < 0 || reset_cmd_index > cmd.size())
     {
-      sprintf(buf, "Trapped zone error, Command is null, zone: %lu reset_cmd_index: %d",
-              id_, reset_cmd_index);
-      logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+      dc_sprintf(buf, "Trapped zone error, Command is null, zone: %lu reset_cmd_index: %d",
+                 id_, reset_cmd_index);
+      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
       break;
     }
     if (cmd[reset_cmd_index]->active == 0)
@@ -4702,8 +4701,8 @@ void Zone::reset(ResetType reset_type)
 
             if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
             {
-              sprintf(buf, "Obj %lu loaded to DC::NOWHERE. Zone %lu Cmd %d", DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
-              logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+              dc_sprintf(buf, "Obj %lu loaded to DC::NOWHERE. Zone %lu Cmd %d", DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
+              DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
             }
             last_cmd = {};
             last_obj = {};
@@ -4726,7 +4725,7 @@ void Zone::reset(ResetType reset_type)
                                                                          clone_object(cmd[reset_cmd_index]->arg1)))
             obj_to_obj(obj, obj_to);
           else
-            logf(
+            DC::getInstance()->logf(
                 IMMORTAL,
                 DC::LogChannel::LOG_WORLD,
                 "Null container obj in P command Zone: %d, Cmd: %d",
@@ -4745,8 +4744,8 @@ void Zone::reset(ResetType reset_type)
       case 'G': /* object to character */
         if (mob == nullptr)
         {
-          // sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_, reset_cmd_index + 1);
-          // logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+          // dc_sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_, reset_cmd_index + 1);
+          // DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           last_cmd = {};
           last_obj = {};
           break;
@@ -4777,7 +4776,7 @@ void Zone::reset(ResetType reset_type)
         // We can't send a number less than one to number() otherwise a debug coredump occurs
         if (cmd[reset_cmd_index]->arg2 < 1)
         {
-          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, reset_cmd_index, cmd[reset_cmd_index]->arg1, cmd[reset_cmd_index]->arg2);
+          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, reset_cmd_index, cmd[reset_cmd_index]->arg1, cmd[reset_cmd_index]->arg2);
           last_cmd = {};
           last_percent = {};
         }
@@ -4800,8 +4799,8 @@ void Zone::reset(ResetType reset_type)
       case 'E': /* object to equipment list */
         if (mob == nullptr)
         {
-          // sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_, reset_cmd_index + 1);
-          // logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+          // dc_sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_, reset_cmd_index + 1);
+          // DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           last_cmd = {};
           last_obj = {};
           break;
@@ -4825,18 +4824,18 @@ void Zone::reset(ResetType reset_type)
           // so we don't see unnecessary errors when a zone reset tries to reequip a mob
           if (mob == nullptr)
           {
-            logentry(QStringLiteral("nullptr mob in reset_zone()!"), ANGEL, DC::LogChannel::LOG_BUG);
+            DC::getInstance()->logentry(QStringLiteral("nullptr mob in reset_zone()!"), ANGEL, DC::LogChannel::LOG_BUG);
           }
           else if (cmd[reset_cmd_index]->arg3 < 0 || cmd[reset_cmd_index]->arg3 >= MAX_WEAR)
           {
-            logentry(QStringLiteral("Invalid eq position in Zone::reset()!"), ANGEL, DC::LogChannel::LOG_BUG);
+            DC::getInstance()->logentry(QStringLiteral("Invalid eq position in Zone::reset()!"), ANGEL, DC::LogChannel::LOG_BUG);
           }
           else if (mob->equipment[cmd[reset_cmd_index]->arg3] == 0)
           {
             if (!mob->equip_char(obj, cmd[reset_cmd_index]->arg3))
             {
-              sprintf(buf, "Bad equip_char zone %lu cmd %d", id_, reset_cmd_index + 1);
-              logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+              dc_sprintf(buf, "Bad equip_char zone %lu cmd %d", id_, reset_cmd_index + 1);
+              DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
             }
           }
 
@@ -4863,30 +4862,30 @@ void Zone::reset(ResetType reset_type)
       case 'D': /* set state of door */
         if (cmd[reset_cmd_index]->arg1 < 0 || cmd[reset_cmd_index]->arg1 > DC::getInstance()->top_of_world)
         {
-          sprintf(log_buf, "Illegal room number Z: %lu cmd %d", id_, reset_cmd_index + 1);
-          logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+          dc_sprintf(log_buf, "Illegal room number Z: %lu cmd %d", id_, reset_cmd_index + 1);
+          DC::getInstance()->logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
         if (cmd[reset_cmd_index]->arg2 < 0 || cmd[reset_cmd_index]->arg2 >= 6)
         {
-          sprintf(log_buf, "Illegal direction %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg2, id_, reset_cmd_index + 1);
-          logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+          dc_sprintf(log_buf, "Illegal direction %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg2, id_, reset_cmd_index + 1);
+          DC::getInstance()->logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
         if (!DC::getInstance()->rooms.contains(cmd[reset_cmd_index]->arg1))
         {
-          sprintf(log_buf, "Room %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg1, id_, reset_cmd_index + 1);
-          logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+          dc_sprintf(log_buf, "Room %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg1, id_, reset_cmd_index + 1);
+          DC::getInstance()->logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
 
         if (DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2] == 0)
         {
-          sprintf(
+          dc_sprintf(
               log_buf,
               "Attempt to reset direction %d on room %d that doesn't exist Z: %lu cmd %d",
               cmd[reset_cmd_index]->arg2, DC::getInstance()->world[cmd[reset_cmd_index]->arg1].number, id_, reset_cmd_index);
-          logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+          DC::getInstance()->logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
         switch (cmd[reset_cmd_index]->arg3)
@@ -4965,8 +4964,8 @@ void Zone::reset(ResetType reset_type)
         break;
 
       default:
-        sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %lu cmd %d: '%c' Skipping .", id_, reset_cmd_index + 1, cmd[reset_cmd_index]->command);
-        logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+        dc_sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %lu cmd %d: '%c' Skipping .", id_, reset_cmd_index + 1, cmd[reset_cmd_index]->command);
+        DC::getInstance()->logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
         age = {};
         return;
         break;
@@ -5295,7 +5294,7 @@ qint32 fread_bitvector(FILE *fl, qint32 beg_range, qint32 end_range)
 
   perror("fread_bitvector: something went wrong");
   abort();
-  return (0);
+  return {};
 }
 
 qint32 fread_bitvector(std::ifstream &in, qint32 beg_range, qint32 end_range)
@@ -5424,7 +5423,7 @@ quint64 fread_uint(FILE *fl, quint64 beg_range, quint64 end_range)
         }
         else
         {
-          logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
+          DC::getInstance()->logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
           throw error_range_int();
         }
       }
@@ -5439,7 +5438,7 @@ quint64 fread_uint(FILE *fl, quint64 beg_range, quint64 end_range)
 
   perror("fread_int: something went wrong");
   abort();
-  return (0);
+  return {};
 }
 
 qint64 fread_int(std::ifstream &in, qint64 beg_range, qint64 end_range)
@@ -5525,7 +5524,7 @@ qint64 fread_int(FILE *fl, qint64 beg_range, qint64 end_range)
         }
         else
         {
-          logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
+          DC::getInstance()->logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
 
           if (i < beg_range)
           {
@@ -5548,7 +5547,7 @@ qint64 fread_int(FILE *fl, qint64 beg_range, qint64 end_range)
 
   perror("fread_int: something went wrong");
   abort();
-  return (0);
+  return {};
 }
 
 QChar fread_char(QTextStream &fl)
@@ -5627,7 +5626,7 @@ void free_char(CharacterPtr ch, Trace trace)
       if (!ch->player->ignoring.empty())
         ch->player->ignoring.clear();
       if (ch->player->golem)
-        logentry(QStringLiteral("Error, golem not released properly"), ANGEL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("Error, golem not released properly"), ANGEL, DC::LogChannel::LOG_BUG);
       /* Free aliases... (I was to lazy to do before. ;) */
       ch->player->away_msgs.clear();
 
@@ -5661,7 +5660,7 @@ void free_char(CharacterPtr ch, Trace trace)
   }
   else
   {
-    // logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("free_char: '%1' is not PC or NPC").arg(qPrintable(qPrintable(ch->name()))));
+    // DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("free_char: '%1' is not PC or NPC").arg(qPrintable(qPrintable(ch->name()))));
   }
 
   ch->title = {};
@@ -5712,8 +5711,8 @@ qint32 file_to_string(const QString name, QString buf)
     {
       if (strlen(buf) + strlen(tmp) + 2 > MAX_STRING_LENGTH)
       {
-        logentry(QStringLiteral("fl->strng: QString too big (db.c, file_to_string)"),
-                 0, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(QStringLiteral("fl->strng: QString too big (db.c, file_to_string)"),
+                                    0, DC::LogChannel::LOG_BUG);
         *buf = '\0';
         return (-1);
       }
@@ -5726,7 +5725,7 @@ qint32 file_to_string(const QString name, QString buf)
 
   fclose(fl);
 
-  return (0);
+  return {};
 }
 
 /* clear some of the the working variables of a chararacter */
@@ -6171,10 +6170,10 @@ void mprog_file_read(QString f, qint32 i)
   QString name = {};
   qint32 type = {};
 
-  sprintf(name, "%s%s", MOB_DIR, f);
+  dc_sprintf(name, "%s%s", MOB_DIR, f);
   if (!(fp = fopen(name, "r")))
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d couldn't opne mobprog file.", i);
+    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d couldn't opne mobprog file.", i);
     return;
   }
   for (;;)
@@ -6183,16 +6182,16 @@ void mprog_file_read(QString f, qint32 i)
       break;
     else if (letter != '>')
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mprog_file_read: Invalid letter mob %d.", i);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mprog_file_read: Invalid letter mob %d.", i);
       return;
     }
     switch ((type = fread_int(fp, 0, MPROG_MAX_TYPE_VALUE)))
     {
     case ERROR_PROG:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: in file prog error.", i);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: in file prog error.", i);
       return;
     case IN_FILE_PROG:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: nested in file progs.", i);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: nested in file progs.", i);
       return;
     default:
       SET_BIT(DC::getInstance()->mob_index[i].progtypes, type);
@@ -6215,7 +6214,7 @@ void load_mobprogs(FILE *fp)
     switch (LOWER(letter = fread_char(fp)))
     {
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: bad command '%c'.", letter);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: bad command '%c'.", letter);
       break;
     case 's':
       return;
@@ -6225,7 +6224,7 @@ void load_mobprogs(FILE *fp)
       value = fread_int(fp, 0, 2147483467);
       if (real_mobile(value) < 0)
       {
-        logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: vnum %d doesn't exist.", value);
+        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: vnum %d doesn't exist.", value);
         break;
       }
       mprog_file_read(fread_word(fp, 1), value);
@@ -6245,7 +6244,7 @@ void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
       break;
     else if (letter != '>' && letter != '\\')
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG character", i);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG character", i);
       ungetc(letter, fp);
       return;
     }
@@ -6253,7 +6252,7 @@ void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
     switch (type)
     {
     case ERROR_PROG:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG type.", i);
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG type.", i);
       return;
     case IN_FILE_PROG:
       mprog_file_read(fread_string(fp, 1), i);
@@ -6309,7 +6308,7 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
     }
     else if (letter != '>' && letter != '\\')
     {
-      logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG character").arg(i));
+      DC::getInstance()->logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG character").arg(i));
       return;
     }
     QString word = fread_word(fp);
@@ -6317,7 +6316,7 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
     switch (type)
     {
     case ERROR_PROG:
-      logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG type.").arg(i));
+      DC::getInstance()->logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG type.").arg(i));
       return;
     case IN_FILE_PROG:
       mprog_file_read(fread_string(fp, 1), i);
@@ -6369,7 +6368,7 @@ void find_unordered_objects(void)
 
     if (cur_vnum < last_vnum)
     {
-      logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
     }
   }
 }
@@ -6384,7 +6383,7 @@ void find_unordered_mobiles(void)
 
     if (cur_vnum < last_vnum)
     {
-      logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
     }
   }
 }
@@ -6626,7 +6625,7 @@ LegacyFile::LegacyFile(QString directory, QString filename, QString error_messag
 
   if (!QDir(directory_).exists())
   {
-    logentry(QStringLiteral("LegacyFile::openFile: Directory '%1' does not exist.").arg(directory_));
+    DC::getInstance()->logentry(QStringLiteral("LegacyFile::openFile: Directory '%1' does not exist.").arg(directory_));
   }
 
   openFile();
@@ -6668,12 +6667,12 @@ bool LegacyFile::backupFile(void)
     {
       if (!QFile::remove(backupFileName))
       {
-        logentry(QStringLiteral("Unable to remove '%1'.").arg(backupFileName));
+        DC::getInstance()->logentry(QStringLiteral("Unable to remove '%1'.").arg(backupFileName));
       }
     }
     if (!QFile::copy(originalfileName, backupFileName))
     {
-      logentry(QStringLiteral("Unable to copy '%1' to '%2'.").arg(originalfileName).arg(backupFileName));
+      DC::getInstance()->logentry(QStringLiteral("Unable to copy '%1' to '%2'.").arg(originalfileName).arg(backupFileName));
     }
     else
     {

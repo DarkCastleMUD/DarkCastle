@@ -256,14 +256,14 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       auto is_abbreviation = [&](auto fullname)
       { return is_abbrev(oneword, fullname); };
 
-      auto it = std::find_if(std::begin(class_names), std::end(class_names), is_abbreviation);
+      auto it = std::std::find_if(std::begin(class_names), std::end(class_names), is_abbreviation);
       if (it != std::end(class_names))
       {
         class_found = *it;
       }
       else
       {
-        it = std::find_if(std::begin(race_names), std::end(race_names), is_abbreviation);
+        it = std::std::find_if(std::begin(race_names), std::end(race_names), is_abbreviation);
         if (it != std::end(race_names))
         {
           race_found = *it;
@@ -559,7 +559,7 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, buf);
 
-  if (ch->isImmortalPlayer() && *buf && !strcmp(buf, "all"))
+  if (ch->isImmortalPlayer() && *buf && buf == u"all"_s)
   { //  immortal noly, shows all
     ch->sendln("All Players:\r\n--------");
     for (auto &d : DC::getInstance()->connections_)

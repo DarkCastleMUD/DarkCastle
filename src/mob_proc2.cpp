@@ -40,7 +40,7 @@ void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, qint32 price, Objec
 
   ch->removeGold(price);
   eq_remove_damage(obj);
-  sprintf(buf, "It will cost you %d coins to repair %s.", price, qPrintable(obj->short_description()));
+  dc_sprintf(buf, "It will cost you %d coins to repair %s.", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
   act("You watch $N fix $p...", ch, obj, owner, TO_CHAR, 0);
   act("You watch $N fix $p...", ch, obj, owner, TO_ROOM, 0);
@@ -54,7 +54,7 @@ void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, qint32 pr
   QString buf;
 
   do_say(owner, "Trying to sucker me for a free repair job?");
-  sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, qPrintable(obj->short_description()));
+  dc_sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
   act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
@@ -64,7 +64,7 @@ void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, qint32 price, 
 {
   QString buf;
 
-  sprintf(buf, "It will only cost you %d coins to repair %s.'", price, qPrintable(obj->short_description()));
+  dc_sprintf(buf, "It will only cost you %d coins to repair %s.'", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
   act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
@@ -414,7 +414,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
 
   if (cmd == cmd_t::LIST) // list
   {
-    sprintf(buf, "%s_consent", qPrintable(ch->name()));
+    dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
     ch->send("Available corpses (freshest first):\r\n$B");
     for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
     {
@@ -432,7 +432,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
       cost = corpse_cost(obj);
       cost /= 20000;
       cost = MAX(cost, 30);
-      sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, qPrintable(obj->short_description()), cost);
+      dc_sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, qPrintable(obj->short_description()), cost);
       ch->send(buf);
     }
     send_to_char("$RIf any corpses were listed, they are still where you left them.  This\r\n"
@@ -464,7 +464,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
 
   for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
   {
-    sprintf(buf, "%s_consent", qPrintable(ch->name()));
+    dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
 
     if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
       continue;
@@ -730,7 +730,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       return ReturnValue::eSUCCESS;
     }
     GET_PLATINUM(ch) -= obj->obj_flags.cost / 10;
-    sprintf(buf, "%s %s", qPrintable(obj->name()), qPrintable(ch->name()));
+    dc_sprintf(buf, "%s %s", qPrintable(obj->name()), qPrintable(ch->name()));
     obj->name(buf);
     obj_to_char(obj, ch);
     owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(qPrintable(ch->name())).arg(obj->short_description()).split(' '));

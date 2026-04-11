@@ -32,21 +32,21 @@ void parse_action(parse_t action, QString str, class Connection *d)
   switch (action)
   {
   case parse_t::HELP:
-    sprintf(buf, "Editor command formats: /<letter>\r\n\r\n"
-                 "/a         -  aborts editor\r\n"
-                 "/c         -  clears buffer\r\n"
-                 "/d#        -  deletes a line #\r\n"
-                 "/e# <text> -  changes the line at # with <text>\r\n"
-                 "/f         -  formats text\r\n"
-                 "/fi        -  indented formatting of text\r\n"
-                 "/h         -  list text editor commands\r\n"
-                 "/i# <text> -  inserts <text> before line #\r\n"
-                 "/l         -  lists buffer\r\n"
-                 "/n         -  lists buffer with line numbers\r\n"
-                 "/r 'a' 'b' -  replace 1st occurance of text <a> in buffer with text <b>\r\n"
-                 "/ra 'a' 'b'-  replace all occurances of text <a> within buffer with text <b>\r\n"
-                 "              usage: /r[a] 'pattern' 'replacement'\r\n"
-                 "/s         -  saves text\r\n");
+    dc_sprintf(buf, "Editor command formats: /<letter>\r\n\r\n"
+                    "/a         -  aborts editor\r\n"
+                    "/c         -  clears buffer\r\n"
+                    "/d#        -  deletes a line #\r\n"
+                    "/e# <text> -  changes the line at # with <text>\r\n"
+                    "/f         -  formats text\r\n"
+                    "/fi        -  indented formatting of text\r\n"
+                    "/h         -  list text editor commands\r\n"
+                    "/i# <text> -  inserts <text> before line #\r\n"
+                    "/l         -  lists buffer\r\n"
+                    "/n         -  lists buffer with line numbers\r\n"
+                    "/r 'a' 'b' -  replace 1st occurance of text <a> in buffer with text <b>\r\n"
+                    "/ra 'a' 'b'-  replace all occurances of text <a> within buffer with text <b>\r\n"
+                    "              usage: /r[a] 'pattern' 'replacement'\r\n"
+                    "/s         -  saves text\r\n");
     write_to_output(buf, d);
     break;
   case parse_t::FORMAT:
@@ -67,7 +67,7 @@ void parse_action(parse_t action, QString str, class Connection *d)
       j++;
     }
     format_text(conn->strnew, flags, d, conn->max_str);
-    sprintf(buf, "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
+    dc_sprintf(buf, "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
     write_to_output(buf, d);
     break;
   case parse_t::REPLACE:
@@ -111,18 +111,18 @@ void parse_action(parse_t action, QString str, class Connection *d)
       return;
     }
     total_len = ((strlen(t) - strlen(s)) + strlen(*conn->strnew));
-    //  sprintf(buf, "ORG: '%s'(%d), NEW: '%s'(%d), OTOT: %d, NTOT: %d\r\n", t, strlen(t), s, strlen(s), strlen(*conn->strnew), total_lenth);
+    //  dc_sprintf(buf, "ORG: '%s'(%d), NEW: '%s'(%d), OTOT: %d, NTOT: %d\r\n", t, strlen(t), s, strlen(s), strlen(*conn->strnew), total_lenth);
     //    write_to_output(buf, d);
     if (total_len < conn->max_str)
     {
       if ((replaced = replace_str(conn->strnew, s, t, rep_all, conn->max_str)) > 0)
       {
-        sprintf(buf, "Replaced %d occurance%sof '%s' with '%s'.\r\n", replaced, ((replaced != 1) ? "s " : " "), s, t);
+        dc_sprintf(buf, "Replaced %d occurance%sof '%s' with '%s'.\r\n", replaced, ((replaced != 1) ? "s " : " "), s, t);
         write_to_output(buf, d);
       }
       else if (replaced == 0)
       {
-        sprintf(buf, "String '%s' not found.\r\n", s);
+        dc_sprintf(buf, "String '%s' not found.\r\n", s);
         write_to_output(buf, d);
       }
       else
@@ -193,8 +193,8 @@ void parse_action(parse_t action, QString str, class Connection *d)
       *t = '\0';
       // TODO rework strnew system
       // RECREATE(*conn->strnew, character, strlen(*conn->strnew) + 3);
-      sprintf(buf, "%d line%sdeleted.\r\n", total_len,
-              ((total_len != 1) ? "s " : " "));
+      dc_sprintf(buf, "%d line%sdeleted.\r\n", total_len,
+                 ((total_len != 1) ? "s " : " "));
       write_to_output(buf, d);
     }
     else
@@ -237,7 +237,7 @@ void parse_action(parse_t action, QString str, class Connection *d)
     *buf = '\0';
     if ((line_high < 999999) || (line_low > 1))
     {
-      sprintf(buf, "Current buffer range [%d - %d]:\r\n", line_low, line_high);
+      dc_sprintf(buf, "Current buffer range [%d - %d]:\r\n", line_low, line_high);
     }
     i = 1;
     total_len = {};
@@ -272,7 +272,7 @@ void parse_action(parse_t action, QString str, class Connection *d)
     else
       strncat(buf, t, 32768 - strlen(buf) - 1);
     /* this is kind of annoying.. will have to take a poll and see..
-    sprintf(buf, "%s\r\n%d line%sshown.\r\n", buf, total_len,
+    dc_sprintf(buf, "%s\r\n%d line%sshown.\r\n", buf, total_len,
           ((total_len != 1)?"s ":" "));
      */
     // page_string(d, buf, true);
@@ -351,7 +351,7 @@ void parse_action(parse_t action, QString str, class Connection *d)
     else if (t)
       strncat(buf, t, 32768 - strlen(buf) - 1);
     /* this is kind of annoying .. seeing as the lines are #ed
-    sprintf(buf, "%s\r\n%d numbered line%slisted.\r\n", buf, total_len,
+    dc_sprintf(buf, "%s\r\n%d numbered line%slisted.\r\n", buf, total_len,
           ((total_len != 1)?"s ":" "));
      */
     // page_string(d, buf, true);
@@ -488,7 +488,7 @@ void parse_action(parse_t action, QString str, class Connection *d)
     break;
   default:
     write_to_output("Invalid option.\r\n", d);
-    logentry(QStringLiteral("SYSERR: invalid command passed to parse_action"), OVERSEER, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(QStringLiteral("SYSERR: invalid command passed to parse_action"), OVERSEER, DC::LogChannel::LOG_MISC);
     return;
   }
 }

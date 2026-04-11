@@ -2,12 +2,9 @@
 | Level 108 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+#include "DC/DC.h"
 #include "DC/interp.h"
-
-#include "DC/player.h"
 #include "DC/handler.h"
-#include "DC/returnvals.h"
-#include "DC/spells.h"
 #include <QString>
 #include "DC/const.h"
 
@@ -64,7 +61,7 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (curExits->to_room > 0 && DC::getInstance()->world[curExits->to_room].zone != curZone)
         {
-          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3lu (%s)\r\n", i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
+          dc_sprintf(buf, "Room %5d - %5s to Room %5d, zone %3lu (%s)\r\n", i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
 
           output += buf;
         }
@@ -76,21 +73,21 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (portal->obj_flags.value[0] < 0)
         {
-          sprintf(buf, "Room %5d - climb to Room %5lu (ERROR)\r\n",
-                  i, real_room(portal->obj_flags.value[0]));
+          dc_sprintf(buf, "Room %5d - climb to Room %5lu (ERROR)\r\n",
+                     i, real_room(portal->obj_flags.value[0]));
 
           output += buf;
         }
         else if (!DC::getInstance()->rooms.contains(portal->obj_flags.value[0]))
         {
-          sprintf(buf, "Room %5d - climb to Room %5lu (DOES NOT EXIST)\r\n",
-                  i, real_room(portal->obj_flags.value[0]));
+          dc_sprintf(buf, "Room %5d - climb to Room %5lu (DOES NOT EXIST)\r\n",
+                     i, real_room(portal->obj_flags.value[0]));
 
           output += buf;
         }
         else if (DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone != curZone)
         {
-          sprintf(buf, "Room %5d - climb to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->obj_flags.value[0]), DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).NameC());
+          dc_sprintf(buf, "Room %5d - climb to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->obj_flags.value[0]), DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).NameC());
 
           output += buf;
         }
@@ -100,13 +97,13 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
         {
-          sprintf(buf, "Room %5d - enter to Room %5lu (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
+          dc_sprintf(buf, "Room %5d - enter to Room %5lu (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
 
           output += buf;
         }
         else if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
         {
-          sprintf(buf, "Room %5d - enter to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->getPortalDestinationRoom()), DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
+          dc_sprintf(buf, "Room %5d - enter to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->getPortalDestinationRoom()), DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
 
           output += buf;
         }
@@ -121,7 +118,7 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           if (DC::getInstance()->world[real_room(portal->in_room)].zone != curZone)
           {
-            sprintf(buf, "Room %5d - leave to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->in_room), DC::getInstance()->world[real_room(portal->in_room)].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).NameC());
+            dc_sprintf(buf, "Room %5d - leave to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->in_room), DC::getInstance()->world[real_room(portal->in_room)].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).NameC());
 
             output += buf;
           }
@@ -236,8 +233,8 @@ command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
       if (vict != nullptr)
       {
         ch->send(QStringLiteral("You purloin %s from %s.\r\n").arg(k->short_description).arg(qPrintable(vict->name())));
-        logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s",
-             qPrintable(ch->name()), k->short_description, qPrintable(vict->name()));
+        DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s",
+                                qPrintable(ch->name()), k->short_description, qPrintable(vict->name()));
       }
       else
       {
@@ -293,7 +290,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->display_string_list(values);
     /*        for (i = 1; *values[i] != '\n'; i++)
             {
-                sprintf(help + strlen(help), "%18s", values[i]);
+                dc_sprintf(help + strlen(help), "%18s", values[i]);
                 if (!(i % 4))
                 {
                     strcat(help, "\r\n");
@@ -317,7 +314,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Get real! You ain't that big.");
     if (vict->isPlayer())
     {
-      sprintf(buf2, "%s just tried to set: %s\r\n", qPrintable(ch->name()), buf);
+      dc_sprintf(buf2, "%s just tried to set: %s\r\n", qPrintable(ch->name()), buf);
       send_to_char(buf2, vict);
     }
     return ReturnValue::eFAILURE;
@@ -344,7 +341,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   argument = one_argument(argument, buf); /* update argument */
 
-  sprintf(buf2, "%s sets %s's %s to %s.", qPrintable(ch->name()), qPrintable(vict->name()), values[skill], buf);
+  dc_sprintf(buf2, "%s sets %s's %s to %s.", qPrintable(ch->name()), qPrintable(vict->name()), values[skill], buf);
   switch (skill)
   {
   case 0: /* age */
@@ -355,7 +352,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set age of victim */
     vict->player->time.birth =
         time(0) - (qint32)value * (qint32)SECS_PER_MUD_YEAR;
@@ -368,7 +365,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Sex must be 'm','f' or 'n'.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set sex of victim */
     switch (*buf)
     {
@@ -399,7 +396,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
                    ch);
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set class of victim */
     switch (*buf)
     {
@@ -459,7 +456,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("That level is higher than you!");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set level of victim */
     vict->setLevel(value);
     DC::getInstance()->update_wizlist(vict);
@@ -468,7 +465,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 4: /* height */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set height of victim */
     vict->height = value;
   }
@@ -476,7 +473,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 5: /* weight */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set weight of victim */
     vict->weight = value;
   }
@@ -490,7 +487,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original strength of victim */
     vict->raw_str = value;
   }
@@ -509,7 +506,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original INT of victim */
     vict->raw_intel = value;
     redo_mana(vict);
@@ -525,7 +522,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original WIS of victim */
     vict->raw_wis = value;
   }
@@ -539,7 +536,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original DEX of victim */
     vict->raw_dex = value;
   }
@@ -553,7 +550,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 26.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original CON of victim */
     vict->raw_con = value;
     redo_hitpoints(vict);
@@ -562,7 +559,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 12: /* gold */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original gold of victim */
     vict->setGold(value);
   }
@@ -573,14 +570,14 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     val = atoll(buf);
     qint64 before_exp = vict->exp;
     vict->exp = val;
-    logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
-         qPrintable(ch->name()), qPrintable(vict->name()), before_exp, vict->exp);
+    DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
+                            qPrintable(ch->name()), qPrintable(vict->name()), before_exp, vict->exp);
   }
   break;
   case 14: /* mana */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original mana of victim */
     vict->raw_mana = value;
     redo_mana(vict);
@@ -589,7 +586,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 15: /* hit */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original hit of victim */
     vict->raw_hit = value;
     redo_hitpoints(vict);
@@ -598,7 +595,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 16: /* move */
   {
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original move of victim */
     vict->raw_move = value;
   }
@@ -611,7 +608,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     value = atoi(buf);
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original sessions of victim */
     vict->player->practices = value;
   }
@@ -625,7 +622,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 1000.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original alignment of victim */
     vict->alignment = value;
   }
@@ -639,7 +636,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 101.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original thirst of victim */
     vict->conditions[THIRST] = value;
   }
@@ -653,7 +650,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 101.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original drunk of victim */
     vict->conditions[DRUNK] = value;
   }
@@ -667,7 +664,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("and less than 101.");
       return ReturnValue::eFAILURE;
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original full of victim */
     vict->conditions[FULL] = value;
   }
@@ -690,13 +687,13 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
         break;
       }
     }
-    logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
   }
   break;
   case 23: /* bank */
   {
     GET_BANK(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 24: /* platinum */
@@ -705,21 +702,21 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       quint32 before_plat = GET_PLATINUM(vict);
       GET_PLATINUM(vict) = atoi(buf);
-      logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
-           qPrintable(ch->name()), qPrintable(vict->name()), before_plat, GET_PLATINUM(vict));
+      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
+                              qPrintable(ch->name()), qPrintable(vict->name()), before_plat, GET_PLATINUM(vict));
     }
   }
   break;
   case 25: /* ki */
   {
     vict->raw_ki = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 26: /* clan number */
   {
     vict->clan = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_BUG);
   }
   break;
   case 27: // saves
@@ -754,25 +751,25 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 28:
   {
     GET_HP_METAS(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 29:
   {
     GET_MANA_METAS(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 30:
   {
     GET_MOVE_METAS(vict) = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 31:
   {
     vict->armor = atoi(buf);
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 32:
@@ -796,7 +793,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     vict->player->profession = value;
-    logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   }

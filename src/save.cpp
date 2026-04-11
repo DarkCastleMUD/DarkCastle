@@ -83,7 +83,7 @@ aliases_t read_char_aliases(FILE *fpsave)
     QString command = fread_alias_string(fpsave);
     if (keyword.isEmpty() || command.isEmpty())
     {
-      logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
+      DC::getInstance()->logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
       continue;
     }
 
@@ -99,7 +99,7 @@ QString fread_alias_string(FILE *fpsave)
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (read_count != 1)
   {
-    logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
+    DC::getInstance()->logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
     return QString();
   }
 
@@ -194,7 +194,7 @@ void Mobile::read(FILE *fpsave)
   fread(&typeflag, sizeof(QChar), 3, fpsave);
 
   // Add new items in this format
-  //  if(!strcmp(typeflag, "XXX"))
+  //  if(typeflag == u"XXX"_s)
   //    do_something
 
   // Any future additions to this read file will need to be placed LAST
@@ -568,7 +568,7 @@ bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
 
   skillchange = {};
   // Add new items in this format
-  //  if(!strcmp(typeflag, "XXX"))
+  //  if(typeflag == u"XXX"_s)
   //    do_something
 
   // Any future additions to this read file will need to be placed LAST
@@ -701,19 +701,19 @@ void read_skill(CharacterPtr ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -769,7 +769,7 @@ qint32 Character::store_to_char_variable_data(FILE *fpsave)
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
 
-  while (!strcmp(typeflag, "MPV"))
+  while (typeflag == u"MPV"_s)
   { // MobProgVars6
     tempvariable *mpv;
     auto mpv = new tempvariable;
@@ -780,13 +780,13 @@ qint32 Character::store_to_char_variable_data(FILE *fpsave)
     this->tempVariable = mpv;
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp(typeflag, "GLD"))
+  if (typeflag == u"GLD"_s)
   {
     fread(&(this->gold_), sizeof(this->gold_), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
   // Add new items in this format
-  //  if(!strcmp(typeflag, "XXX"))
+  //  if(typeflag == u"XXX"_s)
   //    do_something
 
   // Any future additions to this read file will need to be placed LAST
@@ -843,17 +843,17 @@ void save_char_obj_db(CharacterPtr ch)
   {
     if(fpsave != nullptr)
       fclose(fpsave);
-    sprintf(log_buf, "mv -f %s %s", strsave, name);
+    dc_sprintf(log_buf, "mv -f %s %s", strsave, name);
     system(log_buf);
   }
   else
   {
     if(fpsave != nullptr)
       fclose(fpsave);
-    sprintf(log_buf, "Save_char_obj: %s", strsave);
+    dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -889,22 +889,22 @@ void Character::save_char_obj(void)
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
   if (DC::getInstance()->cf.bport)
   {
-    sprintf(name, "%s/%c/%s", BSAVE_DIR, qPrintable(name())[0], qPrintable(name()));
+    dc_sprintf(name, "%s/%c/%s", BSAVE_DIR, qPrintable(name())[0], qPrintable(name()));
   }
   else
   {
-    sprintf(name, "%s/%c/%s", SAVE_DIR, qPrintable(name())[0], qPrintable(name()));
+    dc_sprintf(name, "%s/%c/%s", SAVE_DIR, qPrintable(name())[0], qPrintable(name()));
   }
 
-  sprintf(strsave, "%s.back", name);
+  dc_sprintf(strsave, "%s.back", name);
 
   if (!(fpsave = fopen(strsave, "wb")))
   {
     sendln("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.");
     QString log_buf = {};
-    sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
+    dc_sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -938,7 +938,7 @@ void Character::save_char_obj(void)
       fclose(fpsave);
 
     QString log_buf = {};
-    sprintf(log_buf, "mv -f %s %s", strsave, name);
+    dc_sprintf(log_buf, "mv -f %s %s", strsave, name);
     system(log_buf);
   }
   else
@@ -946,10 +946,10 @@ void Character::save_char_obj(void)
     if (fpsave != nullptr)
       fclose(fpsave);
     QString log_buf = {};
-    sprintf(log_buf, "Save_char_obj: %s", strsave);
+    dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
     send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -963,7 +963,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 {
   QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
   perror(qPrintable(log_buf));
-  logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }
