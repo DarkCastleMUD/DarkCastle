@@ -398,7 +398,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       }
       else if (found->getFunction2())
       {
-        retval = (*(found->getFunction2()))(this, command_arguments.toStdString(), found->getNumber());
+        retval = (*(found->getFunction2()))(this, command_arguments, found->getNumber());
       }
       else if (found->getFunction3())
       {
@@ -434,7 +434,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       // Next bit for the DUI client, they needed it.
       if (!SOMEONE_DIED(retval) && !selfpurge)
       {
-        send(fmt::format("{}{}", BOLD, NTEXT));
+        send(u"$B$R"_s);
       }
 
       return logcmd.setReturn(retval, QStringLiteral(""));

@@ -6,7 +6,7 @@
         {
             "label": "rebuild",
             "type": "shell",
-            "command": "cmake --build --preset debug -j60 && (pidof dcastle && rebootdc.sh || true)",
+            "command": "cmake --build --preset debug -j54 && (pidof dcastle && rebootdc.sh || true)",
             "problemMatcher": [
                 "$gcc"
             ],

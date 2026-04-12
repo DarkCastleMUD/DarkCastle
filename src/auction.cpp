@@ -180,11 +180,11 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
 
   ch->send(QStringLiteral("The new price of ticket %u (%s) is now %u.\r\n").arg(ticket).arg(qPrintable(Item_it->item_name)).arg(new_price));
 
-  for (auto tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+  for (auto &vch : DC::getInstance()->world[ch->in_room].people_)
   {
-    if (tmp != ch)
+    if (vch != ch)
     {
-      tmp->send(QStringLiteral("%1 has just modified the price of one of %2 items.\r\n").arg(qPrintable(ch->name())).arg((GET_SEX(ch) == SEX_MALE) ? "his" : "her"));
+      vch->send(QStringLiteral("%1 has just modified the price of one of %2 items.\r\n").arg(qPrintable(ch->name())).arg((GET_SEX(ch) == SEX_MALE) ? "his" : "her"));
     }
   }
 
@@ -783,9 +783,9 @@ void AuctionHouse::Save()
   out << UncollectedGold;
 }
 
-AuctionHouse::AuctionHouse(QString filename)
+AuctionHouse::AuctionHouse(QString filename, DC *dc)
+    : filename_(filename), dc_(dc)
 {
-  filename_ = filename;
 }
 
 /*
@@ -935,7 +935,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     return;
   }
 
-  obj = ticket_object_load(Item_it, ticket);
+  obj = dc_->ticket_object_load(Item_it, ticket);
 
   if (!obj)
   {
@@ -1420,7 +1420,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     return;
   }
 
-  if (dc_strcmp(qPrintable(obj->short_description()), qPrintable(((DC::getInstance()->obj_index[obj->item_number].item))->short_description())))
+  if (obj->short_description() != DC::getInstance()->obj_index[obj->item_number].item->short_description())
   {
     ch->sendln("The Consignment broker informs you that he does not handle items that have been restrung.");
     return;

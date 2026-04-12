@@ -754,9 +754,7 @@ T operator>>(T &stream, AuctionStates &at)
 class AuctionHouse
 {
 public:
-  AuctionHouse(QString in_file);
-  AuctionHouse();
-  ~AuctionHouse();
+  AuctionHouse(QString in_file, DC *dc);
   void CollectTickets(CharacterPtr ch, quint32 ticket = 0);
   void CancelAll(CharacterPtr ch);
   void AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QString buyer);
@@ -803,6 +801,7 @@ private:
   quint32 cur_index;
   QString filename_;
   QMap<quint32, AuctionTicket> Items_For_Sale;
+  DC *dc_;
 };
 
 class wizlist_info
@@ -7616,7 +7615,7 @@ public:
   room_t top_of_world_alloc = {};             // index of last alloc'd memory in world
   room_t top_of_world = {};
   qint32 total_rooms = {}; // total amount of rooms in memory
-  AuctionHouse TheAuctionHouse;
+  AuctionHouse TheAuctionHouse(u"auctionhouse"_s, this);
   QList<wizlist_info> wizlist;
   QMap<QString, redeem_t> redeem_sessions = {};
   help_index_t help_index_;
