@@ -423,15 +423,15 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  /* For the first time, use strcpy to avoid that annoying space
+  /* For the first time, use dc_strcpy to avoid that annoying space
      at the beginning
   */
   _convert[0] = arg[0];
   _convert[1] = '\0';
   if (arg[ctr] == '%')
-    strcpy(buf, qPrintable(ch->name()));
+    dc_strcpy(buf, qPrintable(ch->name()));
   else
-    strcpy(buf, _convert);
+    dc_strcpy(buf, _convert);
 
   /* No reason to assign _convert[1] every time through, is there? */
   for (ctr = 1; (quint32)ctr < strlen(arg); ctr++)
@@ -439,9 +439,9 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
     _convert[0] = arg[ctr];
 
     if (arg[ctr] == '%')
-      strcat(buf, qPrintable(ch->name()));
+      dc_strcat(buf, qPrintable(ch->name()));
     else
-      strcat(buf, _convert);
+      dc_strcat(buf, _convert);
   }
 
   if (inout[0] == 'i')
@@ -459,7 +459,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString command, loc_str[MAX_INPUT_LENGTH];
+  QString command, loc_str;
   qint32 loc_nr, location, original_loc;
   CharacterPtr target_mob;
   ObjectPtr target_obj;

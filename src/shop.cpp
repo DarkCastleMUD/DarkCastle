@@ -231,7 +231,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
     }
   }
 
-  act("$n buys $p.", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("$n buys $p.", ch, obj, 0, 0);
   keeper->do_tell(shop.message_buy.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
   ch->send(QStringLiteral("You now have %1.\r\n").arg(obj->short_description()));
   ch->removeGold(cost);
@@ -342,13 +342,13 @@ void shopping_sell(const QString arg, CharacterPtr ch,
     return;
   }
 
-  act("$n sells $p.", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("$n sells $p.", ch, obj, 0, 0);
   keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
   ch->send(QStringLiteral("The shopkeeper now has %1.\r\n").arg(obj->short_description()));
   ch->addGold(cost);
   keeper->removeGold(cost);
 
-  strcpy(argm, qPrintable(obj->name()));
+  dc_strcpy(argm, qPrintable(obj->name()));
 
   if (get_obj_in_list(argm, keeper->carrying) || GET_ITEM_TYPE(obj) == ITEM_TRASH || unlimited_supply(obj, shop_nr))
   {
@@ -366,7 +366,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 void shopping_value(const QString arg, CharacterPtr ch,
                     CharacterPtr keeper, qint32 shop_nr)
 {
-  QString buf, buf2[MAX_STRING_LENGTH];
+  QString buf, buf2;
   QString argm;
   ObjectPtr obj;
   qint32 cost;
@@ -398,13 +398,13 @@ void shopping_value(const QString arg, CharacterPtr ch,
   { // if the weaponsmith in town
     if (keeperhas)
     {
-      act("The Weaponsmith holds up his $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
-      act("The Weaponsmith holds up his $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+      act_to_character("The Weaponsmith holds up his $p for you to examine.", ch, obj, 0, 0);
+      act_to_room("The Weaponsmith holds up his $p for $n to examine.", ch, obj, 0, 0);
     }
     else
     {
-      act("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, TO_CHAR, 0);
-      act("$n holds up $p for the Weaponsmith to examine.", ch, obj, 0, TO_ROOM, 0);
+      act_to_character("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, 0);
+      act_to_room("$n holds up $p for the Weaponsmith to examine.", ch, obj, 0, 0);
       do_emote(keeper, QStringLiteral("looks carefully at the item."));
     }
     if (GET_ITEM_TYPE(obj) == ITEM_WEAPON)
@@ -413,11 +413,11 @@ void shopping_value(const QString arg, CharacterPtr ch,
       {
         dc_sprintf(buf, "Well, %s is able to be used by ", qPrintable(obj->short_description()));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
-        strcat(buf, buf2);
+        dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "and it can be wielded by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
-        strcat(buf, buf2);
+        dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
@@ -447,13 +447,13 @@ void shopping_value(const QString arg, CharacterPtr ch,
   { // if the armourer in town
     if (keeperhas)
     {
-      act("The Armourer holds up his $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
-      act("The Armourer holds up his $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+      act_to_character("The Armourer holds up his $p for you to examine.", ch, obj, 0, 0);
+      act_to_room("The Armourer holds up his $p for $n to examine.", ch, obj, 0, 0);
     }
     else
     {
-      act("You hold up $p for the Armourer to examine.", ch, obj, 0, TO_CHAR, 0);
-      act("$n holds up $p to the Armourer to examine.", ch, obj, 0, TO_ROOM, 0);
+      act_to_character("You hold up $p for the Armourer to examine.", ch, obj, 0, 0);
+      act_to_room("$n holds up $p to the Armourer to examine.", ch, obj, 0, 0);
       do_emote(keeper, QStringLiteral("looks carefully at the item."));
     }
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
@@ -462,11 +462,11 @@ void shopping_value(const QString arg, CharacterPtr ch,
       {
         dc_sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
-        strcat(buf, buf2);
+        dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
-        strcat(buf, buf2);
+        dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
@@ -491,13 +491,13 @@ void shopping_value(const QString arg, CharacterPtr ch,
   { // if the wizard in town
     if (keeperhas)
     {
-      act("The Wizard holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
-      act("The Wizard holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+      act_to_character("The Wizard holds up $p for you to examine.", ch, obj, 0, 0);
+      act_to_room("The Wizard holds up $p for $n to examine.", ch, obj, 0, 0);
     }
     else
     {
-      act("You hold up $p for the Wizard to examine.", ch, obj, 0, TO_CHAR, 0);
-      act("$n holds up $p for the Wizard to examine.", ch, obj, 0, TO_ROOM, 0);
+      act_to_character("You hold up $p for the Wizard to examine.", ch, obj, 0, 0);
+      act_to_room("$n holds up $p for the Wizard to examine.", ch, obj, 0, 0);
       do_emote(keeper, "looks carefully at the item.");
     }
     if (GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF)
@@ -512,7 +512,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
           {
             dc_sprintf(buf, "It is eminating the aura of ");
             sprinttype(obj->obj_flags.value[3] - 1, spells, buf2);
-            strcat(buf, buf2);
+            dc_strcat(buf, buf2);
             do_say(keeper, buf);
           }
           if (obj->obj_flags.value[1] == obj->obj_flags.value[2])
@@ -528,7 +528,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
           {
             dc_sprintf(buf, "I can easily identify the signatures of ");
             sprinttype(obj->obj_flags.value[1] - 1, spells, buf2);
-            strcat(buf, buf2);
+            dc_strcat(buf, buf2);
             do_say(keeper, buf);
           }
           if (obj->obj_flags.value[2] >= 1)
@@ -546,19 +546,19 @@ void shopping_value(const QString arg, CharacterPtr ch,
 
   if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
   { // if the leather worker in town
-    act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
-    act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+    act_to_character("The Leather Worker holds up $p for you to examine.", ch, obj, 0, 0);
+    act_to_room("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, 0);
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
     {
       if (obj->obj_flags.eq_level < 20)
       {
         dc_sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
-        strcat(buf, buf2);
+        dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
-        strcat(buf, buf2);
+        dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
@@ -887,7 +887,7 @@ player_shop *read_one_player_shop(FILE *fp)
   code[3] = '\0';
   fread(&code, sizeof(QChar), 3, fp);
 
-  while (strcmp(code, "END"))
+  while (dc_strcmp(code, "END"))
   {
     // add future stuff here
 
@@ -997,7 +997,7 @@ void save_player_shop_world_range()
     {
       write_one_room(lf, x);
     }
-    qfprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
 }
 
@@ -1020,7 +1020,7 @@ void boot_player_shops()
   // read list of player owned shops
 
   filename = fread_string(fp, 0);
-  while (strcmp(filename, "$"))
+  while (dc_strcmp(filename, "$"))
   {
     dc_sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, filename);
     if ((shopfp = fopen(buf, "r")) == nullptr)
@@ -1064,7 +1064,7 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
     return;
   }
 
-  if (strcmp(shop->owner, qPrintable(ch->name())))
+  if (dc_strcmp(shop->owner, qPrintable(ch->name())))
   {
     ch->sendln("You don't own this shop, you can't stock the shelves!");
     return;
@@ -1213,7 +1213,7 @@ void player_shopping_withdraw(const QString arg, CharacterPtr ch, CharacterPtr k
     return;
   }
 
-  if (strcmp(shop->owner, qPrintable(ch->name())))
+  if (dc_strcmp(shop->owner, qPrintable(ch->name())))
   {
     ch->sendln("You don't own this shop!  Go rob a bank or something.");
     return;
@@ -1270,7 +1270,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
     return;
   }
 
-  if (strcmp(shop->owner, qPrintable(ch->name())))
+  if (dc_strcmp(shop->owner, qPrintable(ch->name())))
   {
     ch->sendln("You don't own this shop, you can't change the design!");
     return;
@@ -1316,7 +1316,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
     if (text == u"none"_s)
       *shop->sell_message = '\0';
     else
-      strcpy(shop->sell_message, text);
+      dc_strcpy(shop->sell_message, text);
     ch->send(QStringLiteral("Shop sell message changed to '%1'.\r\n").arg(shop->sell_message));
     write_one_player_shop(shop); // save it
     break;
@@ -1383,10 +1383,10 @@ void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keepe
       if (robj < 0)
         ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
       else
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg(((ObjectPtr)DC::getInstance()->obj_index[robj].item)->short_description(), -40).arg(QString::number(item->price)));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg((DC::getInstance()->obj_index[robj].item)->short_description(), -40).arg(QString::number(item->price)));
     }
 
-  if (!strcmp(shop->owner, qPrintable(ch->name())))
+  if (!dc_strcmp(shop->owner, qPrintable(ch->name())))
     ch->send(QStringLiteral("\r\nYour shop has %1 cash in the till.\r\n").arg(QString::number(shop->money_on_hand)));
 }
 
@@ -1491,7 +1491,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
          return ReturnValue::eFAILURE;
       }
       shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
-      strcpy(shop->owner, buf);
+      dc_strcpy(shop->owner, buf);
       *shop->sell_message = '\0';
       shop->room_num = i;
       shop->money_on_hand = {};
@@ -1624,7 +1624,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       QString cost_buf = {};
       if (eddie[i].item_vnum > 0)
       {
-        strncpy(item_buf, qPrintable(((ObjectPtr)DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description()), 1024);
+        dc_strncpy(item_buf, qPrintable((DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description()), 1024);
       }
       else
       {
@@ -1633,7 +1633,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
       if (eddie[i].cost_vnum > 0)
       {
-        strncpy(cost_buf, qPrintable(((ObjectPtr)DC::getInstance()->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description()), 1024);
+        dc_strncpy(cost_buf, qPrintable((DC::getInstance()->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description()), 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {
@@ -1765,9 +1765,9 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
             obj_from_char(obj);
           }
 
-          act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-          act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
-          act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
+          act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL | NOTVICT);
+          act_to_victim("$n gives you $p.", ch, obj, owner, 0);
+          act_to_character("You give $p to $N.", ch, obj, owner, 0);
 
           dc_sprintf(buf, "%s gives %s to %s (removed)", qPrintable(ch->name()), qPrintable(obj->name()), qPrintable(owner->name()));
           DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
@@ -1788,9 +1788,9 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       {
         obj_to_char(item, ch);
 
-        act("$n gives $p to $N.", owner, item, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-        act("$n gives you $p.", owner, item, ch, TO_VICT, 0);
-        act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
+        act_to_room("$n gives $p to $N.", owner, item, ch, INVIS_NULL | NOTVICT);
+        act_to_victim("$n gives you $p.", owner, item, ch, 0);
+        act_to_character("You give $p to $N.", owner, item, ch, 0);
 
         dc_sprintf(buf, "%s gives %s to %s (created)", qPrintable(owner->name()), qPrintable(item->name()), qPrintable(ch->name()));
         DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
@@ -1922,18 +1922,18 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (obj != 0)
       {
         obj_from(obj);
-        act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-        act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
-        act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
+        act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL | NOTVICT);
+        act_to_victim("$n gives you $p.", ch, obj, owner, 0);
+        act_to_character("You give $p to $N.", ch, obj, owner, 0);
         DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, owner);
-        act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-        act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
-        act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
+        act_to_room("$n gives $p to $N.", ch, r.orig_obj, owner, INVIS_NULL | NOTVICT);
+        act_to_victim("$n gives you $p.", ch, r.orig_obj, owner, 0);
+        act_to_character("You give $p to $N.", ch, r.orig_obj, owner, 0);
         DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(r.orig_obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
@@ -1985,9 +1985,9 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       {
         move_obj(r.choice1_obj, ch);
         DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice1_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-        act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-        act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
-        act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
+        act_to_room("$n gives $p to $N.", owner, r.choice1_obj, ch, INVIS_NULL | NOTVICT);
+        act_to_victim("$n gives you $p.", owner, r.choice1_obj, ch, 0);
+        act_to_character("You give $p to $N.", owner, r.choice1_obj, ch, 0);
       }
       else
       {
@@ -2002,9 +2002,9 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       {
         move_obj(r.choice2_obj, ch);
         DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice2_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-        act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-        act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
-        act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
+        act_to_room("$n gives $p to $N.", owner, r.choice2_obj, ch, INVIS_NULL | NOTVICT);
+        act_to_victim("$n gives you $p.", owner, r.choice2_obj, ch, 0);
+        act_to_character("You give $p to $N.", owner, r.choice2_obj, ch, 0);
       }
       else
       {
@@ -2020,9 +2020,9 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       {
         move_obj(r.orig_obj, ch);
         DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-        act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-        act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
-        act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
+        act_to_room("$n gives $p to $N.", owner, r.orig_obj, ch, INVIS_NULL | NOTVICT);
+        act_to_victim("$n gives you $p.", owner, r.orig_obj, ch, 0);
+        act_to_character("You give $p to $N.", owner, r.orig_obj, ch, 0);
       }
       else
       {
@@ -2048,9 +2048,9 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     {
       move_obj(r.orig_obj, ch);
       DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-      act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
-      act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
+      act_to_room("$n gives $p to $N.", owner, r.orig_obj, ch, INVIS_NULL | NOTVICT);
+      act_to_victim("$n gives you $p.", owner, r.orig_obj, ch, 0);
+      act_to_character("You give $p to $N.", owner, r.orig_obj, ch, 0);
     }
     else
     {

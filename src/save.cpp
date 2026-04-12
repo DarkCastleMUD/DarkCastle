@@ -176,7 +176,7 @@ void Mobile::save(FILE *fpsave)
   fwrite(&(damsizedice), sizeof(damsizedice), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
-  // and appropriate strcmp statement in the read_mob_data object
+  // and appropriate dc_strcmp statement in the read_mob_data object
 
   fwrite("STP", sizeof(QChar), 3, fpsave);
 }
@@ -208,7 +208,7 @@ void Mobile::read(FILE *fpsave)
 void fwrite_string_tilde(FILE *fpsave)
 {
   QString buf;
-  strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
+  dc_strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
   fwrite(&buf, 37, 1, fpsave);
 }
 void Player::save(FILE *fpsave, time_data tmpage)
@@ -349,7 +349,7 @@ void Player::save(FILE *fpsave, time_data tmpage)
   }
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
-  // and appropriate strcmp statement in the read_mob_data object
+  // and appropriate dc_strcmp statement in the read_mob_data object
 
   fwrite("STP", sizeof(QChar), 3, fpsave);
 }
@@ -447,44 +447,44 @@ bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
 
   fread(&typeflag, sizeof(QChar), 3, fpsave);
 
-  if (!strcmp("QS1", typeflag))
+  if (!dc_strcmp("QS1", typeflag))
   {
     fread(&quest_bv1, sizeof(quest_bv1), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
 
-  if (!strcmp("SVM", typeflag))
+  if (!dc_strcmp("SVM", typeflag))
   {
     fread(&(saves_mods), sizeof(saves_mods[0]), SAVE_TYPE_MAX + 1, fpsave); // read the whole array
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
 
-  if (!strcmp("SPC", typeflag))
+  if (!dc_strcmp("SPC", typeflag))
   {
     fread(&(specializations), sizeof(specializations), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
 
-  if (!strcmp("STM", typeflag))
+  if (!dc_strcmp("STM", typeflag))
   {
     fread(&statmetas, sizeof(statmetas), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
 
-  if (!strcmp("KIM", typeflag))
+  if (!dc_strcmp("KIM", typeflag))
   {
     fread(&kimetas, sizeof(kimetas), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
   joining = {};
 
-  if (!strcmp("JIN", typeflag))
+  if (!dc_strcmp("JIN", typeflag))
   {
     QString buffer = fread_var_string(fpsave);
     setJoining(buffer);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("QST", typeflag))
+  if (!dc_strcmp("QST", typeflag))
   {
     fread(&(quest_points), sizeof(quest_points), 1, fpsave);
     for (qint32 j = {}; j < QUEST_MAX_CANCEL; j++)
@@ -493,47 +493,47 @@ bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
       fread(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("BLO", typeflag))
+  if (!dc_strcmp("BLO", typeflag))
   {
     fread(&buildLowVnum, sizeof(buildLowVnum), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("BHI", typeflag))
+  if (!dc_strcmp("BHI", typeflag))
   {
     fread(&buildHighVnum, sizeof(buildHighVnum), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("BMO", typeflag))
+  if (!dc_strcmp("BMO", typeflag))
   {
     fread(&buildMLowVnum, sizeof(buildMLowVnum), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("BMI", typeflag))
+  if (!dc_strcmp("BMI", typeflag))
   {
     fread(&buildMHighVnum, sizeof(buildMHighVnum), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("BOO", typeflag))
+  if (!dc_strcmp("BOO", typeflag))
   {
     fread(&buildOLowVnum, sizeof(buildOLowVnum), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("BOI", typeflag))
+  if (!dc_strcmp("BOI", typeflag))
   {
     fread(&buildOHighVnum, sizeof(buildOHighVnum), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("PRO", typeflag))
+  if (!dc_strcmp("PRO", typeflag))
   {
     fread(&profession, sizeof(profession), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("WIZ", typeflag))
+  if (!dc_strcmp("WIZ", typeflag))
   {
     fread(&wizinvis, sizeof(wizinvis), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  while (!strcmp("OPT", typeflag))
+  while (!dc_strcmp("OPT", typeflag))
   {
     if (config == nullptr)
     {
@@ -549,7 +549,7 @@ bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
 
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
-  while (!strcmp("IGN", typeflag))
+  while (!dc_strcmp("IGN", typeflag))
   {
     QString var_string = fread_var_string(fpsave);
     if (var_string != nullptr)
@@ -688,7 +688,7 @@ qint32 Character::char_to_store_variable_data(FILE *fpsave)
   fwrite(&this->gold_, sizeof(this->gold_), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
-  // and appropriate strcmp statement in the read_mob_data object
+  // and appropriate dc_strcmp statement in the read_mob_data object
 
   fwrite("STP", sizeof(QChar), 3, fpsave);
 
@@ -738,7 +738,7 @@ qint32 Character::store_to_char_variable_data(FILE *fpsave)
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(QChar), 3, fpsave);
 
-  while (strcmp(typeflag, "END"))
+  while (dc_strcmp(typeflag, "END"))
   {
     read_skill(this, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
@@ -1091,62 +1091,62 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
   mod_type[3] = {};
   fread(&mod_type, sizeof(QChar), 3, fpsave);
 
-  if (!strcmp("EQL", mod_type))
+  if (!dc_strcmp("EQL", mod_type))
   {
     fread(&obj->obj_flags.eq_level, sizeof(obj->obj_flags.eq_level), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("VA0", mod_type))
+  if (!dc_strcmp("VA0", mod_type))
   {
     fread(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("VA1", mod_type))
+  if (!dc_strcmp("VA1", mod_type))
   {
     fread(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[1]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("VA2", mod_type))
+  if (!dc_strcmp("VA2", mod_type))
   {
     fread(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("VA3", mod_type))
+  if (!dc_strcmp("VA3", mod_type))
   {
     fread(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("EXF", mod_type))
+  if (!dc_strcmp("EXF", mod_type))
   {
     fread(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("MOF", mod_type))
+  if (!dc_strcmp("MOF", mod_type))
   {
     fread(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("TYF", mod_type))
+  if (!dc_strcmp("TYF", mod_type))
   {
     fread(&obj->obj_flags.type_flag, sizeof(obj->obj_flags.type_flag), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("WEA", mod_type))
+  if (!dc_strcmp("WEA", mod_type))
   {
     fread(&obj->obj_flags.wear_flags, sizeof(obj->obj_flags.wear_flags), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("SZE", mod_type))
+  if (!dc_strcmp("SZE", mod_type))
   {
     fread(&obj->obj_flags.size, sizeof(obj->obj_flags.size), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("WEI", mod_type))
+  if (!dc_strcmp("WEI", mod_type))
   {
     fread(&obj->obj_flags.weight, sizeof(obj->obj_flags.weight), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("AFF", mod_type))
+  if (!dc_strcmp("AFF", mod_type))
   {
     fread(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
 
@@ -1159,7 +1159,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
 
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("RPR", mod_type))
+  if (!dc_strcmp("RPR", mod_type))
   {
     auto a = obj->affected;
     a[i].location = APPLY_DAMAGED;
@@ -1168,7 +1168,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     obj->num_affects++;
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("NAM", mod_type))
+  if (!dc_strcmp("NAM", mod_type))
   {
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(QChar), length, fpsave);
@@ -1176,7 +1176,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     obj->name(buf);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("DES", mod_type))
+  if (!dc_strcmp("DES", mod_type))
   {
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(QChar), length, fpsave);
@@ -1184,7 +1184,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     obj->long_description = QStringLiteral(buf);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("SDE", mod_type))
+  if (!dc_strcmp("SDE", mod_type))
   {
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(QChar), length, fpsave);
@@ -1192,7 +1192,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     qPrintable(obj->short_description()) = QStringLiteral(buf);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("ADE", mod_type))
+  if (!dc_strcmp("ADE", mod_type))
   {
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(QChar), length, fpsave);
@@ -1200,17 +1200,17 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     obj->ActionDescription(buf);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("COS", mod_type))
+  if (!dc_strcmp("COS", mod_type))
   {
     fread(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("SAV", mod_type))
+  if (!dc_strcmp("SAV", mod_type))
   {
     fread(&obj->save_expiration, sizeof(quint32), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
-  if (!strcmp("SEL", mod_type))
+  if (!dc_strcmp("SEL", mod_type))
   {
     fread(&obj->no_sell_expiration, sizeof(quint32), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
@@ -1339,7 +1339,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = ((ObjectPtr)DC::getInstance()->obj_index[obj->item_number].item);
+  standard_obj = (DC::getInstance()->obj_index[obj->item_number].item);
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1477,14 +1477,14 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(qPrintable(obj->name()), sizeof(QChar), length, fpsave);
   }
-  if (obj->long_description && strcmp(obj->long_description, standard_obj->long_description))
+  if (obj->long_description && dc_strcmp(obj->long_description, standard_obj->long_description))
   {
     fwrite("DES", sizeof(QChar), 3, fpsave);
     length = strlen(obj->long_description);
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->long_description, sizeof(QChar), length, fpsave);
   }
-  if (obj->short_description && strcmp(qPrintable(obj->short_description()), standard_obj->short_description))
+  if (obj->short_description && dc_strcmp(qPrintable(obj->short_description()), standard_obj->short_description))
   {
     fwrite("SDE", sizeof(QChar), 3, fpsave);
     length = strlen(obj->short_description);

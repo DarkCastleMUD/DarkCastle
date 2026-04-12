@@ -44,7 +44,7 @@ void test_handle_ansi(QString test)
   QString str1 = test;
   QString str2;
   memset(str2, 1024, 0);
-  strncpy(str2, str1.toStdString().c_str(), 1024);
+  dc_strncpy(str2, str1.toStdString().c_str(), 1024);
   QString result1 = handle_ansi(str1, ch);
   QString result2 = QString(handle_ansi_(str2, ch));
   // std::cerr <<  "Result1: [" << result1 << "]" << std::endl;
@@ -188,14 +188,14 @@ void testStrings(void)
   test_handle_ansi("$x");
   test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
 
-  QString c_arg1 = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
-  QString arg1 = {}, remainder = "charm sleep ";
+  QString c_arg1, c_arg2, c_input = u"charm sleep "_s;
+  QString arg1, remainder = u"charm sleep "_s;
   do
   {
     std::tie(arg1, remainder) = half_chop(remainder);
 
     half_chop(c_input, c_arg1, c_arg2);
-    strncpy(c_input, c_arg2, sizeof(c_input) - 1);
+    dc_strncpy(c_input, c_arg2, sizeof(c_input) - 1);
 
     std::cerr << "[" << arg1.toStdString() << "]"
               << "[" << remainder.toStdString() << "]" << std::endl;
@@ -523,13 +523,15 @@ qint32 main(qint32 argc, QString *argv)
     try
     {
       ObjectPtr obj;
-      if (debug.load_char_obj(d, argv[1]) != load_status_t::success)
+      auto result = debug.load_char_obj(argv[1]);
+      if (!result)
       {
         std::cerr << "Unable to load " << argv[1] << std::endl;
         exit(1);
       }
       else
       {
+        conn = result.data();
         conn->character->save();
       }
 

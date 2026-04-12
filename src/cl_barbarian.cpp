@@ -30,8 +30,8 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool battervbrace = false;
   bool batterwins = false;
-  QString type, dir[MAX_INPUT_LENGTH];
-  QString buf, buf2[MAX_STRING_LENGTH], dammsg[20];
+  QString type, dir;
+  QString buf, buf2, dammsg[20];
   room_direction_data *exit, *back;
   qint32 other_room, door, dam, skill, retval;
 
@@ -92,7 +92,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
     dam = number(100, 200) + 3 * (100 - skill);
 
     ch->send(QStringLiteral("You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n").arg(qPrintable(fname(exit->keyword))));
-    act("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, TO_ROOM, 0);
+    act_to_room("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
@@ -152,7 +152,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
         if (batterwins)
         {
           exit->bracee->send(QStringLiteral("The %s bursts open with a resounding crash and you are hurld to the ground!\r\n").arg(qPrintable(fname(exit->keyword))));
-          act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
+          act_to_room("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, 0);
           exit->bracee->setSitting();
           update_pos(exit->bracee);
           do_brace(exit->bracee, ""); // unbrace
@@ -185,7 +185,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       if (number(1, 100) > (40 - GET_DEX(ch)) + (100 - skill))
       {
         ch->sendln("You manage to maintain your balance and admire your handywork.");
-        act("$n manages to maintain $h balance and admires $s handywork.", ch, 0, exit->keyword, TO_ROOM, 0);
+        act_to_room("$n manages to maintain $h balance and admires $s handywork.", ch, 0, exit->keyword, 0);
       }
       else
       {
@@ -196,9 +196,9 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
             !others_clan_room(ch, &DC::getInstance()->world[EXIT(ch, door)->to_room]))
         {
           ch->sendln("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n");
-          act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
+          act_to_room("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, 0);
           move_char(ch, exit->to_room);
-          act("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, TO_ROOM, 0);
+          act_to_room("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, 0);
           do_look(ch, "");
         }
         else
@@ -222,7 +222,7 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
   room_direction_data *back, *exit;
-  QString type, dir[MAX_INPUT_LENGTH];
+  QString type, dir;
 
   argument_interpreter(argument, type, dir);
 
@@ -243,7 +243,7 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
       else
       {
         ch->send(QStringLiteral("You stop holding the %s shut.\r\n").arg(qPrintable(fname(ch->brace_at->keyword))));
-        act("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, TO_ROOM, 0);
+        act_to_room("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, 0);
       }
       ch->brace_at->bracee = {};
       ch->brace_at = {};
@@ -303,18 +303,18 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
 
     ch->send(QStringLiteral("You lean heavily on the %s, bracing your shoulder solidly against it...\r\n").arg(qPrintable(fname(exit->keyword))));
-    act("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, TO_ROOM, 0);
+    act_to_room("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
       ch->sendln("Your attempt to block the passage fails.");
-      act("$s attempt to block the passage fails!", ch, 0, exit->keyword, TO_ROOM, 0);
+      act_to_room("$s attempt to block the passage fails!", ch, 0, exit->keyword, 0);
       return ReturnValue::eFAILURE;
     }
     else
     {
       ch->sendln("The passage now appears firmly blocked.");
-      act("The passage now appears firmly blocked.", ch, 0, exit->keyword, TO_ROOM, 0);
+      act_to_room("The passage now appears firmly blocked.", ch, 0, exit->keyword, 0);
       exit->bracee = ch;
       ch->brace_at = exit;
       if ((other_room = exit->to_room) != DC::NOWHERE)
@@ -387,7 +387,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
         this, 0, victim, TO_CHAR, 0);
     act("$n starts advancing towards $N, but trips over $s own feet!",
         this, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("$n starts advancing toward you, but trips over $s own feet!", this, 0, victim, TO_VICT, 0);
+    act_return ar = act_to_victim("$n starts advancing toward you, but trips over $s own feet!", this, 0, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
@@ -403,7 +403,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
         this, 0, victim, TO_CHAR, 0);
     act("$n advances confidently towards $N, and flies into a rage!",
         this, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("$n advances confidently towards you, and flies into a rage!", this, 0, victim, TO_VICT, 0);
+    act_return ar = act_to_victim("$n advances confidently towards you, and flies into a rage!", this, 0, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
@@ -451,16 +451,16 @@ command_return_t do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, nullptr, SKILL_BATTLECRY))
   {
-    act("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
-    act("$n gives a cry of defiance, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, 0);
+    act_to_room("$n gives a cry of defiance, but trips over $s own feet!", ch, 0, 0, 0);
 
     ch->setSitting();
     SET_BIT(ch->combat, COMBAT_BASH1);
   }
   else
   {
-    act("You give a battlecry, sounding your defiance!", ch, 0, 0, TO_CHAR, 0);
-    act("$n yells 'They can take our lives, but they'll never take OUR FREEDOM!'", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("You give a battlecry, sounding your defiance!", ch, 0, 0, 0);
+    act_to_room("$n yells 'They can take our lives, but they'll never take OUR FREEDOM!'", ch, 0, 0, 0);
 
     if (ch->followers)
       f = ch->followers;
@@ -477,14 +477,14 @@ command_return_t do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (number(1, 101) > ch->has_skill(SKILL_BATTLECRY))
       {
-        act("You look away sheepishly, unaffected by the rage.", f->follower, 0, 0, TO_CHAR, 0);
-        act("$n looks away sheepishly, unaffected by the rage.", f->follower, 0, 0, TO_ROOM, 0);
+        act_to_character("You look away sheepishly, unaffected by the rage.", f->follower, 0, 0, 0);
+        act_to_room("$n looks away sheepishly, unaffected by the rage.", f->follower, 0, 0, 0);
         continue;
       }
       else
       {
-        act("You give a battlecry, sounding your defiance!", f->follower, 0, 0, TO_CHAR, 0);
-        act("$n gives a loud cry of agreement!", f->follower, 0, 0, TO_ROOM, 0);
+        act_to_character("You give a battlecry, sounding your defiance!", f->follower, 0, 0, 0);
+        act_to_room("$n gives a loud cry of agreement!", f->follower, 0, 0, 0);
         SET_BIT(f->follower->combat, COMBAT_RAGE1);
       }
     }
@@ -555,9 +555,9 @@ command_return_t do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_BERSERK))
   {
-    act("You start freaking out on $N, but trip over your own feet!", ch, 0, victim, TO_CHAR, 0);
-    act("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
+    act_to_character("You start freaking out on $N, but trip over your own feet!", ch, 0, victim, 0);
+    act_to_room("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, NOTVICT);
+    act_return ar = act_to_victim("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
@@ -579,9 +579,9 @@ command_return_t do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    act("You start FOAMING at the mouth, and you go BERSERK on $N!", ch, 0, victim, TO_CHAR, 0);
-    act("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
+    act_to_character("You start FOAMING at the mouth, and you go BERSERK on $N!", ch, 0, victim, 0);
+    act_to_room("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, NOTVICT);
+    act_return ar = act_to_victim("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
@@ -664,7 +664,7 @@ command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    act("$N's small size makes it impossible to target just $S head!", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N's small size makes it impossible to target just $S head!", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -688,9 +688,9 @@ command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BERSERK) && (victim->isNonPlayer() || victim->has_skill(SKILL_BERSERK) > 80))
   {
-    act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, NOTVICT);
-    act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
+    act_to_room("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, NOTVICT);
+    act_to_character("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, NOTVICT);
+    act_to_victim("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, 0);
 
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     return ReturnValue::eSUCCESS;
@@ -725,9 +725,9 @@ command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
         number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense sees your headbutt coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-      act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
-      act_return ar = act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      act_to_character("$N's heightened battlesense sees your headbutt coming from a mile away.", ch, 0, victim, 0);
+      act_to_room("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, NOTVICT);
+      act_return ar = act_to_victim("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, 0);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED))
       {
@@ -753,9 +753,9 @@ command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
           ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].vnum() == 508)
       {
-        act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-        act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);
-        act("Your spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_CHAR, 0);
+        act_to_room("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, NOTVICT);
+        act_to_victim("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, 0);
+        act_to_character("Your spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, 0);
         //	retval = damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED);
         retval = spell_shocking_grasp(50, ch, victim, 0, 60);
         // TWEAKME
@@ -789,7 +789,7 @@ command_return_t do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, nullptr, SKILL_BLOOD_FURY))
   {
-    act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, nullptr, nullptr, TO_ROOM, NOTVICT);
+    act_to_room("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, nullptr, nullptr, NOTVICT);
     ch->sendln("You try to pysch yourself up and choke on the taste of blood.");
     duration = 1;
   }
@@ -1017,11 +1017,11 @@ command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, nullptr, SKILL_FEROCITY))
   {
     ch->sendln("Guess you just weren't that angry.");
-    act("$n tries to rile you up but just seems to be pouty.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n tries to rile you up but just seems to be pouty.", ch, 0, 0, 0);
   }
   else
   {
-    act("$n lets out a deafening roar!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n lets out a deafening roar!", ch, 0, 0, 0);
     ch->sendln("Your heart beats adrenaline through your body and you roar with ferocity!");
 
     af.type = SKILL_FEROCITY_TIMER;
@@ -1040,7 +1040,7 @@ command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
 
       affect_from_char(tmp_char, SKILL_FEROCITY, SUPPRESS_MESSAGES);
       affect_from_char(tmp_char, SKILL_FEROCITY, SUPPRESS_MESSAGES);
-      act("$n's fierce roar gets your adrenaline pumping!", ch, 0, tmp_char, TO_VICT, 0);
+      act_to_victim("$n's fierce roar gets your adrenaline pumping!", ch, 0, tmp_char, 0);
 
       af.type = SKILL_FEROCITY;
       af.duration = 1 + ch->has_skill(SKILL_FEROCITY) / 10;
@@ -1071,7 +1071,7 @@ void barb_magic_resist(CharacterPtr ch, qint32 old, qint32 nw)
 command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  QString buf, where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
+  QString buf, where, who;
   qint32 dir = {};
   qint32 retval, dam, dampercent, learned;
 
@@ -1142,15 +1142,15 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
     {
-      act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N would evade your knockback attempt with ease!", ch, 0, victim, 0);
       return ReturnValue::eFAILURE;
     }
 
     if (IS_AFFECTED(victim, AFF_STABILITY) && number(0, 3) == 0)
     {
-      act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
-      act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
-      act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
+      act_to_character("You bounce off of $N and crash into the ground.", ch, 0, victim, 0);
+      act_to_room("$n bounces off of $N and crashes into the ground.", ch, 0, victim, NOTVICT);
+      act_to_victim("$n bounces off of you and crashes into the ground.", ch, 0, victim, 0);
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       return ReturnValue::eFAILURE;
     }
@@ -1197,9 +1197,9 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0 - (learned / 4 * 3)))
   {
-    act("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, TO_CHAR, 0);
-    act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
+    act_to_character("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, 0);
+    act_to_room("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, NOTVICT);
+    act_return ar = act_to_victim("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
@@ -1214,9 +1214,9 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (!victim_paralyzed && victim->affected_by_spell(SKILL_BATTLESENSE) &&
            number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
   {
-    act("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, TO_CHAR, 0);
-    act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
+    act_to_character("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, 0);
+    act_to_room("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, NOTVICT);
+    act_return ar = act_to_victim("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
@@ -1242,9 +1242,9 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
     if (SOMEONE_DIED(retval))
     {
       dc_sprintf(buf, "You smash %s apart!", temp);
-      act(buf, ch, 0, 0, TO_CHAR, 0);
+      act_to_character(buf, ch, 0, 0, 0);
       dc_sprintf(buf, "$n smashes %s to pieces!", temp);
-      act(buf, ch, 0, 0, TO_ROOM, 0);
+      act_to_room(buf, ch, 0, 0, 0);
       return retval; // this too, just in case it gets called from  a
                      // proc later on, it returns correct stuff
     }
@@ -1291,9 +1291,9 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
     if (SOMEONE_DIED(retval))
     {
       dc_sprintf(buf, "You smash %s apart!", temp);
-      act(buf, ch, 0, 0, TO_CHAR, 0);
+      act_to_character(buf, ch, 0, 0, 0);
       dc_sprintf(buf, "$n smashes %s to pieces!", temp);
-      act(buf, ch, 0, 0, TO_ROOM, 0);
+      act_to_room(buf, ch, 0, 0, 0);
       return retval;
     }
     else
@@ -1352,7 +1352,7 @@ command_return_t do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     affect_to_char(ch, &af);
     ch->sendln("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!");
-    act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, nullptr, nullptr, TO_ROOM, 0);
+    act_to_room("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, nullptr, nullptr, 0);
     ch->setMove(ch->getMove() / 2.0);
     return ReturnValue::eSUCCESS;
   }
@@ -1373,7 +1373,7 @@ command_return_t do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
   af.bitvector = AFF_PRIMAL_FURY;
   affect_to_char(ch, &af);
 
-  act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, nullptr, nullptr, TO_ROOM, 0);
+  act_to_room("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, nullptr, nullptr, 0);
   ch->sendln("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!");
 
   return ReturnValue::eSUCCESS;

@@ -43,7 +43,7 @@ void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
   }
   else
   {
-    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((ObjectPtr)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -70,8 +70,8 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!*name || !str_cmp(name, qPrintable(ch->name())))
   {
-    act("$n offers $mself to $s god, who graciously declines.", ch, 0, 0, TO_ROOM, 0);
-    act("Your god appreciates your offer and may accept it later.", ch, 0, 0, TO_CHAR, 0);
+    act_to_room("$n offers $mself to $s god, who graciously declines.", ch, 0, 0, 0);
+    act_to_character("Your god appreciates your offer and may accept it later.", ch, 0, 0, 0);
     return ReturnValue::eSUCCESS;
   }
 
@@ -83,7 +83,7 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
     obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
     if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isexact("corpse", obj->name()) || isexact("pc", obj->name()))
     {
-      act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
+      act_to_character("You don't seem to be holding that object.", ch, 0, 0, 0);
       return ReturnValue::eFAILURE;
     }
   }
@@ -132,13 +132,13 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
   {
-    act("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, TO_CHAR, 0);
-    act("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
+    act_to_character("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, 0);
+    act_to_room("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
-  act("You sacrifice $p to the gods and receive one $B$5gold$R coin.", ch, obj, 0, TO_CHAR, 0);
+  act_to_room("$n sacrifices $p to $s god.", ch, obj, 0, 0);
+  act_to_character("You sacrifice $p to the gods and receive one $B$5gold$R coin.", ch, obj, 0, 0);
   ch->addGold(1);
   log_sacrifice(ch, obj);
   extract_obj(obj);
@@ -152,7 +152,7 @@ command_return_t do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
     affect_from_char(ch, SPELL_INVISIBLE);
     ch->sendln("You drop your invisiblity spell.");
     if (!IS_AFFECTED(ch, AFF_INVISIBLE))
-      act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n slowly fades into existence.", ch, 0, 0, 0);
     else
       ch->sendln("You must remove the equipment making you invis to become visible.");
     return ReturnValue::eSUCCESS;
@@ -199,7 +199,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   if (obj == nullptr)
   {
     dc_sprintf(buf, "You don't have any '%s' to donate.", name);
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -229,14 +229,14 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
         af.bitvector = -1;
         affect_to_char(ch, &af);
 
-        act("$n yields $p.", ch, obj, 0, TO_ROOM, 0);
-        act("You yield $p.", ch, obj, 0, TO_CHAR, 0);
+        act_to_room("$n yields $p.", ch, obj, 0, 0);
+        act_to_character("You yield $p.", ch, obj, 0, 0);
 
         location = real_room(CFLAG_HOME);
         origin = ch->in_room;
         move_char(ch, location);
 
-        act("$p falls from the heavens...", ch, obj, 0, TO_ROOM, INVIS_NULL);
+        act_to_room("$p falls from the heavens...", ch, obj, 0, INVIS_NULL);
 
         move_char(ch, origin);
         move_obj(obj, location);
@@ -296,8 +296,8 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  act("$n donates $p.", ch, obj, 0, TO_ROOM, 0);
-  act("You donate $p.", ch, obj, 0, TO_CHAR, 0);
+  act_to_room("$n donates $p.", ch, obj, 0, 0);
+  act_to_character("You donate $p.", ch, obj, 0, 0);
 
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
@@ -314,7 +314,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   origin = ch->in_room;
   move_char(ch, location, false);
 
-  act("$n has made a donation...", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("$n has made a donation...", ch, obj, 0, 0);
   act("$p falls through a glowing white portal in the top of the ceiling.",
       ch, obj, 0, TO_ROOM, INVIS_NULL);
 
@@ -1028,13 +1028,13 @@ command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
   {
   case position_t::STANDING:
   {
-    act("You are already standing.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You are already standing.", ch, 0, 0, 0);
   }
   break;
   case position_t::SITTING:
   {
-    act("You stand up.", ch, 0, 0, TO_CHAR, 0);
-    act("$n clambers on $s feet.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You stand up.", ch, 0, 0, 0);
+    act_to_room("$n clambers on $s feet.", ch, 0, 0, INVIS_NULL);
     if (ch->fighting)
       ch->setPOSFighting();
     else
@@ -1044,7 +1044,7 @@ command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case position_t::RESTING:
   {
-    act("You stop resting, and stand up.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You stop resting, and stand up.", ch, 0, 0, 0);
     act("$n stops resting, and clambers on $s feet.",
         ch, 0, 0, TO_ROOM, INVIS_NULL);
     ch->setStanding();
@@ -1053,7 +1053,7 @@ command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case position_t::SLEEPING:
   {
-    act("You have to wake up first!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You have to wake up first!", ch, 0, 0, 0);
   }
   break;
   case position_t::FIGHTING:
@@ -1064,8 +1064,8 @@ command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   default:
   {
-    act("You stop floating around, and put your feet on the ground.", ch, 0, 0, TO_CHAR, 0);
-    act("$n stops floating around, and puts $s feet on the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You stop floating around, and put your feet on the ground.", ch, 0, 0, 0);
+    act_to_room("$n stops floating around, and puts $s feet on the ground.", ch, 0, 0, INVIS_NULL);
     ch->setStanding();
     ;
   }
@@ -1087,8 +1087,8 @@ command_return_t do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
   case position_t::STANDING:
   {
-    act("You sit down.", ch, 0, 0, TO_CHAR, 0);
-    act("$n sits down.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You sit down.", ch, 0, 0, 0);
+    act_to_room("$n sits down.", ch, 0, 0, INVIS_NULL);
     ch->setSitting();
   }
   break;
@@ -1099,14 +1099,14 @@ command_return_t do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case position_t::RESTING:
   {
-    act("You stop resting, and sit up.", ch, 0, 0, TO_CHAR, 0);
-    act("$n stops resting.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You stop resting, and sit up.", ch, 0, 0, 0);
+    act_to_room("$n stops resting.", ch, 0, 0, INVIS_NULL);
     ch->setSitting();
   }
   break;
   case position_t::SLEEPING:
   {
-    act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You have to wake up first.", ch, 0, 0, 0);
   }
   break;
   case position_t::FIGHTING:
@@ -1143,36 +1143,36 @@ command_return_t do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     act("You sit down and rest your tired bones.",
         ch, 0, 0, TO_CHAR, 0);
-    act("$n sits down and rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n sits down and rests.", ch, 0, 0, INVIS_NULL);
     ch->setResting();
   }
   break;
   case position_t::SITTING:
   {
-    act("You rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
-    act("$n rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You rest your tired bones.", ch, 0, 0, 0);
+    act_to_room("$n rests.", ch, 0, 0, INVIS_NULL);
     ch->setResting();
   }
   break;
   case position_t::RESTING:
   {
-    act("You are already resting.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You are already resting.", ch, 0, 0, 0);
   }
   break;
   case position_t::SLEEPING:
   {
-    act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You have to wake up first.", ch, 0, 0, 0);
   }
   break;
   case position_t::FIGHTING:
   {
-    act("Rest while fighting? are you MAD?", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Rest while fighting? are you MAD?", ch, 0, 0, 0);
   }
   break;
   default:
   {
-    act("You stop floating around, and stop to rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
-    act("$n stops floating around, and rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You stop floating around, and stop to rest your tired bones.", ch, 0, 0, 0);
+    act_to_room("$n stops floating around, and rests.", ch, 0, 0, INVIS_NULL);
     ch->setSitting();
   }
   break;
@@ -1207,13 +1207,13 @@ command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
   {
   case position_t::STANDING:
     ch->sendln("You lie down and go to sleep.");
-    act("$n lies down and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n lies down and falls asleep.", ch, 0, 0, INVIS_NULL);
     ch->setSleeping();
     break;
   case position_t::SITTING:
   case position_t::RESTING:
     ch->sendln("You lay back and go to sleep.");
-    act("$n lies back and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n lies back and falls asleep.", ch, 0, 0, INVIS_NULL);
     ch->setSleeping();
     break;
   case position_t::SLEEPING:
@@ -1230,8 +1230,8 @@ command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   default:
   {
-    act("You stop floating around, and lie down to sleep.", ch, 0, 0, TO_CHAR, 0);
-    act("$n stops floating around, and lie down to sleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You stop floating around, and lie down to sleep.", ch, 0, 0, 0);
+    act_to_room("$n stops floating around, and lie down to sleep.", ch, 0, 0, INVIS_NULL);
     ch->setSleeping();
   }
   break;
@@ -1264,7 +1264,7 @@ command_return_t Character::wake(CharacterPtr victim)
   }
 
   sendln("You wake, and stand up.");
-  act("$n awakens.", this, 0, 0, TO_ROOM, 0);
+  act_to_room("$n awakens.", this, 0, 0, 0);
   setStanding();
   return ReturnValue::eSUCCESS;
 }
@@ -1292,7 +1292,7 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
   {
     if (isSleeping())
     {
-      act("You can't wake people up if you are asleep yourself!", this, 0, 0, TO_CHAR, 0);
+      act_to_character("You can't wake people up if you are asleep yourself!", this, 0, 0, 0);
       return ReturnValue::eFAILURE;
     }
   }
@@ -1301,11 +1301,11 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
   {
     if (tmp_char == this)
     {
-      act("You are already awake.", this, 0, tmp_char, TO_CHAR, 0);
+      act_to_character("You are already awake.", this, 0, tmp_char, 0);
     }
     else
     {
-      act("$N is already awake.", this, 0, tmp_char, TO_CHAR, 0);
+      act_to_character("$N is already awake.", this, 0, tmp_char, 0);
     }
     return ReturnValue::eFAILURE;
   }
@@ -1315,11 +1315,11 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
   {
     if (tmp_char == this)
     {
-      act("You can not wake yourself up!", this, 0, tmp_char, TO_CHAR, 0);
+      act_to_character("You can not wake yourself up!", this, 0, tmp_char, 0);
     }
     else
     {
-      act("You can not wake $M up!", this, 0, tmp_char, TO_CHAR, 0);
+      act_to_character("You can not wake $M up!", this, 0, tmp_char, 0);
     }
     return ReturnValue::eFAILURE;
   }
@@ -1328,15 +1328,15 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
   {
     if (number(1, 100) > GET_DEX(this) && tmp_char != this)
     {
-      act("You cannot meneuver yourself over to $M!", this, 0, tmp_char, TO_CHAR, 0);
-      act("$n tries to move the flow of battle towards $N but is unable.", this, 0, tmp_char, TO_ROOM, 0);
+      act_to_character("You cannot meneuver yourself over to $M!", this, 0, tmp_char, 0);
+      act_to_room("$n tries to move the flow of battle towards $N but is unable.", this, 0, tmp_char, 0);
       return ReturnValue::eSUCCESS;
     }
 
-    act("You manage to give $M a swift kick in the ribs.", this, 0, tmp_char, TO_CHAR, 0);
+    act_to_character("You manage to give $M a swift kick in the ribs.", this, 0, tmp_char, 0);
     tmp_char->setStanding();
-    act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
-    act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", this, 0, tmp_char, TO_VICT, 0);
+    act_to_room("$n awakens $N.", this, 0, tmp_char, NOTVICT);
+    act_to_victim("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", this, 0, tmp_char, 0);
     affect_from_char(tmp_char, INTERNAL_SLEEPING);
     return ReturnValue::eSUCCESS;
   }
@@ -1345,14 +1345,14 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
   affect_from_char(tmp_char, INTERNAL_SLEEPING);
   if (tmp_char != this)
   {
-    act("You wake $M up.", this, 0, tmp_char, TO_CHAR, 0);
-    act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
-    act("You are awakened by $n.", this, 0, tmp_char, TO_VICT, 0);
+    act_to_character("You wake $M up.", this, 0, tmp_char, 0);
+    act_to_room("$n awakens $N.", this, 0, tmp_char, NOTVICT);
+    act_to_victim("You are awakened by $n.", this, 0, tmp_char, 0);
   }
   else
   {
-    act("You wake yourself up.", this, 0, 0, TO_CHAR, 0);
-    act("$N awakens.", this, 0, tmp_char, TO_ROOM, NOTVICT);
+    act_to_character("You wake yourself up.", this, 0, 0, 0);
+    act_to_room("$N awakens.", this, 0, tmp_char, NOTVICT);
   }
 
   return ReturnValue::eSUCCESS;
@@ -1389,7 +1389,7 @@ void CVoteData::DisplayVote(CharacterPtr ch)
   }
   ch->send("\r\n--Current Vote Infortmation--\r\nTo vote, type \"vote #\".\r\n"
            "Enter \"vote results\" to see the current voting demographics.\r\n\r\n");
-  strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
+  dc_strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   ch->send(buf);
   ch->send("\r\n");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
@@ -1567,33 +1567,33 @@ void CVoteData::OutToFile()
     return;
   }
 
-  qfprintf(the_file, "%d\n", active);
-  qfprintf(the_file, "%d\n", total_votes);
+  dc_fprintf(the_file, "%d\n", active);
+  dc_fprintf(the_file, "%d\n", total_votes);
 
-  qfprintf(the_file, "%s\n", vote_question.c_str());
+  dc_fprintf(the_file, "%s\n", vote_question.c_str());
 
-  qfprintf(the_file, "%d\n", answers.size());
+  dc_fprintf(the_file, "%d\n", answers.size());
 
   QList<SVoteData>::iterator answer_it;
 
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
-    qfprintf(the_file, "%d\n", answer_it->votes);
-    qfprintf(the_file, "%s\n", answer_it->answer.c_str());
+    dc_fprintf(the_file, "%d\n", answer_it->votes);
+    dc_fprintf(the_file, "%s\n", answer_it->answer.c_str());
   }
 
   QMap<QString, bool>::iterator ip_it;
 
-  qfprintf(the_file, "%d\n", ip_voted.size());
+  dc_fprintf(the_file, "%d\n", ip_voted.size());
   for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
-    qfprintf(the_file, "%s\n", ip_it->first.c_str());
+    dc_fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  qfprintf(the_file, "%d\n", char_voted.size());
+  dc_fprintf(the_file, "%d\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
-    qfprintf(the_file, "%s\n", ip_it->first.c_str());
+    dc_fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
   fclose(the_file);
@@ -1761,6 +1761,6 @@ command_return_t do_random(CharacterPtr ch, QString argument, cmd_t cmd)
   i = number(1, 100);
   ch->send(QStringLiteral("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
   dc_sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
-  act(buf, ch, 0, 0, TO_ROOM, 0);
+  act_to_room(buf, ch, 0, 0, 0);
   return ReturnValue::eSUCCESS;
 }

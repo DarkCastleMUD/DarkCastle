@@ -255,29 +255,20 @@ bool DC::authenticate(QString username, QString password, quint64 level)
   username = username.toLower();
   username[0] = username[0].toUpper();
   if (!Character::validateName(username))
-  {
     return false;
-  }
 
-  ConnectionPtr d{new Connection};
-  if (!load_char_obj(d, username))
-  {
+  auto result = load_char_obj(username);
+  if (!result)
     return false;
-  }
+  auto conn = result->data();
 
-  if (conn->character == nullptr || conn->character->player == nullptr)
-  {
+  if (!conn->character || !conn->character->player)
     return false;
-  }
 
   QString cipher = conn->character->player->password_;
   if (crypt(qPrintable(password), qPrintable(cipher)) == cipher)
-  {
     if (conn->character->getLevel() >= level)
-    {
       return true;
-    }
-  }
 
   return false;
 }
@@ -317,7 +308,7 @@ ObjectPtr DC::getObject(vnum_t vnum)
     return {};
   }
 
-  return static_cast<ObjectPtr>(DC::getInstance()->obj_index[rnum].item);
+  return DC::getInstance()->obj_index[rnum].item;
 }
 
 void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
@@ -361,7 +352,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
   /*
   if (*arg4)
 {
-  if (!strcmp(arg4, "chaos"))
+  if (!dc_strcmp(arg4, "chaos"))
   {
     arena.type = CHAOS; // -2
     dc_sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
@@ -369,21 +360,21 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
     DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", qPrintable(ch->name()));
   }
 
-  if (!strcmp(arg4, "potato"))
+  if (!dc_strcmp(arg4, "potato"))
   {
     arena.type = POTATO; // -3
     dc_sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
     send_info(buf);
   }
 
-  if (!strcmp(arg4, "prize"))
+  if (!dc_strcmp(arg4, "prize"))
   {
     arena.type = PRIZE; // -3
     dc_sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
     send_info(buf);
   }
 
-  if (!strcmp(arg4, "hp"))
+  if (!dc_strcmp(arg4, "hp"))
   {
     if (*arg5)
     {
@@ -513,11 +504,11 @@ const QString Combinables::Scribe::RECIPES_FILENAME = "scribe.dat";
 QMap<Combinables::Scribe::recipe, qint32> Combinables::Scribe::recipes;
 bool Combinables::Scribe::initialized = false;
 
-qint32 qfprintf(FILE *stream, const QString format, ...)
+qint32 dc_fprintf(FILE *stream, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);
-  auto print_count = fprintf(stream, "%s", qPrintable(QString::vasprintf(format, ap)));
+  auto print_count = fprintf(stream, "%s", qPrintable(QString::vasprintf(qPrintable(format), ap)));
   va_end(ap);
   return print_count;
 }
@@ -526,7 +517,7 @@ LegacyFileWorld::~LegacyFileWorld()
 {
   if (file_handle_)
   {
-    qfprintf(file_handle_, "$~\n");
+    dc_fprintf(file_handle_, "$~\n");
   }
 }
 
@@ -534,7 +525,7 @@ qint32 dc_sprintf(QString &str, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);
-  str = QString::vasprintf(format, ap);
+  str = QString::vasprintf(qPrintable(format), ap);
   va_end(ap);
   return str.length();
 }

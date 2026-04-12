@@ -80,14 +80,14 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
       {
         sendln("Why be forceful?");
         buf = fmt::format("$n has failed to force you to '{}'.", to_force);
-        act(buf, ch, 0, vict, TO_VICT, 0);
+        act_to_victim(buf, ch, 0, vict, 0);
       }
       else
       {
         if (player->stealth == false)
         {
           buf = fmt::format("$n has forced you to '{}'.", to_force);
-          act(buf, ch, 0, vict, TO_VICT, 0);
+          act_to_victim(buf, ch, 0, vict, 0);
           sendln("Ok.");
         }
         buf = fmt::format("{} just forced %s to %s.", qPrintable(name()),
@@ -118,7 +118,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
           if (player->stealth == false || getLevel() < 109)
           {
             buf = fmt::format("$n has forced you to '{}'.", to_force);
-            act(buf, ch, 0, vict, TO_VICT, 0);
+            act_to_victim(buf, ch, 0, vict, 0);
           }
           vict->command_interpreter(to_force.c_str());
         }

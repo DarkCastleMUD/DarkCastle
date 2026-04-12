@@ -408,7 +408,7 @@ bool determinePath(class Path *goal, class Path *at, qint32 beststeps, qint32 st
 
 command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg1, arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2;
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
   class Path *pt = {}, *pt2 = {};
@@ -515,7 +515,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
     if (from && DC::getInstance()->world[from].paths)
       ch->send(QStringLiteral("Starting from path %s.\r\n").arg(DC::getInstance()->world[from].paths->p->name));
   }
-  strcat(endbuf, buf);
+  dc_strcat(endbuf, buf);
   start = DC::getInstance()->world[from].paths->p;
   if (DC::getInstance()->world[to].paths)
   {
@@ -565,7 +565,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
       to = p[z]->connectRoom(p[z - 1]);
     else
       to = endto;
-    strcat(endbuf, p[z]->determineRoute(ch, from, to));
+    dc_strcat(endbuf, p[z]->determineRoute(ch, from, to));
     from = to;
     //	QString Path::determineRoute(CharacterPtr ch, qint32 from, qint32 to)
   }

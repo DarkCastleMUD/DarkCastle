@@ -29,8 +29,8 @@ qint32 number_or_name(QString *name, qint32 *num)
   if ((ppos = index(*name, '.')) != nullptr)
   {
     *ppos++ = '\0';
-    strcpy(number, *name);
-    strcpy(*name, ppos);
+    dc_strcpy(number, *name);
+    dc_strcpy(*name, ppos);
 
     for (i = {}; *(number + i); i++)
       if (!isdigit(*(number + i)))
@@ -64,8 +64,8 @@ qint32 number_or_name(QString *name, qint32 *num)
   if (ppos)
   {
     *ppos++ = '\0';
-    strcpy(number, *name);
-    strcpy(*name, ppos);
+    dc_strcpy(number, *name);
+    dc_strcpy(*name, ppos);
 
     for (i = {}; *(number + i); i++)
       if (!isdigit(*(number + i)))
@@ -107,39 +107,39 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
   {
     act("$n draws up a swirling column of dust and breathes life into it.",
         ch, 0, 0, TO_ROOM, 0);
-    act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
+    act_to_room("$n has created $N!", ch, 0, mob, 0);
     dc_sprintf(buf, "You create %i %s!\r\n", cnt, mob->short_desc);
     ch->send(buf);
     if (cnt > 1)
     {
       dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
-               qPrintable(ch->name()),
-               cnt,
-               DC::getInstance()->mob_index[rnum].vnum(),
-               mob->short_desc,
-               DC::getInstance()->world[ch->in_room].number,
-               DC::getInstance()->world[ch->in_room].name);
+                  qPrintable(ch->name()),
+                  cnt,
+                  DC::getInstance()->mob_index[rnum].vnum(),
+                  mob->short_desc,
+                  DC::getInstance()->world[ch->in_room].number,
+                  DC::getInstance()->world[ch->in_room].name);
     }
     else
     {
       dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
-               qPrintable(ch->name()),
-               cnt,
-               DC::getInstance()->mob_index[rnum].vnum(),
-               mob->short_desc,
-               DC::getInstance()->world[ch->in_room].number,
-               DC::getInstance()->world[ch->in_room].name);
+                  qPrintable(ch->name()),
+                  cnt,
+                  DC::getInstance()->mob_index[rnum].vnum(),
+                  mob->short_desc,
+                  DC::getInstance()->world[ch->in_room].number,
+                  DC::getInstance()->world[ch->in_room].name);
     }
     DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
     dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
-             qPrintable(ch->name()),
-             cnt,
-             DC::getInstance()->mob_index[rnum].vnum(),
-             DC::getInstance()->world[ch->in_room].number,
-             DC::getInstance()->world[ch->in_room].name);
+                qPrintable(ch->name()),
+                cnt,
+                DC::getInstance()->mob_index[rnum].vnum(),
+                DC::getInstance()->world[ch->in_room].number,
+                DC::getInstance()->world[ch->in_room].name);
     DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
   }
@@ -156,11 +156,11 @@ obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
     cnt = 1;
   }
 
-  act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n makes a strange magical gesture.", ch, 0, 0, INVIS_NULL);
   for (auto i = 1; i <= cnt; i++)
   {
     obj = clone_object(rnum);
-    act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
+    act_to_room("$n has created $p!", ch, obj, 0, 0);
     if (random == true)
     {
       randomize_object(obj);
@@ -203,11 +203,11 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
   if (cnt == 0)
     cnt = 1;
 
-  act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n makes a strange magical gesture.", ch, 0, 0, INVIS_NULL);
   for (i = 1; i <= cnt; i++)
   {
     obj = clone_object(rnum);
-    act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
+    act_to_room("$n has created $p!", ch, obj, 0, 0);
     if (random == true)
     {
       randomize_object(obj);
@@ -232,24 +232,24 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
   if (cnt > 1)
   {
     dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %lu (%s) at room %d (%s).",
-             qPrintable(ch->name()),
-             cnt,
-             random ? "randomized " : "",
-             GET_OBJ_VNUM(obj),
-             qPrintable(obj->short_description()),
-             DC::getInstance()->world[ch->in_room].number,
-             DC::getInstance()->world[ch->in_room].name);
+                qPrintable(ch->name()),
+                cnt,
+                random ? "randomized " : "",
+                GET_OBJ_VNUM(obj),
+                qPrintable(obj->short_description()),
+                DC::getInstance()->world[ch->in_room].number,
+                DC::getInstance()->world[ch->in_room].name);
   }
   else
   {
     dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %lu (%s) at room %d (%s).",
-             qPrintable(ch->name()),
-             cnt,
-             random ? "randomized " : "",
-             GET_OBJ_VNUM(obj),
-             qPrintable(obj->short_description()),
-             DC::getInstance()->world[ch->in_room].number,
-             DC::getInstance()->world[ch->in_room].name);
+                qPrintable(ch->name()),
+                cnt,
+                random ? "randomized " : "",
+                GET_OBJ_VNUM(obj),
+                qPrintable(obj->short_description()),
+                DC::getInstance()->world[ch->in_room].number,
+                DC::getInstance()->world[ch->in_room].name);
   }
   DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 }
@@ -264,7 +264,7 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
 void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 {
   qint32 i, i2;
-  QString buf, buf2[MAX_STRING_LENGTH];
+  QString buf, buf2;
   QString buf3;
   follow_type *fol;
   ObjectPtr j = {};
@@ -362,14 +362,14 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   if (k->isNonPlayer())
   {
     if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
-      strcpy(buf2, "Exists");
+      dc_strcpy(buf2, "Exists");
     else
-      strcpy(buf2, "None");
+      dc_strcpy(buf2, "None");
 
     if (DC::getInstance()->mob_index[k->mobdata->nr].combat_func)
-      strcpy(buf3, "Exists");
+      dc_strcpy(buf3, "Exists");
     else
-      strcpy(buf3, "None");
+      dc_strcpy(buf3, "None");
   }
 
   dc_sprintf(buf, "|/|  $4FIRE$R: %3d  $1COLD$R: %3d $5NRGY$R: %3d |\\| Mob Non-Combat Spec Proc: %-9s|o|\r\n"
@@ -389,7 +389,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   if (k->isNonPlayer())
     sprinttype((k->mobdata->default_pos), Character::position_types, buf3);
   else
-    strcpy(buf3, "PC");
+    dc_strcpy(buf3, "PC");
 
   for (i = 0, j = k->carrying; j; j = j->next_content, ++i)
     ;
@@ -434,7 +434,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   if (k->isNonPlayer()) // AND THIS
     sprintbit(k->mobdata->actflags, action_bits, buf2);
   else
-    strcpy(buf2, "Not a mob");
+    dc_strcpy(buf2, "Not a mob");
   sprintbit(k->combat, combat_bits, buf3);
   dc_sprintf(buf, "|~| $7NPC flags$R: %-60s|\\|\r\n"
                   "|/| $7Combat flags$R: %-57s|o|\r\n",
@@ -447,9 +447,9 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
              buf2); // the resisted bits
   ch->send(buf);
 
-  strcpy(buf, "$3Title$R: ");
-  strcat(buf, (k->title ? k->title : "None"));
-  strcat(buf, "\r\n");
+  dc_strcpy(buf, "$3Title$R: ");
+  dc_strcat(buf, (k->title ? k->title : "None"));
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   // Description
@@ -462,7 +462,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   // LIST OF FOLLOWERS
   ch->sendln("$3Followers$R:");
   for (fol = k->followers; fol; fol = fol->next)
-    act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
+    act_to_character("    $N", ch, 0, fol->follower, 0);
 
   if (!k->isNonPlayer())
   {
@@ -537,7 +537,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
       dc_sprintf(buf, "     Expires in %3d hours, Bits set ", aff->duration);
       ch->send(buf);
       sprintbit(aff->bitvector, affected_bits, buf);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
     ch->sendln("");
@@ -549,8 +549,8 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   if (k->desc)
   {
     sprinttype(k->desc->connected, connected_types, buf2);
-    strcat(buf, "  $3Connected$R: ");
-    strcat(buf, buf2);
+    dc_strcat(buf, "  $3Connected$R: ");
+    dc_strcat(buf, buf2);
   }
   ch->send(buf);
 }
@@ -579,8 +579,8 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
                k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
-    strcat(buf, buf2);
-    strcat(buf, "\r\n");
+    dc_strcat(buf, buf2);
+    dc_strcat(buf, "\r\n");
   }
   else
   {
@@ -590,14 +590,14 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   }
   ch->send(buf);
 
-  strcpy(buf, "$3Short description$R: ");
-  strcat(buf, (!k->short_description().isEmpty() ? qPrintable(k->short_description()) : "None"));
-  strcat(buf, "\r\n");
+  dc_strcpy(buf, "$3Short description$R: ");
+  dc_strcat(buf, (!k->short_description().isEmpty() ? qPrintable(k->short_description()) : "None"));
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
-  strcpy(buf, "$3Title$R: ");
-  strcat(buf, (k->title ? k->title : "None"));
-  strcat(buf, "\r\n");
+  dc_strcpy(buf, "$3Title$R: ");
+  dc_strcat(buf, (k->title ? k->title : "None"));
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Long description$R: ");
@@ -611,14 +611,14 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   else
     ch->send("None");
 
-  strcpy(buf, "\r\n$3Class$R: ");
+  dc_strcpy(buf, "\r\n$3Class$R: ");
   sprinttype(k->c_class, pc_clss_types, buf2);
 
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
 
   dc_sprintf(buf2, "   $3Level$R:[%llu] $3Alignment$R:[%d] ", k->getLevel(),
              k->alignment);
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
   ch->send(buf);
   dc_sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
   ch->send(buf);
@@ -712,15 +712,15 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   if (k->desc)
   {
     sprinttype(k->desc->connected, connected_types, buf2);
-    strcat(buf, "  $3Connected$R: ");
-    strcat(buf, buf2);
+    dc_strcat(buf, "  $3Connected$R: ");
+    dc_strcat(buf, buf2);
   }
   ch->send(buf);
 
   if (k->isNonPlayer())
   {
-    strcpy(buf, "$3Default position$R: ");
-    strcat(buf, Character::position_to_string(qPrintable(k->mobdata->default_pos)));
+    dc_strcpy(buf, "$3Default position$R: ");
+    dc_strcat(buf, Character::position_to_string(qPrintable(k->mobdata->default_pos)));
     ch->send(buf);
   }
 
@@ -737,19 +737,19 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
     dc_sprintf(buf, "$3PC flags$R: [%d]", k->player->toggles);
     sprintbit(k->player->toggles, player_bits, buf2);
   }
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
   ch->send(buf);
 
   if (k->isNonPlayer())
   {
-    strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
+    dc_strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
+    dc_strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
     ch->send(buf);
-    strcpy(buf, "$3Combat Special Proc$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
+    dc_strcpy(buf, "$3Combat Special Proc$R: ");
+    dc_strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
     ch->send(buf);
-    strcpy(buf, "$3Mob Progs$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].mobprogs ? "exists\r\n" : "none\r\n"));
+    dc_strcpy(buf, "$3Mob Progs$R: ");
+    dc_strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].mobprogs ? "exists\r\n" : "none\r\n"));
     ch->send(buf);
   }
 
@@ -773,7 +773,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
       i2++;
 
   dc_sprintf(buf2, "$3Items in equipment$R: %d\r\n", i2);
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
   ch->send(buf);
 
   dc_sprintf(buf, "$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\r\n",
@@ -825,7 +825,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   ch->send(buf);
   ch->sendln("$3Followers$R:");
   for (fol = k->followers; fol; fol = fol->next)
-    act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
+    act_to_character("    $N", ch, 0, fol->follower, 0);
 
   // Showing the bitvector
   sprintbit(k->combat, combat_bits, buf);
@@ -901,10 +901,10 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
                  apply_types[(qint32)aff->location], aff->modifier);
       ch->send(buf);
       dc_sprintf(buf, "     Expires in %3d hours", aff->duration);
-      //    strcat(buf,",Bits set ");
+      //    dc_strcat(buf,",Bits set ");
       //      ch->send(buf);
       //      sprintbit(aff->bitvector,affected_bits,buf);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
     ch->sendln("");
@@ -972,8 +972,8 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
              qPrintable(j->name()), j->item_number, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
-  strcat(buf, buf2);
-  strcat(buf, "\r\n");
+  dc_strcat(buf, buf2);
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   dc_sprintf(buf, "$3Short description$R: %s\r\n$3Long description$R:\r\n%s\r\n",
@@ -982,38 +982,38 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   ch->send(buf);
   if (j->ex_description)
   {
-    strcpy(buf, "$3Extra description keyword(s)$R:\r\n----------\r\n");
+    dc_strcpy(buf, "$3Extra description keyword(s)$R:\r\n----------\r\n");
     for (desc = j->ex_description; desc; desc = desc->next)
     {
-      strcat(buf, desc->keyword);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, desc->keyword);
+      dc_strcat(buf, "\r\n");
     }
-    strcat(buf, "----------\r\n");
+    dc_strcat(buf, "----------\r\n");
     ch->send(buf);
   }
   else
   {
-    strcpy(buf, "$3Extra description keyword(s)$R: None\r\n");
+    dc_strcpy(buf, "$3Extra description keyword(s)$R: None\r\n");
     ch->send(buf);
   }
   ch->send("$3Can be worn on$R:");
   sprintbit(j->obj_flags.wear_flags, QFlagsToStrings<ObjectPositions>(), buf);
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Can be worn by$R:");
   sprintbit(j->obj_flags.size, Object::size_bits, buf);
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Extra flags$R: ");
   sprintbit(j->obj_flags.extra_flags, Object::extra_bits, buf);
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3More flags$R: ");
   sprintbit(j->obj_flags.more_flags, Object::more_obj_bits, buf);
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   dc_sprintf(buf, "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %llu\r\n",
@@ -1023,19 +1023,19 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
              j->obj_flags.eq_level);
   ch->send(buf);
 
-  strcpy(buf, "$3In room$R: ");
+  dc_strcpy(buf, "$3In room$R: ");
   if (j->in_room == DC::NOWHERE)
-    strcat(buf, "NOWHERE");
+    dc_strcat(buf, "NOWHERE");
   else
   {
     dc_sprintf(buf2, "%d", DC::getInstance()->world[j->in_room].number);
-    strcat(buf, buf2);
+    dc_strcat(buf, buf2);
   }
-  strcat(buf, "  $3In object$R: ");
-  strcat(buf, (!j->in_obj ? "None" : fname(qPrintable(j->in_obj->name()))));
-  strcat(buf, "  $3Carried by$R: ");
-  strcat(buf, (!j->carried_by) ? "Nobody" : qPrintable(j->carried_by->name()));
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "  $3In object$R: ");
+  dc_strcat(buf, (!j->in_obj ? "None" : fname(qPrintable(j->in_obj->name()))));
+  dc_strcat(buf, "  $3Carried by$R: ");
+  dc_strcat(buf, (!j->carried_by) ? "Nobody" : qPrintable(j->carried_by->name()));
+  dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   switch (j->obj_flags.type_flag)
@@ -1140,7 +1140,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     break;
   case ITEM_DRINKCON:
     sprinttype(j->obj_flags.value[2], drinks, buf2);
-    //  strcpy(buf2,drinks[j->obj_flags.value[2]]);
+    //  dc_strcpy(buf2,drinks[j->obj_flags.value[2]]);
     dc_sprintf(buf, "$3Max-contains(v1)$R: %d\r\n"
                     "$3Contains    (v2)$R: %d\r\n"
                     "$3Liquid      (v3)$R: %s (%d)\r\n"
@@ -1228,32 +1228,32 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     switch (j->getPortalType())
     {
     case Object::portal_types_t::Player:
-      strcat(buf, "0-Player-Portal");
+      dc_strcat(buf, "0-Player-Portal");
       break;
     case Object::portal_types_t::Permanent:
-      strcat(buf, "1-Permanent-Game-Portal");
+      dc_strcat(buf, "1-Permanent-Game-Portal");
       break;
     case Object::portal_types_t::Temp:
-      strcat(buf, "2-Temp-Game-portal");
+      dc_strcat(buf, "2-Temp-Game-portal");
       break;
     case Object::portal_types_t::LookOnly:
-      strcat(buf, "3-Look-only-portal");
+      dc_strcat(buf, "3-Look-only-portal");
       break;
     case Object::portal_types_t::PermanentNoLook:
-      strcat(buf, "4-Perm-No-Look-portal");
+      dc_strcat(buf, "4-Perm-No-Look-portal");
       break;
     default:
-      strcat(buf, "Unknown!!!");
+      dc_strcat(buf, "Unknown!!!");
       break;
     }
     dc_sprintf(buf2, "(can be 0-4)\r\n"
                      "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\r\n"
                      "$3Flags  (v4)$R : ",
                j->obj_flags.value[2]);
-    strcat(buf, buf2);
+    dc_strcat(buf, buf2);
     sprintbit(j->obj_flags.value[3], portal_bits, buf2);
-    strcat(buf, buf2);
-    strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
+    dc_strcat(buf, buf2);
+    dc_strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
     break;
   default:
     dc_sprintf(buf, "Values 0-3 : [%d] [%d] [%d] [%d]",
@@ -1265,9 +1265,9 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   }
   ch->send(buf);
 
-  strcpy(buf, "\r\n$3Equipment Status$R: ");
+  dc_strcpy(buf, "\r\n$3Equipment Status$R: ");
   if (!j->carried_by)
-    strcat(buf, "NONE");
+    dc_strcat(buf, "NONE");
   else
   {
     found = false;
@@ -1276,37 +1276,37 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
       if (j->carried_by->equipment[i] == j)
       {
         sprinttype(i, equipment_types, buf2);
-        strcat(buf, buf2);
+        dc_strcat(buf, buf2);
         found = true;
       }
     }
     if (!found)
-      strcat(buf, "Inventory");
+      dc_strcat(buf, "Inventory");
   }
   ch->send(buf);
 
-  strcpy(buf, "\r\n$3Non-Combat Special procedure$R : ");
+  dc_strcpy(buf, "\r\n$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
   else
-    strcat(buf, "No\r\n");
+    dc_strcat(buf, "No\r\n");
   ch->send(buf);
-  strcpy(buf, "$3Combat Special procedure$R : ");
+  dc_strcpy(buf, "$3Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\r\n" : "none\r\n"));
   else
-    strcat(buf, "No\r\n");
+    dc_strcat(buf, "No\r\n");
   ch->send(buf);
-  strcpy(buf, "$3Contains$R :\r\n");
+  dc_strcpy(buf, "$3Contains$R :\r\n");
   found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
   {
-    strcat(buf, qPrintable(fname(j2->name())));
-    strcat(buf, "\r\n");
+    dc_strcat(buf, qPrintable(fname(j2->name())));
+    dc_strcat(buf, "\r\n");
     found = true;
   }
   if (!found)
-    strcpy(buf, "$3Contains$R : Nothing\r\n");
+    dc_strcpy(buf, "$3Contains$R : Nothing\r\n");
   ch->send(buf);
 
   ch->sendln("$3Can affect character$R :");
@@ -1316,9 +1316,9 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     if (j->affected[i].location < 1000)
       sprinttype(j->affected[i].location, apply_types, buf2);
     else if (!get_skill_name(j->affected[i].location / 1000).isEmpty())
-      strcpy(buf2, get_skill_name(j->affected[i].location / 1000).toStdString().c_str());
+      dc_strcpy(buf2, get_skill_name(j->affected[i].location / 1000).toStdString().c_str());
     else
-      strcpy(buf2, "Invalid");
+      dc_strcpy(buf2, "Invalid");
 
     dc_sprintf(buf, "    $3Affects$R : %s By %d\r\n", buf2, j->affected[i].modifier);
     ch->send(buf);
@@ -1534,7 +1534,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
   one_argument(argument, buf);
   if (!*buf)
     ch->sendln("Whom do you wish to restore?");
-  else if (strcmp(buf, "all"))
+  else if (dc_strcmp(buf, "all"))
   {
 
     if (!(victim = get_char(buf)))
@@ -1686,9 +1686,9 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          dc_sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
         else
-          dc_sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     else
@@ -1699,7 +1699,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       }
       else
       {
-        dc_sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+        dc_sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     send_info(buf);
@@ -1854,19 +1854,19 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
   {
 #ifdef __CYGWIN__
     dc_snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\r\n",
-             pTime->tm_mon + 1,
-             pTime->tm_mday,
-             pTime->tm_year + 1900,
-             pTime->tm_hour,
-             pTime->tm_min);
+                pTime->tm_mon + 1,
+                pTime->tm_mday,
+                pTime->tm_year + 1900,
+                pTime->tm_hour,
+                pTime->tm_min);
 #else
     dc_snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\r\n",
-             pTime->tm_mon + 1,
-             pTime->tm_mday,
-             pTime->tm_year + 1900,
-             pTime->tm_hour,
-             pTime->tm_min,
-             pTime->tm_zone);
+                pTime->tm_mon + 1,
+                pTime->tm_mday,
+                pTime->tm_year + 1900,
+                pTime->tm_hour,
+                pTime->tm_min,
+                pTime->tm_zone);
 #endif
   }
 
@@ -2073,11 +2073,11 @@ command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((ObjectPtr)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
 
     qint32 itemsleft = {};
@@ -2102,7 +2102,7 @@ command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+  QString arg, arg2, arg3, buf;
 #ifdef TWITTER
   twitCurl twitterObj;
   QString authUrl, replyMsg;
@@ -2173,12 +2173,12 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
   QString huntname;
   if (argument && *argument)
   {
-    strcpy(huntname, argument);
+    dc_strcpy(huntname, argument);
     begin_hunt(vnum, time, num, argument);
   }
   else
   {
-    strcpy(huntname, "A hunt");
+    dc_strcpy(huntname, "A hunt");
     begin_hunt(vnum, time, num, 0);
   }
 

@@ -18,7 +18,7 @@
 command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
-  QString name, type[MAX_INPUT_LENGTH], buf[500];
+  QString name, type, buf[500];
 
   half_chop(arg, name, type);
 
@@ -35,9 +35,9 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (victim->isPlayer() && (ch->getLevel() <= victim->getLevel()))
     {
-      act("You cast a stream of fire at $N.", ch, 0, victim, TO_CHAR, 0);
-      act("$n casts a stream of fire at you.", ch, 0, victim, TO_VICT, 0);
-      act("$n casts a stream of fire at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character("You cast a stream of fire at $N.", ch, 0, victim, 0);
+      act_to_victim("$n casts a stream of fire at you.", ch, 0, victim, 0);
+      act_to_room("$n casts a stream of fire at $N.", ch, 0, victim, NOTVICT);
       return ReturnValue::eFAILURE;
     }
     if (!victim->isNonPlayer() && victim->player->possesing)
@@ -49,10 +49,10 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
       {
-        act("$N is a thief.  Don't boot $M.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N is a thief.  Don't boot $M.", ch, 0, victim, 0);
         return ReturnValue::eFAILURE;
       }
-      act("$N is a pkiller.  Don't boot $M.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N is a pkiller.  Don't boot $M.", ch, 0, victim, 0);
       return ReturnValue::eFAILURE;
     }
 
@@ -222,7 +222,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->player->stealth == false)
   {
     buf = "$n has forced you to 'save'.";
-    act(buf, ch, 0, vict, TO_VICT, 0);
+    act_to_victim(buf, ch, 0, vict, 0);
     buf = {};
     ch->sendln("Ok.");
   }
@@ -274,9 +274,9 @@ command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
       dc_snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
 
     dc_snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
-             qPrintable(i->name()), ch_clan_name,
-             qPrintable(i->fighting->name()), victim_clan_name,
-             DC::getInstance()->world[i->in_room].number);
+                qPrintable(i->name()), ch_clan_name,
+                qPrintable(i->fighting->name()), victim_clan_name,
+                DC::getInstance()->world[i->in_room].number);
     ch->send(buf);
   }
 
@@ -301,7 +301,7 @@ command_return_t do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
     if (rch->fighting != nullptr)
       stop_fighting(rch);
   }
-  act("$n makes a gesture and all fighting stops.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n makes a gesture and all fighting stops.", ch, 0, 0, 0);
   ch->sendln("You stop all fighting in this room.");
   return ReturnValue::eSUCCESS;
 }
@@ -313,13 +313,13 @@ command_return_t do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
   buf[0] = '\0';
   for (; i < MAX_RACE; i++)
   {
-    QString immbuf, resbuf[MAX_STRING_LENGTH], susbuf[MAX_STRING_LENGTH];
+    QString immbuf, resbuf, susbuf;
     immbuf[0] = resbuf[0] = susbuf[0] = '\0';
     sprintbit(races[i].immune, isr_bits, immbuf);
     sprintbit(races[i].resist, isr_bits, resbuf);
     sprintbit(races[i].suscept, isr_bits, susbuf);
 
-    QString hatbuf, fribuf[MAX_STRING_LENGTH];
+    QString hatbuf, fribuf;
     hatbuf[0] = fribuf[0] = '\0';
     sprintbit(races[i].hate_fear << 1, race_abbrev, hatbuf);
     sprintbit(races[i].friendly << 1, race_abbrev, fribuf);

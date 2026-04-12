@@ -83,7 +83,7 @@ void string_hash_add(class Connection *d, QString str)
 #else
     (*conn->hashstr) = dc_alloc(strlen(str) + 3, sizeof(QChar));
 #endif
-    strcpy(*conn->hashstr, str);
+    dc_strcpy(*conn->hashstr, str);
   }
 
   else
@@ -102,7 +102,7 @@ void string_hash_add(class Connection *d, QString str)
         abort();
       }
 
-      strcat(*conn->hashstr, str);
+      dc_strcat(*conn->hashstr, str);
     }
   }
 
@@ -117,7 +117,7 @@ void string_hash_add(class Connection *d, QString str)
     check_for_awaymsgs(ch);
   }
   else
-    strcat(*conn->hashstr, "\r\n");
+    dc_strcat(*conn->hashstr, "\r\n");
 }
 
 // TODO - figure out what this is for...kill it if nothing
@@ -157,7 +157,7 @@ void quad_arg(QString arg, qint32 *type, QString name, qint32 *field, QString st
 
 command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  QString name, string[MAX_STRING_LENGTH];
+  QString name, string;
   QString message;
   qint32 field, type, ctr;
   CharacterPtr mob = {};
@@ -752,7 +752,7 @@ void show_string(class Connection *d, const QString input)
   /* Or if we have more to show.... */
   else
   {
-    strncpy(buffer, conn->showstr_vector[conn->showstr_page], diff = (conn->showstr_vector[conn->showstr_page + 1]) - (conn->showstr_vector[conn->showstr_page]));
+    dc_strncpy(buffer, conn->showstr_vector[conn->showstr_page], diff = (conn->showstr_vector[conn->showstr_page + 1]) - (conn->showstr_vector[conn->showstr_page]));
     buffer[diff] = '\0';
     conn->character->send(buffer);
     conn->showstr_page++;

@@ -18,11 +18,8 @@
 #include <cstdlib>
 #include <cerrno>
 
-#include "DC/obj.h"
 #include "DC/DC.h"
 
-#include "DC/handler.h"
-#include "DC/structs.h"
 #include "DC/db.h"
 #include <cassert>
 #include <cstddef>
@@ -118,50 +115,50 @@ qint32 write_corpse_to_disk(FILE *fp, ObjectPtr obj, qint32 locate)
 
   if (!obj->ActionDescription().isEmpty())
   {
-    strncpy(buf1, qPrintable(obj->ActionDescription()), sizeof(buf1) - 1);
+    dc_strncpy(buf1, qPrintable(obj->ActionDescription()), sizeof(buf1) - 1);
     clean_string(buf1);
   }
   else
     *buf1 = {};
-  qfprintf(fp,
-           "#%lu\n"
-           "%d %d %d %d %d %u %d %d\n",
-           GET_OBJ_VNUM(obj),
-           locate,
-           GET_OBJ_VAL(obj, 0),
-           GET_OBJ_VAL(obj, 1),
-           GET_OBJ_VAL(obj, 2),
-           GET_OBJ_VAL(obj, 3),
-           GET_OBJ_EXTRA(obj),
-           GET_OBJ_VROOM(obj),  /*vroom is the virtual room a corpse*/
-           GET_OBJ_TIMER(obj)); /* was created in. See make_corpse */
+  dc_fprintf(fp,
+             "#%lu\n"
+             "%d %d %d %d %d %u %d %d\n",
+             GET_OBJ_VNUM(obj),
+             locate,
+             GET_OBJ_VAL(obj, 0),
+             GET_OBJ_VAL(obj, 1),
+             GET_OBJ_VAL(obj, 2),
+             GET_OBJ_VAL(obj, 3),
+             GET_OBJ_EXTRA(obj),
+             GET_OBJ_VROOM(obj),  /*vroom is the virtual room a corpse*/
+             GET_OBJ_TIMER(obj)); /* was created in. See make_corpse */
 
   if (!(IS_OBJ_STAT(obj, ITEM_UNIQUE_SAVE)))
   {
     return 1;
   }
-  qfprintf(fp,
-           "XAP\n"
-           "%s~\n"
-           "%s~\n"
-           "%s~\n"
-           "%s~\n"
-           "%d %d %d %d %d\n",
-           !obj->name().isEmpty() ? qPrintable(obj->name()) : "undefined",
-           qPrintable(obj->short_description()) ? qPrintable(obj->short_description()) : "undefined",
-           !obj->long_description().isEmpty() ? qPrintable(obj->long_description()) : "undefined",
-           buf1,
-           GET_OBJ_TYPE(obj),
-           GET_OBJ_WEAR(obj).toInt(),
-           (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
-           GET_OBJ_COST(obj), obj->num_affects);
+  dc_fprintf(fp,
+             "XAP\n"
+             "%s~\n"
+             "%s~\n"
+             "%s~\n"
+             "%s~\n"
+             "%d %d %d %d %d\n",
+             !obj->name().isEmpty() ? qPrintable(obj->name()) : "undefined",
+             qPrintable(obj->short_description()) ? qPrintable(obj->short_description()) : "undefined",
+             !obj->long_description().isEmpty() ? qPrintable(obj->long_description()) : "undefined",
+             qPrintable(buf1),
+             GET_OBJ_TYPE(obj),
+             GET_OBJ_WEAR(obj).toInt(),
+             (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
+             GET_OBJ_COST(obj), obj->num_affects);
   /* Do we have affects? */
   for (counter = {}; counter < obj->num_affects; counter++)
     if (obj->affected[counter].modifier)
-      qfprintf(fp, "A\n"
-                   "%d %d\n",
-               obj->affected[counter].location,
-               obj->affected[counter].modifier);
+      dc_fprintf(fp, "A\n"
+                     "%d %d\n",
+                 obj->affected[counter].location,
+                 obj->affected[counter].modifier);
 
   /* Do we have extra descriptions? */
   if (obj->ex_description)
@@ -173,13 +170,13 @@ qint32 write_corpse_to_disk(FILE *fp, ObjectPtr obj, qint32 locate)
       {
         continue;
       }
-      strcpy(buf1, qPrintable(ex_desc->description_));
+      dc_strcpy(buf1, ex_desc->description_);
       clean_string(buf1);
-      qfprintf(fp, "E\n"
-                   "%s~\n"
-                   "%s~\n",
-               qPrintable(ex_desc->keyword_),
-               buf1);
+      dc_fprintf(fp, "E\n"
+                     "%s~\n"
+                     "%s~\n",
+                 qPrintable(ex_desc->keyword_),
+                 qPrintable(buf1));
     }
   }
   return 1;
@@ -330,7 +327,7 @@ void DC::load_corpses(void)
         DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       /* read line check for xap. */
-      if (!strcmp("XAP\n", line))
+      if (!dc_strcmp("XAP\n", line))
       { /* then this is a Xap Obj, requires special care */
         if (debug == 1)
           DC::getInstance()->logentry(QStringLiteral("XAP Found"), 0, DC::LogChannel::LOG_MISC);
@@ -539,7 +536,7 @@ qint32 get_line_new(FILE *fl, QString buf)
     case '\0':
       if (a < 1)
         return 0;
-      strcpy(buf, temp);
+      dc_strcpy(buf, temp);
       buf[a] = '\0';
       return 1;
       break;
@@ -547,7 +544,7 @@ qint32 get_line_new(FILE *fl, QString buf)
   }
   if (a < 1)
     return 0;
-  strcpy(buf, temp);
+  dc_strcpy(buf, temp);
   buf[a] = '\0';
   return 1;
   do
@@ -562,7 +559,7 @@ qint32 get_line_new(FILE *fl, QString buf)
     return 0;
   else
   {
-    strcpy(buf, temp);
+    dc_strcpy(buf, temp);
     return lines;
   }
 }

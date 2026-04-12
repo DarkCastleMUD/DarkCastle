@@ -92,7 +92,7 @@ qint32 save_quests(void)
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
     quest = *node;
-    qfprintf(fl, "#%d\n", quest->number);
+    dc_fprintf(fl, "#%d\n", quest->number);
     string_to_file(fl, quest->name);
     string_to_file(fl, quest->hint1);
     string_to_file(fl, quest->hint2);
@@ -100,10 +100,10 @@ qint32 save_quests(void)
     string_to_file(fl, quest->objshort);
     string_to_file(fl, quest->objlong);
     string_to_file(fl, quest->objkey);
-    qfprintf(fl, "%d %d %d %d %d %d %d\n", quest->level, quest->objnum, quest->mobnum, quest->timer, quest->reward, quest->cost, quest->brownie);
+    dc_fprintf(fl, "%d %d %d %d %d %d %d\n", quest->level, quest->objnum, quest->mobnum, quest->timer, quest->reward, quest->cost, quest->brownie);
   }
 
-  qfprintf(fl, "$");
+  dc_fprintf(fl, "$");
 
   fclose(fl);
 
@@ -932,7 +932,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (arg && strlen(arg) > 0 && arg[0] != ' ')
   {
-    strncat(new_arg, arg, sizeof(new_arg) - 1);
+    dc_strncat(new_arg, arg, sizeof(new_arg) - 1);
     arg = new_arg;
   }
 
@@ -1464,7 +1464,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item((ObjectPtr)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1473,7 +1473,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item((ObjectPtr)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1482,7 +1482,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item((ObjectPtr)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1491,7 +1491,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item((ObjectPtr)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }

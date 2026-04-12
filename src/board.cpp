@@ -563,11 +563,11 @@ qint32 save_boards()
   for (board_it = board_db.begin(); board_it != board_db.end(); board_it++)
   {
 
-    qfprintf(the_file, " %d ", board_it->second.min_read_level);
-    qfprintf(the_file, " %d ", board_it->second.min_write_level);
-    qfprintf(the_file, " %d ", board_it->second.min_remove_level);
-    qfprintf(the_file, " %d ", board_it->second.type);
-    qfprintf(the_file, " %d ", board_it->second.owner);
+    dc_fprintf(the_file, " %d ", board_it->second.min_read_level);
+    dc_fprintf(the_file, " %d ", board_it->second.min_write_level);
+    dc_fprintf(the_file, " %d ", board_it->second.min_remove_level);
+    dc_fprintf(the_file, " %d ", board_it->second.type);
+    dc_fprintf(the_file, " %d ", board_it->second.owner);
     fwrite_string(board_it->second.save_file.c_str(), the_file);
     fwrite_string(board_it->first.c_str(), the_file);
   }
@@ -750,11 +750,11 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
                "   |--------------------------------------------------------------------------------|\r\n",
                ch);
 
-  act("$n starts to write a message.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n starts to write a message.", ch, 0, 0, INVIS_NULL);
 
   // if the title is Topic, this clears the date to let us know that
   // during the callback the topic will need updated.
-  if (!(strcmp("Topic", arg)) && ch->getLevel() > IMMORTAL)
+  if (!(dc_strcmp("Topic", arg)) && ch->getLevel() > IMMORTAL)
   {
     reserve->new_post.date.clear();
   }
@@ -770,7 +770,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
 qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
   quint32 ind, tmessage;
-  QString buf, number[MAX_INPUT_LENGTH + 1];
+  QString buf, number;
 
   one_argument(arg, number);
 
@@ -828,7 +828,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   dc_sprintf(buf, "$n just erased message %d.", tmessage);
 
   // Removal message also repaired
-  act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room(buf, ch, 0, 0, INVIS_NULL);
 
   board_save_board(board);
   return ReturnValue::eSUCCESS;
@@ -867,7 +867,7 @@ void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
     return;
   }
 
-  qfprintf(the_file, " %zu ", board->second.msgs.size());
+  dc_fprintf(the_file, " %zu ", board->second.msgs.size());
   for (ind = {}; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);
@@ -935,7 +935,7 @@ void board_load_board()
 
 qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
-  QString buf, number[MAX_INPUT_LENGTH + 1];
+  QString buf, number;
   QString board_msg;
   one_argument(arg, number);
   quint32 tmessage;
@@ -1010,19 +1010,19 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
     ch->player->last_mess_read = tmessage;
 
   dc_sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
-  act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room(buf, ch, 0, 0, INVIS_NULL);
 
   if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
   {
     dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
-             tmessage, board->second.msgs[tmessage].date.c_str(),
-             board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+                tmessage, board->second.msgs[tmessage].date.c_str(),
+                board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
     board_msg += buf;
   }
   else
   {
     dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(),
-             board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+                board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
     board_msg += buf;
   }
 
@@ -1067,7 +1067,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
     return ReturnValue::eSUCCESS;
   }
 
-  act("$n studies the board.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n studies the board.", ch, 0, 0, INVIS_NULL);
 
   ch->sendln("This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>");
   if (board->second.msgs.empty())
@@ -1084,14 +1084,14 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
       if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
       {
         dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
-                 msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
+                    msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
         board_msg += buf;
         //         ch->send(QStringLiteral("(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n").arg(msg_it->date.c_str()).arg(       //                    msg_it->author.c_str(),i--).arg(msg_it->title.c_str()));
       }
       else
       {
         dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\r\n", msg_it->date.c_str(),
-                 msg_it->author.c_str(), i--, msg_it->title.c_str());
+                    msg_it->author.c_str(), i--, msg_it->title.c_str());
         board_msg += buf;
       }
   }
@@ -1102,5 +1102,5 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
 
 qint32 fwrite_string(const QString buf, FILE *fl)
 {
-  return (qfprintf(fl, "%s~\n", buf));
+  return (dc_fprintf(fl, "%s~\n", buf));
 }

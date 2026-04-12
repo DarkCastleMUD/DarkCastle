@@ -193,8 +193,8 @@ qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
       }
       if (number<decltype(index_cursor->frequency)>(0, (index_cursor->frequency)) == 0)
       {
-        act(data_cursor->emote_text, ch, 0, 0, TO_ROOM, 0);
-        act(data_cursor->emote_text, ch, 0, 0, TO_CHAR, 0);
+        act_to_room(data_cursor->emote_text, ch, 0, 0, 0);
+        act_to_character(data_cursor->emote_text, ch, 0, 0, 0);
       }
     }
   }
@@ -372,12 +372,12 @@ qint32 dawnsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
       continue;
     if (GET_ALIGNMENT(v) >= 350)
     {
-      act("$n whispers a quiet prayer and a glorious flash of holy light explodes from their weapon!", ch, 0, v, TO_VICT, 0);
+      act_to_victim("$n whispers a quiet prayer and a glorious flash of holy light explodes from their weapon!", ch, 0, v, 0);
       continue;
     }
     if (IS_AFFECTED(v, AFF_BLIND))
       continue; // no doubleblind
-    act("$n whispers a quiet prayer and a searing blast of white light suddenly blinds you!", ch, 0, v, TO_VICT, 0);
+    act_to_victim("$n whispers a quiet prayer and a searing blast of white light suddenly blinds you!", ch, 0, v, 0);
     af.type = SPELL_BLINDNESS;
     af.location = APPLY_HITROLL;
     af.modifier = v->has_skill(SKILL_BLINDFIGHTING) ? skill_success(v, 0, SKILL_BLINDFIGHTING) ? -10 : -20 : -20;
@@ -476,7 +476,7 @@ qint32 lilithring(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
   if ((!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) && !ISSET(victim->mobdata->actflags, ACT_CHARM)) || victim->getLevel() > 50)
   {
-    act("$N's soul is too powerful for you to command.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N's soul is too powerful for you to command.", ch, 0, victim, 0);
     return ReturnValue::eSUCCESS;
   }
   if (GET_ALIGNMENT(ch) > -350)
@@ -490,8 +490,8 @@ qint32 lilithring(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
     ch->sendln("Something about this room blocks your command.");
     return ReturnValue::eSUCCESS;
   }
-  act("You speak the command and $N must comply. Lilith's Ring of Command glows with mirthful malevolence.", ch, 0, victim, TO_CHAR, 0);
-  act("$n whispers softly to $N. $N's eyes go blank and they now follow $n.", ch, 0, victim, TO_ROOM, 0);
+  act_to_character("You speak the command and $N must comply. Lilith's Ring of Command glows with mirthful malevolence.", ch, 0, victim, 0);
+  act_to_room("$n whispers softly to $N. $N's eyes go blank and they now follow $n.", ch, 0, victim, 0);
 
   addTimer(ch, OBJ_LILITHRING, 24);
   if (victim->master)
@@ -628,21 +628,21 @@ qint32 holyavenger(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                     (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
                 !number(0, 1))
             { // tarrasque's leash..
-              act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
-              act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
-              act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
+              act_to_character("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, 0);
+              act_to_room("$n attempts to behead $N, but fails.", ch, 0, vict, NOTVICT);
+              act_to_victim("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, 0);
               return ReturnValue::eSUCCESS;
             }
             if (IS_AFFECTED(vict, AFF_NO_BEHEAD))
             {
-              act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
-              act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-              act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
+              act_to_character("$N deftly dodges your beheading attempt!", ch, 0, vict, 0);
+              act_to_room("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, NOTVICT);
+              act_to_victim("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, 0);
               return ReturnValue::eSUCCESS;
             }
-            act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
-            act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
-            act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
+            act_to_victim("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, 0);
+            act_to_character("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, 0);
+            act_to_room("$n cleanly slices $N's head off $S body!", ch, 0, vict, NOTVICT);
             vict->setHP(-20, ch);
             make_head(vict);
             group_gain(ch, vict);
@@ -652,9 +652,9 @@ qint32 holyavenger(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
           }
           else
           { /* You MISS the fucker! */
-            act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
-            act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
-            act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+            act_to_victim("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, 0);
+            act_to_character("You miss your attempt to behead $N.", ch, 0, vict, 0);
+            act_to_room("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, NOTVICT);
           }
         }
       }
@@ -683,15 +683,15 @@ qint32 hooktippedsteelhalberd(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
   {
     if (DC::getInstance()->obj_index[obj->item_number].vnum() == 17904)
     {
-      act("$n's diamond war club cracks your $p!", ch, victim->equipment[which], victim, TO_VICT, 0);
-      act("$n smashes $m diamond war club into $N's $p and cracks it!", ch, victim->equipment[which], victim, TO_ROOM, NOTVICT);
-      act("You smash your club into $N's $p, and manage to crack it!", ch, victim->equipment[which], victim, TO_CHAR, 0);
+      act_to_victim("$n's diamond war club cracks your $p!", ch, victim->equipment[which], victim, 0);
+      act_to_room("$n smashes $m diamond war club into $N's $p and cracks it!", ch, victim->equipment[which], victim, NOTVICT);
+      act_to_character("You smash your club into $N's $p, and manage to crack it!", ch, victim->equipment[which], victim, 0);
     }
     else
     {
-      act("$n's hook-tipped steel halberd tears your $p!", ch, victim->equipment[which], victim, TO_VICT, 0);
-      act("$n latches $m hook-tipped steel halberd into $N's $p and tears it!", ch, victim->equipment[which], victim, TO_ROOM, NOTVICT);
-      act("You latch your halberd into $N's $p, and manage to tear it!", ch, victim->equipment[which], victim, TO_CHAR, 0);
+      act_to_victim("$n's hook-tipped steel halberd tears your $p!", ch, victim->equipment[which], victim, 0);
+      act_to_room("$n latches $m hook-tipped steel halberd into $N's $p and tears it!", ch, victim->equipment[which], victim, NOTVICT);
+      act_to_character("You latch your halberd into $N's $p, and manage to tear it!", ch, victim->equipment[which], victim, 0);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -1079,7 +1079,7 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
   // If we get to this point then all components for item_index were found
   qint32 item_vnum = assemble_items[item_index].item;
   qint32 item_real = real_object(item_vnum);
-  ObjectPtr item = (ObjectPtr)DC::getInstance()->obj_index[item_real].item;
+  ObjectPtr item = DC::getInstance()->obj_index[item_real].item;
 
   // Check if the item to be assembled is marked UNIQUE but the player already has one
   if (isSet(item->obj_flags.more_flags, ITEM_UNIQUE))
@@ -1093,7 +1093,7 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
 
   // Send item specific assemble messages to the player and room
   send_to_char(assemble_items[item_index].finish_to_char, ch);
-  act(assemble_items[item_index].finish_to_room, ch, 0, 0, TO_ROOM, 0);
+  act_to_room(assemble_items[item_index].finish_to_room, ch, 0, 0, 0);
 
   // Remove all the components from the player
   for (qint32 component_index = {}; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++)
@@ -1205,7 +1205,7 @@ command_return_t do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
   obj = get_obj_in_list_vis(ch, arg1, ch->carrying);
   if (obj == nullptr)
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't find it!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1238,7 +1238,7 @@ qint32 stupid_button(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   QString vict;
 
   one_argument(arg, vict);
-  if (strcmp(vict, "button") && strcmp(vict, "red") && strcmp(vict, "big"))
+  if (dc_strcmp(vict, "button") && dc_strcmp(vict, "red") && dc_strcmp(vict, "big"))
   {
     ch->sendln("Push what?");
     return ReturnValue::eFAILURE;
@@ -1302,8 +1302,8 @@ qint32 gazeofgaiot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  act("You eyes glow red from hatred, and you discharge it all on $N.", ch, 0, victim, TO_CHAR, 0);
-  act("$n's eyes glow with hatred, and $e directs it all at you. OoO, scary!", ch, 0, victim, TO_VICT, 0);
+  act_to_character("You eyes glow red from hatred, and you discharge it all on $N.", ch, 0, victim, 0);
+  act_to_victim("$n's eyes glow with hatred, and $e directs it all at you. OoO, scary!", ch, 0, victim, 0);
   while (number(0, 1))
     do_flee(victim, "");
   return ReturnValue::eSUCCESS;
@@ -1353,7 +1353,7 @@ qint32 pfe_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
     ch->equipment[pos]->obj_flags.value[3] = 600;
 
-    act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
     ch->sendln("You quietly whisper 'aslexi' into your hands.");
 
     // cast_protection_from_evil(ch->getLevel(), ch, 0, SPELL_TYPE_SPELL, ch, 0, 50);
@@ -1378,7 +1378,7 @@ qint32 pfe_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->sendln("You have a righteous, protected feeling!");
     }
 
-    act("A pulsing aura springs to life around $n!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("A pulsing aura springs to life around $n!", ch, 0, 0, 0);
     return ReturnValue::eSUCCESS;
   }
   else // cmd=69 (remove)
@@ -1429,14 +1429,14 @@ qint32 devilsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (!str_cmp("infrendeo", arg1))
   {
-    act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
     if (ch->equipment[WEAR_WIELD]->obj_flags.value[3] == 8)
     {
       ch->sendln("Nothing happens.");
       return true;
     }
 
-    act("Venom-flecked fangs grow and bristle from the bedeviled Cestus!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("Venom-flecked fangs grow and bristle from the bedeviled Cestus!", ch, 0, 0, 0);
     ch->sendln("Huge fangs spring forth from your weapon!");
 
     ch->equipment[WEAR_WIELD]->obj_flags.value[3] = 8;
@@ -1444,14 +1444,14 @@ qint32 devilsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
   if (!str_cmp("pulsus", arg1))
   {
-    act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
     if (ch->equipment[WEAR_WIELD]->obj_flags.value[3] == 7)
     {
       ch->sendln("Nothing happens.");
       return ReturnValue::eSUCCESS;
     }
 
-    act("The fangs of $n's weapon retract magically into the metal.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("The fangs of $n's weapon retract magically into the metal.", ch, 0, 0, 0);
     ch->sendln("The fangs retract magically into the metal.");
 
     ch->equipment[WEAR_WIELD]->obj_flags.value[3] = 7;
@@ -1472,7 +1472,7 @@ void remove_eliara(CharacterPtr ch)
   if (ch->affected_by_spell(SPELL_SANCTUARY))
     return;
 
-  act("Eliara's glow fades, as she falls dormant once again.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("Eliara's glow fades, as she falls dormant once again.", ch, 0, 0, 0);
   ch->sendln("Eliara's glow fades, as she falls dormant once again.\r\n");
   REMBIT(ch->affected_by, AFF_SANCTUARY);
 }
@@ -1513,7 +1513,7 @@ qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
     v->sendln("As phantom music swells around you, you are helpless to resist.  You must obey.");
     QString tmp_command;
-    strcpy(tmp_command, command_list[number(0, 9)]);
+    dc_strcpy(tmp_command, command_list[number(0, 9)]);
     v->command_interpreter(tmp_command);
   }
   obj->obj_flags.timer = 48;
@@ -1536,7 +1536,7 @@ qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       if (obj->obj_flags.timer > 0 && obj->equipped_by && obj->equipped_by->in_room)
       {
         obj->equipped_by->sendln("The white fire surrounding Durendal gutters and flickers out.");
-        act("The flames surrounding $n's weapon gutters and fade.", obj->equipped_by, 0, 0, TO_ROOM, 0);
+        act_to_room("The flames surrounding $n's weapon gutters and fade.", obj->equipped_by, 0, 0, 0);
       }
     }
     return ReturnValue::eSUCCESS;
@@ -1562,7 +1562,7 @@ qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     return ReturnValue::eSUCCESS;
   }
   ch->sendln("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!");
-  act("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, 0);
   CharacterPtr v, vn;
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = vn)
   {
@@ -1573,7 +1573,7 @@ qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
     v->sendln("You feel the evil in your soul being burned away!");
     damage(ch, v, 250, TYPE_COLD, TYPE_UNDEFINED);
-    act("The evil in $N's soul is burned away!", ch, 0, v, TO_CHAR, 0);
+    act_to_character("The evil in $N's soul is burned away!", ch, 0, v, 0);
   }
   SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
   obj->obj_flags.timer = 360;
@@ -1606,7 +1606,7 @@ qint32 eliara_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   if (IS_AFFECTED(ch, AFF_SANCTUARY))
     return ReturnValue::eSUCCESS;
 
-  act("Eliara glows brightly for a moment, its incandescent field of light surrounding $n in a glowing aura.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("Eliara glows brightly for a moment, its incandescent field of light surrounding $n in a glowing aura.", ch, 0, 0, 0);
   ch->sendln("Eliara glows brightly surrounding you in its protective aura!");
 
   SETBIT(ch->affected_by, AFF_SANCTUARY);
@@ -1687,7 +1687,7 @@ qint32 arenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   }
 
   ch->sendln("A dimensional hole swallows you.\r\nYou reappear elsewhere.");
-  act("$n fades out of existence.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n fades out of existence.", ch, 0, 0, INVIS_NULL);
 
   do_look(ch, "\0");
 
@@ -1723,7 +1723,7 @@ qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     return ReturnValue::eFAILURE;
 
   ch->sendln("A dimensional hole swallows you.\r\nYou reappear elsewhere.");
-  act("$n fades out of existence.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n fades out of existence.", ch, 0, 0, INVIS_NULL);
 
   if (ch->fighting)
   {
@@ -1746,7 +1746,7 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   if (cmd != cmd_t::RESTRING)
     return ReturnValue::eFAILURE;
 
-  act("The machine flashes and shoots sparks and smoke throughout the room.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("The machine flashes and shoots sparks and smoke throughout the room.", ch, 0, 0, 0);
   ch->send("The machine beeps and emits hollow a voice...\n");
 
   half_chop(arg, name, buf);
@@ -1790,7 +1790,7 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
 
   //  target_obj->short_description={};
   //  target_obj->short_description =  dc_alloc(strlen(buf)+1, sizeof(QChar));
-  //  strcpy(target_obj->short_description, buf);
+  //  dc_strcpy(target_obj->short_description, buf);
   QString zarg;
   dc_sprintf(zarg, "$B$7%s$R", buf);
   target_obj->short_description(zarg);
@@ -1917,7 +1917,7 @@ qint32 phish_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   if (!strstr(arg, "button"))
     return ReturnValue::eSUCCESS;
 
-  act("$n fiddles with a small fish-shaped device.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n fiddles with a small fish-shaped device.", ch, 0, 0, INVIS_NULL);
 
   if (!(victim = get_char("Pirahna")))
   {
@@ -1950,9 +1950,9 @@ qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
     {
       next_vict = victim->next_in_room;
       victim->sendln("Your body is pulled apart and reassembled elsewhere!");
-      act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
+      act_to_room("$n slowly fades out of existence.", victim, 0, 0, 0);
       move_char(victim, 26802);
-      act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
+      act_to_room("$n slowly fades into existence.", victim, 0, 0, 0);
       do_look(victim, "");
     }
     break;
@@ -2009,7 +2009,7 @@ qint32 portal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     ch->sendln("The item seems to be recharging.");
     return ReturnValue::eSUCCESS;
   }
-  act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
   ch->sendln("You quietly whisper 'magiskhal' into your hands.");
 
   if (!(victim = get_char_vis(ch, junk)))
@@ -2022,7 +2022,7 @@ qint32 portal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     // set charge time
     ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 600;
   }
-  act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("The $o in $n's hands glows brightly!", ch, obj, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2070,7 +2070,7 @@ qint32 full_heal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     ch->sendln("The item seems to be recharging.");
     return ReturnValue::eSUCCESS;
   }
-  act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
   ch->sendln("You quietly whisper 'heltlaka' into your hands.");
 
   if (!(victim = get_char_vis(ch, junk)))
@@ -2085,7 +2085,7 @@ qint32 full_heal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     // set charge time
     ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 300;
   }
-  act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("The $o in $n's hands glows brightly!", ch, obj, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2152,14 +2152,14 @@ qint32 fireshield_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     ch->sendln("The item seems to be recharging.");
     return ReturnValue::eSUCCESS;
   }
-  act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
   ch->sendln("You quietly whisper 'feuerschild' into your hands.");
 
   spell_fireshield(ch->getLevel(), ch, ch, 0, 0);
   // set charge time
   ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 900;
 
-  act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("The $o in $n's hands glows brightly!", ch, obj, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2213,7 +2213,7 @@ qint32 teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
   ch->sendln("You quietly whisper 'sbiadirsivia' into your hands.");
 
   if (!(victim = ch->get_char_room_vis(junk)))
@@ -2226,7 +2226,7 @@ qint32 teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     // set charge time
     ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 1000;
   }
-  act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("The $o in $n's hands glows brightly!", ch, obj, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2268,7 +2268,7 @@ qint32 alignment_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (str_cmp("moralevalore", arg1))
     return ReturnValue::eFAILURE;
 
-  act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
   ch->sendln("You quietly whisper 'moralevalore' into your hands.");
   if (ch->equipment[WEAR_HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
@@ -2276,11 +2276,11 @@ qint32 alignment_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  if (!strcmp("good", junk))
+  if (!dc_strcmp("good", junk))
     GET_ALIGNMENT(ch) = 1000;
-  else if (!strcmp("evil", junk))
+  else if (!dc_strcmp("evil", junk))
     GET_ALIGNMENT(ch) = -1000;
-  else if (!strcmp("neutral", junk))
+  else if (!dc_strcmp("neutral", junk))
     GET_ALIGNMENT(ch) = {};
   else
     ch->sendln("The box somehow seems......confused.");
@@ -2288,7 +2288,7 @@ qint32 alignment_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   // set charge time
   ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 500;
 
-  act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("The $o in $n's hands glows brightly!", ch, obj, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2335,7 +2335,7 @@ qint32 protection_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     ch->sendln("The item seems to be recharging.");
     return true;
   }
-  act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n mutters something into $s hands.", ch, 0, 0, 0);
   ch->sendln("You quietly whisper 'protezione' into your hands.");
 
   spell_armor(ch->getLevel(), ch, ch, 0, 0);
@@ -2350,7 +2350,7 @@ qint32 protection_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   // set charge time
   ch->equipment[WEAR_HOLD]->obj_flags.value[3] = 1000;
 
-  act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("The $o in $n's hands glows brightly!", ch, obj, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2493,19 +2493,19 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           {
             if (v->getLevel() >= IMMORTAL)
             {
-              act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment but due to immortal magics your head becomes clear.", v, 0, 0, TO_CHAR, 0);
-              act("$n begins to look blurry for a moment but due to immortal magics they become sharp again.", v, 0, 0, TO_ROOM, 0);
+              act_to_character("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment but due to immortal magics your head becomes clear.", v, 0, 0, 0);
+              act_to_room("$n begins to look blurry for a moment but due to immortal magics they become sharp again.", v, 0, 0, 0);
             }
             else
             {
-              act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0, 0, TO_CHAR, 0);
-              act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0, 0, TO_ROOM, 0);
+              act_to_character("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0, 0, 0);
+              act_to_room("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0, 0, 0);
               move_char(v, real_room(30000));
               do_look(v, "");
 
               auto throwitem = new mprog_throw_type;
               throwitem->target_mob_num = 30033;
-              strcpy(throwitem->target_mob_name, "");
+              dc_strcpy(throwitem->target_mob_name, "");
               throwitem->data_num = 99;
               throwitem->delay = {};
               throwitem->mob = true; // This is, surprisingly, a mob
@@ -2551,18 +2551,18 @@ qint32 szrildor_pass_checks(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
 
     if (!search_char_for_item(i, real_object(30097), false) || (++count) > 4)
     {
-      act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
-      act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
+      act_to_character("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, 0);
+      act_to_room("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, 0);
 
       if (i->getLevel() >= IMMORTAL)
       {
-        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment but due to immortal magics your head becomes clear.", i, 0, 0, TO_CHAR, 0);
-        act("$n begins to look blurry for a moment but due to immortal magics they become sharp again.", i, 0, 0, TO_ROOM, 0);
+        act_to_character("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment but due to immortal magics your head becomes clear.", i, 0, 0, 0);
+        act_to_room("$n begins to look blurry for a moment but due to immortal magics they become sharp again.", i, 0, 0, 0);
       }
       else
       {
-        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", i, 0, 0, TO_CHAR, 0);
-        act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", i, 0, 0, TO_ROOM, 0);
+        act_to_character("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", i, 0, 0, 0);
+        act_to_room("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", i, 0, 0, 0);
         move_char(i, real_room(30000));
         do_look(i, "");
       }
@@ -2574,7 +2574,7 @@ qint32 szrildor_pass_checks(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
 qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
                       const QString arg, CharacterPtr invoker)
 {
-  QString msg1, msg2[MAX_STRING_LENGTH];
+  QString msg1, msg2;
   qint32 low, high, room, time, sector = {};
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2737,10 +2737,10 @@ qint32 boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   if (cmd != cmd_t::UNDEFINED)
   {
     // get on the boat
-    act("$n boldly boards $p.", ch, obj, 0, TO_ROOM, 0);
-    act("You board $p.", ch, obj, 0, TO_CHAR, 0);
+    act_to_room("$n boldly boards $p.", ch, obj, 0, 0);
+    act_to_character("You board $p.", ch, obj, 0, 0);
     move_char(ch, obj->obj_flags.value[2]);
-    act("$n climbs aboard.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n climbs aboard.", ch, 0, 0, 0);
     do_look(ch, "");
     return ReturnValue::eSUCCESS;
   }
@@ -2815,20 +2815,20 @@ qint32 leave_boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, C
 
     if (obj2->in_room == dk_boat[1])
     {
-      act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
-      act("You disembark from $p.", ch, obj2, 0, TO_CHAR, 0);
+      act_to_room("$n disembarks from $p.", ch, obj2, 0, 0);
+      act_to_character("You disembark from $p.", ch, obj2, 0, 0);
       move_char(ch, obj2->in_room);
-      act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
+      act_to_room("$n disembarks from $p.", ch, obj2, 0, 0);
       do_look(ch, "");
       return ReturnValue::eSUCCESS;
     }
 
     if (obj2->in_room == dk_boat[dk_boat[0]])
     {
-      act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
-      act("You disembark from $p.", ch, obj2, 0, TO_CHAR, 0);
+      act_to_room("$n disembarks from $p.", ch, obj2, 0, 0);
+      act_to_character("You disembark from $p.", ch, obj2, 0, 0);
       move_char(ch, obj2->in_room);
-      act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
+      act_to_room("$n disembarks from $p.", ch, obj2, 0, 0);
       do_look(ch, "");
       return ReturnValue::eSUCCESS;
     }
@@ -2996,7 +2996,7 @@ qint32 gl_dragon_fire(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     return ReturnValue::eFAILURE;
 
   ch->sendln("The head of your dragon staff animates and breathes $B$4fire$R all around you!");
-  act("The head of the dragon staff in $n's hands animates and begins to breath fire!", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("The head of the dragon staff in $n's hands animates and begins to breath fire!", ch, obj, 0, 0);
 
   return cast_fire_breath(10, ch, QStringLiteral(""), SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
@@ -3061,14 +3061,14 @@ qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStr
     if (number(0, 3))
       return ReturnValue::eFAILURE;
 
-    act("$n's $o glows yellow charging up with electrical energy.", ch, obj, ch->fighting, TO_ROOM, 0);
+    act_to_room("$n's $o glows yellow charging up with electrical energy.", ch, obj, ch->fighting, 0);
     ch->sendln("Your shield glows yellow as it charges up with electrical energy.");
     return spell_lightning_bolt((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
     break;
   case 555: // wicked boneshield
     if (number(0, 9))
       return ReturnValue::eFAILURE;
-    act("The spikes $n's $o glimmer brightly.", ch, obj, ch->fighting, TO_ROOM, 0);
+    act_to_room("The spikes $n's $o glimmer brightly.", ch, obj, ch->fighting, 0);
     ch->sendln("The spikes on your shield glimmer brightly.");
     return spell_cause_critical(ch->getLevel(), ch, ch->fighting, 0, 0);
     break;
@@ -3076,8 +3076,8 @@ qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStr
     if (number(0, 4))
       return ReturnValue::eFAILURE;
 
-    act("$n's $o begins to tremble violently upon contact with $N.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
-    act("$n's $o begins to tremble violently upon contact with you!", ch, obj, ch->fighting, TO_VICT, 0);
+    act_to_room("$n's $o begins to tremble violently upon contact with $N.", ch, obj, ch->fighting, NOTVICT);
+    act_to_victim("$n's $o begins to tremble violently upon contact with you!", ch, obj, ch->fighting, 0);
     ch->sendln("Your shield begins to violently shake after the hit!");
     return spell_cause_serious((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
     break;
@@ -3145,7 +3145,7 @@ qint32 TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   if (!strstr(arg, "button"))
     return ReturnValue::eFAILURE;
 
-  act("$n pushes a small button then holds a looking glass to $s face.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n pushes a small button then holds a looking glass to $s face.", ch, 0, 0, INVIS_NULL);
   ch->sendln("You push the small button and then hold the looking glass to your face peering through it.\r\n");
 
   // 1406 is the portal 'rock' you enter to get to Tohs
@@ -3191,7 +3191,7 @@ qint32 gotta_dance_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   if (number(0, 3))
     return ReturnValue::eFAILURE;
 
-  act("$n eyes widen and $e begins to shake violently.", obj->equipped_by, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n eyes widen and $e begins to shake violently.", obj->equipped_by, 0, 0, INVIS_NULL);
   obj->equipped_by->sendln("Your boots grasp violently to your legs and rhythmic urges flood your body.");
   do_say(obj->equipped_by, "I...I.....I've gotta dance!!!!");
   make_person_dance(obj->equipped_by);
@@ -3214,12 +3214,12 @@ qint32 random_dir_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   if (number(0, 3))
     return ReturnValue::eFAILURE;
 
-  act("$n boots just keep on going!", obj->equipped_by, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n boots just keep on going!", obj->equipped_by, 0, 0, INVIS_NULL);
   obj->equipped_by->sendln("Your boots just keep on running!");
 
   QString dothis;
 
-  strcpy(dothis, dirs[number(0, 5)]);
+  dc_strcpy(dothis, dirs[number(0, 5)]);
 
   return obj->equipped_by->command_interpreter(dothis);
 }
@@ -3275,8 +3275,8 @@ qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
       return ReturnValue::eFAILURE;
 
     dam = dice(1, ch->getLevel());
-    act("The mud on $n's gloves spoils $N's flesh causing boils.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
-    act("The mud on $n's gloves spoils your flesh causing boils.", ch, obj, ch->fighting, TO_VICT, 0);
+    act_to_room("The mud on $n's gloves spoils $N's flesh causing boils.", ch, obj, ch->fighting, NOTVICT);
+    act_to_victim("The mud on $n's gloves spoils your flesh causing boils.", ch, obj, ch->fighting, 0);
     ch->sendln("The mud on your gloves spoils the flesh of your enemy.");
     return damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED);
     break;
@@ -3301,14 +3301,14 @@ qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
     if (number(0, 17))
       return ReturnValue::eFAILURE;
 
-    act("$n's $o momentarily pulse with a $B$7white light$R.", ch, obj, 0, TO_ROOM, 0);
+    act_to_room("$n's $o momentarily pulse with a $B$7white light$R.", ch, obj, 0, 0);
     ch->sendln("Your gloves momentarily pulse with a $B$7white light$R.");
     return spell_cure_serious(30, ch, ch, 0, 50);
     break;
   case 506:
     if (number(0, 33) || !ch->fighting)
       return ReturnValue::eFAILURE;
-    act("$n's $o begin pulse with a blinding white light for a moment.", ch, obj, 0, TO_ROOM, 0);
+    act_to_room("$n's $o begin pulse with a blinding white light for a moment.", ch, obj, 0, 0);
     ch->sendln("Your gloves begin to pulse with a blinding white light for a moment.");
     return spell_souldrain(60, ch, ch->fighting, 0, 100);
   default:
@@ -3513,7 +3513,7 @@ qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
       GET_MANA(obj->equipped_by) -= dam;
       obj->equipped_by->send(QStringLiteral("Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n").arg(dam));
 
-      act("$n is wracked by magical energies!", obj->equipped_by, 0, 0, TO_ROOM, 0);
+      act_to_room("$n is wracked by magical energies!", obj->equipped_by, 0, 0, 0);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -3534,13 +3534,13 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
       if (isSet(obj->obj_flags.more_flags, ITEM_TOGGLE))
       {
         REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
-        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\r\n");
+        dc_strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\r\n");
         send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       else
       {
         SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
-        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\r\n");
+        dc_strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\r\n");
         send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       return ReturnValue::eSUCCESS;
@@ -3696,8 +3696,8 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
     {
       qint32 rnd = number((quint64)0, (quint64)tmp.size() - 1);
       QString buf2 = "$B$7Ghaerad, Sword of Legends says, '";
-      strcat(buf2, tmp[rnd].c_str());
-      strcat(buf2, "'$R\r\n");
+      dc_strcat(buf2, tmp[rnd].c_str());
+      dc_strcat(buf2, "'$R\r\n");
       send_to_room(buf2, vict->in_room, true);
 
       if (rnd == unequip)
@@ -3708,12 +3708,12 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
 
           act("Your $p unequips itself.",
               vict, vict->equipment[WEAR_WIELD], 0, TO_CHAR, 0);
-          act("$n stops using $p.", vict, vict->equipment[WEAR_WIELD], 0, TO_ROOM, INVIS_NULL);
+          act_to_room("$n stops using $p.", vict, vict->equipment[WEAR_WIELD], 0, INVIS_NULL);
           obj_to_char(vict->unequip_char(WEAR_WIELD), vict);
           if (vict->equipment[WEAR_SECOND_WIELD])
           {
-            act("You move your $p to be your primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
-            act("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+            act_to_character("You move your $p to be your primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, INVIS_NULL);
+            act_to_room("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, INVIS_NULL);
             ObjectPtr weapon;
             weapon = vict->unequip_char(WEAR_SECOND_WIELD);
             vict->equip_char(weapon, WEAR_WIELD);
@@ -3722,8 +3722,8 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
         else if (vict->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_SECOND_WIELD]->item_number].vnum() == 27997)
         {
 
-          act("Your $p unequips itself.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, 0);
-          act("$n stops using $p.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+          act_to_character("Your $p unequips itself.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, 0);
+          act_to_room("$n stops using $p.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, INVIS_NULL);
           obj_to_char(vict->unequip_char(WEAR_SECOND_WIELD), vict);
         }
       }
@@ -3854,7 +3854,7 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (dropped == 1)
     {
       vict->sendln("OOPS!!! The hot potato burned you and you dropped it!!!");
-      act("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, TO_ROOM, 0);
+      act_to_room("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, 0);
     }
 
     if (vict->isPlayer())
@@ -3876,7 +3876,7 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
     if (vict->isNonPlayer())
     {
-      act("$n gets back up.", vict, 0, 0, TO_ROOM, 0);
+      act_to_room("$n gets back up.", vict, 0, 0, 0);
       do_say(vict, "HA!  Fooled ya!");
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
@@ -3967,7 +3967,7 @@ qint32 godload_banshee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
     return ReturnValue::eFAILURE;
   if (number(1, 101) > 12)
     return ReturnValue::eFAILURE;
-  act("$n's instrument takes on a life of its own, sending out a piercing wail.", ch, 0, vict, TO_ROOM, 0);
+  act_to_room("$n's instrument takes on a life of its own, sending out a piercing wail.", ch, 0, vict, 0);
   ch->sendln("Your instrument sends out a piercing wail.");
   return song_whistle_sharp(51, ch, QStringLiteral(""), vict, 50);
 }
@@ -3982,7 +3982,7 @@ qint32 godload_claws(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
     return ReturnValue::eFAILURE;
   if (number(1, 101) > 5)
     return ReturnValue::eFAILURE;
-  act("$n's claws glow icy blue.", ch, 0, vict, TO_ROOM, 0);
+  act_to_room("$n's claws glow icy blue.", ch, 0, vict, 0);
   ch->sendln("Your claws glow icy blue.");
   return spell_chill_touch(51, ch, vict, 0, 50);
 }
@@ -3992,7 +3992,7 @@ qint32 godload_defender(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
                         const QString arg,
                         CharacterPtr invoker)
 {
-  QString arg1, arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4071,7 +4071,7 @@ qint32 godload_armbands(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
   }
   addTimer(ch, SPELL_TELEPORT, 24);
   ch->sendln("Your armbands crackle, and you phase out of existence.");
-  act("$n phases out of existence.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n phases out of existence.", ch, 0, 0, 0);
   return spell_teleport(50, ch, ch, 0, 100);
 }
 
@@ -4100,7 +4100,7 @@ qint32 godload_gaze(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
 qint32 godload_wailka(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                       CharacterPtr invoker)
 {
-  QString arg1, arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4316,7 +4316,7 @@ qint32 godload_hammer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
     ch->sendln("The hammer glows, but nothing happens.");
     return ReturnValue::eSUCCESS;
   }
-  act("$n smashes $s hammer into the ground causing a tectonic blast.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n smashes $s hammer into the ground causing a tectonic blast.", ch, 0, 0, 0);
   ch->sendln("You smash your hammer into the ground, causing it to shake violently.");
   addTimer(ch, SPELL_EARTHQUAKE, 24);
   qint32 retval = spell_earthquake(50, ch, ch, 0, 100);
@@ -4338,8 +4338,8 @@ qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
     return ReturnValue::eFAILURE;
   REMOVE_BIT(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
   REMOVE_BIT(DC::getInstance()->world[29265].dir_option[2]->exit_info, EX_CLOSED);
-  act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_ROOM, 0);
-  act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_CHAR, 0);
+  act_to_room("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, 0);
+  act_to_character("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, 0);
   CharacterPtr a, b, c;
   b = ch->getDC()->initiate_oproc(nullptr, obj);
   for (a = DC::getInstance()->world[ch->in_room].people; a; a = c)
@@ -4357,7 +4357,7 @@ qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
 qint32 godload_phyraz(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
-  QString arg1, arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2;
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))
     return ReturnValue::eFAILURE;
   arg = one_argument(arg, arg1);
@@ -4399,7 +4399,7 @@ void destroy_spellcraft_glyphs(CharacterPtr ch)
 
 qint32 spellcraft_glyphs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argi, CharacterPtr invoker)
 {
-  QString target, arg[MAX_STRING_LENGTH];
+  QString target, arg;
   ObjectPtr sunglyph, *bookglyph, heartglyph;
 
   if (cmd != cmd_t::PUT)
@@ -4551,15 +4551,15 @@ qint32 godload_grathelok(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   switch (number(0, 1))
   {
   case 0:
-    act("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
-    act("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, TO_CHAR, 0);
-    act("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_victim("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, 0);
+    act_to_character("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, 0);
+    act_to_room("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, NOTVICT);
     make_leg(vict);
     break;
   case 1:
-    act("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, TO_VICT, 0);
-    act("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, TO_CHAR, 0);
-    act("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_victim("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, 0);
+    act_to_character("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, 0);
+    act_to_room("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, NOTVICT);
     make_arm(vict);
     break;
   }
@@ -4582,15 +4582,15 @@ qint32 goldenbatleth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   switch (number(0, 1))
   {
   case 0:
-    act("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
-    act("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, TO_CHAR, 0);
-    act("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_victim("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, 0);
+    act_to_character("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, 0);
+    act_to_room("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, NOTVICT);
     make_leg(vict);
     break;
   case 1:
-    act("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, TO_VICT, 0);
-    act("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, TO_CHAR, 0);
-    act("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_victim("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, 0);
+    act_to_character("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, 0);
+    act_to_room("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, NOTVICT);
     make_arm(vict);
     break;
   }
@@ -4646,7 +4646,7 @@ qint32 godload_jaelgreth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
 
   if (GET_POS(victim) == position_t::DEAD)
   {
-    act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n is DEAD!!", victim, 0, 0, INVIS_NULL);
     group_gain(ch, victim);
     if (victim->isPlayer())
       victim->sendln("You have been KILLED!!\r\n");
@@ -4699,7 +4699,7 @@ qint32 godload_foecrusher(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStri
 
   if (GET_POS(victim) == position_t::DEAD)
   {
-    act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n is DEAD!!", victim, 0, 0, INVIS_NULL);
     group_gain(ch, victim);
     if (victim->isPlayer())
       victim->sendln("You have been KILLED!!\r\n");

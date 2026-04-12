@@ -42,11 +42,11 @@ void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, qint32 price, Objec
   eq_remove_damage(obj);
   dc_sprintf(buf, "It will cost you %d coins to repair %s.", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
-  act("You watch $N fix $p...", ch, obj, owner, TO_CHAR, 0);
-  act("You watch $N fix $p...", ch, obj, owner, TO_ROOM, 0);
+  act_to_character("You watch $N fix $p...", ch, obj, owner, 0);
+  act_to_room("You watch $N fix $p...", ch, obj, owner, 0);
   do_say(owner, "All fixed!");
-  act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-  act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act_to_character("$N gives you $p.", ch, obj, owner, 0);
+  act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
 }
 
 void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
@@ -56,8 +56,8 @@ void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, qint32 pr
   do_say(owner, "Trying to sucker me for a free repair job?");
   dc_sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
-  act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-  act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act_to_character("$N gives you $p.", ch, obj, owner, 0);
+  act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
 }
 
 void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, qint32 price, ObjectPtr obj)
@@ -66,8 +66,8 @@ void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, qint32 price, 
 
   dc_sprintf(buf, "It will only cost you %d coins to repair %s.'", price, qPrintable(obj->short_description()));
   do_say(owner, buf);
-  act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-  act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act_to_character("$N gives you $p.", ch, obj, owner, 0);
+  act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
 }
 
 qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
@@ -101,16 +101,16 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
     return ReturnValue::eSUCCESS;
   }
 
-  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
-  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act_to_character("You give $N $p.", ch, obj, owner, 0);
+  act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL);
+  act_to_character("\r\n$N examines $p...", ch, obj, owner, 0);
+  act_to_room("\r\n$N examines $p...", ch, obj, owner, INVIS_NULL);
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     do_say(owner, "I can't repair this.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -119,8 +119,8 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
   if (eqdam <= 0)
   {
     do_say(owner, "Looks fine to me.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -185,18 +185,18 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
     return ReturnValue::eSUCCESS;
   }
 
-  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
-  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act_to_character("You give $N $p.", ch, obj, owner, 0);
+  act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL);
+  act_to_character("\r\n$N examines $p...", ch, obj, owner, 0);
+  act_to_room("\r\n$N examines $p...", ch, obj, owner, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 
   if (eqdam <= 0)
   {
     do_say(owner, "Looks fine to me.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -220,8 +220,8 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
   {
     // Dunno how to repair non-weapons/armor
     do_say(owner, "I can't repair this.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -286,18 +286,18 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
     return ReturnValue::eSUCCESS;
   }
 
-  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
-  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act_to_character("You give $N $p.", ch, obj, owner, 0);
+  act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL);
+  act_to_character("\r\n$N examines $p...", ch, obj, owner, 0);
+  act_to_room("\r\n$N examines $p...", ch, obj, owner, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 
   if (eqdam <= 0)
   {
     do_say(owner, "Looks fine to me.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -326,8 +326,8 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   {
     // Dunno how to repair non-weapons/armor
     do_say(owner, "I can't repair this.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -680,7 +680,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
 
     for (qint32 z = {}; z < 13 && platsmith_list[o].sales[z] != 0; z++)
     {
-      auto tmp = gl_item((ObjectPtr)DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+      auto tmp = gl_item(DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
       ch->send(tmp);
     }
     return ReturnValue::eSUCCESS;
@@ -696,7 +696,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     for (o = {}; platsmith_list[o].vnum != 0; o++)
       if (mobvnum == platsmith_list[o].vnum)
         break;
-    QString buf, arg2[MAX_INPUT_LENGTH];
+    QString buf, arg2;
     one_argument(arg, arg2);
     if (platsmith_list[o].vnum == 0)
     {
@@ -813,18 +813,18 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
     return ReturnValue::eSUCCESS;
   }
 
-  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
-  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act_to_character("You give $N $p.", ch, obj, owner, 0);
+  act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL);
+  act_to_character("\r\n$N examines $p...", ch, obj, owner, 0);
+  act_to_room("\r\n$N examines $p...", ch, obj, owner, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 
   if (eqdam <= 0)
   {
     do_say(owner, "Looks fine to me.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -835,8 +835,8 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
   if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     do_say(owner, "I don't repair this kind of junk.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
   if (obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_LIGHT)
@@ -858,8 +858,8 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
   {
     // Dunno how to repair non-weapons/armor
     do_say(owner, "I can't repair this.");
-    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
-    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    act_to_character("$N gives you $p.", ch, obj, owner, 0);
+    act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 

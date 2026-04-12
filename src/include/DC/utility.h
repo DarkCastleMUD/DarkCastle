@@ -19,16 +19,3 @@
 /* $Id: utility.h,v 1.100 2014/07/27 00:20:02 jhhudso Exp $ */
 
 #pragma once
-#include <QString>
-
-template <typename T, typename U, typename... Args>
-void dc_sprintf(T &buffer, U cformat, Args... args)
-{
-  buffer = QString::asprintf(cformat, args...);
-}
-
-template <typename T, typename U, typename... Args>
-void dc_snprintf(T &buffer, int, U cformat, Args... args)
-{
-  buffer = QString::asprintf(cformat, args...);
-}

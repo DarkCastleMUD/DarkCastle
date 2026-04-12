@@ -1156,35 +1156,35 @@ void Leaderboard::write_file(QString filename)
     return;
   }
   for (i = {}; i < 5; i++)
-    qfprintf(fl, "%s~ %d\n", hpactivename[i], hpactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", hpactivename[i], hpactive[i]);
   for (i = {}; i < 5; i++)
-    qfprintf(fl, "%s~ %d\n", mnactivename[i], mnactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", mnactivename[i], mnactive[i]);
   for (i = {}; i < 5; i++)
-    qfprintf(fl, "%s~ %d\n", kiactivename[i], kiactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", kiactivename[i], kiactive[i]);
   for (i = {}; i < 5; i++)
-    qfprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
   for (i = {}; i < 5; i++)
-    qfprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
   for (i = {}; i < 5; i++)
-    qfprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
   for (i = {}; i < 5; i++)
-    qfprintf(fl, "%s~ %d\n", mvactivename[i], mvactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", mvactivename[i], mvactive[i]);
   for (j = {}; j < CLASS_MAX - 2; j++)
   {
     for (i = {}; i < 5; i++)
-      qfprintf(fl, "%s~ %d\n", hpactiveclassname[j][i], hpactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", hpactiveclassname[j][i], hpactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      qfprintf(fl, "%s~ %d\n", mnactiveclassname[j][i], mnactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", mnactiveclassname[j][i], mnactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      qfprintf(fl, "%s~ %d\n", kiactiveclassname[j][i], kiactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", kiactiveclassname[j][i], kiactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      qfprintf(fl, "%s~ %d\n", pkactiveclassname[j][i], pkactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", pkactiveclassname[j][i], pkactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      qfprintf(fl, "%s~ %d\n", pdactiveclassname[j][i], pdactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", pdactiveclassname[j][i], pdactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      qfprintf(fl, "%s~ %d\n", rdactiveclassname[j][i], rdactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", rdactiveclassname[j][i], rdactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      qfprintf(fl, "%s~ %d\n", mvactiveclassname[j][i], mvactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", mvactiveclassname[j][i], mvactiveclass[j][i]);
   }
   fclose(fl);
 }
@@ -1204,7 +1204,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   class Connection *d;
   FILE *fl;
-  QString buf, buf2[MAX_STRING_LENGTH];
+  QString buf, buf2;
   qint32 i, j, k, validclass = {};
   QStringList hponlinename, mnonlinename, kionlinename, pkonlinename, pdonlinename, rdonlinename, mvonlinename;
   qint32 hponline[] = {0, 0, 0, 0, 0}, mnonline[] = {0, 0, 0, 0, 0},
@@ -1536,8 +1536,8 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
   dc_sprintf(buf, "(*)**************************************************************************(*)\r\n");
-  strcat(buf,
-         "(*)                          $BDark Castle Leaderboard$R                         (*)\r\n");
+  dc_strcat(buf,
+            "(*)                          $BDark Castle Leaderboard$R                         (*)\r\n");
   if (validclass)
   {
     k != 2 ? dc_sprintf(buf2,
@@ -1545,22 +1545,22 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
                         clss_types[k])
            : dc_sprintf(buf2,
                         "(*)                             $Bfor      thieves$R                             (*)\r\n");
-    strcat(buf, buf2);
+    dc_strcat(buf, buf2);
   }
-  strcat(buf,
-         "(*)--------------------------------------------------------------------------(*)\r\n");
-  strcat(buf,
-         "(*)                                                                          (*)\r\n");
-  strcat(buf,
-         "(*)    Online         All Time                Online        All Time         (*)\r\n");
-  strcat(buf,
-         "(*)                                                                          (*)\r\n");
-  strcat(buf,
-         "(*)            $2$BHit Points                               Mana$R                 (*)\r\n");
+  dc_strcat(buf,
+            "(*)--------------------------------------------------------------------------(*)\r\n");
+  dc_strcat(buf,
+            "(*)                                                                          (*)\r\n");
+  dc_strcat(buf,
+            "(*)    Online         All Time                Online        All Time         (*)\r\n");
+  dc_strcat(buf,
+            "(*)                                                                          (*)\r\n");
+  dc_strcat(buf,
+            "(*)            $2$BHit Points                               Mana$R                 (*)\r\n");
   dc_sprintf(buf2,
              "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
              hponlinename[0], hpactivename[0], mnonlinename[0], mnactivename[0]);
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
     if (hponline[i] != hponline[i - 1])
@@ -1596,7 +1596,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
                placea, hponlinename[i], placeb, hpactivename[i],
                hpactive[0] - hpactive[i], placec, mnonlinename[i], placed,
                mnactivename[i], mnactive[0] - mnactive[i]);
-    strcat(buf, buf2);
+    dc_strcat(buf, buf2);
   }
   placea = 1;
   placeb = 1;
@@ -1606,14 +1606,14 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
   skippedb = {};
   skippedc = {};
   skippedd = {};
-  strcat(buf,
-         "(*)                                                                          (*)\r\n");
-  strcat(buf,
-         "(*)                $2$BKi                                Movement        $R        (*)\r\n");
+  dc_strcat(buf,
+            "(*)                                                                          (*)\r\n");
+  dc_strcat(buf,
+            "(*)                $2$BKi                                Movement        $R        (*)\r\n");
   dc_sprintf(buf2,
              "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
              kionlinename[0], kiactivename[0], mvonlinename[0], mvactivename[0]);
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
     if (kionline[i] != kionline[i - 1])
@@ -1649,7 +1649,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
                placea, kionlinename[i], placeb, kiactivename[i],
                kiactive[0] - kiactive[i], placec, mvonlinename[i], placed,
                mvactivename[i], mvactive[0] - mvactive[i]);
-    strcat(buf, buf2);
+    dc_strcat(buf, buf2);
   }
   placea = 1;
   placeb = 1;
@@ -1659,14 +1659,14 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
   skippedb = {};
   skippedc = {};
   skippedd = {};
-  strcat(buf,
-         "(*)                                                                          (*)\r\n");
-  strcat(buf,
-         "(*)         $2$BPlayer Kill Score                   Player Death Score       $R    (*)\r\n");
+  dc_strcat(buf,
+            "(*)                                                                          (*)\r\n");
+  dc_strcat(buf,
+            "(*)         $2$BPlayer Kill Score                   Player Death Score       $R    (*)\r\n");
   dc_sprintf(buf2,
              "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
              pkonlinename[0], pkactivename[0], pdonlinename[0], pdactivename[0]);
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
     if (pkonline[i] != pkonline[i - 1])
@@ -1702,7 +1702,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
                placea, pkonlinename[i], placeb, pkactivename[i],
                pkactive[0] - pkactive[i], placec, pdonlinename[i], placed,
                pdactivename[i], pdactive[0] - pdactive[i]);
-    strcat(buf, buf2);
+    dc_strcat(buf, buf2);
   }
   // FROM HERE
   placea = 1;
@@ -1713,14 +1713,14 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
   skippedb = {};
   skippedc = {};
   skippedd = {};
-  strcat(buf,
-         "(*)                                                                          (*)\r\n");
-  strcat(buf,
-         "(*)        $2$BReal Deaths (Level 60)                                      $R      (*)\r\n");
+  dc_strcat(buf,
+            "(*)                                                                          (*)\r\n");
+  dc_strcat(buf,
+            "(*)        $2$BReal Deaths (Level 60)                                      $R      (*)\r\n");
   dc_sprintf(buf2,
              "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                           (*)\r\n",
              rdonlinename[0], rdactivename[0]);
-  strcat(buf, buf2);
+  dc_strcat(buf, buf2);
   for (i = 1; i < 5; i++)
   {
     if (rdonline[i] != rdonline[i - 1])
@@ -1751,16 +1751,16 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
                "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                      (*)\r\n",
                placea, rdonlinename[i], placeb, rdactivename[i],
                rdactive[0] - rdactive[i]);
-    strcat(buf, buf2);
+    dc_strcat(buf, buf2);
   }
 
   // TO HERE
-  strcat(buf,
-         "(*)                                                                          (*)\r\n");
-  strcat(buf,
-         "(*)--------------------------------------------------------------------------(*)\r\n");
-  strcat(buf,
-         "(*)**************************************************************************(*)\r\n");
+  dc_strcat(buf,
+            "(*)                                                                          (*)\r\n");
+  dc_strcat(buf,
+            "(*)--------------------------------------------------------------------------(*)\r\n");
+  dc_strcat(buf,
+            "(*)**************************************************************************(*)\r\n");
   page_string(ch->desc, buf, 1);
   for (i = {}; i < 5; i++)
   {
@@ -1885,7 +1885,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 
     for (auto i = {}; i < lines; i++)
     {
-      qfprintf(fl, "%s~ %d\n", qPrintable(name[i]), value[i]);
+      dc_fprintf(fl, "%s~ %d\n", qPrintable(name[i]), value[i]);
     }
 
     fclose(fl);

@@ -176,7 +176,7 @@ qint32 innate_powerwield(CharacterPtr ch, QString arg, cmd_t cmd)
   af.bitvector = AFF_POWERWIELD;
   affect_to_char(ch, &af);
   ch->sendln("You gather your energy in an effort to wield two mighty weapons.");
-  act("$n gathers his strength in order to wield two mighty weapons.", ch, nullptr, nullptr, TO_ROOM, 0);
+  act_to_room("$n gathers his strength in order to wield two mighty weapons.", ch, nullptr, nullptr, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -219,7 +219,7 @@ qint32 innate_illusion(CharacterPtr ch, QString arg, cmd_t cmd)
   af.bitvector = AFF_INVISIBLE;
   affect_to_char(ch, &af);
   ch->sendln("You use your race's innate illusion powers, and fade out of existence.");
-  act("$n chants something incoherent and fades out of existence.", ch, nullptr, nullptr, TO_ROOM, 0);
+  act_to_room("$n chants something incoherent and fades out of existence.", ch, nullptr, nullptr, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -232,7 +232,7 @@ qint32 innate_bloodlust(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
   ch->sendln("Your blood boils as you drive yourself into a war-like state.");
-  act("$n's blood boils has $e drives $mself into warlike rage.", ch, nullptr, nullptr, TO_ROOM, 0);
+  act_to_room("$n's blood boils has $e drives $mself into warlike rage.", ch, nullptr, nullptr, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -265,7 +265,7 @@ qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
       if (number(1, 101) < chance)
       {
         ch->sendln("You failed to repair it!");
-        act("$n fails to repair $p.", ch, obj, obj, TO_ROOM, 0);
+        act_to_room("$n fails to repair $p.", ch, obj, obj, 0);
         return ReturnValue::eSUCCESS;
       }
       found = true;
@@ -278,8 +278,8 @@ qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   if (found)
   {
-    act("Your knowledge of weapons and armour allow you to quickly repair $p.", ch, obj, obj, TO_CHAR, 0);
-    act("$n quickly repairs their $p.", ch, obj, obj, TO_ROOM, 0);
+    act_to_character("Your knowledge of weapons and armour allow you to quickly repair $p.", ch, obj, obj, 0);
+    act_to_room("$n quickly repairs their $p.", ch, obj, obj, 0);
     return ReturnValue::eSUCCESS;
   }
   else
@@ -321,7 +321,7 @@ qint32 innate_fly(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     affect_from_char(ch, SKILL_INNATE_FLY);
     ch->sendln("You fold your wings smoothly behind you and settle gently to the ground.");
-    act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, nullptr, nullptr, TO_ROOM, 0);
+    act_to_room("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, nullptr, nullptr, 0);
   }
   else
   {
@@ -339,7 +339,7 @@ qint32 innate_fly(CharacterPtr ch, QString arg, cmd_t cmd)
     af.bitvector = AFF_FLYING;
     affect_to_char(ch, &af);
     ch->sendln("You spread your delicate wings and lift lightly into the air.");
-    act("$n spreads $s delicate wings and lifts lightly into the air.", ch, nullptr, nullptr, TO_ROOM, 0);
+    act_to_room("$n spreads $s delicate wings and lifts lightly into the air.", ch, nullptr, nullptr, 0);
   }
 
   return ReturnValue::eSUCCESS;

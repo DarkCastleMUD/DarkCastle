@@ -269,7 +269,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
       "manameta", "movemeta", "armor", "profession", "\n"};
   CharacterPtr vict;
-  QString name, buf2[100], buf[100], help[MAX_STRING_LENGTH];
+  QString name, buf2[100], buf[100], help;
   qint32 skill, value, i, x;
 
   if (ch->isNonPlayer())
@@ -286,14 +286,14 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     ch->sendln("Usage:\r\nset <name> <field> <value>");
 
-    strcpy(help, "\r\nField being one of the following:\r\n");
+    dc_strcpy(help, "\r\nField being one of the following:\r\n");
     ch->display_string_list(values);
     /*        for (i = 1; *values[i] != '\n'; i++)
             {
                 dc_sprintf(help + strlen(help), "%18s", values[i]);
                 if (!(i % 4))
                 {
-                    strcat(help, "\r\n");
+                    dc_strcat(help, "\r\n");
                     ch->send(help);
                     *help = '\0';
                 }

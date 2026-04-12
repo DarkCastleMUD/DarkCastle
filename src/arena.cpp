@@ -129,7 +129,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   ch->fillHP();
   GET_KI(ch) = GET_MAX_KI(ch);
 
-  act("$n disappears in a glorious flash of heroism.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n disappears in a glorious flash of heroism.", ch, 0, 0, 0);
   while (send_to == DC::NOWHERE)
   {
     if (arena.isPotato())
@@ -143,7 +143,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   }
   if (move_char(ch, send_to) == 0)
     return ReturnValue::eFAILURE;
-  act("$n appears, preparing for battle.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n appears, preparing for battle.", ch, 0, 0, 0);
   dc_sprintf(buf, "## %s has joined the bloodbath!\r\n", qPrintable(ch->shortdesc_or_name()));
   send_info(buf);
   do_look(ch, "");

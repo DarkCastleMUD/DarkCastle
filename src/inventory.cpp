@@ -137,20 +137,20 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
     move_obj(obj_object, ch);
     if (sub_object->carried_by == ch)
     {
-      act("You get $p from $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-      act("$n gets $p from $s $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+      act_to_character("You get $p from $P.", ch, obj_object, sub_object, 0);
+      act_to_room("$n gets $p from $s $P.", ch, obj_object, sub_object, INVIS_NULL);
     }
     else
     {
-      act("You get $p from $P.", ch, obj_object, sub_object, TO_CHAR, INVIS_NULL);
-      act("$n gets $p from $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+      act_to_character("You get $p from $P.", ch, obj_object, sub_object, INVIS_NULL);
+      act_to_room("$n gets $p from $P.", ch, obj_object, sub_object, INVIS_NULL);
     }
   }
   else
   {
     move_obj(obj_object, ch);
-    act("You get $p.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You get $p.", ch, obj_object, 0, 0);
+    act_to_room("$n gets $p.", ch, obj_object, 0, INVIS_NULL);
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
       logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(qPrintable(ch->name())).arg(obj_object->name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(ch->in_room));
@@ -283,7 +283,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     if ((str_cmp(arg1, "all") != 0) &&
         (sscanf(arg1, "all.%s", allbuf) != 0))
     {
-      strcpy(arg1, "all");
+      dc_strcpy(arg1, "all");
       alldot = true;
     }
     if (!str_cmp(arg1, "all"))
@@ -302,7 +302,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     if ((str_cmp(arg1, "all") != 0) &&
         (sscanf(arg1, "all.%s", allbuf) != 0))
     {
-      strcpy(arg1, "all");
+      dc_strcpy(arg1, "all");
       alldot = true;
     }
     if (!str_cmp(arg1, "all"))
@@ -1099,7 +1099,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
     if (amount == 0)
       return ReturnValue::eSUCCESS;
 
-    act("$n drops some gold.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n drops some gold.", ch, 0, 0, 0);
     tmp_object = create_money(amount);
     obj_to_room(tmp_object, ch->in_room);
     ch->removeGold(amount);
@@ -1164,7 +1164,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
                                       DC::getInstance()->obj_index[loop_obj->item_number].vnum());
           }
 
-          act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
+          act_to_room("$n drops $p.", ch, tmp_object, 0, INVIS_NULL);
           move_obj(tmp_object, ch->in_room);
           test = true;
           if (blindlag)
@@ -1184,7 +1184,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!test)
         ch->sendln("You do not seem to have anything.");
 
-    } /* if strcmp "all" */
+    } /* if dc_strcmp "all" */
 
     else
     {
@@ -1219,7 +1219,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           if (isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
           ch->sendln(QStringLiteral("You drop the %1.").arg(tmp_object->short_description));
-          act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
+          act_to_room("$n drops $p.", ch, tmp_object, 0, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             QString log_buf = {};
@@ -1449,8 +1449,8 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
 
                 if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING)
                 {
-                  act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
-                  act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
+                  act_to_room("$n attaches $p to $P.", ch, obj_object, sub_object, INVIS_NULL);
+                  act_to_character("You attach $p to $P.", ch, obj_object, sub_object, 0);
                   DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
                                           qPrintable(ch->name()),
                                           obj_object->short_description,
@@ -1460,8 +1460,8 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
                 }
                 else
                 {
-                  act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
-                  act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
+                  act_to_room("$n puts $p in $P.", ch, obj_object, sub_object, INVIS_NULL);
+                  act_to_character("You put $p in $P.", ch, obj_object, sub_object, 0);
                   DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
                                           qPrintable(ch->name()),
                                           obj_object->short_description,
@@ -1615,8 +1615,8 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     */
     sendln(QStringLiteral("You give %1 coin%2 to %3.").arg(amount).arg(amount == 1 ? "" : "s").arg(qPrintable(vict->shortdesc_or_name())));
     logobjects(QStringLiteral("%1 gives %2 coin%3 to %4").arg(qPrintable(this->name())).arg(amount).arg(pluralize(amount)).arg(qPrintable(vict->name())));
-    act(QStringLiteral("%1 gives you %2 $B$5gold$R coin%3.").arg(PERS(this, vict)).arg(amount).arg(amount == 1 ? "" : "s"), this, 0, vict, TO_VICT, INVIS_NULL);
-    act("$n gives some gold to $N.", this, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
+    act_to_victim(QStringLiteral("%1 gives you %2 $B$5gold$R coin%3.").arg(PERS(this, vict)).arg(amount).arg(amount == 1 ? "" : "s"), this, 0, vict, INVIS_NULL);
+    act_to_room("$n gives some gold to $N.", this, 0, vict, INVIS_NULL | NOTVICT);
 
     removeGold(amount);
 
@@ -1772,7 +1772,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   if (vict->isNonPlayer() && (DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == QUEST_MASTER))
   {
-    act("$N graciously refuses your gift.", this, 0, vict, TO_CHAR, 0);
+    act_to_character("$N graciously refuses your gift.", this, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
   if (vict->isNonPlayer() && IS_AFFECTED(vict, AFF_CHARM) && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
@@ -1792,7 +1792,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   {
     if (isImmortalPlayer())
     {
-      act("$N seems to have $S hands full but you give it to $M anyways.", this, 0, vict, TO_CHAR, 0);
+      act_to_character("$N seems to have $S hands full but you give it to $M anyways.", this, 0, vict, 0);
     }
     else
     {
@@ -1804,7 +1804,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
           !vict->room().isArena() ||
           !arena.isPotato())
       {
-        act("$N seems to have $S hands full.", this, 0, vict, TO_CHAR, 0);
+        act_to_character("$N seems to have $S hands full.", this, 0, vict, 0);
         return ReturnValue::eFAILURE;
       }
     }
@@ -1815,7 +1815,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   {
     if (isImmortalPlayer())
     {
-      act("$E can't carry that much weight but you give it to $M anyways.", this, 0, vict, TO_CHAR, 0);
+      act_to_character("$E can't carry that much weight but you give it to $M anyways.", this, 0, vict, 0);
     }
     else
     {
@@ -1827,7 +1827,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
           !vict->room().isArena() ||
           !arena.isPotato())
       {
-        act("$E can't carry that much weight.", this, 0, vict, TO_CHAR, 0);
+        act_to_character("$E can't carry that much weight.", this, 0, vict, 0);
         return ReturnValue::eFAILURE;
       }
     }
@@ -1850,9 +1850,9 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   }
 
   move_obj(obj, vict);
-  act("$n gives $p to $N.", this, obj, vict, TO_ROOM, INVIS_NULL | NOTVICT);
-  act("$n gives you $p.", this, obj, vict, TO_VICT, 0);
-  act("You give $p to $N.", this, obj, vict, TO_CHAR, 0);
+  act_to_room("$n gives $p to $N.", this, obj, vict, INVIS_NULL | NOTVICT);
+  act_to_victim("$n gives you $p.", this, obj, vict, 0);
+  act_to_character("You give $p to $N.", this, obj, vict, 0);
 
   logobjects(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(this->name())).arg(obj->name()).arg(qPrintable(vict->name())));
   for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -2203,22 +2203,22 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
       {
         if (EXIT(ch, door)->keyword)
         {
-          act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+          act_to_room("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, 0);
           ch->send(QStringLiteral("You reveal a hidden %s!\r\n").arg(qPrintable(fname(EXIT(ch).arg(door)->keyword))));
         }
         else
         {
-          act("$n reveals a hidden door!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+          act_to_room("$n reveals a hidden door!", ch, 0, EXIT(ch, door)->keyword, 0);
           ch->sendln("You reveal a hidden door!");
         }
       }
       else
       {
         if (EXIT(ch, door)->keyword)
-          act("$n opens the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+          act_to_room("$n opens the $F.", ch, 0, EXIT(ch, door)->keyword, 0);
         else
         {
-          act("$n opens the door.", ch, 0, 0, TO_ROOM, 0);
+          act_to_room("$n opens the door.", ch, 0, 0, 0);
         }
         ch->sendln("Ok.");
       }
@@ -2283,7 +2283,7 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
     {
       REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
       ch->sendln("Ok.");
-      act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
+      act_to_room("$n opens $p.", ch, obj, 0, 0);
     }
   }
 
@@ -2302,7 +2302,7 @@ command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool found = false;
   qint32 door, other_room;
-  QString type, dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+  QString type, dir, buf;
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -2327,9 +2327,9 @@ command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       SET_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
       if (EXIT(ch, door)->keyword)
-        act("$n closes the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+        act_to_room("$n closes the $F.", ch, 0, EXIT(ch, door)->keyword, 0);
       else
-        act("$n closes the door.", ch, 0, 0, TO_ROOM, 0);
+        act_to_room("$n closes the door.", ch, 0, 0, 0);
       ch->sendln("Ok.");
       /* now for closing the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
@@ -2362,7 +2362,7 @@ command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
       ch->sendln("Ok.");
-      act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
+      act_to_room("$n closes $p.", ch, obj, 0, 0);
     }
   }
 
@@ -2410,7 +2410,7 @@ bool has_key(CharacterPtr ch, qint32 key)
 command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
-  QString type, dir[MAX_INPUT_LENGTH];
+  QString type, dir;
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -2440,7 +2440,7 @@ command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       SET_BIT(obj->obj_flags.value[1], CONT_LOCKED);
       ch->sendln("*Cluck*");
-      act("$n locks $p - 'cluck', it says.", ch, obj, 0, TO_ROOM, 0);
+      act_to_room("$n locks $p - 'cluck', it says.", ch, obj, 0, 0);
     }
   }
   else if ((door = find_door(ch, type, dir)) >= 0)
@@ -2466,7 +2466,7 @@ command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
         act("$n locks the $F.", ch, 0, EXIT(ch, door)->keyword,
             TO_ROOM, 0);
       else
-        act("$n locks the door.", ch, 0, 0, TO_ROOM, 0);
+        act_to_room("$n locks the door.", ch, 0, 0, 0);
       ch->sendln("*Click*");
       /* now for locking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
@@ -2483,7 +2483,7 @@ command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
-  QString type, dir[MAX_INPUT_LENGTH];
+  QString type, dir;
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -2514,7 +2514,7 @@ command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
       ch->sendln("*Click*");
-      act("$n unlocks $p.", ch, obj, 0, TO_ROOM, 0);
+      act_to_room("$n unlocks $p.", ch, obj, 0, 0);
     }
   }
   else if ((door = find_door(ch, type, dir)) >= 0)
@@ -2537,9 +2537,9 @@ command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)
-        act("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+        act_to_room("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword, 0);
       else
-        act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
+        act_to_room("$n unlocks the door.", ch, 0, 0, 0);
       ch->sendln("*click*");
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
@@ -2688,12 +2688,12 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
   }
   else
   {
-    act("You clumsily take $p...", ch, obj_object, 0, TO_CHAR, 0);
+    act_to_character("You clumsily take $p...", ch, obj_object, 0, 0);
     if (sub_object)
       act("$n gets $p from $P.", ch, obj_object, sub_object,
           TO_ROOM, INVIS_NULL);
     else
-      act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+      act_to_room("$n gets $p.", ch, obj_object, 0, INVIS_NULL);
   }
   if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
       (obj_object->obj_flags.value[0] >= 1))

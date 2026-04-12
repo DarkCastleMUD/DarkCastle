@@ -139,10 +139,10 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
 //   if(ch->isNonPlayer() || IS_AFFECTED(ch, AFF_FLYING) || ch->isImmortalPlayer() || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
 //     ; //poop on a stick!
 //   } else if(GET_DEX(ch) > chance) {
-//      act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
+//      act_to_character("You barely avoid slipping in the mud.", ch, 0, 0,  0);
 //   } else {
-//      act("$n slips on the muddy terrain and goes down.", ch, 0, 0, TO_ROOM, 0);
-//      act("Your feet slide out from underneath you in the mud.", ch, 0, 0, TO_CHAR, 0);
+//      act_to_room("$n slips on the muddy terrain and goes down.", ch, 0, 0,  0);
+//      act_to_character("Your feet slide out from underneath you in the mud.", ch, 0, 0,  0);
 //      ch->setSitting();
 //   }
 //}
@@ -163,12 +163,12 @@ command_return_t do_unstable(CharacterPtr ch)
 
   if (GET_DEX(ch) > chance)
   {
-    act("You dextrously maintain your footing.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You dextrously maintain your footing.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  act("$n looses his footing on the unstable ground.", ch, 0, 0, TO_ROOM, 0);
-  act("You fall flat on your ass.", ch, 0, 0, TO_CHAR, 0);
+  act_to_room("$n looses his footing on the unstable ground.", ch, 0, 0, 0);
+  act_to_character("You fall flat on your ass.", ch, 0, 0, 0);
   ch->setSitting();
 
   dc_sprintf(death_log, "%s slipped to death in room %d.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number);
@@ -213,7 +213,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   // Don't effect mobs
   if (ch->isNonPlayer())
   {
-    act("$n clings to the terrain around $m and avoids falling.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n clings to the terrain around $m and avoids falling.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -256,27 +256,27 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   switch (dir)
   {
   case 0:
-    act("$n rolls out to the north.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n rolls out to the north.", ch, 0, 0, 0);
     ch->sendln("You tumble to the north...");
     break;
   case 1:
-    act("$n rolls out to the east.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n rolls out to the east.", ch, 0, 0, 0);
     ch->sendln("You tumble to the east...");
     break;
   case 2:
-    act("$n rolls out to the south.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n rolls out to the south.", ch, 0, 0, 0);
     ch->sendln("You tumble to the south...");
     break;
   case 3:
-    act("$n rolls out to the west.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n rolls out to the west.", ch, 0, 0, 0);
     ch->sendln("You tumble to the west...");
     break;
   case 4:
-    act("$n is launched upwards.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n is launched upwards.", ch, 0, 0, 0);
     ch->sendln("You are launched into the air...");
     break;
   case 5:
-    act("$n falls through the room.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n falls through the room.", ch, 0, 0, 0);
     ch->sendln("You fall...");
     break;
   default:
@@ -303,7 +303,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
 
   if (!SOMEONE_DIED(retval))
   {
-    act("$n plummets into the room and hits the floor HARD.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n plummets into the room and hits the floor HARD.", ch, 0, 0, 0);
   }
 
   if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)))
@@ -529,7 +529,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
       if (ch->race == RACE_FISH)
       {
         ch->sendln("You can't swim around outside water without being able to fly!");
-        act("$n flops around in a futile attempt to move out of water.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_room("$n flops around in a futile attempt to move out of water.", ch, 0, 0, INVIS_NULL);
         return ReturnValue::eFAILURE;
       }
     }
@@ -652,7 +652,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   if (!IS_AFFECTED(ch, AFF_SNEAK) && !IS_AFFECTED(ch, AFF_FOREST_MELD))
   {
     dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
-    act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(tmp, ch, 0, 0, INVIS_NULL);
   }
   // Sneaking
   else if (IS_AFFECTED(ch, AFF_SNEAK))
@@ -661,13 +661,13 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     if (!skill_success(ch, nullptr, SKILL_SNEAK))
     {
       dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
-      act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+      act_to_room(tmp, ch, 0, 0, INVIS_NULL | STAYHIDE);
     }
     else
     {
       dc_sprintf(tmp, "$n sneaks %s.", dirs[dir]);
-      act(tmp, ch, 0, 0, TO_GROUP, INVIS_NULL);
-      act(tmp, ch, 0, 0, TO_ROOM, GODS);
+      act_to_group(tmp, ch, 0, 0, INVIS_NULL);
+      act_to_room(tmp, ch, 0, 0, GODS);
     }
   }
   // Forest melded
@@ -678,12 +678,12 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
       dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
       REMBIT(ch->affected_by, AFF_FOREST_MELD);
       ch->sendln("You detach yourself from the forest.");
-      act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
+      act_to_room(tmp, ch, 0, 0, INVIS_NULL);
     }
     else
     {
       dc_sprintf(tmp, "$n sneaks %s.", dirs[dir]);
-      act(tmp, ch, 0, 0, TO_ROOM, GODS);
+      act_to_room(tmp, ch, 0, 0, GODS);
     }
   }
 
@@ -756,11 +756,11 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
   if (IS_AFFECTED(ch, AFF_SNEAK) || (IS_AFFECTED(ch, AFF_FOREST_MELD) && (DC::getInstance()->world[ch->in_room].sector_type == SECT_FOREST || DC::getInstance()->world[ch->in_room].sector_type == SECT_SWAMP)))
   {
-    act("$n sneaks into the room.", ch, 0, 0, TO_ROOM, GODS);
-    act("$n sneaks into the room.", ch, 0, 0, TO_GROUP, INVIS_NULL);
+    act_to_room("$n sneaks into the room.", ch, 0, 0, GODS);
+    act_to_group("$n sneaks into the room.", ch, 0, 0, INVIS_NULL);
   }
   else
-    act("$n has arrived.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n has arrived.", ch, 0, 0, INVIS_NULL);
 
   do_look(ch, "\0");
 
@@ -771,25 +771,25 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     // code a bit repeaty, but whatever ;)
     if (a == 88 && DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
     {
-      act("Unable to survive underwater, $n returns to the elemental plane of fire.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("Unable to survive underwater, $n returns to the elemental plane of fire.", ch, 0, 0, 0);
       extract_char(ch, true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
     if (a == 89 && DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
     {
-      act("Unable to survive in the desert, $n returns to the elemental plane of water.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("Unable to survive in the desert, $n returns to the elemental plane of water.", ch, 0, 0, 0);
       extract_char(ch, true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
     if (a == 90 && DC::getInstance()->world[ch->in_room].sector_type == SECT_SWAMP)
     {
-      act("Unable to survive in the swamp, $n returns to the elemental plane of air.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("Unable to survive in the swamp, $n returns to the elemental plane of air.", ch, 0, 0, 0);
       extract_char(ch, true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
     if (a == 91 && DC::getInstance()->world[ch->in_room].sector_type == SECT_AIR)
     {
-      act("Unable to survive in the air, $n returns to the elemental plane of earth.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("Unable to survive in the air, $n returns to the elemental plane of earth.", ch, 0, 0, 0);
       extract_char(ch, true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
@@ -832,13 +832,13 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
       if (GET_CLASS(ch) == CLASS_BARD && ISSET(tmp_ch->mobdata->actflags, ACT_BARDCHARM))
       {
-        act("$N looks at you expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_CHAR, 0);
-        act("$N looks at $n expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
+        act_to_character("$N looks at you expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, 0);
+        act_to_room("$N looks at $n expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, INVIS_NULL);
       }
       else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && ch->getLevel() >= tmp_ch->getLevel() && CAN_SEE(tmp_ch, ch))
       {
-        act("$N moves submissively out of your way.", ch, nullptr, tmp_ch, TO_CHAR, 0);
-        act("$N moves submissively out of $n's way.", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
+        act_to_character("$N moves submissively out of your way.", ch, nullptr, tmp_ch, 0);
+        act_to_room("$N moves submissively out of $n's way.", ch, nullptr, tmp_ch, INVIS_NULL);
       }
     }
 
@@ -924,7 +924,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
   if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master) && (ch->in_room == ch->master->in_room))
   {
     ch->sendln("You are unable to abandon your master.");
-    act("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, 0);
     if (ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_BARD)
     {
       ch->master->sendln("You struggle to maintain control.");
@@ -983,19 +983,19 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
         if (is_retreat && k->follower->fighting && (number(1, 100) < 4) && k->follower->fighting->isNonPlayer())
         {
 
-          act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, nullptr, k->follower, TO_VICT, 0);
-          act("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, nullptr, k->follower, TO_ROOM, NOTVICT);
+          act_to_victim("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, nullptr, k->follower, 0);
+          act_to_room("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, nullptr, k->follower, NOTVICT);
           WAIT_STATE(k->follower, 8);
           continue;
         }
         if (CAN_SEE(k->follower, ch))
           dc_sprintf(tmp, "You follow %s.\r\n\r\n", qPrintable(ch->shortdesc_or_name()));
         else
-          strcpy(tmp, "You follow someone.\r\n\r\n");
+          dc_strcpy(tmp, "You follow someone.\r\n\r\n");
         k->follower->send(tmp);
         // do_move(k->follower, "", cmd + 1);
         QString tempcommand;
-        strcpy(tempcommand, dirs[dir]);
+        dc_strcpy(tempcommand, dirs[dir]);
         if (k->follower->fighting)
           stop_fighting(k->follower);
         k->follower->command_interpreter(tempcommand);
@@ -1047,17 +1047,17 @@ command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
           if (k->getPortalDestinationRoom() == DC::getInstance()->world[ch->in_room].number || k->obj_flags.value[2] == DC::getInstance()->world[ch->in_room].zone)
           {
             ch->sendln("You exit the area.");
-            act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+            act_to_room("$n has left the area.", ch, 0, 0, INVIS_NULL | STAYHIDE);
             retval = move_char(ch, real_room(DC::getInstance()->world[k->in_room].number));
             if (!isSet(retval, ReturnValue::eSUCCESS))
             {
               ch->sendln("You attempt to leave, but the door slams in your face!");
-              act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+              act_to_room("$n attempts to leave, but can't!", ch, 0, 0, INVIS_NULL | STAYHIDE);
               return ReturnValue::eFAILURE;
             }
             do_look(ch, "");
             dc_sprintf(buf, "%s walks out of %s.", qPrintable(ch->name()), k->short_description);
-            act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+            act_to_room(buf, ch, 0, 0, INVIS_NULL | STAYHIDE);
             return ambush(ch);
           }
         }
@@ -1130,7 +1130,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
       if (others_clan_room(sesame, &DC::getInstance()->world[real_room(portal->obj_flags.value[0])]) == true)
       {
         ch->sendln("Your master is not from that clan.");
-        act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
+        act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
         do_say(ch, "I may not enter.");
         return ReturnValue::eFAILURE;
       }
@@ -1145,7 +1145,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   if (isSet(portal->obj_flags.value[3], Object::portal_flags_t::No_Enter))
   {
     ch->sendln("The portal's destination rebels against you.");
-    act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1159,7 +1159,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
   {
     ch->sendln("The portal's destination rebels against you.");
-    act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1173,14 +1173,14 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   {
   case 0:
     ch->sendln("You reach out tentatively and touch the portal...");
-    act("$n reaches out to the glowing dimensional portal....", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n reaches out to the glowing dimensional portal....", ch, 0, 0, 0);
     break;
   case 1:
   case 2:
     dc_sprintf(buf, "You take a bold step towards %s.\r\n", portal->short_description);
     ch->send(buf);
     dc_sprintf(buf, "%s boldly walks toward %s and disappears.", qPrintable(ch->name()), portal->short_description);
-    act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+    act_to_room(buf, ch, 0, 0, INVIS_NULL | STAYHIDE);
     break;
   case 3:
     ch->sendln("You cannot enter that.");
@@ -1199,7 +1199,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!isSet(retval, ReturnValue::eSUCCESS))
   {
     ch->sendln("You recoil in pain as the portal slams shut!");
-    act("$n recoils in pain as the portal slams shut!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n recoils in pain as the portal slams shut!", ch, 0, 0, 0);
   }
 
   switch (portal->obj_flags.value[1])
@@ -1208,12 +1208,12 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     do_look(ch, "");
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     ch->sendln("\r\nYou are momentarily dazed from the dimensional shift.");
-    act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, 0);
     break;
   case 1:
   case 2:
     dc_sprintf(buf, "%s has entered %s.", qPrintable(ch->name()), portal->short_description);
-    act(buf, ch, 0, 0, TO_ROOM, STAYHIDE);
+    act_to_room(buf, ch, 0, 0, STAYHIDE);
     do_look(ch, "");
     break;
   case 3:
@@ -1296,7 +1296,7 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n carefully climbs $p.", ch, obj, 0, INVIS_NULL);
   dc_sprintf(buf, "You carefully climb %s.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
   qint32 retval = move_char(ch, real_room(dest));
@@ -1304,7 +1304,7 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
   if (SOMEONE_DIED(retval))
     return retval;
 
-  act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n carefully climbs $p.", ch, obj, 0, INVIS_NULL);
   do_look(ch, "");
 
   return ReturnValue::eSUCCESS;
@@ -1351,9 +1351,9 @@ qint32 ambush(CharacterPtr ch)
 
       if (skill_success(i, ch, SKILL_AMBUSH))
       {
-        //         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
-        //         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
-        //         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
+        //         act_to_room("$n ambushes $N in a brilliant surprise attack!", i, 0, ch,  NOTVICT);
+        //         act_to_victim("$n ambushes you as you enter the room!", i, 0, ch,  0);
+        //         act_to_character("You ambush $N with a brilliant surprise attack!", i, 0, ch,  0);
         retval = damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH);
         if (isSet(retval, ReturnValue::eVICT_DIED))
           return (ReturnValue::eSUCCESS | ReturnValue::eCH_DIED); // ch = damage vict

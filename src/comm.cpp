@@ -168,7 +168,7 @@ qint32 DC::write_hotboot_file(void)
   }
   // std::for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
   std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const qint32 &fd)
-                { qfprintf(fp, "%d\n", fd); });
+                { dc_fprintf(fp, "%d\n", fd); });
 
   for (auto &d : connections_)
   {
@@ -184,7 +184,7 @@ qint32 DC::write_hotboot_file(void)
       conn->connected = Connection::states::PLAYING; // if editors.
       if (conn->original)
       {
-        qfprintf(fp, "%d\n%s\n%s\n", conn->descriptor, qPrintable(conn->original->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
+        dc_fprintf(fp, "%d\n%s\n%s\n", conn->descriptor, qPrintable(conn->original->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
         if (conn->original->player)
         {
           conn->original->player->last_site = conn->original->desc->getPeerOriginalAddress().toString();
@@ -194,7 +194,7 @@ qint32 DC::write_hotboot_file(void)
       }
       else
       {
-        qfprintf(fp, "%d\n%s\n%s\n", conn->descriptor, qPrintable(conn->character->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
+        dc_fprintf(fp, "%d\n%s\n%s\n", conn->descriptor, qPrintable(conn->character->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
         if (conn->character->player)
         {
           conn->character->player->last_site = conn->character->desc->getPeerOriginalAddress().toString();
@@ -2178,21 +2178,21 @@ qint32 perform_subst(class Connection *t, QString orig, QString subst)
   /* now, we construct the new QString for output. */
 
   /* first, everything in the original, up to the QString to be replaced */
-  strncpy(new_subst, orig, (strpos - orig));
+  dc_strncpy(new_subst, orig, (strpos - orig));
   new_subst[(strpos - orig)] = '\0';
 
   /* now, the replacement QString */
-  strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
+  dc_strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
 
   /* now, if there's anything left in the original after the QString to
    * replaced, copy that too. */
   if (((strpos - orig) + strlen(first)) < strlen(orig))
-    strncat(new_subst, strpos + strlen(first),
-            (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
+    dc_strncat(new_subst, strpos + strlen(first),
+               (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
 
-  /* terminate the QString in case of an overflow from strncat */
-  new_subst[MAX_INPUT_LENGTH - 1] = '\0';
-  strcpy(subst, new_subst);
+  /* terminate the QString in case of an overflow from dc_strncat */
+
+  dc_strcpy(subst, new_subst);
 
   return 0;
 }
@@ -2220,14 +2220,14 @@ qint32 close_socket(class Connection *d)
   }
   if (conn->hashstr)
   {
-    strcpy(idiotbuf, "\r\n~\r\n");
-    strcat(idiotbuf, "\0");
+    dc_strcpy(idiotbuf, "\r\n~\r\n");
+    dc_strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
   if (conn->strnew && (conn->character->isNonPlayer() || !isSet(conn->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
-    strcpy(idiotbuf, "/s\r\n");
-    strcat(idiotbuf, "\0");
+    dc_strcpy(idiotbuf, "/s\r\n");
+    dc_strcat(idiotbuf, "\0");
     new_string_add(d, idiotbuf);
   }
   if (conn->character)
@@ -2244,7 +2244,7 @@ qint32 close_socket(class Connection *d)
       if (IS_SINGING(conn->character))
         do_sing(conn->character, QStringLiteral("stop"));
 
-      act("$n has lost $s link.", conn->character, 0, 0, TO_ROOM, 0);
+      act_to_room("$n has lost $s link.", conn->character, 0, 0, 0);
 
       if (IS_AFFECTED(conn->character, AFF_CANTQUIT))
       {
@@ -2867,14 +2867,14 @@ command_return_t do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (*arg1)
   {
-    if (!strcmp(arg1, "web"))
+    if (!dc_strcmp(arg1, "web"))
     {
       SET_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
       ch->sendln("Changing to web editor.");
       ch->sendln("Ok.");
       return ReturnValue::eSUCCESS;
     }
-    else if (!strcmp(arg1, "game"))
+    else if (!dc_strcmp(arg1, "game"))
     {
       REMOVE_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
       ch->sendln("Changing to in game line editor.");

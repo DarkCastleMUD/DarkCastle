@@ -702,7 +702,7 @@ qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
     // This is here so we only show this after the PC's first
     // attack rather than after every hit.
     if (GET_POS(vict) == position_t::STUNNED)
-      act("$n is $B$0stunned$R, but will probably recover.", vict, 0, 0, TO_ROOM, INVIS_NULL);
+      act_to_room("$n is $B$0stunned$R, but will probably recover.", vict, 0, 0, INVIS_NULL);
 
     if (second_attack(ch))
     {
@@ -791,8 +791,8 @@ void update_flags(CharacterPtr vict)
   else if (isSet(vict->combat, COMBAT_RAGE2))
   {
     REMOVE_BIT(vict->combat, COMBAT_RAGE2);
-    act("$n calms down a bit.", vict, 0, 0, TO_ROOM, 0);
-    act("Your mind seems a bit clearer now.", vict, 0, 0, TO_CHAR, 0);
+    act_to_room("$n calms down a bit.", vict, 0, 0, 0);
+    act_to_character("Your mind seems a bit clearer now.", vict, 0, 0, 0);
   }
 
   if (isSet(vict->combat, COMBAT_CRUSH_BLOW))
@@ -803,8 +803,8 @@ void update_flags(CharacterPtr vict)
   else if (isSet(vict->combat, COMBAT_CRUSH_BLOW2))
   {
     REMOVE_BIT(vict->combat, COMBAT_CRUSH_BLOW2);
-    act("$n shrugs off $s weakness!", vict, 0, 0, TO_ROOM, 0);
-    act("You shrug off your weakness.!", vict, 0, 0, TO_CHAR, 0);
+    act_to_room("$n shrugs off $s weakness!", vict, 0, 0, 0);
+    act_to_character("You shrug off your weakness.!", vict, 0, 0, 0);
   }
 
   if (isSet(vict->combat, COMBAT_BLADESHIELD1))
@@ -822,7 +822,7 @@ void update_flags(CharacterPtr vict)
   {
     REMOVE_BIT(vict->combat, COMBAT_ORC_BLOODLUST2);
     vict->sendln("Your bloodlust fades.");
-    act("$n's bloodlust fades.", vict, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's bloodlust fades.", vict, 0, 0, 0);
   }
 
   if (isSet(vict->combat, COMBAT_ORC_BLOODLUST1))
@@ -835,7 +835,7 @@ void update_flags(CharacterPtr vict)
   {
     REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOUGE2);
     REMBIT(vict->affected_by, AFF_BLIND);
-    act("$n clears the blood from $s eyes.\r\n", vict, nullptr, nullptr, TO_ROOM, 0);
+    act_to_room("$n clears the blood from $s eyes.\r\n", vict, nullptr, nullptr, 0);
     vict->sendln("You clear the blood out of your eyes.");
   }
 
@@ -887,8 +887,8 @@ void update_stuns(CharacterPtr ch)
     if (ch->getHP() > 0)
       if (GET_POS(ch) != position_t::FIGHTING)
       {
-        act("$n regains consciousness...", ch, 0, 0, TO_ROOM, 0);
-        act("You regain consciousness...", ch, 0, 0, TO_CHAR, 0);
+        act_to_room("$n regains consciousness...", ch, 0, 0, 0);
+        act_to_character("You regain consciousness...", ch, 0, 0, 0);
         if (ch->fighting)
           ch->setPOSFighting();
         else
@@ -916,9 +916,9 @@ bool do_frostshield(CharacterPtr ch, CharacterPtr vict)
   }
   if (number(0, 99) < 5)
   {
-    act("Bits of $Bfrost$R fly as $n's blow bounces off your $B$1icy$R shield.", ch, 0, vict, TO_VICT, 0);
-    act("Bits of $Bfrost$R fly as $n's blow bounces off $N's $B$1icy$R shield.", ch, 0, vict, TO_ROOM, NOTVICT);
-    act("Bits of $Bfrost$R fly as your blow bounces off $N's $B$1icy$R shield.", ch, 0, vict, TO_CHAR, 0);
+    act_to_victim("Bits of $Bfrost$R fly as $n's blow bounces off your $B$1icy$R shield.", ch, 0, vict, 0);
+    act_to_room("Bits of $Bfrost$R fly as $n's blow bounces off $N's $B$1icy$R shield.", ch, 0, vict, NOTVICT);
+    act_to_character("Bits of $Bfrost$R fly as your blow bounces off $N's $B$1icy$R shield.", ch, 0, vict, 0);
     return (true);
   }
   else
@@ -986,9 +986,9 @@ command_return_t do_lightning_shield(CharacterPtr ch, CharacterPtr vict, qint32 
   /*  if ((learned = ch->has_skill( SKILL_SHIELDBLOCK)) && ch->equipment[WEAR_SHIELD] && GET_CLASS(ch) != CLASS_ANTI_PAL && GET_CLASS(ch) != CLASS_THIEF)
   {
       if (learned/3 > number(0,99)) {
-        act("$n deftly blocks your burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
-        act("You defly block $N's burst of $B$5lightning$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
-        act("$n deftly blocks $N's burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
+        act_to_victim("$n deftly blocks your burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict,  0);
+        act_to_character("You defly block $N's burst of $B$5lightning$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict,  0);
+        act_to_room("$n deftly blocks $N's burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict,  NOTVICT);
         return ReturnValue::eFAILURE;
       }
     }
@@ -999,7 +999,7 @@ command_return_t do_lightning_shield(CharacterPtr ch, CharacterPtr vict, qint32 
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n is DEAD!!", ch, 0, 0, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
@@ -1103,9 +1103,9 @@ command_return_t do_fireshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
   /*
     if ((learned = ch->has_skill( SKILL_SHIELDBLOCK)) && ch->equipment[WEAR_SHIELD] && GET_CLASS(ch) != CLASS_ANTI_PAL && GET_CLASS(ch) != CLASS_THIEF) {
       if (learned/3 > number(0,99)) {
-        act("$n deftly blocks your burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
-        act("You defly block $N's burst of $B$4flame$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
-        act("$n deftly blocks $N's burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
+        act_to_victim("$n deftly blocks your burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict,  0);
+        act_to_character("You defly block $N's burst of $B$4flame$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict,  0);
+        act_to_room("$n deftly blocks $N's burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict,  NOTVICT);
         return ReturnValue::eFAILURE;
       }
     }
@@ -1116,7 +1116,7 @@ command_return_t do_fireshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n is DEAD!!", ch, 0, 0, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
@@ -1189,9 +1189,9 @@ command_return_t do_acidshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
   /*
     if ((learned = ch->has_skill( SKILL_SHIELDBLOCK)) && ch->equipment[WEAR_SHIELD] && GET_CLASS(ch) != CLASS_ANTI_PAL && GET_CLASS(ch) != CLASS_THIEF) {
       if (learned/3 > number(0,99)) {
-        act("$n deftly blocks your burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
-        act("You defly block $N's burst of $B$2acid$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
-        act("$n deftly blocks $N's burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
+        act_to_victim("$n deftly blocks your burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict,  0);
+        act_to_character("You defly block $N's burst of $B$2acid$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict,  0);
+        act_to_room("$n deftly blocks $N's burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict,  NOTVICT);
         return ReturnValue::eFAILURE;
       }
     }
@@ -1202,7 +1202,7 @@ command_return_t do_acidshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n is DEAD!!", ch, 0, 0, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
@@ -1262,7 +1262,7 @@ command_return_t do_boneshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n is DEAD!!", ch, 0, 0, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
       ch->sendln("You have been KILLED!!\r\n");
@@ -1721,35 +1721,35 @@ void eq_destroyed(CharacterPtr ch, ObjectPtr obj, qint32 pos)
       temp = ch->unequip_char(WEAR_SECOND_WIELD);
       ch->equip_char(temp, WEAR_WIELD);
     }
-    act("$p carried by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
+    act_to_room("$p carried by $n is destroyed.", ch, obj, 0, 0);
   }
   else
   { // if its an inventory item, do this
-    act("$p worn by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
+    act_to_room("$p worn by $n is destroyed.", ch, obj, 0, 0);
     ch->recheck_height_wears(); // Make sure $n can still wear the rest of
                                 // the eq
   }
 
-  act("Your $p has been destroyed.", ch, obj, 0, TO_CHAR, 0);
+  act_to_character("Your $p has been destroyed.", ch, obj, 0, 0);
 
   while (obj->contains) // drop contents to floor
   {
     if (isSet(obj->contains->obj_flags.more_flags, ITEM_NO_TRADE))
     {
-      act("A $p falls to $n's inventory.", ch, obj->contains, 0, TO_ROOM, 0);
-      act("A $p falls to your inventory from your destroyed container.", ch, obj->contains, 0, TO_CHAR, 0);
+      act_to_room("A $p falls to $n's inventory.", ch, obj->contains, 0, 0);
+      act_to_character("A $p falls to your inventory from your destroyed container.", ch, obj->contains, 0, 0);
       move_obj(obj->contains, ch);
     }
     else
     {
-      act("A $p falls to the ground from $n.", ch, obj->contains, 0, TO_ROOM, 0);
-      act("A $p falls to the ground from your destroyed container.", ch, obj->contains, 0, TO_CHAR, 0);
+      act_to_room("A $p falls to the ground from $n.", ch, obj->contains, 0, 0);
+      act_to_character("A $p falls to the ground from your destroyed container.", ch, obj->contains, 0, 0);
       move_obj(obj->contains, ch->in_room); // this updates obj->contains
     }
   }
 
-  act("$p falls to the ground in scraps.", ch, obj, 0, TO_CHAR, 0);
-  act("$p falls to the ground in scraps.", ch, obj, 0, TO_ROOM, 0);
+  act_to_character("$p falls to the ground in scraps.", ch, obj, 0, 0);
+  act_to_room("$p falls to the ground in scraps.", ch, obj, 0, 0);
   make_scraps(ch, obj);
   extract_obj(obj);
 }
@@ -1821,8 +1821,8 @@ void eq_damage(CharacterPtr ch, CharacterPtr victim,
       eq_destroyed(victim, obj, pos);
     else
     {
-      act("$p is damaged.", victim, obj, 0, TO_CHAR, 0);
-      act("$p worn by $n is damaged.", victim, obj, 0, TO_ROOM, 0);
+      act_to_character("$p is damaged.", victim, obj, 0, 0);
+      act_to_room("$p worn by $n is damaged.", victim, obj, 0, 0);
     }
   } // number(0, 3) == 0
   else if (victim->carrying && (number(0, 19) == 0))
@@ -1851,8 +1851,8 @@ void eq_damage(CharacterPtr ch, CharacterPtr victim,
       eq_destroyed(victim, obj, -1);
     else
     {
-      act("$p is damaged.", victim, obj, 0, TO_CHAR, 0);
-      act("$p carried by $n is damaged.", victim, obj, 0, TO_ROOM, 0);
+      act_to_character("$p is damaged.", victim, obj, 0, 0);
+      act_to_room("$p carried by $n is damaged.", victim, obj, 0, 0);
     }
   } // end of inventory damage...
 
@@ -2042,7 +2042,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
   qint32 learned;
   qint32 ethereal = {};
   bool reflected = false;
-  QString buf, buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+  QString buf, buf2, buf3;
 
   bool bingo;
   if (is_bingo(dam, weapon_type, attacktype))
@@ -2111,14 +2111,14 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     {
       if (reflected)
       {
-        act("You dissolve the reflected spell into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
-        act("$n's reacts quickly and dissolves the reflected spell into formless mana.", ch, 0, victim, TO_ROOM, NOTVICT);
+        act_to_victim("You dissolve the reflected spell into nothingness by your will.", ch, 0, victim, 0);
+        act_to_room("$n's reacts quickly and dissolves the reflected spell into formless mana.", ch, 0, victim, NOTVICT);
       }
       else
       {
-        act("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
-        act("$N's supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
-        act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
+        act_to_victim("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, 0);
+        act_to_character("$N's supreme will dissolves your spell into formless mana.", ch, 0, victim, 0);
+        act_to_room("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, NOTVICT);
       }
       REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
       return debug_retval(ch, victim, retval);
@@ -2202,34 +2202,34 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     dam = (qint32)(dam * mult);
     if (reflected)
     {
-      strcpy(buf3, buf);
+      dc_strcpy(buf3, buf);
       dc_sprintf(buf2, "s additional damage.");
-      strcat(buf, buf2);
+      dc_strcat(buf, buf2);
       dc_sprintf(buf2, "%s is susceptible to the reflected ", qPrintable(ch->shortdesc_or_name()));
-      strcat(buf2, buf);
-      act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
+      dc_strcat(buf2, buf);
+      act_to_room(buf2, ch, 0, victim, NOTVICT);
       dc_sprintf(buf2, " additional damage.");
-      strcat(buf3, buf2);
+      dc_strcat(buf3, buf2);
       dc_sprintf(buf2, "You are susceptible to the reflected ");
-      strcat(buf2, buf3);
-      act(buf2, ch, 0, victim, TO_CHAR, 0);
+      dc_strcat(buf2, buf3);
+      act_to_character(buf2, ch, 0, victim, 0);
     }
     else
     {
-      strcpy(buf3, buf);
+      dc_strcpy(buf3, buf);
       dc_sprintf(buf2, "s additional damage.");
-      strcat(buf, buf2);
+      dc_strcat(buf, buf2);
       dc_sprintf(buf2, " additional damage.");
-      strcat(buf3, buf2);
+      dc_strcat(buf3, buf2);
       dc_sprintf(buf2, "%s is susceptible to %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
-      strcat(buf2, buf);
-      act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
+      dc_strcat(buf2, buf);
+      act_to_room(buf2, victim, 0, ch, NOTVICT);
       dc_sprintf(buf2, "%s is susceptible to your ", qPrintable(victim->shortdesc_or_name()));
-      strcat(buf2, buf);
-      act(buf2, victim, 0, ch, TO_VICT, 0);
+      dc_strcat(buf2, buf);
+      act_to_victim(buf2, victim, 0, ch, 0);
       dc_sprintf(buf2, "You are susceptible to %s's ", qPrintable(ch->shortdesc_or_name()));
-      strcat(buf2, buf3);
-      act(buf2, victim, 0, ch, TO_CHAR, 0);
+      dc_strcat(buf2, buf3);
+      act_to_character(buf2, victim, 0, ch, 0);
     }
   }
   else if (number(1, 101) < save && !imm)
@@ -2239,38 +2239,38 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     dam -= (qint32)(dam * (double)save / 100); // Save chance.
     if (reflected)
     {
-      strcpy(buf3, buf);
+      dc_strcpy(buf3, buf);
       dc_sprintf(buf2, "s reduced damage.");
-      strcat(buf, buf2);
+      dc_strcat(buf, buf2);
       dc_sprintf(buf2, "%s resists the reflected ", qPrintable(ch->shortdesc_or_name()));
-      strcat(buf2, buf);
-      act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
+      dc_strcat(buf2, buf);
+      act_to_room(buf2, ch, 0, victim, NOTVICT);
       dc_sprintf(buf2, " reduced damage.");
-      strcat(buf3, buf2);
+      dc_strcat(buf3, buf2);
       dc_sprintf(buf2, "You resist the reflected ");
-      strcat(buf2, buf3);
-      act(buf2, ch, 0, victim, TO_CHAR, 0);
+      dc_strcat(buf2, buf3);
+      act_to_character(buf2, ch, 0, victim, 0);
     }
     else
     {
-      strcpy(buf3, buf);
+      dc_strcpy(buf3, buf);
       dc_sprintf(buf2, "s reduced damage.");
-      strcat(buf, buf2);
+      dc_strcat(buf, buf2);
       dc_sprintf(buf2, " reduced damage.");
-      strcat(buf3, buf2);
+      dc_strcat(buf3, buf2);
       dc_sprintf(buf2, "%s resists %s's ", qPrintable(victim->shortdesc_or_name()), qPrintable(ch->shortdesc_or_name()));
-      strcat(buf2, buf);
-      act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
+      dc_strcat(buf2, buf);
+      act_to_room(buf2, victim, 0, ch, NOTVICT);
       dc_sprintf(buf2, "%s resists your ", qPrintable(victim->shortdesc_or_name()));
-      strcat(buf2, buf);
-      act(buf2, victim, 0, ch, TO_VICT, 0);
+      dc_strcat(buf2, buf);
+      act_to_victim(buf2, victim, 0, ch, 0);
       dc_sprintf(buf2, "You resist %s's ", qPrintable(ch->shortdesc_or_name()));
-      strcat(buf2, buf3);
-      act(buf2, victim, 0, ch, TO_CHAR, 0);
+      dc_strcat(buf2, buf3);
+      act_to_character(buf2, victim, 0, ch, 0);
     }
-    //        act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-    //        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
-    //        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
+    //        act_to_room("$n resists $N's assault and sustains reduced damage.", victim, 0, ch,  NOTVICT);
+    //        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT, 0);
+    //        act_to_character("You resist $N's assault and sustain reduced damage.", victim, 0, ch,  0);
   }
   /*
   if (v) { // spellcraft damage bonus
@@ -2321,8 +2321,8 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
       {
         if (GET_POS(victim) < position_t::FIGHTING)
         {
-          act("$n scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
-          act("You scramble to your feet!", victim, 0, 0, TO_CHAR, 0);
+          act_to_room("$n scrambles to $s feet!", victim, 0, 0, 0);
+          act_to_character("You scramble to your feet!", victim, 0, 0, 0);
           victim->setPOSFighting();
         }
       }
@@ -2331,7 +2331,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
   else if (GET_POS(victim) == position_t::SLEEPING)
   {
     affect_from_char(victim, INTERNAL_SLEEPING);
-    act("$n is shocked to a wakened state and scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
+    act_to_room("$n is shocked to a wakened state and scrambles to $s feet!", victim, 0, 0, 0);
     ch->send("You are awakened from combat adrenaline springing you to your feet!");
     victim->setPOSFighting();
   }
@@ -2351,7 +2351,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
   if (IS_AFFECTED(ch, AFF_INVISIBLE) && (!IS_AFFECTED(ch, AFF_ILLUSION) || !(ch->affected_by_spell(BASE_TIMERS + SPELL_INVISIBLE) &&
                                                                              ch->affected_by_spell(SPELL_INVISIBLE) && ch->affected_by_spell(SPELL_INVISIBLE)->modifier == 987)))
   {
-    act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n slowly fades into existence.", ch, 0, 0, 0);
     // if (ch->affected_by_spell(SPELL_INVISIBLE))
     //  no point it looping through the list twice...
     affect_from_char(ch, SPELL_INVISIBLE);
@@ -2484,9 +2484,9 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
         if (number(1, 101) <= learned / 10 + GET_DEX(ch) - GET_DEX(victim))
         {
           dam += (qint32)(dam * (qreal)(2 + learned / 5) / 100);
-          act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
-          act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
-          act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
+          act_to_character("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, 0);
+          act_to_victim("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, 0);
+          act_to_room("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, NOTVICT);
           ch->skill_increase_check(SKILL_CRIT_HIT, learned, SKILL_INCREASE_HARD);
         }
     }
@@ -2517,8 +2517,8 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
                 eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
               else
               {
-                act("$p is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
-                act("$p worn by $n is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_ROOM, 0);
+                act_to_character("$p is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, 0);
+                act_to_room("$p worn by $n is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, 0);
               }
             }
           }
@@ -2543,22 +2543,22 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
       pspell->duration -= pspell->modifier;
       victim->send(QStringLiteral("Your stones absorb %d damage allowing %d through.\r\n").arg(pspell->modifier).arg(dam));
       string1 << "Your attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
-      act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
+      act_to_character(string1.str().c_str(), ch, 0, victim, 0);
       string1.clear();
       string1.str("");
       string1 << "$n's attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
-      act(string1.str().c_str(), ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_room(string1.str().c_str(), ch, 0, victim, NOTVICT);
     }
     else
     {
       pspell->duration -= dam;
       victim->send(QStringLiteral("Your stones absorb %1 damage from the attack and change its direction slightly.\r\n").arg(dam));
       string1 << "$N's stones absorb " << dam << " damage of your attack and cause your blow to change direction slightly.";
-      act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
+      act_to_character(string1.str().c_str(), ch, 0, victim, 0);
       string1.clear();
       string1.str("");
       string1 << "$N's stones completely absorbed $n's attack of " << dam << " damage changing its direction slightly.";
-      act(string1.str().c_str(), ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_room(string1.str().c_str(), ch, 0, victim, NOTVICT);
       dam = 1;
     }
 
@@ -2717,9 +2717,9 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     affected_type *af;
     if (dam >= 350 && (af = victim->affected_by_spell(SPELL_PARALYZE)) && victim->isPlayer())
     {
-      act("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, TO_VICT, 0);
-      act("The powerful magic from your spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_CHAR, 0);
-      act("The powerful magic of $n's spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_victim("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, 0);
+      act_to_character("The powerful magic from your spell has disrupted the paralysis surrounding $N!", ch, 0, victim, 0);
+      act_to_room("The powerful magic of $n's spell has disrupted the paralysis surrounding $N!", ch, 0, victim, NOTVICT);
       affect_remove(victim, af, 0);
     }
 
@@ -2733,7 +2733,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
   if (ethereal)
   {
     victim->sendln("The ethereal stones protecting you shatter and fade into nothing.");
-    act("The ethereal stones surrounding $n shatter into nothingness.\r\n", victim, 0, 0, TO_ROOM, 0);
+    act_to_room("The ethereal stones surrounding $n shatter into nothingness.\r\n", victim, 0, 0, 0);
   }
 
   /*  Now for eq damage...   */
@@ -2879,7 +2879,7 @@ qint32 noncombat_damage(CharacterPtr ch, qint32 dam, const QString char_death_ms
       ch->sendln("\r\nYou have been KILLED!");
     }
     if (room_death_msg)
-      act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
+      act_to_room(room_death_msg, ch, 0, 0, 0);
     if (death_log_msg)
       DC::getInstance()->logentry(death_log_msg, IMMORTAL, DC::LogChannel::LOG_MORTAL);
     if (type == KILL_BATTER)
@@ -2939,7 +2939,7 @@ void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victi
 void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victim, QString dmg, QString buf2, qint32 to)
 {
   CharacterPtr tmpch;
-  QString string1, string2[MAX_INPUT_LENGTH];
+  QString string1, string2;
 
   qint32 i, z = 0, y = {};
   for (i = {}; i <= (qint32)strlen(buf); i++)
@@ -2947,7 +2947,7 @@ void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victi
     if (*(buf + i) == '|')
     {
       string1[z] = '\0';
-      strcat(string1, dmg);
+      dc_strcat(string1, dmg);
       z += strlen(dmg);
     }
     else
@@ -2957,7 +2957,7 @@ void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victi
     }
   }
   if (buf2) // lazy, should've done it earlier, some extra processing wasted, but I don't care!
-    strcpy(string2, buf2);
+    dc_strcpy(string2, buf2);
 
   TokenList *tokens, *tokens2;
   tokens = new TokenList(string1);
@@ -3426,9 +3426,9 @@ bool isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type
 
   if (what < parry || isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   { // Parry. Riposte-check goes here.
-    act("$n parries $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
-    act("$n parries your attack.", victim, nullptr, ch, TO_VICT, 0);
-    act("You parry $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
+    act_to_room("$n parries $N's attack.", victim, nullptr, ch, NOTVICT);
+    act_to_victim("$n parries your attack.", victim, nullptr, ch, 0);
+    act_to_character("You parry $N's attack.", victim, nullptr, ch, 0);
     retval = check_riposte(ch, victim, attacktype);
     if (SOMEONE_DIED(retval))
     {
@@ -3443,15 +3443,15 @@ bool isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type
     case 0: // full avoid
       if (number(0, 1))
       {
-        act("You spin adroitly to the side, watching in amusement as $N's swing passes by harmlessly.", victim, 0, ch, TO_CHAR, 0);
-        act("$n spins adroitly to the side, watching in amusement as your swing passes by harmlessly.", victim, 0, ch, TO_VICT, 0);
-        act("$n spins adroitly to the side, watching in amusement as $N's swing passes by harmlessly.", victim, 0, ch, TO_ROOM, NOTVICT);
+        act_to_character("You spin adroitly to the side, watching in amusement as $N's swing passes by harmlessly.", victim, 0, ch, 0);
+        act_to_victim("$n spins adroitly to the side, watching in amusement as your swing passes by harmlessly.", victim, 0, ch, 0);
+        act_to_room("$n spins adroitly to the side, watching in amusement as $N's swing passes by harmlessly.", victim, 0, ch, NOTVICT);
       }
       else
       {
-        act("You jump quickly and execute a full backflip, landing nimbly on your feet as $N's blow misses completely.", victim, 0, ch, TO_CHAR, 0);
-        act("$n jumps quickly and executes a full backflip, landing nimbly on $s feet as your blow misses completely.", victim, 0, ch, TO_VICT, 0);
-        act("$n jumps quickly and executes a full backflip, landing nimbly on $s feet as $N's blow misses completely.", victim, 0, ch, TO_ROOM, NOTVICT);
+        act_to_character("You jump quickly and execute a full backflip, landing nimbly on your feet as $N's blow misses completely.", victim, 0, ch, 0);
+        act_to_victim("$n jumps quickly and executes a full backflip, landing nimbly on $s feet as your blow misses completely.", victim, 0, ch, 0);
+        act_to_room("$n jumps quickly and executes a full backflip, landing nimbly on $s feet as $N's blow misses completely.", victim, 0, ch, NOTVICT);
       }
       break;
     case 1: // shieldblock style damage
@@ -3473,9 +3473,9 @@ bool isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type
   }
   else if (what < (parry + tumbling + dodge))
   { // Dodge
-    act("$n dodges $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
-    act("$n dodges your attack.", victim, nullptr, ch, TO_VICT, 0);
-    act("You dodge $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
+    act_to_room("$n dodges $N's attack.", victim, nullptr, ch, NOTVICT);
+    act_to_victim("$n dodges your attack.", victim, nullptr, ch, 0);
+    act_to_character("You dodge $N's attack.", victim, nullptr, ch, 0);
   }
   else if (what < (parry + tumbling + dodge + block))
   { // Shieldblock
@@ -3524,24 +3524,24 @@ qint32 checkCounterStrike(CharacterPtr ch, CharacterPtr victim)
   switch (number(1, 4))
   {
   case 1:
-    act("Upon blocking $N's blow, you counter with a hard strike of your palm!", victim, nullptr, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n counters with a hard strike of $s palm!", victim, nullptr, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n counters with a hard strike of $s palm!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act_to_character("Upon blocking $N's blow, you counter with a hard strike of your palm!", victim, nullptr, ch, 0);
+    act_to_victim("Upon blocking your blow, $n counters with a hard strike of $s palm!", victim, nullptr, ch, 0);
+    act_to_room("Upon blocking $N's blow, $n counters with a hard strike of $s palm!", victim, nullptr, ch, NOTVICT);
     break;
   case 2:
-    act("Upon blocking $N's blow, you counter with a sharp kick of your heel!", victim, nullptr, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n counters with a sharp kick of $s heel!", victim, nullptr, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n counters with a sharp kick of $s heel!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act_to_character("Upon blocking $N's blow, you counter with a sharp kick of your heel!", victim, nullptr, ch, 0);
+    act_to_victim("Upon blocking your blow, $n counters with a sharp kick of $s heel!", victim, nullptr, ch, 0);
+    act_to_room("Upon blocking $N's blow, $n counters with a sharp kick of $s heel!", victim, nullptr, ch, NOTVICT);
     break;
   case 3:
-    act("Upon blocking $N's blow, you spin and land a short, hard strike with your elbow!", victim, nullptr, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n spins and lands a short, hard strike with $s elbow!", victim, nullptr, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n spins and lands a short, hard strike with $s elbow!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act_to_character("Upon blocking $N's blow, you spin and land a short, hard strike with your elbow!", victim, nullptr, ch, 0);
+    act_to_victim("Upon blocking your blow, $n spins and lands a short, hard strike with $s elbow!", victim, nullptr, ch, 0);
+    act_to_room("Upon blocking $N's blow, $n spins and lands a short, hard strike with $s elbow!", victim, nullptr, ch, NOTVICT);
     break;
   case 4:
-    act("Upon blocking $N's blow, you spin and land a solid strike with your knee!", victim, nullptr, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act_to_character("Upon blocking $N's blow, you spin and land a solid strike with your knee!", victim, nullptr, ch, 0);
+    act_to_victim("Upon blocking your blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, 0);
+    act_to_room("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, NOTVICT);
     break;
   default:
     DC::getInstance()->logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -3578,14 +3578,14 @@ qint32 doTumblingCounterStrike(CharacterPtr ch, CharacterPtr victim)
   switch (number(1, 2))
   {
   case 1:
-    act("$N overextends $Mself as $E strikes you, leaving $M open to your counterattack!", victim, nullptr, ch, TO_CHAR, 0);
-    act("You overextend yourself as you strike $n, leaving yourself open to $s counterattack!", victim, nullptr, ch, TO_VICT, 0);
-    act("$N overextends $Mself as $E strikes $n, leaving $M open to a counterattack!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act_to_character("$N overextends $Mself as $E strikes you, leaving $M open to your counterattack!", victim, nullptr, ch, 0);
+    act_to_victim("You overextend yourself as you strike $n, leaving yourself open to $s counterattack!", victim, nullptr, ch, 0);
+    act_to_room("$N overextends $Mself as $E strikes $n, leaving $M open to a counterattack!", victim, nullptr, ch, NOTVICT);
     break;
   case 2:
-    act("You find an opening in $N's defenses as $E swings, and land a quick counterattack!", victim, nullptr, ch, TO_CHAR, 0);
-    act("$n finds an opening in your defenses as you swing, and lands a quick counterattack!", victim, nullptr, ch, TO_VICT, 0);
-    act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act_to_character("You find an opening in $N's defenses as $E swings, and land a quick counterattack!", victim, nullptr, ch, 0);
+    act_to_victim("$n finds an opening in your defenses as you swing, and lands a quick counterattack!", victim, nullptr, ch, 0);
+    act_to_room("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, nullptr, ch, NOTVICT);
     break;
   default:
     DC::getInstance()->logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -3649,9 +3649,9 @@ qint32 check_riposte(CharacterPtr ch, CharacterPtr victim, qint32 attacktype)
     }
   }
 
-  act("$n turns $N's attack into one of $s own!", victim, nullptr, ch, TO_ROOM, NOTVICT);
-  act("$n turns your attack against you!", victim, nullptr, ch, TO_VICT, 0);
-  act("You turn $N's attack against $M.", victim, nullptr, ch, TO_CHAR, 0);
+  act_to_room("$n turns $N's attack into one of $s own!", victim, nullptr, ch, NOTVICT);
+  act_to_victim("$n turns your attack against you!", victim, nullptr, ch, 0);
+  act_to_character("You turn $N's attack against $M.", victim, nullptr, ch, 0);
 
   retval = one_hit(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
   retval = SWAP_CH_VICT(retval);
@@ -3691,15 +3691,15 @@ qint32 check_magic_block(CharacterPtr ch, CharacterPtr victim, qint32 attacktype
     return 0;
   if (GET_CLASS(victim) != CLASS_MONK)
   {
-    act("$n blocks part of $N's spell with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_ROOM, NOTVICT);
-    act("$n blocks part of your spell with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_VICT, 0);
-    act("You dodge down behind $p and deflect part of $N's spell.", victim, victim->equipment[WEAR_SHIELD], ch, TO_CHAR, 0);
+    act_to_room("$n blocks part of $N's spell with $p.", victim, victim->equipment[WEAR_SHIELD], ch, NOTVICT);
+    act_to_victim("$n blocks part of your spell with $p.", victim, victim->equipment[WEAR_SHIELD], ch, 0);
+    act_to_character("You dodge down behind $p and deflect part of $N's spell.", victim, victim->equipment[WEAR_SHIELD], ch, 0);
   }
   else
   {
-    act("$n manages to avoid taking a direct hit from $N's spell!", victim, nullptr, ch, TO_ROOM, NOTVICT);
-    act("$n avoids part of your spell!", victim, nullptr, ch, TO_VICT, 0);
-    act("Your martial defense allows you to avoid a direct hit from $N's spell!", victim, nullptr, ch, TO_CHAR, 0);
+    act_to_room("$n manages to avoid taking a direct hit from $N's spell!", victim, nullptr, ch, NOTVICT);
+    act_to_victim("$n avoids part of your spell!", victim, nullptr, ch, 0);
+    act_to_character("Your martial defense allows you to avoid a direct hit from $N's spell!", victim, nullptr, ch, 0);
     reduce = (qint32)((qreal)reduce / 1.25);
   }
   return reduce;
@@ -3763,17 +3763,17 @@ qint32 check_shieldblock(CharacterPtr ch, CharacterPtr victim, qint32 attacktype
   else if (!skill_success(victim, ch, SKILL_SHIELDBLOCK, modifier))
     return 0;
 
-  // act("$n blocks $N's attack with $s shield.", victim, nullptr, ch, TO_ROOM, NOTVICT);
-  // act("$n blocks your attack with $s shield.", victim, nullptr, ch, TO_VICT, 0);
-  // act("You block $N's attack with your shield.", victim, nullptr, ch, TO_CHAR, 0);
+  // act_to_room("$n blocks $N's attack with $s shield.", victim, nullptr, ch,  NOTVICT);
+  // act_to_victim("$n blocks your attack with $s shield.", victim, nullptr, ch,  0);
+  // act_to_character("You block $N's attack with your shield.", victim, nullptr, ch,  0);
   /*  if (!GET_CLASS(victim) == CLASS_MONK) {
-      act("$n blocks $N's attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_ROOM, NOTVICT);
-      act("$n blocks your attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_VICT, 0);
-      act("You block $N's attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_CHAR, 0);
+      act_to_room("$n blocks $N's attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch,  NOTVICT);
+      act_to_victim("$n blocks your attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch,  0);
+      act_to_character("You block $N's attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch,  0);
     } else {
-      act("$n swiftly deflects $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
-      act("$n swiftly deflects your attack.",victim, nullptr, ch, TO_VICT,0);
-      act("You swiftly deflect $N's attack.",victim, nullptr, ch, TO_CHAR, 0);
+      act_to_room("$n swiftly deflects $N's attack.", victim, nullptr, ch,  NOTVICT);
+      act("$n swiftly deflects your attack.",victim, nullptr, ch, TO_VICT, 0);
+      act_to_character("You swiftly deflect $N's attack.",victim, nullptr, ch,  0);
     }*/
   if (GET_CLASS(victim) == CLASS_MONK)
     reduce = (qint32)((qreal)reduce / 1.25);
@@ -3859,9 +3859,9 @@ bool check_parry(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, bool d
 
   if (display_results == true)
   {
-    act("$n parries $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
-    act("$n parries your attack.", victim, nullptr, ch, TO_VICT, 0);
-    act("You parry $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
+    act_to_room("$n parries $N's attack.", victim, nullptr, ch, NOTVICT);
+    act_to_victim("$n parries your attack.", victim, nullptr, ch, 0);
+    act_to_character("You parry $N's attack.", victim, nullptr, ch, 0);
   }
   return true;
 }
@@ -3995,9 +3995,9 @@ bool check_dodge(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, bool d
 
   if (display_results == true)
   {
-    act("$n dodges $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
-    act("$n dodges your attack.", victim, nullptr, ch, TO_VICT, 0);
-    act("You dodge $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
+    act_to_room("$n dodges $N's attack.", victim, nullptr, ch, NOTVICT);
+    act_to_victim("$n dodges your attack.", victim, nullptr, ch, 0);
+    act_to_character("You dodge $N's attack.", victim, nullptr, ch, 0);
   }
 
   return true;
@@ -4221,8 +4221,8 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
     if (!keepZerk)
     {
       REMOVE_BIT(ch->combat, COMBAT_BERSERK);
-      act("$n settles down.", ch, 0, 0, TO_ROOM, 0);
-      act("You settle down.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("$n settles down.", ch, 0, 0, 0);
+      act_to_character("You settle down.", ch, 0, 0, 0);
       GET_AC(ch) -= 30;
     }
   }
@@ -4246,14 +4246,14 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
   if (isSet(ch->combat, COMBAT_RAGE1))
   {
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
-    act("$n calms down.", ch, 0, 0, TO_ROOM, 0);
-    act("Your mind seems a bit clearer now.", ch, 0, 0, TO_CHAR, 0);
+    act_to_room("$n calms down.", ch, 0, 0, 0);
+    act_to_character("Your mind seems a bit clearer now.", ch, 0, 0, 0);
   }
   if (isSet(ch->combat, COMBAT_RAGE2))
   {
     REMOVE_BIT(ch->combat, COMBAT_RAGE2);
-    act("$n calms down.", ch, 0, 0, TO_ROOM, 0);
-    act("Your mind seems a bit clearer now.", ch, 0, 0, TO_CHAR, 0);
+    act_to_room("$n calms down.", ch, 0, 0, 0);
+    act_to_character("Your mind seems a bit clearer now.", ch, 0, 0, 0);
   }
 
   // make sure people aren't stuck unable to do anything
@@ -4975,7 +4975,7 @@ void death_cry(CharacterPtr ch)
       ch->in_room = DC::getInstance()->world[was_in].dir_option[door]->to_room;
       if (ch->in_room == was_in)
         continue;
-      act(message, ch, 0, 0, TO_ROOM, 0);
+      act_to_room(message, ch, 0, 0, 0);
       ch->in_room = was_in;
     }
   }
@@ -5012,27 +5012,27 @@ command_return_t do_skewer(CharacterPtr ch, CharacterPtr vict, qint32 dam, qint3
   {
     if (check_dodge(ch, vict, type, false))
     {
-      act("$n dodges $N's skewer!!", vict, nullptr, ch, TO_ROOM, NOTVICT);
-      act("$n dodges your skewer!!", vict, nullptr, ch, TO_VICT, 0);
-      act("You dodge $N's skewer!!", vict, nullptr, ch, TO_CHAR, 0);
+      act_to_room("$n dodges $N's skewer!!", vict, nullptr, ch, NOTVICT);
+      act_to_victim("$n dodges your skewer!!", vict, nullptr, ch, 0);
+      act_to_character("You dodge $N's skewer!!", vict, nullptr, ch, 0);
       return 0;
     }
     if (check_parry(ch, vict, type, false))
     {
-      act("$n parries $N's skewer!!", vict, nullptr, ch, TO_ROOM, NOTVICT);
-      act("$n parries your skewer!!", vict, nullptr, ch, TO_VICT, 0);
-      act("You parry $N's skewer!!", vict, nullptr, ch, TO_CHAR, 0);
+      act_to_room("$n parries $N's skewer!!", vict, nullptr, ch, NOTVICT);
+      act_to_victim("$n parries your skewer!!", vict, nullptr, ch, 0);
+      act_to_character("You parry $N's skewer!!", vict, nullptr, ch, 0);
       return 0;
     }
     if (check_shieldblock(ch, vict, type))
     {
-      // act("$2$n shield blocks $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
+      // act_to_room("$2$n shield blocks $N's skewer!!$R", ch, 0, vict,  NOTVICT);
       return 0;
     }
 
-    //  act("$n jams $s weapon into $N!!", ch, 0, vict, TO_ROOM, NOTVICT);
-    //  act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
-    //  act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
+    //  act_to_room("$n jams $s weapon into $N!!", ch, 0, vict,  NOTVICT);
+    //  act_to_character("You jam your weapon in $N's heart!", ch, 0, vict,  0);
+    //  act_to_victim("$n's weapon is speared into you! Ouch!", ch, 0, vict,  0);
     damadd = (qint32)(dam * 1.5);
     qint32 retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
     if (SOMEONE_DIED(retval))
@@ -5045,9 +5045,9 @@ command_return_t do_skewer(CharacterPtr ch, CharacterPtr vict, qint32 dam, qint3
     { /* tiny chance of instakill */
       vict->setHP(-1, ch);
       ch->sendln("You impale your weapon through your opponent's chest!");
-      act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
+      act_to_victim("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
-      // duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
+      // duplicate message   act_to_room("$n is DEAD!!", vict, 0, 0,  INVIS_NULL);
       vict->sendln("You have been SKEWERED!!\r\n");
       damage(ch, vict, 9999999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
       //      update_pos(vict);
@@ -5081,21 +5081,21 @@ command_return_t do_behead_skill(CharacterPtr ch, CharacterPtr vict)
                (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
               !number(0, 1))
           { // tarrasque's leash..
-            act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
-            act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
-            act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
+            act_to_character("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, 0);
+            act_to_room("$n attempts to behead $N, but fails.", ch, 0, vict, NOTVICT);
+            act_to_victim("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, 0);
             return ReturnValue::eSUCCESS;
           }
           if (IS_AFFECTED(vict, AFF_NO_BEHEAD))
           {
-            act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
-            act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-            act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
+            act_to_character("$N deftly dodges your beheading attempt!", ch, 0, vict, 0);
+            act_to_room("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, NOTVICT);
+            act_to_victim("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, 0);
             return ReturnValue::eSUCCESS;
           }
-          act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
-          act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
-          act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
+          act_to_victim("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, 0);
+          act_to_character("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, 0);
+          act_to_room("$n cleanly slices $N's head off $S body!", ch, 0, vict, NOTVICT);
           vict->setHP(-20, ch);
           make_head(vict);
           group_gain(ch, vict);
@@ -5105,9 +5105,9 @@ command_return_t do_behead_skill(CharacterPtr ch, CharacterPtr vict)
         }
         else
         { /* You MISS the fucker! */
-          act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
-          act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
-          act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+          act_to_victim("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, 0);
+          act_to_character("You miss your attempt to behead $N.", ch, 0, vict, 0);
+          act_to_room("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, NOTVICT);
           return ReturnValue::eSUCCESS;
         }
       }
@@ -5139,50 +5139,50 @@ command_return_t do_execute_skill(CharacterPtr ch, CharacterPtr vict, qint32 w_t
             (w_type == TYPE_WHIP && isSet(vict->immune, ISR_WHIP)) ||
             (w_type == TYPE_STING && isSet(vict->immune, ISR_STING)))
         {
-          act("$N deftly dodges your mortal strike!", ch, 0, vict, TO_CHAR, 0);
-          act("$N deftly dodges $n's mortal strike!", ch, 0, vict, TO_ROOM, NOTVICT);
-          act("You deftly avoid $n's mortal strike!", ch, 0, vict, TO_VICT, 0);
+          act_to_character("$N deftly dodges your mortal strike!", ch, 0, vict, 0);
+          act_to_room("$N deftly dodges $n's mortal strike!", ch, 0, vict, NOTVICT);
+          act_to_victim("You deftly avoid $n's mortal strike!", ch, 0, vict, 0);
           return ReturnValue::eSUCCESS;
         }
         else if (!skill_success(ch, vict, SKILL_EXECUTE))
         {
-          act("$N narrowly avoids your lethal blow as you attempt to thrust aside $S defenses!", ch, 0, vict, TO_CHAR, 0);
-          act("You narrowly avoid a lethal blow as $n attempts to thrust aside your defenses!", ch, 0, vict, TO_VICT, 0);
-          act("$N narrowly avoids $n's lethal blow as $e attempts to thrust aside $S defenses! ", ch, 0, vict, TO_ROOM, NOTVICT);
+          act_to_character("$N narrowly avoids your lethal blow as you attempt to thrust aside $S defenses!", ch, 0, vict, 0);
+          act_to_victim("You narrowly avoid a lethal blow as $n attempts to thrust aside your defenses!", ch, 0, vict, 0);
+          act_to_room("$N narrowly avoids $n's lethal blow as $e attempts to thrust aside $S defenses! ", ch, 0, vict, NOTVICT);
           return ReturnValue::eSUCCESS;
         }
         else
         {
-          act("$n quickly thrusts aside your defenses and strikes a fatal blow!", ch, 0, vict, TO_VICT, 0);
-          act("You feel a flash of pain and your vision dims from $4red$R to $B$0black$R...", ch, 0, vict, TO_VICT, 0);
+          act_to_victim("$n quickly thrusts aside your defenses and strikes a fatal blow!", ch, 0, vict, 0);
+          act_to_victim("You feel a flash of pain and your vision dims from $4red$R to $B$0black$R...", ch, 0, vict, 0);
           vict->setHP(-20, ch);
-          act("You quickly thrust aside $N's defenses and strike a fatal blow!", ch, 0, vict, TO_CHAR, 0);
-          act("$n quickly thrusts aside $N's defenses and strikes a lethal blow!", ch, 0, vict, TO_ROOM, NOTVICT);
+          act_to_character("You quickly thrust aside $N's defenses and strike a fatal blow!", ch, 0, vict, 0);
+          act_to_room("$n quickly thrusts aside $N's defenses and strikes a lethal blow!", ch, 0, vict, NOTVICT);
           if (w_type == TYPE_SLASH || w_type == TYPE_PIERCE)
           {
             if (number(0, 1))
             {
-              act("$N's arm is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_CHAR, 0);
-              act("$N's arm is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_ROOM, NOTVICT);
+              act_to_character("$N's arm is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, 0);
+              act_to_room("$N's arm is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, NOTVICT);
               make_arm(vict);
             }
             else
             {
-              act("$N's leg is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_CHAR, 0);
-              act("$N's leg is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_ROOM, NOTVICT);
+              act_to_character("$N's leg is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, 0);
+              act_to_room("$N's leg is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, NOTVICT);
               make_leg(vict);
             }
           }
           if (w_type == TYPE_CRUSH || w_type == TYPE_BLUDGEON)
           {
-            act("$N's guts spill to the ground as $S body is split open like an overripe melon.", ch, 0, vict, TO_CHAR, 0);
-            act("$N's guts spill to the ground as $S body is split open like an overripe melon.", ch, 0, vict, TO_ROOM, NOTVICT);
+            act_to_character("$N's guts spill to the ground as $S body is split open like an overripe melon.", ch, 0, vict, 0);
+            act_to_room("$N's guts spill to the ground as $S body is split open like an overripe melon.", ch, 0, vict, NOTVICT);
             make_bowels(vict);
           }
           if (w_type == TYPE_WHIP || w_type == TYPE_STING)
           {
-            act("$N's blood pools on the ground as the remaining life seeps from $S body.", ch, 0, vict, TO_CHAR, 0);
-            act("$N's blood pools on the ground as the remaining life seeps from $S body.", ch, 0, vict, TO_ROOM, NOTVICT);
+            act_to_character("$N's blood pools on the ground as the remaining life seeps from $S body.", ch, 0, vict, 0);
+            act_to_room("$N's blood pools on the ground as the remaining life seeps from $S body.", ch, 0, vict, NOTVICT);
             make_blood(vict);
           }
           group_gain(ch, vict);
@@ -5234,40 +5234,40 @@ void do_combatmastery(CharacterPtr ch, CharacterPtr vict, qint32 weapon)
       af.modifier = vict->has_skill(SKILL_BLINDFIGHTING) ? skill_success(vict, 0, SKILL_BLINDFIGHTING) ? +25 : 50 : 50;
       affect_to_char(vict, &af);
 
-      act("Your attack stings $N's eyes, causing momentary blindness!", ch, 0, vict, TO_CHAR, 0);
-      act("$n's attack stings your eyes, causing momentary blindness!", ch, 0, vict, TO_VICT, 0);
-      act("$n's attack stings $N's eyes, causing momentary blindness!", ch, 0, vict, TO_ROOM, NOTVICT);
+      act_to_character("Your attack stings $N's eyes, causing momentary blindness!", ch, 0, vict, 0);
+      act_to_victim("$n's attack stings your eyes, causing momentary blindness!", ch, 0, vict, 0);
+      act_to_room("$n's attack stings $N's eyes, causing momentary blindness!", ch, 0, vict, NOTVICT);
     }
   }
   if (type == TYPE_BLUDGEON || type == TYPE_CRUSH)
   {
     if (vict->getLevel() >= 90 || (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_HUGE)))
     {
-      act("$N shakes off your crushing blow!", ch, 0, vict, TO_CHAR, 0);
-      act("$N shakes off $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("You shake off $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
+      act_to_character("$N shakes off your crushing blow!", ch, 0, vict, 0);
+      act_to_room("$N shakes off $n's crushing blow!", ch, 0, vict, NOTVICT);
+      act_to_victim("You shake off $n's crushing blow!", ch, 0, vict, 0);
       return;
     }
     if (vict->getLevel() >= 90 || (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_SWARM)))
     {
-      act("$N swarms around your crushing blow!", ch, 0, vict, TO_CHAR, 0);
-      act("$N swarms around $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("You swarm around $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
+      act_to_character("$N swarms around your crushing blow!", ch, 0, vict, 0);
+      act_to_room("$N swarms around $n's crushing blow!", ch, 0, vict, NOTVICT);
+      act_to_victim("You swarm around $n's crushing blow!", ch, 0, vict, 0);
       return;
     }
     if (vict->getLevel() >= 90 || (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_TINY)))
     {
-      act("$N is so small, $E easily avoids your crushing blow!", ch, 0, vict, TO_CHAR, 0);
-      act("$N easily avoids $n's slow, crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("You easily avoid $n's slow, crushing blow!", ch, 0, vict, TO_VICT, 0);
+      act_to_character("$N is so small, $E easily avoids your crushing blow!", ch, 0, vict, 0);
+      act_to_room("$N easily avoids $n's slow, crushing blow!", ch, 0, vict, NOTVICT);
+      act_to_victim("You easily avoid $n's slow, crushing blow!", ch, 0, vict, 0);
       return;
     }
     if (!isSet(vict->combat, COMBAT_CRUSH_BLOW))
     {
       SET_BIT(vict->combat, COMBAT_CRUSH_BLOW);
-      act("Your crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_CHAR, 0);
-      act("$n's crushing blow causes your attacks to momentarily weaken!", ch, 0, vict, TO_VICT, 0);
-      act("$n's crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_ROOM, NOTVICT);
+      act_to_character("Your crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, 0);
+      act_to_victim("$n's crushing blow causes your attacks to momentarily weaken!", ch, 0, vict, 0);
+      act_to_room("$n's crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, NOTVICT);
     }
   }
   if (type == TYPE_WHIP && !ch->affected_by_spell(SKILL_CM_TIMER))
@@ -5277,9 +5277,9 @@ void do_combatmastery(CharacterPtr ch, CharacterPtr vict, qint32 weapon)
       vict->setSitting();
       SET_BIT(vict->combat, COMBAT_BASH2);
       WAIT_STATE(vict, DC::PULSE_VIOLENCE);
-      act("Your whipping attack trips up $N and $E goes down!", ch, 0, vict, TO_CHAR, 0);
-      act("$n's whipping attack trips you up, causing you to stumble and fall!", ch, 0, vict, TO_VICT, 0);
-      act("$n's whipping attack trips up $N causing $M to stumble and fall!", ch, 0, vict, TO_ROOM, NOTVICT);
+      act_to_character("Your whipping attack trips up $N and $E goes down!", ch, 0, vict, 0);
+      act_to_victim("$n's whipping attack trips you up, causing you to stumble and fall!", ch, 0, vict, 0);
+      act_to_room("$n's whipping attack trips up $N causing $M to stumble and fall!", ch, 0, vict, NOTVICT);
 
       affected_type af;
       af.type = SKILL_CM_TIMER;
@@ -5411,7 +5411,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
   {
     if (victim->getGold() > 0)
     {
-      act("$n drops $s stolen booty!", victim, 0, 0, TO_ROOM, 0);
+      act_to_room("$n drops $s stolen booty!", victim, 0, 0, 0);
       obj_to_room(create_money(victim->getGold()), victim->in_room);
       victim->setGold(0);
       victim->save_char_obj();
@@ -5451,7 +5451,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 
     remove_memory(i, 'h', victim);
     if (i->isNonPlayer() && (i->mobdata->fears))
-      if (!strcmp(i->mobdata->fears, qPrintable(victim->name())))
+      if (!dc_strcmp(i->mobdata->fears, qPrintable(victim->name())))
         remove_memory(i, 'f');
     if (i->isNonPlayer() && !i->hunting.isEmpty())
       if (i->hunting == victim->name())
@@ -5770,7 +5770,7 @@ void group_gain(CharacterPtr ch, CharacterPtr victim)
     level_diff_t level_difference = tmp_ch->getLevel() - highest->getLevel();
     if (level_difference <= -51 && tmp_ch->isPlayer())
     {
-      act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
+      act_to_character("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, 0);
 
       tmp_ch = loop_followers(&f);
       continue;
@@ -5914,7 +5914,7 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
           "hit", "pound", "pierce", "slash", "whip", "claw",
           "bite", "sting", "crush"};
 
-  QString buf1, buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+  QString buf1, buf2, buf3;
   const QString vs, *vp, *vx;
   const QString attack = {};
   QChar punct;
@@ -5926,9 +5926,9 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
     dc_sprintf(buf1, "$n's pitiful attack is ignored by $N!");
     dc_sprintf(buf2, "Your pitiful attack is completely ignored by $N!");
     dc_sprintf(buf3, "You ignore $n's pitiful attack.");
-    act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act(buf2, ch, nullptr, victim, TO_CHAR, 0);
-    act(buf3, ch, nullptr, victim, TO_VICT, 0);
+    act_to_room(buf1, ch, nullptr, victim, NOTVICT);
+    act_to_character(buf2, ch, nullptr, victim, 0);
+    act_to_victim(buf3, ch, nullptr, victim, 0);
     return;
   }
 
@@ -6094,7 +6094,7 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
 
   if (isSet(modifier, COMBAT_MOD_FRENZY))
   {
-    strcpy(modstring, "frenzied ");
+    dc_strcpy(modstring, "frenzied ");
   }
   else
     *modstring = '\0';
@@ -6103,12 +6103,12 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
   {
     if (isSet(modifier, COMBAT_MOD_SUSCEPT))
     {
-      strcpy(endstring, " doing extra damage");
+      dc_strcpy(endstring, " doing extra damage");
     }
 
     if (isSet(modifier, COMBAT_MOD_RESIST))
     {
-      strcpy(endstring, " but is resisted");
+      dc_strcpy(endstring, " but is resisted");
     }
     else
       *endstring = '\0';
@@ -6243,10 +6243,10 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
       dc_sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
     }
   }
-  //   act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
+  //   act_to_room(buf1, ch, nullptr, victim,  NOTVICT);
   send_damage(buf1, ch, 0, victim, dammsg, 0, TO_ROOM);
-  act(buf2, ch, nullptr, victim, TO_CHAR, 0);
-  act(buf3, ch, nullptr, victim, TO_VICT, 0);
+  act_to_character(buf2, ch, nullptr, victim, 0);
+  act_to_victim(buf3, ch, nullptr, victim, 0);
 }
 
 /*
@@ -6272,9 +6272,9 @@ void disarm(CharacterPtr ch, CharacterPtr victim)
     ch->sendln("In their enraged state, there's no chance they'd let go of their weapon!");
     return;
   }
-  act("$B$n disarms you and sends your weapon flying!$R", ch, nullptr, victim, TO_VICT, 0);
-  act("You disarm $N and send $S weapon flying!", ch, nullptr, victim, TO_CHAR, 0);
-  act("$n disarms $N and sends $S weapon flying!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+  act_to_victim("$B$n disarms you and sends your weapon flying!$R", ch, nullptr, victim, 0);
+  act_to_character("You disarm $N and send $S weapon flying!", ch, nullptr, victim, 0);
+  act_to_room("$n disarms $N and sends $S weapon flying!", ch, nullptr, victim, NOTVICT);
 
   // all disarms go to inventory right now -pir
   //  if (ch->isPlayer()) {
@@ -6374,7 +6374,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     victim->setMove(2);
     if (victim->getGold() > 0)
     {
-      act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_room("$N drops $S stolen booty!", ch, 0, victim, NOTVICT);
       obj_to_room(create_money(victim->getGold()), victim->in_room);
       victim->setGold(0);
       victim->save_char_obj();
@@ -6951,7 +6951,7 @@ qint32 can_be_attacked(CharacterPtr ch, CharacterPtr vict)
 
   if (ch->isPlayer() && vict->getLevel() < 5)
   {
-    act("The magic of the MUD school is protecting $M from harm.", ch, 0, vict, TO_CHAR, 0);
+    act_to_character("The magic of the MUD school is protecting $M from harm.", ch, 0, vict, 0);
     return false;
   }
 
@@ -7276,7 +7276,7 @@ void inform_victim(CharacterPtr ch, CharacterPtr victim, qint32 dam)
     victim->sendln("You are stunned, but will probably recover.");
     break;
   case position_t::DEAD:
-    act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n is DEAD!!", victim, 0, 0, INVIS_NULL);
     victim->sendln("You have been KILLED!!\r\n");
 
     break;
@@ -7420,14 +7420,14 @@ command_return_t do_flee(CharacterPtr ch, const QString argument, cmd_t cmd)
       {
         if (!escape)
         {
-          act("$n panics, and attempts to flee.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-          act("You panic, and attempt to flee.", ch, 0, 0, TO_CHAR, 0);
+          act_to_room("$n panics, and attempts to flee.", ch, 0, 0, INVIS_NULL);
+          act_to_character("You panic, and attempt to flee.", ch, 0, 0, 0);
         }
         else
         {
-          act("You quickly duck $N's attack and attempt to make good your escape!", ch, 0, vict, TO_CHAR, 0);
-          act("$n quickly ducks your attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_VICT, 0);
-          act("$n quickly ducks $N's attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
+          act_to_character("You quickly duck $N's attack and attempt to make good your escape!", ch, 0, vict, 0);
+          act_to_victim("$n quickly ducks your attack and attempts to make good a stealthy escape!", ch, 0, vict, 0);
+          act_to_room("$n quickly ducks $N's attack and attempts to make good a stealthy escape!", ch, 0, vict, INVIS_NULL | NOTVICT);
         }
         // The flee has succeeded
         CharacterPtr last_fighting = ch->fighting;
@@ -7474,7 +7474,7 @@ command_return_t do_flee(CharacterPtr ch, const QString argument, cmd_t cmd)
         else
         {
           if (!isSet(retval, ReturnValue::eCH_DIED))
-            act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+            act_to_room("$n tries to flee, but is too exhausted!", ch, 0, 0, INVIS_NULL);
 
           if (last_fighting)
             ch->setPOSFighting();
@@ -7499,7 +7499,7 @@ command_return_t Character::check_pursuit(CharacterPtr victim, QString dircomman
   if (number(1, 100) > pursuit)
   {
     // failure
-    act("$N fled quickly before you were able to pursue $m!", this, 0, victim, TO_CHAR, 0);
+    act_to_character("$N fled quickly before you were able to pursue $m!", this, 0, victim, 0);
     WAIT_STATE(this, DC::PULSE_VIOLENCE);
   }
   else
@@ -7509,16 +7509,16 @@ command_return_t Character::check_pursuit(CharacterPtr victim, QString dircomman
     if (!charge_moves(SKILL_PURSUIT))
       return ReturnValue::eFAILURE;
 
-    act("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", this, 0, victim, TO_CHAR, 0);
-    act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, TO_ROOM, NOTVICT);
+    act_to_character("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", this, 0, victim, 0);
+    act_to_room("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, NOTVICT);
 
     qint32 retval = this->command_interpreter(dircommand);
     if (isSet(retval, ReturnValue::eCH_DIED))
       return ReturnValue::eSUCCESS;
 
-    act("Spotting $N nearby, you rush in towards $m and furiously attack!", this, 0, victim, TO_CHAR, 0);
-    act("$n charges in with a bellow of rage, cutting of your escape and attacks you furiously!", this, 0, victim, TO_VICT, 0);
-    act("$n charges in with a bellow of rage, cutting of $N's escape and attacks $m furiously!", this, 0, victim, TO_ROOM, NOTVICT);
+    act_to_character("Spotting $N nearby, you rush in towards $m and furiously attack!", this, 0, victim, 0);
+    act_to_victim("$n charges in with a bellow of rage, cutting of your escape and attacks you furiously!", this, 0, victim, 0);
+    act_to_room("$n charges in with a bellow of rage, cutting of $N's escape and attacks $m furiously!", this, 0, victim, NOTVICT);
     attack(this, victim, TYPE_UNDEFINED);
     WAIT_STATE(this, DC::PULSE_VIOLENCE);
   }

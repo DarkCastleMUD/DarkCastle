@@ -189,7 +189,7 @@ qint32 dice(qint32 num, qint32 size, QRandomGenerator *rng)
   return sum;
 }
 
-// compare strings but ignore case (unlike strcmp)
+// compare strings but ignore case (unlike dc_strcmp)
 // tested in TestUtility::test_str_cmp
 qint32 str_cmp(QString arg1, QString arg2)
 {
@@ -402,7 +402,7 @@ void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChanne
 
   if (stream != STDIN_FILENO)
   {
-    qfprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
+    dc_fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
     fclose(*f);
   }
 
@@ -507,15 +507,15 @@ void sprintbit(uint value[], const QStringList names, QString result)
     qint32 a = i / ASIZE;
     if (isSet(value[a], 1 << (i - a * 32)))
     {
-      if (!strcmp(names[i], "UNUSED"))
+      if (!dc_strcmp(names[i], "UNUSED"))
         continue;
-      strcat(result, names[i]);
-      strcat(result, " ");
+      dc_strcat(result, names[i]);
+      dc_strcat(result, " ");
     }
   }
 
   if (*result == '\0')
-    strcat(result, "NoBits ");
+    dc_strcat(result, "NoBits ");
 }
 
 // no leading space
@@ -529,7 +529,7 @@ QString sprintbit(uint value[], const QStringList names)
     qint32 a = i / ASIZE;
     if (isSet(value[a], 1 << (i - a * 32)))
     {
-      if (!strcmp(names[i], "UNUSED"))
+      if (!dc_strcmp(names[i], "UNUSED"))
       {
         continue;
       }
@@ -567,13 +567,13 @@ void sprintbit(quint32 vektor, const QStringList names, QString result)
   {
     if (isSet(1, vektor))
     {
-      if (!strcmp(names[nr], "unused"))
+      if (!dc_strcmp(names[nr], "unused"))
         continue;
       if (*names[nr] != '\n')
-        strcat(result, names[nr]);
+        dc_strcat(result, names[nr]);
       else
-        strcat(result, "Undefined");
-      strcat(result, " ");
+        dc_strcat(result, "Undefined");
+      dc_strcat(result, " ");
     }
 
     if (*names[nr] != '\n')
@@ -581,7 +581,7 @@ void sprintbit(quint32 vektor, const QStringList names, QString result)
   }
 
   if (*result == '\0')
-    strcat(result, "NoBits ");
+    dc_strcat(result, "NoBits ");
 }
 
 // leading space until all calling functions cleaned up
@@ -604,8 +604,8 @@ void sprintbit(quint32 vektor, QStringList names, QString result)
       if (names[nr].compare("unused", Qt::CaseInsensitive) == 0)
         continue;
 
-      strcat(result, names.value(nr, "Undefined").toStdString().c_str());
-      strcat(result, " ");
+      dc_strcat(result, names.value(nr, "Undefined").toStdString().c_str());
+      dc_strcat(result, " ");
     }
 
     if (nr < names.size() - 1)
@@ -613,7 +613,7 @@ void sprintbit(quint32 vektor, QStringList names, QString result)
   }
 
   if (*result == '\0')
-    strcat(result, "NoBits ");
+    dc_strcat(result, "NoBits ");
 }
 
 // leading space until all calling functions cleaned up
@@ -668,7 +668,7 @@ QString sprintbit(quint32 vektor, const QStringList names)
   {
     if (isSet(1, vektor))
     {
-      if (!strcmp(names[nr], "unused"))
+      if (!dc_strcmp(names[nr], "unused"))
       {
         continue;
       }
@@ -702,7 +702,7 @@ void sprinttype(quint64 type, QStringList names, QString result)
 {
   if (result)
   {
-    strcpy(result, names.value(type, "Undefined").toStdString().c_str());
+    dc_strcpy(result, names.value(type, "Undefined").toStdString().c_str());
   }
 }
 
@@ -1209,7 +1209,7 @@ bool check_blind(CharacterPtr ch)
 
 command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString name, message[MAX_INPUT_LENGTH];
+  QString name, message;
   QString buf;
   bool found = false;
   qint32 org_room;
@@ -1243,12 +1243,12 @@ command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim)
     {
       dc_sprintf(buf, "$N orders you to '%s'", message);
-      act(buf, victim, 0, ch, TO_CHAR, 0);
-      act("$n gives $N an order.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character(buf, victim, 0, ch, 0);
+      act_to_room("$n gives $N an order.", ch, 0, victim, NOTVICT);
       if ((victim->master != ch) ||
           !(IS_AFFECTED(victim, AFF_CHARM) ||
             IS_AFFECTED(victim, AFF_FAMILIAR)))
-        act("$n has an indifferent look.", victim, 0, 0, TO_ROOM, 0);
+        act_to_room("$n has an indifferent look.", victim, 0, 0, 0);
       else
       {
         ch->sendln("Ok.");
@@ -1258,7 +1258,7 @@ command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
     else
     { /* This is order "followers" */
       dc_sprintf(buf, "$n issues the order '%s'.", message);
-      act(buf, ch, 0, victim, TO_ROOM, 0);
+      act_to_room(buf, ch, 0, victim, 0);
 
       org_room = ch->in_room;
 
@@ -1404,7 +1404,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   qint32 retval = {};
   bool is_mob = {};
 
-  act("$n prays to $s God for transportation!", this, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n prays to $s God for transportation!", this, 0, 0, INVIS_NULL);
 
   if (IS_AFFECTED(this, AFF_CHARM))
     return ReturnValue::eFAILURE;
@@ -1592,13 +1592,13 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     if (loop_ch == victim || loop_ch->fighting == victim)
       stop_fighting(loop_ch);
 
-  act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n disappears.", victim, 0, 0, INVIS_NULL);
   is_mob = victim->isNonPlayer();
   retval = move_char(victim, location);
 
   if (!is_mob && !isSet(retval, ReturnValue::eCH_DIED))
   { // if it was a mob, we might have died moving
-    act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n appears out of nowhere.", victim, 0, 0, INVIS_NULL);
     do_look(victim, "");
   }
   return retval;
@@ -1713,7 +1713,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
     }
-    act("$n has left the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n has left the game.", ch, 0, 0, INVIS_NULL);
   }
 
   // Finish off any performances
@@ -1975,7 +1975,7 @@ QString get_skill_name(qint32 skillnum)
 bool check_valid_and_convert(qint32 &value, QString buf)
 {
   value = atoi(buf);
-  if (value == 0 && strcmp(buf, "0"))
+  if (value == 0 && dc_strcmp(buf, "0"))
     return false;
 
   return true;
@@ -2007,7 +2007,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
 
     for (qint32 x = {}; *bits[x] != '\n'; x++)
     {
-      if (!strcmp("unused", bits[x]))
+      if (!dc_strcmp("unused", bits[x]))
         continue;
       if (is_abbrev(arg1.c_str(), bits[x]))
       {
@@ -2098,7 +2098,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
 
     for (qint32 x = {}; *bits[x] != '\n'; x++)
     {
-      if (!strcmp("unused", bits[x]))
+      if (!dc_strcmp("unused", bits[x]))
         continue;
       if (is_abbrev(arg1.c_str(), bits[x]))
       {
@@ -2156,7 +2156,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
 
     for (auto x = {}; *bits[x] != '\n'; x++)
     {
-      if (!strcmp("unused", bits[x]))
+      if (!dc_strcmp("unused", bits[x]))
       {
         continue;
       }
@@ -2229,7 +2229,7 @@ qint32 get_line(FILE *fl, QString buf)
     return 0;
   else
   {
-    strcpy(buf, temp);
+    dc_strcpy(buf, temp);
     return lines;
   }
 }
@@ -2358,13 +2358,13 @@ void remove_character(QString name, BACKUP_TYPE backup)
   switch (backup)
   {
   case SELFDELETED:
-    strncpy(dst_dir, "../archive/selfdeleted/", 256);
+    dc_strncpy(dst_dir, "../archive/selfdeleted/", 256);
     break;
   case CONDEATH:
-    strncpy(dst_dir, "../archive/condeath/", 256);
+    dc_strncpy(dst_dir, "../archive/condeath/", 256);
     break;
   case ZAPPED:
-    strncpy(dst_dir, "../archive/zapped/", 256);
+    dc_strncpy(dst_dir, "../archive/zapped/", 256);
     break;
   case NONE:
     break;
@@ -2435,13 +2435,13 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   switch (backup)
   {
   case SELFDELETED:
-    strncpy(dst_dir, "../archive/selfdeleted/", 256);
+    dc_strncpy(dst_dir, "../archive/selfdeleted/", 256);
     break;
   case CONDEATH:
-    strncpy(dst_dir, "../archive/condeath/", 256);
+    dc_strncpy(dst_dir, "../archive/condeath/", 256);
     break;
   case ZAPPED:
-    strncpy(dst_dir, "../archive/zapped/", 256);
+    dc_strncpy(dst_dir, "../archive/zapped/", 256);
     break;
   case NONE:
     break;

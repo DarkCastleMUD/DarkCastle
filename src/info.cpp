@@ -30,21 +30,14 @@
 #include <QRegularExpression>
 
 #include "DC/DC.h"
-#include "DC/levels.h"
-#include "DC/structs.h"
 
 #include "DC/terminal.h"
-#include "DC/player.h"
 
-#include "DC/clan.h"
 #include "DC/handler.h"
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
-#include "DC/spells.h"
 #include "DC/race.h"
-#include "DC/act.h"
 #include "DC/set.h"
-#include "DC/returnvals.h"
 
 #include "DC/handler.h"
 #include "DC/const.h"
@@ -102,46 +95,12 @@ qint32 get_saves(CharacterPtr ch, qint32 savetype)
 
 /* Procedures related to 'look' */
 
-void argument_split_3(const QString argument, QString first_arg, QString second_arg, QString third_arg)
+void argument_split_3(QString argument, QString &first_arg, QString &second_arg, QString &third_arg)
 {
-  qint32 look_at, begin;
-  begin = {};
-
-  /* Find first non blank */
-  for (; *(argument + begin) == ' '; begin++)
-    ;
-
-  /* Find length of first word */
-  for (look_at = {}; *(argument + begin + look_at) > ' '; look_at++)
-    /* Make all letters lower case, AND copy them to first_arg */
-    *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-
-  *(first_arg + look_at) = '\0';
-  begin += look_at;
-
-  /* Find first non blank */
-  for (; *(argument + begin) == ' '; begin++)
-    ;
-
-  /* Find length of second word */
-  for (look_at = {}; *(argument + begin + look_at) > ' '; look_at++)
-    /* Make all letters lower case, AND copy them to second_arg */
-    *(second_arg + look_at) = LOWER(*(argument + begin + look_at));
-
-  *(second_arg + look_at) = '\0';
-  begin += look_at;
-
-  /* Find first non blank */
-  for (; *(argument + begin) == ' '; begin++)
-    ;
-
-  /* Find length of second word */
-  for (look_at = {}; *(argument + begin + look_at) > ' '; look_at++)
-    /* Make all letters lower case, AND copy them to second_arg */
-    *(third_arg + look_at) = LOWER(*(argument + begin + look_at));
-
-  *(third_arg + look_at) = '\0';
-  begin += look_at;
+  auto arguments = argument.trimmed().toLower().split(' ');
+  first_arg = arguments.value(0);
+  second_arg = arguments.value(1);
+  third_arg = arguments.value(2);
 }
 
 ObjectPtr Character::get_object_in_equip_vis(QString arg, ObjectPtr equipment[], qint32 *j, bool blindfighting)
@@ -150,7 +109,7 @@ ObjectPtr Character::get_object_in_equip_vis(QString arg, ObjectPtr equipment[],
   QString tmpname;
   QString tmp;
 
-  strcpy(tmpname, arg);
+  dc_strcpy(tmpname, arg);
   tmp = tmpname;
   if ((num = get_number(&tmp)) < 0)
     return {};
@@ -213,85 +172,85 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
 
   buffer[0] = '\0';
   if ((mode == 0) && !object->long_description().isEmpty())
-    strcpy(buffer, qPrintable(object->long_description()));
+    dc_strcpy(buffer, qPrintable(object->long_description()));
   else if (!object->short_description().isEmpty() && ((mode == 1) ||
                                                       (mode == 2) || (mode == 3) || (mode == 4)))
-    strcpy(buffer, qPrintable(object->short_description()));
+    dc_strcpy(buffer, qPrintable(object->short_description()));
   else if (mode == 5)
   {
     if (object->obj_flags.type_flag == ITEM_NOTE)
     {
       if (!object->ActionDescription().isEmpty())
       {
-        strncpy(buffer, "There is something written upon it:\r\n\r\n", sizeof(buffer) - 1);
-        strncat(buffer, qPrintable(object->ActionDescription()), sizeof(buffer) - 1);
+        dc_strncpy(buffer, "There is something written upon it:\r\n\r\n", sizeof(buffer) - 1);
+        dc_strncat(buffer, qPrintable(object->ActionDescription()), sizeof(buffer) - 1);
         page_string(this->desc, buffer, 1);
       }
       else
-        act("It's blank.", this, 0, 0, TO_CHAR, 0);
+        act_to_character("It's blank.", this, 0, 0, 0);
       return;
     }
     else if ((object->obj_flags.type_flag != ITEM_DRINKCON))
     {
-      strcpy(buffer, "You see nothing special.");
+      dc_strcpy(buffer, "You see nothing special.");
     }
     else /* ITEM_TYPE == ITEM_DRINKCON */
     {
-      strcpy(buffer, "It looks like a drink container.");
+      dc_strcpy(buffer, "It looks like a drink container.");
     }
   }
 
   if (mode != 3)
   {
-    if (mode == 0)          // 'look'
-      strcat(buffer, "$R"); // setup color background
+    if (mode == 0)             // 'look'
+      dc_strcat(buffer, "$R"); // setup color background
 
-    strcpy(flagbuf, " $B($R");
+    dc_strcpy(flagbuf, " $B($R");
 
     if (IS_OBJ_STAT(object, ITEM_INVISIBLE))
     {
-      strcat(flagbuf, "Invisible");
+      dc_strcat(flagbuf, "Invisible");
       found++;
     }
     if (IS_OBJ_STAT(object, ITEM_MAGIC) && IS_AFFECTED(this, AFF_DETECT_MAGIC))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "Blue Glow");
+        dc_strcat(flagbuf, "$B/$R");
+      dc_strcat(flagbuf, "Blue Glow");
       found++;
     }
     if (IS_OBJ_STAT(object, ITEM_GLOW))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "Glowing");
+        dc_strcat(flagbuf, "$B/$R");
+      dc_strcat(flagbuf, "Glowing");
       found++;
     }
     if (IS_OBJ_STAT(object, ITEM_HUM))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "Humming");
+        dc_strcat(flagbuf, "$B/$R");
+      dc_strcat(flagbuf, "Humming");
       found++;
     }
     if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "NO_NOTICE");
+        dc_strcat(flagbuf, "$B/$R");
+      dc_strcat(flagbuf, "NO_NOTICE");
       found++;
     }
     if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NOSEE))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "NO_SEE");
+        dc_strcat(flagbuf, "$B/$R");
+      dc_strcat(flagbuf, "NO_SEE");
       found++;
     }
     if (found)
     {
-      strcat(flagbuf, "$B)$R");
-      strcat(buffer, flagbuf);
+      dc_strcat(flagbuf, "$B)$R");
+      dc_strcat(buffer, flagbuf);
     }
 
     /* show object's condition if is an armor...  */
@@ -305,22 +264,22 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
         object->obj_flags.type_flag == ITEM_STAFF ||
         object->obj_flags.type_flag == ITEM_LIGHT)
     {
-      strcat(buffer, item_condition(object)); /*
+      dc_strcat(buffer, item_condition(object)); /*
             percent = 100 - (qint32)(100 * ((qreal)eq_current_damage(object) / (qreal)eq_max_damage(object)));
 
             if (percent >= 100)
-               strcat(buffer, " [$B$2Excellent$R]");
+               dc_strcat(buffer, " [$B$2Excellent$R]");
             else if (percent >= 80)
-               strcat(buffer, " [$2Good$R]");
+               dc_strcat(buffer, " [$2Good$R]");
             else if (percent >= 60)
-               strcat(buffer, " [$3Decent$R]");
+               dc_strcat(buffer, " [$3Decent$R]");
             else if (percent >= 40)
-               strcat(buffer, " [$B$5Damaged$R]");
+               dc_strcat(buffer, " [$B$5Damaged$R]");
             else if (percent >= 20)
-               strcat(buffer, " [$4Quite Damaged$R]");
+               dc_strcat(buffer, " [$4Quite Damaged$R]");
             else if (percent >= 0)
-               strcat(buffer, " [$B$4Falling Apart$R]");
-            else strcat(buffer, " [$5Pile of Scraps$R]");
+               dc_strcat(buffer, " [$B$4Falling Apart$R]");
+            else dc_strcat(buffer, " [$5Pile of Scraps$R]");
    */
     }
     if (isSet(object->obj_flags.more_flags, ITEM_24H_SAVE) && !isSet(object->obj_flags.extra_flags, ITEM_NOSAVE))
@@ -329,17 +288,17 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       time_t expires = object->save_expiration;
       if (expires == 0)
       {
-        strcat(buffer, " $R($B$0unsaved$R)");
+        dc_strcat(buffer, " $R($B$0unsaved$R)");
       }
       else if (now >= expires)
       {
-        strcat(buffer, " $R($B$0expired$R)");
+        dc_strcat(buffer, " $R($B$0expired$R)");
       }
       else
       {
         QString timebuffer;
         dc_snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
-        strcat(buffer, timebuffer);
+        dc_strcat(buffer, timebuffer);
       }
     }
 
@@ -349,14 +308,14 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       time_t expires = object->no_sell_expiration;
       if (now >= expires || expires == 0)
       {
-        strcat(buffer, " $R($B$0sellable$R)");
+        dc_strcat(buffer, " $R($B$0sellable$R)");
       }
       else
       {
         QString timebuffer = {};
 
         dc_snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
-        strcat(buffer, timebuffer);
+        dc_strcat(buffer, timebuffer);
       }
     }
 
@@ -366,15 +325,15 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       {
         QString timebuffer = {};
         dc_snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->obj_flags.timer);
-        strcat(buffer, timebuffer);
+        dc_strcat(buffer, timebuffer);
       }
     }
 
-    if (mode == 0)            // 'look'
-      strcat(buffer, "$B$1"); // setup color background
+    if (mode == 0)               // 'look'
+      dc_strcat(buffer, "$B$1"); // setup color background
   }
 
-  strcat(buffer, "\r\n");
+  dc_strcat(buffer, "\r\n");
   page_string(this->desc, buffer, 1);
 }
 
@@ -650,7 +609,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
       }
       else
       {
-        act("You see nothing special about $m.", i, 0, ch, TO_VICT, 0);
+        act_to_victim("You see nothing special about $m.", i, 0, ch, 0);
       }
     }
 
@@ -708,8 +667,8 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
 
     if (found)
     {
-      act("\r\n$n is using:", i, 0, ch, TO_VICT, 0);
-      act("<    worn     > Item Description     (Flags) [Item Condition]\r\n", i, 0, ch, TO_VICT, 0);
+      act_to_victim("\r\n$n is using:", i, 0, ch, 0);
+      act_to_victim("<    worn     > Item Description     (Flags) [Item Condition]\r\n", i, 0, ch, 0);
 
       for (j = {}; j < MAX_WEAR; j++)
       {
@@ -747,7 +706,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
   else if (mode == 2)
   {
     /* Lists inventory */
-    act("$n is carrying:", i, 0, ch, TO_VICT, 0);
+    act_to_victim("$n is carrying:", i, 0, ch, 0);
     ch->list_obj_to_char(i->carrying, 1, true);
   }
 }
@@ -1048,7 +1007,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
       const qint32 rn_of_vnum = real_object(vnum);
       if (rn_of_vnum >= 0)
       {
-        vobj = (ObjectPtr)DC::getInstance()->obj_index[rn_of_vnum].item;
+        vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
       }
     }
   }
@@ -1071,19 +1030,19 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     if (obj->obj_flags.value[1] >= 1)
     {
       sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
     if (obj->obj_flags.value[2] >= 1)
     {
       sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
     if (obj->obj_flags.value[3] >= 1)
     {
       sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
     break;
@@ -1101,7 +1060,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     if (obj->obj_flags.value[3] >= 1)
     {
       sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
     break;
@@ -1193,9 +1152,9 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
       if (obj->affected[i].location < 1000)
         sprinttype(obj->affected[i].location, apply_types, buf2);
       else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
-        strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
+        dc_strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
       else
-        strcpy(buf2, "Invalid");
+        dc_strcpy(buf2, "Invalid");
       ch->send(QStringLiteral("    $3Affects : $R%s$3 By $R%d").arg(buf2).arg(obj->affected[i].modifier));
 
       if (vobj != nullptr &&
@@ -1247,7 +1206,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
       send("Invalid VNUM.\r\n");
       return ReturnValue::eFAILURE;
     }
-    obj = (ObjectPtr)DC::getInstance()->obj_index[rnum].item;
+    obj = DC::getInstance()->obj_index[rnum].item;
 
     if (obj->isDark() && !isImmortalPlayer())
     {
@@ -1289,9 +1248,19 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
   bool found = {};
   ObjectPtr tmp_object = {}, found_object = {};
   CharacterPtr tmp_char = {};
-  static const QStringList keywords = {"north", "east", "south", "west", "up", "down",
-                                       "in", "at", "out", "through", "", /* Look at '' case */
-                                       "\n"};
+  static const QStringList keywords = {
+      "north",
+      "east",
+      "south",
+      "west",
+      "up",
+      "down",
+      "in",
+      "at",
+      "out",
+      "through",
+      "", /* Look at '' case */
+  };
 
   qint32 weight_in(ObjectPtr obj);
   if (!ch->desc)
@@ -1320,7 +1289,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
     if ((keyword_no == -1) && *arg1)
     {
       keyword_no = 7;
-      strcpy(arg2, arg1); /* Let arg2 become the target object (arg1) */
+      dc_strcpy(arg2, arg1); /* Let arg2 become the target object (arg1) */
     }
 
     found = false;
@@ -1394,7 +1363,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
           {
             if (tmp_object->obj_flags.value[1] <= 0)
             {
-              act("It is empty.", ch, 0, 0, TO_CHAR, 0);
+              act_to_character("It is empty.", ch, 0, 0, 0);
             }
             else
             {
@@ -1521,17 +1490,13 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
             }
             if ((cmd == cmd_t::GLANCE) && !IS_AFFECTED(ch, AFF_HIDE))
             {
-              act("$n glances at you.", ch, 0, tmp_char, TO_VICT,
-                  INVIS_NULL);
-              act("$n glances at $N.", ch, 0, tmp_char, TO_ROOM,
-                  INVIS_NULL | NOTVICT);
+              act("$n glances at you.", ch, 0, tmp_char, TO_VICT, INVIS_NULL);
+              act("$n glances at $N.", ch, 0, tmp_char, TO_ROOM, INVIS_NULL | NOTVICT);
             }
             else if (!IS_AFFECTED(ch, AFF_HIDE))
             {
-              act("$n looks at you.", ch, 0, tmp_char, TO_VICT,
-                  INVIS_NULL);
-              act("$n looks at $N.", ch, 0, tmp_char, TO_ROOM,
-                  INVIS_NULL | NOTVICT);
+              act("$n looks at you.", ch, 0, tmp_char, TO_VICT, INVIS_NULL);
+              act("$n looks at $N.", ch, 0, tmp_char, TO_ROOM, INVIS_NULL | NOTVICT);
             }
           }
           return ReturnValue::eSUCCESS;
@@ -1733,7 +1698,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       ch->list_obj_to_char(DC::getInstance()->world[ch->in_room].contents, 0, false);
       ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
 
-      strcpy(buffer, "");
+      dc_strcpy(buffer, "");
       *buffer = '\0';
       for (qint32 doorj = {}; doorj <= 5; doorj++)
       {
@@ -2123,7 +2088,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
         aff_name = QStringLiteral("clanarea challenge timer");
         break;
       case SKILL_CRAZED_ASSAULT:
-        if (strcmp(apply_types[(qint32)aff->location], "HITROLL"))
+        if (dc_strcmp(apply_types[(qint32)aff->location], "HITROLL"))
           aff_name = QStringLiteral("crazed assault reuse timer");
         break;
       case SPELL_IMMUNITY:
@@ -2364,7 +2329,7 @@ command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_sprintf(buf, "The sky is %s and %s.\r\n",
                sky_look[weather_info.sky],
                (weather_info.change >= 0 ? "you feel a warm wind from south" : "your foot tells you bad weather is due"));
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
   }
   else
     ch->sendln("You have no feeling about the weather at all.");
@@ -2383,7 +2348,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
   extern QString help;
 
   qint32 chk, bot, top, mid;
-  QString buf, buffer[MAX_STRING_LENGTH];
+  QString buf, buffer;
 
   if (!ch->desc)
     return ReturnValue::eFAILURE;
@@ -2417,8 +2382,8 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
           buf[80] = {};
           if ((strlen(buffer) + strlen(buf)) >= MAX_STRING_LENGTH)
             break;
-          strcat(buffer, buf);
-          strcat(buffer, "\r");
+          dc_strcat(buffer, buf);
+          dc_strcat(buffer, "\r");
         }
         page_string(ch->desc, buffer, 1);
         return ReturnValue::eSUCCESS;
@@ -2498,7 +2463,7 @@ command_return_t do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (!found)
         {
-          act("<    worn     > Item Description     (Flags) [Item Condition]\r\n", ch, 0, 0, TO_CHAR, 0);
+          act_to_character("<    worn     > Item Description     (Flags) [Item Condition]\r\n", ch, 0, 0, 0);
           found = true;
         }
         send_to_char(where[j], ch);
@@ -2547,7 +2512,7 @@ command_return_t do_info(CharacterPtr ch, QString argument, cmd_t cmd)
 /*********------------ locate objects -----------------***************/
 command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
-  QString buf, buf2[MAX_STRING_LENGTH];
+  QString buf, buf2;
   ObjectPtr k;
   qint32 in_room = 0, count = {};
   qint32 vnum = {};
@@ -2622,36 +2587,36 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 
     if (k->in_obj)
     {
-      strcat(buf, " in ");
-      strcat(buf, qPrintable(k->in_obj->short_description()));
+      dc_strcat(buf, " in ");
+      dc_strcat(buf, qPrintable(k->in_obj->short_description()));
       if (k->in_obj->carried_by)
       {
-        strcat(buf, " carried by ");
-        strcat(buf, qPrintable(k->in_obj->carried_by->name()));
+        dc_strcat(buf, " carried by ");
+        dc_strcat(buf, qPrintable(k->in_obj->carried_by->name()));
       }
       else if (k->in_obj->equipped_by)
       {
-        strcat(buf, " equipped by ");
-        strcat(buf, qPrintable(k->in_obj->equipped_by->name()));
+        dc_strcat(buf, " equipped by ");
+        dc_strcat(buf, qPrintable(k->in_obj->equipped_by->name()));
       }
     }
     if (k->carried_by)
     {
-      strcat(buf, " carried by ");
-      strcat(buf, qPrintable(k->carried_by->name()));
+      dc_strcat(buf, " carried by ");
+      dc_strcat(buf, qPrintable(k->carried_by->name()));
     }
     else if (k->equipped_by)
     {
-      strcat(buf, " equipped by ");
-      strcat(buf, qPrintable(k->equipped_by->name()));
+      dc_strcat(buf, " equipped by ");
+      dc_strcat(buf, qPrintable(k->equipped_by->name()));
     }
     if (strlen(buf2) + strlen(buf) + 3 >= MAX_STRING_LENGTH)
     {
       ch->sendln("LIST TRUNCATED...TOO LONG");
       break;
     }
-    strcat(buf2, buf);
-    strcat(buf2, "\r\n");
+    dc_strcat(buf2, buf);
+    dc_strcat(buf2, "\r\n");
   }
 
   if (!*buf2)
@@ -2666,7 +2631,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 // locates ONLY mobiles.  If cmd == 18, it locates pc's AND mobiles
 command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
-  QString buf, buf2[MAX_STRING_LENGTH];
+  QString buf, buf2;
   qint32 count = {};
   qint32 vnum = {};
   qint32 searchnum = {};
@@ -2710,7 +2675,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
       ch->sendln("LIST TRUNCATED...TOO LONG");
       break;
     }
-    strcat(buf2, buf);
+    dc_strcat(buf2, buf);
   }
 
   if (!*buf2)
@@ -3127,8 +3092,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM,
-      INVIS_NULL | STAYHIDE);
+  act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
   ch->sendln("You carefully search the surroundings...\r\n");
 
   for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
@@ -3268,8 +3232,8 @@ command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
   else
     dc_sprintf(buf, "$n is waiting for %d ticks.", ntick);
 
-  act(buf, ch, 0, 0, TO_CHAR, INVIS_NULL);
-  act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_character(buf, ch, 0, 0, INVIS_NULL);
+  act_to_room(buf, ch, 0, 0, INVIS_NULL);
 
   // TODO - figure out if this ever had any purpose.  It's still fun though:)
   ch->desc->tick_wait = ntick;
@@ -4546,7 +4510,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         const qint32 rn_of_vnum = real_object(vnum);
         if (rn_of_vnum >= 0)
         {
-          vobj = (ObjectPtr)DC::getInstance()->obj_index[rn_of_vnum].item;
+          vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
         }
       }
     }

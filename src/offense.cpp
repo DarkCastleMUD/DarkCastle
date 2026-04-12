@@ -62,11 +62,11 @@ command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
   if (percent > 50)
   {
     ch->sendln("You miss your wrists with the blade and knick your kneecap!");
-    act("$n tries to suicide, but fails miserably.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n tries to suicide, but fails miserably.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
   ch->sendln("Looking out upon the world, you decide that it would be a better place without you.");
-  act("Tired of life, $n decides to end $s.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("Tired of life, $n decides to end $s.", ch, 0, 0, 0);
   fight_kill(ch, ch, TYPE_PKILL, 0);
   return ReturnValue::eSUCCESS;
 }
@@ -149,7 +149,7 @@ command_return_t do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
       if (victim == ch)
       {
         ch->sendln("You hit yourself..OUCH!.");
-        act("$n hits $mself, and says OUCH!", ch, 0, victim, TO_ROOM, 0);
+        act_to_room("$n hits $mself, and says OUCH!", ch, 0, victim, 0);
       }
       else
       {
@@ -205,13 +205,13 @@ command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   //  if (IS_AFFECTED(ch, AFF_CHARM) && ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_ANTI_PAL && victim->isPlayer()) {
-  //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
+  //     act_to_character("I can't attack $N master!", ch->master, 0, victim,  0);
   //     return ReturnValue::eFAILURE;
   //  }
 
   if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master->isPlayer())
   {
-    act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
+    act_to_character("But $N scares me!!", ch->master, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -234,8 +234,8 @@ command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
 
     act("You chop $M to pieces! Ah! The blood!",
         ch, 0, victim, TO_CHAR, 0);
-    act("$N chops you to pieces!", victim, 0, ch, TO_CHAR, 0);
-    act("$n brutally slays $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_character("$N chops you to pieces!", victim, 0, ch, 0);
+    act_to_room("$n brutally slays $N.", ch, 0, victim, NOTVICT);
     fight_kill(ch, victim, TYPE_RAW_KILL, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }
@@ -264,13 +264,13 @@ command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   //  if (IS_AFFECTED(ch, AFF_CHARM) && ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_ANTI_PAL && victim->isPlayer()) {
-  //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
+  //     act_to_character("I can't attack $N master!", ch->master, 0, victim,  0);
   //     return ReturnValue::eFAILURE;
   //  }
 
   if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master->isPlayer())
   {
-    act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
+    act_to_character("But $N scares me!!", ch->master, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -300,8 +300,8 @@ command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       act("You chop $M to pieces! Ah! The blood!",
           ch, 0, victim, TO_CHAR, 0);
-      act("$N chops you to pieces!", victim, 0, ch, TO_CHAR, 0);
-      act("$n brutally slays $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character("$N chops you to pieces!", victim, 0, ch, 0);
+      act_to_room("$n brutally slays $N.", ch, 0, victim, NOTVICT);
       fight_kill(ch, victim, TYPE_CHOOSE, 0);
       return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
     }
@@ -398,7 +398,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   }
 
   // if (IS_AFFECTED(ch, AFF_CHARM) && ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_ANTI_PAL && victim->fighting->isPlayer()) {
-  //    act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
+  //    act_to_character("I can't join the attack against $N master!", ch->master, 0, victim->fighting,  0);
   //    return ReturnValue::eFAILURE;
   // }
 
@@ -406,7 +406,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
 
   if (!tmp_ch)
   {
-    act("But $N is not fighting!!!", this, 0, victim, TO_CHAR, 0);
+    act_to_character("But $N is not fighting!!!", this, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -416,8 +416,8 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
   }
 
   sendln("ARGGGGG!!!! *** K I L L ***!!!!.");
-  act("$N joins you in the fight!", victim, 0, this, TO_CHAR, 0);
-  act("$n has joined $N in the battle.", this, 0, victim, TO_ROOM, NOTVICT);
+  act_to_character("$N joins you in the fight!", victim, 0, this, 0);
+  act_to_room("$n has joined $N in the battle.", this, 0, victim, NOTVICT);
 
   return attack(this, tmp_ch, TYPE_UNDEFINED);
 }

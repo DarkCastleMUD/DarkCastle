@@ -695,13 +695,13 @@ void check_weapon_weights(CharacterPtr ch)
   if (!ch->isNonPlayer() && ch->equipment[WEAR_WIELD] &&
       GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
   {
-    act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_WIELD], 0, TO_CHAR, 0);
-    act("$n stops using $p.", ch, ch->equipment[WEAR_WIELD], 0, TO_ROOM, INVIS_NULL);
+    act_to_character("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_WIELD], 0, 0);
+    act_to_room("$n stops using $p.", ch, ch->equipment[WEAR_WIELD], 0, INVIS_NULL);
     obj_to_char(ch->unequip_char(WEAR_WIELD), ch);
     if (ch->equipment[WEAR_SECOND_WIELD])
     {
-      act("You move your $p to be your primary weapon.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
-      act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+      act_to_character("You move your $p to be your primary weapon.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, INVIS_NULL);
+      act_to_room("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, INVIS_NULL);
       weapon = ch->unequip_char(WEAR_SECOND_WIELD);
       ch->equip_char(weapon, WEAR_WIELD);
       check_weapon_weights(ch); // Not a loop, since it'll only happen once.
@@ -712,8 +712,8 @@ void check_weapon_weights(CharacterPtr ch)
   if (ch->equipment[WEAR_SECOND_WIELD] &&
       GET_OBJ_WEIGHT(ch->equipment[WEAR_SECOND_WIELD]) > GET_STR(ch) / 2 && !ISSET(ch->affected_by, AFF_POWERWIELD))
   {
-    act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, 0);
-    act("$n stops using $p.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+    act_to_character("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, 0);
+    act_to_room("$n stops using $p.", ch, ch->equipment[WEAR_SECOND_WIELD], 0, INVIS_NULL);
     obj_to_char(ch->unequip_char(WEAR_SECOND_WIELD), ch);
   }
 
@@ -722,8 +722,8 @@ void check_weapon_weights(CharacterPtr ch)
                                      (ch->equipment[WEAR_SECOND_WIELD] &&
                                       GET_OBJ_WEIGHT(ch->equipment[WEAR_SECOND_WIELD]) > GET_STR(ch) / 2 && !ISSET(ch->affected_by, AFF_POWERWIELD))))
   {
-    act("You shift your shield into your inventory.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
-    act("$n stops using $p.", ch, ch->equipment[WEAR_SHIELD], 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You shift your shield into your inventory.", ch, ch->equipment[WEAR_SHIELD], 0, 0);
+    act_to_room("$n stops using $p.", ch, ch->equipment[WEAR_SHIELD], 0, INVIS_NULL);
     obj_to_char(ch->unequip_char(WEAR_SHIELD), ch);
   }
 }
@@ -751,8 +751,8 @@ void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool ad
           send_to_char("The magic of this item clashes with your fire "
                        "shield.\r\n",
                        ch);
-          act("Your $B$4flames$R have been extinguished!", ch, 0, ch, TO_VICT, 0);
-          act("The $B$4flames$R encompassing $n's body are extinguished!", ch, 0, 0, TO_ROOM, 0);
+          act_to_victim("Your $B$4flames$R have been extinguished!", ch, 0, ch, 0);
+          act_to_room("The $B$4flames$R encompassing $n's body are extinguished!", ch, 0, 0, 0);
         }
       }
 
@@ -765,8 +765,8 @@ void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool ad
           send_to_char("The magic of this item clashes with your acid "
                        "shield.\r\n",
                        ch);
-          act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, ch, TO_VICT, 0);
-          act("The $B$2acid$R swirling about $n's body dissolves to nothing!", ch, 0, 0, TO_ROOM, 0);
+          act_to_victim("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, ch, 0);
+          act_to_room("The $B$2acid$R swirling about $n's body dissolves to nothing!", ch, 0, 0, 0);
         }
       }
     }
@@ -1664,31 +1664,31 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
         {
           obj_to_char(ch->unequip_char(WEAR_SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
           if (!(flags & SUPPRESS_MESSAGES))
-            act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
+            act_to_character("You shift $p into your inventory.", ch, obj, nullptr, 0);
         }
         else if ((obj = ch->equipment[WEAR_HOLD]))
         {
           obj_to_char(ch->unequip_char(WEAR_HOLD, (flags & SUPPRESS_MESSAGES)), ch);
           if (!(flags & SUPPRESS_MESSAGES))
-            act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
+            act_to_character("You shift $p into your inventory.", ch, obj, nullptr, 0);
         }
         else if ((obj = ch->equipment[WEAR_HOLD2]))
         {
           obj_to_char(ch->unequip_char(WEAR_HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
           if (!(flags & SUPPRESS_MESSAGES))
-            act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
+            act_to_character("You shift $p into your inventory.", ch, obj, nullptr, 0);
         }
         else if ((obj = ch->equipment[WEAR_SHIELD]))
         {
           obj_to_char(ch->unequip_char(WEAR_SHIELD, (flags & SUPPRESS_MESSAGES)), ch);
           if (!(flags & SUPPRESS_MESSAGES))
-            act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
+            act_to_character("You shift $p into your inventory.", ch, obj, nullptr, 0);
         }
         else if ((obj = ch->equipment[WEAR_LIGHT]))
         {
           obj_to_char(ch->unequip_char(WEAR_LIGHT, (flags & SUPPRESS_MESSAGES)), ch);
           if (!(flags & SUPPRESS_MESSAGES))
-            act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
+            act_to_character("You shift $p into your inventory.", ch, obj, nullptr, 0);
         }
       }
     obj = ch->equipment[WEAR_SECOND_WIELD];
@@ -1700,7 +1700,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
         {
           obj_to_char(ch->unequip_char(WEAR_SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
           if (!(flags & SUPPRESS_MESSAGES))
-            act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
+            act_to_character("You shift $p into your inventory.", ch, obj, nullptr, 0);
         }
       }
     if (!(flags & SUPPRESS_MESSAGES))
@@ -1758,7 +1758,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
       ch->sendln("Your musical ability to breathe water ends.");
       if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
       {
-        act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
+        act_to_room("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n", ch, 0, 0, 0);
         ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
       }
     }
@@ -1775,7 +1775,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
 			fight_kill(nullptr, ch, TYPE_RAW_KILL, 0);
 			char_died = true;
 #else
-      act("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\r\n", ch, 0, 0, 0);
       ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
 #endif
     }
@@ -1961,8 +1961,8 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
       {
         if (ch->master->in_room == ch->in_room)
         {
-          act("$N blinks, shakes their head and snaps out of their dark trance. $N looks pissed!", ch->master, 0, ch, TO_ROOM, 0);
-          act("$N blinks, shakes their head and snaps out of their dark trance. $N looks pissed!", ch->master, 0, ch, TO_CHAR, 0);
+          act_to_room("$N blinks, shakes their head and snaps out of their dark trance. $N looks pissed!", ch->master, 0, ch, 0);
+          act_to_character("$N blinks, shakes their head and snaps out of their dark trance. $N looks pissed!", ch->master, 0, ch, 0);
         }
         if (!(flags & SUPPRESS_CONSEQUENCES))
           ch->add_memory(ch->master->name(), 'h');
@@ -2332,7 +2332,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
   {
     if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || this->isPlayerObjectThief() || contains_no_trade_item(obj))
     {
-      act("You are zapped by $p but it stays with you.", this, obj, 0, TO_CHAR, 0);
+      act_to_character("You are zapped by $p but it stays with you.", this, obj, 0, 0);
       this->recheck_height_wears();
       obj_to_char(obj, this);
       if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
@@ -2343,8 +2343,8 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     }
     if (this->in_room != DC::NOWHERE)
     {
-      act("You are zapped by $p and instantly drop it.", this, obj, 0, TO_CHAR, 0);
-      act("$n is zapped by $p and instantly drops it.", this, obj, 0, TO_ROOM, 0);
+      act_to_character("You are zapped by $p and instantly drop it.", this, obj, 0, 0);
+      act_to_room("$n is zapped by $p and instantly drops it.", this, obj, 0, 0);
       this->recheck_height_wears();
       obj_to_room(obj, this->in_room);
       if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
@@ -2361,24 +2361,24 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
 
   if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30010 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
-    act("$p binds to your skin and won't let go. It hurts!", this, obj, 0, TO_CHAR, 0);
-    act("$p binds to $n's skin!", this, obj, 0, TO_ROOM, 0);
+    act_to_character("$p binds to your skin and won't let go. It hurts!", this, obj, 0, 0);
+    act_to_room("$p binds to $n's skin!", this, obj, 0, 0);
     obj->obj_flags.timer = {};
   }
   if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30036 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
-    act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, TO_CHAR, 0);
+    act_to_character("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, 0);
     obj->obj_flags.timer = {};
   }
   if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30033 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
-    act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, TO_CHAR, 0);
+    act_to_character("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, 0);
     obj->obj_flags.timer = {};
   }
 
   if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30008 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
-    act("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, TO_CHAR, 0);
+    act_to_character("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, 0);
     obj->obj_flags.timer = 5;
   }
 
@@ -2404,8 +2404,8 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     //  rather than fixing it, i'm leaving it out because it's annoying anyway cause
     //  it tells you every time you save
     // TODO - make it not be annoying
-    //      act("The soft glow from $p brightens the area around $n.", this, obj, 0, TO_ROOM, 0);
-    //      act("The soft glow from $p brightens the area around you.", this, obj, 0, TO_CHAR, 0);
+    //      act_to_room("The soft glow from $p brightens the area around $n.", this, obj, 0,  0);
+    //      act_to_character("The soft glow from $p brightens the area around you.", this, obj, 0,  0);
   }
   if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
   {
@@ -2441,17 +2441,17 @@ ObjectPtr Character::unequip_char(qint32 pos, bool flag)
 
   if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
-    act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", this, obj, 0, TO_CHAR, 0);
+    act_to_character("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", this, obj, 0, 0);
     GET_MANA(this) = GET_MANA(this) / 2;
   }
   if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
-    act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", this, obj, 0, TO_CHAR, 0);
+    act_to_character("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", this, obj, 0, 0);
     setHP(getHP() / 2);
   }
   if (DC::getInstance()->obj_index[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
-    act("The spring in your step has subsided.", this, obj, 0, TO_CHAR, 0);
+    act_to_character("The spring in your step has subsided.", this, obj, 0, 0);
     obj->obj_flags.timer = {};
   }
 
@@ -2464,7 +2464,7 @@ b: // ew
   if (this->isPlayer())
     for (a = player->skillchange; a; a = a->next_skill)
     {
-      if (a == (ObjectPtr)0x95959595)
+      if (a == 0x95959595)
       {
         qint32 i;
         player->skillchange = {};
@@ -2506,8 +2506,8 @@ b: // ew
       DC::getInstance()->world[in_room].light--;
     // this is just annoying cause it tells you every time you save
     // TODO - make it not be annoying
-    //      act("The soft glow around $n from $p fades.", this, obj, 0, TO_ROOM, 0);
-    //      act("The glow around you fades slightly.", this, obj, 0, TO_CHAR, 0);
+    //      act_to_room("The soft glow around $n from $p fades.", this, obj, 0,  0);
+    //      act_to_character("The glow around you fades slightly.", this, obj, 0,  0);
   }
   if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
   {
@@ -2580,11 +2580,11 @@ qint32 get_number(QString *name)
     *ppos++ = '\0';
     // at this point, ppos points to the name only, and there is a
     // \0 between the number and the name as they appear in the QString.
-    strcpy(number, *name);
+    dc_strcpy(number, *name);
     // now number contains the number as a QString
-    strncpy(buffer, ppos, MAX_INPUT_LENGTH - 1);
-    buffer[MAX_INPUT_LENGTH - 1] = {};
-    strcpy(*name, buffer);
+    dc_strncpy(buffer, ppos, MAX_INPUT_LENGTH - 1);
+
+    dc_strcpy(*name, buffer);
     // now the pointer that was passed into the function
     // points to the name only.
 
@@ -2606,7 +2606,7 @@ ObjectPtr get_obj_in_list(QString name, ObjectPtr list)
   QString tmpname;
   QString tmp;
 
-  strcpy(tmpname, name);
+  dc_strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
     return {};
@@ -2657,7 +2657,7 @@ ObjectPtr get_obj(qint32 vnum)
 {
   qint32 num = real_object(vnum);
 
-  return ((ObjectPtr)DC::getInstance()->obj_index[num].item);
+  return DC::getInstance()->obj_index[num].item;
 }
 
 /*search the entire world for an object number, and return a pointer  */
@@ -2682,7 +2682,7 @@ CharacterPtr get_char_room(const QString name, room_t room, bool careful)
 
   partial_match = {};
 
-  strcpy(tmpname, name);
+  dc_strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
     return {};
@@ -3933,7 +3933,7 @@ CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
 
   partial_match = {};
 
-  strcpy(tmpname, name);
+  dc_strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
     return {};
@@ -4136,7 +4136,7 @@ CharacterPtr get_char_vis(CharacterPtr ch, QString name)
 
   partial_match = {};
 
-  strcpy(tmpname, name);
+  dc_strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
     return {};
@@ -4461,7 +4461,7 @@ ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc)
   if ((i = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents)) != nullptr)
     return (i);
 
-  strcpy(tmpname, name);
+  dc_strcpy(tmpname, name);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
     return {};

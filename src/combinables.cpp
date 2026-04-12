@@ -164,7 +164,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
   if (failure)
   {
     ch->sendln("Ahh crap, something got screwed up.  You are forced to throw away this attempt.");
-    act("$n fiddles with a mortar and pestle and looks unhappy.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n fiddles with a mortar and pestle and looks unhappy.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -179,7 +179,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
   ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description()));
-  act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
+  act_to_room("$n successfully makes a $p.", ch, reward, 0, 0);
 
   return ReturnValue::eSUCCESS;
 }
@@ -390,7 +390,7 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
 
 command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg1, liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
+  QString arg1, liquid, container, buffer;
   ObjectPtr herbobj, *liquidobj, containerobj;
   affected_type af;
   Brew b;
@@ -597,8 +597,8 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (spell == 0)
   {
-    act("As you finish, nothing special seems to happen.", ch, 0, 0, TO_CHAR, 0);
-    act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("As you finish, nothing special seems to happen.", ch, 0, 0, 0);
+    act_to_room("As $e finishes, nothing special seems to happen.", ch, 0, 0, 0);
 
     af.type = SKILL_BREW_TIMER;
     af.location = APPLY_NONE;
@@ -616,13 +616,13 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
+    act_to_character("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, 0);
     dc_snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns %s.", potion_color);
-    act(buffer, ch, herbobj, 0, TO_CHAR, 0);
+    act_to_character(buffer, ch, herbobj, 0, 0);
 
-    act("$n sits down and carefully pours ingredients into $o and gives it a gentle shake to mix them.", ch, containerobj, 0, TO_ROOM, 0);
+    act_to_room("$n sits down and carefully pours ingredients into $o and gives it a gentle shake to mix them.", ch, containerobj, 0, 0);
     dc_snprintf(buffer, MAX_STRING_LENGTH, "As $e finishes, the liquid turns %s.", potion_color);
-    act(buffer, ch, containerobj, 0, TO_ROOM, 0);
+    act_to_room(buffer, ch, containerobj, 0, 0);
 
     // Find container key (crude, plain, etc)
     auto container_key = containerobj->name().split(' ').value(2);
@@ -666,11 +666,11 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
-    act("As you finish, the liquid begins to bubble furiously, cracking the $o and rendering your work useless!", ch, containerobj, 0, TO_CHAR, 0);
+    act_to_character("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, 0);
+    act_to_character("As you finish, the liquid begins to bubble furiously, cracking the $o and rendering your work useless!", ch, containerobj, 0, 0);
 
-    act("$n sits down and carefully pours ingredients into $o and gives it a gentle shake to mix them.", ch, containerobj, 0, TO_ROOM, 0);
-    act("As $e finishes, the liquid begins to bubble furiously, cracking the $o and rendering $s work useless!", ch, containerobj, 0, TO_ROOM, 0);
+    act_to_room("$n sits down and carefully pours ingredients into $o and gives it a gentle shake to mix them.", ch, containerobj, 0, 0);
+    act_to_room("As $e finishes, the liquid begins to bubble furiously, cracking the $o and rendering $s work useless!", ch, containerobj, 0, 0);
 
     extract_obj(containerobj);
     extract_obj(herbobj);
@@ -783,7 +783,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
 {
   vnum_t herb_vnum = {}, container_vnum = {};
   qint32 liquid_type = {}, spell = {};
-  QString arg1 = {}, arg2[MAX_INPUT_LENGTH] = {}, arg3[MAX_INPUT_LENGTH] = {}, arg4[MAX_INPUT_LENGTH] = {};
+  QString arg1 = {}, arg2 = {}, arg3 = {}, arg4 = {};
 
   if (!ch)
   {
@@ -894,7 +894,7 @@ qint32 Brew::find(Brew::recipe r)
 
 command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg1, dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
+  QString arg1, dust, pen, paper;
   ObjectPtr inkobj, *dustobj, *penobj, paperobj;
   affected_type af;
   Scribe s;
@@ -1058,8 +1058,8 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
                       DC::getInstance()->obj_index[paperobj->item_number].vnum()};
   qint32 spell = s.find(r);
 
-  act("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, TO_CHAR, 0);
-  act("$n sits down and carefully inscribes the words of the gods onto some parchment.", ch, 0, 0, TO_ROOM, 0);
+  act_to_character("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, 0);
+  act_to_room("$n sits down and carefully inscribes the words of the gods onto some parchment.", ch, 0, 0, 0);
 
   if (inkobj->obj_flags.value[1] > 0)
   {
@@ -1068,8 +1068,8 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (spell == 0)
   {
-    act("As you finish, nothing special seems to happen.", ch, 0, 0, TO_CHAR, 0);
-    act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("As you finish, nothing special seems to happen.", ch, 0, 0, 0);
+    act_to_room("As $e finishes, nothing special seems to happen.", ch, 0, 0, 0);
 
     af.type = SKILL_SCRIBE_TIMER;
     af.location = APPLY_NONE;
@@ -1080,8 +1080,8 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (!skill_success(ch, 0, SKILL_SCRIBE))
   {
-    act("As you finish, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_CHAR, 0);
-    act("As $e finishes, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("As you finish, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, 0);
+    act_to_room("As $e finishes, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, 0);
     extract_obj(paperobj);
     extract_obj(penobj);
     extract_obj(dustobj);
@@ -1093,8 +1093,8 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    act("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_CHAR, 0);
-    act("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, 0);
+    act_to_room("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, 0);
 
     af.type = SKILL_SCRIBE_TIMER;
     af.location = APPLY_NONE;
@@ -1233,7 +1233,7 @@ qint32 Scribe::add(CharacterPtr ch, QString argument)
 {
   vnum_t ink_vnum = {}, dust_vnum = {}, pen_vnum = {}, paper_vnum = {};
   qint32 spell = {};
-  QString arg1, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
+  QString arg1, arg2, arg3, arg4, arg5;
 
   if (!ch)
   {

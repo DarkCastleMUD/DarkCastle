@@ -86,9 +86,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   {
     if (victim->affected_by_spell(SKILL_BATTLESENSE) && number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense sees your kick coming from a mile away.", this, 0, victim, TO_CHAR, 0);
-      act("Your heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, TO_VICT, 0);
-      act("$N's heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character("$N's heightened battlesense sees your kick coming from a mile away.", this, 0, victim, 0);
+      act_to_victim("Your heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, 0);
+      act_to_room("$N's heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, NOTVICT);
       dam = {};
     }
     else
@@ -251,9 +251,9 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
         number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense somehow notices your deathstroke coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-      act("Your heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_VICT, 0);
-      act("$N's heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character("$N's heightened battlesense somehow notices your deathstroke coming from a mile away.", ch, 0, victim, 0);
+      act_to_victim("Your heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, 0);
+      act_to_room("$N's heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, NOTVICT);
       dam = {};
     }
     retval = damage(ch, victim, dam, attacktype, SKILL_DEATHSTROKE);
@@ -329,8 +329,7 @@ command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   //   if (CAN_GO(ch, attempt))
   {
-    act("$n tries to beat a hasty retreat.", ch, 0, 0, TO_ROOM,
-        INVIS_NULL);
+    act("$n tries to beat a hasty retreat.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     ch->sendln("You try to beat a hasty retreat....");
 
     // check for any spec procs
@@ -356,7 +355,7 @@ command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
     else
     {
       if (!isSet(retval, ReturnValue::eCH_DIED))
-        act("$n tries to retreat, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_room("$n tries to retreat, but is too exhausted!", ch, 0, 0, INVIS_NULL);
       return retval;
     }
   }
@@ -407,8 +406,8 @@ command_return_t do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    act("You start swinging like a MADMAN!", ch, 0, 0, TO_CHAR, 0);
-    act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("You start swinging like a MADMAN!", ch, 0, 0, 0);
+    act_to_room("$n starts swinging like a MADMAN!", ch, 0, 0, 0);
     SET_BIT(ch->combat, COMBAT_HITALL);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
@@ -503,18 +502,18 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->affected_by_spell(SPELL_IRON_ROOTS))
   {
-    act("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
-    act("$n bashes you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
-    act("The tree roots support $N keeping $M from sprawling after $n's bash.", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_character("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, 0);
+    act_to_victim("$n bashes you but the roots around your legs keep you from falling.", ch, 0, victim, 0);
+    act_to_room("The tree roots support $N keeping $M from sprawling after $n's bash.", ch, 0, victim, NOTVICT);
     WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_STABILITY) && number(0, 3) == 0)
   {
-    act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
-    act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
-    act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_character("You bounce off of $N and crash into the ground.", ch, 0, victim, 0);
+    act_to_victim("$n bounces off of you and crashes into the ground.", ch, 0, victim, 0);
+    act_to_room("$n bounces off of $N and crashes into the ground.", ch, 0, victim, NOTVICT);
     WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
     return ReturnValue::eFAILURE;
   }
@@ -575,9 +574,9 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
         number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense sees your bash coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-      act("Your heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, TO_VICT, 0);
-      act("$N's heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character("$N's heightened battlesense sees your bash coming from a mile away.", ch, 0, victim, 0);
+      act_to_victim("Your heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, 0);
+      act_to_room("$N's heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, NOTVICT);
       retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH);
     }
     else
@@ -649,7 +648,7 @@ command_return_t do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (ch->fighting == victim)
   {
-    act("You are already fighting $N.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("You are already fighting $N.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
   if (!can_be_attacked(ch, victim))
@@ -660,16 +659,16 @@ command_return_t do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_REDIRECT))
   {
-    act("$n tries to redirect his attacks but $N won't allow it.", ch, nullptr, ch->fighting, TO_VICT, 0);
-    act("You try to redirect your attacks to $N but are blocked.", ch, nullptr, victim, TO_CHAR, 0);
-    act("$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act_to_victim("$n tries to redirect his attacks but $N won't allow it.", ch, nullptr, ch->fighting, 0);
+    act_to_character("You try to redirect your attacks to $N but are blocked.", ch, nullptr, victim, 0);
+    act_to_room("$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, nullptr, victim, NOTVICT);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   else
   {
-    act("$n redirects his attacks at YOU!", ch, nullptr, victim, TO_VICT, 0);
-    act("You redirect your at attacks at $N!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$n redirects his attacks at $N!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act_to_victim("$n redirects his attacks at YOU!", ch, nullptr, victim, 0);
+    act_to_character("You redirect your at attacks at $N!", ch, nullptr, victim, 0);
+    act_to_room("$n redirects his attacks at $N!", ch, nullptr, victim, NOTVICT);
     stop_fighting(ch);
     set_fighting(ch, victim);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -743,7 +742,7 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\r\n", ch->in_room);
       return ReturnValue::eSUCCESS;
     }
-    act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act_to_room("$n disarms $mself!", ch, nullptr, victim, NOTVICT);
     ch->sendln("You disarm yourself!  Congratulations!  Try using 'remove' next-time.");
     obj = ch->unequip_char(WEAR_WIELD);
     obj_to_char(obj, ch);
@@ -787,9 +786,9 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    act("$B$n attempts to disarm you!$R", ch, nullptr, victim, TO_VICT, 0);
-    act("You try to disarm $N and fail!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$n attempts to disarm $N, but fails!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act_to_victim("$B$n attempts to disarm you!$R", ch, nullptr, victim, 0);
+    act_to_character("You try to disarm $N and fail!", ch, nullptr, victim, 0);
+    act_to_room("$n attempts to disarm $N, but fails!", ch, nullptr, victim, NOTVICT);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     if (victim->isNonPlayer() && !victim->fighting)
     {
@@ -852,7 +851,7 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
 
   if (!tmp_ch)
   {
-    act("But nobody is fighting $M?", this, 0, victim, TO_CHAR, 0);
+    act_to_character("But nobody is fighting $M?", this, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -866,8 +865,8 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
   }
 
   sendln("Banzai! To the rescue...");
-  act("You are rescued by $N, you are confused!", victim, 0, this, TO_CHAR, 0);
-  act("$n heroically rescues $N.", this, 0, victim, TO_ROOM, NOTVICT);
+  act_to_character("You are rescued by $N, you are confused!", victim, 0, this, 0);
+  act_to_room("$n heroically rescues $N.", this, 0, victim, NOTVICT);
 
   qint32 tempwait = GET_WAIT(this);
   qint32 tempvictwait = GET_WAIT(victim);
@@ -921,13 +920,13 @@ command_return_t do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, nullptr, SKILL_BLADESHIELD))
   {
-    act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself.", ch, 0, 0, TO_ROOM, NOTVICT);
+    act_to_room("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself.", ch, 0, 0, NOTVICT);
     ch->sendln("You try to begin the bladeshield technique and almost chop off your own arm!");
     duration /= 2;
   }
   else
   {
-    act("$n forms a defensive wall of swinging weapons around $mself.", ch, 0, 0, TO_ROOM, NOTVICT);
+    act_to_room("$n forms a defensive wall of swinging weapons around $mself.", ch, 0, 0, NOTVICT);
     send_to_char("The world around you slows to a crawl, the weapons around you swing as if through water.  "
                  "Your mind clears of all but thrust angles as your body and mind enter completely into the "
                  "blade shield technique.\r\n",
@@ -1144,11 +1143,11 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, nullptr, SKILL_TACTICS))
   {
     ch->sendln("Guess you just weren't the Patton you thought you were.");
-    act("$n goes on about team not being spelled with an 'I' or something.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n goes on about team not being spelled with an 'I' or something.", ch, 0, 0, 0);
   }
   else
   {
-    act("$n takes command coordinating $s group's efforts.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n takes command coordinating $s group's efforts.", ch, 0, 0, 0);
     ch->sendln("You take command coordinating the group's attacks.");
 
     af.type = SKILL_TACTICS_TIMER;
@@ -1168,7 +1167,7 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
       affect_from_char(tmp_char, SKILL_TACTICS, SUPPRESS_MESSAGES);
       affect_from_char(tmp_char, SKILL_TACTICS, SUPPRESS_MESSAGES);
 
-      act("$n's leadership makes you feel more comfortable with battle.", ch, 0, tmp_char, TO_VICT, 0);
+      act_to_victim("$n's leadership makes you feel more comfortable with battle.", ch, 0, tmp_char, 0);
       af.type = SKILL_TACTICS;
       af.duration = 1 + ch->has_skill(SKILL_TACTICS) / 10;
       af.modifier = 1 + ch->has_skill(SKILL_TACTICS) / 20;
@@ -1243,7 +1242,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
   WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 2.5));
 
   ch->sendln("You scan about for signs of danger as you clear an area to make camp...");
-  act("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, 0);
 
   if (!skill_success(ch, 0, SKILL_MAKE_CAMP))
   {
@@ -1329,7 +1328,7 @@ command_return_t do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, 0, SKILL_TRIAGE))
   {
     ch->sendln("You pause to clean and bandage some of your more painful injuries but feel little improvement in your health.");
-    act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, 0);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1341,7 +1340,7 @@ command_return_t do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
   affect_to_char(ch, &af);
 
   ch->sendln("You pause to clean and bandage some of your more painful injuries and speed the healing process.");
-  act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, 0);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1372,7 +1371,7 @@ command_return_t do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     ch->sendln("Your awareness heightens dramatically as the rush of battle courses through your body.");
-    act("$n's movements become quick and calculated as $s senses heighten with the rush of battle.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's movements become quick and calculated as $s senses heighten with the rush of battle.", ch, 0, 0, 0);
 
     af.type = SKILL_BATTLESENSE;
     af.location = {};
@@ -1427,7 +1426,7 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!can_attack(ch) || !can_be_attacked(ch, vict))
   {
-    act("You cannot attack $M", ch, 0, vict, TO_CHAR, 0);
+    act_to_character("You cannot attack $M", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1449,15 +1448,15 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, vict, SKILL_SMITE))
   {
-    act("Your less-than-mighty challenge fails to improve your attack of $N.", ch, 0, vict, TO_CHAR, 0);
-    act("$n makes a pathetic attempt at shouting a challenge as $e attempts to strike you.", ch, 0, vict, TO_VICT, 0);
-    act("$n makes a pathetic attempt at shouting a challenge as $e attempts to strike $N.", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_character("Your less-than-mighty challenge fails to improve your attack of $N.", ch, 0, vict, 0);
+    act_to_victim("$n makes a pathetic attempt at shouting a challenge as $e attempts to strike you.", ch, 0, vict, 0);
+    act_to_room("$n makes a pathetic attempt at shouting a challenge as $e attempts to strike $N.", ch, 0, vict, NOTVICT);
   }
   else
   {
-    act("You shout a mighty challenge and begin to assault $N with lethal efficiency.", ch, 0, vict, TO_CHAR, 0);
-    act("$n shouts a mighty challenge and begins to assault you with lethal efficiency.", ch, 0, vict, TO_VICT, 0);
-    act("$n shouts a mighty challenge and begins to assault $N with lethal efficiency.", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_character("You shout a mighty challenge and begin to assault $N with lethal efficiency.", ch, 0, vict, 0);
+    act_to_victim("$n shouts a mighty challenge and begins to assault you with lethal efficiency.", ch, 0, vict, 0);
+    act_to_room("$n shouts a mighty challenge and begins to assault $N with lethal efficiency.", ch, 0, vict, NOTVICT);
 
     af.type = SKILL_SMITE;
     af.location = {};
@@ -1502,19 +1501,19 @@ command_return_t do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ch->sendln("You loudly call, 'Once more unto the breach, dear friends!'");
-  act("$n loudly calls, 'Once more unto the breach, dear friends!'", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n loudly calls, 'Once more unto the breach, dear friends!'", ch, 0, 0, 0);
 
   WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 1.5));
 
   if (!skill_success(ch, 0, SKILL_LEADERSHIP))
   {
     ch->sendln("Your bravery miserably fails to inspire.");
-    act("$n's bravery miserably fails to inspire.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's bravery miserably fails to inspire.", ch, 0, 0, 0);
   }
   else
   {
     ch->sendln("Your bravery lends you additional might and inspires the group!");
-    act("$n's bravery lends $m additional might and inspires the group!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's bravery lends $m additional might and inspires the group!", ch, 0, 0, 0);
 
     af.type = SKILL_LEADERSHIP;
     af.duration = 1 + learned / 20;
@@ -1557,7 +1556,7 @@ command_return_t do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     ch->sendln("Your movements seem to build energy and gain momentum as you fight with renewed vigor!");
-    act("$n seems to build energy and $s movements gain momentum as the battle drags on...", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n seems to build energy and $s movements gain momentum as the battle drags on...", ch, 0, 0, 0);
 
     af.type = SKILL_PERSEVERANCE;
     af.location = {};
@@ -1594,16 +1593,16 @@ command_return_t do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cm
 
   if (!skill_success(ch, 0, SKILL_DEFENDERS_STANCE))
   {
-    act("You attempt to brace yourself to defend against $N's onslaught but stumble and fall!", ch, 0, vict, TO_CHAR, 0);
-    act("$n attempts to brace $mself to defend against your onslaught but stumbles and falls!", ch, 0, vict, TO_VICT, 0);
-    act("$n attempts to brace $mself to defend against $N's onslaught but stumbles and falls!", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_character("You attempt to brace yourself to defend against $N's onslaught but stumble and fall!", ch, 0, vict, 0);
+    act_to_victim("$n attempts to brace $mself to defend against your onslaught but stumbles and falls!", ch, 0, vict, 0);
+    act_to_room("$n attempts to brace $mself to defend against $N's onslaught but stumbles and falls!", ch, 0, vict, NOTVICT);
     ch->setSitting();
   }
   else
   {
-    act("You brace yourself to defend against $N's onslaught.", ch, 0, vict, TO_CHAR, 0);
-    act("$n braces $mself to defend against your onslaught.", ch, 0, vict, TO_VICT, 0);
-    act("$n braces $mself to defend against $N's onslaught.", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_character("You brace yourself to defend against $N's onslaught.", ch, 0, vict, 0);
+    act_to_victim("$n braces $mself to defend against your onslaught.", ch, 0, vict, 0);
+    act_to_room("$n braces $mself to defend against $N's onslaught.", ch, 0, vict, NOTVICT);
 
     af.type = SKILL_DEFENDERS_STANCE;
     af.location = {};
@@ -1643,8 +1642,8 @@ command_return_t do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, 0, SKILL_ONSLAUGHT))
   {
-    act("Obviously you have a bit more to learn about battle...slowass.", ch, 0, 0, TO_CHAR, 0);
-    act("$n waves $s weapon in the air in a futile attempt to look skillful.", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("Obviously you have a bit more to learn about battle...slowass.", ch, 0, 0, 0);
+    act_to_room("$n waves $s weapon in the air in a futile attempt to look skillful.", ch, 0, 0, 0);
 
     af.type = SKILL_ONSLAUGHT_TIMER;
     af.location = {};
@@ -1655,8 +1654,8 @@ command_return_t do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    act("Your attacks come fast and furious as you harness your battle expertise.", ch, 0, 0, TO_CHAR, 0);
-    act("$n's attacks come fast and furious as $e harnesses $s battle expertise.", ch, 0, 0, TO_ROOM, 0);
+    act_to_character("Your attacks come fast and furious as you harness your battle expertise.", ch, 0, 0, 0);
+    act_to_room("$n's attacks come fast and furious as $e harnesses $s battle expertise.", ch, 0, 0, 0);
 
     af.type = SKILL_ONSLAUGHT;
     af.location = {};

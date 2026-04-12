@@ -391,15 +391,15 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       {
         infoBuf = "    $B$7S$4a$7l$4m$7o$4n$R   ";
       }
-      else if (!strcmp(qPrintable(i->name()), "Apocalypse"))
+      else if (!dc_strcmp(qPrintable(i->name()), "Apocalypse"))
       {
         infoBuf = "    $5Moose$R    ";
       }
-      else if (!strcmp(qPrintable(i->name()), "Pirahna"))
+      else if (!dc_strcmp(qPrintable(i->name()), "Pirahna"))
       {
         infoBuf = "   $B$4>$5<$1($2($1($5:$4>$R   ";
       }
-      else if (!strcmp(qPrintable(i->name()), "Petra"))
+      else if (!dc_strcmp(qPrintable(i->name()), "Petra"))
       {
         infoBuf = "    $B$1R$2o$1a$2d$1i$2e$R   ";
       }

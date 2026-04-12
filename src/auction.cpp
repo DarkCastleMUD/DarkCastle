@@ -14,17 +14,15 @@ External: (explained more below)
 #include "DC/db.h"
 #include "DC/interp.h"
 #include "DC/inventory.h"
-
 #include <QString>
-
 #include <qdebug.h>
 #include <qiodevicebase.h>
+#include <qqueue.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cassert>
 #include <cerrno>
-#include "DC/utility.h"
 
 CharacterPtr find_mob_in_room(CharacterPtr ch, qint32 iFriendId);
 
@@ -51,7 +49,7 @@ bool AuctionHouse::IsRace(qint32 vnum, QString israce)
   if (nr < 0)
     return false;
 
-  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -101,7 +99,7 @@ bool AuctionHouse::IsClass(qint32 vnum, QString isclass)
   if (nr < 0)
     return false;
 
-  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -424,7 +422,7 @@ bool AuctionHouse::IsSlot(QString slot, qint32 vnum)
   if (nr < 0)
     return true;
 
-  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
   switch (keyword)
   {
   case 0:
@@ -497,7 +495,7 @@ bool AuctionHouse::IsWearable(CharacterPtr ch, qint32 vnum)
   if (nr < 0)
     return true;
 
-  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
   return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > ch->getLevel()));
 }
 
@@ -523,7 +521,7 @@ bool AuctionHouse::IsNoTrade(qint32 vnum)
   qint32 nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return isSet(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return isSet(((DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -544,7 +542,7 @@ bool AuctionHouse::IsLevel(quint32 to, quint32 from, qint32 vnum)
   if ((nr = real_object(vnum)) < 0)
     return false;
 
-  eq_level = ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level;
+  eq_level = ((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level;
 
   return (eq_level >= to && eq_level <= from);
 }
@@ -893,8 +891,6 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   QMap<quint32, AuctionTicket>::iterator Item_it;
   ObjectPtr obj;
   CharacterPtr vict;
-  FILE *fl;
-  QString buf;
   qint32 i = {};
 
   Item_it = Items_For_Sale.find(ticket);
@@ -966,7 +962,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        ch->send(QStringLiteral("You need to have \"%s\" to buy a NO_TRADE item.\r\n").arg(qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description())));
+        ch->send(QStringLiteral("You need to have \"%s\" to buy a NO_TRADE item.\r\n").arg(qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description())));
       return;
     }
     else
@@ -1000,10 +996,9 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
   ch->send(QStringLiteral("You have purchased %s for %u coins.\r\n").arg(qPrintable(obj->short_description())).arg(Item_it->price));
 
-  CharacterPtr tmp;
-  for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
-    if (tmp != ch)
-      tmp->send(QStringLiteral("%s just purchased %s's %s\r\n").arg(qPrintable(ch->name())).arg(qPrintable(Item_it->seller)).arg(qPrintable(obj->short_description())));
+  for (auto &vch : DC::getInstance()->world[ch->in_room].people_)
+    if (vch != ch)
+      vch->send(QStringLiteral("%s just purchased %s's %s\r\n").arg(qPrintable(ch->name())).arg(qPrintable(Item_it->seller)).arg(qPrintable(obj->short_description())));
 
   Item_it->state = AUC_SOLD;
   Item_it->buyer = qPrintable(ch->name());
@@ -1018,33 +1013,25 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   if (DC::getInstance()->cf.bport == false)
   {
     errno = {};
-    if (!(fl = fopen(WEB_AUCTION_FILE, "r")))
+    QFile auction_file(WEB_AUCTION_FILE);
+    if (!auction_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", qPrintable(WEB_AUCTION_FILE), strerror(errno));
       return;
     }
+    QTextStream in(&auction_file);
 
-    while (!feof(fl) && i <= 9)
+    QString buffer = in.readAll();
+    auction_file.close();
+
+    if (!auction_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
     {
-      buf[i] = fread_string(fl, 0);
-      i++;
-    }
-
-    fclose(fl);
-
-    errno = {};
-    if (!(fl = fopen(WEB_AUCTION_FILE, "w")))
-    {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", qPrintable(WEB_AUCTION_FILE), strerror(errno));
       return;
     }
-
-    qfprintf(fl, "%s purchased %s's %s~\n", qPrintable(ch->name()), qPrintable(Item_it->seller), qPrintable(obj->short_description()));
-
-    for (qint32 j = {}; j < i; j++)
-      qfprintf(fl, "%s~\n", buf[j]);
-
-    fclose(fl);
+    QTextStream out(&auction_file);
+    out << u"%1 purchased %2's %3~\n"_s.arg(ch->name()).arg(Item_it->seller).arg(obj->short_description());
+    out << buffer;
   }
   else
   {
@@ -1052,51 +1039,20 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   }
 }
 
-ObjectPtr ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it, qint32 ticket)
+ObjectPtr DC::ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it, qint32 ticket)
 {
   // If obj is nullptr then either we haven't loaded this object yet or it's not custom
   if (Item_it->obj == nullptr)
   {
-    std::stringstream obj_filename;
-    obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
 
-    std::ifstream auction_obj_file;
-    auction_obj_file.open(obj_filename.str().c_str());
-    if (auction_obj_file.is_open())
+    QString obj_filename = u"../lib/auctions/"_s + ticket + ".auction_obj";
+    QFile auction_obj_file(obj_filename);
+
+    if (auction_obj_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
     {
-      auction_obj_file.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
-
-      try
-      {
-        Item_it->obj = new Object;
-        auction_obj_file >> Item_it->obj;
-        auction_obj_file.close();
-      }
-      catch (std::ifstream::failure &e)
-      {
-        if ((auction_obj_file.rdstate() & std::ios_base::eofbit) == std::ios_base::eofbit)
-        {
-          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::eofbit", ticket);
-        }
-        else if ((auction_obj_file.rdstate() & std::ios_base::badbit) == std::ios_base::badbit)
-        {
-          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::badbit", ticket);
-        }
-        else if ((auction_obj_file.rdstate() & std::ios_base::failbit) == std::ios_base::failbit)
-        {
-          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::failbit", ticket);
-        }
-        else
-        {
-          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
-        }
-        Item_it->obj = {};
-      }
-      catch (...)
-      {
-        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): unknown error");
-        Item_it->obj = {};
-      }
+      QTextStream in(&auction_obj_file);
+      Item_it->obj = ObjectPtr(new Object(this));
+      in >> Item_it->obj;
     }
   }
 
@@ -1179,7 +1135,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       return;
     }
 
-    if (isSet(((ObjectPtr)(DC::getInstance()->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (isSet(((DC::getInstance()->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1375,7 +1331,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     qint32 nr = real_object(27909);
     if (nr >= 0)
     {
-      dc_sprintf(buf, "\r\n'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n", qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+      dc_sprintf(buf, "\r\n'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n", qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description()));
       output_buf += buf;
     }
     output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";
@@ -1464,7 +1420,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     return;
   }
 
-  if (strcmp(qPrintable(obj->short_description()), qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[obj->item_number].item))->short_description())))
+  if (dc_strcmp(qPrintable(obj->short_description()), qPrintable(((DC::getInstance()->obj_index[obj->item_number].item))->short_description())))
   {
     ch->sendln("The Consignment broker informs you that he does not handle items that have been restrung.");
     return;

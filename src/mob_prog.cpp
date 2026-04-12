@@ -306,7 +306,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   }
 
   activeTarget = {};
-  QString tmp, half[MAX_INPUT_LENGTH];
+  QString tmp, half;
   half[0] = '\0';
   if ((tmp = strchr(leftptr, ',')) != nullptr)
   {
@@ -331,18 +331,18 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
 
     const auto &character_list = DC::getInstance()->character_list;
     auto result = std::find_if(character_list.begin(), character_list.end(),
-                          [&target, &left](CharacterPtr const &tmp)
-                          {
-                            if (isexact(left, qPrintable(tmp->name())))
-                            {
-                              target = tmp;
-                              return true;
-                            }
-                            else
-                            {
-                              return false;
-                            }
-                          });
+                               [&target, &left](CharacterPtr const &tmp)
+                               {
+                                 if (isexact(left, qPrintable(tmp->name())))
+                                 {
+                                   target = tmp;
+                                   return true;
+                                 }
+                                 else
+                                 {
+                                   return false;
+                                 }
+                               });
   }
   else if (!str_prefix("zone_", left))
   {
@@ -350,18 +350,18 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
 
     const auto &character_list = DC::getInstance()->character_list;
     auto result = std::find_if(character_list.begin(), character_list.end(),
-                          [&target, &left, &mob](CharacterPtr const &tmp)
-                          {
-                            if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, qPrintable(tmp->name())))
-                            {
-                              target = tmp;
-                              return true;
-                            }
-                            else
-                            {
-                              return false;
-                            }
-                          });
+                               [&target, &left, &mob](CharacterPtr const &tmp)
+                               {
+                                 if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, qPrintable(tmp->name())))
+                                 {
+                                   target = tmp;
+                                   return true;
+                                 }
+                                 else
+                                 {
+                                   return false;
+                                 }
+                               });
   }
   else if (!str_prefix("mroom_", left))
   {
@@ -446,7 +446,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
       otarget = obj;
       break;
     case 'p':
-      otarget = (ObjectPtr)vo;
+      otarget = vo;
       break;
     case 'f':
       if (actor)
@@ -475,7 +475,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         if (!str_cmp(buf, qPrintable(mobTempVar->name)))
           break;
       if (mobTempVar)
-        strcpy(buf, qPrintable(mobTempVar->data));
+        dc_strcpy(buf, qPrintable(mobTempVar->data));
 
       if (buf[0] != '\0')
       {
@@ -1472,7 +1472,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   QString val;
   QString val2; // used for non-traditional
   CharacterPtr vict = (CharacterPtr)vo;
-  ObjectPtr v_obj = (ObjectPtr)vo;
+  ObjectPtr v_obj = vo;
   QString bufpt = buf;
   QString argpt = arg;
   QString oprpt = opr;
@@ -1620,7 +1620,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       if (eh->name == buf1)
         break;
     if (eh)
-      strcpy(arg, qPrintable(eh->data));
+      dc_strcpy(arg, qPrintable(eh->data));
   }
 
   if (!is_number(arg) && !(arg[0] == '$') && traditional)
@@ -2775,7 +2775,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       return -1;
     }
     buf4pt = &arg[3];
-    strcpy(buf4, buf4pt);
+    dc_strcpy(buf4, buf4pt);
     buf4pt = &buf4[0];
     while (*buf4pt != ']' && *buf4pt != '\0')
       buf4pt++;
@@ -3297,7 +3297,7 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
   static const QStringList him_her = {"it", "him", "her"};
   static const QStringList his_her = {"its", "his", "her"};
   CharacterPtr vict = (CharacterPtr)vo;
-  ObjectPtr v_obj = (ObjectPtr)vo;
+  ObjectPtr v_obj = vo;
 
   *t = '\0';
 
@@ -3316,22 +3316,22 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       one_argument(qPrintable(((CharacterPtr)mob->beacon)->name()), t);
       break;
     }
-    strcpy(t, "error");
+    dc_strcpy(t, "error");
     break;
   case 'Z':
     if (mob->beacon)
-      strcpy(t, qPrintable(((CharacterPtr)mob->beacon)->short_description()));
+      dc_strcpy(t, qPrintable(((CharacterPtr)mob->beacon)->short_description()));
     else
-      strcpy(t, "error");
+      dc_strcpy(t, "error");
     break;
   case 'I':
-    strcpy(t, qPrintable(mob->short_description()));
+    dc_strcpy(t, qPrintable(mob->short_description()));
     break;
   case 'x':
     if (mob->beacon && ((CharacterPtr)mob->beacon)->fighting)
       one_argument(qPrintable(((CharacterPtr)mob->beacon)->fighting->name()), t);
     else
-      strcpy(t, "error");
+      dc_strcpy(t, "error");
     *t = UPPER(*t);
     break;
   case 'n':
@@ -3351,15 +3351,15 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
     if (actor)
       if (CAN_SEE(mob, actor))
         if (actor->isNonPlayer())
-          strcpy(t, actor->short_desc);
+          dc_strcpy(t, actor->short_desc);
         else
         {
-          strcpy(t, qPrintable(actor->name()));
-          strcat(t, " ");
-          strcat(t, actor->title);
+          dc_strcpy(t, qPrintable(actor->name()));
+          dc_strcat(t, " ");
+          dc_strcat(t, actor->title);
         }
       else
-        strcpy(t, "someone");
+        dc_strcpy(t, "someone");
     else
       DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
     break;
@@ -3380,15 +3380,15 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
     if (vict)
       if (CAN_SEE(mob, vict))
         if (vict->isNonPlayer())
-          strcpy(t, vict->short_desc);
+          dc_strcpy(t, vict->short_desc);
         else
         {
-          strcpy(t, qPrintable(vict->name()));
-          strcat(t, " ");
-          strcat(t, vict->title);
+          dc_strcpy(t, qPrintable(vict->name()));
+          dc_strcat(t, " ");
+          dc_strcat(t, vict->title);
         }
       else
-        strcpy(t, "someone");
+        dc_strcpy(t, "someone");
     else
       DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
     break;
@@ -3408,12 +3408,12 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       if (CAN_SEE(mob, actor->fighting))
       {
         if (actor->fighting->isNonPlayer())
-          strcpy(t, actor->fighting->short_desc);
+          dc_strcpy(t, actor->fighting->short_desc);
         else
         {
-          strcpy(t, actor->qPrintable(fighting->name()));
-          strcat(t, " ");
-          strcat(t, actor->fighting->title);
+          dc_strcpy(t, actor->qPrintable(fighting->name()));
+          dc_strcat(t, " ");
+          dc_strcat(t, actor->fighting->title);
         }
       }
     }
@@ -3433,12 +3433,12 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       if (CAN_SEE(mob, mob->fighting))
       {
         if (mob->fighting->isNonPlayer())
-          strcpy(t, mob->fighting->short_desc);
+          dc_strcpy(t, mob->fighting->short_desc);
         else
         {
-          strcpy(t, mob->qPrintable(fighting->name()));
-          strcat(t, " ");
-          strcat(t, mob->fighting->title);
+          dc_strcpy(t, mob->qPrintable(fighting->name()));
+          dc_strcat(t, " ");
+          dc_strcat(t, mob->fighting->title);
         }
       }
     }
@@ -3460,114 +3460,114 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       {
         if (rndm->isNonPlayer())
         {
-          strcpy(t, rndm->short_desc);
+          dc_strcpy(t, rndm->short_desc);
         }
         else
         {
-          strcpy(t, qPrintable(rndm->name()));
-          strcat(t, " ");
-          strcat(t, rndm->title);
+          dc_strcpy(t, qPrintable(rndm->name()));
+          dc_strcat(t, " ");
+          dc_strcat(t, rndm->title);
         }
       }
       else
       {
-        strcpy(t, "someone");
+        dc_strcpy(t, "someone");
       }
     }
     break;
 
   case 'e':
     if (actor)
-      CAN_SEE(mob, actor) ? strcpy(t, he_she[actor->sex])
-                          : strcpy(t, "someone");
+      CAN_SEE(mob, actor) ? dc_strcpy(t, he_she[actor->sex])
+                          : dc_strcpy(t, "someone");
     break;
 
   case 'm':
     if (actor)
-      CAN_SEE(mob, actor) ? strcpy(t, him_her[actor->sex])
-                          : strcpy(t, "someone");
+      CAN_SEE(mob, actor) ? dc_strcpy(t, him_her[actor->sex])
+                          : dc_strcpy(t, "someone");
     break;
 
   case 's':
     if (actor)
-      CAN_SEE(mob, actor) ? strcpy(t, his_her[actor->sex])
-                          : strcpy(t, "someone's");
+      CAN_SEE(mob, actor) ? dc_strcpy(t, his_her[actor->sex])
+                          : dc_strcpy(t, "someone's");
     break;
 
   case 'E':
     if (vict)
-      CAN_SEE(mob, vict) ? strcpy(t, he_she[vict->sex])
-                         : strcpy(t, "someone");
+      CAN_SEE(mob, vict) ? dc_strcpy(t, he_she[vict->sex])
+                         : dc_strcpy(t, "someone");
     break;
 
   case 'M':
     if (vict)
-      CAN_SEE(mob, vict) ? strcpy(t, him_her[vict->sex])
-                         : strcpy(t, "someone");
+      CAN_SEE(mob, vict) ? dc_strcpy(t, him_her[vict->sex])
+                         : dc_strcpy(t, "someone");
     break;
 
   case 'S':
     if (vict)
-      CAN_SEE(mob, vict) ? strcpy(t, his_her[vict->sex])
-                         : strcpy(t, "someone's");
+      CAN_SEE(mob, vict) ? dc_strcpy(t, his_her[vict->sex])
+                         : dc_strcpy(t, "someone's");
     break;
   case 'q':
     QString buf;
     dc_sprintf(buf, "%d", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
-    strcpy(t, buf);
+    dc_strcpy(t, buf);
     break;
   case 'j':
-    strcpy(t, he_she[mob->sex]);
+    dc_strcpy(t, he_she[mob->sex]);
     break;
 
   case 'k':
-    strcpy(t, him_her[mob->sex]);
+    dc_strcpy(t, him_her[mob->sex]);
     break;
 
   case 'l':
-    strcpy(t, his_her[mob->sex]);
+    dc_strcpy(t, his_her[mob->sex]);
     break;
 
   case 'J':
     if (rndm)
-      CAN_SEE(mob, rndm) ? strcpy(t, he_she[rndm->sex])
-                         : strcpy(t, "someone");
+      CAN_SEE(mob, rndm) ? dc_strcpy(t, he_she[rndm->sex])
+                         : dc_strcpy(t, "someone");
     break;
 
   case 'K':
     if (rndm)
-      CAN_SEE(mob, rndm) ? strcpy(t, him_her[rndm->sex])
-                         : strcpy(t, "someone");
+      CAN_SEE(mob, rndm) ? dc_strcpy(t, him_her[rndm->sex])
+                         : dc_strcpy(t, "someone");
     break;
 
   case 'L':
     if (rndm)
-      CAN_SEE(mob, rndm) ? strcpy(t, his_her[rndm->sex])
-                         : strcpy(t, "someone's");
+      CAN_SEE(mob, rndm) ? dc_strcpy(t, his_her[rndm->sex])
+                         : dc_strcpy(t, "someone's");
     break;
 
   case 'o':
     if (obj)
-      CAN_SEE_OBJ(mob, obj) ? strcpy(t, qPrintable(obj->name().split(' ').value(0)))
-                            : strcpy(t, "something");
+      CAN_SEE_OBJ(mob, obj) ? dc_strcpy(t, qPrintable(obj->name().split(' ').value(0)))
+                            : dc_strcpy(t, "something");
     break;
 
   case 'O':
     if (obj)
-      CAN_SEE_OBJ(mob, obj) ? strcpy(t, qPrintable(obj->short_description()))
-                            : strcpy(t, "something");
+      CAN_SEE_OBJ(mob, obj) ? dc_strcpy(t, qPrintable(obj->short_description()))
+                            : dc_strcpy(t, "something");
     break;
 
   case 'p':
     if (v_obj)
-      CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, qPrintable(v_obj->name().split(' ').value(0)))
-                              : strcpy(t, "something");
+      CAN_SEE_OBJ(mob, v_obj) ? dc_strcpy(t, qPrintable(v_obj->name().split(' ').value(0)))
+                              : dc_strcpy(t, "something");
     break;
 
   case 'P':
     if (v_obj)
-      CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, v_obj->short_description)
-                              : strcpy(t, "something");
+      CAN_SEE_OBJ(mob, v_obj) ? dc_strcpy(t, v_obj->short_description)
+                              : dc_strcpy(t, "something");
     break;
 
   case 'a':
@@ -3579,10 +3579,10 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       case 'i':
       case 'o':
       case 'u':
-        strcpy(t, "an");
+        dc_strcpy(t, "an");
         break;
       default:
-        strcpy(t, "a");
+        dc_strcpy(t, "a");
       }
     break;
 
@@ -3595,15 +3595,15 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       case 'i':
       case 'o':
       case 'u':
-        strcpy(t, "an");
+        dc_strcpy(t, "an");
         break;
       default:
-        strcpy(t, "a");
+        dc_strcpy(t, "a");
       }
     break;
 
   case '$':
-    strcpy(t, "$");
+    dc_strcpy(t, "$");
     break;
 
   default:
@@ -3673,8 +3673,8 @@ void debugpoint() {};
 qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
                           ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
-  QString buf[MAX_INPUT_LENGTH * 2];
-  QString tmp[MAX_INPUT_LENGTH * 2];
+  QString buf;
+  QString tmp;
   QString str;
   QString i;
   QString point;
@@ -3697,7 +3697,7 @@ qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
             *str = '\0';
             if (do_bufs(&buf[0], &tmp[0], cmnd))
                   translate_value(buf, tmp, &lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
-            else strcpy(left, cmnd);
+            else dc_strcpy(left, cmnd);
 
             str += 2;
 
@@ -3705,7 +3705,7 @@ qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
                   str++;
             if (do_bufs(&buf[0], &tmp[0], str))
                   translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
-            else strcpy(right, str);
+            else dc_strcpy(right, str);
           QString buf;
           buf[0] = '\0';
           if (lvali)
@@ -3746,7 +3746,7 @@ qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
       qint64 *lvali64 = {};
       quint64 *lvalui64 = {};
       qint8 *lvalb = {};
-      QString left, right[MAX_INPUT_LENGTH];
+      QString left, right;
       left[0] = '$';
       left[1] = *str;
       left[2] = '\0';
@@ -3799,7 +3799,7 @@ qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
               break;
           if (eh)
           {
-            strcpy(tmp, qPrintable(eh->data));
+            dc_strcpy(tmp, qPrintable(eh->data));
             if (!eh->data.isEmpty())
               eh->data[0] = eh->data[0].toUpper();
           }
@@ -3914,7 +3914,7 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
     activeRndm = rndm;
   }
 
-  strcpy(tmpcmndlst, com_list);
+  dc_strcpy(tmpcmndlst, com_list);
 
   command_list = tmpcmndlst;
   cmnd = command_list;
@@ -4008,18 +4008,18 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
     if (mprg->type & type)
     {
       if (!reverse)
-        strcpy(temp1, mprg->arglist);
+        dc_strcpy(temp1, mprg->arglist);
       else
-        strcpy(temp1, qPrintable(arg));
+        dc_strcpy(temp1, qPrintable(arg));
 
       list = temp1;
       for (i = {}; i < (qint32)strlen(list); i++)
         list[i] = LOWER(list[i]);
 
       if (!reverse)
-        strcpy(temp2, qPrintable(arg));
+        dc_strcpy(temp2, qPrintable(arg));
       else
-        strcpy(temp2, mprg->arglist);
+        dc_strcpy(temp2, mprg->arglist);
 
       dupl = temp2;
       for (i = {}; i < (qint32)strlen(dupl); i++)
@@ -4639,7 +4639,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
   else
     char_to_room(temp, obj->in_room);
   if (ch)
-    temp->beacon = (ObjectPtr)ch;
+    temp->beacon = ch;
   temp->mobdata->setObject(obj);
   //  temp->master = ch;
   // temp->short_desc={};

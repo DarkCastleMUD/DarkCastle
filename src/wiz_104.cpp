@@ -68,7 +68,7 @@ command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
       dc_sprintf(buf2, "$4$BYou thunder '%s'$R", argument);
     else
       dc_sprintf(buf2, "$7$BYou bellow '%s'$R", argument);
-    act(buf2, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf2, ch, 0, 0, 0);
 
     for (auto &i : DC::getInstance()->connections_)
       if (i->character != ch && !i->connected)
@@ -164,10 +164,10 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
       if ((num = real_object(x)) < 0)
         continue;
 
-      if (isexact("prize", ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->name()))
+      if (isexact("prize", ((DC::getInstance()->obj_index[num].item))->name()))
       {
         cnt++;
-        dc_sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->short_description);
+        dc_sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((DC::getInstance()->obj_index[num].item))->short_description);
         ch->send(buf);
       }
 
@@ -262,12 +262,12 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
       if ((ch->getLevel() < 108) &&
-          isSet(((ObjectPtr)(DC::getInstance()->obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
+          isSet(((DC::getInstance()->obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
       {
         ch->sendln("Why would you want to load that?");
         return ReturnValue::eFAILURE;
       }
-      else if (cmd == cmd_t::PRIZE && !isexact("prize", ((ObjectPtr)(DC::getInstance()->obj_index[number].item))->name()))
+      else if (cmd == cmd_t::PRIZE && !isexact("prize", ((DC::getInstance()->obj_index[number].item))->name()))
       {
         ch->sendln("This command can only load prize items.");
         return ReturnValue::eFAILURE;
@@ -280,7 +280,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 
       if (random[0] == 'r')
       {
-        ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[number].item);
+        ObjectPtr obj = (DC::getInstance()->obj_index[number].item);
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
@@ -307,13 +307,13 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     if ((ch->getLevel() < IMPLEMENTER) &&
-        isSet(((ObjectPtr)(DC::getInstance()->obj_index[num].item))->obj_flags.extra_flags,
+        isSet(((DC::getInstance()->obj_index[num].item))->obj_flags.extra_flags,
               ITEM_SPECIAL))
     {
       ch->sendln("Why would you want to load that?");
       return ReturnValue::eFAILURE;
     }
-    else if (cmd == cmd_t::PRIZE && !isexact("prize", ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->name()))
+    else if (cmd == cmd_t::PRIZE && !isexact("prize", ((DC::getInstance()->obj_index[num].item))->name()))
     {
       ch->sendln("This command can only load prize items.");
       return ReturnValue::eFAILURE;
@@ -347,12 +347,12 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
                         " unharmed.\r\n",
                    qPrintable(vict->shortdesc_or_name()));
         ch->send(buf);
-        act("$n tried to purge you.", ch, 0, vict, TO_VICT, 0);
+        act_to_victim("$n tried to purge you.", ch, 0, vict, 0);
         return ReturnValue::eFAILURE;
       }
 
-      act("$n disintegrates $N.", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("You disintegrate $N.", ch, 0, vict, TO_CHAR, 0);
+      act_to_room("$n disintegrates $N.", ch, 0, vict, NOTVICT);
+      act_to_character("You disintegrate $N.", ch, 0, vict, 0);
 
       if (vict->desc)
       {
@@ -365,8 +365,8 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
     else if ((obj = get_obj_in_list_vis(ch, name,
                                         DC::getInstance()->world[ch->in_room].contents)) != nullptr)
     {
-      act("$n purges $p.", ch, obj, 0, TO_ROOM, 0);
-      act("You purge $p.", ch, obj, 0, TO_CHAR, 0);
+      act_to_room("$n purges $p.", ch, obj, 0, 0);
+      act_to_character("You purge $p.", ch, obj, 0, 0);
       extract_obj(obj);
     }
     else
@@ -583,7 +583,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       virt = ZCMD->active ? DC::getInstance()->mob_index[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
-        strcat(buf, "(  always ) in room ");
+        dc_strcat(buf, "(  always ) in room ");
       else
         dc_sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
       dc_sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j]->arg3);
@@ -594,7 +594,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
-        strcat(buf, "(  always ) in room ");
+        dc_strcat(buf, "(  always ) in room ");
       else
         dc_sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
       //      dc_sprintf(buf, "%s[%5d].$R\r\n", buf,
@@ -605,7 +605,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
-        strcat(buf, "(  always ) in objt ");
+        dc_strcat(buf, "(  always ) in objt ");
       else
         dc_sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg3].vnum() : ZCMD->arg3;
@@ -615,7 +615,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
-        strcat(buf, "(  always ) on last mob loaded.$R\r\n");
+        dc_strcat(buf, "(  always ) on last mob loaded.$R\r\n");
       else
         dc_sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
       break;
@@ -623,7 +623,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
-        strcat(buf, "(  always ) on last mob on ");
+        dc_strcat(buf, "(  always ) on last mob on ");
       else
         dc_sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j]->arg2);
       if (zone.cmd[j]->arg3 > MAX_WEAR - 1 ||
@@ -641,16 +641,16 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       switch (zone.cmd[j]->arg3)
       {
       case 0:
-        strcat(buf, "Unlock/Open$R\r\n");
+        dc_strcat(buf, "Unlock/Open$R\r\n");
         break;
       case 1:
-        strcat(buf, "Unlock/Close$R\r\n");
+        dc_strcat(buf, "Unlock/Close$R\r\n");
         break;
       case 2:
-        strcat(buf, "Lock/Close$R\r\n");
+        dc_strcat(buf, "Lock/Close$R\r\n");
         break;
       default:
-        strcat(buf, "ERROR: Unknown$R\r\n");
+        dc_strcat(buf, "ERROR: Unknown$R\r\n");
         break;
       }
       break;
@@ -849,11 +849,11 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     if (isdigit(*name))
     {
       //       half_chop(name, beginrange, endrange);
-      strcpy(beginrange, name);
+      dc_strcpy(beginrange, name);
       //        beginrange = name;
       argument = one_argument(argument, endrange);
       if (!*endrange)
-        strcpy(endrange, "-1");
+        dc_strcpy(endrange, "-1");
 
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
                                                                                                          100000))
@@ -954,9 +954,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       //      half_chop(name, beginrange, endrange);
       argument = one_argument(argument, endrange);
       // beginrange = name;
-      strcpy(beginrange, name);
+      dc_strcpy(beginrange, name);
       if (!*endrange)
-        strcpy(endrange, "-1");
+        dc_strcpy(endrange, "-1");
 
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
                                                                                                          100000))
@@ -979,8 +979,8 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         if ((nr = real_object(begin)) >= 0)
         {
           dc_sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
-                     ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                     qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+                     ((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
+                     qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description()));
           ch->send(buf);
         }
       }
@@ -994,8 +994,8 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                     qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+                     ((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
+                     qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description()));
           ch->send(buf);
 
           if (count > 200)
@@ -1016,12 +1016,12 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         if ((nr = real_object(i)) < 0)
           continue;
 
-        if (isexact(name, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->name()))
+        if (isexact(name, ((DC::getInstance()->obj_index[nr].item))->name()))
         {
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                     qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+                     ((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
+                     qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description()));
           ch->send(buf);
         }
 
@@ -1049,9 +1049,9 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       //      half_chop(name, beginrange, endrange);
       argument = one_argument(argument, endrange);
       //	beginrange = name;
-      strcpy(beginrange, name);
+      dc_strcpy(beginrange, name);
       if (!*endrange)
-        strcpy(endrange, "-1");
+        dc_strcpy(endrange, "-1");
 
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
                                                                                                          100000))
@@ -1635,37 +1635,37 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 20; i++)
           if (isSet(wear, 1 << i))
             if (!isSet(
-                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.wear_flags,
+                    ((DC::getInstance()->obj_index[nr].item))->obj_flags.wear_flags,
                     1 << i))
               goto endLoop;
       if (type)
-        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != type)
+        if (((DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != type)
           continue;
       if (lweight != -555)
-        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight < lweight)
+        if (((DC::getInstance()->obj_index[nr].item))->obj_flags.weight < lweight)
           continue;
       if (hweight != -555)
-        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight > hweight)
+        if (((DC::getInstance()->obj_index[nr].item))->obj_flags.weight > hweight)
           continue;
 
       if (levhigh != -555)
-        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level > levhigh)
+        if (((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level > levhigh)
           continue;
       if (levlow != -555)
-        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level < levlow)
+        if (((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level < levlow)
           continue;
       if (size)
         for (i = {}; i < 10; i++)
           if (isSet(size, 1 << i))
             if (!isSet(
-                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.size,
+                    ((DC::getInstance()->obj_index[nr].item))->obj_flags.size,
                     1 << i))
               goto endLoop;
-      if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
+      if (((DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
       {
         qint32 get_weapon_damage_type(ObjectPtr wielded);
         its = get_weapon_damage_type(
-            ((ObjectPtr)(DC::getInstance()->obj_index[nr].item)));
+            ((DC::getInstance()->obj_index[nr].item)));
       }
       if (dam && dam != (its - 1000))
         continue;
@@ -1673,10 +1673,10 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 30; i++)
           if (isSet(extra, 1 << i))
             if (!isSet(
-                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
+                    ((DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
                     1 << i) &&
                 !(any && isSet(
-                             ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
+                             ((DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
                              1 << any)))
               goto endLoop;
 
@@ -1684,16 +1684,16 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 10; i++)
           if (isSet(more, 1 << i))
             if (!isSet(
-                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags,
+                    ((DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags,
                     1 << i))
               goto endLoop;
       //      qint32 aff,total = {};
       //    bool found = false;
       if (!item_type)
         for (aff = {};
-             aff < ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->num_affects;
+             aff < ((DC::getInstance()->obj_index[nr].item))->num_affects;
              aff++)
-          if (affect == ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->affected[aff].location)
+          if (affect == ((DC::getInstance()->obj_index[nr].item))->affected[aff].location)
             found = true;
       if (affect && !item_type)
         if (!found)
@@ -1702,14 +1702,14 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (item_type)
       {
         bool spell_found = false;
-        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != item_type)
+        if (((DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != item_type)
           continue;
         if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
           for (i = 1; i < 4; i++)
-            if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[i] == spellnum)
+            if (((DC::getInstance()->obj_index[nr].item))->obj_flags.value[i] == spellnum)
               spell_found = true;
         if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
-          if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[3] == spellnum)
+          if (((DC::getInstance()->obj_index[nr].item))->obj_flags.value[3] == spellnum)
             spell_found = true;
 
         if (!spell_found)
@@ -1722,7 +1722,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description()));
+      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description()));
       ch->send(buf);
     endLoop:
       continue;
@@ -1806,11 +1806,11 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
       source_room = victim->in_room;
       if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
       {
-        act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
+        act_to_room("$n disappears in a mushroom cloud.", victim, 0, 0, 0);
         ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->name()), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
         move_char(victim, destination_room);
-        act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-        act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
+        act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
+        act_to_victim("$n has transferred you!", ch, 0, victim, 0);
         do_look(victim, "");
       }
     }
@@ -1833,11 +1833,11 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n disappears in a mushroom cloud.", victim, 0, 0, 0);
   ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->name()), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
   move_char(victim, destination_room);
-  act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-  act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
+  act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
+  act_to_victim("$n has transferred you!", ch, 0, victim, 0);
   do_look(victim, "");
   ch->sendln("Ok.");
 
@@ -1847,7 +1847,7 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
 command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim, target_mob, pers;
-  QString person, room[MAX_INPUT_LENGTH];
+  QString person, room;
   qint32 target;
   qint32 loop;
 
@@ -1927,11 +1927,11 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  act("$n disappears in a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n disappears in a puff of smoke.", victim, 0, 0, 0);
   ch->send(QStringLiteral("Moving %s from %d to %d.\r\n").arg(qPrintable(victim->name())).arg(DC::getInstance()->world[victim->in_room].number).arg(DC::getInstance()->world[target].number));
   move_char(victim, target);
-  act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-  act("$n has teleported you!", ch, 0, victim, TO_VICT, 0);
+  act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
+  act_to_victim("$n has teleported you!", ch, 0, victim, 0);
   do_look(victim, "");
   ch->sendln("Teleport completed.");
 
@@ -1970,7 +1970,7 @@ command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
     move_char(victim, target);
     act("$n arrives from a puff of smoke.",
         victim, 0, 0, TO_ROOM, 0);
-    act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
+    act_to_victim("$n has transferred you!", ch, 0, victim, 0);
     do_look(victim, "");
 
     if (victim->followers)
@@ -1986,7 +1986,7 @@ command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
           move_char(k->follower, target);
           act("$n arrives from a puff of smoke.",
               k->follower, 0, 0, TO_ROOM, 0);
-          act("$n has transferred you!", ch, 0, k->follower, TO_VICT, 0);
+          act_to_victim("$n has transferred you!", ch, 0, k->follower, 0);
           do_look(k->follower, "");
         }
       } /* for */
@@ -2036,7 +2036,7 @@ void opstat(CharacterPtr ch, qint32 vnum)
     ch->sendln("Error, non-existant object.");
     return;
   }
-  obj = (ObjectPtr)DC::getInstance()->obj_index[num].item;
+  obj = DC::getInstance()->obj_index[num].item;
   dc_sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
              qPrintable(obj->name()), vnum);
   ch->send(buf);
@@ -2367,7 +2367,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg1, arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2;
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
@@ -2419,10 +2419,10 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   */
 
-  ch->sendln(QStringLiteral("Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).").arg(v1).arg(((ObjectPtr)DC::getInstance()->obj_index[real_object(v1)].item)->short_description()).arg(v2).arg(((ObjectPtr)DC::getInstance()->obj_index[real_object(v2)].item)->short_description()));
+  ch->sendln(QStringLiteral("Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).").arg(v1).arg((DC::getInstance()->obj_index[real_object(v1)].item)->short_description()).arg(v2).arg((DC::getInstance()->obj_index[real_object(v2)].item)->short_description()));
 
   DC::getInstance()->object_list = DC::getInstance()->object_list->next;
-  otmp = (ObjectPtr)DC::getInstance()->obj_index[r2].item;
+  otmp = DC::getInstance()->obj_index[r2].item;
   obj->item_number = r2;
   DC::getInstance()->obj_index[r2].item = (void *)obj;
   DC::getInstance()->obj_index[r2].non_combat_func = {};
@@ -2441,7 +2441,7 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg1, arg2[MAX_INPUT_LENGTH];
+  QString arg1, arg2;
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))

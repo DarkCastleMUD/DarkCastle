@@ -103,7 +103,7 @@ command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (vict->isNonPlayer())
     ch->sendln("Can't do that to a beast.");
   else if (vict->getLevel() > ch->getLevel())
-    act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
+    act_to_character("$E might object to that.. better not.", ch, 0, vict, 0);
   else if (isSet(vict->player->punish, PUNISH_LOG))
   {
     ch->sendln("LOG removed.");
@@ -462,8 +462,8 @@ command_return_t do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
     eq_destroyed(ch, obj_object, -1);
   else
   {
-    act("$p is damaged.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$p carried by $n is damaged.", ch, obj_object, 0, TO_ROOM, 0);
+    act_to_character("$p is damaged.", ch, obj_object, 0, 0);
+    act_to_room("$p carried by $n is damaged.", ch, obj_object, 0, 0);
   }
 
   return ReturnValue::eSUCCESS;
@@ -545,7 +545,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("$3Syntax:$R sqedit save.");
     return ReturnValue::eFAILURE;
   }
-  QString arg1, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
+  QString arg1, arg2, arg3;
   bool done = false;
   argument = one_argument(argument, arg1);
   skill_quest *skill = {};
@@ -553,9 +553,9 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
   if (argument && *argument)
   {
     argument = one_argument(argument, arg2);
-    strcpy(arg3, arg1);
-    strcat(arg3, " ");
-    strcat(arg3, arg2);
+    dc_strcpy(arg3, arg1);
+    dc_strcat(arg3, " ");
+    dc_strcat(arg3, arg2);
     skill = find_sq(arg3);
   }
 
@@ -787,7 +787,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (real_object(i) < 0)
       continue;
-    obj = (ObjectPtr)DC::getInstance()->obj_index[real_object(i)].item;
+    obj = DC::getInstance()->obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, TAKE) &&
@@ -840,7 +840,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        dc_sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable(((ObjectPtr)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
+        dc_sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable((DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
         //    else dc_sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     dc_sprintf(buf1, "%s\n", buf1);
@@ -931,7 +931,7 @@ command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg, arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  QString arg, arg1, arg2;
   qint32 start, i, end, tot;
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg1);
@@ -962,7 +962,7 @@ command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((ObjectPtr)DC::getInstance()->obj_index[real_object(i)].item)->name()));
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg((DC::getInstance()->obj_index[real_object(i)].item)->name()));
     }
   }
   return ReturnValue::eSUCCESS;

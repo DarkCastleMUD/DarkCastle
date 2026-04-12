@@ -423,10 +423,10 @@ command_return_t do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cm
   }
   for (curr = skill_list; curr; curr = curr->next)
   {
-    qfprintf(fl, "%d %s~\n", curr->num, curr->message);
-    qfprintf(fl, "%d %d\n", curr->clas, curr->level);
+    dc_fprintf(fl, "%d %s~\n", curr->num, curr->message);
+    dc_fprintf(fl, "%d %d\n", curr->clas, curr->level);
   }
-  qfprintf(fl, "0\n");
+  dc_fprintf(fl, "0\n");
   fclose(fl);
   ch->sendln("Skill quests saved.");
   return ReturnValue::eSUCCESS;
@@ -931,7 +931,7 @@ void reset_time(void)
 }
 
 /* generate index table for monster file */
-index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
+mob_index_data *DC::generate_mob_indices(qint32 *top, mob_index_data *index)
 {
   qint32 i = {};
   QString buf;
@@ -968,8 +968,8 @@ index_data *DC::generate_mob_indices(qint32 *top, index_data *index)
        temp.isEmpty() == false;
        temp = read_next_worldfile_name(flMobIndex))
   {
-    strcpy(endfile, "mobs/");
-    strcat(endfile, qPrintable(temp));
+    dc_strcpy(endfile, "mobs/");
+    dc_strcat(endfile, qPrintable(temp));
 
     DC::config &cf = DC::getInstance()->cf;
 
@@ -1244,7 +1244,7 @@ void DC::remove_all_objs_from_world()
 }
 
 /* generate index table for object file */
-index_data *DC::generate_obj_indices(qint32 *top, index_data *index)
+obj_index_data *DC::generate_obj_indices(qint32 *top, obj_index_data *index)
 {
   qint32 i = {};
   QString buf;
@@ -1277,8 +1277,8 @@ index_data *DC::generate_obj_indices(qint32 *top, index_data *index)
        temp.isEmpty() == false;
        temp = read_next_worldfile_name(flObjIndex))
   {
-    strcpy(endfile, "objects/");
-    strcat(endfile, qPrintable(temp));
+    dc_strcpy(endfile, "objects/");
+    dc_strcat(endfile, qPrintable(temp));
     logverbose(temp);
 
     if (!(fl = fopen(endfile, "r")))
@@ -1308,7 +1308,7 @@ index_data *DC::generate_obj_indices(qint32 *top, index_data *index)
           index[i].non_combat_func = {};
           index[i].combat_func = {};
           index[i].progtypes = {};
-          if (!(index[i].item = (ObjectPtr)read_object(i, fl, false)))
+          if (!(index[i].item = read_object(i, fl, false)))
           {
             dc_sprintf(log_buf, "Unable to load object %lu!\r\n", index[i].vnum());
             DC::getInstance()->logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
@@ -1342,13 +1342,13 @@ void write_one_room(LegacyFile &lf, qint32 a)
   if (!DC::getInstance()->rooms.contains(a))
     return;
 
-  qfprintf(f, "#%d\n", DC::getInstance()->world[a].number);
+  dc_fprintf(f, "#%d\n", DC::getInstance()->world[a].number);
   string_to_file(f, DC::getInstance()->world[a].name);
   string_to_file(f, DC::getInstance()->world[a].description);
 
   if (DC::getInstance()->world[a].iFlags)
     REMOVE_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
-  qfprintf(f, "%lu %d %d\n", DC::getInstance()->world[a].zone, DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].sector_type);
+  dc_fprintf(f, "%lu %d %d\n", DC::getInstance()->world[a].zone, DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].sector_type);
   if (DC::getInstance()->world[a].iFlags)
     SET_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
 
@@ -1357,19 +1357,19 @@ void write_one_room(LegacyFile &lf, qint32 a)
   {
     if (!(DC::getInstance()->world[a].dir_option[b]))
       continue;
-    qfprintf(f, "D%d\n", b);
+    dc_fprintf(f, "D%d\n", b);
     if (DC::getInstance()->world[a].dir_option[b]->general_description)
       string_to_file(f, DC::getInstance()->world[a].dir_option[b]->general_description);
     else
-      qfprintf(f, "~\n"); // print blank
+      dc_fprintf(f, "~\n"); // print blank
     if (DC::getInstance()->world[a].dir_option[b]->keyword)
       string_to_file(f, DC::getInstance()->world[a].dir_option[b]->keyword);
     else
-      qfprintf(f, "~\n"); // print blank
-    qfprintf(f, "%d %d %d\n",
-             DC::getInstance()->world[a].dir_option[b]->exit_info,
-             DC::getInstance()->world[a].dir_option[b]->key,
-             DC::getInstance()->world[a].dir_option[b]->to_room);
+      dc_fprintf(f, "~\n"); // print blank
+    dc_fprintf(f, "%d %d %d\n",
+               DC::getInstance()->world[a].dir_option[b]->exit_info,
+               DC::getInstance()->world[a].dir_option[b]->key,
+               DC::getInstance()->world[a].dir_option[b]->to_room);
   } /* exits */
 
   /* extra descriptions */
@@ -1385,30 +1385,30 @@ void write_one_room(LegacyFile &lf, qint32 a)
     extra = room_extra_descriptions.pop();
     if (!extra)
       break;
-    qfprintf(f, "E\n");
+    dc_fprintf(f, "E\n");
     if (!extra->keyword_.isEmpty())
       string_to_file(f, extra->keyword_);
     else
-      qfprintf(f, "~\n"); // print blank
+      dc_fprintf(f, "~\n"); // print blank
     if (!extra->description_.isEmpty())
       string_to_file(f, extra->description_);
     else
-      qfprintf(f, "~\n"); // print blank
+      dc_fprintf(f, "~\n"); // print blank
   } /* extra descriptions */
 
   for (auto deni = DC::getInstance()->world[a].denied; deni; deni = deni->next)
-    qfprintf(f, "B\n%d\n", deni->vnum);
+    dc_fprintf(f, "B\n%d\n", deni->vnum);
 
   // Write out allowed classes if any
   for (qint32 i = {}; i < CLASS_MAX; i++)
   {
     if (DC::getInstance()->world[a].allow_class[i] == true)
     {
-      qfprintf(f, "C%d\n", i);
+      dc_fprintf(f, "C%d\n", i);
     }
   }
 
-  qfprintf(f, "S\n");
+  dc_fprintf(f, "S\n");
 }
 
 qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
@@ -1859,7 +1859,7 @@ void DC::free_objs_from_memory(void)
   // extra_descr_data * curr_extra = {};
 
   for (qint32 i = {}; i <= top_of_objt; i++)
-    if ((curr = (ObjectPtr)obj_index[i].item))
+    if ((curr = obj_index[i].item))
     {
       free_obj(curr);
       obj_index[i].item = {};
@@ -1949,8 +1949,8 @@ void DC::boot_world(void)
        temp.isEmpty() == false;
        temp = read_next_worldfile_name(flWorldIndex))
   {
-    strcpy(endfile, "world/");
-    strcat(endfile, qPrintable(temp));
+    dc_strcpy(endfile, "world/");
+    dc_strcat(endfile, qPrintable(temp));
 
     DC::config &cf = DC::getInstance()->cf;
     if (cf.verbose_mode)
@@ -2222,78 +2222,78 @@ void DC::free_zones_from_memory()
 
 void Zone::write(FILE *fl)
 {
-  qfprintf(fl, "V2\n");
-  qfprintf(fl, "#%lu\n", (id_ ? (bottom / 100) : 0));
-  qfprintf(fl, "%s~\n", qPrintable(name()));
-  qfprintf(fl, "%lu %lu %d %ld %d\n", top, lifespan, reset_mode, zone_flags, continent);
+  dc_fprintf(fl, "V2\n");
+  dc_fprintf(fl, "#%lu\n", (id_ ? (bottom / 100) : 0));
+  dc_fprintf(fl, "%s~\n", qPrintable(name()));
+  dc_fprintf(fl, "%lu %lu %d %ld %d\n", top, lifespan, reset_mode, zone_flags, continent);
 
   for (qint32 i = {}; i < cmd.size(); i++)
   {
     if (cmd[i]->command == '*')
-      qfprintf(fl, "* %s\n", qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "* %s\n", qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == '%')
-      qfprintf(fl, "%% %2d %3d %3d %s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "%% %2d %3d %3d %s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == 'X')
-      qfprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == 'K')
-      qfprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == 'M')
     {
       qint32 virt = cmd[i]->active ? DC::getInstance()->mob_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
-      qfprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
-               virt,
-               cmd[i]->arg2,
-               cmd[i]->arg3,
-               qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+                 virt,
+                 cmd[i]->arg2,
+                 cmd[i]->arg3,
+                 qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     }
     else if (cmd[i]->command == 'P')
     {
       qint32 virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
       qint32 virt2 = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg3].vnum() : cmd[i]->arg3;
-      qfprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
-               virt,
-               cmd[i]->arg2,
-               virt2,
-               qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+                 virt,
+                 cmd[i]->arg2,
+                 virt2,
+                 qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     }
     else if (cmd[i]->command == 'G')
     {
       qint32 virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
 
-      qfprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
-               virt,
-               cmd[i]->arg2,
-               cmd[i]->arg3,
-               qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+                 virt,
+                 cmd[i]->arg2,
+                 cmd[i]->arg3,
+                 qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     }
     else if (cmd[i]->command == 'O')
     {
       qint32 virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
-      qfprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
-               virt,
-               cmd[i]->arg2,
-               cmd[i]->arg3,
-               qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+                 virt,
+                 cmd[i]->arg2,
+                 cmd[i]->arg3,
+                 qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     }
     else if (cmd[i]->command == 'E')
     {
       qint32 virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
-      qfprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
-               virt,
-               cmd[i]->arg2,
-               cmd[i]->arg3,
-               qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+                 virt,
+                 cmd[i]->arg2,
+                 cmd[i]->arg3,
+                 qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     }
     else
-      qfprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i]->command,
-               cmd[i]->if_flag,
-               cmd[i]->arg1,
-               cmd[i]->arg2,
-               cmd[i]->arg3,
-               qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i]->command,
+                 cmd[i]->if_flag,
+                 cmd[i]->arg1,
+                 cmd[i]->arg2,
+                 cmd[i]->arg3,
+                 qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
   }
 
-  qfprintf(fl, "S\n$~\n");
+  dc_fprintf(fl, "S\n$~\n");
 }
 
 zone_t DC::read_one_zone(FILE *fl)
@@ -2490,8 +2490,8 @@ void DC::boot_zones(void)
        temp.isEmpty() == false;
        temp = read_next_worldfile_name(flZoneIndex))
   {
-    strcpy(endfile, "zonefiles/");
-    strcat(endfile, qPrintable(temp));
+    dc_strcpy(endfile, "zonefiles/");
+    dc_strcat(endfile, qPrintable(temp));
 
     if (cf.verbose_mode)
     {
@@ -2738,9 +2738,9 @@ void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob)
   if (mprg->next)
     write_mprog_recur(fl, mprg->next, mob);
   if (mob)
-    qfprintf(fl, ">%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
+    dc_fprintf(fl, ">%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
   else
-    qfprintf(fl, "\\%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
+    dc_fprintf(fl, "\\%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
   if (mprg->arglist)
     string_to_file(fl, mprg->arglist);
   else
@@ -2759,7 +2759,7 @@ void write_mobile(LegacyFile &lf, CharacterPtr mob)
   FILE *fl = lf.file_handle_;
   qint32 i = {};
 
-  qfprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
+  dc_fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
   string_to_file(fl, mob->name());
   string_to_file(fl, qPrintable(mob->short_description()));
   string_to_file(fl, qPrintable(mob->long_description()));
@@ -2767,48 +2767,48 @@ void write_mobile(LegacyFile &lf, CharacterPtr mob)
 
   while (i < ACT_MAX / ASIZE + 1)
   {
-    qfprintf(fl, "%d ", mob->mobdata->actflags[i]);
+    dc_fprintf(fl, "%d ", mob->mobdata->actflags[i]);
     i++;
   }
-  qfprintf(fl, "-1\n");
+  dc_fprintf(fl, "-1\n");
   i = {};
 
   while (i < AFF_MAX / ASIZE + 1)
   {
-    qfprintf(fl, "%d ", mob->affected_by[i]);
+    dc_fprintf(fl, "%d ", mob->affected_by[i]);
     i++;
   }
-  qfprintf(fl, "-1\n");
+  dc_fprintf(fl, "-1\n");
 
-  qfprintf(fl, "%d %d %llu\n"
-               "%d %d %dd%d+%d %dd%d+%d\n"
-               "%ld %ld\n"
-               "%d %d %d %d %d %d\n",
-           mob->alignment,
-           mob->race,
-           mob->getLevel(),
+  dc_fprintf(fl, "%d %d %llu\n"
+                 "%d %d %dd%d+%d %dd%d+%d\n"
+                 "%ld %ld\n"
+                 "%d %d %d %d %d %d\n",
+             mob->alignment,
+             mob->race,
+             mob->getLevel(),
 
-           (20 - mob->hitroll),
-           (qint32)(mob->armor / 10),
-           GET_MAX_HIT(mob),
-           1,
-           0,
-           mob->mobdata->damnodice,
-           mob->mobdata->damsizedice,
-           mob->damroll,
+             (20 - mob->hitroll),
+             (qint32)(mob->armor / 10),
+             GET_MAX_HIT(mob),
+             1,
+             0,
+             mob->mobdata->damnodice,
+             mob->mobdata->damsizedice,
+             mob->damroll,
 
-           mob->getGold(),
-           mob->exp,
+             mob->getGold(),
+             mob->exp,
 
-           mob->getPosition(),
-           mob->mobdata->default_pos,
-           mob->sex,
-           mob->immune,
-           mob->suscept,
-           mob->resist);
+             mob->getPosition(),
+             mob->mobdata->default_pos,
+             mob->sex,
+             mob->immune,
+             mob->suscept,
+             mob->resist);
 
   if (mob->c_class)
-    qfprintf(fl, "C %d\n", mob->c_class);
+    dc_fprintf(fl, "C %d\n", mob->c_class);
 
   if ((mob->raw_str != 11 || mob->raw_dex != 11 || mob->raw_con != 11 ||
        mob->raw_intel != 11 || mob->raw_wis != 11) &&
@@ -2818,25 +2818,25 @@ void write_mobile(LegacyFile &lf, CharacterPtr mob)
        mob->raw_intel != BASE_STAT + mob_race_mod[mob->race][3] ||
        mob->raw_wis != BASE_STAT + mob_race_mod[mob->race][4]))
   {
-    qfprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
+    dc_fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
   }
 
   if (DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs)
   {
     write_mprog_recur(fl, DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs, true);
-    qfprintf(fl, "|\n");
+    dc_fprintf(fl, "|\n");
   }
 
   if (mob->mobdata->mob_flags.type > 0)
   {
-    qfprintf(fl, "Y %d\n", mob->mobdata->mob_flags.type);
+    dc_fprintf(fl, "Y %d\n", mob->mobdata->mob_flags.type);
     for (quint32 i = {}; i < MAX_MOB_VALUES; ++i)
     {
-      qfprintf(fl, "V %d %d\n", i, mob->mobdata->mob_flags.value[i]);
+      dc_fprintf(fl, "V %d %d\n", i, mob->mobdata->mob_flags.value[i]);
     }
   }
 
-  qfprintf(fl, "S\n");
+  dc_fprintf(fl, "S\n");
 }
 
 // If a mob is set to 0d0 we need to give it hps depending upon it's level
@@ -3308,8 +3308,7 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
   obj->item_number = cur_index;
   obj->ex_description = {};
   // shift > items right
-  memmove(&DC::getInstance()->obj_index[cur_index + 1], &DC::getInstance()->obj_index[cur_index],
-          ((top_of_objt - cur_index + 1) * sizeof(index_data)));
+  memmove(&DC::getInstance()->obj_index[cur_index + 1], &DC::getInstance()->obj_index[cur_index], ((top_of_objt - cur_index + 1) * sizeof(obj_index_data)));
   top_of_objt++;
 
   // insert
@@ -3326,7 +3325,7 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
 
   // update index of all the obj prototypes
   for (qint32 i = cur_index + 1; i <= top_of_objt; i++)
-    ((ObjectPtr)DC::getInstance()->obj_index[i].item)->item_number++;
+    (DC::getInstance()->obj_index[i].item)->item_number++;
 
   // update obj file indices
   world_file_list_item *wcurr = {};
@@ -3414,7 +3413,7 @@ qint32 DC::create_blank_mobile(qint32 nr)
   mob->misc = {};
 
   // shift > items right
-  memmove(&DC::getInstance()->mob_index[cur_index + 1], &DC::getInstance()->mob_index[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(index_data)));
+  memmove(&DC::getInstance()->mob_index[cur_index + 1], &DC::getInstance()->mob_index[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(mob_index_data)));
   top_of_mobt++;
 
   // insert
@@ -3506,7 +3505,7 @@ void delete_mob_from_index(qint32 nr)
 
   (CharacterPtr) DC::getInstance()->mob_index[nr].item = {};
   // shift > items left
-  memmove(&DC::getInstance()->mob_index[nr], &DC::getInstance()->mob_index[nr + 1], ((top_of_mobt - nr) * sizeof(index_data)));
+  memmove(&DC::getInstance()->mob_index[nr], &DC::getInstance()->mob_index[nr + 1], ((top_of_mobt - nr) * sizeof(mob_index_data)));
   top_of_mobt--;
 
   // update index of all mobiles in game - these store rnums
@@ -3582,11 +3581,10 @@ void delete_item_from_index(qint32 nr)
   if (nr < 0 || nr > top_of_objt) // doesn't exist!
     return;
 
-  (ObjectPtr) DC::getInstance()->obj_index[nr].item = {};
+  DC::getInstance()->obj_index[nr].item = {};
 
   // shift > items left
-  memmove(&DC::getInstance()->obj_index[nr], &DC::getInstance()->obj_index[nr + 1],
-          ((top_of_objt - nr) * sizeof(index_data)));
+  memmove(&DC::getInstance()->obj_index[nr], &DC::getInstance()->obj_index[nr + 1], ((top_of_objt - nr) * sizeof(mob_index_data)));
   top_of_objt--;
 
   // update index of all items in game - these store rnums
@@ -3596,7 +3594,7 @@ void delete_item_from_index(qint32 nr)
 
   // update index of all the obj prototypes
   for (i = nr; i <= top_of_objt; i++)
-    ((ObjectPtr)DC::getInstance()->obj_index[i].item)->item_number--;
+    (DC::getInstance()->obj_index[i].item)->item_number--;
 
   // update obj file indices - these store rnums
   world_file_list_item *wcurr = {};
@@ -4070,51 +4068,51 @@ void write_object(LegacyFile &lf, ObjectPtr obj)
   FILE *fl = lf.file_handle_;
   extra_descr_data *currdesc;
 
-  qfprintf(fl, "#%lu\n", DC::getInstance()->obj_index[obj->item_number].vnum());
+  dc_fprintf(fl, "#%lu\n", DC::getInstance()->obj_index[obj->item_number].vnum());
   string_to_file(fl, obj->name());
   string_to_file(fl, obj->short_description());
   string_to_file(fl, obj->long_description());
   string_to_file(fl, obj->ActionDescription());
 
-  qfprintf(fl, "%d %d %d %d\n"
-               "%d %d %d %d %llu\n"
-               "%d %d %d\n",
-           obj->obj_flags.type_flag,
-           obj->obj_flags.extra_flags,
-           obj->obj_flags.wear_flags.toInt(),
-           obj->obj_flags.size,
+  dc_fprintf(fl, "%d %d %d %d\n"
+                 "%d %d %d %d %llu\n"
+                 "%d %d %d\n",
+             obj->obj_flags.type_flag,
+             obj->obj_flags.extra_flags,
+             obj->obj_flags.wear_flags.toInt(),
+             obj->obj_flags.size,
 
-           obj->obj_flags.value[0],
-           obj->obj_flags.value[1],
-           obj->obj_flags.value[2],
-           obj->obj_flags.value[3],
-           obj->obj_flags.eq_level,
+             obj->obj_flags.value[0],
+             obj->obj_flags.value[1],
+             obj->obj_flags.value[2],
+             obj->obj_flags.value[3],
+             obj->obj_flags.eq_level,
 
-           obj->obj_flags.weight,
-           obj->obj_flags.cost,
-           obj->obj_flags.more_flags);
+             obj->obj_flags.weight,
+             obj->obj_flags.cost,
+             obj->obj_flags.more_flags);
 
   currdesc = obj->ex_description;
   while (currdesc)
   {
-    qfprintf(fl, "E\n");
+    dc_fprintf(fl, "E\n");
     string_to_file(fl, currdesc->keyword_);
     string_to_file(fl, currdesc->description_);
     currdesc = currdesc->next;
   }
 
   for (qint32 i = {}; i < obj->num_affects; i++)
-    qfprintf(fl, "A\n"
-                 "%d %d\n",
-             obj->affected[i].location, obj->affected[i].modifier);
+    dc_fprintf(fl, "A\n"
+                   "%d %d\n",
+               obj->affected[i].location, obj->affected[i].modifier);
 
   if (DC::getInstance()->obj_index[obj->item_number].mobprogs)
   {
     write_mprog_recur(fl, DC::getInstance()->obj_index[obj->item_number].mobprogs, false);
-    qfprintf(fl, "|\n");
+    dc_fprintf(fl, "|\n");
   }
 
-  qfprintf(fl, "S\n");
+  dc_fprintf(fl, "S\n");
 }
 
 std::ofstream &operator<<(std::ofstream &out, ObjectPtr obj)
@@ -4275,15 +4273,15 @@ void write_object_csv(ObjectPtr obj, std::ofstream &fout)
     write_bitvector_csv(obj->obj_flags.extra_flags, Object::extra_bits, fout);
     write_bitvector_csv(obj->obj_flags.more_flags, Object::more_obj_bits, fout);
 
-    QString buf, buf2[MAX_STRING_LENGTH];
+    QString buf, buf2;
     for (qint32 i = {}; i < obj->num_affects; i++)
     {
       if (obj->affected[i].location < 1000)
         sprinttype(obj->affected[i].location, apply_types, buf2);
       else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
-        strncpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str(), sizeof(buf2));
+        dc_strncpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str(), sizeof(buf2));
       else
-        strcpy(buf2, "Invalid");
+        dc_strcpy(buf2, "Invalid");
 
       dc_sprintf(buf, "%s by %d", buf2, obj->affected[i].modifier);
       fout << buf;
@@ -4320,7 +4318,7 @@ ObjectPtr clone_object(qint32 nr)
 
   obj = new Object;
   clear_object(obj);
-  old = ((ObjectPtr)DC::getInstance()->obj_index[nr].item); /* cast the void pointer */
+  old = (DC::getInstance()->obj_index[nr].item); /* cast the void pointer */
 
   if (old != 0)
   {
@@ -5717,7 +5715,7 @@ qint32 file_to_string(const QString name, QString buf)
         return (-1);
       }
 
-      strcat(buf, tmp);
+      dc_strcat(buf, tmp);
       *(buf + strlen(buf) + 1) = '\0';
       *(buf + strlen(buf)) = '\r';
     }
@@ -6075,9 +6073,9 @@ qint32 obj_in_index(QString name, qint32 index)
   qint32 i, j;
 
   for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
-                     ((ObjectPtr)(DC::getInstance()->obj_index[i].item));
+                     ((DC::getInstance()->obj_index[i].item));
        i++)
-    if (isexact(name, ((ObjectPtr)(DC::getInstance()->obj_index[i].item))->name()))
+    if (isexact(name, ((DC::getInstance()->obj_index[i].item))->name()))
     {
       if (j == index)
         return i;
@@ -6390,7 +6388,7 @@ void find_unordered_mobiles(void)
 
 void string_to_file(FILE *f, QString str)
 {
-  qfprintf(f, "%s~\n", str.remove('\r').toStdString().c_str());
+  dc_fprintf(f, "%s~\n", str.remove('\r').toStdString().c_str());
 }
 
 void string_to_file(QTextStream &fl, QString str)
@@ -6485,7 +6483,7 @@ void copySaveData(ObjectPtr target, ObjectPtr source)
 
 bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2)
 {
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2)))
+  if (dc_strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2)))
   {
     return false;
   }
@@ -6561,7 +6559,7 @@ bool verify_item(ObjectPtr *obj)
 {
   extern qint32 top_of_objt;
 
-  if ((*obj)->short_description() == ((ObjectPtr)DC::getInstance()->obj_index[(*obj)->item_number].item)->short_description())
+  if ((*obj)->short_description() == (DC::getInstance()->obj_index[(*obj)->item_number].item)->short_description())
     return false;
 
   qint32 newitem = -1;
@@ -6573,10 +6571,10 @@ bool verify_item(ObjectPtr *obj)
 
     if ((*obj)->item_number - i >= 0)
     {
-      index_data *obj_index_entry = &DC::getInstance()->obj_index[(*obj)->item_number - i];
+      obj_index_data *obj_index_entry = &DC::getInstance()->obj_index[(*obj)->item_number - i];
       if (obj_index_entry)
       {
-        ObjectPtr obj_index_item = (ObjectPtr)obj_index_entry->item;
+        ObjectPtr obj_index_item = obj_index_entry->item;
         if (obj_index_item)
         {
           if ((*obj)->short_description() == obj_index_item->short_description())
@@ -6597,7 +6595,7 @@ bool verify_item(ObjectPtr *obj)
     }
 
     if ((*obj)->item_number + i <= top_of_objt)
-      if ((*obj)->short_description() == ((ObjectPtr)DC::getInstance()->obj_index[(*obj)->item_number + i].item)->short_description())
+      if ((*obj)->short_description() == (DC::getInstance()->obj_index[(*obj)->item_number + i].item)->short_description())
       {
         newitem = (*obj)->item_number + i;
         break;

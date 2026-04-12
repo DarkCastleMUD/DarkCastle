@@ -393,9 +393,9 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   if (number(1, 101) > success || vict->affected_by_spell(SPELL_IRON_ROOTS)) /* 101 is complete failure */
   {
-    act("$n fails to blast $N!", ch, 0, vict, TO_ROOM, NOTVICT);
-    act("You fail to blast $N!", ch, 0, vict, TO_CHAR, 0);
-    act("$n finds that you are hard to blast!", ch, 0, vict, TO_VICT, 0);
+    act_to_room("$n fails to blast $N!", ch, 0, vict, NOTVICT);
+    act_to_character("You fail to blast $N!", ch, 0, vict, 0);
+    act_to_victim("$n finds that you are hard to blast!", ch, 0, vict, 0);
     if (!vict->fighting && vict->isNonPlayer())
       return attack(vict, ch, TYPE_UNDEFINED);
     return ReturnValue::eSUCCESS;
@@ -408,9 +408,9 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       class_can_go(GET_CLASS(vict), EXIT(vict, exit)->to_room))
   {
     dc_sprintf(buf, "$N is blasted out of the room %s by $n!", dirswards[exit]);
-    act(buf, ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_room(buf, ch, 0, vict, NOTVICT);
     dc_sprintf(buf, "You watch as $N goes flailing out of the room %s!", dirswards[exit]);
-    act(buf, ch, 0, vict, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, vict, 0);
     act("$n's vicious blast throws you out of the room!", ch, 0,
         vict, TO_VICT, 0);
 
@@ -438,7 +438,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
     QString buf, name[100];
     qint32 prev = vict->getHP();
 
-    strcpy(name, qPrintable(vict->shortdesc_or_name()));
+    dc_strcpy(name, qPrintable(vict->shortdesc_or_name()));
     qint32 retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
@@ -535,7 +535,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
                       KI_OFFSET + KI_STORM, 0);
       if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
-      act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("A burst of energy slams into you!", ch, 0, 0, 0);
     } // else
     //		if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
     //	tmp_victim->sendln("A crackle of energy echos past you.");
@@ -705,27 +705,27 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
 
   if (disrupt_bingo == true)
   {
-    act("$n slams a bolt of focused ki energy into the flow of magic all around you!", ch, 0, victim, TO_VICT, 0);
-    act("$n focuses a blast of ki to disrupt the flow of magic all around $N!", ch, 0, victim, TO_ROOM, 0);
+    act_to_victim("$n slams a bolt of focused ki energy into the flow of magic all around you!", ch, 0, victim, 0);
+    act_to_room("$n focuses a blast of ki to disrupt the flow of magic all around $N!", ch, 0, victim, 0);
     ch->sendln("You focus your ki to disrupt the flow of magic all around your opponent!");
   }
   else
   {
-    act("$n slams a bolt of focused ki energy into the flow of magic around you!", ch, 0, victim, TO_VICT, 0);
-    act("$n focuses a blast of ki to disrupt the flow of magic around $N!", ch, 0, victim, TO_ROOM, 0);
+    act_to_victim("$n slams a bolt of focused ki energy into the flow of magic around you!", ch, 0, victim, 0);
+    act_to_room("$n focuses a blast of ki to disrupt the flow of magic around $N!", ch, 0, victim, 0);
     ch->sendln("You focus your ki to disrupt the flow of magic around your opponent!");
   }
 
   if (ISSET(victim->affected_by, AFF_GOLEM))
   {
     ch->sendln("The golem seems to shrug off your ki disrupt attempt!");
-    act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
-    act("$N seems to ignore $n's disrupting energy!", ch, 0, victim, TO_ROOM, 0);
-    act("$N seems to ignore your disrupting energy!", ch, 0, victim, TO_CHAR, 0);
+    act_to_room("$N seems to ignore $n's disrupting energy!", ch, 0, victim, 0);
+    act_to_character("$N seems to ignore your disrupting energy!", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -796,10 +796,8 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
 
     act("$N resists your attempt to disrupt magic!", ch, nullptr, victim,
         TO_CHAR, 0);
-    act("$N resists $n's attempt to disrupt magic!", ch, nullptr, victim, TO_ROOM,
-        NOTVICT);
-    act("You resist $n's attempt to disrupt magic!", ch, nullptr, victim, TO_VICT,
-        0);
+    act("$N resists $n's attempt to disrupt magic!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to disrupt magic!", ch, nullptr, victim, TO_VICT, 0);
 
     if (victim->isNonPlayer() && (!victim->fighting) &&
         GET_POS(ch) > position_t::SLEEPING)
@@ -827,69 +825,69 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
     {
       affect_from_char(victim, SPELL_SANCTUARY);
       REMBIT(victim->affected_by, AFF_SANCTUARY);
-      act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
-      act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("You don't feel so invulnerable anymore.", ch, 0, victim, 0);
+      act_to_room("The $B$7white glow$R around $n's body fades.", victim, 0, 0, 0);
     }
     if (victim->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
     {
       affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
-      act("Your protection from evil has been disrupted!", ch, 0, victim, TO_VICT, 0);
-      act("The dark, $6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your protection from evil has been disrupted!", ch, 0, victim, 0);
+      act_to_room("The dark, $6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, 0);
     }
 
     if (victim->affected_by_spell(SPELL_HASTE))
     {
       affect_from_char(victim, SPELL_HASTE);
-      act("Your magically enhanced speed has been disrupted!", ch, 0, victim, TO_VICT, 0);
-      act("$n's actions slow to their normal speed.", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your magically enhanced speed has been disrupted!", ch, 0, victim, 0);
+      act_to_room("$n's actions slow to their normal speed.", victim, 0, 0, 0);
     }
 
     if (victim->affected_by_spell(SPELL_STONE_SHIELD))
     {
       affect_from_char(victim, SPELL_STONE_SHIELD);
-      act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
-      act("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, 0);
+      act_to_room("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, 0);
     }
 
     if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
     {
       affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
-      act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
-      act("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, 0);
+      act_to_room("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, 0);
     }
 
     if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
     {
       REMBIT(victim->affected_by, AFF_FROSTSHIELD);
-      act("Your shield of $B$3frost$R melts into nothing!.", ch, 0, victim, TO_VICT, 0);
-      act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your shield of $B$3frost$R melts into nothing!.", ch, 0, victim, 0);
+      act_to_room("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, 0);
     }
 
     if (victim->affected_by_spell(SPELL_LIGHTNING_SHIELD))
     {
       affect_from_char(victim, SPELL_LIGHTNING_SHIELD);
-      act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, TO_VICT, 0);
-      act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, 0);
+      act_to_room("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, 0);
     }
 
     if (victim->affected_by_spell(SPELL_FIRESHIELD) || IS_AFFECTED(victim, AFF_FIRESHIELD))
     {
       REMBIT(victim->affected_by, AFF_FIRESHIELD);
       affect_from_char(victim, SPELL_FIRESHIELD);
-      act("Your $B$4flames$R have been extinguished!", ch, 0, victim, TO_VICT, 0);
-      act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your $B$4flames$R have been extinguished!", ch, 0, victim, 0);
+      act_to_room("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, 0);
     }
     if (victim->affected_by_spell(SPELL_ACID_SHIELD))
     {
       affect_from_char(victim, SPELL_ACID_SHIELD);
-      act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, TO_VICT, 0);
-      act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, 0);
+      act_to_room("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, 0);
     }
     if (victim->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
     {
       affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
-      act("Your protection from good has been disrupted!", ch, 0, victim, TO_VICT, 0);
-      act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
+      act_to_victim("Your protection from good has been disrupted!", ch, 0, victim, 0);
+      act_to_room("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, 0);
     }
 
     if (victim->isNonPlayer() && !victim->fighting)
@@ -982,73 +980,73 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
   {
     affect_from_char(victim, SPELL_SANCTUARY);
     REMBIT(victim->affected_by, AFF_SANCTUARY);
-    act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
-    act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("You don't feel so invulnerable anymore.", ch, 0, victim, 0);
+    act_to_room("The $B$7white glow$R around $n's body fades.", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_PROTECT_FROM_EVIL)
   {
     affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
-    act("Your protection from evil has been disrupted!", ch, 0, victim, TO_VICT, 0);
-    act("The dark, $6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your protection from evil has been disrupted!", ch, 0, victim, 0);
+    act_to_room("The dark, $6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_HASTE)
   {
     affect_from_char(victim, SPELL_HASTE);
-    act("Your magically enhanced speed has been disrupted!", ch, 0, victim, TO_VICT, 0);
-    act("$n's actions slow to their normal speed.", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your magically enhanced speed has been disrupted!", ch, 0, victim, 0);
+    act_to_room("$n's actions slow to their normal speed.", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_STONE_SHIELD)
   {
     affect_from_char(victim, SPELL_STONE_SHIELD);
-    act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
-    act("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, 0);
+    act_to_room("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_GREATER_STONE_SHIELD)
   {
     affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
-    act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
-    act("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, 0);
+    act_to_room("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_FROSTSHIELD)
   {
     affect_from_char(victim, SPELL_FROSTSHIELD);
     REMBIT(victim->affected_by, AFF_FROSTSHIELD);
-    act("Your shield of $B$3frost$R melts into nothing!.", ch, 0, victim, TO_VICT, 0);
-    act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your shield of $B$3frost$R melts into nothing!.", ch, 0, victim, 0);
+    act_to_room("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_LIGHTNING_SHIELD)
   {
     affect_from_char(victim, SPELL_LIGHTNING_SHIELD);
-    act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, TO_VICT, 0);
-    act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, 0);
+    act_to_room("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_FIRESHIELD)
   {
     REMBIT(victim->affected_by, AFF_FIRESHIELD);
     affect_from_char(victim, SPELL_FIRESHIELD);
-    act("Your $B$4flames$R have been extinguished!", ch, 0, victim, TO_VICT, 0);
-    act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your $B$4flames$R have been extinguished!", ch, 0, victim, 0);
+    act_to_room("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_ACID_SHIELD)
   {
     affect_from_char(victim, SPELL_ACID_SHIELD);
-    act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, TO_VICT, 0);
-    act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, 0);
+    act_to_room("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, 0);
   }
 
   if (af->type == SPELL_PROTECT_FROM_GOOD)
   {
     affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
-    act("Your protection from good has been disrupted!", ch, 0, victim, TO_VICT, 0);
-    act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
+    act_to_victim("Your protection from good has been disrupted!", ch, 0, victim, 0);
+    act_to_room("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, 0);
   }
 
   if (victim->isNonPlayer() && !victim->fighting)
@@ -1121,12 +1119,12 @@ qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   if (percent > chance)
   {
     ch->sendln("Hopefully none of them noticed you trip on that rock.");
-    act("$n tries to show everyone how to be graceful and trips over a rock.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n tries to show everyone how to be graceful and trips over a rock.", ch, 0, 0, 0);
   }
   else
   {
     ch->sendln("You instruct your party on more graceful movement.");
-    act("$n holds a quick tai chi class.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n holds a quick tai chi class.", ch, 0, 0, 0);
 
     for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
@@ -1136,7 +1134,7 @@ qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
         continue;
       affect_from_char(tmp_char, KI_AGILITY + KI_OFFSET);
       affect_from_char(tmp_char, KI_AGILITY + KI_OFFSET);
-      act("$n's graceful movement inspires you to better form.", ch, 0, tmp_char, TO_VICT, 0);
+      act_to_victim("$n's graceful movement inspires you to better form.", ch, 0, tmp_char, 0);
 
       af.type = KI_AGILITY + KI_OFFSET;
       af.duration = 1 + learned / 10;
@@ -1161,8 +1159,8 @@ qint32 ki_meditation(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vi
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  act("You enter a brief meditative state and focus your ki to heal your injuries.", ch, 0, vict, TO_CHAR, 0);
-  act("$n enters a brief meditative state and focuses $s ki to heal several wounds.", ch, 0, vict, TO_ROOM, 0);
+  act_to_character("You enter a brief meditative state and focus your ki to heal your injuries.", ch, 0, vict, 0);
+  act_to_room("$n enters a brief meditative state and focuses $s ki to heal several wounds.", ch, 0, vict, 0);
 
   gain = ch->hit_gain(position_t::SLEEPING);
 
@@ -1173,7 +1171,7 @@ qint32 ki_meditation(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vi
 
 qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim)
 {
-  QString amt, type[MAX_STRING_LENGTH];
+  QString amt, type;
   qint32 amount, temp = {};
   affected_type af;
 
@@ -1199,7 +1197,7 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
 
   if (victim->affected_by_spell(SPELL_KI_TRANS_TIMER))
   {
-    act("$N cannot receive a transfer right now due to the stress $S mind has been recently been through.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N cannot receive a transfer right now due to the stress $S mind has been recently been through.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1231,7 +1229,7 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
     send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | ki of your essence with $s own.",
                 ch, 0, victim, amt,
                 "$n focuses intently, bonding briefly with your spirit, replenishing your essence with $s own.", TO_VICT);
-    act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_room("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, NOTVICT);
   }
   else if (type[0] == 'm')
   {
@@ -1246,12 +1244,12 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
 
     QString buffer;
     buffer = fmt::format("You focus intently, bonding briefly with $N's spirit, transferring {} ki of your essence into {} mana for $M.", amount, temp);
-    act(buffer.c_str(), ch, 0, victim, TO_CHAR, 0);
+    act_to_character(buffer.c_str(), ch, 0, victim, 0);
 
     buffer = fmt::format("$n focuses intently, bonding briefly with your spirit, replenishing {} mana with a portion of $s essence.", temp);
-    act(buffer.c_str(), ch, 0, victim, TO_VICT, 0);
+    act_to_victim(buffer.c_str(), ch, 0, victim, 0);
 
-    act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_room("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, NOTVICT);
   }
   else
   {

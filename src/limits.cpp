@@ -810,7 +810,7 @@ void point_update(void)
     }
     else if (!i->isNonPlayer() && i->getLevel() < 1 && !i->desc)
     {
-      act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
+      act_to_room("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, 0);
       do_quit(i, "", cmd_t::SAVE_SILENTLY);
     }
   } /* for */
@@ -827,8 +827,6 @@ void update_corpses_and_portals(void)
   /* objects */
   for (j = DC::getInstance()->object_list; j; j = next_thing, proc++)
   {
-    if (j == (ObjectPtr)0x95959595)
-      break;
     next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
      |  object.  Type 0 is the spell portal and type 2 is a game_portal
@@ -855,11 +853,11 @@ void update_corpses_and_portals(void)
         }
         else if (j->in_obj && j->in_obj->carried_by)
         {
-          act("$p shimmers brightly for a moment.", j->in_obj->carried_by, j->in_obj, 0, TO_CHAR, INVIS_NULL);
+          act_to_character("$p shimmers brightly for a moment.", j->in_obj->carried_by, j->in_obj, 0, INVIS_NULL);
         }
         else if (j->carried_by)
         {
-          act("$p shimmers brightly and then fades away.", j->carried_by, j, 0, TO_CHAR, INVIS_NULL);
+          act_to_character("$p shimmers brightly and then fades away.", j->carried_by, j, 0, INVIS_NULL);
         }
 
         if (j->isTotem() && j->in_obj && j->in_obj->obj_flags.type_flag == ITEM_ALTAR)
@@ -884,11 +882,11 @@ void update_corpses_and_portals(void)
       if (!j->obj_flags.timer)
       {
         if (j->carried_by)
-          act("$p decays in your hands.", j->carried_by, j, 0, TO_CHAR, 0);
+          act_to_character("$p decays in your hands.", j->carried_by, j, 0, 0);
         else if ((j->in_room != DC::NOWHERE) && (DC::getInstance()->world[j->in_room].people))
         {
-          act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
-          act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_CHAR, 0);
+          act_to_room("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, INVIS_NULL);
+          act_to_character("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, 0);
         }
         bool corpse_contained = j->contains != nullptr;
         for (jj = j->contains; jj; jj = next_thing2)

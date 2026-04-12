@@ -1,41 +1,20 @@
-/************************************************************************
-| game_portal.C
-| Description:  Handles creation and removal of the magical portals that
-|   move throughout the game.
-*/
-#include <cstdio>
-
-#include "DC/class.h"
-#include "DC/obj.h"
-#include "DC/game_portal.h"
-#include "DC/structs.h"
 #include "DC/DC.h"
 #include "DC/db.h"
-#include "DC/handler.h"
-#include "DC/utility.h"
-
-qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer);
-
-game_portal game_portals[MAX_GAME_PORTALS];
-
-/************************************************************************
-| load_game_portals
-| Description:  Loads the game portals from the list of filenames --
-|   hard coded!
-*/
+#include <qdebug.h>
+#include <qiodevicebase.h>
+#include <qtypes.h>
 
 const QStringList portal_bits = {
     "NO_LEAVE",
-    "NO_ENTER",
-    "\n"};
+    "NO_ENTER"};
 
-void load_game_portals()
+void DC::load_game_portals(void)
 {
 
   // TODO - make this a read which portals from a file like it should instead of
   // being hard coded
 
-  const QStringList portal_files =
+  const QStringList portal_filenames =
       {
           "portal/portal.wagon",
           "portal/portal.tower",
@@ -47,69 +26,46 @@ void load_game_portals()
           "portal/portal.ship6",
           "portal/portal.arcana"};
 
-  extern game_portal game_portals[MAX_GAME_PORTALS];
   qint32 i, j;
   qint32 num_lines = {}; /* Temporary to count lines */
   qint32 file_pos;       /* Used to store position before counting length */
-  FILE *cur_file;
-  QString buf; /* Stores temp file names */
+  QString buf;           /* Stores temp file names */
   QString log_buf;
 
-  for (i = {}; i < MAX_GAME_PORTALS; i++)
+  for (qsizetype portal_id = {}; portal_id < portal_filenames.size(); ++portal_id)
   {
-    num_lines = {};
-    QString portal_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_files[i]);
-    if ((cur_file = fopen(qPrintable(portal_filename), "r")) == 0)
+    auto &portal_filename = portal_filenames[portal_id];
+    QString full_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_filename);
+    QFile portal_file(portal_filename);
+
+    if (!portal_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
     {
       DC::getInstance()->logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
       break;
     }
-    /* Now we have a readable file.  Here's the ure:
-    |  First Line:  to_room -- the room the portal goes to
-    |  Second Line: object -- Object to duplicate for portal (-1 for none)
-    |  Third Line:  timer  -- Length object sticks around (-1 for FOREVER)
-    |  Subsequent Lines: from_rooms.  List of rooms the portal might be
-    |    from.
-    |  NOTE:  THERE SHOULD NOT BE A BLANK LINE AT THE END OF THE FILE.  THIS
-    |    WILL CAUSE THE GAME TO CRASH.  I could build a sanity check, but
-    |    if people read this it's not necessary.  -Morc 24 Apr 1997
-    */
-    if (fscanf(cur_file, "%lld\n%d\n%d\n",
-               &(game_portals[i].to_room),
-               &(game_portals[i].obj_num),
-               &(game_portals[i].max_timer)) != 3)
-    {
-      DC::getInstance()->logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
-      break;
-    }
+    QTextStream in(&portal_file);
+    in >> game_portals_[portal_id].to_room;
+    in >> game_portals_[portal_id].obj_num;
+    in >> game_portals_[portal_id].max_timer;
+
     /* Store the current file value and count line feeds */
-    file_pos = ftell(cur_file);
-    while (fscanf(cur_file, "%*d\n") != EOF)
-      num_lines++;
-    fseek(cur_file, file_pos, 0);
-    game_portals[i].num_rooms = num_lines;
-    game_portals[i].from_rooms = new qint32[game_portals[i].num_rooms];
-    for (j = {}; j < game_portals[i].num_rooms; j++)
+    // game_portals_[i].num_rooms
+
+    while (!in.atEnd())
     {
-      fscanf(cur_file, "%d\n", ((game_portals[i]).from_rooms + j));
+      room_t buffer;
+      in >> buffer;
+      game_portals_[portal_id].from_rooms.insert(buffer);
     }
-    /* Now set some other values that aren't set */
-    game_portals[i].cur_timer = {}; /* So that we get reset */
-    if (game_portals[i].max_timer == (-1))
-      game_portals[i].max_timer = FOREVER;
-    fclose(cur_file);
+    game_portals_[portal_id].cur_timer = {}; /* So that we get reset */
+
+    if (game_portals_[portal_id].max_timer == -1)
+      game_portals_[portal_id].max_timer = FOREVER;
   }
 }
 
 void DC::free_game_portals_from_memory(void)
 {
-  for (qint32 i = {}; i < MAX_GAME_PORTALS; i++)
-  {
-    if (game_portals[i].from_rooms)
-    {
-      game_portals[i].from_rooms = {};
-    }
-  }
 }
 
 /************************************************************************
@@ -118,40 +74,33 @@ void DC::free_game_portals_from_memory(void)
 |   0, otherwise it just decrements the timer.
 | Returns: void
 */
-void process_portals()
+void DC::process_portals(void)
 {
-  qint32 i;
-  //  extern  game_portal game_portals[];
-
-  for (i = {}; i < MAX_GAME_PORTALS; i++)
+  for (auto &portal : game_portals_)
   {
-    if (game_portals[i].cur_timer == FOREVER)
+    if (portal.cur_timer == FOREVER)
       continue;
-    game_portals[i].cur_timer--;
+    portal.cur_timer--;
+
     /* This is sort of tricky.  Here's what happens:
     |  We set the timer of the portal to the max_timer of the object
     |  so that it gets removed by the game after that much time.  We
     |  then keep track of our own timer for re-creation of the portal
     |  after it's removed by the game.
     */
-    if (game_portals[i].cur_timer <= 0)
+    if (portal.cur_timer <= 0)
     {
-      qint32 from_room =
-          game_portals[i].from_rooms[number(0, game_portals[i].num_rooms - 1)];
+      room_t from_room = portal.from_rooms[number(0, portal.from_rooms.size() - 1)];
 
       /* So the portal is already gone, all we do is create a new one */
-      if (make_arbitrary_portal(
-              from_room,
-              game_portals[i].to_room,
-              game_portals[i].obj_num,
-              game_portals[i].max_timer) == 0)
+      if (make_arbitrary_portal(from_room, portal.to_room, portal.obj_num, portal.max_timer) == 0)
       {
         QString log_buf = {};
         dc_sprintf(log_buf, "Making portal from %d to %llu failed.", from_room,
-                   game_portals[i].to_room);
+                   portal.to_room);
         DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }
-      game_portals[i].cur_timer = game_portals[i].max_timer;
+      portal.cur_timer = portal.max_timer;
     }
   }
 }
@@ -167,27 +116,24 @@ void process_portals()
 |
 | Returns: 0 on error, non-zero on success
 */
-qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer)
+bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer)
 {
-
-  QString log_buf;
-
-  auto from_portal = new Object;
-  clear_object(from_portal);
-
   if (real_room(from_room) == DC::NOWHERE)
   {
-    dc_sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
-    from_portal = {};
-    DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
-    return {};
+    QString log_buf;
+    dc_sprintf(log_buf, "Cannot create portal: room %d doesn't exist.", from_room);
+    logbug(log_buf);
+    return false;
   }
+
+  auto from_portal = ObjectPtr(new Object(this));
+  clear_object(from_portal);
 
   if (from_room == to_room)
   {
     from_portal = {};
-    DC::getInstance()->logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
-    return {};
+    logentry(QStringLiteral("Portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    return false;
   }
 
   if (duplicate < 0) /* Make a generic portal */
@@ -210,10 +156,11 @@ qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate,
 
     if (!from_portal->isPortal())
     {
+      QString log_buf;
       dc_sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       from_portal = {};
       DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
-      return 0;
+      return false;
     }
   }
   /* Nonspecific things -- done to all portals */
@@ -228,7 +175,7 @@ qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate,
   /* Make it game_portal flagged for do_enter and limits.C */
   from_portal->obj_flags.value[1] = 2;
   /* Make it non-zone wide for do_leave */
-  from_portal->obj_flags.value[2] = (-1);
+  from_portal->obj_flags.value[2] = -1;
 
   obj_to_room(from_portal, real_room(from_room));
 
@@ -237,7 +184,7 @@ qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate,
                real_room(from_room));
 
   /* Success - presumably */
-  return (1);
+  return true;
 }
 
 void find_and_remove_player_portal(CharacterPtr ch)

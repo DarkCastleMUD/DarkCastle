@@ -242,8 +242,8 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, vict, SKILL_BEHEAD))
   {
     ch->sendln("Your mighty swing goes wild!");
-    act("$n takes a mighty swing at your head, but it goes wild!", ch, 0, vict, TO_VICT, 0);
-    act("$n takes a mighty swing at $n's head, but it goes wild!", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_victim("$n takes a mighty swing at your head, but it goes wild!", ch, 0, vict, 0);
+    act_to_room("$n takes a mighty swing at $n's head, but it goes wild!", ch, 0, vict, NOTVICT);
     retval = one_hit(ch, vict, SKILL_BEHEAD, WEAR_WIELD);
     return retval;
   }
@@ -282,25 +282,25 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
             (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
         !number(0, 1))
     { // tarrasque's leash..
-      act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
-      act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
+      act_to_character("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, 0);
+      act_to_room("$n attempts to behead $N, but fails.", ch, 0, vict, NOTVICT);
+      act_to_victim("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, 0);
       retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
       return ReturnValue::eSUCCESS | retval;
     }
 
     if (IS_AFFECTED(vict, AFF_NO_BEHEAD))
     {
-      act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
-      act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
+      act_to_character("$N deftly dodges your beheading attempt!", ch, 0, vict, 0);
+      act_to_room("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, NOTVICT);
+      act_to_victim("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, 0);
       retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
       return ReturnValue::eSUCCESS | retval;
     }
 
-    act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
-    act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
-    act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_victim("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, 0);
+    act_to_character("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, 0);
+    act_to_room("$n cleanly slices $N's head off $S body!", ch, 0, vict, NOTVICT);
 
     vict->setHP(-20);
     make_head(vict);
@@ -311,9 +311,9 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   { /* You MISS the fucker! */
-    act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
-    act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
-    act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_victim("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, 0);
+    act_to_character("You miss your attempt to behead $N.", ch, 0, vict, 0);
+    act_to_room("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, NOTVICT);
     retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
   }
 

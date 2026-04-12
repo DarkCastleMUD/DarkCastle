@@ -56,12 +56,12 @@ const golem_data golem_list[] = {
 void shatter_message(CharacterPtr ch)
 {
   qint32 golemtype = !IS_AFFECTED(ch, AFF_GOLEM); // 0 or 1
-  act(golem_list[golemtype].shatter_message, ch, 0, 0, TO_ROOM, 0);
+  act_to_room(golem_list[golemtype].shatter_message, ch, 0, 0, 0);
 }
 void release_message(CharacterPtr ch)
 {
   qint32 golemtype = !IS_AFFECTED(ch, AFF_GOLEM);
-  act(golem_list[golemtype].release_message, ch, 0, 0, TO_ROOM, 0);
+  act_to_room(golem_list[golemtype].release_message, ch, 0, 0, 0);
 }
 
 void golem_gain_exp(CharacterPtr ch)
@@ -589,7 +589,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
         aff_name = QStringLiteral("blood fury reuse timer");
         break;
       case SKILL_CRAZED_ASSAULT:
-        if (strcmp(apply_types[(qint32)aff->location], "HITROLL"))
+        if (dc_strcmp(apply_types[(qint32)aff->location], "HITROLL"))
           aff_name = QStringLiteral("crazed assault reuse timer");
         break;
       case SPELL_HOLY_AURA_TIMER:

@@ -1015,7 +1015,7 @@ void affect_update(qint32 duration_type)
         {
           // NOTICE:  this is a TEMP room flag
           REMOVE_BIT(DC::getInstance()->world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
-          act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, nullptr, nullptr, TO_ROOM, NOTVICT);
+          act_to_room("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, nullptr, nullptr, NOTVICT);
         }
         affect_remove(i, af, 0);
       }
@@ -1075,7 +1075,7 @@ void extractFamiliar(CharacterPtr ch)
   if (nullptr == victim)
     return;
 
-  act("$n disappears in a flash of flame and shadow.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n disappears in a flash of flame and shadow.", victim, 0, 0, 0);
   extract_char(victim, true);
 }
 
@@ -1137,15 +1137,15 @@ void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 
     if (GET_CLASS(ch->master) != CLASS_RANGER || reason == follower_reasons_t::BROKE_CHARM_LILITH)
     {
-      act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
-      act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
-      act("$n hates your guts!", ch, 0, ch->master, TO_VICT, 0);
+      act_to_character("You realize that $N is a jerk!", ch, 0, ch->master, 0);
+      act_to_room("$n is free from the bondage of the spell.", ch, 0, 0, 0);
+      act_to_victim("$n hates your guts!", ch, 0, ch->master, 0);
     }
     else
     {
-      act("You lose interest in $N.", ch, 0, ch->master, TO_CHAR, 0);
-      act("$n loses interest in $N.", ch, 0, ch->master, TO_ROOM, NOTVICT);
-      act("$n loses interest in you, and goes back to its business.", ch, 0, ch->master, TO_VICT, 0);
+      act_to_character("You lose interest in $N.", ch, 0, ch->master, 0);
+      act_to_room("$n loses interest in $N.", ch, 0, ch->master, NOTVICT);
+      act_to_victim("$n loses interest in you, and goes back to its business.", ch, 0, ch->master, 0);
     }
     if (ch->fighting && ch->fighting != ch->master)
     {
@@ -1166,16 +1166,16 @@ void stop_follower(CharacterPtr ch, follower_reasons_t reason)
       // multiple checks if ch->master is still valid are necessary because a mob program may mak it no longer valid
       if (ch->master != nullptr)
       {
-        act("You stop following $N.", ch, 0, ch->master, TO_CHAR, 0);
+        act_to_character("You stop following $N.", ch, 0, ch->master, 0);
 
         if (ch->master != nullptr)
         {
-          act("$n stops following $N.", ch, 0, ch->master, TO_ROOM, NOTVICT);
+          act_to_room("$n stops following $N.", ch, 0, ch->master, NOTVICT);
         }
 
         if (ch->master != nullptr)
         {
-          act("$n stops following you.", ch, 0, ch->master, TO_VICT, 0);
+          act_to_victim("$n stops following you.", ch, 0, ch->master, 0);
         }
       }
     }
@@ -1266,14 +1266,14 @@ void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reaso
   leader->followers = k;
 
   if (reason == follower_reasons_t::END_STALK)
-    act("You stalk $N.", ch, 0, leader, TO_CHAR, 0);
+    act_to_character("You stalk $N.", ch, 0, leader, 0);
   else if (reason == follower_reasons_t::CHANGE_LEADER)
     return;
   else
   {
-    act("You now follow $N.", ch, 0, leader, TO_CHAR, 0);
-    act("$n starts following you.", ch, 0, leader, TO_VICT, INVIS_NULL);
-    act("$n now follows $N.", ch, 0, leader, TO_ROOM, INVIS_NULL | NOTVICT);
+    act_to_character("You now follow $N.", ch, 0, leader, 0);
+    act_to_victim("$n starts following you.", ch, 0, leader, INVIS_NULL);
+    act_to_room("$n now follows $N.", ch, 0, leader, INVIS_NULL | NOTVICT);
   }
 }
 
@@ -1343,8 +1343,8 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
       {"z", "k"},
       {"", ""}};
 
-  strcpy(buf, "");
-  strcpy(splwd, spells[si - 1]);
+  dc_strcpy(buf, "");
+  dc_strcpy(splwd, spells[si - 1]);
 
   offs = {};
 
@@ -1353,7 +1353,7 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
     for (j = {}; *(syls[j].org); j++)
       if (strncmp(syls[j].org, splwd + offs, strlen(syls[j].org)) == 0)
       {
-        strcat(buf, syls[j].new_new);
+        dc_strcat(buf, syls[j].new_new);
         if (strlen(syls[j].org))
           offs += strlen(syls[j].org);
         else
@@ -1381,12 +1381,12 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
     {
       if (GET_CLASS(ch) == GET_CLASS(temp_char))
       {
-        act_return ar = act(buf, ch, 0, temp_char, TO_VICT, 0);
+        act_return ar = act_to_victim(buf, ch, 0, temp_char, 0);
         retval = ar.retval;
       }
       else
       {
-        act_return ar = act(buf2, ch, 0, temp_char, TO_VICT, 0);
+        act_return ar = act_to_victim(buf2, ch, 0, temp_char, 0);
         retval = ar.retval;
       }
 
@@ -1532,7 +1532,7 @@ command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
       if (aff->type > 0 && aff->type <= MAX_SPL_LIST && !skill_success(ch, nullptr, SKILL_RELEASE))
       {
         ch->sendln(QStringLiteral("You failed to release the spell effect '%1', and are left momentarily dazed.").arg(get_skill_name(aff->type)));
-        act("$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_room("$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, INVIS_NULL);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
         ch->decrementMove(10);
         return ReturnValue::eFAILURE;
@@ -1550,7 +1550,7 @@ command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       affect_from_char(ch, aftype);
       //	  affect_remove(ch,aff,0);
-      act(QStringLiteral("$n concentrates for a moment and releases their %1.").arg(get_skill_name(aftype)), ch, 0, 0, TO_ROOM, INVIS_NULL);
+      act_to_room(QStringLiteral("$n concentrates for a moment and releases their %1.").arg(get_skill_name(aftype)), ch, 0, 0, INVIS_NULL);
       found = true;
     }
 
@@ -1787,7 +1787,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr tar_obj;
   CharacterPtr tar_char;
-  QString name, filter[MAX_STRING_LENGTH];
+  QString name, filter;
   qint32 qend, spl, i, learned;
   bool target_ok;
 
@@ -2063,7 +2063,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
         for (qint64 i = {}; i < MAX_SPL_LIST; i++)
         {
-          if (!strcmp(spells[i], argument))
+          if (!dc_strcmp(spells[i], argument))
           {
             ok_self = true;
             tar_char = ch;
@@ -2409,7 +2409,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             ch->sendln("The failed elemental filter drains you of additional mana.");
           }
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1) * rel;
-          act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
+          act_to_room("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, 0);
           ch->skill_increase_check(spl, learned, spell_info[spl].difficulty());
           if (oldroom)
           {
@@ -2421,7 +2421,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) && ch->affected_by_spell(SPELL_INVISIBLE))
         {
-          act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
+          act_to_room("$n slowly fades into existence.", ch, 0, 0, 0);
           affect_from_char(ch, SPELL_INVISIBLE);
           REMBIT(ch->affected_by, AFF_INVISIBLE);
         }
@@ -2471,7 +2471,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         if (tar_char && tar_char != ch && ch->isPlayer() && tar_char->isPlayer() && tar_char->desc && ch->desc)
         {
           /*
-          if (!strcmp(tar_char->desc->getPeerOriginalAddress().toString(qPrintable()), ch->desc->getPeerOriginalAddress().toString(qPrintable())))
+          if (!dc_strcmp(tar_char->desc->getPeerOriginalAddress().toString(qPrintable()), ch->desc->getPeerOriginalAddress().toString(qPrintable())))
           {
             dc_sprintf(log_buf, "Multi: %s casted '%s' on %s", qPrintable(ch->name()),
                     get_skill_name(spl), qPrintable(tar_char->name()));
@@ -2546,22 +2546,22 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           if (ch == tar_char || ARE_GROUPED(ch, tar_char))
           { // some idiot was shooting at himself
-            // out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
-            // for		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
+            // out		  act_to_character("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0,  0);
+            // for		  act_to_room("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0,  0);
             // heals		  return ReturnValue::eSUCCESS;
           }
           else
           {
-            act("$n's spell bounces back at $m.", ch, 0, tar_char, TO_VICT, 0);
-            act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, tar_char, TO_CHAR, 0);
-            act("$n's spell reflects off of $N's magical aura", ch, 0, tar_char, TO_ROOM, NOTVICT);
+            act_to_victim("$n's spell bounces back at $m.", ch, 0, tar_char, 0);
+            act_to_character("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, tar_char, 0);
+            act_to_room("$n's spell reflects off of $N's magical aura", ch, 0, tar_char, NOTVICT);
             tar_char = ch;
 
             // Ping-pong
             if (IS_AFFECTED(tar_char, AFF_REFLECT) && number(0, 99) < tar_char->spell_reflect)
             {
-              act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
-              act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
+              act_to_character("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, 0);
+              act_to_room("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, 0);
               if (oldroom)
               {
                 char_from_room(ch);
@@ -2578,15 +2578,15 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         if (group_spell)
         {
           ch->sendln("You utter a swift prayer to the gods to amplify your powers.");
-          act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
+          act_to_room("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, 0);
           argument = QStringLiteral("communegroupspell");
           argument_ptr = argument;
         }
         else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY) && tar_char->affected_by_spell(SPELL_IMMUNITY)->modifier == spl - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_ROOM, NOTVICT);
+          act_to_victim("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, 0);
+          act_to_character("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, NOTVICT);
           return ReturnValue::eSUCCESS;
         }
         else if (fil)
@@ -2595,32 +2595,32 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           {
           case FILTER_FIRE:
             ch->send(QStringLiteral("Upon casting, your %s filters through a $B$4blast of flame$R!\r\n").arg(spells[spl - 1]));
-            act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0);
+            act_to_room("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, 0);
             level = 200 + TYPE_FIRE - TYPE_HIT;
             break;
           case FILTER_ACID:
             ch->send(QStringLiteral("Upon casting, your %s filters through $B$2sizzling acid$R!\r\n").arg(spells[spl - 1]));
-            act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0);
+            act_to_room("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, 0);
             level = 200 + TYPE_ACID - TYPE_HIT;
             break;
           case FILTER_COLD:
             ch->send(QStringLiteral("Upon casting, your %s filters through $B$3shards of ice$R!\r\n").arg(spells[spl - 1]));
-            act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0);
+            act_to_room("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, 0);
             level = 200 + TYPE_COLD - TYPE_HIT;
             break;
           case FILTER_ENERGY:
             ch->send(QStringLiteral("Upon casting, your %s filters through $B$5crackling energy$R!\r\n").arg(spells[spl - 1]));
-            act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0);
+            act_to_room("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, 0);
             level = 200 + TYPE_ENERGY - TYPE_HIT;
             break;
           case FILTER_MAGIC:
             ch->send(QStringLiteral("Upon casting, your %s filters through a $B$7burst of magic$R!\r\n").arg(spells[spl - 1]));
-            act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0);
+            act_to_room("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, 0);
             level = 200 + TYPE_MAGIC - TYPE_HIT;
             break;
           case FILTER_POISON:
             ch->send(QStringLiteral("Upon casting, your %s filters through $2poisonous fumes$R!\r\n").arg(spells[spl - 1]));
-            act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0);
+            act_to_room("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, 0);
             level = 200 + TYPE_POISON - TYPE_HIT;
             break;
           default:
@@ -2647,29 +2647,29 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           if (spl == SPELL_LIGHTNING_BOLT)
           {
             QString buffer;
-            strcpy(buffer, "$n unleashes a bolt of $B$5lightning$R to the ");
+            dc_strcpy(buffer, "$n unleashes a bolt of $B$5lightning$R to the ");
             switch (dir)
             {
             case 0:
-              strcat(buffer, "north.");
+              dc_strcat(buffer, "north.");
               break;
             case 1:
-              strcat(buffer, "east.");
+              dc_strcat(buffer, "east.");
               break;
             case 2:
-              strcat(buffer, "south.");
+              dc_strcat(buffer, "south.");
               break;
             case 3:
-              strcat(buffer, "west.");
+              dc_strcat(buffer, "west.");
               break;
             case 4:
-              strcat(buffer, "area above you.");
+              dc_strcat(buffer, "area above you.");
               break;
             case 5:
-              strcat(buffer, "area below you.");
+              dc_strcat(buffer, "area below you.");
               break;
             }
-            act(buffer, ch, 0, 0, TO_ROOM, 0);
+            act_to_room(buffer, ch, 0, 0, 0);
           }
         }
 
@@ -2688,7 +2688,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
-  QString buf2, buf3[MAX_STRING_LENGTH];
+  QString buf2, buf3;
   qint32 mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -2724,9 +2724,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         cleric = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2736,9 +2736,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         thief = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Thi(%llu)", t_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2748,9 +2748,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         warrior = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "War(%llu)", w_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2760,9 +2760,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         anti = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2772,9 +2772,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         pal = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2784,9 +2784,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         barb = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Bar(%llu)", b_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2796,9 +2796,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         monk = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Mon(%llu)", k_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2808,9 +2808,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         ranger = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2820,9 +2820,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         bard = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Brd(%llu)", d_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2832,9 +2832,9 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         druid = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2896,11 +2896,11 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
     else
       continue;
 
-    strcat(buf, buf2);
-    strcat(buf, "\r\n");
+    dc_strcat(buf, buf2);
+    dc_strcat(buf, "\r\n");
   }
 
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
   return ReturnValue::eSUCCESS;
@@ -2923,11 +2923,11 @@ command_return_t do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
                  UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
                  song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
                  "Brd", d_skills[i].levelavailable);
-      strcat(buf, "\r\n");
+      dc_strcat(buf, "\r\n");
     }
   }
 
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
   return ReturnValue::eSUCCESS;
@@ -2936,7 +2936,7 @@ command_return_t do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
 command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
-  QString buf2, buf3[MAX_STRING_LENGTH];
+  QString buf2, buf3;
   qint32 mage, cleric, anti, pal, ranger, druid;
 
   if (ch->isNonPlayer())
@@ -2968,9 +2968,9 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         cleric = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2980,9 +2980,9 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         anti = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -2992,9 +2992,9 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         pal = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -3004,9 +3004,9 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         ranger = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -3016,9 +3016,9 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         druid = j;
         if (buf2[0] != '\0')
-          strcat(buf2, ", ");
+          dc_strcat(buf2, ", ");
         dc_sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
-        strcat(buf2, buf3);
+        dc_strcat(buf2, buf3);
         break;
       }
     }
@@ -3055,11 +3055,11 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
     else
       continue;
 
-    strcat(buf, buf2);
-    strcat(buf, "\r\n");
+    dc_strcat(buf, buf2);
+    dc_strcat(buf, "\r\n");
   }
 
-  strcat(buf, "\r\n");
+  dc_strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
   return ReturnValue::eSUCCESS;

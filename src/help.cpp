@@ -2,7 +2,6 @@
 #include <cctype>
 #include <cstring>
 
-
 #include "DC/DC.h"
 
 #include "DC/db.h" // exp_table
@@ -49,7 +48,7 @@ public:
 qint32 levenshtein(const QString s, const QString t)
 {
   quint32 i, j, n, m, cost;
-  quint32 d[MAX_INPUT_LENGTH + 1][MAX_HELP_KEYWORD_LENGTH + 1];
+  quint32 d[MAX_HELP_KEYWORD_LENGTH + 1];
 
   m = strlen(s);
   n = strlen(t);
@@ -114,7 +113,7 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
   if (!(this_help = find_help(upper_argument)))
   {
     dc_snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
-             upper_argument);
+                upper_argument);
     ch->send(buf);
 
     // Find similar help entries based on the Levenshtein distance
@@ -222,10 +221,10 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
   dc_sprintf(key5, "'%s'", this_help->keyword5);
 
   dc_sprintf(buf, "%s %s %s %s %s", key1,
-             ((this_help->keyword2 && strcmp(key2, "'NONE'")) ? key2 : " "),
-             ((this_help->keyword3 && strcmp(key3, "'NONE'")) ? key3 : " "),
-             ((this_help->keyword3 && strcmp(key4, "'NONE'")) ? key4 : " "),
-             ((this_help->keyword3 && strcmp(key5, "'NONE'")) ? key5 : " "));
+             ((this_help->keyword2 && dc_strcmp(key2, "'NONE'")) ? key2 : " "),
+             ((this_help->keyword3 && dc_strcmp(key3, "'NONE'")) ? key3 : " "),
+             ((this_help->keyword3 && dc_strcmp(key4, "'NONE'")) ? key4 : " "),
+             ((this_help->keyword3 && dc_strcmp(key5, "'NONE'")) ? key5 : " "));
 
   dc_sprintf(rec_level, "\r\nLevel Required: %d", this_help->min_level);
   dc_sprintf(entry,
@@ -331,12 +330,12 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
       if (*line == '\0')
       {
         dc_snprintf(tmpbuffer, ENTRY_MAX, "%s\r\n", tmpentry);
-        strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
+        dc_strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
       }
       else
       {
         dc_snprintf(tmpbuffer, ENTRY_MAX, "%s%s\r\n", tmpentry, line);
-        strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
+        dc_strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
       }
       linenum += get_line_with_space(fl, line);
     }
@@ -371,7 +370,7 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
 
 command_return_t do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  strcpy(arg, "areas");
+  dc_strcpy(arg, "areas");
   return do_new_help(ch, arg, cmd);
 }
 
@@ -404,7 +403,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
     if ((*(argument + 1) == 'l' || *(argument + 1) == 'L'))
     { // show help based on level range, excluded all level 1's
       // half_chop(arg, argument, arg);
-      QString arg2, arg3[MAX_INPUT_LENGTH];
+      QString arg2, arg3;
       argument = &arg[0];
       argument = one_argument(argument, arg2);
       argument = one_argument(argument, arg3);
@@ -412,7 +411,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
       if (arg[0] && is_number(arg))
         start = atoi(arg);
       argument = &arg2[0];
-      strcpy(arg, arg3);
+      dc_strcpy(arg, arg3);
       if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0))
       { // not valid numbers
         if (atoi(argument) > atoi(arg))
@@ -894,7 +893,7 @@ void save_help(CharacterPtr ch)
   LegacyFile lf(".", file, "Couldn't open help file '%1' for saving.");
   if (lf.isOpen())
   {
-    qfprintf(lf.file_handle_, "@Version: 2\n");
+    dc_fprintf(lf.file_handle_, "@Version: 2\n");
 
     for (i = {}; i < DC::getInstance()->new_top_of_helpt; i++)
     {
@@ -904,15 +903,15 @@ void save_help(CharacterPtr ch)
       help_string_to_file(lf.file_handle_, new_help_table[i].keyword4);
       help_string_to_file(lf.file_handle_, new_help_table[i].keyword5);
       help_string_to_file(lf.file_handle_, new_help_table[i].related);
-      qfprintf(lf.file_handle_, "L: %d\n", new_help_table[i].min_level);
-      qfprintf(lf.file_handle_, "E:\n");
+      dc_fprintf(lf.file_handle_, "L: %d\n", new_help_table[i].min_level);
+      dc_fprintf(lf.file_handle_, "E:\n");
       help_string_to_file(lf.file_handle_, new_help_table[i].entry);
-      qfprintf(lf.file_handle_, "#\n");
-      qfprintf(lf.file_handle_, "~\n");
+      dc_fprintf(lf.file_handle_, "#\n");
+      dc_fprintf(lf.file_handle_, "~\n");
     }
 
     // end file
-    qfprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
   else
   {
@@ -938,16 +937,16 @@ void save_help(CharacterPtr ch)
         help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword4);
         help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword5);
         //      help_string_to_file(lf.file_handle_ new_help_table[i].related);
-        //      qfprintf(lf.file_handle_ "L: %d\n", new_help_table[i].min_level);
-        //      qfprintf(lf.file_handle_ "E:\n");
+        //      dc_fprintf(lf.file_handle_ "L: %d\n", new_help_table[i].min_level);
+        //      dc_fprintf(lf.file_handle_ "E:\n");
         help_string_to_file(lf_web_help.file_handle_, new_help_table[i].entry);
-        qfprintf(lf_web_help.file_handle_, "#\n");
-        //      qfprintf(lf.file_handle_ "~\n");
+        dc_fprintf(lf_web_help.file_handle_, "#\n");
+        //      dc_fprintf(lf.file_handle_ "~\n");
       }
     }
 
     // end file
-    qfprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
   else
   {
@@ -960,7 +959,7 @@ void save_help(CharacterPtr ch)
 void help_string_to_file(FILE *f, QString str)
 {
   QString newbuf;
-  strcpy(newbuf, str);
+  dc_strcpy(newbuf, str);
 
   // remove all \r's
   for (QString curr = newbuf; *curr != '\0'; curr++)
@@ -976,7 +975,7 @@ void help_string_to_file(FILE *f, QString str)
   if (newbuf[strlen(newbuf) - 1] == '\n')
     newbuf[strlen(newbuf) - 1] = '\0';
 
-  qfprintf(f, "%s\n", newbuf);
+  dc_fprintf(f, "%s\n", newbuf);
 }
 
 qint32 get_line_with_space(FILE *fl, QString buf)
@@ -997,7 +996,7 @@ qint32 get_line_with_space(FILE *fl, QString buf)
     return 0;
   else
   {
-    strcpy(buf, temp);
+    dc_strcpy(buf, temp);
     return lines;
   }
 }

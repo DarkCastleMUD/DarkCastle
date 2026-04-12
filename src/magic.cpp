@@ -175,7 +175,7 @@ bool can_heal(CharacterPtr ch, CharacterPtr victim, qint32 spellnum)
     if (ch == victim)
       ch->sendln("You have not received enough damage to warrant this powerful incantation.");
     else
-      act("$N has not received enough damage to warrant this powerful incantation.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N has not received enough damage to warrant this powerful incantation.", ch, 0, victim, 0);
   }
   return can_cast;
 }
@@ -380,8 +380,8 @@ qint32 spell_drown(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   {
     dam = victim->getHP() * 5 + 20;
     victim->sendln(QStringLiteral("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->name()));
-    act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
-    act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
+    act_to_room("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, NOTVICT);
+    act_to_character("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, 0);
     return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN);
   }
 
@@ -405,7 +405,7 @@ qint32 spell_energy_drain(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   gain_exp(victim, 0 - mult);
   victim->removeHP(victim->getHP() / 20);
   victim->sendln("Your knees buckle as life force is drained from your body!\r\nYou have lost some experience!");
-  act("You drain some of $N's experience!", ch, 0, victim, TO_CHAR, 0);
+  act_to_character("You drain some of $N's experience!", ch, 0, victim, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -433,9 +433,9 @@ qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + 40)
 
   {
-    act("$N resists your attempt to souldrain $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to souldrain $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to souldrain you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to souldrain $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to souldrain $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to souldrain you!", ch, nullptr, victim, 0);
     qint32 retval;
     if (victim->isNonPlayer() && !victim->fighting)
     {
@@ -518,7 +518,7 @@ qint32 spell_meteor_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       victim = ch;
     if (isSet(retval, ReturnValue::eEXTRA_VALUE))
       return retval;
-    act("The force of the spell knocks $N over!", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("The force of the spell knocks $N over!", ch, 0, victim, 0);
     victim->sendln("The force of the spell knocks you over!");
     victim->setSitting();
   }
@@ -553,8 +553,8 @@ qint32 spell_fireball(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   if (skill > 80)
     if (number(0, 100) < (skill / 5))
     {
-      act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
-      act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
+      act_to_room("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, 0);
+      act_to_character("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, 0);
       retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL);
     }
   return retval;
@@ -636,7 +636,7 @@ qint32 spell_aegis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
     affect_from_char(ch, spl);
   if (ch->affected_by_spell(SPELL_ARMOR))
   {
-    act("$n is already protected by magical armour.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("$n is already protected by magical armour.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -663,7 +663,7 @@ qint32 spell_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
     affect_from_char(victim, SPELL_ARMOR);
   if (victim->affected_by_spell(SPELL_AEGIS) || victim->affected_by_spell(SPELL_U_AEGIS))
   {
-    act("$n is already protected by magical armour.", victim, 0, ch, TO_VICT, 0);
+    act_to_victim("$n is already protected by magical armour.", victim, 0, ch, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -769,9 +769,9 @@ qint32 cast_iridescent_aura(quint8 level, CharacterPtr ch, QString arg, qint32 t
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_iridescent_aura(level, ch, tar_ch, 0, skill);
@@ -781,9 +781,9 @@ qint32 cast_iridescent_aura(quint8 level, CharacterPtr ch, QString arg, qint32 t
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_iridescent_aura(level, ch, leader, 0, skill);
@@ -898,25 +898,25 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   {
   case SECT_AIR:
     ch->sendln("You attempt to cause an earthquake in the air, but nothing happens.");
-    act("$n attempted to cause an earthquake in the air, what an idiot.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n attempted to cause an earthquake in the air, what an idiot.", ch, 0, 0, 0);
     return retval;
     break;
 
   case SECT_WATER_NOSWIM:
     ch->sendln("The water turns violent as the earth beneath it trembles.");
-    act("$n's earthquake creates a tsunami that capsizes any ships in the area.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's earthquake creates a tsunami that capsizes any ships in the area.", ch, 0, 0, 0);
     capsize = true;
     break;
 
   case SECT_UNDERWATER:
     underwater = true;
     ch->sendln("The earth trembles below you, the water pressure nearly makes you lose consciousness.");
-    act("$n's earthquake nearly makes you implode from the water pressure.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's earthquake nearly makes you implode from the water pressure.", ch, 0, 0, 0);
     break;
 
   default:
     ch->sendln("The earth trembles beneath your feet!");
-    act("$n makes the earth tremble and shiver.\r\n", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n makes the earth tremble and shiver.\r\n", ch, 0, 0, 0);
     break;
   }
 
@@ -970,10 +970,10 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
             if (tmp_obj->obj_flags.type_flag == ITEM_BOAT)
             {
-              act("$p carried by $n has capsized!", tmp_victim, tmp_obj, 0, TO_ROOM, 0);
-              act("Your $p has capsized!", tmp_victim, tmp_obj, 0, TO_CHAR, 0);
-              act("$p breaks apart into floating junk.", tmp_victim, tmp_obj, 0, TO_CHAR, 0);
-              act("$p breaks apart into floating junk.", tmp_victim, tmp_obj, 0, TO_ROOM, 0);
+              act_to_room("$p carried by $n has capsized!", tmp_victim, tmp_obj, 0, 0);
+              act_to_character("Your $p has capsized!", tmp_victim, tmp_obj, 0, 0);
+              act_to_character("$p breaks apart into floating junk.", tmp_victim, tmp_obj, 0, 0);
+              act_to_room("$p breaks apart into floating junk.", tmp_victim, tmp_obj, 0, 0);
               eq_destroyed(tmp_victim, tmp_obj, -1);
             } // if (tmp_obj
           } // for (tmp_obj
@@ -1074,7 +1074,7 @@ void do_solar_blind(CharacterPtr ch, CharacterPtr tmp_victim, qint32 skill)
     return;
   if (!IS_AFFECTED(tmp_victim, AFF_BLIND))
   {
-    act("$n seems to be blinded!", tmp_victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n seems to be blinded!", tmp_victim, 0, 0, INVIS_NULL);
     tmp_victim->sendln("The world dims and goes $B$0black$R as you are blinded!");
 
     af.type = SPELL_BLINDNESS;
@@ -1119,7 +1119,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   // do room caster is in
   ch->sendln("A Bright light comes down from the heavens.");
-  act("$n opens a Solar Gate.\r\n", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n opens a Solar Gate.\r\n", ch, 0, 0, 0);
 
   // we use "orig_room" for this now, instead of ch->in_room.  The reason for
   // this, is so if we die from a reflect, we don't keep looping through and
@@ -1171,7 +1171,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
           QString buf;
           dam = 360; // dice(level, 10) + skill/2;
           dc_sprintf(buf, "You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.", desc_dirs[i]);
-          act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
+          act_to_character(buf, tmp_victim, 0, ch, 0);
 
           retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
           if (isSet(retval, ReturnValue::eCH_DIED))
@@ -1399,7 +1399,7 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   CharacterPtr next_victim = {};
 
   ch->sendln("$B$4Fire$R falls from the heavens!");
-  act("$n makes $B$4fire$R fall from the heavens!", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n makes $B$4fire$R fall from the heavens!", ch, 0, 0, 0);
 
   for (auto victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_victim)
   {
@@ -1488,7 +1488,7 @@ qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
         pal->send(QStringLiteral("You sense your desecration of %s has been destroyed!").arg(DC::getInstance()->world[obj->in_room].name));
     }
     ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!");
-    act("The runes upon the ground shatter with a burst of magic!\r\n$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_room("The runes upon the ground shatter with a burst of magic!\r\n$n has destroyed the unholy desecration here!", ch, 0, victim, NOTVICT);
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
   }
@@ -1506,7 +1506,7 @@ qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
       victim = ch;
     if (IS_NEUTRAL(victim) || IS_GOOD(victim))
     {
-      act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N does not seem to be affected.", ch, 0, victim, 0);
       return ReturnValue::eFAILURE;
     }
     align = GET_ALIGNMENT(victim);
@@ -1537,7 +1537,7 @@ qint32 spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
         pal->send(QStringLiteral("You sense your consecration of %s has been destroyed!").arg(DC::getInstance()->world[obj->in_room].name));
     }
     ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!");
-    act("Runes upon the ground glow brightly, then fade to nothing.\r\n$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_room("Runes upon the ground glow brightly, then fade to nothing.\r\n$n has destroyed the holy consecration here!", ch, 0, victim, NOTVICT);
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
   }
@@ -1555,7 +1555,7 @@ qint32 spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
       victim = ch;
     if (IS_NEUTRAL(victim) || IS_EVIL(victim))
     {
-      act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N does not seem to be affected.", ch, 0, victim, 0);
       return ReturnValue::eFAILURE;
     }
     align = GET_ALIGNMENT(victim);
@@ -1711,9 +1711,9 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   if ((victim->isNonPlayer()) && (!ch->isNonPlayer()))
     victim->add_memory(qPrintable(ch->name()), 'h');
 
-  act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n slowly fades out of existence.", victim, 0, 0, 0);
   move_char(victim, to_room);
-  act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n slowly fades into existence.", victim, 0, 0, 0);
 
   do_look(victim, "");
   return ReturnValue::eSUCCESS;
@@ -1737,7 +1737,7 @@ qint32 spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
         (GET_POS(ch) != position_t::FIGHTING))
     {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_BLESS);
-      act("$p briefly glows.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p briefly glows.", ch, obj, 0, 0);
     }
   }
   else
@@ -1747,7 +1747,7 @@ qint32 spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
     victim->sendln("You feel blessed.");
 
     if (victim != ch)
-      act("$N receives the blessing from your god.", ch, nullptr, victim, TO_CHAR, 0);
+      act_to_character("$N receives the blessing from your god.", ch, nullptr, victim, 0);
 
     af.type = SPELL_BLESS;
     af.duration = 6 + skill / 3;
@@ -1776,8 +1776,8 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     return ReturnValue::eFAILURE;
   if (victim->affected_by_spell(SPELL_VILLAINY) && victim->affected_by_spell(SPELL_VILLAINY)->modifier >= 70)
   {
-    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-    act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
+    act_to_character("$N seems unaffected.", ch, 0, victim, 0);
+    act_to_victim("Your gods protect you from $n's spell.", ch, 0, victim, 0);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1792,7 +1792,7 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
         if (GET_POS(victim) == position_t::SLEEPING)
         {
           victim->sendln("You are awakened by a burst of $6energy$R!");
-          act("$n is awakened in a burst of $6energy$R!", victim, nullptr, nullptr, TO_ROOM, 0);
+          act_to_room("$n is awakened in a burst of $6energy$R!", victim, nullptr, nullptr, 0);
           victim->setSitting();
         }
       }
@@ -1807,10 +1807,10 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (isSet(victim->immune, ISR_PARA) || IS_AFFECTED(victim, AFF_NO_PARA))
   {
-    act("$N absorbs your puny spell and seems no different!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N absorbs $n's puny spell and seems no different!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act_to_character("$N absorbs your puny spell and seems no different!", ch, nullptr, victim, 0);
+    act_to_room("$N absorbs $n's puny spell and seems no different!", ch, nullptr, victim, NOTVICT);
     if (victim->isPlayer())
-      act("You absorb $n's puny spell and are no different!", ch, nullptr, victim, TO_VICT, 0);
+      act_to_victim("You absorb $n's puny spell and are no different!", ch, nullptr, victim, 0);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1823,9 +1823,9 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (malediction_res(ch, victim, SPELL_PARALYZE))
   {
-    act("$N resists your attempt to paralyze $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to paralyze $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to paralyze $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to paralyze $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to paralyze you!", ch, nullptr, victim, 0);
     if ((!victim->fighting) && GET_POS(victim) > position_t::SLEEPING && victim != ch)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -1850,10 +1850,10 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   /* ideally, we would do a dice roll to see if spell hits or not */
   if (spellret >= 0 && (victim != ch))
   {
-    act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
+    act_to_character("$N seems to be unaffected!", ch, nullptr, victim, 0);
     if (victim->isPlayer())
     {
-      act("$n tried to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
+      act_to_victim("$n tried to paralyze you!", ch, nullptr, victim, 0);
     }
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
     {
@@ -1868,21 +1868,21 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   if (ch->isPlayer() && victim->isPlayer() && ((level - victim->getLevel()) > 10) &&
       (!IS_MINLEVEL_PC(ch, DEITY) || victim->getLevel() >= ch->getLevel()))
   {
-    act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
+    act_to_character("$N seems to be unaffected!", ch, nullptr, victim, 0);
     victim = ch;
     if (saves_spell(ch, ch, -100, SAVE_TYPE_MAGIC) >= 0)
     {
-      act("Your magic misfires but you are saved!", ch, nullptr, victim, TO_CHAR, 0);
+      act_to_character("Your magic misfires but you are saved!", ch, nullptr, victim, 0);
       return ReturnValue::eSUCCESS;
     }
-    act("Your cruel heart causes your magic to misfire!", ch, nullptr, victim, TO_CHAR, 0);
+    act_to_character("Your cruel heart causes your magic to misfire!", ch, nullptr, victim, 0);
   }
 
   // Finish off any singing performances (bard)
   if (IS_SINGING(victim))
     do_sing(victim, "stop");
 
-  act("$n seems to be paralyzed!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n seems to be paralyzed!", victim, 0, 0, INVIS_NULL);
   victim->sendln("Your entire body rebels against you and you are paralyzed!");
 
   if (victim->isPlayer())
@@ -1917,16 +1917,16 @@ qint32 spell_blindness(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (victim->affected_by_spell(SPELL_VILLAINY) && victim->affected_by_spell(SPELL_VILLAINY)->modifier >= 90)
   {
-    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-    act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
+    act_to_character("$N seems unaffected.", ch, 0, victim, 0);
+    act_to_victim("Your gods protect you from $n's spell.", ch, 0, victim, 0);
     return ReturnValue::eSUCCESS;
   }
 
   if (malediction_res(ch, victim, SPELL_BLINDNESS))
   {
-    act("$N resists your attempt to blind $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to blind $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to blind you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to blind $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to blind $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to blind you!", ch, nullptr, victim, 0);
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -1943,10 +1943,10 @@ qint32 spell_blindness(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (spellret >= 0 && (victim != ch))
   {
-    act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
+    act_to_character("$N seems to be unaffected!", ch, nullptr, victim, 0);
     if (victim->isPlayer())
     {
-      act("$n tried to blind you!", ch, nullptr, victim, TO_VICT, 0);
+      act_to_victim("$n tried to blind you!", ch, nullptr, victim, 0);
     }
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
     {
@@ -1957,7 +1957,7 @@ qint32 spell_blindness(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     return ReturnValue::eSUCCESS;
   }
 
-  act("$n seems to be blinded!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n seems to be blinded!", victim, 0, 0, INVIS_NULL);
   victim->sendln("You have been blinded!");
 
   af.type = SPELL_BLINDNESS;
@@ -1988,8 +1988,8 @@ qint32 spell_create_food(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   obj_to_room(tmp_obj, ch->in_room);
 
-  act("$p suddenly appears.", ch, tmp_obj, 0, TO_ROOM, INVIS_NULL);
-  act("$p suddenly appears.", ch, tmp_obj, 0, TO_CHAR, INVIS_NULL);
+  act_to_room("$p suddenly appears.", ch, tmp_obj, 0, INVIS_NULL);
+  act_to_character("$p suddenly appears.", ch, tmp_obj, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2021,7 +2021,7 @@ qint32 spell_create_water(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         obj->obj_flags.value[2] = LIQ_WATER;
         obj->obj_flags.value[1] += water;
-        act("$p is filled.", ch, obj, 0, TO_CHAR, 0);
+        act_to_character("$p is filled.", ch, obj, 0, 0);
       }
     }
   }
@@ -2068,21 +2068,21 @@ qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim == ch)
         ch->sendln("Seems you weren't blind after all.");
       else
-        act("Seems $N wasn't blind after all.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("Seems $N wasn't blind after all.", ch, 0, victim, 0);
     }
     if (victim->affected_by_spell(SPELL_BLINDNESS))
     {
       affect_from_char(victim, SPELL_BLINDNESS);
       victim->sendln("Your vision returns!");
       if (victim != ch)
-        act("$N can see again!", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N can see again!", ch, 0, victim, 0);
     }
     if (IS_AFFECTED(victim, AFF_BLIND))
     {
       REMBIT(victim->affected_by, AFF_BLIND);
       victim->sendln("Your vision returns!");
       if (victim != ch)
-        act("$N can see again!", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N can see again!", ch, 0, victim, 0);
     }
   }
   else
@@ -2093,7 +2093,7 @@ qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     }
     else
     {
-      act("Your spell fails to return $N's vision!", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("Your spell fails to return $N's vision!", ch, 0, victim, 0);
     }
   }
 
@@ -2105,7 +2105,7 @@ qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healpoints;
-  QString buf, dammsg[MAX_STRING_LENGTH];
+  QString buf, dammsg;
 
   if (!victim)
   {
@@ -2153,16 +2153,16 @@ qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   if (ch != victim)
   {
     dc_sprintf(buf, "You heal %s of the more critical wounds on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, victim, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n heals %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, victim, TO_VICT, 0);
+    act_to_victim(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n heals | of the more critical wounds on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more critical wounds on $N.", TO_ROOM);
   }
   else
   {
     dc_sprintf(buf, "You heal %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
     dc_sprintf(buf, "$n heals | of $s more critical wounds.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more critical wounds.", TO_ROOM);
   }
@@ -2175,7 +2175,7 @@ qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 qint32 spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healpoints;
-  QString buf, dammsg[MAX_STRING_LENGTH];
+  QString buf, dammsg;
 
   if (!ch || !victim)
   {
@@ -2220,16 +2220,16 @@ qint32 spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (ch != victim)
   {
     dc_sprintf(buf, "You heal %s small cuts and scratches on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, victim, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n heals %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, victim, TO_VICT, 0);
+    act_to_victim(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n heals | of small cuts and scratches on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several small cuts and scratches on $N.", TO_ROOM);
   }
   else
   {
     dc_sprintf(buf, "You heal %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
     dc_sprintf(buf, "$n heals | of $s small cuts and scratches.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s small cuts and scratches.", TO_ROOM);
   }
@@ -2247,7 +2247,7 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   if (obj && obj != ch->equipment[WEAR_WIELD] && obj != ch->equipment[WEAR_SECOND_WIELD])
   { // hack for weapon spells
     SET_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-    act("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);
+    act_to_character("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, 0);
     /* LOWER ATTACK DICE BY -1 */
     if (obj->obj_flags.type_flag == ITEM_WEAPON)
     {
@@ -2276,8 +2276,8 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
     if (victim->affected_by_spell(SPELL_HEROISM) && victim->affected_by_spell(SPELL_HEROISM)->modifier >= 90)
     {
-      act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-      act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
+      act_to_character("$N seems unaffected.", ch, 0, victim, 0);
+      act_to_victim("Your gods protect you from $n's spell.", ch, 0, victim, 0);
       return ReturnValue::eSUCCESS;
     }
 
@@ -2321,9 +2321,9 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
     if (malediction_res(ch, victim, SPELL_CURSE) || (victim->isPlayer() && victim->getLevel() >= IMMORTAL))
     {
-      act("$N resists your attempt to curse $M!", ch, nullptr, victim, TO_CHAR, 0);
-      act("$N resists $n's attempt to curse $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-      act("You resist $n's attempt to curse you!", ch, nullptr, victim, TO_VICT, 0);
+      act_to_character("$N resists your attempt to curse $M!", ch, nullptr, victim, 0);
+      act_to_room("$N resists $n's attempt to curse $M!", ch, nullptr, victim, NOTVICT);
+      act_to_victim("You resist $n's attempt to curse you!", ch, nullptr, victim, 0);
     }
     else
     {
@@ -2340,8 +2340,8 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
         af.bitvector = -1;
 
       affect_to_char(victim, &af);
-      act("$n briefly reveals a $4red$R aura!", victim, 0, 0, TO_ROOM, 0);
-      act("You feel very uncomfortable as a curse takes hold of you.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n briefly reveals a $4red$R aura!", victim, 0, 0, 0);
+      act_to_character("You feel very uncomfortable as a curse takes hold of you.", victim, 0, 0, 0);
     }
 
     if (victim->isNonPlayer() && !victim->fighting)
@@ -2394,7 +2394,7 @@ qint32 spell_detect_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   affect_to_char(victim, &af);
   victim->sendln("You become more conscious of the evil around you.");
-  act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n looks to be more conscious of the evil around $m.", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2427,7 +2427,7 @@ qint32 spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   affect_to_char(victim, &af);
   victim->sendln("You are now able to truly recognize the good in others.");
-  act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n looks to be more conscious of the evil around $m.", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2565,7 +2565,7 @@ qint32 spell_haste(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   if (victim->affected_by_spell(SPELL_HASTE) || IS_AFFECTED(victim, AFF_HASTE))
   {
-    act("$N is already moving fast enough.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already moving fast enough.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
   af.type = SPELL_HASTE;
@@ -2576,7 +2576,7 @@ qint32 spell_haste(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   affect_to_char(victim, &af);
   victim->sendln("You feel fast!");
-  act("$n begins to move faster.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n begins to move faster.", victim, 0, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2600,11 +2600,11 @@ qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
         ch->sendln("You feel healthy.");
     else if (IS_AFFECTED(victim, AFF_POISON))
     {
-      act("You sense that $E is poisoned.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("You sense that $E is poisoned.", ch, 0, victim, 0);
     }
     else
     {
-      act("You sense that $E is healthy.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("You sense that $E is healthy.", ch, 0, victim, 0);
     }
   }
   else
@@ -2613,7 +2613,7 @@ qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
         (obj->obj_flags.type_flag == ITEM_FOOD))
     {
       if (obj->obj_flags.value[3])
-        act("Poisonous fumes are revealed.", ch, 0, 0, TO_CHAR, 0);
+        act_to_character("Poisonous fumes are revealed.", ch, 0, 0, 0);
       else
         ch->sendln("It looks very delicious.");
     }
@@ -2645,16 +2645,16 @@ qint32 spell_enchant_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, O
     if (IS_GOOD(ch))
     {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_EVIL);
-      act("$p glows $B$3blue$R.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p glows $B$3blue$R.", ch, obj, 0, 0);
     }
     else if (IS_EVIL(ch))
     {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
-      act("$p glows $B$4red$R.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p glows $B$4red$R.", ch, obj, 0, 0);
     }
     else
     {
-      act("$p glows $5yellow$R.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p glows $5yellow$R.", ch, obj, 0, 0);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -2693,16 +2693,16 @@ qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     if (IS_GOOD(ch))
     {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_EVIL);
-      act("$p glows $B$1blue$R.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p glows $B$1blue$R.", ch, obj, 0, 0);
     }
     else if (IS_EVIL(ch))
     {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
-      act("$p glows $B$4red$R.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p glows $B$4red$R.", ch, obj, 0, 0);
     }
     else
     {
-      act("$p glows $B$5yellow$R.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p glows $B$5yellow$R.", ch, obj, 0, 0);
     }
   }
   if (GET_ITEM_TYPE(obj) == ITEM_MISSILE)
@@ -2743,7 +2743,7 @@ qint32 spell_mana(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healy;
-  QString buf, dammsg[MAX_STRING_LENGTH];
+  QString buf, dammsg;
 
   if (!victim)
   {
@@ -2794,16 +2794,16 @@ qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
   if (ch != victim)
   {
     dc_sprintf(buf, "Your incantation heals $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, victim, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n calls forth an incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, victim, TO_VICT, 0);
+    act_to_victim(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n calls forth an incantation that heals $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
     dc_sprintf(buf, "Your incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
     dc_sprintf(buf, "$n calls forth an incantation that heals $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
@@ -2815,7 +2815,7 @@ qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 qint32 spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healy;
-  QString buf, dammsg[MAX_STRING_LENGTH];
+  QString buf, dammsg;
 
   if (!victim)
   {
@@ -2859,16 +2859,16 @@ qint32 spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (ch != victim)
   {
     dc_sprintf(buf, "Your powerful incantation heals $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, victim, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n calls forth a powerful incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, victim, TO_VICT, 0);
+    act_to_victim(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n calls forth a powerful incantation that heals $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
     dc_sprintf(buf, "Your powerful incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
     dc_sprintf(buf, "$n calls forth a powerful incantation that heals $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
@@ -2882,7 +2882,7 @@ qint32 spell_full_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 {
   assert(victim);
   qint32 healamount = {};
-  QString buf, dammsg[MAX_STRING_LENGTH];
+  QString buf, dammsg;
 
   if (victim->race == RACE_UNDEAD)
   {
@@ -2926,16 +2926,16 @@ qint32 spell_full_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   if (ch != victim)
   {
     dc_sprintf(buf, "You call forth the magic of the gods to restore $N%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, victim, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n calls forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, victim, TO_VICT, 0);
+    act_to_victim(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n calls forth the magic of the gods to restore $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
     dc_sprintf(buf, "You call forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
     dc_sprintf(buf, "$n calls forth the magic of the gods to restore $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
@@ -2956,14 +2956,14 @@ qint32 spell_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     {
       if (!isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
       {
-        act("$p turns invisible.", ch, obj, 0, TO_CHAR, 0);
-        act("$p turns invisible.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+        act_to_character("$p turns invisible.", ch, obj, 0, 0);
+        act_to_room("$p turns invisible.", ch, obj, 0, INVIS_NULL);
         SET_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
       }
     }
     else
     {
-      act("You fail to make $p invisible.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("You fail to make $p invisible.", ch, obj, 0, 0);
     }
   }
   else
@@ -2975,7 +2975,7 @@ qint32 spell_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     if (IS_AFFECTED(victim, AFF_INVISIBLE))
       return ReturnValue::eFAILURE;
 
-    act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n slowly fades out of existence.", victim, 0, 0, INVIS_NULL);
     victim->sendln("You slowly fade out of existence.");
 
     af.type = SPELL_INVISIBLE;
@@ -3007,7 +3007,7 @@ qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, Character
 
   one_argument(arg, name);
 
-  strncpy(tmpname, name, 256);
+  dc_strncpy(tmpname, name, 256);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
     number = {};
@@ -3152,16 +3152,16 @@ qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   {
     if (IS_AFFECTED(victim, AFF_POISON))
     {
-      act("$N's insides are already being eaten away by poison!", ch, nullptr, victim, TO_CHAR, 0);
+      act_to_character("$N's insides are already being eaten away by poison!", ch, nullptr, victim, 0);
       endy = true;
     }
     else if (isSet(victim->immune, ISR_POISON) ||
              malediction_res(ch, victim, SPELL_POISON) ||
              (victim->isPlayer() && victim->getLevel() >= IMMORTAL))
     {
-      act("$N resists your attempt to poison $M!", ch, nullptr, victim, TO_CHAR, 0);
-      act("$N resists $n's attempt to poison $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-      act("You resist $n's attempt to poison you!", ch, nullptr, victim, TO_VICT, 0);
+      act_to_character("$N resists your attempt to poison $M!", ch, nullptr, victim, 0);
+      act_to_room("$N resists $n's attempt to poison $M!", ch, nullptr, victim, NOTVICT);
+      act_to_victim("You resist $n's attempt to poison you!", ch, nullptr, victim, 0);
       endy = true;
     }
     set_cantquit(ch, victim);
@@ -3183,7 +3183,7 @@ qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
       af.bitvector = AFF_POISON;
       affect_join(victim, &af, false, false);
       victim->sendln("You feel very sick.");
-      act("$N looks very sick.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N looks very sick.", ch, 0, victim, 0);
     }
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
@@ -3197,7 +3197,7 @@ qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
     if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
         (obj->obj_flags.type_flag == ITEM_FOOD))
     {
-      act("$p glows $2green$R for a moment, before returning to its original colour.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p glows $2green$R for a moment, before returning to its original colour.", ch, obj, 0, 0);
       obj->obj_flags.value[3] = 1;
     }
     else
@@ -3225,7 +3225,7 @@ qint32 spell_protection_from_evil(quint8 level, CharacterPtr ch, CharacterPtr vi
 
   if (victim->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
   {
-    act("$N is already protected from evil.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already protected from evil.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -3243,7 +3243,7 @@ qint32 spell_protection_from_evil(quint8 level, CharacterPtr ch, CharacterPtr vi
   af.bitvector = AFF_PROTECT_EVIL;
   affect_to_char(victim, &af);
   victim->sendln("You have a righteous, protected feeling!");
-  act("A dark, $6pulsing$R aura surrounds $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("A dark, $6pulsing$R aura surrounds $n.", victim, 0, 0, INVIS_NULL);
 
   return ReturnValue::eSUCCESS;
 }
@@ -3266,7 +3266,7 @@ qint32 spell_protection_from_good(quint8 level, CharacterPtr ch, CharacterPtr vi
 
   if (victim->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
   {
-    act("$N is already protected from good.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already protected from good.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
   af.type = SPELL_PROTECT_FROM_GOOD;
@@ -3276,7 +3276,7 @@ qint32 spell_protection_from_good(quint8 level, CharacterPtr ch, CharacterPtr vi
   af.bitvector = AFF_PROTECT_GOOD;
   affect_to_char(victim, &af);
   victim->sendln("You feel yourself wrapped in a protective mantle of evil.");
-  act("A light, $B$6pulsing$R aura surrounds $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("A light, $B$6pulsing$R aura surrounds $n.", victim, 0, 0, INVIS_NULL);
 
   return ReturnValue::eSUCCESS;
 }
@@ -3292,7 +3292,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   {
     if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
-      act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("$p briefly glows $3blue$R.", ch, obj, 0, 0);
       REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
       if (DC::getInstance()->obj_index[obj->item_number].vnum() == 514)
       {
@@ -3329,8 +3329,8 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   /* Then it is a PC | NPC */
   if (victim->affected_by_spell(SPELL_CURSE))
   {
-    act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
-    act("You feel better.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, 0);
+    act_to_character("You feel better.", victim, 0, 0, 0);
     affect_from_char(victim, SPELL_CURSE);
     if (!mana_cost)
       return ReturnValue::eSUCCESS;
@@ -3354,11 +3354,11 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
           SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
           add_obj_affect(obj, APPLY_MANA_REGEN, 2);
           victim->mana_regen += 2;
-          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
-          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+          act_to_room("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, 0);
+          act_to_character("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, 0);
         }
-        act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
-        act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
+        act_to_character("$p briefly glows $3blue$R.", victim, obj, 0, 0);
+        act_to_room("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, 0);
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
         if (!mana_cost)
           return ReturnValue::eSUCCESS;
@@ -3374,8 +3374,8 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         if (curses_removed++)
           GET_MANA(victim) -= mana_cost;
-        act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
-        act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
+        act_to_room("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, 0);
+        act_to_character("$p briefly glows $3blue$R.", victim, obj, 0, 0);
         if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].vnum() == 514)
         {
           qint32 i = {};
@@ -3384,8 +3384,8 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
               break; // only do it once
           SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
           add_obj_affect(obj, APPLY_MANA_REGEN, 2);
-          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
-          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+          act_to_room("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, 0);
+          act_to_character("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, 0);
         }
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
         if (!mana_cost)
@@ -3400,8 +3400,8 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     {
       if (curses_removed++)
         GET_MANA(victim) -= mana_cost;
-      act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
-      act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, 0);
+      act_to_character("The curse of attrition afflicting you has been lifted!", victim, 0, 0, 0);
       affect_from_char(victim, SPELL_ATTRITION);
       if (!mana_cost)
         return ReturnValue::eSUCCESS;
@@ -3421,8 +3421,8 @@ qint32 spell_remove_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   {
     if (victim->affected_by_spell(SPELL_DEBILITY))
     {
-      act("$n looks better.", victim, 0, 0, TO_ROOM, 0);
-      act("You feel less debilitated.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n looks better.", victim, 0, 0, 0);
+      act_to_character("You feel less debilitated.", victim, 0, 0, 0);
       affect_from_char(victim, SPELL_DEBILITY);
       return ReturnValue::eSUCCESS;
     }
@@ -3431,7 +3431,7 @@ qint32 spell_remove_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
       affect_from_char(victim, SPELL_POISON);
       act("A warm feeling runs through your body.", victim,
           0, 0, TO_CHAR, 0);
-      act("$n looks better.", victim, 0, 0, TO_ROOM, 0);
+      act_to_room("$n looks better.", victim, 0, 0, 0);
     }
   }
   else
@@ -3440,7 +3440,7 @@ qint32 spell_remove_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
         (obj->obj_flags.type_flag == ITEM_FOOD))
     {
       obj->obj_flags.value[3] = {};
-      act("The $p steams briefly.", ch, obj, 0, TO_CHAR, 0);
+      act_to_character("The $p steams briefly.", ch, obj, 0, 0);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -3453,7 +3453,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
     if (ch == victim)
       ch->sendln("You are already protected by a shield of fire.");
     else
-      act("$N is already protected by a shield of fire.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+      act_to_character("$N is already protected by a shield of fire.", ch, 0, victim, INVIS_NULL);
 
     return true;
   }
@@ -3463,7 +3463,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
     if (ch == victim)
       ch->sendln("You are already protected by a shield of lightning.");
     else
-      act("$N is already protected by a shield of lightning.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+      act_to_character("$N is already protected by a shield of lightning.", ch, 0, victim, INVIS_NULL);
 
     return true;
   }
@@ -3473,7 +3473,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
     if (ch == victim)
       ch->sendln("You are already protected by a $1frost shield$R.");
     else
-      act("$N is already protected by a $1frost shield$R.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+      act_to_character("$N is already protected by a $1frost shield$R.", ch, 0, victim, INVIS_NULL);
 
     return true;
   }
@@ -3483,7 +3483,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
     if (ch == victim)
       ch->sendln("You are already protected by a shield of acid.");
     else
-      act("$N is already protected by a shield of acid.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+      act_to_character("$N is already protected by a shield of acid.", ch, 0, victim, INVIS_NULL);
 
     return true;
   }
@@ -3502,8 +3502,8 @@ qint32 spell_fireshield(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!victim->affected_by_spell(SPELL_FIRESHIELD))
   {
-    act("$n is surrounded by $B$4flames$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    act("You are surrounded by $B$4flames$R.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n is surrounded by $B$4flames$R.", victim, 0, 0, INVIS_NULL);
+    act_to_character("You are surrounded by $B$4flames$R.", victim, 0, 0, 0);
 
     af.type = SPELL_FIRESHIELD;
     af.duration = 1 + skill / 23;
@@ -3772,9 +3772,9 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_sanctuary(level, ch, tar_ch, 0, skill);
@@ -3784,9 +3784,9 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_sanctuary(level, ch, leader, 0, skill);
@@ -3831,11 +3831,11 @@ qint32 spell_camouflague(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   affected_type af;
   if (victim->affected_by_spell(SPELL_CAMOUFLAGE))
   {
-    act("$N is already hidden within the plant life.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already hidden within the plant life.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("$n fades into the plant life.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("You fade into the plant life.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("$n fades into the plant life.", victim, 0, 0, INVIS_NULL);
+  act_to_character("You fade into the plant life.", victim, 0, 0, 0);
 
   af.type = SPELL_CAMOUFLAGE;
   af.duration = 1 + skill / 10;
@@ -3855,10 +3855,10 @@ qint32 spell_farsight(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   affected_type af;
   if (victim->affected_by_spell(SPELL_FARSIGHT))
   {
-    act("$N can already see far enough.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N can already see far enough.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("Your eyesight improves.", victim, 0, 0, TO_CHAR, 0);
+  act_to_character("Your eyesight improves.", victim, 0, 0, 0);
 
   af.type = SPELL_FARSIGHT;
   af.duration = 2 + level / 5;
@@ -3878,10 +3878,10 @@ qint32 spell_freefloat(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   affected_type af;
   if (victim->affected_by_spell(SPELL_FREEFLOAT))
   {
-    act("$N is already stable enough.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already stable enough.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("You gain added stability.", victim, 0, 0, TO_CHAR, 0);
+  act_to_character("You gain added stability.", victim, 0, 0, 0);
 
   af.type = SPELL_FREEFLOAT;
   af.duration = 12 + level / 4;
@@ -3902,10 +3902,10 @@ qint32 spell_insomnia(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (victim->affected_by_spell(SPELL_INSOMNIA))
   {
-    act("$N is already wide awake.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already wide awake.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("You suddenly feel wide awake.", victim, 0, 0, TO_CHAR, 0);
+  act_to_character("You suddenly feel wide awake.", victim, 0, 0, 0);
 
   af.type = SPELL_INSOMNIA;
   af.duration = 2 + level / 5;
@@ -3925,10 +3925,10 @@ qint32 spell_shadowslip(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   affected_type af;
   if (victim->affected_by_spell(SPELL_SHADOWSLIP))
   {
-    act("$N is already hidden amongst the shadows.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already hidden amongst the shadows.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("Portals will no longer find you as your presence becomes obscured by shadows.", victim, 0, 0, TO_CHAR, 0);
+  act_to_character("Portals will no longer find you as your presence becomes obscured by shadows.", victim, 0, 0, 0);
 
   af.type = SPELL_SHADOWSLIP;
   af.duration = level / 4;
@@ -3948,18 +3948,18 @@ qint32 spell_sanctuary(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (IS_AFFECTED(victim, AFF_SANCTUARY))
   {
-    act("$N is already sanctified.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already sanctified.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
   if (victim->affected_by_spell(SPELL_HOLY_AURA))
   {
-    act("$N cannot be bestowed with that much power.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N cannot be bestowed with that much power.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
   if (!victim->affected_by_spell(SPELL_SANCTUARY))
   {
-    act("$n is surrounded by a $Bwhite aura$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    act("You start $Bglowing$R.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n is surrounded by a $Bwhite aura$R.", victim, 0, 0, INVIS_NULL);
+    act_to_character("You start $Bglowing$R.", victim, 0, 0, 0);
     af.type = SPELL_SANCTUARY;
     af.duration = 3 + skill / 18;
     af.modifier = 35;
@@ -3990,7 +3990,7 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   /* You can't sleep someone higher level than you*/
   if (victim->affected_by_spell(SPELL_INSOMNIA) || IS_AFFECTED(victim, AFF_INSOMNIA))
   {
-    act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
+    act_to_character("$N does not look sleepy!", ch, nullptr, victim, 0);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
     retval = SWAP_CH_VICT(retval);
     return retval;
@@ -4009,13 +4009,13 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
       switch (number(1, 3))
       {
       case 1:
-        act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
+        act_to_character("$N does not look sleepy!", ch, nullptr, victim, 0);
         break;
       case 2:
       case 3:
         ch->sendln("The combined magics fizzle, and cause an explosion!");
         {
-          act("$n wakes up in a burst of magical energies!", victim, nullptr, nullptr, TO_ROOM, 0);
+          act_to_room("$n wakes up in a burst of magical energies!", victim, nullptr, nullptr, 0);
           affect_from_char(victim, SPELL_PARALYZE);
         }
         break;
@@ -4027,9 +4027,9 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   if (number(1, 100) <= MIN(MAX((get_saves(ch, SAVE_TYPE_MAGIC) - get_saves(victim, SAVE_TYPE_MAGIC)) / 2, 1), 7))
   {
-    act("$N resists your attempt to sleep $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to sleep $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to sleep you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to sleep $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to sleep $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to sleep you!", ch, nullptr, victim, 0);
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -4065,18 +4065,18 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
       if (GET_POS(victim) > position_t::SLEEPING)
       {
-        act("You feel very sleepy ..... zzzzzz", victim, 0, 0, TO_CHAR, 0);
-        act("$n goes to sleep.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_character("You feel very sleepy ..... zzzzzz", victim, 0, 0, 0);
+        act_to_room("$n goes to sleep.", victim, 0, 0, INVIS_NULL);
         stop_fighting(victim);
         victim->setSleeping();
       }
       return ReturnValue::eSUCCESS;
     }
     else
-      act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
+      act_to_character("$N does not look sleepy!", ch, nullptr, victim, 0);
   }
   else
-    act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
+    act_to_character("$N does not look sleepy!", ch, nullptr, victim, 0);
 
   retval = one_hit(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
   retval = SWAP_CH_VICT(retval);
@@ -4128,7 +4128,7 @@ qint32 spell_strength(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   }
 
   victim->sendln("You feel stronger.");
-  act("$n's muscles bulge a bit and $e looks stronger.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n's muscles bulge a bit and $e looks stronger.", victim, 0, 0, INVIS_NULL);
 
   af.type = SPELL_STRENGTH;
   af.duration = level / 2 + skill / 3;
@@ -4182,8 +4182,8 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
       ch->sendln("Something blocks your attempt to recall.");
     else
     {
-      act("Something blocks your attempt to recall $N.", ch, 0, victim, TO_CHAR, 0);
-      act("Something blocks $n's attempt to recall you.", ch, 0, victim, TO_VICT, 0);
+      act_to_character("Something blocks your attempt to recall $N.", ch, 0, victim, 0);
+      act_to_victim("Something blocks $n's attempt to recall you.", ch, 0, victim, 0);
     }
     return ReturnValue::eFAILURE;
   }
@@ -4285,17 +4285,17 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
       }
       else
       {
-        act("$n disappears.", victim->player->golem, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_room("$n disappears.", victim->player->golem, 0, 0, INVIS_NULL);
         move_char(victim->player->golem, location);
-        act("$n appears out of nowhere.", victim->player->golem, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_room("$n appears out of nowhere.", victim->player->golem, 0, 0, INVIS_NULL);
         GET_MANA(victim) -= 50;
       }
     }
   }
   /* a location has been found. */
-  act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n disappears.", victim, 0, 0, INVIS_NULL);
   move_char(victim, location);
-  act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n appears out of nowhere.", victim, 0, 0, INVIS_NULL);
   do_look(victim, "");
   return ReturnValue::eSUCCESS;
 }
@@ -4475,24 +4475,24 @@ qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
     }
   }
 
-  act("$n disappears suddenly as a magical summoning draws their being.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n disappears suddenly as a magical summoning draws their being.", victim, 0, 0, INVIS_NULL);
 
   target = ch->in_room;
   move_char(victim, target);
-  act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
+  act_to_room("$n arrives suddenly.", victim, 0, 0, INVIS_NULL);
+  act_to_victim("$n has summoned you!", ch, 0, victim, 0);
   do_look(victim, "");
 
   if (victim->isNonPlayer() && victim->getLevel() >= ch->getLevel())
   {
-    act("$n growls.", victim, 0, 0, TO_ROOM, 0);
+    act_to_room("$n growls.", victim, 0, 0, 0);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
     retval = SWAP_CH_VICT(retval);
     return retval;
   }
   else if (victim->isNonPlayer())
   {
-    act("$n freaks shit.", victim, 0, 0, TO_ROOM, 0);
+    act_to_room("$n freaks shit.", victim, 0, 0, 0);
     victim->add_memory(qPrintable(ch->name()), 'f');
     do_flee(victim, "");
   }
@@ -4546,7 +4546,7 @@ qint32 spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
   {
-    act("$N doesnt seem to be affected.", ch, nullptr, victim, TO_CHAR, 0);
+    act_to_character("$N doesnt seem to be affected.", ch, nullptr, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -4567,7 +4567,7 @@ qint32 spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   af.bitvector = AFF_CHARM;
   affect_to_char(victim, &af);
 
-  act("Isn't $n just such a nice fellow?", ch, 0, victim, TO_VICT, 0);
+  act_to_victim("Isn't $n just such a nice fellow?", ch, 0, victim, 0);
   if (victim->equipment[WEAR_WIELD])
   {
     if (victim->equipment[WEAR_SECOND_WIELD])
@@ -4577,7 +4577,7 @@ qint32 spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     }
     tempobj = victim->unequip_char(WEAR_WIELD);
     obj_to_room(tempobj, victim->in_room);
-    act("$n's eyes dull and $s hands slacken dropping $s weapons.", victim, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's eyes dull and $s hands slacken dropping $s weapons.", victim, 0, 0, 0);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -4659,21 +4659,21 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     dc_sprintf(buf, "Object '%s', Item type: ", qPrintable(obj->name()));
     sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
-    strcat(buf, buf2);
-    strcat(buf, "\r\n");
+    dc_strcat(buf, buf2);
+    dc_strcat(buf, "\r\n");
     ch->send(buf);
 
     ch->send("Item is: ");
     sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
     sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
-    strcat(buf, " ");
-    strcat(buf, buf2);
-    strcat(buf, "\r\n");
+    dc_strcat(buf, " ");
+    dc_strcat(buf, buf2);
+    dc_strcat(buf, "\r\n");
     ch->send(buf);
 
     ch->send("Worn by: ");
     sprintbit(obj->obj_flags.size, Object::size_bits, buf);
-    strcat(buf, "\r\n");
+    dc_strcat(buf, "\r\n");
     ch->send(buf);
 
     dc_sprintf(buf, "Weight: %d, Value: %d, Level: %llu\r\n", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
@@ -4689,19 +4689,19 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       if (obj->obj_flags.value[1] >= 1)
       {
         sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
-        strcat(buf, "\r\n");
+        dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
       if (obj->obj_flags.value[2] >= 1)
       {
         sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
-        strcat(buf, "\r\n");
+        dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
       if (obj->obj_flags.value[3] >= 1)
       {
         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-        strcat(buf, "\r\n");
+        dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
       break;
@@ -4719,7 +4719,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       if (obj->obj_flags.value[3] >= 1)
       {
         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
-        strcat(buf, "\r\n");
+        dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
       break;
@@ -4787,9 +4787,9 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
         if (obj->affected[i].location < 1000)
           sprinttype(obj->affected[i].location, apply_types, buf2);
         else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
-          strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
+          dc_strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
         else
-          strcpy(buf2, "Invalid");
+          dc_strcpy(buf2, "Invalid");
         dc_sprintf(buf, "    Affects : %s By %d\r\n", buf2, obj->affected[i].modifier);
         ch->send(buf);
       }
@@ -4807,7 +4807,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
       dc_sprintf(buf, "Race: ");
       sprinttype(victim->race, race_types, buf2);
-      strcat(buf, buf2);
+      dc_strcat(buf, buf2);
       ch->send(buf);
 
       dc_sprintf(buf, "   Height %dcm  Weight %dpounds \r\n",
@@ -4944,7 +4944,7 @@ qint32 spell_fire_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   qint32 dam;
   qint32 retval;
 
-  act("$B$4You are $IENVELOPED$I$B$4 in scorching $B$4flames$R!$R", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$B$4You are $IENVELOPED$I$B$4 in scorching $B$4flames$R!$R", ch, 0, 0, 0);
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
@@ -4960,7 +4960,7 @@ qint32 spell_fire_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
       if (GET_DEX(tmp_victim) > number(1, 100)) // roll vs dex dodged
       {
         ch->sendln("You dive out of the way of the main blast avoiding the inferno!");
-        act("$n barely dives to the side avoiding the heart of the flame.", ch, 0, 0, TO_ROOM, 0);
+        act_to_room("$n barely dives to the side avoiding the heart of the flame.", ch, 0, 0, 0);
         continue;
       }
 
@@ -5084,9 +5084,8 @@ qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (victim->affected_by_spell(SPELL_HEROISM) && victim->affected_by_spell(SPELL_HEROISM)->modifier >= 70)
   {
-    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-    act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT,
-        0);
+    act_to_character("$N seems unaffected.", ch, 0, victim, 0);
+    act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -5094,12 +5093,9 @@ qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (malediction_res(ch, victim, SPELL_FEAR))
   {
-    act("$N resists your attempt to scare $M!", ch, nullptr, victim, TO_CHAR,
-        0);
-    act("$N resists $n's attempt to scare $M!", ch, nullptr, victim, TO_ROOM,
-        NOTVICT);
-    act("You resist $n's attempt to scare you!", ch, nullptr, victim, TO_VICT,
-        0);
+    act("$N resists your attempt to scare $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to scare $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to scare you!", ch, nullptr, victim, TO_VICT, 0);
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -5185,8 +5181,8 @@ qint32 spell_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr o
 
   victim->sendln("You start flapping and rise off the ground!");
   if (ch != victim)
-    act("$N starts flapping and rises off the ground!", ch, nullptr, victim, TO_CHAR, 0);
-  act("$N's feet rise off the ground.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
+    act_to_character("$N starts flapping and rises off the ground!", ch, nullptr, victim, 0);
+  act_to_room("$N's feet rise off the ground.", ch, 0, victim, INVIS_NULL | NOTVICT);
 
   af.type = SPELL_FLY;
   af.duration = 6 + skill / 2;
@@ -5228,8 +5224,8 @@ qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
       return ReturnValue::eFAILURE;
     }
     SET_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
-    act("$n twiddles $s thumbs and the $p $e is carrying begins to glow.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-    act("You twiddle your thumbs and the $p begins to glow.", ch, obj, 0, TO_CHAR, 0);
+    act_to_room("$n twiddles $s thumbs and the $p $e is carrying begins to glow.", ch, obj, 0, INVIS_NULL);
+    act_to_character("You twiddle your thumbs and the $p begins to glow.", ch, obj, 0, 0);
     return ReturnValue::eSUCCESS;
   }
 
@@ -5237,8 +5233,8 @@ qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   obj_to_char(tmp_obj, ch);
 
-  act("$n twiddles $s thumbs and $p suddenly appears.", ch, tmp_obj, 0, TO_ROOM, INVIS_NULL);
-  act("You twiddle your thumbs and $p suddenly appears.", ch, tmp_obj, 0, TO_CHAR, 0);
+  act_to_room("$n twiddles $s thumbs and $p suddenly appears.", ch, tmp_obj, 0, INVIS_NULL);
+  act_to_character("You twiddle your thumbs and $p suddenly appears.", ch, tmp_obj, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -5401,7 +5397,7 @@ qint32 spell_know_alignment(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   if (skill == 150)
     duration = 2;
   ch->sendln("Your eyes tingle, allowing you to see the auras of other creatures.");
-  act("$n's eyes flash with knowledge and insight!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n's eyes flash with knowledge and insight!", ch, 0, 0, INVIS_NULL);
 
   af.type = SPELL_KNOW_ALIGNMENT;
   af.duration = duration;
@@ -5453,12 +5449,12 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     {
       // Someone load it or something?
       ch->sendln("The magic fades away back to the ether.");
-      act("$p fades away gently.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+      act_to_room("$p fades away gently.", ch, obj, 0, INVIS_NULL);
     }
     else
     {
       ch->sendln("The magic is shattered by your will!");
-      act("$p blinks out of existence with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
+      act_to_room("$p blinks out of existence with a bang!", ch, obj, 0, INVIS_NULL);
       obj->equipped_by->sendln("Your magic beacon is shattered!");
       obj->equipped_by->beacon = {};
       obj->equipped_by = {};
@@ -5502,17 +5498,17 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
-    act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
-    act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
+    act_to_room("$N seems to ignore $n's spell!", ch, 0, victim, 0);
+    act_to_character("$N seems to ignore your spell!", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
   // If victim higher level, they get a save vs magic for no effect
   if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus)
   {
-    act("$N resists your attempt to dispel minor!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to dispel minor!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to dispel minor!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to dispel minor!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to dispel minor!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to dispel minor!", ch, nullptr, victim, 0);
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -5534,14 +5530,14 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_INVISIBLE);
         victim->sendln("You feel your invisibility dissipate.");
-        act("$n fades into existence.", victim, 0, 0, TO_ROOM, 0);
+        act_to_room("$n fades into existence.", victim, 0, 0, 0);
         done = true;
       }
       if (IS_AFFECTED(victim, AFF_INVISIBLE))
       {
         REMBIT(victim->affected_by, AFF_INVISIBLE);
         victim->sendln("You feel your invisibility dissipate.");
-        act("$n fades into existence.", victim, 0, 0, TO_ROOM, 0);
+        act_to_room("$n fades into existence.", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5551,7 +5547,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_DETECT_INVISIBLE);
         victim->sendln("Your ability to detect invisible has been dispelled!");
-        act("$N's ability to detect invisible is removed.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's ability to detect invisible is removed.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5561,7 +5557,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_CAMOUFLAGE);
         victim->sendln("Your camouflage has been dispelled!.");
-        act("$N's form is less obscured as you dispel $S camouflage.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's form is less obscured as you dispel $S camouflage.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5571,7 +5567,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_RESIST_ACID);
         victim->sendln("The $2green$R in your skin is dispelled!");
-        act("$N's skin loses its $2green$R hue.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's skin loses its $2green$R hue.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5581,7 +5577,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_RESIST_COLD);
         victim->sendln("The $3blue$R in your skin is dispelled!");
-        act("$N's skin loses its $3blue$R hue.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's skin loses its $3blue$R hue.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5591,7 +5587,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_RESIST_FIRE);
         victim->sendln("The $4red$R in your skin is dispelled!");
-        act("$N's skin loses its $4red$R hue.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's skin loses its $4red$R hue.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5601,7 +5597,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_RESIST_ENERGY);
         victim->sendln("The $5yellow$R in your skin is dispelled!");
-        act("$N's skin loses its $5yellow$R hue.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's skin loses its $5yellow$R hue.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5611,7 +5607,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_BARKSKIN);
         victim->sendln("Your woody has been dispelled!");
-        act("$N loses $S woody.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N loses $S woody.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5621,7 +5617,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_STONE_SKIN);
         victim->sendln("Your skin loses stone-like consistency.");
-        act("$N's looks like less of a stoner as $S skin returns to normal.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's looks like less of a stoner as $S skin returns to normal.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5631,14 +5627,14 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_FLY);
         victim->sendln("You do not feel lighter than air anymore.");
-        act("$N is no longer lighter than air.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N is no longer lighter than air.", ch, 0, victim, 0);
         done = true;
       }
       if (IS_AFFECTED(victim, AFF_FLYING))
       {
         REMBIT(victim->affected_by, AFF_FLYING);
         victim->sendln("You do not feel lighter than air anymore.");
-        act("$n drops to the ground, no longer lighter than air.", victim, 0, 0, TO_ROOM, 0);
+        act_to_room("$n drops to the ground, no longer lighter than air.", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5648,7 +5644,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_TRUE_SIGHT);
         victim->sendln("You no longer see what is hidden.");
-        act("$N no longer sees what is hidden.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N no longer sees what is hidden.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5658,7 +5654,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_WATER_BREATHING);
         victim->sendln("You can no longer breathe underwater!");
-        act("$N can no longer breathe underwater!", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N can no longer breathe underwater!", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5668,7 +5664,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
         affect_from_char(victim, SPELL_ARMOR);
         done = true;
         victim->sendln("Your magical armour is dispelled!");
-        act("$N's magical armour is dispelled!", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's magical armour is dispelled!", ch, 0, victim, 0);
       }
       break;
     case 14:
@@ -5677,7 +5673,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
         affect_from_char(victim, SPELL_SHIELD);
         done = true;
         victim->sendln("Your force shield shimmers and fades away.");
-        act("$N's force shield shimmers and fades away.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's force shield shimmers and fades away.", ch, 0, victim, 0);
       }
       break;
 
@@ -5686,7 +5682,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_RESIST_MAGIC);
         victim->sendln("The $B$7white$R in your skin is dispelled!");
-        act("$N's skin loses its $B$7white$R hue.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("$N's skin loses its $B$7white$R hue.", ch, 0, victim, 0);
         done = true;
       }
       break;
@@ -5726,15 +5722,15 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
-    act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
-    act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
+    act_to_room("$N seems to ignore $n's spell!", ch, 0, victim, 0);
+    act_to_character("$N seems to ignore your spell!", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (ISSET(victim->affected_by, AFF_GOLEM))
   {
     ch->sendln("The golem seems to shrug off your dispel attempt!");
-    act("The golem seems to ignore $n's dispelling magic!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("The golem seems to ignore $n's dispelling magic!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
   /*
@@ -5781,9 +5777,9 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   //          return ReturnValue::eFAILURE;
   if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != ch->getLevel() - 1)
   {
-    act("$N resists your attempt to dispel magic!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to dispel magic!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to dispel magic!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to dispel magic!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to dispel magic!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to dispel magic!", ch, nullptr, victim, 0);
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -5808,15 +5804,15 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_SANCTUARY))
       {
         affect_from_char(victim, SPELL_SANCTUARY);
-        act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
-        act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("You don't feel so invulnerable anymore.", ch, 0, victim, 0);
+        act_to_room("The $B$7white glow$R around $n's body fades.", victim, 0, 0, 0);
         done = true;
       }
       if (IS_AFFECTED(victim, AFF_SANCTUARY))
       {
         REMBIT(victim->affected_by, AFF_SANCTUARY);
-        act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
-        act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("You don't feel so invulnerable anymore.", ch, 0, victim, 0);
+        act_to_room("The $B$7white glow$R around $n's body fades.", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5825,8 +5821,8 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
       {
         affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
-        act("Your protection from evil has been dispelled!", ch, 0, victim, TO_VICT, 0);
-        act("The dark, $6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your protection from evil has been dispelled!", ch, 0, victim, 0);
+        act_to_room("The dark, $6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5835,8 +5831,8 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_HASTE))
       {
         affect_from_char(victim, SPELL_HASTE);
-        act("Your magically enhanced speed has been dispelled!", ch, 0, victim, TO_VICT, 0);
-        act("$n's actions slow to their normal speed.", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your magically enhanced speed has been dispelled!", ch, 0, victim, 0);
+        act_to_room("$n's actions slow to their normal speed.", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5845,8 +5841,8 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_STONE_SHIELD))
       {
         affect_from_char(victim, SPELL_STONE_SHIELD);
-        act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
-        act("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, 0);
+        act_to_room("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5855,8 +5851,8 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
       {
         affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
-        act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
-        act("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, 0);
+        act_to_room("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5865,8 +5861,8 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
       {
         REMBIT(victim->affected_by, AFF_FROSTSHIELD);
-        act("Your shield of $B$3frost$R melts into nothing!.", ch, 0, victim, TO_VICT, 0);
-        act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your shield of $B$3frost$R melts into nothing!.", ch, 0, victim, 0);
+        act_to_room("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5875,15 +5871,15 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_LIGHTNING_SHIELD))
       {
         affect_from_char(victim, SPELL_LIGHTNING_SHIELD);
-        act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, TO_VICT, 0);
-        act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, 0);
+        act_to_room("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, 0);
         done = true;
       }
       else if (IS_AFFECTED(victim, AFF_LIGHTNINGSHIELD))
       {
         REMBIT(victim->affected_by, AFF_LIGHTNINGSHIELD);
-        act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, TO_VICT, 0);
-        act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, 0);
+        act_to_room("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5891,15 +5887,15 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_FIRESHIELD))
       {
         affect_from_char(victim, SPELL_FIRESHIELD);
-        act("Your $B$4flames$R have been extinguished!", ch, 0, victim, TO_VICT, 0);
-        act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your $B$4flames$R have been extinguished!", ch, 0, victim, 0);
+        act_to_room("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, 0);
         done = true;
       }
       if (IS_AFFECTED(victim, AFF_FIRESHIELD))
       {
         REMBIT(victim->affected_by, AFF_FIRESHIELD);
-        act("Your $B$4flames$R have been extinguished!", ch, 0, victim, TO_VICT, 0);
-        act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your $B$4flames$R have been extinguished!", ch, 0, victim, 0);
+        act_to_room("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5907,15 +5903,15 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_ACID_SHIELD))
       {
         affect_from_char(victim, SPELL_ACID_SHIELD);
-        act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, TO_VICT, 0);
-        act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, 0);
+        act_to_room("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, 0);
         done = true;
       }
       if (IS_AFFECTED(victim, AFF_ACID_SHIELD))
       {
         REMBIT(victim->affected_by, AFF_ACID_SHIELD);
-        act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, TO_VICT, 0);
-        act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, 0);
+        act_to_room("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5924,8 +5920,8 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
       {
         affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
-        act("Your protection from good has been dispelled!", ch, 0, victim, TO_VICT, 0);
-        act("The light, $B$6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, TO_ROOM, 0);
+        act_to_victim("Your protection from good has been dispelled!", ch, 0, victim, 0);
+        act_to_room("The light, $B$6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, 0);
         done = true;
       }
       break;
@@ -5952,7 +5948,7 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 qint32 spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healpoints;
-  QString buf, dammsg[MAX_STRING_LENGTH];
+  QString buf, dammsg;
 
   if (!ch || !victim)
   {
@@ -5999,16 +5995,16 @@ qint32 spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   if (ch != victim)
   {
     dc_sprintf(buf, "You heal %s of the more serious wounds on $N.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, victim, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n heals %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, victim, TO_VICT, 0);
+    act_to_victim(buf, ch, 0, victim, 0);
     dc_sprintf(buf, "$n heals | of the more serious wounds on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more serious wounds on $N.", TO_ROOM);
   }
   else
   {
     dc_sprintf(buf, "You heal %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
     dc_sprintf(buf, "$n heals | of $s more serious wounds.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more serious wounds.", TO_ROOM);
   }
@@ -6122,11 +6118,11 @@ qint32 spell_iridescent_aura(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (victim->affected_by_spell(SPELL_IRIDESCENT_AURA))
   {
-    act("$N is already protected by iridescent aura.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already protected by iridescent aura.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("The air around $n shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("The air around you shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around you.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("The air around $n shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around $m.", victim, 0, 0, INVIS_NULL);
+  act_to_character("The air around you shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around you.", victim, 0, 0, 0);
 
   af.type = SPELL_IRIDESCENT_AURA;
   af.duration = 1 + skill / 10;
@@ -6151,11 +6147,11 @@ qint32 spell_resist_cold(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (victim->affected_by_spell(SPELL_RESIST_COLD))
   {
-    act("$N is already resistant to cold.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already resistant to cold.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("$n's skin turns $3blue$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("Your skin turns $3blue$R momentarily.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("$n's skin turns $3blue$R momentarily.", victim, 0, 0, INVIS_NULL);
+  act_to_character("Your skin turns $3blue$R momentarily.", victim, 0, 0, 0);
 
   af.type = SPELL_RESIST_COLD;
   af.duration = 1 + skill / 10;
@@ -6181,11 +6177,11 @@ qint32 spell_resist_fire(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (victim->affected_by_spell(SPELL_RESIST_FIRE))
   {
-    act("$N is already resistant to fire.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already resistant to fire.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("$n's skin turns $4red$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("Your skin turns $4red$R momentarily.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("$n's skin turns $4red$R momentarily.", victim, 0, 0, INVIS_NULL);
+  act_to_character("Your skin turns $4red$R momentarily.", victim, 0, 0, 0);
   af.type = SPELL_RESIST_FIRE;
   af.duration = 1 + skill / 10;
   af.modifier = 10 + skill / 6;
@@ -6210,11 +6206,11 @@ qint32 spell_resist_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (victim->affected_by_spell(SPELL_RESIST_MAGIC))
   {
-    act("$N is already resistant to magic.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already resistant to magic.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("$n's skin turns $B$7white$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("Your skin turns $B$7white$R momentarily.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("$n's skin turns $B$7white$R momentarily.", victim, 0, 0, INVIS_NULL);
+  act_to_character("Your skin turns $B$7white$R momentarily.", victim, 0, 0, 0);
   af.type = SPELL_RESIST_MAGIC;
   af.duration = 1 + skill / 10;
   af.modifier = 10 + skill / 6;
@@ -6238,11 +6234,11 @@ qint32 spell_staunchblood(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   }
   if (victim->affected_by_spell(SPELL_STAUNCHBLOOD))
   {
-    act("$N is already resistant to poison.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already resistant to poison.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("You feel supremely healthy and resistant to $2poison$R!", victim, 0, 0, TO_CHAR, 0);
-  act("$n looks supremely healthy and begins looking for snakes and spiders to fight.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_character("You feel supremely healthy and resistant to $2poison$R!", victim, 0, 0, 0);
+  act_to_room("$n looks supremely healthy and begins looking for snakes and spiders to fight.", victim, 0, 0, INVIS_NULL);
   af.type = SPELL_STAUNCHBLOOD;
   af.duration = 1 + skill / 10;
   af.modifier = 10 + skill / 6;
@@ -6266,11 +6262,11 @@ qint32 spell_resist_energy(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   }
   if (victim->affected_by_spell(SPELL_RESIST_ENERGY))
   {
-    act("$N is already resistant to energy.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already resistant to energy.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("$n's skin turns $5yellow$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("Your skin turns $5yellow$R momentarily.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("$n's skin turns $5yellow$R momentarily.", victim, 0, 0, INVIS_NULL);
+  act_to_character("Your skin turns $5yellow$R momentarily.", victim, 0, 0, 0);
   af.type = SPELL_RESIST_ENERGY;
   af.duration = 1 + skill / 10;
   af.modifier = 10 + skill / 6;
@@ -6295,11 +6291,11 @@ qint32 spell_stone_skin(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (ch->affected_by_spell(SPELL_STONE_SKIN))
   {
-    act("Your skin already rock hard.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Your skin already rock hard.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
-  act("$n's skin turns grey and stone-like.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  act("Your skin turns to a stone-like substance.", ch, 0, 0, TO_CHAR, 0);
+  act_to_room("$n's skin turns grey and stone-like.", ch, 0, 0, INVIS_NULL);
+  act_to_character("Your skin turns to a stone-like substance.", ch, 0, 0, 0);
 
   af.type = SPELL_STONE_SKIN;
   af.duration = 3 + skill / 6;
@@ -6328,15 +6324,15 @@ qint32 spell_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   if (victim->affected_by_spell(SPELL_SHIELD))
     affect_from_char(victim, SPELL_SHIELD);
 
-  act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
+  act_to_room("$N is surrounded by a strong force shield.", ch, 0, victim, INVIS_NULL | NOTVICT);
   if (ch != victim)
   {
-    act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_CHAR, 0);
-    act("You are surrounded by a strong force shield.", ch, 0, victim, TO_VICT, 0);
+    act_to_character("$N is surrounded by a strong force shield.", ch, 0, victim, 0);
+    act_to_victim("You are surrounded by a strong force shield.", ch, 0, victim, 0);
   }
   else
   {
-    act("You are surrounded by a strong force shield.", ch, 0, victim, TO_VICT, 0);
+    act_to_victim("You are surrounded by a strong force shield.", ch, 0, victim, 0);
   }
 
   af.type = SPELL_SHIELD;
@@ -6369,15 +6365,15 @@ qint32 spell_weaken(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
   if (victim->affected_by_spell(SPELL_PARALYZE))
   {
-    act("$N's paralyzed muscles are too rigid to be affected by this enchantment!", ch, 0, victim, TO_CHAR, 0);
-    act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
+    act_to_character("$N's paralyzed muscles are too rigid to be affected by this enchantment!", ch, 0, victim, 0);
+    act_to_victim("Your gods protect you from $n's spell.", ch, 0, victim, 0);
     return ReturnValue::eSUCCESS;
   }
 
   if (victim->affected_by_spell(SPELL_HEROISM) && victim->affected_by_spell(SPELL_HEROISM)->modifier >= 50)
   {
-    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-    act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
+    act_to_character("$N seems unaffected.", ch, 0, victim, 0);
+    act_to_victim("Your gods protect you from $n's spell.", ch, 0, victim, 0);
     return ReturnValue::eSUCCESS;
   }
 
@@ -6408,16 +6404,16 @@ qint32 spell_weaken(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
   if (malediction_res(ch, victim, SPELL_WEAKEN))
   {
-    act("$N resists your attempt to weaken $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to weaken $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to weaken you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to weaken $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to weaken $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to weaken you!", ch, nullptr, victim, 0);
   }
   else
   {
     if (!victim->affected_by_spell(SPELL_WEAKEN))
     {
-      act("You feel weaker.", ch, 0, victim, TO_VICT, 0);
-      act("$n seems weaker.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act_to_victim("You feel weaker.", ch, 0, victim, 0);
+      act_to_room("$n seems weaker.", victim, 0, 0, INVIS_NULL);
 
       if ((cur_af = victim->affected_by_spell(SPELL_STRENGTH)))
       {
@@ -6656,7 +6652,7 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   if (DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).isNoTeleport())
   {
     ch->sendln("A portal shimmers into view but is unstable and immediately fades to nothing.");
-    act("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -7533,14 +7529,14 @@ qint32 cast_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_ARMOR - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
           {
             if (ch != tar_ch)
-              act("$N is protected by mystical armour.", ch, 0, tar_ch, TO_CHAR, 0);
+              act_to_character("$N is protected by mystical armour.", ch, 0, tar_ch, 0);
             retval &= spell_armor(level, ch, tar_ch, 0, skill);
           }
         }
@@ -7549,21 +7545,21 @@ qint32 cast_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_ARMOR - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
         {
           if (ch != leader)
-            act("$N is protected by mystical armour.", ch, 0, tar_ch, TO_CHAR, 0);
+            act_to_character("$N is protected by mystical armour.", ch, 0, tar_ch, 0);
           retval &= spell_armor(level, ch, leader, 0, skill);
         }
       }
       return retval;
     }
     if (ch != tar_ch)
-      act("$N is protected by mystical armour.", ch, 0, tar_ch, TO_CHAR, 0);
+      act_to_character("$N is protected by mystical armour.", ch, 0, tar_ch, 0);
     return spell_armor(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
@@ -7632,9 +7628,9 @@ qint32 targetted_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 {
   if (player_resist_reallocation(victim, skill))
   {
-    act("$N resists your attempt to teleport $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to teleport $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to teleport you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to teleport $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to teleport $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to teleport you!", ch, nullptr, victim, 0);
     return ReturnValue::eFAILURE;
   }
   else
@@ -7719,9 +7715,9 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
           {
             if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_BLESS - 1)
             {
-              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+              act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+              act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+              act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
             }
             else if (GET_POS(tar_ch) == position_t::FIGHTING)
               ch->sendln("Nothing seems to happen.");
@@ -7733,9 +7729,9 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_BLESS - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else if (GET_POS(leader) == position_t::FIGHTING)
             ch->sendln("Nothing seems to happen.");
@@ -7969,13 +7965,13 @@ qint32 cast_control_weather(quint8 level, CharacterPtr ch, QString arg, qint32 t
     {
       weather_info.change += (dice(((level) / 3), 9));
       ch->sendln("The skies around you grow a bit clearer.");
-      act("$n's magic causes the skies around you to grow a bit clearer.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n's magic causes the skies around you to grow a bit clearer.", ch, 0, 0, 0);
     }
     else
     {
       weather_info.change -= (dice(((level) / 3), 9));
       ch->sendln("The skies around you grow a bit darker.");
-      act("$n's magic causes the skies around you to grow a bit darker.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n's magic causes the skies around you to grow a bit darker.", ch, 0, 0, 0);
     }
     break;
   default:
@@ -7994,7 +7990,7 @@ qint32 cast_create_food(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    act("$n magically creates a mushroom.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n magically creates a mushroom.", ch, 0, 0, 0);
     return spell_create_food(level, ch, 0, 0, skill);
     break;
   case SPELL_TYPE_WAND:
@@ -8151,9 +8147,9 @@ qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_cure_critic(level, ch, tar_ch, 0, skill);
@@ -8163,9 +8159,9 @@ qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_cure_critic(level, ch, leader, 0, skill);
@@ -8221,9 +8217,9 @@ qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_cure_light(level, ch, tar_ch, 0, skill);
@@ -8233,9 +8229,9 @@ qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_cure_light(level, ch, leader, 0, skill);
@@ -8451,9 +8447,9 @@ qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_detect_invisibility(level, ch, tar_ch, 0, skill);
@@ -8463,9 +8459,9 @@ qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_detect_invisibility(level, ch, leader, 0, skill);
@@ -8524,9 +8520,9 @@ qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_detect_magic(level, ch, tar_ch, 0, skill);
@@ -8536,9 +8532,9 @@ qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_detect_magic(level, ch, leader, 0, skill);
@@ -8633,9 +8629,9 @@ qint32 cast_detect_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_detect_poison(level, ch, tar_ch, 0, skill);
@@ -8645,9 +8641,9 @@ qint32 cast_detect_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_detect_poison(level, ch, leader, 0, skill);
@@ -9119,9 +9115,9 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
           {
             if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
             {
-              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+              act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+              act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+              act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
             }
             else
               retval &= spell_protection_from_evil(level, ch, tar_ch, 0, skill);
@@ -9131,9 +9127,9 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_protection_from_evil(level, ch, leader, 0, skill);
@@ -9207,9 +9203,9 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
           {
             if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_GOOD - 1)
             {
-              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+              act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+              act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+              act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
             }
             else
               retval &= spell_protection_from_good(level, ch, tar_ch, 0, skill);
@@ -9219,9 +9215,9 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_protection_from_good(level, ch, leader, 0, skill);
@@ -9530,9 +9526,9 @@ qint32 targetted_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr vict
 {
   if (player_resist_reallocation(victim, skill))
   {
-    act("$N resists your attempt to recall $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to recall $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to recall you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to recall $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to recall $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to recall you!", ch, nullptr, victim, 0);
     return ReturnValue::eFAILURE;
   }
   else
@@ -9858,9 +9854,9 @@ qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_REFRESH - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_refresh(level, ch, tar_ch, 0, skill);
@@ -9870,9 +9866,9 @@ qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_REFRESH - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_refresh(level, ch, leader, 0, skill);
@@ -9935,9 +9931,9 @@ qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_FLY - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_fly(level, ch, tar_ch, 0, skill);
@@ -9947,9 +9943,9 @@ qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_FLY - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         retval &= spell_fly(level, ch, leader, 0, skill);
       }
@@ -10395,9 +10391,9 @@ qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_cure_serious(level, ch, tar_ch, 0, skill);
@@ -10407,9 +10403,9 @@ qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_cure_serious(level, ch, leader, 0, skill);
@@ -10776,9 +10772,9 @@ qint32 cast_resist_magic(quint8 level, CharacterPtr ch, QString arg,
         {
           if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC - 1)
           {
-            act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-            act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+            act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+            act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+            act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else
             retval &= spell_resist_magic(level, ch, tar_ch, 0, skill);
@@ -10788,9 +10784,9 @@ qint32 cast_resist_magic(quint8 level, CharacterPtr ch, QString arg,
       {
         if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC - 1)
         {
-          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
-          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+          act_to_character("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, 0);
+          act_to_victim("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, 0);
+          act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
         }
         else
           retval &= spell_resist_magic(level, ch, leader, 0, skill);
@@ -11266,7 +11262,7 @@ qint32 spell_bee_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   dam = 175;
 
-  act("$n calls upon the insect world!\r\n", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n calls upon the insect world!\r\n", ch, 0, 0, INVIS_NULL);
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
@@ -11385,7 +11381,7 @@ qint32 cast_creeping_death(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       af.bitvector = AFF_POISON;
       affect_join(victim, &af, false, false);
       victim->sendln("The insect $2poison$R has gotten into your blood!");
-      act("$N has been $2poisoned$R by your insect swarm!", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N has been $2poisoned$R by your insect swarm!", ch, 0, victim, 0);
     }
   }
 
@@ -11397,8 +11393,8 @@ qint32 cast_creeping_death(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       send_to_char("The insects are crawling in your mouth, out of your eyes, "
                    "through your stomach!\r\n",
                    victim);
-      act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
-      act("$N is completely consumed by your insects!", ch, 0, victim, TO_CHAR, 0);
+      act_to_room("$N is completely consumed by insects!", ch, 0, victim, NOTVICT);
+      act_to_character("$N is completely consumed by your insects!", ch, 0, victim, 0);
       return damage(ch, victim, dam, TYPE_UNDEFINED, SPELL_CREEPING_DEATH);
     }
   }
@@ -11457,7 +11453,7 @@ qint32 spell_barkskin(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   SET_BIT(victim->resist, ISR_SLASH);
 
   victim->sendln("Your skin turns stiff and bark-like.");
-  act("$N begins to look rather woody.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
+  act_to_room("$N begins to look rather woody.", ch, 0, victim, INVIS_NULL | NOTVICT);
   return ReturnValue::eSUCCESS;
 }
 
@@ -11466,7 +11462,7 @@ qint32 spell_barkskin(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   qint32 healamount;
-  QString buf, dammsg[MAX_STRING_LENGTH];
+  QString buf, dammsg;
 
   if (victim->race == RACE_UNDEAD)
   {
@@ -11513,17 +11509,17 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     if (ch != victim)
     {
       dc_sprintf(buf, "Your herbs heal $N%s and makes $m...hungry?", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-      act(buf, ch, 0, victim, TO_CHAR, 0);
+      act_to_character(buf, ch, 0, victim, 0);
       dc_sprintf(buf, "$n's magic herbs heal $N| and make $M look...hungry?");
       send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
       dc_sprintf(dammsg, ", healing you of $B%d$R damage", healamount);
       dc_sprintf(buf, "$n magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-      act(buf, ch, 0, victim, TO_VICT, 0);
+      act_to_victim(buf, ch, 0, victim, 0);
     }
     else
     {
       dc_sprintf(buf, "Your magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
-      act(buf, ch, 0, 0, TO_CHAR, 0);
+      act_to_character(buf, ch, 0, 0, 0);
       dc_sprintf(buf, "$n magic herbs heal $m| and make $m look...hungry?");
       send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
     }
@@ -11551,8 +11547,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
-      act("You slowly fade out of existence.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n slowly fades out of existence.", victim, 0, 0, 0);
+      act_to_character("You slowly fade out of existence.", victim, 0, 0, 0);
       break;
     case HASTE_VNUM:
       aff = AFF_HASTE;
@@ -11562,8 +11558,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n begins moving faster!", victim, 0, 0, TO_ROOM, 0);
-      act("You begin moving faster!", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n begins moving faster!", victim, 0, 0, 0);
+      act_to_character("You begin moving faster!", victim, 0, 0, 0);
       break;
     case TRUE_VNUM:
       aff = AFF_true_SIGHT;
@@ -11573,8 +11569,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n's eyes starts to gently glow $Bwhite$R.", victim, 0, 0, TO_ROOM, 0);
-      act("Your eyes start to glow $Bwhite$R.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n's eyes starts to gently glow $Bwhite$R.", victim, 0, 0, 0);
+      act_to_character("Your eyes start to glow $Bwhite$R.", victim, 0, 0, 0);
       break;
     case INFRA_VNUM:
       aff = AFF_INFRARED;
@@ -11584,8 +11580,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n's eyes starts to glow $B$4red$R.", victim, 0, 0, TO_ROOM, 0);
-      act("Your eyes start to glow $B$4red$R.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n's eyes starts to glow $B$4red$R.", victim, 0, 0, 0);
+      act_to_character("Your eyes start to glow $B$4red$R.", victim, 0, 0, 0);
       break;
     case FARSIGHT_VNUM:
       aff = AFF_FARSIGHT;
@@ -11595,8 +11591,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n's eyes blur and seem to $B$0darken$R.", victim, 0, 0, TO_ROOM, 0);
-      act("Your eyes blur and the world around you seems to come closer.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n's eyes blur and seem to $B$0darken$R.", victim, 0, 0, 0);
+      act_to_character("Your eyes blur and the world around you seems to come closer.", victim, 0, 0, 0);
       break;
     case LIGHTNING_SHIELD_VNUM:
       if (find_spell_shield(ch, victim))
@@ -11611,8 +11607,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n is surrounded by $B$5electricity$R.", victim, 0, 0, TO_ROOM, 0);
-      act("You become surrounded by $B$5electricity$R.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n is surrounded by $B$5electricity$R.", victim, 0, 0, 0);
+      act_to_character("You become surrounded by $B$5electricity$R.", victim, 0, 0, 0);
       break;
     case INSOMNIA_VNUM:
       aff = AFF_INSOMNIA;
@@ -11622,8 +11618,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n blinks and looks a little twitchy.", victim, 0, 0, TO_ROOM, 0);
-      act("You suddenly feel very energetic and not at all sleepy.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n blinks and looks a little twitchy.", victim, 0, 0, 0);
+      act_to_character("You suddenly feel very energetic and not at all sleepy.", victim, 0, 0, 0);
       break;
     case DETECT_GOOD_VNUM:
       aff = AFF_DETECT_GOOD;
@@ -11633,8 +11629,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n's eyes starts to gently glow $B$1blue$R.", victim, 0, 0, TO_ROOM, 0);
-      act("Your eyes start to glow $B$1blue$R.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n's eyes starts to gently glow $B$1blue$R.", victim, 0, 0, 0);
+      act_to_character("Your eyes start to glow $B$1blue$R.", victim, 0, 0, 0);
       break;
     case DETECT_EVIL_VNUM:
       aff = AFF_DETECT_EVIL;
@@ -11644,8 +11640,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n's eyes starts to gently glow $4deep red$R.", victim, 0, 0, TO_ROOM, 0);
-      act("Your eyes start to glow $4deep red$R.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n's eyes starts to gently glow $4deep red$R.", victim, 0, 0, 0);
+      act_to_character("Your eyes start to glow $4deep red$R.", victim, 0, 0, 0);
       break;
     case DETECT_INVISIBLE_VNUM:
       aff = AFF_DETECT_INVISIBLE;
@@ -11655,8 +11651,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n's eyes starts to gently glow $B$5yellow$R.", victim, 0, 0, TO_ROOM, 0);
-      act("Your eyes start to glow $B$5yellow$R.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n's eyes starts to gently glow $B$5yellow$R.", victim, 0, 0, 0);
+      act_to_character("Your eyes start to glow $B$5yellow$R.", victim, 0, 0, 0);
       break;
     case SENSE_LIFE_VNUM:
       aff = AFF_SENSE_LIFE;
@@ -11666,8 +11662,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      //		act("$n's eyes starts to gently glow a $2deep green$R.", victim, 0, 0, TO_ROOM, 0);
-      act("Your become intensely aware of your surroundings.", victim, 0, 0, TO_CHAR, 0);
+      //		act_to_room("$n's eyes starts to gently glow a $2deep green$R.", victim, 0, 0,  0);
+      act_to_character("Your become intensely aware of your surroundings.", victim, 0, 0, 0);
       break;
     case SOLIDITY_VNUM:
       aff = AFF_SOLIDITY;
@@ -11677,8 +11673,8 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
         ch->sendln("They are already affected by that spell.");
         return ReturnValue::eFAILURE;
       }
-      act("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_ROOM, 0);
-      act("You become surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_CHAR, 0);
+      act_to_room("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, 0);
+      act_to_character("You become surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, 0);
       break;
     case 2256:
       aff = {};
@@ -11732,10 +11728,10 @@ qint32 cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     return ReturnValue::eFAILURE;
   }
 
-  act("$n disappears suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n disappears suddenly.", victim, 0, 0, INVIS_NULL);
   move_char(victim, ch->in_room);
-  act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
+  act_to_room("$n arrives suddenly.", victim, 0, 0, INVIS_NULL);
+  act_to_victim("$n has summoned you!", ch, 0, victim, 0);
   do_look(victim, "");
 
   if (!OUTSIDE(ch))
@@ -12003,7 +11999,7 @@ qint32 cast_clarity(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   affect_to_char(victim, &af);
   redo_mana(victim);
   victim->sendln("You suddenly feel smarter than everyone else.");
-  act("$n's eyes shine with powerful intellect!", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n's eyes shine with powerful intellect!", victim, 0, 0, 0);
   af.modifier = 3 + (skill / 20);
   af.location = APPLY_MANA_REGEN;
   affect_to_char(victim, &af);
@@ -12123,7 +12119,7 @@ qint32 cast_companion(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
   } // of switch
 
   mob->hit = mob->max_hit; // Set elem to full hps
-  strcat(name, "elemental companion");
+  dc_strcat(name, "elemental companion");
   mob->name(name);
   mob->short_desc = QStringLiteral(desc);
   mob->long_desc = QStringLiteral(desc);
@@ -12267,7 +12263,7 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
   if (!check_components(ch, true, 14905, 2256, 3181))
   {
     ch->sendln("Without the proper spell components, your spell fizzles out and dies.");
-    act("$n's hands pop and sizzle with misused spell components.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's hands pop and sizzle with misused spell components.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -12537,14 +12533,14 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   if (ch->fighting && (0 == number(0, 20)))
   {
     ch->sendln("In the heat of combat, you forget your beacon's location!");
-    act("$n's eyes widen for a moment, $s concentration broken.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n's eyes widen for a moment, $s concentration broken.", ch, 0, 0, 0);
     ch->beacon->equipped_by = {};
     extract_obj(ch->beacon);
     ch->beacon = {};
     return ReturnValue::eFAILURE;
   }
 
-  act("Poof! $e's gone!", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("Poof! $e's gone!", ch, 0, 0, 0);
   ch->sendln("You rip a dimensional hole through space and step out at your beacon.");
 
   if (!move_char(ch, ch->beacon->in_room))
@@ -12554,7 +12550,7 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   }
   do_look(ch, "");
 
-  act("$n steps out from a dimensional rip.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n steps out from a dimensional rip.", ch, 0, 0, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -12642,7 +12638,7 @@ qint32 choose_druid_familiar(CharacterPtr ch, QString arg)
     if (!check_components(ch, true, 27800))
     {
       ch->sendln("You remember at the last second that you don't have an acorn ready!");
-      act("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
     return FAMILIAR_MOB_CHIPMUNK;
@@ -12652,7 +12648,7 @@ qint32 choose_druid_familiar(CharacterPtr ch, QString arg)
     if (!check_components(ch, true, 44))
     {
       ch->sendln("You remember at the last second that you don't have a dead mouse ready!");
-      act("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
     return FAMILIAR_MOB_OWL;
@@ -12674,7 +12670,7 @@ qint32 choose_mage_familiar(CharacterPtr ch, QString arg)
     if (!check_components(ch, true, 4))
     {
       ch->sendln("You remember at the last second that you don't have a batwing ready!");
-      act("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
     return FAMILIAR_MOB_IMP;
@@ -12684,7 +12680,7 @@ qint32 choose_mage_familiar(CharacterPtr ch, QString arg)
     if (!check_components(ch, true, 43))
     {
       ch->sendln("You remember at the last second that you don't have a silver piece ready!");
-      act("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, TO_ROOM, 0);
+      act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
     return FAMILIAR_MOB_GREMLIN;
@@ -12725,11 +12721,11 @@ void familiar_creation_message(CharacterPtr ch, qint32 fam_type)
                  ch);
     break;
   case FAMILIAR_MOB_OWL:
-    act("$n throws a dead mouse skyward and a large owl swoops down and grabs it in midair.\r\n", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n throws a dead mouse skyward and a large owl swoops down and grabs it in midair.\r\n", ch, 0, 0, 0);
     ch->sendln("You toss the mouse into the air and grin as an owl swoops down from above.\r\nA voice echoes in your mind...'I can help you to $4watch$7 for nearby enemies.'");
     break;
   case FAMILIAR_MOB_GREMLIN:
-    act("$n opens a small portal and throws in a piece of silver.\r\nA confused gremlin is launched out of the portal, hitting its head as it lands on the floor.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n opens a small portal and throws in a piece of silver.\r\nA confused gremlin is launched out of the portal, hitting its head as it lands on the floor.", ch, 0, 0, 0);
     ch->sendln("You open a portal to your target and throw in your silver piece.\r\nThe gremlin is expunged from the dimension beyond through your portal, hitting its head in the process.");
     break;
   default:
@@ -12894,11 +12890,11 @@ qint32 spell_resist_acid(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (victim->affected_by_spell(SPELL_RESIST_ACID))
   {
-    act("$N is already resistant to acid.", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N is already resistant to acid.", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
-  act("$n's skin turns $2green$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("Your skin turns $2green$R momentarily.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("$n's skin turns $2green$R momentarily.", victim, 0, 0, INVIS_NULL);
+  act_to_character("Your skin turns $2green$R momentarily.", victim, 0, 0, 0);
 
   af.type = SPELL_RESIST_ACID;
   af.duration = 1 + skill / 10;
@@ -12958,7 +12954,7 @@ qint32 spell_sun_ray(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
     return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY);
   }
   else
-    act("The sun ray cannot reach $N!", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("The sun ray cannot reach $N!", ch, 0, victim, 0);
 
   return ReturnValue::eFAILURE;
 }
@@ -13025,7 +13021,7 @@ qint32 spell_rapid_mend(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (!victim->affected_by_spell(SPELL_RAPID_MEND))
   {
-    act("$n starts to heal more quickly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n starts to heal more quickly.", victim, 0, 0, INVIS_NULL);
     victim->sendln("You feel your body begin to heal more quickly.");
 
     if (skill < 40)
@@ -13062,7 +13058,7 @@ qint32 spell_rapid_mend(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
     affect_to_char(victim, &af);
   }
   else
-    act("$n is already mending quickly.", victim, 0, 0, TO_CHAR, 0);
+    act_to_character("$n is already mending quickly.", victim, 0, 0, 0);
 
   return ReturnValue::eSUCCESS;
 }
@@ -13102,14 +13098,14 @@ qint32 spell_iron_roots(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (ch->affected_by_spell(SPELL_IRON_ROOTS))
   {
     affect_from_char(ch, SPELL_IRON_ROOTS);
-    act("The tree roots encasing $n's legs sink away under the surface of the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("The roots release their hold upon you and melt away beneath the surface of the ground.", ch, 0, 0, TO_CHAR, 0);
+    act_to_room("The tree roots encasing $n's legs sink away under the surface of the ground.", ch, 0, 0, INVIS_NULL);
+    act_to_character("The roots release their hold upon you and melt away beneath the surface of the ground.", ch, 0, 0, 0);
     REMBIT(ch->affected_by, AFF_NO_FLEE);
   }
   else
   {
-    act("Tree roots spring from the ground bracing $n's legs, holding $m down firmly to the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("Tree roots spring from the ground firmly holding you to the ground.", ch, 0, 0, TO_CHAR, 0);
+    act_to_room("Tree roots spring from the ground bracing $n's legs, holding $m down firmly to the ground.", ch, 0, 0, INVIS_NULL);
+    act_to_character("Tree roots spring from the ground firmly holding you to the ground.", ch, 0, 0, 0);
 
     SETBIT(ch->affected_by, AFF_NO_FLEE);
 
@@ -13168,8 +13164,8 @@ qint32 spell_acid_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!victim->affected_by_spell(SPELL_ACID_SHIELD))
   {
-    act("$n is surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    act("You are surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n is surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, INVIS_NULL);
+    act_to_character("You are surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, 0);
 
     af.type = SPELL_ACID_SHIELD;
     af.duration = 2 + (skill / 23);
@@ -13230,8 +13226,8 @@ qint32 spell_water_breathing(quint8 level, CharacterPtr ch, CharacterPtr victim,
   if ((cur_af = victim->affected_by_spell(SPELL_WATER_BREATHING)))
     affect_remove(victim, cur_af, SUPPRESS_ALL);
 
-  act("Small gills spring forth from $n's neck and begin fanning as $e breathes.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("Your neck springs gills and the air around you suddenly seems very dry.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("Small gills spring forth from $n's neck and begin fanning as $e breathes.", victim, 0, 0, INVIS_NULL);
+  act_to_character("Your neck springs gills and the air around you suddenly seems very dry.", victim, 0, 0, 0);
 
   af.type = SPELL_WATER_BREATHING;
   af.duration = 6 + (skill / 5);
@@ -13418,7 +13414,7 @@ qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     dam = dam * 1 / 2;
 
   ch->sendln("$B$3Ice$R erupts from the earth!");
-  act("$n makes $B$3ice$R fall erupt from the earth!", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n makes $B$3ice$R fall erupt from the earth!", ch, 0, 0, 0);
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
@@ -13440,9 +13436,9 @@ qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
         af.bitvector = -1;
         affect_to_char(tmp_victim, &af);
 
-        act("$N shivers and looks very $B$3chilled$R as $E suffers the affects of your storm.", ch, 0, tmp_victim, TO_CHAR, 0);
-        act("You shiver and feel very $B$3chilled$R as you suffer the affects of $n's storm.", ch, 0, tmp_victim, TO_VICT, 0);
-        act("$N shivers and looks very $B$3chilled$R as $E suffers the affects of $n's storm.", ch, 0, tmp_victim, TO_ROOM, NOTVICT);
+        act_to_character("$N shivers and looks very $B$3chilled$R as $E suffers the affects of your storm.", ch, 0, tmp_victim, 0);
+        act_to_victim("You shiver and feel very $B$3chilled$R as you suffer the affects of $n's storm.", ch, 0, tmp_victim, 0);
+        act_to_room("$N shivers and looks very $B$3chilled$R as $E suffers the affects of $n's storm.", ch, 0, tmp_victim, NOTVICT);
       }
 
       retval2 = damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM);
@@ -13519,8 +13515,8 @@ qint32 spell_lightning_shield(quint8 level, CharacterPtr ch, CharacterPtr victim
 
   if (!victim->affected_by_spell(SPELL_LIGHTNING_SHIELD))
   {
-    act("$n is surrounded by a crackling shield of $B$5electrical$R energy.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    act("You are surrounded by a crackling shield of $B$5electrical$R energy.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n is surrounded by a crackling shield of $B$5electrical$R energy.", victim, 0, 0, INVIS_NULL);
+    act_to_character("You are surrounded by a crackling shield of $B$5electrical$R energy.", victim, 0, 0, 0);
 
     af.type = SPELL_LIGHTNING_SHIELD;
     af.duration = 2 + skill / 23;
@@ -13704,9 +13700,9 @@ qint32 spell_debility(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (malediction_res(ch, victim, SPELL_DEBILITY))
   {
-    act("$N resists your attempt to $6debilitize$R $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to $6debilitize$R $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to $6debilitize$R you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to $6debilitize$R $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to $6debilitize$R $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to $6debilitize$R you!", ch, nullptr, victim, 0);
   }
   else
   {
@@ -13726,8 +13722,8 @@ qint32 spell_debility(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     af.modifier = 0 - (qint32)((double)victim->mana_gain_lookup() * (percent / 100));
     affect_to_char(victim, &af);
     victim->sendln("Your body becomes $6debilitized$R, reducing your regenerative abilities!");
-    act("$N takes on an unhealthy pallor as $n's magic takes hold.", ch, 0, victim, TO_ROOM, NOTVICT);
-    act("Your magic $6debilitizes$R $N!", ch, 0, victim, TO_CHAR, 0);
+    act_to_room("$N takes on an unhealthy pallor as $n's magic takes hold.", ch, 0, victim, NOTVICT);
+    act_to_character("Your magic $6debilitizes$R $N!", ch, 0, victim, 0);
   }
   if (victim->isNonPlayer() && !victim->fighting)
   {
@@ -13827,9 +13823,9 @@ qint32 spell_attrition(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (malediction_res(ch, victim, SPELL_ATTRITION))
   {
-    act("$N resists your attempt to cast attrition on $M!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to cast attrition on $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to cast attrition on you!", ch, nullptr, victim, TO_VICT, 0);
+    act_to_character("$N resists your attempt to cast attrition on $M!", ch, nullptr, victim, 0);
+    act_to_room("$N resists $n's attempt to cast attrition on $M!", ch, nullptr, victim, NOTVICT);
+    act_to_victim("You resist $n's attempt to cast attrition on you!", ch, nullptr, victim, 0);
   }
   else
   {
@@ -13845,8 +13841,8 @@ qint32 spell_attrition(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     affect_to_char(victim, &af);
 
     victim->sendln("You feel less energetic as painful magic penetrates your body!");
-    act("$N's body takes on an unhealthy colouring as $n's magic enters $M.", ch, 0, victim, TO_ROOM, NOTVICT);
-    act("$N pales as your devitalizing magic courses through $S veins!", ch, 0, victim, TO_CHAR, 0);
+    act_to_room("$N's body takes on an unhealthy colouring as $n's magic enters $M.", ch, 0, victim, NOTVICT);
+    act_to_character("$N pales as your devitalizing magic courses through $S veins!", ch, 0, victim, 0);
   }
 
   if (victim->isNonPlayer())
@@ -13912,7 +13908,7 @@ qint32 spell_vampiric_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   affected_type af;
   /*
   if (victim->affected_by_spell(SPELL_ACID_SHIELD)){
-     act("A film of $B$0shadow$R begins to rise around $n but fades around $s ankles.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+     act_to_room("A film of $B$0shadow$R begins to rise around $n but fades around $s ankles.", victim, 0, 0,  INVIS_NULL);
      ch->sendln("A film of $B$0shadow$R tries to rise around you but dissolves in your acid shield.");
      return ReturnValue::eFAILURE;
   }
@@ -13922,8 +13918,8 @@ qint32 spell_vampiric_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, O
     ch->sendln("Your dark power is not available to you so soon.");
     return ReturnValue::eFAILURE;
   }
-  act("A film of $B$0shadow$R encompasses $n then fades from view.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("A film of $B$0shadow$R encompasses you then fades from view.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("A film of $B$0shadow$R encompasses $n then fades from view.", victim, 0, 0, INVIS_NULL);
+  act_to_character("A film of $B$0shadow$R encompasses you then fades from view.", victim, 0, 0, 0);
 
   af.type = SPELL_VAMPIRIC_AURA;
   af.duration = skill / 25;
@@ -13972,8 +13968,8 @@ qint32 spell_holy_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     return ReturnValue::eFAILURE;
   }
 
-  act("A serene calm comes over $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("A serene calm encompasses you.", victim, 0, 0, TO_CHAR, 0);
+  act_to_room("A serene calm comes over $n.", victim, 0, 0, INVIS_NULL);
+  act_to_character("A serene calm encompasses you.", victim, 0, 0, 0);
   GET_ALIGNMENT(ch) -= 200;
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));
   extern void zap_eq_check(CharacterPtr ch);
@@ -14002,7 +13998,7 @@ qint32 cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     QString buf;
     if (ch->affected_by_spell(SPELL_SANCTUARY))
     {
-      act("Your god does not allow that much power to be bestowed upon you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_character("Your god does not allow that much power to be bestowed upon you.", ch, 0, 0, 0);
       return ReturnValue::eFAILURE;
     }
     if (GET_ALIGNMENT(ch) < 1000)
@@ -14029,8 +14025,8 @@ qint32 cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       return ReturnValue::eFAILURE;
     }
 
-    act("A serene calm comes over $n.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("A serene calm encompasses you.", ch, 0, 0, TO_CHAR, 0);
+    act_to_room("A serene calm comes over $n.", ch, 0, 0, INVIS_NULL);
+    act_to_character("A serene calm encompasses you.", ch, 0, 0, 0);
     GET_ALIGNMENT(ch) -= 250;
     GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));
     extern void zap_eq_check(CharacterPtr ch);
@@ -14073,7 +14069,7 @@ qint32 spell_dismiss_familiar(quint8 level, CharacterPtr ch, CharacterPtr victim
     return ReturnValue::eFAILURE;
   }
 
-  act("$n disappears in a flash of flame and shadow.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n disappears in a flash of flame and shadow.", victim, 0, 0, INVIS_NULL);
   extract_char(victim, true);
 
   GET_MANA(ch) += 51;
@@ -14134,7 +14130,7 @@ qint32 spell_dismiss_corpse(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     return ReturnValue::eFAILURE;
   }
 
-  act("$n begins to melt and dissolves into the ground... dust to dust.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n begins to melt and dissolves into the ground... dust to dust.", victim, 0, 0, INVIS_NULL);
   extract_char(victim, true);
 
   return ReturnValue::eSUCCESS;
@@ -14194,16 +14190,16 @@ qint32 spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victi
   switch (DC::getInstance()->mob_index[victim->mobdata->nr].vnum())
   {
   case FIRE_ELEMENTAL:
-    act("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, INVIS_NULL);
     break;
   case WATER_ELEMENTAL:
-    act("$n melts into a puddle and vanishes as it is released from its servitude.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n melts into a puddle and vanishes as it is released from its servitude.", victim, 0, 0, INVIS_NULL);
     break;
   case AIR_ELEMENTAL:
-    act("$n suddenly vanishes, leaving only the strong scent of ozone.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n suddenly vanishes, leaving only the strong scent of ozone.", victim, 0, 0, INVIS_NULL);
     break;
   case EARTH_ELEMENTAL:
-    act("Rocks fly everywhere as $n returns to its own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("Rocks fly everywhere as $n returns to its own plane of existance.", victim, 0, 0, INVIS_NULL);
     break;
   default:
     DC::getInstance()->logentry(QStringLiteral("Serious screw-up in spell_release_elemental!"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -14521,23 +14517,20 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
   switch (virt)
   {
   case FIRE_ELEMENTAL:
-    act("Your container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, nullptr, nullptr, TO_CHAR, 0);
-    act("$n's container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, nullptr, nullptr, TO_ROOM,
-        0);
+    act_to_character("Your container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, nullptr, nullptr, 0);
+    act("$n's container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, nullptr, nullptr, TO_ROOM, 0);
     break;
   case WATER_ELEMENTAL:
-    act("Your holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes into existence.", ch, nullptr, nullptr,
-        TO_CHAR, 0);
-    act("$n's holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes intoto existence.", ch, nullptr, nullptr,
-        TO_ROOM, 0);
+    act("Your holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes into existence.", ch, nullptr, nullptr, TO_CHAR, 0);
+    act("$n's holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes intoto existence.", ch, nullptr, nullptr, TO_ROOM, 0);
     break;
   case EARTH_ELEMENTAL:
-    act("Your dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, nullptr, nullptr, TO_CHAR, 0);
-    act("$n's dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, nullptr, nullptr, TO_ROOM, 0);
+    act_to_character("Your dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, nullptr, nullptr, 0);
+    act_to_room("$n's dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, nullptr, nullptr, 0);
     break;
   case AIR_ELEMENTAL:
-    act("Your wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, nullptr, nullptr, TO_CHAR, 0);
-    act("$n's wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, nullptr, nullptr, TO_ROOM, 0);
+    act_to_character("Your wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, nullptr, nullptr, 0);
+    act_to_room("$n's wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, nullptr, nullptr, 0);
     break;
   default:
     ch->sendln("That item is not used for elemental summoning.");
@@ -14591,8 +14584,8 @@ qint32 spell_divine_intervention(quint8 level, CharacterPtr ch, CharacterPtr vic
 {
   affected_type af;
 
-  act("Light pours down from above bathing you in a shell of divine protection.", ch, 0, 0, TO_CHAR, 0);
-  act("Light pours down from above and surrounds $n in a shell of divine protection.", ch, 0, 0, TO_ROOM, 0);
+  act_to_character("Light pours down from above bathing you in a shell of divine protection.", ch, 0, 0, 0);
+  act_to_room("Light pours down from above and surrounds $n in a shell of divine protection.", ch, 0, 0, 0);
 
   af.type = SPELL_DIV_INT_TIMER;
   af.duration = 24;
@@ -14662,7 +14655,7 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     GET_MANA(ch) -= castcost;
 
   ch->sendln("You call forth the fury of the gods to consume the area in a holy tempest!");
-  act("$n calls forth the fury of the gods to consume the area in a holy tempest!", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n calls forth the fury of the gods to consume the area in a holy tempest!", ch, 0, 0, 0);
 
   for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
   {
@@ -14729,7 +14722,7 @@ qint32 spell_atonement(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   GET_MANA(ch) = GET_MAX_MANA(ch);
 
   ch->sendln("You pray fervently for the support of the gods and are rewarded restoration...at a price.");
-  act("$n prays fervently for the support of the gods and is rewarded restoration...at a price.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n prays fervently for the support of the gods and is rewarded restoration...at a price.", ch, 0, 0, 0);
 
   return ReturnValue::eSUCCESS;
 }
@@ -14764,7 +14757,7 @@ qint32 spell_silence(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   }
 
   ch->sendln("Your chants fade softy to an eerie quiet as the silence takes hold...");
-  act("$n's chants fade to an eerie quiet as the silence takes hold...", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n's chants fade to an eerie quiet as the silence takes hold...", ch, 0, 0, 0);
 
   if (!(silence_obj = clone_object(real_object(SILENCE_OBJ_NUMBER))))
   {
@@ -14821,7 +14814,7 @@ qint32 spell_immunity(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   }
 
   ch->send("You reach forth and etch a protective sigil in the air that briefly surrounds you in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.");
-  act("$n reaches forth and etches a protective sigil in the air that briefly surrounds $m in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n reaches forth and etches a protective sigil in the air that briefly surrounds $m in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.", ch, 0, 0, 0);
 
   af.type = SPELL_IMMUNITY;
   af.duration = 2 + skill / 10;
@@ -15063,15 +15056,15 @@ qint32 spell_solidity(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   affected_type af;
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    act("You are already $6violet$R.", victim, 0, 0, TO_CHAR, 0);
-    act("$n is already $6violet$R.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You are already $6violet$R.", victim, 0, 0, 0);
+    act_to_character("$n is already $6violet$R.", ch, 0, 0, 0);
     return ReturnValue::eSUCCESS;
   }
 
   if (!victim->affected_by_spell(AFF_SOLIDITY))
   {
-    act("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_ROOM, 0);
-    act("You become surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, 0);
+    act_to_character("You become surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, 0);
 
     af.type = SPELL_SOLIDITY;
     af.duration = level / 10;
@@ -15114,14 +15107,14 @@ qint32 spell_stability(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   affected_type af;
   if (IS_AFFECTED(victim, AFF_STABILITY))
   {
-    act("You already have good balance.", victim, 0, 0, TO_CHAR, 0);
-    act("$n already has good balance.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You already have good balance.", victim, 0, 0, 0);
+    act_to_character("$n already has good balance.", ch, 0, 0, 0);
     return ReturnValue::eSUCCESS;
   }
   if (!victim->affected_by_spell(SPELL_STABILITY))
   {
-    act("$n suddenly seems very hard to push over.", victim, 0, 0, TO_ROOM, 0);
-    act("You feel very balanced.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n suddenly seems very hard to push over.", victim, 0, 0, 0);
+    act_to_character("You feel very balanced.", victim, 0, 0, 0);
 
     af.type = SPELL_STABILITY;
     af.duration = level / 10;
@@ -15167,8 +15160,8 @@ qint32 spell_frostshield(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (!victim->affected_by_spell(SPELL_FROSTSHIELD))
   {
-    act("$n is surrounded by a shield of $1ice$R.", victim, 0, 0, TO_ROOM, 0);
-    act("You become surrounded by a shield of $1ice$R.", victim, 0, 0, TO_CHAR, 0);
+    act_to_room("$n is surrounded by a shield of $1ice$R.", victim, 0, 0, 0);
+    act_to_character("You become surrounded by a shield of $1ice$R.", victim, 0, 0, 0);
     af.type = SPELL_FROSTSHIELD;
     af.duration = level / 10;
     af.modifier = {};
@@ -15403,7 +15396,7 @@ qint32 spell_spirit_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   ch->equip_char(ssobj, WEAR_SHIELD);
 
   ch->sendln("Your prayers to the gods for protection are answered as a glowing shield suddenly appears in your hand!");
-  act("$n's prays to the gods for protection and a glowing shield appears in $s hand!", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n's prays to the gods for protection and a glowing shield appears in $s hand!", ch, 0, 0, 0);
 
   WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 2.5));
 
@@ -15445,7 +15438,7 @@ qint32 spell_villainy(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   affect_to_char(victim, &af);
 
   victim->sendln("You call upon the gods to grant you the magic and skill to defeat all that is good!");
-  act("$n calls upon the gods to grant $m magic and skill in $s fight for evil!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n calls upon the gods to grant $m magic and skill in $s fight for evil!", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
 
@@ -15498,7 +15491,7 @@ qint32 spell_heroism(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   affect_to_char(victim, &af);
 
   victim->sendln("You call upon the gods to grant you courage and skill in your fight for justice!");
-  act("$n calls upon the gods to grant $m courage and skill in $s fight for justice!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n calls upon the gods to grant $m courage and skill in $s fight for justice!", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
 
@@ -15895,7 +15888,7 @@ qint32 spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   affect_to_char(ch, &af);
 
   ch->sendln("You focus the minds of your allies to react to the slightest movement...");
-  act("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, INVIS_NULL);
   // loop through group members in room
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = next_ally)
   {

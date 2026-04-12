@@ -71,7 +71,7 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
   buf = QString::asprintf("$3Name$R: %s  $3Vnum$R: %llu.\r\n", qPrintable(victim->name()), DC::getInstance()->mob_index[victim->mobdata->nr].vnum());
   ch->send(buf);
 
-  buf = QString::asprintf("$3Short description$R: %s\r\n$3Long  description$R: %s\r\n", victim->short_description(), victim->long_description());
+  buf = QString::asprintf("$3Short description$R: %s\r\n$3Long  description$R: %s\r\n", qPrintable(victim->short_description()), qPrintable(victim->long_description()));
   ch->send(buf);
 
   if (!(DC::getInstance()->mob_index[victim->mobdata->nr].progtypes))
@@ -80,14 +80,13 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
     return;
   }
 
-  for (mprg = DC::getInstance()->mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != nullptr;
-       i++, mprg = mprg->next)
+  for (auto &mprg : DC::getInstance()->mob_index[victim->mobdata->nr].mobprogs_)
   {
     buf = QString::asprintf("$3%d$R>$3$B", i);
     ch->send(buf);
     send_to_char(Program::mprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    dc_sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
+    dc_sprintf(buf, "$B$5%s$R\r\n", qPrintable(mprg->arglist));
     ch->send(buf);
     ch->sendRaw(QString(mprg->comlist) + "\r\n");
   }
@@ -123,7 +122,7 @@ command_return_t do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
       MOBtrigger = false;
       // argument +1 so we skip the leading ' '
-      act(argument + 1, ch, nullptr, nullptr, TO_ROOM, 0);
+      act_to_room(argument + 1, ch, nullptr, nullptr, 0);
       ch->in_room = was_in_room;
     }
   }
@@ -348,13 +347,13 @@ command_return_t do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (CAN_SEE(ch, victim))
-    act(argument + 1, ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act_to_room(argument + 1, ch, nullptr, victim, NOTVICT);
   return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg, arg1[MAX_INPUT_LENGTH];
+  QString arg, arg1;
   CharacterPtr victim, victim2;
 
   if (ch->isPlayer())
@@ -383,7 +382,7 @@ command_return_t do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t 
   }
 
   //     if (CAN_SEE(ch,victim))
-  act(argument + 1, victim, nullptr, victim2, TO_ROOM, NOTVICT);
+  act_to_room(argument + 1, victim, nullptr, victim2, NOTVICT);
   return ReturnValue::eSUCCESS;
 }
 
@@ -414,7 +413,7 @@ command_return_t do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  act(argument + 1, ch, nullptr, victim, TO_VICT, 0);
+  act_to_victim(argument + 1, ch, nullptr, victim, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -434,7 +433,7 @@ command_return_t do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  act(argument + 1, ch, nullptr, nullptr, TO_ROOM, 0);
+  act_to_room(argument + 1, ch, nullptr, nullptr, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -1015,7 +1014,7 @@ command_return_t do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
   // create
   auto throwitem = new mprog_throw_type;
   throwitem->target_mob_num = mob_num;
-  strcpy(throwitem->target_mob_name, first);
+  dc_strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
   throwitem->delay = delay;
   throwitem->mob = true; // This is, suprisingly, a mob
@@ -1108,7 +1107,7 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
   prepare_character_for_sixty(ch);
 
   dc_snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", qPrintable(skillname));
-  act(skill, ch, 0, victim, TO_ROOM, NOTVICT);
+  act_to_room(skill, ch, 0, victim, NOTVICT);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1118,10 +1117,10 @@ qint32 determine_attack_type(QString attacktype)
   extern QStringList strs_damage_types;
 
   for (qint32 i = 10; *strs_damage_types[i] != '\n'; i++)
-    if (!strcmp(strs_damage_types[i], attacktype))
+    if (!dc_strcmp(strs_damage_types[i], attacktype))
       return (TYPE_HIT + i);
 
-  if (!strcmp("undefined", attacktype))
+  if (!dc_strcmp("undefined", attacktype))
     return TYPE_UNDEFINED;
 
   return 0;
@@ -1209,7 +1208,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
 command_return_t do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  QString arg, align[MAX_INPUT_LENGTH];
+  QString arg, align;
   if (ch->isPlayer())
   {
     ch->sendln("Huh?");
@@ -1264,9 +1263,9 @@ void add_dmg(CharacterPtr ch, qint32 dmg)
 
   auto c = new damage_list;
   if (ch->isNonPlayer())
-    strcpy(c->name, qPrintable(ch->shortdesc_or_name()));
+    dc_strcpy(c->name, qPrintable(ch->shortdesc_or_name()));
   else
-    strcpy(c->name, qPrintable(ch->name()));
+    dc_strcpy(c->name, qPrintable(ch->name()));
   c->damage = dmg;
   c->next = dmg_list;
   dmg_list = c;
@@ -1298,7 +1297,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
   CharacterPtr victim = {};
 
   // if it's 'all' leave victim nullptr and skip
-  if (strcmp(arg, "all") && strcmp(arg, "allpc"))
+  if (dc_strcmp(arg, "all") && dc_strcmp(arg, "allpc"))
   {
     victim = get_char_room(arg, ch->in_room);
     if (victim && (victim->getLevel() > MORTAL || victim->isNonPlayer())) // don't target immortals
@@ -1535,7 +1534,7 @@ command_return_t do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
   // create
   auto throwitem = new mprog_throw_type;
   throwitem->target_mob_num = mob_num;
-  strcpy(throwitem->target_mob_name, first);
+  dc_strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
   throwitem->delay = delay;
   throwitem->mob = false;
@@ -1569,8 +1568,8 @@ qint32 skill_aff[] =
 
 command_return_t do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg, arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
-      arg3[MAX_INPUT_LENGTH];
+  QString arg, arg1, arg2,
+      arg3;
   CharacterPtr victim, owner = {};
   if (ch->isPlayer())
   {
@@ -1745,7 +1744,7 @@ command_return_t do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  QString person, type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+  QString person, type, buf;
   room_t to_room = {};
 
   if (ch->isPlayer() && ch->getLevel() < 110)
@@ -1755,7 +1754,7 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!*person)
   {
-    strncpy(person, qPrintable(ch->name()), MAX_INPUT_LENGTH);
+    dc_strncpy(person, qPrintable(ch->name()), MAX_INPUT_LENGTH);
   }
 
   if (!(victim = get_char_vis(ch, person)))
@@ -1816,9 +1815,9 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
            (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
-  act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n slowly fades out of existence.", victim, 0, 0, 0);
   move_char(victim, to_room);
-  act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
+  act_to_room("$n slowly fades into existence.", victim, 0, 0, 0);
 
   do_look(victim, "");
   return ReturnValue::eSUCCESS;
@@ -1960,7 +1959,7 @@ QString expand_data(CharacterPtr ch, QString orig)
   QString buf1;
   while (*orig == ' ')
     orig++;
-  strcpy(buf1, orig);
+  dc_strcpy(buf1, orig);
   orig = &buf1[0];
   buf[0] = '\0';
   QString ptr;
@@ -1989,7 +1988,7 @@ QString expand_data(CharacterPtr ch, QString orig)
       }
     }
     *(ptr) = '\0';
-    strcpy(left, (ptr - l));
+    dc_strcpy(left, (ptr - l));
     *(ptr) = '#';
     *(ptr - l) = '~';
     for (r = 1;; r++)
@@ -2001,7 +2000,7 @@ QString expand_data(CharacterPtr ch, QString orig)
     }
     c = *(ptr + r);
     *(ptr + r) = '\0';
-    strcpy(right, ptr + 1);
+    dc_strcpy(right, ptr + 1);
     *(ptr + r) = c;
     r--;
     if (c == '\0')
@@ -2036,7 +2035,7 @@ QString expand_data(CharacterPtr ch, QString orig)
       dc_sprintf(tmp, "%u", *lvalui);
     if (lvalb)
       dc_sprintf(tmp, "%d", *lvalb);
-    strcat(buf, tmp);
+    dc_strcat(buf, tmp);
     i += strlen(tmp);
     z = (ptr - orig) + r + 1;
   }

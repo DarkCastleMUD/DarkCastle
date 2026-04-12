@@ -56,7 +56,7 @@ command_return_t do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_sprintf(buf, "You abandon: %s\r\n", k->group_name);
   ch->send(buf);
   dc_sprintf(buf, "%s abandons: %s", qPrintable(ch->shortdesc_or_name()), k->group_name);
-  act(buf, ch, 0, 0, TO_ROOM, 0);
+  act_to_room(buf, ch, 0, 0, 0);
 
   if (ch->isPlayer())
   {
@@ -111,7 +111,7 @@ command_return_t do_found(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_sprintf(buf, "You found: %s\r\n", argument);
   ch->send(buf);
   dc_sprintf(buf, "%s founds: %s", qPrintable(ch->shortdesc_or_name()), argument);
-  act(buf, ch, 0, 0, TO_ROOM, 0);
+  act_to_room(buf, ch, 0, 0, 0);
 
   if (ch->isPlayer())
   {
@@ -330,7 +330,7 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
       dc_sprintf(buf, "%s    $N (Leader)", report);
 
       if (IS_AFFECTED(k, AFF_GROUP))
-        act(buf, ch, 0, k, TO_CHAR, ASLEEP);
+        act_to_character(buf, ch, 0, k, ASLEEP);
 
       for (f = k->followers; f; f = f->next)
       {
@@ -339,7 +339,7 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
           j = f->follower;
           setup_group_buf(report, j, ch);
           dc_sprintf(buf, "%s    $N", report);
-          act(buf, ch, 0, f->follower, TO_CHAR, ASLEEP);
+          act_to_character(buf, ch, 0, f->follower, ASLEEP);
         }
       }
     }
@@ -366,7 +366,7 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (ch->master)
     {
-      act("You can not enroll group members without being head of a group.", ch, 0, 0, TO_CHAR, 0);
+      act_to_character("You can not enroll group members without being head of a group.", ch, 0, 0, 0);
       return ReturnValue::eFAILURE;
     }
 
@@ -397,14 +397,14 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
       if (IS_AFFECTED(victim, AFF_GROUP))
       {
         stop_grouped_bards(victim, 1);
-        act("$n has been kicked out of the group!", victim, 0, ch, TO_ROOM, 0);
-        act("You are no longer a member of the group!", victim, 0, 0, TO_CHAR, ASLEEP);
+        act_to_room("$n has been kicked out of the group!", victim, 0, ch, 0);
+        act_to_character("You are no longer a member of the group!", victim, 0, 0, ASLEEP);
         REMBIT(victim->affected_by, AFF_GROUP);
       }
       else
       {
-        act("$n is now a group member.", victim, 0, 0, TO_ROOM, 0);
-        act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
+        act_to_room("$n is now a group member.", victim, 0, 0, 0);
+        act_to_character("You are now a group member.", victim, 0, 0, ASLEEP);
         SETBIT(victim->affected_by, AFF_GROUP);
         if (victim->isPlayer())
           REMOVE_BIT(victim->player->toggles, Player::PLR_LFG);
@@ -412,10 +412,10 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
       //    }
       //  else
-      //	  act("$n is not of the right caliber to join this group.", victim, 0, 0, TO_ROOM, ASLEEP);
+      //	  act_to_room("$n is not of the right caliber to join this group.", victim, 0, 0,  ASLEEP);
     }
     else
-      act("$N must follow you, to enter the group.", ch, 0, victim, TO_CHAR, ASLEEP);
+      act_to_character("$N must follow you, to enter the group.", ch, 0, victim, ASLEEP);
   }
   return ReturnValue::eFAILURE;
 }
@@ -486,7 +486,7 @@ command_return_t do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
                   "the New Leader of: %s",
              qPrintable(ch->shortdesc_or_name()), ch->group_name,
              qPrintable(ch->shortdesc_or_name()), qPrintable(new_new_leader->shortdesc_or_name()), ch->group_name);
-  act(buf, ch, 0, new_new_leader, TO_ROOM, NOTVICT);
+  act_to_room(buf, ch, 0, new_new_leader, NOTVICT);
 
   if (ch->isPlayer() && new_new_leader->isPlayer())
   {
@@ -527,7 +527,7 @@ command_return_t do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString name[MAX_INPUT_LENGTH + 1];
+  QString name;
   QString buf;
   CharacterPtr adios, k;
   follow_type *f, *next_f;
@@ -563,9 +563,9 @@ command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     k = ch;
     dc_sprintf(buf, "You disband your group: %s", k->group_name);
-    act(buf, k, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, k, 0, 0, 0);
     dc_sprintf(buf, "$n disbands $s group: %s", k->group_name);
-    act(buf, k, 0, 0, TO_ROOM, 0);
+    act_to_room(buf, k, 0, 0, 0);
 
     k->group_name = {};
     k->group_name = {};
@@ -631,7 +631,7 @@ command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString name[MAX_INPUT_LENGTH + 1];
+  QString name;
   CharacterPtr leader;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -669,7 +669,7 @@ command_return_t do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master))
   {
-    act("But you only feel like following $N!", ch, 0, ch->master, TO_CHAR, 0);
+    act_to_character("But you only feel like following $N!", ch, 0, ch->master, 0);
   }
   else
   { /* Not Charmed follow person */

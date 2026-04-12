@@ -101,9 +101,9 @@ command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         do_say(victim, "Laaaaaaast Christmas, I gave you my....");
       }
-      act("$N blinks and stares glassy-eyed into the distance blissfully no longer aware of $n RIPPING OUT $S $B$4heart$R!", ch, 0, victim, TO_ROOM, NOTVICT);
-      act("You feel empty inside and full of heart-ache as if something important to you is missing.  Memories flash of your longing fo....", ch, 0, victim, TO_VICT, 0);
-      act("You slide your fingers between $N's ribs and give $S's left ventricle a tickle with your pinky before RIPPING OUT $S heart.", ch, 0, victim, TO_CHAR, 0);
+      act_to_room("$N blinks and stares glassy-eyed into the distance blissfully no longer aware of $n RIPPING OUT $S $B$4heart$R!", ch, 0, victim, NOTVICT);
+      act_to_victim("You feel empty inside and full of heart-ache as if something important to you is missing.  Memories flash of your longing fo....", ch, 0, victim, 0);
+      act_to_character("You slide your fingers between $N's ribs and give $S's left ventricle a tickle with your pinky before RIPPING OUT $S heart.", ch, 0, victim, 0);
       dam = 9999999;
     }
     else
@@ -265,35 +265,35 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->isImmortalPlayer() && victim->isImmortalPlayer())
   {
-    act_return ar = act("Due to immortal magic, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
+    act_return ar = act_to_victim("Due to immortal magic, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("Due to immortal magic, $N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    ar = act_to_room("Due to immortal magic, $N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, NOTVICT);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("$n's stun reflects back to them!", ch, nullptr, victim, TO_ROOM, 0);
+    ar = act_to_room("$n's stun reflects back to them!", ch, nullptr, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("Due to immortal magic, $N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, 0);
+    ar = act_to_character("Due to immortal magic, $N shakes off your attempt to immobilize them.", ch, nullptr, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("Your stun is reflected back to yourself!", ch, nullptr, nullptr, TO_CHAR, 0);
+    ar = act_to_character("Your stun is reflected back to yourself!", ch, nullptr, nullptr, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
@@ -323,7 +323,7 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    act("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, TO_CHAR, 0);
+    act_to_character("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -335,21 +335,21 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BERSERK) && (victim->isNonPlayer() || victim->has_skill(SKILL_BERSERK) > 80))
   {
-    act_return ar = act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
+    act_return ar = act_to_victim("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    ar = act_to_room("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, NOTVICT);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, 0);
+    ar = act_to_character("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
@@ -359,21 +359,21 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if ((!skill_success(ch, victim, SKILL_STUN) && GET_POS(victim) != position_t::SLEEPING) || do_frostshield(ch, victim))
   {
-    act_return ar = act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, nullptr, victim, TO_VICT, 0);
+    act_return ar = act_to_victim("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, nullptr, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, nullptr, victim, TO_CHAR, 0);
+    ar = act_to_character("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, nullptr, victim, 0);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
       return retval;
     }
 
-    ar = act("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    ar = act_to_room("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, nullptr, victim, NOTVICT);
     retval = ar.retval;
     if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
     {
@@ -397,21 +397,21 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
     if (isSet(victim->combat, COMBAT_STUNNED) ||
         isSet(victim->combat, COMBAT_STUNNED2))
     {
-      act_return ar = act("$n delivers another HARD BLOW to your solar plexus!", ch, nullptr, victim, TO_VICT, 0);
+      act_return ar = act_to_victim("$n delivers another HARD BLOW to your solar plexus!", ch, nullptr, victim, 0);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
         return retval;
       }
 
-      ar = act("You deliver another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, TO_CHAR, 0);
+      ar = act_to_character("You deliver another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, 0);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
         return retval;
       }
 
-      ar = act("$n delivers another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+      ar = act_to_room("$n delivers another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, NOTVICT);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
@@ -421,7 +421,7 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
       if (number(0, 1))
       {
         victim->sendln("The hit knocks the sense back into you!");
-        act_return ar = act("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, TO_ROOM, NOTVICT);
+        act_return ar = act_to_room("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, NOTVICT);
         retval = ar.retval;
         if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
         {
@@ -438,21 +438,21 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
         number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      ar = act("$N's heightened battlesense sees your stun coming from a mile away and $E easily blocks it.", ch, 0, victim, TO_CHAR, 0);
+      ar = act_to_character("$N's heightened battlesense sees your stun coming from a mile away and $E easily blocks it.", ch, 0, victim, 0);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
         return retval;
       }
 
-      ar = act("Your heightened battlesense sees $n's stun coming from a mile away and you easily block it.", ch, 0, victim, TO_VICT, 0);
+      ar = act_to_victim("Your heightened battlesense sees $n's stun coming from a mile away and you easily block it.", ch, 0, victim, 0);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
         return retval;
       }
 
-      ar = act("$N's heightened battlesense sees $n's stun coming from a mile away and $N easily blocks it.", ch, 0, victim, TO_ROOM, NOTVICT);
+      ar = act_to_room("$N's heightened battlesense sees $n's stun coming from a mile away and $N easily blocks it.", ch, 0, victim, NOTVICT);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
@@ -461,21 +461,21 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ar = act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, nullptr, victim, TO_VICT, 0);
+      ar = act_to_victim("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, nullptr, victim, 0);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
         return retval;
       }
 
-      ar = act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, TO_CHAR, 0);
+      ar = act_to_character("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, 0);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {
         return retval;
       }
 
-      ar = act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+      ar = act_to_room("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, NOTVICT);
       retval = ar.retval;
       if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))
       {

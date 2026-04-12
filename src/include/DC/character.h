@@ -7,7 +7,6 @@
 */
 #include "DC/db.h"
 
-bool on_forbidden_name_list(const QString name);
 QString color_to_code(QString color);
 
 constexpr auto MAX_GOLEMS = 2; // amount of golems above +1

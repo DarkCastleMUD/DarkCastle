@@ -157,8 +157,8 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       return logcmd.setReturn(ReturnValue::eFAILURE, "berserk");
     }
     REMOVE_BIT(combat, COMBAT_BERSERK);
-    act("$n settles down.", this, 0, 0, TO_ROOM, 0);
-    act("You settle down.", this, 0, 0, TO_CHAR, 0);
+    act_to_room("$n settles down.", this, 0, 0, 0);
+    act_to_character("You settle down.", this, 0, 0, 0);
     GET_AC(this) -= 30;
   }
 
@@ -309,12 +309,12 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         if (found->toggle_hide == 0) {
           REMBIT(this->affected_by, AFF_HIDE);
           dc_sprintf(buf, "You emerge from your hidden position...\r\n");
-          act(buf, this, 0, 0, TO_CHAR, 0);
+          act_to_character(buf, this, 0, 0,  0);
           }
         if ((found->toggle_hide > 1) && (number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
           REMBIT(this->affected_by, AFF_HIDE);
           dc_sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
-          act(buf, this, 0, 0, TO_CHAR, 0);
+          act_to_character(buf, this, 0, 0,  0);
           }
         }
       */
@@ -668,7 +668,7 @@ void automail(QString name)
   QString buf;
 
   blah = fopen("../lib/whassup.txt", "w");
-  qfprintf(blah, "%s", name);
+  dc_fprintf(blah, "%s", name);
   fclose(blah);
   dc_sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
@@ -855,7 +855,7 @@ void chop_half(QString str, QString arg1, QString arg2)
   }
 
   // copy last word to arg1
-  strncpy(arg1, str + i + 1, j);
+  dc_strncpy(arg1, str + i + 1, j);
   arg1[j] = '\0';
 
   // skip over leading space in str
@@ -866,7 +866,7 @@ void chop_half(QString str, QString arg1, QString arg2)
   }
 
   // copy str to arg2
-  strncpy(arg2, str, i);
+  dc_strncpy(arg2, str, i);
 
   // remove trailing space from arg2
   while (isspace(arg2[i]))

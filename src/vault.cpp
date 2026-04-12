@@ -251,7 +251,7 @@ const QString imm_vault_usage = "        vault <stats> [name]\r\n";
 
 command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg{}, arg1[MAX_INPUT_LENGTH]{}, arg2[MAX_INPUT_LENGTH] = {};
+  QString arg{}, arg1{}, arg2 = {};
 
   half_chop(argument, arg, arg1);
 
@@ -270,7 +270,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (!str_cmp(arg1, "clan") && ch->clan)
-    strcpy(arg1, qPrintable(clanVName(ch->clan)));
+    dc_strcpy(arg1, qPrintable(clanVName(ch->clan)));
 
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", strlen(arg)))
@@ -319,7 +319,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
         // Clan leader or a clan member with the vaultlog right can view log.
-        if ((clan->leader && !strcmp(clan->leader, qPrintable(ch->name()))) || has_right(ch, CLAN_RIGHTS_VAULTLOG))
+        if ((clan->leader && !dc_strcmp(clan->leader, qPrintable(ch->name()))) || has_right(ch, CLAN_RIGHTS_VAULTLOG))
         {
           std::stringstream clanName;
 
@@ -376,7 +376,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
-        strcpy(arg2, qPrintable(clanVName(ch->clan)));
+        dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
       }
       else if (!*arg2)
       {
@@ -400,7 +400,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
-        strcpy(arg2, qPrintable(clanVName(ch->clan)));
+        dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
       }
       else if (!*arg2)
       {
@@ -420,7 +420,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     half_chop(arg1, argument, arg2);
     if (!str_cmp(arg2, "clan") && ch->clan)
-      strcpy(arg2, qPrintable(clanVName(ch->clan)));
+      dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
     if (!*argument)
     {
       ch->sendln("What item would you like to place in the vault?");
@@ -436,7 +436,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     half_chop(arg1, argument, arg2);
     if (!str_cmp(arg2, "clan") && ch->clan)
-      strcpy(arg2, qPrintable(clanVName(ch->clan)));
+      dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
 
     if (!*argument)
     {
@@ -463,7 +463,7 @@ void Character::vault_stats(QString name)
   vault_access_data *access;
   ObjectPtr obj;
   qint32 items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = {};
-  QString buf, buf1[MAX_STRING_LENGTH];
+  QString buf, buf1;
 
   dc_sprintf(buf, "###) Character Name        Gold     Items (Unique) Item Weight/Vault Weight/Vault Max Weight Access   Errors\r\n");
   for (vault = vault_table; vault; vault = vault->next, num++)
@@ -490,9 +490,9 @@ void Character::vault_stats(QString name)
     }
 
     dc_snprintf(buf1, sizeof(buf1), "%3d) %-15s $B$5%10lu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
-             count, qPrintable(vault->owner), vault->gold, items, unique, weight, vault->weight, vault->size, accesses, weight != vault->weight ? "$5mismatch$R" : "$1    none$R");
+                count, qPrintable(vault->owner), vault->gold, items, unique, weight, vault->weight, vault->size, accesses, weight != vault->weight ? "$5mismatch$R" : "$1    none$R");
     if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH * 4)
-      strcat(buf, buf1);
+      dc_strcat(buf, buf1);
     else
       skipped++;
 
@@ -621,13 +621,13 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
   switch (backup)
   {
   case SELFDELETED:
-    strncpy(dst_dir, "../archive/selfdeleted/", 256);
+    dc_strncpy(dst_dir, "../archive/selfdeleted/", 256);
     break;
   case CONDEATH:
-    strncpy(dst_dir, "../archive/condeath/", 256);
+    dc_strncpy(dst_dir, "../archive/condeath/", 256);
     break;
   case ZAPPED:
-    strncpy(dst_dir, "../archive/zapped/", 256);
+    dc_strncpy(dst_dir, "../archive/zapped/", 256);
     break;
   case NONE:
     break;
@@ -974,7 +974,7 @@ void DC::load_vaults(void)
   FILE *fl = {}, *index = {};
   qint32 vnum = 0, full = 0, count = {};
   quint64 gold = {};
-  QString value = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, filename[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
+  QString value = {}, line[128] = {}, buf = {}, filename = {}, type[128] = {}, tmp[10] = {};
   bool saveChanges = false;
   QString src_filename = {};
 
@@ -1047,7 +1047,7 @@ void DC::load_vaults(void)
             DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
             FILE *oldfl;
-            QString oldfname, oldtype[MAX_INPUT_LENGTH];
+            QString oldfname, oldtype;
 
             dc_sprintf(oldfname, "../vaults.old/%c/%s.vault", UPPER(*line), line);
             if(!(oldfl = fopen(oldfname, "r"))) {
@@ -1105,14 +1105,14 @@ void DC::load_vaults(void)
           if (full)
           {
             // Skip the rest of the full item
-            while (strcmp(type, "S") != 0)
+            while (dc_strcmp(type, "S") != 0)
             {
               get_line(fl, type);
             }
           }
 
           dc_snprintf(buf, sizeof(buf), "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
-                   qPrintable(vault->owner));
+                      qPrintable(vault->owner));
           DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
           saveChanges = true;
         }
@@ -1493,7 +1493,7 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
 
       for (qint32 j = {}; j < items->count; j++, i++)
       {
-        strncpy(obj_list[i], qPrintable(fname(obj->name())), sizeof(obj_list[i]));
+        dc_strncpy(obj_list[i], qPrintable(fname(obj->name())), sizeof(obj_list[i]));
         if (i > 49)
         {
           ch->send("You can only take out 50 items at a time.\r\n");
@@ -1579,7 +1579,7 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
 
     sbuf = QStringLiteral("%1 removed %2(v%3) from %4's vault.").arg(ch->name()).arg(GET_OBJ_SHORT(obj)).arg(QString::number(GET_OBJ_VNUM(obj))).arg(owner);
     logvault(sbuf, owner);
-    act(sbuf, ch, 0, 0, TO_ROOM, GODS);
+    act_to_room(sbuf, ch, 0, 0, GODS);
     ch->send(QStringLiteral("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
     item_remove(obj, vault);
@@ -1716,7 +1716,7 @@ void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
   qint32 self = {};
 
   owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, qPrintable(ch->name())))
+  if (!dc_strcmp(owner, qPrintable(ch->name())))
     self = 1;
 
   if (!(vault = has_vault(owner)))
@@ -1772,7 +1772,7 @@ void Character::vault_withdraw(quint32 amount, QString owner)
   qint32 self = {};
 
   owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, qPrintable(ch->name())))
+  if (!dc_strcmp(owner, qPrintable(ch->name())))
     self = 1;
 
   if (!(vault = has_vault(owner)))
@@ -1956,7 +1956,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
       sbuf += owner;
       sbuf += "'s vault.";
 
-      act(sbuf, ch, 0, 0, TO_ROOM, GODS);
+      act_to_room(sbuf, ch, 0, 0, GODS);
 
       if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
       {
@@ -2184,7 +2184,7 @@ void add_new_vault(const QString name, qint32 indexonly)
 {
   FILE *vfl, *tvfl, *pvfl;
   Vault *vault;
-  QString filename, line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+  QString filename, line, buf;
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
     DC::getInstance()->logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -2202,13 +2202,13 @@ void add_new_vault(const QString name, qint32 indexonly)
     fscanf(vfl, "%s\n", line);
     while (*line != '$')
     {
-      qfprintf(tvfl, "%s\n", line);
+      dc_fprintf(tvfl, "%s\n", line);
       fscanf(vfl, "%s\n", line);
     }
   }
   // we found $, now add in the new name, then the $
-  qfprintf(tvfl, "%s\n", name);
-  qfprintf(tvfl, "$\n");
+  dc_fprintf(tvfl, "%s\n", name);
+  dc_fprintf(tvfl, "$\n");
   fclose(tvfl);
   if (vfl)
   {
@@ -2231,10 +2231,10 @@ void add_new_vault(const QString name, qint32 indexonly)
   }
 
   if (ch)
-    qfprintf(pvfl, "S %llu\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
+    dc_fprintf(pvfl, "S %llu\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
   else
-    qfprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
-  qfprintf(pvfl, "$\n");
+    dc_fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
+  dc_fprintf(pvfl, "$\n");
   fclose(pvfl);
 
   dc_sprintf(buf, "%s bought a vault.", name);
@@ -2263,7 +2263,7 @@ CharacterPtr find_owner(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   const auto &result = std::find_if(character_list.begin(), character_list.end(), [&name](const auto &ch)
-                               {
+                                    {
     if (name == qPrintable(ch->name()) && ch->isPlayer())
     {
 			return true;
@@ -2283,13 +2283,13 @@ void vault_log(CharacterPtr ch, QString owner)
   QString buf;
   QString fname;
 
-  if (!strcmp(owner, qPrintable(clanVName(ch->clan))))
+  if (!dc_strcmp(owner, qPrintable(clanVName(ch->clan))))
   {
-    strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
+    dc_strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
   }
   else
   {
-    strncpy(buf, "The following are your most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
+    dc_strncpy(buf, "The following are your most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
   }
 
   owner[0] = UPPER(owner[0]);
@@ -2309,7 +2309,7 @@ void logvault(QString message, QString name)
   tm *tm = {};
   time_t ct;
   FILE *ofile, *nfile;
-  QString buf, line[MAX_INPUT_LENGTH];
+  QString buf, line;
   QString fname, nfname[256];
   qint32 lines = 1;
   QString mins, hours[5];
@@ -2342,7 +2342,7 @@ void logvault(QString message, QString name)
       DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
-    qfprintf(ofile, "$\n");
+    dc_fprintf(ofile, "$\n");
     fclose(ofile);
     if (!(ofile = fopen(fname, "r")))
     {
@@ -2373,15 +2373,15 @@ void logvault(QString message, QString name)
     dc_sprintf(hours, "%d", tm->tm_hour);
 
   dc_sprintf(buf, "%s %d %s:%s", months[tm->tm_mon], tm->tm_mday, hours, mins);
-  qfprintf(nfile, "%s :: %s\n", buf, qPrintable(message));
+  dc_fprintf(nfile, "%s :: %s\n", buf, qPrintable(message));
 
   get_line(ofile, line);
   while (*line != '$' && lines++ < 500)
   {
-    qfprintf(nfile, "%s\n", line);
+    dc_fprintf(nfile, "%s\n", line);
     get_line(ofile, line);
   }
-  qfprintf(nfile, "$\n");
+  dc_fprintf(nfile, "$\n");
 
   fclose(nfile);
   fclose(ofile);
@@ -2398,7 +2398,7 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
     return ReturnValue::eFAILURE;
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
-  QString arg1, buf[MAX_STRING_LENGTH];
+  QString arg1, buf;
   arg = one_argument(arg, arg1);
 
   Vault *vault = has_vault(qPrintable(ch->name()));

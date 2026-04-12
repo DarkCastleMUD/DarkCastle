@@ -225,8 +225,8 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (wand->obj_flags.value[1] == 0) // no total charges left
     {
-      act("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, TO_CHAR, 0);
-      act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
+      act_to_character("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, 0);
+      act_to_room("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, 0);
       make_scraps(ch, wand);
       extract_obj(wand);
       return ReturnValue::eSUCCESS;
@@ -236,27 +236,27 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
     if (wand->obj_flags.value[2] >= wand->obj_flags.value[1])
     {
       wand->obj_flags.value[2] = wand->obj_flags.value[1];
-      act("You focus your arcane powers and imbue them into $p restoring its full charge!", ch, wand, 0, TO_CHAR, 0);
+      act_to_character("You focus your arcane powers and imbue them into $p restoring its full charge!", ch, wand, 0, 0);
     }
     else
     {
       dc_sprintf(buf, "You focus your arcane powers and imbue them into $p restoring %d charges!", charges);
-      act(buf, ch, wand, 0, TO_CHAR, 0);
+      act_to_character(buf, ch, wand, 0, 0);
     }
 
     ch->sendln("As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.");
-    act("$n focuses $s arcane powers and imbues them into $p!", ch, wand, 0, TO_ROOM, 0);
-    act("As $e finishes, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.", ch, wand, 0, TO_ROOM, 0);
+    act_to_room("$n focuses $s arcane powers and imbues them into $p!", ch, wand, 0, 0);
+    act_to_room("As $e finishes, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.", ch, wand, 0, 0);
   }
   else
   { // failure
-    act("You focus your arcane powers on $p but fail to restore its powers.", ch, wand, 0, TO_CHAR, 0);
-    act("$n focuses $s arcane powers on $p to no effect.", ch, wand, 0, TO_ROOM, 0);
+    act_to_character("You focus your arcane powers on $p but fail to restore its powers.", ch, wand, 0, 0);
+    act_to_room("$n focuses $s arcane powers on $p to no effect.", ch, wand, 0, 0);
 
     if (wand->obj_flags.value[2] == 0) // no current charges left
     {
-      act("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, TO_CHAR, 0);
-      act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
+      act_to_character("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, 0);
+      act_to_room("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, 0);
       make_scraps(ch, wand);
       extract_obj(wand);
       return ReturnValue::eSUCCESS;
@@ -266,10 +266,10 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
     if (wand->obj_flags.value[2] <= 0)
     {
       wand->obj_flags.value[2] = {};
-      act("The energy in $p has been completely lost!", ch, wand, 0, TO_CHAR, 0);
+      act_to_character("The energy in $p has been completely lost!", ch, wand, 0, 0);
     }
     else
-      act("Some of the energy in $p has been lost!", ch, wand, 0, TO_CHAR, 0);
+      act_to_character("Some of the energy in $p has been lost!", ch, wand, 0, 0);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -364,8 +364,8 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
           (ally->master && ally->master == i->master) // or we share the same group leader
       )
       {
-        act("$n's magically sharpened reflexes direct attacks at you as you enter the room!", i, 0, ch, TO_VICT, 0);
-        act("You attack $N with supernaturally focused reflexes!", ally, 0, ch, TO_CHAR, 0);
+        act_to_victim("$n's magically sharpened reflexes direct attacks at you as you enter the room!", i, 0, ch, 0);
+        act_to_character("You attack $N with supernaturally focused reflexes!", ally, 0, ch, 0);
         WAIT_STATE(ally, DC::PULSE_VIOLENCE * 2);
 
         if (trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL)

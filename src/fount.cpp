@@ -51,13 +51,13 @@ command_return_t do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!*buf) /* No arguments */
   {
-    act("What do you want to fill?", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("What do you want to fill?", ch, 0, 0, 0);
     return 1;
   }
 
   if (!(to_obj = get_obj_in_list_vis(ch, buf, ch->carrying)))
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't find it!", ch, 0, 0, 0);
     return 1;
   }
 
@@ -66,24 +66,24 @@ command_return_t do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (to_obj->obj_flags.type_flag != ITEM_DRINKCON)
     {
-      act("You can't pour anything into that.", ch, 0, 0, TO_CHAR, 0);
+      act_to_character("You can't pour anything into that.", ch, 0, 0, 0);
       return 1;
     }
 
     if ((to_obj->obj_flags.value[1] != 0) &&
         (to_obj->obj_flags.value[2] != 0))
     {
-      act("There is already another liquid in it!", ch, 0, 0, TO_CHAR, 0);
+      act_to_character("There is already another liquid in it!", ch, 0, 0, 0);
       return 1;
     }
 
     if (!(to_obj->obj_flags.value[1] < to_obj->obj_flags.value[0]))
     {
-      act("There is no room for more.", ch, 0, 0, TO_CHAR, 0);
+      act_to_character("There is no room for more.", ch, 0, 0, 0);
       return 1;
     }
 
-    act("You fill $p!", ch, to_obj, 0, TO_CHAR, 0);
+    act_to_character("You fill $p!", ch, to_obj, 0, 0);
 
     /* First same type liq. */
     to_obj->obj_flags.value[2] = {};
@@ -93,7 +93,7 @@ command_return_t do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    act("There is no fountain here!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("There is no fountain here!", ch, 0, 0, 0);
   }
 
   return 1;

@@ -1,7 +1,6 @@
 #include "DC/DC.h"
 #include "DC/comm.h"
 #include "DC/db.h"
-#include "DC/handler.h"
 #include "DC/terminal.h"
 #include "DC/const.h"
 #include "DC/comm.h"
@@ -75,22 +74,10 @@ bool Mobile::isObject(void)
 QString Player::getJoining(void)
 {
   QString buffer;
-  for (joining_t::const_iterator i = joining.begin(); i != joining.end(); ++i)
-  {
-    if (conn->value())
-    {
-      if (buffer.isEmpty())
-      {
-        buffer = conn->key();
-      }
-      else
-      {
-        buffer += " " + conn->key();
-      }
-    }
-  }
-
-  return buffer;
+  for (const auto &[key, value] : joining.asKeyValueRange())
+    if (value)
+      buffer += key + u" "_s;
+  return buffer.trimmed();
 }
 
 void Player::setJoining(QString list)
@@ -105,15 +92,10 @@ void Player::setJoining(QString list)
 
 void Player::toggleJoining(QString key)
 {
-  joining_t::iterator i = joining.find(key);
-  if (i == joining.end())
-  {
-    joining.insert(key, true);
-  }
+  if (joining.contains(key))
+    joining[key] = !joining[key];
   else
-  {
-    joining.insert(key, !conn->value());
-  }
+    joining[key] = true;
 }
 
 PlayerConfig::PlayerConfig(QObject *parent)
@@ -322,7 +304,7 @@ bool Character::validateName(QString name)
     }
   }
 
-  if (on_forbidden_name_list(qPrintable(name)))
+  if (on_forbidden_name_list(name))
   {
     return false;
   }
@@ -475,8 +457,11 @@ const QStringList Object::apply_types =
 
 Sockets::Sockets(CharacterPtr ch, QString searchkey)
 {
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &conn : DC::getInstance()->connections_)
   {
+    if (!conn)
+      continue;
+
     if (ch->getLevel() < OVERSEER)
     {
       if (conn->character == nullptr)

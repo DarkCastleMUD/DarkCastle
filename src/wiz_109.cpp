@@ -65,8 +65,8 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   isr_set(new_new);
 
   char_to_room(new_new, in_room);
-  act("$n gestures sharply and $N comes into existence!", this, 0, new_new, TO_ROOM, 0);
-  act("You linkload $N.", this, 0, new_new, TO_CHAR, 0);
+  act_to_room("$n gestures sharply and $N comes into existence!", this, 0, new_new, 0);
+  act_to_character("You linkload $N.", this, 0, new_new, 0);
   DC::getInstance()->logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", qPrintable(this->name()), qPrintable(new_new->name()));
   return ReturnValue::eSUCCESS;
 }
@@ -77,7 +77,7 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
   QString tmp;
   QString buf;
 
-  strcpy(buf, "ps -ux > ../lib/whassup.txt");
+  dc_strcpy(buf, "ps -ux > ../lib/whassup.txt");
 
   system(buf);
 
@@ -87,7 +87,7 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
                                 DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
-  if (qfprintf(fl, "~\n") < 0)
+  if (dc_fprintf(fl, "~\n") < 0)
   {
     fclose(fl);
     ch->sendln("Failure writing to transition file.");

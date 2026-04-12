@@ -5,24 +5,61 @@
 */
 #include "DC/DC.h"
 #include "DC/comm.h"
-#include "DC/act.h"
-#include "DC/token.h"
-#include "DC/spells.h"
-#include "DC/affect.h"
-#include "DC/utility.h"
 
 #include <QString>
 
 extern bool MOBtrigger;
 
+constexpr auto TO_ROOM = 0;           // Everyone in ch's room except ch
+constexpr auto TO_VICT = 1;           // Just vict_obj
+constexpr auto TO_CHAR = 2;           // Just ch
+constexpr auto TO_ZONE = 3;           // Everyone in ch's zone except ch
+constexpr auto TO_WORLD = 4;          // Everyone in the world except ch
+constexpr auto TO_GROUP = 5;          // Everyone in the ch's group except ch
+constexpr auto TO_ROOM_NOT_GROUP = 6; // Everyone in ch's room except ch's group or ch
+
+act_return act_to_room(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
+{
+  return act_to_room(str, ch, obj, vict_obj, TO_ROOM, flags);
+}
+
+act_return act_to_victim(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
+{
+  return act_to_room(str, ch, obj, vict_obj, TO_VICT, flags);
+}
+
+act_return act_to_character(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
+{
+  return act_to_room(str, ch, obj, vict_obj, TO_CHAR, flags);
+}
+
+act_return act_to_zone(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
+{
+  return act_to_room(str, ch, obj, vict_obj, TO_ZONE, flags);
+}
+
+act_return act_to_world(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
+{
+  return act_to_room(str, ch, obj, vict_obj, TO_WORLD, flags);
+}
+
+act_return act_to_group(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
+{
+  return act_to_room(str, ch, obj, vict_obj, TO_GROUP, flags);
+}
+
+act_return act_to_room_not_group(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
+{
+  return act_to_room(str, ch, obj, vict_obj, TO_ROOM_NOT_GROUP, flags);
+}
+
 act_return act(
     QString str,        // Buffer
     CharacterPtr ch,    // Character from
     ObjectPtr obj,      // Object
-    void *vict_obj,     // Victim object
+    auto vict_obj,      // Victim object
     qint16 destination, // Destination flags
-    qint16 flags        // Optional flags
-)
+    qint16 flags)
 {
   class Connection *i;
   qint32 retval = {};
@@ -55,7 +92,7 @@ act_return act(
 
   if (destination == TO_VICT)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (CharacterPtr)vict_obj);
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, vict_obj);
     retval |= st_return.retval;
     ar.str = st_return.str;
     ar.retval = retval;
@@ -108,7 +145,7 @@ act_return act(
       ar.retval = ReturnValue::eFAILURE;
       return ar;
     }
-    for (auto &i : DC::getInstance()->connections_)
+    for (auto &conn : DC::getInstance()->connections_)
     {
       // Dropped link or they're not really playing and no force flag, don't send.
       if (!conn->character || conn->character == ch)
@@ -148,7 +185,7 @@ void send_message(QString str, CharacterPtr to)
   write_to_output(str, to->desc);
 }
 
-send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, ObjectPtr obj, void *vict_obj, qint32 flags, CharacterPtr to)
+send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint32 flags, CharacterPtr to)
 {
   qint32 retval = {};
   QString buf = tokens->Interpret(ch, obj, vict_obj, to, flags);

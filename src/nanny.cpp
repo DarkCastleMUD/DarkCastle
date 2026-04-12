@@ -774,33 +774,22 @@ void Character::set_hw(void)
 // Deal with sockets that haven't logged in yet.
 void DC::nanny(class Connection *d, QString arg)
 {
-  QString buf;
-  std::stringstream str_tmp;
-  QString tmp_name;
-  QString password;
-  CharacterPtr ch;
-  qint32 y;
-  QString badclssmsg = "You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> ";
-  quint32 selection = {};
-  auto &character_list = DC::getInstance()->character_list;
-  QString log_buf = {};
-  QString buffer;
+  auto badclssmsg = u"You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> "_s;
+  auto ch = conn->character;
+  arg = arg.trimmed();
 
-  ch = conn->character;
-  arg.erase(0, arg.find_first_not_of(' '));
-
-  if (!str_prefix("help", arg.c_str()) &&
-      (conn->connected == Connection::states::OLD_GET_CLASS ||
-       conn->connected == Connection::states::OLD_GET_RACE ||
-       conn->connected == Connection::states::OLD_CHOOSE_STATS ||
-       conn->connected == Connection::states::GET_CLASS ||
-       conn->connected == Connection::states::GET_RACE ||
-       conn->connected == Connection::states::GET_STATS))
-  {
-    arg.erase(0, 4);
-    do_new_help(conn->character, arg.data(), cmd_t::PAGING_HELP);
-    return;
-  }
+  if (!str_prefix("help", arg))
+    switch (conn->connected)
+    {
+    case Connection::states::OLD_GET_CLASS:
+    case Connection::states::OLD_GET_RACE:
+    case Connection::states::OLD_CHOOSE_STATS:
+    case Connection::states::GET_STATS:
+      arg.erase(0, 4);
+      do_new_help(conn->character, arg.data(), cmd_t::PAGING_HELP);
+      return;
+      break;
+    }
 
   load_status_t ls = {};
   switch (conn->connected)
@@ -879,7 +868,7 @@ void DC::nanny(class Connection *d, QString arg)
     }
   case Connection::states::GET_NAME:
 
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       write_to_output("Empty name.  Disconnecting...", d);
       close_socket(d);
@@ -1695,7 +1684,7 @@ void DC::nanny(class Connection *d, QString arg)
       // by logging in twice, and leaving one at the password: prompt
       if (ch->getLevel() > 0)
       {
-        strcpy(tmp_name, qPrintable(ch->name()));
+        dc_strcpy(tmp_name, qPrintable(ch->name()));
         free_char(conn->character, Trace("nanny Connection::states::SELECT_MENU 1"));
         conn->character = {};
         load_char_obj(d, tmp_name);
@@ -1742,7 +1731,7 @@ void DC::nanny(class Connection *d, QString arg)
       if (ch->getLevel() < OVERSEER)
         clan_login(ch);
 
-      act("$n has entered the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+      act_to_room("$n has entered the game.", ch, 0, 0, INVIS_NULL);
       if (!GET_SHORT_ONLY(ch))
         ch->short_description(ch->name());
       DC::getInstance()->update_wizlist(ch);
@@ -1910,13 +1899,13 @@ void DC::nanny(class Connection *d, QString arg)
     {
       QString blah1, blah2[50];
       // this prevents a dupe bug
-      strcpy(blah1, qPrintable(ch->name()));
-      strcpy(blah2, ch->player->pwd);
+      dc_strcpy(blah1, qPrintable(ch->name()));
+      dc_strcpy(blah2, ch->player->pwd);
       free_char(conn->character, Trace("nanny Connection::states::CONFIRM_RESET_PASSWORD"));
       conn->character = {};
       load_char_obj(d, blah1);
       ch = conn->character;
-      strcpy(ch->player->pwd, blah2);
+      dc_strcpy(ch->player->pwd, blah2);
       ch->save_char_obj();
       dc_sprintf(log_buf, "%s password changed", qPrintable(ch->name()));
       DC::getInstance()->logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
@@ -1945,15 +1934,11 @@ qint32 _parse_email(QString arg)
 }
 
 // Parse a name for acceptability.
-qint32 _parse_name(const QString arg, QString name)
+bool _parse_name(QString arg, QString name)
 {
-  qint32 i;
+  arg = arg.trimmed();
 
-  /* skip whitespaces */
-  for (; isspace(*arg); arg++)
-    ;
-
-  for (i = {}; (name[i] = arg[i]) != '\0'; i++)
+  for (auto i = 0U; (name[i] = arg[i]) != '\0'; i++)
   {
     if (name[i] < 0 || !isalpha(name[i]) || i >= MAX_NAME_LENGTH)
       return 1;
@@ -2012,7 +1997,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
     // removed 8/29/02..i think this might be related to the bug causing people
     // to morph into other people
     // if(conn->character->player)
-    //  strncpy( conn->character->player->pwd, tmp_ch->player->pwd, PASSWORD_LEN );
+    //  dc_strncpy( conn->character->player->pwd, tmp_ch->player->pwd, PASSWORD_LEN );
     //      }
     //      else {
 
@@ -2025,7 +2010,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
       tmp_ch->sendln("Reconnecting.");
 
       QString log_buf = QStringLiteral("%1@%2 has reconnected.").arg(qPrintable(tmp_ch->name())).arg(conn->getPeerOriginalAddress().toString());
-      act("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, TO_ROOM, INVIS_NULL);
+      act_to_room("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, INVIS_NULL);
 
       if (tmp_ch->isMortalPlayer())
       {
@@ -2132,7 +2117,7 @@ void remove_command_lag(CharacterPtr ch)
 void update_characters()
 {
   qint32 tmp, retval;
-  QString log_msg, dammsg[MAX_STRING_LENGTH];
+  QString log_msg, dammsg;
   affected_type af;
 
   const auto &character_list = DC::getInstance()->character_list;
@@ -2148,7 +2133,7 @@ void update_characters()
       else
       {
         i->send(QStringLiteral("You strain your muscles keeping the %s closed.\r\n").arg(qPrintable(fname(i->brace_at->keyword))));
-        act("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, TO_ROOM, 0);
+        act_to_room("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, 0);
       }
     }
     if (IS_AFFECTED(i, AFF_POISON) && !(i->affected_by_spell(SPELL_POISON)))
@@ -2368,11 +2353,11 @@ void checkConsecrate(qint32 pulseType)
               }
               if (GET_HIT(tmp_ch) - amount < 0)
               {
-                act("The strength of $N's desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
-                act("The strength of your desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
+                act_to_room("The strength of $N's desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, NOTVICT);
+                act_to_victim("The strength of your desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, 0);
                 if (tmp_ch->isPlayer())
                 {
-                  act("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
+                  act_to_character("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, 0);
                   tmp_ch->sendln("You have been KILLED!!\r\n");
                 }
                 group_gain(ch, tmp_ch);
@@ -2424,11 +2409,11 @@ void checkConsecrate(qint32 pulseType)
               }
               if (GET_HIT(tmp_ch) - amount < 0)
               {
-                act("The strength of $N's consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
-                act("The strength of your consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
+                act_to_room("The strength of $N's consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, NOTVICT);
+                act_to_victim("The strength of your consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, 0);
                 if (tmp_ch->isPlayer())
                 {
-                  act("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
+                  act_to_character("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, 0);
                   tmp_ch->sendln("You have been KILLED!!\r\n");
                 }
                 group_gain(ch, tmp_ch);
@@ -2458,7 +2443,7 @@ void checkConsecrate(qint32 pulseType)
 }
 
 /* check name to see if it is listed in the file of forbidden player names */
-bool on_forbidden_name_list(const QString name)
+bool DC::on_forbidden_name_list(QString name)
 {
   FILE *nameList;
   QString buf;

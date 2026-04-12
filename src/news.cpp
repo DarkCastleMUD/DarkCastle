@@ -68,10 +68,10 @@ void savenews()
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
     // This should be %ld but we need to through the existing news files 1st
-    qfprintf(fl, "%d %s~\n", (qint32)tmpnews->time, tmpnews->addedby);
+    dc_fprintf(fl, "%d %s~\n", (qint32)tmpnews->time, qPrintable(tmpnews->addedby));
     string_to_file(fl, tmpnews->news);
   }
-  qfprintf(fl, "0\n");
+  dc_fprintf(fl, "0\n");
   fclose(fl);
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
@@ -120,7 +120,7 @@ const QString newsify(QString string)
     if (*(string + i) == '\n' && i < (qint32)(strlen(string) - 1))
     {
       tmp[a++] = '\0';
-      strcat(tmp, "\n              ");
+      dc_strcat(tmp, "\n              ");
       a += 14;
     }
     else
@@ -158,7 +158,7 @@ command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
       continue;
     strftime(&timez[0], 10, "%d/%b/%y", gmtime(&tnews->time));
 
-    strcpy(old, buf);
+    dc_strcpy(old, buf);
     const QString newsstring = tnews->news;
     if (up)
       dc_sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,

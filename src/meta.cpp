@@ -864,8 +864,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       *pstat += 1;
       ch->player->statmetas++;
 
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", statplatprice, GET_PLATINUM(ch)));
 
       // affect the stat by 0 to reflect the new raw stat
@@ -899,8 +899,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       increase = 5;
       ch->raw_hit += increase;
       GET_HP_METAS(ch) += 5;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       return ReturnValue::eSUCCESS;
@@ -927,8 +927,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       increase = 1;
       ch->raw_hit += increase;
       GET_HP_METAS(ch) += 1;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       return ReturnValue::eSUCCESS;
@@ -954,8 +954,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       increase = 5;
       ch->raw_mana += increase;
       GET_MANA_METAS(ch) += 5;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
@@ -983,8 +983,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       increase = 1;
       ch->raw_mana += increase;
       GET_MANA_METAS(ch) += 1;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
@@ -1008,8 +1008,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->raw_move += 5;
       ch->max_move += 5;
       GET_MOVE_METAS(ch) += 5;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
@@ -1037,8 +1037,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->raw_move += 1;
       ch->max_move += 1;
       GET_MOVE_METAS(ch) += 1;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
@@ -1068,8 +1068,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->raw_ki += 1;
       GET_KI_METAS(ch) += 1;
       redo_ki(ch);
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", ki_cost, GET_PLATINUM(ch)));
       return ReturnValue::eSUCCESS;
     }
@@ -1168,8 +1168,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->exp -= 100000000;
       ch->addGold(500000);
 
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       return ReturnValue::eSUCCESS;
     }
     if (choice == 19)
@@ -1237,8 +1237,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_QPOINTS(ch) -= 10;
       GET_AC_METAS(ch) += 2;
       GET_AC(ch) -= 2;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", qPrintable(ch->name()));
       ch->save();
 
@@ -1259,8 +1259,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
       GET_QPOINTS(ch) -= 1;
       ch->exp += 2000000;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", qPrintable(ch->name()));
       ch->save();
 
@@ -1605,7 +1605,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
   }
   else if (cmd == cmd_t::BUY) // buy
   {
-    QString arg, arg2[MAX_INPUT_LENGTH];
+    QString arg, arg2;
     argument = one_argument(argument, arg);
     argument = one_argument(argument, arg2);
     qint32 choice = atoi(arg);
@@ -1815,8 +1815,8 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
 
       GET_QPOINTS(ch) -= 5;
       GET_AGE_METAS(ch) += 1;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 
@@ -1842,8 +1842,8 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
 
       GET_QPOINTS(ch) -= 5;
       GET_AGE_METAS(ch) -= 1;
-      act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
-      act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+      act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
+      act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 

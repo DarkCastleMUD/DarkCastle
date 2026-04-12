@@ -27,7 +27,7 @@ qsizetype search_list(QString argument, const QStringList list);
 qsizetype old_search_block(QString argument, qint32 begin, qint32 length, const QStringList list, qint32 mode);
 
 void argument_interpreter(QString argument, QString first_arg, QString second_arg);
-QString one_argumentnolow(QString argument, QString first_arg);
+
 void half_chop(const QString str, QString arg1, QString arg2);
 std::tuple<QString, QString> last_argument(QString arguments);
 std::tuple<QString, QString> half_chop(QString arguments, const QChar token = ' ');

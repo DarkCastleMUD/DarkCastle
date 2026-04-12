@@ -80,7 +80,7 @@ qint32 get_max_stat_bonus(CharacterPtr ch, qint32 attrs)
 // List skill maxes.
 command_return_t do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg, arg2[MAX_INPUT_LENGTH];
+  QString arg, arg2;
   CharacterClassSkill *classskill;
   argument = one_argument(argument, arg);
   one_argument(argument, arg2);
@@ -847,7 +847,7 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   for (r = {}; r < top_of_objt; r++)
   {
-    obj = (ObjectPtr)DC::getInstance()->obj_index[r].item;
+    obj = DC::getInstance()->obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
@@ -871,7 +871,7 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString arg1, arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  QString arg1, arg2, arg3;
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
   argument = one_argument(argument, arg3);
@@ -930,7 +930,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
 
 command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
 {
-  QString export_type, filename[MAX_INPUT_LENGTH];
+  QString export_type, filename;
   world_file_list_item *curr = DC::getInstance()->obj_file_list;
 
   args = one_argument(args, export_type);
@@ -963,7 +963,7 @@ command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
     {
       for (qint32 x = curr->firstnum; x <= curr->lastnum; x++)
       {
-        write_object_csv((ObjectPtr)DC::getInstance()->obj_index[x].item, fout);
+        write_object_csv(DC::getInstance()->obj_index[x].item, fout);
       }
       curr = curr->next;
     }

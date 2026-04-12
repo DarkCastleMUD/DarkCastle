@@ -82,12 +82,12 @@ command_return_t Character::check_social(QString pcomm)
   {
     if (action->char_no_arg)
     {
-      act(action->char_no_arg, this, 0, 0, TO_CHAR, 0);
+      act_to_character(action->char_no_arg, this, 0, 0, 0);
     }
 
     if (action->others_no_arg)
     {
-      act(action->others_no_arg, this, 0, 0, TO_ROOM, (action->hide) ? INVIS_NULL : 0);
+      act_to_room(action->others_no_arg, this, 0, 0, (action->hide) ? INVIS_NULL : 0);
     }
     return SOCIAL_true_WITH_NOISE;
   }
@@ -96,13 +96,13 @@ command_return_t Character::check_social(QString pcomm)
   {
     if (action->not_found)
     {
-      act(action->not_found, this, 0, 0, TO_CHAR, 0);
+      act_to_character(action->not_found, this, 0, 0, 0);
     }
   }
   else if (vict == this)
   {
     if (action->char_auto)
-      act(action->char_auto, this, 0, 0, TO_CHAR, 0);
+      act_to_character(action->char_auto, this, 0, 0, 0);
     if (action->others_auto)
       act(action->others_auto, this, 0, 0, TO_ROOM,
           (action->hide) ? INVIS_NULL : 0);
@@ -115,7 +115,7 @@ command_return_t Character::check_social(QString pcomm)
   else
   {
     if (action->char_found)
-      act(action->char_found, this, 0, vict, TO_CHAR, 0);
+      act_to_character(action->char_found, this, 0, vict, 0);
     if (action->others_found)
       act(action->others_found, this, 0, vict, TO_ROOM,
           NOTVICT | ((action->hide) ? INVIS_NULL : 0));

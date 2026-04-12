@@ -66,14 +66,13 @@ command_return_t do_say(CharacterPtr ch, QString argument, cmd_t cmd)
       argument = remove_all_codes(argument);
     }
 
-    buf = fmt::format("$B$7$n says '{}$B$7'$R", argument.c_str());
-    act(buf, ch, 0, 0, TO_ROOM, 0);
+    act_to_room(u"$B$7$n says '{}$B$7'$R"_s.arg(argument), ch, {}, CharacterPtr{}, {});
 
     if (ch->isPlayer())
       MOBtrigger = false;
 
     buf = fmt::format("$B$7You say '{}$B$7'$R", argument.c_str());
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf, ch, 0, 0, 0);
 
     if (ch->isPlayer())
     {
@@ -145,17 +144,17 @@ command_return_t do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->isPlayer())
     MOBtrigger = false;
   buf = fmt::format("$B$n says (to $N) '{}'$R", messageStr.c_str());
-  act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
+  act_to_room(buf, ch, 0, victim, NOTVICT);
 
   if (ch->isPlayer())
     MOBtrigger = false;
   buf = fmt::format("$B$n says (to $3you$7) '{}'$R", messageStr.c_str());
-  act(buf, ch, 0, victim, TO_VICT, 0);
+  act_to_victim(buf, ch, 0, victim, 0);
 
   if (ch->isPlayer())
     MOBtrigger = false;
   buf = fmt::format("$BYou say (to $N) '{}'$R", messageStr.c_str());
-  act(buf, ch, 0, victim, TO_CHAR, 0);
+  act_to_character(buf, ch, 0, victim, 0);
   MOBtrigger = true;
   //   if(ch->isPlayer()) {
   //     retval = mprog_speech_trigger( message, ch );
@@ -290,7 +289,7 @@ command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
       ch->sendln(QStringLiteral("Here are the last %1 gossips:").arg(msgs.size()));
 
     while (!msgs.isEmpty())
-      act(msgs.dequeue().getMessage(ch), ch, 0, ch, TO_VICT, 0);
+      act_to_victim(msgs.dequeue().getMessage(ch), ch, 0, ch, 0);
   }
   else
   {
@@ -299,7 +298,7 @@ command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
     ChannelMessage msg(ch, DC::LogChannel::CHANNEL_GOSSIP, argument);
 
     dc_sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
-    act(buf2, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf2, ch, 0, 0, 0);
 
     if (ch->isPlayer())
     {
@@ -325,7 +324,7 @@ command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 
         if (!silence)
         {
-          act(msg.getMessage(conn->character->getLevel()), ch, 0, conn->character, TO_VICT, 0);
+          act_to_victim(msg.getMessage(conn->character->getLevel()), ch, 0, conn->character, 0);
         }
       }
     }
@@ -385,7 +384,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     this->sendln("Here are the last 10 auctions:");
     while (!tmp.empty())
     {
-      act(tmp.front(), this, 0, this, TO_VICT, 0);
+      act_to_victim(tmp.front(), this, 0, this, 0);
       tmp.pop();
     }
   }
@@ -404,7 +403,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     }
 
     QString buf2 = QStringLiteral("$6$BYou auction '%1'$R").arg(arguments.join(' '));
-    act(buf2, this, 0, 0, TO_CHAR, 0);
+    act_to_character(buf2, this, 0, 0, 0);
 
     auction_history.push(buf1);
     if (auction_history.size() > 10)
@@ -422,7 +421,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
             break;
           }
         if (!silence)
-          act(buf1, this, 0, conn->character, TO_VICT, 0);
+          act_to_victim(buf1, this, 0, conn->character, 0);
       }
   }
   return ReturnValue::eSUCCESS;
@@ -484,7 +483,7 @@ command_return_t do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
   {
     dc_sprintf(buf1, "$B$n shouts '%s'$R", argument);
     dc_sprintf(buf2, "$BYou shout '%s'$R", argument);
-    act(buf2, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf2, ch, 0, 0, 0);
 
     for (auto &i : DC::getInstance()->connections_)
       if (conn->character != ch && !conn->connected &&
@@ -499,7 +498,7 @@ command_return_t do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
             break;
           }
         if (!silence)
-          act(buf1, ch, 0, conn->character, TO_VICT, 0);
+          act_to_victim(buf1, ch, 0, conn->character, 0);
       }
   }
   return ReturnValue::eSUCCESS;
@@ -564,7 +563,7 @@ command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Here are the last 10 messages:");
       while (!tmp.empty())
       {
-        act(tmp.front(), ch, 0, ch, TO_VICT, 0);
+        act_to_victim(tmp.front(), ch, 0, ch, 0);
         tmp.pop();
       }
     }
@@ -583,7 +582,7 @@ command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_sprintf(buf1, "$3$B%s answers '%s'$R", qPrintable(ch->shortdesc_or_name()), argument);
     dc_sprintf(buf2, "$3$BYou answer '%s'$R", argument);
   }
-  act(buf2, ch, 0, 0, TO_CHAR, 0);
+  act_to_character(buf2, ch, 0, 0, 0);
 
   trivia_history.push(buf1);
   if (trivia_history.size() > 10)
@@ -601,7 +600,7 @@ command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
           break;
         }
       if (!silence)
-        act(buf1, ch, 0, conn->character, TO_VICT, 0);
+        act_to_victim(buf1, ch, 0, conn->character, 0);
     }
 
   return ReturnValue::eSUCCESS;
@@ -828,13 +827,13 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   if (this == vict)
     this->sendln("You try to tell yourself something.");
   else if ((GET_POS(vict) == position_t::SLEEPING || isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
-    act("Sorry, $E cannot hear you.", this, 0, vict, TO_CHAR, STAYHIDE);
+    act_to_character("Sorry, $E cannot hear you.", this, 0, vict, STAYHIDE);
   else
   {
     for (tmp_obj = DC::getInstance()->world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
       if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
       {
-        act("$E cannot hear you right now.", this, 0, vict, TO_CHAR, STAYHIDE);
+        act_to_character("$E cannot hear you right now.", this, 0, vict, STAYHIDE);
         return ReturnValue::eSUCCESS;
       }
     if (is_ignoring(vict, this))
@@ -882,13 +881,13 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
         if (this->isPlayer() && vict->isPlayer())
           vict->player->last_tell = qPrintable(this->name());
       }
-      act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
+      act_to_character(buf, vict, 0, 0, STAYHIDE);
 
       buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
       vict->tell_history(this, buf);
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
-      act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
+      act_return ar = act_to_character(buf, this, 0, 0, STAYHIDE);
       this->tell_history(this, ar.str);
 
       // Log what I told a logged player under their name
@@ -921,7 +920,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       vict->tell_history(this, buf);
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
-      act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
+      act_return ar = act_to_character(buf, this, 0, 0, STAYHIDE);
       this->tell_history(this, ar.str);
 
       this->sendln("They were sleeping btw...");
@@ -934,7 +933,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     else
     {
       buf = fmt::format("$2$B%s can't hear anything right now.$R", qPrintable(vict->shortdesc_or_name())).c_str();
-      act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
+      act_to_character(buf, this, 0, 0, STAYHIDE);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -1002,7 +1001,7 @@ command_return_t do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("No-one by that name here..");
   else if (vict == ch)
   {
-    act("$n whispers quietly to $mself.", ch, 0, 0, TO_ROOM, STAYHIDE);
+    act_to_room("$n whispers quietly to $mself.", ch, 0, 0, STAYHIDE);
     ch->sendln("You can't seem to get your mouth close enough to your ear...");
   }
   else if (is_ignoring(vict, ch))
@@ -1012,15 +1011,14 @@ command_return_t do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     dc_sprintf(buf, "$1$B$n whispers to you, '%s'$R", message);
-    act_return ar = act(buf, ch, 0, vict, TO_VICT, STAYHIDE);
+    act_return ar = act_to_victim(buf, ch, 0, vict, STAYHIDE);
     vict->tell_history(ch, ar.str);
 
     dc_sprintf(buf, "$1$BYou whisper to $N, '%s'$R", message);
-    ar = act(buf, ch, 0, vict, TO_CHAR, STAYHIDE);
+    ar = act_to_character(buf, ch, 0, vict, STAYHIDE);
     ch->tell_history(ch, ar.str);
 
-    act("$n whispers something to $N.", ch, 0, vict, TO_ROOM,
-        NOTVICT | STAYHIDE);
+    act("$n whispers something to $N.", ch, 0, vict, TO_ROOM, NOTVICT | STAYHIDE);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -1046,7 +1044,7 @@ command_return_t do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("No-one by that name here.");
   else if (vict == ch)
   {
-    act("$n quietly asks $mself a question.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n quietly asks $mself a question.", ch, 0, 0, 0);
     ch->sendln("You think about it for a while...");
   }
   else if (is_ignoring(vict, ch))
@@ -1056,14 +1054,14 @@ command_return_t do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     dc_sprintf(buf, "$B$n asks you, '%s'$R", message);
-    act_return ar = act(buf, ch, 0, vict, TO_VICT, 0);
+    act_return ar = act_to_victim(buf, ch, 0, vict, 0);
     vict->tell_history(ch, ar.str);
 
     dc_sprintf(buf, "$BYou ask $N, '%s'$R", message);
-    ar = act(buf, ch, 0, vict, TO_CHAR, 0);
+    ar = act_to_character(buf, ch, 0, vict, 0);
     ch->tell_history(ch, ar.str);
 
-    act("$n asks $N a question.", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_room("$n asks $N a question.", ch, 0, vict, NOTVICT);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -1121,7 +1119,7 @@ command_return_t do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   dc_sprintf(buf, "$B$1You tell the group, $7'%s'$R", argument);
-  act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE | ASLEEP);
+  act_return ar = act_to_character(buf, ch, 0, 0, STAYHIDE | ASLEEP);
   ch->gtell_history(ch, ar.str);
 
   if (!(k = ch->master))
@@ -1131,7 +1129,7 @@ command_return_t do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->master)
   {
-    act_return ar = act(buf, ch, 0, ch->master, TO_VICT, STAYHIDE | ASLEEP);
+    act_return ar = act_to_victim(buf, ch, 0, ch->master, STAYHIDE | ASLEEP);
 
     if (ch->master && ch->master->player)
     {
@@ -1153,7 +1151,7 @@ command_return_t do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       if (!silence)
       {
-        act_return ar = act(buf, ch, 0, f->follower, TO_VICT, STAYHIDE | ASLEEP);
+        act_return ar = act_to_victim(buf, ch, 0, f->follower, STAYHIDE | ASLEEP);
         if (f->follower && f->follower->player)
         {
           f->follower->gtell_history(ch, ar.str);
@@ -1215,7 +1213,7 @@ command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Here are the last 10 messages:");
     while (!tmp.empty())
     {
-      act(tmp.front(), ch, 0, ch, TO_VICT, 0);
+      act_to_victim(tmp.front(), ch, 0, ch, 0);
       tmp.pop();
     }
   }
@@ -1227,7 +1225,7 @@ command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     dc_sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", qPrintable(ch->shortdesc_or_name()), argument);
     dc_sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
-    act(buf2, ch, 0, 0, TO_CHAR, 0);
+    act_to_character(buf2, ch, 0, 0, 0);
 
     newbie_history.push(buf1);
     if (newbie_history.size() > 10)
@@ -1245,7 +1243,7 @@ command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
             break;
           }
         if (!silence)
-          act(buf1, ch, 0, conn->character, TO_VICT, 0);
+          act_to_victim(buf1, ch, 0, conn->character, 0);
       }
   }
   return ReturnValue::eSUCCESS;

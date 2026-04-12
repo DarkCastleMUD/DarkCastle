@@ -25,6 +25,72 @@
 
 #include "DC/DC_global.h"
 using namespace Qt::StringLiterals;
+
+template <typename T, typename U, typename... Args>
+void dc_sprintf(T &buffer, U cformat, Args... args)
+{
+  buffer = QString::asprintf(cformat, args...);
+}
+
+template <typename T, typename U, typename... Args>
+void dc_snprintf(T &buffer, int, U cformat, Args... args)
+{
+  buffer = QString::asprintf(cformat, args...);
+}
+
+template <typename T>
+void dc_strcpy(T &dst, T src)
+{
+  dst = src;
+}
+
+template <typename T>
+void dc_strcpy(T &dst, const char *src)
+{
+  if (src)
+    dst = src;
+}
+
+template <typename T, typename U>
+void dc_strncpy(T &dst, U n, T src)
+{
+  dst = src;
+}
+
+template <typename T, typename U>
+void dc_strncpy(T &dst, U n, const char *src)
+{
+  if (src)
+    dst = src;
+}
+
+template <typename T>
+void dc_strcat(T &dst, T src)
+{
+  dst += src;
+}
+
+template <typename T>
+void dc_strcat(T &dst, const char *src)
+{
+  if (src)
+    dst += src;
+}
+
+template <typename T>
+int dc_strcmp(T dst, T src)
+{
+  return dst.compare(src);
+}
+
+template <typename T>
+int dc_strcmp(T dst, const char *src)
+{
+  if (src)
+    return dst.compare(src);
+  return -1;
+}
+
 enum class cmd_t
 {
   UNDEFINED,   // 0
@@ -1044,6 +1110,8 @@ public:
     QUESTION_STATS,
     GET_STATS
   };
+
+  Connection(QObject *parent) : QObject(parent) {}
 
   Proxy proxy = {};
 
@@ -2633,14 +2701,24 @@ public:
   quint64 qty = {};                                                                         /* number of existing units of ths mob/obj */
   qint32 (*non_combat_func)(CharacterPtr, ObjectPtr, cmd_t, const QString, CharacterPtr){}; // non Combat special proc
   qint32 (*combat_func)(CharacterPtr, ObjectPtr, cmd_t, const QString, CharacterPtr){};     // combat special proc
-  void *item = {};                                                                          /* the mobile/object itself                 */
-
   QList<mob_prog_data> mobprogs_;
   QList<mob_prog_data> mobspec_;
   qint32 progtypes = {};
 
 private:
   vnum_t vnum_ = {}; /* virt number of ths mob/obj           */
+};
+
+class obj_index_data : public index_data
+{
+public:
+  ObjectPtr item = {}; /* the mobile/object itself                 */
+};
+
+class mob_index_data : public index_data
+{
+public:
+  CharacterPtr item = {};
 };
 
 namespace SSH
@@ -3743,8 +3821,6 @@ private:
   QString name_;               /* Title of object :get etc.        */
   QString action_description_; /* What to write when used          */
 };
-
-ObjectPtr ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it, qint32 ticket);
 
 // Character, Character
 // This contains all memory items for a player/mob
@@ -5482,9 +5558,9 @@ private:
   //--
   // Private variables
   //--
-  QString buf; /* Holds the buffer */
-  qint32 type; /* Holds type of buffer */
-  Token *next; /* Next token in the list */
+  QString buf;   /* Holds the buffer */
+  qint32 type{}; /* Holds type of buffer */
+  Token *next{}; /* Next token in the list */
 }; // end of Token class
 
 class TokenList
@@ -5496,7 +5572,8 @@ public:
 
   TokenList(QString);
   ~TokenList();
-  QString Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, CharacterPtr send_to, qint32 flags);
+  QString Interpret(CharacterPtr from, ObjectPtr obj, ObjectPtr vict_obj, CharacterPtr send_to, qint32 flags);
+  QString Interpret(CharacterPtr from, ObjectPtr obj, CharacterPtr vict_obj, CharacterPtr send_to, qint32 flags);
 
 private:
   //--
@@ -6552,7 +6629,15 @@ public:
   qint32 retval;
 };
 
-act_return act(QString str, CharacterPtr ch, ObjectPtr obj, void *vict_obj, qint16 destination, qint16 flags);
+act_return act_to_room(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags);
+act_return act_to_victim(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags);
+act_return act_to_character(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags);
+act_return act_to_zone(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags);
+act_return act_to_world(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags);
+act_return act_to_group(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags);
+act_return act_to_room_not_group(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags);
+act_return act(QString str, CharacterPtr ch, ObjectPtr obj, ObjectPtr vict_obj, qint16 destination, qint16 flags);
+act_return act(QString str, CharacterPtr ch, ObjectPtr obj, CharacterPtr vict_obj, qint16 destination, qint16 flags);
 
 class send_tokens_return
 {
@@ -6561,26 +6646,10 @@ public:
   qint32 retval;
 };
 
-send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, ObjectPtr obj, void *vch, qint32 flags, CharacterPtr to);
+send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, CharacterPtr to, CharacterPtr victim, ObjectPtr obj, ObjectPtr vic_obj, qint32 flags);
 
 void send_message(const QString str, CharacterPtr to);
 void send_message(QString str, CharacterPtr to);
-//--
-// Constants
-//--
-// Undefine the old ones if this header is included
-#undef TO_ROOM
-#undef TO_VICT
-#undef TO_CHAR
-
-// These constants need to go in the destination variable
-constexpr auto TO_ROOM = 0;           // Everyone in ch's room except ch
-constexpr auto TO_VICT = 1;           // Just vict_obj
-constexpr auto TO_CHAR = 2;           // Just ch
-constexpr auto TO_ZONE = 3;           // Everyone in ch's zone except ch
-constexpr auto TO_WORLD = 4;          // Everyone in the world except ch
-constexpr auto TO_GROUP = 5;          // Everyone in the ch's group except ch
-constexpr auto TO_ROOM_NOT_GROUP = 6; // Everyone in ch's room except ch's group or ch
 
 // These constants go in the flags part (optional -- 0 for none)
 constexpr auto FLAG_DEFAULT = 0;       // "someone" if invisible, sleepers skipped
@@ -6661,7 +6730,7 @@ constexpr auto SAVE_TYPE_POISON = 5;
 // If you decide to add a new saving throw type you
 // will have to be a little tricky:) -pir 12/13/01 3:32am
 
-qint32 qfprintf(FILE *stream, const QString format, ...);
+qint32 dc_fprintf(FILE *stream, const QString format, ...);
 
 constexpr auto MAX_BUF_LENGTH = 240;
 
@@ -7391,16 +7460,6 @@ public:
   message_type *msg2;       /* List of messages with toggle damage ON */
 };
 
-/*
- * TO types for act() output.
- */
-/* OLD
-constexpr auto TO_ROOM    0
-constexpr auto TO_VICT    1
-constexpr auto TO_NOTVICT 2
-constexpr auto TO_CHAR    3
-constexpr auto TO_GODS    4
-*/
 extern void debugpoint();
 
 class reroll_t
@@ -7422,6 +7481,19 @@ public:
 };
 
 extern QMap<QString, reroll_t> reroll_sessions;
+
+constexpr auto MAX_GAME_PORTALS = 9;
+constexpr auto FOREVER = -5;
+
+class game_portal
+{
+public:
+  room_t to_room;          /* Room to make the portal to */
+  QSet<room_t> from_rooms; /* Rooms to make the portal from */
+  qint32 obj_num;          /* Object to duplicate for portal */
+  qint32 max_timer;        /* What does the timer reset to? -- game days */
+  qint32 cur_timer;        /* What is the timer at now? -- game days */
+};
 
 class DC_EXPORT DC : public QCoreApplication
 {
@@ -7509,6 +7581,7 @@ public:
 
   static const QString menu;
 
+  QList<game_portal> game_portals_;
   QList<ConnectionPtr> connections_; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
@@ -7530,8 +7603,8 @@ public:
   QMap<room_t, Room> rooms;
   World world;
   clan_list_t clan_list_;
-  class index_data obj_index_array[MAX_INDEX] = {};
-  class index_data *obj_index = obj_index_array;
+  class obj_index_data obj_index_array[MAX_INDEX] = {};
+  class obj_index_data *obj_index = obj_index_array;
 
   world_file_list_item *world_file_list = {}; // List of the world files
   world_file_list_item *mob_file_list = {};   // List of the mob files
@@ -7561,6 +7634,7 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
+  bool is_forbidden(QString name);
   ObjectPtr getObject(vnum_t vnum);
   void findLibrary(void);
   qint32 create_one_room(CharacterPtr ch, qint32 vnum);
@@ -7657,13 +7731,14 @@ public:
   void testing_load_vaults(void);
   void reload_vaults(void);
   void load_corpses(void);
+  ObjectPtr ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it, qint32 ticket);
   qint32 write_hotboot_file(void);
   qint32 load_hotboot_descs(void);
   vnum_t getObjectVNUM(ObjectPtr obj, bool *ok = {});
   vnum_t getObjectVNUM(qint32 nr, bool *ok = {});
   vnum_t getObjectVNUM(rnum_t nr, bool *ok = {});
-  index_data *generate_mob_indices(qint32 *top, index_data *index);
-  index_data *generate_obj_indices(qint32 *top, index_data *index);
+  mob_index_data *generate_mob_indices(qint32 *top, mob_index_data *index);
+  obj_index_data *generate_obj_indices(qint32 *top, obj_index_data *index);
   CharacterPtr read_mobile(qint32 nr, FILE *fl);
   CharacterPtr clone_mobile(qint32 nr);
   auto create_blank_item(qint32 nr) -> std::expected<qint32, create_error>;
@@ -7683,6 +7758,9 @@ public:
   void logf(qint32 level, DC::LogChannel type, QString arg);
   void logf(qint32 level, DC::LogChannel type, QString cformat, ...);
   qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
+  qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer);
+  void load_game_portals(void);
+  void process_portals(void);
 
   template <typename T>
   T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max())
@@ -7771,8 +7849,8 @@ public:
   room_t last_char_room = {};
   Commands CMD_;
   Arena arena_;
-  index_data mob_index_array[MAX_INDEX] = {};
-  class index_data *mob_index = mob_index_array;
+  mob_index_data mob_index_array[MAX_INDEX] = {};
+  class mob_index_data *mob_index = mob_index_array;
   Bans bans_;
   Vaults vaults_;
 
@@ -8096,3 +8174,5 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
 }
 bool IS_ARENA(auto room) { return isSet(DC::getInstance()->world[room].room_flags, ARENA); }
 void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type = DC::PULSE_TIME);
+QString one_argument(QString arguments, QString &arg1);
+QString one_argumentnolow(QString arguments, QString &arg1);

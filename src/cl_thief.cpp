@@ -83,9 +83,9 @@ command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
         number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense sees your eyegouge coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-      act("Your heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, TO_VICT, 0);
-      act("$N's heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character("$N's heightened battlesense sees your eyegouge coming from a mile away.", ch, 0, victim, 0);
+      act_to_victim("Your heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, 0);
+      act_to_room("$N's heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, NOTVICT);
       level = {};
     }
     else if (!isSet(victim->immune, TYPE_PIERCE))
@@ -156,7 +156,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   if (IS_AFFECTED(victim, AFF_ALERT))
   {
-    act("$E is too alert and nervous looking; you are unable to sneak behind!", this, 0, victim, TO_CHAR, 0);
+    act_to_character("$E is too alert and nervous looking; you are unable to sneak behind!", this, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -381,9 +381,9 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (IS_AFFECTED(victim, AFF_NO_CIRCLE))
   {
-    act("$N notices your attempt and turns $S back away from you!", ch, 0, victim, TO_CHAR, 0);
-    act("$N notices $n's attempt to circle behind $M and backs away quickly!", ch, 0, victim, TO_ROOM, NOTVICT);
-    act("You see $n try to circle around you and move quickly to block $s access!", ch, 0, victim, TO_VICT, 0);
+    act_to_character("$N notices your attempt and turns $S back away from you!", ch, 0, victim, 0);
+    act_to_room("$N notices $n's attempt to circle behind $M and backs away quickly!", ch, 0, victim, NOTVICT);
+    act_to_victim("You see $n try to circle around you and move quickly to block $s access!", ch, 0, victim, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -429,8 +429,8 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  act("You circle around your target...", ch, 0, 0, TO_CHAR, 0);
-  act("$n circles around $s target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_character("You circle around your target...", ch, 0, 0, 0);
+  act_to_room("$n circles around $s target...", ch, 0, 0, INVIS_NULL);
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   QString buffer;
@@ -441,9 +441,9 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
            number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
   {
-    act("$N's heightened battlesense sees your circle coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-    act("Your heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, TO_VICT, 0);
-    act("$N's heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_character("$N's heightened battlesense sees your circle coming from a mile away.", ch, 0, victim, 0);
+    act_to_victim("Your heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, 0);
+    act_to_room("$N's heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, NOTVICT);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, WEAR_WIELD);
   }
   else
@@ -557,9 +557,9 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->affected_by_spell(SPELL_IRON_ROOTS))
   {
-    act("You try to trip $N but tree roots around $S legs keep $M upright.", ch, 0, victim, TO_CHAR, 0);
-    act("$n trips you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
-    act("The tree roots support $N keeping $M from falling after $n's trip.", ch, 0, victim, TO_ROOM, NOTVICT);
+    act_to_character("You try to trip $N but tree roots around $S legs keep $M upright.", ch, 0, victim, 0);
+    act_to_victim("$n trips you but the roots around your legs keep you from falling.", ch, 0, victim, 0);
+    act_to_room("The tree roots support $N keeping $M from falling after $n's trip.", ch, 0, victim, NOTVICT);
     WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
     return ReturnValue::eFAILURE;
   }
@@ -575,9 +575,9 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_TRIP, modifier))
   {
-    act("$n fumbles clumsily as $e attempts to trip you!", ch, nullptr, victim, TO_VICT, 0);
-    act("You fumble the trip!", ch, nullptr, victim, TO_CHAR, 0);
-    act("$n fumbles as $e tries to trip $N!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act_to_victim("$n fumbles clumsily as $e attempts to trip you!", ch, nullptr, victim, 0);
+    act_to_character("You fumble the trip!", ch, nullptr, victim, 0);
+    act_to_room("$n fumbles as $e tries to trip $N!", ch, nullptr, victim, NOTVICT);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP);
   }
@@ -586,15 +586,15 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
         number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense sees your trip coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-      act("Your heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, TO_VICT, 0);
-      act("$N's heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act_to_character("$N's heightened battlesense sees your trip coming from a mile away.", ch, 0, victim, 0);
+      act_to_victim("Your heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, 0);
+      act_to_room("$N's heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, NOTVICT);
     }
     else
     {
-      act("$n trips you and you go down!", ch, nullptr, victim, TO_VICT, 0);
-      act("You trip $N and $N goes down!", ch, nullptr, victim, TO_CHAR, 0);
-      act("$n trips $N and $N goes down!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+      act_to_victim("$n trips you and you go down!", ch, nullptr, victim, 0);
+      act_to_character("You trip $N and $N goes down!", ch, nullptr, victim, 0);
+      act_to_room("$n trips $N and $N goes down!", ch, nullptr, victim, NOTVICT);
       if (GET_POS(victim) > position_t::SITTING)
         victim->setSitting();
       SET_BIT(victim->combat, COMBAT_BASH2);
@@ -928,13 +928,13 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
       ohoh = true;
       if (!number(0, 4))
       {
-        act("$n tried to steal something from you!", ch, 0, victim, TO_VICT, 0);
-        act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
+        act_to_victim("$n tried to steal something from you!", ch, 0, victim, 0);
+        act_to_room("$n tries to steal something from $N.", ch, 0, victim, INVIS_NULL | NOTVICT);
         REMBIT(ch->affected_by, AFF_HIDE);
       }
       else
       {
-        act("You managed to keep $N unaware of your failed attempt.", ch, 0, victim, TO_CHAR, 0);
+        act_to_character("You managed to keep $N unaware of your failed attempt.", ch, 0, victim, 0);
         return ReturnValue::eFAILURE;
       }
     }
@@ -1132,16 +1132,16 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
         ch->wake(victim);
-        act("$n tried to steal something from you, waking you up in the process.!", ch, 0, victim, TO_VICT, 0);
-        act("$n fails stealing something from $N, waking $N up in the process.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
+        act_to_victim("$n tried to steal something from you, waking you up in the process.!", ch, 0, victim, 0);
+        act_to_room("$n fails stealing something from $N, waking $N up in the process.", ch, 0, victim, INVIS_NULL | NOTVICT);
       }
       else if (!number(1, 4))
       {
-        act("You remove $p and attempt to steal it.", ch, obj, 0, TO_CHAR, 0);
+        act_to_character("You remove $p and attempt to steal it.", ch, obj, 0, 0);
         ch->sendln("Your victim wakes up before you can complete the theft!");
-        act("$n tries to steal $p from $N, but fails.", ch, obj, victim, TO_ROOM, NOTVICT);
+        act_to_room("$n tries to steal $p from $N, but fails.", ch, obj, victim, NOTVICT);
         obj_to_char(victim->unequip_char(eq_pos), victim);
-        act("You awake to find $n removing some of your equipment.", ch, obj, victim, TO_VICT, 0);
+        act_to_victim("You awake to find $n removing some of your equipment.", ch, obj, victim, 0);
         victim->save(cmd_t::SAVE_SILENTLY);
         set_cantquit(ch, victim);
         if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
@@ -1152,8 +1152,8 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        act("You remove $p and steal it.", ch, obj, 0, TO_CHAR, 0);
-        act("$n steals $p from $N.", ch, obj, victim, TO_ROOM, NOTVICT);
+        act_to_character("You remove $p and steal it.", ch, obj, 0, 0);
+        act_to_room("$n steals $p from $N.", ch, obj, victim, NOTVICT);
         obj_to_char(victim->unequip_char(eq_pos), ch);
         if (victim->isPlayer() || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
@@ -1228,7 +1228,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
     } // if(obj)
     else
     { // they don't got it
-      act("$N does not seem to possess that item.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("$N does not seem to possess that item.", ch, 0, victim, 0);
       return ReturnValue::eFAILURE;
     }
   } // of else, not in inventory
@@ -1354,13 +1354,13 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
     ohoh = true;
     if (number(0, 6))
     {
-      act("You discover that $n has $s hands in your wallet.", ch, 0, victim, TO_VICT, 0);
-      act("$n tries to steal $B$5gold$R from $N.", ch, 0, victim, TO_ROOM, NOTVICT | INVIS_NULL);
+      act_to_victim("You discover that $n has $s hands in your wallet.", ch, 0, victim, 0);
+      act_to_room("$n tries to steal $B$5gold$R from $N.", ch, 0, victim, NOTVICT | INVIS_NULL);
       REMBIT(ch->affected_by, AFF_HIDE);
     }
     else
     {
-      act("You manage to keep $N unaware of your botched attempt.", ch, 0, victim, TO_CHAR, 0);
+      act_to_character("You manage to keep $N unaware of your botched attempt.", ch, 0, victim, 0);
       return ReturnValue::eFAILURE;
     }
   }
@@ -1437,7 +1437,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room, j;
-  QString type, dir[MAX_INPUT_LENGTH];
+  QString type, dir;
   room_direction_data *back;
   ObjectPtr obj;
   CharacterPtr victim;
@@ -1497,7 +1497,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 
       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
       ch->sendln("*Click*");
-      act("$n fiddles with $p.", ch, obj, 0, TO_ROOM, 0);
+      act_to_room("$n fiddles with $p.", ch, obj, 0, 0);
     }
   }
   else if ((door = find_door(ch, type, dir)) >= 0)
@@ -1543,11 +1543,11 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)
       {
-        act("$n skillfully picks the lock of the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+        act_to_room("$n skillfully picks the lock of the $F.", ch, 0, EXIT(ch, door)->keyword, 0);
       }
       else
       {
-        act("$n picks the lock of the.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_room("$n picks the lock of the.", ch, 0, 0, INVIS_NULL);
       }
 
       ch->sendln("The lock quickly yields to your skills.");
@@ -1692,8 +1692,8 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
       dc_sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
                  amount);
-      act(buf, ch, 0, vict, TO_VICT, GODS);
-      act("$n slips some $B$5gold$R to $N.", ch, 0, vict, TO_ROOM, GODS | NOTVICT);
+      act_to_victim(buf, ch, 0, vict, GODS);
+      act_to_room("$n slips some $B$5gold$R to $N.", ch, 0, vict, GODS | NOTVICT);
 
       dc_sprintf(buf, "%s slips %d coins to %s", qPrintable(ch->name()), amount,
                  qPrintable(vict->name()));
@@ -1790,13 +1790,13 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
           container, TO_ROOM, 0);
     }
     else
-      act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
+      act_to_room("$n slips $p in $P.", ch, obj, container, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
     if (DC::getInstance()->obj_index[container->item_number].vnum() != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
-    act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
+    act_to_character("You slip $p in $P.", ch, obj, container, 0);
     return ReturnValue::eSUCCESS;
   }
   if (!(vict = ch->get_char_room_vis(vict_name)))
@@ -1807,7 +1807,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (vict->isNonPlayer() && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
   {
-    act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
+    act_to_character("$N graciously refuses your gift.", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1827,13 +1827,13 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if ((1 + IS_CARRYING_N(vict)) > CAN_CARRY_N(vict))
   {
-    act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
+    act_to_character("$N seems to have $S hands full.", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
-    act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
+    act_to_character("$E can't carry that much weight.", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1884,9 +1884,9 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     logobjects(QStringLiteral("%1 slips %2 to %3").arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(vict->name())));
 
     move_obj(obj, vict);
-    act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);
-    act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS | NOTVICT);
-    act("$n slips you $p.", ch, obj, vict, TO_VICT, GODS);
+    act_to_character("You slip $p to $N.", ch, obj, vict, 0);
+    act_to_room("$n slips $p to $N.", ch, obj, vict, GODS | NOTVICT);
+    act_to_victim("$n slips you $p.", ch, obj, vict, GODS);
     ch->save();
     vict->save_char_obj();
   }
@@ -1921,12 +1921,12 @@ command_return_t do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, nullptr, SKILL_VITAL_STRIKE))
   {
-    act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger.", ch, 0, 0, TO_ROOM, NOTVICT);
+    act_to_room("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger.", ch, 0, 0, NOTVICT);
     ch->sendln("You try to begin the vital strike technique and nearly slice off your own pinkie finger!");
   }
   else
   {
-    act("$n begins jabbing $s weapons with lethal accuracy and strength.", ch, 0, 0, TO_ROOM, NOTVICT);
+    act_to_room("$n begins jabbing $s weapons with lethal accuracy and strength.", ch, 0, 0, NOTVICT);
     send_to_char("Your body begins to coil, the strength building inside of you, your mind\r\n"
                  "pinpointing vital and vulnerable areas....\r\n",
                  ch);
@@ -1989,11 +1989,11 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, nullptr, SKILL_DECEIT))
   {
     ch->sendln("Your class just isn't up to the task.");
-    act("$n tries to explain to you the weaknesses of others, but you do not understand.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n tries to explain to you the weaknesses of others, but you do not understand.", ch, 0, 0, 0);
   }
   else
   {
-    act("$n instructs $s group on the virtues of deceit.", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n instructs $s group on the virtues of deceit.", ch, 0, 0, 0);
     ch->sendln("Your instruction is well received and your pupils are more able to exploit weaknesses.");
 
     af.type = SKILL_DECEIT_TIMER;
@@ -2012,7 +2012,7 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
 
       affect_from_char(tmp_char, SKILL_DECEIT, SUPPRESS_MESSAGES);
       affect_from_char(tmp_char, SKILL_DECEIT, SUPPRESS_MESSAGES);
-      act("$n lures your mind into the thought patterns of the morally corrupt.", ch, 0, tmp_char, TO_VICT, 0);
+      act_to_victim("$n lures your mind into the thought patterns of the morally corrupt.", ch, 0, tmp_char, 0);
 
       af.type = SKILL_DECEIT;
       af.duration = 1 + ch->has_skill(SKILL_DECEIT) / 10;
@@ -2186,7 +2186,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
   ObjectPtr obj = {};
-  QString name = {}, buf[MAX_STRING_LENGTH] = {};
+  QString name = {}, buf = {};
   QString item = {};
   qint32 appraised = {}, bits = {}, learned = {};
   bool found = false, weight = false;
@@ -2251,7 +2251,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
         obj = get_obj_in_list_vis(ch, item, victim->carrying);
         if (number(0, 2) || !obj)
         {
-          act("$N doesn't seem to be carrying anything like that.", ch, 0, victim, TO_CHAR, 0);
+          act_to_character("$N doesn't seem to be carrying anything like that.", ch, 0, victim, 0);
           return ReturnValue::eSUCCESS;
         }
         else
@@ -2371,7 +2371,7 @@ command_return_t do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (IS_AFFECTED(vict, AFF_CRIPPLE))
   {
-    act("$N has already been crippled!", ch, 0, vict, TO_CHAR, 0);
+    act_to_character("$N has already been crippled!", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -2391,24 +2391,24 @@ command_return_t do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, vict, SKILL_CRIPPLE))
   {
-    act("You quickly lash out but fail to cripple $N.", ch, 0, vict, TO_CHAR, 0);
-    act("$n quickly lashes out, narrowly missing an attempt to cripple you!", ch, 0, vict, TO_VICT, 0);
-    act("$n quickly lashes out but fails to cripple $N.", ch, 0, vict, TO_ROOM, NOTVICT);
+    act_to_character("You quickly lash out but fail to cripple $N.", ch, 0, vict, 0);
+    act_to_victim("$n quickly lashes out, narrowly missing an attempt to cripple you!", ch, 0, vict, 0);
+    act_to_room("$n quickly lashes out but fails to cripple $N.", ch, 0, vict, NOTVICT);
   }
   else
   {
     if (vict->affected_by_spell(SKILL_BATTLESENSE) &&
         number(1, 100) < vict->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense sees your strike coming from a mile away.", ch, 0, vict, TO_CHAR, 0);
-      act("Your heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, TO_VICT, 0);
-      act("$N's heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, TO_ROOM, NOTVICT);
+      act_to_character("$N's heightened battlesense sees your strike coming from a mile away.", ch, 0, vict, 0);
+      act_to_victim("Your heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, 0);
+      act_to_room("$N's heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, NOTVICT);
     }
     else
     {
-      act("You quickly lash out and strike a crippling blow to $N!", ch, 0, vict, TO_CHAR, 0);
-      act("$n lashes out quickly and cripples you with a painful blow!", ch, 0, vict, TO_VICT, 0);
-      act("$n quickly lashes out and strikes a crippling blow to $N!", ch, 0, vict, TO_ROOM, NOTVICT);
+      act_to_character("You quickly lash out and strike a crippling blow to $N!", ch, 0, vict, 0);
+      act_to_victim("$n lashes out quickly and cripples you with a painful blow!", ch, 0, vict, 0);
+      act_to_room("$n quickly lashes out and strikes a crippling blow to $N!", ch, 0, vict, NOTVICT);
       affected_type af;
       af.type = SKILL_CRIPPLE;
       af.duration = skill / 20;

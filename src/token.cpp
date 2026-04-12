@@ -130,7 +130,7 @@ void TokenList::Next()
 |   Zero is returned (0) if the QString should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, CharacterPtr send_to, qint32 flags)
+QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, auto vict_obj, CharacterPtr send_to, qint32 flags)
 {
 
   // Reset the QString
@@ -362,17 +362,17 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, C
                 }
                 break;
               case 'O':
-                if (send_to == nullptr || vict_obj == nullptr || ((ObjectPtr)vict_obj)->name().isEmpty())
+                if (send_to == nullptr || vict_obj == nullptr || vict_obj->name().isEmpty())
                 {
                   break;
                 }
-                if (!CAN_SEE_OBJ(send_to, (ObjectPtr)vict_obj))
+                if (!CAN_SEE_OBJ(send_to, vict_obj))
                 {
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
                   {
-                    auto o = (ObjectPtr)vict_obj;
+                    auto o = vict_obj;
                     auto n = o->name();
                     auto fs = fname(n).toStdString();
                     interp += fs;
@@ -382,14 +382,14 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, C
                 }
                 else
                 {
-                  auto o = (ObjectPtr)vict_obj;
+                  auto o = vict_obj;
                   auto n = o->name();
                   auto fs = fname(n).toStdString();
                   interp += fs;
                 }
                 break;
               case 'p':
-                if (send_to == nullptr || obj == nullptr || qPrintable(obj->short_description())().isEmpty())
+                if (send_to == nullptr || obj == nullptr || obj->short_description().isEmpty())
                 {
                   break;
                 }
@@ -399,22 +399,22 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, C
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += qPrintable(obj->short_description())().toStdString();
+                    interp += obj->short_description();
                   else
                     interp += "something";
                 }
                 else
                 {
-                  interp += qPrintable(obj->short_description())().toStdString();
+                  interp += obj->short_description();
                 }
                 break;
               case 'P':
-                if (send_to == nullptr || vict_obj == nullptr || ((ObjectPtr)vict_obj)->short_description().isEmpty())
+                if (send_to == nullptr || vict_obj == nullptr || vict_obj->short_description().isEmpty())
                 {
                   break;
                 }
 
-                if (!CAN_SEE_OBJ(send_to, (ObjectPtr)vict_obj))
+                if (!CAN_SEE_OBJ(send_to, vict_obj))
                 {
                   if (flags & INVIS_NULL)
                     return {};
@@ -482,14 +482,14 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, C
               case 'T':
                 if (vict_obj != nullptr)
                 {
-                  interp += vict_obj;
+                  interp += vict_obj->name();
                 }
                 break;
 
               case 'F':
                 if (vict_obj != nullptr)
                 {
-                  interp += fname(QString(vict_obj)).toStdString();
+                  interp += fname(vict_obj->name());
                 }
                 break;
 
@@ -521,7 +521,7 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, void *vict_obj, C
 | TokenList::Token::Token(QString tok_str)
 | Description:  Used to create a new token
 */
-Token::Token(QString tok_str) : buf(0), type(0), next(0)
+Token::Token(QString tok_str)
 {
   SetBuf(tok_str);
 }
@@ -544,7 +544,7 @@ void Token::SetBuf(QString rhs)
 {
   buf = {};
 
-  strcpy(buf, rhs);
+  dc_strcpy(buf, rhs);
 
   if (buf[0] != '$')
   {

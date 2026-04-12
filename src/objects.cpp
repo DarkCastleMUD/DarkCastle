@@ -157,7 +157,7 @@ void DC::object_activity(quint64 pulse_type)
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = ((ObjectPtr)obj_index[item_number].item)->obj_flags.value[1];
+      obj->obj_flags.value[0] = (obj_index[item_number].item)->obj_flags.value[1];
       send_to_room(obj->ex_description->description_, obj->in_room, true);
     }
     else
@@ -206,8 +206,8 @@ command_return_t do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!ch->has_skill(SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
   {
-    act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
-    act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
+    act_to_room("$n fails to switch $s weapons.", ch, 0, 0, 0);
+    act_to_character("You fail to switch your weapons.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
   if (GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
@@ -251,7 +251,7 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
         pos = -2;
         if (!(temp = get_obj_in_list_vis(ch, buf, ch->carrying, true)))
         {
-          act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
+          act_to_character("You do not have that item.", ch, 0, 0, 0);
           return ReturnValue::eFAILURE;
         }
       }
@@ -260,21 +260,21 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (temp->obj_flags.type_flag != ITEM_POTION)
   {
-    act("You can only quaff potions.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can only quaff potions.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if ((GET_COND(ch, FULL) >= 24) && (GET_COND(ch, THIRST) >= 24) && ch->isPlayer())
   {
-    act("Your stomach is too full to quaff that!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Your stomach is too full to quaff that!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
   if (ch->fighting && number(0, 1) != 0)
   {
-    act("During combat, $n drops $p and it SMASHES!", ch, temp, 0, TO_ROOM, 0);
-    act("During combat, you drop $p which SMASHES!", ch, temp, 0, TO_CHAR, 0);
+    act_to_room("During combat, $n drops $p and it SMASHES!", ch, temp, 0, 0);
+    act_to_character("During combat, you drop $p which SMASHES!", ch, temp, 0, 0);
     if (equipped)
       ch->unequip_char(pos);
     extract_obj(temp);
@@ -290,8 +290,8 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
   if (pos == -2)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
-  act("$n quaffs $p.", ch, temp, 0, TO_ROOM, 0);
-  act("You quaff $p which dissolves.", ch, temp, 0, TO_CHAR, 0);
+  act_to_room("$n quaffs $p.", ch, temp, 0, 0);
+  act_to_character("You quaff $p which dissolves.", ch, temp, 0, 0);
 
   gain_condition(ch, FULL, 2);
   gain_condition(ch, THIRST, 2);
@@ -356,19 +356,19 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
       pos = WEAR_HOLD2;
       if ((scroll == 0) || !isexact(buf, scroll->name()))
       {
-        act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
+        act_to_character("You do not have that item.", ch, 0, 0, 0);
         return ReturnValue::eFAILURE;
       }
     }
   }
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
-    act("Your magic is muffled by greater beings.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Your magic is muffled by greater beings.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
   if (scroll->obj_flags.type_flag != ITEM_SCROLL)
   {
-    act("Recite is normally used for scrolls.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Recite is normally used for scrolls.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -386,8 +386,8 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
     victim = ch;
   }
 
-  act("$n recites $p.", ch, scroll, 0, TO_ROOM, INVIS_NULL);
-  act("You recite $p which dissolves.", ch, scroll, 0, TO_CHAR, 0);
+  act_to_room("$n recites $p.", ch, scroll, 0, INVIS_NULL);
+  act_to_character("You recite $p which dissolves.", ch, scroll, 0, 0);
 
   qint32 failmark = 35 - GET_INT(ch);
   if (ch->isNonPlayer())
@@ -402,7 +402,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->fighting && number(0, 100) < failmark)
   {
     // failed to read scroll
-    act("$n mumbles the words on the scroll and it goes up in flame!", ch, 0, 0, TO_ROOM, 0);
+    act_to_room("$n mumbles the words on the scroll and it goes up in flame!", ch, 0, 0, 0);
     ch->sendln("You mumble the words and the scroll goes up in flame!");
   }
   else
@@ -467,7 +467,7 @@ void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
 
   dc_sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
-  act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n sets something on the ground all around $m.", ch, 0, 0, 0);
 
   // make a new item
   trap_obj = clone_object(GOD_TRAP_ITEM);
@@ -488,7 +488,7 @@ void set_exit_trap(CharacterPtr ch, ObjectPtr obj, QString arg)
 
   dc_sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
-  act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n sets something on the ground all around $m.", ch, 0, 0, 0);
 
   // make a new item
   trap_obj = clone_object(GOD_TRAP_ITEM);
@@ -557,7 +557,7 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
     trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
 
   do_say(ch, "Fire in the hole!");
-  act("$n sets off $o with a flash and bang!.", ch, obj, 0, TO_ROOM, 0);
+  act_to_room("$n sets off $o with a flash and bang!.", ch, obj, 0, 0);
   ch->sendln("You set off the device with a loud bang.");
 
   if (!CAN_GO(ch, dir))
@@ -587,7 +587,7 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
 
   dc_sprintf(buf, "You sprinkle the %s all around you.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
-  act("$n sprinkles something on the ground around $m.", ch, 0, 0, TO_ROOM, 0);
+  act_to_room("$n sprinkles something on the ground around $m.", ch, 0, 0, 0);
 
   // make sure it's useable in the place we're at
   if (DC::getInstance()->world[ch->in_room].sector_type != obj->obj_flags.value[1])
@@ -710,7 +710,7 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
   if ((ch->equipment[WEAR_HOLD] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD]->name())) &&
       (ch->equipment[WEAR_HOLD2] == 0 || !isexact(buf, ch->equipment[WEAR_HOLD2]->name())))
   {
-    act("You must be holding an item in order to to use it.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You must be holding an item in order to to use it.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
   if (ch->equipment[WEAR_HOLD] && isexact(buf, ch->equipment[WEAR_HOLD]->name()))
@@ -722,8 +722,8 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
   argument = one_argument(argument, xtra_arg);
   if (stick->obj_flags.type_flag == ITEM_STAFF)
   {
-    act("$n taps $p three times on the ground.", ch, stick, 0, TO_ROOM, 0);
-    act("You tap $p three times on the ground.", ch, stick, 0, TO_CHAR, 0);
+    act_to_room("$n taps $p three times on the ground.", ch, stick, 0, 0);
+    act_to_character("You tap $p three times on the ground.", ch, stick, 0, 0);
     if (stick->obj_flags.value[2] > 0)
     { /* Charges left? */
       stick->obj_flags.value[2]--;
@@ -751,14 +751,14 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (bits == FIND_CHAR_ROOM)
       {
-        act("$n points $p at you.", ch, stick, tmp_char, TO_VICT, INVIS_NULL);
-        act("$n points $p at $N.", ch, stick, tmp_char, TO_ROOM, NOTVICT | INVIS_NULL);
-        act("You point $p at $N.", ch, stick, tmp_char, TO_CHAR, 0);
+        act_to_victim("$n points $p at you.", ch, stick, tmp_char, INVIS_NULL);
+        act_to_room("$n points $p at $N.", ch, stick, tmp_char, NOTVICT | INVIS_NULL);
+        act_to_character("You point $p at $N.", ch, stick, tmp_char, 0);
       }
       else
       {
-        act("$n points $p at $P.", ch, stick, tmp_object, TO_ROOM, INVIS_NULL);
-        act("You point $p at $P.", ch, stick, tmp_object, TO_CHAR, 0);
+        act_to_room("$n points $p at $P.", ch, stick, tmp_object, INVIS_NULL);
+        act_to_character("You point $p at $P.", ch, stick, tmp_object, 0);
       }
 
       if (stick->obj_flags.value[2] > 0)
@@ -849,24 +849,24 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 
   if ((GET_COND(this, DRUNK) > 10) && (GET_COND(this, THIRST) > 0)) /* The pig is drunk */
   {
-    act("You simply fail to reach your mouth!", this, 0, 0, TO_CHAR, 0);
-    act("$n tried to drink but missed $s mouth!", this, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You simply fail to reach your mouth!", this, 0, 0, 0);
+    act_to_room("$n tried to drink but missed $s mouth!", this, 0, 0, INVIS_NULL);
     return ReturnValue::eFAILURE;
   }
 
   if (GET_COND(this, FULL) > 20 && GET_COND(this, THIRST) > 20) /* Stomach full */
   {
-    act("Your stomach cannot contain anymore!", this, 0, 0, TO_CHAR, 0);
+    act_to_character("Your stomach cannot contain anymore!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   auto arg1 = arguments.value(0);
   if ((temp = get_obj_in_list_vis(this, arg1, DC::getInstance()->world[this->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
   {
-    act("You drink from $p.", this, temp, 0, TO_CHAR, 0);
-    act("$n drinks from $p.", this, temp, 0, TO_ROOM, INVIS_NULL);
-    act("You are full.", this, 0, 0, TO_CHAR, 0);
-    act("You are not thirsty anymore.", this, 0, 0, TO_CHAR, 0);
+    act_to_character("You drink from $p.", this, temp, 0, 0);
+    act_to_room("$n drinks from $p.", this, temp, 0, INVIS_NULL);
+    act_to_character("You are full.", this, 0, 0, 0);
+    act_to_character("You are not thirsty anymore.", this, 0, 0, 0);
 
     if (isImmortalPlayer())
       return ReturnValue::eSUCCESS;
@@ -887,13 +887,13 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 
   if (!(temp = get_obj_in_list_vis(this, arg1, this->carrying)))
   {
-    act("You cannot find it!", this, 0, 0, TO_CHAR, 0);
+    act_to_character("You cannot find it!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (temp->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    act("You can't drink from that!", this, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't drink from that!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -901,7 +901,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   {
     if (temp->obj_flags.value[1] > 0) /* Not empty */
     {
-      act(QStringLiteral("$n drinks %1 from $p.").arg(drinks[temp->obj_flags.value[2]]), this, temp, 0, TO_ROOM, INVIS_NULL);
+      act_to_room(QStringLiteral("$n drinks %1 from $p.").arg(drinks[temp->obj_flags.value[2]]), this, temp, 0, INVIS_NULL);
       sendln(QStringLiteral("You drink the %1.").arg(drinks[temp->obj_flags.value[2]]));
 
       if (isImmortalPlayer())
@@ -924,13 +924,13 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
       gain_condition(this, THIRST, (qint32)((qint32)drink_aff[temp->obj_flags.value[2]][THIRST] * amount) / 4);
 
       if (GET_COND(this, DRUNK) > 10)
-        act("You feel drunk.", this, 0, 0, TO_CHAR, 0);
+        act_to_character("You feel drunk.", this, 0, 0, 0);
 
       if (GET_COND(this, THIRST) > 20)
-        act("You do not feel thirsty.", this, 0, 0, TO_CHAR, 0);
+        act_to_character("You do not feel thirsty.", this, 0, 0, 0);
 
       if (GET_COND(this, FULL) > 20)
-        act("You are full.", this, 0, 0, TO_CHAR, 0);
+        act_to_character("You are full.", this, 0, 0, 0);
 
       if (temp->obj_flags.value[2] == LIQ_HOLYWATER &&
           getHP() < GET_MAX_HIT(this) &&
@@ -943,8 +943,8 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
       if (temp->obj_flags.value[3] && (!this->isImmortalPlayer()))
       {
         /* The shit was poisoned ! */
-        act("Ooups, it tasted rather strange ?!!?", this, 0, 0, TO_CHAR, 0);
-        act("$n chokes and utters some strange sounds.", this, 0, 0, TO_ROOM, 0);
+        act_to_character("Ooups, it tasted rather strange ?!!?", this, 0, 0, 0);
+        act_to_room("$n chokes and utters some strange sounds.", this, 0, 0, 0);
         if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
         {
           this->sendln("Luckily, your body rejects the poison almost immediately.");
@@ -978,7 +978,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
     }
   }
 
-  act("It's empty already.", this, 0, 0, TO_CHAR, 0);
+  act_to_character("It's empty already.", this, 0, 0, 0);
   return ReturnValue::eFAILURE;
 }
 
@@ -997,35 +997,35 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
 
   if (!(temp = get_obj_in_list_vis(this, arg1, carrying)))
   {
-    act("You can't find it!", this, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't find it!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if ((temp->obj_flags.type_flag != ITEM_FOOD) && (!isImmortalPlayer()))
   {
-    act("Your stomach refuses to eat that!?!", this, 0, 0, TO_CHAR, 0);
+    act_to_character("Your stomach refuses to eat that!?!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (GET_COND(this, FULL) > 20) /* Stomach full */
   {
-    act("You are too full to eat more!", this, 0, 0, TO_CHAR, 0);
+    act_to_character("You are too full to eat more!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  act("$n eats $p.", this, temp, 0, TO_ROOM, INVIS_NULL);
-  act("You eat the $o.", this, temp, 0, TO_CHAR, 0);
+  act_to_room("$n eats $p.", this, temp, 0, INVIS_NULL);
+  act_to_character("You eat the $o.", this, temp, 0, 0);
 
   gain_condition(this, FULL, temp->obj_flags.value[0]);
 
   if (GET_COND(this, FULL) > 20)
-    act("You are full.", this, 0, 0, TO_CHAR, 0);
+    act_to_character("You are full.", this, 0, 0, 0);
 
   if (temp->obj_flags.value[3] && (!isImmortalPlayer()))
   {
     /* The shit was poisoned ! */
-    act("Ooups, it tasted rather strange ?!!?", this, 0, 0, TO_CHAR, 0);
-    act("$n coughs and utters some strange sounds.", this, 0, 0, TO_ROOM, 0);
+    act_to_character("Ooups, it tasted rather strange ?!!?", this, 0, 0, 0);
+    act_to_room("$n coughs and utters some strange sounds.", this, 0, 0, 0);
 
     if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
     {
@@ -1065,38 +1065,38 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!*arg1) /* No arguments */
   {
-    act("What do you want to pour from?", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("What do you want to pour from?", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (!(from_obj = get_obj_in_list_vis(ch, arg1, ch->carrying)))
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't find it!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (from_obj->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    act("You can't pour from that!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't pour from that!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (from_obj->obj_flags.value[1] == 0)
   {
-    act("The $p is empty.", ch, from_obj, 0, TO_CHAR, 0);
+    act_to_character("The $p is empty.", ch, from_obj, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (!*arg2)
   {
-    act("Where do you want it? Out or in what?", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Where do you want it? Out or in what?", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(arg2, "out"))
   {
-    act("$n empties $p", ch, from_obj, 0, TO_ROOM, INVIS_NULL);
-    act("You empty the $p.", ch, from_obj, 0, TO_CHAR, 0);
+    act_to_room("$n empties $p", ch, from_obj, 0, INVIS_NULL);
+    act_to_character("You empty the $p.", ch, from_obj, 0, 0);
 
     from_obj->obj_flags.value[1] = {};
     from_obj->obj_flags.value[2] = {};
@@ -1106,32 +1106,32 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(to_obj = get_obj_in_list_vis(ch, arg2, ch->carrying)))
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't find it!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (to_obj->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    act("You can't pour anything into that.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't pour anything into that.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (to_obj == from_obj)
   {
-    act("A most unproductive effort.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("A most unproductive effort.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if ((to_obj->obj_flags.value[1] != 0) &&
       (to_obj->obj_flags.value[2] != from_obj->obj_flags.value[2]))
   {
-    act("There is already a different liquid in it!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("There is already a different liquid in it!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (!(to_obj->obj_flags.value[1] < to_obj->obj_flags.value[0]))
   {
-    act("There is no room for more.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("There is no room for more.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1180,30 +1180,30 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(temp = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't find it!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (temp->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    act("You can't sip from that!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't sip from that!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (GET_COND(ch, DRUNK) > 10) /* The pig is drunk ! */
   {
-    act("You simply fail to reach your mouth!", ch, 0, 0, TO_CHAR, 0);
-    act("$n tries to sip, but fails!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You simply fail to reach your mouth!", ch, 0, 0, 0);
+    act_to_room("$n tries to sip, but fails!", ch, 0, 0, INVIS_NULL);
     return ReturnValue::eFAILURE;
   }
 
   if (!temp->obj_flags.value[1]) /* Empty */
   {
-    act("But there is nothing in it?", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("But there is nothing in it?", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  act("$n sips from the $o", ch, temp, 0, TO_ROOM, INVIS_NULL);
+  act_to_room("$n sips from the $o", ch, temp, 0, INVIS_NULL);
   dc_sprintf(buf, "It tastes like %s.\r\n", drinks[temp->obj_flags.value[2]]);
   ch->send(buf);
 
@@ -1211,10 +1211,10 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
                  (qint32)(drink_aff[temp->obj_flags.value[2]][DRUNK] / 4));
 
   if (GET_COND(ch, DRUNK) > 10)
-    act("You feel drunk.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You feel drunk.", ch, 0, 0, 0);
 
   if (temp->obj_flags.value[3] == 1 && !IS_AFFECTED(ch, AFF_POISON))
-    act("But it also had a strange taste!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("But it also had a strange taste!", ch, 0, 0, 0);
 
   temp->obj_flags.value[1]--;
 
@@ -1242,7 +1242,7 @@ command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(temp = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("You can't find it!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
@@ -1253,23 +1253,23 @@ command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(temp->obj_flags.type_flag == ITEM_FOOD))
   {
-    act("Taste that?!? Your stomach refuses!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Taste that?!? Your stomach refuses!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  act("$n tastes the $o.", ch, temp, 0, TO_ROOM, INVIS_NULL);
-  act("You taste the $o.", ch, temp, 0, TO_CHAR, 0);
+  act_to_room("$n tastes the $o.", ch, temp, 0, INVIS_NULL);
+  act_to_character("You taste the $o.", ch, temp, 0, 0);
 
   if (temp->obj_flags.value[3] == 1 && !IS_AFFECTED(ch, AFF_POISON))
   {
-    act("Oops, it did not taste good at all!", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("Oops, it did not taste good at all!", ch, 0, 0, 0);
   }
 
   temp->obj_flags.value[0]--;
 
   if (!temp->obj_flags.value[0]) /* Nothing left */
   {
-    act("There is nothing left now.", ch, 0, 0, TO_CHAR, 0);
+    act_to_character("There is nothing left now.", ch, 0, 0, 0);
     extract_obj(temp);
   }
 
@@ -1284,69 +1284,69 @@ void perform_wear(CharacterPtr ch, ObjectPtr obj_object,
   switch (keyword)
   {
   case 0:
-    act("$n wears $p on $s finger.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n wears $p on $s finger.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 1:
-    act("You wear $p around your neck.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p around $s neck.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p around your neck.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p around $s neck.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 2:
-    act("You wear $p on your body.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p on $s body.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your body.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p on $s body.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 3:
-    act("You wear $p on your head.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p on $s head.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your head.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p on $s head.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 4:
-    act("You wear $p on your legs.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p on $s legs.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your legs.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p on $s legs.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 5:
-    act("You wear $p on your feet.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p on $s feet.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your feet.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p on $s feet.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 6:
-    act("You wear $p on your hands.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p on $s hands.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your hands.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p on $s hands.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 7:
-    act("You wear $p on your arms.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p on $s arms.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your arms.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p on $s arms.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 8:
-    act("You wear $p on your body.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p about $s body.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your body.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p about $s body.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 9:
-    act("You wear $p on your waist.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p about $s waist.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your waist.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p about $s waist.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 10:
-    act("$n wears $p around $s wrist.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n wears $p around $s wrist.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 11:
-    act("You wear $p on your face.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wears $p on $s face.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wear $p on your face.", ch, obj_object, 0, 0);
+    act_to_room("$n wears $p on $s face.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 12:
-    act("You wield $p.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n wields $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You wield $p.", ch, obj_object, 0, 0);
+    act_to_room("$n wields $p.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 13:
-    act("You start using $p as a shield.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n starts using $p as a shield.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You start using $p as a shield.", ch, obj_object, 0, 0);
+    act_to_room("$n starts using $p as a shield.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 14:
-    act("You grab $p.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n grabs $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+    act_to_character("You grab $p.", ch, obj_object, 0, 0);
+    act_to_room("$n grabs $p.", ch, obj_object, 0, INVIS_NULL);
     break;
   case 15:
-    act("$n wears $p in $s ear.", ch, obj_object, 0, TO_ROOM, 0);
+    act_to_room("$n wears $p in $s ear.", ch, obj_object, 0, 0);
     break;
   case 16:
-    act("You light $p and hold it.", ch, obj_object, 0, TO_CHAR, 0);
-    act("$n lights $p and holds it.", ch, obj_object, 0, TO_ROOM, 0);
+    act_to_character("You light $p and hold it.", ch, obj_object, 0, 0);
+    act_to_room("$n lights $p and holds it.", ch, obj_object, 0, 0);
     break;
   }
 }
@@ -1557,13 +1557,13 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   obj = obj_object;
   if (class_restricted(ch, obj_object))
   {
-    act("You are forbidden from wearing $p due to a class restriction.", ch, obj_object, 0, TO_CHAR, 0);
+    act_to_character("You are forbidden from wearing $p due to a class restriction.", ch, obj_object, 0, 0);
     return;
   }
 
   if (size_restricted(ch, obj_object))
   {
-    act("$p is the wrong size for you and does not fit.", ch, obj_object, 0, TO_CHAR, 0);
+    act_to_character("$p is the wrong size for you and does not fit.", ch, obj_object, 0, 0);
     return;
   }
 
@@ -1578,7 +1578,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (ch->getLevel() < obj_object->obj_flags.eq_level)
     {
       dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
-      act(buffer, ch, obj_object, 0, TO_CHAR, 0);
+      act_to_character(buffer, ch, obj_object, 0, 0);
       return;
     }
   }
@@ -1588,7 +1588,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
         dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
-        act(buffer, ch, obj_object, 0, TO_CHAR, 0);
+        act_to_character(buffer, ch, obj_object, 0, 0);
         return;
       }
   }
@@ -1601,7 +1601,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
       !isexact(qPrintable(ch->name()), obj->name()) && ch->getLevel() < IMPLEMENTER)
   {
-    act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
+    act_to_character("$p can only be worn by its rightful owner.", ch, obj_object, 0, 0);
     return;
   }
 
@@ -1620,8 +1620,8 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_FINGER_L]) && (ch->equipment[WEAR_FINGER_R]))
       {
-        act("You are already wearing $p on your left ring-finger.", ch, ch->equipment[WEAR_FINGER_L], 0, TO_CHAR, 0);
-        act("You are already wearing $p on your right ring-finger.", ch, ch->equipment[WEAR_FINGER_R], 0, TO_CHAR, 0);
+        act_to_character("You are already wearing $p on your left ring-finger.", ch, ch->equipment[WEAR_FINGER_L], 0, 0);
+        act_to_character("You are already wearing $p on your right ring-finger.", ch, ch->equipment[WEAR_FINGER_R], 0, 0);
       }
       else
       {
@@ -1654,8 +1654,8 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_NECK_1]) && (ch->equipment[WEAR_NECK_2]))
       {
-        act("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_1], 0, TO_CHAR, 0);
-        act("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_2], 0, TO_CHAR, 0);
+        act_to_character("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_1], 0, 0);
+        act_to_character("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_2], 0, 0);
       }
       else
       {
@@ -1684,7 +1684,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_BODY])
       {
-        act("You already wear $p on your body.", ch, ch->equipment[WEAR_BODY], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p on your body.", ch, ch->equipment[WEAR_BODY], 0, 0);
       }
       else
       {
@@ -1705,7 +1705,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_HEAD])
       {
-        act("You already wear $p on your head.", ch, ch->equipment[WEAR_HEAD], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p on your head.", ch, ch->equipment[WEAR_HEAD], 0, 0);
       }
       else
       {
@@ -1726,7 +1726,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_LEGS])
       {
-        act("You already wear $p on your legs.", ch, ch->equipment[WEAR_LEGS], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p on your legs.", ch, ch->equipment[WEAR_LEGS], 0, 0);
       }
       else
       {
@@ -1747,7 +1747,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_FEET])
       {
-        act("You already wear $p on your feet.", ch, ch->equipment[WEAR_FEET], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p on your feet.", ch, ch->equipment[WEAR_FEET], 0, 0);
       }
       else
       {
@@ -1768,7 +1768,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_HANDS])
       {
-        act("You already wear $p on your hands.", ch, ch->equipment[WEAR_HANDS], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p on your hands.", ch, ch->equipment[WEAR_HANDS], 0, 0);
       }
       else
       {
@@ -1789,7 +1789,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_ARMS])
       {
-        act("You already wear $p on your arms.", ch, ch->equipment[WEAR_ARMS], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p on your arms.", ch, ch->equipment[WEAR_ARMS], 0, 0);
       }
       else
       {
@@ -1810,7 +1810,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_ABOUT])
       {
-        act("You already wear $p about your body.", ch, ch->equipment[WEAR_ABOUT], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p about your body.", ch, ch->equipment[WEAR_ABOUT], 0, 0);
       }
       else
       {
@@ -1831,7 +1831,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_WAISTE])
       {
-        act("You already wear $p about your waist.", ch, ch->equipment[WEAR_WAISTE], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p about your waist.", ch, ch->equipment[WEAR_WAISTE], 0, 0);
       }
       else
       {
@@ -1852,8 +1852,8 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_WRIST_L]) && (ch->equipment[WEAR_WRIST_R]))
       {
-        act("You already wear $p around your left wrist.", ch, ch->equipment[WEAR_WRIST_L], 0, TO_CHAR, 0);
-        act("You already wear $p around your right wrist.", ch, ch->equipment[WEAR_WRIST_R], 0, TO_CHAR, 0);
+        act_to_character("You already wear $p around your left wrist.", ch, ch->equipment[WEAR_WRIST_L], 0, 0);
+        act_to_character("You already wear $p around your right wrist.", ch, ch->equipment[WEAR_WRIST_R], 0, 0);
       }
       else
       {
@@ -1909,7 +1909,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       else if (ch->equipment[WEAR_WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) &&
                !ISSET(ch->affected_by, AFF_POWERWIELD))
 
-        act("$p is too heavy for you to use as a secondary weapon.", ch, obj_object, 0, TO_CHAR, 0);
+        act_to_character("$p is too heavy for you to use as a secondary weapon.", ch, obj_object, 0, 0);
 
       else if ((!ch->hands_are_free(2)) &&
                (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
@@ -1944,7 +1944,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_SHIELD])
       {
-        act("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
+        act_to_character("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, 0);
       }
       else if ((!ch->hands_are_free(2)) &&
                (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
@@ -2006,21 +2006,21 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_EAR_L]) && (ch->equipment[WEAR_EAR_R]))
       {
-        act("You already wearing $p on your left ear.", ch, ch->equipment[WEAR_EAR_L], 0, TO_CHAR, 0);
-        act("You already wearing $p on your right ear.", ch, ch->equipment[WEAR_EAR_R], 0, TO_CHAR, 0);
+        act_to_character("You already wearing $p on your left ear.", ch, ch->equipment[WEAR_EAR_L], 0, 0);
+        act_to_character("You already wearing $p on your right ear.", ch, ch->equipment[WEAR_EAR_R], 0, 0);
       }
       else
       {
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_EAR_L])
         {
-          act("You wear $p in your right ear.", ch, obj_object, 0, TO_CHAR, 0);
+          act_to_character("You wear $p in your right ear.", ch, obj_object, 0, 0);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_EAR_R);
         }
         else
         {
-          act("You wear $p in your left ear.", ch, obj_object, 0, TO_CHAR, 0);
+          act_to_character("You wear $p in your left ear.", ch, obj_object, 0, 0);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_EAR_L);
         }
@@ -2037,7 +2037,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       ch->sendln("You cannot wear this.");
     else if (ch->equipment[WEAR_LIGHT])
     {
-      act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
+      act_to_character("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, 0);
     }
     else if ((!ch->hands_are_free(2)) &&
              (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
@@ -2082,8 +2082,8 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
 
       if (!ch->has_skill(SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
       {
-        act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
-        act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
+        act_to_room("$n fails to switch $s weapons.", ch, 0, 0, 0);
+        act_to_character("You fail to switch your weapons.", ch, 0, 0, 0);
         return;
       }
 
@@ -2430,7 +2430,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (*arg1)
   {
-    if (!strcmp(arg1, "all"))
+    if (!dc_strcmp(arg1, "all"))
     {
       for (j = {}; j < MAX_WEAR; j++)
       {
@@ -2459,8 +2459,8 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
             }
             else
               obj_to_char(ch->unequip_char(j), ch);
-            act("You stop using $p.", ch, obj_object, 0, TO_CHAR, 0);
-            act("$n stops using $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+            act_to_character("You stop using $p.", ch, obj_object, 0, 0);
+            act_to_room("$n stops using $p.", ch, obj_object, 0, INVIS_NULL);
           }
         }
         else
@@ -2514,8 +2514,8 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
           else
             obj_to_char(ch->unequip_char(j), ch);
 
-          act("You stop using $p.", ch, obj_object, 0, TO_CHAR, 0);
-          act("$n stops using $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+          act_to_character("You stop using $p.", ch, obj_object, 0, 0);
+          act_to_room("$n stops using $p.", ch, obj_object, 0, INVIS_NULL);
           if (blindlag)
             WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         }
@@ -2557,8 +2557,8 @@ qint32 Character::recheck_height_wears(void)
     {
       obj = unequip_char(j);
       obj_to_char(obj, this);
-      act("$n looks uncomfortable, and shifts $p into $s inventory.", this, obj, nullptr, TO_ROOM, 0);
-      act("$p feels uncomfortable and you shift it into your inventory.", this, obj, nullptr, TO_CHAR, 0);
+      act_to_room("$n looks uncomfortable, and shifts $p into $s inventory.", this, obj, nullptr, 0);
+      act_to_character("$p feels uncomfortable and you shift it into your inventory.", this, obj, nullptr, 0);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -2596,7 +2596,7 @@ bool fullSave(ObjectPtr obj)
     return 1;
   }
 
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
+  if (dc_strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
 
   if (obj->name() != tmp_obj->name()) // GL. and stuff.

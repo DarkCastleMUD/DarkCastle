@@ -21,7 +21,6 @@
 #include "DC/terminal.h"
 #include "DC/interp.h"
 #include "DC/db.h"
-#include "DC/utility.h"
 
 extern bool MOBtrigger;
 
@@ -79,7 +78,7 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
                   levels_to_gain);
 
       dc_sprintf(buf, "$n reports '%s'", report);
-      act(buf, ch, 0, 0, TO_ROOM, 0);
+      act_to_room(buf, ch, 0, 0, 0);
 
       ch->send(QStringLiteral("You report: %1\r\n").arg(report));
       return ReturnValue::eSUCCESS;
@@ -102,7 +101,7 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   dc_sprintf(buf, "$n reports '%s'", report);
-  act(buf, ch, 0, 0, TO_ROOM, 0);
+  act_to_room(buf, ch, 0, 0, 0);
 
   ch->send(QStringLiteral("You report: %1\r\n").arg(report));
 
@@ -211,7 +210,7 @@ qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   return (1);
 }
 
-command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
+command_return_t do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x;
   qint32 y = {};
@@ -255,9 +254,8 @@ command_return_t do_channel(CharacterPtr ch, QStringList arg, cmd_t cmd)
   if (ch->isNonPlayer())
     return ReturnValue::eSUCCESS;
 
-  if (*arg)
-    one_argument(arg, buf);
-
+  if (!arg.isEmpty())
+    arg = one_argument(arg, buf);
   else
   {
     //    ch->sendln("");
@@ -417,7 +415,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-bool is_ignoring(const CharacterPtr const ch, const CharacterPtr const victim)
+bool is_ignoring(CharacterPtr ch, CharacterPtr victim)
 {
   if (ch->isNonPlayer() || (victim->getLevel() >= IMMORTAL && victim->isPlayer()) || ch->player->ignoring.empty())
   {
@@ -436,7 +434,7 @@ bool is_ignoring(const CharacterPtr const ch, const CharacterPtr const victim)
 
   // Since it didn't match the whole name, see if it matches one of
   // the name keywords used for a mob name
-  QString names = qPrintable(victim->name());
+  QString names = victim->name();
   QString name1 = {}, remainder_names = {};
   std::tie(name1, remainder_names) = half_chop(names);
   while (name1.isEmpty() == false)
@@ -457,8 +455,7 @@ constexpr auto MAX_NOTE_LENGTH = 1000; /* arbitrary */
 command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr paper = 0, pen = {};
-  QString papername, penname[MAX_INPUT_LENGTH],
-      buf[MAX_STRING_LENGTH];
+  QString papername, penname, buf;
 
   argument_interpreter(argument, papername, penname);
 
@@ -532,11 +529,11 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
   /* ok.. now let's see what kind of stuff we've found */
   if (pen->obj_flags.type_flag != ITEM_PEN)
   {
-    act("$p is no good for writing with.", ch, pen, 0, TO_CHAR, 0);
+    act_to_character("$p is no good for writing with.", ch, pen, 0, 0);
   }
   else if (paper->obj_flags.type_flag != ITEM_NOTE)
   {
-    act("You can't write on $p.", ch, paper, 0, TO_CHAR, 0);
+    act_to_character("You can't write on $p.", ch, paper, 0, 0);
   }
   else if (!paper->ActionDescription().isEmpty())
     /*    else if (paper->item_number != real_object(1205) )  */
@@ -546,7 +543,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     /* we can write - hooray! */
 
     ch->sendln("Ok.. go ahead and write.. end the note with a \\@.");
-    act("$n begins to jot down a note.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room("$n begins to jot down a note.", ch, 0, 0, INVIS_NULL);
     // TODO BROKEN
     // ch->desc->strnew = &paper->ActionDescription();
     ch->desc->max_str = MAX_NOTE_LENGTH;
@@ -580,25 +577,25 @@ command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
         {
         case 0:
           if (GET_SEX(victim) == SEX_MALE)
-            act("$n accuses you of fighting like a woman!", ch, 0, victim, TO_VICT, 0);
+            act_to_victim("$n accuses you of fighting like a woman!", ch, 0, victim, 0);
           else
-            act("$n says that women can't fight.", ch, 0, victim, TO_VICT, 0);
+            act_to_victim("$n says that women can't fight.", ch, 0, victim, 0);
           break;
         case 1:
           if (GET_SEX(victim) == SEX_MALE)
-            act("$n accuses you of having the smallest.... (brain?)", ch, 0, victim, TO_VICT, 0);
+            act_to_victim("$n accuses you of having the smallest.... (brain?)", ch, 0, victim, 0);
           else
-            act("$n tells you that you'd loose a beauty contest against a troll.", ch, 0, victim, TO_VICT, 0);
+            act_to_victim("$n tells you that you'd loose a beauty contest against a troll.", ch, 0, victim, 0);
           break;
         case 2:
-          act("$n calls your mother a bitch!", ch, 0, victim, TO_VICT, 0);
+          act_to_victim("$n calls your mother a bitch!", ch, 0, victim, 0);
           break;
         default:
-          act("$n tells you that you have big ears!", ch, 0, victim, TO_VICT, 0);
+          act_to_victim("$n tells you that you have big ears!", ch, 0, victim, 0);
           break;
         } // end switch
 
-        act("$n insults $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+        act_to_room("$n insults $N.", ch, 0, victim, NOTVICT);
       }
       else
       { /* ch == victim */
@@ -632,7 +629,7 @@ command_return_t do_emote(CharacterPtr ch, const QString argument, cmd_t cmd)
     dc_sprintf(buf, "$n %s", argument + i);
     // don't want players triggering mobs with emotes
     MOBtrigger = false;
-    act(buf, ch, 0, 0, TO_ROOM, 0);
+    act_to_room(buf, ch, 0, 0, 0);
     ch->send(QStringLiteral("%s %s\r\n").arg(qPrintable(ch->shortdesc_or_name())).arg(argument + i));
     MOBtrigger = true;
   }

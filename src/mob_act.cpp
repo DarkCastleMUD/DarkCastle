@@ -213,7 +213,7 @@ void mobile_activity(void)
         // -Pirahna 12/11/00
         get(ch, best_obj, 0, 0, cmd_t::DEFAULT);
         //        move_obj( best_obj, ch );
-        //        act( "$n gets $p.",  ch, best_obj, 0, TO_ROOM, 0);
+        //        act_to_room( "$n gets $p.",  ch, best_obj, 0,  0);
       }
     }
 
@@ -268,19 +268,19 @@ void mobile_activity(void)
           continue;
         if (!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
-        act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
+        act_to_character("Checking $N", ch, 0, tmp_ch, 0);
         if (isexact(qPrintable(tmp_ch->name()), ch->mobdata->hated)) // use isname since hated is a list
         {
           if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
           {
-            act("You growl at $N.", ch, 0, tmp_ch, TO_CHAR, 0);
-            act("$n growls at YOU!.", ch, 0, tmp_ch, TO_VICT, 0);
-            act("$n growls at $N.", ch, 0, tmp_ch, TO_ROOM, NOTVICT);
+            act_to_character("You growl at $N.", ch, 0, tmp_ch, 0);
+            act_to_victim("$n growls at YOU!.", ch, 0, tmp_ch, 0);
+            act_to_room("$n growls at $N.", ch, 0, tmp_ch, NOTVICT);
             continue;
           }
           else if (tmp_ch->isPlayer())
           {
-            act("$n screams, 'I am going to KILL YOU!'", ch, 0, 0, TO_ROOM, 0);
+            act_to_room("$n screams, 'I am going to KILL YOU!'", ch, 0, 0, 0);
             PerfTimers["mprog_attack"].start();
             retval = mprog_attack_trigger(ch, tmp_ch);
             PerfTimers["mprog_attack"].stop();
@@ -388,7 +388,7 @@ void mobile_activity(void)
         {
           if (ch->mobdata->hated != nullptr)
             remove_memory(ch, 'h');
-          act("$n screams 'Oh SHIT!'", ch, 0, 0, TO_ROOM, 0);
+          act_to_room("$n screams 'Oh SHIT!'", ch, 0, 0, 0);
           do_flee(ch, "");
           continue;
         }
@@ -423,7 +423,7 @@ void mobile_activity(void)
               dc_sprintf(buf, "$n screams 'Take heart, fellow %s!'", races[tmp_race].singular_name);
             else
               dc_sprintf(buf, "$n screams 'HEY! Don't be picking on %s!'", races[tmp_race].plural_name);
-            act(buf, ch, 0, 0, TO_ROOM, 0);
+            act_to_room(buf, ch, 0, 0, 0);
 
             PerfTimers["attack_trigger3"].start();
             retval = mprog_attack_trigger(ch, tmp_ch);
@@ -478,14 +478,14 @@ void mobile_activity(void)
               if (i == 1)
               {
                 if (GET_ALIGNMENT(ch) <= -350)
-                  act("$n screams 'Get outta here, freak!'", ch, 0, 0, TO_ROOM, 0);
+                  act_to_room("$n screams 'Get outta here, freak!'", ch, 0, 0, 0);
                 else
-                  act("$n screams 'May truth and justice prevail!'", ch, 0, 0, TO_ROOM, 0);
+                  act_to_room("$n screams 'May truth and justice prevail!'", ch, 0, 0, 0);
               }
               else
               {
-                act("$n senses your evil intentions and attacks!", ch, 0, tmp_ch, TO_VICT, 0);
-                act("$n senses $N's evil intentions and attacks!", ch, 0, tmp_ch, TO_ROOM, NOTVICT);
+                act_to_victim("$n senses your evil intentions and attacks!", ch, 0, tmp_ch, 0);
+                act_to_room("$n senses $N's evil intentions and attacks!", ch, 0, tmp_ch, NOTVICT);
               }
 
               PerfTimers["attack_trigger4"].start();
@@ -504,14 +504,14 @@ void mobile_activity(void)
               if (i == 1)
               {
                 if (GET_ALIGNMENT(ch) >= 350)
-                  act("$n screams 'I'm afraid I cannot let you trespass onto these grounds!'", ch, 0, 0, TO_ROOM, 0);
+                  act_to_room("$n screams 'I'm afraid I cannot let you trespass onto these grounds!'", ch, 0, 0, 0);
                 else
-                  act("$n screams 'The forces of evil shall crush your goodness!'", ch, 0, 0, TO_ROOM, 0);
+                  act_to_room("$n screams 'The forces of evil shall crush your goodness!'", ch, 0, 0, 0);
               }
               else
               {
-                act("$n is offended by your good nature and attacks!", ch, 0, tmp_ch, TO_VICT, 0);
-                act("$n is offended by $N's good nature and attacks!", ch, 0, tmp_ch, TO_ROOM, NOTVICT);
+                act_to_victim("$n is offended by your good nature and attacks!", ch, 0, tmp_ch, 0);
+                act_to_room("$n is offended by $N's good nature and attacks!", ch, 0, tmp_ch, NOTVICT);
               }
               PerfTimers["attack_trigger5"].start();
               retval = mprog_attack_trigger(ch, tmp_ch);
@@ -528,11 +528,11 @@ void mobile_activity(void)
                 GET_ALIGNMENT(tmp_ch) < 350)
             {
               if (i == 0)
-                act("$n screams 'Pick a side, neutral dog!'", ch, 0, 0, TO_ROOM, 0);
+                act_to_room("$n screams 'Pick a side, neutral dog!'", ch, 0, 0, 0);
               else
               {
-                act("$n detects $N's neutrality and attacks!", ch, 0, tmp_ch, TO_ROOM, NOTVICT);
-                act("$n detects your neutrality and attacks!", ch, 0, tmp_ch, TO_VICT, 0);
+                act_to_room("$n detects $N's neutrality and attacks!", ch, 0, tmp_ch, NOTVICT);
+                act_to_victim("$n detects your neutrality and attacks!", ch, 0, tmp_ch, 0);
               }
 
               retval = mprog_attack_trigger(ch, tmp_ch);
@@ -554,7 +554,7 @@ void mobile_activity(void)
               if (!wimpy || (wimpy && ch->getLevel() >= tmp_ch->getLevel()))
               {
                 dc_sprintf(buf, "$n screams 'Oooo, I HATE %s!'", races[tmp_race].plural_name);
-                act(buf, ch, 0, 0, TO_ROOM, 0);
+                act_to_room(buf, ch, 0, 0, 0);
                 retval = mprog_attack_trigger(ch, tmp_ch);
                 if (SOMEONE_DIED(retval))
                   break;
@@ -563,7 +563,7 @@ void mobile_activity(void)
               else
               {
                 dc_sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", races[tmp_race].plural_name);
-                act(buf, ch, 0, 0, TO_ROOM, 0);
+                act_to_room(buf, ch, 0, 0, 0);
                 do_flee(ch, "");
               }
               break;
@@ -685,7 +685,7 @@ void scavenge(CharacterPtr ch)
             if (!ch->equipment[WEAR_WIELD])
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_WIELD);
@@ -695,7 +695,7 @@ void scavenge(CharacterPtr ch)
             if ((ch->equipment[WEAR_WIELD]) && (!ch->equipment[WEAR_SECOND_WIELD]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_SECOND_WIELD);
@@ -717,7 +717,7 @@ void scavenge(CharacterPtr ch)
                 ((!ch->equipment[WEAR_FINGER_L]) || (!ch->equipment[WEAR_FINGER_R])))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_FINGER_L])
@@ -733,7 +733,7 @@ void scavenge(CharacterPtr ch)
                 ((!ch->equipment[WEAR_NECK_1]) || (!ch->equipment[WEAR_NECK_2])))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_NECK_1])
@@ -748,7 +748,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, BODY)) && (!ch->equipment[WEAR_BODY]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_BODY);
@@ -760,7 +760,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, HEAD)) && (!ch->equipment[WEAR_HEAD]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_HEAD);
@@ -772,7 +772,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, LEGS)) && (!ch->equipment[WEAR_LEGS]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_LEGS);
@@ -784,7 +784,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, FEET)) && (!ch->equipment[WEAR_FEET]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_FEET);
@@ -796,7 +796,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, HANDS)) && (!ch->equipment[WEAR_HANDS]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_HANDS);
@@ -808,7 +808,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, ARMS)) && (!ch->equipment[WEAR_ARMS]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_ARMS);
@@ -820,7 +820,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, ABOUT)) && (!ch->equipment[WEAR_ABOUT]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_ABOUT);
@@ -832,7 +832,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, WAISTE)) && (!ch->equipment[WEAR_WAISTE]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_WAISTE);
@@ -845,7 +845,7 @@ void scavenge(CharacterPtr ch)
                 ((!ch->equipment[WEAR_WRIST_L]) || (!ch->equipment[WEAR_WRIST_R])))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_WRIST_L])
@@ -860,7 +860,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, FACE)) && (!ch->equipment[WEAR_FACE]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_FACE);
@@ -876,7 +876,7 @@ void scavenge(CharacterPtr ch)
             if ((CAN_WEAR(obj, SHIELD)) && (!ch->equipment[WEAR_SHIELD]))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               ch->equip_char(obj, WEAR_SHIELD);
@@ -891,7 +891,7 @@ void scavenge(CharacterPtr ch)
                   (!ch->equipment[WEAR_LIGHT]))
               {
                 move_obj(obj, ch);
-                act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+                act_to_room("$n gets $p.", ch, obj, 0, 0);
                 perform_wear(ch, obj, 16);
                 obj_from_char(obj);
                 ch->equip_char(obj, WEAR_LIGHT);
@@ -900,7 +900,7 @@ void scavenge(CharacterPtr ch)
               else if (obj->obj_flags.type_flag != ITEM_LIGHT)
               {
                 move_obj(obj, ch);
-                act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+                act_to_room("$n gets $p.", ch, obj, 0, 0);
                 perform_wear(ch, obj, keyword);
                 obj_from_char(obj);
                 ch->equip_char(obj, WEAR_HOLD);
@@ -914,7 +914,7 @@ void scavenge(CharacterPtr ch)
                 ((!ch->equipment[WEAR_EAR_L]) || (!ch->equipment[WEAR_EAR_R])))
             {
               move_obj(obj, ch);
-              act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
+              act_to_room("$n gets $p.", ch, obj, 0, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_EAR_L])
