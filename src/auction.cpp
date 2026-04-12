@@ -29,13 +29,13 @@ CharacterPtr find_mob_in_room(CharacterPtr ch, qint32 iFriendId);
 void AuctionHouse::ShowStats(CharacterPtr ch)
 {
   ch->sendln("Vendor Statistics:");
-  ch->send(QStringLiteral("Items Posted:     %1\r\n").arg(ItemsPosted));
-  ch->send(QStringLiteral("Items For Sale:   %1\r\n").arg(ItemsActive));
-  ch->send(QStringLiteral("Items Sold:       %1\r\n").arg(ItemsSold));
-  ch->send(QStringLiteral("Items Expired:    %1\r\n").arg(ItemsExpired));
-  ch->send(QStringLiteral("Total Revenue:    %1\r\n").arg(Revenue));
-  ch->send(QStringLiteral("Tax Collected:    %1\r\n").arg(TaxCollected));
-  ch->send(QStringLiteral("Uncollected Gold: %1\r\n").arg(UncollectedGold));
+  ch->send(u"Items Posted:     %1\r\n"_s.arg(ItemsPosted));
+  ch->send(u"Items For Sale:   %1\r\n"_s.arg(ItemsActive));
+  ch->send(u"Items Sold:       %1\r\n"_s.arg(ItemsSold));
+  ch->send(u"Items Expired:    %1\r\n"_s.arg(ItemsExpired));
+  ch->send(u"Total Revenue:    %1\r\n"_s.arg(Revenue));
+  ch->send(u"Tax Collected:    %1\r\n"_s.arg(TaxCollected));
+  ch->send(u"Uncollected Gold: %1\r\n"_s.arg(UncollectedGold));
 }
 
 /*
@@ -149,18 +149,18 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
   QMap<quint32, AuctionTicket>::iterator Item_it;
   if (new_price < AUC_MIN_PRICE || new_price > AUC_MAX_PRICE)
   {
-    ch->send(QStringLiteral("Price must be between %u and %u.\r\n").arg(AUC_MIN_PRICE).arg(AUC_MAX_PRICE));
+    ch->send(u"Price must be between %u and %u.\r\n"_s.arg(AUC_MIN_PRICE).arg(AUC_MAX_PRICE));
     return;
   }
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
   {
-    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 doesn't seem to exist.\r\n"_s.arg(ticket));
     return;
   }
 
   if (Item_it->seller.compare(ch->name()))
   {
-    ch->send(QStringLiteral("Ticket number %1 doesn't belong to you.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 doesn't belong to you.\r\n"_s.arg(ticket));
     return;
   }
 
@@ -170,25 +170,25 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
     quint32 fee = (quint32)((double)difference * 0.025);
     if (ch->getGold() < fee)
     {
-      ch->send(QStringLiteral("Increasing the items price by %u costs %u, you don't have enough.\r\n").arg(difference).arg(fee));
+      ch->send(u"Increasing the items price by %u costs %u, you don't have enough.\r\n"_s.arg(difference).arg(fee));
       return;
     }
     ch->removeGold(fee);
-    ch->send(QStringLiteral("The broker collects %u coins for increasing the price by %u.\r\n").arg(fee).arg(difference));
+    ch->send(u"The broker collects %u coins for increasing the price by %u.\r\n"_s.arg(fee).arg(difference));
     ch->save();
   }
 
-  ch->send(QStringLiteral("The new price of ticket %u (%s) is now %u.\r\n").arg(ticket).arg(qPrintable(Item_it->item_name)).arg(new_price));
+  ch->send(u"The new price of ticket %u (%s) is now %u.\r\n"_s.arg(ticket).arg(qPrintable(Item_it->item_name)).arg(new_price));
 
   for (auto &vch : DC::getInstance()->world[ch->in_room].people_)
   {
     if (vch != ch)
     {
-      vch->send(QStringLiteral("%1 has just modified the price of one of %2 items.\r\n").arg(qPrintable(ch->name())).arg((GET_SEX(ch) == SEX_MALE) ? "his" : "her"));
+      vch->send(u"%1 has just modified the price of one of %2 items.\r\n"_s).arg(qPrintable(ch->name())).arg((GET_SEX(ch) == SEX_MALE) ? "his" : "her"));
     }
   }
 
-  DC::getInstance()->logentry(QStringLiteral("VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n").arg(qPrintable(ch->name())).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  DC::getInstance()->logentry(u"VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n"_s.arg(qPrintable(ch->name())).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   Item_it->price = new_price;
   Save();
 }
@@ -206,12 +206,12 @@ void AuctionHouse::CheckForSoldItems(CharacterPtr ch)
       if (Item_it->state == AUC_SOLD)
       {
         has_sold_items = true;
-        ch->send(QStringLiteral("Your auction of %1 has $2SOLD$R to %2 for %3 coins.\r\n").arg(Item_it->item_name).arg(Item_it->buyer).arg(Item_it->price));
+        ch->send(u"Your auction of %1 has $2SOLD$R to %2 for %3 coins.\r\n"_s.arg(Item_it->item_name).arg(Item_it->buyer).arg(Item_it->price));
       }
       if (Item_it->state == AUC_EXPIRED)
       {
         has_sold_items = true;
-        ch->send(QStringLiteral("Your auction of %1 has $4EXPIRED$R.\r\n").arg(Item_it->item_name));
+        ch->send(u"Your auction of %1 has $4EXPIRED$R.\r\n"_s.arg(Item_it->item_name));
       }
     }
   }
@@ -241,7 +241,7 @@ void AuctionHouse::HandleDelete(QString name)
     plural = "s ";
   }
 
-  DC::getInstance()->logentry(QStringLiteral("%1 auction%2 belonging to %3 have been deleted.").arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 auction%2 belonging to %3 have been deleted."_s).arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
 
   while (!tickets_to_delete.isEmpty())
   {
@@ -285,7 +285,7 @@ void AuctionHouse::HandleRename(CharacterPtr ch, QString old_name, QString new_n
   {
     plural = "s ";
   }
-  DC::getInstance()->logentry(QStringLiteral("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 auction%2 have been converted from %3 to %4."_s).arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
   Save();
 }
 
@@ -344,14 +344,14 @@ void AuctionHouse::Identify(CharacterPtr ch, quint32 ticket)
   auto Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 doesn't seem to exist.\r\n"_s.arg(ticket));
     return;
   }
 
   if (!Item_it->buyer.isEmpty() && Item_it->buyer.compare(qPrintable(ch->name())) && Item_it->seller.compare(qPrintable(ch->name())))
 
   {
-    ch->send(QStringLiteral("Ticket number %1 is private.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 is private.\r\n"_s).arg(ticket));
     return;
   }
 
@@ -364,7 +364,7 @@ void AuctionHouse::Identify(CharacterPtr ch, quint32 ticket)
   qint32 nr = real_object(Item_it->vitem);
   if (nr < 0)
   {
-    ch->send(QStringLiteral("There is a problem with ticket %1. Please tell an imm.\r\n").arg(ticket));
+    ch->send(u"There is a problem with ticket %1. Please tell an imm.\r\n"_s).arg(ticket));
     return;
   }
 
@@ -373,7 +373,7 @@ void AuctionHouse::Identify(CharacterPtr ch, quint32 ticket)
   if (!obj)
   {
 
-    DC::getInstance()->logentry(QStringLiteral("Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!").arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!"_s.arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -582,7 +582,7 @@ void AuctionHouse::ListRooms(CharacterPtr ch)
 
   for (room_it = auction_rooms.begin(); room_it != auction_rooms.end(); room_it++)
   {
-    ch->send(QStringLiteral(" %1").arg(room_it.key()));
+    ch->send(u" %1"_s.arg(room_it.key()));
   }
 
   ch->sendln();
@@ -596,13 +596,13 @@ void AuctionHouse::AddRoom(CharacterPtr ch, qint32 room)
   if (auction_rooms.end() == auction_rooms.find(room))
   {
     auction_rooms[room] = 1;
-    ch->send(QStringLiteral("Done. Room %1 added to auction houses.\r\n").arg(room));
+    ch->send(u"Done. Room %1 added to auction houses.\r\n"_s).arg(room));
     DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just added room %d to auction houses.", qPrintable(ch->name()), room);
     Save();
     return;
   }
   else
-    ch->send(QStringLiteral("Room %1 is already an auction house.\r\n").arg(room));
+    ch->send(u"Room %1 is already an auction house.\r\n"_s).arg(room));
 }
 
 /*
@@ -612,13 +612,13 @@ void AuctionHouse::RemoveRoom(CharacterPtr ch, qint32 room)
 {
   if (1 == auction_rooms.remove(room))
   {
-    ch->send(QStringLiteral("Done. Room %1 has been removed from auction houses.\r\n").arg(room));
+    ch->send(u"Done. Room %1 has been removed from auction houses.\r\n"_s).arg(room));
     DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just removed room %d from auction houses.", qPrintable(ch->name()), room);
     Save();
     return;
   }
   else
-    ch->send(QStringLiteral("Room %1 doesn't appear to be an auction house.\r\n").arg(room));
+    ch->send(u"Room %1 doesn't appear to be an auction house.\r\n"_s.arg(room));
 }
 
 void AuctionHouse::ParseStats()
@@ -722,7 +722,7 @@ void AuctionHouse::Save()
 
   if (DC::getInstance()->cf.bport)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to save auction files because this is the testport!"), ANGEL, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Unable to save auction files because this is the testport!"_s, ANGEL, DC::LogChannel::LOG_MISC);
     return;
   }
   QSaveFile ah_file(filename_);
@@ -825,12 +825,12 @@ void AuctionHouse::CollectTickets(CharacterPtr ch, quint32 ticket)
     {
       if (Item_it->seller.compare(qPrintable(ch->name())))
       {
-        ch->send(QStringLiteral("Ticket %1 doesn't seem to belong to you.\r\n").arg(ticket));
+        ch->send(u"Ticket %1 doesn't seem to belong to you.\r\n"_s.arg(ticket));
         return;
       }
       if (Item_it->state != AUC_EXPIRED && Item_it->state != AUC_SOLD)
       {
-        ch->send(QStringLiteral("Ticket %1 isn't collectible!.\r\n").arg(ticket));
+        ch->send(u"Ticket %1 isn't collectible!.\r\n"_s.arg(ticket));
         return;
       }
     }
@@ -873,7 +873,7 @@ void AuctionHouse::CheckExpire()
       ItemsActive -= 1;
       ItemsExpired += 1;
       if ((ch = get_active_pc(qPrintable(Item_it->seller))))
-        ch->send(QStringLiteral("Your auction of %s has expired.\r\n").arg(qPrintable(Item_it->item_name)));
+        ch->send(u"Your auction of %s has expired.\r\n"_s.arg(qPrintable(Item_it->item_name)));
       Item_it->state = AUC_EXPIRED;
       something_expired = true;
     }
@@ -896,19 +896,19 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 doesn't seem to exist.\r\n"_s.arg(ticket));
     return;
   }
 
   if (!Item_it->buyer.isEmpty() && Item_it->buyer.compare(qPrintable(ch->name())))
   {
-    ch->send(QStringLiteral("Ticket number %1 is private.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 is private.\r\n"_s).arg(ticket));
     return;
   }
 
   if (Item_it->state != AUC_FOR_SALE)
   {
-    ch->send(QStringLiteral("Ticket number %1 has already been sold\r\n.").arg(ticket));
+    ch->send(u"Ticket number %1 has already been sold\r\n."_s).arg(ticket));
     return;
   }
 
@@ -920,7 +920,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
   if (ch->getGold() < Item_it->price)
   {
-    ch->send(QStringLiteral("Ticket number %d costs %d coins, you can't afford that!\r\n").arg(ticket).arg(Item_it->price));
+    ch->send(u"Ticket number %d costs %d coins, you can't afford that!\r\n"_s.arg(ticket).arg(Item_it->price));
     return;
   }
 
@@ -962,12 +962,12 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        ch->send(QStringLiteral("You need to have \"%s\" to buy a NO_TRADE item.\r\n").arg(qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description())));
+        ch->send(u"You need to have \"%s\"_s to buy a NO_TRADE item.\r\n").arg(qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description())));
       return;
     }
     else
     {
-      ch->send(QStringLiteral("You give your %1 to the broker.\r\n").arg(no_trade_obj->short_description()));
+      ch->send(u"You give your %1 to the broker.\r\n"_s).arg(no_trade_obj->short_description()));
       extract_obj(no_trade_obj);
     }
   }
@@ -992,13 +992,13 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   ch->removeGold(Item_it->price);
 
   if ((vict = get_active_pc(qPrintable(Item_it->seller))))
-    vict->send(QStringLiteral("%s just purchased your ticket of %s for %u coins.\r\n").arg(qPrintable(ch->name())).arg(qPrintable(Item_it->item_name)).arg(Item_it->price));
+    vict->send(u"%s just purchased your ticket of %s for %u coins.\r\n"_s.arg(qPrintable(ch->name())).arg(qPrintable(Item_it->item_name)).arg(Item_it->price));
 
-  ch->send(QStringLiteral("You have purchased %s for %u coins.\r\n").arg(qPrintable(obj->short_description())).arg(Item_it->price));
+  ch->send(u"You have purchased %s for %u coins.\r\n"_s.arg(qPrintable(obj->short_description())).arg(Item_it->price));
 
   for (auto &vch : DC::getInstance()->world[ch->in_room].people_)
     if (vch != ch)
-      vch->send(QStringLiteral("%s just purchased %s's %s\r\n").arg(qPrintable(ch->name())).arg(qPrintable(Item_it->seller)).arg(qPrintable(obj->short_description())));
+      vch->send(u"%s just purchased %s's %s\r\n"_s.arg(qPrintable(ch->name())).arg(qPrintable(Item_it->seller)).arg(qPrintable(obj->short_description())));
 
   Item_it->state = AUC_SOLD;
   Item_it->buyer = qPrintable(ch->name());
@@ -1035,7 +1035,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   }
   else
   {
-    DC::getInstance()->logentry(QStringLiteral("bport mode: Not saving auction file to web dir."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"bport mode: Not saving auction file to web dir."_s, 0, DC::LogChannel::LOG_MISC);
   }
 }
 
@@ -1091,12 +1091,12 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
   Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 doesn't seem to exist.\r\n"_s.arg(ticket));
     return;
   }
   if (Item_it->seller.compare(qPrintable(ch->name())))
   {
-    ch->send(QStringLiteral("Ticket number %1 doesn't belong to you.\r\n").arg(ticket));
+    ch->send(u"Ticket number %1 doesn't belong to you.\r\n"_s.arg(ticket));
     return;
   }
 
@@ -1107,7 +1107,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     quint32 fee = (quint32)((double)Item_it->price * 0.025);
     if (fee > 500000)
       fee = 500000;
-    ch->sendln(QStringLiteral("The Broker hands you %u $B$5gold$R coins from your sale of %s.\r\nHe pockets %u $B$5gold$R as a broker's fee.").arg((Item_it->price - fee)).arg(Item_it->item_name).arg(fee));
+    ch->sendln(u"The Broker hands you %u $B$5gold$R coins from your sale of %s.\r\nHe pockets %u $B$5gold$R as a broker's fee."_s.arg((Item_it->price - fee)).arg(Item_it->item_name).arg(fee));
     TaxCollected += fee;
     Revenue -= fee;
     UncollectedGold -= Item_it->price;
@@ -1151,7 +1151,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       return;
     }
 
-    ch->send(QStringLiteral("The Consignment Broker retrieves %1 and returns it to you.\r\n").arg(obj->short_description()));
+    ch->send(u"The Consignment Broker retrieves %1 and returns it to you.\r\n"_s).arg(obj->short_description()));
     QString log_buf = {};
     dc_sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
                qPrintable(ch->name()), ticket, qPrintable(Item_it->item_name), Item_it->price);
@@ -1181,7 +1181,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
   }
   break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Default case reached in Removeticket, contact a coder!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Default case reached in Removeticket, contact a coder!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -1269,8 +1269,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
         break;
       }
       i++;
-      std::stringstream ss;
-      ss.imbue(std::locale("en_US"));
+
       ss << Item_it->price;
       dc_sprintf(buf, "\r\n%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\r\n",
                  Item_it.key(),
@@ -1303,15 +1302,15 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
   if (i == 0)
   {
     if (options == LIST_BY_SLOT)
-      ch->send(QStringLiteral("\r\nThere are no %s items currently posted.\r\n").arg(qPrintable(name)));
+      ch->send(u"\r\nThere are no %s items currently posted.\r\n"_s.arg(qPrintable(name)));
     else if (options == LIST_BY_SELLER)
-      ch->sendln(QStringLiteral("\r\n\"%s\" doesn't seem to be selling any public items.\r\n\r\nTo view private items, use \"vend list private\".\r\n").arg(qPrintable(name));
+      ch->sendln(u"\r\n\"%s\"_s doesn't seem to be selling any public items.\r\n\r\nTo view private items, use \"vend list private\".\r\n").arg(qPrintable(name));
     else if (options == LIST_BY_CLASS)
-      ch->send(QStringLiteral("\r\nThere are no \"%s\" wearable public items for sale.\r\n").arg(qPrintable(name)));
+      ch->send(u"\r\nThere are no \"%s\" wearable public items for sale.\r\n"_s).arg(qPrintable(name)));
     else if (options == LIST_MINE)
       ch->sendln("\r\nYou do not have any tickets.");
     else if (options == LIST_BY_RACE)
-      ch->send(QStringLiteral("\r\nThere is nothing for sale that would fit a \"%s\".\r\n").arg(qPrintable(name)));
+      ch->send(u"\r\nThere is nothing for sale that would fit a \"%s\".\r\n"_s).arg(qPrintable(name)));
     else
       ch->sendln("\r\nThere is nothing for sale!");
   }
@@ -1322,7 +1321,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     if (vault)
     {
       qint32 max_items = vault.size_ / 100;
-      ch->send(QStringLiteral("\r\nYou are using %d of your %d available tickets.\r\n").arg(i).arg(max_items));
+      ch->send(u"\r\nYou are using %d of your %d available tickets.\r\n"_s.arg(i).arg(max_items));
     }
   }
 
@@ -1374,13 +1373,13 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
 
   if (ARE_CONTAINERS(obj) && obj->contains)
   { // non-empty containers
-    ch->send(QStringLiteral("%s needs to be emptied first.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%s needs to be emptied first.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return;
   }
 
   if (price > AUC_MAX_PRICE)
   {
-    ch->send(QStringLiteral("Price must be between %u and %u.\r\n").arg(AUC_MIN_PRICE).arg(AUC_MAX_PRICE));
+    ch->send(u"Price must be between %u and %u.\r\n"_s.arg(AUC_MIN_PRICE).arg(AUC_MAX_PRICE));
     return;
   }
 
@@ -1416,7 +1415,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(ch->name(), DC::getInstance()->obj_index[obj->item_number].vnum()))
   {
-    ch->send(QStringLiteral("You're selling %1 already and it's unique!\r\n").arg(obj->short_description()));
+    ch->send(u"You're selling %1 already and it's unique!\r\n"_s.arg(obj->short_description()));
     return;
   }
 
@@ -1480,10 +1479,10 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
   Save();
 
   if (buyer.isEmpty())
-    ch->sendln(QStringLiteral("You are now selling %1 for %2 coins.").arg(obj->short_description()).arg(price));
+    ch->sendln(u"You are now selling %1 for %2 coins."_s).arg(obj->short_description()).arg(price));
   else
   {
-    ch->sendln(QStringLiteral("You are now selling %1 to %2 for %3 coins.").arg(obj->short_description()).arg(buyer).arg(price));
+    ch->sendln(u"You are now selling %1 to %2 for %3 coins."_s).arg(obj->short_description()).arg(buyer).arg(price));
   }
 
   if (advertise == true && NewTicket.buyer.isEmpty())
@@ -1497,12 +1496,12 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
 
     if (Broker)
     {
-      Broker->do_auction(QStringLiteral("%1 is selling \"$R%2$R$6$B\" for %3 gold.").arg(qPrintable(ch->shortdesc_or_name())).arg(obj->short_description()).arg(price).split(' '));
+      Broker->do_auction(u"%1 is selling \"_s$R%2$R$6$B\" for %3 gold.").arg(qPrintable(ch->shortdesc_or_name())).arg(obj->short_description()).arg(price).split(' '));
     }
     else
     {
       ch->sendln("The Consignment Broker couldn't auction. Contact an imm.");
-      DC::getInstance()->logentry(QStringLiteral("CharacterPtr Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+      DC::getInstance()->logentry(u"CharacterPtr Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])"_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
     }
   }
 
@@ -1550,7 +1549,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = one_argument(argument, buf);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>");
     if (ch->getLevel() >= 104)
@@ -1563,14 +1562,14 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     quint32 ticket;
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Modify what ticket?\r\nSyntax: vend modify <ticket> <new_price>");
       return ReturnValue::eSUCCESS;
     }
     ticket = atoi(buf);
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("What price do you want it?\r\nSyntax: vend modify <ticket> <new_price>");
       return ReturnValue::eSUCCESS;
@@ -1584,7 +1583,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"search"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Search by what?\r\nSyntax: vend search <name | level | slot | seller | race | class>");
       return ReturnValue::eSUCCESS;
@@ -1592,7 +1591,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     if (buf == u"name"_s)
     {
       argument = one_argument(argument, buf);
-      if (!*buf)
+      if (buf.isEmpty())
       {
         ch->sendln("What name do you want to search for?\r\nSyntax: vend search name <keyword>");
         return ReturnValue::eSUCCESS;
@@ -1606,7 +1605,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     if (buf == u"slot"_s)
     {
       argument = one_argument(argument, buf);
-      if (!*buf)
+      if (buf.isEmpty())
       {
         send_to_char("What slot do you want to search for?\r\n"
                      "finger, neck, body, head, legs, feet, hands, arms, shield,\r\n"
@@ -1624,7 +1623,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     if (buf == u"race"_s)
     {
       argument = one_argument(argument, buf);
-      if (!*buf)
+      if (buf.isEmpty())
       {
         send_to_char("What race do you want to search for?\r\n"
                      "Human, Elf, Dwarf, Hobbit, Pixie, Gnome, Orc, Troll\r\n"
@@ -1641,7 +1640,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     if (buf == u"class"_s)
     {
       argument = one_argument(argument, buf);
-      if (!*buf)
+      if (buf.isEmpty())
       {
         send_to_char("What class do you want to search for?\r\n"
                      "\r\nSyntax: vend search class <class_name>\r\n",
@@ -1662,7 +1661,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     if (buf == u"seller"_s)
     {
       argument = one_argument(argument, buf);
-      if (!*buf)
+      if (buf.isEmpty())
       {
         send_to_char("What person are you looking for?\r\n"
                      "\r\nSyntax: vend search seller <name>\r\n",
@@ -1679,14 +1678,14 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       quint32 level;
       argument = one_argument(argument, buf);
-      if (!*buf)
+      if (buf.isEmpty())
       {
         ch->sendln("What level?\r\nSyntax: vend search level <min_level> [max_level]");
         return ReturnValue::eSUCCESS;
       }
       level = atoi(buf);
       argument = one_argument(argument, buf);
-      if (!*buf)
+      if (buf.isEmpty())
         DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
       else
         DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
@@ -1703,7 +1702,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"collect"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Collect what?\r\nSyntax: vend collect <all | ticket#>");
       return ReturnValue::eSUCCESS;
@@ -1727,7 +1726,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"buy"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Buy what?\r\nSyntax: vend buy <ticket #>");
       return ReturnValue::eSUCCESS;
@@ -1740,7 +1739,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"cancel"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Cancel what?\r\nSyntax: vend cancel <all | ticket#>");
       return ReturnValue::eSUCCESS;
@@ -1758,7 +1757,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"list"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("List what?\r\nSyntax: vend list <all | mine | private | recent>");
       return ReturnValue::eSUCCESS;
@@ -1791,7 +1790,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"sell"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Sell what?\r\nSyntax: vend sell <item> <price> [person]");
       return ReturnValue::eSUCCESS;
@@ -1803,7 +1802,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("How much do you want to sell it for?\r\nSyntax: vend sell <item> <price> [person]");
       return ReturnValue::eSUCCESS;
@@ -1824,7 +1823,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"identify"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Identify what?\r\nSyntax: vend identify <ticket>");
       return ReturnValue::eSUCCESS;
@@ -1844,7 +1843,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->getLevel() >= 104 && buf == u"addroom"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Add what room?\r\nSyntax: vend addroom <vnum>");
       return ReturnValue::eSUCCESS;
@@ -1857,7 +1856,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->getLevel() >= 104 && buf == u"removeroom"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("Remove what room?\r\nSyntax: vend removeroom <vnum>");
       return ReturnValue::eSUCCESS;

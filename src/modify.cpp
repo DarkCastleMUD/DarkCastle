@@ -108,7 +108,7 @@ void string_hash_add(class Connection *d, QString str)
 
   if (terminator)
   {
-    scan = QStringLiteral(*conn->hashstr);
+    scan = *conn->hashstr;
     *conn->hashstr = {};
     *conn->hashstr = scan;
     conn->hashstr = {};
@@ -209,7 +209,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       }
 
       ch->sendln("This is broken.");
-      DC::getInstance()->logentry(QStringLiteral("do_string: broken"));
+      DC::getInstance()->logentry(u"do_string: broken"_s);
       /*
       TODO
       if (mob->isNonPlayer())
@@ -305,7 +305,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       ch->send("Noone may restring object extra descs at this time. -pir");
       return 1;
 
-      if (!*string)
+      if (string.isEmpty())
       {
         ch->sendln("You have to supply a keyword.");
         return 1;
@@ -322,7 +322,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 #endif
           ed->next = obj->ex_description;
           obj->ex_description = ed;
-          ed->keyword = QStringLiteral(string);
+          ed->keyword = string;
           ed->description = {};
           ch->desc->hashstr = &ed->description;
           ch->sendln("New field.");
@@ -341,7 +341,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       return 1;
       break;
     case 6:
-      if (!*string)
+      if (string.isEmpty())
       {
         ch->sendln("You must supply a field name.");
         return 1;
@@ -398,7 +398,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else
     {
-      *ch->desc->hashstr = QStringLiteral(string);
+      *ch->desc->hashstr = string;
       ch->desc->hashstr = {};
     }
     ch->sendln("Ok.");
@@ -561,7 +561,7 @@ const QString next_page(const QString str)
     {
       if (*(str + 1) == '\0')
       { // this should never happen
-        DC::getInstance()->logentry(QStringLiteral("String ended in $ in next_page"), ANGEL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(u"String ended in $ in next_page"_s, ANGEL, DC::LogChannel::LOG_BUG);
         //*str = '\0'; // overwrite the $ so it doesn't mess up anything
         return {};
       }
@@ -640,7 +640,7 @@ void page_string(class Connection *d, const QString str, qint32 keep_internal)
   if (!d || !(conn->character))
     return;
 
-  if (!str || !*str)
+  if (!str || str.isEmpty())
   {
     conn->character->send("");
     return;
@@ -678,7 +678,7 @@ void page_string_dep(class Connection *d, const QString str, qint32 keep_interna
 {
   if (!d)
     return;
-  if (!str || !*str)
+  if (!str || str.isEmpty())
   {
     conn->character->send("");
     return;

@@ -33,7 +33,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
     sendln("Aliases:");
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {
-      sendln(QStringLiteral("%2=%3").arg(alias).arg(command));
+      sendln(u"%2=%3"_s.arg(alias).arg(command));
     }
     return ReturnValue::eSUCCESS;
   }
@@ -68,16 +68,16 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 
     if (player->aliases_.contains(alias) && player->aliases_[alias] == command)
     {
-      sendln(QStringLiteral("Alias '%1' with command '%2' already set.").arg(alias).arg(command));
+      sendln(u"Alias '%1' with command '%2' already set."_s.arg(alias).arg(command));
       return ReturnValue::eFAILURE;
     }
     else if (player->aliases_.contains(alias))
     {
-      sendln(QStringLiteral("Alias '%1' with command '%2' replaced with '%3'.").arg(alias).arg(player->aliases_[alias]).arg(command));
+      sendln(u"Alias '%1' with command '%2' replaced with '%3'."_s.arg(alias).arg(player->aliases_[alias]).arg(command));
     }
     else
     {
-      sendln(QStringLiteral("Alias '%1' defined with command '%2'.").arg(alias).arg(command));
+      sendln(u"Alias '%1' defined with command '%2'."_s.arg(alias).arg(command));
     }
     player->aliases_[alias] = command;
     save();
@@ -94,7 +94,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {
-      sendln(QStringLiteral("Removed alias %2=%3").arg(alias).arg(command));
+      sendln(u"Removed alias %2=%3"_s.arg(alias).arg(command));
     }
 
     player->aliases_.clear();
@@ -104,12 +104,12 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 
   if (!player->aliases_.contains(arg1))
   {
-    sendln(QStringLiteral("Alias '%1' not found to delete.").arg(arg1));
+    sendln(u"Alias '%1' not found to delete."_s.arg(arg1));
     return ReturnValue::eFAILURE;
   }
 
   player->aliases_.remove(arg1);
-  sendln(QStringLiteral("Alias '%1' deleted.").arg(arg1));
+  sendln(u"Alias '%1' deleted."_s.arg(arg1));
   save();
   return ReturnValue::eFAILURE;
 }
@@ -125,13 +125,13 @@ QString pet_info(CharacterPtr ch, QString type, quint32 victim_count)
   if (ISSET(ch->mobdata->actflags, ACT_4TH_ATTACK))
     attacks++;
 
-  auto bare_damage_str = QStringLiteral("$7$B%1$Rd$7$B%2$R").arg(ch->mobdata->damnodice).arg(ch->mobdata->damsizedice);
+  auto bare_damage_str = u"$7$B%1$Rd$7$B%2$R"_s.arg(ch->mobdata->damnodice).arg(ch->mobdata->damsizedice);
 
   QString buffer = {};
   sprintbit(ch->affected_by, affected_bits, buffer);
   QString affected_by_str = QString(buffer).trimmed();
 
-  return QStringLiteral("%1,%2,%3,%4,%5,%6,%7,%8, $B%9$R [$B$0%10$R] %11")
+  return u"%1,%2,%3,%4,%5,%6,%7,%8, $B%9$R [$B$0%10$R] %11"_s
       .arg(ch->getLevel(), 3)
       .arg(attacks, 3)
       .arg(GET_REAL_HITROLL(ch), 3)
@@ -177,12 +177,12 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       {
         include_bard = true;
       }
-      else if (!arg1.isEmpty() && QStringLiteral("bard").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      else if (!arg1.isEmpty() && u"bard"_s.startsWith(arg1, Qt::CaseInsensitive) || arg1 == u"all"_s)
       {
         include_bard = true;
       }
       if (include_bard)
-        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Bard"), victim_qty));
+        results.insert(victim->getLevel(), pet_info(victim, u"Bard"_s, victim_qty));
     }
 
     bool include_ranger = false;
@@ -192,12 +192,12 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       {
         include_ranger = true;
       }
-      else if (!arg1.isEmpty() && QStringLiteral("ranger").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      else if (!arg1.isEmpty() && u"ranger"_s.startsWith(arg1, Qt::CaseInsensitive) || arg1 == u"all"_s)
       {
         include_ranger = true;
       }
       if (include_ranger)
-        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Ranger"), victim_qty));
+        results.insert(victim->getLevel(), pet_info(victim, u"Ranger"_s, victim_qty));
     }
 
     bool include_antipaladin = false;
@@ -207,12 +207,12 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       {
         include_antipaladin = true;
       }
-      else if (!arg1.isEmpty() && (QStringLiteral("antipaladin").startsWith(arg1, Qt::CaseInsensitive) || QStringLiteral("anti-paladin").startsWith(arg1, Qt::CaseInsensitive) || QStringLiteral("anti_paladin").startsWith(arg1, Qt::CaseInsensitive)) || arg1 == QStringLiteral("all"))
+      else if (!arg1.isEmpty() && (u"antipaladin"_s.startsWith(arg1, Qt::CaseInsensitive) || u"anti-paladin"_s.startsWith(arg1, Qt::CaseInsensitive) || u"anti_paladin"_s.startsWith(arg1, Qt::CaseInsensitive)) || arg1 == u"all"_s)
       {
         include_antipaladin = true;
       }
       if (include_antipaladin)
-        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("AntiPal"), victim_qty));
+        results.insert(victim->getLevel(), pet_info(victim, u"AntiPal"_s, victim_qty));
     }
 
     bool include_cleric = false;
@@ -222,12 +222,12 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       {
         include_cleric = true;
       }
-      else if (!arg1.isEmpty() && QStringLiteral("cleric").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      else if (!arg1.isEmpty() && u"cleric"_s.startsWith(arg1, Qt::CaseInsensitive) || arg1 == u"all"_s)
       {
         include_cleric = true;
       }
       if (include_cleric)
-        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Cleric"), victim_qty));
+        results.insert(victim->getLevel(), pet_info(victim, u"Cleric"_s, victim_qty));
     }
 
     bool include_druid = false;
@@ -237,12 +237,12 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       {
         include_druid = true;
       }
-      else if (!arg1.isEmpty() && QStringLiteral("druid").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      else if (!arg1.isEmpty() && u"druid"_s.startsWith(arg1, Qt::CaseInsensitive) || arg1 == u"all"_s)
       {
         include_druid = true;
       }
       if (include_druid)
-        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Druid"), victim_qty));
+        results.insert(victim->getLevel(), pet_info(victim, u"Druid"_s, victim_qty));
     }
 
     bool include_mage = false;
@@ -252,21 +252,21 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       {
         include_mage = true;
       }
-      else if (!arg1.isEmpty() && QStringLiteral("mage").startsWith(arg1, Qt::CaseInsensitive) || arg1 == QStringLiteral("all"))
+      else if (!arg1.isEmpty() && u"mage"_s.startsWith(arg1, Qt::CaseInsensitive) || arg1 == u"all"_s)
       {
         include_mage = true;
       }
       if (include_mage)
-        results.insert(victim->getLevel(), pet_info(victim, QStringLiteral("Mage"), victim_qty));
+        results.insert(victim->getLevel(), pet_info(victim, u"Mage"_s, victim_qty));
     }
   }
 
   if (results.isEmpty())
   {
     if (arg1.isEmpty())
-      sendln(QStringLiteral("No charmable pets found for a %1.").arg(Character::classes_[c_class].name));
+      sendln(u"No charmable pets found for a %1."_s).arg(Character::classes_[c_class].name));
     else
-      sendln(QStringLiteral("No charmable pets found for a %1.").arg(arg1));
+      sendln(u"No charmable pets found for a %1."_s).arg(arg1));
     sendln("Type 'pets all' to see charmable pets for all classes.");
     sendln("Type 'pets bard' to see charmable pets for bards.");
     sendln("Type 'pets bard 50' or 'pets 50' to only see pets level 50 or above.");
@@ -275,7 +275,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   sendln("$B$7LVL,ATK,HIT,DAM,   HP, -AC, dice, class, description$R");
   for (const auto &line : results)
     sendln(line);
-  sendln(QStringLiteral("$B$5*$R = in world now"));
+  sendln(u"$B$5*$R = in world now"_s));
   // loop though all npcs
 
   // search npcs affect of charmable

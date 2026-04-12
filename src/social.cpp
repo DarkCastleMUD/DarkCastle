@@ -134,7 +134,7 @@ QString fread_social_string(FILE *fl)
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl))
   {
-    DC::getInstance()->logentry(QStringLiteral("Fread_social_string - unexpected EOF."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Fread_social_string - unexpected EOF."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     exit(0);
   }
 
@@ -253,7 +253,7 @@ command_return_t do_social(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 i{};
   for (const auto &social : soc_mess_list)
   {
-    buf += QStringLiteral("%1").arg(social.name, 18);
+    buf += u"%1"_s.arg(social.name, 18);
     if (!(i++ % 4))
     {
       ch->sendln(buf);
@@ -262,6 +262,6 @@ command_return_t do_social(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ch->sendln(buf);
-  ch->sendln(QStringLiteral("Current Socials:  %1").arg(i));
+  ch->sendln(u"Current Socials:  %1"_s.arg(i));
   return ReturnValue::eSUCCESS;
 }

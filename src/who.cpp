@@ -34,7 +34,7 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!target.isEmpty())
   {
-    ch->sendln(QStringLiteral("Searching for '$B%1$R'...").arg(target));
+    ch->sendln(u"Searching for '$B%1$R'..."_s.arg(target));
   }
 
   QString tempbuffer;
@@ -57,7 +57,7 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       foundgroup = 1; // we found someone!
       k = i;
-      tempbuffer += QStringLiteral("\r\n"
+      tempbuffer += u"\r\n"_s
                                    "   $B$7[$4: $5%1 $4:$7]$R\r\n"
                                    "   Player kills: %2  Average level of victim: %3  Total kills: %4\r\n")
                         .arg(k->group_name)
@@ -71,7 +71,7 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
       // First, if they're not anonymous
       if ((!ch->isNonPlayer() && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
-        tempbuffer += QStringLiteral("   $B%1 %2 %3   Level %4      $1($7Leader$1)$R \r\n")
+        tempbuffer += u"   $B%1 %2 %3   Level %4      $1($7Leader$1)$R \r\n"_s
                           .arg(k->name(), -18)
                           .arg(races[(qint32)k->race].singular_name, -10)
                           .arg(pc_clss_types[(qint32)GET_CLASS(k)], -14)
@@ -79,7 +79,7 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        tempbuffer += QStringLiteral("   $B%1 %2 Anonymous                      $1($7Leader$1)$R \r\n").arg(k->name(), -18).arg(races[(qint32)k->race].singular_name, -10);
+        tempbuffer += u"   $B%1 %2 Anonymous                      $1($7Leader$1)$R \r\n"_s.arg(k->name(), -18).arg(races[(qint32)k->race].singular_name, -10);
       }
 
       // loop through my followers and process them
@@ -93,13 +93,13 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
               foundtarget = 1;
             // First if they're not anonymous
             if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
-              tempbuffer += QStringLiteral("   %1 %2 %3   Level %4\r\n")
+              tempbuffer += u"   %1 %2 %3   Level %4\r\n"_s
                                 .arg(f->follower->name(), -18)
                                 .arg(races[(qint32)f->follower->race].singular_name, -10)
                                 .arg(pc_clss_types[(qint32)GET_CLASS(f->follower)], -14)
                                 .arg(f->follower->getLevel(), 2);
             else
-              tempbuffer += QStringLiteral("   %1 %2 Anonymous            \r\n")
+              tempbuffer += u"   %1 %2 Anonymous            \r\n"_s
                                 .arg(f->follower->name(), -18)
                                 .arg(races[(qint32)f->follower->race].singular_name, -10);
           }
@@ -159,7 +159,7 @@ command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!IS_AFFECTED(i, AFF_GROUP))
       {
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
-          tempbuffer += QStringLiteral("   %1 %2 %3 %4     %5%6%7\r\n")
+          tempbuffer += u"   %1 %2 %3 %4     %5%6%7\r\n"_s
                             .arg(i->name(), -15)
                             .arg(races[(qint32)i->race].singular_name, -9)
                             .arg(pc_clss_types[(qint32)GET_CLASS(i)], -13)
@@ -168,7 +168,7 @@ command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
                             .arg(i->isNonPlayer() ? 0 : i->player->pdeathslogin, -7)
                             .arg(i->isNonPlayer() ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         else
-          tempbuffer += QStringLiteral("   %1 %2 Anonymous            %3%4%5\r\n")
+          tempbuffer += u"   %1 %2 Anonymous            %3%4%5\r\n"_s
                             .arg(i->name(), -15)
                             .arg(races[(qint32)i->race].singular_name, -9)
                             .arg(i->isNonPlayer() ? 0 : i->player->totalpkills, -4)
@@ -412,11 +412,11 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       {
         if (!i->isNonPlayer() && i->player->incognito == true)
         {
-          extraBuf = QStringLiteral(" (Incognito / WizInvis %1)").arg(i->player->wizinvis);
+          extraBuf = u" (Incognito / WizInvis %1)"_s.arg(i->player->wizinvis);
         }
         else
         {
-          extraBuf = QStringLiteral(" (WizInvis %1)").arg(i->player->wizinvis);
+          extraBuf = u" (WizInvis %1)"_s.arg(i->player->wizinvis);
         }
       }
       numImmort++;
@@ -426,11 +426,11 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     {
       if (!IS_ANONYMOUS(i) || (clan && clan == i->clan) || hasholylight)
       {
-        infoBuf = QStringLiteral(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(i->getLevel(), 2).arg(pc_clss_abbrev[(qint32)GET_CLASS(i)]).arg(race_abbrev[(qint32)i->race]);
+        infoBuf = u" $B$5%1$7-$1%2  $2%3$R$7 "_s.arg(i->getLevel(), 2).arg(pc_clss_abbrev[(qint32)GET_CLASS(i)]).arg(race_abbrev[(qint32)i->race]);
       }
       else
       {
-        infoBuf = QStringLiteral("  $6-==-   $B$2%1$R ").arg(race_abbrev[(qint32)i->race]);
+        infoBuf = u"  $6-==-   $B$2%1$R "_s.arg(race_abbrev[(qint32)i->race]);
       }
       numPC++;
     }
@@ -458,13 +458,13 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     auto clanPtr = get_clan(i);
     if (i->clan && clanPtr && i->getLevel() < OVERSEER)
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(qPrintable(i->shortdesc_or_name())).arg(i->title);
-      buf += QStringLiteral("%5 $2[%6$R$2] %7$R\r\n").arg(extraBuf).arg(clanPtr->name()).arg(tailBuf);
+      buf = u"[%1] %2$3%3 %4 "_s.arg(infoBuf).arg(preBuf).arg(qPrintable(i->shortdesc_or_name())).arg(i->title);
+      buf += u"%5 $2[%6$R$2] %7$R\r\n"_s.arg(extraBuf).arg(clanPtr->name()).arg(tailBuf);
     }
     else
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(qPrintable(i->shortdesc_or_name())).arg(i->title);
-      buf += QStringLiteral("%5 %6$R\r\n").arg(extraBuf).arg(tailBuf);
+      buf = u"[%1] %2$3%3 %4 "_s.arg(infoBuf).arg(preBuf).arg(qPrintable(i->shortdesc_or_name())).arg(i->title);
+      buf += u"%5 %6$R\r\n"_s.arg(extraBuf).arg(tailBuf);
     }
 
     if (addimmbuf)
@@ -515,9 +515,9 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
         if (tmp->room().isArena() && !isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
         {
           if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
-            ch->send(QStringLiteral("%-20s - [%s$R]\r\n").arg(qPrintable(tmp->name())).arg(qPrintable(clan->name())));
+            ch->send(u"%-20s - [%s$R]\r\n"_s.arg(qPrintable(tmp->name())).arg(qPrintable(clan->name())));
           else
-            ch->send(QStringLiteral("%-20s\r\n").arg(qPrintable(tmp->name())));
+            ch->send(u"%-20s\r\n"_s.arg(qPrintable(tmp->name())));
           count++;
         }
       }
@@ -538,9 +538,9 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
       if (tmp->room().isArena())
       {
         if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
-          ch->send(QStringLiteral("%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\r\n").arg(qPrintable(tmp->name()), tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room).arg(qPrintable(clan->name())));
+          ch->send(u"%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\r\n"_s.arg(qPrintable(tmp->name()), tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room).arg(qPrintable(clan->name())));
         else
-          ch->send(QStringLiteral("%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\r\n").arg(qPrintable(tmp->name())).arg(tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room));
+          ch->send(u"%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\r\n"_s.arg(qPrintable(tmp->name())).arg(tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room));
         count++;
       }
     }
@@ -568,11 +568,11 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (conn->original)
         { // If switched
-          ch->send(QStringLiteral("%-20s - %s$R [%d] In body of %s\r\n").arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
+          ch->send(u"%-20s - %s$R [%d] In body of %s\r\n"_s.arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
         }
         else
         {
-          ch->send(QStringLiteral("%-20s - %s$R [%d]\r\n").arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
+          ch->send(u"%-20s - %s$R [%d]\r\n"_s.arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
         }
       }
     } // for
@@ -588,14 +588,14 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
         { // If switched
           if (is_abbrev(buf, conn->original->name()))
           {
-            ch->send(QStringLiteral("%-20s - %s$R [%d] In body of %s\r\n").arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
+            ch->send(u"%-20s - %s$R [%d] In body of %s\r\n"_s.arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
           }
         }
         else
         {
           if (is_abbrev(buf, qPrintable(conn->character->name())))
           {
-            ch->send(QStringLiteral("%-20s - %s$R [%d]\r\n").arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
+            ch->send(u"%-20s - %s$R [%d]\r\n"_s.arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
           }
         }
       }
@@ -618,7 +618,7 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
           !conn->character->isNonPlayer())
       {
         if (DC::getInstance()->world[conn->character->in_room].zone == zonenumber)
-          ch->send(QStringLiteral("%-20s - %s$R\r\n").arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name));
+          ch->send(u"%-20s - %s$R\r\n"_s.arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name));
       }
     }
   }

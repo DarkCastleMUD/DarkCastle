@@ -72,7 +72,7 @@ void Leaderboard::check(void)
           pkactivename[j] = pkactivename[j + 1];
         }
         pkactive[4] = {};
-        pkactivename[4] = QStringLiteral(" ");
+        pkactivename[4] = u" "_s;
       }
       if (pdactivename[i] == conn->character->name())
       {
@@ -82,7 +82,7 @@ void Leaderboard::check(void)
           pdactivename[j] = pdactivename[j + 1];
         }
         pdactive[4] = {};
-        pdactivename[4] = QStringLiteral(" ");
+        pdactivename[4] = u" "_s;
       }
       if (rdactivename[i] == conn->character->name())
       {
@@ -92,7 +92,7 @@ void Leaderboard::check(void)
           rdactivename[j] = rdactivename[j + 1];
         }
         rdactive[4] = {};
-        rdactivename[4] = QStringLiteral(" ");
+        rdactivename[4] = u" "_s;
       }
       if (mvactivename[i] == conn->character->name())
       {
@@ -102,7 +102,7 @@ void Leaderboard::check(void)
           mvactivename[j] = mvactivename[j + 1];
         }
         mvactive[4] = {};
-        mvactivename[4] = QStringLiteral(" ");
+        mvactivename[4] = u" "_s;
       }
     }
 
@@ -116,7 +116,7 @@ void Leaderboard::check(void)
           hpactiveclassname[k][j] = hpactiveclassname[k][j + 1];
         }
         hpactiveclass[k][4] = {};
-        hpactiveclassname[k][4] = QStringLiteral(" ");
+        hpactiveclassname[k][4] = u" "_s;
       }
       if (mnactiveclassname[k][i] == conn->character->name())
       {
@@ -126,7 +126,7 @@ void Leaderboard::check(void)
           mnactiveclassname[k][j] = mnactiveclassname[k][j + 1];
         }
         mnactiveclass[k][4] = {};
-        mnactiveclassname[k][4] = QStringLiteral(" ");
+        mnactiveclassname[k][4] = u" "_s;
       }
       if (kiactiveclassname[k][i] == conn->character->name())
       {
@@ -136,7 +136,7 @@ void Leaderboard::check(void)
           kiactiveclassname[k][j] = kiactiveclassname[k][j + 1];
         }
         kiactiveclass[k][4] = {};
-        kiactiveclassname[k][4] = QStringLiteral(" ");
+        kiactiveclassname[k][4] = u" "_s;
       }
       if (pkactiveclassname[k][i] == conn->character->name())
       {
@@ -146,7 +146,7 @@ void Leaderboard::check(void)
           pkactiveclassname[k][j] = pkactiveclassname[k][j + 1];
         }
         pkactiveclass[k][4] = {};
-        pkactiveclassname[k][4] = QStringLiteral(" ");
+        pkactiveclassname[k][4] = u" "_s;
       }
       if (pdactiveclassname[k][i] == conn->character->name())
       {
@@ -156,7 +156,7 @@ void Leaderboard::check(void)
           pdactiveclassname[k][j] = pdactiveclassname[k][j + 1];
         }
         pdactiveclass[k][4] = {};
-        pdactiveclassname[k][4] = QStringLiteral(" ");
+        pdactiveclassname[k][4] = u" "_s;
       }
       if (rdactiveclassname[k][i] == conn->character->name())
       {
@@ -166,7 +166,7 @@ void Leaderboard::check(void)
           rdactiveclassname[k][j] = rdactiveclassname[k][j + 1];
         }
         rdactiveclass[k][4] = {};
-        rdactiveclassname[k][4] = QStringLiteral(" ");
+        rdactiveclassname[k][4] = u" "_s;
       }
       if (mvactiveclassname[k][i] == conn->character->name())
       {
@@ -176,7 +176,7 @@ void Leaderboard::check(void)
           mvactiveclassname[k][j] = mvactiveclassname[k][j + 1];
         }
         mvactiveclass[k][4] = {};
-        mvactiveclassname[k][4] = QStringLiteral(" ");
+        mvactiveclassname[k][4] = u" "_s;
       }
     }
 
@@ -396,7 +396,7 @@ void Leaderboard::check(void)
     port1 = DC::getInstance()->cf.ports[0];
   }
 
-  write_file(QStringLiteral("%1%2/%3").arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
+  write_file(u"%1%2/%3"_s.arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
 
   for (i = {}; i < 5; i++)
   {
@@ -504,7 +504,7 @@ void Leaderboard::check_offline(void)
         }
         hpactive[4] = {};
         hpactivename[4] = {};
-        hpactivename[4] = QStringLiteral(" ");
+        hpactivename[4] = u" "_s;
       }
       if (mnactivename[i] == ch->name())
       {
@@ -516,7 +516,7 @@ void Leaderboard::check_offline(void)
         }
         mnactive[4] = {};
         mnactivename[4] = {};
-        mnactivename[4] = QStringLiteral(" ");
+        mnactivename[4] = u" "_s;
       }
       if (kiactivename[i] == ch->name())
       {
@@ -528,7 +528,7 @@ void Leaderboard::check_offline(void)
         }
         kiactive[4] = {};
         kiactivename[4] = {};
-        kiactivename[4] = QStringLiteral(" ");
+        kiactivename[4] = u" "_s;
       }
       if (pkactivename[i] == ch->name())
       {
@@ -540,7 +540,7 @@ void Leaderboard::check_offline(void)
         }
         pkactive[4] = {};
         pkactivename[4] = {};
-        pkactivename[4] = QStringLiteral(" ");
+        pkactivename[4] = u" "_s;
       }
       if (pdactivename[i] == ch->name())
       {
@@ -552,7 +552,7 @@ void Leaderboard::check_offline(void)
         }
         pdactive[4] = {};
         pdactivename[4] = {};
-        pdactivename[4] = QStringLiteral(" ");
+        pdactivename[4] = u" "_s;
       }
       if (rdactivename[i] == ch->name())
       {
@@ -564,7 +564,7 @@ void Leaderboard::check_offline(void)
         }
         rdactive[4] = {};
         rdactivename[4] = {};
-        rdactivename[4] = QStringLiteral(" ");
+        rdactivename[4] = u" "_s;
       }
       if (mvactivename[i] == ch->name())
       {
@@ -576,7 +576,7 @@ void Leaderboard::check_offline(void)
         }
         mvactive[4] = {};
         mvactivename[4] = {};
-        mvactivename[4] = QStringLiteral(" ");
+        mvactivename[4] = u" "_s;
       }
     }
 
@@ -592,7 +592,7 @@ void Leaderboard::check_offline(void)
         }
         hpactiveclass[k][4] = {};
         hpactiveclassname[k][4] = {};
-        hpactiveclassname[k][4] = QStringLiteral(" ");
+        hpactiveclassname[k][4] = u" "_s;
       }
       if (mnactiveclassname[k][i] == ch->name())
       {
@@ -604,7 +604,7 @@ void Leaderboard::check_offline(void)
         }
         mnactiveclass[k][4] = {};
         mnactiveclassname[k][4] = {};
-        mnactiveclassname[k][4] = QStringLiteral(" ");
+        mnactiveclassname[k][4] = u" "_s;
       }
       if (kiactiveclassname[k][i] == ch->name())
       {
@@ -616,7 +616,7 @@ void Leaderboard::check_offline(void)
         }
         kiactiveclass[k][4] = {};
         kiactiveclassname[k][4] = {};
-        kiactiveclassname[k][4] = QStringLiteral(" ");
+        kiactiveclassname[k][4] = u" "_s;
       }
       if (pkactiveclassname[k][i] == ch->name())
       {
@@ -628,7 +628,7 @@ void Leaderboard::check_offline(void)
         }
         pkactiveclass[k][4] = {};
         pkactiveclassname[k][4] = {};
-        pkactiveclassname[k][4] = QStringLiteral(" ");
+        pkactiveclassname[k][4] = u" "_s;
       }
       if (pdactiveclassname[k][i] == ch->name())
       {
@@ -640,7 +640,7 @@ void Leaderboard::check_offline(void)
         }
         pdactiveclass[k][4] = {};
         pdactiveclassname[k][4] = {};
-        pdactiveclassname[k][4] = QStringLiteral(" ");
+        pdactiveclassname[k][4] = u" "_s;
       }
       if (rdactiveclassname[k][i] == ch->name())
       {
@@ -652,7 +652,7 @@ void Leaderboard::check_offline(void)
         }
         rdactiveclass[k][4] = {};
         rdactiveclassname[k][4] = {};
-        rdactiveclassname[k][4] = QStringLiteral(" ");
+        rdactiveclassname[k][4] = u" "_s;
       }
       if (mvactiveclassname[k][i] == ch->name())
       {
@@ -664,7 +664,7 @@ void Leaderboard::check_offline(void)
         }
         mvactiveclass[k][4] = {};
         mvactiveclassname[k][4] = {};
-        mvactiveclassname[k][4] = QStringLiteral(" ");
+        mvactiveclassname[k][4] = u" "_s;
       }
     }
 
@@ -906,7 +906,7 @@ void Leaderboard::check_offline(void)
     port1 = DC::getInstance()->cf.ports[0];
   }
 
-  write_file(QStringLiteral("%1%2/%3").arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
+  write_file(u"%1%2/%3"_s.arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
 
   for (i = {}; i < 5; i++)
   {
@@ -1002,7 +1002,7 @@ void Leaderboard::read_file(void)
         hpactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(hpactivename[i]) == false)
         {
-          hpactivename[i] = QStringLiteral("UNKNOWN");
+          hpactivename[i] = u"UNKNOWN"_s;
           hpactive[i] = {};
         }
       }
@@ -1012,7 +1012,7 @@ void Leaderboard::read_file(void)
         mnactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(mnactivename[i]) == false)
         {
-          mnactivename[i] = QStringLiteral("UNKNOWN");
+          mnactivename[i] = u"UNKNOWN"_s;
         }
       }
       for (i = {}; i < 5; i++)
@@ -1021,7 +1021,7 @@ void Leaderboard::read_file(void)
         kiactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(kiactivename[i]) == false)
         {
-          kiactivename[i] = QStringLiteral("UNKNOWN");
+          kiactivename[i] = u"UNKNOWN"_s;
         }
       }
       for (i = {}; i < 5; i++)
@@ -1030,7 +1030,7 @@ void Leaderboard::read_file(void)
         pkactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(pkactivename[i]) == false)
         {
-          pkactivename[i] = QStringLiteral("UNKNOWN");
+          pkactivename[i] = u"UNKNOWN"_s;
         }
       }
       for (i = {}; i < 5; i++)
@@ -1039,7 +1039,7 @@ void Leaderboard::read_file(void)
         pdactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(pdactivename[i]) == false)
         {
-          pdactivename[i] = QStringLiteral("UNKNOWN");
+          pdactivename[i] = u"UNKNOWN"_s;
         }
       }
       for (i = {}; i < 5; i++)
@@ -1048,7 +1048,7 @@ void Leaderboard::read_file(void)
         rdactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(rdactivename[i]) == false)
         {
-          rdactivename[i] = QStringLiteral("UNKNOWN");
+          rdactivename[i] = u"UNKNOWN"_s;
         }
       }
       for (i = {}; i < 5; i++)
@@ -1057,7 +1057,7 @@ void Leaderboard::read_file(void)
         mvactive[i] = fread_int(fl, 0, 2147483467);
         if (char_file_exists(mvactivename[i]) == false)
         {
-          mvactivename[i] = QStringLiteral("UNKNOWN");
+          mvactivename[i] = u"UNKNOWN"_s;
         }
       }
       for (j = {}; j < CLASS_MAX - 2; j++)
@@ -1068,7 +1068,7 @@ void Leaderboard::read_file(void)
           hpactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(hpactiveclassname[j][i]) == false)
           {
-            hpactiveclassname[j][i] = QStringLiteral("UNKNOWN");
+            hpactiveclassname[j][i] = u"UNKNOWN"_s;
           }
         }
         for (i = {}; i < 5; i++)
@@ -1077,7 +1077,7 @@ void Leaderboard::read_file(void)
           mnactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(mnactiveclassname[j][i]) == false)
           {
-            mnactiveclassname[j][i] = QStringLiteral("UNKNOWN");
+            mnactiveclassname[j][i] = u"UNKNOWN"_s;
           }
         }
         for (i = {}; i < 5; i++)
@@ -1086,7 +1086,7 @@ void Leaderboard::read_file(void)
           kiactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(kiactiveclassname[j][i]) == false)
           {
-            kiactiveclassname[j][i] = QStringLiteral("UNKNOWN");
+            kiactiveclassname[j][i] = u"UNKNOWN"_s;
           }
         }
         for (i = {}; i < 5; i++)
@@ -1095,7 +1095,7 @@ void Leaderboard::read_file(void)
           pkactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(pkactiveclassname[j][i]) == false)
           {
-            pkactiveclassname[j][i] = QStringLiteral("UNKNOWN");
+            pkactiveclassname[j][i] = u"UNKNOWN"_s;
           }
         }
         for (i = {}; i < 5; i++)
@@ -1104,7 +1104,7 @@ void Leaderboard::read_file(void)
           pdactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(pdactiveclassname[j][i]) == false)
           {
-            pdactiveclassname[j][i] = QStringLiteral("UNKNOWN");
+            pdactiveclassname[j][i] = u"UNKNOWN"_s;
           }
         }
         for (i = {}; i < 5; i++)
@@ -1113,7 +1113,7 @@ void Leaderboard::read_file(void)
           rdactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(rdactiveclassname[j][i]) == false)
           {
-            rdactiveclassname[j][i] = QStringLiteral("UNKNOWN");
+            rdactiveclassname[j][i] = u"UNKNOWN"_s;
           }
         }
         for (i = {}; i < 5; i++)
@@ -1122,7 +1122,7 @@ void Leaderboard::read_file(void)
           mvactiveclass[j][i] = fread_int(fl, 0, 2147483467);
           if (char_file_exists(mvactiveclassname[j][i]) == false)
           {
-            mvactiveclassname[j][i] = QStringLiteral("UNKNOWN");
+            mvactiveclassname[j][i] = u"UNKNOWN"_s;
           }
         }
       }
@@ -1262,19 +1262,19 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   for (i = {}; i < 5; i++)
-    hponlinename[i] = QStringLiteral(" ");
+    hponlinename[i] = u" "_s;
   for (i = {}; i < 5; i++)
-    mnonlinename[i] = QStringLiteral(" ");
+    mnonlinename[i] = u" "_s;
   for (i = {}; i < 5; i++)
-    kionlinename[i] = QStringLiteral(" ");
+    kionlinename[i] = u" "_s;
   for (i = {}; i < 5; i++)
-    pkonlinename[i] = QStringLiteral(" ");
+    pkonlinename[i] = u" "_s;
   for (i = {}; i < 5; i++)
-    pdonlinename[i] = QStringLiteral(" ");
+    pdonlinename[i] = u" "_s;
   for (i = {}; i < 5; i++)
-    rdonlinename[i] = QStringLiteral(" ");
+    rdonlinename[i] = u" "_s;
   for (i = {}; i < 5; i++)
-    mvonlinename[i] = QStringLiteral(" ");
+    mvonlinename[i] = u" "_s;
 
   one_argument(argument, buf);
   for (k = {}; k < 11; k++)

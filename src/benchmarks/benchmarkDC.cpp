@@ -3,7 +3,7 @@
 
 using namespace std::literals;
 
-const auto STRING_LITERAL1 = QStringLiteral("$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$");
+const auto STRING_LITERAL1 = u"$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"_s);
 
 class BenchmarkUtility : public QObject
 {
@@ -68,7 +68,7 @@ private slots:
     qint32 result = {};
     QBENCHMARK
     {
-      result = QStringLiteral("ABC123") != QStringLiteral("abc123");
+      result = u"ABC123"_s != u"abc123"_s;
     }
     Q_UNUSED(result);
   }
@@ -97,7 +97,7 @@ private slots:
       QString result;
       QBENCHMARK
       {
-        result = space_to_underscore(QStringLiteral("  this is a test  "));
+        result = space_to_underscore(u"  this is a test  "_s);
       }
       Q_UNUSED(result);
     }
@@ -132,7 +132,7 @@ private slots:
     {
       QBENCHMARK
       {
-        result = str_n_nosp_cmp_begin(QStringLiteral("  this is a test  "), QStringLiteral("__THIS_IS_A_test__"));
+        result = str_n_nosp_cmp_begin(u"  this is a test  "_s, u"__THIS_IS_A_test__"_s);
       }
     }
     Q_UNUSED(result);

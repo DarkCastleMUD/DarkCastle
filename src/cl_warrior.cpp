@@ -1398,7 +1398,7 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     if (!ch->fighting)
     {

@@ -108,7 +108,7 @@ command_return_t do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (argument[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpasound - No argument."));
+    ch->prog_error(u"Mpasound - No argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -148,31 +148,31 @@ command_return_t do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("MpKill - no argument."));
+    ch->prog_error(u"MpKill - no argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
-    ch->prog_error(QStringLiteral("MpKill - Victim not in room."));
+    ch->prog_error(u"MpKill - Victim not in room."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (victim == ch)
   {
-    ch->prog_error(QStringLiteral("MpKill - Bad victim to attack."));
+    ch->prog_error(u"MpKill - Bad victim to attack."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim)
   {
-    ch->prog_error(QStringLiteral("MpKill - Charmed mob attacking master."));
+    ch->prog_error(u"MpKill - Charmed mob attacking master."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (ch->isFighting())
   {
-    ch->prog_error(QStringLiteral("MpKill - Already fighting"));
+    ch->prog_error(u"MpKill - Already fighting"_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -194,31 +194,31 @@ command_return_t do_mphit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("MpHit - no argument."));
+    ch->prog_error(u"MpHit - no argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
-    ch->prog_error(QStringLiteral("MpHit - Victim not in room."));
+    ch->prog_error(u"MpHit - Victim not in room."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
-    ch->prog_error(QStringLiteral("MpHit - Victim already dead."));
+    ch->prog_error(u"MpHit - Victim already dead."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (victim == ch)
   {
-    ch->prog_error(QStringLiteral("MpHit - Bad victim to attack."));
+    ch->prog_error(u"MpHit - Bad victim to attack."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim)
   {
-    ch->prog_error(QStringLiteral("MpHit - Charmed mob attacking master."));
+    ch->prog_error(u"MpHit - Charmed mob attacking master."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -242,18 +242,18 @@ command_return_t do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("MpAddlag - no argument."));
+    ch->prog_error(u"MpAddlag - no argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
-    ch->prog_error(QStringLiteral("MpAddlag - Victim not in room."));
+    ch->prog_error(u"MpAddlag - Victim not in room."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (!arg1[0] || !is_number(arg1))
   {
-    ch->prog_error(QStringLiteral("MpAddlag - Invalid duration."));
+    ch->prog_error(u"MpAddlag - Invalid duration."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   WAIT_STATE(victim, atoi(arg1));
@@ -281,7 +281,7 @@ command_return_t do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpjunk - No argument."));
+    ch->prog_error(u"Mpjunk - No argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -337,13 +337,13 @@ command_return_t do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpechoaround - No argument."));
+    ch->prog_error(u"Mpechoaround - No argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!(victim = get_char_room(arg, ch->in_room, true)))
   {
-    ch->prog_error(QStringLiteral("Mpechoaround - victim does not exist."));
+    ch->prog_error(u"Mpechoaround - victim does not exist."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (CAN_SEE(ch, victim))
@@ -366,18 +366,18 @@ command_return_t do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t 
   argument = one_argument(argument, arg1);
   if (arg[0] == '\0' || arg1[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpechoaroundnotbad - No argument."));
+    ch->prog_error(u"Mpechoaroundnotbad - No argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!(victim = get_char_room(arg, ch->in_room)))
   {
-    ch->prog_error(QStringLiteral("Mpechoaroundnotbad - victim does not exist."));
+    ch->prog_error(u"Mpechoaroundnotbad - victim does not exist."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (!(victim2 = get_char_room(arg1, ch->in_room)))
   {
-    ch->prog_error(QStringLiteral("Mpechoaroundnotbad - victim does not exist."));
+    ch->prog_error(u"Mpechoaroundnotbad - victim does not exist."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -403,13 +403,13 @@ command_return_t do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0' || argument[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpechoat - No argument."));
+    ch->prog_error(u"Mpechoat - No argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!(victim = get_char_room(arg, ch->in_room, true)))
   {
-    ch->prog_error(QStringLiteral("Mpechoat - victim does not exist."));
+    ch->prog_error(u"Mpechoat - victim does not exist."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -429,7 +429,7 @@ command_return_t do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (argument[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpecho - called w/o argument."));
+    ch->prog_error(u"Mpecho - called w/o argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -457,13 +457,13 @@ command_return_t do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0' || !is_number(arg))
   {
-    ch->prog_error(QStringLiteral("Mpmload - Bad vnum as arg."));
+    ch->prog_error(u"Mpmload - Bad vnum as arg."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((realnum = real_mobile(atoi(arg))) < 0)
   {
-    ch->prog_error(QStringLiteral("Mpmload - Bad mob vnum."));
+    ch->prog_error(u"Mpmload - Bad mob vnum."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -494,13 +494,13 @@ command_return_t do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg1[0] == '\0' || !is_number(arg1))
   {
-    ch->prog_error(QStringLiteral("Mpoload - Bad syntax."));
+    ch->prog_error(u"Mpoload - Bad syntax."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((realnum = real_object(atoi(arg1))) < 0)
   {
-    ch->prog_error(QStringLiteral("Mpoload - Bad vnum arg."));
+    ch->prog_error(u"Mpoload - Bad vnum arg."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   obj = clone_object(realnum);
@@ -583,7 +583,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
     //      from our inventory if the player already had one.  It may or may not be there.
     //	else
     //	{
-    //	    ch->prog_error( QStringLiteral("Mppurge - Bad argument."));
+    //	    ch->prog_error( u"Mppurge - Bad argument."_s);
     //            return ReturnValue::eFAILURE|ReturnValue::eINTERNAL_ERROR;
     //	}
     return ReturnValue::eSUCCESS;
@@ -591,7 +591,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->isPlayer())
   {
-    ch->prog_error(QStringLiteral("Mppurge - Purging a PC."));
+    ch->prog_error(u"Mppurge - Purging a PC."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -631,7 +631,7 @@ command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
   argument = one_argument(argument, arg);
   if (arg[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpgoto - No argument."));
+    ch->prog_error(u"Mpgoto - No argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -643,7 +643,7 @@ command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
     one_argument(argument, arg);
     if (arg[0] == '\0' || !is_number(arg))
     {
-      ch->prog_error(QStringLiteral("Mpgoto - Missing vnum after 'mob' argument."));
+      ch->prog_error(u"Mpgoto - Missing vnum after 'mob' argument."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     vict = get_mob_vnum(atoi(arg));
@@ -657,7 +657,7 @@ command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
     one_argument(argument, arg);
     if (arg[0] == '\0')
     {
-      ch->prog_error(QStringLiteral("Mpgoto - Missing arg after 'pc' argument."));
+      ch->prog_error(u"Mpgoto - Missing arg after 'pc' argument."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     if (!(vict = get_pc(arg)))
@@ -683,7 +683,7 @@ command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (location < 0)
   {
-    ch->prog_error(QStringLiteral("Mpgoto - No such location."));
+    ch->prog_error(u"Mpgoto - No such location."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (location == ch->in_room)
@@ -719,7 +719,7 @@ command_return_t do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0' || argument[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpat - Bad argument."));
+    ch->prog_error(u"Mpat - Bad argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -736,14 +736,14 @@ command_return_t do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (location < 0)
   {
-    ch->prog_error(QStringLiteral("do_mpat - No such location."));
+    ch->prog_error(u"do_mpat - No such location."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (location > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(location))
   {
     if (!DC::getInstance()->rooms.contains(1))
     {
-      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(location));
+      ch->send(u"mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n"_s.arg(location));
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     else
@@ -785,25 +785,25 @@ command_return_t do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0' || !(vict = get_pc_room_vis_exact(ch, QString(arg))))
   {
-    ch->prog_error(QStringLiteral("Mpxpreward - Bad argument."));
+    ch->prog_error(u"Mpxpreward - Bad argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!check_valid_and_convert(reward, buf))
   {
-    ch->prog_error(QStringLiteral("Mpxpreward - Bad argument."));
+    ch->prog_error(u"Mpxpreward - Bad argument."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (reward < 0)
     if ((vict->exp + reward) < 0)
     {
-      vict->send(QStringLiteral("You lose %d exps.\r\n").arg((-1 * reward)));
+      vict->send(u"You lose %d exps.\r\n"_s.arg((-1 * reward)));
       vict->exp = {};
       return ReturnValue::eSUCCESS;
     }
 
-  vict->send(QStringLiteral("You receive %1 exps.\r\n").arg(reward));
+  vict->send(u"You receive %1 exps.\r\n"_s).arg(reward));
   gain_exp(vict, reward);
   return ReturnValue::eSUCCESS;
 }
@@ -829,7 +829,7 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg1[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mptransfer - Bad syntax"));
+    ch->prog_error(u"Mptransfer - Bad syntax"_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -861,26 +861,26 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (location < 0)
     {
-      ch->prog_error(QStringLiteral("Mptransfer - No such location."));
+      ch->prog_error(u"Mptransfer - No such location."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
     if (isSet(DC::getInstance()->world[location].room_flags, PRIVATE))
     {
-      ch->prog_error(QStringLiteral("Mptransfer - Private room."));
+      ch->prog_error(u"Mptransfer - Private room."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
   }
 
   if ((victim = get_char_vis(ch, arg1)) == nullptr)
   {
-    ch->prog_error(QStringLiteral("Mptransfer - No such person."));
+    ch->prog_error(u"Mptransfer - No such person."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (victim->in_room == DC::NOWHERE)
   {
-    ch->prog_error(QStringLiteral("Mptransfer - Victim in Limbo."));
+    ch->prog_error(u"Mptransfer - Victim in Limbo."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -910,7 +910,7 @@ command_return_t do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0' || argument[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpforce - Bad syntax"));
+    ch->prog_error(u"Mpforce - Bad syntax"_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -932,13 +932,13 @@ command_return_t do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
     auto victim = ch->get_char_room_vis(arg);
     if (victim)
     {
-      ch->prog_error(QStringLiteral("Mpforce - No such victim."));
+      ch->prog_error(u"Mpforce - No such victim."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
     if (victim == ch)
     {
-      ch->prog_error(QStringLiteral("Mpforce - Forcing oneself"));
+      ch->prog_error(u"Mpforce - Forcing oneself"_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
@@ -948,7 +948,7 @@ command_return_t do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
         victim->command_interpreter(QString(argument));
       else
       {
-        ch->prog_error(QStringLiteral("Tried to MOBProg force %1 to '%2'.").arg(victim->name()).arg(argument));
+        ch->prog_error(u"Tried to MOBProg force %1 to '%2'."_s.arg(victim->name()).arg(argument));
       }
     }
   }
@@ -981,7 +981,7 @@ command_return_t do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0))
     {
-      ch->prog_error(QStringLiteral("Mpthrow - Invalid mobnum."));
+      ch->prog_error(u"Mpthrow - Invalid mobnum."_s);
       return ReturnValue::eFAILURE;
     }
     *first = '\0';
@@ -990,20 +990,20 @@ command_return_t do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (strlen(first) >= MAX_THROW_NAME)
     {
-      ch->prog_error(QStringLiteral("Mpthrow - Name too long."));
+      ch->prog_error(u"Mpthrow - Name too long."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
   {
-    ch->prog_error(QStringLiteral("Mpthrow - Invalid catch_num."));
+    ch->prog_error(u"Mpthrow - Invalid catch_num."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!check_range_valid_and_convert(delay, third, 0, 500000))
   {
-    ch->prog_error(QStringLiteral("Mpthrow - Invalid delay."));
+    ch->prog_error(u"Mpthrow - Invalid delay."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1050,7 +1050,7 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0' || skill[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpteachskill - Bad syntax."));
+    ch->prog_error(u"Mpteachskill - Bad syntax."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1058,14 +1058,14 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if ((victim = get_char_room(arg, ch->in_room)) == nullptr)
   {
-    ch->prog_error(QStringLiteral("Mpteachskill - No such victim."));
+    ch->prog_error(u"Mpteachskill - No such victim."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   qint32 skillnum;
   if (!(check_range_valid_and_convert(skillnum, skill, 0, SKILL_SONG_MAX)))
   {
-    ch->prog_error(QStringLiteral("Mpteachskill - No such skill"));
+    ch->prog_error(u"Mpteachskill - No such skill"_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1073,21 +1073,21 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->has_skill(skillnum))
   {
-    victim->send(QStringLiteral("You already know the basics of %s!\r\n").arg(skillname.isEmpty() ? "Unknown" : qPrintable(skillname)));
+    victim->send(u"You already know the basics of %s!\r\n"_s.arg(skillname.isEmpty() ? "Unknown" : qPrintable(skillname)));
     return ReturnValue::eFAILURE;
   }
 
   CharacterClassSkill *skilllist = victim->get_skill_list();
   if (!skilllist)
   {
-    ch->prog_error(QStringLiteral("Mpteachskill - %1 had no skill list?").arg(victim->name()));
+    ch->prog_error(u"Mpteachskill - %1 had no skill list?"_s.arg(victim->name()));
     return ReturnValue::eFAILURE; // no skills to train
   }
 
   qint32 index = search_skills2(skillnum, skilllist);
   if (victim->getLevel() < skilllist[index].levelavailable)
   {
-    victim->send(QStringLiteral("You try to learn the basics of %1, but it is too advanced for you right now.\r\n").arg(skillname));
+    victim->send(u"You try to learn the basics of %1, but it is too advanced for you right now.\r\n"_s).arg(skillname));
     return ReturnValue::eFAILURE;
   }
 
@@ -1096,7 +1096,7 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");
-    ch->prog_error(QStringLiteral("Mpteachskill - invalid skill number"));
+    ch->prog_error(u"Mpteachskill - invalid skill number"_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1148,7 +1148,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
     {
       qint32 num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
 
-      DC::getInstance()->logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
+      DC::getInstance()->logentry(u"Mob %1 lacking argument for mpsettemp."_s).arg(num));
     }
     return ReturnValue::eFAILURE;
   }
@@ -1214,7 +1214,7 @@ command_return_t do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Huh?");
     return ReturnValue::eFAILURE;
   }
-  if (!*argument || !ch->in_room)
+  if (argument.isEmpty() || !ch->in_room)
     return ReturnValue::eFAILURE;
   half_chop(argument, arg, align);
   victim = get_char_room(arg, ch->in_room);
@@ -1290,7 +1290,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg[0] == '\0')
   {
-    ch->prog_error(QStringLiteral("Mpdamage - Bad syntax: Missing victim."));
+    ch->prog_error(u"Mpdamage - Bad syntax: Missing victim."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1341,7 +1341,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (!numdice || !sizedice)
     {
-      ch->prog_error(QStringLiteral("Mpdamage - Invalid damroll"));
+      ch->prog_error(u"Mpdamage - Invalid damroll"_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
@@ -1349,7 +1349,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
     qint32 damtype = determine_attack_type(attacktype);
     if (!damtype)
     {
-      ch->prog_error(QStringLiteral("Mpdamage - Invalid damtype"));
+      ch->prog_error(u"Mpdamage - Invalid damtype"_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     qint32 dam = {};
@@ -1378,7 +1378,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        ch->prog_error(QStringLiteral("Mpdamage - Must damage either ki,mana,hitpoints or move"));
+        ch->prog_error(u"Mpdamage - Must damage either ki,mana,hitpoints or move"_s);
         return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
 
@@ -1447,7 +1447,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
         data = victim->getMovePtr();
       else
       {
-        ch->prog_error(QStringLiteral("Mpdamage - Must damage either ki,mana,hitpoints or move"));
+        ch->prog_error(u"Mpdamage - Must damage either ki,mana,hitpoints or move"_s);
         return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
       if (perc)
@@ -1504,7 +1504,7 @@ command_return_t do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!check_valid_and_convert(mob_num, first) ||
         (real_object(mob_num) < 0))
     {
-      ch->prog_error(QStringLiteral("Mpothrow - Invalid objnum."));
+      ch->prog_error(u"Mpothrow - Invalid objnum."_s);
       return ReturnValue::eFAILURE;
     }
     *first = '\0';
@@ -1513,7 +1513,7 @@ command_return_t do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (strlen(first) >= MAX_THROW_NAME)
     {
-      ch->prog_error(QStringLiteral("Mpthrow - Name too long."));
+      ch->prog_error(u"Mpthrow - Name too long."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -1521,13 +1521,13 @@ command_return_t do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN,
                                      MPROG_CATCH_MAX))
   {
-    ch->prog_error(QStringLiteral("Mpthrow - Invalid catch_num."));
+    ch->prog_error(u"Mpthrow - Invalid catch_num."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!check_range_valid_and_convert(delay, third, 0, 500))
   {
-    ch->prog_error(QStringLiteral("Mpthrow - Invalid delay."));
+    ch->prog_error(u"Mpthrow - Invalid delay."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1585,7 +1585,7 @@ command_return_t do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   if ((victim = get_char_room(arg, ch->in_room, true)) == nullptr && str_cmp(arg, "all") && str_cmp(arg, "allpc"))
   {
-    ch->prog_error(QStringLiteral("Mpbestow - No such person."));
+    ch->prog_error(u"Mpbestow - No such person."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   qint32 i, o = {};
@@ -1676,7 +1676,7 @@ command_return_t do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (!check_range_valid_and_convert(delay, second, 0, 65536))
     {
-      ch->prog_error(QStringLiteral("mpppause all - Invalid delay."));
+      ch->prog_error(u"mpppause all - Invalid delay."_s);
       return ReturnValue::eFAILURE;
     }
     throwitem = new mprog_throw_type;
@@ -1691,7 +1691,7 @@ command_return_t do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!check_range_valid_and_convert(delay, first, 0, 65536))
     {
-      ch->prog_error(QStringLiteral("mppause - Invalid delay."));
+      ch->prog_error(u"mppause - Invalid delay."_s);
       return ReturnValue::eFAILURE;
     }
     throwitem = new mprog_throw_type;
@@ -1752,7 +1752,7 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, person, type);
 
-  if (!*person)
+  if (person.isEmpty())
   {
     dc_strncpy(person, qPrintable(ch->name()), MAX_INPUT_LENGTH);
   }
@@ -1840,7 +1840,7 @@ command_return_t do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
     vict = get_char_room(arg, ch->in_room);
     if (!vict)
     {
-      ch->prog_error(QStringLiteral("Mppeace - Vict not found."));
+      ch->prog_error(u"Mppeace - Vict not found."_s);
       return ReturnValue::eFAILURE;
     }
     if (vict->isNonPlayer() && vict->mobdata->hated != nullptr)
@@ -1943,7 +1943,7 @@ qint32 process_math(CharacterPtr ch, QString string)
       lastsign = *string;
       break;
     default:
-      ch->prog_error(QStringLiteral("Mpsetmath - Unknown symbol: '%1'.").arg(*string));
+      ch->prog_error(u"Mpsetmath - Unknown symbol: '%1'."_s.arg(*string));
       return result;
       break;
     };
@@ -2017,7 +2017,7 @@ QString expand_data(CharacterPtr ch, QString orig)
 
     if (!lvali && !lvalui && !lvalb)
     {
-      ch->prog_error(QStringLiteral("Mpsetmath - Expand_data - Accessing unknown data."));
+      ch->prog_error(u"Mpsetmath - Expand_data - Accessing unknown data."_s);
       return {};
     }
 
@@ -2062,9 +2062,9 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   CharacterPtr vict;
-  //  if (activeActor) activeActor->send(QStringLiteral("{%1}\r\n").arg(arg));
+  //  if (activeActor) activeActor->send(u"{%1}\r\n"_s.arg(arg));
   //  vict = get_pc("Urizen");
-  //  if (vict) vict->send(QStringLiteral("{%1}\r\n").arg(arg));
+  //  if (vict) vict->send(u"{%1}\r\n"_s.arg(arg));
 
   QString arg1;
   QString arg2;
@@ -2077,9 +2077,9 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
     r++;
     one_argument(r, arg2);
   }
-  if (!r || !*r || !*arg1)
+  if (!r || r.isEmpty() || arg.isEmpty() 1)
   {
-    ch->prog_error(QStringLiteral("Mpsetmath - Invalid primary data."));
+    ch->prog_error(u"Mpsetmath - Invalid primary data."_s);
     return ReturnValue::eFAILURE;
   }
   bool allowed = false;
@@ -2096,7 +2096,7 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
   vict = activeTarget;
   if (!vict)
   {
-    // ch->prog_error( QStringLiteral("Mpsetmath - No target."));
+    // ch->prog_error( u"Mpsetmath - No target."_s);
     // return ReturnValue::eFAILURE;
   }
   if (vict && vict->isNonPlayer())
@@ -2108,7 +2108,7 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!allowed && vict)
   {
-    ch->prog_error(QStringLiteral("Mpsetmath - Accessing unallowed data."));
+    ch->prog_error(u"Mpsetmath - Accessing unallowed data."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2118,7 +2118,7 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
     arg = one_argument(arg, nw);
     if (!nw[0])
     {
-      ch->prog_error(QStringLiteral("Mpsetmath - Invalid string."));
+      ch->prog_error(u"Mpsetmath - Invalid string."_s);
       return ReturnValue::eFAILURE;
     }
     *lvalstr = (nw);
@@ -2126,7 +2126,7 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   if (!lvalui && !lvali && !lvalb)
   {
-    ch->prog_error(QStringLiteral("Mpsetmath - Accessing unknown data."));
+    ch->prog_error(u"Mpsetmath - Accessing unknown data."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2136,29 +2136,29 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (i == -9839)
   {
-    ch->prog_error(QStringLiteral("Mpsetmath - Invalid math-string."));
+    ch->prog_error(u"Mpsetmath - Invalid math-string."_s);
     return ReturnValue::eFAILURE;
   }
   if (lvali)
   {
     *lvali = i;
-    //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
+    //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
     //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalb)
   {
     *lvalb = (qint8)i;
-    //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
+    //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
     //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalui)
   {
     *lvalui = (quint32)i;
-    //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
+    //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
     //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
 
-  /*  vict->sendln(QStringLiteral("%d\r\n%d\r\n%d\r\n%d\r\n",
+  /*  vict->sendln(u"%d\r\n%d\r\n%d\r\n%d\r\n"_s,
       process_math(ch, "1+1-3+5*10"),
       process_math(ch, "1-3+5*10/2"),
       process_math(ch, "1+101-34+5*10*2/8"),
@@ -2172,14 +2172,14 @@ void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(u"Obj %1, com %2, line %3: %4"_s).arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else if (this->isNonPlayer())
   {
-    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(u"Mob %1, com %2, line %3: %4"_s).arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else
   {
-    logworld(QStringLiteral("Unknown prog: %1").arg(error_message));
+    logworld(u"Unknown prog: %1"_s.arg(error_message));
   }
 }

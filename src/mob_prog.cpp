@@ -189,8 +189,8 @@ bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
   if (opr == "!/")
     return str_infix(rhs, lhs);
 
-  prog_error(QStringLiteral("Improper MOBprog operator"));
-  logworld(QStringLiteral("Improper MOBprog operator"));
+  prog_error(u"Improper MOBprog operator"_s);
+  logworld(u"Improper MOBprog operator"_s);
   return false;
 }
 
@@ -1499,7 +1499,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     }
     else if (*point == ' ')
     {
-      mob->prog_error(QStringLiteral("ifchck syntax error: '%1'").arg(ifchck));
+      mob->prog_error(u"ifchck syntax error: '%1'"_s.arg(ifchck));
       return -1;
     }
     else if (*point == '.')
@@ -1508,7 +1508,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     }
     else if (*point == '\0')
     {
-      mob->prog_error(QStringLiteral("ifchck syntax error"));
+      mob->prog_error(u"ifchck syntax error"_s);
       DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
@@ -3018,7 +3018,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
         return null;
     }
     if (ur)
-      ur->send(QStringLiteral("%d>%d\r\n").arg(ifpos - 1).arg(legal));
+      ur->send(u"%d>%d\r\n"_s.arg(ifpos - 1).arg(legal));
   }
   else
   {
@@ -3029,7 +3029,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
     else if (legal < 0)
       return {};
     if (ur)
-      ur->send(QStringLiteral("%d>-%d\r\n").arg(thrw->cPos - 1).arg(legal));
+      ur->send(u"%d>-%d\r\n"_s.arg(thrw->cPos - 1).arg(legal));
   }
 
   while (loopdone == false) /*scan over any existing or statements */
@@ -3057,7 +3057,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
             return null;
         }
         if (ur)
-          ur->send(QStringLiteral("%d<%d\r\n").arg(ifpos - 1).arg(legal));
+          ur->send(u"%d<%d\r\n"_s.arg(ifpos - 1).arg(legal));
       }
       else
       {
@@ -3068,7 +3068,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
         else if (legal < 0)
           return {};
         if (ur)
-          ur->send(QStringLiteral("%d<-%d\r\n").arg(thrw->cPos - 1).arg(legal));
+          ur->send(u"%d<-%d\r\n"_s.arg(thrw->cPos - 1).arg(legal));
       }
     }
     else
@@ -3128,17 +3128,17 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
         {
           qDebug("debug: ");
           if (cmnd)
-                                                qDebug(qUtf8Printable(QStringLiteral("cmd: %1 ").arg(cmnd));
+                                                qDebug(qUtf8Printable(u"cmd: %1 "_s.arg(cmnd));
 					else
 						qDebug("cmd: (null) ");
 
 					if (mob && mob->name)
-						qDebug(qUtf8Printable(QStringLiteral("mob: %1 ").arg(mob->name)));
+						qDebug(qUtf8Printable(u"mob: %1 "_s.arg(mob->name)));
 					else
 						qDebug("mob: (null) ");
 
 					if (actor && actor->name)
-						qDebug(qUtf8Printable(QStringLiteral("actor: %1 = ").arg(actor->name)));
+						qDebug(qUtf8Printable(u"actor: %1 = "_s.arg(actor->name)));
 					else
 						qDebug("actor: (null) = ");
         }
@@ -4503,7 +4503,7 @@ qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint
               eh = new tempvariable;
 
               eh->data = var;
-              eh->name = QStringLiteral("throw");
+              eh->name = u"throw"_s;
               eh->next = mob->tempVariable;
               mob->tempVariable = eh;
             }
@@ -4643,7 +4643,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
   temp->mobdata->setObject(obj);
   //  temp->master = ch;
   // temp->short_desc={};
-  temp->short_desc = QStringLiteral(obj->short_description);
+  temp->short_desc = obj->short_description;
   QString buf;
   dc_sprintf(buf, "%s", qPrintable(obj->name()));
   for (qint32 i = strlen(buf) - 1; i > 0; i--)
@@ -4665,7 +4665,7 @@ void end_oproc(CharacterPtr ch, Trace trace)
   static qint32 core_counter = {};
   if (selfpurge)
   {
-    DC::getInstance()->logentry(QStringLiteral("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Crash averted in end_oproc() %1 %2"_s.arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, DC::LogChannel::LOG_BUG);
 
     if (core_counter++ < 10)
     {
@@ -4783,7 +4783,7 @@ qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qin
             auto eh = new tempvariable;
 
             eh->data = var;
-            eh->name = QStringLiteral("throw");
+            eh->name = u"throw"_s;
             eh->next = vmob->tempVariable;
             vmob->tempVariable = eh;
           }
@@ -5012,7 +5012,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
       {
         if (!arguments.isEmpty())
         {
-          do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(name()).arg(arguments).split(' '));
+          do_mpsettemp(u"%1 lasttyped %2"_s.arg(name()).arg(arguments).split(' '));
         }
 
         vmob = dc_->initiate_oproc(this, item);
@@ -5032,7 +5032,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
     {
       if (!arguments.isEmpty())
       {
-        do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(name()).arg(arguments).split(' '));
+        do_mpsettemp(u"%1 lasttyped %2"_s.arg(name()).arg(arguments).split(' '));
       }
       vmob = dc_->initiate_oproc(this, item);
       if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
@@ -5052,7 +5052,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
       {
         if (!arguments.isEmpty())
         {
-          do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(name()).arg(arguments).split(' '));
+          do_mpsettemp(u"%1 lasttyped %2"_s.arg(name()).arg(arguments).split(' '));
         }
 
         vmob = dc_->initiate_oproc(this, equipment[i]);

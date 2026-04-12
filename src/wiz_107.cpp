@@ -13,7 +13,7 @@ command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = one_argument(argument, name);
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Archive whom?");
     return ReturnValue::eFAILURE;
@@ -34,7 +34,7 @@ command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
   send_to_char("Suddenly someone reaches down and packs you into a "
                "little ball.\r\n",
                victim);
-  victim->send(QStringLiteral("You have been archived by %s.  Goodbye.\r\n").arg(qPrintable(ch->name())));
+  victim->send(u"You have been archived by %s.  Goodbye.\r\n"_s.arg(qPrintable(ch->name())));
   act("$N is grabbed up and packed into a small ball by $n.", ch, 0,
       victim, TO_ROOM, 0);
   do_quit(victim, "", cmd_t::SAVE_SILENTLY);
@@ -69,7 +69,7 @@ command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sendln(QStringLiteral("Target's prompt is: %1").arg(victim->getPrompt()));
+  sendln(u"Target's prompt is: %1"_s.arg(victim->getPrompt()));
   return ReturnValue::eSUCCESS;
 }
 
@@ -111,7 +111,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   if ((victim->getLevel() > this->getLevel()) && (qPrintable(this->name()) != qPrintable(victim->name())))
   {
     this->sendln("Can't do that. That mob is higher than you!");
-    DC::getInstance()->logentry(QStringLiteral("%1 tried to snoop a higher mob\r\n").arg(qPrintable(this->name())), OVERSEER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"%1 tried to snoop a higher mob\r\n"_s.arg(qPrintable(this->name())), OVERSEER, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
 
@@ -123,14 +123,14 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
       this->desc->snooping->snoop_by = {};
       this->desc->snooping = {};
     }
-    DC::getInstance()->logentry(QStringLiteral("%1 snoops themself.").arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"%1 snoops themself."_s).arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
     return ReturnValue::eSUCCESS;
   }
 
   if (victim->getLevel() == IMPLEMENTER)
   {
     sendln("What are you!? Crazy! You can't snoop an Imp.");
-    victim->sendln(QStringLiteral("%1 failed snooping you.").arg(name()));
+    victim->sendln(u"%1 failed snooping you."_s).arg(name()));
     return ReturnValue::eFAILURE;
   }
 
@@ -138,11 +138,11 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   {
     if (victim->desc->snoop_by->character)
     {
-      sendln(QStringLiteral("%1 is snooping them already.").arg(victim->desc->snoop_by->character->name()));
+      sendln(u"%1 is snooping them already."_s).arg(victim->desc->snoop_by->character->name()));
     }
     else
     {
-      sendln(QStringLiteral("Descriptor #%1 is snooping them already.").arg(victim->desc->snoop_by->descriptor));
+      sendln(u"Descriptor #%1 is snooping them already."_s.arg(victim->desc->snoop_by->descriptor));
     }
 
     return ReturnValue::eFAILURE;
@@ -157,7 +157,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   this->desc->snooping = victim->desc;
   victim->desc->snoop_by = this->desc;
-  DC::getInstance()->logentry(QStringLiteral("%1 snoops %2.").arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 snoops %2."_s).arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
@@ -194,7 +194,7 @@ command_return_t do_send(CharacterPtr ch, QString argument, cmd_t cmd)
   name[99] = '\0';
   message[199] = '\0';
 
-  if (!*name || !*message)
+  if (name.isEmpty() || message.isEmpty())
   {
     ch->sendln("Send what to who?");
     return ReturnValue::eFAILURE;

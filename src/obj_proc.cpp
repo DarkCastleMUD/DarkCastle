@@ -26,7 +26,7 @@
 #include "DC/inventory.h"
 #include "DC/utility.h"
 
-const auto EMOTING_FILE = QStringLiteral("emoting-objects.txt");
+const auto EMOTING_FILE = u"emoting-objects.txt"_s;
 
 extern mprog_throw_type *g_mprog_throw_list;
 
@@ -421,7 +421,7 @@ qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     {
       if (tmp_char == ch)
       {
-        tmp_char->send(QStringLiteral("You feel your Travelling March recover %1 moves for you.\r\n").arg(heal));
+        tmp_char->send(u"You feel your Travelling March recover %1 moves for you.\r\n"_s).arg(heal));
       }
       else
       {
@@ -564,22 +564,22 @@ qint32 orrowand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Characte
     if (!firstP && real_object(27903))
     {
       auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27903)].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     if (!secondP && real_object(27903))
     {
       auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27903)].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     if (!vial && real_object(27904))
     {
       auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27904)].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     if (!diamond && real_object(17399))
     {
       auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(17399)].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     return ReturnValue::eSUCCESS;
   }
@@ -757,7 +757,7 @@ qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   /* balance */
   if (cmd == cmd_t::BALANCE)
   {
-    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
+    ch->send(u"You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
     return ReturnValue::eSUCCESS;
   }
 
@@ -771,7 +771,7 @@ qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
 
     one_argument(arg, buf);
-    if (!*buf || !(x = atoi(buf)) || x < 0)
+    if (buf.isEmpty() || !(x = atoi(buf)) || x < 0)
     {
       ch->sendln("Deposit what?");
       return ReturnValue::eSUCCESS;
@@ -788,14 +788,14 @@ qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
     ch->removeGold(x);
     GET_BANK(ch) += x;
-    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
+    ch->send(u"You deposit {:L} $B$5gold$R coins.\r\n", x));
     ch->save();
     return ReturnValue::eSUCCESS;
   }
 
   /* withdraw */
   one_argument(arg, buf);
-  if (!*buf || !(x = atoi(buf)) || x < 0)
+  if (buf.isEmpty() || !(x = atoi(buf)) || x < 0)
   {
     ch->sendln("Withdraw what?");
     return ReturnValue::eSUCCESS;
@@ -807,7 +807,7 @@ qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
-  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
+  ch->send(u"You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();
   return ReturnValue::eSUCCESS;
 }
@@ -824,7 +824,7 @@ qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   /* balance */
   if (cmd == cmd_t::BALANCE)
   {
-    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
+    ch->send(u"You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
     return ReturnValue::eSUCCESS;
   }
 
@@ -837,7 +837,7 @@ qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   /* withdraw */
   one_argument(arg, buf);
-  if (!*buf || !(x = atoi(buf)) || x < 0)
+  if (buf.isEmpty() || !(x = atoi(buf)) || x < 0)
   {
     ch->sendln("Withdraw what?");
     return ReturnValue::eSUCCESS;
@@ -849,7 +849,7 @@ qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
-  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
+  ch->send(u"You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();
   return ReturnValue::eSUCCESS;
 }
@@ -1193,7 +1193,7 @@ command_return_t do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
       // Attempt to assemble all the components
       if (assemble_item_index(ch, last_item_index) == false)
       {
-        ch->send(QStringLiteral("%s").arg(assemble_items[last_item_index].missing_to_char));
+        ch->send(u"%s"_s.arg(assemble_items[last_item_index].missing_to_char));
         return ReturnValue::eFAILURE;
       }
     }
@@ -1222,7 +1222,7 @@ command_return_t do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
   // Attempt to assemble all the components
   if (assemble_item_index(ch, item_index) == false)
   {
-    ch->send(QStringLiteral("%s").arg(assemble_items[item_index].missing_to_char));
+    ch->send(u"%s"_s.arg(assemble_items[item_index].missing_to_char));
     return ReturnValue::eFAILURE;
   }
 
@@ -1484,7 +1484,7 @@ qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   {
     return ReturnValue::eFAILURE;
   }
-  do_say(ch, QStringLiteral("just dance"), cmd_t::SAY);
+  do_say(ch, u"just dance"_s, cmd_t::SAY);
   if (obj->obj_flags.timer > 0)
   {
     ch->sendln("The vest remains silent.");
@@ -1751,7 +1751,7 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
 
   half_chop(arg, name, buf);
 
-  if (!*arg || !*name || !*buf)
+  if (arg.isEmpty() || name.isEmpty() || buf.isEmpty())
   {
     send_to_char("'Restring Machine v2.1' *beep*'\r\n"
                  "'restring <Item> <Description>' *beep*'\r\n"
@@ -2998,7 +2998,7 @@ qint32 gl_dragon_fire(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   ch->sendln("The head of your dragon staff animates and breathes $B$4fire$R all around you!");
   act_to_room("The head of the dragon staff in $n's hands animates and begins to breath fire!", ch, obj, 0, 0);
 
-  return cast_fire_breath(10, ch, QStringLiteral(""), SPELL_TYPE_SPELL, ch->fighting, 0, 0);
+  return cast_fire_breath(10, ch, u""_s, SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
 
 qint32 dk_rend(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
@@ -3237,20 +3237,20 @@ qint32 noremove_eq(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   {
     obj->obj_flags.value[3]--;
     if (!obj->obj_flags.value[3])
-      obj->equipped_by->send(QStringLiteral("The %1 loses it's grip on your body.\r\n").arg(obj->short_description()));
+      obj->equipped_by->send(u"The %1 loses it's grip on your body.\r\n"_s.arg(obj->short_description()));
     return ReturnValue::eSUCCESS;
   }
   if (cmd == cmd_t::UNDEFINED && obj->obj_flags.value[3] <= 0)
   {
     if (number(0, 4))
       return ReturnValue::eSUCCESS;
-    obj->equipped_by->send(QStringLiteral("The %s clamps down onto your body locking your equipment in place!\r\n").arg(qPrintable(obj->short_description())));
+    obj->equipped_by->send(u"The %s clamps down onto your body locking your equipment in place!\r\n"_s.arg(qPrintable(obj->short_description())));
     obj->obj_flags.value[3] = 5;
     return ReturnValue::eSUCCESS;
   }
   if (obj->obj_flags.value[3] > 0)
   {
-    obj->equipped_by->send(QStringLiteral("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description()));
+    obj->equipped_by->send(u"The %1 refuses to let you remove anything!\r\n"_s.arg(obj->short_description()));
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
@@ -3511,7 +3511,7 @@ qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
     if (dam > 0)
     {
       GET_MANA(obj->equipped_by) -= dam;
-      obj->equipped_by->send(QStringLiteral("Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n").arg(dam));
+      obj->equipped_by->send(u"Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n"_s).arg(dam));
 
       act_to_room("$n is wracked by magical energies!", obj->equipped_by, 0, 0, 0);
     }
@@ -3924,7 +3924,7 @@ qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QStrin
 
   if (obj->in_room <= 0)
   {
-    DC::getInstance()->logentry(QStringLiteral("Mortar round without a room?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Mortar round without a room?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_obj(obj);
     return ReturnValue::eFAILURE;
   }
@@ -3969,7 +3969,7 @@ qint32 godload_banshee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
     return ReturnValue::eFAILURE;
   act_to_room("$n's instrument takes on a life of its own, sending out a piercing wail.", ch, 0, vict, 0);
   ch->sendln("Your instrument sends out a piercing wail.");
-  return song_whistle_sharp(51, ch, QStringLiteral(""), vict, 50);
+  return song_whistle_sharp(51, ch, u""_s, vict, 50);
 }
 // 511
 qint32 godload_claws(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,

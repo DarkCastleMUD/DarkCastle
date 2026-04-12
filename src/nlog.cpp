@@ -11,10 +11,6 @@
 
 #include "DC/terminal.h"
 
-/*
- * DC::getInstance()->logf, QStringLiteral, and csendf by Sadus, others by Ysafar.
- */
-
 class hash_info
 {
 public:

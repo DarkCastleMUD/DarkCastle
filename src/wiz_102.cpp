@@ -71,7 +71,7 @@ void rebuild_rnum_references(qint32 startAt, qint32 type)
       case 'J':
         break;
       default:
-        DC::getInstance()->logentry(QStringLiteral("Illegal character hit in rebuild_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
+        DC::getInstance()->logentry(u"Illegal character hit in rebuild_rnum_references"_s, 0, DC::LogChannel::LOG_WORLD);
         break;
       }
     }
@@ -101,7 +101,7 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
     // must be done to clear out "d" before it is used
     if (!(ch->getDC()->load_char_obj(&d, name)))
     {
-      if (file_exists(QStringLiteral("../archive/%1.gz").arg(name)))
+      if (file_exists(u"../archive/%1.gz"_s.arg(name)))
         ch->sendln("Character is archived.");
       else
         ch->sendln("Unable to load! (character might not exist...)");
@@ -114,36 +114,36 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
     redo_hitpoints(vict);
     redo_mana(vict);
     if (vict->title_.isEmpty())
-      vict->title_ = QStringLiteral("is a virgin");
+      vict->title_ = u"is a virgin"_s;
     if (GET_CLASS(vict) == CLASS_MONK)
       GET_AC(vict) -= vict->getLevel() * 3;
     isr_set(vict);
   }
 
-  ch->sendln(QStringLiteral("$3Short Desc$R: %1").arg(vict->shortdesc_or_name()));
+  ch->sendln(u"$3Short Desc$R: %1"_s.arg(vict->shortdesc_or_name()));
 
   auto race = races[(qint32)(vict->race)].singular_name;
   auto ch_class = pc_clss_types[(qint32)(GET_CLASS(vict))];
   auto room = DC::getInstance()->world[vict->in_room].number;
-  ch->send(QStringLiteral("$3Race$R: %1 $3Class$R: %2 $3Level$R: %3 $3").arg(race, -9).arg(ch_class, -9).arg(vict->getLevel(), -8));
+  ch->send(u"$3Race$R: %1 $3Class$R: %2 $3Level$R: %3 $3"_s.arg(race, -9).arg(ch_class, -9).arg(vict->getLevel(), -8));
 
   if (connected)
-    ch->sendln(QStringLiteral("In Room$R : %1 ").arg(room));
+    ch->sendln(u"In Room$R : %1 "_s.arg(room));
   else
-    ch->sendln(QStringLiteral("Not Connected"));
+    ch->sendln(u"Not Connected"_s);
 
-  ch->sendln(QStringLiteral("$3Exp$R: %1 $3Gold$R: %2 $3Bank$R: %3 $3Align$R: %4").arg(vict->exp, -10).arg(vict->getGold(), -10).arg(GET_BANK(vict), -9).arg(GET_ALIGNMENT(vict)));
+  ch->sendln(u"$3Exp$R: %1 $3Gold$R: %2 $3Bank$R: %3 $3Align$R: %4"_s.arg(vict->exp, -10).arg(vict->getGold(), -10).arg(GET_BANK(vict), -9).arg(GET_ALIGNMENT(vict)));
   if (ch->getLevel() >= SERAPH)
-    ch->sendln(QStringLiteral("$3Load Rm$R: %1  $3Home Rm$R: %2  $3Platinum$R: %3  $3Clan$R: %4").arg(room,-5).arg(vict->hometown,-5).arg(GET_PLATINUM(vict)).arg(GET_CLAN(vict));
+    ch->sendln(u"$3Load Rm$R: %1  $3Home Rm$R: %2  $3Platinum$R: %3  $3Clan$R: %4"_s.arg(room,-5).arg(vict->hometown,-5).arg(GET_PLATINUM(vict)).arg(GET_CLAN(vict));
 
-  ch->sendln(QStringLiteral("$3Str$R: %1  $3Wis$R: %2  $3Int$R: %3  $3Dex$R: %4  $3Con$R: %5").arg(GET_STR(vict), -2).arg(GET_WIS(vict), -2).arg(GET_INT(vict), -2).arg(GET_DEX(vict), -2).arg(GET_CON(vict), -2));  
-  ch->sendln(QStringLiteral("$3Hit Points$R: %1/%2 $3Mana$R: %3/%4 $3Move$R: %5/%6 $3Ki$R: %7/%8").arg(vict->getHP()).arg(GET_MAX_HIT(vict)).arg(GET_MANA(vict)).arg(GET_MAX_MANA(vict)).arg(GET_MOVE(vict)).arg(GET_MAX_MOVE(vict)).arg(GET_KI(vict)).arg(GET_MAX_KI(vict)));
+  ch->sendln(u"$3Str$R: %1  $3Wis$R: %2  $3Int$R: %3  $3Dex$R: %4  $3Con$R: %5"_s.arg(GET_STR(vict), -2).arg(GET_WIS(vict), -2).arg(GET_INT(vict), -2).arg(GET_DEX(vict), -2).arg(GET_CON(vict), -2));  
+  ch->sendln(u"$3Hit Points$R: %1/%2 $3Mana$R: %3/%4 $3Move$R: %5/%6 $3Ki$R: %7/%8"_s.arg(vict->getHP()).arg(GET_MAX_HIT(vict)).arg(GET_MANA(vict)).arg(GET_MAX_MANA(vict)).arg(GET_MOVE(vict)).arg(GET_MAX_MOVE(vict)).arg(GET_KI(vict)).arg(GET_MAX_KI(vict)));
 
   if (ch->getLevel() >= OVERSEER && !vict->isNonPlayer() && ch->getLevel() >= vict->getLevel())
   {
-      ch->sendln(QStringLiteral("$3Last connected from$R: %1").arg(vict->player->last_site));
+      ch->sendln(u"$3Last connected from$R: %1"_s.arg(vict->player->last_site));
       const time_t tBuffer = vict->player->time.logon;
-      ch->sendln(QStringLiteral("$3Last connected on$R: %1").arg(ctime(&tBuffer)));
+      ch->sendln(u"$3Last connected on$R: %1"_s.arg(ctime(&tBuffer)));
   }
 
   display_punishes(ch, vict);
@@ -153,11 +153,11 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (ch->getLevel() >= OVERSEER && ch->getLevel() >= vict->getLevel())
       {
-        ch->sendln(QStringLiteral("$3Connected from$R: %1").arg(vict->desc->getPeerOriginalAddress().toString()));
+        ch->sendln(u"$3Connected from$R: %1"_s.arg(vict->desc->getPeerOriginalAddress().toString()));
       }
       else
       {
-        ch->sendln(QStringLiteral("Connected.\r\n"));
+        ch->sendln(u"Connected.\r\n"_s);
       }
     }
     else
@@ -194,7 +194,7 @@ command_return_t do_find(CharacterPtr ch, QString arg, cmd_t cmd)
 
   half_chop(arg, type, name);
 
-  if (!*type || !*name)
+  if (type.isEmpty() || name.isEmpty())
   {
     ch->sendln("Usage:  find <mob|pc|character|obj> <name>");
     return ReturnValue::eFAILURE;
@@ -215,7 +215,7 @@ command_return_t do_find(CharacterPtr ch, QString arg, cmd_t cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_find.");
-    DC::getInstance()->logentry(QStringLiteral("Default in do_find...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Default in do_find...should NOT happen."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: // mobile
     return do_mlocate(ch, name);
@@ -233,7 +233,7 @@ command_return_t do_find(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  ch->send(QStringLiteral("%1 -- %2 [%3]").arg(vict->shortdesc_or_name(), 30).arg(DC::getInstance()->world[vict->in_room].name_).arg(DC::getInstance()->world[vict->in_room].number));
+  ch->send(u"%1 -- %2 [%3]"_s.arg(vict->shortdesc_or_name(), 30).arg(DC::getInstance()->world[vict->in_room].name_).arg(DC::getInstance()->world[vict->in_room].number));
   return ReturnValue::eSUCCESS;
 }
 
@@ -274,7 +274,7 @@ command_return_t do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_stat.");
-    DC::getInstance()->logentry(QStringLiteral("Default in do_stat...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Default in do_stat...should NOT happen."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: // mobile
     if (auto vch = get_mob_vis(ch, name); vch)
@@ -355,7 +355,7 @@ command_return_t do_mpstat(CharacterPtr ch, QString arg, cmd_t cmd)
 
   one_argument(arg, name);
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Usage:  procstat <name|num>");
     return ReturnValue::eFAILURE;
@@ -403,7 +403,7 @@ command_return_t zedit_flags(CharacterPtr ch, QStringList arguments, Zone &zone)
   if (arguments.isEmpty())
   {
     ch->sendln("$3Usage$R: zedit flags <noteleport|noclaim|nohunt>");
-    ch->send(QStringLiteral("Current flags: %1\r\n").arg(sprintbit(zone.getZoneFlags(), Zone::zone_bits)));
+    ch->send(u"Current flags: %1\r\n"_s.arg(sprintbit(zone.getZoneFlags(), Zone::zone_bits)));
     return ReturnValue::eFAILURE;
   }
 
@@ -472,7 +472,7 @@ command_return_t zedit_flags(CharacterPtr ch, QStringList arguments, Zone &zone)
   }
   else
   {
-    ch->send(QStringLiteral("'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n").arg(text));
+    ch->send(u"'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n"_s.arg(text));
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eSUCCESS;
@@ -498,7 +498,7 @@ command_return_t zedit_lifetime(CharacterPtr ch, QStringList arguments, Zone &zo
     return ReturnValue::eFAILURE;
   }
 
-  ch->send(QStringLiteral("Zone %1's lifetime changed from %2 to %3.\r\n").arg(zone.getID()).arg(zone.lifespan).arg(ticks));
+  ch->send(u"Zone %1's lifetime changed from %2 to %3.\r\n"_s.arg(zone.getID()).arg(zone.lifespan).arg(ticks));
   zone.lifespan = ticks;
 
   return ReturnValue::eSUCCESS;
@@ -553,7 +553,7 @@ command_return_t zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
       case '%':
         zone.cmd[cmd]->arg2 = 100;
         zone.cmd[cmd]->command = result;
-        ch->send(QStringLiteral("Type for command %1 changed to %2.\r\nArg1-3 reset.\r\n").arg(cmd + 1).arg(result));
+        ch->send(u"Type for command %1 changed to %2.\r\nArg1-3 reset.\r\n"_s.arg(cmd + 1).arg(result));
         break;
       default:
         ch->sendln("Type must be:  M, O, P, G, E, D, X, K, *, or %.");
@@ -566,43 +566,43 @@ command_return_t zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
       {
       case '0':
         zone.cmd[cmd]->if_flag = {};
-        ch->send(QStringLiteral("If flag for command %1 changed to 0 (always).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 0 (always).\r\n"_s.arg(cmd + 1));
         break;
       case '1':
         zone.cmd[cmd]->if_flag = 1;
-        ch->send(QStringLiteral("If flag for command %1 changed to 1 ($B$2ontrue$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 1 ($B$2ontrue$R).\r\n"_s.arg(cmd + 1));
         break;
       case '2':
         zone.cmd[cmd]->if_flag = 2;
-        ch->send(QStringLiteral("If flag for command %1 changed to 2 ($B$4onfalse$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 2 ($B$4onfalse$R).\r\n"_s.arg(cmd + 1));
         break;
       case '3':
         zone.cmd[cmd]->if_flag = 3;
-        ch->send(QStringLiteral("If flag for command %1 changed to 3 ($B$5onboot$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 3 ($B$5onboot$R).\r\n"_s.arg(cmd + 1));
         break;
       case '4':
         zone.cmd[cmd]->if_flag = 4;
-        ch->send(QStringLiteral("If flag for command %1 changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n"_s.arg(cmd + 1));
         break;
       case '5':
         zone.cmd[cmd]->if_flag = 5;
-        ch->send(QStringLiteral("If flag for command %1 changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n"_s.arg(cmd + 1));
         break;
       case '6':
         zone.cmd[cmd]->if_flag = 6;
-        ch->send(QStringLiteral("If flag for command %1 changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n"_s.arg(cmd + 1));
         break;
       case '7':
         zone.cmd[cmd]->if_flag = 7;
-        ch->send(QStringLiteral("If flag for command %1 changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n"_s.arg(cmd + 1));
         break;
       case '8':
         zone.cmd[cmd]->if_flag = 8;
-        ch->send(QStringLiteral("If flag for command %1 changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n"_s.arg(cmd + 1));
         break;
       case '9':
         zone.cmd[cmd]->if_flag = 9;
-        ch->send(QStringLiteral("If flag for command %1 changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n").arg(cmd + 1));
+        ch->send(u"If flag for command %1 changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n"_s.arg(cmd + 1));
         break;
       default:
         ch->send("Legal values are 0 (always), 1 (ontrue), 2 (onfalse), 3 (onboot),\r\n"
@@ -614,18 +614,17 @@ command_return_t zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
     }
     else if (isexact(select, "comment"))
     {
-      //      This is QStringLiteral'd, don't delete it
       //      if(zone.cmd[cmd]->comment)
       //        zone.cmd[cmd]->comment={};
       if (last == "none")
       {
         zone.cmd[cmd]->comment = {};
-        ch->send(QStringLiteral("Comment for command %d removed.\r\n").arg(cmd + 1));
+        ch->send(u"Comment for command %d removed.\r\n"_s.arg(cmd + 1));
       }
       else
       {
         zone.cmd[cmd]->comment = last;
-        ch->send(QStringLiteral("Comment for command %1 change to '%2'.\r\n").arg(cmd + 1).arg(zone.cmd[cmd]->comment));
+        ch->send(u"Comment for command %1 change to '%2'.\r\n"_s.arg(cmd + 1).arg(zone.cmd[cmd]->comment));
       }
     }
     else
@@ -744,7 +743,7 @@ command_return_t zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
       {
         change_type += " ";
       }
-      ch->send(QStringLiteral("Zone %1, command %2, argument %3 changed from %4%5 to %6.\r\n").arg(zone.getID()).arg(cmd + 1).arg(argument_number).arg(change_type).arg(original_value).arg(new_value));
+      ch->send(u"Zone %1, command %2, argument %3 changed from %4%5 to %6.\r\n"_s).arg(zone.getID()).arg(cmd + 1).arg(argument_number).arg(change_type).arg(original_value).arg(new_value));
     }
     return ReturnValue::eFAILURE;
   }
@@ -774,7 +773,7 @@ command_return_t zedit_remove(CharacterPtr ch, QStringList arguments, Zone &zone
 
   zone.cmd.remove(zone_command_number);
 
-  ch->send(QStringLiteral("Command %1 removed.\r\n").arg(zone_command_number + 1));
+  ch->send(u"Command %1 removed.\r\n"_s).arg(zone_command_number + 1));
   return ReturnValue::eSUCCESS;
 }
 
@@ -800,7 +799,7 @@ zone_t zedit_add(CharacterPtr ch, QStringList arguments, Zone &zone)
   if (isexact(text, "new"))
   {
     zone.cmd.push_back(QSharedPointer<ResetCommand>::create('J'));
-    ch->send(QStringLiteral("New command 'J' added at %1.\r\n").arg(zone.cmd.size()));
+    ch->send(u"New command 'J' added at %1.\r\n"_s.arg(zone.cmd.size()));
     return zone.cmd.size() - 1;
   }
 
@@ -812,7 +811,7 @@ zone_t zedit_add(CharacterPtr ch, QStringList arguments, Zone &zone)
   }
 
   zone.cmd.insert(i, QSharedPointer<ResetCommand>::create('J'));
-  ch->send(QStringLiteral("New command 'J' added at %1.\r\n").arg(i + 1));
+  ch->send(u"New command 'J' added at %1.\r\n"_s.arg(i + 1));
   return i - 1;
 }
 
@@ -861,7 +860,7 @@ command_return_t zedit_name(CharacterPtr ch, QStringList arguments, Zone &zone)
 
   zone.name(arguments.join(' '));
 
-  ch->send(QStringLiteral("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(zone.name()));
+  ch->send(u"Zone %1's name changed to '%2'.\r\n"_s.arg(zone.getID()).arg(zone.name()));
 
   return ReturnValue::eSUCCESS;
 }
@@ -877,7 +876,7 @@ command_return_t zedit_mode(CharacterPtr ch, QStringList arguments, Zone &zone)
     QString buffer;
     for (quint64 j = {}; *zone_modes[j] != '\n'; j++)
     {
-      ch->send(QStringLiteral("  $C%1$R: %2\r\n").arg(j + 1).arg(zone_modes[j]));
+      ch->send(u"  $C%1$R: %2\r\n"_s.arg(j + 1).arg(zone_modes[j]));
     }
     return ReturnValue::eFAILURE;
   }
@@ -894,7 +893,7 @@ command_return_t zedit_mode(CharacterPtr ch, QStringList arguments, Zone &zone)
 
   zone.reset_mode = k - 1;
 
-  ch->send(QStringLiteral("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[k - 1]).arg(k));
+  ch->send(u"Zone %1's reset mode changed to %2(%3).\r\n"_s.arg(zone.getID()).arg(zone_modes[k - 1]).arg(k));
   return ReturnValue::eSUCCESS;
 }
 
@@ -977,7 +976,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!subcommand_found)
   {
-    ch->send(QStringLiteral("'%1' is an invalid subcommand.\r\n").arg(select));
+    ch->send(u"'%1' is an invalid subcommand.\r\n"_s.arg(select));
     return zedit_help(ch);
   }
 
@@ -1082,7 +1081,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->send(QStringLiteral("Searching for Object rnum %1 with vnum %2\r\n").arg(robj).arg(j));
+      ch->send(u"Searching for Object rnum %1 with vnum %2\r\n"_s.arg(robj).arg(j));
     }
     if (rmob == -1)
     {
@@ -1090,7 +1089,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->send(QStringLiteral("Searching for Mobile rnum %1 with vnum %2\r\n").arg(rmob).arg(j));
+      ch->send(u"Searching for Mobile rnum %1 with vnum %2\r\n"_s.arg(rmob).arg(j));
     }
 
     for (const auto [z_key, zone] : DC::getInstance()->zones.asKeyValueRange())
@@ -1102,14 +1101,14 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
         case 'M':
           if (rmob == zone.cmd[i]->arg1)
           {
-            ch->send(QStringLiteral(" Zone %d  Command %d (%c)\r\n").arg(z_key).arg(i + 1).arg(zone.cmd[i]->command));
+            ch->send(u" Zone %d  Command %d (%c)\r\n"_s.arg(z_key).arg(i + 1).arg(zone.cmd[i]->command));
             if (stats)
             {
-              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(u" %1 list %2 1 stats\r\n"_s.arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(u" %1 list %2 1\r\n"_s.arg(z_key).arg(i + 1).toStdString().c_str());
             }
             do_zedit(ch, str);
             free(str);
@@ -1120,14 +1119,14 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
         case 'O':
           if (robj == zone.cmd[i]->arg1)
           {
-            ch->send(QStringLiteral(" Zone %d  Command %d (%c)\r\n").arg(z_key).arg(i + 1).arg(zone.cmd[i]->command));
+            ch->send(u" Zone %d  Command %d (%c)\r\n"_s.arg(z_key).arg(i + 1).arg(zone.cmd[i]->command));
             if (stats)
             {
-              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(u" %1 list %2 1 stats\r\n"_s.arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(u" %1 list %2 1\r\n"_s.arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
             do_zedit(ch, str);
@@ -1138,14 +1137,14 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
           if (robj == zone.cmd[i]->arg1 ||
               robj == zone.cmd[i]->arg3)
           {
-            ch->send(QStringLiteral(" Zone %d  Command %d (%c)\r\n").arg(z_key).arg(i + 1).arg(zone.cmd[i]->command));
+            ch->send(u" Zone %d  Command %d (%c)\r\n"_s.arg(z_key).arg(i + 1).arg(zone.cmd[i]->command));
             if (stats)
             {
-              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(u" %1 list %2 1 stats\r\n"_s.arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(u" %1 list %2 1\r\n"_s.arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
             do_zedit(ch, str);
@@ -1195,7 +1194,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
     zone.cmd[i - 1] = zone.cmd[j - 1];
     zone.cmd[j - 1] = temp_com;
 
-    ch->send(QStringLiteral("Commands %d and %d swapped.\r\n").arg(i).arg(j));
+    ch->send(u"Commands %d and %d swapped.\r\n"_s.arg(i).arg(j));
     break;
 
   case 11: // copy
@@ -1233,7 +1232,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
       // bump everything up a slot
       for (j = last_cmd; j != (to - 2); j--)
         zone.cmd[j + 1] = zone.cmd[j];
-      buf = QStringLiteral("Command copied to %1.\r\n").arg(to);
+      buf = u"Command copied to %1.\r\n"_s).arg(to);
       to--;
     }
     else // tack it on the end
@@ -1261,7 +1260,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
       for (cont = NO_CONTINENT; cont != continent_names.size(); cont++)
       {
 
-        ch->send(QStringLiteral("%d) %s\r\n").arg(cont).arg(continent_names.at(cont).c_str()));
+        ch->send(u"%d) %s\r\n"_s.arg(cont).arg(continent_names.at(cont).c_str()));
       }
       return ReturnValue::eFAILURE;
     }
@@ -1270,10 +1269,10 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
     cont = text.toLongLong(&ok);
     if (!ok || !cont || cont > continent_names.size() - 1)
     {
-      ch->send(QStringLiteral("You much choose between 1 and %d.\r\n").arg(continent_names.size()));
+      ch->send(u"You much choose between 1 and %d.\r\n"_s).arg(continent_names.size()));
       return ReturnValue::eFAILURE;
     }
-    ch->send(QStringLiteral("Success. Continent changed to %s\r\n").arg(continent_names.at(cont).c_str()));
+    ch->send(u"Success. Continent changed to %s\r\n"_s.arg(continent_names.at(cont).c_str()));
     zone.continent = cont;
     break;
 
@@ -1530,7 +1529,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
 
   obj = DC::getInstance()->obj_index[item_num].item;
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     send_to_char("$3Syntax$R:  oedit [item_num] exdesc <field> [values]\r\n"
                  "The field must be one of the following:\r\n",
@@ -1538,7 +1537,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
     ch->display_string_list(fields);
     ch->sendln("\r\n$3Current Descs$R:");
     for (x = 1, curr = obj->ex_description; curr; x++, curr = curr->next)
-      ch->send(QStringLiteral("$3%d$R) %s\r\n%s\r\n").arg(x).arg(curr->keyword).arg(curr->description));
+      ch->send(u"$3%d$R) %s\r\n%s\r\n"_s.arg(x).arg(curr->keyword).arg(curr->description));
     return ReturnValue::eFAILURE;
   }
 
@@ -1558,7 +1557,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
   // new
   case 0:
   {
-    if (!*select)
+    if (select.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] exdesc new <keywords>\r\n"
                    "This adds a new description with the keywords chosen.\r\n",
@@ -1566,8 +1565,8 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
       return ReturnValue::eFAILURE;
     }
     curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-    curr->keyword = QStringLiteral(select);
-    curr->description = QStringLiteral("Empty desc.\r\n");
+    curr->keyword = select;
+    curr->description = u"Empty desc.\r\n"_s;
     curr->next = obj->ex_description;
     obj->ex_description = curr;
     ch->sendln("New desc created.");
@@ -1577,7 +1576,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
   // delete
   case 1:
   {
-    if (!*select)
+    if (select.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] exdesc delete <number>\r\n"
                    "This removes desc <number> from the list permanently.\r\n",
@@ -1620,7 +1619,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
   // keywords
   case 2:
   {
-    if (!*select || !*value)
+    if (select.isEmpty() || value.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] exdesc keywords <number> <new keywords>\r\n"
                    "This removes desc <number> from the list permanently.\r\n",
@@ -1640,7 +1639,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
       ch->sendln("There is no desc for that number.");
       return ReturnValue::eFAILURE;
     }
-    curr->keyword = QStringLiteral(value);
+    curr->keyword = value;
     ch->sendln("New keyword set.");
     break;
   }
@@ -1648,7 +1647,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
   // desc
   case 3:
   {
-    if (!*select)
+    if (select.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] exdesc desc <number>\r\n"
                    "This removes desc <number> from the list permanently.\r\n",
@@ -1718,7 +1717,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
   // select = # of affect
   // value = value to change aff to
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     send_to_char("$3Syntax$R:  oedit [item_num] affects [affectnumber] [value]\r\n"
                  "The field must be one of the following:\r\n",
@@ -1745,7 +1744,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
   // new
   case 0:
   {
-    if (!*select)
+    if (select.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] affects new yes\r\n"
                    "This adds a new blank affect to the end of the list.\r\n",
@@ -1760,7 +1759,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
   // delete
   case 1:
   {
-    if (!*select)
+    if (select.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] affects delete <number>\r\n"
                    "This removes affect <number> from the list permanently.\r\n",
@@ -1815,7 +1814,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
   // 1spell
   case 3:
   {
-    if (!*select)
+    if (select.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] affects 1spell <number> <value>\r\n"
                    "This sets the modifying spell affect to <value> for affect <number>.\r\n",
@@ -1857,7 +1856,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
   // 2amount
   case 4:
   {
-    if (!*select)
+    if (select.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] affects 1amount <number> <value>\r\n"
                    "This sets the spell affect's modifier to <value> for affect <number>.\r\n"
@@ -1890,16 +1889,16 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     {
       QString skill_name = get_skill_name(obj->affected[num].location / 1000);
 
-      ch->send(QStringLiteral("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(skill_name).arg(obj->affected[num].modifier));
+      ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s).arg(num + 1).arg(skill_name).arg(obj->affected[num].modifier));
     }
     else
     {
-      ch->send(QStringLiteral("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(apply_types[obj->affected[num].location]).arg(obj->affected[num].modifier));
+      ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s).arg(num + 1).arg(apply_types[obj->affected[num].location]).arg(obj->affected[num].modifier));
     }
     break;
   }
   case 5:
-    if (!*select || !*value)
+    if (select.isEmpty() || value.isEmpty())
     {
       send_to_char("$3Syntax$R: oedit [item_num] affects 3spell <number> <skill>\r\n"
                    "This sets the affect as affecting skills by 2amount\r\n",
@@ -1923,7 +1922,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     modifier = atoi(value);
     num -= 1;
     obj->affected[num].location = modifier * 1000;
-    ch->send(QStringLiteral("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
+    ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s).arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
     break;
   default:
     ch->sendln("Illegal value.");
@@ -1988,7 +1987,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   // buf3 = args[0]
   // buf4 = args[1-+]
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     send_to_char("$3Syntax$R:  oedit new [obj vnum]           -- Create new object\r\n"
                  "         oedit [obj vnum]               -- Stat object\r\n"
@@ -2049,7 +2048,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     dc_strcpy(buf3, buf);
   }
 
-  if (!*buf3) // no field.  Stat the item.
+  if (buf.isEmpty() 3) // no field.  Stat the item.
   {
     obj_stat(this, DC::getInstance()->obj_index[rnum].item);
     return ReturnValue::eSUCCESS;
@@ -2081,7 +2080,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit keywords */
   case 0:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [item_num] keywords <new_keywords>");
       return ReturnValue::eFAILURE;
@@ -2095,12 +2094,12 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit long desc */
   case 1:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [item_num] longdesc <new_desc>");
       return ReturnValue::eFAILURE;
     }
-    (DC::getInstance()->obj_index[rnum].item)->long_description = QStringLiteral(buf4);
+    (DC::getInstance()->obj_index[rnum].item)->long_description = buf4;
     dc_sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
     send(buf);
   }
@@ -2109,12 +2108,12 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     // edit short desc
   case 2:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [item_num] shortdesc <new_desc>");
       return ReturnValue::eFAILURE;
     }
-    (DC::getInstance()->obj_index[rnum].item)->short_description = QStringLiteral(buf4);
+    (DC::getInstance()->obj_index[rnum].item)->short_description = buf4;
     dc_sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
     send(buf);
   }
@@ -2123,7 +2122,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit action desc */
   case 3:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [item_num] actiondesc <new_desc>");
       return ReturnValue::eFAILURE;
@@ -2137,7 +2136,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit type */
   case 4:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: oedit [item_num] type <>\r\n"
                    "$3Current$R: ",
@@ -2148,7 +2147,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 
       for (i = 1; i < item_types.size(); i++)
       {
-        send(QStringLiteral("%1) %2\r\n").arg(i, 3).arg(item_types[i]));
+        send(u"%1) %2\r\n"_s.arg(i, 3).arg(item_types[i]));
       }
       return ReturnValue::eFAILURE;
     }
@@ -2174,7 +2173,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit wear */
   case 5:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\r\n"
                    "$3Current$R: ",
@@ -2184,7 +2183,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("$3Valid types$R:");
       for (i = {}; i < QFlagsToStrings<ObjectPositions>().size(); i++)
       {
-        send(QStringLiteral("  %1\r\n").arg(QFlagsToStrings<ObjectPositions>().value(i)));
+        send(u"  %1\r\n"_s.arg(QFlagsToStrings<ObjectPositions>().value(i)));
       }
       return ReturnValue::eFAILURE;
     }
@@ -2196,7 +2195,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit size */
   case 6:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\r\n"
                    "$3Current$R: ",
@@ -2220,7 +2219,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit extra */
   case 7:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\r\n"
                    "$3Current$R: ",
@@ -2230,7 +2229,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("\r\n$3Valid types$R:");
       for (i = {}; i < Object::extra_bits.size(); i++)
       {
-        send(QStringLiteral("  %1\r\n").arg(Object::extra_bits[i]));
+        send(u"  %1\r\n"_s.arg(Object::extra_bits[i]));
       }
       return ReturnValue::eFAILURE;
     }
@@ -2241,7 +2240,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit weight */
   case 8:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [item_num] weight <>");
       return ReturnValue::eFAILURE;
@@ -2260,7 +2259,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit value */
   case 9:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [item_num] value <>");
       return ReturnValue::eFAILURE;
@@ -2279,7 +2278,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit moreflags */
   case 10:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\r\n"
                    "$3Current$R: ",
@@ -2289,7 +2288,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("\r\n$3Valid types$R:");
       for (i = {}; i < Object::more_obj_bits.size(); i++)
       {
-        send(QStringLiteral("  %1\r\n").arg(Object::more_obj_bits[i]));
+        send(u"  %1\r\n"_s.arg(Object::more_obj_bits[i]));
       }
       return ReturnValue::eFAILURE;
     }
@@ -2300,7 +2299,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit level */
   case 11:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [vnum] level <>");
       return ReturnValue::eFAILURE;
@@ -2319,7 +2318,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit 1value */
   case 12:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [vnum] 1value <num>");
       return ReturnValue::eFAILURE;
@@ -2338,7 +2337,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit 2value */
   case 13:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [vnum] 2value <num>");
       return ReturnValue::eFAILURE;
@@ -2357,7 +2356,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit 3value */
   case 14:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [vnum] 3value <num>");
       return ReturnValue::eFAILURE;
@@ -2376,7 +2375,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     /* edit 4value */
   case 15:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [vnum] 4value <num>");
       return ReturnValue::eFAILURE;
@@ -2409,7 +2408,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   // new
   case 18:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit new [vnum]");
       return ReturnValue::eFAILURE;
@@ -2444,17 +2443,17 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     auto x = getDC()->create_blank_item(intval);
     if (!x.has_value())
     {
-      send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists. %2\r\n").arg(intval).arg(QVariant::fromValue(x.error()).toString()));
+      send(u"Could not create item '%1'.  Max index hit or obj already exists. %2\r\n"_s.arg(intval).arg(QVariant::fromValue(x.error()).toString()));
       return ReturnValue::eFAILURE;
     }
-    send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));
+    send(u"Item '%1' created successfully.\r\n"_s.arg(intval));
     break;
   }
 
   // delete
   case 19:
   {
-    if (!*buf4 || strncmp(buf4, "yesiwanttodeletethisitem", 24))
+    if (buf.isEmpty() 4 || strncmp(buf4, "yesiwanttodeletethisitem", 24))
     {
       sendln("$3Syntax$R: oedit [item_num] yesiwanttodeletethisitem") = {};
       sendln("\r\nDeleting an item is $3permanent$R and will cause ALL copies of");
@@ -2521,7 +2520,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   }
   case 21:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       sendln("$3Syntax$R: oedit [item_num] 3value <num>");
       return ReturnValue::eFAILURE;
@@ -2545,7 +2544,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     { // None existing;
       curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
       curr->keyword = (qPrintable((DC::getInstance()->obj_index[rnum].item)->name()));
-      curr->description = QStringLiteral("");
+      curr->description = u""_s;
       curr->next = (DC::getInstance()->obj_index[rnum].item)->ex_description;
       (DC::getInstance()->obj_index[rnum].item)->ex_description = curr;
     }
@@ -2606,7 +2605,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   // buf = field
   // buf3 = args[0]
   // buf4 = args[1-+]
-  if (!*buf)
+  if (buf.isEmpty())
   {
     send_to_char("$3Syntax$R:  procedit [mob_vnum] [field] [arg]\r\n"
                  "  Edit a field with no args for help on that field.\r\n\r\n"
@@ -2659,7 +2658,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   ch->setPlayerLastMob(mobvnum);
 
   // no field
-  if (!*buf3)
+  if (buf.isEmpty() 3)
   {
     mpstat(ch, (CharacterPtr)DC::getInstance()->mob_index[mob_num].item);
     return ReturnValue::eSUCCESS;
@@ -2682,7 +2681,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   /* add */
   case 0:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: procedit [mob_num] add new\r\n"
                    "This creates a new mob prog and tacks it on the end.\r\n",
@@ -2691,8 +2690,8 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     prog = new mob_prog_data;
     prog->type = GREET_PROG;
-    prog->arglist = QStringLiteral("80");
-    prog->comlist = QStringLiteral("say This is my new mob prog!\r\n");
+    prog->arglist = u"80"_s;
+    prog->comlist = u"say This is my new mob prog!\r\n"_s;
     prog->next = {};
 
     qint32 prog_num = 1;
@@ -2713,14 +2712,14 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
     update_mobprog_bits(mob_num);
 
-    ch->send(QStringLiteral("New mobprog created as #%1.\r\n").arg(prog_num));
+    ch->send(u"New mobprog created as #%1.\r\n"_s.arg(prog_num));
   }
   break;
 
     /* remove */
   case 1:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: procedit [mob_num] remove <prog>");
       return ReturnValue::eFAILURE;
@@ -2761,7 +2760,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   case 2:
   {
     half_chop(buf4, buf2, buf3);
-    if (!*buf2 || !*buf3)
+    if (buf.isEmpty() 2 || buf.isEmpty() 3)
     {
       send_to_char("$3Syntax$R: procedit [mob_num] type <prog> <newtype>\r\n"
                    "$3Valid types$R:\r\n"
@@ -2874,7 +2873,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   case 3:
   {
     half_chop(buf4, buf2, buf3);
-    if (!*buf2 || !*buf3)
+    if (buf.isEmpty() 2 || buf.isEmpty() 3)
     {
       ch->sendln("$3Syntax$R: procedit [mob_num] arglist <prog> <new arglist>");
       return ReturnValue::eFAILURE;
@@ -2904,7 +2903,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* command */
   case 4:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: procedit [mob_num] command <prog>\r\n"
                    "This will put you into the editor which will replace the current\r\n"
@@ -2976,7 +2975,7 @@ command_return_t do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, buf);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("$3Syntax$R:  mscore <mob_num>");
     return ReturnValue::eFAILURE;
@@ -3032,7 +3031,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
   // buf3 = args[0]
   // buf4 = args[1-+]
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     send_to_char("$3Syntax$R:  medit [mob_num] [field] [arg]\r\n"
                  "  Edit a mob_num with no field or arg to view the item.\r\n"
@@ -3074,7 +3073,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   ch->setPlayerLastMob(mobvnum);
 
-  if (!*buf3) // no field.  Stat the item.
+  if (buf.isEmpty() 3) // no field.  Stat the item.
   {
     return mob_stat(ch, (CharacterPtr)DC::getInstance()->mob_index[mob_num].item);
   }
@@ -3109,7 +3108,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
   /* edit keywords */
   case 0:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_num] keywords <new_keywords>");
       return ReturnValue::eFAILURE;
@@ -3123,12 +3122,12 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit short desc */
   case 1:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_num] shortdesc <desc>");
       return ReturnValue::eFAILURE;
     }
-    mob->short_desc = QStringLiteral(buf4);
+    mob->short_desc = buf4;
     dc_sprintf(buf, "Mob shortdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -3137,13 +3136,13 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // edit long desc
   case 2:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_num] longdesc <desc>");
       return ReturnValue::eFAILURE;
     }
     dc_strcat(buf4, "\r\n");
-    mob->long_desc = QStringLiteral(buf4);
+    mob->long_desc = buf4;
     dc_sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -3152,7 +3151,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit description */
   case 3:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char(
           "$3Syntax$R: medit [mob_num] description <anything>\r\n"
@@ -3167,7 +3166,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
     //        mob->description = {};
     ch->desc->connected = Connection::states::EDITING;
-    mob->description = QStringLiteral("");
+    mob->description = u""_s;
     ch->desc->strnew =
         &(mob->description);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
@@ -3177,7 +3176,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit sex */
   case 4:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_num] sex <male|female|neutral>");
       return ReturnValue::eFAILURE;
@@ -3205,7 +3204,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit class */
   case 5:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] class <class>\r\n"
                    "$3Current$R: ",
@@ -3235,7 +3234,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit race */
   case 6:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] race <racetype>\r\n"
                    "$3Current$R: ",
@@ -3245,7 +3244,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
                  races[mob->race].singular_name);
       ch->send(buf);
       for (i = {}; i <= MAX_RACE; i++)
-        ch->send(QStringLiteral("  %s\r\n").arg(races[i].singular_name));
+        ch->send(u"  %s\r\n"_s.arg(races[i].singular_name));
       ch->sendln("");
       return ReturnValue::eFAILURE;
     }
@@ -3254,7 +3253,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (is_abbrev(buf4, races[i].singular_name))
       {
-        ch->send(QStringLiteral("Mob race set to %s.\r\n").arg(races[i].singular_name));
+        ch->send(u"Mob race set to %s.\r\n"_s.arg(races[i].singular_name));
         mob->race = i;
         race_set = 1;
 
@@ -3267,7 +3266,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (!race_set)
     {
-      ch->send(QStringLiteral("Could not find race '%s'.\r\n").arg(buf4));
+      ch->send(u"Could not find race '%s'.\r\n"_s.arg(buf4));
       return ReturnValue::eFAILURE;
     }
   }
@@ -3276,7 +3275,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit level */
   case 7:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\r\n"
                    "$3Current$R: ",
@@ -3300,7 +3299,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit alignment */
   case 8:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] alignment <alignnum>\r\n"
                    "$3Current$R: ",
@@ -3324,13 +3323,13 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit load position */
   case 9:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char(
           "$3Syntax$R: medit [mob_num] loadposition <position>\r\n"
           "$3Current$R: ",
           ch);
-      ch->sendln(QStringLiteral("%1").arg(mob->getPositionQString()));
+      ch->sendln(u"%1"_s.arg(mob->getPositionQString()));
       send_to_char("$3Valid positions$R:\r\n"
                    "  1 = Standing\r\n"
                    "  2 = Sitting\r\n"
@@ -3362,20 +3361,20 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
     }
 
-    ch->sendln(QStringLiteral("Mob default position set to %1.").arg(victim->getPositionQString()));
+    ch->sendln(u"Mob default position set to %1."_s).arg(victim->getPositionQString()));
   }
   break;
 
     /* edit default position */
   case 10:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char(
           "$3Syntax$R: medit [mob_num] defaultposition <position>\r\n"
           "$3Current$R: ",
           ch);
-      ch->sendln(QStringLiteral("%1").arg(Character::position_to_string(mob->mobdata->default_pos)));
+      ch->sendln(u"%1"_s.arg(Character::position_to_string(mob->mobdata->default_pos)));
 
       send_to_char("$3Valid positions$R:\r\n"
                    "  1 = Standing\r\n"
@@ -3416,7 +3415,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit actflags */
   case 11:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char(
           "$3Syntax$R: medit [mob_num] actflags <location[s]>\r\n"
@@ -3455,7 +3454,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
           NPCs_changed++;
         }
       }
-      ch->send(QStringLiteral("%1 NPCs in the world have been updated.\r\n").arg(NPCs_changed));
+      ch->send(u"%1 NPCs in the world have been updated.\r\n"_s).arg(NPCs_changed));
     }
   }
   break;
@@ -3463,7 +3462,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit affectflags */
   case 12:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char(
           "$3Syntax$R: medit [mob_num] affectflags <location[s]>\r\n"
@@ -3489,7 +3488,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit numdamdice */
   case 13:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] numdamdice <amount>\r\n"
                    "$3Current$R: ",
@@ -3514,7 +3513,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit sizedamdice */
   case 14:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] sizedamdice <amount>\r\n"
                    "$3Current$R: ",
@@ -3539,7 +3538,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit damroll */
   case 15:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] damroll <damrollnum>\r\n"
                    "$3Current$R: ",
@@ -3564,7 +3563,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit hitroll */
   case 16:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] hitroll <levelnum>\r\n"
                    "$3Current$R: ",
@@ -3589,7 +3588,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit hphitpoints */
   case 17:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\r\n"
                    "$3Current$R: ",
@@ -3615,7 +3614,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit gold */
   case 18:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\r\n"
                    "$3Current$R: ",
@@ -3645,7 +3644,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit experiencepoints */
   case 19:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char(
           "$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\r\n"
@@ -3671,7 +3670,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit immune */
   case 20:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] immune <location[s]>\r\n"
                    "$3Current$R: ",
@@ -3695,7 +3694,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit suscept */
   case 21:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] suscept <location[s]>\r\n"
                    "$3Current$R: ",
@@ -3719,7 +3718,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit resist */
   case 22:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] resist <location[s]>\r\n"
                    "$3Current$R: ",
@@ -3743,7 +3742,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // armorclass
   case 23:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\r\n"
                    "$3Current$R: ",
@@ -3774,7 +3773,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // strength
   case 25:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] strength <str>\r\n"
                    "$3Current$R: ",
@@ -3798,7 +3797,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // dexterity
   case 26:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\r\n"
                    "$3Current$R: ",
@@ -3822,7 +3821,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // intelligence
   case 27:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] intelligence <qint32>\r\n"
                    "$3Current$R: ",
@@ -3846,7 +3845,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // wisdom
   case 28:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\r\n"
                    "$3Current$R: ",
@@ -3870,7 +3869,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // constitution
   case 29:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\r\n"
                    "$3Current$R: ",
@@ -3894,7 +3893,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     // New
   case 30:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit new [number]");
       return ReturnValue::eFAILURE;
@@ -3913,16 +3912,16 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     x = ch->getDC()->create_blank_mobile(intval);
     if (x < 0)
     {
-      ch->send(QStringLiteral("Could not create mobile '%d'.  Max index hit or mob already exists.\r\n").arg(intval));
+      ch->send(u"Could not create mobile '%d'.  Max index hit or mob already exists.\r\n"_s.arg(intval));
       return ReturnValue::eFAILURE;
     }
-    ch->send(QStringLiteral("Mobile '%1' created successfully.\r\n").arg(intval));
+    ch->send(u"Mobile '%1' created successfully.\r\n"_s.arg(intval));
     ch->setPlayerLastMob(intval);
   }
   break;
   case 31:
   {
-    if (!*buf4 || strncmp(buf4, "yesiwanttodeletethismob", 23))
+    if (buf.isEmpty() 4 || strncmp(buf4, "yesiwanttodeletethismob", 23))
     {
       ch->sendln("$3Syntax$R: medit [mob_number] yesiwanttodeletethismob") = {};
       return ReturnValue::eFAILURE;
@@ -3939,7 +3938,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 32:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       send_to_char("$3Syntax$R: medit [mob_vnum] type <type id>\r\n"
                    "$3Current$R: ",
@@ -3971,7 +3970,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit 1value */
   case 33:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_vnum] 1value <num>");
       return ReturnValue::eFAILURE;
@@ -3990,7 +3989,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit 2value */
   case 34:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_vnum] 2value <num>");
       return ReturnValue::eFAILURE;
@@ -4009,7 +4008,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit 3value */
   case 35:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_vnum] 3value <num>");
       return ReturnValue::eFAILURE;
@@ -4028,7 +4027,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* edit 4value */
   case 36:
   {
-    if (!*buf4)
+    if (buf.isEmpty() 4)
     {
       ch->sendln("$3Syntax$R: medit [mob_vnum] 4value <num>");
       return ReturnValue::eFAILURE;
@@ -4092,7 +4091,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (fields[x][0] == '\0')
         return ReturnValue::eFAILURE;
-      ch->send(QStringLiteral("  %s\r\n").arg(fields[x]));
+      ch->send(u"  %s\r\n"_s.arg(fields[x]));
     }
   }
 
@@ -4111,7 +4110,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (fields[x][0] == '\0')
           return ReturnValue::eFAILURE;
-        ch->send(QStringLiteral("%s\r\n").arg(fields[x]));
+        ch->send(u"%s\r\n"_s.arg(fields[x]));
       }
     }
     if (is_abbrev(arg1.c_str(), fields[x]))
@@ -4191,12 +4190,12 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           if (DC::getInstance()->world[ch->in_room].dir_option[x] == nullptr)
           {
-            ch->send(QStringLiteral("There is no %s exit.\r\n").arg(dirs[x]));
+            ch->send(u"There is no %s exit.\r\n"_s.arg(dirs[x]));
             return ReturnValue::eFAILURE;
           }
 
           qint16 destination_room = DC::getInstance()->world[ch->in_room].dir_option[x]->to_room;
-          ch->send(QStringLiteral("Deleting %s exit from room %d to %d.\r\n").arg(dirs[x]).arg(ch->in_room).arg(destination_room));
+          ch->send(u"Deleting %s exit from room %d to %d.\r\n"_s.arg(dirs[x]).arg(ch->in_room).arg(destination_room));
           free(DC::getInstance()->world[ch->in_room].dir_option[x]);
           DC::getInstance()->world[ch->in_room].dir_option[x] = {};
 
@@ -4208,20 +4207,20 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
               // and that reverse exit points to us then we can delete it too
               if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]->to_room == ch->in_room)
               {
-                ch->send(QStringLiteral("Deleting %s exit from room %d to %d.\r\n").arg(dirs[reverse_number[x]]).arg(destination_room).arg(ch->in_room));
+                ch->send(u"Deleting %s exit from room %d to %d.\r\n"_s.arg(dirs[reverse_number[x]]).arg(destination_room).arg(ch->in_room));
                 free(DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]);
                 DC::getInstance()->world[destination_room].dir_option[reverse_number[x]] = {};
                 return ReturnValue::eSUCCESS;
               }
               else
               {
-                ch->sendln(QStringLiteral("Reverse %s exit in room %d does not point to room %d.").arg(dirs[reverse_number[x]]).arg(destination_room).arg(ch->in_room));
+                ch->sendln(u"Reverse %s exit in room %d does not point to room %d."_s.arg(dirs[reverse_number[x]]).arg(destination_room).arg(ch->in_room));
                 return ReturnValue::eSUCCESS;
               }
             }
             else
             {
-              ch->sendln(QStringLiteral("Reverse %s exit in room %d does not exist.").arg(dirs[reverse_number[x]]).arg(destination_room));
+              ch->sendln(u"Reverse %s exit in room %d does not exist."_s.arg(dirs[reverse_number[x]]).arg(destination_room));
               return ReturnValue::eSUCCESS;
             }
           } // end of check if Player::PLR_ONEWAY is toggled
@@ -4245,7 +4244,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (remainder_args.empty())
     {
-      ch->send(QStringLiteral("Missing vnum of room you want to have %s exit connect to.\r\n").arg(dirs[x]));
+      ch->send(u"Missing vnum of room you want to have %s exit connect to.\r\n"_s.arg(dirs[x]));
       return ReturnValue::eFAILURE;
     }
 
@@ -4307,13 +4306,13 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       if (DC::getInstance()->create_one_room(ch, d))
       {
         c = real_room(d);
-        ch->send(QStringLiteral("Creating room %1.\r\n").arg(d));
+        ch->send(u"Creating room %1.\r\n"_s).arg(d));
       }
     }
 
     if (c == (-1))
     {
-      ch->send(QStringLiteral("Error creating exit to room %1.\r\n").arg(d));
+      ch->send(u"Error creating exit to room %1.\r\n"_s).arg(d));
       return ReturnValue::eFAILURE;
     }
 
@@ -4368,7 +4367,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (remainder_args.empty())
     {
-      ch->send(QStringLiteral("$3Syntax$R: <> is required. [] is optional.\r\nredit extra                   - show this syntax and current keywords.\r\nredit extra <keywords ...>    - add or edit keywords.\r\nredit extra <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n")) = {};
+      ch->send(u"$3Syntax$R: <> is required. [] is optional.\r\nredit extra                   - show this syntax and current keywords.\r\nredit extra <keywords ...>    - add or edit keywords.\r\nredit extra <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n"_s) = {};
       bool found = false;
       for (extra = DC::getInstance()->world[ch->in_room].ex_description; extra != nullptr; extra = extra->next)
       {
@@ -4379,7 +4378,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
             found = true;
             ch->sendln("Extra description keywords:");
           }
-          ch->send(QStringLiteral("%1\r\n").arg(extra->keyword));
+          ch->send(u"%1\r\n"_s.arg(extra->keyword));
         }
       }
       if (found == false)
@@ -4412,7 +4411,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
           {
             prev->next = extra->next;
           }
-          ch->send(QStringLiteral("Extra description with keyword '%1' deleted.\r\n").arg(extra->keyword));
+          ch->send(u"Extra description with keyword '%1' deleted.\r\n"_s.arg(extra->keyword));
           FREE(extra);
           deleted = true;
           // break out of for loop
@@ -4421,7 +4420,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       if (deleted == false)
       {
-        ch->send(QStringLiteral("Extra description with keyword '%s' not found.\r\n").arg(arg3.c_str()));
+        ch->send(u"Extra description with keyword '%s' not found.\r\n"_s.arg(arg3.c_str()));
       }
       // break out of switch case
       break;
@@ -4432,7 +4431,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!extra)
       {
         // No matching extra description found so make a new one
-        ch->send(QStringLiteral("Creating new extra description for keyword '%s'.\r\n").arg(arg2.c_str()));
+        ch->send(u"Creating new extra description for keyword '%s'.\r\n"_s.arg(arg2.c_str()));
         CREATE(extra, extra_descr_data, 1);
         extra->next = {};
 
@@ -4460,7 +4459,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       else if (arg2 == QString(extra->keyword))
       {
         // A pre-existing extra description was found
-        ch->send(QStringLiteral("Modifying extra description for keyword '%s'.\r\n").arg(arg2.c_str()));
+        ch->send(u"Modifying extra description for keyword '%s'.\r\n"_s.arg(arg2.c_str()));
         break;
       }
     }
@@ -4537,11 +4536,11 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
           continue;
         if ((x + 1) % 4 == 0)
         {
-          ch->send(QStringLiteral("%-18s\r\n").arg(room_bits[x]));
+          ch->send(u"%-18s\r\n"_s.arg(room_bits[x]));
         }
         else
         {
-          ch->send(QStringLiteral("%-18s").arg(room_bits[x]));
+          ch->send(u"%-18s"_s.arg(room_bits[x]));
         }
       }
       ch->sendln("\r\n");
@@ -4564,11 +4563,11 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
           break;
         if ((x + 1) % 4 == 0)
         {
-          ch->send(QStringLiteral("%-18s\r\n").arg(sector_types[x]));
+          ch->send(u"%-18s\r\n"_s.arg(sector_types[x]));
         }
         else
         {
-          ch->send(QStringLiteral("%-18s").arg(sector_types[x]));
+          ch->send(u"%-18s"_s.arg(sector_types[x]));
         }
       }
       ch->sendln("\r\n");
@@ -4584,7 +4583,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       else if (is_abbrev(remainder_args.c_str(), sector_types[x]))
       {
         DC::getInstance()->world[ch->in_room].sector_type = x;
-        ch->send(QStringLiteral("Sector type set to %s.\r\n").arg(sector_types[x]));
+        ch->send(u"Sector type set to %s.\r\n"_s.arg(sector_types[x]));
         break;
       }
     }
@@ -4616,7 +4615,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
         else
           DC::getInstance()->world[ch->in_room].denied = nd->next;
         nd = {};
-        ch->send(QStringLiteral("Mobile %1 ALLOWED entrance.\r\n").arg(mob));
+        ch->send(u"Mobile %1 ALLOWED entrance.\r\n"_s).arg(mob));
         done = true;
         break;
       }
@@ -4636,7 +4635,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     DC::getInstance()->world[ch->in_room].denied = nd;
-    ch->send(QStringLiteral("Mobile %1 DENIED entrance.\r\n").arg(mob));
+    ch->send(u"Mobile %1 DENIED entrance.\r\n"_s).arg(mob));
     break;
   }
   DC::getInstance()->set_zone_modified_world(ch->in_room);
@@ -4651,7 +4650,7 @@ command_return_t do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
 
   half_chop(arg, buf, buf2);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     send_to_char("$3Syntax$R:\r\nrdelete exit   <direction>\r\nrdelete "
                  "exdesc <direction>\r\nrdelete extra  <keyword>\r\n",
@@ -4685,7 +4684,7 @@ command_return_t do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     DC::getInstance()->world[ch->in_room].dir_option[x] = {};
     DC::getInstance()->world[ch->in_room].dir_option[x] = {};
-    ch->sendln(QStringLiteral("You stretch forth your hands and remove the %s exit.\r\n").arg(dirs[x]));
+    ch->sendln(u"You stretch forth your hands and remove the %s exit.\r\n"_s.arg(dirs[x]));
   }
 
   else if (is_abbrev(buf, "extra"))
@@ -4722,7 +4721,7 @@ command_return_t do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
 
   else if (is_abbrev(buf, "exdesc"))
   {
-    if (!*buf2)
+    if (buf.isEmpty() 2)
     {
       ch->sendln("Syntax:\r\nrdelete exdesc <direction>");
       return ReturnValue::eFAILURE;
@@ -4803,14 +4802,14 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
     zone_key = arguments.value(0).toULongLong(&ok);
     if (!ok)
     {
-      sendln(QStringLiteral("Invalid zone number. Valid zone numbers are %1-%2.").arg(zones.firstKey()).arg(zones.lastKey()));
+      sendln(u"Invalid zone number. Valid zone numbers are %1-%2."_s.arg(zones.firstKey()).arg(zones.lastKey()));
       return ReturnValue::eFAILURE;
     }
   }
 
   if (zones.contains(zone_key) == false)
   {
-    sendln(QStringLiteral("Zone %1 not found. Valid zone numbers are %2-%3.").arg(zone_key).arg(zones.firstKey()).arg(zones.lastKey()));
+    sendln(u"Zone %1 not found. Valid zone numbers are %2-%3."_s.arg(zone_key).arg(zones.firstKey()).arg(zones.lastKey()));
     return ReturnValue::eFAILURE;
   }
   auto &zone = zones[zone_key];
@@ -4823,30 +4822,30 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
 
   if (zone.getFilename().isEmpty())
   {
-    sendln(QStringLiteral("Zone %1 has an empty filename.").arg(zone_key));
+    sendln(u"Zone %1 has an empty filename."_s).arg(zone_key));
     return ReturnValue::eFAILURE;
   }
 
   if (!zone.isModified())
   {
-    sendln(QStringLiteral("Zone %1 has not been modified. Saving anyway.").arg(zone_key));
+    sendln(u"Zone %1 has not been modified. Saving anyway."_s).arg(zone_key));
   }
 
-  QString filename = QStringLiteral("zonefiles/%1").arg(zone.getFilename());
-  QString command = QStringLiteral("cp %1 %1.last").arg(filename);
+  QString filename = u"zonefiles/%1"_s.arg(zone.getFilename());
+  QString command = u"cp %1 %1.last"_s).arg(filename);
   system(qPrintable(command));
 
   FILE *f = {};
   if ((f = fopen(qPrintable(filename), "w")) == nullptr)
   {
-    logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(name()));
+    logbug(u"do_zsave: couldn't open zone save file '%1' for '%2'."_s.arg(filename).arg(name()));
     return ReturnValue::eFAILURE;
   }
 
   zone.write(f);
 
   fclose(f);
-  sendln(QStringLiteral("Saved zone %1.").arg(zone_key));
+  sendln(u"Saved zone %1."_s).arg(zone_key));
   zone.setModified(false);
   return ReturnValue::eSUCCESS;
 }
@@ -5322,7 +5321,7 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   argument = one_argument(argument, arg1);
 
   /* no argument */
-  if (!*arg1)
+  if (arg.isEmpty() 1)
   {
     rm = &DC::getInstance()->world[ch->in_room];
   }
@@ -5388,9 +5387,9 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
     if (a == 0)
       ch->send("Mobiles Denied: ");
     if (real_mobile(conn->vnum) == -1)
-      ch->send(QStringLiteral("UNKNOWN(%1)\r\n").arg(conn->vnum));
+      ch->send(u"UNKNOWN(%1)\r\n"_s.arg(conn->vnum));
     else
-      ch->send(QStringLiteral("%s(%d)\r\n").arg(qPrintable(((CharacterPtr)DC::getInstance()->mob_index[real_mobile(conn->vnum)].item)->short_description())).arg(conn->vnum));
+      ch->send(u"%s(%d)\r\n"_s.arg(qPrintable(((CharacterPtr)DC::getInstance()->mob_index[real_mobile(conn->vnum)].item)->short_description())).arg(conn->vnum));
     a++;
   }
   ch->sendln("");
@@ -5454,7 +5453,7 @@ command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, arg);
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Possess who?");
   }
@@ -5565,7 +5564,7 @@ command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
   const quint64 longest_connection_state_size = std::max(5UL, sockets.getLongestConnectionStateSize());
   const quint64 longest_idle_size = std::max(4UL, sockets.getLongestIdleSize() + 1);
 
-  send(QStringLiteral("%1: %2 | %3 | %4 | %5$R\r\n").arg("Des").arg("Name", -longest_name_size).arg("State", -longest_connection_state_size).arg("Idle", -longest_idle_size).arg("IP", -longest_IP_size));
+  send(u"%1: %2 | %3 | %4 | %5$R\r\n").arg("Des"_.arg("Name", -longest_name_size).arg("State", -longest_connection_state_size).arg("Idle", -longest_idle_size).arg("IP", -longest_IP_size));
   for (const auto &d : connections)
   {
     const QString connection_character_name = conn->name();
@@ -5573,12 +5572,12 @@ command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
     const auto descriptor = conn->descriptor;
     const bool duplicate_IP = IPs[d.getPeerOriginalAddress().toString()] > 1;
     const QString connected_state = constindex(conn->connected, DC::connected_states);
-    const QString idle_seconds = QStringLiteral("%1s").arg(d.idle_time / DC::PASSES_PER_SEC);
+    const QString idle_seconds = u"%1s"_s.arg(d.idle_time / DC::PASSES_PER_SEC);
 
-    send(QStringLiteral("%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : "").arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
+    send(u"%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : ""_.arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
   }
 
-  send(QStringLiteral("\r\nThere are %1 connections.\r\n").arg(connections.size()));
+  send(u"\r\nThere are %1 connections.\r\n"_s).arg(connections.size()));
 
   return ReturnValue::eSUCCESS;
 }
@@ -5590,7 +5589,7 @@ command_return_t do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
   void send_info(QString);
   half_chop(arg, buf, buf2);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->send("Syntax: voteset <question|add|remove|clear|start|end> <QString>");
     return ReturnValue::eFAILURE;
@@ -5615,7 +5614,7 @@ command_return_t do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!*buf2)
+  if (buf.isEmpty() 2)
   {
     ch->send("Syntax: voteset <question|add|remove|clear|start|end> <QString>");
     return ReturnValue::eFAILURE;
@@ -5656,7 +5655,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
 
   arg = one_argument(arg, name);
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Punish who?");
     send_to_char("\r\nusage: punish <character> [stupid silence freeze noemote "
@@ -5869,7 +5868,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else
     {
-      vict->send(QStringLiteral("%s has removed your ability to pray!\r\n").arg(qPrintable(ch->name())));
+      vict->send(u"%s has removed your ability to pray!\r\n"_s.arg(qPrintable(ch->name())));
       ch->sendln("NOPRAY (nemke) set.");
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_NOPRAY);

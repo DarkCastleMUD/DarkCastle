@@ -26,7 +26,7 @@
 #include <qcontainerfwd.h>
 
 /* Set this define to wherever you want to save your corpses */
-const auto CORPSE_FILE = QStringLiteral("corpse.save");
+const auto CORPSE_FILE = u"corpse.save"_s;
 
 /* External Structures / Variables */
 
@@ -253,7 +253,7 @@ void DC::load_corpses(void)
 
   if (!(fp = fopen(CORPSE_FILE, "r")))
   {
-    logverbose(QStringLiteral("Unable to open '%1").arg(CORPSE_FILE));
+    logverbose(u"Unable to open '%1"_s.arg(CORPSE_FILE));
     return;
   }
 
@@ -262,7 +262,7 @@ void DC::load_corpses(void)
     get_line_new(fp, line);
   }
   else
-    DC::getInstance()->logentry(QStringLiteral("No corpses in file to load"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"No corpses in file to load"_s, 0, DC::LogChannel::LOG_MISC);
 
   while (!feof(fp) && !end)
   {
@@ -330,18 +330,18 @@ void DC::load_corpses(void)
       if (!dc_strcmp("XAP\n", line))
       { /* then this is a Xap Obj, requires special care */
         if (debug == 1)
-          DC::getInstance()->logentry(QStringLiteral("XAP Found"), 0, DC::LogChannel::LOG_MISC);
+          DC::getInstance()->logentry(u"XAP Found"_s, 0, DC::LogChannel::LOG_MISC);
 
         temp->name(fread_string_new(fp));
         if (temp->name().isEmpty())
         {
-          temp->name(QStringLiteral("undefined"));
+          temp->name(u"undefined"_s);
         }
         else
         {
           if (debug == 1)
           {
-            logmisc(QStringLiteral("   -NAME: %1").arg(temp->name()));
+            logmisc(u"   -NAME: %1"_s.arg(temp->name()));
           }
         }
 
@@ -388,7 +388,7 @@ void DC::load_corpses(void)
         if (!get_line_new(fp, line) ||
             (sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
         {
-          DC::getInstance()->logentry(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"), 0, DC::LogChannel::LOG_MISC);
+          DC::getInstance()->logentry(u"load_corpses: Format error in first numeric line (expecting 5 args)"_s, 0, DC::LogChannel::LOG_MISC);
         }
         else
         {
@@ -473,7 +473,7 @@ void DC::load_corpses(void)
           continue;
         }
         if (debug == 1)
-          DC::getInstance()->logentry(QStringLiteral("XAP NOT Found"), 0, DC::LogChannel::LOG_MISC);
+          DC::getInstance()->logentry(u"XAP NOT Found"_s, 0, DC::LogChannel::LOG_MISC);
       }
       if (temp != nullptr)
       {
@@ -489,7 +489,7 @@ void DC::load_corpses(void)
             {
               if (debug == 1)
               {
-                logmisc(QStringLiteral("  -Moving [%1] to [%2]").arg(obj->name()).arg(temp->name()));
+                logmisc(u"  -Moving [%1] to [%2]"_s.arg(obj->name()).arg(temp->name()));
               }
               obj_from_room(obj);    /* get those objs from that room */
               obj_to_obj(obj, temp); /* and put them in the corpse */
@@ -500,7 +500,7 @@ void DC::load_corpses(void)
             /* put the corpse in the right room */
             if (debug == 1)
             {
-              logmisc(QStringLiteral("  -Moving corpse [%1] to [%2]").arg(temp->name()).arg(GET_OBJ_VROOM(temp)));
+              logmisc(u"  -Moving corpse [%1] to [%2]"_s.arg(temp->name()).arg(GET_OBJ_VROOM(temp)));
             }
             obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));
           }
@@ -510,7 +510,7 @@ void DC::load_corpses(void)
           /* just a plain obj..send it to a temp room until we load a corpse */
           if (debug == 1)
           {
-            logmisc(QStringLiteral("  -Moving corpse [%1] to holding room.").arg(temp->name()));
+            logmisc(u"  -Moving corpse [%1] to holding room."_s.arg(temp->name()));
           }
           obj_to_room(temp, real_room(frozen_start_room));
         }
@@ -553,7 +553,7 @@ qint32 get_line_new(FILE *fl, QString buf)
     fgets(temp, 256, fl);
     if (*temp)
       temp[strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && (*temp == '*' || !*temp));
+  } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 
   if (feof(fl))
     return 0;

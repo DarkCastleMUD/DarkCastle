@@ -125,7 +125,7 @@ QString showObjectAffects(ObjectPtr obj)
     }
     else
     {
-      buffer += QStringLiteral("Invalid");
+      buffer += u"Invalid"_s;
     }
 
     buffer += " by " + QString::number(obj->affected[i].modifier);
@@ -228,25 +228,25 @@ qint32 main(qint32 argc, QString *argv)
     }
   }
 
-  DC::getInstance()->logentry(QStringLiteral("Loading the zones"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Loading the zones"_s, 0, DC::LogChannel::LOG_MISC);
   debug.boot_zones();
 
-  DC::getInstance()->logentry(QStringLiteral("Loading the world."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Loading the world."_s, 0, DC::LogChannel::LOG_MISC);
 
   debug.top_of_world_alloc = 2000;
 
   debug.boot_world();
 
-  DC::getInstance()->logentry(QStringLiteral("Renumbering the world."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Renumbering the world."_s, 0, DC::LogChannel::LOG_MISC);
   renum_world();
 
-  DC::getInstance()->logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Generating object indices/loading all objects"_s, 0, DC::LogChannel::LOG_MISC);
   debug.generate_obj_indices(&top_of_objt, debug.obj_index);
 
-  DC::getInstance()->logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Generating mob indices/loading all mobiles"_s, 0, DC::LogChannel::LOG_MISC);
   debug.generate_mob_indices(&top_of_mobt, debug.mob_index);
 
-  DC::getInstance()->logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"renumbering zone table"_s, 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
 
   class Connection *d = new Connection;
@@ -399,7 +399,7 @@ qint32 main(qint32 argc, QString *argv)
               continue;
             }
 
-            if (argv[1] == QStringLiteral("all"))
+            if (argv[1] == u"all"_s)
             {
               CharacterPtr ch = conn->character;
               for (qint32 iWear = {}; iWear < MAX_WEAR; iWear++)
@@ -454,11 +454,11 @@ qint32 main(qint32 argc, QString *argv)
 
       if (c->isImmortalPlayer())
       {
-        qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->name()).arg(qPrintable(c->getLevel())));
+        qWarning(u"WARNING: %1 level: %2"_s.arg(c->name()).arg(qPrintable(c->getLevel())));
       }
     }
 
-    if (argv[1] == QStringLiteral("leaderboard"))
+    if (argv[1] == u"leaderboard"_s)
     {
       do_leaderboard(ch, "scan");
       conn->process_output();
@@ -515,7 +515,7 @@ qint32 main(qint32 argc, QString *argv)
     }
     do_look(ch, "");
     conn->process_output();
-    ch->do_force({QStringLiteral("all"), QStringLiteral("save")});
+    ch->do_force({u"all"_s, u"save"_s});
     conn->process_output();
   }
   else

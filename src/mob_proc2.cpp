@@ -87,7 +87,7 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
   one_argument(arg, item);
 
-  if (!*item)
+  if (item.isEmpty())
   {
     ch->sendln("What item?");
     return ReturnValue::eSUCCESS;
@@ -165,7 +165,7 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
   one_argument(arg, item);
 
-  if (!*item)
+  if (item.isEmpty())
   {
     ch->sendln("What item?");
     return ReturnValue::eSUCCESS;
@@ -266,7 +266,7 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
 
   one_argument(arg, item);
 
-  if (!*item)
+  if (item.isEmpty())
   {
     ch->sendln("What item?");
     return ReturnValue::eSUCCESS;
@@ -449,7 +449,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     cost = corpse_cost(ch);
     cost /= 20000;
     cost = MAX(cost, 30);
-    ch->send(QStringLiteral("The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n").arg(cost));
+    ch->send(u"The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n"_s).arg(cost));
     return ReturnValue::eSUCCESS;
   }
 
@@ -506,16 +506,16 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
   QString buf;
   if (platinum)
   {
-    buf = QStringLiteral("$B$7%1$R) %2 ").arg(number + 1, -2).arg(obj->short_description());
+    buf = u"$B$7%1$R) %2 "_s.arg(number + 1, -2).arg(obj->short_description());
   }
   else
   {
-    buf = QStringLiteral("$B$7%1$R) $3$B%2$R ").arg(number + 1, -2).arg(obj->short_description());
+    buf = u"$B$7%1$R) $3$B%2$R "_s.arg(number + 1, -2).arg(obj->short_description());
   }
 
   if (obj->obj_flags.type_flag == ITEM_WEAPON)
   { // weapon
-    buf = QStringLiteral("%1%2d%3, %4, ").arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+    buf = u"%1%2d%3, %4, "_s).arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
   }
 
   QString buf2;
@@ -534,10 +534,10 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
       }
       else
       {
-        buf2 = QStringLiteral("Invalid");
+        buf2 = u"Invalid"_s;
       }
 
-      QString buf3 = QStringLiteral("%1 by %2, ").arg(buf2).arg(obj->affected[i].modifier).toLower();
+      QString buf3 = u"%1 by %2, "_s).arg(buf2).arg(obj->affected[i].modifier).toLower();
 
       QString potential_buffer = buf + buf3;
       qsizetype starting_point = potential_buffer.lastIndexOf("\n");
@@ -549,7 +549,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
 
       if (length > 79)
       {
-        buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf3);
+        buf = u"%1\r\n    %2"_s.arg(buf).arg(buf3);
       }
       else
       {
@@ -563,7 +563,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
   {
     if (class_restricted(ch, obj) || size_restricted(ch, obj))
     {
-      buf2 = QStringLiteral("$4[restricted]$R, ");
+      buf2 = u"$4[restricted]$R, "_s;
 
       QString potential_buffer = buf + buf2;
       qsizetype starting_point = potential_buffer.lastIndexOf("\n");
@@ -574,7 +574,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
       length = nocolor_strlen(potential_buffer.sliced(starting_point));
       if (length > 79)
       {
-        buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf2);
+        buf = u"%1\r\n    %2"_s.arg(buf).arg(buf2);
       }
       else
       {
@@ -588,11 +588,11 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
     a &= ITEM_WARRIOR | ITEM_MAGE | ITEM_THIEF | ITEM_CLERIC | ITEM_PAL | ITEM_ANTI | ITEM_BARB | ITEM_MONK | ITEM_RANGER | ITEM_DRUID | ITEM_BARD;
 
     QString buffer = sprintbit(a, Object::extra_bits);
-    buf2 = QStringLiteral("%1]$R, ").arg(buffer);
+    buf2 = u"%1]$R, "_s.arg(buffer);
 
     if (a)
     {
-      QString potential_buffer = QStringLiteral("%1$4[%2").arg(buf).arg(buf2);
+      QString potential_buffer = u"%1$4[%2"_s.arg(buf).arg(buf2);
       qsizetype starting_point = potential_buffer.lastIndexOf("\n");
       if (starting_point == -1)
       {
@@ -602,7 +602,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
 
       if (length > 79)
       {
-        buf = QStringLiteral("%1\r\n    $4[%2").arg(buf).arg(buf2);
+        buf = u"%1\r\n    $4[%2"_s.arg(buf).arg(buf2);
       }
       else
       {
@@ -613,11 +613,11 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
 
   if (platinum)
   {
-    buf2 = QStringLiteral("costing %1 coins.").arg(obj->obj_flags.cost / 10);
+    buf2 = u"costing %1 coins."_s).arg(obj->obj_flags.cost / 10);
   }
   else
   {
-    buf2 = QStringLiteral("costing %1 qpoints.").arg(obj->obj_flags.cost / 10000);
+    buf2 = u"costing %1 qpoints."_s).arg(obj->obj_flags.cost / 10000);
   }
 
   QString potential_buffer = buf + buf2;
@@ -630,7 +630,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
 
   if (length > 79)
   {
-    buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf2);
+    buf = u"%1\r\n    %2"_s.arg(buf).arg(buf2);
   }
   else
   {
@@ -673,10 +673,10 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         break;
     if (platsmith_list[o].vnum == 0)
     {
-      owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Sorry, I don't seem to be working correctly. Do tell someone."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    owner->do_tell(QStringLiteral("%1 Here's what I can do for you, %2.").arg(qPrintable(ch->name())).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
+    owner->do_tell(u"%1 Here's what I can do for you, %2."_s.arg(qPrintable(ch->name())).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
 
     for (qint32 z = {}; z < 13 && platsmith_list[o].sales[z] != 0; z++)
     {
@@ -700,18 +700,18 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     one_argument(arg, arg2);
     if (platsmith_list[o].vnum == 0)
     {
-      owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Sorry, I don't seem to be working correctly. Do tell someone."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
     if (!is_number(arg2))
     {
-      owner->do_tell(QStringLiteral("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Sorry, mate. You type buy <number> to specify what you want.."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
     qint32 k = atoi(arg2) - 1;
     if (k >= 13 || k < 0 || platsmith_list[o].sales[k] == 0)
     {
-      owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Don't have that I'm afraid. Type \"list\" to see my wares."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
     ObjectPtr obj;
@@ -719,13 +719,13 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
 
     if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
     {
-      owner->do_tell(QStringLiteral("%1 That item is not available to you.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 That item is not available to you."_s).arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
     if (GET_PLATINUM(ch) < (quint32)(obj->obj_flags.cost / 10))
     {
-      owner->do_tell(QStringLiteral("%1 Come back when you've got the platinum.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Come back when you've got the platinum."_s.arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
@@ -733,7 +733,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     dc_sprintf(buf, "%s %s", qPrintable(obj->name()), qPrintable(ch->name()));
     obj->name(buf);
     obj_to_char(obj, ch);
-    owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(qPrintable(ch->name())).arg(obj->short_description()).split(' '));
+    owner->do_tell(u"%1 Here's your %2$B$2. Have a nice time with it."_s.arg(qPrintable(ch->name())).arg(obj->short_description()).split(' '));
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::SELL)
@@ -749,25 +749,25 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     }
     if (!obj)
     {
-      owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Try that on the kooky meta-physician.."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
     if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      owner->do_tell(QStringLiteral("%1 I don't deal in worthless junk.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 I don't deal in worthless junk."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
     // don't allow non-empty containers to be sold
     if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
     {
-      owner->do_tell(QStringLiteral("%1 %2$B$2 needs to be emptied first.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).split(' '));
+      owner->do_tell(u"%1 %2$B$2 needs to be emptied first."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
     qint32 cost = obj->obj_flags.cost / 10;
 
-    owner->do_tell(QStringLiteral("%1 I'll give you %2 plats for that. Thanks for shoppin'.").arg(qPrintable(ch->name())).arg(cost).split(' '));
+    owner->do_tell(u"%1 I'll give you %2 plats for that. Thanks for shoppin'."_s.arg(qPrintable(ch->name())).arg(cost).split(' '));
     extract_obj(obj);
     GET_PLATINUM(ch) += cost;
     return ReturnValue::eSUCCESS;
@@ -793,7 +793,7 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
 
   one_argument(arg, item);
 
-  if (!*item)
+  if (item.isEmpty())
   {
     ch->sendln("What item?");
     return ReturnValue::eSUCCESS;

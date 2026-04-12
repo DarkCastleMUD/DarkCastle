@@ -147,13 +147,13 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 
   half_chop(arg, type, arg2);
 
-  if (cmd == cmd_t::DEFAULT && (!*type || !*arg2))
+  if (cmd == cmd_t::DEFAULT && (type.isEmpty() || arg.isEmpty() 2))
   {
     ch->sendln("Usage:  load <mob> <name|vnum> [qty]");
     ch->sendln("        load <obj> <name|vnum> [qty] [random]");
     return ReturnValue::eFAILURE;
   }
-  if (cmd == cmd_t::PRIZE && !*type)
+  if (cmd == cmd_t::PRIZE && type.isEmpty())
   {
 
     *buf = '\0';
@@ -224,7 +224,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_load.");
-    DC::getInstance()->logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Default in do_load...should NOT happen."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: /* mobile */
     if ((number = number_or_name(&c, &num)) == 0)
@@ -283,17 +283,17 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
         ObjectPtr obj = (DC::getInstance()->obj_index[number].item);
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
+          ch->send(u"You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n"_s.arg(num));
           return ReturnValue::eFAILURE;
         }
         else if (isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
         {
-          ch->send(QStringLiteral("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
+          ch->send(u"You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n"_s.arg(num));
           return ReturnValue::eFAILURE;
         }
         else if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
         {
-          ch->send(QStringLiteral("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
+          ch->send(u"You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n"_s.arg(num));
           return ReturnValue::eFAILURE;
         }
       }
@@ -508,7 +508,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
     auto last = zone.cmd[j]->last;
     QDateTime last_date_time;
     last_date_time.setSecsSinceEpoch(last);
-    QString lastStr = QStringLiteral("never");
+    QString lastStr = u"never"_s;
     if (last)
     {
       lastStr = last_date_time.toString("yyyy-MM-dd hh:mm:ss z");
@@ -517,7 +517,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
     auto lastSuccess = zone.cmd[j]->lastSuccess;
     QDateTime lastSuccess_date_time;
     lastSuccess_date_time.setSecsSinceEpoch(last);
-    QString lastSuccessStr = QStringLiteral("never");
+    QString lastSuccessStr = u"never"_s;
     if (lastSuccess)
     {
       lastSuccessStr = lastSuccess_date_time.toString("yyyy-MM-dd hh:mm:ss z");
@@ -724,7 +724,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
     ch->send(buf);
     if (stats)
     {
-      ch->sendln(QStringLiteral("      Last attempt: $B%1$R Last success: $B%2$R Average: $B%3$R").arg(lastStr).arg(lastSuccessStr).arg(successRate * 100.0));
+      ch->sendln(u"      Last attempt: $B%1$R Last success: $B%2$R Average: $B%3$R"_s.arg(lastStr).arg(lastSuccessStr).arg(successRate * 100.0));
     }
   } // for
 
@@ -787,7 +787,7 @@ void show_legacy_files(CharacterPtr ch, world_file_list_item *head)
       file_modified = "MODIFIED";
     }
 
-    ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
+    ch->send(u"%1) %2 %3 %4 %5%6%7 %8\r\n"_s.arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
     curr = curr->next;
   }
 }
@@ -811,7 +811,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
   qint32 has_range = ch->has_skill(COMMAND_RANGE);
 
-  if (!*type)
+  if (type.isEmpty())
   {
     send_to_char("Format: show <type> <name>.\r\n"
                  "Types:\r\n"
@@ -837,7 +837,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
   if (is_abbrev(type, "mobile"))
   {
     argument = one_argument(argument, name);
-    if (!*name)
+    if (name.isEmpty())
     {
       send_to_char("Format:  show mob <keyword>\r\n"
                    "                  <number>\r\n"
@@ -852,7 +852,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       dc_strcpy(beginrange, name);
       //        beginrange = name;
       argument = one_argument(argument, endrange);
-      if (!*endrange)
+      if (endrange.isEmpty())
         dc_strcpy(endrange, "-1");
 
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
@@ -929,18 +929,18 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
     }
-    if (!*buf)
+    if (buf.isEmpty())
       ch->sendln("Couldn't find any MOBS by that NAME.");
   } /* "mobile" */
   else if (is_abbrev(type, "counts") && has_range)
   {
-    ch->send(QStringLiteral("$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n").arg(DC::getInstance()->total_rooms).arg(top_of_mobt).arg(top_of_objt));
+    ch->send(u"$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n"_s.arg(DC::getInstance()->total_rooms).arg(top_of_mobt).arg(top_of_objt));
     return ReturnValue::eSUCCESS;
   }
   else if (is_abbrev(type, "object"))
   {
     argument = one_argument(argument, name);
-    if (!*name)
+    if (name.isEmpty())
     {
       send_to_char("Format:  show obj <keyword>\r\n"
                    "                  <number>\r\n"
@@ -955,7 +955,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       argument = one_argument(argument, endrange);
       // beginrange = name;
       dc_strcpy(beginrange, name);
-      if (!*endrange)
+      if (endrange.isEmpty())
         dc_strcpy(endrange, "-1");
 
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
@@ -1032,13 +1032,13 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
     }
-    if (!*buf)
+    if (buf.isEmpty())
       ch->sendln("Couldn't find any OBJECTS by that NAME.");
   } /* "object" */
   else if (is_abbrev(type, "room"))
   {
     argument = one_argument(argument, name);
-    if (!*name)
+    if (name.isEmpty())
     {
       ch->sendln("Format:  show room <beginrange> <endrange>");
       return ReturnValue::eFAILURE;
@@ -1050,7 +1050,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       argument = one_argument(argument, endrange);
       //	beginrange = name;
       dc_strcpy(beginrange, name);
-      if (!*endrange)
+      if (endrange.isEmpty())
         dc_strcpy(endrange, "-1");
 
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
@@ -1096,13 +1096,13 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
     }
-    if (!*buf)
+    if (buf.isEmpty())
       ch->sendln("Couldn't find any ROOMS in that range.");
   } /* "object" */
   else if (is_abbrev(type, "zone"))
   {
     argument = one_argument(argument, name);
-    if (!*name)
+    if (name.isEmpty())
     {
       ch->sendln("Show which zone? (# or 'all')");
       return ReturnValue::eFAILURE;
@@ -1122,7 +1122,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         room_t range_end = zone.getTop();
         qint32 num = count_rooms(range_start, range_end);
 
-        ch->send(QStringLiteral("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.name()));
+        ch->send(u"%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n"_s.arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.name()));
       }
       return ReturnValue::eSUCCESS;
     }
@@ -1183,7 +1183,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     if (zon > last_room)
     {
 
-      ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
+      ch->send(u"Unknown zone. Zone %1 is greater than last valid zone %2.\r\n"_s).arg(zon).arg(last_room));
       return ReturnValue::eFAILURE;
     }
     QString buf;
@@ -1344,7 +1344,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
     qint32 c, nr;
-    if (!*act && !clas && !levlow && !levhigh && !*affect && !immune && !race && !align)
+    if (act.isEmpty() && !clas && !levlow && !levhigh && affect.isEmpty() && !immune && !race && !align)
     {
       ch->sendln("No valid search supplied.");
       return ReturnValue::eFAILURE;
@@ -1537,12 +1537,12 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
           return ReturnValue::eFAILURE;
         }
       }
-      ch->send(QStringLiteral("Unknown type: %s.\r\n").arg(arg1));
+      ch->send(u"Unknown type: %s.\r\n"_s.arg(arg1));
     endy:
       continue;
     }
     qint32 c, nr, aff;
-    //     ch->sendln(QStringLiteral("%1 %2 %3 %4 %5").arg(more).arg(extra).arg(wear).arg(size).arg(affect));
+    //     ch->sendln(u"%1 %2 %3 %4 %5"_s.arg(more).arg(extra).arg(wear).arg(size).arg(affect));
     bool found = false;
     qint32 o = 0, z;
     if (!fo)
@@ -1742,7 +1742,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (is_abbrev(type, "keydoorcombo"))
   {
-    if (!*name)
+    if (name.isEmpty())
     {
       ch->sendln("Show which key? (# of key)");
       return ReturnValue::eFAILURE;
@@ -1755,7 +1755,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->send(QStringLiteral("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
+    ch->send(u"$3Doors in game that use key %1$R:\r\n\r\n"_s.arg(count));
     for (i = {}; i < DC::getInstance()->top_of_world; i++)
       for (nr = {}; nr < MAX_DIRS; nr++)
         if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
@@ -1764,7 +1764,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
                     EX_ISDOOR) &&
               DC::getInstance()->rooms[i].dir_option[nr]->key == count)
           {
-            ch->send(QStringLiteral(" $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n").arg(DC::getInstance()->rooms[i].number).arg(dirs[nr]).arg(DC::getInstance()->rooms[i].dir_option[nr]->key));
+            ch->send(u" $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n"_s.arg(DC::getInstance()->rooms[i].number).arg(dirs[nr]).arg(DC::getInstance()->rooms[i].dir_option[nr]->key));
           }
         }
   }
@@ -1856,13 +1856,13 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, person, room);
 
-  if (!*person)
+  if (person.isEmpty())
   {
     ch->sendln("Who do you wish to teleport?");
     return ReturnValue::eFAILURE;
   } /* if */
 
-  if (!*room)
+  if (room.isEmpty())
   {
     ch->sendln("Where do you wish to send ths person?");
     return ReturnValue::eFAILURE;
@@ -1928,7 +1928,7 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   act_to_room("$n disappears in a puff of smoke.", victim, 0, 0, 0);
-  ch->send(QStringLiteral("Moving %s from %d to %d.\r\n").arg(qPrintable(victim->name())).arg(DC::getInstance()->world[victim->in_room].number).arg(DC::getInstance()->world[target].number));
+  ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(victim->name())).arg(DC::getInstance()->world[victim->in_room].number).arg(DC::getInstance()->world[target].number));
   move_char(victim, target);
   act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
   act_to_victim("$n has teleported you!", ch, 0, victim, 0);
@@ -1950,7 +1950,7 @@ command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   one_argument(argument, buf);
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("Whom is the group leader you wish to transfer?");
     return ReturnValue::eFAILURE;
@@ -1966,7 +1966,7 @@ command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
     act("$n disappears in a mushroom cloud.",
         victim, 0, 0, TO_ROOM, 0);
     target = ch->in_room;
-    ch->send(QStringLiteral("Moving %s from %d to %d.\r\n").arg(qPrintable(victim->name())).arg(DC::getInstance()->world[victim->in_room].number).arg(DC::getInstance()->world[target].number));
+    ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(victim->name())).arg(DC::getInstance()->world[victim->in_room].number).arg(DC::getInstance()->world[target].number));
     move_char(victim, target);
     act("$n arrives from a puff of smoke.",
         victim, 0, 0, TO_ROOM, 0);
@@ -1982,7 +1982,7 @@ command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
           act("$n disappears in a mushroom cloud.",
               victim, 0, 0, TO_ROOM, 0);
           target = ch->in_room;
-          ch->send(QStringLiteral("Moving %s from %d to %d.\r\n").arg(qPrintable(k->follower->name())).arg(DC::getInstance()->world[k->follower->in_room].number).arg(DC::getInstance()->world[target].number));
+          ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(k->follower->name())).arg(DC::getInstance()->world[k->follower->in_room].number).arg(DC::getInstance()->world[target].number));
           move_char(k->follower, target);
           act("$n arrives from a puff of smoke.",
               k->follower, 0, 0, TO_ROOM, 0);
@@ -2070,7 +2070,7 @@ command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   qint32 vnum = -1;
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->send("Usage: opstat <vnum>\r\n ");
     return ReturnValue::eFAILURE;
@@ -2135,7 +2135,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   ch->player->last_obj_vnum = vnum;
-  /*  if (!*arg)
+  /*  if (arg.isEmpty())
     {
           opstat(ch, vnum);
           return ReturnValue::eSUCCESS;
@@ -2144,7 +2144,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!str_cmp(arg, "add"))
   {
     argument = one_argument(argument, arg);
-    if (!*arg)
+    if (arg.isEmpty())
     {
       send_to_char("$3Syntax$R: opedit [num] add new\r\n"
                    "This creates a new object proc.\r\n",
@@ -2153,8 +2153,8 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     prog = new mob_prog_data;
     prog->type = ALL_GREET_PROG;
-    prog->arglist = QStringLiteral("80");
-    prog->comlist = QStringLiteral("say This is my new obj prog!\r\n");
+    prog->arglist = u"80"_s;
+    prog->comlist = u"say This is my new obj prog!\r\n"_s;
     prog->next = {};
 
     if ((currprog = DC::getInstance()->obj_index[num].mobprogs))
@@ -2173,7 +2173,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     argument = one_argument(argument, arg);
     qint32 a = -1;
-    if (!*arg || !isdigit(*arg))
+    if (arg.isEmpty() || !isdigit(*arg))
     {
       send_to_char("$3Syntax$R: opedit [obj_num] remove <prog>\r\n"
                    "This removes an object procedure completly\r\n",
@@ -2209,7 +2209,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (!str_cmp(arg, "type"))
   {
     argument = one_argument(argument, arg);
-    if (!*arg || !argument || !*argument || !isdigit(*arg) || !isdigit(*(1 + argument)))
+    if (arg.isEmpty() || !argument || argument.isEmpty() || !isdigit(*arg) || !isdigit(*(1 + argument)))
     {
       ch->sendln("$3Syntax$R: opedit [obj_num] type <prog> <type>");
       ch->sendln("$3Valid types are$R:");
@@ -2282,7 +2282,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     //    QString arg1;
     argument = one_argument(argument, arg);
     //    argument = one_argument(argument, arg1);
-    if (!*arg || !argument || !*argument || !isdigit(*arg))
+    if (arg.isEmpty() || !argument || argument.isEmpty() || !isdigit(*arg))
     {
       ch->sendln("$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>");
       return ReturnValue::eFAILURE;
@@ -2307,7 +2307,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (!str_cmp(arg, "command"))
   {
     argument = one_argument(argument, arg);
-    if (!*arg || !isdigit(*arg))
+    if (arg.isEmpty() || !isdigit(*arg))
     {
       ch->sendln("$3Syntax$R: opedit [obj_num] command <prog>");
       return ReturnValue::eFAILURE;
@@ -2392,7 +2392,7 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (r2 < 0)
   {
-    QString buf = QStringLiteral("new %1").arg(v2);
+    QString buf = u"new %1"_s.arg(v2);
     qint32 retval = ch->do_oedit(buf.split(' '));
     if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;
@@ -2419,7 +2419,7 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   */
 
-  ch->sendln(QStringLiteral("Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).").arg(v1).arg((DC::getInstance()->obj_index[real_object(v1)].item)->short_description()).arg(v2).arg((DC::getInstance()->obj_index[real_object(v2)].item)->short_description()));
+  ch->sendln(u"Ok.\r\nYou copied item %d (%s) and replaced item %d (%s)."_s.arg(v1).arg((DC::getInstance()->obj_index[real_object(v1)].item)->short_description()).arg(v2).arg((DC::getInstance()->obj_index[real_object(v2)].item)->short_description()));
 
   DC::getInstance()->object_list = DC::getInstance()->object_list->next;
   otmp = DC::getInstance()->obj_index[r2].item;
@@ -2508,7 +2508,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  ch->sendln(QStringLiteral("Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n").arg(     vsrc).arg(((CharacterPtr )DC::getInstance()->mob_index[src].item)->short_description()).arg(vdst).arg(((CharacterPtr )DC::getInstance()->mob_index[dst].item)->short_description());
+  ch->sendln(u"Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n"_s.arg(     vsrc).arg(((CharacterPtr )DC::getInstance()->mob_index[src].item)->short_description()).arg(vdst).arg(((CharacterPtr )DC::getInstance()->mob_index[dst].item)->short_description());
 
   // Overwrite old mob with new mob
   DC::getInstance()->mob_index[dst].item = (void *)mob;

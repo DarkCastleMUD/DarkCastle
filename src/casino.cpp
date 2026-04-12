@@ -159,7 +159,7 @@ bool verify(player_data *plr)
     if (result != character_list.end())
     {
       QString buf;
-      buf = QStringLiteral("%1 folds as %2 leaves the room.\r\n").arg(plr->ch->name()).arg(HSSH(plr->ch));
+      buf = u"%1 folds as %2 leaves the room.\r\n"_s).arg(plr->ch->name()).arg(HSSH(plr->ch));
       send_to_table(buf, plr->table);
       plr->ch->sendln("Your hand is folded as you leave the room.");
     }
@@ -548,7 +548,7 @@ void check_winner(table_data *tbl)
         tbl->hand_data[2] == 0)
     { // insurance bet paid off
       qint32 pay = plr->doubled ? plr->bet / 2 : plr->bet;
-      plr->ch->send(QStringLiteral("Your insurance bet paid %d %s.\r\n").arg(pay).arg(plr->table->gold ? "gold" : "platinum"));
+      plr->ch->send(u"Your insurance bet paid %d %s.\r\n"_s.arg(pay).arg(plr->table->gold ? "gold" : "platinum"));
       if (plr->table->gold)
         plr->ch->addGold(pay);
       else
@@ -695,10 +695,10 @@ void check_blackjacks(table_data *tbl)
     if (hand_strength(plr) == 21 &&
         hand_strength(tbl) != 21)
     {
-      buf = QStringLiteral("%1 blackjacks!\r\n").arg(qPrintable(plr->ch->name()));
+      buf = u"%1 blackjacks!\r\n"_s.arg(qPrintable(plr->ch->name()));
       send_to_table(buf, tbl, plr);
       plr->ch->sendln("$BYou BLACKJACK!$R");
-      buf = QStringLiteral("The dealer gives you %1 %2 coins.\r\n").arg((qint32)(plr->bet * 2.5)).arg(plr->table->gold ? "gold" : "platinum");
+      buf = u"The dealer gives you %1 %2 coins.\r\n"_s).arg((qint32)(plr->bet * 2.5)).arg(plr->table->gold ? "gold" : "platinum");
       plr->ch->send(buf);
       plr->ch->sendBlackjackPrompt();
 
@@ -1158,7 +1158,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       if (amt < 0 || amt > obj->obj_flags.value[1] || amt < obj->obj_flags.value[0])
       {
 
-        ch->send(QStringLiteral("Minimum bet: %d\r\nMaximum bet: %d\r\n").arg(obj->obj_flags.value[0]).arg(obj->obj_flags.value[1]));
+        ch->send(u"Minimum bet: %d\r\nMaximum bet: %d\r\n"_s.arg(obj->obj_flags.value[0]).arg(obj->obj_flags.value[1]));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1167,7 +1167,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       if (amt < 0 || amt > obj->obj_flags.value[3] || amt < obj->obj_flags.value[2])
       {
 
-        ch->send(QStringLiteral("Minimum bet: %d\r\nMaximum bet: %d\r\n").arg(obj->obj_flags.value[2]).arg(obj->obj_flags.value[3]));
+        ch->send(u"Minimum bet: %d\r\nMaximum bet: %d\r\n"_s.arg(obj->obj_flags.value[2]).arg(obj->obj_flags.value[3]));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1770,7 +1770,7 @@ qint32 handcompare(qint32 hand1[5], qint32 hand2[5])
     if (a == b)
       return 3; //
   }
-  DC::getInstance()->logentry(QStringLiteral("Error in handcompare."), 110, DC::LogChannel::LOG_MORTAL);
+  DC::getInstance()->logentry(u"Error in handcompare."_s, 110, DC::LogChannel::LOG_MORTAL);
 
   return -1;
 }
@@ -1983,7 +1983,7 @@ void save_slot_machines()
 
   if (!curr)
   {
-    DC::getInstance()->logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Mess up in save_slot_machines, no object file."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -2149,7 +2149,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
     if (payout == 200 && machine->bet == 5)
     {
       send_to_room("The jackpot lights flash and loud noises come from all around you!\r\n", machine->obj->in_room);
-      machine->ch->send(QStringLiteral("$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\r\n").arg((qint32)machine->jackpot).arg(machine->gold ? "coins" : "plats"));
+      machine->ch->send(u"$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\r\n"_s.arg((qint32)machine->jackpot).arg(machine->gold ? "coins" : "plats"));
       dc_sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
       send_info(buf);
 
@@ -2245,7 +2245,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       if (obj->slot->bet == 1)
         ch->sendln("You place only the minimum bet into the slot machine now.");
       else
-        ch->send(QStringLiteral("You now start placing %1 times the base amount into the slot machine.\r\n").arg(obj->slot->bet));
+        ch->send(u"You now start placing %1 times the base amount into the slot machine.\r\n"_s).arg(obj->slot->bet));
       return ReturnValue::eSUCCESS;
     }
     ch->sendln("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.");
@@ -2388,7 +2388,7 @@ void send_wheel_bets(CharacterPtr ch, wheel_data *wheel)
           }
           else
             ch->send(" and");
-          ch->send(QStringLiteral(" a bet of %u on %s").arg(wheel->plr[i]->bet_array[j]).arg(bet_name[j]));
+          ch->send(u" a bet of %u on %s"_s.arg(wheel->plr[i]->bet_array[j]).arg(bet_name[j]));
         }
       }
       for (j = 11; j < 48; j++)
@@ -2402,7 +2402,7 @@ void send_wheel_bets(CharacterPtr ch, wheel_data *wheel)
           }
           else
             ch->send(" and");
-          ch->send(QStringLiteral(" a bet of %u on %s").arg(wheel->plr[i]->bet_array[j]).arg(roulette_display[j - 11]));
+          ch->send(u" a bet of %u on %s"_s.arg(wheel->plr[i]->bet_array[j]).arg(roulette_display[j - 11]));
         }
       }
     }
@@ -2423,7 +2423,7 @@ quint32 check_roulette_wins(roulette_player *plr, qint32 num)
                             num == 35))
   {
     tmp = 2 * plr->bet_array[0];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $0$BBLACK$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $0$BBLACK$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
 
@@ -2433,61 +2433,61 @@ quint32 check_roulette_wins(roulette_player *plr, qint32 num)
                              num == 35 || num == 0))
   {
     tmp = 2 * plr->bet_array[1];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $4$BRED$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $4$BRED$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[2] && num % 2 == 0 && num)
   {
     tmp = 2 * plr->bet_array[2];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BEVEN$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $BEVEN$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[3] && num % 2 == 1)
   {
     tmp = 2 * plr->bet_array[3];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BODD$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $BODD$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[4] && num > 0 && num < 13)
   {
     tmp = 3 * plr->bet_array[4];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-12$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $B1-12$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[5] && num > 12 && num < 25)
   {
     tmp = 3 * plr->bet_array[5];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B13-24$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $B13-24$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[6] && num > 24 && num < 37)
   {
     tmp = 3 * plr->bet_array[6];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B25-36$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $B25-36$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[7] && num > 0 && num < 10)
   {
     tmp = 4 * plr->bet_array[7];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-9$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $B1-9$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[8] && num > 9 && num < 19)
   {
     tmp = 4 * plr->bet_array[8];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B10-18$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $B10-18$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[9] && num > 18 && num < 28)
   {
     tmp = 4 * plr->bet_array[9];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B19-27$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $B19-27$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   if (plr->bet_array[10] && num > 27 && num < 37)
   {
     tmp = 4 * plr->bet_array[10];
-    plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B28-36$R!\r\n").arg(tmp));
+    plr->ch->send(u"You WIN %1 coins on your bet of $B28-36$R!\r\n"_s.arg(tmp));
     winnings += tmp;
   }
   for (qint32 i = 11; i < 48; i++)
@@ -2495,7 +2495,7 @@ quint32 check_roulette_wins(roulette_player *plr, qint32 num)
     if (plr->bet_array[i] && num == i - 11)
     {
       tmp = 36 * plr->bet_array[i];
-      plr->ch->send(QStringLiteral("You WIN %u coins on your bet of %s!\r\n").arg(tmp).arg(roulette_display[num]));
+      plr->ch->send(u"You WIN %u coins on your bet of %s!\r\n"_s.arg(tmp).arg(roulette_display[num]));
       winnings += tmp;
     }
   }
@@ -2678,7 +2678,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
 
   if (cmd == cmd_t::BET) // bet
   {
-    if (!*arg2)
+    if (arg.isEmpty() 2)
     {
       ch->sendln("Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>");
       return ReturnValue::eSUCCESS;
@@ -2714,14 +2714,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B$0BLACK$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[0] + bet));
+          ch->send(u"You add %u to your bet on $B$0BLACK$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[0] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B$0BLACK$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[0] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B$0BLACK$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B$0BLACK$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B$0BLACK$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2739,14 +2739,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B$4RED$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[1] + bet));
+          ch->send(u"You add %u to your bet on $B$4RED$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[1] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B$4RED$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[1] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B$4RED$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B$4RED$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B$4RED$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2764,14 +2764,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $BEVEN$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[2] + bet));
+          ch->send(u"You add %u to your bet on $BEVEN$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[2] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $BEVEN$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[2] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $BEVEN$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $BEVEN$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $BEVEN$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2789,14 +2789,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $BODD$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[3] + bet));
+          ch->send(u"You add %u to your bet on $BODD$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[3] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $BODD$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[3] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $BODD$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $BODD$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $BODD$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2814,14 +2814,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B1-12$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[4] + bet));
+          ch->send(u"You add %u to your bet on $B1-12$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[4] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B1-12$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[4] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B1-12$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B1-12$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B1-12$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2839,14 +2839,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B13-24$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[5] + bet));
+          ch->send(u"You add %u to your bet on $B13-24$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[5] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B13-24$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[5] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B13-24$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B13-24$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B13-24$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2864,14 +2864,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B25-36$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[6] + bet));
+          ch->send(u"You add %u to your bet on $B25-36$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[6] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B25-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[6] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B25-36$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B25-36$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B25-36$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2889,14 +2889,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B1-9$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[1] + bet));
+          ch->send(u"You add %u to your bet on $B1-9$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[1] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B1-9$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B1-9$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B1-9$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B1-9$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2914,14 +2914,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B10-18$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[8] + bet));
+          ch->send(u"You add %u to your bet on $B10-18$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[8] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B10-18$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B10-18$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B10-18$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B10-18$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2939,14 +2939,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B19-27$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[9] + bet));
+          ch->send(u"You add %u to your bet on $B19-27$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[9] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B19-27$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[9] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B19-27$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B19-27$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B19-27$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2964,14 +2964,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on $B28-36$R.  The total bet is now %u coins.\r\n").arg(bet).arg(obj->wheel->plr[i]->bet_array[10] + bet));
+          ch->send(u"You add %u to your bet on $B28-36$R.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(obj->wheel->plr[i]->bet_array[10] + bet));
           dc_sprintf(buf, "$n adds to $s bet on $B28-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[10] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %1 on $B28-36$R.\r\n").arg(bet));
+        ch->send(u"You have placed a bet of %1 on $B28-36$R.\r\n"_s.arg(bet));
         dc_sprintf(buf, "$n places a bet of %u on $B28-36$R.", bet);
         act_to_room(buf, ch, 0, 0, 0);
       }
@@ -2990,7 +2990,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         }
         else
         {
-          ch->send(QStringLiteral("You add %u to your bet on %s.  The total bet is now %u coins.\r\n").arg(bet).arg(roulette_display[number]).arg(obj->wheel->plr[i]->bet_array[number + 11] + bet));
+          ch->send(u"You add %u to your bet on %s.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(roulette_display[number]).arg(obj->wheel->plr[i]->bet_array[number + 11] + bet));
           dc_sprintf(buf, "$n adds to $s bet on %s for a total of %u coins.",
                      roulette_display[number], obj->wheel->plr[i]->bet_array[number + 11] + bet);
           act_to_room(buf, ch, 0, 0, 0);
@@ -2998,7 +2998,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
       }
       else
       {
-        ch->send(QStringLiteral("You have placed a bet of %u on %s.\r\n").arg(bet).arg(roulette_display[number]));
+        ch->send(u"You have placed a bet of %u on %s.\r\n"_s.arg(bet).arg(roulette_display[number]));
         dc_sprintf(buf, "$n places a bet of %u on %s.", bet, roulette_display[number]);
         act_to_room(buf, ch, 0, 0, 0);
       }

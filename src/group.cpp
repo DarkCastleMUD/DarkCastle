@@ -82,7 +82,7 @@ command_return_t do_found(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("Found what?!");
     return ReturnValue::eFAILURE;
@@ -151,7 +151,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if (ok == false)
   {
     send("Invalid value.\r\n");
-    send(QStringLiteral("Valid values are %1 to %2.\r\n").arg(1).arg(static_cast<quint64>(-1)));
+    send(u"Valid values are %1 to %2.\r\n"_s).arg(1).arg(static_cast<quint64>(-1)));
     return ReturnValue::eFAILURE;
   }
 
@@ -202,18 +202,18 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   removeGold(amount);
   save(cmd_t::SAVE_SILENTLY);
 
-  send(QStringLiteral("You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
+  send(u"You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\r\n"_s.arg(amount).arg(share + extra));
   addGold(share + extra);
 
   if (k != this && k->in_room == in_room)
   {
-    k->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
+    k->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
     qint32 lost = {};
     if (k->clan && get_clan(k)->tax && !isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
         (k->clan != clan || (k->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
     {
       lost = (qint32)((qreal)share * (qreal)((qreal)get_clan(k)->tax / 100));
-      k->send(QStringLiteral("Your clan taxes %L1 $B$5gold$R of your share.\r\n").arg(lost));
+      k->send(u"Your clan taxes %L1 $B$5gold$R of your share.\r\n"_s.arg(lost));
       get_clan(k)->cdeposit(lost);
       save_clans();
     }
@@ -226,13 +226,13 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
         f->follower != this &&
         !f->follower->isNonPlayer())
     {
-      f->follower->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
+      f->follower->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
       qint32 lost = {};
       if (f->follower->clan && get_clan(f->follower)->tax && !isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
           (f->follower->clan != clan || (f->follower->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
       {
         lost = (qint32)((qreal)share * (qreal)((qreal)get_clan(f->follower)->tax / 100));
-        f->follower->send(QStringLiteral("Your clan taxes %L1 gold of your share.\r\n").arg(lost));
+        f->follower->send(u"Your clan taxes %L1 gold of your share.\r\n"_s).arg(lost));
         get_clan(f->follower)->cdeposit(lost);
         save_clans();
       }
@@ -314,7 +314,7 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (!*name)
+  if (name.isEmpty())
   {
     if (!IS_AFFECTED(ch, AFF_GROUP))
       ch->sendln("But you are a member of no group?!");
@@ -441,7 +441,7 @@ command_return_t do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Who do you wish to promote to group leader? ");
     return ReturnValue::eFAILURE;
@@ -504,7 +504,7 @@ command_return_t do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->group_name = {};
   }
   else
-    new_new_leader->group_name = QStringLiteral("I am a dork");
+    new_new_leader->group_name = u"I am a dork"_s;
 
   stop_follower(new_new_leader, follower_reasons_t::CHANGE_LEADER);
 
@@ -552,7 +552,7 @@ command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Who do you wish to disband? ");
     ch->sendln("Disband 'all' will disband the group.");
@@ -733,7 +733,7 @@ command_return_t do_autojoin(CharacterPtr ch, QString str_arguments, cmd_t cmd)
     }
     else
     {
-      ch->send(QStringLiteral("You are configured to auto-join: %1\r\n").arg(ch->player->getJoining()));
+      ch->send(u"You are configured to auto-join: %1\r\n"_s.arg(ch->player->getJoining()));
     }
 
     ch->send("Syntax: autojoin <player1> <player2> <player3> ...\r\n");
@@ -754,7 +754,7 @@ command_return_t do_autojoin(CharacterPtr ch, QString str_arguments, cmd_t cmd)
     ch->player->toggleJoining(i);
   }
 
-  ch->send(QStringLiteral("You are now autojoining: %1\r\n").arg(ch->player->getJoining()));
+  ch->send(u"You are now autojoining: %1\r\n"_s.arg(ch->player->getJoining()));
   return ReturnValue::eSUCCESS;
 }
 

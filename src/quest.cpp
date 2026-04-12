@@ -44,7 +44,7 @@ qint32 load_quests(void)
 
   if (!(fl = fopen(QUEST_FILE, "r")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Failed to open quest file for reading!"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Failed to open quest file for reading!"_s, 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
@@ -85,7 +85,7 @@ qint32 save_quests(void)
 
   if (!(fl = fopen(QUEST_FILE, "w")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Failed to open quest file for writing!"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Failed to open quest file for writing!"_s, 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
@@ -129,7 +129,7 @@ quest_info *get_quest_(qint32 num)
 
 quest_info *get_quest_(QString name)
 {
-  if (name == nullptr || !*name)
+  if (name == nullptr || name.isEmpty())
     return 0;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
@@ -157,13 +157,13 @@ command_return_t do_add_quest(CharacterPtr ch, QString name)
 {
   auto quest = new quest_info;
 
-  quest->name = QStringLiteral(name);
-  quest->hint1 = QStringLiteral(" ");
-  quest->hint2 = QStringLiteral(" ");
-  quest->hint3 = QStringLiteral(" ");
-  quest->objshort = QStringLiteral("a Quest Item");
-  quest->objlong = QStringLiteral("A quest item lies here.");
-  quest->objkey = QStringLiteral("quest item");
+  quest->name = name;
+  quest->hint1 = u" "_s;
+  quest->hint2 = u" "_s;
+  quest->hint3 = u" "_s;
+  quest->objshort = u"a Quest Item"_s;
+  quest->objlong = u"A quest item lies here."_s;
+  quest->objkey = u"quest item"_s;
   quest->level = 75;
   quest->objnum = 51;
   quest->mobnum = QUEST_MASTER;
@@ -179,7 +179,7 @@ command_return_t do_add_quest(CharacterPtr ch, QString name)
 
   quest_list.push_back(quest);
 
-  ch->send(QStringLiteral("Quest number %1 added.\r\n\r\n").arg(quest->number));
+  ch->send(u"Quest number %1 added.\r\n\r\n"_s).arg(quest->number));
   show_quest_info(ch, quest->number);
 
   return ReturnValue::eSUCCESS;
@@ -198,7 +198,7 @@ void list_quests(CharacterPtr ch, qint32 lownum, qint32 highnum)
     {
       // Create a format QString based on a space offset that takes color codes into account
 
-      ch->send(QStringLiteral("%1. $B$2Name:$7 %2$R Cost: %3 Reward: %4 Lvl: %5").arg(quest->number, 3).arg(quest->name).arg(quest->cost).arg(quest->brownie ? "$5*$R" : "").arg(quest->reward).arg(quest->level));
+      ch->send(u"%1. $B$2Name:$7 %2$R Cost: %3 Reward: %4 Lvl: %5"_s.arg(quest->number, 3).arg(quest->name).arg(quest->cost).arg(quest->brownie ? "$5*$R" : "").arg(quest->reward).arg(quest->level));
     }
   }
 }
@@ -213,24 +213,7 @@ void show_quest_info(CharacterPtr ch, qint32 num)
 
     if (quest->number == num)
     {
-      ch->sendln(QStringLiteral(
-                     "$3Quest Info for #$R%d\r\n$3========================================$R\r\n$3Name:$R   %s\r\n$3Level:$R  %d\r\n"
-                     "$3Cost:$R   %d plats\r\n"
-                     "$3Brownie:$R%s\r\n"
-                     "$3Reward:$R %d qpoints\r\n"
-                     "$3Timer:$R  %d\r\n"
-                     "$3----------------------------------------$R\r\n"
-                     "$3Quest Mob Vnum:$R %d (%s)\r\n"
-                     "$3----------------------------------------$R\r\n"
-                     "$3Quest Object Vnum:$R %d\r\n"
-                     "$3Keywords:$R          %s\r\n"
-                     "$3Short description:$R %s\r\n"
-                     "$3Long description:$R  %s\r\n"
-                     "$3----------------------------------------$R\r\n"
-                     "$3Hints:$R\r\n"
-                     "$31.$R %s\r\n"
-                     "$32.$R %s\r\n"
-                     "$33.$R %s\r\n")
+      ch->sendln(u"$3Quest Info for #$R%d\r\n$3========================================$R\r\n$3Name:$R   %s\r\n$3Level:$R  %d\r\n$3Cost:$R   %d plats\r\n$3Brownie:$R%s\r\n$3Reward:$R %d qpoints\r\n$3Timer:$R  %d\r\n$3----------------------------------------$R\r\n$3Quest Mob Vnum:$R %d (%s)\r\n$3----------------------------------------$R\r\n$3Quest Object Vnum:$R %d\r\n$3Keywords:$R          %s\r\n$3Short description:$R %s\r\n$3Long description:$R  %s\r\n$3----------------------------------------$R\r\n$3Hints:$R\r\n$31.$R %s\r\n$32.$R %s\r\n$33.$R %s\r\n"_s
                      .arg(quest->number)
                      .arg(quest->name)
                      .arg(quest->level)
@@ -294,19 +277,19 @@ qint32 get_quest_price(quest_info *quest)
 
 void show_quest_header(CharacterPtr ch)
 {
-  ch->sendln(QStringLiteral("  .-------------------------------------------------------------------------."));
-  ch->sendln(QStringLiteral(" /.-.                                                                     .-.\\"));
-  ch->sendln(QStringLiteral("[/   \\                                                                   /   \\]"));
-  ch->sendln(QStringLiteral("[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]"));
-  ch->sendln(QStringLiteral("[\\  ! /                                                                 \\ !  /]"));
-  ch->sendln(QStringLiteral("[ `--'                                                                   `--' ]"));
-  ch->sendln(QStringLiteral("[-----------------------------------------------------------------------------]"));
+  ch->sendln(u"  .-------------------------------------------------------------------------."_s);
+  ch->sendln(u" /.-.                                                                     .-.\\"_s);
+  ch->sendln(u"[/   \\                                                                   /   \\]"_s);
+  ch->sendln(u"[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]"_s);
+  ch->sendln(u"[\\  ! /                                                                 \\ !  /]"_s);
+  ch->sendln(u"[ `--'                                                                   `--' ]"_s);
+  ch->sendln(u"[-----------------------------------------------------------------------------]"_s);
   ch->sendln();
 }
 
 void show_quest_amount(CharacterPtr ch, qint32 remaining)
 {
-  ch->send(QStringLiteral("\r\n $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n").arg(quest_list.size() - remaining).arg(remaining).arg(quest_list.size()));
+  ch->send(u"\r\n $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n"_s.arg(quest_list.size() - remaining).arg(remaining).arg(quest_list.size()));
 }
 
 void show_quest_footer(CharacterPtr ch)
@@ -344,7 +327,7 @@ void show_quest_footer(CharacterPtr ch)
     }
   }
 
-  ch->send(QStringLiteral("\r\n $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n").arg(attempting).arg(completed).arg(total - completed - attempting).arg(total));
+  ch->send(u"\r\n $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n"_s.arg(attempting).arg(completed).arg(total - completed - attempting).arg(total));
 
   ch->sendln("[-----------------------------------------------------------------------------]");
 }
@@ -353,11 +336,11 @@ qint32 show_one_quest(CharacterPtr ch, quest_info *quest, qint32 count)
 {
   qint32 i, amount = {};
 
-  ch->sendln(QStringLiteral(" $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\r\n $B$2Hint:$7 %-52s$R\r\n").arg(quest->name).arg(quest->number).arg(quest->hint1));
+  ch->sendln(u" $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\r\n $B$2Hint:$7 %-52s$R\r\n"_s.arg(quest->name).arg(quest->number).arg(quest->hint1));
   if (quest->hint2)
-    ch->send(QStringLiteral(" $B$7%-52s$R\r\n").arg(quest->hint2));
+    ch->send(u" $B$7%-52s$R\r\n"_s.arg(quest->hint2));
   if (quest->hint3)
-    ch->send(QStringLiteral(" $B$7%-52s$R\r\n").arg(quest->hint3));
+    ch->send(u" $B$7%-52s$R\r\n"_s.arg(quest->hint3));
   if (quest->timer)
   {
     for (i = {}; i < QUEST_MAX; i++)
@@ -369,28 +352,28 @@ qint32 show_one_quest(CharacterPtr ch, quest_info *quest, qint32 count)
 
       if (!amount)
       {
-        DC::getInstance()->logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(u"Somebody passed a quest into here that they don't really have."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
 
-      ch->send(QStringLiteral(" $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\r\n\r\n").arg(quest->level).arg(amount).arg(quest->reward));
+      ch->send(u" $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\r\n\r\n"_s.arg(quest->level).arg(amount).arg(quest->reward));
     }
   }
   else
   {
-    ch->send(QStringLiteral(" $B$2Level:$7 %d  $2Reward:$7 %-5d$R\r\n\r\n").arg(quest->level).arg(quest->reward));
+    ch->send(u" $B$2Level:$7 %d  $2Reward:$7 %-5d$R\r\n\r\n"_s.arg(quest->level).arg(quest->reward));
   }
   return ++count;
 }
 
 qint32 show_one_complete_quest(CharacterPtr ch, quest_info *quest, qint32 count)
 {
-  ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\r\n").arg(quest->name, -35).arg(quest->reward, -5));
+  ch->send(u" $B$2Name:$7 %1 $2Reward:$7 %2$R\r\n"_s.arg(quest->name, -35).arg(quest->reward, -5));
   return ++count;
 }
 
 qint32 show_one_available_quest(CharacterPtr ch, quest_info *quest, qint32 count)
 {
-  ch->sendln(QStringLiteral("$B$7%1. $2Name:$7 %2$R Cost: %3 Reward: %4")
+  ch->sendln(u"$B$7%1. $2Name:$7 %2$R Cost: %3 Reward: %4"_s
                  .arg(quest->name)
                  .arg(quest->cost)
                  .arg(quest->brownie ? "$5*$R" : "")
@@ -514,7 +497,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
   price = quest->cost;
   if (GET_PLATINUM(ch) < price)
   {
-    ch->send(QStringLiteral("You need %1 platinum coins to start this quest, which you don't have!\r\n").arg(price));
+    ch->send(u"You need %1 platinum coins to start this quest, which you don't have!\r\n"_s.arg(price));
     return ReturnValue::eEXTRA_VAL2;
   }
 
@@ -523,7 +506,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
     brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
     if (!brownie)
     {
-      ch->send(QStringLiteral("You need a brownie point to start this quest!\r\n").arg(price));
+      ch->send(u"You need a brownie point to start this quest!\r\n"_s.arg(price));
       return ReturnValue::eEXTRA_VAL2;
     }
   }
@@ -538,7 +521,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
       if (mob && (mob->getLevel() < 90) && DC::getInstance()->zones.value(DC::getInstance()->world[mob->in_room].zone).isNoHunt() == false && (mob->description().length() > 80))
         break;
     }
-    quest->hint1 = QStringLiteral(qPrintable(mob->description()));
+    quest->hint1 = mob->description();
   }
   else
     mob = get_mob_vnum(quest->mobnum);
@@ -581,11 +564,11 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
 
   if (quest->brownie)
   {
-    ch->send(QStringLiteral("%s takes a brownie point from you.\r\n").arg(qPrintable(qmaster->shortdesc_or_name())));
+    ch->send(u"%s takes a brownie point from you.\r\n"_s.arg(qPrintable(qmaster->shortdesc_or_name())));
     obj_from_char(brownie);
   }
 
-  ch->send(QStringLiteral("%s takes %d platinum from you.\r\n").arg(qPrintable(qmaster->shortdesc_or_name())).arg(price));
+  ch->send(u"%s takes %d platinum from you.\r\n"_s.arg(qPrintable(qmaster->shortdesc_or_name())).arg(price));
   GET_PLATINUM(ch) -= price;
 
   return ReturnValue::eSUCCESS;
@@ -739,7 +722,7 @@ void quest_update()
 
               DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", qPrintable(i->name()), quest->number, quest->name);
 
-              i->send(QStringLiteral("Time has expired for %1.  This quest has ended.\r\n").arg(quest->name));
+              i->send(u"Time has expired for %1.  This quest has ended.\r\n"_s).arg(quest->name));
             }
             i->player->quest_current_ticksleft[j]--;
             break;
@@ -747,7 +730,7 @@ void quest_update()
 
       if (check_quest_current(i, quest->number))
       {
-        obj = get_obj(QStringLiteral("q%1").arg(quest->number));
+        obj = get_obj(u"q%1"_s.arg(quest->number));
         if (!obj)
         {
           if ((mob = get_mob_vnum(quest->mobnum)))
@@ -755,7 +738,7 @@ void quest_update()
             obj = clone_object(quest->objnum);
             obj->short_description(quest->objshort);
             obj->long_description(quest->objlong);
-            obj->name(QStringLiteral("%1 q%2").arg(quest->objkey).arg(quest->number));
+            obj->name(u"%1 q%2"_s.arg(quest->objkey).arg(quest->number));
             obj_to_char(obj, mob);
             wear(mob, obj, obj->keywordfind());
           }
@@ -873,7 +856,7 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
     }
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Bug in quest_handler, how'd they get here?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   return retval;
@@ -940,7 +923,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (is_abbrev(arg, "current"))
     show_current_quests(ch);
-  else if (is_abbrev(arg, "canceled") && !*name)
+  else if (is_abbrev(arg, "canceled") && name.isEmpty())
     show_canceled_quests(ch);
   else if (is_abbrev(arg, "completed"))
     show_complete_quests(ch);
@@ -1045,9 +1028,9 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->send(QStringLiteral("%s takes 2000 platinum from you.\r\n").arg(qPrintable(qmaster->shortdesc_or_name())));
+    ch->send(u"%s takes 2000 platinum from you.\r\n"_s).arg(qPrintable(qmaster->shortdesc_or_name())));
     GET_PLATINUM(ch) -= 2000;
-    ch->send(QStringLiteral("%s takes a brownie point from you.\r\n").arg(qPrintable(qmaster->shortdesc_or_name())));
+    ch->send(u"%s takes a brownie point from you.\r\n"_s.arg(qPrintable(qmaster->shortdesc_or_name())));
     obj_from_char(brownie);
 
     stop_all_quests(ch);
@@ -1063,17 +1046,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   else
   {
-    ch->sendln(QStringLiteral(
-        "Usage: quest current            (lists current quests)\r\n"
-        "       quest completed          (lists completed quests)\r\n"
-        "       quest canceled           (lists canceled quests)\r\n"
-        "\r\n"
-        "The following commands may only be used at the Quest Master.\r\n"
-        "       quest list               (lists available quests)\r\n"
-        "       quest cancel <name or #> (cancel the current quest)\r\n"
-        "       quest start <name or #>  (starts a new quest)\r\n"
-        "       quest finish <name or #> (finishes a current quest)\r\n"
-        "       quest reset              (reset all quests. costs 2k plats, 1 brownie)\r\n");
+    ch->sendln(u"Usage: quest current            (lists current quests)\r\n       quest completed          (lists completed quests)\r\n       quest canceled           (lists canceled quests)\r\n\r\nThe following commands may only be used at the Quest Master.\r\n       quest list               (lists available quests)\r\n       quest cancel <name or #> (cancel the current quest)\r\n       quest start <name or #>  (starts a new quest)\r\n       quest finish <name or #> (finishes a current quest)\r\n       quest reset              (reset all quests. costs 2k plats, 1 brownie)\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1094,20 +1067,9 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; *argument == ' '; argument++)
     ;
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
-    ch->sendln(QStringLiteral(
-        "Usage: qedit list                      (list all quest names and numbers)\r\n"
-        "       qedit list <lownum> <highnum>   (lists names and numbers between)\r\n"
-        "       qedit show <number>             (show detailed information)\r\n"
-        "       qedit <number> <field> <value>  (edit a quest)\r\n"
-        "       qedit new <name>                (add a quest)\r\n"
-        "       qedit save                      (saves all quests)\r\n"
-        "       qedit stat <playername>         (show player's current qpoints)\r\n"
-        "       qedit set <playername> <value>  (alter player's current qpoints)\r\n"
-        "       qedut reset <playername>\r\n"
-        "\r\n"
-        "Valid qedit fields:"));
+    ch->sendln(u"Usage: qedit list                      (list all quest names and numbers)\r\n       qedit list <lownum> <highnum>   (lists names and numbers between)\r\n       qedit show <number>             (show detailed information)\r\n       qedit <number> <field> <value>  (edit a quest)\r\n       qedit new <name>                (add a quest)\r\n       qedit save                      (saves all quests)\r\n       qedit stat <playername>         (show player's current qpoints)\r\n       qedit set <playername> <value>  (alter player's current qpoints)\r\n       qedut reset <playername>\r\n\r\nValid qedit fields:"_s);
 
     // Display all of qedit's valid fields in rows of 4 columns
     //
@@ -1115,7 +1077,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     qint32 i = {};
     while (*tmp != nullptr)
     {
-      ch->send(QStringLiteral("%1\t").arg(*tmp));
+      ch->send(u"%1\t"_s.arg(*tmp));
       if (++i % 4 == 0)
       {
         ch->sendln("");
@@ -1135,7 +1097,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (is_abbrev(arg, "new"))
   {
-    if (!*argument)
+    if (argument.isEmpty())
     {
       ch->sendln("Usage: qedit new <name>");
       return ReturnValue::eFAILURE;
@@ -1160,7 +1122,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; *argument == ' '; argument++)
     ;
 
-  if (*arg && is_number(arg) && !*field)
+  if (*arg && is_number(arg) && field.isEmpty())
   {
     show_quest_info(ch, atoi(arg));
     return ReturnValue::eSUCCESS;
@@ -1168,7 +1130,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (is_abbrev(arg, "stat"))
   {
-    if (!*field)
+    if (field.isEmpty())
     {
       ch->sendln("Usage: qedit stat <playername>");
       return ReturnValue::eFAILURE;
@@ -1181,14 +1143,14 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
 
-      ch->send(QStringLiteral("%s's quest points: %d\r\n").arg(qPrintable(vict->name())).arg(vict->player->quest_points));
+      ch->send(u"%s's quest points: %d\r\n"_s.arg(qPrintable(vict->name())).arg(vict->player->quest_points));
     }
     return ReturnValue::eSUCCESS;
   }
 
   if (is_abbrev(arg, "reset"))
   {
-    if (!*field)
+    if (field.isEmpty())
     {
       ch->sendln("Usage: qedit reset <playername>");
       return ReturnValue::eFAILURE;
@@ -1204,7 +1166,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
       memset(vict->player->quest_cancel, 0, sizeof(vict->player->quest_cancel));
       memset(vict->player->quest_complete, 0, sizeof(vict->player->quest_complete));
 
-      ch->send(QStringLiteral("Reset quests for player %1\r\n").arg(qPrintable(vict->name())));
+      ch->send(u"Reset quests for player %1\r\n"_s.arg(qPrintable(vict->name())));
       vict->save(cmd_t::SAVE_SILENTLY);
       return ReturnValue::eSUCCESS;
     }
@@ -1216,7 +1178,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     for (; *argument == ' '; argument++)
       ;
 
-    if (!*field || !*value || !is_number(value))
+    if (field.isEmpty() || value.isEmpty() || !is_number(value))
     {
       ch->sendln("Usage: qedit set <playername> <value>");
       return ReturnValue::eFAILURE;
@@ -1231,7 +1193,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
       DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", qPrintable(ch->name()), qPrintable(vict->name()),
                               vict->player->quest_points, atoi(value));
-      ch->send(QStringLiteral("Setting %s's quest points from %d to %d.\r\n").arg(qPrintable(vict->name())).arg(vict->player->quest_points).arg(atoi(value)));
+      ch->send(u"Setting %s's quest points from %d to %d.\r\n"_s.arg(qPrintable(vict->name())).arg(vict->player->quest_points).arg(atoi(value)));
 
       vict->player->quest_points = atoi(value);
     }
@@ -1240,7 +1202,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (is_abbrev(arg, "show"))
   {
-    if (!*field || !is_number(field))
+    if (field.isEmpty() || !is_number(field))
       ch->sendln("Usage: qedit show <number>");
     else
       show_quest_info(ch, atoi(field));
@@ -1251,7 +1213,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; *argument == ' '; argument++)
     ;
 
-  if (is_abbrev(arg, "list") && !*field)
+  if (is_abbrev(arg, "list") && field.isEmpty())
   {
     list_quests(ch, 0, QUEST_TOTAL);
     return ReturnValue::eSUCCESS;
@@ -1295,7 +1257,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*field)
+  if (field.isEmpty())
   {
     ch->sendln("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.");
     return ReturnValue::eFAILURE;
@@ -1336,76 +1298,76 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->send(QStringLiteral("Name changed from %1 ").arg(quest->name));
-      quest->name = QStringLiteral(field);
-      ch->send(QStringLiteral("to %1.\r\n").arg(quest->name));
+      ch->send(u"Name changed from %1 "_s.arg(quest->name));
+      quest->name = field;
+      ch->send(u"to %1.\r\n"_s).arg(quest->name));
     }
     break;
   case 1: // level
-    ch->send(QStringLiteral("Level changed from %1 ").arg(quest->level));
+    ch->send(u"Level changed from %1 "_s.arg(quest->level));
     quest->level = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->level));
+    ch->send(u"to %1.\r\n"_s).arg(quest->level));
     break;
   case 2: // objnum
-    ch->send(QStringLiteral("Objnum changed from %1 ").arg(quest->objnum));
+    ch->send(u"Objnum changed from %1 "_s.arg(quest->objnum));
     quest->objnum = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objnum));
+    ch->send(u"to %1.\r\n"_s).arg(quest->objnum));
     break;
   case 3: // objshort
-    ch->send(QStringLiteral("Objshort changed from %1 ").arg(quest->objshort));
+    ch->send(u"Objshort changed from %1 "_s.arg(quest->objshort));
     dc_sprintf(field, "%s %s", value, argument);
-    quest->objshort = QStringLiteral(field);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objshort));
+    quest->objshort = field;
+    ch->send(u"to %1.\r\n"_s).arg(quest->objshort));
     break;
   case 4: // objlong
-    ch->send(QStringLiteral("Objlong changed from %1 ").arg(quest->objlong));
+    ch->send(u"Objlong changed from %1 "_s.arg(quest->objlong));
     dc_sprintf(field, "%s %s", value, argument);
-    quest->objlong = QStringLiteral(field);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objlong));
+    quest->objlong = field;
+    ch->send(u"to %1.\r\n"_s).arg(quest->objlong));
     break;
   case 5: // objkey
-    ch->send(QStringLiteral("Objkey changed from %1 ").arg(quest->objkey));
+    ch->send(u"Objkey changed from %1 "_s.arg(quest->objkey));
     dc_sprintf(field, "%s %s", value, argument);
-    quest->objkey = QStringLiteral(field);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objkey));
+    quest->objkey = field;
+    ch->send(u"to %1.\r\n"_s).arg(quest->objkey));
     break;
   case 6: // mobnum
-    ch->send(QStringLiteral("Mobnum changed from %1 ").arg(quest->mobnum));
+    ch->send(u"Mobnum changed from %1 "_s.arg(quest->mobnum));
     quest->mobnum = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->mobnum));
+    ch->send(u"to %1.\r\n"_s).arg(quest->mobnum));
     break;
   case 7: // timer
-    ch->send(QStringLiteral("Timer changed from %1 ").arg(quest->timer));
+    ch->send(u"Timer changed from %1 "_s.arg(quest->timer));
     quest->timer = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->timer));
+    ch->send(u"to %1.\r\n"_s).arg(quest->timer));
     break;
   case 8: // reward
-    ch->send(QStringLiteral("Reward changed from %1 ").arg(quest->reward));
+    ch->send(u"Reward changed from %1 "_s.arg(quest->reward));
     quest->reward = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->reward));
+    ch->send(u"to %1.\r\n"_s).arg(quest->reward));
     break;
   case 9: // hint1
     dc_sprintf(field, "%s %s", value, argument);
-    ch->send(QStringLiteral("Hint #1 changed from %s ").arg(quest->hint1));
-    quest->hint1 = QStringLiteral(field);
-    ch->send(QStringLiteral("to %s.\r\n").arg(quest->hint1));
+    ch->send(u"Hint #1 changed from %s "_s.arg(quest->hint1));
+    quest->hint1 = field;
+    ch->send(u"to %s.\r\n"_s.arg(quest->hint1));
     break;
   case 10: // hint2
     dc_sprintf(field, "%s %s", value, argument);
-    ch->send(QStringLiteral("Hint #2 changed from %s ").arg(quest->hint2));
-    quest->hint2 = QStringLiteral(field);
-    ch->send(QStringLiteral("to %s.\r\n").arg(quest->hint2));
+    ch->send(u"Hint #2 changed from %s "_s.arg(quest->hint2));
+    quest->hint2 = field;
+    ch->send(u"to %s.\r\n"_s.arg(quest->hint2));
     break;
   case 11: // hint3
     dc_sprintf(field, "%s %s", value, argument);
-    ch->send(QStringLiteral("Hint #3 changed from %s ").arg(quest->hint3));
-    quest->hint3 = QStringLiteral(field);
-    ch->send(QStringLiteral("to %s.\r\n").arg(quest->hint3));
+    ch->send(u"Hint #3 changed from %s "_s.arg(quest->hint3));
+    quest->hint3 = field;
+    ch->send(u"to %s.\r\n"_s.arg(quest->hint3));
     break;
   case 12: // cost
-    ch->send(QStringLiteral("Cost changed from %1 ").arg(quest->cost));
+    ch->send(u"Cost changed from %1 "_s.arg(quest->cost));
     quest->cost = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->cost));
+    ch->send(u"to %1.\r\n"_s).arg(quest->cost));
     break;
   case 13: // brownie
     if (quest->brownie)
@@ -1420,7 +1382,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Screw up in do_edit_quest, whatsamaddahyou?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eSUCCESS;
@@ -1503,7 +1465,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
     if (!is_number(arg2))
     {
-      owner->do_tell(QStringLiteral("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Sorry, mate. You type buy <number> to specify what you want.."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1558,7 +1520,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
     if (!FOUND)
     {
-      owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Don't have that I'm afraid. Type \"list\" to see my wares."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1579,14 +1541,14 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
         search_char_for_item(ch, obj->item_number, false))
     {
-      owner->do_tell(QStringLiteral("%1 You already have one of those.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 You already have one of those."_s).arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
 
     if (GET_QPOINTS(ch) < (quint32)(obj->obj_flags.cost / 10000))
     {
-      owner->do_tell(QStringLiteral("%1 Come back when you've got the qpoints.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Come back when you've got the qpoints."_s.arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
@@ -1598,7 +1560,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     obj->no_sell_expiration = time(nullptr) + (60 * 60 * 24);
 
     obj_to_char(obj, ch);
-    owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(qPrintable(ch->name())).arg(obj->short_description()).split(' '));
+    owner->do_tell(u"%1 Here's your %2$B$2. Have a nice time with it."_s.arg(qPrintable(ch->name())).arg(obj->short_description()).split(' '));
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::SELL)
@@ -1609,13 +1571,13 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     ObjectPtr obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
     if (!obj)
     {
-      owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 Try that on the kooky meta-physician.."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
     if (!obj->isQuest())
     {
-      owner->do_tell(QStringLiteral("%1 I only buy quest equipment.").arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 I only buy quest equipment."_s).arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1625,14 +1587,14 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       time_t expires = obj->no_sell_expiration;
       if (now < expires)
       {
-        owner->do_tell(QStringLiteral("%1 I won't buy that for another %2 seconds.").arg(qPrintable(ch->name())).arg(expires - now).split(' '));
+        owner->do_tell(u"%1 I won't buy that for another %2 seconds."_s.arg(qPrintable(ch->name())).arg(expires - now).split(' '));
         return ReturnValue::eSUCCESS;
       }
     }
 
     qint32 cost = obj->obj_flags.cost / 10000.0;
 
-    owner->do_tell(QStringLiteral("%1 I'll give you %2 qpoints for that. Thanks for shoppin'.").arg(qPrintable(ch->name())).arg(cost).split(' '));
+    owner->do_tell(u"%1 I'll give you %2 qpoints for that. Thanks for shoppin'."_s.arg(qPrintable(ch->name())).arg(cost).split(' '));
     extract_obj(obj);
     GET_QPOINTS(ch) += cost;
     return ReturnValue::eSUCCESS;

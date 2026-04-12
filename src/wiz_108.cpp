@@ -30,7 +30,7 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  ch->send(QStringLiteral("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
+  ch->send(u"Searching Zone: %1 - %2\r\n"_s.arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
   for (low = curRoom; low > 0; low--)
   {
     if (!DC::getInstance()->rooms.contains(low - 1))
@@ -131,7 +131,7 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
   // }
   // catch(QString errmsg)
   // {
-  //   ch->send(QStringLiteral("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
+  //   ch->send(u"Error encountered while finding zone exits:\r\n%1\r\n"_s.arg(errmsg));
   //   ch->sendln("Ask Rubicon if it needs fixed...");
   //   return ReturnValue::eFAILURE;
   //}
@@ -232,13 +232,13 @@ command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       if (vict != nullptr)
       {
-        ch->send(QStringLiteral("You purloin %s from %s.\r\n").arg(k->short_description).arg(qPrintable(vict->name())));
+        ch->send(u"You purloin %s from %s.\r\n"_s.arg(k->short_description).arg(qPrintable(vict->name())));
         DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s",
                                 qPrintable(ch->name()), k->short_description, qPrintable(vict->name()));
       }
       else
       {
-        ch->send(QStringLiteral("You purloin %1.\r\n").arg(k->short_description()));
+        ch->send(u"You purloin %1.\r\n"_s).arg(k->short_description()));
       }
       move_obj(k, ch);
       return ReturnValue::eSUCCESS;
@@ -282,7 +282,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   argument = one_argument(argument, name);
-  if (!*name) // no arguments. print an informative text
+  if (name.isEmpty()) // no arguments. print an informative text
   {
     ch->sendln("Usage:\r\nset <name> <field> <value>");
 
@@ -327,7 +327,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   argument = one_argument(argument, buf);
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("A field was expected.");
     return ReturnValue::eFAILURE;
@@ -722,7 +722,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 27: // saves
   {
     one_argument(argument, buf2);
-    if (!*buf || !*buf2)
+    if (buf.isEmpty() || buf.isEmpty() 2)
     {
       ch->sendln("Syntax: set <vict> saves <0-5> <num>");
       return ReturnValue::eFAILURE;
@@ -774,9 +774,9 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 32:
   {
-    if (!*buf)
+    if (buf.isEmpty())
     {
-      ch->send(QStringLiteral("Syntax: set <vict> profession <0-%1>\r\n").arg(MAX_PROFESSIONS));
+      ch->send(u"Syntax: set <vict> profession <0-%1>\r\n"_s.arg(MAX_PROFESSIONS));
       return ReturnValue::eFAILURE;
     }
 
@@ -788,7 +788,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (!check_range_valid_and_convert(value, buf, 0, MAX_PROFESSIONS))
     {
-      ch->send(QStringLiteral("Save type be from 0 to %1.\r\n").arg(MAX_PROFESSIONS));
+      ch->send(u"Save type be from 0 to %1.\r\n"_s).arg(MAX_PROFESSIONS));
       return ReturnValue::eFAILURE;
     }
 

@@ -143,7 +143,7 @@ void mobile_activity(void)
     }
     catch (...)
     {
-      DC::getInstance()->logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"error in mobile_activity. dumping core."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -339,7 +339,7 @@ void mobile_activity(void)
           {
             if (!tmp_ch || !ch)
             {
-              DC::getInstance()->logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, DC::LogChannel::LOG_BUG);
+              DC::getInstance()->logentry(u"Null ch or tmp_ch in mobile_action()"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
               break;
             }
             next_aggro = tmp_ch->next_in_room;
@@ -926,7 +926,7 @@ void scavenge(CharacterPtr ch)
             break;
 
           default:
-            DC::getInstance()->logentry(QStringLiteral("Bad switch in mob_act.C"), 0, DC::LogChannel::LOG_BUG);
+            DC::getInstance()->logentry(u"Bad switch in mob_act.C"_s, 0, DC::LogChannel::LOG_BUG);
             break;
 
           } /* end switch */

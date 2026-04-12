@@ -521,7 +521,7 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   taken out!!  if we really don't want it, we can delete this block later.
   */
-  if (!*name && ch->fighting)
+  if (name.isEmpty() && ch->fighting)
   {
     victim = ch->fighting;
   }
@@ -637,7 +637,7 @@ command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!charge_moves(ch, SKILL_SNEAK))
     return ReturnValue::eSUCCESS;
 
-  do_hide(ch, QStringLiteral(""), cmd_t::LOOK);
+  do_hide(ch, u""_s, cmd_t::LOOK);
 
   ch->sendln("You try to move silently for a while.");
 
@@ -667,7 +667,7 @@ command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!(*argument))
   {
     if (ch->master)
-      ch->send(QStringLiteral("You are currently stalking %s.\r\n").arg(qPrintable(ch->master->shortdesc_or_name())));
+      ch->send(u"You are currently stalking %s.\r\n"_s.arg(qPrintable(ch->master->shortdesc_or_name())));
     else
       ch->sendln("Pick a name, any name.");
     return ReturnValue::eFAILURE;
@@ -1013,7 +1013,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
               (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
           {
-            ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj->short_description()));
+            ch->send(u"Whoa!  The %1 poofed into thin air!\r\n"_s.arg(obj->short_description()));
             extract_obj(obj);
           }
           // check for no_trade inside containers
@@ -1027,7 +1027,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
               if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                   (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
               {
-                ch->send(QStringLiteral("Whoa!  The %s inside the %s poofed into thin air!\r\n").arg(qPrintable(loop_obj->short_description())).arg(qPrintable(obj->short_description())));
+                ch->send(u"Whoa!  The %s inside the %s poofed into thin air!\r\n"_s.arg(qPrintable(loop_obj->short_description())).arg(qPrintable(obj->short_description())));
                 extract_obj(loop_obj);
               }
             }
@@ -1220,7 +1220,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
             if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                 (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
             {
-              ch->send(QStringLiteral("Whoa! The %s inside the %s poofed into thin air!\r\n").arg(qPrintable(loop_obj->short_description())).arg(qPrintable(obj->short_description())));
+              ch->send(u"Whoa! The %s inside the %s poofed into thin air!\r\n"_s.arg(qPrintable(loop_obj->short_description())).arg(qPrintable(obj->short_description())));
               extract_obj(loop_obj);
             }
           }
@@ -1465,7 +1465,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*type)
+  if (type.isEmpty())
   {
     ch->sendln("Pick what?");
   }
@@ -1564,13 +1564,13 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
 
-      QString door_keyword = QStringLiteral("door");
+      QString door_keyword = u"door"_s;
       if (EXIT(ch, door)->keyword)
       {
         door_keyword = fname(EXIT(ch, door)->keyword);
       }
 
-      ch->sendln(QStringLiteral("You open the %1.").arg(door_keyword));
+      ch->sendln(u"You open the %1."_s).arg(door_keyword));
       auto rc = ch->do_open({door_keyword, dir});
     }
   }
@@ -1638,7 +1638,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
     argument = one_argument(argument, vict_name);
 
-    if (!*vict_name)
+    if (vict.isEmpty() _name)
     {
       ch->sendln("To who?");
       return ReturnValue::eFAILURE;
@@ -1662,7 +1662,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Whoops!  You dropped the coins!");
       if (ch->isImmortalPlayer())
       {
-        special_log(QString(QStringLiteral("%1 tries to slip %2 coins to %3 and drops them in room %4!")).arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
+        special_log(QString(u"%1 tries to slip %2 coins to %3 and drops them in room %4!"_s).arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
       }
 
       act("$n tries to slip you some coins, but $e accidentally drops "
@@ -1683,11 +1683,11 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     // Success
     else
     {
-      ch->send(QStringLiteral("You slip %d coins to %s.\r\n").arg(amount).arg(qPrintable(vict->name())));
+      ch->send(u"You slip %d coins to %s.\r\n"_s.arg(amount).arg(qPrintable(vict->name())));
 
       if (ch->isImmortalPlayer())
       {
-        special_log(QString(QStringLiteral("%1 slips %2 coins to %3 in room %4!")).arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
+        special_log(QString(u"%1 slips %2 coins to %3 in room %4!"_s).arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
       }
 
       dc_sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
@@ -1720,7 +1720,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = one_argument(argument, vict_name);
 
-  if (!*obj_name || !*vict_name)
+  if (obj.isEmpty() _name || vict.isEmpty() _name)
   {
     ch->sendln("Slip what to who?");
     return ReturnValue::eFAILURE;
@@ -1858,7 +1858,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (ch->isImmortalPlayer())
     {
-      special_log(QString(QStringLiteral("%1 slips %2 to %3 and fumbles it in room %4!")).arg(ch->name()).arg(obj->short_description()).arg(vict->name()).arg(ch->in_room));
+      special_log(QString(u"%1 slips %2 to %3 and fumbles it in room %4!"_s).arg(ch->name()).arg(obj->short_description()).arg(vict->name()).arg(ch->in_room));
     }
 
     move_obj(obj, ch->in_room);
@@ -1878,10 +1878,10 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ch->isImmortalPlayer())
     {
-      special_log(QString(QStringLiteral("%1 slips %2 to %3 in room %4.")).arg(ch->name()).arg(obj->short_description()).arg(vict->name()).arg(ch->in_room));
+      special_log(QString(u"%1 slips %2 to %3 in room %4."_s)).arg(ch->name()).arg(obj->short_description()).arg(vict->name()).arg(ch->in_room));
     }
 
-    logobjects(QStringLiteral("%1 slips %2 to %3").arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(vict->name())));
+    logobjects(u"%1 slips %2 to %3"_s.arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(vict->name())));
 
     move_obj(obj, vict);
     act_to_character("You slip $p to $N.", ch, obj, vict, 0);
@@ -2058,7 +2058,7 @@ command_return_t do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
   one_argument(argument, arg);
   CharacterPtr victim;
 
-  if (!*arg && ch->fighting)
+  if (arg.isEmpty() && ch->fighting)
     victim = ch->fighting;
   else
     victim = ch->get_char_room_vis(arg);
@@ -2226,7 +2226,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim)
   {
-    if (victim == ch && !*item)
+    if (victim == ch && item.isEmpty())
     {
       ch->sendln("You're worth a million bucks, baby.");
       return ReturnValue::eFAILURE;
@@ -2308,16 +2308,16 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (weight)
       {
-        ch->sendln(QString(QStringLiteral("After some consideration, you estimate the weight of %1 to be %2.")).arg(GET_OBJ_SHORT(obj)).arg(appraised));
+        ch->sendln(QString(u"After some consideration, you estimate the weight of %1 to be %2."_s)).arg(GET_OBJ_SHORT(obj)).arg(appraised));
       }
       else if (found)
       {
-        ch->sendln(QString(QStringLiteral("After some consideration, you estimate the value of %1 to be %2.")).arg(GET_OBJ_SHORT(obj)).arg(appraised));
+        ch->sendln(QString(u"After some consideration, you estimate the value of %1 to be %2."_s)).arg(GET_OBJ_SHORT(obj)).arg(appraised));
       }
     }
     else if (victim)
     {
-      ch->sendln(QString(QStringLiteral("After some consideration, you estimate the amount of $B$5gold$R %1 is carrying to be %2.")).arg(victim->name()).arg(appraised));
+      ch->sendln(QString(u"After some consideration, you estimate the amount of $B$5gold$R %1 is carrying to be %2."_s).arg(victim->name()).arg(appraised));
     }
     WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 1.5));
   }

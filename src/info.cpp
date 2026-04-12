@@ -474,11 +474,11 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
         {
           if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
           {
-            buffer.append(QStringLiteral(" %1 [%2]").arg(i->title_).arg(clan->name()));
+            buffer.append(u" %1 [%2]"_s.arg(i->title_).arg(clan->name()));
           }
           else
           {
-            buffer.append(QStringLiteral(" the %1 [%2]").arg(races[(qint32)i->race].singular_name).arg(clan->name()));
+            buffer.append(u" the %1 [%2]"_s.arg(races[(qint32)i->race].singular_name).arg(clan->name()));
           }
         }
         else
@@ -491,7 +491,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
           else
           {
             buffer.append(" the ");
-            buffer.append(QStringLiteral("%1").arg(races[(qint32)i->race].singular_name));
+            buffer.append(u"%1"_s.arg(races[(qint32)i->race].singular_name));
           }
         }
       }
@@ -626,7 +626,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
 
     buffer = qPrintable(i->shortdesc_or_name());
 
-    buffer.append(QStringLiteral(" the %1").arg(races[(qint32)i->race].singular_name));
+    buffer.append(u" the %1"_s.arg(races[(qint32)i->race].singular_name));
 
     if (percent >= 100)
       buffer.append(" is in excellent condition.\r\n");
@@ -736,7 +736,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
         i = conn->character;
       if (!CAN_SEE(this, i))
         continue;
-      sendln(QStringLiteral("\r\n%1").arg(i->name()));
+      sendln(u"\r\n%1"_s.arg(i->name()));
       sendln("----------");
       do_botcheck(i->name().split(' '));
     }
@@ -745,21 +745,21 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
   if (victim == nullptr)
   {
-    sendln(QStringLiteral("Unable to find %1.").arg(name));
+    sendln(u"Unable to find %1."_s).arg(name));
     return ReturnValue::eFAILURE;
   }
 
   if (victim->getLevel() > this->getLevel())
   {
     this->sendln("Unable to show information.");
-    this->send(QStringLiteral("%s is a higher level than you.\r\n").arg(qPrintable(victim->name())));
+    this->send(u"%s is a higher level than you.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer())
   {
     this->sendln("Unable to show information.");
-    this->send(QStringLiteral("%s is a mob.\r\n").arg(qPrintable(victim->name())));
+    this->send(u"%s is a mob.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -768,7 +768,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
   if (victim->player->lastseen->size() == 0)
   {
-    this->send(QStringLiteral("%s has not seen any mobs recently.\r\n").arg(qPrintable(victim->name())));
+    this->send(u"%s has not seen any mobs recently.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -795,7 +795,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
     if (nr >= 0)
     {
-      this->send(QStringLiteral("[%4dms] [%5d] [%s]\r\n").arg(ms).arg(DC::getInstance()->mob_index[nr].vnum()).arg(qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description())));
+      this->send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(DC::getInstance()->mob_index[nr].vnum()).arg(qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description())));
     }
   }
 
@@ -909,7 +909,7 @@ QString Character::getStatDiff(qint32 base, qint32 random, bool swapcolors)
   }
 
   // original value
-  buf2 = QStringLiteral("%1").arg(base);
+  buf2 = u"%1"_s.arg(base);
   buf += buf2;
 
   if (random - base > 0)
@@ -917,11 +917,11 @@ QString Character::getStatDiff(qint32 base, qint32 random, bool swapcolors)
     // if postive show "+ difference"
     if (swapcolors)
     {
-      buf2 = QStringLiteral("%1+%2$R").arg(color_bad).arg(random - base);
+      buf2 = u"%1+%2$R"_s.arg(color_bad).arg(random - base);
     }
     else
     {
-      buf2 = QStringLiteral("%1+%2$R").arg(color_good).arg(random - base);
+      buf2 = u"%1+%2$R"_s.arg(color_good).arg(random - base);
     }
     buf += buf2;
   }
@@ -930,11 +930,11 @@ QString Character::getStatDiff(qint32 base, qint32 random, bool swapcolors)
     // if negative show "- difference"
     if (swapcolors)
     {
-      buf2 = QStringLiteral("%s%d$R").arg(color_good).arg(random - base);
+      buf2 = u"%s%d$R"_s.arg(color_good).arg(random - base);
     }
     else
     {
-      buf2 = QStringLiteral("%1%2$R").arg(color_bad).arg(random - base);
+      buf2 = u"%1%2$R"_s.arg(color_bad).arg(random - base);
     }
     buf += buf2;
   }
@@ -966,37 +966,37 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
 
   if (!obj->short_description().isEmpty())
   {
-    ch->send(QStringLiteral("$3Short description: $R%1\r\n").arg(obj->short_description()));
+    ch->send(u"$3Short description: $R%1\r\n"_s.arg(obj->short_description()));
   }
   else
   {
     ch->sendln("$3Short description: $R");
   }
 
-  ch->send(QStringLiteral("$3Keywords: '$R%1$3'$R\r\n").arg(obj->name()));
+  ch->send(u"$3Keywords: '$R%1$3'$R\r\n"_s.arg(obj->name()));
 
   sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
-  ch->send(QStringLiteral("$3Item type: $R%s\r\n").arg(buf2));
+  ch->send(u"$3Item type: $R%s\r\n"_s.arg(buf2));
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-  ch->send(QStringLiteral("$3Extra flags: $R%1\r\n").arg(buf));
+  ch->send(u"$3Extra flags: $R%1\r\n"_s.arg(buf));
 
   sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
-  ch->send(QStringLiteral("$3More flags: $R%s\r\n").arg(buf2));
+  ch->send(u"$3More flags: $R%s\r\n"_s.arg(buf2));
 
   if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isSet(obj->obj_flags.more_flags, ITEM_NPC_CORPSE) || isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE) || isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED))
   {
-    ch->send(QStringLiteral("$3Owner: $R%s\r\n").arg(qPrintable(obj->getOwner())));
+    ch->send(u"$3Owner: $R%s\r\n"_s.arg(qPrintable(obj->getOwner())));
   }
 
-  ch->send(QStringLiteral("$3Worn on: $R%1\r\n").arg(QFlagsToStrings(obj->obj_flags.wear_flags)));
+  ch->send(u"$3Worn on: $R%1\r\n"_s.arg(QFlagsToStrings(obj->obj_flags.wear_flags)));
 
   sprintbit(obj->obj_flags.size, Object::size_bits, buf);
-  ch->send(QStringLiteral("$3Worn by: $R%1\r\n").arg(buf));
+  ch->send(u"$3Worn by: $R%1\r\n"_s.arg(buf));
 
-  ch->send(QStringLiteral("$3Level: $R%1\r\n").arg(obj->obj_flags.eq_level));
-  ch->send(QStringLiteral("$3Weight: $R%1\r\n").arg(obj->obj_flags.weight));
-  ch->send(QStringLiteral("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
+  ch->send(u"$3Level: $R%1\r\n"_s.arg(obj->obj_flags.eq_level));
+  ch->send(u"$3Weight: $R%1\r\n"_s.arg(obj->obj_flags.weight));
+  ch->send(u"$3Value: $R%1\r\n"_s.arg(obj->obj_flags.cost));
 
   const ObjectPtr vobj = {};
   if (obj->item_number >= 0)
@@ -1017,13 +1017,13 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
 
   case ITEM_SCROLL:
   case ITEM_POTION:
-    ch->send(QStringLiteral("$3Level $R%d ").arg(obj->obj_flags.value[0]));
+    ch->send(u"$3Level $R%d "_s.arg(obj->obj_flags.value[0]));
 
     if (vobj != nullptr)
     {
-      ch->send(QStringLiteral("("));
+      ch->send(u"("_s);
       showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
-      ch->send(QStringLiteral(") "));
+      ch->send(u") "_s);
     }
     ch->sendln("$3spells of:$R");
 
@@ -1066,22 +1066,22 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     break;
 
   case ITEM_WEAPON:
-    ch->send(QStringLiteral("$3Damage Dice are '$R%dD%d$3'$R").arg(obj->obj_flags.value[1]).arg(       obj->obj_flags.value[2]);
+    ch->send(u"$3Damage Dice are '$R%dD%d$3'$R"_s.arg(obj->obj_flags.value[1]).arg(       obj->obj_flags.value[2]);
 
     if (vobj != nullptr)
     {
-      ch->send(QStringLiteral(" ("));
+      ch->send(u" ("_s);
       showStatDiff(ch, vobj->obj_flags.value[1], obj->obj_flags.value[1]);
-      ch->send(QStringLiteral("D"));
+      ch->send(u"D"_s);
       showStatDiff(ch, vobj->obj_flags.value[2], obj->obj_flags.value[2]);
-      ch->send(QStringLiteral(")"));
+      ch->send(u")"_s);
     }
     ch->sendln("");
 
     qint32 get_weapon_damage_type(ObjectPtr  wielded);
     bits = get_weapon_damage_type(obj) - 1000;
     extern QStringList strs_damage_types;
-    ch->send(QStringLiteral("$3Damage type$R: %s\r\n").arg(strs_damage_types[bits]));
+    ch->send(u"$3Damage type$R: %s\r\n"_s.arg(strs_damage_types[bits]));
     break;
 
   case ITEM_INSTRUMENT:
@@ -1126,9 +1126,9 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     }
     if (isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
     {
-      ch->send(QStringLiteral("-%d").arg(obj->obj_flags.value[1]));
+      ch->send(u"-%d"_s.arg(obj->obj_flags.value[1]));
     }
-    ch->send(QStringLiteral(")$3     Resistance to damage is $R%d\r\n").arg(obj->obj_flags.value[2]));
+    ch->send(u")$3     Resistance to damage is $R%d\r\n"_s.arg(obj->obj_flags.value[2]));
     break;
   }
 
@@ -1155,14 +1155,14 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
         dc_strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
       else
         dc_strcpy(buf2, "Invalid");
-      ch->send(QStringLiteral("    $3Affects : $R%s$3 By $R%d").arg(buf2).arg(obj->affected[i].modifier));
+      ch->send(u"    $3Affects : $R%s$3 By $R%d"_s.arg(buf2).arg(obj->affected[i].modifier));
 
       if (vobj != nullptr &&
           i < vobj->num_affects &&
           !vobj->affected.isEmpty() &&
           vobj->affected[i].location == obj->affected[i].location)
       {
-        ch->send(QStringLiteral(" ("));
+        ch->send(u" ("_s);
         // Swap color for ARMOR so lower values use "good" color
         if (vobj->affected[i].location == 17)
         {
@@ -1173,10 +1173,10 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
           showStatDiff(ch, vobj->affected[i].modifier, obj->affected[i].modifier);
         }
 
-        ch->send(QStringLiteral(")"));
+        ch->send(u")"_s);
       }
 
-      ch->send(QStringLiteral("\r\n").arg(buf));
+      ch->send(u"\r\n"_s.arg(buf));
     }
   }
 
@@ -1228,7 +1228,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      send(QStringLiteral("You could not find %1 in your inventory, among your equipment or in this room.\r\n").arg(arg1));
+      send(u"You could not find %1 in your inventory, among your equipment or in this room.\r\n"_s).arg(arg1));
     }
   }
 
@@ -1434,7 +1434,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
               if (NOT_KEYRING(tmp_object))
               {
-                ch->send(QStringLiteral("(%sfull) : \r\n").arg(fullness[temp]));
+                ch->send(u"(%sfull) : \r\n"_s.arg(fullness[temp]));
               }
               else
               {
@@ -1679,12 +1679,12 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                    sector_buf);
         sprintbit((qint32)DC::getInstance()->world[ch->in_room].room_flags, room_bits,
                   rflag_buf);
-        ch->send(QStringLiteral("\r\nLight[%d] <%s> [ %s]").arg(DARK_AMOUNT(ch->in_room)).arg(sector_buf).arg(rflag_buf));
+        ch->send(u"\r\nLight[%d] <%s> [ %s]"_s.arg(DARK_AMOUNT(ch->in_room)).arg(sector_buf).arg(rflag_buf));
         if (DC::getInstance()->world[ch->in_room].temp_room_flags)
         {
           sprintbit((qint32)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
                     tempflag_buf);
-          ch->send(QStringLiteral(" [ %1]").arg(tempflag_buf));
+          ch->send(u" [ %1]"_s.arg(tempflag_buf));
         }
       }
 
@@ -1782,7 +1782,7 @@ command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Examine what?");
     return ReturnValue::eFAILURE;
@@ -1915,12 +1915,12 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      experience_needed = QStringLiteral("%L1").arg(exp_needed);
+      experience_needed = u"%L1"_s.arg(exp_needed);
     }
 
     qint32 instrument_combat{}, instrument_non_combat = {};
     get_instrument_bonus(ch, instrument_combat, instrument_non_combat);
-    ch->sendln(QStringLiteral("($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\r\n"
+    ch->sendln(u"($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\r\n"_s
                               "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\r\n"
                               "|o|  $3Armor$7:   %1   $3Pkills$7:  %2  |~|  $3Items Carried$7:  %3 |/|\r\n"
                               "|\\|  $3BonusHit$7: %4   $3PDeaths$7: %5  |/|  $3Weight Carried$7: %6 |~|\r\n"
@@ -1933,29 +1933,29 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
                               "($5:$7)===================================($5:$7)===================================($5:$7)")
                    .arg(GET_ARMOR(ch), 5)
                    .arg(GET_PKILLS(ch), 5)
-                   .arg(QStringLiteral("%1/%2").arg(IS_CARRYING_N(ch)).arg(CAN_CARRY_N(ch)), 16)
-                   .arg(QStringLiteral("%1%2").arg(to_hit > 0 ? "+" : "").arg(to_hit), 4)
+                   .arg(u"%1/%2"_s.arg(IS_CARRYING_N(ch)).arg(CAN_CARRY_N(ch)), 16)
+                   .arg(u"%1%2"_s.arg(to_hit > 0 ? "+" : "").arg(to_hit), 4)
                    .arg(QString::number(GET_PDEATHS(ch)), 5)
-                   .arg(QStringLiteral("%1/%2").arg(IS_CARRYING_W(ch)).arg(CAN_CARRY_W(ch)), 16)
-                   .arg(QStringLiteral("%1%2").arg(to_dam > 0 ? "+" : "").arg(to_dam), 4)                                                   // +4d
-                   .arg(QStringLiteral("%1%2").arg(spell_dam > 0 ? "+" : "").arg(spell_dam), 5)                                             //+5d
-                   .arg(ch->exp, 18)                                                                                                        // -18s
-                   .arg(QStringLiteral("%1%2").arg(instrument_combat > 0 ? "+" : "").arg(instrument_combat), 4)                             //+4
-                   .arg(QStringLiteral("%1%2").arg(instrument_non_combat > 0 ? "+" : "").arg(instrument_non_combat), 5)                     //+5
-                   .arg(experience_needed, 18)                                                                                              // -18s
-                   .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_FIRE) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_FIRE)), 3)     //+3
-                   .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_COLD) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_COLD)), 3)     //+3
-                   .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_ENERGY) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ENERGY)), 3) //+3
+                   .arg(u"%1/%2"_s.arg(IS_CARRYING_W(ch)).arg(CAN_CARRY_W(ch)), 16)
+                   .arg(u"%1%2"_s.arg(to_dam > 0 ? "+" : "").arg(to_dam), 4)                                                   // +4d
+                   .arg(u"%1%2"_s.arg(spell_dam > 0 ? "+" : "").arg(spell_dam), 5)                                             //+5d
+                   .arg(ch->exp, 18)                                                                                           // -18s
+                   .arg(u"%1%2"_s.arg(instrument_combat > 0 ? "+" : "").arg(instrument_combat), 4)                             //+4
+                   .arg(u"%1%2"_s.arg(instrument_non_combat > 0 ? "+" : "").arg(instrument_non_combat), 5)                     //+5
+                   .arg(experience_needed, 18)                                                                                 // -18s
+                   .arg(u"%1%2"_s.arg(get_saves(ch, SAVE_TYPE_FIRE) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_FIRE)), 3)     //+3
+                   .arg(u"%1%2"_s.arg(get_saves(ch, SAVE_TYPE_COLD) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_COLD)), 3)     //+3
+                   .arg(u"%1%2"_s.arg(get_saves(ch, SAVE_TYPE_ENERGY) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ENERGY)), 3) //+3
                    .arg(ch->getGold(), 26)
-                   .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_ACID) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ACID)), 3)     //+3
-                   .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_MAGIC) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_MAGIC)), 3)   //+3
-                   .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_POISON) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_POISON)), 3) //+3
-                   .arg(GET_BANK(ch), 26)                                                                                                   // -25s
-                   .arg(QStringLiteral("%1%2").arg(ch->melee_mitigation > 0 ? "+" : "").arg(ch->melee_mitigation), 3)                       // +3
-                   .arg(QStringLiteral("%1%2").arg(ch->spell_mitigation > 0 ? "+" : "").arg(ch->spell_mitigation), 3)                       // +3
-                   .arg(QStringLiteral("%1%2").arg(ch->song_mitigation > 0 ? "+" : "").arg(ch->song_mitigation), 3)                         // +3
-                   .arg(GET_QPOINTS(ch), 5)                                                                                                 // -25s
-                   .arg(GET_PLATINUM(ch), 7));                                                                                              // -6d
+                   .arg(u"%1%2"_s.arg(get_saves(ch, SAVE_TYPE_ACID) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ACID)), 3)     //+3
+                   .arg(u"%1%2"_s.arg(get_saves(ch, SAVE_TYPE_MAGIC) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_MAGIC)), 3)   //+3
+                   .arg(u"%1%2"_s.arg(get_saves(ch, SAVE_TYPE_POISON) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_POISON)), 3) //+3
+                   .arg(GET_BANK(ch), 26)                                                                                      // -25s
+                   .arg(u"%1%2"_s.arg(ch->melee_mitigation > 0 ? "+" : "").arg(ch->melee_mitigation), 3)                       // +3
+                   .arg(u"%1%2"_s.arg(ch->spell_mitigation > 0 ? "+" : "").arg(ch->spell_mitigation), 3)                       // +3
+                   .arg(u"%1%2"_s.arg(ch->song_mitigation > 0 ? "+" : "").arg(ch->song_mitigation), 3)                         // +3
+                   .arg(GET_QPOINTS(ch), 5)                                                                                    // -25s
+                   .arg(GET_PLATINUM(ch), 7));                                                                                 // -6d
   }
   else
     ch->sendln("($5:$7)===================================($5:$7)==================================($5:$7)");
@@ -2038,72 +2038,72 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       case BASE_SETS + SET_RAGER:
         if (aff->location == 0)
         {
-          aff_name = QStringLiteral("Battlerager's Fury");
+          aff_name = u"Battlerager's Fury"_s;
         }
         break;
       case BASE_SETS + SET_RAGER2:
         if (aff->location == 0)
         {
-          aff_name = QStringLiteral("Battlerager's Fury");
+          aff_name = u"Battlerager's Fury"_s;
         }
         break;
       case BASE_SETS + SET_MOSS:
         if (aff->location == 0)
-          aff_name = QStringLiteral("infravision");
+          aff_name = u"infravision"_s;
         break;
       case Character::PLAYER_CANTQUIT:
-        aff_name = QStringLiteral("CANTQUIT");
+        aff_name = u"CANTQUIT"_s;
         break;
       case Character::PLAYER_OBJECT_THIEF:
-        aff_name = QStringLiteral("DIRTY_THIEF/CANT_QUIT");
+        aff_name = u"DIRTY_THIEF/CANT_QUIT"_s;
         break;
       case Character::PLAYER_GOLD_THIEF:
-        aff_name = QStringLiteral("GOLD_THIEF/CANT_QUIT");
+        aff_name = u"GOLD_THIEF/CANT_QUIT"_s;
         break;
       case SKILL_HARM_TOUCH:
-        aff_name = QStringLiteral("harmtouch reuse timer");
+        aff_name = u"harmtouch reuse timer"_s;
         break;
       case SKILL_LAY_HANDS:
-        aff_name = QStringLiteral("layhands reuse timer");
+        aff_name = u"layhands reuse timer"_s;
         break;
       case SKILL_QUIVERING_PALM:
-        aff_name = QStringLiteral("quiver reuse timer");
+        aff_name = u"quiver reuse timer"_s;
         break;
       case SKILL_BLOOD_FURY:
-        aff_name = QStringLiteral("blood fury reuse timer");
+        aff_name = u"blood fury reuse timer"_s;
         break;
       case SKILL_FEROCITY_TIMER:
-        aff_name = QStringLiteral("ferocity reuse timer");
+        aff_name = u"ferocity reuse timer"_s;
         break;
       case SKILL_DECEIT_TIMER:
-        aff_name = QStringLiteral("deceit reuse timer");
+        aff_name = u"deceit reuse timer"_s;
         break;
       case SKILL_TACTICS_TIMER:
-        aff_name = QStringLiteral("tactics reuse timer");
+        aff_name = u"tactics reuse timer"_s;
         break;
       case SKILL_CLANAREA_CLAIM:
-        aff_name = QStringLiteral("clanarea claim timer");
+        aff_name = u"clanarea claim timer"_s;
         break;
       case SKILL_CLANAREA_CHALLENGE:
-        aff_name = QStringLiteral("clanarea challenge timer");
+        aff_name = u"clanarea challenge timer"_s;
         break;
       case SKILL_CRAZED_ASSAULT:
         if (dc_strcmp(apply_types[(qint32)aff->location], "HITROLL"))
-          aff_name = QStringLiteral("crazed assault reuse timer");
+          aff_name = u"crazed assault reuse timer"_s;
         break;
       case SPELL_IMMUNITY:
-        aff_name = QStringLiteral("immunity");
+        aff_name = u"immunity"_s;
         modifyOutput = true;
         break;
       case SKILL_NAT_SELECT:
-        aff_name = QStringLiteral("natural selection");
+        aff_name = u"natural selection"_s;
         modifyOutput = true;
         break;
       case SKILL_BREW_TIMER:
-        aff_name = QStringLiteral("brew timer");
+        aff_name = u"brew timer"_s;
         break;
       case SKILL_SCRIBE_TIMER:
-        aff_name = QStringLiteral("scribe timer");
+        aff_name = u"scribe timer"_s;
         break;
       case CONC_LOSS_FIXER:
         aff_name = {}; // We don't want this showing up in score
@@ -2336,8 +2336,8 @@ command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isImmortalPlayer())
   {
-    ch->send(QStringLiteral("Pressure: %4d  Change: %d (- = worse)\r\n").arg(weather_info.pressure).arg(weather_info.change));
-    ch->send(QStringLiteral("Sky: %9s  Sunlight: %d\r\n").arg(sky_look[weather_info.sky]).arg(weather_info.sunlight));
+    ch->send(u"Pressure: %4d  Change: %d (- = worse)\r\n"_s.arg(weather_info.pressure).arg(weather_info.change));
+    ch->send(u"Sky: %9s  Sunlight: %d\r\n"_s.arg(sky_look[weather_info.sky]).arg(weather_info.sunlight));
   }
   return ReturnValue::eSUCCESS;
 }
@@ -2432,12 +2432,12 @@ command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
     total++;
   }
 
-  ch->send(QStringLiteral("There are %d visible players connected, %d of which are immortals.\r\n").arg(total).arg(immortal));
-  ch->send(QStringLiteral("%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\r\n").arg(clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER]).arg(clss[CLASS_THIEF]).arg(clss[CLASS_BARBARIAN]).arg(clss[CLASS_MONK]));
-  ch->send(QStringLiteral("%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\r\n").arg(clss[CLASS_PALADIN]).arg(clss[CLASS_ANTI_PAL]).arg(clss[CLASS_BARD]).arg(clss[CLASS_DRUID]).arg(clss[CLASS_RANGER]));
-  ch->send(QStringLiteral("%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\r\n").arg(race[RACE_HUMAN], race[RACE_ELVEN]).arg(race[RACE_DWARVEN]).arg(race[RACE_HOBBIT]).arg(race[RACE_PIXIE]));
-  ch->send(QStringLiteral("%d ogres, %d gnomes, %d orcs, %d trolls.\r\n").arg(race[RACE_GIANT]).arg(race[RACE_GNOME]).arg(race[RACE_ORC]).arg(race[RACE_TROLL]));
-  ch->send(QStringLiteral("The maximum number of players since last reboot was %d.").arg(max_who));
+  ch->send(u"There are %d visible players connected, %d of which are immortals.\r\n"_s).arg(total).arg(immortal));
+  ch->send(u"%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\r\n"_s).arg(clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER]).arg(clss[CLASS_THIEF]).arg(clss[CLASS_BARBARIAN]).arg(clss[CLASS_MONK]));
+  ch->send(u"%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\r\n"_s).arg(clss[CLASS_PALADIN]).arg(clss[CLASS_ANTI_PAL]).arg(clss[CLASS_BARD]).arg(clss[CLASS_DRUID]).arg(clss[CLASS_RANGER]));
+  ch->send(u"%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\r\n"_s).arg(race[RACE_HUMAN], race[RACE_ELVEN]).arg(race[RACE_DWARVEN]).arg(race[RACE_HOBBIT]).arg(race[RACE_PIXIE]));
+  ch->send(u"%d ogres, %d gnomes, %d orcs, %d trolls.\r\n"_s).arg(race[RACE_GIANT]).arg(race[RACE_GNOME]).arg(race[RACE_ORC]).arg(race[RACE_TROLL]));
+  ch->send(u"The maximum number of players since last reboot was %d."_s.arg(max_who));
   return ReturnValue::eSUCCESS;
 }
 
@@ -2619,7 +2619,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
     dc_strcat(buf2, "\r\n");
   }
 
-  if (!*buf2)
+  if (buf.isEmpty() 2)
     ch->sendln("Couldn't find any such OBJECT.");
   else
     page_string(ch->desc, buf2, 1);
@@ -2678,7 +2678,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
     dc_strcat(buf2, buf);
   }
 
-  if (!*buf2)
+  if (buf.isEmpty() 2)
     ch->sendln("Couldn't find any MOBS by that NAME.");
   else
     page_string(ch->desc, buf2, 1);
@@ -2824,7 +2824,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       }
     }
 
-    ch->send(QStringLiteral("As far as armor goes, %s %s\r\n").arg(qPrintable(victim->shortdesc_or_name())).arg(ac_messages[x]));
+    ch->send(u"As far as armor goes, %s %s\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())).arg(ac_messages[x]));
   }
 
   /* HIT POINTS */
@@ -2834,7 +2834,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (victim->isPlayer() && victim->getLevel() > IMMORTAL)
     {
-      ch->send(QStringLiteral("Compared to your hps, %s can definitely take anything you can dish out.\r\n").arg(qPrintable(victim->shortdesc_or_name())));
+      ch->send(u"Compared to your hps, %s can definitely take anything you can dish out.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())));
     }
     else
     {
@@ -2864,7 +2864,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
           }
         }
 
-        ch->send(QStringLiteral("Compared to your hps, %s %s.\r\n").arg(qPrintable(victim->shortdesc_or_name())).arg(hplow_messages[x]));
+        ch->send(u"Compared to your hps, %s %s.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())).arg(hplow_messages[x]));
       }
       else
       {
@@ -2891,7 +2891,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
           }
         }
 
-        ch->send(QStringLiteral("Compared to your hps, %s %s.\r\n").arg(qPrintable(victim->shortdesc_or_name())).arg(hphigh_messages[x]));
+        ch->send(u"Compared to your hps, %s %s.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())).arg(hphigh_messages[x]));
       }
     }
 
@@ -2960,7 +2960,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
 
-      ch->send(QStringLiteral("Average damage: %s %s.\r\n").arg(qPrintable(victim->shortdesc_or_name())).arg(dam_messages[x]));
+      ch->send(u"Average damage: %s %s.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())).arg(dam_messages[x]));
     }
   }
 
@@ -3012,7 +3012,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
 
-      ch->send(QStringLiteral("Chances of stealing: %s\r\n").arg(thief_messages[x]));
+      ch->send(u"Chances of stealing: %s\r\n"_s.arg(thief_messages[x]));
     }
   }
   /* Level Comparison */
@@ -3048,19 +3048,19 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
         GET_CLASS(victim) == CLASS_BARBARIAN ||
         GET_CLASS(victim) == CLASS_MONK ||
         GET_CLASS(victim) == CLASS_BARD)
-      ch->send(QStringLiteral("%s appears to be a trained fighter.\r\n").arg(qPrintable(victim->shortdesc_or_name())));
+      ch->send(u"%s appears to be a trained fighter.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
     else if (GET_CLASS(victim) == CLASS_MAGIC_USER ||
              GET_CLASS(victim) == CLASS_CLERIC ||
              GET_CLASS(victim) == CLASS_DRUID ||
              GET_CLASS(victim) == CLASS_PSIONIC ||
              GET_CLASS(victim) == CLASS_NECROMANCER)
-      ch->send(QStringLiteral("%s appears to be trained in mystical arts.\r\n").arg(qPrintable(victim->shortdesc_or_name())));
+      ch->send(u"%s appears to be trained in mystical arts.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
     else if (GET_CLASS(victim) == CLASS_ANTI_PAL ||
              GET_CLASS(victim) == CLASS_PALADIN ||
              GET_CLASS(victim) == CLASS_RANGER)
-      ch->send(QStringLiteral("%s appears to have training in both combat and magic.\r\n").arg(qPrintable(victim->shortdesc_or_name())));
+      ch->send(u"%s appears to have training in both combat and magic.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
     else if (GET_CLASS(victim))
-      ch->send(QStringLiteral("%s appears to have training, but you are unfamiliar with what.\r\n").arg(qPrintable(victim->shortdesc_or_name())));
+      ch->send(u"%s appears to have training, but you are unfamiliar with what.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())));
     else
       ch->sendln("You've seen stray dogs that were better trained.");
   }
@@ -3099,7 +3099,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (CAN_SEE(ch, vict) && ch != vict)
     {
-      ch->send(QStringLiteral("%35s -- %s\r\n").arg(qPrintable(vict->shortdesc_or_name())).arg("Right Here"));
+      ch->send(u"%35s -- %s\r\n"_s.arg(qPrintable(vict->shortdesc_or_name())).arg("Right Here"));
     }
   }
 
@@ -3112,7 +3112,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
       if (isSet(room->room_flags, NO_SCAN))
       {
-        ch->send(QStringLiteral("%35s -- a little bit %s\r\n", "It's too hard to see!").arg(possibilities[i]));
+        ch->send(u"%35s -- a little bit %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
       }
       else
         for (vict = room->people; vict; vict = vict->next_in_room)
@@ -3127,7 +3127,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
 
             if (skill_success(ch, nullptr, SKILL_SCAN))
             {
-              ch->send(QStringLiteral("%35s -- a little bit %s\r\n").arg(qPrintable(vict->shortdesc_or_name())).arg(possibilities[i]));
+              ch->send(u"%35s -- a little bit %s\r\n"_s.arg(qPrintable(vict->shortdesc_or_name())).arg(possibilities[i]));
             }
           }
         }
@@ -3142,7 +3142,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
         room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
         if (isSet(room->room_flags, NO_SCAN))
         {
-          ch->send(QStringLiteral("%35s -- a ways off %s\r\n", "It's too hard to see!").arg(possibilities[i]));
+          ch->send(u"%35s -- a ways off %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
         }
         else
           for (vict = room->people; vict; vict = vict->next_in_room)
@@ -3157,7 +3157,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
 
               if (skill_success(ch, nullptr, SKILL_SCAN, -10))
               {
-                ch->sendln(QStringLiteral("%35s -- a ways off %s").arg(qPrintable(vict->shortdesc_or_name())).arg(possibilities[i]));
+                ch->sendln(u"%35s -- a ways off %s"_s.arg(qPrintable(vict->shortdesc_or_name())).arg(possibilities[i]));
               }
             }
           }
@@ -3170,7 +3170,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
             room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
             if (isSet(room->room_flags, NO_SCAN))
             {
-              ch->send(QStringLiteral("%35s -- extremely far off %s\r\n", "It's too hard to see!").arg(possibilities[i]));
+              ch->send(u"%35s -- extremely far off %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
             }
             else
               for (vict = room->people; vict; vict = vict->next_in_room)
@@ -3185,7 +3185,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
 
                   if (skill_success(ch, nullptr, SKILL_SCAN, -20))
                   {
-                    ch->sendln(QStringLiteral("%35s -- extremely far off %s").arg(qPrintable(vict->shortdesc_or_name())).arg(possibilities[i]));
+                    ch->sendln(u"%35s -- extremely far off %s"_s.arg(qPrintable(vict->shortdesc_or_name())).arg(possibilities[i]));
                   }
                 }
               }
@@ -3260,11 +3260,11 @@ command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
 
     if (experience_remaining < 0)
     {
-      send(QStringLiteral("You have enough experience to advance to level %L1.\r\n").arg(next_level));
+      send(u"You have enough experience to advance to level %L1.\r\n"_s).arg(next_level));
     }
     else
     {
-      send(QStringLiteral("You require %L1 experience to advance to level %L2.\r\n").arg(experience_remaining).arg(next_level));
+      send(u"You require %L1 experience to advance to level %L2.\r\n"_s).arg(experience_remaining).arg(next_level));
     }
   } while (experience_remaining < 0);
 
@@ -3310,7 +3310,7 @@ void check_champion_and_website_who_list()
     }
     else
     {
-      DC::getInstance()->logentry(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(u"CHAMPION_ITEM obj not found. Please create one."_s, 0, DC::LogChannel::LOG_MISC);
     }
   }
 
@@ -3354,7 +3354,7 @@ command_return_t do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
       break;
     }
 
-    ch->send(QStringLiteral("You are currently in %s %s area.\r\n").arg(art.c_str()).arg(sector_types[sector]));
+    ch->send(u"You are currently in %s %s area.\r\n"_s.arg(art.c_str()).arg(sector_types[sector]));
   }
 
   return ReturnValue::eSUCCESS;
@@ -3364,7 +3364,7 @@ command_return_t do_version(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch)
   {
-    ch->sendln(QStringLiteral("Version: %1 Build time: %2").arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
+    ch->sendln(u"Version: %1 Build time: %2"_s.arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
   }
   return ReturnValue::eSUCCESS;
 }
@@ -4081,7 +4081,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send(QStringLiteral("%1 matches found in inventory.\r\n").arg(obj_results.size() - old_count));
+    send(u"%1 matches found in inventory.\r\n"_s).arg(obj_results.size() - old_count));
     old_count = obj_results.size();
 
     // Search equipment
@@ -4113,7 +4113,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send(QStringLiteral("%1 matches found among worn equipment.\r\n").arg(obj_results.size() - old_count));
+    send(u"%1 matches found among worn equipment.\r\n"_s).arg(obj_results.size() - old_count));
     old_count = obj_results.size();
 
     // search room
@@ -4142,7 +4142,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send(QStringLiteral("%1 matches found in room.\r\n").arg(obj_results.size() - old_count));
+    send(u"%1 matches found in room.\r\n"_s).arg(obj_results.size() - old_count));
     old_count = obj_results.size();
 
     // Search all vaults player has access to
@@ -4199,11 +4199,11 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     if (vaults_searched == 1)
     {
-      send(QStringLiteral("%1 matches found within 1 vault.\r\n").arg(obj_results.size() - old_count));
+      send(u"%1 matches found within 1 vault.\r\n"_s).arg(obj_results.size() - old_count));
     }
     else
     {
-      send(QStringLiteral("%1 matches found within %2 vaults.\r\n").arg(obj_results.size() - old_count).arg(vaults_searched));
+      send(u"%1 matches found within %2 vaults.\r\n"_s).arg(obj_results.size() - old_count).arg(vaults_searched));
     }
     old_count = obj_results.size();
 
@@ -4211,7 +4211,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     {
       // search clan vault is able
 
-      QString vault_name = QStringLiteral("clan%1").arg(clan);
+      QString vault_name = u"clan%1"_s.arg(clan);
       auto vault = has_vault(qPrintable(vault_name));
       // search vault if able
       if (vault)
@@ -4282,7 +4282,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
             }
           }
 
-          send(QStringLiteral("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
+          send(u"Within %1 results the levels were %2-%3\r\n"_s.arg(obj_results.size()).arg(min_level).arg(max_level));
 
           showed_ranges = true;
         }
@@ -4343,7 +4343,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     }
     if (obj_results.empty())
     {
-      send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
+      send(u"Searching $B%1$R objects...No results found.\r\n"_s.arg(top_of_objt));
       return ReturnValue::eFAILURE;
     }
 
@@ -4369,7 +4369,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
             }
           }
 
-          send(QStringLiteral("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
+          send(u"Within %1 results the levels were %2-%3\r\n"_s.arg(obj_results.size()).arg(min_level).arg(max_level));
 
           showed_ranges = true;
         }
@@ -4386,11 +4386,11 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   {
     if (limit_output)
     {
-      send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
+      send(u"Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n"_s).arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
     }
     else
     {
-      send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
+      send(u"Searching %1 objects...%2 matches found.\r\n"_s).arg(top_of_objt).arg(obj_results.size()));
     }
   }
 
@@ -4420,38 +4420,38 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   if (std::count_if(sl.begin(), sl.end(), [](Search search_item)
                     { return (search_item.getType() == Search::types::O_NAME); }))
   {
-    header += QStringLiteral(" [%1]").arg("Keywords", -max_keyword_size);
+    header += u" [%1]"_s.arg("Keywords", -max_keyword_size);
   }
 
   if (search_world)
   {
-    header += QStringLiteral(" [%1]").arg("Location", 19);
+    header += u" [%1]"_s.arg("Location", 19);
   }
 
   if (true || std::count_if(sl.begin(), sl.end(), [](Search search_item)
                             { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
   {
-    header += QStringLiteral(" [%1]").arg(QStringLiteral("Short Description"), -max_short_description_size);
+    header += u" [%1]"_s.arg(u"Short Description"_s, -max_short_description_size);
   }
 
   if (show_details)
   {
     if (search_world)
     {
-      header += QStringLiteral(" [%1]").arg(QStringLiteral("Details"), -21);
+      header += u" [%1]"_s.arg(u"Details"_s, -21);
     }
     else
     {
-      header += QStringLiteral(" [%1]").arg(QStringLiteral("Details"));
+      header += u" [%1]"_s.arg(u"Details"_s);
     }
   }
 
   if (show_affects)
   {
-    header += QStringLiteral(" [%1]").arg(QStringLiteral("Affects"));
+    header += u" [%1]"_s.arg(u"Affects"_s);
   }
 
-  send(QStringLiteral("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
+  send(u"$7$B[ VNUM] [ LV]%1$R\r\n"_s.arg(header));
 
   result_nr = {};
   for (const auto &result : obj_results)
@@ -4466,7 +4466,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     if (std::count_if(sl.begin(), sl.end(), [](Search search_item)
                       { return (search_item.getType() == Search::types::O_NAME); }))
     {
-      custom_columns += QStringLiteral(" [%1]").arg(obj->name(), -max_keyword_size);
+      custom_columns += u" [%1]"_s.arg(obj->name(), -max_keyword_size);
     }
 
     if (search_world)
@@ -4474,17 +4474,17 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       switch (result.getLocation())
       {
       case Search::locations::in_inventory:
-        custom_columns += QStringLiteral(" [%1]").arg("inventory", 19);
+        custom_columns += u" [%1]"_s.arg("inventory", 19);
         break;
       case Search::locations::in_equipment:
-        custom_columns += QStringLiteral(" [%1]").arg("equipped", 19);
+        custom_columns += u" [%1]"_s.arg("equipped", 19);
         break;
       case Search::locations::in_room:
-        custom_columns += QStringLiteral(" [%1]").arg("in room", 19);
+        custom_columns += u" [%1]"_s.arg("in room", 19);
         break;
       case Search::locations::in_vault:
       case Search::locations::in_clan_vault:
-        custom_columns += QStringLiteral(" [%1 vault]").arg(result.getName(), 13);
+        custom_columns += u" [%1 vault]"_s.arg(result.getName(), 13);
         break;
       case Search::in_object_database:
         break;
@@ -4497,7 +4497,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
                       { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
     {
       // Because the color codes make the QString longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
-      custom_columns += QStringLiteral(" [%1]").arg(obj->short_description(), -(strlen(qPrintable(obj->short_description())) - nocolor_strlen(obj->short_description()) + max_short_description_size));
+      custom_columns += u" [%1]"_s.arg(obj->short_description(), -(strlen(qPrintable(obj->short_description())) - nocolor_strlen(obj->short_description()) + max_short_description_size));
     }
 
     // Needed to show details or affects below
@@ -4521,7 +4521,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       switch (GET_ITEM_TYPE(obj))
       {
       case ITEM_WEAPON:
-        buffer = QStringLiteral("%1D%2").arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]);
+        buffer = u"%1D%2"_s.arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]);
 
         if (search_world && vobj != nullptr)
         {
@@ -4536,12 +4536,12 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         buffer = "";
         break;
       }
-      custom_columns += QStringLiteral(" [%1]").arg(buffer, -21);
+      custom_columns += u" [%1]"_s.arg(buffer, -21);
       /*
                qint32 get_weapon_damage_type(ObjectPtr  wielded);
                bits = get_weapon_damage_type(obj) - 1000;
                extern QStringList strs_damage_types;
-               ch->send(QStringLiteral("$3Damage type$R: %s\r\n").arg(strs_damage_types[bits]));
+               ch->send(u"$3Damage type$R: %s\r\n"_s.arg(strs_damage_types[bits]));
       */
     }
 
@@ -4573,30 +4573,30 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
           if (affects_found++ == 0)
           {
-            custom_columns += QStringLiteral(" [");
+            custom_columns += u" ["_s;
           }
           else
           {
-            custom_columns += QStringLiteral(",");
+            custom_columns += u","_s);
           }
 
           if (obj->affected[i].modifier > 0)
           {
-            custom_columns += QStringLiteral("$R%1%2+%3$R").arg(buffer).arg(getSettingAsColor("color.good")).arg(obj->affected[i].modifier);
+            custom_columns += u"$R%1%2+%3$R"_s.arg(buffer).arg(getSettingAsColor("color.good")).arg(obj->affected[i].modifier);
           }
           else
           {
-            custom_columns += QStringLiteral("$R%1%2-%3$R").arg(buffer).arg(getSettingAsColor("color.bad")).arg(obj->affected[i].modifier);
+            custom_columns += u"$R%1%2-%3$R").arg(buffer).arg(getSettingAsColor("color.bad"_s).arg(obj->affected[i].modifier);
           }
         }
       }
       if (affects_found)
       {
-        custom_columns += QStringLiteral("]");
+        custom_columns += u"]"_s;
       }
     }
 
-    send(QStringLiteral("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
+    send(u"[%1] [%2]%3\r\n"_s.arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
   }
   send("\r\nIdentify a virtual object with the command: identify v####\r\n");
 

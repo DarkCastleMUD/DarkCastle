@@ -28,7 +28,7 @@ Direction::Direction(QString dirstr)
 QString Direction::toString(void) const
 {
   if (!valid_)
-    return QStringLiteral("Unknown");
+    return u"Unknown"_s;
 
   return TypeToString_.value(value_);
 }
@@ -65,48 +65,48 @@ cmd_t Direction::toCommand(void) const
 
 const QMap<Direction::Type, QString> Direction::TypeToString_ =
     {
-        {Direction::NORTH, QStringLiteral("north")},
-        {Direction::EAST, QStringLiteral("east")},
-        {Direction::SOUTH, QStringLiteral("south")},
-        {Direction::WEST, QStringLiteral("west")},
-        {Direction::UP, QStringLiteral("up")},
-        {Direction::DOWN, QStringLiteral("down")}};
+        {Direction::NORTH, u"north"_s},
+        {Direction::EAST, u"east"_s},
+        {Direction::SOUTH, u"south"_s},
+        {Direction::WEST, u"west"_s},
+        {Direction::UP, u"up"_s},
+        {Direction::DOWN, u"down"_s}};
 
 const QMap<Direction::Type, QString> Direction::TypeToStringAlt_ =
     {
-        {Direction::NORTH, QStringLiteral("northward")},
-        {Direction::EAST, QStringLiteral("eastward")},
-        {Direction::SOUTH, QStringLiteral("southward")},
-        {Direction::WEST, QStringLiteral("westward")},
-        {Direction::UP, QStringLiteral("upward")},
-        {Direction::DOWN, QStringLiteral("downward")}};
+        {Direction::NORTH, u"northward"_s},
+        {Direction::EAST, u"eastward"_s},
+        {Direction::SOUTH, u"southward"_s},
+        {Direction::WEST, u"westward"_s},
+        {Direction::UP, u"upward"_s},
+        {Direction::DOWN, u"downward"_s}};
 
 const QMap<QString, Direction::Type> Direction::StringToType_ =
     {
-        {QStringLiteral("n"), Direction::NORTH},
-        {QStringLiteral("no"), Direction::NORTH},
-        {QStringLiteral("nor"), Direction::NORTH},
-        {QStringLiteral("nort"), Direction::NORTH},
-        {QStringLiteral("north"), Direction::NORTH},
-        {QStringLiteral("e"), Direction::EAST},
-        {QStringLiteral("ea"), Direction::EAST},
-        {QStringLiteral("eas"), Direction::EAST},
-        {QStringLiteral("east"), Direction::EAST},
-        {QStringLiteral("s"), Direction::SOUTH},
-        {QStringLiteral("so"), Direction::SOUTH},
-        {QStringLiteral("sou"), Direction::SOUTH},
-        {QStringLiteral("sout"), Direction::SOUTH},
-        {QStringLiteral("south"), Direction::SOUTH},
-        {QStringLiteral("w"), Direction::WEST},
-        {QStringLiteral("we"), Direction::WEST},
-        {QStringLiteral("wes"), Direction::WEST},
-        {QStringLiteral("west"), Direction::WEST},
-        {QStringLiteral("u"), Direction::UP},
-        {QStringLiteral("up"), Direction::UP},
-        {QStringLiteral("d"), Direction::DOWN},
-        {QStringLiteral("do"), Direction::DOWN},
-        {QStringLiteral("dow"), Direction::DOWN},
-        {QStringLiteral("down"), Direction::DOWN}};
+        {u"n"_s, Direction::NORTH},
+        {u"no"_s, Direction::NORTH},
+        {u"nor"_s, Direction::NORTH},
+        {u"nort"_s, Direction::NORTH},
+        {u"north"_s, Direction::NORTH},
+        {u"e"_s, Direction::EAST},
+        {u"ea"_s, Direction::EAST},
+        {u"eas"_s, Direction::EAST},
+        {u"east"_s, Direction::EAST},
+        {u"s"_s, Direction::SOUTH},
+        {u"so"_s, Direction::SOUTH},
+        {u"sou"_s, Direction::SOUTH},
+        {u"sout"_s, Direction::SOUTH},
+        {u"south"_s, Direction::SOUTH},
+        {u"w"_s, Direction::WEST},
+        {u"we"_s, Direction::WEST},
+        {u"wes"_s, Direction::WEST},
+        {u"west"_s, Direction::WEST},
+        {u"u"_s, Direction::UP},
+        {u"up"_s, Direction::UP},
+        {u"d"_s, Direction::DOWN},
+        {u"do"_s, Direction::DOWN},
+        {u"dow"_s, Direction::DOWN},
+        {u"down"_s, Direction::DOWN}};
 
 Direction Direction::getReverse(void) const
 {

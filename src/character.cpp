@@ -247,20 +247,20 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
   {
     restored = ".restored";
   }
-  QString filename = QStringLiteral("%1.%2%3").arg(player_name).arg(QString::number(0)).arg(restored);
+  QString filename = u"%1.%2%3"_s).arg(player_name).arg(QString::number(0)).arg(restored);
 
-  QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
+  QString path = u"%1/%2/"_s.arg(FOLLOWER_DIR).arg(player_name[0]);
   QString fullpath = path + filename;
   if (!(fpfile = fopen(qPrintable(fullpath), "r")))
   {
-    send(QStringLiteral("No charmie save file found at '%1'.").arg(fullpath));
+    send(u"No charmie save file found at '%1'."_s.arg(fullpath));
     return false;
   }
 
   CharacterPtr charmie = dc_->clone_mobile(real_mobile(8));
   if (charmie == nullptr)
   {
-    DC::getInstance()->logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
+    DC::getInstance()->logentry(u"Error. clone_mobile(real_mobile(8)) returned nullptr."_s);
     return false;
   }
   charmie->setLevel(1);
@@ -273,7 +273,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
   char_to_room(charmie, in_room);
 
-  QString message = QStringLiteral("Restored charmie for player %1 with file '%2'.").arg(player_name).arg(fullpath);
+  QString message = u"Restored charmie for player %1 with file '%2'."_s.arg(player_name).arg(fullpath);
   send(message);
   DC::getInstance()->logentry(message);
 
@@ -282,7 +282,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     QFile file(fullpath);
     if (file.rename(fullpath + ".restored"))
     {
-      DC::getInstance()->logentry(QStringLiteral("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
+      DC::getInstance()->logentry(u"Renamed '%1' to '%2'."_s.arg(fullpath).arg(fullpath + ".restored"));
     }
   }
 
@@ -522,7 +522,7 @@ void Character::display_string_list(QStringList list)
   quint64 count = {};
   for (const auto &item : list)
   {
-    send(QStringLiteral("%1").arg(item, 18));
+    send(u"%1"_s.arg(item, 18));
     if (++count % 4 == 0)
     {
       send("\r\n");
@@ -599,11 +599,11 @@ const QStringList Character::race_names = {
     "orc",
     "troll"};
 
-const QStringList Character::song_names = {QStringLiteral("listsongs"), QStringLiteral("whistle sharp"), QStringLiteral("stop"), /* If you move stop, update do_sing */
-                                           QStringLiteral("travelling march"), QStringLiteral("bountiful sonnet"), QStringLiteral("insane chant"), QStringLiteral("glitter dust"), QStringLiteral("synchronous chord"), QStringLiteral("healing melody"), QStringLiteral("sticky lullaby"), QStringLiteral("revealing staccato"),
-                                           QStringLiteral("flight of the bumblebee"), QStringLiteral("jig of alacrity"), QStringLiteral("note of knowledge"), QStringLiteral("terrible clef"), QStringLiteral("soothing rememberance"), QStringLiteral("forgetful rhythm"), QStringLiteral("searching song"),
-                                           QStringLiteral("vigilant siren"), QStringLiteral("astral chanty"), QStringLiteral("disarming limerick"), QStringLiteral("shattering resonance"), QStringLiteral("irresistable ditty"), QStringLiteral("fanatical fanfare"), QStringLiteral("dischordant dirge"),
-                                           QStringLiteral("crushing crescendo"), QStringLiteral("hypnotic harmony"), QStringLiteral("mountain king's charge"), QStringLiteral("submariner's anthem"), QStringLiteral("summoning song"), QStringLiteral("\n")};
+const QStringList Character::song_names = {u"listsongs"_s, u"whistle sharp"_s, u"stop"_s, /* If you move stop, update do_sing */
+                                           u"travelling march"_s, u"bountiful sonnet"_s, u"insane chant"_s, u"glitter dust"_s, u"synchronous chord"_s, u"healing melody"_s, u"sticky lullaby"_s, u"revealing staccato"_s,
+                                           u"flight of the bumblebee"_s, u"jig of alacrity"_s, u"note of knowledge"_s, u"terrible clef"_s, u"soothing rememberance"_s, u"forgetful rhythm"_s, u"searching song"_s,
+                                           u"vigilant siren"_s, u"astral chanty"_s, u"disarming limerick"_s, u"shattering resonance"_s, u"irresistable ditty"_s, u"fanatical fanfare"_s, u"dischordant dirge"_s,
+                                           u"crushing crescendo"_s, u"hypnotic harmony"_s, u"mountain king's charge"_s, u"submariner's anthem"_s, u"summoning song"_s, u"\n"_s};
 
 const QList<Toggle> Player::togglables = {
     {"brief", PLR_BRIEF_BIT, &Character::do_brief},
@@ -636,7 +636,7 @@ level_ Character::getLevel(void) const
   if (level_ > 110)
   {
     produce_coredump();
-    DC::getInstance()->logentry(QStringLiteral("Warning: getLevel returned %1.").arg(QString::number(level_)));
+    DC::getInstance()->logentry(u"Warning: getLevel returned %1."_s).arg(QString::number(level_)));
   }
 
   return level_;
@@ -649,7 +649,7 @@ void Character::setLevel(level_t level)
   if (level_ > 110)
   {
     produce_coredump();
-    DC::getInstance()->logentry(QStringLiteral("Warning: setLevel(%1).").arg(QString::number(level_)));
+    DC::getInstance()->logentry(u"Warning: setLevel(%1)."_s.arg(QString::number(level_)));
   }
 }
 
@@ -938,16 +938,16 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
     if (target)
     {
       if (target_is == targets::Charmie || target_is == targets::GrouptMember)
-        return QStringLiteral("%1").arg(calc_condition(target, use_color));
+        return u"%1"_s.arg(calc_condition(target, use_color));
 
       if (fighting)
       {
         if (target_is == targets::Self)
-          return QStringLiteral("<%1>").arg(calc_condition(target, use_color));
+          return u"<%1>"_s.arg(calc_condition(target, use_color));
         else if (target_is == targets::Fighting)
-          return QStringLiteral("(%1)").arg(calc_condition(target, use_color));
+          return u"(%1)"_s.arg(calc_condition(target, use_color));
         else if (target_is == targets::Tank)
-          return QStringLiteral("[%1]").arg(calc_condition(target, use_color));
+          return u"[%1]"_s.arg(calc_condition(target, use_color));
       }
     }
   }
@@ -1016,7 +1016,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
     value = time_look[weather_info.sunlight];
   }
   else if (variable == "cr")
-    value = QStringLiteral("\r\n");
+    value = u"\r\n"_s;
 
   if (value.isEmpty())
     return {};
@@ -1024,7 +1024,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
   if (color.isEmpty())
     return value;
 
-  return QStringLiteral("%1%2%3").arg(color).arg(value).arg(NTEXT);
+  return u"%1%2%3"_s.arg(color).arg(value).arg(NTEXT);
 }
 
 QString Character::createPrompt(void)
@@ -1032,7 +1032,7 @@ QString Character::createPrompt(void)
   QString source = {};
   if (this->isNonPlayer())
   {
-    source = QStringLiteral("HP: %i/%H %f >");
+    source = u"HP: %i/%H %f >"_s;
   }
   else
   {
@@ -1096,7 +1096,7 @@ QString Character::calc_name(bool use_color)
   else if (!short_description().isEmpty())
     namebuffer += short_description();
   else
-    namebuffer += QStringLiteral("unknown");
+    namebuffer += u"unknown"_s;
 
   if (use_color)
     namebuffer += NTEXT;
@@ -1124,8 +1124,8 @@ void ChannelMessage::set_name(const CharacterPtr sender)
   }
   else
   {
-    sender_name_ = QStringLiteral("Unknown");
-    logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
+    sender_name_ = u"Unknown"_s;
+    logbug(u"channel_msg::set_name: sender is nullptr. type: %1 msg: %2"_s.arg(type_).arg(msg_));
   }
 }
 
@@ -1149,7 +1149,7 @@ QString ChannelMessage::getMessage(CharacterPtr ch) const
   }
 
   QTimeZone timezone = QTimeZone(ch->getSetting("timezone", "America/Chicago").toLatin1());
-  QString timestamp = ch->getSetting(QStringLiteral("%1.history.timestamp").arg(prefix));
+  QString timestamp = ch->getSetting(u"%1.history.timestamp"_s).arg(prefix));
   QString dateformat_str = ch->getSetting("dateformat", "ISODate");
   Qt::DateFormat dateformat = Qt::DateFormat(QMetaEnum::fromType<Qt::DateFormat>().keyToValue(qPrintable(dateformat_str)));
 

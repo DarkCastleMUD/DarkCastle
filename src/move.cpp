@@ -38,7 +38,7 @@ qint32 move_player(CharacterPtr ch, qint32 room)
   {
     retval = move_char(ch, real_room(START_ROOM));
     if (!isSet(retval, ReturnValue::eSUCCESS))
-      DC::getInstance()->logentry(QStringLiteral("Error in move_player(), Failure moving ch to start room. move_player_home_nofail"),
+      DC::getInstance()->logentry(u"Error in move_player(), Failure moving ch to start room. move_player_home_nofail"_s,
                                   IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 
@@ -280,7 +280,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
     ch->sendln("You fall...");
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Default hit in do_fall"), IMMORTAL, DC::LogChannel::LOG_MORTAL);
+    DC::getInstance()->logentry(u"Default hit in do_fall"_s, IMMORTAL, DC::LogChannel::LOG_MORTAL);
     break;
   }
 
@@ -865,7 +865,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
 
   if (ch->brace_at)
   {
-    ch->send(QStringLiteral("You can't move and brace the %s at the same time!\r\n").arg(qPrintable(fname(ch->brace_at->keyword))));
+    ch->send(u"You can't move and brace the %s at the same time!\r\n"_s.arg(qPrintable(fname(ch->brace_at->keyword))));
     return ReturnValue::eFAILURE;
   }
 
@@ -888,7 +888,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
     if (isSet(EXIT(ch, dir)->exit_info, EX_HIDDEN))
       ch->sendln("You can't go that way.");
     else if (EXIT(ch, dir)->keyword)
-      ch->send(QStringLiteral("The %s seems to be closed.\r\n").arg(qPrintable(fname(EXIT(ch).arg(dir)->keyword))));
+      ch->send(u"The %s seems to be closed.\r\n"_s.arg(qPrintable(fname(EXIT(ch).arg(dir)->keyword))));
     else
       ch->sendln("It seems to be closed.");
     return ReturnValue::eFAILURE;
@@ -1083,7 +1083,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     one_argument(argument, buf);
   }
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("Enter what?");
     return ReturnValue::eFAILURE;
@@ -1229,7 +1229,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
 {
   if (!ch)
   {
-    DC::getInstance()->logentry(QStringLiteral("Error in move_char(), nullptr character"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Error in move_char(), nullptr character"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1240,7 +1240,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     // Couldn't move character from the room
     if (char_from_room(ch, stop_all_fighting) == 0)
     {
-      DC::getInstance()->logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
+      DC::getInstance()->logentry(u"Error in move_char(), character not DC::NOWHERE, but couldn't be moved."_s,
                                   OVERSEER, DC::LogChannel::LOG_BUG);
       return ReturnValue::eINTERNAL_ERROR;
     }
@@ -1252,7 +1252,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     // Now we have real problems
     if (char_to_room(ch, origination) == 0)
     {
-      qFatal("%s", qUtf8Printable(QStringLiteral("Error in move_char(), character stuck in DC::NOWHERE: %1.\n").arg(qPrintable(ch->name()))));
+      qFatal("%s", qUtf8Printable(u"Error in move_char(), character stuck in DC::NOWHERE: %1.\n"_s.arg(qPrintable(ch->name()))));
     }
     DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", qPrintable(ch->name()), DC::getInstance()->world[dest].number);
     return ReturnValue::eINTERNAL_ERROR;
@@ -1269,7 +1269,7 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, buf);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("Climb what?");
     return ReturnValue::eSUCCESS;

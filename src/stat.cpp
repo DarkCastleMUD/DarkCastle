@@ -62,12 +62,12 @@ void AreaData::SortAreaData(CharacterPtr ch, SortState state)
   case SORT_XP:
     std::sort(lAreaStats.begin(), lAreaStats.end(), CompareAreaXPStats);
     for (const auto &lit : lAreaStats)
-      ch->sendln(QStringLiteral("%1)%1 $5%2$R xps").arg(++i).arg(DC::getInstance()->zones.value(lit.area).name()).arg(lit.xps));
+      ch->sendln(u"%1)%1 $5%2$R xps"_s.arg(++i).arg(DC::getInstance()->zones.value(lit.area).name()).arg(lit.xps));
     break;
   case SORT_GOLD:
     std::sort(lAreaStats.begin(), lAreaStats.end(), CompareAreaGoldStats);
     for (const auto &lit : lAreaStats)
-      ch->sendln(QStringLiteral("%1)%1 $5%2$R gold").arg(++i).arg(DC::getInstance()->zones.value(lit.area).name()).arg(lit.gold));
+      ch->sendln(u"%1)%1 $5%2$R gold"_s.arg(++i).arg(DC::getInstance()->zones.value(lit.area).name()).arg(lit.gold));
     break;
   case SORT_MOB:
     break;
@@ -82,8 +82,8 @@ void AreaData::DisplaySingleArea(CharacterPtr ch, zone_t area)
     return;
   }
 
-  ch->sendln(QStringLiteral("%1)%2 -- $5%3$R xps -- $5%4$R gold").arg(area).arg(DC::getInstance()->zones.value(area).name(), 30).arg(areaStats[area].xps, 12).arg(areaStats[area].gold, 12));
-  ch->sendln(QStringLiteral("%1 %2").arg("Mob Name", -30).arg("Killed", -5));
+  ch->sendln(u"%1)%2 -- $5%3$R xps -- $5%4$R gold"_s.arg(area).arg(DC::getInstance()->zones.value(area).name(), 30).arg(areaStats[area].xps, 12).arg(areaStats[area].gold, 12));
+  ch->sendln(u"%1 %2"_s.arg("Mob Name", -30).arg("Killed", -5));
 
   for (auto mobs = areaStats[area].mobKills.begin(); mobs != areaStats[area].mobKills.end(); mobs++)
   {
@@ -93,7 +93,7 @@ void AreaData::DisplaySingleArea(CharacterPtr ch, zone_t area)
       ch->sendln("Shit a mob is missing from game!!!");
       continue;
     }
-    ch->sendln(QStringLiteral("%1 %2 %3").arg(get_mob_vnum(mobs->name)->short_description(), -30).arg(mobs->howmany, -5).arg(mobs->howmany < 2 ? "time" : "times"));
+    ch->sendln(u"%1 %2 %3"_s.arg(get_mob_vnum(mobs->name)->short_description(), -30).arg(mobs->howmany, -5).arg(mobs->howmany < 2 ? "time" : "times"));
   }
 }
 
@@ -101,7 +101,7 @@ void AreaData::DisplayAreaData(CharacterPtr ch)
 {
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
     if (areaStats[zone_key].xps)
-      ch->sendln(QStringLiteral("%1)%2|$5%3$R xps|$5%4$R gold|").arg(zone_key).arg(zone.name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
+      ch->sendln(u"%1)%2|$5%3$R xps|$5%4$R gold|"_.arg(zone_key).arg(zone.name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
 }
 
 void AreaData::GetAreaData(zone_t zone, qint32 mob, qint64 xps, qint64 gold)
@@ -140,7 +140,7 @@ command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
 
   argument = one_argument(argument, buf);
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("$BUsage:$R ");
     ch->sendln("$Bareastats$R ");
@@ -152,7 +152,7 @@ command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
   if (buf == u"area"_s)
   {
     argument = one_argument(argument, buf);
-    if (!*buf)
+    if (buf.isEmpty())
     {
       ch->sendln("You need to specify a zone number.");
       return ReturnValue::eSUCCESS;

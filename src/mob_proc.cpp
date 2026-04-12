@@ -68,7 +68,7 @@ qint32 call_for_help_in_room(CharacterPtr ch, qint32 iFriendId)
 
       if (!friends)
       {
-        do_say(ch, QStringLiteral("This guy is beating the hell out of me!  HELP!!"), cmd_t::DEFAULT);
+        do_say(ch, u"This guy is beating the hell out of me!  HELP!!"_s, cmd_t::DEFAULT);
         friends = 1;
       }
       do_say(ally, "I shall come to your aid!", cmd_t::DEFAULT);
@@ -109,7 +109,7 @@ qint32 protect(CharacterPtr ch, qint32 iFriendId)
     if (real_mobile(iFriendId) == ally->mobdata->nr)
     {
       // obscure whitney houston joke
-      do_say(ch, QStringLiteral("and IiiiIIiiii will always, looove yooooou!"), cmd_t::DEFAULT);
+      do_say(ch, u"and IiiiIIiiii will always, looove yooooou!"_s, cmd_t::DEFAULT);
       // do join
       retval = attack(ch, ally->fighting, TYPE_UNDEFINED);
       if (SOMEONE_DIED(retval))
@@ -307,7 +307,7 @@ qint32 fighter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (ch->getLevel() > 39 && GET_POS(vict) < position_t::FIGHTING)
   {
     MOB_WAIT_STATE(ch) = 2;
-    return do_deathstroke(ch, QStringLiteral(""), cmd_t::DEFAULT);
+    return do_deathstroke(ch, u""_s, cmd_t::DEFAULT);
   }
 
   if (ch->equipment[WEAR_WIELD] && vict->equipment[WEAR_WIELD])
@@ -327,7 +327,7 @@ qint32 fighter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
   {
     MOB_WAIT_STATE(ch) = 3;
-    return do_bash(ch, QStringLiteral(""), cmd_t::DEFAULT);
+    return do_bash(ch, u""_s, cmd_t::DEFAULT);
   }
   if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
   {
@@ -897,9 +897,9 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
         {
           auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
           if (obj && qPrintable(obj->short_description()))
-            ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\r\n").arg(obj->short_description()));
+            ch->sendln(u"Despite having %1, the guard allows you to go through because you're an immortal.\r\n"_s.arg(obj->short_description()));
           else
-            ch->sendln(QStringLiteral("Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\r\n"));
+            ch->sendln(u"Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\r\n"_s);
           return ReturnValue::eFAILURE;
         }
         else if (GET_CLASS(ch) != clas)
@@ -932,7 +932,7 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
           if (obj && qPrintable(obj->short_description()))
           {
             act_to_room("The guard humiliates $n, and blocks $s way because they have $p.", ch, obj, 0, 0);
-            ch->sendln(QStringLiteral("The guard humiliates you, and blocks your way because you have %1.").arg(obj->short_description()));
+            ch->sendln(u"The guard humiliates you, and blocks your way because you have %1."_s).arg(obj->short_description()));
           }
           else
           {
@@ -2598,12 +2598,12 @@ qint32 doorcloser(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       (EXIT(ch, 3) && !isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
     if (number(0, 1))
-      do_say(ch, QStringLiteral("How the hell do these doors keep opening?"), cmd_t::DEFAULT);
+      do_say(ch, u"How the hell do these doors keep opening?"_s, cmd_t::DEFAULT);
     else
-      do_say(ch, QStringLiteral("I coulda sworn I just closed this...."), cmd_t::DEFAULT);
+      do_say(ch, u"I coulda sworn I just closed this...."_s, cmd_t::DEFAULT);
 
-    do_close(ch, QStringLiteral("cell e"), cmd_t::DEFAULT);
-    do_close(ch, QStringLiteral("cell w"), cmd_t::DEFAULT);
+    do_close(ch, u"cell e"_s, cmd_t::DEFAULT);
+    do_close(ch, u"cell w"_s, cmd_t::DEFAULT);
 
     return ReturnValue::eSUCCESS;
   }
@@ -2625,9 +2625,9 @@ qint32 panicprisoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   if ((vict = ch->get_char_room_vis("guard")))
   {
     if (number(0, 1))
-      do_say(ch, QStringLiteral("Run!  It's the fuzz!"), cmd_t::DEFAULT);
+      do_say(ch, u"Run!  It's the fuzz!"_s, cmd_t::DEFAULT);
     else
-      do_say(ch, QStringLiteral("Uh oh, guard.  I'm off like a prom dress!"), cmd_t::DEFAULT);
+      do_say(ch, u"Uh oh, guard.  I'm off like a prom dress!"_s, cmd_t::DEFAULT);
     do_flee(ch, "");
     return ReturnValue::eSUCCESS;
   }
@@ -2641,9 +2641,9 @@ qint32 panicprisoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
       (EXIT(ch, 3) && isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
     if (number(0, 1))
-      do_say(ch, QStringLiteral("I must free my fellow prisoners!"), cmd_t::DEFAULT);
+      do_say(ch, u"I must free my fellow prisoners!"_s, cmd_t::DEFAULT);
     else
-      do_say(ch, QStringLiteral("Viva la resistance!"), cmd_t::DEFAULT);
+      do_say(ch, u"Viva la resistance!"_s, cmd_t::DEFAULT);
 
     ch->do_open({"cell", "e"});
     ch->do_open({"cell", "w"});
@@ -2678,7 +2678,7 @@ qint32 bounder(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  do_say(ch, QStringLiteral("I hope you land in enfan hell!"), cmd_t::DEFAULT);
+  do_say(ch, u"I hope you land in enfan hell!"_s, cmd_t::DEFAULT);
   act("$n recites a bound scroll.", ch, 0, vict, TO_ROOM, INVIS_NULL);
   return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
@@ -2763,7 +2763,7 @@ qint32 marauder(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
   {
-    return do_bash(ch, QStringLiteral(""), cmd_t::DEFAULT);
+    return do_bash(ch, u""_s, cmd_t::DEFAULT);
   }
   if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
   {
@@ -2800,7 +2800,7 @@ qint32 foggy_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   mob = ch->getDC()->clone_mobile(real_mobile(22026));
   if (!mob)
   {
-    DC::getInstance()->logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Foggy combat mobile missing"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   // put it in the room ch is in
@@ -3197,7 +3197,7 @@ qint32 shogura_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
 
   if (GET_HIT(ch->fighting) < 5000)
   {
-    do_say(ch, QStringLiteral("It's time to finish this, little one."), cmd_t::DEFAULT);
+    do_say(ch, u"It's time to finish this, little one."_s, cmd_t::DEFAULT);
     return ki_punch(ch->getLevel(), ch, "", ch->fighting);
   }
 
@@ -3220,7 +3220,7 @@ qint32 shogura_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
 
   case 2:
     // summon all mobs 8668
-    do_say(ch, QStringLiteral("Multi-form technique!"), cmd_t::DEFAULT);
+    do_say(ch, u"Multi-form technique!"_s, cmd_t::DEFAULT);
     if (!find_mob_in_room(ch, 8668))
       summon_all_of_mob_to_room(ch, 8668);
     break;
@@ -3273,7 +3273,7 @@ qint32 druid_elemental(CharacterPtr ch, ObjectPtr obj,
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, QStringLiteral("creates an elemental gateway and steps through.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"creates an elemental gateway and steps through.\r\n"_s, cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
       act_to_room("An elemental gateway shimmers into existance and $n emerges.", ch, 0, 0, 0);
       return ReturnValue::eSUCCESS;
@@ -3306,7 +3306,7 @@ qint32 gremlinthing(CharacterPtr ch)
     CharacterPtr gol = ch->master->player->golem;
     if (gol->hit < gol->max_hit)
     {
-      do_emote(ch, QStringLiteral("climbs up its master's golem, hammering, tweaking and repairing.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"climbs up its master's golem, hammering, tweaking and repairing.\r\n"_s, cmd_t::DEFAULT);
       gol->hit += number(40, 60);
       if (gol->hit > gol->max_hit)
         gol->hit = gol->max_hit;
@@ -3329,7 +3329,7 @@ qint32 mage_familiar_gremlin_non(CharacterPtr ch, ObjectPtr obj,
     return ReturnValue::eFAILURE;
   if (!ch->master)
   {
-    DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3339,9 +3339,9 @@ qint32 mage_familiar_gremlin_non(CharacterPtr ch, ObjectPtr obj,
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, QStringLiteral("looks around, glances at its watch then skitters out of the room.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"looks around, glances at its watch then skitters out of the room.\r\n"_s), cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, QStringLiteral("skitters into the room, anxiously looking for its master.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"skitters into the room, anxiously looking for its master.\r\n"_s), cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
@@ -3384,7 +3384,7 @@ qint32 mage_familiar_imp_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QS
 
   if (!ch->master)
   {
-    DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3397,9 +3397,9 @@ qint32 mage_familiar_imp_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QS
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, QStringLiteral("looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n"_s), cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, QStringLiteral("steps out of a nearby shadow relieved to be back in its master's presence.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"steps out of a nearby shadow relieved to be back in its master's presence.\r\n"_s, cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
@@ -3411,7 +3411,7 @@ qint32 mage_familiar_imp_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QS
 
     if (number(1, 500) == 1)
     {
-      do_emote(ch, QStringLiteral("chitters about for a bit then settles down."), cmd_t::DEFAULT);
+      do_emote(ch, u"chitters about for a bit then settles down."_s, cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
   }
@@ -3461,7 +3461,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
     char_from_room(ch);
     char_to_room(ch, to_room);
     SETBIT(ch->affected_by, AFF_true_SIGHT);
-    do_look(ch, QStringLiteral(""), cmd_t::DEFAULT);
+    do_look(ch, u""_s, cmd_t::DEFAULT);
     if (!ts)
       REMBIT(ch->affected_by, AFF_true_SIGHT);
     char_from_room(ch);
@@ -3472,7 +3472,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
   {
     if (!ch->master)
     {
-      DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       extract_char(ch, true);
       return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
     }
@@ -3485,9 +3485,9 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
     {
       if (ch->in_room != ch->master->in_room)
       {
-        do_emote(ch, QStringLiteral("lifts from its perch and flies out of the room.\r\n"), cmd_t::DEFAULT);
+        do_emote(ch, u"lifts from its perch and flies out of the room.\r\n"_s, cmd_t::DEFAULT);
         move_char(ch, ch->master->in_room);
-        do_emote(ch, QStringLiteral("swoops into the room perching itself high up, watching its master.\r\n"), cmd_t::DEFAULT);
+        do_emote(ch, u"swoops into the room perching itself high up, watching its master.\r\n"_s), cmd_t::DEFAULT);
         return ReturnValue::eFAILURE;
       }
 
@@ -3499,7 +3499,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
 
       if (number(1, 500) == 1)
       {
-        do_emote(ch, QStringLiteral("circles above, looking for mice."), cmd_t::DEFAULT);
+        do_emote(ch, u"circles above, looking for mice."_s), cmd_t::DEFAULT);
         return ReturnValue::eFAILURE;
       }
     }
@@ -3518,7 +3518,7 @@ qint32 druid_familiar_chipmunk_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, co
 
   if (!ch->master)
   {
-    DC::getInstance()->logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3531,9 +3531,9 @@ qint32 druid_familiar_chipmunk_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, co
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, QStringLiteral("looks around for its master than runs off.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"looks around for its master than runs off.\r\n"_s, cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, QStringLiteral("runs in and drops by its masters feet, obviously tired.\r\n"), cmd_t::DEFAULT);
+      do_emote(ch, u"runs in and drops by its masters feet, obviously tired.\r\n"_s), cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
@@ -3545,13 +3545,13 @@ qint32 druid_familiar_chipmunk_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, co
 
     if (number(1, 500) == 1)
     {
-      do_emote(ch, QStringLiteral("sqeaks with delight at a found nut."), cmd_t::DEFAULT);
+      do_emote(ch, u"sqeaks with delight at a found nut."_s, cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
     if (number(1, 100) == 1)
     {
-      ch->master->sendln(QStringLiteral("The presence of your chipmunk is soothing to your mind."));
+      ch->master->sendln(u"The presence of your chipmunk is soothing to your mind."_s);
       GET_MANA(ch->master) += 10;
       if (GET_MANA(ch->master) > GET_MAX_MANA(ch->master))
         GET_MANA(ch->master) = GET_MAX_MANA(ch->master);

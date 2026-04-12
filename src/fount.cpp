@@ -49,7 +49,7 @@ command_return_t do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr to_obj;
   one_argument(argument, buf);
 
-  if (!*buf) /* No arguments */
+  if (buf.isEmpty()) /* No arguments */
   {
     act_to_character("What do you want to fill?", ch, 0, 0, 0);
     return 1;

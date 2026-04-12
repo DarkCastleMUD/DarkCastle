@@ -101,13 +101,13 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    sendln(QStringLiteral("%1  %2  %3  %4").arg("Banned Site Name ", -15).arg("Ban Type", -8).arg("Banned On", -19).arg("Banned By", -16));
-    sendln(QStringLiteral("%1  %2  %3  %4").arg("-----------------------", -15).arg("---------------------------------", -8).arg("-------------------", -19).arg("---------------------------------", -16));
+    sendln(u"%1  %2  %3  %4"_s.arg("Banned Site Name ", -15).arg("Ban Type", -8).arg("Banned On", -19).arg("Banned By", -16));
+    sendln(u"%1  %2  %3  %4"_s.arg("-----------------------", -15).arg("---------------------------------", -8).arg("-------------------", -19).arg("---------------------------------", -16));
 
     QString buffer;
     for (const auto &ban : DC::getInstance()->bans_.list())
     {
-      sendln(QStringLiteral("%1  %2  %3  %4").arg(ban.site(), -15).arg(Ban::ban_types.value(qsizetype(ban.type())), -8).arg(ban.date().toString(), -19).arg(ban.name(), -16));
+      sendln(u"%1  %2  %3  %4"_s.arg(ban.site(), -15).arg(Ban::ban_types.value(qsizetype(ban.type())), -8).arg(ban.date().toString(), -19).arg(ban.name(), -16));
     }
     return ReturnValue::eSUCCESS;
   }
@@ -151,7 +151,7 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
   ban.type(flag);
   DC::getInstance()->bans_.add(ban);
 
-  loggod(QStringLiteral("1s has banned %2 for %3 players.").arg(name()).arg(site).arg(Ban::ban_types.value(qsizetype(ban.type()))));
+  loggod(u"1s has banned %2 for %3 players."_s).arg(name()).arg(site).arg(Ban::ban_types.value(qsizetype(ban.type()))));
   sendln("Site banned.");
   DC::getInstance()->bans_.save();
   return ReturnValue::eSUCCESS;
@@ -180,7 +180,7 @@ command_return_t Character::do_unban(QStringList arguments, cmd_t cmd)
 
   DC::getInstance()->bans_.remove(site);
   sendln("Site unbanned.");
-  loggod(QStringLiteral("%1 removed the %2-player ban.").arg(name()).arg(site));
+  loggod(u"%1 removed the %2-player ban."_s.arg(name()).arg(site));
   DC::getInstance()->bans_.save();
 
   return ReturnValue::eSUCCESS;

@@ -53,7 +53,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 
         if (bestow_command->testcmd == false)
         {
-          bestow_buffer.append(QStringLiteral("[GFT]%1").arg(command.name(), -11));
+          bestow_buffer.append(u"[GFT]%1"_s.arg(command.name(), -11));
           if (++bestow_column % 5 == 0)
           {
             bestow_buffer.append("\r\n");
@@ -61,7 +61,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
         }
         else
         {
-          test_buffer.append(QStringLiteral("[TST]%1").arg(command.name(), -11));
+          test_buffer.append(u"[TST]%1"_s.arg(command.name(), -11));
           if (++test_column % 5 == 0)
           {
             test_buffer.append("\r\n");
@@ -75,7 +75,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
         continue;
       }
 
-      buffer.append(QStringLiteral("[%1]%2").arg(command.getMinimumLevel(), 2).arg(command.name(), -11));
+      buffer.append(u"[%1]%2"_s.arg(command.getMinimumLevel(), 2).arg(command.name(), -11));
 
       if (++column % 5 == 0)
       {
@@ -149,12 +149,12 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     {
       if (zones.isEmpty())
       {
-        send(QStringLiteral("Invalid zone %1 specified. No zones loaded.\r\n").arg(zone_key));
+        send(u"Invalid zone %1 specified. No zones loaded.\r\n"_s).arg(zone_key));
         return ReturnValue::eFAILURE;
       }
 
       auto last_zone_nr = zones.lastKey();
-      send(QStringLiteral("Invalid zone %1 specified. Valid values are 1-%2\r\n").arg(zone_key).arg(last_zone_nr));
+      send(u"Invalid zone %1 specified. Valid values are 1-%2\r\n"_s.arg(zone_key).arg(last_zone_nr));
       return ReturnValue::eFAILURE;
     }
     auto &zone = zones[zone_key];
@@ -205,19 +205,19 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if ((target_mob = getVisiblePlayer(arg1)))
       {
         location = target_mob->in_room;
-        send(QStringLiteral("Going to player %1 in room %2.\r\n").arg(qPrintable(target_mob->name())).arg(location));
+        send(u"Going to player %1 in room %2.\r\n"_s).arg(qPrintable(target_mob->name())).arg(location));
       }
       else if ((target_mob = getVisibleCharacter(arg1)))
       {
         location = target_mob->in_room;
-        send(QStringLiteral("Going to character %1 in room %2.\r\n").arg(qPrintable(target_mob->name())).arg(location));
+        send(u"Going to character %1 in room %2.\r\n"_s).arg(qPrintable(target_mob->name())).arg(location));
       }
       else if ((target_obj = getVisibleObject(arg1)))
       {
         if (target_obj->in_room != DC::NOWHERE)
         {
           location = target_obj->in_room;
-          send(QStringLiteral("Going to object %1 in room %2.\r\n").arg(target_obj->name()).arg(location));
+          send(u"Going to object %1 in room %2.\r\n"_s).arg(target_obj->name()).arg(location));
         }
         else
         {
@@ -253,7 +253,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         }
         else
         {
-          send(QStringLiteral("You can't modify room %1").arg(loc_nr));
+          send(u"You can't modify room %1"_s.arg(loc_nr));
           return ReturnValue::eFAILURE;
         }
       }
@@ -348,7 +348,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if (start_room == k->follower->in_room && CAN_SEE(k->follower, this) &&
           k->follower->getLevel() >= IMMORTAL)
       {
-        k->follower->send(QStringLiteral("You follow %s.\r\n\r\n").arg(qPrintable(this->shortdesc_or_name())));
+        k->follower->send(u"You follow %s.\r\n\r\n"_s.arg(qPrintable(this->shortdesc_or_name())));
         k->follower->do_goto(arguments, cmd_t::DEFAULT);
       }
     }
@@ -369,7 +369,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 
   arg = one_argument(arg, inout);
 
-  if (!*inout)
+  if (inout.isEmpty())
   {
     ch->sendln("Usage:\r\npoof [i|o] <QString>");
     ch->sendln("\r\nCurrent poof in is:");
@@ -387,7 +387,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("A poof type message was expected.");
     return ReturnValue::eFAILURE;
@@ -468,7 +468,7 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   half_chop(argument, loc_str, command);
-  if (!*loc_str)
+  if (loc.isEmpty() _str)
   {
     ch->sendln("You must supply a room number or a name.");
     return ReturnValue::eFAILURE;
@@ -538,7 +538,7 @@ command_return_t do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   one_argument(argument, buf);
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("Who do you wish to high-five? ");
     return ReturnValue::eFAILURE;
@@ -602,7 +602,7 @@ command_return_t do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
   if (arg1 < 0)
     arg1 = {};
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     if (ch->player->wizinvis == 0)
     {
@@ -619,7 +619,7 @@ command_return_t do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
       arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
-  ch->sendln(QStringLiteral("WizInvis Set to: %1 ").arg(ch->player->wizinvis));
+  ch->sendln(u"WizInvis Set to: %1 "_s.arg(ch->player->wizinvis));
   return ReturnValue::eSUCCESS;
 }
 
@@ -773,15 +773,15 @@ command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
       if (amt > max)
       {
-        ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        QString buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        ch->send(u"Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n"_s).arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        QString buffer = strdup(u"%1 list %2 1"_s.arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
         free(buffer);
       }
       else
       {
-        ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        QString buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        ch->send(u"Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n"_s).arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        QString buffer = strdup(u"%1 list %2 1"_s.arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
         free(buffer);
       }

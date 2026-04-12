@@ -263,7 +263,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
   if (enemy_hp < 0.3) // covered is 0.3
   {
     chance += (ch->has_skill(SKILL_TWO_HANDED_WEAPONS) / 6);
-    // ch->send(QStringLiteral("BEHEAD chance increased by %d\r\n").arg(ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6));
+    // ch->send(u"BEHEAD chance increased by %d\r\n"_s.arg(ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6));
   }
   else
     chance >>= 1; // halving the chance if less than covered (nerf)
@@ -274,7 +274,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
   if (chance < 0)
     chance = {};
 
-  // ch->send(QStringLiteral("behead chance: %d, enemy hp%: %f\r\n").arg(chance).arg(enemy_hp));
+  // ch->send(u"behead chance: %d, enemy hp%: %f\r\n"_s).arg(chance).arg(enemy_hp));
 
   if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {

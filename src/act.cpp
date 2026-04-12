@@ -78,7 +78,7 @@ act_return act(
   // This shouldn't happen
   if (ch == 0)
   {
-    DC::getInstance()->logentry(QStringLiteral("Error in act(), character equal to 0"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Error in act(), character equal to 0"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     tokens = {};
     ar.retval = ReturnValue::eFAILURE;
     return ar;
@@ -140,7 +140,7 @@ act_return act(
   {
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
-      DC::getInstance()->logentry(QStringLiteral("Error in act(), invalid value sent as 'destination'"), OVERSEER, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Error in act(), invalid value sent as 'destination'"_s, OVERSEER, DC::LogChannel::LOG_BUG);
       tokens = {};
       ar.retval = ReturnValue::eFAILURE;
       return ar;

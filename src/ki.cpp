@@ -129,7 +129,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (ch->getLevel() < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
-    ch->sendln(QStringLiteral("You feel at peace, calm, relaxed, one with yourself and the universe."));
+    ch->sendln(u"You feel at peace, calm, relaxed, one with yourself and the universe."_s));
     return ReturnValue::eFAILURE;
   }
 
@@ -237,7 +237,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!tar_char)
       {
-        DC::getInstance()->logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(u"Dammit Morc, fix that null tar_char thing in ki"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
         send_to_char("If you triggered this message, you almost crashed the\r\ngame.  Tell a god what you did immediately.\r\n", ch);
         return ReturnValue::eFAILURE;
       }
@@ -376,7 +376,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Serious problem in ki blast!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -571,7 +571,7 @@ qint32 ki_speed(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null victim sent to ki speed"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -602,7 +602,7 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null victim sent to ki purify"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
   if (!arg)
@@ -665,7 +665,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
 {
   if (!victim)
   {
-    DC::getInstance()->logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Serious problem in ki disrupt!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 

@@ -156,7 +156,7 @@ void save_golem_data(CharacterPtr ch)
   dc_sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Error while opening file in save_golem_data[golem.cpp]."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   CharacterPtr golem = ch->player->golem; // Just to make the code below cleaner.
@@ -382,7 +382,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (QString(argument).isEmpty())
       {
-        ch->sendln(QStringLiteral("Specify which non-player follower you want to fscore."));
+        ch->sendln(u"Specify which non-player follower you want to fscore."_s);
         return ReturnValue::eFAILURE;
       }
       else
@@ -395,12 +395,12 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         if (!IS_AFFECTED(vict, AFF_CHARM))
         {
-          ch->sendln(QStringLiteral("%1 is not a charmie.").arg(qPrintable(vict->shortdesc_or_name())));
+          ch->sendln(u"%1 is not a charmie."_s).arg(qPrintable(vict->shortdesc_or_name())));
           return ReturnValue::eFAILURE;
         }
         if (vict->master != ch)
         {
-          ch->sendln(QStringLiteral("%1 is not your charmie.").arg(qPrintable(vict->shortdesc_or_name())));
+          ch->sendln(u"%1 is not your charmie."_s).arg(qPrintable(vict->shortdesc_or_name())));
           return ReturnValue::eFAILURE;
         }
         ch = vict;
@@ -427,7 +427,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    DC::getInstance()->logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
+    DC::getInstance()->logentry(u"unexpected cmd set to %1 sent to do_golem_score"_s.arg(QString::number(static_cast<quint64>(cmd))));
     return ReturnValue::eFAILURE;
   }
 
@@ -441,7 +441,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_sprintf(race, "%s", races[(qint32)ch->race].singular_name);
   if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
-    DC::getInstance()->logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(qPrintable(master->name())).arg(ch->getLevel()).arg(ch->getLevel() + 19));
+    DC::getInstance()->logentry(u"do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60."_s.arg(qPrintable(master->name())).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
     return ReturnValue::eSUCCESS;
@@ -571,29 +571,29 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       switch (aff->type)
       {
       case Character::PLAYER_CANTQUIT:
-        aff_name = QStringLiteral("Can't Quit");
+        aff_name = u"Can't Quit"_s;
         break;
       case Character::PLAYER_OBJECT_THIEF:
-        aff_name = QStringLiteral("DIRTY_DIRTY_THIEF");
+        aff_name = u"DIRTY_DIRTY_THIEF"_s;
         break;
       case SKILL_HARM_TOUCH:
-        aff_name = QStringLiteral("harmtouch reuse timer");
+        aff_name = u"harmtouch reuse timer"_s;
         break;
       case SKILL_LAY_HANDS:
-        aff_name = QStringLiteral("layhands reuse timer");
+        aff_name = u"layhands reuse timer"_s;
         break;
       case SKILL_QUIVERING_PALM:
-        aff_name = QStringLiteral("quiver reuse timer");
+        aff_name = u"quiver reuse timer"_s;
         break;
       case SKILL_BLOOD_FURY:
-        aff_name = QStringLiteral("blood fury reuse timer");
+        aff_name = u"blood fury reuse timer"_s;
         break;
       case SKILL_CRAZED_ASSAULT:
         if (dc_strcmp(apply_types[(qint32)aff->location], "HITROLL"))
-          aff_name = QStringLiteral("crazed assault reuse timer");
+          aff_name = u"crazed assault reuse timer"_s;
         break;
       case SPELL_HOLY_AURA_TIMER:
-        aff_name = QStringLiteral("holy aura timer");
+        aff_name = u"holy aura timer"_s;
         break;
       default:
         break;

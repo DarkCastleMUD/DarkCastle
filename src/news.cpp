@@ -61,7 +61,7 @@ void savenews()
   FILE *fl;
   if (!(fl = fopen("news.data", "w")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Cannot open news file 'news.data'"_s, 0, DC::LogChannel::LOG_MISC);
     abort();
   }
   news_data *tmpnews;
@@ -76,7 +76,7 @@ void savenews()
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
-    DC::getInstance()->logentry(QStringLiteral("Cannot save news file to web dir."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Cannot save news file to web dir."_s, 0, DC::LogChannel::LOG_MISC);
 }
 
 void DC::loadnews(void)
@@ -85,7 +85,7 @@ void DC::loadnews(void)
 
   if (!news_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
   {
-    logmisc(QStringLiteral("Cannot open news file 'news.data'"));
+    logmisc(u"Cannot open news file 'news.data'"_s);
     return;
   }
   QTextStream fl(&news_file);
@@ -172,7 +172,7 @@ command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
   page_string(ch->desc, buf, 1);
   if (QString(buf).isEmpty())
   {
-    if (QString(argument) == QStringLiteral("all"))
+    if (QString(argument) == u"all"_s)
       ch->sendln("There's been no news recorded ever.");
     else
       ch->sendln("There's been no recent news. Type 'news all' to see all news.");
@@ -191,7 +191,7 @@ command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!argument || !*argument || !ch->desc)
+  if (!argument || argument.isEmpty() || !ch->desc)
   {
     send_to_char("Syntax: addnews <date>\r\n"
                  "Date is either TODAY or in the following format: day/month/year\r\n"
@@ -251,7 +251,7 @@ command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
   ch->sendln("        Enter news item.  (/s saves /h for help)");
   if (nnews->news)
     ch->send(nnews->news);
-  //  nnews->news = QStringLiteral("Temporary data.\r\n");
+  //  nnews->news = u"Temporary data.\r\n"_s;
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(nnews->news);
   ch->desc->max_str = 2096;

@@ -512,7 +512,7 @@ void advance_level(CharacterPtr ch, bool is_conversion)
     break;
 
   default:
-    DC::getInstance()->logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unknown class in advance level?"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -638,7 +638,7 @@ void gain_exp(CharacterPtr ch, qint64 gain)
   {
     ch->sendln("You now have enough experience to level!");
     if (ch->getLevel() == 1)
-      ch->send(QStringLiteral("$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\r\n").arg(pc_clss_types[GET_CLASS(ch)]));
+      ch->send(u"$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\r\n"_s.arg(pc_clss_types[GET_CLASS(ch)]));
   }
 }
 
@@ -731,7 +731,7 @@ void food_update(void)
         if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
           i->sendln("It's too dark to see what's safe to eat!");
         else if (FOUNTAINisPresent(i))
-          i->do_drink({QStringLiteral("fountain")});
+          i->do_drink({u"fountain"_s});
         else if ((food = bring_type_to_front(i, ITEM_FOOD)))
           i->do_eat(food->name().split(' '));
         else
@@ -747,7 +747,7 @@ void food_update(void)
         if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
           i->sendln("It's too dark to see if there's any potable liquid around!");
         else if (FOUNTAINisPresent(i))
-          i->do_drink({QStringLiteral("fountain")});
+          i->do_drink({u"fountain"_s});
         else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
           i->do_drink(food->name().split(' '));
         else
@@ -841,13 +841,13 @@ void update_corpses_and_portals(void)
       {
         if (j->in_room != DC::NOWHERE)
         {
-          auto str = QStringLiteral("%1 shimmers brightly and then fades away.\r\n").arg(GET_OBJ_SHORT(j));
+          auto str = u"%1 shimmers brightly and then fades away.\r\n"_s).arg(GET_OBJ_SHORT(j));
           str[0] = str[0].toUpper();
           send_to_room(str, j->in_room);
         }
         else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE)
         {
-          auto str = QStringLiteral("%1 shimmers brightly for a moment.\r\n").arg(GET_OBJ_SHORT(j->in_obj));
+          auto str = u"%1 shimmers brightly for a moment.\r\n"_s).arg(GET_OBJ_SHORT(j->in_obj));
           str[0] = str[0].toUpper();
           send_to_room(str, j->in_obj->in_room);
         }
@@ -936,7 +936,7 @@ void update_corpses_and_portals(void)
           }
           else
           {
-            DC::getInstance()->logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, DC::LogChannel::LOG_BUG);
+            DC::getInstance()->logentry(u"BIIIG problem in limits.c!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
             return;
           }
         }
@@ -1008,7 +1008,7 @@ void prepare_character_for_sixty(CharacterPtr ch)
       qint32 i = (ch->exp / 100000000) * 500000;
       if (i > 0)
       {
-        ch->send(QStringLiteral("$B$3You have been credited %d $B$5gold$R coins for your %ld experience.$R\r\n").arg(i).arg(ch->exp));
+        ch->send(u"$B$3You have been credited %d $B$5gold$R coins for your %ld experience.$R\r\n"_s.arg(i).arg(ch->exp));
         ch->addGold(i);
       }
       else if (ch->exp > 0)

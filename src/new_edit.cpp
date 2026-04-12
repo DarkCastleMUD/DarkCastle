@@ -334,7 +334,7 @@ void parse_action(parse_t action, QString str, class Connection *d)
         s++;
         temp = *s;
         *s = '\0';
-        sbuffer = QStringLiteral("%1%2: ").arg(buf).arg(i - 1, 4);
+        sbuffer = u"%1%2: "_s.arg(buf).arg(i - 1, 4);
         dc_strncpy(buf, qPrintable(sbuffer), sizeof(buf) - 1);
         buf[sizeof(buf) - 1] = {};
         dc_strncat(buf, t, 32768 - strlen(buf) - 1);
@@ -488,7 +488,7 @@ void parse_action(parse_t action, QString str, class Connection *d)
     break;
   default:
     write_to_output("Invalid option.\r\n", d);
-    DC::getInstance()->logentry(QStringLiteral("SYSERR: invalid command passed to parse_action"), OVERSEER, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"SYSERR: invalid command passed to parse_action"_s, OVERSEER, DC::LogChannel::LOG_MISC);
     return;
   }
 }

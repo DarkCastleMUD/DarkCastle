@@ -1546,7 +1546,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
 
     if (hjp->next != af)
     {
-      DC::getInstance()->logentry(QStringLiteral("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"_s, ANGEL, DC::LogChannel::LOG_BUG);
       dc_sprintf(buf, "Problem With: %s    Affect type: %d", qPrintable(ch->name()), af->type);
       DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
       return;
@@ -2186,7 +2186,7 @@ qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
 
   if (DC::getInstance()->world[room].people == ch)
   {
-    DC::getInstance()->logentry(QStringLiteral("Error: DC::getInstance()->world[room].people == ch in char_to_room()."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Error: DC::getInstance()->world[room].people == ch in char_to_room()."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -2295,12 +2295,12 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
 
   if (!obj)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null obj in equip_char()!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
   if (pos < 0 || pos >= MAX_WEAR)
   {
-    DC::getInstance()->logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Invalid eq position in equip_char!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
   if (equipment[pos])
@@ -2318,13 +2318,13 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
 
   if (obj->carried_by)
   {
-    DC::getInstance()->logentry(QStringLiteral("EQUIP: Obj is carried_by when equip."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"EQUIP: Obj is carried_by when equip."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
   if (obj->in_room != DC::NOWHERE)
   {
-    DC::getInstance()->logentry(QStringLiteral("EQUIP: Obj is in_room when equip."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"EQUIP: Obj is in_room when equip."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -2355,7 +2355,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     }
     else
     {
-      DC::getInstance()->logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping character."), 0, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"this->in_room = DC::NOWHERE when equipping character."_s, 0, DC::LogChannel::LOG_BUG);
     }
   }
 
@@ -2821,13 +2821,13 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
 
   if (!obj)
   {
-    DC::getInstance()->logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"nullptr object sent to move_obj!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
   if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
   {
-    qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name())));
+    qFatal("%s", qUtf8Printable(u"FATAL: Object move_obj() while equipped: %1.\n"_s.arg(obj->name())));
   }
 
   if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -2875,17 +2875,17 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
     if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (1): %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in NOWHERE (1): %1.\n"_s.arg(obj->name())));
     }
     else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (2) : %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in NOWHERE (2) : %1.\n"_s.arg(obj->name())));
     }
     else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in NOWHERE (3) : %1.\n"_s.arg(obj->name())));
     }
 
     DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", qPrintable(obj->name()), DC::getInstance()->world[dest].number);
@@ -2906,13 +2906,13 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
 
   if (!obj)
   {
-    DC::getInstance()->logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"nullptr object sent to move_obj!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
   if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
   {
-    qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name())));
+    qFatal("%s", qUtf8Printable(u"FATAL: Object move_obj() while equipped: %1.\n"_s.arg(obj->name())));
   }
 
   if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -2956,17 +2956,17 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
     if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (4): %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (4): %1.\n"_s.arg(obj->name())));
     }
     else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (5) : %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (5) : %1.\n"_s.arg(obj->name())));
     }
     else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (6) : %1.\n"_s.arg(obj->name())));
     }
 
     DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", qPrintable(obj->name()), qPrintable(dest_obj->name()));
@@ -2989,13 +2989,13 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
 
   if (!obj)
   {
-    DC::getInstance()->logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"nullptr object sent to move_obj!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
   if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
   {
-    qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name())));
+    qFatal("%s", qUtf8Printable(u"FATAL: Object move_obj() while equipped: %1.\n"_s.arg(obj->name())));
   }
 
   if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3055,17 +3055,17 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
     if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (7): %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (7): %1.\n"_s.arg(obj->name())));
     }
     else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (8) : %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (8) : %1.\n"_s.arg(obj->name())));
     }
     else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (9) : %1.\n"_s.arg(obj->name())));
     }
 
     DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", qPrintable(obj->name()), qPrintable(ch->name()));
@@ -3132,7 +3132,7 @@ qint32 obj_from_char(ObjectPtr object)
 
   if (!object->carried_by)
   {
-    DC::getInstance()->logentry(QStringLiteral("Obj_from_char called on an object no one is carrying!"), OVERSEER,
+    DC::getInstance()->logentry(u"Obj_from_char called on an object no one is carrying!"_s, OVERSEER,
                                 DC::LogChannel::LOG_BUG);
     return 0;
   }
@@ -3191,7 +3191,7 @@ qint32 obj_to_room(ObjectPtr object, qint32 room)
       if (GET_ITEM_TYPE(obj) == ITEM_MONEY)
       {
         object->obj_flags.value[0] += obj->obj_flags.value[0];
-        object->long_description = QStringLiteral("A pile of $B$5gold$R coins.");
+        object->long_description = u"A pile of $B$5gold$R coins."_s;
         extract_obj(obj);
         break;
       }
@@ -3256,7 +3256,7 @@ qint32 obj_from_room(ObjectPtr object)
 
   if (object->in_room == DC::NOWHERE)
   {
-    DC::getInstance()->logentry(QStringLiteral("obj_from_room called on an object that isn't in a room!"), OVERSEER,
+    DC::getInstance()->logentry(u"obj_from_room called on an object that isn't in a room!"_s, OVERSEER,
                                 DC::LogChannel::LOG_BUG);
     return 0;
   }
@@ -3333,7 +3333,7 @@ qint32 obj_from_obj(ObjectPtr obj)
 
   if (!obj->in_obj)
   {
-    DC::getInstance()->logentry(QStringLiteral("obj_from_obj called on an item that isn't inside another item."),
+    DC::getInstance()->logentry(u"obj_from_obj called on an item that isn't inside another item."_s,
                                 OVERSEER, DC::LogChannel::LOG_BUG);
     return 0;
   }
@@ -3558,7 +3558,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
   }
   if (ch->in_room == DC::NOWHERE)
   {
-    DC::getInstance()->logentry(QStringLiteral("Extract_char: DC::NOWHERE"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Extract_char: DC::NOWHERE"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -3730,7 +3730,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
   GET_AC(ch) -= GET_AC_METAS(ch);
 
   if (ch->desc && ch->desc->original)
-    do_return(ch, QStringLiteral(""), cmd_t::LOOK);
+    do_return(ch, u""_s, cmd_t::LOOK);
 
   if (ch->isNonPlayer() && ch->mobdata->nr > -1)
     DC::getInstance()->mob_index[ch->mobdata->nr].qty--;
@@ -4494,7 +4494,7 @@ ObjectPtr create_money(qint32 amount)
 
   if (amount <= 0)
   {
-    DC::getInstance()->logentry(QStringLiteral("ERROR: Try to create negative money."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"ERROR: Try to create negative money."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return {};
   }
 
@@ -4505,21 +4505,21 @@ ObjectPtr create_money(qint32 amount)
 
   if (amount == 1)
   {
-    obj->name(QStringLiteral("coin gold"));
-    qPrintable(obj->short_description()) = QStringLiteral("a gold coin");
-    obj->long_description = QStringLiteral("One miserable gold coin.");
+    obj->name(u"coin gold"_s);
+    qPrintable(obj->short_description()) = u"a gold coin"_s;
+    obj->long_description = u"One miserable gold coin."_s;
 
-    new_new_descr->keyword = QStringLiteral("coin gold");
-    new_new_descr->description = QStringLiteral("One miserable gold coin.");
+    new_new_descr->keyword = u"coin gold"_s;
+    new_new_descr->description = u"One miserable gold coin."_s;
   }
   else
   {
-    obj->name(QStringLiteral("coins gold"));
-    qPrintable(obj->short_description()) = QStringLiteral("gold coins");
-    obj->long_description = QStringLiteral("A pile of gold coins.");
+    obj->name(u"coins gold"_s);
+    qPrintable(obj->short_description()) = u"gold coins"_s;
+    obj->long_description = u"A pile of gold coins."_s;
 
-    new_new_descr->keyword = QStringLiteral("coins gold");
-    new_new_descr->description = QStringLiteral("They look like coins...of gold...duh.");
+    new_new_descr->keyword = u"coins gold"_s;
+    new_new_descr->description = u"They look like coins...of gold...duh."_s;
   }
 
   new_new_descr->next = {};
@@ -4591,11 +4591,11 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
       {
         if ((*tar_ch)->short_desc)
         {
-          ch->send(QStringLiteral("You find %s in this room.\r\n").arg((*tar_ch)->short_desc));
+          ch->send(u"You find %s in this room.\r\n"_s.arg((*tar_ch)->short_desc));
         }
         else if (!(*tar_ch)->name().isEmpty())
         {
-          ch->sendln(QStringLiteral("You find %1 in this room.").arg((*tar_ch)->name()));
+          ch->sendln(u"You find %1 in this room."_s).arg((*tar_ch)->name()));
         }
         else
         {
@@ -4615,11 +4615,11 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
       {
         if ((*tar_ch)->short_desc)
         {
-          ch->send(QStringLiteral("You find %s somewhere in the world.\r\n").arg((*tar_ch)->short_desc));
+          ch->send(u"You find %s somewhere in the world.\r\n"_s.arg((*tar_ch)->short_desc));
         }
         else if (!(*tar_ch)->name().isEmpty())
         {
-          ch->sendln(QStringLiteral("You find %1 somewhere in the world.").arg((*tar_ch)->name()));
+          ch->sendln(u"You find %1 somewhere in the world."_s).arg((*tar_ch)->name()));
         }
         else
         {
@@ -4639,11 +4639,11 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
       {
         if ((*tar_obj)->short_description)
         {
-          ch->sendln(QStringLiteral("You find %1 in your inventory.").arg((*tar_obj)->short_description));
+          ch->sendln(u"You find %1 in your inventory."_s).arg((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->name().isEmpty())
         {
-          ch->sendln(QStringLiteral("You find %1 in your inventory.").arg((*tar_obj)->name()));
+          ch->sendln(u"You find %1 in your inventory."_s).arg((*tar_obj)->name()));
         }
         else
         {
@@ -4670,11 +4670,11 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
       {
         if (!(*tar_obj)->short_description().isEmpty())
         {
-          ch->send(QStringLiteral("You find %s among your equipment.\r\n").arg(qPrintable((*tar_obj)->short_description())));
+          ch->send(u"You find %s among your equipment.\r\n"_s.arg(qPrintable((*tar_obj)->short_description())));
         }
         else if (!(*tar_obj)->name().isEmpty())
         {
-          ch->send(QStringLiteral("You find %s among your equipment.\r\n").arg(qPrintable((*tar_obj)->name())));
+          ch->send(u"You find %s among your equipment.\r\n"_s.arg(qPrintable((*tar_obj)->name())));
         }
         else
         {
@@ -4694,11 +4694,11 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
       {
         if ((*tar_obj)->short_description)
         {
-          ch->send(QStringLiteral("You find %s in this room.\r\n").arg((*tar_obj)->short_description));
+          ch->send(u"You find %s in this room.\r\n"_s.arg((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->name().isEmpty())
         {
-          ch->send(QStringLiteral("You find %s in this room.\r\n").arg(qPrintable((*tar_obj)->name())));
+          ch->send(u"You find %s in this room.\r\n"_s.arg(qPrintable((*tar_obj)->name())));
         }
         else
         {
@@ -4718,11 +4718,11 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
       {
         if ((*tar_obj)->short_description)
         {
-          ch->send(QStringLiteral("You find %s somewhere in the world.\r\n").arg((*tar_obj)->short_description));
+          ch->send(u"You find %s somewhere in the world.\r\n"_s.arg((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->name().isEmpty())
         {
-          ch->send(QStringLiteral("You find %s somewhere in the world\r\n").arg(qPrintable((*tar_obj)->name())));
+          ch->send(u"You find %s somewhere in the world\r\n"_s.arg(qPrintable((*tar_obj)->name())));
         }
         else
         {
@@ -4806,7 +4806,6 @@ void remove_memory(CharacterPtr ch, QChar type, CharacterPtr vict)
   //  if(type == 'h')
   //    ch->mobdata->hated = {};
 
-  // these two are QStringLiteral'd, so just null them out
   if (type == 'f')
     ch->mobdata->fears = {};
 }
@@ -4865,7 +4864,7 @@ void Character::add_memory(QString victim_name, QChar type)
       }
 
       // name 1 + name 2 + a space + terminator
-      this->mobdata->hated = QStringLiteral("%1 %2").arg(mobdata->hated).arg(victim_name);
+      this->mobdata->hated = u"%1 %2"_s.arg(mobdata->hated).arg(victim_name);
     }
   }
   else if (type == 'f')

@@ -452,41 +452,41 @@ void Character::meta_list_stats(void)
   plat_cost = meta_get_stat_plat_cost(attribute_t::STRENGTH);
   max_stat = get_max_stat(this, attribute_t::STRENGTH);
   if (this->raw_str >= max_stat)
-    this->send(QStringLiteral("$B$31)$R Str:       Your strength is already %1.\r\n").arg(max_stat));
+    this->send(u"$B$31)$R Str:       Your strength is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(QStringLiteral("$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n").arg((this->raw_str + 1)).arg(xp_price).arg(plat_cost));
+    this->send(u"$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n"_s.arg((this->raw_str + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::DEXTERITY);
   plat_cost = meta_get_stat_plat_cost(attribute_t::DEXTERITY);
   max_stat = get_max_stat(this, attribute_t::DEXTERITY);
   if (this->raw_dex >= max_stat)
-    this->send(QStringLiteral("$B$32)$R Dex:       Your dexterity is already %1.\r\n").arg(max_stat));
+    this->send(u"$B$32)$R Dex:       Your dexterity is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(QStringLiteral("$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_dex + 1)).arg(xp_price).arg(plat_cost));
+    this->send(u"$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_dex + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::CONSTITUTION);
   plat_cost = meta_get_stat_plat_cost(attribute_t::CONSTITUTION);
   max_stat = get_max_stat(this, attribute_t::CONSTITUTION);
   if (this->raw_con >= max_stat)
-    this->send(QStringLiteral("$B$33)$R Con:       Your constitution is already %1.\r\n").arg(max_stat));
+    this->send(u"$B$33)$R Con:       Your constitution is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(QStringLiteral("$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_con + 1)).arg(xp_price).arg(plat_cost));
+    this->send(u"$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_con + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::INTELLIGENCE);
   plat_cost = meta_get_stat_plat_cost(attribute_t::INTELLIGENCE);
   max_stat = get_max_stat(this, attribute_t::INTELLIGENCE);
   if (this->raw_intel >= max_stat)
-    this->send(QStringLiteral("$B$34)$R Int:       Your intelligence is already %1.\r\n").arg(max_stat));
+    this->send(u"$B$34)$R Int:       Your intelligence is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(QStringLiteral("$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_intel + 1)).arg(xp_price).arg(plat_cost));
+    this->send(u"$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_intel + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::WISDOM);
   plat_cost = meta_get_stat_plat_cost(attribute_t::WISDOM);
   max_stat = get_max_stat(this, attribute_t::WISDOM);
   if (this->raw_wis >= max_stat)
-    this->send(QStringLiteral("$B$35)$R Wis:       Your wisdom is already %1.\r\n").arg(max_stat));
+    this->send(u"$B$35)$R Wis:       Your wisdom is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(QStringLiteral("$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n").arg((this->raw_wis + 1)).arg(xp_price).arg(plat_cost));
+    this->send(u"$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_wis + 1)).arg(xp_price).arg(plat_cost));
 }
 
 quint64 Character::meta_get_moves_exp_cost(void)
@@ -719,7 +719,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       break;
     }
     expcost = platcost * 51523;
-    ch->send(QStringLiteral("$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \r\n").arg(platcost).arg(expcost));
+    ch->send(u"$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \r\n"_s.arg(platcost).arg(expcost));
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::LIST)
@@ -741,7 +741,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->sendln("$B$37)$R Add to your hit points:   You cannot do ch.");
 
     if (mana_exp && mana_cost)
-      ch->sendln(QStringLiteral("$B$38)$R Add 5 points to your mana points:  %ld experience points and %ld Platinum coins.").arg(mana_exp).arg(mana_cost));
+      ch->sendln(u"$B$38)$R Add 5 points to your mana points:  %ld experience points and %ld Platinum coins."_s.arg(mana_exp).arg(mana_cost));
     else
       ch->sendln("$B$38)$R Add to your mana points:  You cannot do ch.");
 
@@ -751,7 +751,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->sendln("$B$39)$R Add to your mana points:   You cannot do ch.");
 
     if (move_exp && move_cost)
-      ch->sendln(QStringLiteral("$B$310)$R Add 5 points to your movement points: %ld experience points and %ld Platinum coins.").arg(move_exp).arg(move_cost));
+      ch->sendln(u"$B$310)$R Add 5 points to your movement points: %ld experience points and %ld Platinum coins."_s.arg(move_exp).arg(move_cost));
     else
       ch->sendln("$B$310)$R Add to your movement points:  You cannot do ch.");
 
@@ -764,7 +764,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
     if (!ch->isNonPlayer() && ki_cost && ki_exp)
     { // mobs can't meta ki
-      ch->send(QStringLiteral("$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n").arg(ki_exp).arg(ki_cost));
+      ch->send(u"$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n"_s.arg(ki_exp).arg(ki_cost));
     }
     else if (!ch->isNonPlayer())
       ch->sendln("$B$312)$R Add a point of ki:        You cannot do ch.");
@@ -783,7 +783,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
         ch);
     if (!ch->isNonPlayer())
     {
-      ch->send(QStringLiteral("$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\r\n").arg(GET_AC_METAS(ch)));
+      ch->send(u"$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\r\n"_s.arg(GET_AC_METAS(ch)));
       ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
     }
 
@@ -866,7 +866,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", statplatprice, GET_PLATINUM(ch)));
+      QLocale::setDefault(QLocale("en_US"));
+      ch->send(u"The Meta-physician takes %L1 platinum from you, leaving you with %L2 platinum.\r\n"_s).arg(statplatprice).arg(GET_PLATINUM(ch));
 
       // affect the stat by 0 to reflect the new raw stat
       affect_modify(ch, APPLY_STR, 0, -1, true);
@@ -901,7 +902,8 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_HP_METAS(ch) += 5;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
+      QLocale::setDefault(QLocale("en_US"));
+      ch->send(u"The Meta-physician takes %L1 platinum from you, leaving you with %L2 platinum.\r\n"_s).arg(hit_cost).arg(GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -929,7 +931,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_HP_METAS(ch) += 1;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
+      ch->send(u"The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -956,7 +958,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_MANA_METAS(ch) += 5;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
+      ch->send(u"The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -985,7 +987,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_MANA_METAS(ch) += 1;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
+      ch->send(u"The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -1010,7 +1012,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_MOVE_METAS(ch) += 5;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
+      ch->send(u"The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
@@ -1039,7 +1041,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_MOVE_METAS(ch) += 1;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
+      ch->send(u"The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
@@ -1070,7 +1072,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       redo_ki(ch);
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", ki_cost, GET_PLATINUM(ch)));
+      ch->send(u"The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", ki_cost, GET_PLATINUM(ch)));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1569,37 +1571,37 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
     ch->sendln("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)");
 
     for (qint32 i = 1; i <= MAX_PC_RACE; i++)
-      ch->send(QStringLiteral("$B$3%d)$R  %-32s - %s\r\n").arg(i).arg(races[i].singular_name).arg(ch->race_message(i)));
+      ch->send(u"$B$3%d)$R  %-32s - %s\r\n"_s.arg(i).arg(races[i].singular_name).arg(ch->race_message(i)));
 
     ch->sendln("$BOther Services:$R");
 
-    ch->send(QStringLiteral("$B$3%d)$R %-32s - 1000 platinum coins.\r\n").arg(MAX_PC_RACE + 1).arg("Sex Change"));
-    ch->send(QStringLiteral("$B$3%d)$R %-32s - 50 platinum coins.\r\n").arg(MAX_PC_RACE + 2).arg("A deep red vial of mana"));
+    ch->send(u"$B$3%d)$R %-32s - 1000 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 1).arg("Sex Change"));
+    ch->send(u"$B$3%d)$R %-32s - 50 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 2).arg("A deep red vial of mana"));
 
     ch->sendln("$BHeight/Weight Change:$R");
     ch->heightweight(false);
     if (ch->height < races[ch->race].max_height)
-      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 3).arg("Increase your height by 1"));
+      ch->send(u"$B$3%d)$R %-32s - 250 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 3).arg("Increase your height by 1"));
     else
-      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 3).arg("You cannot increase your height further"));
+      ch->send(u"$B$3%d)$R %-32s.\r\n"_s.arg(MAX_PC_RACE + 3).arg("You cannot increase your height further"));
 
     if (ch->height > races[ch->race].min_height)
-      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 4).arg("Decrease your height by 1"));
+      ch->send(u"$B$3%d)$R %-32s - 250 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 4).arg("Decrease your height by 1"));
     else
-      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 4).arg("You cannot decrease your height further"));
+      ch->send(u"$B$3%d)$R %-32s.\r\n"_s.arg(MAX_PC_RACE + 4).arg("You cannot decrease your height further"));
 
     if (ch->weight < races[ch->race].max_weight)
-      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 5).arg("Increase your weight by 1"));
+      ch->send(u"$B$3%d)$R %-32s - 250 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 5).arg("Increase your weight by 1"));
     else
-      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 5).arg("You cannot increase your weight further"));
+      ch->send(u"$B$3%d)$R %-32s.\r\n"_s.arg(MAX_PC_RACE + 5).arg("You cannot increase your weight further"));
 
     if (ch->weight > races[ch->race].min_weight)
-      ch->send(QStringLiteral("$B$3%d)$R %-32s - 250 platinum coins.\r\n").arg(MAX_PC_RACE + 6).arg("Decrease your weight by 1"));
+      ch->send(u"$B$3%d)$R %-32s - 250 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 6).arg("Decrease your weight by 1"));
     else
-      ch->send(QStringLiteral("$B$3%d)$R %-32s.\r\n").arg(MAX_PC_RACE + 6).arg("You cannot decrease your weight further"));
+      ch->send(u"$B$3%d)$R %-32s.\r\n"_s.arg(MAX_PC_RACE + 6).arg("You cannot decrease your weight further"));
     ch->heightweight(true);
-    ch->send(QStringLiteral("$B$3%d)$R %-32s - 5 quest points.\r\n").arg(MAX_PC_RACE + 7).arg("Increase your age by 1 (500 max)"));
-    ch->send(QStringLiteral("$B$3%d)$R %-32s - 5 quest points.\r\n").arg(MAX_PC_RACE + 8).arg("Decrease your age by 1  (18 min)"));
+    ch->send(u"$B$3%d)$R %-32s - 5 quest points.\r\n"_s.arg(MAX_PC_RACE + 7).arg("Increase your age by 1 (500 max)"));
+    ch->send(u"$B$3%d)$R %-32s - 5 quest points.\r\n"_s.arg(MAX_PC_RACE + 8).arg("Decrease your age by 1  (18 min)"));
 
     return ReturnValue::eSUCCESS;
   }
@@ -1674,7 +1676,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       }
       else
       {
-        ch->send(QStringLiteral("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\r\n").arg(choice));
+        ch->send(u"$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\r\n"_s.arg(choice));
         ch->sendln("$4NOTE$R$B: Your attributes will be adjusted to fit ch new race and then lowered by 2 points each.$R");
       }
       return ReturnValue::eSUCCESS;
@@ -1690,7 +1692,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
         newsex = Character::sex_t::FEMALE;
       else
       {
-        ch->send(QStringLiteral("Syntax: buy %d m/f/n\r\n").arg(MAX_PC_RACE + 1));
+        ch->send(u"Syntax: buy %d m/f/n\r\n"_s.arg(MAX_PC_RACE + 1));
         return ReturnValue::eSUCCESS;
       }
       if (GET_SEX(ch) == newsex)

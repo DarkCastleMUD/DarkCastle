@@ -192,7 +192,7 @@ command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, arg);
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Slay whom?");
     return ReturnValue::eFAILURE;
@@ -251,7 +251,7 @@ command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, arg);
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Slay whom?");
     return ReturnValue::eFAILURE;

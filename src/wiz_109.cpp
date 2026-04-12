@@ -59,7 +59,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   redo_hitpoints(new_new);
   redo_mana(new_new);
   if (!GET_TITLE(new_new))
-    new_new->title = QStringLiteral("is a virgin");
+    new_new->title = u"is a virgin"_s;
   if (GET_CLASS(new_new) == CLASS_MONK)
     GET_AC(new_new) -= new_new->getLevel() * 3;
   isr_set(new_new);
@@ -83,7 +83,7 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
+    DC::getInstance()->logentry(u"Unable to open whassup.txt for adding in do_processes!"_s, IMPLEMENTER,
                                 DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
@@ -98,7 +98,7 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
+    DC::getInstance()->logentry(u"Unable to open whassup.txt for reading in do_processes!"_s, IMPLEMENTER,
                                 DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
@@ -130,14 +130,14 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    send(QStringLiteral("%1 is now a guide.\r\n").arg(qPrintable(victim->name())));
+    send(u"%1 is now a guide.\r\n"_s).arg(qPrintable(victim->name())));
     victim->sendln("You have been selected to be a DC Guide!");
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send(QStringLiteral("%1 is no longer a guide.\r\n").arg(qPrintable(victim->name())));
+    send(u"%1 is no longer a guide.\r\n"_s).arg(qPrintable(victim->name())));
     victim->sendln("You have been removed as a DC guide.");
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
@@ -180,7 +180,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*level ||
+  if (level.isEmpty() ||
       (new_newlevel = atoi(level)) <= 0 || new_newlevel > IMPLEMENTER)
   {
     ch->sendln("Level must be 1 to 110.");
@@ -327,7 +327,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    DC::getInstance()->logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(name()).arg(victim->name()), ANGEL, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"%1 has deleted %2.\r\n"_s).arg(name()).arg(victim->name()), ANGEL, DC::LogChannel::LOG_GOD);
   }
 
   else
@@ -400,7 +400,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
   if (arg1 == "cold")
   {
-    QString buffer = QStringLiteral("Shutdown by %1.\r\n").arg(qPrintable(this->shortdesc_or_name()));
+    QString buffer = u"Shutdown by %1.\r\n"_s).arg(qPrintable(this->shortdesc_or_name()));
     send_to_all(buffer);
     DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     _shutdown = 1;
@@ -419,7 +419,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
           {
             if (follower->carrying != nullptr)
             {
-              send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
+              send(u"Player %1 has charmie %2 with equipment.\r\n"_s).arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
               return ReturnValue::eFAILURE;
             }
           }
@@ -428,14 +428,14 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     }
 
     do_not_save_corpses = 1;
-    QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(qPrintable(this->shortdesc_or_name()));
+    QString buffer = u"Hot reboot by %1.\r\n"_s).arg(qPrintable(this->shortdesc_or_name()));
     send_to_all(buffer);
     DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
-    DC::getInstance()->logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
-    do_force({QStringLiteral("all"), QStringLiteral("save")});
+    DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
+    do_force({u"all"_s, u"save"_s});
     if (!DC::getInstance()->write_hotboot_file())
     {
-      DC::getInstance()->logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
       this->sendln("Hot reboot failed.");
     }
   }
@@ -464,7 +464,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   else if (arg1 == "core")
   {
     produce_coredump(this);
-    DC::getInstance()->logentry(QStringLiteral("Corefile produced."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Corefile produced."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
   }
   else if (arg1 == "die")
   {
@@ -493,7 +493,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
             {
               if (follower->carrying != nullptr || follower->equipment[0] != nullptr)
               {
-                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
+                send(u"Player %1 has charmie %2 with equipment. Use Force to override.\r\n"_s).arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
                 return ReturnValue::eFAILURE;
               }
             }
@@ -653,7 +653,7 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 #ifdef BANDWIDTH
 command_return_t do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  ch->send(QStringLiteral("Bytes sent in %ld seconds: %ld\r\n").arg(get_bandwidth_start()).arg(get_bandwidth_amount()));
+  ch->send(u"Bytes sent in %ld seconds: %ld\r\n"_s.arg(get_bandwidth_start()).arg(get_bandwidth_amount()));
   return ReturnValue::eSUCCESS;
 }
 #endif

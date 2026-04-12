@@ -233,7 +233,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
 
   act_to_room("$n buys $p.", ch, obj, 0, 0);
   keeper->do_tell(shop.message_buy.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
-  ch->send(QStringLiteral("You now have %1.\r\n").arg(obj->short_description()));
+  ch->send(u"You now have %1.\r\n"_s).arg(obj->short_description()));
   ch->removeGold(cost);
   keeper->addGold(cost);
 
@@ -275,7 +275,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 
   if (*argm == '\0')
   {
-    keeper->do_tell(QStringLiteral("%1 What do you want to sell?").arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 What do you want to sell?"_s.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
@@ -324,14 +324,14 @@ void shopping_sell(const QString arg, CharacterPtr ch,
   if (virt >= 13400 && virt <= 13707 &&
       DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() != 13416)
   {
-    keeper->do_tell(QStringLiteral("%1 There is only one merchant in the land that deals with such fine jewels.").arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 There is only one merchant in the land that deals with such fine jewels."_s).arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
   // don't allow non-empty containers to be sold
   if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
   {
-    keeper->do_tell(QStringLiteral("%1 %2$B$2 needs to be emptied first.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).split(' '));
+    keeper->do_tell(u"%1 %2$B$2 needs to be emptied first."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).split(' '));
     return;
   }
 
@@ -344,7 +344,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 
   act_to_room("$n sells $p.", ch, obj, 0, 0);
   keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
-  ch->send(QStringLiteral("The shopkeeper now has %1.\r\n").arg(obj->short_description()));
+  ch->send(u"The shopkeeper now has %1.\r\n"_s).arg(obj->short_description()));
   ch->addGold(cost);
   keeper->removeGold(cost);
 
@@ -379,7 +379,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
 
   if (*argm == '\0')
   {
-    keeper->do_tell(QStringLiteral("%1 What do you want to value?").arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 What do you want to value?"_s.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
@@ -405,7 +405,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     {
       act_to_character("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, 0);
       act_to_room("$n holds up $p for the Weaponsmith to examine.", ch, obj, 0, 0);
-      do_emote(keeper, QStringLiteral("looks carefully at the item."));
+      do_emote(keeper, u"looks carefully at the item."_s);
     }
     if (GET_ITEM_TYPE(obj) == ITEM_WEAPON)
     {
@@ -454,7 +454,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     {
       act_to_character("You hold up $p for the Armourer to examine.", ch, obj, 0, 0);
       act_to_room("$n holds up $p to the Armourer to examine.", ch, obj, 0, 0);
-      do_emote(keeper, QStringLiteral("looks carefully at the item."));
+      do_emote(keeper, u"looks carefully at the item."_s);
     }
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
     {
@@ -588,7 +588,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
   if (!keeperhas)
   {
     cost = (qint32)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_sell);
-    keeper->do_tell(QStringLiteral("%1 I'll give you %2 gold coins for that.").arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
+    keeper->do_tell(u"%1 I'll give you %2 gold coins for that."_s.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
   }
 }
 
@@ -610,8 +610,8 @@ void shopping_list(const QString arg, CharacterPtr ch,
 
   if (!keeper->carrying && DC::getInstance()->shop_index[shop_nr].inventory)
   {
-    keeper->do_tell(QStringLiteral("%1 Oops, I seem to be out of inventory.").arg(qPrintable(ch->name())).split(' '));
-    keeper->do_tell(QStringLiteral("%1 One minute while I restock.").arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 Oops, I seem to be out of inventory."_s).arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 One minute while I restock."_s).arg(qPrintable(ch->name())).split(' '));
     restock_keeper(keeper, shop_nr);
   }
   i = {};
@@ -656,11 +656,11 @@ void shopping_list(const QString arg, CharacterPtr ch,
     {
       first_vnum = DC::getInstance()->getObjectVNUM(obj);
     }
-    ch->sendln(QStringLiteral("[%1] [%2] [%3] %4.").arg(QString::number(a), 3).arg(QString::number(cost), 7).arg(QString::number(DC::getInstance()->getObjectVNUM(obj)), 6).arg(obj->short_description()));
+    ch->sendln(u"[%1] [%2] [%3] %4."_s.arg(QString::number(a), 3).arg(QString::number(cost), 7).arg(QString::number(DC::getInstance()->getObjectVNUM(obj)), 6).arg(obj->short_description()));
   }
   if (first_vnum && first_vnum != DC::INVALID_VNUM)
   {
-    ch->sendln(QStringLiteral("Type 'identify vVNUM' for details about a specific object. Example: identify v%1").arg(QString::number(first_vnum)));
+    ch->sendln(u"Type 'identify vVNUM' for details about a specific object. Example: identify v%1"_s.arg(QString::number(first_vnum)));
   }
 
   if (!found)
@@ -689,7 +689,7 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Shop_keeper: keeper not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -699,7 +699,7 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
     if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  DC::getInstance()->logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Shop_keeper: shop_nr not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
   return ReturnValue::eFAILURE;
 
 LFound2:
@@ -1075,7 +1075,7 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
 
   half_chop(arg, item, price);
 
-  if (!*item || !*price)
+  if (item.isEmpty() || price.isEmpty())
   {
     ch->sendln("Syntax:  stock <item> <price>");
     return;
@@ -1137,9 +1137,9 @@ void player_shopping_buy(const QString arg, CharacterPtr ch, CharacterPtr keeper
   QString buf;
 
   one_argument(arg, buf);
-  if (!*buf)
+  if (buf.isEmpty())
   {
-    keeper->do_tell(QStringLiteral("%1 Which do you want to buy?").arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 Which do you want to buy?"_s.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
@@ -1174,13 +1174,13 @@ void player_shopping_buy(const QString arg, CharacterPtr ch, CharacterPtr keeper
   ch->removeGold(item->price);
   shop->money_on_hand += item->price;
 
-  if (!*shop->sell_message)
+  if (shop.isEmpty()->sell_message)
   {
-    keeper->do_tell(QStringLiteral("%1 Thank you, come again!").arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 Thank you, come again!"_s.arg(qPrintable(ch->name())).split(' '));
   }
   else
   {
-    keeper->do_tell(QStringLiteral("%1 %2").arg(qPrintable(ch->name())).arg(shop->sell_message).split(' '));
+    keeper->do_tell(u"%1 %2"_s.arg(qPrintable(ch->name())).arg(shop->sell_message).split(' '));
   }
 
   // update inventory
@@ -1222,7 +1222,7 @@ void player_shopping_withdraw(const QString arg, CharacterPtr ch, CharacterPtr k
   QString price;
   one_argument(arg, price);
 
-  if (!*price)
+  if (price.isEmpty())
   {
     ch->sendln("Withdraw how much from your store?");
     return;
@@ -1244,7 +1244,7 @@ void player_shopping_withdraw(const QString arg, CharacterPtr ch, CharacterPtr k
 
   shop->money_on_hand -= value;
   ch->addGold(value);
-  ch->send(QStringLiteral("You take %1 $B$5gold$R out of the till.\r\n").arg(QString::number(value)));
+  ch->send(u"You take %1 $B$5gold$R out of the till.\r\n"_s.arg(QString::number(value)));
   write_one_player_shop(shop);
 }
 
@@ -1301,7 +1301,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
   switch (skill)
   {
   case 0: // sellmessage
-    if (!*text)
+    if (text.isEmpty())
     {
       send_to_char("$3Syntax$R: design sellmessage <message>\r\n"
                    "  Put 'none' if you want no special message.\r\n",
@@ -1317,12 +1317,12 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
       *shop->sell_message = '\0';
     else
       dc_strcpy(shop->sell_message, text);
-    ch->send(QStringLiteral("Shop sell message changed to '%1'.\r\n").arg(shop->sell_message));
+    ch->send(u"Shop sell message changed to '%1'.\r\n"_s.arg(shop->sell_message));
     write_one_player_shop(shop); // save it
     break;
 
   case 1: // roomname
-    if (!*text)
+    if (text.isEmpty())
     {
       ch->sendln("$3Syntax$R: design roomname <name>");
       return;
@@ -1333,7 +1333,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
       return;
     }
     DC::getInstance()->world[shop->room_num].name_ = text;
-    ch->sendln(QStringLiteral("Room name set to '%1'.").arg(DC::getInstance()->world[shop->room_num].name_));
+    ch->sendln(u"Room name set to '%1'."_s.arg(DC::getInstance()->world[shop->room_num].name_));
     save_player_shop_world_range();
     break;
 
@@ -1381,13 +1381,13 @@ void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keepe
       count++;
       robj = real_object(item->item_vnum);
       if (robj < 0)
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
+        ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
       else
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg((DC::getInstance()->obj_index[robj].item)->short_description(), -40).arg(QString::number(item->price)));
+        ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg((DC::getInstance()->obj_index[robj].item)->short_description(), -40).arg(QString::number(item->price)));
     }
 
   if (!dc_strcmp(shop->owner, qPrintable(ch->name())))
-    ch->send(QStringLiteral("\r\nYour shop has %1 cash in the till.\r\n").arg(QString::number(shop->money_on_hand)));
+    ch->send(u"\r\nYour shop has %1 cash in the till.\r\n"_s).arg(QString::number(shop->money_on_hand)));
 }
 
 qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
@@ -1396,7 +1396,7 @@ qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
 
   if (!(keeper = invoker))
   {
-    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Shop_keeper: keeper not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1479,7 +1479,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
   switch(skill) {
     case 0: // new
       half_chop(arg, buf, text);
-      if(!*buf || !*text) {
+      if(buf.isEmpty() || text.isEmpty()) {
          send_to_char("$3Syntax$R: pshopedit new <Playername> <roomnum>\r\n"
                       "  Make sure that your CAPITALIZE the player name or\r\n"
                       "  they won't be able to use it.\r\n", ch);
@@ -1500,7 +1500,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
       g_playershops = shop;
       save_shop_list();
       write_one_player_shop(shop);
-      ch->send(QStringLiteral("Shop created for player '%s' in room %d.\r\n").arg(shop->owner).arg(shop->room_num));
+      ch->send(u"Shop created for player '%s' in room %d.\r\n"_s.arg(shop->owner).arg(shop->room_num));
       break;
 
     case 1: // delete
@@ -1513,7 +1513,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
       if(!g_playershops)
          ch->sendln("No current shops.");
       else for(i = 1, shop = g_playershops; shop; shop = shop->next, i++)
-        ch->send(QStringLiteral("%2d$3)$R %-15s $3Room$R: %5d\r\n").arg(i).arg(shop->owner).arg(shop->room_num));
+        ch->send(u"%2d$3)$R %-15s $3Room$R: %5d\r\n"_s.arg(i).arg(shop->owner).arg(shop->room_num));
       break;
 
     default:
@@ -1613,7 +1613,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
   if (cmd == cmd_t::LIST)
   {
-    ch->send(QStringLiteral("$B$2%s tells you, 'This is what I can do for you...\r\n$R").arg(qPrintable(owner->shortdesc_or_name())));
+    ch->send(u"$B$2%s tells you, 'This is what I can do for you...\r\n$R"_s.arg(qPrintable(owner->shortdesc_or_name())));
     ch->sendln("  | Item                              | Cost                                   |");
     ch->sendln("--------------------------------------------------------------------------------");
     qint32 last_vnum = {};
@@ -1637,12 +1637,12 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       }
       else if (eddie[i].cost_exp > 0)
       {
-        QString cost_buf_str = fmt::format(std::locale("en_US.UTF-8"), "{:L} experience", eddie[i].cost_exp);
+        QString cost_buf_str = u"{:L} experience", eddie[i].cost_exp);
         dc_snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
       else if (eddie[i].cost_plats > 0)
       {
-        QString cost_buf_str = fmt::format(std::locale("en_US.UTF-8"), "{:L} platinum", eddie[i].cost_plats);
+        QString cost_buf_str = u"{:L} platinum", eddie[i].cost_plats);
         dc_snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
 
@@ -1660,16 +1660,16 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       if (cost_qty > 0)
       {
 
-        ch->sendln(QStringLiteral("$B$3%%2d$R|%%2d x %%-%zus|%%2d x %%-%zus|").arg(i + 1).arg(item_qty).arg(item_buf).arg(cost_qty).arg(cost_buf));
+        ch->sendln(u"$B$3%%2d$R|%%2d x %%-%zus|%%2d x %%-%zus|"_.arg(i + 1).arg(item_qty).arg(item_buf).arg(cost_qty).arg(cost_buf));
       }
       else if (cost_plats > 0)
       {
 
-        ch->sendln(QStringLiteral("$B$3%%2d$R|%%2d x %%-%zus| $B%%-%zus$R    |\r\n").arg(i + 1).arg(item_qty).arg(item_buf).arg(cost_buf));
+        ch->sendln(u"$B$3%%2d$R|%%2d x %%-%zus| $B%%-%zus$R    |\r\n"_.arg(i + 1).arg(item_qty).arg(item_buf).arg(cost_buf));
       }
       else
       {
-        ch->sendln(QStringLiteral("$B$3%%2d$R|%%2d x %%-%zus| %%-%zus    |\r\n").arg(i + 1).arg(item_qty).arg(item_buf).arg(cost_buf));
+        ch->sendln(u"$B$3%%2d$R|%%2d x %%-%zus| %%-%zus    |\r\n"_.arg(i + 1).arg(item_qty).arg(item_buf).arg(cost_buf));
       }
     }
     ch->sendln("--------------------------------------------------------------------------------");
@@ -1710,7 +1710,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
     qint32 choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
-      ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\r\n").arg(QString::number(MAX_EDDIE_ITEMS)));
+      ch->send(u"Invalid number. Choose between 1 and %1.\r\n"_s).arg(QString::number(MAX_EDDIE_ITEMS)));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1719,11 +1719,11 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       if (ch->exp >= eddie[choice - 1].cost_exp)
       {
         ch->exp -= eddie[choice - 1].cost_exp;
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} experience from you, leaving you with {:L} experience.\r\n", eddie[choice - 1].cost_exp, ch->exp));
+        ch->send(u"Eddie takes {:L} experience from you, leaving you with {:L} experience.\r\n", eddie[choice - 1].cost_exp, ch->exp));
       }
       else
       {
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - ch->exp));
+        ch->send(u"You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - ch->exp));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1732,11 +1732,11 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       if (GET_PLATINUM(ch) >= eddie[choice - 1].cost_plats)
       {
         GET_PLATINUM(ch) -= eddie[choice - 1].cost_plats;
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", eddie[choice - 1].cost_plats, GET_PLATINUM(ch)));
+        ch->send(u"Eddie takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", eddie[choice - 1].cost_plats, GET_PLATINUM(ch)));
       }
       else
       {
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
+        ch->send(u"You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1830,7 +1830,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   case cmd_t::LIST:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, u"You need to confirm or cancel rerolling %1."_s).arg(GET_OBJ_SHORT(r.orig_obj)));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1845,7 +1845,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   case cmd_t::REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, u"You need to confirm or cancel rerolling %1."_s).arg(GET_OBJ_SHORT(r.orig_obj)));
       return ReturnValue::eSUCCESS;
     }
     else if (r.state == reroll_t::reroll_states_t::REROLLED)
@@ -1864,7 +1864,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       obj = get_obj_in_list_vis(ch, arg1.c_str(), ch->carrying);
       if (obj == nullptr)
       {
-        owner->tell(ch, QStringLiteral("I don't see anything on you matching \'%1\'").arg(arg1.c_str()));
+        owner->tell(ch, u"I don't see anything on you matching \'%1\'"_s.arg(arg1.c_str()));
         return ReturnValue::eSUCCESS;
       }
       else
@@ -1903,7 +1903,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         r.orig_rnum = GET_OBJ_RNUM(obj);
         r.state = reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL;
         reroll_sessions[qPrintable(ch->name())] = r;
-        owner->tell(ch, QStringLiteral("Are you sure you want me to reroll %1 for you?").arg(GET_OBJ_SHORT(obj)));
+        owner->tell(ch, u"Are you sure you want me to reroll %1 for you?"_s.arg(GET_OBJ_SHORT(obj)));
         owner->tell(ch, "Type confirm and I'll reroll it otherwise type cancel if you changed your mind.");
       }
     }
@@ -1925,7 +1925,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", ch, obj, owner, 0);
         act_to_character("You give $p to $N.", ch, obj, owner, 0);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -1934,7 +1934,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         act_to_room("$n gives $p to $N.", ch, r.orig_obj, owner, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", ch, r.orig_obj, owner, 0);
         act_to_character("You give $p to $N.", ch, r.orig_obj, owner, 0);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(ch->name())).arg(r.orig_obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(ch->name())).arg(r.orig_obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1984,7 +1984,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice1_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.choice1_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act_to_room("$n gives $p to $N.", owner, r.choice1_obj, ch, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", owner, r.choice1_obj, ch, 0);
         act_to_character("You give $p to $N.", owner, r.choice1_obj, ch, 0);
@@ -2001,7 +2001,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.choice2_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.choice2_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act_to_room("$n gives $p to $N.", owner, r.choice2_obj, ch, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", owner, r.choice2_obj, ch, 0);
         act_to_character("You give $p to $N.", owner, r.choice2_obj, ch, 0);
@@ -2019,7 +2019,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act_to_room("$n gives $p to $N.", owner, r.orig_obj, ch, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", owner, r.orig_obj, ch, 0);
         act_to_character("You give $p to $N.", owner, r.orig_obj, ch, 0);
@@ -2047,7 +2047,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       act_to_room("$n gives $p to $N.", owner, r.orig_obj, ch, INVIS_NULL | NOTVICT);
       act_to_victim("$n gives you $p.", owner, r.orig_obj, ch, 0);
       act_to_character("You give $p to $N.", owner, r.orig_obj, ch, 0);
@@ -2131,7 +2131,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       obj = get_objindex_vnum(arg1);
       if (obj == nullptr)
       {
-        owner->tell(ch, QStringLiteral("I can't find an object with vnum \'%1\'").arg(arg1));
+        owner->tell(ch, u"I can't find an object with vnum \'%1\'"_s.arg(arg1));
         return ReturnValue::eSUCCESS;
       }
       else
@@ -2175,7 +2175,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           return ReturnValue::eSUCCESS;
         }
 
-        ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].vnum()).split(' '));
+        ch->do_identify(u"v%1"_s.arg(DC::getInstance()->obj_index[obj->item_number].vnum()).split(' '));
 
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);
@@ -2187,7 +2187,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         DC::getInstance()->redeem_sessions[qPrintable(ch->name())] = r;
 
         auto random_str = r.random ? "randomized" : "default";
-        owner->tell(ch, QStringLiteral("Type 'confirm' if you want me to redeem %1 Apocalypse tokens for one %2 '%3'? Type "
+        owner->tell(ch, u"Type 'confirm' if you want me to redeem %1 Apocalypse tokens for one %2 '%3'? Type "_s
                                        "'cancel' if not.")
                             .arg(QString::number(r.token_count))
                             .arg(random_str)
@@ -2201,7 +2201,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     {
     case cmd_t::REDEEM:
     case cmd_t::LIST:
-      owner->tell(ch, QStringLiteral("You need to confirm or cancel redeeming %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, u"You need to confirm or cancel redeeming %1."_s).arg(GET_OBJ_SHORT(r.orig_obj)));
       return ReturnValue::eSUCCESS;
       break;
     case cmd_t::CONFIRM:

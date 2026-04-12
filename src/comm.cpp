@@ -163,7 +163,7 @@ qint32 DC::write_hotboot_file(void)
   class Connection *sd;
   if ((fp = fopen("hotboot", "w")) == nullptr)
   {
-    DC::getInstance()->logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Hotboot failed, unable to open hotboot file."_s), 0, DC::LogChannel::LOG_MISC);
     return 0;
   }
   // std::for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
@@ -206,14 +206,14 @@ qint32 DC::write_hotboot_file(void)
     }
   }
   fclose(fp);
-  DC::getInstance()->logentry(QStringLiteral("Hotboot descriptor file successfully written."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Hotboot descriptor file successfully written."_s, 0, DC::LogChannel::LOG_MISC);
 
   chdir("../bin/");
 
   QString cwd = get_current_dir_name();
   if (cwd != nullptr)
   {
-    DC::getInstance()->logentry(QStringLiteral("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"Hotbooting %1 at [%2]"_s.arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
     free(cwd);
   }
 
@@ -223,7 +223,7 @@ qint32 DC::write_hotboot_file(void)
     QString execv_strerror = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
 
-    DC::getInstance()->logentry(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(applicationFilePath()).arg(execv_strerror), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Hotboot execv(%1, argv) failed with error: %2"_s.arg(applicationFilePath()).arg(execv_strerror), 0, DC::LogChannel::LOG_MISC);
 
     // wipe the file since we can't use it anyway
     if (unlink("hotboot") == -1)
@@ -231,7 +231,7 @@ qint32 DC::write_hotboot_file(void)
       QString unlink_strerror = {};
       strerror_r(errno, unlink_strerror, sizeof(unlink_strerror));
 
-      DC::getInstance()->logentry(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(u"Hotboot unlink(\"hotboot\") failed with error: %1"_s.arg(unlink_strerror), 0, DC::LogChannel::LOG_MISC);
     }
 
     chdir(qPrintable(cf.library_directory));
@@ -245,7 +245,7 @@ qint32 DC::write_hotboot_file(void)
 // links to the mud.
 qint32 DC::load_hotboot_descs(void)
 {
-  QFile hotboot_file{QStringLiteral("hotboot")};
+  QFile hotboot_file{u"hotboot"_s};
   if (!hotboot_file.exists())
   {
     return {};
@@ -254,7 +254,7 @@ qint32 DC::load_hotboot_descs(void)
   if (hotboot_file.open(QFile::ReadOnly))
   {
     unlink("hotboot");
-    logmisc(QStringLiteral("Hotboot, reloading characters."));
+    logmisc(u"Hotboot, reloading characters."_s));
 
     QTextStream out(&hotboot_file);
     std::for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
@@ -296,7 +296,7 @@ qint32 DC::load_hotboot_descs(void)
       {
         if (write_to_descriptor(descriptor, str) == -1)
         {
-          DC::getInstance()->logentry(QStringLiteral("Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot.").arg(address).arg(character_name).arg(descriptor));
+          DC::getInstance()->logentry(u"Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot."_s).arg(address).arg(character_name).arg(descriptor));
           close(descriptor);
           d = {};
           d = {};
@@ -315,7 +315,7 @@ qint32 DC::load_hotboot_descs(void)
   unlink("hotboot"); // if the above unlink failed somehow(?),
                      // remove the hotboot file so that it dosen't think
                      // next reboot is another hotboot
-  DC::getInstance()->logentry(QStringLiteral("Successful hotboot file read."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Successful hotboot file read."_s, 0, DC::LogChannel::LOG_MISC);
   return 1;
 }
 
@@ -385,7 +385,7 @@ void DC::finish_hotboot(void)
     auto result = load_char_obj(conn->output);
     if (!result || !result.value())
     {
-      logmisc(QStringLiteral("Could not load character '%1' in hotboot.").arg(conn->output));
+      logmisc(u"Could not load character '%1' in hotboot."_s.arg(conn->output));
       write_to_descriptor(conn->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
@@ -422,17 +422,17 @@ void DC::init_game(void)
     fclose(fp);
   }
 
-  logverbose(QStringLiteral("Attempting to load hotboot file."));
+  logverbose(u"Attempting to load hotboot file."_s);
 
   if (load_hotboot_descs())
   {
-    logverbose(QStringLiteral("Hotboot Loading complete."));
+    logverbose(u"Hotboot Loading complete."_s);
     was_hotboot = 1;
   }
   else
   {
-    logverbose(QStringLiteral("Hotboot failed.  Starting regular sockets."));
-    logverbose(QStringLiteral("Opening mother connections."));
+    logverbose(u"Hotboot failed.  Starting regular sockets."_s);
+    logverbose(u"Opening mother connections."_s);
 
     std::for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
                   {
@@ -453,17 +453,17 @@ void DC::init_game(void)
 
   if (was_hotboot)
   {
-    DC::getInstance()->logentry(QStringLiteral("Connecting hotboot characters to their descriptiors"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Connecting hotboot characters to their descriptiors"_s, 0, DC::LogChannel::LOG_MISC);
     finish_hotboot();
   }
 
-  logverbose(QStringLiteral("Signal trapping."));
+  logverbose(u"Signal trapping."_s);
   signal_setup();
 
   // we got all the way through, let's turn auto-hotboot back on
   try_to_hotboot_on_crash = 1;
 
-  DC::getInstance()->logentry(QStringLiteral("Entering game loop."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Entering game loop."_s, 0, DC::LogChannel::LOG_MISC);
 
   unlink("died_in_bootup");
 
@@ -483,7 +483,7 @@ void DC::init_game(void)
 
   do_not_save_corpses = 1;
 
-  DC::getInstance()->logentry(QStringLiteral("Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
   while (DC::getInstance()->connections_)
   {
     close_socket(DC::getInstance()->connections_);
@@ -494,8 +494,8 @@ void DC::init_game(void)
              DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Closing fd %d.", fd);
              close(fd); });
 
-  DC::getInstance()->logentry(QStringLiteral("Goodbye."), 0, DC::LogChannel::LOG_MISC);
-  DC::getInstance()->logentry(QStringLiteral("Normal termination of game."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Goodbye."_s, 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Normal termination of game."_s, 0, DC::LogChannel::LOG_MISC);
 }
 
 /*
@@ -585,11 +585,11 @@ void DC::game_loop(void)
     if (nsecs_expired >= 1000000)
     {
       msecs_expired = nsecs_expired / 1000000.0;
-      // qDebug() << QStringLiteral("%1 msec.").arg(msecs_expired);
+      // qDebug() << u"%1 msec."_s).arg(msecs_expired);
     }
     else
     {
-      // qDebug() << QStringLiteral("%1 nsec.").arg(nsecs_expired);
+      // qDebug() << u"%1 nsec."_s).arg(nsecs_expired);
     }
 
     last_execution.restart();
@@ -689,7 +689,7 @@ void DC::game_loop(void)
       case Connection::states::GET_OLD_PASSWORD:
         if (idle_seconds > 30)
         {
-          write_to_output(QStringLiteral("Disconnected for being idle for over 30 seconds.\r\n"), d);
+          write_to_output(u"Disconnected for being idle for over 30 seconds.\r\n"_s), d);
           close_socket(d);
         }
         break;
@@ -884,19 +884,19 @@ void DC::game_loop_init(void)
   server.route("/myApi/<arg>", QHttpServerRequest::Method::Get,
                [&dc](qint32 id, const QHttpServerRequest &request)
                {
-                 return QHttpServerResponse(QStringLiteral("qint32:%1\r\n").arg(id));
+                 return QHttpServerResponse(u"qint32:%1\r\n"_s.arg(id));
                });
   server.route("/myApi/<arg>/<arg>", QHttpServerRequest::Method::Get,
                [&dc](QString str, QString str2, const QHttpServerRequest &request)
                {
-                 return QHttpServerResponse(QStringLiteral("str:%1 str2:%2\r\n").arg(str).arg(str2));
+                 return QHttpServerResponse(u"str:%1 str2:%2\r\n"_s.arg(str).arg(str2));
                });
 
   server.route("/test", [&dc](const QHttpServerRequest &request)
                {
     if (!dc->authenticate(request))
     {
-      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
+      return QHttpServerResponse(u"Failed to authenticate.\r\n"_s);
     }
 
     auto future = QtConcurrent::run([]() {});
@@ -905,7 +905,7 @@ void DC::game_loop_init(void)
     {
       // QJsonArray array = QJsonArray::fromStringList(myData);
 
-      return QHttpServerResponse(QStringLiteral("Success.\r\n"));
+      return QHttpServerResponse(u"Success.\r\n"_s);
     }
     else
     {
@@ -916,14 +916,14 @@ void DC::game_loop_init(void)
                {
     if (!dc->authenticate(request))
     {
-      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
+      return QHttpServerResponse(u"Failed to authenticate.\r\n"_s);
     }
 
     auto future = QtConcurrent::run([]() {});
 
     if (future.isValid())
     {
-      return QHttpServerResponse(QStringLiteral("Success.\r\n"));
+      return QHttpServerResponse(u"Success.\r\n"_s);
     }
     else
     {
@@ -934,17 +934,17 @@ void DC::game_loop_init(void)
                {
                  if (!dc->authenticate(request, 110))
                  {
-                   return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
+                   return QHttpServerResponse(u"Failed to authenticate.\r\n"_s);
                  }
 
                  auto future = QtConcurrent::run([]() {});
 
                  command_return_t do_not_save_corpses = 1;
 
-                 QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
+                 QString buf = u"Hot reboot by %1.\r\n"_s).arg("HTTP /shutdown/");
                  send_to_all(buf);
                  DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
-                 DC::getInstance()->logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
+                 DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
 
                  for (const auto &ch : dc->character_list)
                  {
@@ -956,7 +956,7 @@ void DC::game_loop_init(void)
 
                  if (!write_hotboot_file())
                  {
-                   DC::getInstance()->logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+                   DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
                    return QHttpServerResponse("Failed.\r\n");
                  }
 
@@ -967,12 +967,12 @@ void DC::game_loop_init(void)
   auto tcpserver = new QTcpServer();
   if (!tcpserver->listen(QHostAddress::LocalHost, 6980))
   {
-    logmisc(QStringLiteral("Unable to listen to port 6980."));
+    logmisc(u"Unable to listen to port 6980."_s));
   }
 
   if (!server.bind(tcpserver))
   {
-    logmisc(QStringLiteral("Unable to bind HTTP server."));
+    logmisc(u"Unable to bind HTTP server."_s);
   }
 
   exec();
@@ -982,12 +982,12 @@ void DC::game_loop_init(void)
 
 void DC::game_test_init(void)
 {
-  assert(remove_all_codes(QStringLiteral("$B")) == "$$B");
-  assert(remove_non_color_codes(QStringLiteral("$B")) == "$B");
-  assert(nocolor_strlen(QStringLiteral("$B")) == 0);
-  assert(remove_all_codes(QStringLiteral("$B123$R")) == "$$B123$$R");
-  assert(remove_non_color_codes(QStringLiteral("$B123$R")) == "$B123$R");
-  assert(nocolor_strlen(QStringLiteral("$B123$R")) == 3);
+  assert(remove_all_codes(u"$B"_s) == "$$B");
+  assert(remove_non_color_codes(u"$B"_s) == "$B");
+  assert(nocolor_strlen(u"$B"_s) == 0);
+  assert(remove_all_codes(u"$B123$R"_s) == "$$B123$$R");
+  assert(remove_non_color_codes(u"$B123$R"_s) == "$B123$R");
+  assert(nocolor_strlen(u"$B123$R"_s) == 3);
 
   QString arg = " start 1";
   QString name = {};
@@ -1021,9 +1021,9 @@ void DC::game_test_init(void)
 
   update_max_who();
 
-  do_restore(ch, QStringLiteral("debugimp"));
+  do_restore(ch, u"debugimp"_s);
 
-  do_stand(ch, QStringLiteral(""));
+  do_stand(ch, u""_s);
   conn->process_output();
 
   char_to_room(ch, 3001);
@@ -1032,10 +1032,10 @@ void DC::game_test_init(void)
   ch->do_toggle({"ansi"}, cmd_t::DEFAULT);
   ch->do_toggle({}, cmd_t::DEFAULT);
   ch->do_goto({"23"});
-  do_score(ch, QStringLiteral(""));
+  do_score(ch, u""_s);
   conn->process_output();
 
-  do_load(ch, QStringLiteral("m 23"));
+  do_load(ch, u"m 23"_s);
   conn->process_output();
 
   do_look(ch, "debugimp");
@@ -1044,7 +1044,7 @@ void DC::game_test_init(void)
   ch->do_bestow({"debugimp", "load"});
   conn->process_output();
 
-  do_load(ch, QStringLiteral("m 23"));
+  do_load(ch, u"m 23"_s);
   conn->process_output();
 
   ch->do_test({"all"});
@@ -1284,7 +1284,7 @@ command_return_t do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
   if (ch->getLastPrompt().isEmpty())
     ch->sendln("Last prompt: unset");
   else
-    ch->sendln(QStringLiteral("Last prompt: %1").arg(ch->getLastPrompt()));
+    ch->sendln(u"Last prompt: %1"_s.arg(ch->getLastPrompt()));
 
   return ReturnValue::eSUCCESS;
 }
@@ -1300,7 +1300,7 @@ command_return_t do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Set your prompt to what? Try 'help prompt'.");
     if (!ch->getPrompt().isEmpty())
@@ -1432,7 +1432,7 @@ QString Connection::createPrompt(void)
   }
   if (showstr_count)
   {
-    return QStringLiteral("\r\n[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%1 %2) ]").arg(showstr_page).arg(showstr_count);
+    return u"\r\n[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%1 %2) ]"_s.arg(showstr_page).arg(showstr_count);
   }
   else if (strnew)
   {
@@ -1629,7 +1629,7 @@ qint32 new_descriptor(qint32 s)
                               "imps@dcastle.org\r\n");
 
     close(desc);
-    DC::getInstance()->logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd.getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
+    DC::getInstance()->logentry(u"Connection attempt denied from [%1]"_s.arg(newd.getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
     newd = {};
     return 0;
   }
@@ -1734,7 +1734,7 @@ qint32 write_to_descriptor(qint32 desc, QByteArray txt)
     {
       if (errno != EAGAIN && errno != EWOULDBLOCK)
       {
-        logmisc(QStringLiteral("write(%1,-,%2) returned %3 and errno=%4").arg(desc).arg(total).arg(bytes_written).arg(errno));
+        logmisc(u"write(%1,-,%2) returned %3 and errno=%4"_s.arg(desc).arg(total).arg(bytes_written).arg(errno));
         if (errno != EPIPE)
           return -1;
       }
@@ -1931,11 +1931,11 @@ qint32 process_input(class Connection *t)
     {
       if (t->character != nullptr && qPrintable(t->character->name()) != nullptr)
       {
-        DC::getInstance()->logentry(QStringLiteral("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(qPrintable(t->character->name())), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(u"Connection broken by peer %1 playing %2."_s).arg(t->getPeerAddress().toString()).arg(qPrintable(t->character->name())), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
       else
       {
-        DC::getInstance()->logentry(QStringLiteral("Connection broken by peer %1 not playing a character.").arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(u"Connection broken by peer %1 not playing a character."_s).arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
 
       return -1;
@@ -2242,17 +2242,17 @@ qint32 close_socket(class Connection *d)
 
       // end any performances
       if (IS_SINGING(conn->character))
-        do_sing(conn->character, QStringLiteral("stop"));
+        do_sing(conn->character, u"stop"_s);
 
       act_to_room("$n has lost $s link.", conn->character, 0, 0, 0);
 
       if (IS_AFFECTED(conn->character, AFF_CANTQUIT))
       {
-        logsocket(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
+        logsocket(u"%1@%2 has disconnected from room %3 with CANTQUIT."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
       }
       else
       {
-        logsocket(QStringLiteral("%1@%2 has disconnected from room %3.").arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
+        logsocket(u"%1@%2 has disconnected from room %3."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
       }
       conn->character->desc = {};
     }
@@ -2272,7 +2272,7 @@ qint32 close_socket(class Connection *d)
   }
   //   Removed this log caues it's so fricken annoying
   //   else
-  //    DC::getInstance()->logentry(QStringLiteral("Losing descriptor without character."), ANGEL, DC::LogChannel::LOG_SOCKET);
+  //    DC::getInstance()->logentry(u"Losing descriptor without character."_s, ANGEL, DC::LogChannel::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (conn->original && conn->original->desc)
@@ -2335,7 +2335,7 @@ void check_idle_passwords(void)
 
 void report_debug_logging()
 {
-  DC::getInstance()->logentry(QStringLiteral("Name: [%1] Last cmd: [%2] Last room: [%3]").arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Name: [%1] Last cmd: [%2] Last room: [%3]"_s.arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
 }
 
 void DC::crash_hotboot(void)
@@ -2360,10 +2360,10 @@ void DC::crash_hotboot(void)
     {
       write_to_descriptor(conn->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
-    DC::getInstance()->logentry(QStringLiteral("Attempting to hotboot from the crash."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Attempting to hotboot from the crash."_s, ANGEL, DC::LogChannel::LOG_BUG);
     write_hotboot_file();
     // we shouldn't return from there unless we failed
-    DC::getInstance()->logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Hotboot crash recovery failed.  Exiting."_s, ANGEL, DC::LogChannel::LOG_BUG);
     for (d = connections_; d && died_from_sigsegv < 2; d = conn->next)
     {
       write_to_descriptor(conn->descriptor, "Hotboot failed giving up.\r\n");
@@ -2379,18 +2379,18 @@ void DC::crash_hotboot(void)
 void crashill(qint32 sig)
 {
   report_debug_logging();
-  DC::getInstance()->logentry(QStringLiteral("Recieved SIGFPE (Illegal Instruction)"), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Recieved SIGFPE (Illegal Instruction)"_s, ANGEL, DC::LogChannel::LOG_BUG);
   DC::getInstance()->crash_hotboot();
-  DC::getInstance()->logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Mud exiting from SIGFPE."_s, ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
 void crashfpe(qint32 sig)
 {
   report_debug_logging();
-  DC::getInstance()->logentry(QStringLiteral("Recieved SIGFPE (Arithmetic Error)"), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Recieved SIGFPE (Arithmetic Error)"_s, ANGEL, DC::LogChannel::LOG_BUG);
   DC::getInstance()->crash_hotboot();
-  DC::getInstance()->logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Mud exiting from SIGFPE."_s, ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
@@ -2404,13 +2404,13 @@ void crashsig(qint32 sig)
   }
   if (died_from_sigsegv > 2)
   { // panic! try to log and get out
-    DC::getInstance()->logentry(QStringLiteral("Hit 'died_from_sigsegv > 2'"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Hit 'died_from_sigsegv > 2'"_s, ANGEL, DC::LogChannel::LOG_BUG);
     exit(0);
   }
   report_debug_logging();
-  DC::getInstance()->logentry(QStringLiteral("Recieved SIGSEGV (Segmentation fault)"), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Recieved SIGSEGV (Segmentation fault)"_s, ANGEL, DC::LogChannel::LOG_BUG);
   DC::getInstance()->crash_hotboot();
-  DC::getInstance()->logentry(QStringLiteral("Mud exiting from SIGSEGV."), ANGEL, DC::LogChannel::LOG_BUG);
+  DC::getInstance()->logentry(u"Mud exiting from SIGSEGV."_s, ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
@@ -2419,7 +2419,7 @@ void unrestrict_game(qint32 sig)
   extern class ban_list_element *ban_list;
   extern qint32 num_invalid;
 
-  DC::getInstance()->logentry(QStringLiteral("Received SIGUSR2 - completely unrestricting game (emergent)"),
+  DC::getInstance()->logentry(u"Received SIGUSR2 - completely unrestricting game (emergent)"_s,
                               ANGEL, DC::LogChannel::LOG_GOD);
   ban_list = {};
   restrict = {};
@@ -2428,7 +2428,7 @@ void unrestrict_game(qint32 sig)
 
 void hupsig(qint32 sig)
 {
-  DC::getInstance()->logentry(QStringLiteral("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."_s), 0, DC::LogChannel::LOG_MISC);
   abort(); /* perhaps something more elegant should
             * substituted */
 }
@@ -2436,10 +2436,10 @@ void hupsig(qint32 sig)
 void sigusr1(qint32 sig)
 {
   do_not_save_corpses = 1;
-  DC::getInstance()->logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
+  DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
   if (!DC::getInstance()->write_hotboot_file())
   {
-    DC::getInstance()->logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
   }
 }
 
@@ -2484,12 +2484,12 @@ void signal_handler(qint32 signal, siginfo_t *si, void *)
     QString *new_argv = {};
     extern command_return_t do_not_save_corpses;
     do_not_save_corpses = 1;
-    send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
-    DC::getInstance()->logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
-    DC::getInstance()->logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
+    send_to_all(u"Hot reboot by SIGHUP.\r\n"_s);
+    DC::getInstance()->logentry(u"Hot reboot by SIGHUP.\r\n"_s, ANGEL, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
     if (!DC::getInstance()->write_hotboot_file())
     {
-      DC::getInstance()->logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
     }
   }
 }
@@ -2861,7 +2861,7 @@ command_return_t do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  ch->send(QStringLiteral("Current editor: %s\r\n\r\n").arg(isSet(ch->player->toggles).arg(Player::PLR_EDITOR_WEB) ? "web" : "game"));
+  ch->send(u"Current editor: %s\r\n\r\n"_s.arg(isSet(ch->player->toggles).arg(Player::PLR_EDITOR_WEB) ? "web" : "game"));
 
   one_argument(argument, arg1);
 
@@ -2914,7 +2914,7 @@ Proxy::Proxy(QString h)
     else
     {
       inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2)));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Unrecognized PROXY inet protocol family in arg2 [%1]"_s.arg(arg2)));
     }
   }
 
@@ -2936,7 +2936,7 @@ Proxy::Proxy(QString h)
     source_port = arg5.toUInt(&ok);
     if (!ok)
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(QStringLiteral("Invalid source port [%1]").arg(arg5)));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Invalid source port [%1]"_s.arg(arg5)));
       return;
     }
   }
@@ -2949,7 +2949,7 @@ Proxy::Proxy(QString h)
     destination_port = arg6.toUInt(&ok);
     if (!ok)
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(QStringLiteral("Invalid source port [%1]").arg(arg6)));
+      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Invalid source port [%1]"_s.arg(arg6)));
       return;
     }
 

@@ -29,7 +29,7 @@ DC::DC(config c)
 
 void DC::setup(void)
 {
-  qSetMessagePattern(QStringLiteral("%{if-category}%{category}:%{endif}%{function}:%{line}:%{message}"));
+  qSetMessagePattern(u"%{if-category}%{category}:%{endif}%{function}:%{line}:%{message}"_s);
   QCoreApplication::setOrganizationName("DarkCastleMUD");
   QCoreApplication::setOrganizationDomain("dcastle.org");
   QCoreApplication::setApplicationName("DarkCastle");
@@ -38,6 +38,7 @@ void DC::setup(void)
     database_ = Database("dcastle");
   }
   findLibrary();
+  QLocale::setDefault(QLocale::English);
 }
 
 void DC::findLibrary(void)
@@ -46,23 +47,23 @@ void DC::findLibrary(void)
   QString absolutePath = libraryDirectory.absolutePath();
   QSet<QString> searchedDirectories;
 
-  if (libraryDirectory.dirName() != QStringLiteral("lib"))
+  if (libraryDirectory.dirName() != u"lib"_s)
   {
     searchedDirectories.insert(absolutePath);
-    if (!libraryDirectory.cd(absolutePath + QStringLiteral("/lib")))
+    if (!libraryDirectory.cd(absolutePath + u"/lib"_s))
     {
-      searchedDirectories.insert(absolutePath + QStringLiteral("/lib"));
-      if (!libraryDirectory.cd(absolutePath + QStringLiteral("/../lib")))
+      searchedDirectories.insert(absolutePath + u"/lib"_s);
+      if (!libraryDirectory.cd(absolutePath + u"/../lib"_s))
       {
-        searchedDirectories.insert(absolutePath + QStringLiteral("/../lib"));
-        if (!libraryDirectory.cd(QCoreApplication::applicationDirPath() + QStringLiteral("/../lib")))
+        searchedDirectories.insert(absolutePath + u"/../lib"_s);
+        if (!libraryDirectory.cd(QCoreApplication::applicationDirPath() + u"/../lib"_s))
         {
-          searchedDirectories.insert(QCoreApplication::applicationDirPath() + QStringLiteral("/../lib"));
+          searchedDirectories.insert(QCoreApplication::applicationDirPath() + u"/../lib"_s);
         }
       }
     }
   }
-  if (libraryDirectory.exists() && libraryDirectory.dirName() == QStringLiteral("lib"))
+  if (libraryDirectory.exists() && libraryDirectory.dirName() == u"lib"_s)
   {
     QDir::setCurrent(libraryDirectory.absolutePath());
   }
@@ -455,11 +456,11 @@ bool Character::isNowhere(void)
 
 command_return_t Character::do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd)
 {
-  sendln(QStringLiteral("$3%1$R: %2").arg(desc).arg(value));
+  sendln(u"$3%1$R: %2"_s.arg(desc).arg(value));
 
   auto command = dc_->CMD_.find(cmd);
   if (command)
-    sendln(QStringLiteral("$3Syntax$R: %1 [vnum] %2 <value>").arg(command->name()).arg(fieldname));
+    sendln(u"$3Syntax$R: %1 [vnum] %2 <value>"_s.arg(command->name()).arg(fieldname));
 
   return ReturnValue::eSUCCESS;
 }
@@ -491,14 +492,7 @@ const QStringList Ban::ban_types = {
     "all",
     "ERROR"};
 
-const QString DC::menu = QStringLiteral(
-    "\r\nWelcome to Dark Castle Mud\r\n\r\n"
-    "0) Exit Dark Castle.\r\n"
-    "1) Enter the game.\r\n"
-    "2) Enter your character's description.\r\n"
-    "3) Change your password.\r\n"
-    "4) Delete this character.\r\n\r\n"
-    "   Make your choice: ");
+const QString DC::menu = u"\r\nWelcome to Dark Castle Mud\r\n\r\n0) Exit Dark Castle.\r\n1) Enter the game.\r\n2) Enter your character's description.\r\n3) Change your password.\r\n4) Delete this character.\r\n\r\n   Make your choice: "_s;
 
 const QString Combinables::Scribe::RECIPES_FILENAME = "scribe.dat";
 QMap<Combinables::Scribe::recipe, qint32> Combinables::Scribe::recipes;

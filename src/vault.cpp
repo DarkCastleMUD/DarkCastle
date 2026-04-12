@@ -126,18 +126,18 @@ void save_vault(QString name)
     if (vault->size < ch->getLevel() * 10)
       vault->size = ch->getLevel() * 10;
 
-  QString fname = QStringLiteral("../vaults/%1/%2.vault").arg(name[0]).arg(name);
+  QString fname = u"../vaults/%1/%2.vault"_s.arg(name[0]).arg(name);
 
   QFile file(fname);
   if (!file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Text))
   {
-    DC::getInstance()->logentry(QStringLiteral("save_vault: could not open vault file for [%1].").arg(fname), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"save_vault: could not open vault file for [%1]."_s.arg(fname), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   QTextStream out(&file);
-  out << QStringLiteral("S %1\n").arg(vault->size);
-  out << QStringLiteral("G %1\n").arg(vault->gold);
+  out << u"S %1\n"_s.arg(vault->size);
+  out << u"G %1\n"_s.arg(vault->gold);
 
   for (items = vault->items; items; items = items->next)
   {
@@ -145,13 +145,13 @@ void save_vault(QString name)
     if (obj == 0)
       continue;
 
-    out << QStringLiteral("O %1 %2 %3\n").arg(items->item_vnum).arg(items->count).arg(items->obj ? 1 : 0);
+    out << u"O %1 %2 %3\n"_s.arg(items->item_vnum).arg(items->count).arg(items->obj ? 1 : 0);
     if (items->obj)
       write_object(items->obj, out);
   }
 
   for (access = vault->access; access; access = access->next)
-    out << QStringLiteral("A %1\n").arg(access->name);
+    out << u"A %1\n"_s.arg(access->name);
 
   out << "$\n";
 }
@@ -171,7 +171,7 @@ void Character::vault_access(QString who)
   {
     send("The following people have access to your vault:\r\n");
     for (access = vault->access; access; access = access->next)
-      send(QStringLiteral("%1\r\n").arg(access->name));
+      send(u"%1\r\n"_s.arg(access->name));
     return;
   }
 
@@ -205,7 +205,7 @@ void Character::vault_myaccess(QString arg)
   sendln("You have access to the following vaults:");
   for (vault = vault_table; vault; vault = vault->next)
     if (vault && dc_->has_vault_access(this, vault))
-      send(QStringLiteral("%1\r\n").arg(vault->owner));
+      send(u"%1\r\n"_s.arg(vault->owner));
 }
 
 void Character::vault_balance(QString owner)
@@ -224,20 +224,20 @@ void Character::vault_balance(QString owner)
     if (self)
       send("You don't have a vault.\r\n");
     else
-      send(QStringLiteral("%1 doesn't have a vault.\r\n").arg(owner));
+      send(u"%1 doesn't have a vault.\r\n"_s.arg(owner));
     return;
   }
 
   if (!dc_->has_vault_access(name(), vault))
   {
-    send(QStringLiteral("You don't have permission to see %1's balance.\r\n").arg(owner));
+    send(u"You don't have permission to see %1's balance.\r\n"_s.arg(owner));
     return;
   }
 
   if (self)
-    send(QStringLiteral("You have %1 $B$5gold$R coins in your vault.\r\n").arg(vault->gold));
+    send(u"You have %1 $B$5gold$R coins in your vault.\r\n"_s.arg(vault->gold));
   else
-    send(QStringLiteral("There are %1 $B$5gold$R coins in %2's vault.\r\n").arg(vault->gold).arg(owner));
+    send(u"There are %1 $B$5gold$R coins in %2's vault.\r\n"_s.arg(vault->gold).arg(owner));
 }
 
 const QString vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
@@ -261,7 +261,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->send(vault_usage);
     if (ch->getLevel() > IMMORTAL)
@@ -275,7 +275,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", strlen(arg)))
   {
-    if (!*arg1)
+    if (arg.isEmpty() 1)
       dc_sprintf(arg1, "%s", qPrintable(ch->name()));
     ch->vault_list(arg1);
 
@@ -283,7 +283,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (!strncmp(arg, "balance", strlen(arg)))
   {
-    if (!*arg1)
+    if (arg.isEmpty() 1)
       dc_sprintf(arg1, "%s", qPrintable(ch->name()));
     ch->vault_balance(arg1);
 
@@ -378,7 +378,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
       }
-      else if (!*arg2)
+      else if (arg.isEmpty() 2)
       {
         dc_sprintf(arg2, "%s", qPrintable(ch->name()));
       }
@@ -402,7 +402,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
       }
-      else if (!*arg2)
+      else if (arg.isEmpty() 2)
       {
         dc_sprintf(arg2, "%s", qPrintable(ch->name()));
       }
@@ -421,12 +421,12 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     half_chop(arg1, argument, arg2);
     if (!str_cmp(arg2, "clan") && ch->clan)
       dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
-    if (!*argument)
+    if (argument.isEmpty())
     {
       ch->sendln("What item would you like to place in the vault?");
       return ReturnValue::eSUCCESS;
     }
-    else if (!*arg2)
+    else if (arg.isEmpty() 2)
       dc_sprintf(arg2, "%s", qPrintable(ch->name()));
     vault_put(ch, argument, arg2);
 
@@ -438,12 +438,12 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!str_cmp(arg2, "clan") && ch->clan)
       dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
 
-    if (!*argument)
+    if (argument.isEmpty())
     {
       ch->sendln("What item would you like to get from the vault?");
       return ReturnValue::eSUCCESS;
     }
-    else if (!*arg2)
+    else if (arg.isEmpty() 2)
       dc_sprintf(arg2, "%s", qPrintable(ch->name()));
     vault_get(ch, argument, arg2);
   }
@@ -503,8 +503,8 @@ void Character::vault_stats(QString name)
   }
 
   page_string(desc, buf, 1);
-  send(QStringLiteral("Total Vaults: %1\r\n").arg(count));
-  send(QStringLiteral("Not Showing: %1\r\n").arg(skipped));
+  send(u"Total Vaults: %1\r\n"_s.arg(count));
+  send(u"Not Showing: %1\r\n"_s.arg(skipped));
 }
 
 void DC::reload_vaults(void)
@@ -560,7 +560,7 @@ void rename_vault_owner(QString oldname, QString newname)
     vault->owner = newname;
     save_vault(newname);
 
-    logvault(QStringLiteral("Vault owner changed from '%1' to '%2'.").arg(oldname).arg(newname), newname);
+    logvault(u"Vault owner changed from '%1' to '%2'."_s.arg(oldname).arg(newname), newname);
   }
 
   if (!vault)
@@ -591,7 +591,7 @@ void rename_vault_owner(QString oldname, QString newname)
     {
       if (oldname == access->name)
       {
-        logvault(QStringLiteral("Replaced '%1' with '%2' in %3's vault access list.").arg(access->name).arg(newname).arg(vault->owner), vault->owner);
+        logvault(u"Replaced '%1' with '%2' in %3's vault access list."_s.arg(access->name).arg(newname).arg(vault->owner), vault->owner);
         access->name = newname;
         save_vault(vault->owner);
       }
@@ -757,7 +757,7 @@ void DC::testing_load_vaults(void)
   QFile vault_index_file(VAULT_INDEX_FILE);
   if (!vault_index_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
   {
-    DC::getInstance()->logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."));
+    DC::getInstance()->logentry(u"boot_vaults: could not open vault index file, probably doesn't exist."_s);
     return;
   }
   QTextStream vault_index_stream(&vault_index_file);
@@ -767,7 +767,7 @@ void DC::testing_load_vaults(void)
   }
   vault_index_stream.seek(0);
 
-  DC::getInstance()->logentry(QStringLiteral("load_vaults: found [%1] player vaults to read.").arg(total_vaults));
+  DC::getInstance()->logentry(u"load_vaults: found [%1] player vaults to read."_s.arg(total_vaults));
   if (total_vaults)
   {
     vault_table = new Vault[total_vaults];
@@ -783,11 +783,11 @@ void DC::testing_load_vaults(void)
       line[0] = line[0].toUpper();
     }
 
-    QString fname = QStringLiteral("../vaults/%1/%2.vault").arg(line[0]).arg(line);
+    QString fname = u"../vaults/%1/%2.vault"_s.arg(line[0]).arg(line);
     QFile vault_file(fname);
     if (!vault_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
     {
-      DC::getInstance()->logentry(QStringLiteral("boot_vaults: unable to open file [%1].").arg(fname), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"boot_vaults: unable to open file [%1]."_s.arg(fname), IMMORTAL, DC::LogChannel::LOG_BUG);
       line = vault_index_stream.readLine();
       continue;
     }
@@ -863,7 +863,7 @@ void DC::testing_load_vaults(void)
             }
           }
 
-          DC::getInstance()->logentry(QStringLiteral("boot_vaults: bad item vnum (#%1) in vault: %2").arg(vnum).arg(vault->owner), IMMORTAL, DC::LogChannel::LOG_BUG);
+          DC::getInstance()->logentry(u"boot_vaults: bad item vnum (#%1) in vault: %2"_s.arg(vnum).arg(vault->owner), IMMORTAL, DC::LogChannel::LOG_BUG);
           saveChanges = true;
         }
         else
@@ -885,7 +885,7 @@ void DC::testing_load_vaults(void)
         qDebugQTextStreamLine(vault_file_stream, "load_vaults(), before type A vault_file_stream >> value");
         vault_file_stream >> value >> Qt::ws;
 
-        if (!value.isEmpty() && !stat(qPrintable(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(value[0]).arg(value)), &statbuf))
+        if (!value.isEmpty() && !stat(qPrintable(u"%1/%2/%3"_s.arg(SAVE_DIR).arg(value[0]).arg(value)), &statbuf))
         {
           access = new vault_access_data;
           access->name = value;
@@ -896,13 +896,13 @@ void DC::testing_load_vaults(void)
         }
         else
         {
-          logvault(QStringLiteral("Invalid access entry found. Removing %1's access to %2.").arg(value).arg(vault->owner), vault->owner);
+          logvault(u"Invalid access entry found. Removing %1's access to %2."_s.arg(value).arg(vault->owner), vault->owner);
           saveChanges = true;
         }
 
         break;
       default:
-        DC::getInstance()->logentry(QStringLiteral("boot_vaults: unknown type [%1] in file [%2].").arg(type).arg(fname), IMMORTAL, DC::LogChannel::LOG_BUG);
+        DC::getInstance()->logentry(u"boot_vaults: unknown type [%1] in file [%2]."_s.arg(type).arg(fname), IMMORTAL, DC::LogChannel::LOG_BUG);
         break;
       }
 
@@ -953,7 +953,7 @@ void Character::add_vault_access(QString victim_name, Vault &vault)
     return;
   }
 
-  send(QStringLiteral("%1 now has access to your vault.\r\n").arg(victim_name));
+  send(u"%1 now has access to your vault.\r\n"_s).arg(victim_name));
   access = new vault_access_data;
   access->name = victim_name;
   access->next = vault->access;
@@ -986,19 +986,19 @@ void DC::load_vaults(void)
   while (*line != '$')
   {
     total_vaults++;
-    logverbose(QStringLiteral("%1 - %2").arg(total_vaults).arg(line));
+    logverbose(u"%1 - %2"_s.arg(total_vaults).arg(line));
     fscanf(index, "%s\n", line);
   }
   fclose(index);
 
-  logverbose(QStringLiteral("boot_vaults: found [%1] player vaults to read.").arg(total_vaults));
+  logverbose(u"boot_vaults: found [%1] player vaults to read."_s.arg(total_vaults));
 
   if (total_vaults)
     vault_table = new Vault[total_vaults];
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
-    DC::getInstance()->logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"boot_vaults: could not open vault index file, probably doesn't exist."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1197,7 +1197,7 @@ void Character::remove_vault_access(QString victim_name, Vault &vault)
     return;
   }
 
-  send(QStringLiteral("%1 no longer has access to your vault.\r\n").arg(victim_name));
+  send(u"%1 no longer has access to your vault.\r\n"_s).arg(victim_name));
   access_remove(victim_name, vault);
   save_char_obj();
 }
@@ -1218,7 +1218,7 @@ void remove_vault_accesses(QString name)
       next_access = access->next;
       if (name == access->name)
       {
-        logvault(QStringLiteral("Removed %1's access to %2's vault.").arg(name).arg(vault->owner), vault->owner);
+        logvault(u"Removed %1's access to %2's vault."_s.arg(name).arg(vault->owner), vault->owner);
         access_remove(name, vault);
         save_vault(vault->owner);
       }
@@ -1253,7 +1253,7 @@ void access_remove(QString name, Vault &vault)
 
 QString clanVName(quint64 clan_id)
 {
-  return QStringLiteral("Clan%1").arg(clan_id);
+  return u"Clan%1"_s.arg(clan_id);
 }
 
 bool DC::has_vault_access(CharacterPtr ch, Vault &vault)
@@ -1451,13 +1451,13 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
     if (self)
       ch->send("You don't have a vault.\r\n");
     else
-      ch->send(QStringLiteral("%1 doesn't have a vault.\r\n").arg(owner));
+      ch->send(u"%1 doesn't have a vault.\r\n"_s.arg(owner));
     return;
   }
 
   if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
   {
-    ch->send(QStringLiteral("You don't have permission to take %1's stuff.\r\n").arg(owner));
+    ch->send(u"You don't have permission to take %1's stuff.\r\n"_s.arg(owner));
     return;
   }
 
@@ -1577,10 +1577,10 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
       return;
     }
 
-    sbuf = QStringLiteral("%1 removed %2(v%3) from %4's vault.").arg(ch->name()).arg(GET_OBJ_SHORT(obj)).arg(QString::number(GET_OBJ_VNUM(obj))).arg(owner);
+    sbuf = u"%1 removed %2(v%3) from %4's vault."_s.arg(ch->name()).arg(GET_OBJ_SHORT(obj)).arg(QString::number(GET_OBJ_VNUM(obj))).arg(owner);
     logvault(sbuf, owner);
     act_to_room(sbuf, ch, 0, 0, GODS);
-    ch->send(QStringLiteral("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 has been removed from the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
 
     item_remove(obj, vault);
 
@@ -1724,13 +1724,13 @@ void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
     if (self)
       ch->send("You don't have a vault.\r\n");
     else
-      ch->send(QStringLiteral("%1 doesn't have a vault.\r\n").arg(owner));
+      ch->send(u"%1 doesn't have a vault.\r\n"_s.arg(owner));
     return;
   }
 
   if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
   {
-    ch->send(QStringLiteral("You don't have permission to put $B$5gold$R in %1's vault.\r\n").arg(owner));
+    ch->send(u"You don't have permission to put $B$5gold$R in %1's vault.\r\n"_s.arg(owner));
     return;
   }
 
@@ -1743,7 +1743,7 @@ void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
 
   if (amount < 1 || amount > max_amount)
   {
-    ch->send(QStringLiteral("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
+    ch->send(u"Valid amounts are from 1 to %1 $B$5gold$R.\r\n"_s.arg(max_amount));
     return;
   }
 
@@ -1754,12 +1754,12 @@ void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
     ch->save_char_obj();
     save_vault(owner);
 
-    logvault(QStringLiteral("%1 added %2 gold to %3's vault.").arg(qPrintable(ch->name())).arg(amount).arg(owner), owner);
-    ch->send(QStringLiteral("You deposit %1 $B$5gold$R into the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
+    logvault(u"%1 added %2 gold to %3's vault."_s.arg(qPrintable(ch->name())).arg(amount).arg(owner), owner);
+    ch->send(u"You deposit %1 $B$5gold$R into the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n"_s.arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
   {
-    ch->send(QStringLiteral("But you only have %1 $B$5gold$R coins!\r\n").arg(ch->getGold()));
+    ch->send(u"But you only have %1 $B$5gold$R coins!\r\n"_s.arg(ch->getGold()));
   }
 }
 
@@ -1780,20 +1780,20 @@ void Character::vault_withdraw(quint32 amount, QString owner)
     if (self)
       ch->send("You don't have a vault.\r\n");
     else
-      ch->send(QStringLiteral("%1 doesn't have a vault.\r\n").arg(owner));
+      ch->send(u"%1 doesn't have a vault.\r\n"_s.arg(owner));
     return;
   }
 
   if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
   {
-    ch->send(QStringLiteral("You don't have permission to put $B$5gold$R in %1's vault.\r\n").arg(owner));
+    ch->send(u"You don't have permission to put $B$5gold$R in %1's vault.\r\n"_s.arg(owner));
     return;
   }
 
   auto max_amount = MIN(vault->gold, VAULT_MAX_DEPWITH);
   if (amount < 1 || amount > max_amount)
   {
-    ch->send(QStringLiteral("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
+    ch->send(u"Valid amounts are from 1 to %1 $B$5gold$R.\r\n"_s.arg(max_amount));
     return;
   }
 
@@ -1807,12 +1807,12 @@ void Character::vault_withdraw(quint32 amount, QString owner)
     ch->addGold(amount);
     ch->save_char_obj();
     save_vault(owner);
-    logvault(QStringLiteral("%1 removed %2 gold from %3's vault.").arg(qPrintable(ch->name())).arg(amount).arg(owner), owner);
-    ch->send(QStringLiteral("You withdraw %1 $B$5gold$R from the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
+    logvault(u"%1 removed %2 gold from %3's vault."_s.arg(qPrintable(ch->name())).arg(amount).arg(owner), owner);
+    ch->send(u"You withdraw %1 $B$5gold$R from the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n"_s.arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
   {
-    ch->send(QStringLiteral("The vault only has %1 $B$5gold$R coins in it!\r\n").arg(vault->gold));
+    ch->send(u"The vault only has %1 $B$5gold$R coins in it!\r\n"_s.arg(vault->gold));
   }
 }
 
@@ -1822,7 +1822,7 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, Vault &vault, CharacterPtr c
 
   if (GET_OBJ_VNUM(obj) == -1)
   {
-    ch->send(QStringLiteral("%1 is hardly worth saving.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 is hardly worth saving.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1834,48 +1834,48 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, Vault &vault, CharacterPtr c
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_vault_by_vnum(GET_OBJ_VNUM(obj), vault))
   { // Uniques
-    ch->send(QStringLiteral("Why would you need another %1?\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"Why would you need another %1?\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && !self)
   { // GL
-    ch->send(QStringLiteral("%1 is far too valuable to place in someone else's vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 is far too valuable to place in someone else's vault.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (!self && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
   { // no_trade
-    ch->send(QStringLiteral("%1 seems bound to you.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 seems bound to you.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   { // cursed
-    ch->send(QStringLiteral("%1 is stuck! Ack!.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 is stuck! Ack!.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) || isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   { // nosave
-    ch->send(QStringLiteral("%1 doesn't seem to be a permanent part of the world.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 doesn't seem to be a permanent part of the world.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (ARE_CONTAINERS(obj) && obj->contains)
   { // non-empty containers
-    ch->send(QStringLiteral("%1 needs to be emptied first.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 needs to be emptied first.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
   { // vault is full
-    ch->send(QStringLiteral("You can't seem to stuff %1 in the vault.  Its too big!\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"You can't seem to stuff %1 in the vault.  Its too big!\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
   if (obj->obj_flags.timer > 0)
   {
-    ch->send(QStringLiteral("%1 cannot be placed in the vault right now.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 cannot be placed in the vault right now.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1908,13 +1908,13 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
     if (self)
       ch->send("You don't have a vault.\r\n");
     else
-      ch->send(QStringLiteral("%1 doesn't have a vault.\r\n").arg(owner));
+      ch->send(u"%1 doesn't have a vault.\r\n"_s.arg(owner));
     return;
   }
 
   if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
   {
-    ch->send(QStringLiteral("You don't have permission to put things in %1's vault.\r\n").arg(owner));
+    ch->send(u"You don't have permission to put things in %1's vault.\r\n"_s.arg(owner));
     return;
   }
 
@@ -1928,18 +1928,18 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
 
       if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
       {
-        ch->send(QStringLiteral("%1 won't fit in the vault!\r\n").arg(GET_OBJ_SHORT(obj)));
+        ch->send(u"%1 won't fit in the vault!\r\n"_s.arg(GET_OBJ_SHORT(obj)));
         continue;
       }
 
       QString buffer;
       if (!ch->isImmortalPlayer())
-        buffer = QStringLiteral("%1 added %2 to %3's vault.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(owner);
+        buffer = u"%1 added %2 to %3's vault."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
-        buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
+        buffer = u"%1 added %2[%3] to %4's vault."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
       logvault(buffer, owner);
-      ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1 has been placed in the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
 
       QString sbuf;
       QString ssin_string;
@@ -1983,19 +1983,19 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
 
       if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
       {
-        ch->send(QStringLiteral("%1 won't fit in the vault!\r\n").arg(GET_OBJ_SHORT(obj)));
+        ch->send(u"%1 won't fit in the vault!\r\n"_s.arg(GET_OBJ_SHORT(obj)));
         continue;
       }
 
       QString buffer;
       if (!ch->isImmortalPlayer())
-        buffer = QStringLiteral("%1 added %2 to %3's vault.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(owner);
+        buffer = u"%1 added %2 to %3's vault."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
-        buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
+        buffer = u"%1 added %2[%3] to %4's vault."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
       logvault(buffer, owner);
 
-      ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1 has been placed in the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
       if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
       {
         item_add(GET_OBJ_VNUM(obj), vault);
@@ -2021,19 +2021,19 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
 
     if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
     {
-      ch->send(QStringLiteral("%1 won't fit in the vault!\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1 won't fit in the vault!\r\n"_s.arg(GET_OBJ_SHORT(obj)));
       return;
     }
 
     QString buffer;
     if (!ch->isImmortalPlayer())
-      buffer = QStringLiteral("%1 added %2 to %3's vault.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(owner);
+      buffer = u"%1 added %2 to %3's vault."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(owner);
     else
-      buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
+      buffer = u"%1 added %2[%3] to %4's vault."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
     logvault(buffer, owner);
 
-    ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 has been placed in the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
 
     if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
     {
@@ -2101,13 +2101,13 @@ void Character::vault_list(QString owner)
     if (self)
       send("You don't have a vault.\r\n");
     else
-      send(QStringLiteral("%1 doesn't have a vault.\r\n").arg(owner));
+      send(u"%1 doesn't have a vault.\r\n"_s.arg(owner));
     return;
   }
 
   if (!getDC()->has_vault_access(qPrintable(this->name()), vault))
   {
-    send(QStringLiteral("You don't have access to %1's vault.\r\n").arg(owner));
+    send(u"You don't have access to %1's vault.\r\n"_s.arg(owner));
     return;
   }
 
@@ -2118,7 +2118,7 @@ void Character::vault_list(QString owner)
   {
     if (self)
     {
-      send(QStringLiteral("Some objects in your vault have changed weight.\r\nYour vault's weight has been recalculated from %1 to %2.\r\n").arg(vault->weight).arg(sv.weight));
+      send(u"Some objects in your vault have changed weight.\r\nYour vault's weight has been recalculated from %1 to %2.\r\n"_s.arg(vault->weight).arg(sv.weight));
     }
     vault->weight = sv.weight;
   }
@@ -2127,22 +2127,22 @@ void Character::vault_list(QString owner)
   {
     if (self)
     {
-      send(QStringLiteral("Your vault is currently empty and can hold %1 pounds.\r\n").arg(vault->size));
+      send(u"Your vault is currently empty and can hold %1 pounds.\r\n"_s).arg(vault->size));
     }
     else
     {
-      send(QStringLiteral("%1's vault is currently empty.\r\n").arg(owner));
+      send(u"%1's vault is currently empty.\r\n"_s.arg(owner));
     }
     return;
   }
 
   if (self)
   {
-    send(QStringLiteral("Your vault is at %1 of %2 maximum pounds and contains:\r\n").arg(vault->weight).arg(vault->size));
+    send(u"Your vault is at %1 of %2 maximum pounds and contains:\r\n"_s.arg(vault->weight).arg(vault->size));
   }
   else
   {
-    send(QStringLiteral("%1's vault is at %2 of %3 maximum pounds and contains:\r\n").arg(owner).arg(vault->weight).arg(vault->size));
+    send(u"%1's vault is at %2 of %3 maximum pounds and contains:\r\n"_s.arg(owner).arg(vault->weight).arg(vault->size));
   }
 
   // We are showing the last item in vault first because items were inserted at the
@@ -2155,10 +2155,10 @@ void Character::vault_list(QString owner)
 
     if (count > 1)
     {
-      send(QStringLiteral("[$5%1$R] ").arg(count));
+      send(u"[$5%1$R] "_s.arg(count));
     }
 
-    send(QStringLiteral("%1$R").arg(GET_OBJ_SHORT(obj)));
+    send(u"%1$R"_s.arg(GET_OBJ_SHORT(obj)));
 
     if (obj->obj_flags.type_flag == ITEM_ARMOR ||
         obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -2169,12 +2169,12 @@ void Character::vault_list(QString owner)
         obj->obj_flags.type_flag == ITEM_WAND ||
         obj->obj_flags.type_flag == ITEM_LIGHT)
     {
-      send(QStringLiteral("%1 $3Lvl: %2$R").arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
+      send(u"%1 $3Lvl: %2$R"_s.arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
     }
 
     if (getLevel() > IMMORTAL && obj->item_number > 0)
     {
-      send(QStringLiteral(" [%1]").arg(DC::getInstance()->obj_index[obj->item_number].vnum()));
+      send(u" [%1]"_s.arg(DC::getInstance()->obj_index[obj->item_number].vnum()));
     }
     send("\r\n");
   }
@@ -2187,12 +2187,12 @@ void add_new_vault(const QString name, qint32 indexonly)
   QString filename, line, buf;
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
-    DC::getInstance()->logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"add_new_vault: error opening index file."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 
   if (!(tvfl = fopen(VAULT_INDEX_FILE_TMP, "w")))
   {
-    DC::getInstance()->logentry(QStringLiteral("add_new_vault: error opening temp index file."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"add_new_vault: error opening temp index file."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -2226,7 +2226,7 @@ void add_new_vault(const QString name, qint32 indexonly)
   dc_sprintf(filename, "../vaults/%c/%s.vault", UPPER(*name), name);
   if (!(pvfl = fopen(filename, "w")))
   {
-    DC::getInstance()->logentry(QStringLiteral("add_new_vault: error opening new vault file [%1].").arg(filename), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"add_new_vault: error opening new vault file [%1]."_s.arg(filename), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -2717,7 +2717,7 @@ qint32 vault_search(CharacterPtr ch, const QString args)
         if (!owner_shown)
         {
           owner_shown = true;
-          ch->send(QStringLiteral("\r\n%1:\r\n").arg(vault->owner));
+          ch->send(u"\r\n%1:\r\n"_s.arg(vault->owner));
         }
 
         const auto &count = o.second;
@@ -2750,7 +2750,7 @@ qint32 vault_search(CharacterPtr ch, const QString args)
     } // if we have access to vault
   } // for loop of vaults
 
-  ch->send(QStringLiteral("\r\nSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
+  ch->send(u"\r\nSearched %1 vaults and found %2 objects.\r\n"_s).arg(vaults_searched).arg(objects_found));
 
   return ReturnValue::eSUCCESS;
 }

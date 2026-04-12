@@ -128,7 +128,7 @@ command_return_t do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
   while (*arg == ' ')
     arg++;
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Who do you want to tame?");
     return ReturnValue::eFAILURE;
@@ -356,7 +356,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
         this->add_memory(pScent->trackee, 't');
         ansi_color(RED, this);
         ansi_color(BOLD, this);
-        this->send(QStringLiteral("You sense traces of your quarry to the %s.\r\n").arg(dirs[y]));
+        this->send(u"You sense traces of your quarry to the %s.\r\n"_s.arg(dirs[y]));
         ansi_color(NTEXT, this);
 
         if (this->isNonPlayer())
@@ -368,7 +368,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             auto cmd_dir = getCommandFromDirection(y);
             if (cmd_dir)
             {
-              retval = do_move(this, QStringLiteral(""), *cmd_dir);
+              retval = do_move(this, u""_s, *cmd_dir);
               if (isSet(retval, ReturnValue::eCH_DIED))
                 return retval;
             }
@@ -521,19 +521,19 @@ command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    sendln(QStringLiteral("You will ambush %1 on sight.").arg(ambush.isEmpty() ? "no one" : ambush));
+    sendln(u"You will ambush %1 on sight."_s).arg(ambush.isEmpty() ? "no one" : ambush));
     return ReturnValue::eSUCCESS;
   }
 
   if (ambush == arg1)
   {
     ambush.clear();
-    sendln(QStringLiteral("You will no longer ambush %1 on sight.").arg(arg1));
+    sendln(u"You will no longer ambush %1 on sight."_s).arg(arg1));
     return ReturnValue::eSUCCESS;
   }
 
   ambush = arg1;
-  sendln(QStringLiteral("You will now ambush %1 on sight.").arg(arg1));
+  sendln(u"You will now ambush %1 on sight."_s).arg(arg1));
   return ReturnValue::eSUCCESS;
 }
 
@@ -842,7 +842,7 @@ ObjectPtr find_arrow(ObjectPtr quiver)
 
   ObjectPtr get_obj_in_list(QString, ObjectPtr);
 
-  target = get_obj_in_list(QStringLiteral("arrow"), quiver->contains);
+  target = get_obj_in_list(u"arrow"_s, quiver->contains);
 
   if (!target)
     return {};
@@ -936,7 +936,7 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
   if (ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
     if (!number(0, 20))
-      do_shout(victim, QStringLiteral("Duh George, someone keeps shooting me!"));
+      do_shout(victim, u"Duh George, someone keeps shooting me!"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1004,7 +1004,7 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
             }
 
             if (isSet(retval, ReturnValue::eFAILURE)) // can't go after the archer
-              return do_flee(victim, QStringLiteral(""));
+              return do_flee(victim, u""_s);
           }
     }
     if (number(1, 5) == 1)
@@ -1041,7 +1041,7 @@ command_return_t do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
    switch(number(1,2))
    {
     case 1:
-    ch->sendln(QStringLiteral("Your shot impales %1 through the heart!").arg(qPrintable(victim->shortdesc_or_name())));
+    ch->sendln(u"Your shot impales %1 through the heart!"_s.arg(qPrintable(victim->shortdesc_or_name())));
     dc_sprintf(buf, "%s from the %s drives full force into your chest!\r\n",
        qPrintable(found->short_description()), dirs[rev_dir[dir]]);
     victim->send(buf);
@@ -1163,7 +1163,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   while (*arg == ' ')
     arg++;
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Shoot at whom?");
     return ReturnValue::eFAILURE;
@@ -1483,7 +1483,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
         }
         else
         {
-          ch->sendln(QStringLiteral("Your shot impales %1 through the heart!").arg(victname));
+          ch->sendln(u"Your shot impales %1 through the heart!"_s.arg(victname));
           dc_sprintf(buf, "%s from the %s impales %s through the chest!\r\n", qPrintable(found->short_description()), dirs[rev_dir[dir]], victname);
           send_to_room(buf, victroom);
         }
@@ -1707,7 +1707,7 @@ command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
   CharacterPtr target = {};
   //  qint32 learned, specialization;
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Delve into whom?");
     return ReturnValue::eFAILURE;
@@ -1739,12 +1739,12 @@ command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!target->isNonPlayer())
   {
-    ch->sendln(QStringLiteral("Ewwwww gross!!!  %1 is imagining you naked on all fours!").arg(qPrintable(target->shortdesc_or_name())));
+    ch->sendln(u"Ewwwww gross!!!  %1 is imagining you naked on all fours!"_s.arg(qPrintable(target->shortdesc_or_name())));
     return ReturnValue::eFAILURE;
   }
 
   act_to_character("You enter $S mind...", ch, 0, target, INVIS_NULL);
-  ch->sendln(QStringLiteral("%1 seems to hate... %2.").arg(qPrintable(target->shortdesc_or_name())).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
+  ch->sendln(u"%1 seems to hate... %2."_s).arg(qPrintable(target->shortdesc_or_name())).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
 
   if (ch->master)
     dc_sprintf(buf, "%s seems to really like... %s.\r\n", qPrintable(target->shortdesc_or_name()),
@@ -1825,7 +1825,7 @@ command_return_t do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  ch->send(QStringLiteral("You study the habits of the %s race and select them as your enemy of choice.\r\n").arg(races[i].singular_name));
+  ch->send(u"You study the habits of the %s race and select them as your enemy of choice.\r\n"_s.arg(races[i].singular_name));
 
   return ReturnValue::eSUCCESS;
 }

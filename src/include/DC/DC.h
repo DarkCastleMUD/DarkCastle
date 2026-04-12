@@ -1173,7 +1173,7 @@ public:
   {
     if (proxy.isActive())
     {
-      return QStringLiteral("%1 via %2").arg(getPeerOriginalAddress().toString()).arg(getPeerAddress().toString());
+      return u"%1 via %2"_s.arg(getPeerOriginalAddress().toString()).arg(getPeerAddress().toString());
     }
     else
     {
@@ -1802,7 +1802,7 @@ public:
       return false;
     }
   }
-  bool decrementMove(move_t move_change = 1, QString message = QStringLiteral("You're too out of breath!"))
+  bool decrementMove(move_t move_change = 1, QString message = u"You're too out of breath!"_s)
   {
     if (move_ >= move_change)
     {
@@ -1966,7 +1966,7 @@ public:
       return do_edit_generic_show(getfnc(), fieldname, desc, arguments, cmd);
 
     setfnc(arguments.join(' '));
-    sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(getfnc()));
+    sendln(u"%1 set to '%2'."_s.arg(fieldname).arg(getfnc()));
     return ReturnValue::eSUCCESS;
   }
 
@@ -2012,7 +2012,7 @@ public:
     if (arguments.isEmpty())
     {
       do_edit_generic_show((*entity.*(getfnc))(), fieldname, desc, arguments, cmd);
-      sendln(QStringLiteral("$3Valid types$R:"));
+      sendln(u"$3Valid types$R:"_s);
 
       quint64 longest_typename{};
       for (const auto &type : item_types)
@@ -2022,7 +2022,7 @@ public:
       quint8 column = 1;
       for (const auto &type : item_types)
       {
-        send(QStringLiteral("%1").arg(type.toLower(), longest_typename));
+        send(u"%1"_s.arg(type.toLower(), longest_typename));
         if (!(column++ % 3))
           sendln();
         else
@@ -2034,10 +2034,10 @@ public:
 
     if ((!(*entity.*(setfnc))(arguments.join(' ').toLower())))
     {
-      sendln(QStringLiteral("Invalid input."));
+      sendln(u"Invalid input."_s);
       return ReturnValue::eFAILURE;
     }
-    sendln(QStringLiteral("%1 set to '%2'.").arg(fieldname).arg(arguments.join(' ').toLower()));
+    sendln(u"%1 set to '%2'."_s.arg(fieldname).arg(arguments.join(' ').toLower()));
     return ReturnValue::eSUCCESS;
   }
 
@@ -2865,7 +2865,7 @@ public:
   operator bool() const { return !list_.isEmpty(); }
 
 private:
-  const QString BANNED_FILE = QStringLiteral("banned");
+  const QString BANNED_FILE = u"banned"_s;
   QMap<QString, Ban> list_;
 };
 
@@ -4406,13 +4406,13 @@ T parse_bitstrings(QString arg1, CharacterPtr ch = {}, T value = {})
         // value
         value.setFlag(obj_position, false);
         if (ch)
-          ch->send(QStringLiteral("%1 flag REMOVED.\r\n").arg(metaEnum.key(x)));
+          ch->send(u"%1 flag REMOVED.\r\n"_s).arg(metaEnum.key(x)));
       }
       else
       {
         value.setFlag(obj_position);
         if (ch)
-          ch->send(QStringLiteral("%1 flag ADDED.\r\n").arg(metaEnum.key(x)));
+          ch->send(u"%1 flag ADDED.\r\n"_s).arg(metaEnum.key(x)));
       }
       found = true;
       break;
@@ -4433,73 +4433,73 @@ constexpr auto auction_duration = 1209600UL;
 constexpr auto AUC_MIN_PRICE = 1000;
 constexpr auto AUC_MAX_PRICE = 2000000000;
 
-const auto SAVE_DIR = QStringLiteral("../save");
-const auto BSAVE_DIR = QStringLiteral("../bsave");
-const auto QSAVE_DIR = QStringLiteral("../save/qdata");
-const auto NEWSAVE_DIR = QStringLiteral("../newsave");
-const auto ARCHIVE_DIR = QStringLiteral("../archive");
-const auto MOB_DIR = QStringLiteral("../MOBProgs/");
-const auto BAN_FILE = QStringLiteral("banned.txt");
-const auto SHOP_DIR = QStringLiteral("../lib/shops");
-const auto PLAYER_SHOP_DIR = QStringLiteral("../lib/playershops");
-const auto FORBIDDEN_NAME_FILE = QStringLiteral("../lib/forbidden_names.txt");
-const auto SKILL_QUEST_FILE = QStringLiteral("../lib/skill_quests.txt");
-const auto FAMILIAR_DIR = QStringLiteral("../familiar");
-const auto FOLLOWER_DIR = QStringLiteral("../follower");
-const auto VAULT_DIR = QStringLiteral("../vaults");
-const auto SHOP_FILE = QStringLiteral("tinyworld.shp");
-const auto WEBPAGE_FILE = QStringLiteral("webresponse.txt");
-const auto GREETINGS1_FILE = QStringLiteral("greetings1.txt");
-const auto GREETINGS2_FILE = QStringLiteral("greetings3.txt");
-const auto GREETINGS3_FILE = QStringLiteral("greetings4.txt");
-const auto GREETINGS4_FILE = QStringLiteral("greetings5.txt");
-const auto CREDITS_FILE = QStringLiteral("credits.txt");
-const auto MOTD_FILE = QStringLiteral("../lib/motd.txt");
-const auto IMOTD_FILE = QStringLiteral("motdimm.txt");
-const auto STORY_FILE = QStringLiteral("story.txt");
-const auto TIME_FILE = QStringLiteral("time.txt");
-const auto IDEA_LOG = QStringLiteral("ideas.log");
-const auto TYPO_LOG = QStringLiteral("typos.log");
-const auto MESS_FILE = QStringLiteral("messages.txt");
-const auto MESS2_FILE = QStringLiteral("messages2.txt");
-const auto SOCIAL_FILE = QStringLiteral("social.txt");
-const auto HELP_KWRD_FILE = QStringLiteral("help_key.txt");
-const auto HELP_PAGE_FILE = QStringLiteral("help.txt");
-const auto INFO_FILE = QStringLiteral("info.txt");
-const auto LOCAL_WHO_FILE = QStringLiteral("onlinewho.txt");
-const auto WEB_WHO_FILE = QStringLiteral("/srv/www/www.dcastle.org/htdocs/onlinewho.txt");
-const auto WEB_AUCTION_FILE = QStringLiteral("/srv/www/www.dcastle.org/htdocs/auctions.txt");
-const auto NEW_HELP_FILE = QStringLiteral("new_help.txt");
-const auto WEB_HELP_FILE = QStringLiteral("/srv/www/www.dcastle.org/htdocs/webhelp.txt");
-const auto NEW_HELP_PAGE_FILE = QStringLiteral("new_help_screen.txt");
-const auto NEW_IHELP_PAGE_FILE = QStringLiteral("new_ihelp_screen.txt");
-const auto LEADERBOARD_FILE = QStringLiteral("leaderboard.txt");
-const auto QUEST_FILE = QStringLiteral("quests.txt");
-const auto WEBCLANSLIST_FILE = QStringLiteral("webclanslist.txt");
-const auto HTDOCS_DIR = QStringLiteral("/srv/www/www.dcastle.org/htdocs/");
-const auto PLAYER_DIR = QStringLiteral("player/");
-const auto BUG_LOG = QStringLiteral("bug.log");
-const auto GOD_LOG = QStringLiteral("god.log");
-const auto MORTAL_LOG = QStringLiteral("mortal.log");
-const auto SOCKET_LOG = QStringLiteral("socket.log");
-const auto PLAYER_LOG = QStringLiteral("player.log");
-const auto WORLD_LOG = QStringLiteral("world.log");
-const auto ARENA_LOG = QStringLiteral("arena.log");
-const auto CLAN_LOG = QStringLiteral("clan.log");
-const auto OBJECTS_LOG = QStringLiteral("objects.log");
-const auto QUEST_LOG = QStringLiteral("quest.log");
-const auto VAULT_LOG = QStringLiteral("vault.log");
-const auto WORLD_INDEX_FILE = QStringLiteral("worldindex");
-const auto OBJECT_INDEX_FILE = QStringLiteral("objectindex");
-const auto MOB_INDEX_FILE = QStringLiteral("mobindex");
-const auto ZONE_INDEX_FILE = QStringLiteral("zoneindex");
-const auto PLAYER_SHOP_INDEX = QStringLiteral("playershopindex");
-const auto OBJECT_INDEX_FILE_TINY = QStringLiteral("objectindex.tiny");
-const auto WORLD_INDEX_FILE_TINY = QStringLiteral("worldindex.tiny");
-const auto MOB_INDEX_FILE_TINY = QStringLiteral("mobindex.tiny");
-const auto ZONE_INDEX_FILE_TINY = QStringLiteral("zoneindex.tiny");
-const auto VAULT_INDEX_FILE = QStringLiteral("../vaults/vaultindex");
-const auto VAULT_INDEX_FILE_TMP = QStringLiteral("../vaults/vaultindex.tmp");
+const auto SAVE_DIR = u"../save"_s;
+const auto BSAVE_DIR = u"../bsave"_s;
+const auto QSAVE_DIR = u"../save/qdata"_s;
+const auto NEWSAVE_DIR = u"../newsave"_s;
+const auto ARCHIVE_DIR = u"../archive"_s;
+const auto MOB_DIR = u"../MOBProgs/"_s;
+const auto BAN_FILE = u"banned.txt"_s;
+const auto SHOP_DIR = u"../lib/shops"_s;
+const auto PLAYER_SHOP_DIR = u"../lib/playershops"_s;
+const auto FORBIDDEN_NAME_FILE = u"../lib/forbidden_names.txt"_s;
+const auto SKILL_QUEST_FILE = u"../lib/skill_quests.txt"_s;
+const auto FAMILIAR_DIR = u"../familiar"_s;
+const auto FOLLOWER_DIR = u"../follower"_s;
+const auto VAULT_DIR = u"../vaults"_s;
+const auto SHOP_FILE = u"tinyworld.shp"_s;
+const auto WEBPAGE_FILE = u"webresponse.txt"_s;
+const auto GREETINGS1_FILE = u"greetings1.txt"_s);
+const auto GREETINGS2_FILE = u"greetings3.txt"_s);
+const auto GREETINGS3_FILE = u"greetings4.txt"_s);
+const auto GREETINGS4_FILE = u"greetings5.txt"_s);
+const auto CREDITS_FILE = u"credits.txt"_s;
+const auto MOTD_FILE = u"../lib/motd.txt"_s;
+const auto IMOTD_FILE = u"motdimm.txt"_s;
+const auto STORY_FILE = u"story.txt"_s;
+const auto TIME_FILE = u"time.txt"_s;
+const auto IDEA_LOG = u"ideas.log"_s;
+const auto TYPO_LOG = u"typos.log"_s;
+const auto MESS_FILE = u"messages.txt"_s;
+const auto MESS2_FILE = u"messages2.txt"_s);
+const auto SOCIAL_FILE = u"social.txt"_s;
+const auto HELP_KWRD_FILE = u"help_key.txt"_s;
+const auto HELP_PAGE_FILE = u"help.txt"_s;
+const auto INFO_FILE = u"info.txt"_s;
+const auto LOCAL_WHO_FILE = u"onlinewho.txt"_s;
+const auto WEB_WHO_FILE = u"/srv/www/www.dcastle.org/htdocs/onlinewho.txt"_s;
+const auto WEB_AUCTION_FILE = u"/srv/www/www.dcastle.org/htdocs/auctions.txt"_s;
+const auto NEW_HELP_FILE = u"new_help.txt"_s;
+const auto WEB_HELP_FILE = u"/srv/www/www.dcastle.org/htdocs/webhelp.txt"_s;
+const auto NEW_HELP_PAGE_FILE = u"new_help_screen.txt"_s;
+const auto NEW_IHELP_PAGE_FILE = u"new_ihelp_screen.txt"_s;
+const auto LEADERBOARD_FILE = u"leaderboard.txt"_s;
+const auto QUEST_FILE = u"quests.txt"_s;
+const auto WEBCLANSLIST_FILE = u"webclanslist.txt"_s;
+const auto HTDOCS_DIR = u"/srv/www/www.dcastle.org/htdocs/"_s;
+const auto PLAYER_DIR = u"player/"_s;
+const auto BUG_LOG = u"bug.log"_s;
+const auto GOD_LOG = u"god.log"_s;
+const auto MORTAL_LOG = u"mortal.log"_s;
+const auto SOCKET_LOG = u"socket.log"_s;
+const auto PLAYER_LOG = u"player.log"_s;
+const auto WORLD_LOG = u"world.log"_s;
+const auto ARENA_LOG = u"arena.log"_s;
+const auto CLAN_LOG = u"clan.log"_s;
+const auto OBJECTS_LOG = u"objects.log"_s;
+const auto QUEST_LOG = u"quest.log"_s;
+const auto VAULT_LOG = u"vault.log"_s;
+const auto WORLD_INDEX_FILE = u"worldindex"_s;
+const auto OBJECT_INDEX_FILE = u"objectindex"_s;
+const auto MOB_INDEX_FILE = u"mobindex"_s;
+const auto ZONE_INDEX_FILE = u"zoneindex"_s;
+const auto PLAYER_SHOP_INDEX = u"playershopindex"_s;
+const auto OBJECT_INDEX_FILE_TINY = u"objectindex.tiny"_s;
+const auto WORLD_INDEX_FILE_TINY = u"worldindex.tiny"_s;
+const auto MOB_INDEX_FILE_TINY = u"mobindex.tiny"_s;
+const auto ZONE_INDEX_FILE_TINY = u"zoneindex.tiny"_s;
+const auto VAULT_INDEX_FILE = u"../vaults/vaultindex"_s;
+const auto VAULT_INDEX_FILE_TMP = u"../vaults/vaultindex.tmp"_s;
 
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
 class clan_room_data
@@ -7615,7 +7615,7 @@ public:
   room_t top_of_world_alloc = {};             // index of last alloc'd memory in world
   room_t top_of_world = {};
   qint32 total_rooms = {}; // total amount of rooms in memory
-  AuctionHouse TheAuctionHouse(u"auctionhouse"_s, this);
+  AuctionHouse TheAuctionHouse = AuctionHouse(u"auctionhouse"_s, this);
   QList<wizlist_info> wizlist;
   QMap<QString, redeem_t> redeem_sessions = {};
   help_index_t help_index_;
@@ -7694,7 +7694,7 @@ public:
 
   [[nodiscard]] inline QString current(void)
   {
-    return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
+    return u"%1:%2:%3:%4"_s.arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
   }
 
   void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
@@ -7776,22 +7776,22 @@ public:
     {
       if (arg1.toLongLong(&ok) != number && ok)
       {
-        logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+        logentry(u"fread_int<%1> value %2 from \"%3\" != %4"_s.arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
       }
       else if (!ok)
       {
-        logentry(QStringLiteral("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(minval).name()));
+        logentry(u"fread_int<%1> arg2.toLongLong not ok."_s.arg(typeid(minval).name()));
       }
     }
     else if (std::is_unsigned<T>::value)
     {
       if (arg1.toULongLong(&ok) != number && ok)
       {
-        logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+        logentry(u"fread_int<%1> value %2 from \"%3\" != %4"_s.arg(typeid(minval).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
       }
       else if (!ok)
       {
-        logentry(QStringLiteral("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(minval).name()));
+        logentry(u"fread_int<%1> arg2.toULongLong not ok."_s.arg(typeid(minval).name()));
       }
     }
     else
@@ -7940,9 +7940,9 @@ auto &operator>>(auto &in, Room &room)
       }
       if (!found)
       {
-        // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
+        // QString error = u"Room %1 is outside of any zone."_s).arg(room_nr);
         // DC::getInstance()->logentry(error);
-        // DC::getInstance()->logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
+        // DC::getInstance()->logentry(u"Room outside of ANY zone.  ERROR"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
       else
       {
@@ -8059,7 +8059,7 @@ auto &operator>>(auto &in, Room &room)
 }
 void write_object(ObjectPtr obj, auto &out)
 {
-  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].vnum());
+  out << u"#%1\n"_s.arg(DC::getInstance()->obj_index[obj->item_number].vnum());
   string_to_file(out, obj->name());
   string_to_file(out, obj->short_description());
   string_to_file(out, obj->long_description());
@@ -8157,7 +8157,7 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
   if (from > to)
   {
 
-    DC::getInstance()->logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
+    DC::getInstance()->logentry(u"BACKWARDS usage: number(%1, %2)!"_s.arg(from).arg(to));
     produce_coredump();
     return to;
   }

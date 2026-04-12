@@ -32,7 +32,7 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
   assert(ch != 0);
   if (ch->in_room == DC::NOWHERE)
   {
-    DC::getInstance()->logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"NOWHERE sent to do_report!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eSUCCESS;
   }
 
@@ -80,7 +80,7 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
       dc_sprintf(buf, "$n reports '%s'", report);
       act_to_room(buf, ch, 0, 0, 0);
 
-      ch->send(QStringLiteral("You report: %1\r\n").arg(report));
+      ch->send(u"You report: %1\r\n"_s.arg(report));
       return ReturnValue::eSUCCESS;
     }
   }
@@ -103,7 +103,7 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_sprintf(buf, "$n reports '%s'", report);
   act_to_room(buf, ch, 0, 0, 0);
 
-  ch->send(QStringLiteral("You report: %1\r\n").arg(report));
+  ch->send(u"You report: %1\r\n"_s.arg(report));
 
   return ReturnValue::eSUCCESS;
 }
@@ -188,8 +188,8 @@ qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
     break;
   }
 
-  buf = QStringLiteral("//(%1) %2\r\n").arg(typestr).arg(message);
-  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\r\n").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
+  buf = u"//(%1) %2\r\n"_s.arg(typestr).arg(message);
+  buf1 = u"%1%2//%3(%4)%5 %6%7 %8%9%10\r\n"_s.arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
 
   for (auto &conn : DC::getInstance()->connections_)
   {
@@ -388,7 +388,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
         }
       }
     }
-    ch->sendln(QStringLiteral("Ignoring: %1").arg(ignoreString));
+    ch->sendln(u"Ignoring: %1"_s.arg(ignoreString));
 
     return ReturnValue::eSUCCESS;
   }
@@ -405,12 +405,12 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
   if (ch->player->ignoring.contains(arg1))
   {
     ch->player->ignoring.remove(arg1);
-    ch->sendln(QStringLiteral("You stop ignoring %1.").arg(arg1));
+    ch->sendln(u"You stop ignoring %1."_s).arg(arg1));
   }
   else
   {
     ch->player->ignoring[arg1] = {true, 0};
-    ch->sendln(QStringLiteral("You now ignore anyone named %1.").arg(arg1));
+    ch->sendln(u"You now ignore anyone named %1."_s).arg(arg1));
   }
   return ReturnValue::eSUCCESS;
 }
@@ -467,7 +467,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!*papername) /* nothing was delivered */
+  if (papername.isEmpty()) /* nothing was delivered */
   {
     ch->sendln("Write? with what? ON what? what are you trying to do??");
     return ReturnValue::eSUCCESS;
@@ -630,7 +630,7 @@ command_return_t do_emote(CharacterPtr ch, const QString argument, cmd_t cmd)
     // don't want players triggering mobs with emotes
     MOBtrigger = false;
     act_to_room(buf, ch, 0, 0, 0);
-    ch->send(QStringLiteral("%s %s\r\n").arg(qPrintable(ch->shortdesc_or_name())).arg(argument + i));
+    ch->send(u"%s %s\r\n"_s.arg(qPrintable(ch->shortdesc_or_name())).arg(argument + i));
     MOBtrigger = true;
   }
   return ReturnValue::eSUCCESS;
@@ -726,7 +726,7 @@ void DC::send_hint(void)
     num = number(0LL, hints_.size() - 1);
   }
 
-  QString hint = QStringLiteral("$B$5HINT:$7 %1$R\r\n").arg(hints_.value(num));
+  QString hint = u"$B$5HINT:$7 %1$R\r\n"_s.arg(hints_.value(num));
 
   for (auto &i : DC::getInstance()->connections_)
   {

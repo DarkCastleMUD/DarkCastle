@@ -650,7 +650,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
       mobspec_status = "exists";
     }
 
-    ch->sendln(QStringLiteral("$3Mobspec$R: %1  $3Progtypes$R: %2").arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
+    ch->sendln(u"$3Mobspec$R: %1  $3Progtypes$R: %2"_s.arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
   }
   dc_sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);
@@ -829,22 +829,22 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   // Showing the bitvector
   sprintbit(k->combat, combat_bits, buf);
-  ch->send(QStringLiteral("$3Combat flags$R: %1\r\n").arg(buf));
+  ch->send(u"$3Combat flags$R: %1\r\n"_s.arg(buf));
 
   if (!k->isNonPlayer())
     display_punishes(ch, k);
 
   sprintbit(k->affected_by, affected_bits, buf);
-  ch->send(QStringLiteral("$3Affected by$R: [%d %d] %s\r\n").arg(k->affected_by[0]).arg(k->affected_by[1]).arg(buf));
+  ch->send(u"$3Affected by$R: [%d %d] %s\r\n"_s.arg(k->affected_by[0]).arg(k->affected_by[1]).arg(buf));
 
   sprintbit(k->immune, isr_bits, buf);
-  ch->send(QStringLiteral("$3Immune$R: [%d] %s\r\n").arg(k->immune).arg(buf));
+  ch->send(u"$3Immune$R: [%d] %s\r\n"_s.arg(k->immune).arg(buf));
 
   sprintbit(k->suscept, isr_bits, buf);
-  ch->send(QStringLiteral("$3Susceptible$R: [%d] %s\r\n").arg(k->suscept).arg(buf));
+  ch->send(u"$3Susceptible$R: [%d] %s\r\n"_s.arg(k->suscept).arg(buf));
 
   sprintbit(k->resist, isr_bits, buf);
-  ch->send(QStringLiteral("$3Resistant$R: [%d] %s\r\n").arg(k->resist).arg(buf));
+  ch->send(u"$3Resistant$R: [%d] %s\r\n"_s.arg(k->resist).arg(buf));
 
   if (!k->isNonPlayer())
   {
@@ -871,12 +871,12 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
     }
   }
 
-  ch->send(QStringLiteral("$3Lag Left$R:  %d\r\n").arg((GET_WAIT(k) ? GET_WAIT(k) : 0)));
+  ch->send(u"$3Lag Left$R:  %d\r\n"_s.arg((GET_WAIT(k) ? GET_WAIT(k) : 0)));
 
   if (k->isPlayer())
   {
-    ch->send(QStringLiteral("$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n").arg(GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k)).arg(GET_KI_METAS(k)).arg(GET_AC_METAS(k)).arg(GET_AGE_METAS(k)));
-    ch->send(QStringLiteral("$3Profession$R: %s (%d)\r\n").arg(qPrintable(find_profession(k->c_class).arg(k->player->profession))).arg(k->player->profession));
+    ch->send(u"$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n"_s.arg(GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k)).arg(GET_KI_METAS(k)).arg(GET_AC_METAS(k)).arg(GET_AGE_METAS(k)));
+    ch->send(u"$3Profession$R: %s (%d)\r\n"_s.arg(find_profession(k->c_class, k->player->profession)).arg(k->player->profession));
   }
 
   if (k->affected)
@@ -890,13 +890,13 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
       if (aff_name.isEmpty())
       {
         if (aff->type == INTERNAL_SLEEPING)
-          aff_name = QStringLiteral("Internal Sleeping");
+          aff_name = u"Internal Sleeping"_s;
         else if (aff->type == Character::PLAYER_CANTQUIT)
-          aff_name = QStringLiteral("CANTQUIT");
+          aff_name = u"CANTQUIT"_s;
         else
-          aff_name = QStringLiteral("Unknown!!!");
+          aff_name = u"Unknown!!!"_s;
       }
-      ch->sendln(QStringLiteral("Spell : '%1' (%2)").arg(aff_name).arg(aff->type));
+      ch->sendln(u"Spell : '%1' (%2)"_s.arg(aff_name).arg(aff->type));
       dc_sprintf(buf, "     Modifies %s by %d points\r\n",
                  apply_types[(qint32)aff->location], aff->modifier);
       ch->send(buf);
@@ -1339,7 +1339,7 @@ void do_start(CharacterPtr ch)
 
   if (ch->title == nullptr)
   {
-    ch->title = QStringLiteral("is a virgin.");
+    ch->title = u"is a virgin."_s;
   }
 
   dc_sprintf(buf, "%s appears with an ear-splitting bang!", qPrintable(ch->shortdesc_or_name()));
@@ -1532,7 +1532,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
   }
 
   one_argument(argument, buf);
-  if (!*buf)
+  if (buf.isEmpty())
     ch->sendln("Whom do you wish to restore?");
   else if (dc_strcmp(buf, "all"))
   {

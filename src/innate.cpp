@@ -93,7 +93,7 @@ command_return_t do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (buf[0] == '\0')
       {
-        ch->send(QStringLiteral("Your race has access to the $B%s$R innate ability.\r\n").arg(innates[i].name));
+        ch->send(u"Your race has access to the $B%s$R innate ability.\r\n"_s.arg(innates[i].name));
         found = true;
       }
       else if (!str_cmp(innates[i].name, buf))

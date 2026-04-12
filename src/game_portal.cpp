@@ -35,12 +35,12 @@ void DC::load_game_portals(void)
   for (qsizetype portal_id = {}; portal_id < portal_filenames.size(); ++portal_id)
   {
     auto &portal_filename = portal_filenames[portal_id];
-    QString full_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_filename);
+    QString full_filename = u"%1/%2"_s.arg(DC::getInstance()->cf.library_directory).arg(portal_filename);
     QFile portal_file(portal_filename);
 
     if (!portal_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
     {
-      DC::getInstance()->logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
+      DC::getInstance()->logentry(u"Could not open portal file: %1"_s.arg(portal_filename));
       break;
     }
     QTextStream in(&portal_file);
@@ -132,13 +132,13 @@ bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qi
   if (from_room == to_room)
   {
     from_portal = {};
-    logentry(QStringLiteral("Portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    logentry(u"Portal made to itself!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return false;
   }
 
   if (duplicate < 0) /* Make a generic portal */
   {
-    from_portal->name(QStringLiteral("portal"));
+    from_portal->name(u"portal"_s);
     from_portal->short_description("a path to a hidden world");
     from_portal->long_description("A mystical path to a hidden world "
                                   "shimmers in the air before you.");
@@ -194,9 +194,9 @@ void find_and_remove_player_portal(CharacterPtr ch)
   QString searchstr;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
-    searchstr = QStringLiteral("cleric %1").arg(qPrintable(ch->name()));
+    searchstr = u"cleric %1"_s.arg(qPrintable(ch->name()));
   else
-    searchstr = QStringLiteral("only %1").arg(qPrintable(ch->name()));
+    searchstr = u"only %1"_s.arg(qPrintable(ch->name()));
 
   for (k = DC::getInstance()->object_list; k; k = next_k)
   {

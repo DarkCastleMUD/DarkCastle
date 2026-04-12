@@ -73,7 +73,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
       if (getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
         sendln("Now doing that would just tick off the IMPS!");
-        DC::getInstance()->logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
+        DC::getInstance()->logentry(u"%1 just tried to force %2 to %3"_s.arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
         return ReturnValue::eSUCCESS;
       }
       if ((getLevel() <= vict->getLevel()) && vict->isPlayer())
@@ -203,7 +203,7 @@ void run_check(CharacterPtr ch, command_return_t *rc, auto *function, QString ar
     {
       new_rc = function(ch, arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -225,7 +225,7 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_gen2_t function, Q
     {
       new_rc = function(ch, arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -247,7 +247,7 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_gen3_t function, Q
     {
       new_rc = (*ch.*(function))(arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -269,7 +269,7 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_special_t function
     {
       new_rc = (*ch.*(function))(arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -294,17 +294,17 @@ command_return_t test_casino(CharacterPtr ch)
   run_check(ch, &max_rc, &Character::do_goto, {"1"});
   run_check(ch, &max_rc, &Character::do_goto, {"21900"});
 
-  run_check(ch, &max_rc, do_look, QStringLiteral("sign"), cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, QStringLiteral("sign"), cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, u"sign"_s, cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, u"sign"_s, cmd_t::EXAMINE);
 
-  run_check(ch, &max_rc, do_move, QStringLiteral(""), cmd_t::NORTH);
+  run_check(ch, &max_rc, do_move, u""_s, cmd_t::NORTH);
 
-  run_check(ch, &max_rc, do_look, QStringLiteral("fountain"), cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, QStringLiteral("fountain"), cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, u"fountain"_s, cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, u"fountain"_s, cmd_t::EXAMINE);
   run_check(ch, &max_rc, &Character::do_drink, {"fountain"});
 
-  run_check(ch, &max_rc, do_look, QStringLiteral("machine"), cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, QStringLiteral("machine"), cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, u"machine"_s, cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, u"machine"_s, cmd_t::EXAMINE);
 
   // saving the player's finances and giving them a consistent
   // amount of cash in bank to be withdrawn
@@ -318,10 +318,10 @@ command_return_t test_casino(CharacterPtr ch)
   run_check(ch, &max_rc, &Character::special, "", cmd_t::WITHDRAW);
   run_check(ch, &max_rc, &Character::special, "1000000", cmd_t::WITHDRAW);
 
-  run_check(ch, &max_rc, do_move, QStringLiteral(""), cmd_t::NORTH);
+  run_check(ch, &max_rc, do_move, u""_s, cmd_t::NORTH);
 
-  run_check(ch, &max_rc, do_look, QStringLiteral("table"), cmd_t::LOOK);
-  run_check(ch, &max_rc, do_examine, QStringLiteral("table"), cmd_t::EXAMINE);
+  run_check(ch, &max_rc, do_look, u"table"_s, cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, u"table"_s, cmd_t::EXAMINE);
 
   auto original_random = DC::getInstance()->random_;
   DC::getInstance()->random_ = QRandomGenerator(1);
@@ -372,7 +372,7 @@ command_return_t test_casino(CharacterPtr ch)
 
   if (ch->getGold() > 2000000)
   {
-    ch->send(QStringLiteral("Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n").arg(ch->getGold()));
+    ch->send(u"Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n"_s).arg(ch->getGold()));
     max_rc = max_rc | ReturnValue::eFAILURE;
   }
 
@@ -404,16 +404,16 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
     command_return_t rc = {};
     for (auto &test : tests)
     {
-      send(QStringLiteral("Running %1..").arg(test.getName()));
+      send(u"Running %1.."_s).arg(test.getName()));
       rc = test.run(this) & rc;
-      sendln(QStringLiteral("Return code is %1 (%2)").arg(rc).arg(rc_to_qstring(rc)));
+      sendln(u"Return code is %1 (%2)"_s.arg(rc).arg(rc_to_qstring(rc)));
     }
     return rc;
   }
   else if (tests.contains(arg1))
   {
     auto rc = tests[arg1].run(this);
-    send(QStringLiteral("Return code is %1 (%2)\r\n").arg(rc).arg(rc_to_qstring(rc)));
+    send(u"Return code is %1 (%2)\r\n"_s.arg(rc).arg(rc_to_qstring(rc)));
     return rc;
   }
 

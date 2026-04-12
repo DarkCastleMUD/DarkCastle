@@ -68,7 +68,7 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (!*name || !str_cmp(name, qPrintable(ch->name())))
+  if (name.isEmpty() || !str_cmp(name, qPrintable(ch->name())))
   {
     act_to_room("$n offers $mself to $s god, who graciously declines.", ch, 0, 0, 0);
     act_to_character("Your god appreciates your offer and may accept it later.", ch, 0, 0, 0);
@@ -189,7 +189,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Donate what?");
     return ReturnValue::eFAILURE;
@@ -253,7 +253,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln(QStringLiteral("You can only yield %1 from a safe room.").arg(obj->short_description()));
+      ch->sendln(u"You can only yield %1 from a safe room."_s).arg(obj->short_description()));
       return ReturnValue::eFAILURE;
     }
   }
@@ -338,7 +338,7 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   qint32 ctr;
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("Type \"title message\" to set a title or \"notitle\" to remove your title.");
     return ReturnValue::eFAILURE;
@@ -407,8 +407,8 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
     {
       if (t.value_ != Player::PLR_GUIDE_TOG || (isSet(player->toggles, Player::PLR_GUIDE)))
       {
-        send(QStringLiteral("%1 ").arg(t.name_, -11));
-        send(QStringLiteral("%1\r\n").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
+        send(u"%1 "_s.arg(t.name_, -11));
+        send(u"%1\r\n"_s.arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
       }
     }
     return ReturnValue::eSUCCESS;
@@ -456,7 +456,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
   {
     for (auto setting = player->config->constBegin(); setting != player->config->constEnd(); ++setting)
     {
-      send(QStringLiteral("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
+      send(u"%1=%2\r\n"_s.arg(setting.key()).arg(setting.value()));
     }
     return ReturnValue::eSUCCESS;
   }
@@ -513,7 +513,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
       if (key == conn->key() || key.isEmpty() || conn->key().startsWith(key))
       {
         found = true;
-        send(QStringLiteral("%1=%2\r\n").arg(conn->key()).arg(conn->value()));
+        send(u"%1=%2\r\n"_s.arg(conn->key()).arg(conn->value()));
       }
     }
 
@@ -521,7 +521,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
     {
       if (key.isEmpty() == false)
       {
-        send(QStringLiteral("%1 not found.\r\n").arg(key));
+        send(u"%1 not found.\r\n"_s).arg(key));
       }
       else
       {
@@ -538,12 +538,12 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
   {
     if (player->config->find(key) != player->config->end())
     {
-      sendln(QStringLiteral("%1 unset.").arg(key));
+      sendln(u"%1 unset."_s).arg(key));
       player->config->insert(key, QString());
       save(cmd_t::SAVE_SILENTLY);
       return ReturnValue::eSUCCESS;
     }
-    send(QStringLiteral("%1 not found.\r\n").arg(key));
+    send(u"%1 not found.\r\n"_s).arg(key));
     return ReturnValue::eFAILURE;
   }
 
@@ -567,11 +567,11 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
         {
           if (color.key() == "black")
           {
-            send(QStringLiteral("%1\r\n").arg(color.key()));
+            send(u"%1\r\n"_s.arg(color.key()));
           }
           else
           {
-            send(QStringLiteral("%1 - %2Example$R\r\n").arg(color.key(), -15).arg(color.value()));
+            send(u"%1 - %2Example$R\r\n"_s.arg(color.key(), -15).arg(color.value()));
           }
         }
 
@@ -604,12 +604,12 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
 
       if (!found_locale)
       {
-        if (value != QStringLiteral("?"))
+        if (value != u"?"_s)
         {
-          sendln(QStringLiteral("'%1' is an invalid locale. Type config locale=? to see a list of valid locales.").arg(value));
+          sendln(u"'%1' is an invalid locale. Type config locale=? to see a list of valid locales."_s.arg(value));
           return ReturnValue::eSUCCESS;
         }
-        sendln(QStringLiteral("Here's a list of valid locales:"));
+        sendln(u"Here's a list of valid locales:"_s);
         for (const auto &locale : locales)
         {
           sendln(locale.name());
@@ -634,7 +634,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
       {
         if (!found)
         {
-          sendln(QStringLiteral("Invalid timezone '%1' specified. Type config timezone=? to see the full list.").arg(value));
+          sendln(u"Invalid timezone '%1' specified. Type config timezone=? to see the full list."_s.arg(value));
           return ReturnValue::eSUCCESS;
         }
       }
@@ -643,18 +643,18 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
     }
     else if (key == "dateformat")
     {
-      if (QStringLiteral("TextDate").compare(value, Qt::CaseInsensitive) &&
-          QStringLiteral("ISODateWithMs").compare(value, Qt::CaseInsensitive) &&
-          QStringLiteral("ISODate").compare(value, Qt::CaseInsensitive) &&
-          QStringLiteral("RFC2822Date").compare(value, Qt::CaseInsensitive))
+      if (u"TextDate"_s.compare(value, Qt::CaseInsensitive) &&
+          u"ISODateWithMs"_s.compare(value, Qt::CaseInsensitive) &&
+          u"ISODate"_s.compare(value, Qt::CaseInsensitive) &&
+          u"RFC2822Date"_s.compare(value, Qt::CaseInsensitive))
       {
         sendln("Valid timestamp formats are:");
         auto timezone_str = getSetting("timezone", "America/Chicago");
         auto timezone = QTimeZone(timezone_str.toLatin1());
-        sendln(QStringLiteral("%1 %2").arg("TextDate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::TextDate)));
-        sendln(QStringLiteral("%1 %2").arg("ISODateWithMs", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODateWithMs)));
-        sendln(QStringLiteral("%1 %2").arg("ISODate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODate)));
-        sendln(QStringLiteral("%1 %2").arg("RFC2822Date", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::RFC2822Date)));
+        sendln(u"%1 %2"_s.arg("TextDate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::TextDate)));
+        sendln(u"%1 %2"_s.arg("ISODateWithMs", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODateWithMs)));
+        sendln(u"%1 %2"_s.arg("ISODate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODate)));
+        sendln(u"%1 %2"_s.arg("RFC2822Date", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::RFC2822Date)));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -672,7 +672,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
 
     player->config->insert(key, value);
 
-    send(QStringLiteral("Setting %1=%2\r\n").arg(key).arg(value));
+    send(u"Setting %1=%2\r\n"_s.arg(key).arg(value));
     save(cmd_t::SAVE_SILENTLY);
     return ReturnValue::eSUCCESS;
   }
@@ -1368,7 +1368,7 @@ command_return_t do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(name, argument);
 
-  if (!*name || !(victim = ch->get_char_room_vis(name)))
+  if (name.isEmpty() || !(victim = ch->get_char_room_vis(name)))
   {
     ch->sendln("Tag who?");
     return ReturnValue::eFAILURE;
@@ -1393,7 +1393,7 @@ void CVoteData::DisplayVote(CharacterPtr ch)
   ch->send(buf);
   ch->send("\r\n");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
-    ch->send(QStringLiteral("%1: %2\r\n").arg(i++, 2).arg(answer_it->answer.c_str()));
+    ch->send(u"%1: %2\r\n"_s.arg(i++, 2).arg(answer_it->answer.c_str()));
   ch->send("\r\n");
 }
 
@@ -1527,10 +1527,10 @@ void CVoteData::DisplayResults(CharacterPtr ch)
     if (ch->isMortalPlayer())
     {
       qint32 percent = (answer_it->votes * 100) / total_votes;
-      ch->send(QStringLiteral("%3d\%: %s\r\n").arg(percent).arg(answer_it->answer.c_str()));
+      ch->send(u"%3d\%: %s\r\n"_s.arg(percent).arg(answer_it->answer.c_str()));
     }
     else
-      ch->send(QStringLiteral("%3d: %s\r\n").arg(answer_it->votes).arg(answer_it->answer.c_str()));
+      ch->send(u"%3d: %s\r\n"_s.arg(answer_it->votes).arg(answer_it->answer.c_str()));
   }
   ch->sendln("");
 }
@@ -1562,7 +1562,7 @@ void CVoteData::OutToFile()
 
   if (!the_file)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
+    DC::getInstance()->logentry(u"Unable to open/create save file for vote data"_s, ANGEL,
                                 DC::LogChannel::LOG_BUG);
     return;
   }
@@ -1646,7 +1646,7 @@ CVoteData::CVoteData()
   {
     fclose(the_file);
     this->Reset(nullptr);
-    DC::getInstance()->logentry(QStringLiteral("Error reading question from vote file."), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Error reading question from vote file."_s, 0, DC::LogChannel::LOG_MISC);
     return;
   }
   buf[strlen(buf) - 1] = {};
@@ -1660,7 +1660,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      DC::getInstance()->logentry(QStringLiteral("Error reading answers from vote file."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(u"Error reading answers from vote file."_s, 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1678,7 +1678,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      DC::getInstance()->logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(u"Error reading ip addresses from vote file."_s, 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1693,7 +1693,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      DC::getInstance()->logentry(QStringLiteral("Error reading character names from vote file."), 0, DC::LogChannel::LOG_MISC);
+      DC::getInstance()->logentry(u"Error reading character names from vote file."_s, 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1759,7 +1759,7 @@ command_return_t do_random(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   i = number(1, 100);
-  ch->send(QStringLiteral("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
+  ch->send(u"You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n"_s.arg(i));
   dc_sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
   act_to_room(buf, ch, 0, 0, 0);
   return ReturnValue::eSUCCESS;

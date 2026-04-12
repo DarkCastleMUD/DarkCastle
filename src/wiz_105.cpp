@@ -28,10 +28,10 @@ command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, buf);
 
-  if (!*buf)
+  if (buf.isEmpty())
     victim = ch;
   else if (!generic_find(argument, FIND_CHAR_ROOM | FIND_CHAR_WORLD, ch, &victim, &dummy, true))
-    ch->send(QStringLiteral("Couldn't find '%1' anywhere.\r\n").arg(argument));
+    ch->send(u"Couldn't find '%1' anywhere.\r\n"_s.arg(argument));
   if (victim)
   {
     for (af = victim->affected; af; af = afpk)
@@ -41,7 +41,7 @@ command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
       QString aff_name = get_skill_name(af->type);
       if (!aff_name.isEmpty())
       {
-        ch->send(QStringLiteral("Removing %1 affect.\r\n").arg(aff_name));
+        ch->send(u"Removing %1 affect.\r\n"_s).arg(aff_name));
       }
       else
       {
@@ -94,7 +94,7 @@ command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, buf);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("Log who?");
   }
@@ -127,7 +127,7 @@ command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
   CharacterPtr victim;
   one_argument(argument, person);
 
-  if (!*person)
+  if (person.isEmpty())
   {
     QString buf;
     const auto &character_list = DC::getInstance()->character_list;
@@ -146,7 +146,7 @@ command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  ch->send(QStringLiteral("Player: %s\r\n").arg(qPrintable(victim->name())));
+  ch->send(u"Player: %s\r\n"_s.arg(qPrintable(victim->name())));
 
   if (isSet(victim->combat, COMBAT_SHOCKED))
     ch->sendln("COMBAT_SHOCKED");
@@ -241,7 +241,7 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
     {
       for (const auto &name : PerfTimers.keys())
       {
-        ch->sendln(QStringLiteral("%1").arg(name));
+        ch->sendln(u"%1"_s.arg(name));
       }
     }
     else if (arg2 == "show")
@@ -315,7 +315,7 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     victim->setDebug(!victim->getDebug());
-    ch->sendln(QStringLiteral("Debug for %1 toggled %2").arg(qPrintable(victim->name())).arg(victim->getDebug() ? "on" : "off"));
+    ch->sendln(u"Debug for %1 toggled %2"_s.arg(qPrintable(victim->name())).arg(victim->getDebug() ? "on" : "off"));
     return ReturnValue::eSUCCESS;
   }
   else if (arg1 == "mobile")
@@ -345,11 +345,11 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
               first_npc_debug_state = c->getDebug();
             }
             c->setDebug(!first_npc_debug_state);
-            ch->sendln(QStringLiteral("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
+            ch->sendln(u"Vnum %1 Rnum %2 debug turned %3."_s).arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
             change_count++;
           }
         }
-        ch->sendln(QStringLiteral("%1 mobiles changed.").arg(change_count));
+        ch->sendln(u"%1 mobiles changed."_s).arg(change_count));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -381,7 +381,7 @@ command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, person, flag);
 
-  if (!*person)
+  if (person.isEmpty())
   {
     ch->sendln("Pardon whom?");
     return ReturnValue::eFAILURE;
@@ -443,7 +443,7 @@ command_return_t do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, buf);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     ch->sendln("Syntax: damage <item>");
     return ReturnValue::eFAILURE;
@@ -475,7 +475,7 @@ QString print_classes(qint32 bitv)
   QString buf;
   for (; *pc_clss_types2[i] != '\n'; i++)
     if (isSet(bitv, 1 << (i - 1)))
-      buf = QStringLiteral("%1 %2").arg(buf).arg(pc_clss_types2[i]);
+      buf = u"%1 %2"_s.arg(buf).arg(pc_clss_types2[i]);
   return buf;
 }
 
@@ -520,7 +520,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   //  if (argument && *argument && !is_number(argument))
   //   argument = one_argument(argument, skill+strlen(skill));
-  /*  if (!argument || !*argument)
+  /*  if (!argument || argument.isEmpty())
     {
        send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
                     "$3Syntax:$R sqedit message/new/<skillname>\r\n",ch)={};
@@ -594,7 +594,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     auto newOne = new skill_quest;
     newOne->num = i;
     newOne->level = 1;
-    newOne->message = QStringLiteral("New skillquest.");
+    newOne->message = u"New skillquest."_s;
     newOne->clas = (1 << (clas - 1));
     newOne->next = skill_list;
     skill_list = newOne;
@@ -669,7 +669,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Class modified.");
     break;
   case 5: // show
-    ch->send(QStringLiteral("$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n").arg(qPrintable(get_skill_name(skill->num))).arg(skill->message).arg(print_classes(skill->clas)).arg(skill->level));
+    ch->send(u"$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n"_s.arg(qPrintable(get_skill_name(skill->num))).arg(skill->message).arg(print_classes(skill->clas)).arg(skill->level));
     break;
   case 6:
     qint32 l;
@@ -684,12 +684,12 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ch->sendln("These are the current sqs:");
-    ch->send(QStringLiteral("$3%s skillquests.$R\r\n").arg(pc_clss_types2[l]));
+    ch->send(u"$3%s skillquests.$R\r\n"_s.arg(pc_clss_types2[l]));
     for (curren = skill_list; curren; curren = curren->next)
     {
       if (!isSet(curren->clas, 1 << (l - 1)))
         continue;
-      ch->send(QStringLiteral("$3%d$R. %s\r\n").arg(curren->num).arg(qPrintable(get_skill_name(curren->num))));
+      ch->send(u"$3%d$R. %s\r\n"_s.arg(curren->num).arg(qPrintable(get_skill_name(curren->num))));
       done = true;
     }
     if (!done)
@@ -699,7 +699,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     do_write_skillquest(ch, argument, cmd);
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, DC::LogChannel::LOG_WORLD);
+    DC::getInstance()->logentry(u"Incorrect -i- in do_sqedit"_s, 0, DC::LogChannel::LOG_WORLD);
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eSUCCESS;
@@ -904,7 +904,7 @@ command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
     file_to_string(NEW_IHELP_PAGE_FILE, new_ihelp);
   else if (!str_cmp(arg, "xhelp"))
   {
-    do_reload_help(ch, QStringLiteral(""));
+    do_reload_help(ch, u""_s);
     ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "greetings"))
@@ -958,11 +958,11 @@ command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
     if (mob)
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((CharacterPtr)DC::getInstance()->mob_index[real_mobile(i)].item)->name()));
+      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg(((CharacterPtr)DC::getInstance()->mob_index[real_mobile(i)].item)->name()));
     }
     else
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg((DC::getInstance()->obj_index[real_object(i)].item)->name()));
+      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg((DC::getInstance()->obj_index[real_object(i)].item)->name()));
     }
   }
   return ReturnValue::eSUCCESS;

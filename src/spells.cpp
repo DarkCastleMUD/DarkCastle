@@ -1033,7 +1033,7 @@ void isr_set(CharacterPtr ch)
 
   if (!ch)
   {
-    DC::getInstance()->logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"nullptr ch in isr_set!"_s, 0, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1121,7 +1121,7 @@ void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 
   if (ch->master == nullptr)
   {
-    DC::getInstance()->logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Stop_follower: null ch_master!"_s, ARCHANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   /*
@@ -1480,7 +1480,7 @@ command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("Specify the spell to release or 'all' to release all spells.");
     for (aff = ch->affected; aff; aff = aff_next)
@@ -1525,13 +1525,13 @@ command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (ch->getMove() < 25)
       {
-        ch->sendln(QStringLiteral("You don't have enough movement points to release the spell effect '%1'.").arg(get_skill_name(aff->type)));
+        ch->sendln(u"You don't have enough movement points to release the spell effect '%1'."_s.arg(get_skill_name(aff->type)));
         return ReturnValue::eFAILURE;
       }
 
       if (aff->type > 0 && aff->type <= MAX_SPL_LIST && !skill_success(ch, nullptr, SKILL_RELEASE))
       {
-        ch->sendln(QStringLiteral("You failed to release the spell effect '%1', and are left momentarily dazed.").arg(get_skill_name(aff->type)));
+        ch->sendln(u"You failed to release the spell effect '%1', and are left momentarily dazed."_s.arg(get_skill_name(aff->type)));
         act_to_room("$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, INVIS_NULL);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
         ch->decrementMove(10);
@@ -1539,7 +1539,7 @@ command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
       }
 
       ch->decrementMove(25);
-      ch->sendln(QStringLiteral("You release the spell effect '%1'.").arg(get_skill_name(aff->type)));
+      ch->sendln(u"You release the spell effect '%1'."_s.arg(get_skill_name(aff->type)));
       QString buffer;
       qint32 aftype = aff->type;
 
@@ -1550,12 +1550,12 @@ command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       affect_from_char(ch, aftype);
       //	  affect_remove(ch,aff,0);
-      act_to_room(QStringLiteral("$n concentrates for a moment and releases their %1.").arg(get_skill_name(aftype)), ch, 0, 0, INVIS_NULL);
+      act_to_room(u"$n concentrates for a moment and releases their %1."_s.arg(get_skill_name(aftype)), ch, 0, 0, INVIS_NULL);
       found = true;
     }
 
     if (!found)
-      ch->sendln(QStringLiteral("No such spell effect '%1' found to be released.").arg(argument));
+      ch->sendln(u"No such spell effect '%1' found to be released."_s.arg(argument));
   }
 
   return ReturnValue::eSUCCESS;
@@ -2232,7 +2232,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             }
         }
         else
-        { // !*name No argument was typed
+        { // name.isEmpty() No argument was typed
 
           if (isSet(spell_info[spl].targets(), TAR_FIGHT_SELF))
             if ((ch->fighting) && ((ch->fighting)->in_room == ch->in_room))
@@ -2403,7 +2403,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         if (!ch->isImmortalPlayer() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
-          ch->send(QStringLiteral("You lost your concentration and are unable to cast %s!\r\n").arg(spells[spl - 1]));
+          ch->send(u"You lost your concentration and are unable to cast %s!\r\n"_s.arg(spells[spl - 1]));
           if (rel > 1)
           {
             ch->sendln("The failed elemental filter drains you of additional mana.");
@@ -2579,7 +2579,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           ch->sendln("You utter a swift prayer to the gods to amplify your powers.");
           act_to_room("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, 0);
-          argument = QStringLiteral("communegroupspell");
+          argument = u"communegroupspell"_s;
           argument_ptr = argument;
         }
         else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY) && tar_char->affected_by_spell(SPELL_IMMUNITY)->modifier == spl - 1)
@@ -2594,32 +2594,32 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           switch (fil)
           {
           case FILTER_FIRE:
-            ch->send(QStringLiteral("Upon casting, your %s filters through a $B$4blast of flame$R!\r\n").arg(spells[spl - 1]));
+            ch->send(u"Upon casting, your %s filters through a $B$4blast of flame$R!\r\n"_s.arg(spells[spl - 1]));
             act_to_room("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, 0);
             level = 200 + TYPE_FIRE - TYPE_HIT;
             break;
           case FILTER_ACID:
-            ch->send(QStringLiteral("Upon casting, your %s filters through $B$2sizzling acid$R!\r\n").arg(spells[spl - 1]));
+            ch->send(u"Upon casting, your %s filters through $B$2sizzling acid$R!\r\n"_s.arg(spells[spl - 1]));
             act_to_room("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, 0);
             level = 200 + TYPE_ACID - TYPE_HIT;
             break;
           case FILTER_COLD:
-            ch->send(QStringLiteral("Upon casting, your %s filters through $B$3shards of ice$R!\r\n").arg(spells[spl - 1]));
+            ch->send(u"Upon casting, your %s filters through $B$3shards of ice$R!\r\n"_s.arg(spells[spl - 1]));
             act_to_room("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, 0);
             level = 200 + TYPE_COLD - TYPE_HIT;
             break;
           case FILTER_ENERGY:
-            ch->send(QStringLiteral("Upon casting, your %s filters through $B$5crackling energy$R!\r\n").arg(spells[spl - 1]));
+            ch->send(u"Upon casting, your %s filters through $B$5crackling energy$R!\r\n"_s.arg(spells[spl - 1]));
             act_to_room("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, 0);
             level = 200 + TYPE_ENERGY - TYPE_HIT;
             break;
           case FILTER_MAGIC:
-            ch->send(QStringLiteral("Upon casting, your %s filters through a $B$7burst of magic$R!\r\n").arg(spells[spl - 1]));
+            ch->send(u"Upon casting, your %s filters through a $B$7burst of magic$R!\r\n"_s.arg(spells[spl - 1]));
             act_to_room("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, 0);
             level = 200 + TYPE_MAGIC - TYPE_HIT;
             break;
           case FILTER_POISON:
-            ch->send(QStringLiteral("Upon casting, your %s filters through $2poisonous fumes$R!\r\n").arg(spells[spl - 1]));
+            ch->send(u"Upon casting, your %s filters through $2poisonous fumes$R!\r\n"_s.arg(spells[spl - 1]));
             act_to_room("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, 0);
             level = 200 + TYPE_POISON - TYPE_HIT;
             break;

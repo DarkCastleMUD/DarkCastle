@@ -311,7 +311,7 @@ void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChanne
     logpath << SOCKET_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      qFatal(qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
+      qFatal(qUtf8Printable(u"Unable to open socket log: %1\n"_s.arg(logpath.str().c_str())));
     }
     break;
   case DC::LogChannel::LOG_PLAYER:
@@ -321,7 +321,7 @@ void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChanne
       logpath << vict->name().toStdString();
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
-        qCritical(qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
+        qCritical(qUtf8Printable(u"Unable to open player log '%1'.\n"_s.arg(logpath.str().c_str())));
       }
     }
     else
@@ -392,11 +392,11 @@ void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChanne
   {
     if (DC::getInstance()->cf.stderr_timestamp == true)
     {
-      std::cerr << QStringLiteral("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
+      std::cerr << u"%1 :%2: %3"_s.arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
     }
     else
     {
-      std::cerr << QStringLiteral("%1:%2").arg(type).arg(str).toStdString() << std::endl;
+      std::cerr << u"%1:%2"_s.arg(type).arg(str).toStdString() << std::endl;
     }
   }
 
@@ -840,7 +840,7 @@ void util_archive(const QString char_name, CharacterPtr caller)
     if (caller)
       caller->sendln("That character does not exist.");
     else
-      DC::getInstance()->logentry(QStringLiteral("Attempt to archive a non-existent character."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Attempt to archive a non-existent character."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
   dc_sprintf(buf, "gzip -9 %s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -848,7 +848,7 @@ void util_archive(const QString char_name, CharacterPtr caller)
   {
     dc_sprintf(buf, "Unsuccessful archive: %s", char_name);
     if (caller)
-      caller->send(QStringLiteral("%1\r\n").arg(buf));
+      caller->send(u"%1\r\n"_s.arg(buf));
     else
       DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
@@ -858,7 +858,7 @@ void util_archive(const QString char_name, CharacterPtr caller)
   rename(buf, buf2);
   dc_sprintf(buf, "Character archived: %s", char_name);
   if (caller)
-    caller->send(QStringLiteral("%1\r\n").arg(buf));
+    caller->send(u"%1\r\n"_s.arg(buf));
   DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
@@ -902,7 +902,7 @@ void util_unarchive(QString char_name, CharacterPtr caller)
   {
     dc_sprintf(buf, "Unsuccessful unarchive: %s", char_name);
     if (caller)
-      caller->send(QStringLiteral("%1\r\n").arg(buf));
+      caller->send(u"%1\r\n"_s.arg(buf));
     else
       DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
@@ -912,7 +912,7 @@ void util_unarchive(QString char_name, CharacterPtr caller)
   rename(buf, buf2);
   dc_sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
-    caller->send(QStringLiteral("%1\r\n").arg(buf));
+    caller->send(u"%1\r\n"_s.arg(buf));
   DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
@@ -1035,7 +1035,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 
   if (!sub || !obj)
   {
-    DC::getInstance()->logentry(QStringLiteral("Invalid pointer passed to CAN_SEE!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Invalid pointer passed to CAN_SEE!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -1225,7 +1225,7 @@ command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*name || !*message)
+  if (name.isEmpty() || message.isEmpty())
     ch->sendln("Order who to do what?");
   else if (!(victim = ch->get_char_room_vis(name)) &&
            str_cmp("follower", name) && str_cmp("followers", name))
@@ -1300,7 +1300,7 @@ command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("That doesn't sound like a good idea to me.  Sorry.");
     return ReturnValue::eFAILURE;
@@ -1335,7 +1335,7 @@ command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("I beg your pardon?");
     return ReturnValue::eFAILURE;
@@ -1371,7 +1371,7 @@ command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("Pardon?");
     return ReturnValue::eFAILURE;
@@ -1444,7 +1444,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
     {
-      send(QStringLiteral("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(qPrintable(victim->name())));
+      send(u"You are not grouped or clanned with %1 so you cannot recall them.\r\n"_s).arg(qPrintable(victim->name())));
       return ReturnValue::eFAILURE;
     }
   }
@@ -1570,7 +1570,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (this->getGold() < (quint32)cost)
     {
-      this->send(QStringLiteral("You don't have %1 gold!\r\n").arg(cost));
+      this->send(u"You don't have %1 gold!\r\n"_s.arg(cost));
       return ReturnValue::eFAILURE;
     }
 
@@ -1627,7 +1627,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   */
   if (ch == 0)
   {
-    DC::getInstance()->logentry(QStringLiteral("do_quit received null character - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"do_quit received null character - problem!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1730,7 +1730,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
         DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       release_message(fol->follower);
-      extract_char(fol->follower, false, QStringLiteral("do_quit/followers"));
+      extract_char(fol->follower, false, u"do_quit/followers"_s);
     }
   }
   affect_from_char(ch, SPELL_IRON_ROOTS);
@@ -1767,9 +1767,9 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
     affect_to_char(ch, &af);
 
     if (obj && qPrintable(obj->short_description()))
-      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for %2 to reappear!\r\n").arg(ch->name()).arg(obj->short_description()));
+      send_info(u"\r\n##%1 has just logged out, watch for %2 to reappear!\r\n"_s.arg(ch->name()).arg(obj->short_description()));
     else
-      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(qPrintable(ch->name())));
+      send_info(u"\r\n##%1 has just logged out, watch for the Champion flag to reappear!\r\n"_s.arg(qPrintable(ch->name())));
   }
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);
@@ -1805,7 +1805,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   while (ch->carrying)
     extract_obj(ch->carrying);
 
-  extract_char(ch, true, QStringLiteral("do_quit"));
+  extract_char(ch, true, u"do_quit"_s);
   return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
 }
 
@@ -1822,7 +1822,7 @@ command_return_t Character::save(cmd_t cmd)
 
   if (cmd != cmd_t::SAVE_SILENTLY)
   {
-    send(QStringLiteral("Saving %1.\r\n").arg(qPrintable(this->name())));
+    send(u"Saving %1.\r\n"_s).arg(qPrintable(this->name())));
   }
 
   if (this->isPlayer())
@@ -2014,12 +2014,12 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
         if (ISSET(value, x + 1))
         {
           REMBIT(value, x + 1);
-          ch->send(QStringLiteral("%s flag REMOVED.\r\n").arg(bits[x]));
+          ch->send(u"%s flag REMOVED.\r\n"_s.arg(bits[x]));
         }
         else
         {
           SETBIT(value, x + 1);
-          ch->send(QStringLiteral("%s flag ADDED.\r\n").arg(bits[x]));
+          ch->send(u"%s flag ADDED.\r\n"_s.arg(bits[x]));
         }
         found = true;
         break;
@@ -2045,7 +2045,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, CharacterPtr ch, 
         REMOVE_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(QStringLiteral("%1 flag REMOVED.\r\n").arg(bits.value(x)));
+          ch->send(u"%1 flag REMOVED.\r\n"_s).arg(bits.value(x)));
         }
       }
       else
@@ -2053,7 +2053,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, CharacterPtr ch, 
         SET_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(QStringLiteral("%1 flag ADDED.\r\n").arg(bits.value(x)));
+          ch->send(u"%1 flag ADDED.\r\n"_s).arg(bits.value(x)));
         }
       }
       found = true;
@@ -2105,12 +2105,12 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
         if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
-          ch->send(QStringLiteral("%s flag REMOVED.\r\n").arg(bits[x]));
+          ch->send(u"%s flag REMOVED.\r\n"_s.arg(bits[x]));
         }
         else
         {
           SET_BIT(value, (1 << x));
-          ch->send(QStringLiteral("%s flag ADDED.\r\n").arg(bits[x]));
+          ch->send(u"%s flag ADDED.\r\n"_s.arg(bits[x]));
         }
         found = true;
         break;
@@ -2166,12 +2166,12 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
         if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
-          ch->send(QStringLiteral("%s flag REMOVED.\r\n").arg(bits[x]));
+          ch->send(u"%s flag REMOVED.\r\n"_s.arg(bits[x]));
         }
         else
         {
           SET_BIT(value, (1 << x));
-          ch->send(QStringLiteral("%s flag ADDED.\r\n").arg(bits[x]));
+          ch->send(u"%s flag ADDED.\r\n"_s.arg(bits[x]));
         }
         found = true;
         break;
@@ -2223,7 +2223,7 @@ qint32 get_line(FILE *fl, QString buf)
     fgets(temp, 256, fl);
     if (*temp)
       temp[strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && (*temp == '*' || !*temp));
+  } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 
   if (feof(fl))
     return 0;
@@ -2276,7 +2276,7 @@ bool is_in_game(CharacterPtr ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    DC::getInstance()->logentry(QStringLiteral("nullptr args sent to is_pc_playing in utility.c!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"nullptr args sent to is_pc_playing in utility.c!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -3115,11 +3115,11 @@ bool str_infix(QString astr, QString bstr)
 
 void special_log(QString message)
 {
-  QFile special_logfile(QStringLiteral("../lib/special.txt"));
+  QFile special_logfile(u"../lib/special.txt"_s);
 
   if (!special_logfile.open(QIODevice::Append | QIODevice::Text))
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open SPECIAL LOG FILE in special_log."), IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"Unable to open SPECIAL LOG FILE in special_log."_s, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     return;
   }
 

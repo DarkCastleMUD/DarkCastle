@@ -83,7 +83,7 @@ aliases_t read_char_aliases(FILE *fpsave)
     QString command = fread_alias_string(fpsave);
     if (keyword.isEmpty() || command.isEmpty())
     {
-      DC::getInstance()->logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
+      DC::getInstance()->logentry(u"Removing command alias [%1] because it's missing a keyword."_s.arg(command));
       continue;
     }
 
@@ -99,7 +99,7 @@ QString fread_alias_string(FILE *fpsave)
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (read_count != 1)
   {
-    DC::getInstance()->logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
+    DC::getInstance()->logentry(u"fread_alias_string: fread() read %1 bytes instead of %2 at position %3"_s.arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
     return QString();
   }
 
@@ -364,13 +364,13 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
   {
     if (feof(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(qPrintable(filename)));
+      qDebug(u"fread_to_tilde: unexpected EOF in %1"_s.arg(qPrintable(filename)));
       return characters_read;
     }
 
     if (ferror(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected error in %1").arg(qPrintable(filename)));
+      qDebug(u"fread_to_tilde: unexpected error in %1"_s.arg(qPrintable(filename)));
       return characters_read;
     }
 
@@ -379,7 +379,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
     long after_fread_offset = ftell(fpsave);
     if (read_count != 1)
     {
-      qDebug(QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(qPrintable(filename)));
+      qDebug(u"fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4"_s.arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(qPrintable(filename)));
     }
 
     buffer += a;
@@ -391,7 +391,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
 
   if (characters_read >= 160)
   {
-    qDebug(QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(qPrintable(filename)));
+    qDebug(u"fread_to_tilde: >= 160 buffer: [%1] in %2"_s.arg(buffer).arg(qPrintable(filename)));
   }
 
   return characters_read;
@@ -418,7 +418,7 @@ bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
   {
     if (fread_to_tilde(fpsave, filename) >= 160)
     {
-      logbug(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->name()));
+      logbug(u"read_Player: Error reading %1. fread_to_tilde >= 160. Aborting."_s.arg(ch->name()));
       return false;
     }
   }
@@ -590,7 +590,7 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, time_data tmpage)
     return true;
   }
 
-  logbug(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(name()));
+  logbug(u"save_pc_or_mob_data: %1 not an NPC and not a player."_s.arg(name()));
   return false;
 }
 
@@ -701,19 +701,19 @@ void read_skill(CharacterPtr ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s).arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s).arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s).arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -831,7 +831,7 @@ void save_char_obj_db(CharacterPtr ch)
 
   qint32 msec = finish.tv_sec * 1000 + finish.tv_usec / 1000;
   msec -= start.tv_sec * 1000 + start.tv_usec / 1000;
-  ch->send(QStringLiteral("Save took %1ms\r\n").arg(msec));
+  ch->send(u"Save took %1ms\r\n"_s.arg(msec));
 
   /*
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
@@ -961,7 +961,7 @@ void Character::save_char_obj(void)
 // just error crap to avoid using "goto" like we were
 void load_char_obj_error(FILE *fpsave, QString strsave)
 {
-  QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
+  QString log_buf = u"Load_char_obj: %1"_s.arg(strsave);
   perror(qPrintable(log_buf));
   DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
@@ -996,11 +996,11 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
 
   if (DC::getInstance()->cf.bport)
   {
-    strsave = QStringLiteral("%1/%2/%3").arg(BSAVE_DIR).arg(name[0]).arg(name);
+    strsave = u"%1/%2/%3"_s.arg(BSAVE_DIR).arg(name[0]).arg(name);
   }
   else
   {
-    strsave = QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(name[0]).arg(name);
+    strsave = u"%1/%2/%3"_s.arg(SAVE_DIR).arg(name[0]).arg(name);
   }
 
   //   stat mystats;
@@ -1181,7 +1181,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(QChar), length, fpsave);
     buf[length] = '\0';
-    obj->long_description = QStringLiteral(buf);
+    obj->long_description = buf;
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("SDE", mod_type))
@@ -1189,7 +1189,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(QChar), length, fpsave);
     buf[length] = '\0';
-    qPrintable(obj->short_description()) = QStringLiteral(buf);
+    qPrintable(obj->short_description()) = buf;
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("ADE", mod_type))

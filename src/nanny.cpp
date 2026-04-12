@@ -381,7 +381,7 @@ void Character::do_on_login_stuff(void)
 
   if (this->title == nullptr)
   {
-    this->title = QStringLiteral("is a virgin.");
+    this->title = u"is a virgin."_s;
   }
 
   if (GET_CLASS(this) == CLASS_MONK)
@@ -589,7 +589,7 @@ void Character::do_on_login_stuff(void)
     {
       if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
       {
-        DC::getInstance()->logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(qPrintable(this->name())), IMMORTAL, DC::LogChannel::LOG_PLAYER);
+        DC::getInstance()->logentry(u"Removing skill %1 from %2"_s.arg(curr.first).arg(qPrintable(this->name())), IMMORTAL, DC::LogChannel::LOG_PLAYER);
         // this->send(fmt::format("Removing skill {}\r\n", curr.first));
         skills_to_delete.push(curr.first);
       }
@@ -632,7 +632,7 @@ void Character::do_on_login_stuff(void)
     {
       if (!access.name.isEmpty())
       {
-        if (!file_exists(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(access.name[0].toUpper()).arg(access.name)))
+        if (!file_exists(u"%1/%2/%3"_s.arg(SAVE_DIR).arg(access.name[0].toUpper()).arg(access.name)))
         {
           todelete.push(access.name);
         }
@@ -642,7 +642,7 @@ void Character::do_on_login_stuff(void)
 
   while (!todelete.empty())
   {
-    DC::getInstance()->logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(qPrintable(this->name())), 0, DC::LogChannel::LOG_MORTAL);
+    DC::getInstance()->logentry(u"Deleting %1 from %2's vault access list.\n"_s.arg(todelete.front()).arg(qPrintable(this->name())), 0, DC::LogChannel::LOG_MORTAL);
     remove_vault_access(todelete.front(), vault);
     todelete.pop();
   }
@@ -686,11 +686,11 @@ void Character::roll_and_display_stats(void)
 
   write_to_output("\r\n  Choose from any of the following groups of abilities...     \r\n", desc);
   write_to_output("Group: 1     2     3     4     5\r\n", this->desc);
-  write_to_output(QStringLiteral("Str:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->str[0], -2).arg(desc->stats->str[1], -2).arg(desc->stats->str[2], -2).arg(desc->stats->str[3], -2).arg(desc->stats->str[4], -2), desc);
-  write_to_output(QStringLiteral("Dex:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->dex[0], -2).arg(desc->stats->dex[1], -2).arg(desc->stats->dex[2], -2).arg(desc->stats->dex[3], -2).arg(desc->stats->dex[4], -2), desc);
-  write_to_output(QStringLiteral("Con:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->con[0], -2).arg(desc->stats->con[1], -2).arg(desc->stats->con[2], -2).arg(desc->stats->con[3], -2).arg(desc->stats->con[4], -2), desc);
-  write_to_output(QStringLiteral("Int:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->tel[0], -2).arg(desc->stats->tel[1], -2).arg(desc->stats->tel[2], -2).arg(desc->stats->tel[3], -2).arg(desc->stats->tel[4], -2), desc);
-  write_to_output(QStringLiteral("Wis:   %1    %2    %3    %4    %5\r\n").arg(desc->stats->wis[0], -2).arg(desc->stats->str[1], -2).arg(desc->stats->wis[2], -2).arg(desc->stats->wis[3], -2).arg(desc->stats->wis[4], -2), desc);
+  write_to_output(u"Str:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->str[0], -2).arg(desc->stats->str[1], -2).arg(desc->stats->str[2], -2).arg(desc->stats->str[3], -2).arg(desc->stats->str[4], -2), desc);
+  write_to_output(u"Dex:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->dex[0], -2).arg(desc->stats->dex[1], -2).arg(desc->stats->dex[2], -2).arg(desc->stats->dex[3], -2).arg(desc->stats->dex[4], -2), desc);
+  write_to_output(u"Con:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->con[0], -2).arg(desc->stats->con[1], -2).arg(desc->stats->con[2], -2).arg(desc->stats->con[3], -2).arg(desc->stats->con[4], -2), desc);
+  write_to_output(u"Int:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->tel[0], -2).arg(desc->stats->tel[1], -2).arg(desc->stats->tel[2], -2).arg(desc->stats->tel[3], -2).arg(desc->stats->tel[4], -2), desc);
+  write_to_output(u"Wis:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->wis[0], -2).arg(desc->stats->str[1], -2).arg(desc->stats->wis[2], -2).arg(desc->stats->wis[3], -2).arg(desc->stats->wis[4], -2), desc);
   write_to_output("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", desc);
   telnet_ga(desc);
 
@@ -717,7 +717,7 @@ qint32 DC::exceeded_connection_limit(class Connection *new_conn)
 
   if (count > getConnectionLimit())
   {
-    write_to_output(QStringLiteral("Sorry, there are more than %1 connections from IP %2\r\n"
+    write_to_output(u"Sorry, there are more than %1 connections from IP %2\r\n"_s
                                    "already logged into Dark Castle.  If you have a valid reason\r\n"
                                    "for having this many connections from one IP please let an imm\r\n"
                                    "know and they will speak with you. Assuming this is an error and closing all connections.\r\n")
@@ -727,7 +727,7 @@ qint32 DC::exceeded_connection_limit(class Connection *new_conn)
 
     for (const auto &d : to_close_list)
     {
-      logsocket(QStringLiteral("Closing socket %1 from IP %2 due to > %3 connections.").arg(conn->desc_num).arg(conn->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
+      logsocket(u"Closing socket %1 from IP %2 due to > %3 connections."_s.arg(conn->desc_num).arg(conn->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
       close_socket(d);
     }
     return true;
@@ -796,7 +796,7 @@ void DC::nanny(class Connection *d, QString arg)
   {
 
   default:
-    DC::getInstance()->logentry(QStringLiteral("Nanny: invalid conn->connected == %1").arg(conn->connected), 0, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Nanny: invalid conn->connected == %1"_s.arg(conn->connected), 0, DC::LogChannel::LOG_BUG);
     close_socket(d);
     return;
 
@@ -949,7 +949,7 @@ void DC::nanny(class Connection *d, QString arg)
     }
     else
     {
-      write_to_output(QStringLiteral("There was an error loading %1").arg(tmp_name), d);
+      write_to_output(u"There was an error loading %1"_s.arg(tmp_name), d);
       close_socket(d);
       return;
     }
@@ -1012,7 +1012,7 @@ void DC::nanny(class Connection *d, QString arg)
     if (check_reconnect(d, ch->name(), true))
       return;
 
-    buffer = QStringLiteral("%1@%2 has connected.").arg(qPrintable(ch->name())).arg(conn->getPeerOriginalAddress().toString());
+    buffer = u"%1@%2 has connected."_s.arg(qPrintable(ch->name())).arg(conn->getPeerOriginalAddress().toString());
     if (ch->getLevel() < ANGEL)
       DC::getInstance()->logentry(buffer, OVERSEER, DC::LogChannel::LOG_SOCKET);
     else
@@ -1033,7 +1033,7 @@ void DC::nanny(class Connection *d, QString arg)
       ch->sendln("$B----------------------------------------------------------------------$R");
     }
 
-    write_to_output(QStringLiteral("\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n").arg(ch->player->last_site), d);
+    write_to_output(u"\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n"_s).arg(ch->player->last_site), d);
     telnet_ga(d);
 
     if (conn->character->player->bad_pw_tries)
@@ -2009,7 +2009,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
       tmp_ch->timer = {};
       tmp_ch->sendln("Reconnecting.");
 
-      QString log_buf = QStringLiteral("%1@%2 has reconnected.").arg(qPrintable(tmp_ch->name())).arg(conn->getPeerOriginalAddress().toString());
+      QString log_buf = u"%1@%2 has reconnected."_s.arg(qPrintable(tmp_ch->name())).arg(conn->getPeerOriginalAddress().toString());
       act_to_room("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, INVIS_NULL);
 
       if (tmp_ch->isMortalPlayer())
@@ -2132,7 +2132,7 @@ void update_characters()
       }
       else
       {
-        i->send(QStringLiteral("You strain your muscles keeping the %s closed.\r\n").arg(qPrintable(fname(i->brace_at->keyword))));
+        i->send(u"You strain your muscles keeping the %s closed.\r\n"_s.arg(qPrintable(fname(i->brace_at->keyword))));
         act_to_room("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, 0);
       }
     }
@@ -2257,14 +2257,14 @@ void checkConsecrate(qint32 pulseType)
               if (spl == SPELL_CONSECRATE)
               {
                 if (ch->in_room != obj->in_room)
-                  ch->send(QStringLiteral("You sense your consecration of %s has ended.\r\n").arg(DC::getInstance()->world[obj->in_room].name));
+                  ch->send(u"You sense your consecration of %s has ended.\r\n"_s.arg(DC::getInstance()->world[obj->in_room].name));
                 else
                   ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.");
               }
               else
               {
                 if (ch->in_room != obj->in_room)
-                  ch->send(QStringLiteral("You sense your desecration of %s has ended.\r\n").arg(DC::getInstance()->world[obj->in_room].name));
+                  ch->send(u"You sense your desecration of %s has ended.\r\n"_s.arg(DC::getInstance()->world[obj->in_room].name));
                 else
                   ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.");
               }
@@ -2453,7 +2453,7 @@ bool DC::on_forbidden_name_list(QString name)
   nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
   if (!nameList)
   {
-    DC::getInstance()->logentry(QStringLiteral("Failed to open forbidden name file!"), 0, DC::LogChannel::LOG_MISC);
+    DC::getInstance()->logentry(u"Failed to open forbidden name file!"_s, 0, DC::LogChannel::LOG_MISC);
     return false;
   }
   else

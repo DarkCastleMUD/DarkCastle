@@ -60,17 +60,17 @@ command_return_t do_profession(CharacterPtr ch, QString args, cmd_t cmd)
   if (arg1[0] == '\0')
   {
     // Show list of available professions based on player's class type
-    ch->send(QStringLiteral("As a %s you can pick from the following professions:\r\n").arg(pc_clss_types3[GET_CLASS(ch)]));
+    ch->send(u"As a %s you can pick from the following professions:\r\n"_s.arg(pc_clss_types3[GET_CLASS(ch)]));
 
     for (QList<profession>::iterator i = professions.begin(); i != professions.end(); ++i)
     {
       if ((*i).c_class == GET_CLASS(ch))
       {
-        ch->send(QStringLiteral("%s\r\n").arg((*i).Name.c_str()));
+        ch->send(u"%s\r\n"_s.arg((*i).Name.c_str()));
       }
     }
 
-    ch->sendln(QStringLiteral("\r\nSyntax: profession [profession name]\r\n        profession reset\r\n\r\nResetting your profession costs 10000 platinum."));
+    ch->sendln(u"\r\nSyntax: profession [profession name]\r\n        profession reset\r\n\r\nResetting your profession costs 10000 platinum."_s);
 
     return ReturnValue::eSUCCESS;
   }
@@ -95,7 +95,7 @@ command_return_t do_profession(CharacterPtr ch, QString args, cmd_t cmd)
 
   if (found == false)
   {
-    ch->send(QStringLiteral("%s not a valid profession.\r\n").arg(arg1));
+    ch->send(u"%s not a valid profession.\r\n"_s.arg(arg1));
     return ReturnValue::eFAILURE;
   }
 
@@ -502,7 +502,7 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        this->send(QStringLiteral("\r\n$B%s Profession Skills:$R\r\n").arg(qPrintable(find_profession(c_class).arg(skilllist[i].group))));
+        this->send(u"\r\n$B%s Profession Skills:$R\r\n"_s.arg(qPrintable(find_profession(c_class).arg(skilllist[i].group))));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -526,47 +526,47 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
     }
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
     {
-      send(QStringLiteral("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski(), 3));
+      send(u"Ki:   $B%1$R "_s.arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski(), 3));
     }
     else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET + MAX_KI_LIST)
     {
-      send(QStringLiteral("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski(), 3));
+      send(u"Ki:   $B%1$R "_s.arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski(), 3));
     }
     else if (skilllist[i].skillnum == 318) // scan
     {
-      send(QStringLiteral("Move: $B%1$R ").arg(2, 3));
+      send(u"Move: $B%1$R "_s.arg(2, 3));
     }
     else if (skilllist[i].skillnum == 320) // switch
     {
-      send(QStringLiteral("Move: $B%1$R ").arg(4, 3));
+      send(u"Move: $B%1$R "_s.arg(4, 3));
     }
     else if (skilllist[i].skillnum == 319) // consider
     {
-      send(QStringLiteral("Move: $B%1$R ").arg(5, 3));
+      send(u"Move: $B%1$R "_s.arg(5, 3));
     }
     else if (skilllist[i].skillnum == 368) // release
     {
-      send(QStringLiteral("Move: $B%1$R ").arg(25, 3));
+      send(u"Move: $B%1$R "_s.arg(25, 3));
     }
     else if (skilllist[i].skillnum == 380) // fire arrows
     {
-      send(QStringLiteral("Mana: $B%1$R ").arg(30, 3));
+      send(u"Mana: $B%1$R "_s.arg(30, 3));
     }
     else if (skilllist[i].skillnum == 381) // ice arrows
     {
-      send(QStringLiteral("Mana: $B%1$R ").arg(20, 3));
+      send(u"Mana: $B%1$R "_s.arg(20, 3));
     }
     else if (skilllist[i].skillnum == 382) // tempest arrows
     {
-      send(QStringLiteral("Mana: $B%1$R ").arg(10, 3));
+      send(u"Mana: $B%1$R "_s.arg(10, 3));
     }
     else if (skilllist[i].skillnum == 383) // granite arrows
     {
-      send(QStringLiteral("Mana: $B%1$R ").arg(40, 3));
+      send(u"Mana: $B%1$R "_s.arg(40, 3));
     }
     else if (skill_cost.find(skilllist[i].skillnum) != skill_cost.end())
     {
-      send(QStringLiteral("Move: $B%1$R ").arg(skill_cost.find(skilllist[i].skillnum)->second, 3));
+      send(u"Move: $B%1$R "_s.arg(skill_cost.find(skilllist[i].skillnum)->second, 3));
     }
     else
       send("          ");
@@ -628,7 +628,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
   if (!skilllist)
     return ReturnValue::eFAILURE; // no skills to train
 
-  if (!*arg) // display skills that can be learned
+  if (arg.isEmpty()) // display skills that can be learned
   {
     dc_sprintf(buf, "You have %d practice sessions left.\r\n", player->practices);
     send(buf);
@@ -720,7 +720,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
     if (skilllist[skillnumber].group && this->isPlayer() && skilllist[skillnumber].group != player->profession)
     {
-      this->send(QStringLiteral("You must join the %s profession in order to learn that.\r\n").arg(qPrintable(find_profession(c_class).arg(skilllist[skillnumber].group))));
+      this->send(u"You must join the %s profession in order to learn that.\r\n"_s.arg(qPrintable(find_profession(c_class).arg(skilllist[skillnumber].group))));
       return ReturnValue::eSUCCESS;
     }
   }
@@ -732,9 +732,9 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
 
   if (known >= get_max(x))
   {
-    do_emote(owner, QStringLiteral("eyes you up and down."));
-    do_say(owner, QStringLiteral("Taking into account your current attributes, your"));
-    do_say(owner, QStringLiteral("maximum proficiency in this ability has been reached."));
+    do_emote(owner, u"eyes you up and down."_s);
+    do_say(owner, u"Taking into account your current attributes, your"_s));
+    do_say(owner, u"maximum proficiency in this ability has been reached."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -897,7 +897,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     {
       x = (qint32)(exp_needed - ch->exp);
 
-      ch->send(QStringLiteral("You need %1 experience to level.\r\n").arg(x));
+      ch->send(u"You need %1 experience to level.\r\n"_s).arg(x));
       return ReturnValue::eSUCCESS;
     }
 
@@ -991,7 +991,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
   for (; *arg == ' '; arg++)
     ; // skip whitespace
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->skills_guild(arg, owner);
   }
@@ -1116,7 +1116,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     return ReturnValue::eSUCCESS;
   }
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     dc_sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
     ch->send(buf);
@@ -1395,7 +1395,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     oi -= int_app[GET_INT(this)].hard_bonus;
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Illegal difficulty value sent to skill_increase_check"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -1408,7 +1408,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
 
   if (skillname.isEmpty())
   {
-    send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
+    send(u"Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n"_s.arg(skill));
     DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", qPrintable(this->name()), skill, learned, difficulty);
     return;
   }
@@ -1416,7 +1416,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
   // increase the skill by one
   learn_skill(skill, 1, get_max(skill));
   learned = has_skill(skill);
-  sendln(QStringLiteral("$R$B$5You feel more competent in your %1 ability. It increased to %2 out of %3.$R").arg(skillname).arg(learned).arg(get_max(skill)));
+  sendln(u"$R$B$5You feel more competent in your %1 ability. It increased to %2 out of %3.$R"_s.arg(skillname).arg(learned).arg(get_max(skill)));
 }
 
 void Character::verify_max_stats(void)

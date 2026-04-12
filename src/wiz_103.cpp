@@ -228,7 +228,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   vict->save();
 
-  DC::getInstance()->logentry(QStringLiteral("%1 just forced %2 to save.").arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 just forced %2 to save."_s).arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return ReturnValue::eSUCCESS;
 }
@@ -353,7 +353,7 @@ qint32 lookupClass(CharacterPtr ch, QString str)
     ch->sendln("Valid classes:");
     for (c_class = 1; c_class <= CLASS_MAX; c_class++)
     {
-      ch->send(QStringLiteral("%s\r\n").arg(pc_clss_types[c_class]));
+      ch->send(u"%s\r\n"_s.arg(pc_clss_types[c_class]));
     }
   }
 
@@ -414,14 +414,14 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
 
-      ch->send(QStringLiteral("Allow list for room #%1: ").arg(room));
+      ch->send(u"Allow list for room #%1: "_s.arg(room));
       bool found = false;
       for (c_class = 1; c_class < CLASS_MAX; c_class++)
       {
         if (DC::getInstance()->rooms.contains(room) && DC::getInstance()->rooms[room].allow_class[c_class] == true)
         {
           found = true;
-          ch->send(QStringLiteral("%s ").arg(pc_clss_types[c_class]));
+          ch->send(u"%s "_s.arg(pc_clss_types[c_class]));
         }
       }
 
@@ -446,14 +446,14 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
       }
 
       qint32 count = {};
-      ch->send(QStringLiteral("%s only rooms:\r\n").arg(pc_clss_types[c_class]));
+      ch->send(u"%s only rooms:\r\n"_s.arg(pc_clss_types[c_class]));
 
       qint32 cols = {};
       for (qint32 r = {}; r < DC::getInstance()->top_of_world; r++)
       {
         if (DC::getInstance()->rooms.contains(r) && DC::getInstance()->rooms[r].allow_class[c_class] == true)
         {
-          ch->send(QStringLiteral("%1 ").arg(r, 5));
+          ch->send(u"%1 "_s.arg(r, 5));
 
           count++;
           cols++;
@@ -499,18 +499,18 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!DC::getInstance()->rooms.contains(room))
   {
-    ch->send(QStringLiteral("Room %1 does not exist.\r\n").arg(room));
+    ch->send(u"Room %1 does not exist.\r\n"_s).arg(room));
     return ReturnValue::eFAILURE;
   }
 
   if (DC::getInstance()->rooms[room].allow_class[c_class] == true)
   {
-    ch->send(QStringLiteral("Removed %s class from room #%d's allow list.\r\n").arg(pc_clss_types[c_class]).arg(room));
+    ch->send(u"Removed %s class from room #%d's allow list.\r\n"_s.arg(pc_clss_types[c_class]).arg(room));
     DC::getInstance()->rooms[room].allow_class[c_class] = false;
   }
   else
   {
-    ch->send(QStringLiteral("Added %s class to room #%d's allow list.\r\n").arg(pc_clss_types[c_class]).arg(room));
+    ch->send(u"Added %s class to room #%d's allow list.\r\n"_s.arg(pc_clss_types[c_class]).arg(room));
     DC::getInstance()->rooms[room].allow_class[c_class] = true;
   }
 

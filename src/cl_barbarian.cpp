@@ -43,14 +43,14 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument_interpreter(argument, type, dir);
 
-  if (!*type)
+  if (type.isEmpty())
   {
     ch->sendln("Batter what??");
     ch->sendln("batter <door> <direction>");
     return ReturnValue::eFAILURE;
   }
 
-  if (!*dir)
+  if (dir.isEmpty())
   {
     ch->sendln("What direction?");
     return ReturnValue::eFAILURE;
@@ -91,7 +91,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 
     dam = number(100, 200) + 3 * (100 - skill);
 
-    ch->send(QStringLiteral("You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n").arg(qPrintable(fname(exit->keyword))));
+    ch->send(u"You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n"_s).arg(qPrintable(fname(exit->keyword))));
     act_to_room("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
@@ -151,7 +151,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (batterwins)
         {
-          exit->bracee->send(QStringLiteral("The %s bursts open with a resounding crash and you are hurld to the ground!\r\n").arg(qPrintable(fname(exit->keyword))));
+          exit->bracee->send(u"The %s bursts open with a resounding crash and you are hurld to the ground!\r\n"_s.arg(qPrintable(fname(exit->keyword))));
           act_to_room("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, 0);
           exit->bracee->setSitting();
           update_pos(exit->bracee);
@@ -159,7 +159,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         else
         { // brace wins
-          exit->bracee->send(QStringLiteral("The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n").arg(qPrintable(fname(exit->keyword))));
+          exit->bracee->send(u"The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n"_s.arg(qPrintable(fname(exit->keyword))));
         }
       }
       else
@@ -232,17 +232,17 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*type)
+  if (type.isEmpty())
   {
     if (ch->brace_at != nullptr)
     {
       if (cmd == cmd_t::UNDEFINED)
       {
-        ch->send(QStringLiteral("You are no longer able to brace the %s.\r\n").arg(qPrintable(fname(ch->brace_at->keyword))));
+        ch->send(u"You are no longer able to brace the %s.\r\n"_s.arg(qPrintable(fname(ch->brace_at->keyword))));
       }
       else
       {
-        ch->send(QStringLiteral("You stop holding the %s shut.\r\n").arg(qPrintable(fname(ch->brace_at->keyword))));
+        ch->send(u"You stop holding the %s shut.\r\n"_s.arg(qPrintable(fname(ch->brace_at->keyword))));
         act_to_room("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, 0);
       }
       ch->brace_at->bracee = {};
@@ -257,7 +257,7 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*dir)
+  if (dir.isEmpty())
   {
     ch->sendln("What direction?");
     return ReturnValue::eFAILURE;
@@ -285,15 +285,15 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
       {
         if (exit->bracee == ch)
         {
-          ch->send(QStringLiteral("You are already bracing the %s shut!\r\n").arg(qPrintable(fname(exit->keyword))));
+          ch->send(u"You are already bracing the %s shut!\r\n"_s.arg(qPrintable(fname(exit->keyword))));
         }
         else
         {
-          ch->send(QStringLiteral("%s is already holding the %s shut!\r\n").arg(qPrintable(exit->bracee->name())).arg(qPrintable(fname(exit->keyword))));
+          ch->send(u"%s is already holding the %s shut!\r\n"_s.arg(qPrintable(exit->bracee->name())).arg(qPrintable(fname(exit->keyword))));
         }
       }
       else
-        ch->send(QStringLiteral("The %s is already being braced from the other side!\r\n").arg(qPrintable(fname(exit->keyword))));
+        ch->send(u"The %s is already being braced from the other side!\r\n"_s.arg(qPrintable(fname(exit->keyword))));
 
       return ReturnValue::eFAILURE;
     }
@@ -302,7 +302,7 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
     if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5))
       return ReturnValue::eSUCCESS;
 
-    ch->send(QStringLiteral("You lean heavily on the %s, bracing your shoulder solidly against it...\r\n").arg(qPrintable(fname(exit->keyword))));
+    ch->send(u"You lean heavily on the %s, bracing your shoulder solidly against it...\r\n"_s).arg(qPrintable(fname(exit->keyword))));
     act_to_room("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
@@ -899,12 +899,12 @@ command_return_t do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = one_argument(argument, who);
   one_argument(argument, direction);
-  if (!*direction)
+  if (direction.isEmpty())
   {
     ch->sendln("Bullrush which direction?");
     return ReturnValue::eFAILURE;
   }
-  if (!*who)
+  if (who.isEmpty())
   {
     ch->sendln("Bullrush on.. who?");
     return ReturnValue::eFAILURE;
@@ -1089,7 +1089,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   argument = one_argument(argument, who);
   one_argument(argument, where);
 
-  if (!*who)
+  if (who.isEmpty())
   {
     ch->sendln("Knockback whom?");
     return ReturnValue::eFAILURE;

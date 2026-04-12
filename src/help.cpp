@@ -79,7 +79,7 @@ qint32 levenshtein(const QString s, const QString t)
   return d[m][n];
 }
 
-command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
+command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   extern QString new_help;
@@ -91,9 +91,9 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
   if (!ch->desc)
     return ReturnValue::eFAILURE;
 
-  skip_spaces(&argument);
+  argument = argument.trimmed();
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     if (!ch->isImmortalPlayer())
       ch->send(new_help);
@@ -121,7 +121,7 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
 
     qint32 h;
     quint32 l;
-    quint32 argSize = strlen(argument);
+    quint32 argSize = argument.length();
     std::multimap<quint32, QString, ltstr> ltable;
     std::multimap<quint32, QString, ltstr>::iterator cur;
 
@@ -129,39 +129,39 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
 
     for (h = {}; h < DC::getInstance()->new_top_of_helpt; h++)
     {
-      if (new_help_table[h].min_level > level)
+      if (new_help_table[h].min_level_ > level)
       {
         continue;
       }
 
-      if (!new_help_table[h].keyword1.isEmpty())
+      if (!new_help_table[h].keyword1_.isEmpty())
       {
-        l = levenshtein(argument, new_help_table[h].keyword1);
-        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword1));
+        l = levenshtein(argument, new_help_table[h].keyword1_);
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword1_));
       }
 
-      if (!new_help_table[h].keyword2.isEmpty())
+      if (!new_help_table[h].keyword2_.isEmpty())
       {
-        l = levenshtein(argument, new_help_table[h].keyword2);
-        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword2));
+        l = levenshtein(argument, new_help_table[h].keyword2_);
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword2_));
       }
 
-      if (!new_help_table[h].keyword3.isEmpty())
+      if (!new_help_table[h].keyword3_.isEmpty())
       {
-        l = levenshtein(argument, new_help_table[h].keyword3);
-        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword3));
+        l = levenshtein(argument, new_help_table[h].keyword3_);
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword3_));
       }
 
-      if (!new_help_table[h].keyword4.isEmpty())
+      if (!new_help_table[h].keyword4_.isEmpty())
       {
-        l = levenshtein(argument, new_help_table[h].keyword4);
-        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword4));
+        l = levenshtein(argument, new_help_table[h].keyword4_);
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword4_));
       }
 
-      if (!new_help_table[h].keyword5.isEmpty())
+      if (!new_help_table[h].keyword5_.isEmpty())
       {
-        l = levenshtein(argument, new_help_table[h].keyword5);
-        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword5));
+        l = levenshtein(argument, new_help_table[h].keyword5_);
+        ltable.insert(std::pair<qint32, QString>(l, new_help_table[h].keyword5_));
       }
     }
 
@@ -172,7 +172,7 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
     QList<QString> results;
     for (cur = ltable.begin(); cur != ltable.end(); cur++)
     {
-      if (find(results.begin(), results.end(), (*cur).second) == results.end())
+      if (std::find(results.begin(), results.end(), (*cur).second) == results.end())
       {
         // Skip words which matches less than 50% of the original
         if ((*cur).first > argSize / 2)
@@ -184,7 +184,7 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
         }
 
         results.push_back((*cur).second);
-        ch->send(QStringLiteral("%s").arg((*cur).second));
+        ch->send(u"%s"_s.arg((*cur).second));
 
         if (results.size() >= 5)
         {
@@ -214,19 +214,14 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  dc_sprintf(key1, "'%s'", this_help->keyword1);
-  dc_sprintf(key2, "'%s'", this_help->keyword2);
-  dc_sprintf(key3, "'%s'", this_help->keyword3);
-  dc_sprintf(key4, "'%s'", this_help->keyword4);
-  dc_sprintf(key5, "'%s'", this_help->keyword5);
+  dc_sprintf(key1, "'%s'", this_help->keyword1_);
+  dc_sprintf(key2, "'%s'", this_help->keyword2_);
+  dc_sprintf(key3, "'%s'", this_help->keyword3_);
+  dc_sprintf(key4, "'%s'", this_help->keyword4_);
+  dc_sprintf(key5, "'%s'", this_help->keyword5_);
 
-  dc_sprintf(buf, "%s %s %s %s %s", key1,
-             ((this_help->keyword2 && dc_strcmp(key2, "'NONE'")) ? key2 : " "),
-             ((this_help->keyword3 && dc_strcmp(key3, "'NONE'")) ? key3 : " "),
-             ((this_help->keyword3 && dc_strcmp(key4, "'NONE'")) ? key4 : " "),
-             ((this_help->keyword3 && dc_strcmp(key5, "'NONE'")) ? key5 : " "));
-
-  dc_sprintf(rec_level, "\r\nLevel Required: %d", this_help->min_level);
+  dc_sprintf(buf, "%s %s %s %s %s", key1, key2, key3, key4, key5);
+  dc_sprintf(rec_level, "\r\nLevel Required: %d", this_help->min_level_);
   dc_sprintf(entry,
              "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
              "$1$B| | $B$5Help For: $B$7%-61.61s $1$B| |\r\n"
@@ -253,7 +248,7 @@ command_return_t do_new_help(CharacterPtr ch, const QString argument, cmd_t cmd)
 help_index_element_new &find_help(QString keyword)
 {
   keyword = keyword.toUpper();
-  if (keyword == QStringLiteral("NONE"))
+  if (keyword == u"NONE"_s)
     return {};
 
   for (auto &help_entry : new_help_table)
@@ -280,7 +275,7 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
   {
     if (reload == 1)
     {
-      DC::getInstance()->logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, DC::LogChannel::LOG_HELP);
+      DC::getInstance()->logentry(u"Error in verion number in help file.\r\n"_s, OVERSEER, DC::LogChannel::LOG_HELP);
       return ReturnValue::eFAILURE;
     }
     else
@@ -294,22 +289,22 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
 
   while (*line != '$')
   {
-    new_help.keyword1 = QStringLiteral(line);
+    new_help.keyword1 = line;
 
     linenum += get_line(fl, line);
-    new_help.keyword2 = QStringLiteral(line);
+    new_help.keyword2 = line;
 
     linenum += get_line(fl, line);
-    new_help.keyword3 = QStringLiteral(line);
+    new_help.keyword3 = line;
 
     linenum += get_line(fl, line);
-    new_help.keyword4 = QStringLiteral(line);
+    new_help.keyword4 = line;
 
     linenum += get_line(fl, line);
-    new_help.keyword5 = QStringLiteral(line);
+    new_help.keyword5 = line;
 
     linenum += get_line(fl, line);
-    new_help.related = QStringLiteral(line);
+    new_help.related = line;
 
     linenum += get_line(fl, line);
     if (sscanf(line, "L: %d", &level) == 1)
@@ -343,8 +338,8 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
     if (strlen(tmpentry) > MAX_HELP_LENGTH)
       tmpentry[MAX_HELP_LENGTH - 1] = '\0';
 
-    if (!(new_help.entry = QStringLiteral(tmpentry)))
-      new_help.entry = QStringLiteral("Error reading help entry. Please notify an Immortal!\n");
+    if (!(new_help.entry = tmpentry))
+      new_help.entry = u"Error reading help entry. Please notify an Immortal!\n"_s;
 
     new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
     DC::getInstance()->new_top_of_helpt++;
@@ -382,19 +377,9 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
   QString arg;
 
   half_chop(argument, argument, arg);
-  if (!*argument)
+  if (argument.isEmpty())
   {
-    ch->sendln(QStringLiteral(
-                   "Usage: hindex <ID#>"
-                   "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)"
-                   "       hindex <start of a word(s)>"
-                   "       hindex -<l|i|u|d>"
-                   "              l = level, l <start> <end>"
-                   "              i = immortal"
-                   "              d = defunct, < level 0 OR > level %1"
-                   "              u = unfinished, level 75")
-                   .arg(IMPLEMENTER));
-
+    ch->sendln(u"Usage: hindex <ID#>\r\n       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n       hindex <start of a word(s)>\r\n       hindex -<l|i|u|d>\r\n              l = level, l <start> <end>\r\n              i = immortal\r\n              d = defunct, < level 0 OR > level %1\r\n              u = unfinished, level 75\r\n"_s.arg(IMPLEMENTER));
     return ReturnValue::eFAILURE;
   }
   qint32 start = {};
@@ -419,7 +404,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
           ch->sendln("Usage: hindex -l <low level> <high level>");
           return ReturnValue::eFAILURE;
         }
-        if (!*arg)
+        if (arg.isEmpty())
           dc_sprintf(arg, "%s", argument); // if they left off the second arg, copy the first, show only one level
         show_help_header(ch);
         for (i = {}; i < DC::getInstance()->new_top_of_helpt; i++)
@@ -516,8 +501,8 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
     show_help_bar(ch);
   }
   ch->send(help_buf);
-  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
+  ch->send(u"$B$7Total Shown: $B$5%1$R\r\n"_s.arg(count));
+  ch->send(u"$B$7Total Help Entries: $B$5%1$R\r\n"_s.arg(DC::getInstance()->new_top_of_helpt));
 
   return ReturnValue::eSUCCESS;
 }
@@ -528,9 +513,9 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
   QString arg;
 
   half_chop(argument, argument, arg);
-  if (!*argument)
+  if (argument.isEmpty())
   {
-    ch->send(QStringLiteral("Usage: index <ID#>\r\n       index <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n       index <start of a word(s)>\r\n\r\n"));
+    ch->send(u"Usage: index <ID#>\r\n       index <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n       index <start of a word(s)>\r\n\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -596,8 +581,8 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
     show_help_bar(ch);
   }
   ch->send(help_buf);
-  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
+  ch->send(u"$B$7Total Shown: $B$5%1$R\r\n"_s.arg(count));
+  ch->send(u"$B$7Total Help Entries: $B$5%1$R\r\n"_s.arg(DC::getInstance()->new_top_of_helpt));
 
   return ReturnValue::eSUCCESS;
 }
@@ -605,8 +590,7 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
 qint32 show_one_help_entry(qint32 entry, CharacterPtr ch, qint32 count)
 {
 
-  ch->sendln(QStringLiteral(
-                 "$B$6%3d $7- $5%3d $7[$3%-20.20s$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7]")
+  ch->sendln(u "$B$6%3d $7- $5%3d $7[$3%-20.20s$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7]"_s
                  .arg(entry)
                  .arg((new_help_table[entry].min_level >= 0 ? new_help_table[entry].min_level : 999))
                  .arg((*new_help_table[entry].keyword1 ? new_help_table[entry].keyword1 : "None"))
@@ -663,7 +647,7 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(u"Error opening help file for reload."_s, OVERSEER, DC::LogChannel::LOG_HELP);
     return ReturnValue::eFAILURE;
   }
 
@@ -672,7 +656,7 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
+    DC::getInstance()->logentry(u"Error opening help file for reload."_s, OVERSEER, DC::LogChannel::LOG_HELP);
     return ReturnValue::eFAILURE;
   }
 
@@ -708,7 +692,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, buf, buf2);
 
-  if (!*buf)
+  if (buf.isEmpty())
   {
     show_hedit_usage(ch);
     return ReturnValue::eFAILURE;
@@ -720,7 +704,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!*buf2)
+  if (buf.isEmpty() 2)
   {
     show_hedit_usage(ch);
     return ReturnValue::eFAILURE;
@@ -730,14 +714,14 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
   { // New Help Entry
     for (i = {}; i < (qint32)strlen(buf2); i++)
       buf2[i] = UPPER(buf2[i]);
-    new_help.keyword1 = QStringLiteral(buf2);
-    new_help.keyword2 = QStringLiteral("NONE");
-    new_help.keyword3 = QStringLiteral("NONE");
-    new_help.keyword4 = QStringLiteral("NONE");
-    new_help.keyword5 = QStringLiteral("NONE");
-    new_help.related = QStringLiteral("NONE");
+    new_help.keyword1 = buf2;
+    new_help.keyword2 = u"NONE"_s;
+    new_help.keyword3 = u"NONE"_s;
+    new_help.keyword4 = u"NONE"_s;
+    new_help.keyword5 = u"NONE"_s;
+    new_help.related = u"NONE"_s;
     new_help.min_level = 75;
-    new_help.entry = QStringLiteral("Blank help file!\r\n");
+    new_help.entry = u"Blank help file!\r\n"_s;
 
     auto old_table = new_help_table;
     new_help_table = new help_index_element_new[DC::getInstance()->new_top_of_helpt + 1];
@@ -762,7 +746,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (is_abbrev(field, "key"))
     { // changing one of the keys
       half_chop(buf2, buf3, value);
-      if (!*buf3 || !*value)
+      if (buf.isEmpty() 3 || value.isEmpty())
       {
         ch->sendln("Not a valid key # or no value specified.");
         return ReturnValue::eFAILURE;
@@ -778,19 +762,19 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
         switch (key_id)
         {
         case 1:
-          new_help_table[help_id].keyword1 = QStringLiteral(value);
+          new_help_table[help_id].keyword1 = value;
           break;
         case 2:
-          new_help_table[help_id].keyword2 = QStringLiteral(value);
+          new_help_table[help_id].keyword2 = value;
           break;
         case 3:
-          new_help_table[help_id].keyword3 = QStringLiteral(value);
+          new_help_table[help_id].keyword3 = value;
           break;
         case 4:
-          new_help_table[help_id].keyword4 = QStringLiteral(value);
+          new_help_table[help_id].keyword4 = value;
           break;
         case 5:
-          new_help_table[help_id].keyword5 = QStringLiteral(value);
+          new_help_table[help_id].keyword5 = value;
           break;
         default:
           ch->sendln("Not a valid key #.");
@@ -831,7 +815,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         for (i = {}; i < (qint32)strlen(buf2); i++)
           buf2[i] = UPPER(buf2[i]);
-        new_help_table[help_id].related = QStringLiteral(buf2);
+        new_help_table[help_id].related = buf2;
         dc_sprintf(buf, "Related changed to '%s' for ID# %d.\r\n", buf2, help_id);
         ch->send(buf);
       }
@@ -990,7 +974,7 @@ qint32 get_line_with_space(FILE *fl, QString buf)
     if (*temp)
       temp[strlen(temp) - 1] = '\0';
   } while (!feof(fl) && *temp == '*');
-  // } while (!feof(fl) && (*temp == '*' || !*temp));
+  // } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 
   if (feof(fl))
     return 0;

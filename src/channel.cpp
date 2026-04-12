@@ -131,7 +131,7 @@ command_return_t do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(vict.c_str())))
   {
-    ch->send(QStringLiteral("You see noone that goes by '%1' here.\r\n").arg(vict.c_str()));
+    ch->send(u"You see noone that goes by '%1' here.\r\n"_s.arg(vict.c_str()));
     return ReturnValue::eSUCCESS;
   }
 
@@ -177,7 +177,7 @@ command_return_t do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
   while (*arg == ' ')
     arg++;
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("You must have something to tell the immortals...");
     return ReturnValue::eSUCCESS;
@@ -284,9 +284,9 @@ command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
     else if (msgs.count() == 1)
-      ch->sendln(QStringLiteral("Here is the only gossip so far:"));
+      ch->sendln(u"Here is the only gossip so far:"_s);
     else
-      ch->sendln(QStringLiteral("Here are the last %1 gossips:").arg(msgs.size()));
+      ch->sendln(u"Here are the last %1 gossips:"_s.arg(msgs.size()));
 
     while (!msgs.isEmpty())
       act_to_victim(msgs.dequeue().getMessage(ch), ch, 0, ch, 0);
@@ -395,14 +395,14 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     QString buf1;
     if (this->isNonPlayer())
     {
-      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(qPrintable(this->shortdesc_or_name())).arg(arguments.join(' '));
+      buf1 = u"$6$B%1 auctions '%2'$R"_s.arg(qPrintable(this->shortdesc_or_name())).arg(arguments.join(' '));
     }
     else
     {
-      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(qPrintable(this->name())).arg(arguments.join(' '));
+      buf1 = u"$6$B%1 auctions '%2'$R"_s.arg(qPrintable(this->name())).arg(arguments.join(' '));
     }
 
-    QString buf2 = QStringLiteral("$6$BYou auction '%1'$R").arg(arguments.join(' '));
+    QString buf2 = u"$6$BYou auction '%1'$R"_s.arg(arguments.join(' '));
     act_to_character(buf2, this, 0, 0, 0);
 
     auction_history.push(buf1);
@@ -767,7 +767,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      sendln(QStringLiteral("Here are the last %1 tell messages:").arg(player->tell_history.count()));
+      sendln(u"Here are the last %1 tell messages:"_s.arg(player->tell_history.count()));
     }
     for (const auto &c : player->tell_history)
     {
@@ -838,7 +838,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       }
     if (is_ignoring(vict, this))
     {
-      this->send(QStringLiteral("%s is ignoring you right now.\r\n").arg(qPrintable(vict->shortdesc_or_name())));
+      this->send(u"%s is ignoring you right now.\r\n"_s.arg(qPrintable(vict->shortdesc_or_name())));
       return ReturnValue::eSUCCESS;
     }
     if (is_busy(vict) && level_ >= OVERSEER)
@@ -893,7 +893,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        DC::getInstance()->logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        DC::getInstance()->logentry(u"Log %1: %2 told them: %3"_s.arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
@@ -927,7 +927,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       // Log what I told a logged player under their name
       if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
-        DC::getInstance()->logentry(QStringLiteral("Log %1: %2 told them: %3").arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
+        DC::getInstance()->logentry(u"Log %1: %2 told them: %3"_s.arg(qPrintable(vict->name())).arg(qPrintable(this->name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else
@@ -995,7 +995,7 @@ command_return_t do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, name, message);
 
-  if (!*name || !*message)
+  if (name.isEmpty() || message.isEmpty())
     ch->sendln("Who do you want to whisper to.. and what??");
   else if (!(vict = ch->get_char_room_vis(name)))
     ch->sendln("No-one by that name here..");
@@ -1038,7 +1038,7 @@ command_return_t do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, name, message);
 
-  if (!*name || !*message)
+  if (name.isEmpty() || message.isEmpty())
     ch->sendln("Who do you want to ask something, and what??");
   else if (!(vict = ch->get_char_room_vis(name)))
     ch->sendln("No-one by that name here.");
@@ -1079,7 +1079,7 @@ command_return_t do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     if (ch->player->gtell_history.isEmpty())
     {

@@ -119,7 +119,7 @@ command_return_t do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         percent = MIN((qreal)max, percent);
         percent = MAX((double)max * 0.75, (double)percent);
-        ch->send(QStringLiteral("%s: %d\r\n").arg(classskill[i].skillname).arg((qint32)percent));
+        ch->send(u"%s: %d\r\n"_s.arg(classskill[i].skillname).arg((qint32)percent));
       }
       ch->race = orace;
       return ReturnValue::eSUCCESS;
@@ -147,7 +147,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
   CharacterPtr victim = get_pc_vis(this, victim_name);
   if (!victim)
   {
-    this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(victim_name));
+    this->sendln(u"You don't see anyone named '%1'."_s.arg(victim_name));
     return ReturnValue::eSUCCESS;
   }
 
@@ -160,7 +160,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (!bgc.testcmd)
       {
-        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
+        this->sendln(u"%1 %2"_s.arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
@@ -172,7 +172,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (bgc.testcmd)
       {
-        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
+        this->sendln(u"%1 %2"_s.arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
@@ -183,22 +183,22 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 
   if (!bc.has_value())
   {
-    this->sendln(QStringLiteral("There is no god command named '%1'.").arg(command));
+    this->sendln(u"There is no god command named '%1'."_s.arg(command));
     return ReturnValue::eSUCCESS;
   }
 
   // if has
   if (victim->has_skill(bc->num))
   {
-    this->sendln(QStringLiteral("%1 already has that command.").arg(victim->name()));
+    this->sendln(u"%1 already has that command."_s).arg(victim->name()));
     return ReturnValue::eSUCCESS;
   }
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  DC::getInstance()->logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
-  this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(qPrintable(victim->name())).arg(bc->name));
-  this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(name()).arg(bc->name));
+  DC::getInstance()->logentry(u"%1 has been bestowed %2 by %3."_s).arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
+  this->sendln(u"%1 has been bestowed %2."_s).arg(qPrintable(victim->name())).arg(bc->name));
+  this->sendln(u"%1 has bestowed %2 upon you."_s).arg(name()).arg(bc->name));
   return ReturnValue::eSUCCESS;
 }
 
@@ -212,7 +212,7 @@ command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 
   half_chop(arg, arg, command);
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     send_to_char("Bestow gives a god command to a god.\r\n"
                  "Syntax:  revoke <god> <command|all>\r\n"
@@ -314,7 +314,7 @@ command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 
   half_chop(arg, name, buf);
 
-  if (!*name)
+  if (name.isEmpty())
   {
     ch->sendln("Change whose password?");
     return ReturnValue::eFAILURE;
@@ -328,7 +328,7 @@ command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 
   one_argument(buf, name);
 
-  if (!*name || strlen(name) > 10)
+  if (name.isEmpty() || strlen(name) > 10)
   {
     ch->sendln("Password must be 10 characters or less.");
     return ReturnValue::eFAILURE;
@@ -351,7 +351,7 @@ command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, lev_str, command);
 
-  if (!*lev_str)
+  if (lev.isEmpty() _str)
   {
     ch->sendln("Also, you must supply a level.");
     return ReturnValue::eFAILURE;
@@ -394,21 +394,21 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   CharacterPtr victim = get_pc(oldname);
   if (!victim)
   {
-    send(QStringLiteral("%1 is not in the game.\r\n").arg(oldname));
+    send(u"%1 is not in the game.\r\n"_s).arg(oldname));
     return ReturnValue::eFAILURE;
   }
 
   if (level_ <= victim->getLevel())
   {
     send("You can't rename someone your level or higher.\r\n");
-    send(QStringLiteral("%1 just tried to rename you.\r\n").arg(qPrintable(this->name())));
+    send(u"%1 just tried to rename you.\r\n"_s).arg(qPrintable(this->name())));
     return ReturnValue::eFAILURE;
   }
 
   // +1 cause you can actually have 13 character names
   if (newname.length() > (MAX_NAME_LENGTH + 1))
   {
-    send(QStringLiteral("New name too long. Maximum allowed length is %1 characters.\r\n").arg(MAX_NAME_LENGTH + 1));
+    send(u"New name too long. Maximum allowed length is %1 characters.\r\n"_s).arg(MAX_NAME_LENGTH + 1));
     return ReturnValue::eFAILURE;
   }
 
@@ -417,31 +417,31 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   {
     if (GET_PLATINUM(victim) < 500)
     {
-      send(QStringLiteral("They don't have enough plats. They need 500 but have %1\r\n").arg(GET_PLATINUM(victim)));
+      send(u"They don't have enough plats. They need 500 but have %1\r\n"_s.arg(GET_PLATINUM(victim)));
       return ReturnValue::eFAILURE;
     }
     else
     {
       GET_PLATINUM(victim) -= 500;
-      send(QStringLiteral("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(qPrintable(victim->shortdesc_or_name())).arg(GET_PLATINUM(victim)));
-      victim->send(QStringLiteral("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      DC::getInstance()->logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
+      send(u"You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())).arg(GET_PLATINUM(victim)));
+      victim->send(u"You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n"_s).arg(GET_PLATINUM(victim)));
+      DC::getInstance()->logentry(u"500 platinum removed from %1 for rename."_s).arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
     }
   }
 
   QString strsave;
   if (DC::getInstance()->cf.bport == false)
   {
-    strsave = QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(newname[0]).arg(newname);
+    strsave = u"%1/%2/%3"_s.arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    strsave = QStringLiteral("%1/%2/%3").arg(BSAVE_DIR).arg(newname[0]).arg(newname);
+    strsave = u"%1/%2/%3"_s.arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
   if (QFile(strsave).exists())
   {
-    send(QStringLiteral("The name '%1' is already in use at %2.\r\n").arg(newname).arg(strsave));
+    send(u"The name '%1' is already in use at %2.\r\n"_s.arg(newname).arg(strsave));
     return ReturnValue::eFAILURE;
   }
 
@@ -457,7 +457,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
         tmp[x] = '\0';
       }
 
-      tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
+      tmp = u"%1 %2"_s.arg(tmp).arg(newname);
       victim->equipment[iWear]->name(tmp);
     }
     if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
@@ -472,7 +472,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
           {
             tmp[x] = '\0';
           }
-          tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
+          tmp = u"%1 %2"_s.arg(tmp).arg(newname);
           obj->name(tmp);
         }
       }
@@ -484,13 +484,13 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   {
     if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      QString tmp = QStringLiteral("%1").arg(obj->name());
+      QString tmp = u"%1"_s.arg(obj->name());
       qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
       }
-      tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
+      tmp = u"%1 %2"_s.arg(tmp).arg(newname);
       obj->name(tmp);
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
@@ -500,13 +500,13 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       {
         if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          QString tmp = QStringLiteral("%1").arg(obj2->name());
+          QString tmp = u"%1"_s.arg(obj2->name());
           qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
           }
-          tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
+          tmp = u"%1 %2"_s.arg(tmp).arg(newname);
           obj2->name(tmp);
         }
       }
@@ -524,11 +524,11 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   QString buffer;
   if (DC::getInstance()->cf.bport == false)
   {
-    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->name()[0]).arg(qPrintable(victim->name())).arg(SAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = u"cp %1/%2/%3 %4/%5/%6"_s.arg(SAVE_DIR).arg(victim->name()[0]).arg(qPrintable(victim->name())).arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->name()[0]).arg(qPrintable(victim->name())).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = u"cp %1/%2/%3 %4/%5/%6"_s.arg(BSAVE_DIR).arg(victim->name()[0]).arg(qPrintable(victim->name())).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
   system(qPrintable(buffer));
@@ -538,22 +538,22 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   // Only copy golems if they exist
   for (quint32 i = {}; i < MAX_GOLEMS; i++)
   {
-    QString src_filename = QStringLiteral("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(qPrintable(victim->name())[0]).arg(qPrintable(victim->name())).arg(i);
+    QString src_filename = u"%s/%c/%s.%d"_s.arg(FAMILIAR_DIR).arg(qPrintable(victim->name())[0]).arg(qPrintable(victim->name())).arg(i);
     if (0 == stat(qPrintable(src_filename), &buf))
     {
       // Make backup
-      QString dst_filename = QStringLiteral("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(qPrintable(victim->name())[0]).arg(qPrintable(victim->name())).arg(i);
-      QString command = QStringLiteral("cp -f %1 %2").arg(src_filename).arg(dst_filename);
+      QString dst_filename = u"%1/%2/%3.%4.old"_s.arg(FAMILIAR_DIR).arg(qPrintable(victim->name())[0]).arg(qPrintable(victim->name())).arg(i);
+      QString command = u"cp -f %1 %2"_s.arg(src_filename).arg(dst_filename);
       system(qPrintable(command));
 
       // Rename
-      dst_filename = QStringLiteral("%1/%2/%3.%4").arg(FAMILIAR_DIR).arg(newname[0]).arg(newname).arg(i);
-      command = QStringLiteral("mv -f %1 %2").arg(src_filename).arg(dst_filename);
+      dst_filename = u"%1/%2/%3.%4"_s.arg(FAMILIAR_DIR).arg(newname[0]).arg(newname).arg(i);
+      command = u"mv -f %1 %2"_s.arg(src_filename).arg(dst_filename);
       system(qPrintable(command));
     }
   }
 
-  buffer = QStringLiteral("%1 renamed to %2.").arg(qPrintable(victim->name())).arg(newname);
+  buffer = u"%1 renamed to %2."_s).arg(qPrintable(victim->name())).arg(newname);
   DC::getInstance()->logentry(buffer, level_, DC::LogChannel::LOG_GOD);
 
   // handle the renames
@@ -602,7 +602,7 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
   half_chop(arg, arg1, buf);
   half_chop(buf, arg2, type);
 
-  if (!*arg1 || !*type || !*arg2)
+  if (arg.isEmpty() 1 || type.isEmpty() || arg.isEmpty() 2)
   {
     dc_sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                     "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
@@ -745,20 +745,20 @@ command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
     case 'm':
       victim->player->buildMLowVnum = low;
       victim->player->buildMHighVnum = high;
-      ch->sendln(QStringLiteral("%1 M range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
-      victim->sendln(QStringLiteral("Your M range has been set to %1-%2.").arg(low).arg(high));
+      ch->sendln(u"%1 M range set to %2-%3."_s.arg(victim->name()).arg(low).arg(high));
+      victim->sendln(u"Your M range has been set to %1-%2."_s.arg(low).arg(high));
       return ReturnValue::eSUCCESS;
     case 'o':
       victim->player->buildOLowVnum = low;
       victim->player->buildOHighVnum = high;
-      ch->sendln(QStringLiteral("%1 O range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
-      victim->sendln(QStringLiteral("Your O range has been set to %1-%2.").arg(low).arg(high));
+      ch->sendln(u"%1 O range set to %2-%3."_s.arg(victim->name()).arg(low).arg(high));
+      victim->sendln(u"Your O range has been set to %1-%2."_s.arg(low).arg(high));
       return ReturnValue::eSUCCESS;
     case 'r':
       victim->player->buildLowVnum = low;
       victim->player->buildHighVnum = high;
-      ch->sendln(QStringLiteral("%1 R range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
-      victim->sendln(QStringLiteral("Your R range has been set to %1-%2.").arg(low).arg(high));
+      ch->sendln(u"%1 R range set to %2-%3."_s.arg(victim->name()).arg(low).arg(high));
+      victim->sendln(u"Your R range has been set to %1-%2."_s.arg(low).arg(high));
       return ReturnValue::eSUCCESS;
     default:
       ch->sendln("Invalid type. Valid ones are r/o/m.");
@@ -769,8 +769,8 @@ command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     victim->player->buildLowVnum = victim->player->buildOLowVnum = victim->player->buildMLowVnum = low;
     victim->player->buildHighVnum = victim->player->buildOHighVnum = victim->player->buildMHighVnum = high;
-    ch->sendln(QStringLiteral("%1 range set to %2-%3.").arg(victim->name()).arg(low).arg(high));
-    victim->send(QStringLiteral("Your range has been set to %1-%2.").arg(low).arg(high));
+    ch->sendln(u"%1 range set to %2-%3."_s.arg(victim->name()).arg(low).arg(high));
+    victim->send(u"Your range has been set to %1-%2."_s.arg(low).arg(high));
   }
   return ReturnValue::eSUCCESS;
 }
@@ -904,7 +904,7 @@ command_return_t do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
 
     qreal percent = 30 + num1 * (qreal)(toHit)-num2;
 
-    ch->send(QStringLiteral("%d AC - %f%% chance to hit\r\n").arg(AC).arg(percent));
+    ch->send(u"%d AC - %f%% chance to hit\r\n"_s.arg(AC).arg(percent));
   }
   return ReturnValue::eSUCCESS;
 }
@@ -990,11 +990,11 @@ command_return_t do_world(CharacterPtr ch, QString args, cmd_t cmd)
     auto world = DC::getInstance()->world_file_list;
     while (world != nullptr)
     {
-      QString potential_filename = QStringLiteral("%1-%2.txt").arg(world->firstnum).arg(world->lastnum);
+      QString potential_filename = u"%1-%2.txt"_s.arg(world->firstnum).arg(world->lastnum);
       if (world->filename != potential_filename)
       {
-        ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
-        ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
+        ch->send(u"filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n"_s.arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
+        ch->send(u"Renaming %1 to %2\r\n"_s.arg(world->filename).arg(potential_filename));
 
         if (rename(qPrintable(world->filename), qPrintable(potential_filename)) == -1)
         {
@@ -1002,7 +1002,7 @@ command_return_t do_world(CharacterPtr ch, QString args, cmd_t cmd)
           QString errStr = strerror(rename_errno);
           if (errStr != nullptr)
           {
-            ch->send(QStringLiteral("Error renaming %1 to %2 was %3 %4\r\n").arg(world->filename).arg(potential_filename).arg(rename_errno).arg(errStr));
+            ch->send(u"Error renaming %1 to %2 was %3 %4\r\n"_s.arg(world->filename).arg(potential_filename).arg(rename_errno).arg(errStr));
           }
         }
       }

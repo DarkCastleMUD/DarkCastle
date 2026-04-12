@@ -555,7 +555,7 @@ qint32 save_boards()
 
   if (!the_file)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
+    DC::getInstance()->logentry(u"Unable to open/create save file for bulletin board index"_s, ANGEL,
                                 DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
@@ -645,7 +645,7 @@ qint32 board(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
       return ReturnValue::eSUCCESS;
     }
     if (
-        ((obj->name() == QStringLiteral("board uruk")) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
+        ((obj->name() == u"board uruk"_s) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
     {
       ch->sendln("You can't erase posts from this board.");
       return ReturnValue::eSUCCESS;
@@ -727,7 +727,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
   for (; isspace(*arg); arg++)
     ;
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Need a header, fool.");
     return;
@@ -774,7 +774,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
 
   one_argument(arg, number);
 
-  if (!*number || !isdigit(*number))
+  if (number.isEmpty() || !isdigit(*number))
     return ReturnValue::eFAILURE;
 
   if (!(tmessage = atoi(number)))
@@ -862,7 +862,7 @@ void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
 
   if (!the_file)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
+    DC::getInstance()->logentry(u"Unable to open/create save file for bulletin board"_s, ANGEL,
                                 DC::LogChannel::LOG_BUG);
     return;
   }
@@ -942,7 +942,7 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
 
   if (ch->isNonPlayer())
   {
-    if (!*number)
+    if (number.isEmpty())
     {
       ch->sendln("Sorry, mobs have to specify the number of the post they want to read.");
       return ReturnValue::eFAILURE;
@@ -950,14 +950,14 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
   }
   else
   {
-    if (!*number && ch->player->last_mess_read > 0)
+    if (number.isEmpty() && ch->player->last_mess_read > 0)
     {
       ch->player->last_mess_read++;
       dc_sprintf(number, "%i", ch->player->last_mess_read);
     }
   }
 
-  if (!*number || !isdigit(*number))
+  if (number.isEmpty() || !isdigit(*number))
   {
     ch->sendln("Read what?");
     return ReturnValue::eFAILURE;
@@ -1074,10 +1074,10 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
     ch->sendln("The board is empty.");
   else
   {
-    ch->send(QStringLiteral("There are %d messages on the board.\r\n").arg(board->second.msgs.size()));
+    ch->send(u"There are %d messages on the board.\r\n"_s.arg(board->second.msgs.size()));
     ;
 
-    ch->send(QStringLiteral("Board Topic:\r\n%s------------\r\n").arg(board->second.msgs[0].text.c_str()));
+    ch->send(u"Board Topic:\r\n%s------------\r\n"_s.arg(board->second.msgs[0].text.c_str()));
     QList<message>::reverse_iterator msg_it;
     i = board->second.msgs.size() - 1;
     for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
@@ -1086,7 +1086,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
         dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
                     msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
         board_msg += buf;
-        //         ch->send(QStringLiteral("(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n").arg(msg_it->date.c_str()).arg(       //                    msg_it->author.c_str(),i--).arg(msg_it->title.c_str()));
+        //         ch->send(u"(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n"_s.arg(msg_it->date.c_str()).arg(       //                    msg_it->author.c_str(),i--).arg(msg_it->title.c_str()));
       }
       else
       {

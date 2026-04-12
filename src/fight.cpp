@@ -89,13 +89,13 @@ void do_champ_flag_death(CharacterPtr victim)
     send_info(buf);
 
     if (obj && qPrintable(obj->short_description()))
-      send_info(QStringLiteral("##%1 has just died with %2, watch for it to reappear!\r\n").arg(victim->name()).arg(obj->short_description()));
+      send_info(u"##%1 has just died with %2, watch for it to reappear!\r\n"_s.arg(victim->name()).arg(obj->short_description()));
     else
-      send_info(QStringLiteral("##%1 has just died with the Champion Flag, watch for it to reappear!\r\n").arg(victim->name()));
+      send_info(u"##%1 has just died with the Champion Flag, watch for it to reappear!\r\n"_s.arg(victim->name()));
   }
   else
   {
-    DC::getInstance()->logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Champion without the flag, no bueno amigo!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -144,7 +144,7 @@ qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0)
       continue;
     if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN))
       continue;
-    qint32 retval = tmp->do_join(QStringLiteral("0.%1").arg(ch->name()).split(' '));
+    qint32 retval = tmp->do_join(u"0.%1"_s).arg(ch->name()).split(' '));
     if (SOMEONE_DIED(retval))
       return retval;
   }
@@ -188,7 +188,7 @@ qint32 Character::check_charmiejoin(void)
     return ReturnValue::eFAILURE;
   }
 
-  return do_join(QStringLiteral("0.%1").arg(master->name()).split(' '));
+  return do_join(u"0.%1"_s).arg(master->name()).split(' '));
 }
 
 qint32 check_charmiejoin(CharacterPtr ch)
@@ -224,7 +224,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      DC::getInstance()->logentry(QStringLiteral("Error in perform_violence()!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Error in perform_violence()!  Null ch->fighting!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
 
@@ -347,7 +347,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      DC::getInstance()->logentry(QStringLiteral("Error in perform_violence(), part2!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Error in perform_violence(), part2!  Null ch->fighting!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
     bool over = false;
@@ -528,7 +528,7 @@ qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 
   if (!ch || !vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("nullptr Victim or Ch sent to attack!  This crashes us!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"nullptr Victim or Ch sent to attack!  This crashes us!"_s, -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
 
     return ReturnValue::eINTERNAL_ERROR;
@@ -536,7 +536,7 @@ qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    DC::getInstance()->logentry(QStringLiteral("Dead ch sent to attack. Wtf ;)"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Dead ch sent to attack. Wtf ;)"_s, -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
     stop_fighting(ch);
 
@@ -907,7 +907,7 @@ bool do_frostshield(CharacterPtr ch, CharacterPtr vict)
 {
   if (!ch || !vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch or vict sent to do_frostshield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch or vict sent to do_frostshield"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return (false);
   }
   if (!IS_AFFECTED(vict, AFF_FROSTSHIELD))
@@ -934,7 +934,7 @@ command_return_t do_lightning_shield(CharacterPtr ch, CharacterPtr vict, qint32 
 
   if (!ch || !vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch or vict sent to do_lightning_shield"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1016,7 +1016,7 @@ command_return_t do_vampiric_aura(CharacterPtr ch, CharacterPtr vict)
 {
   if (!ch || !vict || ch == vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_vampiric_aura!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch or vict, or ch==vict sent to do_vampiric_aura!"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1049,7 +1049,7 @@ command_return_t do_fireshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (!ch || !vict || ch == vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_fireshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch or vict, or ch==vict sent to do_fireshield!"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1138,7 +1138,7 @@ command_return_t do_acidshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (!ch || !vict || ch == vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_acidshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch or vict, or ch==vict sent to do_acidshield!"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1223,7 +1223,7 @@ command_return_t do_boneshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 
   if (!ch || !vict || ch == vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_boneshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch or vict, or ch==vict sent to do_boneshield!"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1378,7 +1378,7 @@ qint32 get_weapon_damage_type(ObjectPtr wielded)
     return TYPE_PIERCE;
     break;
   default:
-    logbug(QStringLiteral("WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3.").arg(wielded->item_number).arg(wielded->name()).arg(wielded->obj_flags.value[3]));
+    logbug(u"WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3."_s.arg(wielded->item_number).arg(wielded->name()).arg(wielded->obj_flags.value[3]));
     break;
   }
   return TYPE_HIT; // should never get here
@@ -1441,7 +1441,7 @@ qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 
   if (!vict || !ch)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim or character in one_hit!  This Crashes us!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null victim or character in one_hit!  This Crashes us!"_s, -1, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -2541,7 +2541,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     {
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
-      victim->send(QStringLiteral("Your stones absorb %d damage allowing %d through.\r\n").arg(pspell->modifier).arg(dam));
+      victim->send(u"Your stones absorb %d damage allowing %d through.\r\n"_s.arg(pspell->modifier).arg(dam));
       string1 << "Your attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
       act_to_character(string1.str().c_str(), ch, 0, victim, 0);
       string1.clear();
@@ -2552,7 +2552,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     else
     {
       pspell->duration -= dam;
-      victim->send(QStringLiteral("Your stones absorb %1 damage from the attack and change its direction slightly.\r\n").arg(dam));
+      victim->send(u"Your stones absorb %1 damage from the attack and change its direction slightly.\r\n"_s).arg(dam));
       string1 << "$N's stones absorb " << dam << " damage of your attack and cause your blow to change direction slightly.";
       act_to_character(string1.str().c_str(), ch, 0, victim, 0);
       string1.clear();
@@ -3012,33 +3012,33 @@ void do_dam_msgs(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 attack
   if (filter > TYPE_HIT && (attacktype == SPELL_BURNING_HANDS || attacktype == SPELL_FIREBALL || attacktype == SPELL_FIRESTORM || attacktype == SPELL_HELLSTREAM || attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM || attacktype == SPELL_LIGHTNING_BOLT || attacktype == SPELL_CHILL_TOUCH))
   {
     if (attacktype == SPELL_CHILL_TOUCH)
-      find = QStringLiteral("$B$3");
+      find = u"$B$3"_s;
     else if (attacktype == SPELL_LIGHTNING_BOLT)
-      find = QStringLiteral("$B$5");
+      find = u"$B$5"_s;
     else if (attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM)
-      find = QStringLiteral("$B$7");
+      find = u"$B$7"_s;
     else
-      find = QStringLiteral("$B$4");
+      find = u"$B$4"_s;
 
     switch (filter)
     {
     case TYPE_FIRE:
-      replace = QStringLiteral("$B$4");
+      replace = u"$B$4"_s;
       break;
     case TYPE_COLD:
-      replace = QStringLiteral("$B$3");
+      replace = u"$B$3"_s;
       break;
     case TYPE_ENERGY:
-      replace = QStringLiteral("$B$5");
+      replace = u"$B$5"_s;
       break;
     case TYPE_ACID:
-      replace = QStringLiteral("$B$2");
+      replace = u"$B$2"_s;
       break;
     case TYPE_POISON:
-      replace = QStringLiteral("$2");
+      replace = u"$2"_s;
       break;
     case TYPE_MAGIC:
-      replace = QStringLiteral("$B$7");
+      replace = u"$B$7"_s;
       break;
     default:
       replace = find;
@@ -3183,7 +3183,7 @@ void fight_kill(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 spec_typ
 {
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null vict sent to fight_kill()!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null vict sent to fight_kill()!"_s, -1, DC::LogChannel::LOG_BUG);
     return;
   }
   bool vict_is_attacker = false;
@@ -3235,7 +3235,7 @@ QString translate_name(const CharacterPtr ch)
 {
   if (ch->isNonPlayer())
   {
-    return QStringLiteral("%1(v%2)").arg(qPrintable(ch->name())).arg(DC::getInstance()->mob_index[ch->mobdata->nr].vnum());
+    return u"%1(v%2)"_s.arg(qPrintable(ch->name())).arg(DC::getInstance()->mob_index[ch->mobdata->nr].vnum());
   }
   return qPrintable(ch->name());
 }
@@ -3244,7 +3244,7 @@ void debug_isHit(const CharacterPtr ch, const CharacterPtr victim, const qint32 
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    DC::getInstance()->logentry(QStringLiteral("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7"_s.arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3252,7 +3252,7 @@ void debug_isHit_toHit(const CharacterPtr ch, const CharacterPtr victim, const q
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    DC::getInstance()->logentry(QStringLiteral("isHit: toHit=%1").arg(toHit), DIVINITY, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"isHit: toHit=%1"_s.arg(toHit), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3260,7 +3260,7 @@ void debug_isHit_generic(const CharacterPtr ch, const CharacterPtr victim, const
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    DC::getInstance()->logentry(QStringLiteral("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5"_s.arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3413,7 +3413,7 @@ bool isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type
   // Ze random stuff.
   if (number(1, 100) < (qint32)percent && !isSet(victim->combat, COMBAT_BLADESHIELD1) && !isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    debug_isHit(ch, victim, attacktype, type, reduce, toHit, QStringLiteral("Ze random stuff percent=%1").arg(percent));
+    debug_isHit(ch, victim, attacktype, type, reduce, toHit, u"Ze random stuff percent=%1"_s.arg(percent));
     return ReturnValue::eFAILURE;
   }
 
@@ -3544,7 +3544,7 @@ qint32 checkCounterStrike(CharacterPtr ch, CharacterPtr victim)
     act_to_room("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, NOTVICT);
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Serious screw-up in counter strike!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -3588,7 +3588,7 @@ qint32 doTumblingCounterStrike(CharacterPtr ch, CharacterPtr victim)
     act_to_room("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, nullptr, ch, NOTVICT);
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Serious screw-up in counter strike!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -4042,7 +4042,7 @@ void load_messages(const QString file, qint32 base)
     //	 produce_coredump();
     if (i >= MAX_MESSAGES)
     {
-      DC::getInstance()->logentry(QStringLiteral("Too many combat messages."), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Too many combat messages."_s, ANGEL, DC::LogChannel::LOG_BUG);
       exit(0);
     }
 
@@ -4202,7 +4202,7 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
 
   if (!ch)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch in stop_fighting.  This would have crashed us."), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch in stop_fighting.  This would have crashed us."_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -4309,7 +4309,7 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
       ;
     if (!tmp)
     {
-      DC::getInstance()->logentry(QStringLiteral("Stop_fighting: character not found"), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Stop_fighting: character not found"_s, ANGEL, DC::LogChannel::LOG_BUG);
       // abort();
       return;
     }
@@ -4344,7 +4344,7 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
   auto showdps = ch->getSetting("fighting.showdps", "0");
   if (showdps == "1" || showdps.startsWith('t', Qt::CaseInsensitive))
   {
-    ch->send(QStringLiteral("You caused %lu damage over %lu seconds with DPS of %lu.\r\n").arg(ch->damage_done).arg(fight_length).arg(ch->damage_per_second));
+    ch->send(u"You caused %lu damage over %lu seconds with DPS of %lu.\r\n"_s.arg(ch->damage_done).arg(fight_length).arg(ch->damage_per_second));
   }
 }
 
@@ -4359,7 +4359,7 @@ void make_scraps(CharacterPtr ch, ObjectPtr obj)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("scraps"));
+  corpse->name(u"scraps"_s);
 
   dc_sprintf(buf, "A pile of scraps from %s is lying here.", qPrintable(obj->short_description()));
   corpse->long_description(buf);
@@ -4692,7 +4692,7 @@ void make_husk(CharacterPtr ch)
   clear_object(corpse);
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("husk"));
+  corpse->name(u"husk"_s);
   dc_sprintf(buf, "The withered husk of %s, its soul drained, flutters here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
   dc_sprintf(buf, "Husk of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
@@ -4727,7 +4727,7 @@ void make_head(CharacterPtr ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("head"));
+  corpse->name(u"head"_s);
 
   dc_sprintf(buf, "The head of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
@@ -4765,7 +4765,7 @@ void make_arm(CharacterPtr ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("arm"));
+  corpse->name(u"arm"_s);
 
   dc_sprintf(buf, "The arm of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
@@ -4803,7 +4803,7 @@ void make_leg(CharacterPtr ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("leg"));
+  corpse->name(u"leg"_s);
 
   dc_sprintf(buf, "The leg of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
@@ -4841,7 +4841,7 @@ void make_bowels(CharacterPtr ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("bowels"));
+  corpse->name(u"bowels"_s);
 
   dc_sprintf(buf, "The steaming bowels of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
@@ -4879,7 +4879,7 @@ void make_blood(CharacterPtr ch)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("blood"));
+  corpse->name(u"blood"_s);
 
   dc_sprintf(buf, "A pool of %s's blood is here.", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->long_description(buf);
@@ -4920,7 +4920,7 @@ void make_heart(CharacterPtr ch, CharacterPtr vict)
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
-  corpse->name(QStringLiteral("heart"));
+  corpse->name(u"heart"_s);
 
   dc_sprintf(buf, "%s's heart is laying here.", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
   corpse->long_description(buf);
@@ -5301,7 +5301,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 
   if (!victim)
   {
-    DC::getInstance()->logentry(QStringLiteral("Error in raw_kill()!  Null victim!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Error in raw_kill()!  Null victim!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -5318,7 +5318,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
   }
   if (ch && ch->isImmortalPlayer() && victim->isNonPlayer())
   {
-    special_log(QString(QStringLiteral("%1 killed %2 in room %3!")).arg(ch->name()).arg(victim->name()).arg(ch->in_room));
+    special_log(QString(u"%1 killed %2 in room %3!"_s).arg(ch->name()).arg(victim->name()).arg(ch->in_room));
   }
 
   // register my death with this zone's counter
@@ -6058,7 +6058,7 @@ void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr victim,
     w_type -= TYPE_HIT;
     if (((quint32)w_type) >= sizeof(attack_table))
     {
-      DC::getInstance()->logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Dam_message: bad w_type"_s, ANGEL, DC::LogChannel::LOG_BUG);
       w_type = {};
     }
   }
@@ -6345,7 +6345,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
 
   if (!victim)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null victim sent to do_pkill."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -6669,7 +6669,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     ObjectPtr obj = {};
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
-      DC::getInstance()->logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
+      DC::getInstance()->logentry(u"Champion without the flag, no bueno amigo!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
     if (ch->isNonPlayer() && ch->master)
@@ -6710,7 +6710,7 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
 
   if (!victim)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to arena_kill."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null victim sent to arena_kill."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -7026,7 +7026,7 @@ qint32 weapon_spells(CharacterPtr ch, CharacterPtr vict, qint32 weapon)
 
   if (!ch || !vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null ch or vict sent to weapon spells!"_s, -1, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (!weapon)
@@ -7587,7 +7587,7 @@ void remove_nosave(CharacterPtr vict)
 
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to remove_nosave!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null victim sent to remove_nosave!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -7622,7 +7622,7 @@ void remove_active_potato(CharacterPtr vict)
 
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to remove_active_potato!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Null victim sent to remove_active_potato!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 

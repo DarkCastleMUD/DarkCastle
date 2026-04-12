@@ -178,7 +178,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 
   ObjectPtr reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
-  ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description()));
+  ch->send(u"You succesfully make a %1!\r\n"_s.arg(reward->short_description()));
   act_to_room("$n successfully makes a $p.", ch, reward, 0, 0);
 
   return ReturnValue::eSUCCESS;
@@ -196,7 +196,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, vialarg);
 
-  if (!*vialarg)
+  if (vialarg.isEmpty())
   {
     ch->sendln("Poison your weapon with what?");
     return ReturnValue::eFAILURE;
@@ -220,7 +220,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
   if (!vial)
   {
-    ch->send(QStringLiteral("You don't seem to have any %1.\r\n").arg(vialarg));
+    ch->send(u"You don't seem to have any %1.\r\n"_s.arg(vialarg));
     return ReturnValue::eFAILURE;
   }
 
@@ -234,7 +234,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (found < 0)
   {
-    ch->send(QStringLiteral("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description()));
+    ch->send(u"The %1 is not a valid weapon poison.\r\n"_s).arg(vial->short_description()));
     return ReturnValue::eFAILURE;
   }
 
@@ -265,7 +265,7 @@ qint32 valid_trade_skill_combine(ObjectPtr container, trade_data_type *data, Cha
 {
   if (!(container->contains))
   {
-    ch->send(QStringLiteral("Your %1 appears to be empty.\r\n").arg(container->short_description()));
+    ch->send(u"Your %1 appears to be empty.\r\n"_s).arg(container->short_description()));
     return -2;
   }
 
@@ -378,7 +378,7 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
            break;
 
         default:
-           ch->send(QStringLiteral("Unknown poison type %1.  Let a god know.\r\n").arg(type));
+           ch->send(u"Unknown poison type %1.  Let a god know.\r\n"_s).arg(type));
            break;
      }
 
@@ -403,7 +403,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     send_to_char("Brew what?\r\n"
                  "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
@@ -460,7 +460,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
   argument = one_argument(argument, liquid);
   one_argument(argument, container);
 
-  if (!*liquid)
+  if (liquid.isEmpty())
   {
     send_to_char("You'll need to choose a liquid type and container.\r\n"
                  "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
@@ -468,7 +468,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*container)
+  if (container.isEmpty())
   {
     send_to_char("You'll need to select a container.\r\n"
                  "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
@@ -590,7 +590,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
                     DC::getInstance()->obj_index[containerobj->item_number].vnum()};
   qint32 spell = b.find(r);
 
-  //  ch->sendln(QStringLiteral("Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
+  //  ch->sendln(u"Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n"_s,
   //	 DC::getInstance()->obj_index[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
   //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
   //	 DC::getInstance()->obj_index[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
@@ -647,9 +647,9 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
     // Put it all together into the new name
 
-    auto potionname = QStringLiteral("potion %1 %2").arg(container_key).arg(liquid_key);
-    auto potionshort = QStringLiteral("a %1 %2 %3 potion").arg(container_key).arg(liquid_key).arg(potion_color);
-    auto potionlong = QStringLiteral("a %1 %2 %3 potion lies here.").arg(container_key).arg(liquid_key).arg(potion_color);
+    auto potionname = u"potion %1 %2"_s.arg(container_key).arg(liquid_key);
+    auto potionshort = u"a %1 %2 %3 potion"_s.arg(container_key).arg(liquid_key).arg(potion_color);
+    auto potionlong = u"a %1 %2 %3 potion lies here."_s).arg(container_key).arg(liquid_key).arg(potion_color);
 
     containerobj->obj_flags.type_flag = ITEM_POTION;
     containerobj->obj_flags.value[0] = (learned / 2 - 5) + GET_WIS(ch) / 2 + GET_INT(ch) / 2;
@@ -775,7 +775,7 @@ void Brew::list(CharacterPtr ch)
     qint32 spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    ch->send(QStringLiteral("[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\r\n").arg(++i, r.herb, r.liquid).arg(r.container).arg(buffer).arg(spell));
+    ch->send(u"[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\r\n"_s.arg(++i, r.herb, r.liquid).arg(r.container).arg(buffer).arg(spell));
   }
 }
 
@@ -795,7 +795,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
   argument = one_argument(argument, arg3);
   argument = one_argument(argument, arg4);
 
-  if (!*arg1 || !*arg2 || !*arg3 || !*arg4)
+  if (arg.isEmpty() 1 || arg.isEmpty() 2 || arg.isEmpty() 3 || arg.isEmpty() 4)
   {
     ch->sendln("Syntax: brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]");
     return ReturnValue::eFAILURE;
@@ -818,7 +818,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
   case LIQ_SALTWATER:
     break;
   default:
-    ch->send(QStringLiteral("Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\r\n").arg(LIQ_MILK).arg(LIQ_WINE).arg(LIQ_SALTWATER));
+    ch->send(u"Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\r\n"_s.arg(LIQ_MILK).arg(LIQ_WINE).arg(LIQ_SALTWATER));
     return ReturnValue::eFAILURE;
     break;
   }
@@ -831,7 +831,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
 
   if ((spell = find_skill_num(arg4)) < 0)
   {
-    ch->send(QStringLiteral("Cannot find spell '%s' in master spell list.\r\n").arg(arg4));
+    ch->send(u"Cannot find spell '%s' in master spell list.\r\n"_s.arg(arg4));
     return ReturnValue::eFAILURE;
   }
 
@@ -850,7 +850,7 @@ qint32 Brew::remove(CharacterPtr ch, QString argument)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("Syntax: brew remove [recipe_num]");
     return ReturnValue::eFAILURE;
@@ -864,13 +864,13 @@ qint32 Brew::remove(CharacterPtr ch, QString argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
+      ch->send(u"Recipe # %1 has been removed.\r\n"_s.arg(target));
 
       return ReturnValue::eSUCCESS;
     }
   }
 
-  ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
+  ch->send(u"Recipe # %1 not found.\r\n"_s.arg(target));
   return ReturnValue::eFAILURE;
 }
 
@@ -907,7 +907,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     send_to_char("Scribe what?\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
@@ -965,7 +965,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
   argument = one_argument(argument, pen);
   argument = one_argument(argument, paper);
 
-  if (!*dust)
+  if (dust.isEmpty())
   {
     send_to_char("You'll need to choose a dust, pen and paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
@@ -973,7 +973,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*pen)
+  if (pen.isEmpty())
   {
     send_to_char("You'll need to choose a pen and paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
@@ -981,7 +981,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*paper)
+  if (paper.isEmpty())
   {
     send_to_char("You'll need to select a paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
@@ -1109,9 +1109,9 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     auto paper_key = paperobj->name().split(' ').value(2);
 
     // Put it all together into the new name
-    auto scrollname = QStringLiteral("scroll %1 %2 %3 %4").arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
-    auto scrollshort = QStringLiteral("a %1 $B%2$R scroll %3 in %4 ink").arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
-    auto scrolllong = QStringLiteral("a %1 $B%2$R scroll %3 in %4 ink lies here.").arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
+    auto scrollname = u"scroll %1 %2 %3 %4"_s.arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
+    auto scrollshort = u"a %1 $B%2$R scroll %3 in %4 ink"_s.arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
+    auto scrolllong = u"a %1 $B%2$R scroll %3 in %4 ink lies here."_s.arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
 
     paperobj->obj_flags.type_flag = ITEM_SCROLL;
     paperobj->obj_flags.value[0] = learned / 4 + ch->getLevel() / 2;
@@ -1225,7 +1225,7 @@ void Scribe::list(CharacterPtr ch)
     qint32 spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    ch->send(QStringLiteral("[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\r\n").arg(++i, r.ink, r.dust, r.pen).arg(r.paper).arg(buffer).arg(spell));
+    ch->send(u"[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\r\n"_s.arg(++i, r.ink, r.dust, r.pen).arg(r.paper).arg(buffer).arg(spell));
   }
 }
 
@@ -1246,7 +1246,7 @@ qint32 Scribe::add(CharacterPtr ch, QString argument)
   argument = one_argument(argument, arg4);
   argument = one_argument(argument, arg5);
 
-  if (!*arg1 || !*arg2 || !*arg3 || !*arg4 || !*arg5)
+  if (arg.isEmpty() 1 || arg.isEmpty() 2 || arg.isEmpty() 3 || arg.isEmpty() 4 || arg.isEmpty() 5)
   {
     ch->sendln("Syntax: scribe add [ink_vnum] [dust_vnum] [pen_vnum] [paper_vnum] [spell_num]");
     return ReturnValue::eFAILURE;
@@ -1283,7 +1283,7 @@ qint32 Scribe::add(CharacterPtr ch, QString argument)
 
   if ((spell = find_skill_num(arg5)) < 0)
   {
-    ch->send(QStringLiteral("Cannot find spell '%s' in master spell list.\r\n").arg(arg4));
+    ch->send(u"Cannot find spell '%s' in master spell list.\r\n"_s.arg(arg4));
     return ReturnValue::eFAILURE;
   }
 
@@ -1302,7 +1302,7 @@ qint32 Scribe::remove(CharacterPtr ch, QString argument)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*argument)
+  if (argument.isEmpty())
   {
     ch->sendln("Syntax: scribe remove [recipe_num]");
     return ReturnValue::eFAILURE;
@@ -1316,13 +1316,13 @@ qint32 Scribe::remove(CharacterPtr ch, QString argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
+      ch->send(u"Recipe # %1 has been removed.\r\n"_s.arg(target));
 
       return ReturnValue::eSUCCESS;
     }
   }
 
-  ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
+  ch->send(u"Recipe # %1 not found.\r\n"_s.arg(target));
   return ReturnValue::eFAILURE;
 }
 

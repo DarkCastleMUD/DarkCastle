@@ -34,7 +34,7 @@ class TestDC : public QObject
 public:
   TestDC()
   {
-    qSetMessagePattern(QStringLiteral("%{if-category}%{category}:%{endif}%{function}:%{line}:%{message}"));
+    qSetMessagePattern(u"%{if-category}%{category}:%{endif}%{function}:%{line}:%{message}"_s);
   }
   QByteArray checksumFile(QString filename)
   {
@@ -58,9 +58,9 @@ private slots:
 
   void test_double_dollars_qstring()
   {
-    QString source = QStringLiteral("abc$def$12");
+    QString source = u"abc$def$12"_s;
     QString destination = double_dollars(source);
-    QCOMPARE(destination, QStringLiteral("abc$$def$$12"));
+    QCOMPARE(destination, u"abc$$def$$12"_s);
   }
 
   void test_nocolor_strlen_data()
@@ -140,7 +140,7 @@ private slots:
 
   void test_space_to_underscore()
   {
-    QCOMPARE(space_to_underscore(QStringLiteral("  this is a test  ")), "__this_is_a_test__");
+    QCOMPARE(space_to_underscore(u"  this is a test  "_s), "__this_is_a_test__");
     QCOMPARE(space_to_underscore(QString("  this is a test  ")), "__this_is_a_test__");
   }
 
@@ -158,7 +158,7 @@ private slots:
 
   void test_str_nosp_cmp_qstring()
   {
-    QCOMPARE(str_nosp_equal(QStringLiteral("  this is a test  "), QStringLiteral("__this_is_a_test__")), 0);
+    QCOMPARE(str_nosp_equal(u"  this is a test  "_s, u"__this_is_a_test__"_s), 0);
   }
 
   void test_str_n_nosp_cmp_c_string()
@@ -172,9 +172,9 @@ private slots:
     QCOMPARE(str_n_nosp_cmp_begin(QString("  that is a test  "), QString("__THIS_IS_A_test__")), MatchType::Failure);
     QCOMPARE(str_n_nosp_cmp_begin(QString("  this is a"), QString("__THIS_IS_A_test__XYZ")), MatchType::Subset);
 
-    QCOMPARE(str_n_nosp_cmp_begin(QStringLiteral("  this is a test  "), QStringLiteral("__THIS_IS_A_test__")), MatchType::Exact);
-    QCOMPARE(str_n_nosp_cmp_begin(QStringLiteral("  that is a test  "), QStringLiteral("__THIS_IS_A_test__")), MatchType::Failure);
-    QCOMPARE(str_n_nosp_cmp_begin(QStringLiteral("  this is a"), QStringLiteral("__THIS_IS_A_test__XYZ")), MatchType::Subset);
+    QCOMPARE(str_n_nosp_cmp_begin(u"  this is a test  "_s, u"__THIS_IS_A_test__"_s), MatchType::Exact);
+    QCOMPARE(str_n_nosp_cmp_begin(u"  that is a test  "_s, u"__THIS_IS_A_test__"_s), MatchType::Failure);
+    QCOMPARE(str_n_nosp_cmp_begin(u"  this is a"_s, u"__THIS_IS_A_test__XYZ"_s), MatchType::Subset);
   }
 
   void test_update_character_singing()
@@ -187,7 +187,7 @@ private slots:
     dc.random_ = QRandomGenerator(0);
 
     Character ch(&dc);
-    ch.setName(QStringLiteral("Testsing"));
+    ch.setName(u"Testsing"_s);
     ch.in_room = 3;
     ch.height = 72;
     ch.weight = 150;
@@ -207,12 +207,12 @@ private slots:
     QVERIFY(!ch.isNonPlayer());
     QVERIFY(!dc.character_list.empty());
 
-    do_sing(&ch, QStringLiteral("'flight of the bumblebee'"));
+    do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "Lie still; you are DEAD.\r\n");
     conn->output = {};
 
     ch.setPosition(position_t::STANDING);
-    do_sing(&ch, QStringLiteral("'flight of the bumblebee'"));
+    do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You raise your clear (?) voice towards the sky.\r\n");
     conn->output = {};
     QVERIFY(ch.songs.empty());
@@ -225,13 +225,13 @@ private slots:
     ch.learn_skill(skillnum, 1, 100);
     QCOMPARE(ch.has_skill(skillnum), 1);
 
-    do_sing(&ch, QStringLiteral("'flight of the bumblebee'"));
+    do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You raise your clear (?) voice towards the sky.\r\n");
     conn->output = {};
     QVERIFY(ch.songs.empty());
 
     ch.setClass(10);
-    do_sing(&ch, QStringLiteral("'flight of the bumblebee'"));
+    do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You do not have enough ki!\r\n");
     conn->output = {};
     QVERIFY(ch.songs.empty());
@@ -240,17 +240,17 @@ private slots:
     ch.intel = 25;
     redo_ki(&ch);
     ch.ki = ki_limit(&ch);
-    do_sing(&ch, QStringLiteral("'flight of the bumblebee'"));
+    do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You feel more competent in your flight of the bumblebee ability. It increased to 2 out of 75.\r\nYou forgot the words!\r\n");
     conn->output = {};
     QVERIFY(ch.songs.empty());
 
-    do_sing(&ch, QStringLiteral("'flight of the bumblebee'"));
+    do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You begin to sing a lofty song...\r\n");
     conn->output = {};
     QVERIFY(!ch.songs.empty());
 
-    do_sing(&ch, QStringLiteral("'flight of the bumblebee'"));
+    do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You are already in the middle of another song!\r\n");
     conn->output = {};
     QVERIFY(!ch.songs.empty());
@@ -318,7 +318,7 @@ private slots:
     dc.random_ = QRandomGenerator(0);
 
     Character ch(&dc);
-    ch.setName(QStringLiteral("Testvault"));
+    ch.setName(u"Testvault"_s);
     ch.in_room = 3;
     ch.height = 72;
     ch.weight = 150;
@@ -342,15 +342,15 @@ private slots:
     QVERIFY(o1);
     QVERIFY(o2);
     QVERIFY(o3);
-    o1->name(QStringLiteral("sword"));
-    GET_OBJ_SHORT(o1) = QStringLiteral("a short sword");
-    o2->name(QStringLiteral("sword"));
-    GET_OBJ_SHORT(o2) = QStringLiteral("a short sword");
-    o3->name(QStringLiteral("mushroom"));
-    GET_OBJ_SHORT(o3) = QStringLiteral("a small mushroom");
+    o1->name(u"sword"_s);
+    GET_OBJ_SHORT(o1) = u"a short sword"_s;
+    o2->name(u"sword"_s);
+    GET_OBJ_SHORT(o2) = u"a short sword"_s;
+    o3->name(u"mushroom"_s);
+    GET_OBJ_SHORT(o3) = u"a small mushroom"_s;
 
     command_return_t rc;
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't feel safe enough to manage your valuables.\r\n");
     conn->output = {};
@@ -366,12 +366,12 @@ private slots:
       DC::getInstance()->vaults_.(ch.getNameC()); // free it up first..
     }
 
-    rc = do_vault(&ch, QStringLiteral("list"));
+    rc = do_vault(&ch, u"list"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have a vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have a vault.\r\n");
     conn->output = {};
@@ -384,12 +384,12 @@ private slots:
     QCOMPARE(conn->output, "Your gain is: 11/14 hp, 1/1 m, 1/21 mv, 0/0 prac, 1/1 ki.\r\nYour gain is: 12/26 hp, 1/2 m, 1/22 mv, 0/0 prac, 0/1 ki.\r\nYour gain is: 10/36 hp, 1/3 m, 1/23 mv, 0/0 prac, 1/2 ki.\r\nYour gain is: 14/50 hp, 1/4 m, 1/24 mv, 0/0 prac, 0/2 ki.\r\nYour gain is: 14/64 hp, 1/5 m, 1/25 mv, 0/0 prac, 1/3 ki.\r\nYour gain is: 13/77 hp, 1/6 m, 1/26 mv, 0/0 prac, 0/3 ki.\r\nYou are now able to participate in pkilling!\r\nRead HELP PKILL for more information.\r\nYour gain is: 12/89 hp, 1/7 m, 1/27 mv, 0/0 prac, 1/4 ki.\r\nYour gain is: 11/100 hp, 1/8 m, 1/28 mv, 0/0 prac, 0/4 ki.\r\nYour gain is: 13/113 hp, 1/9 m, 1/29 mv, 0/0 prac, 1/5 ki.\r\nYour gain is: 13/126 hp, 1/10 m, 1/30 mv, 0/0 prac, 0/5 ki.\r\nYou have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("list"));
+    rc = do_vault(&ch, u"list"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "Your vault is currently empty and can hold 100 pounds.\r\n");
     conn->output = {};
@@ -402,173 +402,173 @@ private slots:
     status = obj_to_char(o3, &ch);
     QVERIFY(status);
 
-    rc = do_vault(&ch, QStringLiteral("put all")); // put all
+    rc = do_vault(&ch, u"put all"_s); // put all
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a small mushroom has been placed in the vault.\r\na short sword has been placed in the vault.\r\na short sword has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("get all")); // get all
+    rc = do_vault(&ch, u"get all"_s); // get all
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\na small mushroom has been removed from the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all.sword")); // put all.keyword
+    rc = do_vault(&ch, u"put all.sword"_s); // put all.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been placed in the vault.\r\na short sword has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put mushroom")); // put keyword
+    rc = do_vault(&ch, u"put mushroom"_s); // put keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a small mushroom has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("get all.sword")); // get all.keyword
+    rc = do_vault(&ch, u"get all.sword"_s); // get all.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("get mushroom")); // get keyword
+    rc = do_vault(&ch, u"get mushroom"_s); // get keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a small mushroom has been removed from the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put 2.mushroom")); // put bad#.keyword
+    rc = do_vault(&ch, u"put 2.mushroom"_s)); // put bad#.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put 1.mushroom")); // put #.keyword
+    rc = do_vault(&ch, u"put 1.mushroom"_s)); // put #.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a small mushroom has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put 2.sword"));
+    rc = do_vault(&ch, u"put 2.sword"_s));
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put 2.sword"));
+    rc = do_vault(&ch, u"put 2.sword"_s));
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put 1.sword"));
+    rc = do_vault(&ch, u"put 1.sword"_s));
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("get all.missing")); // get all.missingkeyword
+    rc = do_vault(&ch, u"get all.missing"_s); // get all.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all.missing")); // put all.missingkeyword
+    rc = do_vault(&ch, u"put all.missing"_s); // put all.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put undefined.missing")); // put undefined.missingkeyword
+    rc = do_vault(&ch, u"put undefined.missing"_s); // put undefined.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put missing")); // put missing
+    rc = do_vault(&ch, u"put missing"_s); // put missing
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("get missing")); // get missing
+    rc = do_vault(&ch, u"get missing"_s); // get missing
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("get undefined.sword")); // put undefined.keyword
+    rc = do_vault(&ch, u"get undefined.sword"_s); // put undefined.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put 1.missing")); // put #.missingkeyword
+    rc = do_vault(&ch, u"put 1.missing"_s)); // put #.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put 2.missing")); // put bad#.missingkeyword
+    rc = do_vault(&ch, u"put 2.missing"_s)); // put bad#.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put -2.sword")); // put invalid#.keyword
+    rc = do_vault(&ch, u"put -2.sword"_s); // put invalid#.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put -2.missing")); // put invalid#.missingkeyword
+    rc = do_vault(&ch, u"put -2.missing"_s); // put invalid#.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get undefined.sword")); // get undefined.keyword
+    rc = do_vault(&ch, u"get undefined.sword"_s); // get undefined.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get undefined.missing")); // get undefined.missingkeyword
+    rc = do_vault(&ch, u"get undefined.missing"_s); // get undefined.missingkeyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get 1.sword")); // get #.keyword
+    rc = do_vault(&ch, u"get 1.sword"_s)); // get #.keyword
     QCOMPARE(conn->output, "a short sword has been removed from the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been placed in the vault.\r\n");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get 1.missing")); // get #.missingkeyword
+    rc = do_vault(&ch, u"get 1.missing"_s)); // get #.missingkeyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get 3.sword")); // get bad#.keyword
+    rc = do_vault(&ch, u"get 3.sword"_s)); // get bad#.keyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get 3.missing")); // get bad#.missingkeyword
+    rc = do_vault(&ch, u"get 3.missing"_s)); // get bad#.missingkeyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get 3.sword")); // get invalid#.keyword
+    rc = do_vault(&ch, u"get 3.sword"_s)); // get invalid#.keyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, QStringLiteral("put all"));
+    rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, QStringLiteral("get 3.missing")); // get invalid#.missingkeyword
+    rc = do_vault(&ch, u"get 3.missing"_s)); // get invalid#.missingkeyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
@@ -585,7 +585,7 @@ private slots:
     cf.sql = false;
     DC dc(cf);
 
-    QFile testfile(QStringLiteral("fread_tests.txt"));
+    QFile testfile(u"fread_tests.txt"_s);
     QVERIFY(testfile.open(QIODeviceBase::WriteOnly));
     testfile.write("3\n");
     testfile.write("-1\n");
@@ -636,13 +636,13 @@ private slots:
     QCOMPARE(val3, -1);
 
     QString str1 = fread_qstring(stream);
-    QCOMPARE(str1, QStringLiteral("abc\r\n123"));
+    QCOMPARE(str1, u"abc\r\n123"_s);
 
     QString str2 = fread_qstring(stream);
-    QCOMPARE(str2, QStringLiteral("abc123"));
+    QCOMPARE(str2, u"abc123"_s);
 
     QString str3 = fread_qstring(stream);
-    QCOMPARE(str3, QStringLiteral(""));
+    QCOMPARE(str3, u""_s);
 
     fclose(stream);
     testfile.remove();
@@ -667,13 +667,13 @@ private slots:
       filename = "1-1.txt";
     }
 
-    QString legacyfile_filename = QStringLiteral("world/%1.legacyfile").arg(filename);
-    QString qfile_filename = QStringLiteral("world/%1.qfile").arg(filename);
-    QString qsavefile_filename = QStringLiteral("world/%1.qsavefile").arg(filename);
-    QString fstream_filename = QStringLiteral("world/%1.fstream").arg(filename);
+    QString legacyfile_filename = u"world/%1.legacyfile"_s.arg(filename);
+    QString qfile_filename = u"world/%1.qfile"_s.arg(filename);
+    QString qsavefile_filename = u"world/%1.qsavefile"_s.arg(filename);
+    QString fstream_filename = u"world/%1.fstream"_s.arg(filename);
     quint64 rooms_written = {};
     {
-      LegacyFileWorld lfw(QStringLiteral("%1.legacyfile").arg(filename));
+      LegacyFileWorld lfw(u"%1.legacyfile"_s).arg(filename));
       QFile qf(qfile_filename);
       QSaveFile qsf(qsavefile_filename);
       std::fstream fstream_world_file;
@@ -714,7 +714,7 @@ private slots:
 
     qInfo("Wrote %lu rooms to '%s'.", rooms_written, qPrintable(filename));
 
-    auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
+    auto original_checksum = checksumFile(u"world/%1"_s.arg(filename));
     auto legacyfile_checksum = checksumFile(legacyfile_filename);
     auto qfile_checksum = checksumFile(qfile_filename);
     auto qsavefile_checksum = checksumFile(qsavefile_filename);
@@ -770,7 +770,7 @@ private slots:
     auto base_character_count = dc.character_list.size();
 
     Character ch(&dc);
-    ch.setName(QStringLiteral("Testvend"));
+    ch.setName(u"Testvend"_s);
     ch.in_room = 3;
     ch.height = 72;
     ch.weight = 150;
@@ -796,7 +796,7 @@ private slots:
     conn->output = {};
 
     Character ch2(&dc);
-    ch2.setName(QStringLiteral("Testvend2"));
+    ch2.setName(u"Testvend2"_s);
     ch2.in_room = 3;
     ch2.height = 72;
     ch2.weight = 150;
@@ -820,17 +820,17 @@ private slots:
     ch2.setMove(GET_MAX_MOVE(&ch2));
     conn2.output = {};
 
-    auto rc = do_channel(&ch, QStringLiteral("auction"));
+    auto rc = do_channel(&ch, u"auction"_s);
     QCOMPARE(conn->output, "auction channel turned ON.\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    rc = do_channel(&ch2, QStringLiteral("auction"));
+    rc = do_channel(&ch2, u"auction"_s);
     QCOMPARE(conn2.output, "auction channel turned ON.\r\n");
     conn2.output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    rc = ch.do_auction({QStringLiteral("test")});
+    rc = ch.do_auction({u"test"_s});
     QCOMPARE(conn->output, "");
     conn->output = {};
     QCOMPARE(conn2.output, "");
@@ -847,10 +847,10 @@ private slots:
     ObjectPtr o2 = clone_object(rnum);
     QVERIFY(o1);
     QVERIFY(o2);
-    o1->name(QStringLiteral("sword"));
-    GET_OBJ_SHORT(o1) = QStringLiteral("a short sword");
+    o1->name(u"sword"_s);
+    GET_OBJ_SHORT(o1) = u"a short sword"_s;
 
-    rc = do_vend(&ch, QStringLiteral(""));
+    rc = do_vend(&ch, u""_s);
     QCOMPARE(conn->output, "You must be in an auction house to do this!\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eFAILURE);
@@ -864,12 +864,12 @@ private slots:
 
     auto items_posted_qty = dc.TheAuctionHouse.getItemsPosted();
 
-    rc = do_vend(&ch, QStringLiteral(""));
+    rc = do_vend(&ch, u""_s);
     QCOMPARE(conn->output, "Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    rc = do_vend(&ch, QStringLiteral("sell sword"));
+    rc = do_vend(&ch, u"sell sword"_s);
     QCOMPARE(conn->output, "You don't seem to have that item.\r\nSyntax: vend sell <item> <price> [person]\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
@@ -877,12 +877,12 @@ private slots:
     auto status = obj_to_char(o1, &ch);
     QVERIFY(status);
 
-    rc = do_vend(&ch, QStringLiteral("sell sword"));
+    rc = do_vend(&ch, u"sell sword"_s);
     QCOMPARE(conn->output, "How much do you want to sell it for?\r\nSyntax: vend sell <item> <price> [person]\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    rc = do_vend(&ch, QStringLiteral("sell sword 1000"));
+    rc = do_vend(&ch, u"sell sword 1000"_s);
     QCOMPARE(conn->output, "The Consignment broker informs you that he does not handle items that have been restrung.\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
@@ -893,14 +893,14 @@ private slots:
     QVERIFY(status);
 
     QCOMPARE(conn2.output, "");
-    rc = do_vend(&ch, QStringLiteral("sell item 1000000"));
+    rc = do_vend(&ch, u"sell item 1000000"_s);
     QCOMPARE(conn->output, "You are now selling a reflecty test item for 1000000 coins.\r\n"
                            "Saving Testvend.\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn2.output, "");
 
-    rc = do_vend(&ch, QStringLiteral("list mine"));
+    rc = do_vend(&ch, u"list mine"_s);
     QCOMPARE(conn->output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\r\n"
                            "You are using 1 of your 1 available tickets.\r\n\r\n"
                            "00002)              1,000,000  PUBLIC     a reflecty test item          \r\n\r\n"
@@ -909,12 +909,12 @@ private slots:
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    rc = do_vend(&ch, QStringLiteral("cancel 2"));
+    rc = do_vend(&ch, u"cancel 2"_s);
     QCOMPARE(conn->output, "The Consignment Broker retrieves a reflecty test item and returns it to you.\r\nSaving Testvend.\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    rc = do_vend(&ch, QStringLiteral("list mine"));
+    rc = do_vend(&ch, u"list mine"_s);
     QCOMPARE(conn->output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\r\n"
                            "You do not have any tickets.\r\n\r\n"
                            "You are using 0 of your 1 available tickets.\r\n");
@@ -945,7 +945,7 @@ private slots:
     auto base_character_count = dc.character_list.size();
 
     Character ch(&dc);
-    ch.setName(QStringLiteral("Test"));
+    ch.setName(u"Test"_s);
     Player player;
     ch.player = &player;
     ch.setType(Character::Type::Player);
@@ -957,31 +957,31 @@ private slots:
     dc.character_list.insert(&ch);
     conn->output = {};
 
-    auto rc = do_medit(&ch, QStringLiteral(""));
+    auto rc = do_medit(&ch, u""_s);
     QCOMPARE(conn->output, "Syntax:  medit [mob_num] [field] [arg]\r\n  Edit a mob_num with no field or arg to view the item.\r\n  Edit a field with no args for help on that field.\r\n\r\nThe field must be one of the following:\r\n          keywords         shortdesc          longdesc       description\r\n               sex             class              race             level\r\n         alignment      loadposition   defaultposition          actflags\r\n       affectflags        numdamdice       sizedamdice           damroll\r\n           hitroll       hphitpoints              gold  experiencepoints\r\n            immune           suscept            resist        armorclass\r\n              stat          strength         dexterity      intelligence\r\n            wisdom      constitution               new            delete\r\n              type                v1                v2                v3\r\n                v4\r\n");
     conn->output = {};
     ch.player->last_mob_edit = {};
     QCOMPARE(rc, ReturnValue::eFAILURE);
 
-    rc = do_medit(&ch, QStringLiteral("0"));
+    rc = do_medit(&ch, u"0"_s);
     QCOMPARE(conn->output, "0 is an invalid mob vnum.\r\n");
     conn->output = {};
     ch.player->last_mob_edit = {};
     QCOMPARE(rc, ReturnValue::eFAILURE);
 
-    rc = do_medit(&ch, QStringLiteral("-1"));
+    rc = do_medit(&ch, u"-1"_s);
     QCOMPARE(conn->output, "-1 is an invalid mob vnum.\r\n");
     conn->output = {};
     ch.player->last_mob_edit = {};
     QCOMPARE(rc, ReturnValue::eFAILURE);
 
-    rc = do_medit(&ch, QStringLiteral("1"));
+    rc = do_medit(&ch, u"1"_s);
     QCOMPARE(conn->output, "Changing last mob vnum from 0 to 1.\r\nMOB - Name: [chain]  VNum: 1  RNum: 0  In room: -1 Mobile type: NORMAL\r\nShort description: Chain\r\nTitle: None\r\nLong description: Chain is here, looking for ideas to steal.\r\nDetailed description:\r\nKevin looks like he's between the ages of 22-24.  He is picking his nose.\r\nEvery few seconds he types \"score\" then he jots down some notes.  He\r\nappears to be reading as many help files as he can find.  He also seems\r\ninterested in finding a copy of the DC code, and is keeping an eye out for\r\nany Imps that might be nearby.\r\n\r\nClass: Mage   Level:[105] Alignment:[0] Spelldamage:[30] Race: Rodent\r\nMobspec: exists  Progtypes: 25611\r\nHeight:[198]  Weight:[200]  Sex:[FEMALE]  Hometown:[3001]\r\nStr:[15]+[ 0]=15 Int:[15]+[ 0]=15 Wis:[10]+[ 0]=10\r\nDex:[20]+[ 0]=20 Con:[20]+[ 0]=20\r\nMana:[ 1150/ 1150+27  ]  Hit:[ 4000/ 4000+166]  Move:[ 1150/ 1150+105]  Ki:[175/175]\r\nAC:[-40]  Exp:[0]  Hitroll:[21]  Damroll:[33]  Gold: [0]\r\nPosition: Standing  Fighting: Nobody  Default position: Standing  Timer:[0] \r\nNPC flags: [134217731 0]SPEC SENTINEL NOMATRIX \r\nNon-Combat Special Proc: exists  Combat Special Proc: none  Mob Progs: exists\r\nNPC Bare Hand Damage: 0d0.\r\nCarried weight: 0   Carried items: 0\r\nItems in inventory: 0  Items in equipment: 0\r\nSave Vs: FIRE[35] COLD[35] ENERGY[35] ACID[35] MAGIC[35] POISON[-15]\r\nThirst: -1  Hunger: -1  Drunk: -1\r\nMelee: [0] Spell: [0] Song: [0] Reflect: [0]\r\nTracking: 'NOBODY'\r\nHates: 'NOBODY'\r\nFears: 'NOBODY'\r\nMaster: 'NOBODY'\r\nFollowers:\r\nCombat flags: NoBits \r\nAffected by: [35914280 0] DETECT-INVISIBLE SENSE-LIFE EAS true-SIGHT INFARED \r\nImmune: [3669751] PIERCE SLASH MAGIC FIRE ENERGY ACID POISON COLD PARA BLUDGEON WHIP CRUSH HIT BITE STING CLAW PHYSICAL KI SONG \r\nSusceptible: [128] POISON \r\nResistant: [0] NoBits \r\nLag Left:  0\r\n");
     conn->output = {};
     ch.player->last_mob_edit = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    rc = do_medit(&ch, QStringLiteral("abc"));
+    rc = do_medit(&ch, u"abc"_s);
     QCOMPARE(conn->output, "Invalid field.\r\n");
     conn->output = {};
     ch.player->last_mob_edit = {};
@@ -999,7 +999,7 @@ private slots:
     auto base_character_count = dc.character_list.size();
 
     Character ch(&dc);
-    ch.setName(QStringLiteral("Test"));
+    ch.setName(u"Test"_s);
     ch.setPosition(position_t::STANDING);
     Player player;
     ch.player = &player;
@@ -1018,7 +1018,7 @@ private slots:
     QCOMPARE(ch.in_room, 3009);
     ch.setPosition(position_t::STANDING);
 
-    rc = do_look(&ch, QStringLiteral(""));
+    rc = do_look(&ch, u""_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "Sadus' House of Fish and Pastries\r\n"
                            "   You are standing inside a small bakery, filled with the aromatic smells of\r\n"
@@ -1076,7 +1076,7 @@ private slots:
     auto base_character_count = dc.character_list.size();
 
     Character ch(&dc);
-    ch.setName(QStringLiteral("Test"));
+    ch.setName(u"Test"_s);
     ch.setPosition(position_t::STANDING);
     Player player;
     ch.player = &player;
@@ -1095,7 +1095,7 @@ private slots:
     QCOMPARE(ch.in_room, 21905);
     ch.setPosition(position_t::STANDING);
 
-    rc = do_look(&ch, QStringLiteral(""));
+    rc = do_look(&ch, u""_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "The Platinum Club blackjack tables\r\n"
                            "   People scurry about the blackjack area, searching for perhaps a lively\r\n"
@@ -1347,7 +1347,7 @@ private slots:
     Character p1(&dc), g1(&dc), g2(&dc), g3(&dc), g4(&dc);
 
     auto count = {};
-    QStringList names = {QStringLiteral("agis"), QStringLiteral("thalanil"), QStringLiteral("elluin"), QStringLiteral("dakath"), QStringLiteral("reptar")};
+    QStringList names = {u"agis"_s, u"thalanil"_s, u"elluin"_s, u"dakath"_s, u"reptar"_s};
     for (CharacterPtr ch : {&p1, &g1, &g2, &g3, &g4})
     {
       ch->name(names.value(count++));
@@ -1356,7 +1356,7 @@ private slots:
       ch->player = new Player;
       ch->setType(Character::Type::Player);
       ch->setPosition(position_t::STANDING);
-      ch->title = QStringLiteral("the great");
+      ch->title = u"the great"_s;
       ch->alignment = 123;
       // divide by zero error if max values are 0
       ch->ki = 1230;
@@ -1397,11 +1397,11 @@ private slots:
       p1.desc->output = {};
       QCOMPARE(do_follow(ch, QStringLiteral(qUtf8Printable(names[0]))), ReturnValue::eSUCCESS);
       QCOMPARE(ch->desc->output, "You now follow agis.\r\n");
-      QCOMPARE(p1.desc->output, QStringLiteral("%1 starts following you.\r\n").arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
+      QCOMPARE(p1.desc->output, u"%1 starts following you.\r\n"_s).arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
       ch->desc->output = {};
       p1.desc->output = {};
       QCOMPARE(do_group(&p1, QStringLiteral(qUtf8Printable(ch->name()))), ReturnValue::eSUCCESS);
-      QCOMPARE(p1.desc->output, QStringLiteral("%1 is now a group member.\r\n").arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
+      QCOMPARE(p1.desc->output, u"%1 is now a group member.\r\n"_s).arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
       p1.desc->output = {};
     }
 
@@ -1510,7 +1510,7 @@ private slots:
 
     p1.desc->output = {};
     p1.setLevel(OVERSEER);
-    QCOMPARE(do_cast(&p1, QStringLiteral("'create golem' iron")), ReturnValue::eSUCCESS);
+    QCOMPARE(do_cast(&p1, u"'create golem' iron"_s), ReturnValue::eSUCCESS);
     p1.setLevel(10);
     QCOMPARE(p1.desc->output, "Ok.\r\nAdding in the final ingredient, your golem increases in strength!\r\nAn enchanted iron golem starts following you.\r\nThere is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n");
     p1.desc->output = {};
@@ -1602,32 +1602,32 @@ private slots:
     dc.boot_db();
     dc.random_ = QRandomGenerator(0);
 
-    QCOMPARE(get_vnum(QStringLiteral("v0")), 0);
-    QCOMPARE(get_vnum(QStringLiteral("0")), 0);
-    QCOMPARE(get_vnum(QStringLiteral("1")), 1);
-    QCOMPARE(get_vnum(QStringLiteral("v1")), 1);
+    QCOMPARE(get_vnum(u"v0"_s), 0);
+    QCOMPARE(get_vnum(u"0"_s), 0);
+    QCOMPARE(get_vnum(u"1"_s), 1);
+    QCOMPARE(get_vnum(u"v1"_s), 1);
 
-    QCOMPARE(get_objindex_vnum(QStringLiteral("v0")), nullptr);
-    QCOMPARE_NE(get_objindex_vnum(QStringLiteral("v1")), nullptr);
-    QCOMPARE_NE(get_objindex_vnum(QStringLiteral("v99")), nullptr);
+    QCOMPARE(get_objindex_vnum(u"v0"_s), nullptr);
+    QCOMPARE_NE(get_objindex_vnum(u"v1"_s), nullptr);
+    QCOMPARE_NE(get_objindex_vnum(u"v99"_s), nullptr);
 
-    QCOMPARE(get_obj_vnum(QStringLiteral("v0")), nullptr);
-    QCOMPARE(get_obj_vnum(QStringLiteral("v1")), nullptr);
-    QCOMPARE_NE(get_obj_vnum(QStringLiteral("v99")), nullptr);
+    QCOMPARE(get_obj_vnum(u"v0"_s), nullptr);
+    QCOMPARE(get_obj_vnum(u"v1"_s), nullptr);
+    QCOMPARE_NE(get_obj_vnum(u"v99"_s), nullptr);
 
-    QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(QStringLiteral("v99"))->item_number].vnum(), 99);
-    QCOMPARE(get_obj_vnum(QStringLiteral("v99"))->carried_by, nullptr);
-    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v1"))->item_number].vnum(), 1);
-    QCOMPARE(get_objindex_vnum(QStringLiteral("v1"))->carried_by, nullptr);
-    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->item_number].vnum(), 99);
-    QCOMPARE(get_objindex_vnum(QStringLiteral("v99"))->carried_by, nullptr);
+    QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(get_obj_vnum(u"v99"_s)->carried_by, nullptr);
+    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(u"v1"_s)->item_number].vnum(), 1);
+    QCOMPARE(get_objindex_vnum(u"v1"_s)->carried_by, nullptr);
+    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(get_objindex_vnum(u"v99"_s)->carried_by, nullptr);
   }
 
   void test_qflags()
   {
     QCOMPARE(QFlagsToStrings<ObjectPositions>().size(), 19);
-    QCOMPARE(QFlagsToStrings<ObjectPositions>().first(), QStringLiteral("TAKE"));
-    QCOMPARE(QFlagsToStrings<ObjectPositions>().last(), QStringLiteral("EAR"));
+    QCOMPARE(QFlagsToStrings<ObjectPositions>().first(), u"TAKE"_s);
+    QCOMPARE(QFlagsToStrings<ObjectPositions>().last(), u"EAR"_s);
     Object obj;
     obj.obj_flags.wear_flags = {TAKE, SHIELD};
     qDebug() << obj.obj_flags.wear_flags;
@@ -1636,7 +1636,7 @@ private slots:
     QVERIFY(obj.obj_flags.wear_flags.testFlag(SHIELD));
     QVERIFY(CAN_WEAR(&obj, SHIELD));
     QVERIFY(!obj.obj_flags.wear_flags.testFlag(EAR));
-    QCOMPARE(QFlagsToStrings(obj.obj_flags.wear_flags), QStringLiteral("TAKE SHIELD"));
+    QCOMPARE(QFlagsToStrings(obj.obj_flags.wear_flags), u"TAKE SHIELD"_s);
   }
 };
 

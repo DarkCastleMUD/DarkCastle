@@ -303,12 +303,12 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
       if (spell_info[temp->obj_flags.value[i]].spell_pointer())
       {
         lvl = (qint32)(1.5 * temp->obj_flags.value[0]);
-        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer())((quint8)temp->obj_flags.value[0], ch, QStringLiteral(""), SPELL_TYPE_POTION, ch, 0, lvl));
+        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer())((quint8)temp->obj_flags.value[0], ch, u""_s, SPELL_TYPE_POTION, ch, 0, lvl));
       }
       else if (spell_info[temp->obj_flags.value[i]].spell_pointer2())
       {
         lvl = (qint32)(1.5 * temp->obj_flags.value[0]);
-        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer2())((quint8)temp->obj_flags.value[0], ch, QStringLiteral(""), SPELL_TYPE_POTION, ch, 0, lvl, 0));
+        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer2())((quint8)temp->obj_flags.value[0], ch, u""_s, SPELL_TYPE_POTION, ch, 0, lvl, 0));
       }
     }
     if (isSet(retval, ReturnValue::eCH_DIED))
@@ -419,7 +419,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if (spell_info[scroll->obj_flags.value[i]].spell_pointer())
         {
-          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer())((quint8)scroll->obj_flags.value[0], ch, QStringLiteral(""), SPELL_TYPE_SCROLL, victim, obj, lvl));
+          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer())((quint8)scroll->obj_flags.value[0], ch, u""_s, SPELL_TYPE_SCROLL, victim, obj, lvl));
           if (SOMEONE_DIED(retval))
           {
             break;
@@ -431,7 +431,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         else if (spell_info[scroll->obj_flags.value[i]].spell_pointer2())
         {
-          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer2())((quint8)scroll->obj_flags.value[0], ch, QStringLiteral(""), SPELL_TYPE_SCROLL, victim, obj, lvl, 0));
+          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer2())((quint8)scroll->obj_flags.value[0], ch, u""_s, SPELL_TYPE_SCROLL, victim, obj, lvl, 0));
           if (SOMEONE_DIED(retval))
           {
             break;
@@ -655,7 +655,7 @@ command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = one_argument(argument, arg);
 
-  if (!*arg)
+  if (arg.isEmpty())
   {
     ch->sendln("Set what?");
     return ReturnValue::eFAILURE;
@@ -901,8 +901,8 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   {
     if (temp->obj_flags.value[1] > 0) /* Not empty */
     {
-      act_to_room(QStringLiteral("$n drinks %1 from $p.").arg(drinks[temp->obj_flags.value[2]]), this, temp, 0, INVIS_NULL);
-      sendln(QStringLiteral("You drink the %1.").arg(drinks[temp->obj_flags.value[2]]));
+      act_to_room(u"$n drinks %1 from $p."_s.arg(drinks[temp->obj_flags.value[2]]), this, temp, 0, INVIS_NULL);
+      sendln(u"You drink the %1."_s).arg(drinks[temp->obj_flags.value[2]]));
 
       if (isImmortalPlayer())
         return ReturnValue::eSUCCESS;
@@ -1063,7 +1063,7 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument_interpreter(argument, arg1, arg2);
 
-  if (!*arg1) /* No arguments */
+  if (arg.isEmpty() 1) /* No arguments */
   {
     act_to_character("What do you want to pour from?", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -1087,7 +1087,7 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!*arg2)
+  if (arg.isEmpty() 2)
   {
     act_to_character("Where do you want it? Out or in what?", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -1537,9 +1537,9 @@ qint32 will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, qint32 add)
   if (problem)
   {
     if (add)
-      ch->send(QStringLiteral("Wearing that would cause your %s to no longer fit!\r\n").arg(qPrintable(ch->equipment[j]->short_description())));
+      ch->send(u"Wearing that would cause your %s to no longer fit!\r\n"_s.arg(qPrintable(ch->equipment[j]->short_description())));
     else
-      ch->send(QStringLiteral("Removing that would cause your %s to no longer fit!\r\n").arg(qPrintable(ch->equipment[j]->short_description())));
+      ch->send(u"Removing that would cause your %s to no longer fit!\r\n"_s.arg(qPrintable(ch->equipment[j]->short_description())));
 
     return true;
   }
@@ -2111,7 +2111,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   break;
   default:
   {
-    DC::getInstance()->logentry(QStringLiteral("Unknown type called in wear."), ANGEL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unknown type called in wear."_s, ANGEL, DC::LogChannel::LOG_BUG);
   }
   break;
   }
@@ -2702,12 +2702,12 @@ bool Object::isQuest(void)
 
 bool Object::isTest(void)
 {
-  return isexact(QStringLiteral("test"), name());
+  return isexact(u"test"_s, name());
 }
 
 bool Object::isGodload(void)
 {
-  return isexact(QStringLiteral("gl"), name()) || isexact(QStringLiteral("godload"), name()) || isSet(obj_flags.extra_flags, ITEM_SPECIAL);
+  return isexact(u"gl"_s, name()) || isexact(u"godload"_s, name()) || isSet(obj_flags.extra_flags, ITEM_SPECIAL);
 }
 
 bool Object::hasPortalFlagNoLeave(void)
