@@ -229,7 +229,7 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 i /*,j*/;
   bool equipped;
   qint32 retval = ReturnValue::eSUCCESS;
-  qint32 is_mob = ch->isNonPlayer();
+  bool is_mob = ch->isNonPlayer();
   qint32 lvl;
 
   equipped = false;
@@ -331,7 +331,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 i, bits;
   bool equipped;
   qint32 retval = ReturnValue::eSUCCESS;
-  qint32 is_mob = ch->isNonPlayer();
+  bool is_mob = ch->isNonPlayer();
   qint32 lvl;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))

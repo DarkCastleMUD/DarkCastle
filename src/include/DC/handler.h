@@ -26,7 +26,7 @@ constexpr auto SUPPRESS_ALL = (SUPPRESS_CONSEQUENCES | SUPPRESS_MESSAGES);
 /* utility */
 
 QString fname(QString namelist);
-qint32 isprefix(const QString str, const QString namel);
+bool isprefix(const QString str, const QString namel);
 // END TIMERS
 /* ******** objects *********** */
 

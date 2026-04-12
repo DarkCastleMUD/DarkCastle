@@ -21,6 +21,7 @@
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
 #include <QThread>
+#include <qtypes.h>
 
 #include "DC/DC_global.h"
 using namespace Qt::StringLiterals;
@@ -289,12 +290,12 @@ typedef QMap<skill_t, char_skill_data> skill_list_t;
 class CharacterClassSkill
 {
 public:
-  QString skillname_;      // name of skill
-  qint16 skillnum{};       // ID # of skill
+  QString skillname_;       // name of skill
+  qint16 skillnum{};        // ID # of skill
   level_t levelavailable{}; // what level class can get it
-  qint16 maximum{};        // maximum value PC can train it to (1-100)
-  quint8 group{};          // which class tree group it is assigned
-  qint16 attrs{};          // What attributes the skill is based on
+  qint16 maximum{};         // maximum value PC can train it to (1-100)
+  quint8 group{};           // which class tree group it is assigned
+  qint16 attrs{};           // What attributes the skill is based on
 };
 class MinimumEntity
 {
@@ -607,8 +608,8 @@ public:
   };
 
   auto Low(void) const { return low_; }
-  auto High(void) const  { return high_; }
-  auto Number(void) const  { return number_; }
+  auto High(void) const { return high_; }
+  auto Number(void) const { return number_; }
   auto CurrentNumber(void) const { return current_number_; }
   auto IncrementCurrentNumber(void) -> void { current_number_++; }
   auto HPLimit(void) const -> quint64 { return hp_limit_; }
@@ -675,6 +676,15 @@ public:
   ObjectPtr obj;
 };
 
+template <typename T>
+T operator>>(T &stream, AuctionStates &at)
+{
+  quint64 buffer;
+  stream >> buffer;
+  at = AuctionStates(buffer);
+  return stream;
+}
+
 class AuctionHouse
 {
 public:
@@ -725,7 +735,7 @@ private:
   bool IsLevel(quint32 to, quint32 from, qint32 vnum);
   QMap<qint32, qint32> auction_rooms;
   quint32 cur_index;
-  QString file_name;
+  QString filename_;
   QMap<quint32, AuctionTicket> Items_For_Sale;
 };
 
@@ -920,7 +930,7 @@ public:
   command_gen2_t command_pointer2_;
   command_gen3_t command_pointer3_;
   position_t minimum_position_; /* Position commander must be in    */
-  level_t minimum_level_;        /* Minimum level needed             */
+  level_t minimum_level_;       /* Minimum level needed             */
   cmd_t command_number_;        /* Passed to function as argument   */
   bool allow_charmie_;
   quint8 toggle_hide_;
@@ -3051,7 +3061,6 @@ namespace DCNS
 
 }
 using namespace DCNS;
-qint32 dc_sprintf(QString &str, const QString format, ...);
 
 class obj_flag_data
 {
@@ -3064,7 +3073,7 @@ public:
   qint16 weight = {};       /* Weight what else                 */
   qint32 cost = {};         /* Value when sold (gp.)            */
   quint32 more_flags = {};  /* A second bitvector (extra_flags2)*/
-  level_t eq_level = {};     /* Min level to use it for eq       */
+  level_t eq_level = {};    /* Min level to use it for eq       */
   qint16 timer = {};        /* Timer for object                 */
   CharacterPtr origin = {}; /* Creator of object, previously was stored at value[3] */
   bool Value(qsizetype i, object_value_t v)
@@ -4603,7 +4612,7 @@ qint32 ki_limit(CharacterPtr ch);
 qint32 hit_limit(CharacterPtr ch);
 QString get_skill_name(qint32 skillnum);
 void gain_exp_regardless(CharacterPtr ch, qint32 gain);
-void advance_level(CharacterPtr ch, qint32 is_conversion);
+void advance_level(CharacterPtr ch, bool is_conversion);
 qint32 close_socket(class Connection *d);
 void page_string(class Connection *d, const QString str, qint32 keep_internal);
 void gain_exp(CharacterPtr ch, qint64 gain);
@@ -4648,7 +4657,7 @@ void send_to_char_nosp(QString messg, CharacterPtr ch);
 void util_archive(const QString, CharacterPtr);
 void util_unarchive(QString, CharacterPtr);
 bool is_busy(CharacterPtr ch);
-qint32 is_ignoring(const CharacterPtr ch, const CharacterPtr i);
+bool is_ignoring(const CharacterPtr ch, const CharacterPtr i);
 void colorCharSend(QString s, CharacterPtr ch);
 void send_to_char_regardless(QString messg, CharacterPtr ch);
 void send_to_char_regardless(QString messg, CharacterPtr ch);
@@ -5212,18 +5221,18 @@ qint32 third_attack(CharacterPtr ch);
 qint32 fourth_attack(CharacterPtr ch);
 qint32 second_wield(CharacterPtr ch);
 void set_cantquit(CharacterPtr, CharacterPtr, bool = false);
-qint32 is_pkill(CharacterPtr ch, CharacterPtr vict);
+bool is_pkill(CharacterPtr ch, CharacterPtr vict);
 void raw_kill(CharacterPtr ch, CharacterPtr victim);
 void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_attacker = false);
 void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type);
 void do_dead(CharacterPtr ch, CharacterPtr victim);
 void eq_destroyed(CharacterPtr ch, ObjectPtr obj, qint32 pos);
-qint32 is_stunned(CharacterPtr ch);
+bool is_stunned(CharacterPtr ch);
 void update_flags(CharacterPtr vict);
 void update_stuns(CharacterPtr ch);
 void do_dam_msgs(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 attacktype, qint32 weapon, qint32 filter = 0);
 qint32 act_poisonous(CharacterPtr ch);
-qint32 isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type, qint32 &reduce);
+bool isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type, qint32 &reduce);
 void inform_victim(CharacterPtr ch, CharacterPtr victim, qint32 dam);
 CharacterPtr loop_followers(follow_type **f);
 CharacterPtr get_highest_level_killer(CharacterPtr leader, CharacterPtr killer);
@@ -5460,10 +5469,10 @@ public:
 
   Token(QString rhs);
   ~Token();
-  qint32 IsAnsi() { return (type & ANSI); }
-  qint32 IsVt100() { return (type & VT100); }
-  qint32 IsCode() { return (type & CODE); }
-  qint32 IsText() { return (type & TEXT); }
+  bool isAnsi() { return (type & ANSI); }
+  bool isVt100() { return (type & VT100); }
+  bool isCode() { return (type & CODE); }
+  bool isText() { return (type & TEXT); }
   QString GetBuf() { return (buf); }
   void SetBuf(QString);
   Token *Next() { return next; }
@@ -5512,7 +5521,7 @@ private:
 
 /* Function headers */
 void display_punishes(CharacterPtr ch, Character vict);
-qint32 is_in_range(CharacterPtr ch, qint32 virt);
+bool is_in_range(CharacterPtr ch, qint32 virt);
 void isr_set(CharacterPtr ch);
 command_return_t mob_stat(CharacterPtr ch, CharacterPtr k);
 void obj_stat(CharacterPtr ch, ObjectPtr j);
@@ -6340,7 +6349,7 @@ QString constindex(const qsizetype index, const QStringList names);
 // bool is_number(const QString str);
 bool is_number(QString str);
 
-qint32 isprefix(QString str, QString namel);
+bool isprefix(QString str, QString namel);
 
 bool isexact(QString arg, joining_t &namelist);
 bool isexact(QString arg, QStringList namelist);

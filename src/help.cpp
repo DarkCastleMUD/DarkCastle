@@ -15,7 +15,7 @@
 // Externs
 extern help_index_element_new *new_help_table;
 qint32 get_line(FILE *fl, QString buf);
-qint32 is_abbrev(const QString arg1, const QString arg2);
+bool is_abbrev(const QString arg1, const QString arg2);
 void help_string_to_file(FILE *f, QString string);
 
 // locals

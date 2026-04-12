@@ -1738,8 +1738,8 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       for (qint32 doorj = {}; doorj <= 5; doorj++)
       {
 
-        qint32 is_closed;
-        qint32 is_hidden;
+        bool is_closed;
+        bool is_hidden;
 
         // cheesy way of making it list west before east in 'look'
         if (doorj == 1)

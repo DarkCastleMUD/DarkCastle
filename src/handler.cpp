@@ -17,6 +17,7 @@
 #include "DC/DC.h"
 
 #include <qlogging.h>
+#include <qnamespace.h>
 #include <sys/time.h>
 
 #include <cstdlib>
@@ -31,8 +32,6 @@
 
 #include <QString>
 #include <QStringList>
-
-#include "DC/spells.h"
 
 // LOWER
 #include "DC/db.h"
@@ -94,105 +93,11 @@ QString fname(QString namelist)
   return namelist.split(' ').value(0);
 }
 
-bool isprefix(QString str, QStringList namelist)
+bool isexact(QString name, QStringList namelist)
 {
-  for (const auto &name : namelist)
-  {
-    if (arg.compare(name, Qt::CaseInsensitive) == 0)
-    {
-      return true;
-    }
-  }
-
+  if (!name.isEmpty() && namelist.contains(name, Qt::CaseInsensitive))
+    return true;
   return false;
-}
-}
-
-qint32 isexact(QString arg, QStringList namelist)
-{
-  for (const auto &name : namelist)
-  {
-    if (arg.compare(name, Qt::CaseInsensitive) == 0)
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-qint32 isexact(const QString arg, QStringList namelist)
-{
-  for (joining_t::const_iterator i = namelist.begin(); i != namelist.end(); ++i)
-  {
-    if (conn->value() && QString(arg).compare(conn->key(), Qt::CaseInsensitive) == 0)
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/************************************************************************
-| isname
-| Preconditions:  str != 0, namelist != 0
-| Postconditions: None
-| Side Effects: None
-| Returns: One if it's in the namelist, zero otherwise
-*/
-qint32 isexact(const QString str, const QString namelist)
-{
-#if 0
-	QString haystack(namelist);
-	if (haystack.find(str) != QString::npos) {
-		return 1;
-	}
-
-	return 0;
-
-#endif
-  const QString curname, *curstr;
-
-  if (!str || !namelist)
-  {
-    return {};
-  }
-
-  if (strlen(str) == 0)
-    return 0;
-  if (strlen(namelist) == 0)
-    return 0;
-
-  curname = namelist;
-
-  for (;;)
-  {
-    for (curstr = str;; curstr++, curname++)
-    {
-      if (!*curstr && !isalpha(*curname))
-        return (1);
-
-      if (!*curname)
-        return {};
-
-      if (!*curstr || *curname == ' ')
-        break;
-
-      if ((*curstr).toLower() != curname.toLower())
-        break;
-    }
-
-    /* skip to next name */
-
-    for (; isalpha(*curname); curname++)
-      ;
-    if (!*curname)
-      return {};
-    curname++; /* first character of new_new name */
-  }
-
-  return 0;
 }
 
 qint32 get_max_stat(CharacterPtr ch, attribute_t stat)
@@ -364,7 +269,7 @@ bool still_affected_by_poison(CharacterPtr ch)
   return 0;
 }
 
-const set_data set_list[] = {
+const QList<set_data> set_list = {
     {"Ascetic's Focus",
      19,
      {2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 21718, 22302, 22314, 22600, 22601, 22602, 24815, 24815, 24816, 26237},
@@ -464,12 +369,7 @@ const set_data set_list[] = {
      16,
      {314, 314, 316, 317, 318, 319, 320, 321, 322, 328, 328, 324, 325, 325, 326, 327, -1, -1, -1},
      "You feel the need to sing, you are a STAR!\r\n",
-     "Your desire to sing like a star has faded.\r\n"},
-    {"\n",
-     0,
-     {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "\n",
-     "\n"}};
+     "Your desire to sing like a star has faded.\r\n"}};
 
 void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
 {
@@ -479,24 +379,24 @@ void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
   qint32 z = 0, y;
   // Quadruple nested for. Annoying, but it's gotta be done.
 
-  for (; *(set_list[z].SetName) != '\n'; z++)
-    for (y = {}; y < 19 && set_list[z].vnum[y] != -1; y++)
-      if (set_list[z].vnum[y] == obj_vnum)
+  for (auto &sl : set_list)
+    for (y = {}; y < 19 && sl.vnum[y] != -1; y++)
+      if (sl.vnum[y] == obj_vnum)
       { // Aye, 'tis part of a set.
         if ((obj_vnum == 4818 || obj_vnum == 4819) && pos == WEAR_HANDS)
           continue;
-        for (y = {}; y < 19 && set_list[z].vnum[y] != -1; y++)
+        for (y = {}; y < 19 && sl.vnum[y] != -1; y++)
         {
-          if (set_list[z].vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD)
+          if (sl.vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD)
             continue;
-          if (set_list[z].vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK)
+          if (sl.vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK)
             continue;
           bool found = false, doublea = false;
           for (i = {}; i < MAX_WEAR; i++)
           {
-            if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].vnum() == set_list[z].vnum[y])
+            if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
             {
-              if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
+              if (y > 0 && !doublea && sl.vnum[y] == sl.vnum[y - 1])
               {
                 doublea = true;
                 continue;
@@ -519,8 +419,8 @@ void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
         // By gawd, they just completed the set.
         if (ch->affected_by_spell(BASE_SETS + z))
           return;
-        if (!flag && set_list[z].Set_Wear_Message != nullptr)
-          send_to_char(set_list[z].Set_Wear_Message, ch);
+        if (!flag && sl.Set_Wear_Message != nullptr)
+          send_to_char(sl.Set_Wear_Message, ch);
         switch (z)
         {
         case SET_SAIYAN: // (aka Ascetic's Focus)
@@ -750,22 +650,22 @@ void remove_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag)
   qint32 z = 0, y;
   // Quadruply nested for. Annoying, but it's gotta be done.
   // I'm sure "quadruply" is a word.
-  for (; *(set_list[z].SetName) != '\n'; z++)
-    for (y = {}; y < 19 && set_list[z].vnum[y] != -1; y++)
-      if (set_list[z].vnum[y] == obj_vnum)
+  for (auto &sl : set_list)
+    for (y = {}; y < 19 && sl.vnum[y] != -1; y++)
+      if (sl.vnum[y] == obj_vnum)
       { // Aye, 'tis part of a set.
-        for (y = {}; y < 19 && set_list[z].vnum[y] != -1; y++)
+        for (y = {}; y < 19 && sl.vnum[y] != -1; y++)
         {
-          if (set_list[z].vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD)
+          if (sl.vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD)
             continue;
-          if (set_list[z].vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK)
+          if (sl.vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK)
             continue;
           bool found = false, doublea = false;
           for (i = {}; i < MAX_WEAR; i++)
           {
-            if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].vnum() == set_list[z].vnum[y])
+            if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
             {
-              if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
+              if (y > 0 && !doublea && sl.vnum[y] == sl.vnum[y - 1])
               {
                 doublea = true;
                 continue;
@@ -779,8 +679,8 @@ void remove_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag)
         }
         // Remove it
         affect_from_char(ch, BASE_SETS + z);
-        if (!flag && set_list[z].Set_Remove_Message != nullptr)
-          send_to_char(set_list[z].Set_Remove_Message, ch);
+        if (!flag && sl.Set_Remove_Message != nullptr)
+          send_to_char(sl.Set_Remove_Message, ch);
         break;
       }
 }
@@ -2151,10 +2051,9 @@ affected_type *affected_by_random(CharacterPtr ch)
 
 void affect_join(CharacterPtr ch, affected_type *af, bool avg_dur, bool avg_mod)
 {
-  affected_type *hjp;
   bool found = false;
 
-  for (hjp = ch->affected; !found && hjp; hjp = hjp->next)
+  for (auto &hjp : ch->affected)
   {
     if (hjp->type == af->type)
     {
@@ -2835,7 +2734,7 @@ CharacterPtr get_char(QString name)
 
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
-                        {
+                             {
 		if (number == 0 && i->isNonPlayer()) return false;
 		if (number == 1 || number == 0)
 		{
@@ -2876,7 +2775,7 @@ CharacterPtr get_mob(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
-                        {
+                             {
 		if(!i->isNonPlayer()) {
 			return false;
 		}
@@ -2898,7 +2797,7 @@ CharacterPtr get_char_num(qint32 nr)
 {
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&nr](CharacterPtr const &i)
-                        {
+                             {
  		if (i->isNonPlayer() && i->mobdata->nr == nr) {
  			return true;
  		}
@@ -4099,7 +3998,7 @@ CharacterPtr get_mob_vis(CharacterPtr ch, QString name)
 
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
-                        {
+                             {
 		if (number == 1)
 		{
 			if (isexact(tmp, i->name())&& i->isNonPlayer() && CAN_SEE(ch,i))
@@ -4185,7 +4084,7 @@ CharacterPtr get_random_mob_vnum(qint32 vnum)
   const auto &character_list = DC::getInstance()->character_list;
 
   auto result = std::find_if(character_list.begin(), character_list.end(), [&total, &which, &num](CharacterPtr const &i)
-                        {
+                             {
 		if(i->isNonPlayer() && i->mobdata->nr == num)
 		{
 			if (total == which)
@@ -4210,7 +4109,7 @@ CharacterPtr get_mob_vnum(qint32 vnum)
   const auto &character_list = DC::getInstance()->character_list;
 
   auto result = std::find_if(character_list.begin(), character_list.end(), [&number](CharacterPtr const &i)
-                        {
+                             {
 		if(i->isNonPlayer() && i->mobdata->nr == number) {
 			return true;
 		}
@@ -4244,7 +4143,7 @@ CharacterPtr get_char_vis(CharacterPtr ch, QString name)
 
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](CharacterPtr const &i)
-                        {
+                             {
 		if (i->in_room == DC::NOWHERE)
 		{
 			return false;
@@ -4293,7 +4192,7 @@ CharacterPtr get_pc(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
-                        {
+                             {
 		if(i->isPlayer() && isexact(name, qPrintable(i->name())))
 		return true;
 
@@ -4420,7 +4319,7 @@ CharacterPtr get_pc_vis(CharacterPtr ch, const QString name)
 
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](CharacterPtr const &i)
-                        {
+                             {
 		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
 			if (isexact(name, qPrintable(i->name())))
@@ -4450,7 +4349,7 @@ CharacterPtr get_pc_vis_exact(CharacterPtr ch, QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&ch, &name](CharacterPtr const &i)
-                        {
+                             {
 		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
 			if (name ==i->name())

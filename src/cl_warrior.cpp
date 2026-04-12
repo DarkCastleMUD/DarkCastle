@@ -270,7 +270,7 @@ command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 retval = {};
   CharacterPtr chTemp, loop_ch;
 
-  qint32 is_stunned(CharacterPtr ch);
+  bool is_stunned(CharacterPtr ch);
 
   if (is_stunned(ch))
     return ReturnValue::eFAILURE;
@@ -686,7 +686,7 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr obj;
   qint32 retval = {};
 
-  qint32 is_fighting_mob(CharacterPtr ch);
+  bool is_fighting_mob(CharacterPtr ch);
 
   if (!ch->canPerform(SKILL_DISARM))
   {

@@ -856,7 +856,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 attempt_move(CharacterPtr ch, cmd_t cmd, qint32 is_retreat)
+qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
 {
   QString tmp;
   qint32 return_val;

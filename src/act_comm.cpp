@@ -21,6 +21,7 @@
 #include "DC/terminal.h"
 #include "DC/interp.h"
 #include "DC/db.h"
+#include "DC/utility.h"
 
 extern bool MOBtrigger;
 
@@ -73,9 +74,9 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
       }
 
       dc_snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
-               ch->exp,
-               (qint64)(exp_table[(qint32)ch->getLevel() + 1] - (qint64)ch->exp),
-               levels_to_gain);
+                  ch->exp,
+                  (qint64)(exp_table[(qint32)ch->getLevel() + 1] - (qint64)ch->exp),
+                  levels_to_gain);
 
       dc_sprintf(buf, "$n reports '%s'", report);
       act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -87,17 +88,17 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isNonPlayer() || IS_ANONYMOUS(ch))
     dc_snprintf(report, 200, "%d%% hps, %d%% mana, %llu%% movement, and %d%% ki.",
-             MAX(1, ch->getHP() * 100) / MAX(1, GET_MAX_HIT(ch)),
-             MAX(1, GET_MANA(ch) * 100) / MAX(1, GET_MAX_MANA(ch)),
-             MAX<move_t>(1, GET_MOVE(ch) * 100) / MAX<move_t>(1, GET_MAX_MOVE(ch)),
-             MAX(1, GET_KI(ch) * 100) / MAX(1, GET_MAX_KI(ch)));
+                MAX(1, ch->getHP() * 100) / MAX(1, GET_MAX_HIT(ch)),
+                MAX(1, GET_MANA(ch) * 100) / MAX(1, GET_MAX_MANA(ch)),
+                MAX<move_t>(1, GET_MOVE(ch) * 100) / MAX<move_t>(1, GET_MAX_MOVE(ch)),
+                MAX(1, GET_KI(ch) * 100) / MAX(1, GET_MAX_KI(ch)));
   else
   {
     dc_snprintf(report, 200, "%d/%d hps, %d/%d mana, %llu/%llu movement, and %d/%d ki.",
-             ch->getHP(), GET_MAX_HIT(ch),
-             GET_MANA(ch), GET_MAX_MANA(ch),
-             GET_MOVE(ch), GET_MAX_MOVE(ch),
-             GET_KI(ch), GET_MAX_KI(ch));
+                ch->getHP(), GET_MAX_HIT(ch),
+                GET_MANA(ch), GET_MAX_MANA(ch),
+                GET_MOVE(ch), GET_MAX_MOVE(ch),
+                GET_KI(ch), GET_MAX_KI(ch));
   }
 
   dc_sprintf(buf, "$n reports '%s'", report);
@@ -416,7 +417,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 is_ignoring(const CharacterPtr const ch, const CharacterPtr const victim)
+bool is_ignoring(const CharacterPtr const ch, const CharacterPtr const victim)
 {
   if (ch->isNonPlayer() || (victim->getLevel() >= IMMORTAL && victim->isPlayer()) || ch->player->ignoring.empty())
   {

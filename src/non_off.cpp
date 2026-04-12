@@ -1617,7 +1617,7 @@ CVoteData::CVoteData()
   FILE *the_file = {};
   ;
   qint32 num = {};
-  qint32 is_active = {};
+  bool is_active = {};
   qint32 i = {};
   SVoteData tmp_vote_data;
   active = false;

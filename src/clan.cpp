@@ -1437,7 +1437,7 @@ void do_clan_member_list(CharacterPtr ch)
   }
 }
 
-qint32 is_clan_leader(CharacterPtr ch)
+bool is_clan_leader(CharacterPtr ch)
 {
   Clan *pclan = {};
 

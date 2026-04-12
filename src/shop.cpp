@@ -49,7 +49,7 @@ QMap<QString, reroll_t> reroll_sessions = {};
 /*
  * See if a shop keeper wants to trade.
  */
-qint32 is_ok(CharacterPtr keeper, CharacterPtr ch, qint32 shop_nr)
+bool is_ok(CharacterPtr keeper, CharacterPtr ch, qint32 shop_nr)
 {
   QString buf;
 

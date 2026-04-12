@@ -77,11 +77,11 @@ bool handle_get_race(Connection *d, QString arg);
 void show_question_race(Connection *d);
 void show_question_class(Connection *d);
 bool handle_get_class(Connection *d, QString arg);
-qint32 is_clss_race_compat(CharacterPtr ch, qint32 clss);
+bool is_clss_race_compat(CharacterPtr ch, qint32 clss);
 void show_question_stats(Connection *d);
 bool handle_get_stats(Connection *d, QString arg);
 
-qint32 is_race_eligible(CharacterPtr ch, qint32 race)
+bool is_race_eligible(CharacterPtr ch, qint32 race)
 {
   if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
     return false;
@@ -102,7 +102,7 @@ qint32 is_race_eligible(CharacterPtr ch, qint32 race)
   return true;
 }
 
-qint32 is_clss_race_compat(const CharacterPtr ch, qint32 clss, qint32 race)
+bool is_clss_race_compat(const CharacterPtr ch, qint32 clss, qint32 race)
 {
   bool compat = false;
 
@@ -157,7 +157,7 @@ qint32 is_clss_race_compat(const CharacterPtr ch, qint32 clss, qint32 race)
   return (compat);
 }
 
-qint32 is_clss_eligible(CharacterPtr ch, qint32 clss)
+bool is_clss_eligible(CharacterPtr ch, qint32 clss)
 {
   qint32 x = {};
 

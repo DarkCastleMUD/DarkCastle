@@ -422,7 +422,7 @@ void redo_ki(CharacterPtr ch)
 }
 
 /* Gain maximum in various */
-void advance_level(CharacterPtr ch, qint32 is_conversion)
+void advance_level(CharacterPtr ch, bool is_conversion)
 {
   qint32 add_hp = {};
   qint32 add_mana = 1;

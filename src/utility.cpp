@@ -1402,7 +1402,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   clan_room_data *room;
   qint32 found = {};
   qint32 retval = {};
-  qint32 is_mob = {};
+  bool is_mob = {};
 
   act("$n prays to $s God for transportation!", this, 0, 0, TO_ROOM, INVIS_NULL);
 

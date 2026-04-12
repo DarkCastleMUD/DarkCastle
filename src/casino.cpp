@@ -202,15 +202,15 @@ QChar suit(qint32 card)
     return 's';
 }
 
-const QString suitcol(qint32 card)
+QString suitcol(qint32 card)
 {
   if (card < 14)
-    return BOLD RED;
+    return u"$B$4"_s;
   else if (card < 27)
-    return BOLD RED;
+    return u"$B$4"_s;
   else if (card < 40)
-    return BOLD BLACK;
-  return BOLD BLACK;
+    return u"$B$0"_s;
+  return u"$B$0"_s;
 }
 
 qint32 val(qint32 card)
@@ -617,9 +617,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
   case 2:
     send_to_table("It is now the dealer's turn.\r\n", tbl);
     tbl->state++;
-    dc_sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
-               suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
-               NTEXT);
+    dc_sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",               suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),               NTEXT);
     send_to_table(buf, tbl);
     player_data *plr, *pnext;
     for (plr = tbl->plr; plr; plr = pnext)

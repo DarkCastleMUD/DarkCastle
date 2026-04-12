@@ -11,19 +11,20 @@ External: (explained more below)
 
 */
 #include "DC/DC.h"
-#include "DC/DC.h"
-#include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/interp.h"
 #include "DC/inventory.h"
 
 #include <QString>
 
+#include <qdebug.h>
+#include <qiodevicebase.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cassert>
 #include <cerrno>
+#include "DC/utility.h"
 
 CharacterPtr find_mob_in_room(CharacterPtr ch, qint32 iFriendId);
 
@@ -655,73 +656,62 @@ LOAD
 */
 void AuctionHouse::Load()
 {
-
-  FILE *the_file;
-  quint32 num_rooms, num_items, ticket, i, state;
   qint32 room;
   QString nl;
   QString buf;
   AuctionTicket InTicket;
-  the_file = fopen(qPrintable(file_name), "r");
 
-  if (!the_file)
+  QFile ah_file(filename_);
+  if (!ah_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
   {
     QString buf;
-    dc_sprintf(buf, "Unable to open the save file \"%s\" for Auction files!!", qPrintable(file_name));
+    dc_sprintf(buf, "Unable to open the save file \"%s\" for Auction files!!", qPrintable(filename_));
     DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_MISC);
     return;
   }
+  QTextStream in(&ah_file);
 
-  fscanf(the_file, "%u\n", &num_rooms);
+  room_t num_rooms;
+  in >> num_rooms;
 
-  for (i = {}; i < num_rooms; i++)
+  quint32 num_items;
+  in >> num_items;
+
+  for (room_t i = {}; i < num_rooms; i++)
   {
-    fscanf(the_file, "%d\n", &room);
+    in >> room;
     auction_rooms[room] = 1;
   }
 
-  fscanf(the_file, "%u\n", &num_items);
-  for (i = {}; i < num_items; i++)
+  in >> num_items;
+  for (room_t i = {}; i < num_items; i++)
   {
-    fscanf(the_file, "%u\n", &ticket);
-    fscanf(the_file, "%d\n", &InTicket.vitem);
-    fgets(buf, MAX_STRING_LENGTH, the_file);
-    nl = strrchr(buf, '\n');
-    if (nl)
-      *nl = '\0'; // fgets grabs newline too, removing it here
-    InTicket.item_name = buf;
-    fgets(buf, MAX_STRING_LENGTH, the_file);
-    nl = strrchr(buf, '\n');
-    if (nl)
-      *nl = '\0'; // fgets grabs newline too, removing it here
-    InTicket.seller = buf;
-    fgets(buf, MAX_STRING_LENGTH, the_file);
-    nl = strrchr(buf, '\n');
-    if (nl)
-      *nl = '\0'; // fgets grabs newline too, removing it here
-    InTicket.buyer = buf;
-    fscanf(the_file, "%u\n", &state);
-    InTicket.state = (AuctionStates)state;
-    fscanf(the_file, "%u\n", &InTicket.end_time);
-    fscanf(the_file, "%u\n", &InTicket.price);
+    quint32 ticket;
+    in >> ticket;
+    in >> InTicket.vitem;
+    in >> InTicket.item_name;
+    in >> InTicket.seller;
+    in >> InTicket.buyer;
+    in >> InTicket.state;
+    in >> InTicket.end_time;
+    in >> InTicket.price;
     InTicket.obj = {};
 
     Items_For_Sale[ticket] = InTicket;
   } // LOOP
 
-  if (feof(the_file)) // this means the stat info was lost somehow
+  if (in.atEnd()) // this means the stat info was lost somehow
     ParseStats();
   else
   {
-    fscanf(the_file, "%u\n", &ItemsPosted);
-    fscanf(the_file, "%u\n", &ItemsExpired);
-    fscanf(the_file, "%u\n", &ItemsSold);
-    fscanf(the_file, "%u\n", &TaxCollected);
-    fscanf(the_file, "%u\n", &Revenue);
-    fscanf(the_file, "%u\n", &ItemsActive);
-    fscanf(the_file, "%u\n", &UncollectedGold);
+    in >> ItemsPosted;
+    in >> ItemsExpired;
+    in >> ItemsSold;
+    in >> TaxCollected;
+    in >> Revenue;
+    in >> ItemsActive;
+    in >> UncollectedGold;
   }
-  fclose(the_file);
 }
 
 /*
@@ -729,7 +719,6 @@ SAVE
 */
 void AuctionHouse::Save()
 {
-  FILE *the_file;
   QMap<quint32, AuctionTicket>::iterator Item_it;
   QMap<qint32, qint32>::iterator room_it;
 
@@ -738,121 +727,67 @@ void AuctionHouse::Save()
     DC::getInstance()->logentry(QStringLiteral("Unable to save auction files because this is the testport!"), ANGEL, DC::LogChannel::LOG_MISC);
     return;
   }
-  QString temp_file_name = file_name + ".temp";
-  the_file = fopen(qPrintable(temp_file_name), "w");
+  QSaveFile ah_file(filename_);
 
-  if (!the_file)
+  if (!ah_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
     QString buf;
-    dc_sprintf(buf, "Unable to open/create the save file \"%s\" for Auction files!!", qPrintable(file_name));
+    dc_sprintf(buf, "Unable to open/create the save file \"%s\" for Auction files!!", qPrintable(filename_));
     DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
+  QTextStream out(&ah_file);
 
-  qfprintf(the_file, "%lld\n", auction_rooms.size());
+  out << auction_rooms.size();
   for (room_it = auction_rooms.begin(); room_it != auction_rooms.end(); room_it++)
   {
-    qfprintf(the_file, "%d\n", room_it.key());
+    out << room_it.key();
   }
 
-  qfprintf(the_file, "%llu\n", Items_For_Sale.size());
+  out << Items_For_Sale.size();
   for (Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
-    qfprintf(the_file, "%u\n", Item_it.key());
-    qfprintf(the_file, "%d\n", Item_it->vitem);
-    qfprintf(the_file, "%s\n", qPrintable(Item_it->item_name));
-    qfprintf(the_file, "%s\n", qPrintable(Item_it->seller));
-    qfprintf(the_file, "%s\n", qPrintable(Item_it->buyer));
-    qfprintf(the_file, "%u\n", Item_it->state);
-    qfprintf(the_file, "%u\n", Item_it->end_time);
-    qfprintf(the_file, "%u\n", Item_it->price);
+    out << Item_it.key();
+    out << Item_it->vitem;
+    out << Item_it->item_name;
+    out << Item_it->seller;
+    out << Item_it->buyer;
+    out << Item_it->state;
+    out << Item_it->end_time;
+    out << Item_it->price;
 
     if (Item_it->obj)
     {
-      std::stringstream obj_filename;
-      obj_filename << "../lib/auctions/" << Item_it.key() << ".auction_obj";
-
-      std::ofstream auction_obj_file;
-      auction_obj_file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
-      errno = {};
-      try
+      auto obj_filename = u"../lib/auctions/%1.auction_obj"_s.arg(Item_it.key());
+      QSaveFile auction_obj_file(obj_filename);
+      if (!QDir(u"../lib/auctions/"_s).exists())
       {
-        struct stat statinfo;
-        if (stat("../lib/auctions/", &statinfo) != 0)
+        if (!QDir(u"."_s).mkdir(u"../lib/auctions/"_s))
         {
-          if (mkdir("../lib/auctions/", S_IRWXU) != 0)
-          {
-            perror("mkdir");
-            throw(0);
-          }
+          qFatal("Unable to create ../lib/auctions/");
+          return;
         }
-        auction_obj_file.open(obj_filename.str().c_str());
-        auction_obj_file << Item_it->obj << std::flush;
-        auction_obj_file.close();
       }
-      catch (...)
+      if (auction_obj_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
       {
-        perror("AuctionHouse::Save()");
-        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it.key());
+        QTextStream out(&auction_obj_file);
+        out << Item_it->obj;
       }
     }
   }
-  qfprintf(the_file, "%u\n", ItemsPosted);
-  qfprintf(the_file, "%u\n", ItemsExpired);
-  qfprintf(the_file, "%u\n", ItemsSold);
-  qfprintf(the_file, "%u\n", TaxCollected);
-  qfprintf(the_file, "%u\n", Revenue);
-  qfprintf(the_file, "%u\n", ItemsActive);
-  qfprintf(the_file, "%u\n", UncollectedGold);
 
-  fclose(the_file);
-  if (rename(qPrintable(temp_file_name), qPrintable(file_name)) != 0)
-  {
-    perror("AuctionHouse::save() rename");
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "AuctionHouse::Save() rename: %s", strerror(errno));
-  }
+  out << ItemsPosted;
+  out << ItemsExpired;
+  out << ItemsSold;
+  out << TaxCollected;
+  out << Revenue;
+  out << ItemsActive;
+  out << UncollectedGold;
 }
 
-/*
-Destructor
-*/
-AuctionHouse::~AuctionHouse()
+AuctionHouse::AuctionHouse(QString filename)
 {
-}
-
-/*
-Empty constructor
-*/
-AuctionHouse::AuctionHouse()
-{
-  /*
-   In the current implementation this must NEVER be called
-   */
-  ItemsPosted = {};
-  ItemsActive = {};
-  ItemsExpired = {};
-  ItemsSold = {};
-  TaxCollected = {};
-  UncollectedGold = {};
-  Revenue = {};
-  cur_index = {};
-  assert(0);
-}
-
-/*
-Constructor with file name
-*/
-AuctionHouse::AuctionHouse(QString in_file)
-{
-  ItemsPosted = {};
-  ItemsActive = {};
-  ItemsExpired = {};
-  ItemsSold = {};
-  TaxCollected = {};
-  UncollectedGold = {};
-  Revenue = {};
-  cur_index = {};
-  file_name = in_file;
+  filename_ = filename;
 }
 
 /*

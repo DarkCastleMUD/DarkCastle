@@ -207,7 +207,7 @@ void perform_violence(void)
 {
   // QString debug;
   CharacterPtr ch;
-  qint32 is_mob = {};
+  bool is_mob = {};
   qint32 retval;
   static affected_type *af, *next_af_dude;
   follow_type *fol, *folnext;
@@ -2893,7 +2893,7 @@ qint32 noncombat_damage(CharacterPtr ch, qint32 dam, const QString char_death_ms
   }
 }
 
-qint32 is_pkill(CharacterPtr ch, CharacterPtr vict)
+bool is_pkill(CharacterPtr ch, CharacterPtr vict)
 {
   CharacterPtr tmp_ch;
 
@@ -3265,7 +3265,7 @@ void debug_isHit_generic(const CharacterPtr ch, const CharacterPtr victim, const
 }
 
 // New toHit code
-qint32 isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type, qint32 &reduce)
+bool isHit(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, qint32 &type, qint32 &reduce)
 {
   if ((isSet(victim->combat, COMBAT_STUNNED)) ||
       (isSet(victim->combat, COMBAT_STUNNED2)) ||
@@ -5296,7 +5296,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 {
   QString buf;
   QString buf2;
-  qint32 is_thief = {};
+  bool is_thief = {};
   qint32 death_room = {};
 
   if (!victim)
@@ -6823,7 +6823,7 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
   victim->save_char_obj();
 }
 
-qint32 is_stunned(CharacterPtr ch)
+bool is_stunned(CharacterPtr ch)
 {
   if (isSet(ch->combat, COMBAT_STUNNED))
     return true;
@@ -7344,7 +7344,7 @@ void inform_victim(CharacterPtr ch, CharacterPtr victim, qint32 dam)
 | the function returns 0.
 | Morc 8/6/95
 */
-qint32 is_fighting_mob(CharacterPtr ch)
+bool is_fighting_mob(CharacterPtr ch)
 {
   CharacterPtr fighting = ch->fighting;
   if (!fighting)
