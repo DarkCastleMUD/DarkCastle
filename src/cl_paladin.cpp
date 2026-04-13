@@ -274,7 +274,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
   if (chance < 0)
     chance = {};
 
-  // ch->send(u"behead chance: %d, enemy hp%: %f\r\n"_s).arg(chance).arg(enemy_hp));
+  // ch->send(u"behead chance: %d, enemy hp%: %f\r\n"_s.arg(chance).arg(enemy_hp));
 
   if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {

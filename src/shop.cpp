@@ -233,7 +233,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
 
   act_to_room("$n buys $p.", ch, obj, 0, 0);
   keeper->do_tell(shop.message_buy.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
-  ch->send(u"You now have %1.\r\n"_s).arg(obj->short_description()));
+  ch->send(u"You now have %1.\r\n"_s.arg(obj->short_description()));
   ch->removeGold(cost);
   keeper->addGold(cost);
 
@@ -324,7 +324,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
   if (virt >= 13400 && virt <= 13707 &&
       DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() != 13416)
   {
-    keeper->do_tell(u"%1 There is only one merchant in the land that deals with such fine jewels."_s).arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 There is only one merchant in the land that deals with such fine jewels."_s.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
@@ -344,7 +344,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 
   act_to_room("$n sells $p.", ch, obj, 0, 0);
   keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
-  ch->send(u"The shopkeeper now has %1.\r\n"_s).arg(obj->short_description()));
+  ch->send(u"The shopkeeper now has %1.\r\n"_s.arg(obj->short_description()));
   ch->addGold(cost);
   keeper->removeGold(cost);
 
@@ -610,8 +610,8 @@ void shopping_list(const QString arg, CharacterPtr ch,
 
   if (!keeper->carrying && DC::getInstance()->shop_index[shop_nr].inventory)
   {
-    keeper->do_tell(u"%1 Oops, I seem to be out of inventory."_s).arg(qPrintable(ch->name())).split(' '));
-    keeper->do_tell(u"%1 One minute while I restock."_s).arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 Oops, I seem to be out of inventory."_s.arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(u"%1 One minute while I restock."_s.arg(qPrintable(ch->name())).split(' '));
     restock_keeper(keeper, shop_nr);
   }
   i = {};
@@ -727,7 +727,7 @@ LFound2:
   return ReturnValue::eSUCCESS;
 }
 
-void boot_the_shops()
+void DC::boot_the_shops(void)
 {
   QString buf;
   qint32 temp;
@@ -828,7 +828,7 @@ void boot_the_shops()
   fclose(fp);
 }
 
-void assign_the_shopkeepers()
+void DC::assign_the_shopkeepers(void)
 {
   qint32 shop_nr;
 
@@ -836,7 +836,7 @@ void assign_the_shopkeepers()
     DC::getInstance()->mob_index[DC::getInstance()->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
 }
 
-void fix_shopkeepers_inventory()
+void DC::fix_shopkeepers_inventory(void)
 {
   qint32 shop_nr;
 
@@ -1001,7 +1001,7 @@ void save_player_shop_world_range()
   }
 }
 
-void boot_player_shops()
+void DC::boot_player_shops(void)
 {
   FILE *fp;
   FILE *shopfp;
@@ -1387,7 +1387,7 @@ void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keepe
     }
 
   if (!dc_strcmp(shop->owner, qPrintable(ch->name())))
-    ch->send(u"\r\nYour shop has %1 cash in the till.\r\n"_s).arg(QString::number(shop->money_on_hand)));
+    ch->send(u"\r\nYour shop has %1 cash in the till.\r\n"_s.arg(QString::number(shop->money_on_hand)));
 }
 
 qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
@@ -1527,12 +1527,12 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 */
-void assign_the_player_shopkeepers()
+void DC::assign_the_player_shopkeepers(void)
 {
-  DC::getInstance()->mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
+  mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
 }
 
-void redo_shop_profit()
+void DC::redo_shop_profit(void)
 {
   switch (number(0, 3))
   {
@@ -1710,7 +1710,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
     qint32 choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
-      ch->send(u"Invalid number. Choose between 1 and %1.\r\n"_s).arg(QString::number(MAX_EDDIE_ITEMS)));
+      ch->send(u"Invalid number. Choose between 1 and %1.\r\n"_s.arg(QString::number(MAX_EDDIE_ITEMS)));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1830,7 +1830,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   case cmd_t::LIST:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      owner->tell(ch, u"You need to confirm or cancel rerolling %1."_s).arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, u"You need to confirm or cancel rerolling %1."_s.arg(GET_OBJ_SHORT(r.orig_obj)));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1845,7 +1845,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   case cmd_t::REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      owner->tell(ch, u"You need to confirm or cancel rerolling %1."_s).arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, u"You need to confirm or cancel rerolling %1."_s.arg(GET_OBJ_SHORT(r.orig_obj)));
       return ReturnValue::eSUCCESS;
     }
     else if (r.state == reroll_t::reroll_states_t::REROLLED)
@@ -2201,7 +2201,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     {
     case cmd_t::REDEEM:
     case cmd_t::LIST:
-      owner->tell(ch, u"You need to confirm or cancel redeeming %1."_s).arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, u"You need to confirm or cancel redeeming %1."_s.arg(GET_OBJ_SHORT(r.orig_obj)));
       return ReturnValue::eSUCCESS;
       break;
     case cmd_t::CONFIRM:

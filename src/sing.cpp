@@ -409,7 +409,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (!isSet(song_info[spl].targets(), TAR_IGNORE))
     {
-      if (*name)
+      if (!name.isEmpty())
       {
         if (isSet(song_info[spl].targets(), TAR_CHAR_ROOM))
           if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
@@ -478,7 +478,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (target_ok != true)
     {
-      if (*name)
+      if (!name.isEmpty())
       {
         if (isSet(song_info[spl].targets(), TAR_CHAR_ROOM))
           ch->sendln("Nobody here by that name.");
@@ -1117,7 +1117,7 @@ qint32 execute_song_healing_melody(quint8 level, CharacterPtr ch, QString arg, C
     {
       if (tmp_char == ch)
       {
-        ch->send(u"You feel your Healing Melody soothing %1 points of your health.\r\n"_s).arg(heal));
+        ch->send(u"You feel your Healing Melody soothing %1 points of your health.\r\n"_s.arg(heal));
       }
       else
       {
@@ -1556,7 +1556,7 @@ qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, 
     {
       if (tmp_char == ch)
       {
-        tmp_char->send(u"You feel your Travelling March recover %1 moves for you.\r\n"_s).arg(heal));
+        tmp_char->send(u"You feel your Travelling March recover %1 moves for you.\r\n"_s.arg(heal));
       }
       else
       {
@@ -1604,7 +1604,7 @@ qint32 song_stop(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim
 
   QList<songInfo>::iterator i;
 
-  if (*arg)
+  if (!arg.isEmpty())
   { // sing 'stop' <song>
     qint32 spl = old_search_block(arg, 0, strlen(arg), Character::song_names, 0);
     spl--; /* songs goes from 0+ not 1+ like spells */

@@ -99,25 +99,26 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
     connected = false;
 
     // must be done to clear out "d" before it is used
-    if (!(ch->getDC()->load_char_obj(&d, name)))
+    if (auto result = ch->getDC()->load_char_obj(name); result && *result)
     {
-      if (file_exists(u"../archive/%1.gz"_s.arg(name)))
-        ch->sendln("Character is archived.");
-      else
-        ch->sendln("Unable to load! (character might not exist...)");
-      return ReturnValue::eFAILURE;
+      auto conn = *result;
+      vict = conn->character;
+      vict->desc = {};
+
+      redo_hitpoints(vict);
+      redo_mana(vict);
+      if (vict->title_.isEmpty())
+        vict->title_ = u"is a virgin"_s;
+      if (GET_CLASS(vict) == CLASS_MONK)
+        GET_AC(vict) -= vict->getLevel() * 3;
+      isr_set(vict);
     }
 
-    vict = conn->character;
-    vict->desc = {};
-
-    redo_hitpoints(vict);
-    redo_mana(vict);
-    if (vict->title_.isEmpty())
-      vict->title_ = u"is a virgin"_s;
-    if (GET_CLASS(vict) == CLASS_MONK)
-      GET_AC(vict) -= vict->getLevel() * 3;
-    isr_set(vict);
+    if (file_exists(u"../archive/%1.gz"_s.arg(name)))
+      ch->sendln("Character is archived.");
+    else
+      ch->sendln("Unable to load! (character might not exist...)");
+    return ReturnValue::eFAILURE;
   }
 
   ch->sendln(u"$3Short Desc$R: %1"_s.arg(vict->shortdesc_or_name()));
@@ -165,7 +166,7 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
   else
   {
       ch->sendln("(Not on game)");
-      free_char(vict, Trace("do_check"));
+      free_char(vict);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -285,52 +286,52 @@ command_return_t do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln("No such mobile.");
     return ReturnValue::eFAILURE;
   case 1: // object
-    if (!(obj = get_obj_vis(ch, name)))
-    {
+    if (auto obj = get_obj_vis(ch, name); obj)
+      obj_stat(ch, obj);
+    else
       ch->sendln("No such object.");
-      return ReturnValue::eFAILURE;
-    }
-    obj_stat(ch, obj);
     return ReturnValue::eFAILURE;
+    break;
   case 2: // character
     break;
   }
 
-  if (vch = get_pc_vis(ch, name)))
+  if (auto vch = get_pc_vis(ch, name); vch)
+  {
+    if (!name.isEmpty())
     {
-      if (!name.isEmpty())
-      {
-        name = name.toLower();
-        name[0] = name[0].toUpper();
-      }
-
-      // must be done to clear out "d" before it is used
-      if (auto result = ch->getDC()->load_char_obj(name); result && *result)
-      {
-        auto conn = *result;
-        vict = conn->character;
-        vict->desc = {};
-        redo_hitpoints(vict);
-        redo_mana(vict);
-        if (vict->title_.isEmpty())
-          vict->title_ = "is a virgin";
-        if (GET_CLASS(vict) == CLASS_MONK)
-          GET_AC(vict) -= vict->getLevel() * 3;
-        isr_set(vict);
-        char_to_room(vict, ch->in_room);
-        mob_stat(ch, vict);
-        char_from_room(vict);
-        free_char(vict, Trace("do_stat"));
-        return ReturnValue::eSUCCESS;
-      }
-      else
-      {
-        ch->sendln("Unable to load! (character might not exist...)");
-        return ReturnValue::eFAILURE;
-      }
+      name = name.toLower();
+      name[0] = name[0].toUpper();
     }
 
-  mob_stat(ch, vict);
+    // must be done to clear out "d" before it is used
+    if (auto result = ch->getDC()->load_char_obj(name); result && *result)
+    {
+      auto conn = *result;
+      auto vict = conn->character;
+      vict->desc = {};
+      redo_hitpoints(vict);
+      redo_mana(vict);
+      if (vict->title_.isEmpty())
+        vict->title_ = "is a virgin";
+      if (GET_CLASS(vict) == CLASS_MONK)
+        GET_AC(vict) -= vict->getLevel() * 3;
+      isr_set(vict);
+      char_to_room(vict, ch->in_room);
+      mob_stat(ch, vict);
+      char_from_room(vict);
+      free_char(vict);
+      return ReturnValue::eSUCCESS;
+    }
+    else
+    {
+      ch->sendln("Unable to load! (character might not exist...)");
+      return ReturnValue::eFAILURE;
+    }
+
+    mob_stat(ch, vch);
+  }
+
   return ReturnValue::eSUCCESS;
 }
 
@@ -743,7 +744,7 @@ command_return_t zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
       {
         change_type += " ";
       }
-      ch->send(u"Zone %1, command %2, argument %3 changed from %4%5 to %6.\r\n"_s).arg(zone.getID()).arg(cmd + 1).arg(argument_number).arg(change_type).arg(original_value).arg(new_value));
+      ch->send(u"Zone %1, command %2, argument %3 changed from %4%5 to %6.\r\n"_s.arg(zone.getID()).arg(cmd + 1).arg(argument_number).arg(change_type).arg(original_value).arg(new_value));
     }
     return ReturnValue::eFAILURE;
   }
@@ -773,7 +774,7 @@ command_return_t zedit_remove(CharacterPtr ch, QStringList arguments, Zone &zone
 
   zone.cmd.remove(zone_command_number);
 
-  ch->send(u"Command %1 removed.\r\n"_s).arg(zone_command_number + 1));
+  ch->send(u"Command %1 removed.\r\n"_s.arg(zone_command_number + 1));
   return ReturnValue::eSUCCESS;
 }
 
@@ -1232,7 +1233,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
       // bump everything up a slot
       for (j = last_cmd; j != (to - 2); j--)
         zone.cmd[j + 1] = zone.cmd[j];
-      buf = u"Command copied to %1.\r\n"_s).arg(to);
+      buf = u"Command copied to %1.\r\n"_s.arg(to);
       to--;
     }
     else // tack it on the end
@@ -1269,7 +1270,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
     cont = text.toLongLong(&ok);
     if (!ok || !cont || cont > continent_names.size() - 1)
     {
-      ch->send(u"You much choose between 1 and %d.\r\n"_s).arg(continent_names.size()));
+      ch->send(u"You much choose between 1 and %d.\r\n"_s.arg(continent_names.size()));
       return ReturnValue::eFAILURE;
     }
     ch->send(u"Success. Continent changed to %s\r\n"_s.arg(continent_names.at(cont).c_str()));
@@ -1675,7 +1676,6 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
 
     ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(curr->description);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
     break;
   }
@@ -1889,11 +1889,11 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     {
       QString skill_name = get_skill_name(obj->affected[num].location / 1000);
 
-      ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s).arg(num + 1).arg(skill_name).arg(obj->affected[num].modifier));
+      ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s.arg(num + 1).arg(skill_name).arg(obj->affected[num].modifier));
     }
     else
     {
-      ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s).arg(num + 1).arg(apply_types[obj->affected[num].location]).arg(obj->affected[num].modifier));
+      ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s.arg(num + 1).arg(apply_types[obj->affected[num].location]).arg(obj->affected[num].modifier));
     }
     break;
   }
@@ -1922,7 +1922,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     modifier = atoi(value);
     num -= 1;
     obj->affected[num].location = modifier * 1000;
-    ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s).arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
+    ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s.arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
     break;
   default:
     ch->sendln("Illegal value.");
@@ -2464,7 +2464,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    Vault *vault, *tvault;
+    VaultPtr vault, *tvault;
     vault_items_data *items, *titems;
     ObjectPtr obj;
     qint32 num = 0, real_num = {};
@@ -2487,7 +2487,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
           if (obj->item_number == rnum)
           {
 
-            void item_remove(ObjectPtr obj, Vault & vault);
+            void item_remove(ObjectPtr obj, VaultPtr vault);
             item_remove(obj, vault);
             // items->obj = {};
             DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, qPrintable(vault->owner));
@@ -2551,7 +2551,6 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     sendln("Write your object's description. End with /s.");
     desc->connected = Connection::states::EDITING;
     desc->strnew = &(curr->description);
-    desc->max_str = MAX_MESSAGE_LENGTH;
     break;
   default:
     sendln("Illegal value, tell a coder.");
@@ -2928,7 +2927,6 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
     ch->desc->backstr = {};
     ch->desc->strnew = &(currprog->comlist);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
@@ -3167,9 +3165,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     //        mob->description = {};
     ch->desc->connected = Connection::states::EDITING;
     mob->description = u""_s;
-    ch->desc->strnew =
-        &(mob->description);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    ch->desc->strnew = &(mob->description);
   }
   break;
 
@@ -3361,7 +3357,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
     }
 
-    ch->sendln(u"Mob default position set to %1."_s).arg(victim->getPositionQString()));
+    ch->sendln(u"Mob default position set to %1."_s.arg(victim->getPositionQString()));
   }
   break;
 
@@ -3454,7 +3450,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
           NPCs_changed++;
         }
       }
-      ch->send(u"%1 NPCs in the world have been updated.\r\n"_s).arg(NPCs_changed));
+      ch->send(u"%1 NPCs in the world have been updated.\r\n"_s.arg(NPCs_changed));
     }
   }
   break;
@@ -4148,7 +4144,6 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("        Write your room's description.  (/s saves /h for help)");
     ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(DC::getInstance()->world[ch->in_room].description);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
   }
   break;
 
@@ -4306,13 +4301,13 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       if (DC::getInstance()->create_one_room(ch, d))
       {
         c = real_room(d);
-        ch->send(u"Creating room %1.\r\n"_s).arg(d));
+        ch->send(u"Creating room %1.\r\n"_s.arg(d));
       }
     }
 
     if (c == (-1))
     {
-      ch->send(u"Error creating exit to room %1.\r\n"_s).arg(d));
+      ch->send(u"Error creating exit to room %1.\r\n"_s.arg(d));
       return ReturnValue::eFAILURE;
     }
 
@@ -4468,7 +4463,6 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     extra->keyword = (arg2.c_str());
     ch->sendln("Write your extra description. (/s saves /h for help)");
     ch->desc->strnew = &extra->description;
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
     ch->desc->connected = Connection::states::EDITING;
     if (ch->desc->strnew != nullptr && *ch->desc->strnew != nullptr && **ch->desc->strnew != '\0')
     {
@@ -4515,7 +4509,6 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
         }
    */
     ch->desc->strnew = &DC::getInstance()->world[ch->in_room].dir_option[x]->general_description;
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
     ch->desc->connected = Connection::states::EDITING;
   }
   break;
@@ -4615,7 +4608,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
         else
           DC::getInstance()->world[ch->in_room].denied = nd->next;
         nd = {};
-        ch->send(u"Mobile %1 ALLOWED entrance.\r\n"_s).arg(mob));
+        ch->send(u"Mobile %1 ALLOWED entrance.\r\n"_s.arg(mob));
         done = true;
         break;
       }
@@ -4635,7 +4628,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     DC::getInstance()->world[ch->in_room].denied = nd;
-    ch->send(u"Mobile %1 DENIED entrance.\r\n"_s).arg(mob));
+    ch->send(u"Mobile %1 DENIED entrance.\r\n"_s.arg(mob));
     break;
   }
   DC::getInstance()->set_zone_modified_world(ch->in_room);
@@ -4822,17 +4815,17 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
 
   if (zone.getFilename().isEmpty())
   {
-    sendln(u"Zone %1 has an empty filename."_s).arg(zone_key));
+    sendln(u"Zone %1 has an empty filename."_s.arg(zone_key));
     return ReturnValue::eFAILURE;
   }
 
   if (!zone.isModified())
   {
-    sendln(u"Zone %1 has not been modified. Saving anyway."_s).arg(zone_key));
+    sendln(u"Zone %1 has not been modified. Saving anyway."_s.arg(zone_key));
   }
 
   QString filename = u"zonefiles/%1"_s.arg(zone.getFilename());
-  QString command = u"cp %1 %1.last"_s).arg(filename);
+  QString command = u"cp %1 %1.last"_s.arg(filename);
   system(qPrintable(command));
 
   FILE *f = {};
@@ -4845,7 +4838,7 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
   zone.write(f);
 
   fclose(f);
-  sendln(u"Saved zone %1."_s).arg(zone_key));
+  sendln(u"Saved zone %1."_s.arg(zone_key));
   zone.setModified(false);
   return ReturnValue::eSUCCESS;
 }
@@ -5577,7 +5570,7 @@ command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
     send(u"%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : ""_.arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
   }
 
-  send(u"\r\nThere are %1 connections.\r\n"_s).arg(connections.size()));
+  send(u"\r\nThere are %1 connections.\r\n"_s.arg(connections.size()));
 
   return ReturnValue::eSUCCESS;
 }

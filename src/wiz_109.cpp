@@ -130,14 +130,14 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    send(u"%1 is now a guide.\r\n"_s).arg(qPrintable(victim->name())));
+    send(u"%1 is now a guide.\r\n"_s.arg(qPrintable(victim->name())));
     victim->sendln("You have been selected to be a DC Guide!");
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send(u"%1 is no longer a guide.\r\n"_s).arg(qPrintable(victim->name())));
+    send(u"%1 is no longer a guide.\r\n"_s.arg(qPrintable(victim->name())));
     victim->sendln("You have been removed as a DC guide.");
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
@@ -160,7 +160,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
   half_chop(argument, name, buf);
   argument_interpreter(buf, level, passwd);
 
-  if (*name)
+  if (!name.isEmpty())
   {
     if (!(victim = get_char_vis(ch, name)))
     {
@@ -280,10 +280,8 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
   {
     if (victim->isPlayer() && (this->getLevel() < victim->getLevel()))
     {
-      act("$n casts a massive lightning bolt at you.", this, 0, victim,
-          TO_VICT, 0);
-      act("$n casts a massive lightning bolt at $N.", this, 0, victim,
-          TO_ROOM, NOTVICT);
+      act("$n casts a massive lightning bolt at you.", this, 0, victim, TO_VICT, 0);
+      act_to_room("$n casts a massive lightning bolt at $N.", this, 0, victim, NOTVICT);
       return ReturnValue::eFAILURE;
     }
 
@@ -327,7 +325,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    DC::getInstance()->logentry(u"%1 has deleted %2.\r\n"_s).arg(name()).arg(victim->name()), ANGEL, DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"%1 has deleted %2.\r\n"_s.arg(name()).arg(victim->name()), ANGEL, DC::LogChannel::LOG_GOD);
   }
 
   else
@@ -400,7 +398,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
   if (arg1 == "cold")
   {
-    QString buffer = u"Shutdown by %1.\r\n"_s).arg(qPrintable(this->shortdesc_or_name()));
+    QString buffer = u"Shutdown by %1.\r\n"_s.arg(qPrintable(this->shortdesc_or_name()));
     send_to_all(buffer);
     DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     _shutdown = 1;
@@ -419,7 +417,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
           {
             if (follower->carrying != nullptr)
             {
-              send(u"Player %1 has charmie %2 with equipment.\r\n"_s).arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
+              send(u"Player %1 has charmie %2 with equipment.\r\n"_s.arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
               return ReturnValue::eFAILURE;
             }
           }
@@ -428,7 +426,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     }
 
     do_not_save_corpses = 1;
-    QString buffer = u"Hot reboot by %1.\r\n"_s).arg(qPrintable(this->shortdesc_or_name()));
+    QString buffer = u"Hot reboot by %1.\r\n"_s.arg(qPrintable(this->shortdesc_or_name()));
     send_to_all(buffer);
     DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
@@ -493,7 +491,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
             {
               if (follower->carrying != nullptr || follower->equipment[0] != nullptr)
               {
-                send(u"Player %1 has charmie %2 with equipment. Use Force to override.\r\n"_s).arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
+                send(u"Player %1 has charmie %2 with equipment. Use Force to override.\r\n"_s.arg(qPrintable(victim->name())).arg(qPrintable(follower->name())));
                 return ReturnValue::eFAILURE;
               }
             }

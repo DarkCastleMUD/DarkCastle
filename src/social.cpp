@@ -209,7 +209,7 @@ bool read_social_from_file(QTextStream &fl)
   return true;
 }
 
-void boot_social_messages(void)
+void DC::boot_social_messages(void)
 {
   QFile social_messages_file(SOCIAL_FILE);
   QTextStream fl(&social_messages_file);

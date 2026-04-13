@@ -3536,7 +3536,7 @@ void update_char_objects(CharacterPtr ch)
 }
 
 /* Extract a ch completely from the world, and leave his stuff behind */
-void extract_char(CharacterPtr ch, bool pull, Trace t)
+void extract_char(CharacterPtr ch, bool pull)
 {
   t.addTrack("extract_char");
   CharacterPtr k, next_char;
@@ -4595,7 +4595,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else if (!(*tar_ch)->name().isEmpty())
         {
-          ch->sendln(u"You find %1 in this room."_s).arg((*tar_ch)->name()));
+          ch->sendln(u"You find %1 in this room."_s.arg((*tar_ch)->name()));
         }
         else
         {
@@ -4619,7 +4619,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else if (!(*tar_ch)->name().isEmpty())
         {
-          ch->sendln(u"You find %1 somewhere in the world."_s).arg((*tar_ch)->name()));
+          ch->sendln(u"You find %1 somewhere in the world."_s.arg((*tar_ch)->name()));
         }
         else
         {
@@ -4639,11 +4639,11 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
       {
         if ((*tar_obj)->short_description)
         {
-          ch->sendln(u"You find %1 in your inventory."_s).arg((*tar_obj)->short_description));
+          ch->sendln(u"You find %1 in your inventory."_s.arg((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->name().isEmpty())
         {
-          ch->sendln(u"You find %1 in your inventory."_s).arg((*tar_obj)->name()));
+          ch->sendln(u"You find %1 in your inventory."_s.arg((*tar_obj)->name()));
         }
         else
         {

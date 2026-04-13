@@ -151,7 +151,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   if (ok == false)
   {
     send("Invalid value.\r\n");
-    send(u"Valid values are %1 to %2.\r\n"_s).arg(1).arg(static_cast<quint64>(-1)));
+    send(u"Valid values are %1 to %2.\r\n"_s.arg(1).arg(static_cast<quint64>(-1)));
     return ReturnValue::eFAILURE;
   }
 
@@ -232,7 +232,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
           (f->follower->clan != clan || (f->follower->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
       {
         lost = (qint32)((qreal)share * (qreal)((qreal)get_clan(f->follower)->tax / 100));
-        f->follower->send(u"Your clan taxes %L1 gold of your share.\r\n"_s).arg(lost));
+        f->follower->send(u"Your clan taxes %L1 gold of your share.\r\n"_s.arg(lost));
         get_clan(f->follower)->cdeposit(lost);
         save_clans();
       }
@@ -642,7 +642,7 @@ command_return_t do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (*name)
+  if (!name.isEmpty())
   {
     if (!(leader = get_char_room(name, ch->in_room)))
     {

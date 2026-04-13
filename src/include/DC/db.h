@@ -59,9 +59,7 @@ enum Continents
 qint32 count_hash_records(FILE *fl);
 void load_hints();
 void find_unordered_mobiles(void);
-void write_wizlist(std::stringstream &filename);
 void write_wizlist(QString filename);
-void write_wizlist(const QString filename);
 void string_to_file(QTextStream &fl, QString str);
 
 void string_to_file(auto &fl, QString str)
@@ -71,8 +69,7 @@ void string_to_file(auto &fl, QString str)
 
 void load_emoting_objects(void);
 qint32 create_entry(QString name);
-void zone_update(void);
-QString fread_qstring(QTextStream &stream, bool *ok = {});
+QString fread_string(QTextStream &stream, bool *ok = {});
 QString fread_word(QTextStream &);
 void delete_item_from_index(qint32 nr);
 void delete_mob_from_index(qint32 nr);
@@ -108,11 +105,6 @@ QString lf_to_crlf(QString &s1);
 QString lf_to_crlf(QString s1);
 
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
-void load_messages(const QString file, qint32 base = 0);
-void boot_social_messages(void);
-void boot_clans(void);
-void assign_clan_rooms(void);
-void find_unordered_objects(void);
 
 extern qint32 top_of_objt;
 extern time_t start_time; /* mud start time */

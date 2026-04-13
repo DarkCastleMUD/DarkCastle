@@ -95,8 +95,8 @@ void DC::loadnews(void)
     news_data *nnews;
     nnews = new news_data;
     nnews->time = i;
-    nnews->addedby = fread_qstring(fl, 0);
-    nnews->news = fread_qstring(fl, 0);
+    nnews->addedby = fread_string(fl, 0);
+    nnews->news = fread_string(fl, 0);
     qint32 i, v = {};
     QString buf;
     for (i = {}; i < (qint32)strlen(nnews->news); i++)
@@ -254,7 +254,6 @@ command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
   //  nnews->news = u"Temporary data.\r\n"_s;
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(nnews->news);
-  ch->desc->max_str = 2096;
 
   return ReturnValue::eSUCCESS;
 }

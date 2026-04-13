@@ -33,11 +33,11 @@ qint32 main(qint32 argc, QString *argv)
     dcastle.cf.ports.push_back(DFLT_PORT4);
   }
 
-  DC::getInstance()->logentry(u"Using %1 as data directory."_s).arg(dcastle.cf.library_directory));
+  DC::getInstance()->logentry(u"Using %1 as data directory."_s.arg(dcastle.cf.library_directory));
 
   if (!QFile(dcastle.cf.library_directory).exists())
   {
-    DC::getInstance()->logentry(u"Data directory %1 is missing."_s).arg(dcastle.cf.library_directory));
+    DC::getInstance()->logentry(u"Data directory %1 is missing."_s.arg(dcastle.cf.library_directory));
     exit(EXIT_FAILURE);
   }
 

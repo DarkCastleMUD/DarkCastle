@@ -839,7 +839,6 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
       ch->desc->connected = Connection::states::EDITING;
       ch->desc->strnew = &(new_help_table[help_id].entry);
-      ch->desc->max_str = MAX_HELP_LENGTH;
     }
     else
     { // no idea wtf they are doing
@@ -971,7 +970,7 @@ qint32 get_line_with_space(FILE *fl, QString buf)
   {
     lines++;
     fgets(temp, 256, fl);
-    if (*temp)
+    if (!temp.isEmpty())
       temp[strlen(temp) - 1] = '\0';
   } while (!feof(fl) && *temp == '*');
   // } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));

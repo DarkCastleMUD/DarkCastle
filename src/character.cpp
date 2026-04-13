@@ -247,7 +247,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
   {
     restored = ".restored";
   }
-  QString filename = u"%1.%2%3"_s).arg(player_name).arg(QString::number(0)).arg(restored);
+  QString filename = u"%1.%2%3"_s.arg(player_name).arg(QString::number(0)).arg(restored);
 
   QString path = u"%1/%2/"_s.arg(FOLLOWER_DIR).arg(player_name[0]);
   QString fullpath = path + filename;
@@ -304,7 +304,7 @@ bool Character::validateName(QString name)
     }
   }
 
-  if (on_forbidden_name_list(name))
+  if (dc_->on_forbidden_name_list(name))
   {
     return false;
   }
@@ -481,7 +481,7 @@ Sockets::Sockets(CharacterPtr ch, QString searchkey)
 
     if (!searchkey.isEmpty())
     {
-      if (!d.getPeerOriginalAddress().toString().contains(searchkey) && conn->character != nullptr && !conn->character->name().isEmpty() && QString(qPrintable(conn->character->name())).contains(searchkey, Qt::CaseInsensitive) == false)
+      if (!conn->getPeerOriginalAddress().toString().contains(searchkey) && conn->character != nullptr && !conn->character->name().isEmpty() && QString(qPrintable(conn->character->name())).contains(searchkey, Qt::CaseInsensitive) == false)
       {
         continue;
       }
@@ -493,7 +493,7 @@ Sockets::Sockets(CharacterPtr ch, QString searchkey)
       longest_name_size_ = name.size();
     }
 
-    const QString IPstr = d.getPeerFullAddressString();
+    const QString IPstr = conn->getPeerFullAddressString();
     if (IPstr.size() > longest_IP_size_)
     {
       longest_IP_size_ = IPstr.size();
@@ -505,14 +505,14 @@ Sockets::Sockets(CharacterPtr ch, QString searchkey)
       longest_connection_state_size_ = state.size();
     }
 
-    const QString idle = QString::number(d.idle_time / DC::PASSES_PER_SEC);
+    const QString idle = QString::number(conn->idle_time / DC::PASSES_PER_SEC);
     if (idle.size() > longest_idle_size_)
     {
       longest_idle_size_ = idle.size();
     }
 
-    IPs_[d.getPeerAddress().toString()]++;
-    connections_.push_back(d);
+    IPs_[conn->getPeerAddress().toString()]++;
+    connections_.push_back(conn);
   }
 }
 
@@ -546,7 +546,7 @@ void Character::display_string_list(const QStringList list)
       *buf = '\0';
     }
   }
-  if (*buf)
+  if (!buf.isEmpty())
     this->send(buf);
   this->sendln("");
 }
@@ -636,7 +636,7 @@ level_ Character::getLevel(void) const
   if (level_ > 110)
   {
     produce_coredump();
-    DC::getInstance()->logentry(u"Warning: getLevel returned %1."_s).arg(QString::number(level_)));
+    DC::getInstance()->logentry(u"Warning: getLevel returned %1."_s.arg(QString::number(level_)));
   }
 
   return level_;
@@ -1149,7 +1149,7 @@ QString ChannelMessage::getMessage(CharacterPtr ch) const
   }
 
   QTimeZone timezone = QTimeZone(ch->getSetting("timezone", "America/Chicago").toLatin1());
-  QString timestamp = ch->getSetting(u"%1.history.timestamp"_s).arg(prefix));
+  QString timestamp = ch->getSetting(u"%1.history.timestamp"_s.arg(prefix));
   QString dateformat_str = ch->getSetting("dateformat", "ISODate");
   Qt::DateFormat dateformat = Qt::DateFormat(QMetaEnum::fromType<Qt::DateFormat>().keyToValue(qPrintable(dateformat_str)));
 

@@ -68,7 +68,7 @@
 extern QMap<qint32, QMap<quint8, QString>> professions;
 
 // extern funcs
-Clan *get_clan(CharacterPtr);
+ClanPtr get_clan(CharacterPtr);
 void release_message(CharacterPtr ch);
 timer_data *timer_list = {};
 
@@ -1398,8 +1398,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   CharacterPtr loop_ch = {};
   qreal cf = {};
   QString name;
-  Clan *clan = {};
-  clan_room_data *room;
+  ClanPtr clan = {};
   qint32 found = {};
   qint32 retval = {};
   bool is_mob = {};
@@ -1444,7 +1443,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
     {
-      send(u"You are not grouped or clanned with %1 so you cannot recall them.\r\n"_s).arg(qPrintable(victim->name())));
+      send(u"You are not grouped or clanned with %1 so you cannot recall them.\r\n"_s.arg(qPrintable(victim->name())));
       return ReturnValue::eFAILURE;
     }
   }
@@ -1614,8 +1613,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 iWear;
   follow_type *k;
-  Clan *clan;
-  clan_room_data *room;
+  ClanPtr clan;
   qint32 found = {};
   QString buf;
   ObjectPtr obj, tmp_obj;
@@ -1822,7 +1820,7 @@ command_return_t Character::save(cmd_t cmd)
 
   if (cmd != cmd_t::SAVE_SILENTLY)
   {
-    send(u"Saving %1.\r\n"_s).arg(qPrintable(this->name())));
+    send(u"Saving %1.\r\n"_s.arg(qPrintable(this->name())));
   }
 
   if (this->isPlayer())
@@ -1870,8 +1868,7 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
 
 command_return_t do_home(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Clan *clan;
-  clan_room_data *room;
+  ClanPtr clan;
   qint32 found = {};
 
   if (!ch->isImmortalPlayer())
@@ -2045,7 +2042,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, CharacterPtr ch, 
         REMOVE_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(u"%1 flag REMOVED.\r\n"_s).arg(bits.value(x)));
+          ch->send(u"%1 flag REMOVED.\r\n"_s.arg(bits.value(x)));
         }
       }
       else
@@ -2053,7 +2050,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, CharacterPtr ch, 
         SET_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(u"%1 flag ADDED.\r\n"_s).arg(bits.value(x)));
+          ch->send(u"%1 flag ADDED.\r\n"_s.arg(bits.value(x)));
         }
       }
       found = true;
@@ -2221,7 +2218,7 @@ qint32 get_line(FILE *fl, QString buf)
   {
     lines++;
     fgets(temp, 256, fl);
-    if (*temp)
+    if (!temp.isEmpty())
       temp[strlen(temp) - 1] = '\0';
   } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 
@@ -2535,7 +2532,7 @@ qint32 get_leadership_bonus(CharacterPtr ch)
   return MIN(bonus, leader->affected_by_spell(SKILL_LEADERSHIP)->modifier);
 }
 
-void update_make_camp_and_leadership(void)
+void DC::update_make_camp_and_leadership(void)
 {
   affected_type af;
   qint32 bonus = {};

@@ -337,7 +337,7 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (*name)
+  if (!name.isEmpty())
   { /* argument supplied. destroy single object or chararacter */
     if ((vict = ch->get_char_room_vis(name)) && (ch->getLevel() > G_POWER))
     {
@@ -1183,7 +1183,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     if (zon > last_room)
     {
 
-      ch->send(u"Unknown zone. Zone %1 is greater than last valid zone %2.\r\n"_s).arg(zon).arg(last_room));
+      ch->send(u"Unknown zone. Zone %1 is greater than last valid zone %2.\r\n"_s.arg(zon).arg(last_room));
       return ReturnValue::eFAILURE;
     }
     QString buf;
@@ -1378,14 +1378,14 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (levhigh != -555)
         if (((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->getLevel() > levhigh)
           continue;
-      if (*act)
+      if (!act.isEmpty())
         for (i = {}; i < ACT_MAX; i++)
           if (ISSET(act, i))
             if (!ISSET(
                     ((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->mobdata->actflags,
                     i + 1))
               goto eheh;
-      if (*affect)
+      if (!affect.isEmpty())
         for (i = {}; i < AFF_MAX; i++)
           if (ISSET(affect, i))
             if (!ISSET(
@@ -2326,7 +2326,6 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
     ch->desc->backstr = {};
     ch->desc->strnew = &(currprog->comlist);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {

@@ -26,7 +26,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename);
 bool read_pc_or_mob_data(CharacterPtr ch, FILE *fpsave, QString filename);
 void load_vaults();
 
-extern Vault *vault_table;
+extern VaultPtr vault_table;
 extern Leaderboard leaderboard;
 
 bool verbose_mode = false;
@@ -500,7 +500,7 @@ qint32 main(qint32 argc, QString *argv)
     // do_leaderboard(ch, "");
     // conn->process_output();
 
-    Vault *vault;
+    VaultPtr vault;
 
     for (vault = vault_table; vault; vault = vault->next)
     {

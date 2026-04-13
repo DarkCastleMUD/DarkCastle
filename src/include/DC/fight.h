@@ -16,7 +16,6 @@ constexpr auto COMBAT_MOD_RESIST = 1 << 1;
 constexpr auto COMBAT_MOD_SUSCEPT = 1 << 2;
 constexpr auto COMBAT_MOD_IGNORE = 1 << 3;
 constexpr auto COMBAT_MOD_REDUCED = 1 << 4;
-void perform_violence(void);
 
 // These are so that we only need one copy of one_hit and weapon_spells and
 // skewer and behead

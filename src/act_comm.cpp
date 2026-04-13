@@ -405,12 +405,12 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
   if (ch->player->ignoring.contains(arg1))
   {
     ch->player->ignoring.remove(arg1);
-    ch->sendln(u"You stop ignoring %1."_s).arg(arg1));
+    ch->sendln(u"You stop ignoring %1."_s.arg(arg1));
   }
   else
   {
     ch->player->ignoring[arg1] = {true, 0};
-    ch->sendln(u"You now ignore anyone named %1."_s).arg(arg1));
+    ch->sendln(u"You now ignore anyone named %1."_s.arg(arg1));
   }
   return ReturnValue::eSUCCESS;
 }
@@ -473,7 +473,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (*penname) /* there were two arguments */
+  if (!penname.isEmpty()) /* there were two arguments */
   {
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
@@ -546,7 +546,6 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_room("$n begins to jot down a note.", ch, 0, 0, INVIS_NULL);
     // TODO BROKEN
     // ch->desc->strnew = &paper->ActionDescription();
-    ch->desc->max_str = MAX_NOTE_LENGTH;
   }
   return ReturnValue::eSUCCESS;
 }
@@ -560,7 +559,7 @@ command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, arg);
 
-  if (*arg)
+  if (!arg.isEmpty())
   {
     if (!(victim = ch->get_char_room_vis(arg)))
     {
@@ -728,9 +727,9 @@ void DC::send_hint(void)
 
   QString hint = u"$B$5HINT:$7 %1$R\r\n"_s.arg(hints_.value(num));
 
-  for (auto &i : DC::getInstance()->connections_)
+  for (auto &conn : DC::getInstance()->connections_)
   {
-    if (!i.isPlaying() || !conn->character || !conn->character->desc || is_busy(conn->character) || conn->character->isNonPlayer())
+    if (!conn->isPlaying() || !conn->character || !conn->character->desc || is_busy(conn->character) || conn->character->isNonPlayer())
     {
       continue;
     }

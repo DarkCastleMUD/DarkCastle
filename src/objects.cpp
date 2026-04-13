@@ -372,7 +372,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (*argument)
+  if (!argument.isEmpty())
   {
     bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj, true);
     if (bits == 0)
@@ -902,7 +902,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
     if (temp->obj_flags.value[1] > 0) /* Not empty */
     {
       act_to_room(u"$n drinks %1 from $p."_s.arg(drinks[temp->obj_flags.value[2]]), this, temp, 0, INVIS_NULL);
-      sendln(u"You drink the %1."_s).arg(drinks[temp->obj_flags.value[2]]));
+      sendln(u"You drink the %1."_s.arg(drinks[temp->obj_flags.value[2]]));
 
       if (isImmortalPlayer())
         return ReturnValue::eSUCCESS;

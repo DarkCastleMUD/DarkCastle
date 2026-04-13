@@ -174,7 +174,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
   {
     obj_from_char(obj_object);
 
-    buffer = u"There was %1 coins."_s).arg(obj_object->obj_flags.value[0]);
+    buffer = u"There was %1 coins."_s.arg(obj_object->obj_flags.value[0]);
     if (ch->isNonPlayer() || !isSet(ch->player->toggles, Player::PLR_BRIEF))
     {
       ch->send(buffer);
@@ -195,7 +195,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
       }
       else
-        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s).arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
+        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s.arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
     //           !isexact("pc",sub_object->name()) && ch->clan
@@ -409,14 +409,14 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
       {
-        ch->send(u"%1 is too powerful for you to possess.\r\n"_s).arg(obj_object->short_description()));
+        ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
         continue;
       }
 
       if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
           !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
       {
-        ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s).arg(obj_object->short_description()));
+        ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s.arg(obj_object->short_description()));
         continue;
       }
 
@@ -526,7 +526,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
           !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
       {
-        ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s).arg(obj_object->short_description()));
+        ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s.arg(obj_object->short_description()));
       }
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
@@ -554,12 +554,12 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (ch->in_room != real_room(3099))
         {
-          ch->send(u"%1 is too powerful for you to possess.\r\n"_s).arg(obj_object->short_description()));
+          ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
           fail = true;
         }
         else
         {
-          ch->send(u"The aura of the donation room allows you to pick up %1.\r\n"_s).arg(obj_object->short_description()));
+          ch->send(u"The aura of the donation room allows you to pick up %1.\r\n"_s.arg(obj_object->short_description()));
           get(ch, obj_object, sub_object, 0, cmd);
           ch->save(cmd_t::SAVE_SILENTLY);
           found = true;
@@ -669,7 +669,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
           if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
               !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
           {
-            ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s).arg(obj_object->short_description()));
+            ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s.arg(obj_object->short_description()));
             continue;
           }
 
@@ -715,7 +715,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
                 if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
                 {
-                  ch->send(u"%1 is too powerful for you to possess.\r\n"_s).arg(obj_object->short_description()));
+                  ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
                   continue;
                 }
 
@@ -830,7 +830,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
           else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
           {
-            ch->send(u"%1 is too powerful for you to possess.\r\n"_s).arg(obj_object->short_description()));
+            ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
             fail = true;
           }
 
@@ -1013,7 +1013,7 @@ command_return_t do_consent(CharacterPtr ch, QString arg, cmd_t cmd)
     obj->name(buf2);
   }
 
-  ch->sendln(u"All corpses in the game which belong to you can now be molested by anyone named %1."_s).arg(arg1));
+  ch->sendln(u"All corpses in the game which belong to you can now be molested by anyone named %1."_s.arg(arg1));
   return ReturnValue::eSUCCESS;
 }
 
@@ -1105,14 +1105,14 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->removeGold(amount);
     if (ch->isImmortalPlayer())
     {
-      special_log(QString(u"%1 dropped %2 coins in room %3!"_s).arg(ch->name()).arg(amount).arg(ch->in_room));
+      special_log(QString(u"%1 dropped %2 coins in room %3!"_s.arg(ch->name()).arg(amount).arg(ch->in_room));
     }
 
     ch->save(cmd_t::SAVE_SILENTLY);
     return ReturnValue::eSUCCESS;
   }
 
-  if (*arg)
+  if (!arg.isEmpty())
   {
     if (!str_cmp(arg, "all") || sscanf(arg, "all.%s", alldot) != 0)
     {
@@ -1142,11 +1142,11 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
             ch->sendln("(This item is cursed, BTW.)");
           if (CAN_SEE_OBJ(ch, tmp_object))
           {
-            ch->sendln(u"You drop the %1."_s).arg(tmp_object->short_description));
+            ch->sendln(u"You drop the %1."_s.arg(tmp_object->short_description));
           }
           else if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            ch->sendln(u"You drop the %1."_s).arg(tmp_object->short_description));
+            ch->sendln(u"You drop the %1."_s.arg(tmp_object->short_description));
             blindlag = true;
           }
           else
@@ -1218,7 +1218,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           if (isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
-          ch->sendln(u"You drop the %1."_s).arg(tmp_object->short_description));
+          ch->sendln(u"You drop the %1."_s.arg(tmp_object->short_description));
           act_to_room("$n drops $p.", ch, tmp_object, 0, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
@@ -1613,7 +1613,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
              return ReturnValue::eFAILURE;
           }
     */
-    sendln(u"You give %1 coin%2 to %3."_s).arg(amount).arg(amount == 1 ? "" : "s").arg(qPrintable(vict->shortdesc_or_name())));
+    sendln(u"You give %1 coin%2 to %3."_s.arg(amount).arg(amount == 1 ? "" : "s").arg(qPrintable(vict->shortdesc_or_name())));
     logobjects(u"%1 gives %2 coin%3 to %4"_s.arg(qPrintable(this->name())).arg(amount).arg(pluralize(amount)).arg(qPrintable(vict->name())));
     act_to_victim(u"%1 gives you %2 $B$5gold$R coin%3."_s.arg(PERS(this, vict)).arg(amount).arg(amount == 1 ? "" : "s"), this, 0, vict, INVIS_NULL);
     act_to_room("$n gives some gold to $N.", this, 0, vict, INVIS_NULL | NOTVICT);
@@ -1622,7 +1622,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
     if (this->isNonPlayer() && (!IS_AFFECTED(this, AFF_CHARM) || getLevel() > 50))
     {
-      special_log(QString(u"%1 (mob) giving %2 gold to %3 in room %4."_s).arg(name()).arg(amount).arg(vict->name()).arg(in_room));
+      special_log(QString(u"%1 (mob) giving %2 gold to %3 in room %4."_s.arg(name()).arg(amount).arg(vict->name()).arg(in_room));
     }
 
     if (getGold() < 0)
@@ -1631,7 +1631,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
       sendln("Warning:  You are giving out more $B$5gold$R than you had.");
       if (getLevel() < IMPLEMENTER)
       {
-        special_log(QString(u"%1 gives %2 coins to %3 (negative!) in room %4."_s).arg(name()).arg(amount).arg(vict->name()).arg(in_room));
+        special_log(QString(u"%1 gives %2 coins to %3 (negative!) in room %4."_s.arg(name()).arg(amount).arg(vict->name()).arg(in_room));
       }
     }
     vict->addGold(amount);
@@ -2072,7 +2072,7 @@ qint32 find_door(CharacterPtr ch, QString type, QString dir)
           "down",
           "\n"};
 
-  if (*dir) /* a direction was specified */
+  if (!dir.isEmpty()) /* a direction was specified */
   {
     if ((door = search_block(dir, dirs, false)) == -1) /* Partial Match */
     {
@@ -2178,13 +2178,13 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
       {
         if (EXIT(ch, door)->bracee->in_room == ch->in_room)
         {
-          ch->sendln(u"%1 is holding the %2 shut."_s).arg(EXIT(ch, door)->bracee->name()).arg(fname(EXIT(ch, door)->keyword)));
-          EXIT(ch, door)->bracee->sendln(u"The %1 quivers slightly but holds as %2 attempts to force their way through."_s).arg(fname(EXIT(ch, door)->keyword).arg(ch->name()));
+          ch->sendln(u"%1 is holding the %2 shut."_s.arg(EXIT(ch, door)->bracee->name()).arg(fname(EXIT(ch, door)->keyword)));
+          EXIT(ch, door)->bracee->sendln(u"The %1 quivers slightly but holds as %2 attempts to force their way through."_s.arg(fname(EXIT(ch, door)->keyword).arg(ch->name()));
         }
         else
         {
-          ch->sendln(u"The %1 seems to be barred from the other side."_s).arg(fname(EXIT(ch, door)->keyword)));
-          EXIT(ch, door)->bracee->sendln(u"The %1 quivers slightly but holds as someone attempts to force their way through."_s).arg(fname(EXIT(ch, door)->keyword)));
+          ch->sendln(u"The %1 seems to be barred from the other side."_s.arg(fname(EXIT(ch, door)->keyword)));
+          EXIT(ch, door)->bracee->sendln(u"The %1 quivers slightly but holds as someone attempts to force their way through."_s.arg(fname(EXIT(ch, door)->keyword)));
         }
       }
       else
@@ -2289,7 +2289,7 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
 
   if (found == false)
   {
-    ch->send(u"I see no %1 here.\r\n"_s).arg(type));
+    ch->send(u"I see no %1 here.\r\n"_s.arg(type));
   }
 
   // in case ch died or anything
@@ -2368,7 +2368,7 @@ command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (found == false)
   {
-    ch->send(u"I see no %1 here.\r\n"_s).arg(type));
+    ch->send(u"I see no %1 here.\r\n"_s.arg(type));
   }
 
   return ReturnValue::eSUCCESS;
@@ -2553,7 +2553,7 @@ command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
         door_keyword = fname(EXIT(ch, door)->keyword);
       }
 
-      ch->sendln(u"You open the %1."_s).arg(door_keyword));
+      ch->sendln(u"You open the %1."_s.arg(door_keyword));
       auto rc = ch->do_open({door_keyword, dir});
       free(copy_of_door_keyword);
       return rc;
@@ -2707,7 +2707,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
     {
       qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s).arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
+      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s.arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
     }
 

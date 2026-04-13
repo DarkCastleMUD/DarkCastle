@@ -179,7 +179,7 @@ command_return_t do_add_quest(CharacterPtr ch, QString name)
 
   quest_list.push_back(quest);
 
-  ch->send(u"Quest number %1 added.\r\n\r\n"_s).arg(quest->number));
+  ch->send(u"Quest number %1 added.\r\n\r\n"_s.arg(quest->number));
   show_quest_info(ch, quest->number);
 
   return ReturnValue::eSUCCESS;
@@ -722,7 +722,7 @@ void quest_update()
 
               DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", qPrintable(i->name()), quest->number, quest->name);
 
-              i->send(u"Time has expired for %1.  This quest has ended.\r\n"_s).arg(quest->name));
+              i->send(u"Time has expired for %1.  This quest has ended.\r\n"_s.arg(quest->name));
             }
             i->player->quest_current_ticksleft[j]--;
             break;
@@ -1028,7 +1028,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->send(u"%s takes 2000 platinum from you.\r\n"_s).arg(qPrintable(qmaster->shortdesc_or_name())));
+    ch->send(u"%s takes 2000 platinum from you.\r\n"_s.arg(qPrintable(qmaster->shortdesc_or_name())));
     GET_PLATINUM(ch) -= 2000;
     ch->send(u"%s takes a brownie point from you.\r\n"_s.arg(qPrintable(qmaster->shortdesc_or_name())));
     obj_from_char(brownie);
@@ -1300,51 +1300,51 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       ch->send(u"Name changed from %1 "_s.arg(quest->name));
       quest->name = field;
-      ch->send(u"to %1.\r\n"_s).arg(quest->name));
+      ch->send(u"to %1.\r\n"_s.arg(quest->name));
     }
     break;
   case 1: // level
     ch->send(u"Level changed from %1 "_s.arg(quest->level));
     quest->level = atoi(value);
-    ch->send(u"to %1.\r\n"_s).arg(quest->level));
+    ch->send(u"to %1.\r\n"_s.arg(quest->level));
     break;
   case 2: // objnum
     ch->send(u"Objnum changed from %1 "_s.arg(quest->objnum));
     quest->objnum = atoi(value);
-    ch->send(u"to %1.\r\n"_s).arg(quest->objnum));
+    ch->send(u"to %1.\r\n"_s.arg(quest->objnum));
     break;
   case 3: // objshort
     ch->send(u"Objshort changed from %1 "_s.arg(quest->objshort));
     dc_sprintf(field, "%s %s", value, argument);
     quest->objshort = field;
-    ch->send(u"to %1.\r\n"_s).arg(quest->objshort));
+    ch->send(u"to %1.\r\n"_s.arg(quest->objshort));
     break;
   case 4: // objlong
     ch->send(u"Objlong changed from %1 "_s.arg(quest->objlong));
     dc_sprintf(field, "%s %s", value, argument);
     quest->objlong = field;
-    ch->send(u"to %1.\r\n"_s).arg(quest->objlong));
+    ch->send(u"to %1.\r\n"_s.arg(quest->objlong));
     break;
   case 5: // objkey
     ch->send(u"Objkey changed from %1 "_s.arg(quest->objkey));
     dc_sprintf(field, "%s %s", value, argument);
     quest->objkey = field;
-    ch->send(u"to %1.\r\n"_s).arg(quest->objkey));
+    ch->send(u"to %1.\r\n"_s.arg(quest->objkey));
     break;
   case 6: // mobnum
     ch->send(u"Mobnum changed from %1 "_s.arg(quest->mobnum));
     quest->mobnum = atoi(value);
-    ch->send(u"to %1.\r\n"_s).arg(quest->mobnum));
+    ch->send(u"to %1.\r\n"_s.arg(quest->mobnum));
     break;
   case 7: // timer
     ch->send(u"Timer changed from %1 "_s.arg(quest->timer));
     quest->timer = atoi(value);
-    ch->send(u"to %1.\r\n"_s).arg(quest->timer));
+    ch->send(u"to %1.\r\n"_s.arg(quest->timer));
     break;
   case 8: // reward
     ch->send(u"Reward changed from %1 "_s.arg(quest->reward));
     quest->reward = atoi(value);
-    ch->send(u"to %1.\r\n"_s).arg(quest->reward));
+    ch->send(u"to %1.\r\n"_s.arg(quest->reward));
     break;
   case 9: // hint1
     dc_sprintf(field, "%s %s", value, argument);
@@ -1367,7 +1367,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   case 12: // cost
     ch->send(u"Cost changed from %1 "_s.arg(quest->cost));
     quest->cost = atoi(value);
-    ch->send(u"to %1.\r\n"_s).arg(quest->cost));
+    ch->send(u"to %1.\r\n"_s.arg(quest->cost));
     break;
   case 13: // brownie
     if (quest->brownie)
@@ -1541,7 +1541,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
         search_char_for_item(ch, obj->item_number, false))
     {
-      owner->do_tell(u"%1 You already have one of those."_s).arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 You already have one of those."_s.arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
@@ -1577,7 +1577,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
     if (!obj->isQuest())
     {
-      owner->do_tell(u"%1 I only buy quest equipment."_s).arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 I only buy quest equipment."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 

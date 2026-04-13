@@ -264,9 +264,9 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   if (results.isEmpty())
   {
     if (arg1.isEmpty())
-      sendln(u"No charmable pets found for a %1."_s).arg(Character::classes_[c_class].name));
+      sendln(u"No charmable pets found for a %1."_s.arg(Character::classes_[c_class].name));
     else
-      sendln(u"No charmable pets found for a %1."_s).arg(arg1));
+      sendln(u"No charmable pets found for a %1."_s.arg(arg1));
     sendln("Type 'pets all' to see charmable pets for all classes.");
     sendln("Type 'pets bard' to see charmable pets for bards.");
     sendln("Type 'pets bard 50' or 'pets 50' to only see pets level 50 or above.");

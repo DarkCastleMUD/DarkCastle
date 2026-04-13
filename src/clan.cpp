@@ -30,7 +30,6 @@ quint64 i = UINT64_MAX;
 #include "DC/interp.h"   // do_outcast, etc..
 #include "DC/terminal.h" // get_char_room_vis
                          // CLAN_ROOM flag
-#include "DC/Trace.h"
 #include "DC/clan.h"
 
 void addtimer(timer_data *timer);
@@ -56,9 +55,8 @@ const QStringList clan_rights = {
     "log",
     "\n"};
 
-void boot_clans(void)
+void DC::boot_clans(void)
 {
-  clan_room_data *new_new_room = {};
   ClanMember *new_new_member = {};
   qint32 tempint;
   bool skip_clan = false, changes_made = false;
@@ -77,121 +75,120 @@ void boot_clans(void)
     if (!file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
       qFatal("Unable to open ../lib/clan.txt file for reading...");
   }
-  QTextStream out(&file);
+  QTextStream stream(&file);
 
   QChar a;
-  while ((a = fread_char(out)) != '~')
+  while ((a = fread_char(stream)) != '~')
   {
-    out.seek(-1);
+    stream.seek(-1);
 
-    new_new_clan = new Clan;
-    new_new_clan->leader_ = fread_word(fl, 1);
-    new_new_clan->founder_ = fread_word(fl, 1);
-    new_new_clan->name(fread_word(fl, 1));
-    new_new_clan->number = fread_int(fl, 0, 2147483467);
-    if (new_new_clan->number < 1 || new_new_clan->number == UINT16_MAX)
+    auto new_new_clan = ClanPtr(new Clan(this));
+    new_new_clan->leader_ = fread_word(stream);
+    new_new_clan->founder_ = fread_word(stream);
+    new_new_clan->name(fread_word(stream));
+    new_new_clan->id_ = fread_int(stream, 0, 2147483467);
+    if (new_new_clan->id_ < 1 || new_new_clan->id_ == UINT16_MAX)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+      logf(0, DC::LogChannel::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->id_);
       skip_clan = true;
     }
 
-    if (get_clan(new_new_clan->number) != nullptr)
+    if (get_clan(new_new_clan->id_) != nullptr)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+      logf(0, DC::LogChannel::LOG_BUG, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->id_);
       skip_clan = true;
     }
 
     QChar b;
     while (true) /* I see clan rooms! */
     {
-      b = fread_char(fl);
+      b = fread_char(stream);
       if (b == 'S')
         break;
       if (b != 'R')
         continue;
-      auto new_new_room = new clan_room_data;
-      new_new_room->next = new_new_clan->rooms;
-      tempint = fread_int(fl, 0, 50000);
-      new_new_room->room_number = (qint16)tempint;
-      new_new_clan->rooms = new_new_room;
+
+      tempint = fread_int(stream, 0, 50000);
+      if (tempint)
+        new_new_clan->rooms_.insert(tempint);
     }
 
     QChar a;
-    while ((a = fread_char(fl)) != '~')
+    while ((a = fread_char(stream)) != '~')
     {
       if (a != ' ' && a != '\n')
-        getc(fl);
-      switch (a)
+        stream.read(1);
+      switch (a.toLatin1())
       {
       case ' ':
       case '\n':
         break;
       case 'E':
       {
-        new_new_clan->email_ = fread_string(fl, 0);
+        new_new_clan->email_ = fread_string(stream, 0);
         break;
       }
       case 'D':
       {
-        new_new_clan->description_ = fread_string(fl, 0);
+        new_new_clan->description_ = fread_string(stream, 0);
         break;
       }
       case 'C':
       {
-        new_new_clan->clanmotd_ = fread_string(fl, 0);
+        new_new_clan->clanmotd_ = fread_string(stream, 0);
         break;
       }
       case 'B':
       { // Account balance
         try
         {
-          new_new_clan->setBalance(fread_uint(fl, 0, UINT64_MAX));
+          new_new_clan->setBalance(fread_uint(stream, 0, UINT64_MAX));
         }
         catch (error_negative_int &e)
         {
-          qCritical("%s", qUtf8Printable(u"negative clan balance read for clan %1.\n"_s).arg(new_new_clan->number)));
-          qCritical("%s", qUtf8Printable(u"Setting clan %1's balance to 0.\n"_s.arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(u"negative clan balance read for clan %1.\n"_s.arg(new_new_clan->id_)));
+          qCritical("%s", qUtf8Printable(u"Setting clan %1's balance to 0.\n"_s.arg(new_new_clan->id_)));
           new_new_clan->setBalance(0);
         }
         catch (...)
         {
-          qCritical("%s", qUtf8Printable(u"unknown error reading clan balance for clan %1.\n"_s).arg(new_new_clan->number)));
-          qCritical("%s", qUtf8Printable(u"Setting clan %1's balance to 0.\n"_s.arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(u"unknown error reading clan balance for clan %1.\n"_s.arg(new_new_clan->id_)));
+          qCritical("%s", qUtf8Printable(u"Setting clan %1's balance to 0.\n"_s.arg(new_new_clan->id_)));
           new_new_clan->setBalance(0);
         }
         break;
       }
       case 'T':
       { // Tax
-        new_new_clan->tax = fread_int(fl, 0, 99);
+        new_new_clan->tax = fread_int(stream, 0, 99);
         break;
       }
       case 'L':
       {
-        new_new_clan->login_message_ = fread_qstring(fl);
+        new_new_clan->login_message_ = fread_string(stream);
         break;
       }
       case 'X':
       {
-        new_new_clan->death_message_ = fread_qstring(fl);
+        new_new_clan->death_message_ = fread_string(stream);
         break;
       }
       case 'O':
       {
-        new_new_clan->logout_message_ = fread_qstring(fl);
+        new_new_clan->logout_message_ = fread_string(stream);
         break;
       }
       case 'M':
       { // read a member
         new_new_member = new ClanMember;
-        new_new_member->name(fread_string(fl, 0));
-        new_new_member->rights(fread_int(fl, 0, 2147483467));
-        new_new_member->rank(fread_int(fl, 0, 2147483467));
-        new_new_member->unused1(fread_int(fl, 0, 2147483467));
-        new_new_member->unused2(fread_int(fl, 0, 2147483467));
-        new_new_member->unused3(fread_int(fl, 0, 2147483467));
-        new_new_member->time_joined(fread_int(fl, 0, 2147483467));
-        new_new_member->unused4(fread_string(fl, 0));
+        new_new_member->name(fread_string(stream));
+        new_new_member->rights(fread_int(stream, 0, 2147483467));
+        new_new_member->rank(fread_int(stream, 0, 2147483467));
+        new_new_member->unused1(fread_int(stream, 0, 2147483467));
+        new_new_member->unused2(fread_int(stream, 0, 2147483467));
+        new_new_member->unused3(fread_int(stream, 0, 2147483467));
+        new_new_member->time_joined(fread_int(stream, 0, 2147483467));
+        new_new_member->unused4(fread_string(stream));
 
         // add it to the member linked list
         add_clan_member(new_new_clan, new_new_member);
@@ -206,7 +203,7 @@ void boot_clans(void)
     if (skip_clan)
     {
       skip_clan = false;
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Deleting clan number %d.", new_new_clan->number);
+      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Deleting clan number %d.", new_new_clan->id_);
       delete_clan(new_new_clan);
       changes_made = true;
     }
@@ -216,7 +213,7 @@ void boot_clans(void)
     }
   }
 
-  fclose(fl);
+  fclose(stream);
 
   if (changes_made)
   {
@@ -228,8 +225,7 @@ void boot_clans(void)
 void save_clans(void)
 {
   FILE *fl;
-  Clan *pclan = {};
-  clan_room_data *proom = {};
+  ClanPtr pclan = {};
   ClanMember *pmember = {};
 
   if (!(fl = fopen("../lib/clan.txt", "w")))
@@ -239,7 +235,7 @@ void save_clans(void)
 
   for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
-    dc_fprintf(fl, "%s %s %s %d\n", qPrintable(pclan->leader_), qPrintable(pclan->founder_), qPrintable(pclan->name()), pclan->number);
+    dc_fprintf(fl, "%s %s %s %d\n", qPrintable(pclan->leader_), qPrintable(pclan->founder_), qPrintable(pclan->name()), pclan->id_);
     for (proom = pclan->rooms; proom; proom = proom->next)
       dc_fprintf(fl, "R %d\n", proom->room_number);
     dc_fprintf(fl, "S\n");
@@ -304,7 +300,7 @@ void save_clans(void)
 
   for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
-    dc_fprintf(fl, "%s %s %d\n", qPrintable(pclan->name()), qPrintable(pclan->leader_), pclan->number);
+    dc_fprintf(fl, "%s %s %d\n", qPrintable(pclan->name()), qPrintable(pclan->leader_), pclan->id_);
     dc_fprintf(fl, "$3Contact Email$R:  %s\n"
                    "$3Clan Hall$R:      %s\n"
                    "$3Clan info$R:\n"
@@ -322,11 +318,9 @@ void DC::free_clans_from_memory(void)
   clan_list.clear();
 }
 
-void assign_clan_rooms()
+void DC::assign_clan_rooms(void)
 {
-  Clan *clan = {};
-  clan_room_data *room = {};
-
+  ClanPtr clan = {};
   for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
     for (room = clan->rooms; room; room = room->next)
       if (-1 != real_room(room->room_number))
@@ -352,7 +346,7 @@ bool is_in_clan(Clan &clan, CharacterPtr ch)
 
 void remove_clan_member(qint32 clannumber, CharacterPtr ch)
 {
-  Clan *pclan = {};
+  ClanPtr pclan = {};
 
   if (!(pclan = get_clan(clannumber)))
     return;
@@ -360,7 +354,7 @@ void remove_clan_member(qint32 clannumber, CharacterPtr ch)
   remove_clan_member(pclan, ch);
 }
 
-void remove_clan_member(Clan *theClan, CharacterPtr ch)
+void remove_clan_member(ClanPtr theClan, CharacterPtr ch)
 {
   ClanMember *pcurr = {};
   ClanMember *plast = {};
@@ -385,7 +379,7 @@ void remove_clan_member(Clan *theClan, CharacterPtr ch)
 }
 
 // Add someone.  Just makes the class, fills it, then calls the other add_clan_member
-void add_clan_member(Clan *theClan, CharacterPtr ch)
+void add_clan_member(ClanPtr theClan, CharacterPtr ch)
 {
   ClanMember *pmember = {};
 
@@ -401,7 +395,7 @@ void add_clan_member(Clan *theClan, CharacterPtr ch)
 
 // This should really be done as a binary tree, but I'm lazy, and this doesn't get used
 // very often, so it's just a linked list sorted by member name
-void add_clan_member(Clan *theClan, ClanMember *new_new_member)
+void add_clan_member(ClanPtr theClan, ClanMember *new_new_member)
 {
   ClanMember *pcurr = {};
   ClanMember *plast = {};
@@ -503,7 +497,7 @@ qint32 has_right(CharacterPtr ch, quint32 bit)
   return isSet(pmember->rights(), bit);
 }
 
-qint32 num_clan_members(Clan *clan)
+qint32 num_clan_members(ClanPtr clan)
 {
   qint32 i = {};
   for (ClanMember *pmem = clan->members;
@@ -514,31 +508,31 @@ qint32 num_clan_members(Clan *clan)
   return i;
 }
 
-Clan *get_clan(qint32 nClan)
+ClanPtr get_clan(qint32 nClan)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
 
   if (nClan == 0)
     return {};
 
   for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
-    if (nClan == clan->number)
+    if (nClan == clan->id_)
       return clan;
 
   return 0;
 }
 
-Clan *get_clan(CharacterPtr ch)
+ClanPtr get_clan(CharacterPtr ch)
 {
   if (ch == 0)
   {
     return {};
   }
 
-  Clan *clan;
+  ClanPtr clan;
 
   for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
-    if (ch->clan == clan->number)
+    if (ch->clan == clan->id_)
       return clan;
 
   ch->clan = {};
@@ -548,7 +542,7 @@ Clan *get_clan(CharacterPtr ch)
 QString get_clan_name(qint32 nClan)
 {
 
-  Clan *clan = get_clan(nClan);
+  ClanPtr clan = get_clan(nClan);
 
   if (clan)
     return clan->name();
@@ -558,7 +552,7 @@ QString get_clan_name(qint32 nClan)
 
 QString get_clan_name(CharacterPtr ch)
 {
-  Clan *clan = get_clan(ch);
+  ClanPtr clan = get_clan(ch);
 
   if (clan)
     return clan->name();
@@ -566,7 +560,7 @@ QString get_clan_name(CharacterPtr ch)
   return "no clan";
 }
 
-QString get_clan_name(Clan *clan)
+QString get_clan_name(ClanPtr clan)
 {
   if (clan)
     return clan->name();
@@ -604,7 +598,7 @@ void clan_death(CharacterPtr ch, CharacterPtr killer)
 
   QString buf;
   QString secondbuf;
-  Clan *clan;
+  ClanPtr clan;
   QString curr = {};
 
   if (!(clan = get_clan(ch->clan)))
@@ -648,7 +642,7 @@ void clan_login(CharacterPtr ch)
     return;
 
   QString buf;
-  Clan *clan;
+  ClanPtr clan;
   QString curr = {};
 
   if (!(clan = get_clan(ch->clan)))
@@ -693,7 +687,7 @@ void clan_logout(CharacterPtr ch)
     return;
 
   QString buf;
-  Clan *clan;
+  ClanPtr clan;
   QString curr = {};
 
   if (!(clan = get_clan(ch->clan)))
@@ -727,7 +721,7 @@ void clan_logout(CharacterPtr ch)
 command_return_t do_accept(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
-  Clan *clan;
+  ClanPtr clan;
   QString buf;
 
   while (isspace(*arg))
@@ -788,7 +782,7 @@ command_return_t do_accept(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
 {
-  Clan *clanPtr = get_clan(this);
+  ClanPtr clanPtr = get_clan(this);
   if (!clanPtr)
   {
     sendln("You are not a member of any clan!");
@@ -873,14 +867,14 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   victim->clan = {};
   remove_clan_member(clan, victim);
   save_clans();
-  sendln(u"You cast %1 out of your clan."_s).arg(victim->name()));
-  victim->sendln(u"You are cast out of %1."_s).arg(clanPtr->name()));
+  sendln(u"You cast %1 out of your clan."_s.arg(victim->name()));
+  victim->sendln(u"You are cast out of %1."_s.arg(clanPtr->name()));
 
   DC::getInstance()->logentry(u"%1 was outcasted from clan [%2]."_s.arg(victim->name()).arg(clanPtr->name()), IMPLEMENTER, DC::LogChannel::LOG_CLAN);
 
   victim->save(cmd_t::SAVE_SILENTLY);
   if (!victim_connected)
-    free_char(victim, Trace("do_outcast"));
+    free_char(victim);
 
   return ReturnValue::eSUCCESS;
 }
@@ -888,7 +882,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
 command_return_t do_cpromote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
-  Clan *clan;
+  ClanPtr clan;
   QString buf;
 
   while (isspace(*arg))
@@ -948,7 +942,7 @@ command_return_t do_cpromote(CharacterPtr ch, QString arg, cmd_t cmd)
 
 qint32 clan_desc(CharacterPtr ch, QString arg)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
 
   QString buf;
   QString text;
@@ -982,7 +976,6 @@ qint32 clan_desc(CharacterPtr ch, QString arg)
 
   //  ch->desc->connected = Connection::states::EDITING;
   //  ch->desc->str = &clan->description;
-  //  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   ch->desc->backstr = {};
   send_to_char("        Write your description and stay within the line.  (/s saves /h for help)\r\n"
                "   |--------------------------------------------------------------------------------|\r\n",
@@ -991,13 +984,12 @@ qint32 clan_desc(CharacterPtr ch, QString arg)
   ch->send(ch->desc->backstr);
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->qstrnew = clan->description_;
-  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   return 1;
 }
 
 qint32 clan_motd(CharacterPtr ch, QString arg)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
 
   QString buf;
   QString text;
@@ -1031,8 +1023,6 @@ qint32 clan_motd(CharacterPtr ch, QString arg)
 
   // ch->desc->connected = Connection::states::EDITING;
   // ch->desc->str = &clan->clanmotd;
-  // ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
-
   ch->desc->backstr = {};
   send_to_char("        Write your motd and stay within the line.  (/s saves /h for help)\r\n"
                "   |--------------------------------------------------------------------------------|\r\n",
@@ -1045,13 +1035,12 @@ qint32 clan_motd(CharacterPtr ch, QString arg)
 
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(clan->clanmotd);
-  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   return 1;
 }
 
 qint32 clan_death_message(CharacterPtr ch, QString arg)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
 
   QString buf;
 
@@ -1119,7 +1108,7 @@ qint32 clan_death_message(CharacterPtr ch, QString arg)
 
 qint32 clan_logout_message(CharacterPtr ch, QString arg)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
 
   QString buf;
 
@@ -1175,7 +1164,7 @@ qint32 clan_logout_message(CharacterPtr ch, QString arg)
 
 qint32 clan_login_message(CharacterPtr ch, QString arg)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
 
   QString buf;
 
@@ -1231,7 +1220,7 @@ qint32 clan_login_message(CharacterPtr ch, QString arg)
 
 qint32 clan_email(CharacterPtr ch, QString arg)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
 
   QString buf;
   QString text;
@@ -1370,7 +1359,7 @@ command_return_t do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
 
 void do_clan_list(CharacterPtr ch)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
   QString buf, buf2;
 
   if (ch->getLevel() > 103)
@@ -1387,11 +1376,11 @@ void do_clan_list(CharacterPtr ch)
   {
     if (ch->getLevel() > 103)
     {
-      buf = fmt::format("{:2} {:<20}$R {:<16} {:3} {:16L}\r\n", clan->number, qPrintable(clan->name()), clan->leader, clan->tax, clan->getBalance());
+      buf = fmt::format("{:2} {:<20}$R {:<16} {:3} {:16L}\r\n", clan->id_, qPrintable(clan->name()), clan->leader, clan->tax, clan->getBalance());
     }
     else
     {
-      buf = fmt::format("{:2} {:<20}$R {:<16}\r\n", clan->number, qPrintable(clan->name()), clan->leader);
+      buf = fmt::format("{:2} {:<20}$R {:<16}\r\n", clan->id_, qPrintable(clan->name()), clan->leader);
     }
     ch->send(buf);
   }
@@ -1400,7 +1389,7 @@ void do_clan_list(CharacterPtr ch)
 void do_clan_member_list(CharacterPtr ch)
 {
   ClanMember *pmember = {};
-  Clan *pclan = {};
+  ClanPtr pclan = {};
   qint32 column = 1;
   QString buf, buf2[200];
 
@@ -1438,7 +1427,7 @@ void do_clan_member_list(CharacterPtr ch)
 
 bool is_clan_leader(CharacterPtr ch)
 {
-  Clan *pclan = {};
+  ClanPtr pclan = {};
 
   if (!ch || !(pclan = get_clan(ch->clan)))
     return 0;
@@ -1528,10 +1517,8 @@ void do_clan_rights(CharacterPtr ch, QString arg)
 
 void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Clan *clan = {};
-  Clan *tarclan = {};
-  clan_room_data *newroom = {};
-  clan_room_data *lastroom = {};
+  ClanPtr clan = {};
+  ClanPtr tarclan = {};
 
   QString buf;
   QString buf2;
@@ -1581,7 +1568,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
         *buf = '\0';
       }
     }
-    if (*buf)
+    if (!buf.isEmpty())
       ch->send(buf);
     ch->sendln("");
     return;
@@ -1619,7 +1606,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (get_clan(x) != nullptr)
     {
-      ch->send(u"%1 is an invalid clan number because it already exists.\r\n"_s).arg(x));
+      ch->send(u"%1 is an invalid clan number because it already exists.\r\n"_s.arg(x));
       return;
     }
 
@@ -1628,7 +1615,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
     clan->amt = {};
     clan->founder = (qPrintable(ch->name()));
     clan->name(text);
-    clan->number = x;
+    clan->id_ = x;
     clan->acc = {};
     clan->rooms = {};
     clan->next = {};
@@ -1751,10 +1738,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
     }
 
     SET_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
-    auto newroom = new clan_room_data;
-    newroom->room_number = skill;
-    newroom->next = tarclan->rooms;
-    tarclan->rooms = newroom;
+    tarclan->rooms.insert(skill);
     ch->sendln("Room added.");
     break;
   }
@@ -2104,9 +2088,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 void do_leader_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ClanMember *pmember = {};
-  //  Clan * tarclan = {};
-  //  clan_room_data * newroom = {};
-  //  clan_room_data * lastroom = {};
+  //  ClanPtr  tarclan = {};
 
   QString buf;
   QString select;
@@ -2179,7 +2161,7 @@ void do_leader_clans(CharacterPtr ch, QString arg, cmd_t cmd)
       }
       j++;
     }
-    if (*buf)
+    if (!buf.isEmpty())
       ch->send(buf);
     ch->sendln("");
     return;
@@ -2360,7 +2342,7 @@ qint32 needs_clan_command(CharacterPtr ch)
 
 command_return_t do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Clan *clan = {};
+  ClanPtr clan = {};
   QString tmparg;
 
   QString buf;
@@ -2412,7 +2394,7 @@ command_return_t do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Clan *clan;
+  ClanPtr clan;
   qint32 nClan;
   QString buf;
 
@@ -2469,7 +2451,7 @@ command_return_t do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Clan *clan;
+  ClanPtr clan;
   class Connection *desc;
   CharacterPtr pch;
   QString buf;
@@ -2489,13 +2471,13 @@ command_return_t do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
   for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
   {
     found = {};
-    if (clan_num && clan->number != clan_num)
+    if (clan_num && clan->id_ != clan_num)
       continue;
     for (desc = DC::getInstance()->connections_; desc; desc = desc->next)
     {
       if (desc->connected || !(pch = desc->character))
         continue;
-      if (pch->clan != clan->number || pch->getLevel() >= OVERSEER ||
+      if (pch->clan != clan->id_ || pch->getLevel() >= OVERSEER ||
           (!CAN_SEE(ch, pch) && ch->clan != pch->clan))
         continue;
       if (found == 0)
@@ -2503,7 +2485,7 @@ command_return_t do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
         dc_sprintf(buf, "$3Clan %s$R:\r\n", qPrintable(clan->name()));
         ch->send(buf);
       }
-      if (clan->number == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
+      if (clan->id_ == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
         dc_sprintf(buf, "  %s %s %s\r\n", qPrintable(pch->shortdesc_or_name()), (!dc_strcmp(qPrintable(pch->name()), clan->leader) ? "$3($RLeader$3)$R" : ""), isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
       else
         dc_sprintf(buf, "  %s %s\r\n", qPrintable(pch->shortdesc_or_name()), (!dc_strcmp(qPrintable(pch->name()), clan->leader) ? "$3($RLeader$3)$R" : ""));
@@ -2516,7 +2498,7 @@ command_return_t do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_cmotd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  Clan *clan;
+  ClanPtr clan;
 
   if (!ch->clan || !(clan = get_clan(ch)))
   {
@@ -2623,8 +2605,8 @@ command_return_t Character::do_cdeposit(QStringList arguments, cmd_t cmd)
   }
 
   send(u"You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n"_s.arg(dep).arg(coin));
-  QString log_entry = u"%1 deposited %2 gold %3 in the clan bank account.\r\n"_s).arg(name_).arg(dep).arg(coin);
-  Clan *clan = get_clan(this->clan);
+  QString log_entry = u"%1 deposited %2 gold %3 in the clan bank account.\r\n"_s.arg(name_).arg(dep).arg(coin);
+  ClanPtr clan = get_clan(this->clan);
   if (clan != nullptr)
   {
     clan->log(log_entry);
@@ -2686,7 +2668,7 @@ command_return_t do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     dc_snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %lu $B$5gold$R coins from the clan bank account.\r\n", qPrintable(ch->name()), wdraw);
   }
-  Clan *clan = get_clan(ch);
+  ClanPtr clan = get_clan(ch);
   if (clan != nullptr)
   {
     clan->log(buf);
@@ -3079,7 +3061,7 @@ bool can_lose(takeover_pulse_data *take)
   }
 }
 
-void pulse_takeover()
+void DC::pulse_takeover(void)
 {
   takeover_pulse_data *take, *next;
   for (take = pulse_list; take; take = next)
@@ -3188,7 +3170,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner > 0)
     {
-      this->send(u"This area is claimed by %s, you need to challenge to obtain ownership.\r\n"_s).arg(qPrintable(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner)->name())));
+      this->send(u"This area is claimed by %s, you need to challenge to obtain ownership.\r\n"_s.arg(qPrintable(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner)->name())));
 
       return ReturnValue::eFAILURE;
     }
@@ -3386,44 +3368,23 @@ bool others_clan_room(CharacterPtr ch, Room *room)
   }
 
   // ch is not in a clan
-  Clan *clan;
+  ClanPtr clan;
   if ((clan = get_clan(ch)) == 0)
   {
     return true;
   }
 
   // Search through our clan's list of rooms, to see if room is one of them
-  for (clan_room_data *c_room = clan->rooms; c_room; c_room = c_room->next)
-  {
-    if (room->number == c_room->room_number)
-    {
-      return false;
-    }
-  }
+  if (clan->rooms_.contains(room->number))
+    return false;
 
   // Room was a clan room, we are in a clan, but this room is not ours
   return true;
 }
 
-Clan::Clan(QString n)
-    : MinimumEntity(n)
+Clan::Clan(DC *dc, QString clan_id)
+    : QObject(dc), dc_(dc), MinimumEntity(n)
 {
-  balance = {};
-  leader = {};
-  founder = {};
-  email = {};
-  description = {};
-  login_message = {};
-  death_message = {};
-  logout_message = {};
-  clanmotd = {};
-  rooms = {};
-  members = {};
-  next = {};
-  acc = {};
-  amt = {};
-  number = {};
-  tax = {};
 }
 
 void Clan::cdeposit(const quint64 &deposit)

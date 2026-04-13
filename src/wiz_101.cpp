@@ -21,8 +21,6 @@
 QQueue<QString> imm_history;
 QQueue<QString> imp_history;
 
-constexpr auto MAX_MESSAGE_LENGTH = 4096;
-
 command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 {
   if (!isImmortalPlayer())
@@ -149,7 +147,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     {
       if (zones.isEmpty())
       {
-        send(u"Invalid zone %1 specified. No zones loaded.\r\n"_s).arg(zone_key));
+        send(u"Invalid zone %1 specified. No zones loaded.\r\n"_s.arg(zone_key));
         return ReturnValue::eFAILURE;
       }
 
@@ -205,19 +203,19 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if ((target_mob = getVisiblePlayer(arg1)))
       {
         location = target_mob->in_room;
-        send(u"Going to player %1 in room %2.\r\n"_s).arg(qPrintable(target_mob->name())).arg(location));
+        send(u"Going to player %1 in room %2.\r\n"_s.arg(qPrintable(target_mob->name())).arg(location));
       }
       else if ((target_mob = getVisibleCharacter(arg1)))
       {
         location = target_mob->in_room;
-        send(u"Going to character %1 in room %2.\r\n"_s).arg(qPrintable(target_mob->name())).arg(location));
+        send(u"Going to character %1 in room %2.\r\n"_s.arg(qPrintable(target_mob->name())).arg(location));
       }
       else if ((target_obj = getVisibleObject(arg1)))
       {
         if (target_obj->in_room != DC::NOWHERE)
         {
           location = target_obj->in_room;
-          send(u"Going to object %1 in room %2.\r\n"_s).arg(target_obj->name()).arg(location));
+          send(u"Going to object %1 in room %2.\r\n"_s.arg(target_obj->name()).arg(location));
         }
         else
         {
@@ -773,14 +771,14 @@ command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
       if (amt > max)
       {
-        ch->send(u"Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n"_s).arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        ch->send(u"Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n"_s.arg(j + 1).arg(zone_key).arg(amt).arg(max));
         QString buffer = strdup(u"%1 list %2 1"_s.arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
         free(buffer);
       }
       else
       {
-        ch->send(u"Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n"_s).arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        ch->send(u"Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n"_s.arg(j + 1).arg(zone_key).arg(amt).arg(max));
         QString buffer = strdup(u"%1 list %2 1"_s.arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
         free(buffer);

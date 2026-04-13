@@ -123,14 +123,14 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
       this->desc->snooping->snoop_by = {};
       this->desc->snooping = {};
     }
-    DC::getInstance()->logentry(u"%1 snoops themself."_s).arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::getInstance()->logentry(u"%1 snoops themself."_s.arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
     return ReturnValue::eSUCCESS;
   }
 
   if (victim->getLevel() == IMPLEMENTER)
   {
     sendln("What are you!? Crazy! You can't snoop an Imp.");
-    victim->sendln(u"%1 failed snooping you."_s).arg(name()));
+    victim->sendln(u"%1 failed snooping you."_s.arg(name()));
     return ReturnValue::eFAILURE;
   }
 
@@ -138,7 +138,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   {
     if (victim->desc->snoop_by->character)
     {
-      sendln(u"%1 is snooping them already."_s).arg(victim->desc->snoop_by->character->name()));
+      sendln(u"%1 is snooping them already."_s.arg(victim->desc->snoop_by->character->name()));
     }
     else
     {
@@ -157,7 +157,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   this->desc->snooping = victim->desc;
   victim->desc->snoop_by = this->desc;
-  DC::getInstance()->logentry(u"%1 snoops %2."_s).arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 snoops %2."_s.arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 

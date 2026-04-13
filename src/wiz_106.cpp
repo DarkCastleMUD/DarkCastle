@@ -15,7 +15,7 @@ command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 minamt;
 
   one_argument(argument, arg);
-  if (*arg)
+  if (!arg.isEmpty())
     minamt = atoi(arg);
   else
     minamt = 1;
@@ -372,7 +372,7 @@ command_return_t test_casino(CharacterPtr ch)
 
   if (ch->getGold() > 2000000)
   {
-    ch->send(u"Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n"_s).arg(ch->getGold()));
+    ch->send(u"Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n"_s.arg(ch->getGold()));
     max_rc = max_rc | ReturnValue::eFAILURE;
   }
 
@@ -404,7 +404,7 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
     command_return_t rc = {};
     for (auto &test : tests)
     {
-      send(u"Running %1.."_s).arg(test.getName()));
+      send(u"Running %1.."_s.arg(test.getName()));
       rc = test.run(this) & rc;
       sendln(u"Return code is %1 (%2)"_s.arg(rc).arg(rc_to_qstring(rc)));
     }

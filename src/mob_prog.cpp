@@ -27,7 +27,6 @@
  ***************************************************************************/
 
 #include <sys/types.h>
-#include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <cctype>
@@ -39,18 +38,10 @@
 #include <fmt/format.h>
 #include <QString>
 
-#include "DC/levels.h"
-#include "DC/player.h"
-
-#include "DC/structs.h"
-
 #include "DC/interp.h"
-#include "DC/handler.h"
 #include "DC/db.h"
-#include "DC/returnvals.h"
 #include "DC/inventory.h"
 #include "DC/DC.h"
-#include "DC/Trace.h"
 
 // Extern variables
 
@@ -4660,7 +4651,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
   return temp;
 }
 
-void end_oproc(CharacterPtr ch, Trace trace)
+void end_oproc(CharacterPtr ch)
 {
   static qint32 core_counter = {};
   if (selfpurge)
@@ -4696,7 +4687,7 @@ qint32 Character::oprog_can_see_trigger(ObjectPtr item)
   {
     vmob = dc_->initiate_oproc(this, item);
     mprog_percent_check(vmob, this, item, nullptr, CAN_SEE_PROG);
-    end_oproc(vmob, Trace("oprog_can_see_trigger"));
+    end_oproc(vmob);
     return mprog_cur_result;
   }
   return mprog_cur_result;
@@ -4720,10 +4711,10 @@ qint32 Character::oprog_speech_trigger(const QString txt)
       vmob = dc_->initiate_oproc(this, item);
       if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
       {
-        end_oproc(vmob, Trace("oprog_speech_trigger1"));
+        end_oproc(vmob);
         return mprog_cur_result;
       }
-      end_oproc(vmob, Trace("oprog_speech_trigger2"));
+      end_oproc(vmob);
     }
   for (item = carrying; item; item = item->next_content)
     if (dc_->obj_index[item->item_number].progtypes & SPEECH_PROG)
@@ -4731,10 +4722,10 @@ qint32 Character::oprog_speech_trigger(const QString txt)
       vmob = dc_->initiate_oproc(this, item);
       if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
       {
-        end_oproc(vmob, Trace("oprog_speech_trigger3"));
+        end_oproc(vmob);
         return mprog_cur_result;
       }
-      end_oproc(vmob, Trace("oprog_speech_trigger4"));
+      end_oproc(vmob);
     }
 
   for (qint32 i = {}; i < MAX_WEAR; i++)
@@ -4744,9 +4735,9 @@ qint32 Character::oprog_speech_trigger(const QString txt)
         vmob = dc_->initiate_oproc(this, equipment[i]);
         if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
         {
-          end_oproc(vmob, Trace("oprog_speech_trigger5"));
+          end_oproc(vmob);
         }
-        end_oproc(vmob, Trace("oprog_speech_trigger6"));
+        end_oproc(vmob);
       }
   return mprog_cur_result;
 }
@@ -4791,7 +4782,7 @@ qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qin
           mprog_driver(mprg->comlist, vmob, actor, obj2, vo, nullptr, rndm);
           if (selfpurge)
             return mprog_cur_result;
-          end_oproc(vmob, Trace("oprog_catch_trigger"));
+          end_oproc(vmob);
           break;
         }
       }
@@ -4821,10 +4812,10 @@ qint32 Character::oprog_act_trigger(QString txt)
       vmob = dc_->initiate_oproc(this, item);
       if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
       {
-        end_oproc(vmob, Trace("oprog_act_trigger1"));
+        end_oproc(vmob);
         return mprog_cur_result;
       }
-      end_oproc(vmob, Trace("oprog_act_trigger2"));
+      end_oproc(vmob);
     }
   for (item = carrying; item; item = item->next_content)
     if (dc_->obj_index[item->item_number].progtypes & ACT_PROG)
@@ -4832,10 +4823,10 @@ qint32 Character::oprog_act_trigger(QString txt)
       vmob = dc_->initiate_oproc(this, item);
       if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
       {
-        end_oproc(vmob, Trace("oprog_act_trigger3"));
+        end_oproc(vmob);
         return mprog_cur_result;
       }
-      end_oproc(vmob, Trace("oprog_act_trigger4"));
+      end_oproc(vmob);
     }
 
   for (qint32 i = {}; i < MAX_WEAR; i++)
@@ -4845,10 +4836,10 @@ qint32 Character::oprog_act_trigger(QString txt)
         vmob = dc_->initiate_oproc(this, equipment[i]);
         if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
         {
-          end_oproc(vmob, Trace("oprog_act_trigger5"));
+          end_oproc(vmob);
           return mprog_cur_result;
         }
-        end_oproc(vmob, Trace("oprog_act_trigger6"));
+        end_oproc(vmob);
       }
   return mprog_cur_result;
 }
@@ -4867,7 +4858,7 @@ qint32 Character::oprog_greet_trigger(void)
     {
       auto vmob = dc_->initiate_oproc(this, item);
       mprog_percent_check(vmob, this, item, nullptr, ALL_GREET_PROG);
-      end_oproc(vmob, Trace("oprog_greet_trigger"));
+      end_oproc(vmob);
       return mprog_cur_result;
     }
   return mprog_cur_result;

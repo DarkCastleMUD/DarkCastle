@@ -203,7 +203,7 @@ command_return_t do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
 
   dc_sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", qPrintable(ch->name()), arg);
 
-  for (auto &i : DC::getInstance()->connections_)
+  for (auto &conn : DC::getInstance()->connections_)
   {
     if ((conn->character == nullptr) || (conn->character->getLevel() <= MORTAL))
       continue;

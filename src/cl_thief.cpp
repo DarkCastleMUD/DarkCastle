@@ -1570,7 +1570,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
         door_keyword = fname(EXIT(ch, door)->keyword);
       }
 
-      ch->sendln(u"You open the %1."_s).arg(door_keyword));
+      ch->sendln(u"You open the %1."_s.arg(door_keyword));
       auto rc = ch->do_open({door_keyword, dir});
     }
   }
@@ -1662,7 +1662,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Whoops!  You dropped the coins!");
       if (ch->isImmortalPlayer())
       {
-        special_log(QString(u"%1 tries to slip %2 coins to %3 and drops them in room %4!"_s).arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
+        special_log(QString(u"%1 tries to slip %2 coins to %3 and drops them in room %4!"_s.arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
       }
 
       act("$n tries to slip you some coins, but $e accidentally drops "
@@ -1687,7 +1687,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (ch->isImmortalPlayer())
       {
-        special_log(QString(u"%1 slips %2 coins to %3 in room %4!"_s).arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
+        special_log(QString(u"%1 slips %2 coins to %3 in room %4!"_s.arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
       }
 
       dc_sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
@@ -1858,7 +1858,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (ch->isImmortalPlayer())
     {
-      special_log(QString(u"%1 slips %2 to %3 and fumbles it in room %4!"_s).arg(ch->name()).arg(obj->short_description()).arg(vict->name()).arg(ch->in_room));
+      special_log(QString(u"%1 slips %2 to %3 and fumbles it in room %4!"_s.arg(ch->name()).arg(obj->short_description()).arg(vict->name()).arg(ch->in_room));
     }
 
     move_obj(obj, ch->in_room);
@@ -2232,7 +2232,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (*item)
+    if (!item.isEmpty())
     {
       if (victim == ch)
       {
@@ -2317,7 +2317,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else if (victim)
     {
-      ch->sendln(QString(u"After some consideration, you estimate the amount of $B$5gold$R %1 is carrying to be %2."_s).arg(victim->name()).arg(appraised));
+      ch->sendln(QString(u"After some consideration, you estimate the amount of $B$5gold$R %1 is carrying to be %2."_s.arg(victim->name()).arg(appraised));
     }
     WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 1.5));
   }

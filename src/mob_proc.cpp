@@ -932,7 +932,7 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
           if (obj && qPrintable(obj->short_description()))
           {
             act_to_room("The guard humiliates $n, and blocks $s way because they have $p.", ch, obj, 0, 0);
-            ch->sendln(u"The guard humiliates you, and blocks your way because you have %1."_s).arg(obj->short_description()));
+            ch->sendln(u"The guard humiliates you, and blocks your way because you have %1."_s.arg(obj->short_description()));
           }
           else
           {

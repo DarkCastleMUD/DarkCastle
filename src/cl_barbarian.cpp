@@ -91,7 +91,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 
     dam = number(100, 200) + 3 * (100 - skill);
 
-    ch->send(u"You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n"_s).arg(qPrintable(fname(exit->keyword))));
+    ch->send(u"You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n"_s.arg(qPrintable(fname(exit->keyword))));
     act_to_room("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
@@ -302,7 +302,7 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
     if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5))
       return ReturnValue::eSUCCESS;
 
-    ch->send(u"You lean heavily on the %s, bracing your shoulder solidly against it...\r\n"_s).arg(qPrintable(fname(exit->keyword))));
+    ch->send(u"You lean heavily on the %s, bracing your shoulder solidly against it...\r\n"_s.arg(qPrintable(fname(exit->keyword))));
     act_to_room("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
@@ -1159,7 +1159,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   learned = ch->has_skill(SKILL_KNOCKBACK);
   dam = 100;
 
-  if (*where)
+  if (!where.isEmpty())
   {
     if (learned < 80)
       ch->sendln("You're not good enough to direct your smashes, so you just let it fly!");

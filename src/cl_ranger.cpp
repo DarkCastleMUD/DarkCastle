@@ -250,11 +250,8 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   QString sex;
   QString condition;
   QString weight;
-
   CharacterPtr quarry;
-  CharacterPtr tmp_ch = {}; // For checking room stuff
-  QSharedPointer<Tracks> pScent = {};
-
+  CharacterPtr tmp_ch;
   QString victim = arguments.value(0);
 
   learned = how_deep = ((has_skill(SKILL_TRACK) / 10) + 1);
@@ -309,7 +306,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (DC::getInstance()->world[this->in_room].nTracks < 1)
+  if (DC::getInstance()->world[this->in_room].tracks_.size() < 1)
   {
     if (!hunting.isEmpty())
     {
@@ -332,8 +329,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     for (x = 1; x <= how_deep; x++)
     {
 
-      if ((x > DC::getInstance()->world[this->in_room].nTracks) ||
-          !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
+      if ((x > DC::getInstance()->world[this->in_room].tracks_.size()) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
       {
         if (!hunting.isEmpty())
         {
@@ -437,7 +433,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
   for (x = 1; x <= how_deep; x++)
   {
-    if ((x > DC::getInstance()->world[this->in_room].nTracks) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
+    if ((x > DC::getInstance()->world[this->in_room].tracks_.size()) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
     {
       if (x == 1)
         this->sendln("There are no distinct smells here.");
@@ -521,19 +517,19 @@ command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    sendln(u"You will ambush %1 on sight."_s).arg(ambush.isEmpty() ? "no one" : ambush));
+    sendln(u"You will ambush %1 on sight."_s.arg(ambush.isEmpty() ? "no one" : ambush));
     return ReturnValue::eSUCCESS;
   }
 
   if (ambush == arg1)
   {
     ambush.clear();
-    sendln(u"You will no longer ambush %1 on sight."_s).arg(arg1));
+    sendln(u"You will no longer ambush %1 on sight."_s.arg(arg1));
     return ReturnValue::eSUCCESS;
   }
 
   ambush = arg1;
-  sendln(u"You will now ambush %1 on sight."_s).arg(arg1));
+  sendln(u"You will now ambush %1 on sight."_s.arg(arg1));
   return ReturnValue::eSUCCESS;
 }
 
@@ -1186,7 +1182,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   dir = -1;
   artype = {};
 
-  if (*arrow)
+  if (!arrow.isEmpty())
   {
     artype = parse_arrow(ch, arrow);
     if (!artype)
@@ -1210,7 +1206,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
       break;
     }
   }
-  if (*direct)
+  if (!direct.isEmpty())
   {
     if (direct[0] == 'n')
       dir = {};
@@ -1744,7 +1740,7 @@ command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   act_to_character("You enter $S mind...", ch, 0, target, INVIS_NULL);
-  ch->sendln(u"%1 seems to hate... %2."_s).arg(qPrintable(target->shortdesc_or_name())).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
+  ch->sendln(u"%1 seems to hate... %2."_s.arg(qPrintable(target->shortdesc_or_name())).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
 
   if (ch->master)
     dc_sprintf(buf, "%s seems to really like... %s.\r\n", qPrintable(target->shortdesc_or_name()),

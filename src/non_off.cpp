@@ -253,7 +253,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln(u"You can only yield %1 from a safe room."_s).arg(obj->short_description()));
+      ch->sendln(u"You can only yield %1 from a safe room."_s.arg(obj->short_description()));
       return ReturnValue::eFAILURE;
     }
   }
@@ -521,7 +521,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
     {
       if (key.isEmpty() == false)
       {
-        send(u"%1 not found.\r\n"_s).arg(key));
+        send(u"%1 not found.\r\n"_s.arg(key));
       }
       else
       {
@@ -538,12 +538,12 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
   {
     if (player->config->find(key) != player->config->end())
     {
-      sendln(u"%1 unset."_s).arg(key));
+      sendln(u"%1 unset."_s.arg(key));
       player->config->insert(key, QString());
       save(cmd_t::SAVE_SILENTLY);
       return ReturnValue::eSUCCESS;
     }
-    send(u"%1 not found.\r\n"_s).arg(key));
+    send(u"%1 not found.\r\n"_s.arg(key));
     return ReturnValue::eFAILURE;
   }
 

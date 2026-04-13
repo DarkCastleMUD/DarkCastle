@@ -966,7 +966,7 @@ bool Character::can_use_command(cmd_t cmd)
   return true;
 }
 
-void pulse_command_lag()
+void DC::pulse_command_lag(void)
 {
   command_lag *cmdl{}, *cmdlp = {}, *cmdlnext = {};
 

@@ -451,7 +451,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (*name)
+  if (!name.isEmpty())
     victim = ch->get_char_room_vis(name);
   else
     victim = ch->fighting;
@@ -1411,7 +1411,7 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, name);
 
-  if (*argument)
+  if (!argument.isEmpty())
     if (!(vict = ch->get_char_room_vis(name)))
     {
       ch->sendln("Smite whom?");

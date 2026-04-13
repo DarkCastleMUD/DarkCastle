@@ -1025,7 +1025,7 @@ void DC::nanny(class Connection *d, QString arg)
     else
       conn->character->send(imotd);
 
-    Clan *clan;
+    ClanPtr clan;
     if ((clan = get_clan(ch->clan)) && clan->clanmotd)
     {
       ch->sendln("$B----------------------------------------------------------------------$R");
@@ -1033,7 +1033,7 @@ void DC::nanny(class Connection *d, QString arg)
       ch->sendln("$B----------------------------------------------------------------------$R");
     }
 
-    write_to_output(u"\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n"_s).arg(ch->player->last_site), d);
+    write_to_output(u"\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n"_s.arg(ch->player->last_site), d);
     telnet_ga(d);
 
     if (conn->character->player->bad_pw_tries)
@@ -1685,7 +1685,7 @@ void DC::nanny(class Connection *d, QString arg)
       if (ch->getLevel() > 0)
       {
         dc_strcpy(tmp_name, qPrintable(ch->name()));
-        free_char(conn->character, Trace("nanny Connection::states::SELECT_MENU 1"));
+        free_char(conn->character);
         conn->character = {};
         load_char_obj(d, tmp_name);
         ch = conn->character;
@@ -1770,7 +1770,6 @@ void DC::nanny(class Connection *d, QString arg)
       ch->description({});
 
       conn->qstrnew = ch->description();
-      conn->max_str = 539;
       conn->connected = Connection::states::EXDSCR;
       break;
 
@@ -1901,7 +1900,7 @@ void DC::nanny(class Connection *d, QString arg)
       // this prevents a dupe bug
       dc_strcpy(blah1, qPrintable(ch->name()));
       dc_strcpy(blah2, ch->player->pwd);
-      free_char(conn->character, Trace("nanny Connection::states::CONFIRM_RESET_PASSWORD"));
+      free_char(conn->character);
       conn->character = {};
       load_char_obj(d, blah1);
       ch = conn->character;
@@ -1934,7 +1933,7 @@ qint32 _parse_email(QString arg)
 }
 
 // Parse a name for acceptability.
-bool _parse_name(QString arg, QString name)
+bool DC::_parse_name(QString arg, QString name)
 {
   arg = arg.trimmed();
 
@@ -2003,7 +2002,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 
     if (fReconnect == true)
     {
-      free_char(conn->character, Trace("check_reconnect"));
+      free_char(conn->character);
       conn->character = tmp_ch;
       tmp_ch->desc = d;
       tmp_ch->timer = {};
@@ -2065,7 +2064,7 @@ bool check_playing(class Connection *d, QString name)
 
     if (dold->connected == Connection::states::GET_OLD_PASSWORD)
     {
-      free_char(dold->character, Trace("check_playing"));
+      free_char(dold->character);
       dold->character = {};
       close_socket(dold);
       continue;
@@ -2231,7 +2230,7 @@ void check_silence_beacons(void)
   }
 }
 
-void checkConsecrate(qint32 pulseType)
+void DC::checkConsecrate(qint32 pulseType)
 {
   ObjectPtr obj, tmp_obj;
   CharacterPtr ch = {}, tmp_ch, next_ch;

@@ -867,7 +867,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       QLocale::setDefault(QLocale("en_US"));
-      ch->send(u"The Meta-physician takes %L1 platinum from you, leaving you with %L2 platinum.\r\n"_s).arg(statplatprice).arg(GET_PLATINUM(ch));
+      ch->send(u"The Meta-physician takes %L1 platinum from you, leaving you with %L2 platinum.\r\n"_s.arg(statplatprice).arg(GET_PLATINUM(ch));
 
       // affect the stat by 0 to reflect the new raw stat
       affect_modify(ch, APPLY_STR, 0, -1, true);
@@ -903,7 +903,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
       QLocale::setDefault(QLocale("en_US"));
-      ch->send(u"The Meta-physician takes %L1 platinum from you, leaving you with %L2 platinum.\r\n"_s).arg(hit_cost).arg(GET_PLATINUM(ch)));
+      ch->send(u"The Meta-physician takes %L1 platinum from you, leaving you with %L2 platinum.\r\n"_s.arg(hit_cost).arg(GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       return ReturnValue::eSUCCESS;
     }

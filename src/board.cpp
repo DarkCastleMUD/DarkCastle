@@ -40,18 +40,15 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 */
 #include "DC/DC.h"
-#include "DC/class.h"
-#include "DC/structs.h"
 #include "DC/clan.h"
-#include "DC/act.h"
 #include "DC/interp.h"
 
 #include <cstdio>  // FILE *
 #include <cstring> // memset()
 #include <QString>
 #include <QMap>
-
-constexpr auto MAX_MESSAGE_LENGTH = 2048;
+#include <qdebug.h>
+#include <qiodevicebase.h>
 
 class message
 {
@@ -80,7 +77,6 @@ public:
 
 void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
 qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-QString fread_string(FILE *fl, qint32 hasher);
 qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
 void board_save_board(QMap<QString, BOARD_INFO>::iterator board);
 void board_load_board();
@@ -545,33 +541,28 @@ QMap<QString, BOARD_INFO> populate_boards()
 
 QMap<QString, BOARD_INFO> board_db = populate_boards();
 
-qint32 save_boards()
+command_return_t DC::save_boards(void)
 {
-  QMap<QString, BOARD_INFO>::iterator board_it;
-
-  FILE *the_file;
-
-  the_file = fopen("board/index", "w");
-
-  if (!the_file)
+  QSaveFile board_file("board/index");
+  if (!board_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
     DC::getInstance()->logentry(u"Unable to open/create save file for bulletin board index"_s, ANGEL,
                                 DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
+  QTextStream stream(&board_file);
 
-  for (board_it = board_db.begin(); board_it != board_db.end(); board_it++)
+  for (const auto &[key, value] : board_db.asKeyValueRange())
   {
-
-    dc_fprintf(the_file, " %d ", board_it->second.min_read_level);
-    dc_fprintf(the_file, " %d ", board_it->second.min_write_level);
-    dc_fprintf(the_file, " %d ", board_it->second.min_remove_level);
-    dc_fprintf(the_file, " %d ", board_it->second.type);
-    dc_fprintf(the_file, " %d ", board_it->second.owner);
-    fwrite_string(board_it->second.save_file.c_str(), the_file);
-    fwrite_string(board_it->first.c_str(), the_file);
+    stream << value.min_read_level;
+    stream << value.min_write_level;
+    stream << value.min_remove_level;
+    stream << value.type;
+    stream << value.owner;
+    stream << value.save_file;
+    stream << key;
   }
-  fclose(the_file);
+
   return ReturnValue::eSUCCESS;
 }
 
@@ -764,7 +755,6 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
   wait_for_write[ch] = reserve;
   ch->desc->connected = Connection::states::WRITE_BOARD;
   ch->desc->strnew = &reserve->buf;
-  ch->desc->max_str = MAX_MESSAGE_LENGTH;
 }
 
 qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)

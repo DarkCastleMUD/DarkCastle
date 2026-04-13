@@ -21,6 +21,7 @@
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
 #include <QThread>
+#include <qtmetamacros.h>
 #include <qtypes.h>
 
 #include "DC/DC_global.h"
@@ -271,7 +272,7 @@ class PlayerConfig : public QObject
 {
   Q_OBJECT
 public:
-  explicit PlayerConfig(QObject *parent = {});
+  explicit PlayerConfig(DC *dc);
   player_config_t::iterator begin();
   player_config_t::iterator end();
   player_config_t::const_iterator constBegin() const;
@@ -1128,7 +1129,6 @@ public:
   //  character	**str;			/* for the modify-str system	*/
   QString *hashstr = {};
   QString astr = {};
-  qint32 max_str = {};
   QString buf = {};        /* buffer for raw input	*/
   QString last_input = {}; /* the last input	*/
   QByteArray output = {};  /* output buffer for writing to connection	*/
@@ -1489,6 +1489,7 @@ public:
   QList<vault_items_data> items;
   operator bool() { return !owner_.isEmpty(); }
 };
+typedef QPointer<Vault> VaultPtr;
 
 enum mob_type_t
 {
@@ -1553,7 +1554,7 @@ private:
   ObjectPtr object = {};
 };
 
-class Character : public MinimumEntity, public Entity, public QObject
+class Character : public QObject, public MinimumEntity, public Entity
 {
   Q_OBJECT
 public:
@@ -1583,7 +1584,7 @@ public:
   static constexpr qsizetype MIN_NAME_SIZE = 3;
   static constexpr qsizetype MAX_NAME_SIZE = 12;
   static const QList<qint32> wear_to_item_wear;
-  static bool validateName(QString name);
+  bool validateName(QString name);
 
   class Mobile *mobdata = {};
   class Player *player = {};
@@ -2279,8 +2280,8 @@ public:
   void vault_myaccess(QString owner);
   void vault_balance(QString owner);
   void vault_stats(QString owner);
-  void add_vault_access(QString name, Vault &vault);
-  void remove_vault_access(QString name, Vault &vault);
+  void add_vault_access(QString name, VaultPtr vault);
+  void remove_vault_access(QString name, VaultPtr vault);
   void vault_list(QString owner);
   void load_golem_data(qint32 golemtype);
   qint32 mprog_greet_trigger(void);
@@ -2407,34 +2408,6 @@ typedef QSet<ObjectPtr> obj_list_t;
 using special_function = qint32 (*)(CharacterPtr, ObjectPtr, cmd_t, const QString, CharacterPtr);
 typedef QMap<vnum_t, special_function> special_function_list_t;
 typedef QSet<CharacterPtr>::iterator character_list_i;
-class Trace
-{
-public:
-  typedef QList<QString> tracks_t;
-  Trace(QString source = "unknown");
-  ~Trace();
-  const tracks_t &getTracks();
-  void addTrack(QString source);
-
-private:
-  tracks_t tracks;
-};
-typedef QMap<CharacterPtr, Trace> death_list_t;
-typedef QMap<CharacterPtr, Trace> free_list_t;
-
-auto &operator<<(auto &out, Trace &t)
-{
-  qsizetype track_index = {};
-  for (auto &track : t.getTracks())
-  {
-    out << track;
-    if (++track_index != t.getTracks().length())
-    {
-      out << "->";
-    }
-  }
-  return out;
-}
 class redeem_t
 {
 public:
@@ -2875,7 +2848,7 @@ class Vaults
 
 public:
   void save(QString name);
-  [[nodiscard]] inline Vault &has_vault(QString name)
+  [[nodiscard]] inline VaultPtr has_vault(QString name)
   {
     if (list_.contains(name))
       return list_[name];
@@ -2914,6 +2887,8 @@ public:
     qint32 condition;
     QString trackee;
   };
+  typedef QPointer<Tracks> TracksPtr;
+
   class path_data
   { // Keeps track of paths connecting to a room or path.
   public:
@@ -3068,7 +3043,7 @@ public:
                   return std::unexpected(Room::room_errors_t::funct);
               // r1.contents == r2.contents &&
               // r1.people == r2.people &&
-              // r1.nTracks == r2.nTracks &&
+              // r1.tracks_.size() == r2.tracks_.size() &&
               // r1.tracks == r2.tracks &&
               // r1.iFlags == r2.iFlags &&
               // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
@@ -3516,7 +3491,7 @@ public:
   modifier_t modifier = {}; /* How much it changes by              */
 };
 
-class Object : public MinimumEntity, public Entity, public QObject
+class Object : public QObject, public MinimumEntity, public Entity
 {
   Q_OBJECT
 public:
@@ -4406,13 +4381,13 @@ T parse_bitstrings(QString arg1, CharacterPtr ch = {}, T value = {})
         // value
         value.setFlag(obj_position, false);
         if (ch)
-          ch->send(u"%1 flag REMOVED.\r\n"_s).arg(metaEnum.key(x)));
+          ch->send(u"%1 flag REMOVED.\r\n"_s.arg(metaEnum.key(x)));
       }
       else
       {
         value.setFlag(obj_position);
         if (ch)
-          ch->send(u"%1 flag ADDED.\r\n"_s).arg(metaEnum.key(x)));
+          ch->send(u"%1 flag ADDED.\r\n"_s.arg(metaEnum.key(x)));
       }
       found = true;
       break;
@@ -4449,10 +4424,10 @@ const auto FOLLOWER_DIR = u"../follower"_s;
 const auto VAULT_DIR = u"../vaults"_s;
 const auto SHOP_FILE = u"tinyworld.shp"_s;
 const auto WEBPAGE_FILE = u"webresponse.txt"_s;
-const auto GREETINGS1_FILE = u"greetings1.txt"_s);
-const auto GREETINGS2_FILE = u"greetings3.txt"_s);
-const auto GREETINGS3_FILE = u"greetings4.txt"_s);
-const auto GREETINGS4_FILE = u"greetings5.txt"_s);
+const auto GREETINGS1_FILE = u"greetings1.txt"_s;
+const auto GREETINGS2_FILE = u"greetings3.txt"_s;
+const auto GREETINGS3_FILE = u"greetings4.txt"_s;
+const auto GREETINGS4_FILE = u"greetings5.txt"_s;
 const auto CREDITS_FILE = u"credits.txt"_s;
 const auto MOTD_FILE = u"../lib/motd.txt"_s;
 const auto IMOTD_FILE = u"motdimm.txt"_s;
@@ -4461,7 +4436,7 @@ const auto TIME_FILE = u"time.txt"_s;
 const auto IDEA_LOG = u"ideas.log"_s;
 const auto TYPO_LOG = u"typos.log"_s;
 const auto MESS_FILE = u"messages.txt"_s;
-const auto MESS2_FILE = u"messages2.txt"_s);
+const auto MESS2_FILE = u"messages2.txt"_s;
 const auto SOCIAL_FILE = u"social.txt"_s;
 const auto HELP_KWRD_FILE = u"help_key.txt"_s;
 const auto HELP_PAGE_FILE = u"help.txt"_s;
@@ -4502,18 +4477,11 @@ const auto VAULT_INDEX_FILE = u"../vaults/vaultindex"_s;
 const auto VAULT_INDEX_FILE_TMP = u"../vaults/vaultindex.tmp"_s;
 
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
-class clan_room_data
-{
-public:
-  qint32 room_number;
-  clan_room_data *next;
-};
 
 class ClanMember
 {
 public:
   ClanMember(CharacterPtr ch = {});
-  ClanMember *next;
 
   [[nodiscard]] inline auto name(void) const
   {
@@ -4600,10 +4568,11 @@ private:
   quint32 time_joined_;
 };
 
-class Clan : public MinimumEntity
+class Clan : public QObject, public MinimumEntity
 {
+  Q_OBJECT
 public:
-  Clan(QString n = {});
+  Clan(DC *dc, QString clan_id = {});
   QString leader_;
   QString founder_;
   QString email_;
@@ -4615,7 +4584,7 @@ public:
   quint16 tax_{};
   clan_id_t id_{};
   quint16 amt_{};
-  QList<clan_room_data> rooms_;
+  QSet<room_t> rooms_;
   QList<ClanMember> members_;
   QList<vault_access_data> acc_;
   QQueue<QString> ctell_history_;
@@ -4629,13 +4598,14 @@ public:
 private:
   gold_t balance_;
 };
-Clan *get_clan(qint32 nClan);
-Clan *get_clan(CharacterPtr ch);
-void add_clan(Clan *new_new_clan);
-void add_clan_member(Clan *theClan, ClanMember *new_new_member);
-void add_clan_member(Clan *theClan, CharacterPtr ch);
-void remove_clan_member(Clan *theClan, CharacterPtr ch);
-QString get_clan_name(Clan *clan);
+typedef QPointer<Clan> ClanPtr;
+ClanPtr get_clan(qint32 nClan);
+ClanPtr get_clan(CharacterPtr ch);
+void add_clan(ClanPtr new_new_clan);
+void add_clan_member(ClanPtr theClan, ClanMember *new_new_member);
+void add_clan_member(ClanPtr theClan, CharacterPtr ch);
+void remove_clan_member(ClanPtr theClan, CharacterPtr ch);
+QString get_clan_name(ClanPtr clan);
 
 void extractFamiliar(CharacterPtr ch);
 
@@ -4775,7 +4745,7 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
 void show_obj_class_size_mini(ObjectPtr obj, CharacterPtr ch);
 const QString item_condition(ObjectPtr obj);
 bool identify(CharacterPtr ch, ObjectPtr obj);
-extern void end_oproc(CharacterPtr ch, Trace trace = Trace("unknown"));
+extern void end_oproc(CharacterPtr ch);
 QByteArray handle_ansi(QByteArray, CharacterPtr ch);
 QString handle_ansi(QString, CharacterPtr ch);
 QString handle_ansi(QString s, CharacterPtr ch);
@@ -5118,7 +5088,7 @@ ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, boo
 ObjectPtr get_obj_in_list_vis(CharacterPtr ch, qint32 item_num, ObjectPtr list, bool bf = false);
 ObjectPtr get_obj_vis(CharacterPtr ch, QString name, bool loc = false);
 
-void extract_char(CharacterPtr ch, bool pull, Trace t = Trace("unknown"));
+void extract_char(CharacterPtr ch, bool pull);
 /* wiz_102.cpp */
 
 typedef QMap<QString, quint64> skill_results_t;
@@ -5212,7 +5182,7 @@ void init_char(CharacterPtr ch);
 void clear_char(CharacterPtr ch);
 void clear_object(ObjectPtr obj);
 void reset_char(CharacterPtr ch);
-void free_char(CharacterPtr ch, Trace trace = Trace("Unknown"));
+void free_char(CharacterPtr ch);
 void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent, cmd_t cmd);
 void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay);
 qint32 search_char_for_item_count(CharacterPtr ch, qint16 item_number, bool wearonly);
@@ -5623,12 +5593,10 @@ QString get_clan_name(CharacterPtr ch);
 qint32 plr_rights(CharacterPtr ch);
 void remove_clan_member(qint32 clannumber, CharacterPtr ch);
 void free_member(ClanMember *member);
-ClanMember *get_member(QString strName, qint32 nClanId);
+ClanMember *get_member(QString strName, qint32 clan_id);
 void show_clan_log(CharacterPtr ch);
 void clan_death(CharacterPtr ch, CharacterPtr killer);
-
 /* Our own constants */
-const qint32 MAX_MESSAGE_LENGTH = 4096;
 constexpr auto DRUNK = 0;
 constexpr auto FULL = 1;
 constexpr auto THIRST = 2;
@@ -6431,9 +6399,6 @@ bool isexact(QString arg, joining_t &namelist);
 bool isexact(QString arg, QStringList namelist);
 bool isexact(QString arg, QString namelist);
 
-void assign_rooms(void);
-void assign_objects(void);
-
 QList<QString> splitstring(QString splitme, QString delims, bool ignore_empty = false);
 QString joinstring(QList<QString> joinme, QString delims, bool ignore_empty = false);
 
@@ -6491,8 +6456,6 @@ bool check_range_valid_and_convert(T &value, QString buf, T begin, T end)
 }
 
 bool check_valid_and_convert(qint32 &value, QString buf);
-void update_make_camp_and_leadership(void);
-qint32 _parse_name(const QString arg, QString name);
 
 const QString pluralize(qint32 qty, const QString ending = "s");
 size_t nocolor_strlen(const QString s);
@@ -7585,7 +7548,6 @@ public:
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
   character_list_t character_list;
-  death_list_t death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
   QSet<CharacterPtr> shooting_list_;
@@ -7633,6 +7595,48 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
+  void assign_rooms(void);
+  void assign_objects(void);
+  bool on_forbidden_name_list(QString name);
+  void assign_one_mob_non(qint32 vnum, special_function func);
+  void assign_one_mob_com(qint32 vnum, special_function func);
+  void assign_one_obj_non(qint32 vnum, special_function func);
+  void assign_one_obj_com(qint32 vnum, special_function func);
+  void boot_the_shops(void);
+  void boot_player_shops(void);
+  void assign_the_shopkeepers(void);
+  void assign_the_player_shopkeepers(void);
+  void assign_non_combat_procs(void);
+  void assign_combat_procs(void);
+
+  void signal_setup(void);
+  qint32 new_descriptor(qint32 s);
+  void check_idle_passwords(void);
+  void init_heartbeat(void);
+  void report_debug_logging();
+  void pulse_takeover(void);
+  void zone_update(void);
+  void point_update(void); /* In limits.c */
+  void food_update(void);  /* In limits.c */
+  void mobile_activity(void);
+  void update_corpses_and_portals(void);
+  void perform_violence(void);
+  void time_update(void);
+  void weather_update(void);
+  void pulse_command_lag(void);
+  void checkConsecrate(qint32);
+  void another_hour(qint32 mode);
+  void weather_change(void);
+
+  void load_messages(const QString file, qint32 base = 0);
+  void boot_social_messages(void);
+  void assign_clan_rooms(void);
+  void find_unordered_objects(void);
+  void boot_clans(void);
+  void update_make_camp_and_leadership(void);
+  qint32 _parse_name(const QString arg, QString name);
+
+  command_return_t save_boards(void);
   bool is_forbidden(QString name);
   ObjectPtr getObject(vnum_t vnum);
   void findLibrary(void);
@@ -7746,8 +7750,8 @@ public:
   void heartbeat(void);
   void finish_hotboot(void);
   std::expected<ConnectionPtr, load_status_t> load_char_obj(QString name);
-  bool has_vault_access(QString owner, Vault &vault);
-  bool has_vault_access(CharacterPtr ch, Vault &vault);
+  bool has_vault_access(QString owner, VaultPtr vault);
+  bool has_vault_access(CharacterPtr ch, VaultPtr vault);
   void update_mprog_throws(void);
   CharacterPtr initiate_oproc(CharacterPtr ch, ObjectPtr obj);
   qint32 oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm);
@@ -7940,7 +7944,7 @@ auto &operator>>(auto &in, Room &room)
       }
       if (!found)
       {
-        // QString error = u"Room %1 is outside of any zone."_s).arg(room_nr);
+        // QString error = u"Room %1 is outside of any zone."_s.arg(room_nr);
         // DC::getInstance()->logentry(error);
         // DC::getInstance()->logentry(u"Room outside of ANY zone.  ERROR"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       }

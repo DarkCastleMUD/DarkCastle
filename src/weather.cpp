@@ -37,22 +37,19 @@ extern weather_data weather_info;
 
 /* In ths part. */
 
-void another_hour(qint32 mode);
-void weather_change(void);
-
 /* Here comes the code */
 
-void time_update()
+void DC::time_update(void)
 {
   another_hour(1);
 }
 
-void weather_update()
+void DC::weather_update()
 {
   weather_change();
 }
 
-void another_hour(qint32 mode)
+void DC::another_hour(qint32 mode)
 {
   time_info.hours++;
 
@@ -127,7 +124,7 @@ void another_hour(qint32 mode)
   }
 }
 
-void weather_change(void)
+void DC::weather_change(void)
 {
   qint32 diff, change;
   if ((time_info.month >= 9) && (time_info.month <= 16))

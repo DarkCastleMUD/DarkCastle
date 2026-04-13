@@ -238,7 +238,7 @@ command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        ch->send(u"You purloin %1.\r\n"_s).arg(k->short_description()));
+        ch->send(u"You purloin %1.\r\n"_s.arg(k->short_description()));
       }
       move_obj(k, ch);
       return ReturnValue::eSUCCESS;
@@ -298,7 +298,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
                     *help = '\0';
                 }
             }
-            if (*help)
+            if (!help.isEmpty())
                 ch->send(help);
             ch->sendln("");*/
     return ReturnValue::eFAILURE;
@@ -788,7 +788,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (!check_range_valid_and_convert(value, buf, 0, MAX_PROFESSIONS))
     {
-      ch->send(u"Save type be from 0 to %1.\r\n"_s).arg(MAX_PROFESSIONS));
+      ch->send(u"Save type be from 0 to %1.\r\n"_s.arg(MAX_PROFESSIONS));
       return ReturnValue::eFAILURE;
     }
 

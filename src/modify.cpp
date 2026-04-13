@@ -72,12 +72,6 @@ void string_hash_add(class Connection *d, QString str)
 
   if (!(*conn->hashstr))
   {
-    if (strlen(str) > (quint32)conn->max_str)
-    {
-      conn->character->sendln("String too long - Truncated.");
-      *(str + conn->max_str) = '\0';
-      terminator = 1;
-    }
 #ifdef LEAK_CHECK
     (*conn->hashstr) = calloc(strlen(str) + 3, sizeof(QChar));
 #else
@@ -88,22 +82,13 @@ void string_hash_add(class Connection *d, QString str)
 
   else
   {
-    if (strlen(str) + strlen(*conn->hashstr) > (quint32)conn->max_str)
+    if (!(*conn->hashstr = realloc(*conn->hashstr, strlen(*conn->hashstr) + strlen(str) + 3)))
     {
-      conn->character->sendln("String too long. Last line skipped.");
-      terminator = 1;
+      perror("string_hash_add: ");
+      abort();
     }
 
-    else
-    {
-      if (!(*conn->hashstr = realloc(*conn->hashstr, strlen(*conn->hashstr) + strlen(str) + 3)))
-      {
-        perror("string_hash_add: ");
-        abort();
-      }
-
-      dc_strcat(*conn->hashstr, str);
-    }
+    dc_strcat(*conn->hashstr, str);
   }
 
   if (terminator)
@@ -336,7 +321,6 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
           ch->sendln("Modifying description.");
           break;
         }
-      ch->desc->max_str = MAX_STRING_LENGTH;
       /* the stndrd (see below) procedure does not apply here */
       return 1;
       break;
@@ -376,7 +360,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   /* there was a string in the argument array */
-  if (*string)
+  if (!string.isEmpty())
   {
     for (ctr = {}; (quint32)ctr <= strlen(string); ctr++)
     {
@@ -422,7 +406,6 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 #else
       (*ch->desc->hashstr) = dc_alloc(length[field - 1], sizeof(QChar));
 #endif
-    ch->desc->max_str = length[field - 1];
     ch->desc->connected = Connection::states::EDITING;
   }
   return 1;
@@ -721,7 +704,7 @@ void show_string(class Connection *d, const QString input)
   else if (isdigit(*buf))
     conn->showstr_page = MAX(0, MIN(atoi(buf) - 1, conn->showstr_count - 1));
 
-  else if (*buf)
+  else if (!buf.isEmpty())
   {
     conn->showstr_vector = {};
     conn->showstr_vector = {};

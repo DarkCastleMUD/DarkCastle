@@ -551,7 +551,7 @@ qint32 get_line_new(FILE *fl, QString buf)
   {
     lines++;
     fgets(temp, 256, fl);
-    if (*temp)
+    if (!temp.isEmpty())
       temp[strlen(temp) - 1] = '\0';
   } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 

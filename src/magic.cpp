@@ -53,7 +53,7 @@
 constexpr auto BEACON_OBJ_NUMBER = 405;
 
 qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16 save_type);
-Clan *get_clan(CharacterPtr);
+ClanPtr get_clan(CharacterPtr);
 
 void update_pos(CharacterPtr victim);
 bool many_charms(CharacterPtr ch);
@@ -4153,8 +4153,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 {
   qint32 location;
   QString buf;
-  Clan *clan;
-  clan_room_data *room;
+  ClanPtr clan;
   qint32 found = {};
 
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
@@ -12814,7 +12813,7 @@ qint32 cast_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 t
 
 qint32 spell_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  QSharedPointer<Tracks> ptrack;
+  TracksPtr ptrack;
   QString buf;
 
   ptrack = DC::getInstance()->world[ch->in_room].tracks;

@@ -228,7 +228,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   vict->save();
 
-  DC::getInstance()->logentry(u"%1 just forced %2 to save."_s).arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 just forced %2 to save."_s.arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return ReturnValue::eSUCCESS;
 }
@@ -241,10 +241,10 @@ command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 countFighters = {};
   QString buf;
   QString arg;
-  Clan *ch_clan = {};
+  ClanPtr ch_clan = {};
   QString ch_clan_name;
   ch_clan_name[0] = {};
-  Clan *victim_clan = {};
+  ClanPtr victim_clan = {};
   QString victim_clan_name;
   victim_clan_name[0] = {};
 
@@ -499,7 +499,7 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!DC::getInstance()->rooms.contains(room))
   {
-    ch->send(u"Room %1 does not exist.\r\n"_s).arg(room));
+    ch->send(u"Room %1 does not exist.\r\n"_s.arg(room));
     return ReturnValue::eFAILURE;
   }
 

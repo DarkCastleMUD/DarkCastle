@@ -144,7 +144,7 @@ qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0)
       continue;
     if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN))
       continue;
-    qint32 retval = tmp->do_join(u"0.%1"_s).arg(ch->name()).split(' '));
+    qint32 retval = tmp->do_join(u"0.%1"_s.arg(ch->name()).split(' '));
     if (SOMEONE_DIED(retval))
       return retval;
   }
@@ -188,7 +188,7 @@ qint32 Character::check_charmiejoin(void)
     return ReturnValue::eFAILURE;
   }
 
-  return do_join(u"0.%1"_s).arg(master->name()).split(' '));
+  return do_join(u"0.%1"_s.arg(master->name()).split(' '));
 }
 
 qint32 check_charmiejoin(CharacterPtr ch)
@@ -203,7 +203,7 @@ qint32 check_charmiejoin(CharacterPtr ch)
   }
 }
 
-void perform_violence(void)
+void DC::perform_violence(void)
 {
   // QString debug;
   CharacterPtr ch;
@@ -2552,7 +2552,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     else
     {
       pspell->duration -= dam;
-      victim->send(u"Your stones absorb %1 damage from the attack and change its direction slightly.\r\n"_s).arg(dam));
+      victim->send(u"Your stones absorb %1 damage from the attack and change its direction slightly.\r\n"_s.arg(dam));
       string1 << "$N's stones absorb " << dam << " damage of your attack and cause your blow to change direction slightly.";
       act_to_character(string1.str().c_str(), ch, 0, victim, 0);
       string1.clear();
@@ -4006,7 +4006,7 @@ bool check_dodge(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, bool d
 /*
  * Load fighting messages into memory.
  */
-void load_messages(const QString file, qint32 base)
+void DC::load_messages(const QString file, qint32 base)
 {
   FILE *fl;
   qint32 i, type;
@@ -5318,7 +5318,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
   }
   if (ch && ch->isImmortalPlayer() && victim->isNonPlayer())
   {
-    special_log(QString(u"%1 killed %2 in room %3!"_s).arg(ch->name()).arg(victim->name()).arg(ch->in_room));
+    special_log(QString(u"%1 killed %2 in room %3!"_s.arg(ch->name()).arg(victim->name()).arg(ch->in_room));
   }
 
   // register my death with this zone's counter
@@ -5888,7 +5888,7 @@ CharacterPtr loop_followers(follow_type **f)
   CharacterPtr tmp_ch;
 
   // this loops the followers
-  if (*f)
+  if (!f.isEmpty())
   {
     tmp_ch = (*f)->follower;
     *f = (*f)->next;
@@ -6703,8 +6703,8 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
 
   QString killer_message;
   //  CharacterPtr i;
-  Clan *ch_clan = {};
-  Clan *victim_clan = {};
+  ClanPtr ch_clan = {};
+  ClanPtr victim_clan = {};
   qint32 eliminated = 1;
   void move_player_home(CharacterPtr victim);
 

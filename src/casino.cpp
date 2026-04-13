@@ -159,7 +159,7 @@ bool verify(player_data *plr)
     if (result != character_list.end())
     {
       QString buf;
-      buf = u"%1 folds as %2 leaves the room.\r\n"_s).arg(plr->ch->name()).arg(HSSH(plr->ch));
+      buf = u"%1 folds as %2 leaves the room.\r\n"_s.arg(plr->ch->name()).arg(HSSH(plr->ch));
       send_to_table(buf, plr->table);
       plr->ch->sendln("Your hand is folded as you leave the room.");
     }
@@ -698,7 +698,7 @@ void check_blackjacks(table_data *tbl)
       buf = u"%1 blackjacks!\r\n"_s.arg(qPrintable(plr->ch->name()));
       send_to_table(buf, tbl, plr);
       plr->ch->sendln("$BYou BLACKJACK!$R");
-      buf = u"The dealer gives you %1 %2 coins.\r\n"_s).arg((qint32)(plr->bet * 2.5)).arg(plr->table->gold ? "gold" : "platinum");
+      buf = u"The dealer gives you %1 %2 coins.\r\n"_s.arg((qint32)(plr->bet * 2.5)).arg(plr->table->gold ? "gold" : "platinum");
       plr->ch->send(buf);
       plr->ch->sendBlackjackPrompt();
 
@@ -2245,7 +2245,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       if (obj->slot->bet == 1)
         ch->sendln("You place only the minimum bet into the slot machine now.");
       else
-        ch->send(u"You now start placing %1 times the base amount into the slot machine.\r\n"_s).arg(obj->slot->bet));
+        ch->send(u"You now start placing %1 times the base amount into the slot machine.\r\n"_s.arg(obj->slot->bet));
       return ReturnValue::eSUCCESS;
     }
     ch->sendln("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.");

@@ -66,9 +66,9 @@ void vault_log(CharacterPtr ch, QString owner);
 QString clanVName(quint64 clan_id);
 void vault_search_usage(CharacterPtr ch);
 
-Vault *has_vault(QString name)
+VaultPtr has_vault(QString name)
 {
-  Vault *vault;
+  VaultPtr vault;
 
   for (vault = vault_table; vault; vault = vault->next)
     if (vault && !name.compare(vault->owner, Qt::CaseInsensitive))
@@ -107,7 +107,7 @@ void remove_from_object_list(ObjectPtr obj)
 
 void save_vault(QString name)
 {
-  Vault *vault;
+  VaultPtr vault;
   vault_access_data *access;
   vault_items_data *items;
 
@@ -159,7 +159,7 @@ void save_vault(QString name)
 void Character::vault_access(QString who)
 {
   vault_access_data *access;
-  Vault *vault = {};
+  VaultPtr vault = {};
 
   if (!vault && !(vault = has_vault(name())))
   {
@@ -170,8 +170,8 @@ void Character::vault_access(QString who)
   if (who.isEmpty())
   {
     send("The following people have access to your vault:\r\n");
-    for (access = vault->access; access; access = access->next)
-      send(u"%1\r\n"_s.arg(access->name));
+    for (auto &access : vault->access)
+      send(u"%1\r\n"_s.arg(access.name));
     return;
   }
 
@@ -183,7 +183,7 @@ void Character::vault_access(QString who)
 
 void Character::vault_myaccess(QString arg)
 {
-  Vault *vault;
+  VaultPtr vault;
 
   if (arg[0] != '\0')
   {
@@ -311,7 +311,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (!strcasecmp(arg1, qPrintable(clanVName(ch->clan))))
       {
-        Clan *clan = get_clan(ch);
+        ClanPtr clan = get_clan(ch);
         if (clan == nullptr)
         {
           ch->sendln("You are not a member of any clan.");
@@ -323,7 +323,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           std::stringstream clanName;
 
-          clanName << "clan" << clan->number;
+          clanName << "clan" << clan->id_;
           dc_sprintf(arg1, "%s", clanName.str().c_str());
 
           vault_log(ch, arg1);
@@ -458,7 +458,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void Character::vault_stats(QString name)
 {
-  Vault *vault = {};
+  VaultPtr vault = {};
   vault_items_data *item;
   vault_access_data *access;
   ObjectPtr obj;
@@ -509,7 +509,7 @@ void Character::vault_stats(QString name)
 
 void DC::reload_vaults(void)
 {
-  Vault *vault, *tvault;
+  VaultPtr vault, *tvault;
   vault_access_data *access, *taccess;
   vault_items_data *items, *titems;
   qint32 num = {};
@@ -549,7 +549,7 @@ void rename_vault_owner(QString oldname, QString newname)
 {
   qint32 num = {};
 
-  Vault *vault = has_vault(newname);
+  VaultPtr vault = has_vault(newname);
   if (vault)
   {
     DC::getInstance()->vaults_.remove_vault(newname); // free it up first..
@@ -684,7 +684,7 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
 
   remove_vault_accesses(name);
 
-  Vault *vault, *next_vault, *prev_vault = {};
+  VaultPtr vault, *next_vault, *prev_vault = {};
   vault_items_data *items, *titems;
   vault_access_data *access, *taccess;
 
@@ -744,7 +744,7 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
 
 void DC::testing_load_vaults(void)
 {
-  Vault *vault;
+  VaultPtr vault;
   vault_access_data *access;
   vault_items_data *items;
   ObjectPtr obj = {};
@@ -922,7 +922,7 @@ void DC::testing_load_vaults(void)
   }
 }
 
-void Character::add_vault_access(QString victim_name, Vault &vault)
+void Character::add_vault_access(QString victim_name, VaultPtr vault)
 {
   vault_access_data *access;
   class Connection d;
@@ -949,11 +949,11 @@ void Character::add_vault_access(QString victim_name, Vault &vault)
   {
     sendln("That person already has access to your vault.");
     if (conn->character)
-      free_char(conn->character, Trace("add_vault_access 1"));
+      free_char(conn->character);
     return;
   }
 
-  send(u"%1 now has access to your vault.\r\n"_s).arg(victim_name));
+  send(u"%1 now has access to your vault.\r\n"_s.arg(victim_name));
   access = new vault_access_data;
   access->name = victim_name;
   access->next = vault->access;
@@ -961,12 +961,12 @@ void Character::add_vault_access(QString victim_name, Vault &vault)
 
   save_char_obj();
   if (conn->character)
-    free_char(conn->character, Trace("add_vault_access 2"));
+    free_char(conn->character);
 }
 
 void DC::load_vaults(void)
 {
-  Vault *vault;
+  VaultPtr vault;
   vault_access_data *access;
   vault_items_data *items;
   ObjectPtr obj = {};
@@ -1177,7 +1177,7 @@ void DC::load_vaults(void)
   fclose(index);
 }
 
-void Character::remove_vault_access(QString victim_name, Vault &vault)
+void Character::remove_vault_access(QString victim_name, VaultPtr vault)
 {
   victim_name = victim_name.toLower();
   if (!victim_name.isEmpty())
@@ -1197,14 +1197,14 @@ void Character::remove_vault_access(QString victim_name, Vault &vault)
     return;
   }
 
-  send(u"%1 no longer has access to your vault.\r\n"_s).arg(victim_name));
+  send(u"%1 no longer has access to your vault.\r\n"_s.arg(victim_name));
   access_remove(victim_name, vault);
   save_char_obj();
 }
 
 void remove_vault_accesses(QString name)
 {
-  Vault *vault;
+  VaultPtr vault;
   vault_access_data *access, *next_access;
   qint32 num = {};
 
@@ -1226,7 +1226,7 @@ void remove_vault_accesses(QString name)
   }
 }
 
-void access_remove(QString name, Vault &vault)
+void access_remove(QString name, VaultPtr vault)
 {
   vault_access_data *access, *next_access, *prev_access = {};
 
@@ -1256,7 +1256,7 @@ QString clanVName(quint64 clan_id)
   return u"Clan%1"_s.arg(clan_id);
 }
 
-bool DC::has_vault_access(CharacterPtr ch, Vault &vault)
+bool DC::has_vault_access(CharacterPtr ch, VaultPtr vault)
 {
   if (ch == nullptr)
   {
@@ -1290,7 +1290,7 @@ bool DC::has_vault_access(CharacterPtr ch, Vault &vault)
   return false;
 }
 
-bool DC::has_vault_access(QString name, Vault &vault)
+bool DC::has_vault_access(QString name, VaultPtr vault)
 {
   Connection d = {};
   CharacterPtr ch = get_pc(name);
@@ -1307,12 +1307,12 @@ bool DC::has_vault_access(QString name, Vault &vault)
   auto ch_has_vault_access = has_vault_access(ch, vault);
   if (conn->character)
   {
-    free_char(conn->character, Trace("add_vault_access 2"));
+    free_char(conn->character);
   }
   return ch_has_vault_access;
 }
 
-vault_items_data *get_unique_item_in_vault(Vault *vault, QString object, qint32 num)
+vault_items_data *get_unique_item_in_vault(VaultPtr vault, QString object, qint32 num)
 {
   vault_items_data *items;
   ObjectPtr obj;
@@ -1333,7 +1333,7 @@ vault_items_data *get_unique_item_in_vault(Vault *vault, QString object, qint32 
   return 0;
 }
 
-ObjectPtr get_unique_obj_in_vault(Vault *vault, QString object, qint32 num)
+ObjectPtr get_unique_obj_in_vault(VaultPtr vault, QString object, qint32 num)
 {
   vault_items_data *items;
   ObjectPtr obj;
@@ -1355,7 +1355,7 @@ ObjectPtr get_unique_obj_in_vault(Vault *vault, QString object, qint32 num)
   return 0;
 }
 
-vault_items_data *get_item_in_vault(Vault *vault, QString object, qint32 num)
+vault_items_data *get_item_in_vault(VaultPtr vault, QString object, qint32 num)
 {
   vault_items_data *items;
   ObjectPtr obj;
@@ -1386,7 +1386,7 @@ vault_items_data *get_item_in_vault(Vault *vault, QString object, qint32 num)
   return 0;
 }
 
-ObjectPtr get_obj_in_vault(Vault *vault, QString object, qint32 num)
+ObjectPtr get_obj_in_vault(VaultPtr vault, QString object, qint32 num)
 {
   vault_items_data *items;
   ObjectPtr obj;
@@ -1414,7 +1414,7 @@ ObjectPtr get_obj_in_vault(Vault *vault, QString object, qint32 num)
   return 0;
 }
 
-ObjectPtr exists_in_vault(Vault *vault, ObjectPtr obj)
+ObjectPtr exists_in_vault(VaultPtr vault, ObjectPtr obj)
 {
   vault_items_data *items;
   if (!obj)
@@ -1434,7 +1434,7 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
   QString obj_list[100];
   ObjectPtr obj, tmp_obj;
   vault_items_data *items;
-  Vault *vault;
+  VaultPtr vault;
   qint32 self = 0, i;
 
   if (!owner.isEmpty())
@@ -1580,7 +1580,7 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
     sbuf = u"%1 removed %2(v%3) from %4's vault."_s.arg(ch->name()).arg(GET_OBJ_SHORT(obj)).arg(QString::number(GET_OBJ_VNUM(obj))).arg(owner);
     logvault(sbuf, owner);
     act_to_room(sbuf, ch, 0, 0, GODS);
-    ch->send(u"%1 has been removed from the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 has been removed from the vault.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
 
     item_remove(obj, vault);
 
@@ -1608,7 +1608,7 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
   ch->save_char_obj();
 }
 
-void item_add(qint32 vnum, Vault &vault)
+void item_add(qint32 vnum, VaultPtr vault)
 {
   if (vnum == -1)
   {
@@ -1637,7 +1637,7 @@ void item_add(qint32 vnum, Vault &vault)
   vault->weight += GET_OBJ_WEIGHT(get_obj(vnum));
 }
 
-void item_add(ObjectPtr obj, Vault &vault)
+void item_add(ObjectPtr obj, VaultPtr vault)
 {
   vault_items_data *item;
   qint32 vnum = GET_OBJ_VNUM(obj);
@@ -1663,7 +1663,7 @@ void item_add(ObjectPtr obj, Vault &vault)
   vault->weight += GET_OBJ_WEIGHT(obj);
 }
 
-void item_remove(ObjectPtr obj, Vault &vault)
+void item_remove(ObjectPtr obj, VaultPtr vault)
 {
   vault_items_data *item, *next_item, *prev_item = {};
   qint32 vnum = GET_OBJ_VNUM(obj);
@@ -1696,7 +1696,7 @@ void item_remove(ObjectPtr obj, Vault &vault)
   }
 }
 
-qint32 search_vault_by_vnum(qint32 vnum, Vault &vault)
+qint32 search_vault_by_vnum(qint32 vnum, VaultPtr vault)
 {
   vault_items_data *items;
 
@@ -1711,7 +1711,7 @@ void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
 {
   if (!ch)
     return;
-  Vault *vault;
+  VaultPtr vault;
   QString buf;
   qint32 self = {};
 
@@ -1767,7 +1767,7 @@ void Character::vault_withdraw(quint32 amount, QString owner)
 {
   if (!ch)
     return;
-  Vault *vault;
+  VaultPtr vault;
   QString buf;
   qint32 self = {};
 
@@ -1816,13 +1816,13 @@ void Character::vault_withdraw(quint32 amount, QString owner)
   }
 }
 
-qint32 can_put_in_vault(ObjectPtr obj, qint32 self, Vault &vault, CharacterPtr ch)
+qint32 can_put_in_vault(ObjectPtr obj, qint32 self, VaultPtr vault, CharacterPtr ch)
 {
   //  ObjectPtr tmp_obj;
 
   if (GET_OBJ_VNUM(obj) == -1)
   {
-    ch->send(u"%1 is hardly worth saving.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 is hardly worth saving.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1846,7 +1846,7 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, Vault &vault, CharacterPtr c
 
   if (!self && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
   { // no_trade
-    ch->send(u"%1 seems bound to you.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 seems bound to you.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1864,7 +1864,7 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, Vault &vault, CharacterPtr c
 
   if (ARE_CONTAINERS(obj) && obj->contains)
   { // non-empty containers
-    ch->send(u"%1 needs to be emptied first.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 needs to be emptied first.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1875,7 +1875,7 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, Vault &vault, CharacterPtr c
   }
   if (obj->obj_flags.timer > 0)
   {
-    ch->send(u"%1 cannot be placed in the vault right now.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 cannot be placed in the vault right now.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1888,7 +1888,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
     return;
 
   ObjectPtr obj, tmp_obj;
-  Vault *vault;
+  VaultPtr vault;
   QString buf;
   qint32 self = {};
 
@@ -1939,7 +1939,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
         buffer = u"%1 added %2[%3] to %4's vault."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
       logvault(buffer, owner);
-      ch->send(u"%1 has been placed in the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1 has been placed in the vault.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
 
       QString sbuf;
       QString ssin_string;
@@ -1995,7 +1995,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
 
       logvault(buffer, owner);
 
-      ch->send(u"%1 has been placed in the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+      ch->send(u"%1 has been placed in the vault.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
       if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
       {
         item_add(GET_OBJ_VNUM(obj), vault);
@@ -2033,7 +2033,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
 
     logvault(buffer, owner);
 
-    ch->send(u"%1 has been placed in the vault.\r\n"_s).arg(GET_OBJ_SHORT(obj)));
+    ch->send(u"%1 has been placed in the vault.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
 
     if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
     {
@@ -2050,7 +2050,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
   ch->save_char_obj();
 }
 
-void sort_vault(const Vault &vault, sorted_vault &sv)
+void sort_vault(const VaultPtr vault, sorted_vault &sv)
 {
   ObjectPtr obj;
 
@@ -2080,7 +2080,7 @@ void sort_vault(const Vault &vault, sorted_vault &sv)
 void Character::vault_list(QString owner)
 {
   vault_items_data *items;
-  Vault *vault;
+  VaultPtr vault;
   ObjectPtr obj;
   qint32 objects = 0, self = {};
   qint32 diff_len = {};
@@ -2127,7 +2127,7 @@ void Character::vault_list(QString owner)
   {
     if (self)
     {
-      send(u"Your vault is currently empty and can hold %1 pounds.\r\n"_s).arg(vault->size));
+      send(u"Your vault is currently empty and can hold %1 pounds.\r\n"_s.arg(vault->size));
     }
     else
     {
@@ -2183,7 +2183,7 @@ void Character::vault_list(QString owner)
 void add_new_vault(const QString name, qint32 indexonly)
 {
   FILE *vfl, *tvfl, *pvfl;
-  Vault *vault;
+  VaultPtr vault;
   QString filename, line, buf;
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
@@ -2401,8 +2401,8 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   QString arg1, buf;
   arg = one_argument(arg, arg1);
 
-  Vault *vault = has_vault(qPrintable(ch->name()));
-  Vault *cvault = ch->clan ? has_vault(qPrintable(clanVName(ch->clan))) : 0;
+  VaultPtr vault = has_vault(qPrintable(ch->name()));
+  VaultPtr cvault = ch->clan ? has_vault(qPrintable(clanVName(ch->clan))) : 0;
   if (cmd == cmd_t::LIST)
   {
     if (!vault)
@@ -2651,7 +2651,7 @@ qint32 vault_search(CharacterPtr ch, const QString args)
   } while (!arg1.isEmpty());
 
   // now that we know what we're looking for, let's search through all the vaults to find it
-  for (Vault *vault = vault_table; vault; vault = vault->next)
+  for (VaultPtr vault = vault_table; vault; vault = vault->next)
   {
     if (vault && !vault->owner.isEmpty() && ch->getDC()->has_vault_access(ch, vault))
     {
@@ -2750,7 +2750,7 @@ qint32 vault_search(CharacterPtr ch, const QString args)
     } // if we have access to vault
   } // for loop of vaults
 
-  ch->send(u"\r\nSearched %1 vaults and found %2 objects.\r\n"_s).arg(vaults_searched).arg(objects_found));
+  ch->send(u"\r\nSearched %1 vaults and found %2 objects.\r\n"_s.arg(vaults_searched).arg(objects_found));
 
   return ReturnValue::eSUCCESS;
 }

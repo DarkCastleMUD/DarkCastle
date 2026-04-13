@@ -123,37 +123,10 @@ void short_activity();
 QString any_one_arg(QString argument, QString first_arg);
 const QString calc_color(qint32 hit, qint32 max_hit);
 QString get_from_q(QQueue<QString> &input_queue);
-void signal_setup(void);
-qint32 new_descriptor(qint32 s);
 qint32 process_input(class Connection *t);
 void flush_queues(class Connection *d);
 qint32 perform_subst(class Connection *t, QString orig, QString subst);
-
-void check_idle_passwords(void);
-void init_heartbeat();
-void heartbeat();
-void report_debug_logging();
-
-/* extern fcnts */
-void pulse_takeover(void);
-void zone_update(void);
-void point_update(void); /* In limits.c */
-void food_update(void);  /* In limits.c */
-void mobile_activity(void);
-void object_activity(quint64 pulse_type);
-void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, QString str);
-void perform_violence(void);
-void time_update();
-void weather_update();
-void send_hint();
-extern void pulse_command_lag();
-void checkConsecrate(qint32);
-
-// extern QString greetings1;
-// extern QString greetings2;
-// extern QString greetings3;
-// extern QString greetings4;
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
@@ -170,9 +143,8 @@ qint32 DC::write_hotboot_file(void)
   std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const qint32 &fd)
                 { dc_fprintf(fp, "%d\n", fd); });
 
-  for (auto &d : connections_)
+  for (auto &conn : connections_)
   {
-    sd = conn->next;
     if (conn->connected != Connection::states::PLAYING || !conn->character || conn->character->getLevel() < 1)
     {
       // Kick out anyone not currently playing in the game.
@@ -296,7 +268,7 @@ qint32 DC::load_hotboot_descs(void)
       {
         if (write_to_descriptor(descriptor, str) == -1)
         {
-          DC::getInstance()->logentry(u"Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot."_s).arg(address).arg(character_name).arg(descriptor));
+          DC::getInstance()->logentry(u"Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot."_s.arg(address).arg(character_name).arg(descriptor));
           close(descriptor);
           d = {};
           d = {};
@@ -585,11 +557,11 @@ void DC::game_loop(void)
     if (nsecs_expired >= 1000000)
     {
       msecs_expired = nsecs_expired / 1000000.0;
-      // qDebug() << u"%1 msec."_s).arg(msecs_expired);
+      // qDebug() << u"%1 msec."_s.arg(msecs_expired);
     }
     else
     {
-      // qDebug() << u"%1 nsec."_s).arg(nsecs_expired);
+      // qDebug() << u"%1 nsec."_s.arg(nsecs_expired);
     }
 
     last_execution.restart();
@@ -941,7 +913,7 @@ void DC::game_loop_init(void)
 
                  command_return_t do_not_save_corpses = 1;
 
-                 QString buf = u"Hot reboot by %1.\r\n"_s).arg("HTTP /shutdown/");
+                 QString buf = u"Hot reboot by %1.\r\n"_s.arg("HTTP /shutdown/");
                  send_to_all(buf);
                  DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
                  DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
@@ -1056,7 +1028,7 @@ void DC::game_test_init(void)
 }
 
 extern void pulse_hunts();
-void init_heartbeat()
+void DC::init_heartbeat()
 {
   pulse_mobile = DC::PULSE_MOBILE;
   pulse_timer = DC::PULSE_TIMER;
@@ -1586,7 +1558,7 @@ void write_to_output(QByteArray txt, class Connection *t)
  *  socket handling                                                  *
  ****************************************************************** */
 
-qint32 new_descriptor(qint32 s)
+qint32 DC::new_descriptor(qint32 s)
 {
   socket_t desc = {};
   socklen_t i = {};
@@ -1931,11 +1903,11 @@ qint32 process_input(class Connection *t)
     {
       if (t->character != nullptr && qPrintable(t->character->name()) != nullptr)
       {
-        DC::getInstance()->logentry(u"Connection broken by peer %1 playing %2."_s).arg(t->getPeerAddress().toString()).arg(qPrintable(t->character->name())), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(u"Connection broken by peer %1 playing %2."_s.arg(t->getPeerAddress().toString()).arg(qPrintable(t->character->name())), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
       else
       {
-        DC::getInstance()->logentry(u"Connection broken by peer %1 not playing a character."_s).arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        DC::getInstance()->logentry(u"Connection broken by peer %1 not playing a character."_s.arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
 
       return -1;
@@ -2267,7 +2239,7 @@ qint32 close_socket(class Connection *d)
         //			qPrintable(conn->character->name()));
         //		DC::getInstance()->logentry(buf, 110, LOG_HMM);
       }
-      free_char(conn->character, Trace("close_socket"));
+      free_char(conn->character);
     }
   }
   //   Removed this log caues it's so fricken annoying
@@ -2310,7 +2282,7 @@ qint32 close_socket(class Connection *d)
   return 1;
 }
 
-void check_idle_passwords(void)
+void DC::check_idle_passwords(void)
 {
   class Connection *d, *next_d;
 
@@ -2333,9 +2305,9 @@ void check_idle_passwords(void)
   }
 }
 
-void report_debug_logging()
+void DC::report_debug_logging()
 {
-  DC::getInstance()->logentry(u"Name: [%1] Last cmd: [%2] Last room: [%3]"_s.arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
+  logentry(u"Name: [%1] Last cmd: [%2] Last room: [%3]"_s.arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
 }
 
 void DC::crash_hotboot(void)
@@ -2494,7 +2466,7 @@ void signal_handler(qint32 signal, siginfo_t *si, void *)
   }
 }
 
-void signal_setup(void)
+void DC::signal_setup(void)
 {
   sigset_t set;
   sigfillset(&set);

@@ -234,7 +234,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (found < 0)
   {
-    ch->send(u"The %1 is not a valid weapon poison.\r\n"_s).arg(vial->short_description()));
+    ch->send(u"The %1 is not a valid weapon poison.\r\n"_s.arg(vial->short_description()));
     return ReturnValue::eFAILURE;
   }
 
@@ -265,7 +265,7 @@ qint32 valid_trade_skill_combine(ObjectPtr container, trade_data_type *data, Cha
 {
   if (!(container->contains))
   {
-    ch->send(u"Your %1 appears to be empty.\r\n"_s).arg(container->short_description()));
+    ch->send(u"Your %1 appears to be empty.\r\n"_s.arg(container->short_description()));
     return -2;
   }
 
@@ -378,7 +378,7 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
            break;
 
         default:
-           ch->send(u"Unknown poison type %1.  Let a god know.\r\n"_s).arg(type));
+           ch->send(u"Unknown poison type %1.  Let a god know.\r\n"_s.arg(type));
            break;
      }
 
@@ -649,7 +649,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
     auto potionname = u"potion %1 %2"_s.arg(container_key).arg(liquid_key);
     auto potionshort = u"a %1 %2 %3 potion"_s.arg(container_key).arg(liquid_key).arg(potion_color);
-    auto potionlong = u"a %1 %2 %3 potion lies here."_s).arg(container_key).arg(liquid_key).arg(potion_color);
+    auto potionlong = u"a %1 %2 %3 potion lies here."_s.arg(container_key).arg(liquid_key).arg(potion_color);
 
     containerobj->obj_flags.type_flag = ITEM_POTION;
     containerobj->obj_flags.value[0] = (learned / 2 - 5) + GET_WIS(ch) / 2 + GET_INT(ch) / 2;

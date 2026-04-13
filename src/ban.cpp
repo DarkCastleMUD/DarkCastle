@@ -151,7 +151,7 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
   ban.type(flag);
   DC::getInstance()->bans_.add(ban);
 
-  loggod(u"1s has banned %2 for %3 players."_s).arg(name()).arg(site).arg(Ban::ban_types.value(qsizetype(ban.type()))));
+  loggod(u"1s has banned %2 for %3 players."_s.arg(name()).arg(site).arg(Ban::ban_types.value(qsizetype(ban.type()))));
   sendln("Site banned.");
   DC::getInstance()->bans_.save();
   return ReturnValue::eSUCCESS;

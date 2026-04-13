@@ -92,7 +92,7 @@ qint32 top_of_objt = {}; /* top of object index table       */
 time_info_data time_info;  /* the infomation about the time   */
 weather_data weather_info; /* the infomation about the weather */
 
-Vault *vault_table = {};
+VaultPtr vault_table = {};
 
 /* local procedures */
 void setup_dir(FILE *fl, qint32 room, qint32 dir);
@@ -137,9 +137,9 @@ Arena &Room::arena(void)
 
 // add new tracks to the head of the list. When the list
 // gets longer than 11, remove the tail and delete it.
-void Room::AddTrackItem(QSharedPointer<Tracks> newTrack)
+void Room::AddTrackItem(TracksPtr newTrack)
 {
-  if (!tracks)
+  if (!tracks_)
   {
     tracks = newTrack;
     last_track = newTrack;
@@ -154,7 +154,7 @@ void Room::AddTrackItem(QSharedPointer<Tracks> newTrack)
 
   if (++nTracks > 11)
   {
-    QSharedPointer<Tracks> pScent;
+    TracksPtr pScent;
     pScent = last_track->previous;
     pScent->next = {};
     last_track = pScent;
@@ -242,17 +242,17 @@ bool operator==(const Room &r1, const Room &r2)
           r1.funct == r2.funct &&
           // r1.contents == r2.contents &&
           // r1.people == r2.people &&
-          // r1.nTracks == r2.nTracks &&
+          // r1.tracks_.size() == r2.tracks_.size() &&
           // r1.tracks == r2.tracks &&
           // r1.iFlags == r2.iFlags &&
           // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
           !memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)));
 }
 
-QSharedPointer<Tracks> Room::TrackItem(qint32 nIndex)
+TracksPtr Room::TrackItem(qint32 nIndex)
 {
   qint32 nr;
-  QSharedPointer<Tracks> pScent;
+  TracksPtr pScent;
 
   for (pScent = tracks, nr = 1; pScent;
        pScent = pScent->next, nr++)
@@ -815,7 +815,7 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
       if (DC::getInstance()->wizlist[x].getName()[0] == '@')
       {
         z = 1;
-        if (*lines)
+        if (!lines.isEmpty())
         {
           line_length = strlen(lines) - 2;
           lines[strlen(lines) - 2] = '\n';
@@ -910,7 +910,7 @@ void reset_time(void)
     break;
   }
   }
-  DC::getInstance()->logverbose(u"Current Gametime: %1H %2D %3M %4Y."_s).arg(time_info.hours).arg(time_info.day).arg(time_info.month).arg(time_info.year));
+  DC::getInstance()->logverbose(u"Current Gametime: %1H %2D %3M %4Y."_s.arg(time_info.hours).arg(time_info.day).arg(time_info.month).arg(time_info.year));
 
   weather_info.pressure = 960;
   if ((time_info.month >= 7) && (time_info.month <= 12))
@@ -1459,7 +1459,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
     if (room_nr)
     {
       DC::getInstance()->world[room_nr].description = description;
-      DC::getInstance()->world[room_nr].nTracks = {};
+      DC::getInstance()->world[room_nr].tracks_.size() = {};
       DC::getInstance()->world[room_nr].tracks = {};
       DC::getInstance()->world[room_nr].last_track = {};
       DC::getInstance()->world[room_nr].denied = {};
@@ -1486,7 +1486,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       }
       if (!found)
       {
-        QString error = u"Room %1 is outside of any zone."_s).arg(room_nr);
+        QString error = u"Room %1 is outside of any zone."_s.arg(room_nr);
         DC::getInstance()->logentry(error);
         DC::getInstance()->logentry(u"Room outside of ANY zone.  ERROR"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
@@ -1847,7 +1847,7 @@ void DC::free_mobs_from_memory(void)
   {
     if ((curr = (CharacterPtr)mob_index[i].item))
     {
-      free_char(curr, Trace("free_mobs_from_memory"));
+      free_char(curr);
       mob_index[i].item = {};
     }
   }
@@ -2392,7 +2392,7 @@ zone_t DC::read_one_zone(FILE *fl)
         buf[strlen(buf) - 1] = '\0';
 
       // if any, keep anything left
-      if (*skipper)
+      if (!skipper.isEmpty())
         reset->comment = skipper;
       reset_tab.push_back(reset);
       continue;
@@ -2445,7 +2445,7 @@ zone_t DC::read_one_zone(FILE *fl)
       buf[strlen(buf) - 1] = '\0';
 
     // if any, keep anything left
-    if (*skipper)
+    if (!skipper.isEmpty())
       reset->comment = skipper;
 
     reset_tab.push_back(reset);
@@ -3925,7 +3925,7 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
       break;
 
     default:
-      logbug(u"Illegal obj addon flag %1 in obj %2."_s).arg(chk).arg(obj->name()));
+      logbug(u"Illegal obj addon flag %1 in obj %2."_s.arg(chk).arg(obj->name()));
       break;
     } // switch
       // read in next flag
@@ -3952,7 +3952,7 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
   return obj;
 }
 
-std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
+auto &operator>>(auto &stream, ObjectPtr obj)
 {
   qint32 loc, mod, nr;
 
@@ -3961,22 +3961,22 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
 
   if (obj == nullptr)
   {
-    return in;
+    return stream;
   }
 
   clear_object(obj);
-  in >> c;
+  stream >> c;
   if (c == '#')
   {
-    in >> nr;
+    stream >> nr;
   }
-  in >> std::ws;
+  stream >> std::ws;
 
-  obj->name(fread_string(in, true));
+  obj->name(fread_string(stream, true));
 
-  obj->short_description(fread_string(in, true));
-  obj->long_description(fread_string(in, 1));
-  obj->ActionDescription(fread_string(in, 1));
+  obj->short_description(fread_string(stream, true));
+  obj->long_description(fread_string(stream, 1));
+  obj->ActionDescription(fread_string(stream, 1));
   obj->table = {};
   DC::getInstance()->currentVNUM(nr);
   DC::getInstance()->currentName(obj->name());
@@ -3984,22 +3984,22 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
 
   // numeric data
 
-  obj->obj_flags.type_flag = fread_int(in, -1000, 2147483467);
+  obj->obj_flags.type_flag = fread_int(stream, -1000, 2147483467);
 
-  obj->obj_flags.extra_flags = fread_bitvector(in, 0, 2147483467);
-  obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(in);
-  obj->obj_flags.size = fread_bitvector(in, 0, 2147483467);
+  obj->obj_flags.extra_flags = fread_bitvector(stream, 0, 2147483467);
+  obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(stream);
+  obj->obj_flags.size = fread_bitvector(stream, 0, 2147483467);
 
-  obj->obj_flags.value[0] = fread_int(in, -1000, 2147483467);
-  obj->obj_flags.value[1] = fread_int(in, -1000, 2147483467);
-  obj->obj_flags.value[2] = fread_int(in, -1000, 2147483467);
-  obj->obj_flags.value[3] = fread_int(in, -1000, 2147483467);
-  obj->obj_flags.eq_level = fread_int(in, -1000, IMPLEMENTER);
-  obj->obj_flags.weight = fread_int(in, -1000, 2147483467);
-  obj->obj_flags.cost = fread_int(in, -1000, 2147483467);
-  obj->obj_flags.more_flags = fread_bitvector(in, -1000, 2147483467);
+  obj->obj_flags.value[0] = fread_int(stream, -1000, 2147483467);
+  obj->obj_flags.value[1] = fread_int(stream, -1000, 2147483467);
+  obj->obj_flags.value[2] = fread_int(stream, -1000, 2147483467);
+  obj->obj_flags.value[3] = fread_int(stream, -1000, 2147483467);
+  obj->obj_flags.eq_level = fread_int(stream, -1000, IMPLEMENTER);
+  obj->obj_flags.weight = fread_int(stream, -1000, 2147483467);
+  obj->obj_flags.cost = fread_int(stream, -1000, 2147483467);
+  obj->obj_flags.more_flags = fread_bitvector(stream, -1000, 2147483467);
 
-  // currently not stored in object file
+  // currently not stored stream object file
   obj->obj_flags.timer = {};
 
   obj->ex_description = {};
@@ -4007,7 +4007,7 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
   obj->num_affects = {};
   // other flags
 
-  in >> chk;
+  stream >> chk;
 
   QString log_buf = {};
   while (chk != 'S')
@@ -4021,31 +4021,31 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
     case 'E':
     {
       auto new_new_descr = new extra_descr_data;
-      new_new_descr->keyword_ = fread_string(in, 1);
-      new_new_descr->description_ = fread_string(in, 1);
+      new_new_descr->keyword_ = fread_string(stream, 1);
+      new_new_descr->description_ = fread_string(stream, 1);
       new_new_descr->next = obj->ex_description;
       obj->ex_description = new_new_descr;
     }
     break;
 
     case '\\':
-      // ungetc( '\\', in );
-      // mprog_read_programs( in, nr,ignore );
+      // ungetc( '\\', stream );
+      // mprog_read_programs( stream, nr,ignore );
       break;
 
     case 'A':
       // these are only two members of obj_affected_type, so nothing else needs initializing
-      loc = fread_int(in, -1000, 2147483467);
-      mod = fread_int(in, -1000, 1000);
+      loc = fread_int(stream, -1000, 2147483467);
+      mod = fread_int(stream, -1000, 1000);
       add_obj_affect(obj, loc, mod);
       break;
 
     default:
-      logbug(u"Illegal obj addon flag %1 in obj %2."_s).arg(chk).arg(obj->name()));
+      logbug(u"Illegal obj addon flag %1 stream obj %2."_s.arg(chk).arg(obj->name()));
       break;
     } // switch
-      // read in next flag
-    in >> chk;
+      // read stream next flag
+    stream >> chk;
   }
 
   obj->in_room = DC::NOWHERE;
@@ -4057,7 +4057,7 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
   obj->contains = {};
   obj->item_number = {};
 
-  return in;
+  return stream;
 }
 
 // write an object to file
@@ -4115,54 +4115,57 @@ void write_object(LegacyFile &lf, ObjectPtr obj)
   dc_fprintf(fl, "S\n");
 }
 
-std::ofstream &operator<<(std::ofstream &out, ObjectPtr obj)
+auto &operator<<(auto &stream, ObjectPtr obj)
 {
-  out << "#" << DC::getInstance()->obj_index[obj->item_number].vnum() << "\n";
-  string_to_file(out, obj->name());
-  string_to_file(out, obj->short_description());
-  string_to_file(out, obj->long_description());
-  string_to_file(out, obj->ActionDescription());
+  if (!obj)
+    return stream;
 
-  out << qint32(obj->obj_flags.type_flag) << " "
-      << obj->obj_flags.extra_flags << " "
-      << obj->obj_flags.wear_flags << " "
-      << obj->obj_flags.size << "\n";
+  stream << "#" << obj->getDC()->obj_index[obj->item_number].vnum() << "\n";
+  string_to_file(stream, obj->name());
+  string_to_file(stream, obj->short_description());
+  string_to_file(stream, obj->long_description());
+  string_to_file(stream, obj->ActionDescription());
 
-  out << obj->obj_flags.value[0] << " "
-      << obj->obj_flags.value[1] << " "
-      << obj->obj_flags.value[2] << " "
-      << obj->obj_flags.value[3] << " "
-      << obj->obj_flags.eq_level << "\n";
+  stream << qint32(obj->obj_flags.type_flag) << " "
+         << obj->obj_flags.extra_flags << " "
+         << obj->obj_flags.wear_flags << " "
+         << obj->obj_flags.size << "\n";
 
-  out << obj->obj_flags.weight << " "
-      << obj->obj_flags.cost << " "
-      << obj->obj_flags.more_flags << "\n";
+  stream << obj->obj_flags.value[0] << " "
+         << obj->obj_flags.value[1] << " "
+         << obj->obj_flags.value[2] << " "
+         << obj->obj_flags.value[3] << " "
+         << obj->obj_flags.eq_level << "\n";
+
+  stream << obj->obj_flags.weight << " "
+         << obj->obj_flags.cost << " "
+         << obj->obj_flags.more_flags << "\n";
 
   extra_descr_data *currdesc = obj->ex_description;
   while (currdesc)
   {
-    out << "E\n";
-    string_to_file(out, currdesc->keyword_);
-    string_to_file(out, currdesc->description_);
+    stream << "E\n";
+    string_to_file(stream, currdesc->keyword_);
+    string_to_file(stream, currdesc->description_);
     currdesc = currdesc->next;
   }
 
   for (qint32 i = {}; i < obj->num_affects; i++)
   {
-    out << "A\n";
-    out << obj->affected[i].location << " "
-        << obj->affected[i].modifier << "\n";
+    stream << "A\n";
+    stream << obj->affected[i].location << " "
+           << obj->affected[i].modifier << "\n";
   }
 
-  if (DC::getInstance()->obj_index[obj->item_number].mobprogs)
+  if (obj->getDC()->obj_index[obj->item_number].mobprogs)
   {
-    write_mprog_recur(out, DC::getInstance()->obj_index[obj->item_number].mobprogs, false);
-    out << "|\n";
+    write_mprog_recur(stream, obj->getDC()->obj_index[obj->item_number].mobprogs, false);
+    stream << "|\n";
   }
 
-  out << "S\n";
+  stream << "S\n";
 
-  return out;
+  return stream;
 }
 
 QString quotequotes(QString &s1)
@@ -4520,7 +4523,7 @@ void randomize_object(ObjectPtr obj)
   }
 }
 
-void zone_update(void)
+void DC::zone_update(void)
 {
   auto &zones = DC::getInstance()->zones;
   for (auto [zone_key, zone] : zones.asKeyValueRange())
@@ -5036,7 +5039,7 @@ bool Zone::isEmpty(void)
   return true;
 }
 
-QString fread_qstring(QTextStream &stream, bool *ok)
+QString fread_string(QTextStream &stream, bool *ok)
 {
   assert(stream.status() == QTextStream::Status::Ok);
   QString buffer;
@@ -5072,89 +5075,6 @@ QString fread_qstring(QTextStream &stream, bool *ok)
   qDebug() << "fread_string returning" << buffer << buffer.length();
   qDebugQTextStreamLine(stream, "after fread_string()");
   return buffer;
-}
-
-QString fread_qstring(FILE *stream, bool *ok)
-{
-  QString lineptr = {};
-  size_t n = {};
-
-  ssize_t bytes_read = getdelim(&lineptr, &n, '~', stream);
-  if (lineptr && bytes_read && lineptr[bytes_read - 1] == '~')
-  {
-    lineptr[bytes_read - 1] = {};
-  }
-  fseek(stream, 1, SEEK_CUR);
-  // qDebug("%d [%s]", bytes_read, lineptr);
-
-  return lf_to_crlf(QString(lineptr));
-}
-
-/* read and allocate space for a '~'-terminated string from a given file */
-QString fread_string(FILE *fl, qint32 hasher)
-{
-  QString buf = {};
-  QString pAlloc = {};
-  QString pBufLast = {};
-  QString temp = {};
-
-  for (pBufLast = buf; pBufLast < &buf[MAX_STRING_LENGTH - 2];)
-  {
-    *pBufLast = getc(fl);
-    switch (*pBufLast)
-    {
-    default:
-      pBufLast++;
-      break;
-
-    case '\n':
-      while (pBufLast > buf && isspace(pBufLast[-1]))
-        pBufLast--;
-      *pBufLast++ = '\r';
-      *pBufLast++ = '\n';
-      break;
-
-    case '~':
-      getc(fl);
-      if (pBufLast == buf)
-      {
-        if (hasher)
-        {
-          pAlloc = u""_s;
-        }
-        else
-        {
-          pAlloc = u""_s;
-        }
-      }
-      else if (hasher)
-      {
-        *pBufLast++ = '\0';
-
-        pAlloc = {};
-        memcpy(pAlloc, buf, pBufLast - buf);
-        temp = pAlloc;
-        pAlloc = {};
-        pAlloc = temp;
-      }
-      else
-      {
-        *pBufLast++ = '\0';
-        pAlloc = {};
-        memcpy(pAlloc, buf, pBufLast - buf);
-      }
-      return pAlloc;
-      // end of ~ case
-    case (QChar)EOF:
-      perror("fread_string: EOF");
-      throw error_eof();
-      break;
-    } // switch
-  } // for
-
-  perror("fread_string: QString too long");
-  abort();
-  return (nullptr);
 }
 
 QString fread_word(QTextStream &fl)
@@ -5585,7 +5505,7 @@ QChar fread_char(FILE *fl)
 }
 
 /* release memory allocated for a character  */
-void free_char(CharacterPtr ch, Trace trace)
+void free_char(CharacterPtr ch)
 {
   qint32 iWear;
   //  affected_type *af;
@@ -6356,7 +6276,7 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
 
 // * --- End MOBProgs stuff --- *
 
-void find_unordered_objects(void)
+void DC::find_unordered_objects(void)
 {
   qint32 cur_vnum, last_vnum = {};
 
@@ -6659,7 +6579,7 @@ bool LegacyFile::backupFile(void)
   if (fi.exists())
   {
     QString originalfileName = fi.canonicalFilePath();
-    QString backupFileName = u"%1.last"_s).arg(originalfileName);
+    QString backupFileName = u"%1.last"_s.arg(originalfileName);
 
     if (QFile::exists(backupFileName))
     {

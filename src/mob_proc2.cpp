@@ -449,7 +449,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     cost = corpse_cost(ch);
     cost /= 20000;
     cost = MAX(cost, 30);
-    ch->send(u"The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n"_s).arg(cost));
+    ch->send(u"The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n"_s.arg(cost));
     return ReturnValue::eSUCCESS;
   }
 
@@ -515,7 +515,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
 
   if (obj->obj_flags.type_flag == ITEM_WEAPON)
   { // weapon
-    buf = u"%1%2d%3, %4, "_s).arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+    buf = u"%1%2d%3, %4, "_s.arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
   }
 
   QString buf2;
@@ -537,7 +537,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
         buf2 = u"Invalid"_s;
       }
 
-      QString buf3 = u"%1 by %2, "_s).arg(buf2).arg(obj->affected[i].modifier).toLower();
+      QString buf3 = u"%1 by %2, "_s.arg(buf2).arg(obj->affected[i].modifier).toLower();
 
       QString potential_buffer = buf + buf3;
       qsizetype starting_point = potential_buffer.lastIndexOf("\n");
@@ -613,11 +613,11 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
 
   if (platinum)
   {
-    buf2 = u"costing %1 coins."_s).arg(obj->obj_flags.cost / 10);
+    buf2 = u"costing %1 coins."_s.arg(obj->obj_flags.cost / 10);
   }
   else
   {
-    buf2 = u"costing %1 qpoints."_s).arg(obj->obj_flags.cost / 10000);
+    buf2 = u"costing %1 qpoints."_s.arg(obj->obj_flags.cost / 10000);
   }
 
   QString potential_buffer = buf + buf2;
@@ -719,7 +719,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
 
     if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
     {
-      owner->do_tell(u"%1 That item is not available to you."_s).arg(qPrintable(ch->name())).split(' '));
+      owner->do_tell(u"%1 That item is not available to you."_s.arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }

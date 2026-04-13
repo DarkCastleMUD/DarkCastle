@@ -711,11 +711,10 @@ void gain_condition(CharacterPtr ch, qint32 condition, qint32 value)
   }
 }
 
-void food_update(void)
+void DC::food_update(void)
 {
   ObjectPtr food = {};
 
-  const auto &character_list = (dynamic_cast<DCPtr>(DC::instance()))->character_list;
   for (const auto &i : character_list)
   {
     if (i->affected_by_spell(SPELL_PARALYZE))
@@ -760,7 +759,7 @@ void food_update(void)
 
 // Update the HP of mobs and players
 // Also clears out any linkdead level 1s
-void point_update(void)
+void DC::point_update(void)
 {
   /* characters */
   const auto &character_list = DC::getInstance()->character_list;
@@ -816,7 +815,7 @@ void point_update(void)
   } /* for */
 }
 
-void update_corpses_and_portals(void)
+void DC::update_corpses_and_portals(void)
 {
   // QString buf;
   ObjectPtr j, next_thing;
@@ -841,13 +840,13 @@ void update_corpses_and_portals(void)
       {
         if (j->in_room != DC::NOWHERE)
         {
-          auto str = u"%1 shimmers brightly and then fades away.\r\n"_s).arg(GET_OBJ_SHORT(j));
+          auto str = u"%1 shimmers brightly and then fades away.\r\n"_s.arg(GET_OBJ_SHORT(j));
           str[0] = str[0].toUpper();
           send_to_room(str, j->in_room);
         }
         else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE)
         {
-          auto str = u"%1 shimmers brightly for a moment.\r\n"_s).arg(GET_OBJ_SHORT(j->in_obj));
+          auto str = u"%1 shimmers brightly for a moment.\r\n"_s.arg(GET_OBJ_SHORT(j->in_obj));
           str[0] = str[0].toUpper();
           send_to_room(str, j->in_obj->in_room);
         }

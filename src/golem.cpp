@@ -395,12 +395,12 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         if (!IS_AFFECTED(vict, AFF_CHARM))
         {
-          ch->sendln(u"%1 is not a charmie."_s).arg(qPrintable(vict->shortdesc_or_name())));
+          ch->sendln(u"%1 is not a charmie."_s.arg(qPrintable(vict->shortdesc_or_name())));
           return ReturnValue::eFAILURE;
         }
         if (vict->master != ch)
         {
-          ch->sendln(u"%1 is not your charmie."_s).arg(qPrintable(vict->shortdesc_or_name())));
+          ch->sendln(u"%1 is not your charmie."_s.arg(qPrintable(vict->shortdesc_or_name())));
           return ReturnValue::eFAILURE;
         }
         ch = vict;

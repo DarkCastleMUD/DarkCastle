@@ -701,19 +701,19 @@ void read_skill(CharacterPtr ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s).arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s).arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s).arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -857,7 +857,7 @@ void save_char_obj_db(CharacterPtr ch)
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  Vault *vault;
+  VaultPtr vault;
   if ((vault = has_vault(qPrintable(ch->name()))))
     save_vault(vault->owner);
   */
@@ -953,7 +953,7 @@ void Character::save_char_obj(void)
   }
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  Vault *vault;
+  VaultPtr vault;
   if ((vault = has_vault(name())))
     save_vault(vault->owner);
 }
@@ -987,7 +987,7 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
 
   if (conn->character)
   {
-    free_char(conn->character, Trace("load_char_obj"));
+    free_char(conn->character);
   }
 
   conn->character = ch;

@@ -897,7 +897,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     {
       x = (qint32)(exp_needed - ch->exp);
 
-      ch->send(u"You need %1 experience to level.\r\n"_s).arg(x));
+      ch->send(u"You need %1 experience to level.\r\n"_s.arg(x));
       return ReturnValue::eSUCCESS;
     }
 

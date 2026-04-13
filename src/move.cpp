@@ -9,22 +9,15 @@
  *************************************************************************
  */
 #include "DC/DC.h"
-#include "DC/affect.h"
 
 #include "DC/fight.h"
 
 #include "DC/interp.h"
-#include "DC/spells.h"
 #include "DC/handler.h"
-#include "DC/act.h"
 #include "DC/race.h" // RACE_FISH
-#include "DC/clan.h" // clan_room_data
-#include <cstring>
 #include "DC/innate.h"
 #include "DC/const.h"
 #include "DC/move.h"
-#include "DC/utility.h"
-#include "DC/room.h"
 
 qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type); // class/cl_mage.cpp
 
@@ -49,9 +42,7 @@ void move_player_home(CharacterPtr victim)
 {
   qint32 was_in = victim->in_room;
   qint32 found = {};
-  Clan *clan = {};
-  clan_room_data *room = {};
-
+  ClanPtr clan = {};
   // check for homes that don't exist
   if (real_room(victim->hometown < 1))
     victim->hometown = START_ROOM;
@@ -113,7 +104,7 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
   if (DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_SWIM || DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_NOSWIM)
     return;
 
-  auto newScent = QSharedPointer<Tracks>::create();
+  auto newScent = TracksPtr::create();
   auto valid_dir = getDirectionFromCommand(cmd);
   if (valid_dir)
     newScent->direction = *valid_dir;

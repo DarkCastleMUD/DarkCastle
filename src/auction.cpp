@@ -184,7 +184,7 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
   {
     if (vch != ch)
     {
-      vch->send(u"%1 has just modified the price of one of %2 items.\r\n"_s).arg(qPrintable(ch->name())).arg((GET_SEX(ch) == SEX_MALE) ? "his" : "her"));
+      vch->send(u"%1 has just modified the price of one of %2 items.\r\n"_s.arg(qPrintable(ch->name())).arg((GET_SEX(ch) == SEX_MALE) ? "his" : "her"));
     }
   }
 
@@ -241,7 +241,7 @@ void AuctionHouse::HandleDelete(QString name)
     plural = "s ";
   }
 
-  DC::getInstance()->logentry(u"%1 auction%2 belonging to %3 have been deleted."_s).arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 auction%2 belonging to %3 have been deleted."_s.arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
 
   while (!tickets_to_delete.isEmpty())
   {
@@ -285,7 +285,7 @@ void AuctionHouse::HandleRename(CharacterPtr ch, QString old_name, QString new_n
   {
     plural = "s ";
   }
-  DC::getInstance()->logentry(u"%1 auction%2 have been converted from %3 to %4."_s).arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  DC::getInstance()->logentry(u"%1 auction%2 have been converted from %3 to %4."_s.arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
   Save();
 }
 
@@ -351,7 +351,7 @@ void AuctionHouse::Identify(CharacterPtr ch, quint32 ticket)
   if (!Item_it->buyer.isEmpty() && Item_it->buyer.compare(qPrintable(ch->name())) && Item_it->seller.compare(qPrintable(ch->name())))
 
   {
-    ch->send(u"Ticket number %1 is private.\r\n"_s).arg(ticket));
+    ch->send(u"Ticket number %1 is private.\r\n"_s.arg(ticket));
     return;
   }
 
@@ -364,16 +364,16 @@ void AuctionHouse::Identify(CharacterPtr ch, quint32 ticket)
   qint32 nr = real_object(Item_it->vitem);
   if (nr < 0)
   {
-    ch->send(u"There is a problem with ticket %1. Please tell an imm.\r\n"_s).arg(ticket));
+    ch->send(u"There is a problem with ticket %1. Please tell an imm.\r\n"_s.arg(ticket));
     return;
   }
 
-  ObjectPtr obj = ticket_object_load(Item_it, ticket);
+  ObjectPtr obj = dc_->ticket_object_load(Item_it, ticket);
 
   if (!obj)
   {
 
-    DC::getInstance()->logentry(u"Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!"_s.arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!"_s.arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -596,13 +596,13 @@ void AuctionHouse::AddRoom(CharacterPtr ch, qint32 room)
   if (auction_rooms.end() == auction_rooms.find(room))
   {
     auction_rooms[room] = 1;
-    ch->send(u"Done. Room %1 added to auction houses.\r\n"_s).arg(room));
+    ch->send(u"Done. Room %1 added to auction houses.\r\n"_s.arg(room));
     DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just added room %d to auction houses.", qPrintable(ch->name()), room);
     Save();
     return;
   }
   else
-    ch->send(u"Room %1 is already an auction house.\r\n"_s).arg(room));
+    ch->send(u"Room %1 is already an auction house.\r\n"_s.arg(room));
 }
 
 /*
@@ -612,7 +612,7 @@ void AuctionHouse::RemoveRoom(CharacterPtr ch, qint32 room)
 {
   if (1 == auction_rooms.remove(room))
   {
-    ch->send(u"Done. Room %1 has been removed from auction houses.\r\n"_s).arg(room));
+    ch->send(u"Done. Room %1 has been removed from auction houses.\r\n"_s.arg(room));
     DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just removed room %d from auction houses.", qPrintable(ch->name()), room);
     Save();
     return;
@@ -902,13 +902,13 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
   if (!Item_it->buyer.isEmpty() && Item_it->buyer.compare(qPrintable(ch->name())))
   {
-    ch->send(u"Ticket number %1 is private.\r\n"_s).arg(ticket));
+    ch->send(u"Ticket number %1 is private.\r\n"_s.arg(ticket));
     return;
   }
 
   if (Item_it->state != AUC_FOR_SALE)
   {
-    ch->send(u"Ticket number %1 has already been sold\r\n."_s).arg(ticket));
+    ch->send(u"Ticket number %1 has already been sold\r\n."_s.arg(ticket));
     return;
   }
 
@@ -962,12 +962,12 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        ch->send(u"You need to have \"%s\"_s to buy a NO_TRADE item.\r\n").arg(qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description())));
+        ch->send(u"You need to have \"%s\"_s to buy a NO_TRADE item.\r\n"_s.arg(DC::getInstance()->obj_index[nr].item->short_description()));
       return;
     }
     else
     {
-      ch->send(u"You give your %1 to the broker.\r\n"_s).arg(no_trade_obj->short_description()));
+      ch->send(u"You give your %1 to the broker.\r\n"_s.arg(no_trade_obj->short_description()));
       extract_obj(no_trade_obj);
     }
   }
@@ -1045,7 +1045,7 @@ ObjectPtr DC::ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it,
   if (Item_it->obj == nullptr)
   {
 
-    QString obj_filename = u"../lib/auctions/"_s + ticket + ".auction_obj";
+    QString obj_filename = u"../lib/auctions/"_s + QString::number(ticket) + u".auction_obj"_s;
     QFile auction_obj_file(obj_filename);
 
     if (auction_obj_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
@@ -1141,7 +1141,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       return;
     }
 
-    obj = ticket_object_load(Item_it, ticket);
+    obj = dc_->ticket_object_load(Item_it, ticket);
     if (!obj)
     {
       QString buf;
@@ -1151,7 +1151,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       return;
     }
 
-    ch->send(u"The Consignment Broker retrieves %1 and returns it to you.\r\n"_s).arg(obj->short_description()));
+    ch->send(u"The Consignment Broker retrieves %1 and returns it to you.\r\n"_s.arg(obj->short_description()));
     QString log_buf = {};
     dc_sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
                qPrintable(ch->name()), ticket, qPrintable(Item_it->item_name), Item_it->price);
@@ -1270,11 +1270,10 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
       }
       i++;
 
-      ss << Item_it->price;
       dc_sprintf(buf, "\r\n%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\r\n",
                  Item_it.key(),
                  (options == LIST_MINE) ? qPrintable(Item_it->buyer) : qPrintable(Item_it->seller),
-                 ss.str().c_str(),
+                 qPrintable(QString::number(Item_it->price)),
                  qPrintable(state_output), IsNoTrade(Item_it->vitem) ? "$4N$R" : " ",
                  IsWearable(ch, Item_it->vitem) ? " " : "$4*$R", qPrintable(Item_it->item_name));
       if (options == LIST_RECENT)
@@ -1306,11 +1305,11 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     else if (options == LIST_BY_SELLER)
       ch->sendln(u"\r\n\"%s\"_s doesn't seem to be selling any public items.\r\n\r\nTo view private items, use \"vend list private\".\r\n").arg(qPrintable(name));
     else if (options == LIST_BY_CLASS)
-      ch->send(u"\r\nThere are no \"%s\" wearable public items for sale.\r\n"_s).arg(qPrintable(name)));
+      ch->send(u"\r\nThere are no \"%s\" wearable public items for sale.\r\n"_s.arg(qPrintable(name)));
     else if (options == LIST_MINE)
       ch->sendln("\r\nYou do not have any tickets.");
     else if (options == LIST_BY_RACE)
-      ch->send(u"\r\nThere is nothing for sale that would fit a \"%s\".\r\n"_s).arg(qPrintable(name)));
+      ch->send(u"\r\nThere is nothing for sale that would fit a \"%s\".\r\n"_s.arg(qPrintable(name)));
     else
       ch->sendln("\r\nThere is nothing for sale!");
   }
@@ -1479,10 +1478,10 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
   Save();
 
   if (buyer.isEmpty())
-    ch->sendln(u"You are now selling %1 for %2 coins."_s).arg(obj->short_description()).arg(price));
+    ch->sendln(u"You are now selling %1 for %2 coins."_s.arg(obj->short_description()).arg(price));
   else
   {
-    ch->sendln(u"You are now selling %1 to %2 for %3 coins."_s).arg(obj->short_description()).arg(buyer).arg(price));
+    ch->sendln(u"You are now selling %1 to %2 for %3 coins."_s.arg(obj->short_description()).arg(buyer).arg(price));
   }
 
   if (advertise == true && NewTicket.buyer.isEmpty())

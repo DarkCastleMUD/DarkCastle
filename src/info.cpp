@@ -60,7 +60,7 @@ extern qint32 max_who;
 /* extern functions */
 
 void page_string(class Connection *d, const QString str, qint32 keep_internal);
-Clan *get_clan(CharacterPtr);
+ClanPtr get_clan(CharacterPtr);
 extern qint32 getRealSpellDamage(CharacterPtr ch);
 
 /* intern functions */
@@ -443,7 +443,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
 {
   QString buffer;
   ObjectPtr tmp_obj{};
-  Clan *clan{};
+  ClanPtr clan{};
   qint32 j{}, found{}, percent{};
 
   if (mode == 0)
@@ -745,7 +745,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
   if (victim == nullptr)
   {
-    sendln(u"Unable to find %1."_s).arg(name));
+    sendln(u"Unable to find %1."_s.arg(name));
     return ReturnValue::eFAILURE;
   }
 
@@ -1228,7 +1228,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      send(u"You could not find %1 in your inventory, among your equipment or in this room.\r\n"_s).arg(arg1));
+      send(u"You could not find %1 in your inventory, among your equipment or in this room.\r\n"_s.arg(arg1));
     }
   }
 
@@ -1734,7 +1734,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
       ansi_color(NTEXT, ch);
       ch->send("Exits: ");
-      if (*buffer)
+      if (!buffer.isEmpty())
         ch->send(buffer);
       else
         ch->send("None.");
@@ -2356,7 +2356,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (*argument)
+  if (!argument.isEmpty())
   {
     if (!DC::getInstance()->help_index_)
     {
@@ -2432,11 +2432,11 @@ command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
     total++;
   }
 
-  ch->send(u"There are %d visible players connected, %d of which are immortals.\r\n"_s).arg(total).arg(immortal));
-  ch->send(u"%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\r\n"_s).arg(clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER]).arg(clss[CLASS_THIEF]).arg(clss[CLASS_BARBARIAN]).arg(clss[CLASS_MONK]));
-  ch->send(u"%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\r\n"_s).arg(clss[CLASS_PALADIN]).arg(clss[CLASS_ANTI_PAL]).arg(clss[CLASS_BARD]).arg(clss[CLASS_DRUID]).arg(clss[CLASS_RANGER]));
-  ch->send(u"%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\r\n"_s).arg(race[RACE_HUMAN], race[RACE_ELVEN]).arg(race[RACE_DWARVEN]).arg(race[RACE_HOBBIT]).arg(race[RACE_PIXIE]));
-  ch->send(u"%d ogres, %d gnomes, %d orcs, %d trolls.\r\n"_s).arg(race[RACE_GIANT]).arg(race[RACE_GNOME]).arg(race[RACE_ORC]).arg(race[RACE_TROLL]));
+  ch->send(u"There are %d visible players connected, %d of which are immortals.\r\n"_s.arg(total).arg(immortal));
+  ch->send(u"%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\r\n"_s.arg(clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER]).arg(clss[CLASS_THIEF]).arg(clss[CLASS_BARBARIAN]).arg(clss[CLASS_MONK]));
+  ch->send(u"%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\r\n"_s.arg(clss[CLASS_PALADIN]).arg(clss[CLASS_ANTI_PAL]).arg(clss[CLASS_BARD]).arg(clss[CLASS_DRUID]).arg(clss[CLASS_RANGER]));
+  ch->send(u"%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\r\n"_s.arg(race[RACE_HUMAN], race[RACE_ELVEN]).arg(race[RACE_DWARVEN]).arg(race[RACE_HOBBIT]).arg(race[RACE_PIXIE]));
+  ch->send(u"%d ogres, %d gnomes, %d orcs, %d trolls.\r\n"_s.arg(race[RACE_GIANT]).arg(race[RACE_GNOME]).arg(race[RACE_ORC]).arg(race[RACE_TROLL]));
   ch->send(u"The maximum number of players since last reboot was %d."_s.arg(max_who));
   return ReturnValue::eSUCCESS;
 }
@@ -2824,7 +2824,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       }
     }
 
-    ch->send(u"As far as armor goes, %s %s\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())).arg(ac_messages[x]));
+    ch->send(u"As far as armor goes, %s %s\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())).arg(ac_messages[x]));
   }
 
   /* HIT POINTS */
@@ -2834,7 +2834,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (victim->isPlayer() && victim->getLevel() > IMMORTAL)
     {
-      ch->send(u"Compared to your hps, %s can definitely take anything you can dish out.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())));
+      ch->send(u"Compared to your hps, %s can definitely take anything you can dish out.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
     }
     else
     {
@@ -2864,7 +2864,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
           }
         }
 
-        ch->send(u"Compared to your hps, %s %s.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())).arg(hplow_messages[x]));
+        ch->send(u"Compared to your hps, %s %s.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())).arg(hplow_messages[x]));
       }
       else
       {
@@ -2891,7 +2891,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
           }
         }
 
-        ch->send(u"Compared to your hps, %s %s.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())).arg(hphigh_messages[x]));
+        ch->send(u"Compared to your hps, %s %s.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())).arg(hphigh_messages[x]));
       }
     }
 
@@ -3060,7 +3060,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
              GET_CLASS(victim) == CLASS_RANGER)
       ch->send(u"%s appears to have training in both combat and magic.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
     else if (GET_CLASS(victim))
-      ch->send(u"%s appears to have training, but you are unfamiliar with what.\r\n"_s).arg(qPrintable(victim->shortdesc_or_name())));
+      ch->send(u"%s appears to have training, but you are unfamiliar with what.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
     else
       ch->sendln("You've seen stray dogs that were better trained.");
   }
@@ -3260,11 +3260,11 @@ command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
 
     if (experience_remaining < 0)
     {
-      send(u"You have enough experience to advance to level %L1.\r\n"_s).arg(next_level));
+      send(u"You have enough experience to advance to level %L1.\r\n"_s.arg(next_level));
     }
     else
     {
-      send(u"You require %L1 experience to advance to level %L2.\r\n"_s).arg(experience_remaining).arg(next_level));
+      send(u"You require %L1 experience to advance to level %L2.\r\n"_s.arg(experience_remaining).arg(next_level));
     }
   } while (experience_remaining < 0);
 
@@ -4081,7 +4081,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send(u"%1 matches found in inventory.\r\n"_s).arg(obj_results.size() - old_count));
+    send(u"%1 matches found in inventory.\r\n"_s.arg(obj_results.size() - old_count));
     old_count = obj_results.size();
 
     // Search equipment
@@ -4113,7 +4113,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send(u"%1 matches found among worn equipment.\r\n"_s).arg(obj_results.size() - old_count));
+    send(u"%1 matches found among worn equipment.\r\n"_s.arg(obj_results.size() - old_count));
     old_count = obj_results.size();
 
     // search room
@@ -4142,12 +4142,12 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send(u"%1 matches found in room.\r\n"_s).arg(obj_results.size() - old_count));
+    send(u"%1 matches found in room.\r\n"_s.arg(obj_results.size() - old_count));
     old_count = obj_results.size();
 
     // Search all vaults player has access to
     quint64 vaults_searched = {};
-    extern Vault *vault_table;
+    extern VaultPtr vault_table;
     for (auto vault = vault_table; vault; vault = vault->next)
     {
       if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(qPrintable(this->name()), vault))
@@ -4199,11 +4199,11 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     if (vaults_searched == 1)
     {
-      send(u"%1 matches found within 1 vault.\r\n"_s).arg(obj_results.size() - old_count));
+      send(u"%1 matches found within 1 vault.\r\n"_s.arg(obj_results.size() - old_count));
     }
     else
     {
-      send(u"%1 matches found within %2 vaults.\r\n"_s).arg(obj_results.size() - old_count).arg(vaults_searched));
+      send(u"%1 matches found within %2 vaults.\r\n"_s.arg(obj_results.size() - old_count).arg(vaults_searched));
     }
     old_count = obj_results.size();
 
@@ -4386,11 +4386,11 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   {
     if (limit_output)
     {
-      send(u"Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n"_s).arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
+      send(u"Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n"_s.arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
     }
     else
     {
-      send(u"Searching %1 objects...%2 matches found.\r\n"_s).arg(top_of_objt).arg(obj_results.size()));
+      send(u"Searching %1 objects...%2 matches found.\r\n"_s.arg(top_of_objt).arg(obj_results.size()));
     }
   }
 
@@ -4586,7 +4586,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
           }
           else
           {
-            custom_columns += u"$R%1%2-%3$R").arg(buffer).arg(getSettingAsColor("color.bad"_s).arg(obj->affected[i].modifier);
+            custom_columns += u"$R%1%2-%3$R").arg(buffer).arg(getSettingAsColor("color.bad"_s.arg(obj->affected[i].modifier);
           }
         }
       }

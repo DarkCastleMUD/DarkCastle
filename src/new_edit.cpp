@@ -21,7 +21,7 @@ qint32 replace_str(QString *string, QString pattern, QString replacement, qint32
 void check_for_awaymsgs(CharacterPtr);
 
 /*  handle some editor commands */
-void parse_action(parse_t action, QString str, class Connection *d)
+void parse_action(parse_t action, QString str, class Connection *conn)
 {
   qint32 indent = 0, rep_all = 0, flags = 0, total_len, replaced;
   qint32 j = {};
@@ -66,9 +66,9 @@ void parse_action(parse_t action, QString str, class Connection *d)
       }
       j++;
     }
-    format_text(conn->strnew, flags, d, conn->max_str);
+    format_text(conn->strnew, flags, d);
     dc_sprintf(buf, "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
-    write_to_output(buf, d);
+    write_to_output(buf, conn);
     break;
   case parse_t::REPLACE:
     while (isalpha(str[j]) && j < 2)
@@ -113,26 +113,19 @@ void parse_action(parse_t action, QString str, class Connection *d)
     total_len = ((strlen(t) - strlen(s)) + strlen(*conn->strnew));
     //  dc_sprintf(buf, "ORG: '%s'(%d), NEW: '%s'(%d), OTOT: %d, NTOT: %d\r\n", t, strlen(t), s, strlen(s), strlen(*conn->strnew), total_lenth);
     //    write_to_output(buf, d);
-    if (total_len < conn->max_str)
+    if ((replaced = replace_str(conn->strnew, s, t, rep_all)) > 0)
     {
-      if ((replaced = replace_str(conn->strnew, s, t, rep_all, conn->max_str)) > 0)
-      {
-        dc_sprintf(buf, "Replaced %d occurance%sof '%s' with '%s'.\r\n", replaced, ((replaced != 1) ? "s " : " "), s, t);
-        write_to_output(buf, d);
-      }
-      else if (replaced == 0)
-      {
-        dc_sprintf(buf, "String '%s' not found.\r\n", s);
-        write_to_output(buf, d);
-      }
-      else
-      {
-        write_to_output("ERROR: Replacement QString causes buffer overflow, aborted replace.\r\n", d);
-      }
+      dc_sprintf(buf, "Replaced %d occurance%sof '%s' with '%s'.\r\n", replaced, ((replaced != 1) ? "s " : " "), s, t);
+      write_to_output(buf, d);
+    }
+    else if (replaced == 0)
+    {
+      dc_sprintf(buf, "String '%s' not found.\r\n", s);
+      write_to_output(buf, d);
     }
     else
     {
-      write_to_output("Not enough space left in buffer.\r\n", d);
+      write_to_output("ERROR: Replacement QString causes buffer overflow, aborted replace.\r\n", d);
     }
     break;
   case parse_t::DELETE:
@@ -390,12 +383,6 @@ void parse_action(parse_t action, QString str, class Connection *d)
       }
       temp = *s;
       *s = '\0';
-      if ((qint32)((strlen(*conn->strnew) + strlen(buf2) + strlen(s + 1) + 3)) > conn->max_str)
-      {
-        *s = temp;
-        write_to_output("Insert text pushes buffer over maximum size, insert aborted.\r\n", d);
-        return;
-      }
       if (*conn->strnew && (**conn->strnew != '\0'))
         dc_strncat(buf, *conn->strnew, 32768 - strlen(buf) - 1);
       *s = temp;
@@ -469,11 +456,6 @@ void parse_action(parse_t action, QString str, class Connection *d)
         dc_strncat(buf, s, 32768 - strlen(buf) - 1);
       }
       /* check for buffer overflow */
-      if ((qint32)strlen(buf) > conn->max_str)
-      {
-        write_to_output("Change causes new length to exceed buffer maximum size, aborted.\r\n", d);
-        return;
-      }
       /* change the size of the REAL buffer to fit the new text */
       // TODO rework strnew system
       // RECREATE(*conn->strnew, character, strlen(buf) + 3);
@@ -563,7 +545,6 @@ void format_text(QString *ptr_string, qint32 mode, class Connection *d, qint32 m
 {
   qint32 total_chars, cap_next = true, cap_next_next = false;
   QString flow, *start = {}, temp;
-  /* warning: do not edit messages with max_str's of over this value */
   QString formated;
 
   flow = *ptr_string;
@@ -769,33 +750,20 @@ void new_string_add(class Connection *d, QString str)
 
   if (!(*conn->strnew))
   {
-    if ((qint32)strlen(str) > conn->max_str)
-    {
-      write_to_output("String too long - Truncated.\r\n", d);
-      *(str + conn->max_str) = '\0';
-    }
     // TODO rework strnew system
     //*conn->strnew = new character[strlen(str) + 5];
     dc_strcpy(*conn->strnew, str);
   }
   else
   {
-    if ((qint32)(strlen(str) + strlen(*conn->strnew)) > conn->max_str)
+    // TODO fix
+    /*
+    if (!(*conn->strnew = *conn->strnew = new character[strlen(*conn->strnew) + strlen(str) + 5]))
     {
-      if (!action)
-        write_to_output("String too long, limit reached on message.  Last line ignored.\r\n", d);
-    }
-    else
-    {
-      // TODO fix
-      /*
-      if (!(*conn->strnew = *conn->strnew = new character[strlen(*conn->strnew) + strlen(str) + 5]))
-      {
-        perror("string_add");
-        abort();
-      }*/
-      dc_strcat(*conn->strnew, str);
-    }
+      perror("string_add");
+      abort();
+    }*/
+    dc_strcat(*conn->strnew, str);
   }
 
   bool ishashed(QString arg);
@@ -882,7 +850,7 @@ void new_string_add(class Connection *d, QString str)
   }
   else
   {
-    if (!action && !((qint32)(strlen(str) + strlen(*conn->strnew) + 2) > conn->max_str))
+    if (!action)
     {
       dc_strcat(*conn->strnew, "\r\n");
     }

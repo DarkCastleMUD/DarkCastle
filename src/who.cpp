@@ -13,7 +13,7 @@
 #include "DC/returnvals.h"
 #include "DC/const.h"
 
-Clan *get_clan(CharacterPtr);
+ClanPtr get_clan(CharacterPtr);
 
 command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 {
@@ -501,7 +501,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
 command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 count = {};
-  Clan *clan;
+  ClanPtr clan;
 
   ch->sendln("\r\nPlayers in the Arena:\r\n--------------------------");
 

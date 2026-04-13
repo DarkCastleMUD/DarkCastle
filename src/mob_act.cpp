@@ -45,7 +45,7 @@ bool is_r_denied(CharacterPtr ch, qint32 room)
       return true;
   return false;
 }
-void mobile_activity(void)
+void DC::mobile_activity(void)
 {
   CharacterPtr tmp_ch, pch;
   ObjectPtr obj, best_obj;

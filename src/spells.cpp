@@ -2090,7 +2090,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           filter[0] = '\0';
           argument = one_argument(argument, filter);
 
-          if (*filter)
+          if (!filter.isEmpty())
           {
 
             if (*filter == 'f')
@@ -2165,7 +2165,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         argument = one_argument(argument, name);
 
-        if (*name)
+        if (!name.isEmpty())
         {
           if (isSet(spell_info[spl].targets(), TAR_CHAR_ROOM))
           {
@@ -2270,7 +2270,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
       quint64 mana_cost = {};
       if (!target_ok)
       {
-        if (*name)
+        if (!name.isEmpty())
         {
           if (isSet(spell_info[spl].targets(), TAR_CHAR_ROOM))
             ch->sendln("Nobody here by that name.");

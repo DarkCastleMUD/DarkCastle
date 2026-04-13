@@ -421,7 +421,7 @@ qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     {
       if (tmp_char == ch)
       {
-        tmp_char->send(u"You feel your Travelling March recover %1 moves for you.\r\n"_s).arg(heal));
+        tmp_char->send(u"You feel your Travelling March recover %1 moves for you.\r\n"_s.arg(heal));
       }
       else
       {
@@ -983,7 +983,7 @@ qint32 hellmouth_thing(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
   QString arg1;
 
   half_chop(arg, arg1, junk);
-  if (*junk)
+  if (!junk.isEmpty())
     return ReturnValue::eFAILURE;
 
   if (strncmp(arg1, "vanity", 6))
@@ -1337,7 +1337,7 @@ qint32 pfe_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
 
   half_chop(arg, arg1, junk);
-  if (*junk)
+  if (!junk.isEmpty())
     return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::SAY)
@@ -1424,7 +1424,7 @@ qint32 devilsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   half_chop(arg, arg1, junk);
 
-  if (*junk)
+  if (!junk.isEmpty())
     return ReturnValue::eFAILURE;
 
   if (!str_cmp("infrendeo", arg1))
@@ -3511,7 +3511,7 @@ qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
     if (dam > 0)
     {
       GET_MANA(obj->equipped_by) -= dam;
-      obj->equipped_by->send(u"Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n"_s).arg(dam));
+      obj->equipped_by->send(u"Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n"_s.arg(dam));
 
       act_to_room("$n is wracked by magical energies!", obj->equipped_by, 0, 0, 0);
     }

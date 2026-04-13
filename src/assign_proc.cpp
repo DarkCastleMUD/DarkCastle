@@ -13,14 +13,7 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 #include "DC/DC.h"
-
-void boot_the_shops();
-void boot_player_shops();
-void assign_the_shopkeepers();
-void assign_the_player_shopkeepers();
-void assign_non_combat_procs();
-void assign_combat_procs();
-
+#include "DC/db.h"
 /* ********************************************************************
  *  Assignments                                                        *
  ******************************************************************** */
@@ -32,7 +25,7 @@ void DC::assign_mobiles(void)
   assign_combat_procs();
 
   boot_the_shops();
-  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Booting player shops.");
+  logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Booting player shops.");
   boot_player_shops();
   assign_the_shopkeepers();
   assign_the_player_shopkeepers();
@@ -41,37 +34,37 @@ void DC::assign_mobiles(void)
 // The following four functions are just here to make sure when someone removes a mob
 // or object from the world, we don't try to assign procs to index[-1]
 
-void assign_one_mob_non(qint32 vnum, special_function func)
+void DC::assign_one_mob_non(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
-    DC::getInstance()->mob_non_combat_functions[vnum] = func;
+    mob_non_combat_functions[vnum] = func;
   }
 
   qint32 rnum = real_mobile(vnum);
 
   if (rnum >= 0)
   {
-    DC::getInstance()->mob_index[rnum].non_combat_func = func;
+    mob_index[rnum].non_combat_func = func;
   }
 }
 
-void assign_one_mob_com(qint32 vnum, special_function func)
+void DC::assign_one_mob_com(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
-    DC::getInstance()->mob_non_combat_functions[vnum] = func;
+    mob_non_combat_functions[vnum] = func;
   }
 
   qint32 rnum = real_mobile(vnum);
 
   if (rnum >= 0)
   {
-    DC::getInstance()->mob_index[rnum].combat_func = func;
+    mob_index[rnum].combat_func = func;
   }
 }
 
-void assign_one_obj_non(qint32 vnum, special_function func)
+void DC::assign_one_obj_non(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
@@ -86,7 +79,7 @@ void assign_one_obj_non(qint32 vnum, special_function func)
   }
 }
 
-void assign_one_obj_com(qint32 vnum, special_function func)
+void DC::assign_one_obj_com(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
@@ -101,7 +94,7 @@ void assign_one_obj_com(qint32 vnum, special_function func)
   }
 }
 
-void assign_non_combat_procs()
+void DC::assign_non_combat_procs(void)
 {
   SPEC_FUN guild;
   SPEC_FUN guild_guard;
@@ -293,7 +286,7 @@ void assign_non_combat_procs()
   assign_one_mob_non(23006, redeem_trader);
 }
 
-void assign_combat_procs()
+void DC::assign_combat_procs(void)
 {
   SPEC_FUN red_dragon;
   SPEC_FUN green_dragon;
@@ -404,7 +397,7 @@ void assign_combat_procs()
 }
 
 /* assign special procedures to objects */
-void assign_objects(void)
+void DC::assign_objects(void)
 {
   SPEC_FUN board;
   SPEC_FUN bank;
@@ -655,7 +648,7 @@ void assign_objects(void)
 }
 
 /* assign special procedures to rooms */
-void assign_rooms(void)
+void DC::assign_rooms(void)
 {
   ROOM_PROC pet_shops;
   if (real_room(3031) >= 0)

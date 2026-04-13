@@ -803,7 +803,7 @@ command_return_t do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-  vict->send(u"You receive %1 exps.\r\n"_s).arg(reward));
+  vict->send(u"You receive %1 exps.\r\n"_s.arg(reward));
   gain_exp(vict, reward);
   return ReturnValue::eSUCCESS;
 }
@@ -1087,7 +1087,7 @@ command_return_t do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 index = search_skills2(skillnum, skilllist);
   if (victim->getLevel() < skilllist[index].levelavailable)
   {
-    victim->send(u"You try to learn the basics of %1, but it is too advanced for you right now.\r\n"_s).arg(skillname));
+    victim->send(u"You try to learn the basics of %1, but it is too advanced for you right now.\r\n"_s.arg(skillname));
     return ReturnValue::eFAILURE;
   }
 
@@ -1148,7 +1148,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
     {
       qint32 num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
 
-      DC::getInstance()->logentry(u"Mob %1 lacking argument for mpsettemp."_s).arg(num));
+      DC::getInstance()->logentry(u"Mob %1 lacking argument for mpsettemp."_s.arg(num));
     }
     return ReturnValue::eFAILURE;
   }
@@ -2172,11 +2172,11 @@ void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    logworld(u"Obj %1, com %2, line %3: %4"_s).arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(u"Obj %1, com %2, line %3: %4"_s.arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else if (this->isNonPlayer())
   {
-    logworld(u"Mob %1, com %2, line %3: %4"_s).arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(u"Mob %1, com %2, line %3: %4"_s.arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else
   {

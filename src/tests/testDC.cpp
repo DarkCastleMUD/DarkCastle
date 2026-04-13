@@ -360,7 +360,7 @@ private slots:
     QCOMPARE(conn->output, "");
     conn->output = {};
 
-    Vault *vault = has_vault(ch.getNameC());
+    VaultPtr vault = has_vault(ch.getNameC());
     if (vault)
     {
       DC::getInstance()->vaults_.(ch.getNameC()); // free it up first..
@@ -635,13 +635,13 @@ private slots:
     qint32 val3 = fread_int(stream, -10, 10);
     QCOMPARE(val3, -1);
 
-    QString str1 = fread_qstring(stream);
+    QString str1 = fread_string(stream);
     QCOMPARE(str1, u"abc\r\n123"_s);
 
-    QString str2 = fread_qstring(stream);
+    QString str2 = fread_string(stream);
     QCOMPARE(str2, u"abc123"_s);
 
-    QString str3 = fread_qstring(stream);
+    QString str3 = fread_string(stream);
     QCOMPARE(str3, u""_s);
 
     fclose(stream);
@@ -673,7 +673,7 @@ private slots:
     QString fstream_filename = u"world/%1.fstream"_s.arg(filename);
     quint64 rooms_written = {};
     {
-      LegacyFileWorld lfw(u"%1.legacyfile"_s).arg(filename));
+      LegacyFileWorld lfw(u"%1.legacyfile"_s.arg(filename));
       QFile qf(qfile_filename);
       QSaveFile qsf(qsavefile_filename);
       std::fstream fstream_world_file;
@@ -1397,11 +1397,11 @@ private slots:
       p1.desc->output = {};
       QCOMPARE(do_follow(ch, QStringLiteral(qUtf8Printable(names[0]))), ReturnValue::eSUCCESS);
       QCOMPARE(ch->desc->output, "You now follow agis.\r\n");
-      QCOMPARE(p1.desc->output, u"%1 starts following you.\r\n"_s).arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
+      QCOMPARE(p1.desc->output, u"%1 starts following you.\r\n"_s.arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
       ch->desc->output = {};
       p1.desc->output = {};
       QCOMPARE(do_group(&p1, QStringLiteral(qUtf8Printable(ch->name()))), ReturnValue::eSUCCESS);
-      QCOMPARE(p1.desc->output, u"%1 is now a group member.\r\n"_s).arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
+      QCOMPARE(p1.desc->output, u"%1 is now a group member.\r\n"_s.arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
       p1.desc->output = {};
     }
 

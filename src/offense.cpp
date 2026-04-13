@@ -141,7 +141,7 @@ command_return_t do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
 
   one_argument(argument, arg);
 
-  if (*arg)
+  if (!arg.isEmpty())
   {
     victim = ch->get_char_room_vis(arg);
     if (victim)

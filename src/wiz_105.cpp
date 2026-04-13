@@ -41,7 +41,7 @@ command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
       QString aff_name = get_skill_name(af->type);
       if (!aff_name.isEmpty())
       {
-        ch->send(u"Removing %1 affect.\r\n"_s).arg(aff_name));
+        ch->send(u"Removing %1 affect.\r\n"_s.arg(aff_name));
       }
       else
       {
@@ -345,11 +345,11 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
               first_npc_debug_state = c->getDebug();
             }
             c->setDebug(!first_npc_debug_state);
-            ch->sendln(u"Vnum %1 Rnum %2 debug turned %3."_s).arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
+            ch->sendln(u"Vnum %1 Rnum %2 debug turned %3."_s.arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
             change_count++;
           }
         }
-        ch->sendln(u"%1 mobiles changed."_s).arg(change_count));
+        ch->sendln(u"%1 mobiles changed."_s.arg(change_count));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -623,7 +623,6 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Enter new message. End with \\s.");
     ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(skill->message);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
     break;
   case 3:
     if (is_number(arg2))
