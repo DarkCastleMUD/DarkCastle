@@ -159,7 +159,7 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->in_room && (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)))
+  if (ch->in_room && (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC) || isSet(dc_->world[ch->in_room].room_flags, SAFE)))
   {
     ch->sendln("Something about this room prohibits your magical imbuement.");
     return ReturnValue::eFAILURE;
@@ -204,7 +204,7 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 
   GET_MANA(ch) -= manacost;
 
-  charges = number(1, 1 + lvl / 20);
+  charges = dc_->number(1, 1 + lvl / 20);
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
@@ -289,12 +289,12 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
   // Moving, and act() calls both happen a lot, so we want to get out of here as fast as possible if
   // we can.  We do this by checking if the room has a flag or not
   // NOTICE:  This is a TEMP_room_flag
-  if (!isSet(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
+  if (!isSet(dc_->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
     return ReturnValue::eSUCCESS;
 
   // loop through the room to find the caster. It should only be possible for a single
   // caster in a room to have this running (as long as no imms are being stupid)
-  for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -308,7 +308,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
 
     // Okay, something is going down no matter what, so let's remove the flags first to avoid any cascading effects
     // NOTICE:  This is a TEMP_room_flag
-    REMOVE_BIT(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+    REMOVE_BIT(dc_->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
     affect_from_char(i, SPELL_ETHEREAL_FOCUS);
 
     if (i->isPlayer() && !i->desc) // don't work if I'm linkdead
@@ -318,7 +318,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
     if (GET_POS(i) <= position_t::RESTING ||
         GET_POS(i) == position_t::FIGHTING || i->fighting ||
         IS_AFFECTED(i, AFF_PARALYSIS) ||
-        (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
+        (isSet(dc_->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
     {
       dc_sprintf(buf, "I see you %s but I can't do anything about it!", qPrintable(ch->shortdesc_or_name()));
       do_say(i, buf);
@@ -346,7 +346,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
     // Loop through allies and attack
-    for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = next_ally)
+    for (ally = dc_->world[ch->in_room].people; ally; ally = next_ally)
     {
       next_ally = ally->next_in_room;
 

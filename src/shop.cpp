@@ -76,22 +76,22 @@ bool is_ok(CharacterPtr keeper, CharacterPtr ch, qint32 shop_nr)
   /*
    * Shop hours.
    */
-  if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open1)
+  if (time_info.hours < dc_->shop_index[shop_nr].open1)
   {
     do_say(keeper, "Come back later!");
     return false;
   }
 
-  else if (time_info.hours <= DC::getInstance()->shop_index[shop_nr].close1)
+  else if (time_info.hours <= dc_->shop_index[shop_nr].close1)
   {
     return true;
   }
-  else if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open2)
+  else if (time_info.hours < dc_->shop_index[shop_nr].open2)
   {
     do_say(keeper, "Come back later!");
     return false;
   }
-  else if (time_info.hours <= DC::getInstance()->shop_index[shop_nr].close2)
+  else if (time_info.hours <= dc_->shop_index[shop_nr].close2)
   {
     return true;
   }
@@ -114,7 +114,7 @@ qint32 trade_with(ObjectPtr item, qint32 shop_nr)
   if (item->obj_flags.cost < 1)
     return false;
 
-  for (const auto &type : DC::getInstance()->shop_index[shop_nr].type)
+  for (const auto &type : dc_->shop_index[shop_nr].type)
   {
     if (GET_ITEM_TYPE(item) == type)
       return true;
@@ -127,7 +127,7 @@ qint32 unlimited_supply(ObjectPtr item, qint32 shop_nr)
 {
   ObjectPtr obj;
 
-  for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
+  for (obj = dc_->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
     if (item->item_number == obj->item_number)
       return true;
@@ -142,9 +142,9 @@ void restock_keeper(CharacterPtr keeper, qint32 shop_nr)
   QString buf;
 
   dc_sprintf(buf, "Restocking shop keeper: %d", shop_nr);
-  DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
+  dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
 
-  for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
+  for (obj = dc_->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
     obj2 = clone_object(obj->item_number);
     obj_to_char(obj2, keeper);
@@ -179,7 +179,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
     return;
   }
 
-  auto &shop = DC::getInstance()->shop_index[shop_nr];
+  auto &shop = dc_->shop_index[shop_nr];
   if ((obj = get_obj_in_list_vis(ch, argm, keeper->carrying)) == nullptr)
   {
     keeper->do_tell(shop.no_such_item1.arg(ch->name()).split(' '));
@@ -287,7 +287,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 
   if ((obj = get_obj_in_list_vis(ch, argm, ch->carrying)) == nullptr)
   {
-    keeper->do_tell(DC::getInstance()->shop_index[shop_nr].no_such_item2.arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(dc_->shop_index[shop_nr].no_such_item2.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
@@ -316,13 +316,13 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 
   if (!trade_with(obj, shop_nr) || obj->obj_flags.cost < 1)
   {
-    keeper->do_tell(DC::getInstance()->shop_index[shop_nr].do_not_buy.arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(dc_->shop_index[shop_nr].do_not_buy.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
-  qint32 virt = DC::getInstance()->obj_index[obj->item_number].vnum();
+  qint32 virt = dc_->obj_index[obj->item_number].vnum();
   if (virt >= 13400 && virt <= 13707 &&
-      DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() != 13416)
+      dc_->mob_index[keeper->mobdata->nr].vnum() != 13416)
   {
     keeper->do_tell(u"%1 There is only one merchant in the land that deals with such fine jewels."_s.arg(qPrintable(ch->name())).split(' '));
     return;
@@ -335,15 +335,15 @@ void shopping_sell(const QString arg, CharacterPtr ch,
     return;
   }
 
-  cost = (qint32)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_sell);
+  cost = (qint32)(obj->obj_flags.cost * dc_->shop_index[shop_nr].profit_sell);
   if (keeper->getGold() < cost)
   {
-    keeper->do_tell(DC::getInstance()->shop_index[shop_nr].missing_cash1.arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(dc_->shop_index[shop_nr].missing_cash1.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
   act_to_room("$n sells $p.", ch, obj, 0, 0);
-  keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
+  keeper->do_tell(dc_->shop_index[shop_nr].message_sell.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
   ch->send(u"The shopkeeper now has %1.\r\n"_s.arg(obj->short_description()));
   ch->addGold(cost);
   keeper->removeGold(cost);
@@ -389,12 +389,12 @@ void shopping_value(const QString arg, CharacterPtr ch,
       keeperhas = true;
     else
     {
-      keeper->do_tell(DC::getInstance()->shop_index[shop_nr].no_such_item2.arg(qPrintable(ch->name())).split(' '));
+      keeper->do_tell(dc_->shop_index[shop_nr].no_such_item2.arg(qPrintable(ch->name())).split(' '));
       return;
     }
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3003)
+  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -443,7 +443,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3004)
+  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -487,7 +487,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     else
       do_say(keeper, "I deal with armor exclusively.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3000)
+  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -544,7 +544,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
+  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
   { // if the leather worker in town
     act_to_character("The Leather Worker holds up $p for you to examine.", ch, obj, 0, 0);
     act_to_room("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, 0);
@@ -582,12 +582,12 @@ void shopping_value(const QString arg, CharacterPtr ch,
 
   if (!trade_with(obj, shop_nr) || obj->obj_flags.cost < 1)
   {
-    keeper->do_tell(DC::getInstance()->shop_index[shop_nr].do_not_buy.arg(qPrintable(ch->name())).split(' '));
+    keeper->do_tell(dc_->shop_index[shop_nr].do_not_buy.arg(qPrintable(ch->name())).split(' '));
     return;
   }
   if (!keeperhas)
   {
-    cost = (qint32)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_sell);
+    cost = (qint32)(obj->obj_flags.cost * dc_->shop_index[shop_nr].profit_sell);
     keeper->do_tell(u"%1 I'll give you %2 gold coins for that."_s.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
   }
 }
@@ -608,7 +608,7 @@ void shopping_list(const QString arg, CharacterPtr ch,
   if (!is_ok(keeper, ch, shop_nr))
     return;
 
-  if (!keeper->carrying && DC::getInstance()->shop_index[shop_nr].inventory)
+  if (!keeper->carrying && dc_->shop_index[shop_nr].inventory)
   {
     keeper->do_tell(u"%1 Oops, I seem to be out of inventory."_s.arg(qPrintable(ch->name())).split(' '));
     keeper->do_tell(u"%1 One minute while I restock."_s.arg(qPrintable(ch->name())).split(' '));
@@ -625,9 +625,9 @@ void shopping_list(const QString arg, CharacterPtr ch,
 
     found = true;
 
-    cost = (qint32)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_buy);
+    cost = (qint32)(obj->obj_flags.cost * dc_->shop_index[shop_nr].profit_buy);
 
-    qint32 vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+    qint32 vnum = dc_->obj_index[obj->item_number].vnum();
     bool loop = false;
     for (a = {}; a < i; a++)
       if (done[a] == vnum)
@@ -635,12 +635,12 @@ void shopping_list(const QString arg, CharacterPtr ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = DC::getInstance()->obj_index[obj->item_number].vnum();
+      done[i++] = dc_->obj_index[obj->item_number].vnum();
     else
       break;
     a = {};
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (DC::getInstance()->obj_index[tobj->item_number].vnum() == DC::getInstance()->obj_index[obj->item_number].vnum())
+      if (dc_->obj_index[tobj->item_number].vnum() == dc_->obj_index[obj->item_number].vnum())
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
@@ -654,9 +654,9 @@ void shopping_list(const QString arg, CharacterPtr ch,
     //        }
     if (!first_vnum || first_vnum == DC::INVALID_VNUM)
     {
-      first_vnum = DC::getInstance()->getObjectVNUM(obj);
+      first_vnum = dc_->getObjectVNUM(obj);
     }
-    ch->sendln(u"[%1] [%2] [%3] %4."_s.arg(QString::number(a), 3).arg(QString::number(cost), 7).arg(QString::number(DC::getInstance()->getObjectVNUM(obj)), 6).arg(obj->short_description()));
+    ch->sendln(u"[%1] [%2] [%3] %4."_s.arg(QString::number(a), 3).arg(QString::number(cost), 7).arg(QString::number(dc_->getObjectVNUM(obj)), 6).arg(obj->short_description()));
   }
   if (first_vnum && first_vnum != DC::INVALID_VNUM)
   {
@@ -677,11 +677,11 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   /*
    * Find a shop keeper in the room.
    */
-  //    for ( keeper = DC::getInstance()->world[ch->in_room].people;
+  //    for ( keeper = dc_->world[ch->in_room].people;
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( keeper->isNonPlayer() && dc_->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -689,21 +689,21 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    DC::getInstance()->logentry(u"Shop_keeper: keeper not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Shop_keeper: keeper not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
   // LFound1:
   for (shop_nr = {}; shop_nr < max_shop; shop_nr++)
   {
-    if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
+    if (dc_->shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  DC::getInstance()->logentry(u"Shop_keeper: shop_nr not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->logentry(u"Shop_keeper: shop_nr not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
   return ReturnValue::eFAILURE;
 
 LFound2:
-  //    if ( ch->in_room != DC::getInstance()->shop_index[shop_nr].in_room )
+  //    if ( ch->in_room != dc_->shop_index[shop_nr].in_room )
   //      return ReturnValue::eFAILURE;
 
   switch (cmd)
@@ -772,53 +772,53 @@ void DC::boot_the_shops(void)
     for (count = {}; count < 6; count++)
       fscanf(fp, "%d \n", &temp);
 
-    fscanf(fp, "%f \n", &DC::getInstance()->shop_index[max_shop].profit_buy_base);
-    fscanf(fp, "%f \n", &DC::getInstance()->shop_index[max_shop].profit_sell);
+    fscanf(fp, "%f \n", &dc_->shop_index[max_shop].profit_buy_base);
+    fscanf(fp, "%f \n", &dc_->shop_index[max_shop].profit_sell);
     for (count = {}; count < MAX_TRADE; count++)
     {
-      fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].type[count]);
+      fscanf(fp, "%d \n", &dc_->shop_index[max_shop].type[count]);
     }
 
-    DC::getInstance()->shop_index[max_shop].profit_buy = DC::getInstance()->shop_index[max_shop].profit_buy_base;
-    DC::getInstance()->shop_index[max_shop].no_such_item1 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    DC::getInstance()->shop_index[max_shop].no_such_item2 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    DC::getInstance()->shop_index[max_shop].do_not_buy = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    DC::getInstance()->shop_index[max_shop].missing_cash1 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    DC::getInstance()->shop_index[max_shop].missing_cash2 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    DC::getInstance()->shop_index[max_shop].message_buy = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    DC::getInstance()->shop_index[max_shop].message_sell = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].profit_buy = dc_->shop_index[max_shop].profit_buy_base;
+    dc_->shop_index[max_shop].no_such_item1 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].no_such_item2 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].do_not_buy = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].missing_cash1 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].missing_cash2 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].message_buy = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].message_sell = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
 
     fscanf(fp, "%d \n", &temp); /* Temper       */
     fscanf(fp, "%d \n", &temp); /* Temper       */
 
     fscanf(fp, "%d \n", &temp);
-    DC::getInstance()->shop_index[max_shop].keeper = real_mobile(temp);
+    dc_->shop_index[max_shop].keeper = real_mobile(temp);
 
     fscanf(fp, "%d \n", &temp); /* With_whom    */
 
     fscanf(fp, "%d \n", &temp);
 
     qint32 room_nr = real_room(temp);
-    if (room_nr < 0 || room_nr > DC::getInstance()->top_of_world)
+    if (room_nr < 0 || room_nr > dc_->top_of_world)
     {
-      DC::getInstance()->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
+      dc_->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
       room_nr = {};
     }
 
-    DC::getInstance()->shop_index[max_shop].in_room = room_nr;
+    dc_->shop_index[max_shop].in_room = room_nr;
 
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].open1);
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].close1);
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].open2);
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].close2);
+    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].open1);
+    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].close1);
+    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].open2);
+    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].close2);
 
-    DC::getInstance()->shop_index[max_shop].inventory = {};
+    dc_->shop_index[max_shop].inventory = {};
 
     if (real_room(temp) == DC::NOWHERE)
     {
       QString log_buf = {};
       dc_sprintf(log_buf, "BAD SHOP IN missing ROOM %d -- FIX THIS!", temp);
-      DC::getInstance()->logverbose(log_buf);
+      dc_->logverbose(log_buf);
       continue;
       /* This way we don't increment if it was bad */
     }
@@ -833,7 +833,7 @@ void DC::assign_the_shopkeepers(void)
   qint32 shop_nr;
 
   for (shop_nr = {}; shop_nr < max_shop; shop_nr++)
-    DC::getInstance()->mob_index[DC::getInstance()->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
+    dc_->mob_index[dc_->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
 }
 
 void DC::fix_shopkeepers_inventory(void)
@@ -846,15 +846,15 @@ void DC::fix_shopkeepers_inventory(void)
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
   for (shop_nr = {}; shop_nr < max_shop; shop_nr++)
-    for (keeper = DC::getInstance()->world[DC::getInstance()->shop_index[shop_nr].in_room].people; keeper != nullptr;
+    for (keeper = dc_->world[dc_->shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (keeper->isNonPlayer() && dc_->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
           last_obj = clone_object(keeper->carrying->item_number);
-          DC::getInstance()->shop_index[shop_nr].inventory = last_obj;
+          dc_->shop_index[shop_nr].inventory = last_obj;
           for (obj = keeper->carrying->next_content; obj;
                obj = obj->next_content)
           {
@@ -864,7 +864,7 @@ void DC::fix_shopkeepers_inventory(void)
           }
         }
         else
-          DC::getInstance()->shop_index[shop_nr].inventory = {};
+          dc_->shop_index[shop_nr].inventory = {};
       }
     }
 }
@@ -891,8 +891,8 @@ player_shop *read_one_player_shop(FILE *fp)
   {
     // add future stuff here
 
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
     exit(1);
   }
 
@@ -927,7 +927,7 @@ void write_one_player_shop(player_shop *shop)
 
   if ((fp = fopen(buf, "w")) == nullptr)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
   }
 
@@ -979,14 +979,14 @@ void save_player_shop_world_range()
   world_file_list_item *curr;
   QString buf;
 
-  curr = DC::getInstance()->world_file_list;
+  curr = dc_->world_file_list;
   while (curr && curr->firstnum != 23000)
     curr = curr->next;
 
   if (!curr)
   {
     // panic!
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
     exit(1);
   }
 
@@ -1116,7 +1116,7 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
 
   // add it to list
   auto newitem = new player_shop_item;
-  newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  newitem->item_vnum = dc_->obj_index[obj->item_number].vnum();
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
@@ -1332,8 +1332,8 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
       ch->sendln("That room name is too long (60 chars max).");
       return;
     }
-    DC::getInstance()->world[shop->room_num].name_ = text;
-    ch->sendln(u"Room name set to '%1'."_s.arg(DC::getInstance()->world[shop->room_num].name_));
+    dc_->world[shop->room_num].name_ = text;
+    ch->sendln(u"Room name set to '%1'."_s.arg(dc_->world[shop->room_num].name_));
     save_player_shop_world_range();
     break;
 
@@ -1383,7 +1383,7 @@ void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keepe
       if (robj < 0)
         ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
       else
-        ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg((DC::getInstance()->obj_index[robj].item)->short_description(), -40).arg(QString::number(item->price)));
+        ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg((dc_->obj_index[robj].item)->short_description(), -40).arg(QString::number(item->price)));
     }
 
   if (!dc_strcmp(shop->owner, qPrintable(ch->name())))
@@ -1396,7 +1396,7 @@ qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
 
   if (!(keeper = invoker))
   {
-    DC::getInstance()->logentry(u"Shop_keeper: keeper not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Shop_keeper: keeper not found."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1486,7 +1486,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
          return ReturnValue::eFAILURE;
       }
       i = atoi(text);
-      if(i < 1 || i > DC::getInstance()->top_of_world || !DC::getInstance()->rooms[i]) {
+      if(i < 1 || i > dc_->top_of_world || !dc_->rooms[i]) {
          ch->sendln("You must choose a valid room number.");
          return ReturnValue::eFAILURE;
       }
@@ -1534,25 +1534,25 @@ void DC::assign_the_player_shopkeepers(void)
 
 void DC::redo_shop_profit(void)
 {
-  switch (number(0, 3))
+  switch (ch->dc_->number(0, 3))
   {
   case 0:
     break;
   case 1:
     for (qint32 i = {}; i < 58; i++)
     {
-      DC::getInstance()->shop_index[i].profit_buy = DC::getInstance()->shop_index[i].profit_buy_base;
+      dc_->shop_index[i].profit_buy = dc_->shop_index[i].profit_buy_base;
     }
     break;
   case 2:
     for (qint32 i = {}; i < 58; i++)
-      DC::getInstance()->shop_index[i].profit_buy *= 1.0 + number(10, 50) / 100.0;
+      dc_->shop_index[i].profit_buy *= 1.0 + dc_->number(10, 50) / 100.0;
     break;
   case 3:
     for (qint32 i = {}; i < 58; i++)
     {
-      DC::getInstance()->shop_index[i].profit_buy *= 1.0 - number(10, 50) / 100.0;
-      DC::getInstance()->shop_index[i].profit_buy = MAX<float>(DC::getInstance()->shop_index[i].profit_buy, DC::getInstance()->shop_index[i].profit_sell + 0.1);
+      dc_->shop_index[i].profit_buy *= 1.0 - dc_->number(10, 50) / 100.0;
+      dc_->shop_index[i].profit_buy = MAX<float>(dc_->shop_index[i].profit_buy, dc_->shop_index[i].profit_sell + 0.1);
     }
     break;
   default:
@@ -1624,7 +1624,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       QString cost_buf = {};
       if (eddie[i].item_vnum > 0)
       {
-        dc_strncpy(item_buf, qPrintable((DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description()), 1024);
+        dc_strncpy(item_buf, qPrintable((dc_->obj_index[real_object(eddie[i].item_vnum)].item)->short_description()), 1024);
       }
       else
       {
@@ -1633,7 +1633,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
       if (eddie[i].cost_vnum > 0)
       {
-        dc_strncpy(cost_buf, qPrintable((DC::getInstance()->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description()), 1024);
+        dc_strncpy(cost_buf, qPrintable((dc_->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description()), 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {
@@ -1770,7 +1770,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
           act_to_character("You give $p to $N.", ch, obj, owner, 0);
 
           dc_sprintf(buf, "%s gives %s to %s (removed)", qPrintable(ch->name()), qPrintable(obj->name()), qPrintable(owner->name()));
-          DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+          dc_->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         }
         else
         {
@@ -1793,7 +1793,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
         act_to_character("You give $p to $N.", owner, item, ch, 0);
 
         dc_sprintf(buf, "%s gives %s to %s (created)", qPrintable(owner->name()), qPrintable(item->name()), qPrintable(ch->name()));
-        DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        dc_->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1925,7 +1925,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         act_to_room("$n gives $p to $N.", ch, obj, owner, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", ch, obj, owner, 0);
         act_to_character("You give $p to $N.", ch, obj, owner, 0);
-        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        dc_->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(ch->name())).arg(obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -1934,7 +1934,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         act_to_room("$n gives $p to $N.", ch, r.orig_obj, owner, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", ch, r.orig_obj, owner, 0);
         act_to_character("You give $p to $N.", ch, r.orig_obj, owner, 0);
-        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(ch->name())).arg(r.orig_obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        dc_->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(ch->name())).arg(r.orig_obj->name()).arg(qPrintable(owner->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1984,7 +1984,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.choice1_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        dc_->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.choice1_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act_to_room("$n gives $p to $N.", owner, r.choice1_obj, ch, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", owner, r.choice1_obj, ch, 0);
         act_to_character("You give $p to $N.", owner, r.choice1_obj, ch, 0);
@@ -2001,7 +2001,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.choice2_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        dc_->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.choice2_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act_to_room("$n gives $p to $N.", owner, r.choice2_obj, ch, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", owner, r.choice2_obj, ch, 0);
         act_to_character("You give $p to $N.", owner, r.choice2_obj, ch, 0);
@@ -2019,7 +2019,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        dc_->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act_to_room("$n gives $p to $N.", owner, r.orig_obj, ch, INVIS_NULL | NOTVICT);
         act_to_victim("$n gives you $p.", owner, r.orig_obj, ch, 0);
         act_to_character("You give $p to $N.", owner, r.orig_obj, ch, 0);
@@ -2047,7 +2047,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      DC::getInstance()->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      dc_->logentry(u"%1 gives %2 to %3"_s.arg(qPrintable(owner->name())).arg(r.orig_obj->name()).arg(qPrintable(ch->name())), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       act_to_room("$n gives $p to $N.", owner, r.orig_obj, ch, INVIS_NULL | NOTVICT);
       act_to_victim("$n gives you $p.", owner, r.orig_obj, ch, 0);
       act_to_character("You give $p to $N.", owner, r.orig_obj, ch, 0);
@@ -2089,7 +2089,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   QString arg1 = arguments.value(0);
   QString arg2 = arguments.value(1);
   QString arg3 = arguments.value(2);
-  redeem_t r = DC::getInstance()->redeem_sessions.value(ch->name());
+  redeem_t r = dc_->redeem_sessions.value(ch->name());
 
   switch (r.state)
   {
@@ -2175,7 +2175,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           return ReturnValue::eSUCCESS;
         }
 
-        ch->do_identify(u"v%1"_s.arg(DC::getInstance()->obj_index[obj->item_number].vnum()).split(' '));
+        ch->do_identify(u"v%1"_s.arg(dc_->obj_index[obj->item_number].vnum()).split(' '));
 
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);
@@ -2184,7 +2184,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           r.token_count = 6;
         else
           r.token_count = 3;
-        DC::getInstance()->redeem_sessions[qPrintable(ch->name())] = r;
+        dc_->redeem_sessions[qPrintable(ch->name())] = r;
 
         auto random_str = r.random ? "randomized" : "default";
         owner->tell(ch, u"Type 'confirm' if you want me to redeem %1 Apocalypse tokens for one %2 '%3'? Type "_s

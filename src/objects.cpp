@@ -122,7 +122,7 @@ void eq_remove_damage(ObjectPtr obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 qint32 damage_eq_once(ObjectPtr obj)
 {
-  if (DC::getInstance()->obj_index[obj->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
+  if (dc_->obj_index[obj->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
     send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
@@ -183,7 +183,7 @@ command_return_t do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ObjectPtr between;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -271,7 +271,7 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
-  if (ch->fighting && number(0, 1) != 0)
+  if (ch->fighting && dc_->number(0, 1) != 0)
   {
     act_to_room("During combat, $n drops $p and it SMASHES!", ch, temp, 0, 0);
     act_to_character("During combat, you drop $p which SMASHES!", ch, temp, 0, 0);
@@ -281,7 +281,7 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!ch->fighting && isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (!ch->fighting && isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -334,7 +334,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
   bool is_mob = ch->isNonPlayer();
   qint32 lvl;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Your magic is muffled by greater beings.");
     return ReturnValue::eFAILURE;
@@ -361,7 +361,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
       }
     }
   }
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
   {
     act_to_character("Your magic is muffled by greater beings.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -399,7 +399,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
     failmark -= 5;
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
-  if (ch->fighting && number(0, 100) < failmark)
+  if (ch->fighting && dc_->number(0, 100) < failmark)
   {
     // failed to read scroll
     act_to_room("$n mumbles the words on the scroll and it goes up in flame!", ch, 0, 0, 0);
@@ -407,7 +407,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    if (victim && !AWAKE(victim) && number(1, 5) < 3)
+    if (victim && !AWAKE(victim) && dc_->number(1, 5) < 3)
       victim->sendln("Your sleep is restless.");
 
     // success
@@ -443,7 +443,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         else
         {
-          DC::getInstance()->logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", DC::getInstance()->obj_index[scroll->item_number].vnum(), i, i);
+          dc_->logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", dc_->obj_index[scroll->item_number].vnum(), i, i);
           continue;
         }
       }
@@ -538,12 +538,12 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
     return false;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("In the rear with the gear huh?  Maybe use this somewhere in the field.");
     return false;
   }
-  if (CAN_GO(ch, dir) && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
+  if (CAN_GO(ch, dir) && isSet(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
   {
     ch->sendln("Firing it into a safe room seems wasteful.");
     return false;
@@ -571,9 +571,9 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
     dc_sprintf(buf, "It flies with great speed %sward.\r\n", dirs[dir]);
     send_to_room(buf, ch->in_room);
     dc_sprintf(buf, "Something flies into the area with great speed landing at your feet.\r\n");
-    send_to_room(buf, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
+    send_to_room(buf, dc_->world[ch->in_room].dir_option[dir]->to_room);
     // set it up in the target room
-    obj_to_room(trap_obj, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
+    obj_to_room(trap_obj, dc_->world[ch->in_room].dir_option[dir]->to_room);
   }
 
   return true;
@@ -590,7 +590,7 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
   act_to_room("$n sprinkles something on the ground around $m.", ch, 0, 0, 0);
 
   // make sure it's useable in the place we're at
-  if (DC::getInstance()->world[ch->in_room].sector_type != obj->obj_flags.value[1])
+  if (dc_->world[ch->in_room].sector_type != obj->obj_flags.value[1])
   {
     if (SECT_MAX_SECT < obj->obj_flags.value[1] ||
         0 > obj->obj_flags.value[1])
@@ -604,12 +604,12 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
     ch->send(buf);
 
     // small chance of success
-    if (number(0, 9))
+    if (ch->dc_->number(0, 9))
       return;
   }
 
   SETBIT(ch->affected_by, AFF_UTILITY);
-  DC::getInstance()->world[ch->in_room].tracks_.clear();
+  dc_->world[ch->in_room].tracks_.clear();
 }
 
 void set_utility_item(CharacterPtr ch, ObjectPtr obj, QString argument)
@@ -693,13 +693,13 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 lvl;
   qint32 bits;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Your magic is muffled by greater beings.");
     return ReturnValue::eFAILURE;
@@ -841,7 +841,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   affected_type af = {};
   qint32 amount = {};
 
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[this->in_room].room_flags, QUIET))
   {
     sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -861,7 +861,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   }
 
   auto arg1 = arguments.value(0);
-  if ((temp = get_obj_in_list_vis(this, arg1, DC::getInstance()->world[this->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
+  if ((temp = get_obj_in_list_vis(this, arg1, dc_->world[this->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
   {
     act_to_character("You drink from $p.", this, temp, 0, 0);
     act_to_room("$n drinks from $p.", this, temp, 0, INVIS_NULL);
@@ -872,9 +872,9 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
       return ReturnValue::eSUCCESS;
 
     if (GET_COND(this, FULL) != -1)
-      GET_COND(this, FULL) = 22 + number(0, 5);
+      GET_COND(this, FULL) = 22 + dc_->number(0, 5);
     if (GET_COND(this, THIRST) != -1)
-      GET_COND(this, THIRST) = 22 + number(0, 5);
+      GET_COND(this, THIRST) = 22 + dc_->number(0, 5);
 
     return ReturnValue::eSUCCESS;
   }
@@ -911,7 +911,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
       if (drink_aff[temp->obj_flags.value[2]][DRUNK] > 0)
         amount = (25 - GET_COND(this, THIRST)) / drink_aff[temp->obj_flags.value[2]][DRUNK];
       else
-        amount = number(3, 10);
+        amount = dc_->number(3, 10);
 
       amount = MIN(amount, temp->obj_flags.value[1]);
 
@@ -934,7 +934,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 
       if (temp->obj_flags.value[2] == LIQ_HOLYWATER &&
           getHP() < GET_MAX_HIT(this) &&
-          number(0, 1))
+          dc_->number(0, 1))
       {
         sendln("You feel refreshed!");
         addHP(10);
@@ -945,7 +945,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
         /* The shit was poisoned ! */
         act_to_character("Ooups, it tasted rather strange ?!!?", this, 0, 0, 0);
         act_to_room("$n chokes and utters some strange sounds.", this, 0, 0, 0);
-        if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
+        if (ch->dc_->number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
         {
           this->sendln("Luckily, your body rejects the poison almost immediately.");
         }
@@ -987,7 +987,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
   ObjectPtr temp = {};
   affected_type af = {};
 
-  if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
+  if (isSet(dc_->world[in_room].room_flags, QUIET))
   {
     sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1027,7 +1027,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
     act_to_character("Ooups, it tasted rather strange ?!!?", this, 0, 0, 0);
     act_to_room("$n coughs and utters some strange sounds.", this, 0, 0, 0);
 
-    if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
+    if (ch->dc_->number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
     {
       sendln("Luckily, your body rejects the poison almost immediately.");
     }
@@ -1055,7 +1055,7 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr to_obj;
   qint32 amount;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1170,7 +1170,7 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   ObjectPtr temp;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1232,7 +1232,7 @@ command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
   QString arg;
   ObjectPtr temp;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1378,7 +1378,7 @@ qint32 charmie_restricted(CharacterPtr ch, ObjectPtr obj, qint32 wear_loc)
   return false; // sigh, work for nohin'
   if (ch->isNonPlayer() && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
   {
-    qint32 vnum = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    qint32 vnum = dc_->mob_index[ch->mobdata->nr].vnum();
     if (vnum == 8 || (vnum > 22388 && vnum < 22399))
       return false; // golems and corpses wear all
     switch (ch->race)
@@ -1491,19 +1491,19 @@ qint32 will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, qint32 add)
   // temporarily affect the person's height
   if (add)
   {
-    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
   else
   {
-    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
 
   if (add == 1 && size_restricted(ch, obj))
   {
     // Only have to check the item itself if we're wearing it, not removing
-    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
     ch->sendln("After modifying your height that item would not fit!");
     return true;
@@ -1525,12 +1525,12 @@ qint32 will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, qint32 add)
   // fix height back to normal
   if (add)
   {
-    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
   else
   {
-    //	  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
 
@@ -1584,7 +1584,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   }
   else
   {
-    if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() != 8)
+    if (dc_->mob_index[ch->mobdata->nr].vnum() != 8)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
         dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
@@ -1592,8 +1592,8 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         return;
       }
   }
-  /*  if (ch->isNonPlayer() && (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() < 22394 &&
-    DC::getInstance()->mob_index[ch->mobdata->nr].vnum() > 22388))
+  /*  if (ch->isNonPlayer() && (dc_->mob_index[ch->mobdata->nr].vnum() < 22394 &&
+    dc_->mob_index[ch->mobdata->nr].vnum() > 22388))
     {
        return;
     }*/
@@ -2111,7 +2111,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   break;
   default:
   {
-    DC::getInstance()->logentry(u"Unknown type called in wear."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unknown type called in wear."_s, ANGEL, DC::LogChannel::LOG_BUG);
   }
   break;
   }
@@ -2203,7 +2203,7 @@ command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
       "light",
       "primary"};
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -2278,7 +2278,7 @@ command_return_t do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
   bool blindlag = false;
   qint32 keyword = 12;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -2327,7 +2327,7 @@ command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr obj_object;
   bool blindlag = false;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -2420,7 +2420,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
   bool blindlag = false;
   qint32 j;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -2445,13 +2445,13 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
               send_to_char(arg1, ch);
               continue;
             }
-            if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
+            if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
             {
               ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
               continue;
             }
 
-            if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+            if (dc_->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
@@ -2488,7 +2488,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }
-          if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
+          if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
           {
             ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
             return ReturnValue::eFAILURE;
@@ -2505,7 +2505,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
             ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
             ch->equipment[WEAR_SECOND_WIELD] = {};
           }
-          else if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+          else if (dc_->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);
@@ -2577,7 +2577,7 @@ bool fullSave(ObjectPtr obj)
   {
     QString buf;
     dc_sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", qPrintable(obj->name()));
-    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
@@ -2690,14 +2690,14 @@ quint64 Object::getLevel(void)
 bool Object::isQuest(void)
 {
   return isexact("quest", name()) ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3124 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3125 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3126 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3127 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3128 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 27997 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 27998 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 27999;
+         dc_->obj_index[item_number].vnum() == 3124 ||
+         dc_->obj_index[item_number].vnum() == 3125 ||
+         dc_->obj_index[item_number].vnum() == 3126 ||
+         dc_->obj_index[item_number].vnum() == 3127 ||
+         dc_->obj_index[item_number].vnum() == 3128 ||
+         dc_->obj_index[item_number].vnum() == 27997 ||
+         dc_->obj_index[item_number].vnum() == 27998 ||
+         dc_->obj_index[item_number].vnum() == 27999;
 }
 
 bool Object::isTest(void)

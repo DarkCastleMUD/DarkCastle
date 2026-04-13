@@ -35,12 +35,12 @@ void DC::load_game_portals(void)
   for (qsizetype portal_id = {}; portal_id < portal_filenames.size(); ++portal_id)
   {
     auto &portal_filename = portal_filenames[portal_id];
-    QString full_filename = u"%1/%2"_s.arg(DC::getInstance()->cf.library_directory).arg(portal_filename);
+    QString full_filename = u"%1/%2"_s.arg(dc_->cf.library_directory).arg(portal_filename);
     QFile portal_file(portal_filename);
 
     if (!portal_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
     {
-      DC::getInstance()->logentry(u"Could not open portal file: %1"_s.arg(portal_filename));
+      dc_->logentry(u"Could not open portal file: %1"_s.arg(portal_filename));
       break;
     }
     QTextStream in(&portal_file);
@@ -98,7 +98,7 @@ void DC::process_portals(void)
         QString log_buf = {};
         dc_sprintf(log_buf, "Making portal from %d to %llu failed.", from_room,
                    portal.to_room);
-        DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+        dc_->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }
       portal.cur_timer = portal.max_timer;
     }
@@ -147,8 +147,8 @@ bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qi
     from_portal->item_number = (-1);
 
     /* Only need to do this if I didn't clone it */
-    from_portal->next = DC::getInstance()->object_list;
-    DC::getInstance()->object_list = from_portal;
+    from_portal->next = dc_->object_list;
+    dc_->object_list = from_portal;
   }
   else /* Duplicate the object # duplicate */
   {
@@ -159,7 +159,7 @@ bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qi
       QString log_buf;
       dc_sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       from_portal = {};
-      DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+      dc_->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       return false;
     }
   }
@@ -198,14 +198,14 @@ void find_and_remove_player_portal(CharacterPtr ch)
   else
     searchstr = u"only %1"_s.arg(qPrintable(ch->name()));
 
-  for (k = DC::getInstance()->object_list; k; k = next_k)
+  for (k = dc_->object_list; k; k = next_k)
   {
     next_k = k->next;
     if (!k->isPortal() || !k->name().contains(searchstr))
       continue;
 
     // at this point, the portal belongs to the person that quit
-    if (k->in_room < DC::getInstance()->top_of_world && k->in_room > DC::NOWHERE && DC::getInstance()->rooms.contains(k->in_room))
+    if (k->in_room < dc_->top_of_world && k->in_room > DC::NOWHERE && dc_->rooms.contains(k->in_room))
     {
       send_to_room("Its creator gone, the portal fades away prematurely.\r\n", k->in_room);
     }

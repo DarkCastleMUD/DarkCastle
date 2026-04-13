@@ -65,7 +65,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   qint32 pot_low = 6362;
   qint32 pot_hi = 6379;
 
-  auto &arena = DC::getInstance()->arena_;
+  auto &arena = dc_->arena_;
   if (arena.Low() > ch->getLevel() || arena.High() < ch->getLevel())
   {
     ch->sendln("The arena is not open for anyone your level.");
@@ -134,11 +134,11 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   {
     if (arena.isPotato())
     { // potato arena
-      send_to = real_room(number(pot_low, pot_hi));
+      send_to = real_room(ch->dc_->number(pot_low, pot_hi));
     }
     else
     {
-      send_to = real_room(number(Arena::ARENA_LOW, Arena::ARENA_HIGH - 1));
+      send_to = real_room(ch->dc_->number(Arena::ARENA_LOW, Arena::ARENA_HIGH - 1));
     }
   }
   if (move_char(ch, send_to) == 0)

@@ -33,10 +33,10 @@ Database::Database(const QString &name, const QString &hostname, const QString &
 
   if (!database_.open())
   {
-    DC::getInstance()->logentry(u"Failed to open database %1."_s.arg(name));
+    dc_->logentry(u"Failed to open database %1."_s.arg(name));
     qWarning() << database_ << database_.isOpen();
-    DC::getInstance()->logentry(database_.lastError().databaseText());
-    DC::getInstance()->logentry(database_.lastError().driverText());
+    dc_->logentry(database_.lastError().databaseText());
+    dc_->logentry(database_.lastError().driverText());
   }
 }
 
@@ -62,18 +62,18 @@ Table::Table(Database &database, const QString &name)
       QSqlQuery query;
       if (query.exec(u"CREATE TABLE %1 (id BIGINT GENERATED ALWAYS AS IDENTITY)"_s.arg(name)))
       {
-        DC::getInstance()->logentry(u"Created database table %1."_s.arg(name));
+        dc_->logentry(u"Created database table %1."_s.arg(name));
         if (!db.tables().contains(name))
         {
-          DC::getInstance()->logentry(u"Failed to find database table %1 after creating it."_s.arg(name));
+          dc_->logentry(u"Failed to find database table %1 after creating it."_s.arg(name));
           return;
         }
       }
       else
       {
-        DC::getInstance()->logentry(u"Failed to create database table %1."_s.arg(name));
-        DC::getInstance()->logentry(query.lastError().databaseText());
-        DC::getInstance()->logentry(query.lastError().driverText());
+        dc_->logentry(u"Failed to create database table %1."_s.arg(name));
+        dc_->logentry(query.lastError().databaseText());
+        dc_->logentry(query.lastError().driverText());
       }
     }
   }
@@ -92,21 +92,21 @@ Column::Column(Table &table, const QString &name, const QString &type)
     QSqlQuery query;
     if (query.exec(u"ALTER TABLE %1 ADD %2 %3"_s.arg(table.getName()).arg(name).arg(type)))
     {
-      DC::getInstance()->logentry(u"Created table %1 column %2."_s.arg(table.getName()).arg(name));
+      dc_->logentry(u"Created table %1 column %2."_s.arg(table.getName()).arg(name));
 
       // Check again
       QSqlRecord table_fields = table.getDatabase().getQSqlDatabase().record(table.getName());
       if (!table_fields.contains(name))
       {
-        DC::getInstance()->logentry(u"Failed to find table %1 column %2 after creating it."_s.arg(table.getName()).arg(name));
+        dc_->logentry(u"Failed to find table %1 column %2 after creating it."_s.arg(table.getName()).arg(name));
         return;
       }
     }
     else
     {
-      DC::getInstance()->logentry(u"Failed to create table %1 column %2."_s.arg(table.getName()).arg(name));
-      DC::getInstance()->logentry(query.lastError().databaseText());
-      DC::getInstance()->logentry(query.lastError().driverText());
+      dc_->logentry(u"Failed to create table %1 column %2."_s.arg(table.getName()).arg(name));
+      dc_->logentry(query.lastError().databaseText());
+      dc_->logentry(query.lastError().driverText());
     }
   }
 }

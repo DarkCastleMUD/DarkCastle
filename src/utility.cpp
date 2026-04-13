@@ -184,7 +184,7 @@ qint32 dice(qint32 num, qint32 size, QRandomGenerator *rng)
     return 1;
 
   for (r = 1; r <= num; r++)
-    sum += number(1, size, rng);
+    sum += dc_->number(1, size, rng);
 
   return sum;
 }
@@ -233,7 +233,7 @@ FILE *quest_log = {};
 FILE *vault_log = {};
 
 // writes a QString to the log
-void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
+void dc_->logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
   FILE **f = {};
   qint32 stream = 1;
@@ -241,7 +241,7 @@ void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChanne
   // DCPtr dc = dynamic_cast<DCPtr >(DC::instance());
   // DC::config &cf = dc->cf;
 
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
     logpath << "../blog/";
   }
@@ -390,7 +390,7 @@ void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChanne
 
   if (stream == STDIN_FILENO || type == DC::LogChannel::LOG_BUG)
   {
-    if (DC::getInstance()->cf.stderr_timestamp == true)
+    if (dc_->cf.stderr_timestamp == true)
     {
       std::cerr << u"%1 :%2: %3"_s.arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
     }
@@ -407,92 +407,92 @@ void DC::getInstance() -> logentry(QString str, quint64 god_level, DC::LogChanne
   }
 
   if (god_level >= IMMORTAL)
-    DC::getInstance()->send_to_gods(str, god_level, type);
+    dc_->send_to_gods(str, god_level, type);
 }
 
 void logarena(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_ARENA);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_ARENA);
 }
 
 void logbug(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
 }
 
 void logclan(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_CLAN);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_CLAN);
 }
 
 void logdatabase(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_DATABASE);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_DATABASE);
 }
 
 void logdebug(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_DEBUG);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_DEBUG);
 }
 
 void loggod(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_GOD);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 void loghelp(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_HELP);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_HELP);
 }
 
 void logmisc(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
 }
 
 void logmortal(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 }
 
 void logobjects(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_OBJECTS);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_OBJECTS);
 }
 
 void logplayer(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_PLAYER);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_PLAYER);
 }
 
 void logprayer(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_PRAYER);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_PRAYER);
 }
 
 void logquest(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_QUEST);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_QUEST);
 }
 
 void logsocket(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
 }
 
 void logvault(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
 }
 
 void logwarning(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_WARNING);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_WARNING);
 }
 
 void logworld(QString message)
 {
-  DC::getInstance()->logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
+  dc_->logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
 }
 
 // function for new SETBIT et al. commands
@@ -559,7 +559,7 @@ void sprintbit(quint32 vektor, const QStringList names, QString result)
 
   if (vektor < 0)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -593,7 +593,7 @@ void sprintbit(quint32 vektor, QStringList names, QString result)
 
   if (vektor < 0)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -624,7 +624,7 @@ QString sprintbit(quint32 vektor, QStringList names)
 
   if (vektor < 0)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return {};
   }
 
@@ -660,7 +660,7 @@ QString sprintbit(quint32 vektor, const QStringList names)
 
   if (vektor < 0)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return result;
   }
 
@@ -821,13 +821,13 @@ void util_archive(const QString char_name, CharacterPtr caller)
       {
         dc_sprintf(buf, "Illegal archive attempt: %s by %s.",
                    char_name, qPrintable(caller->name()));
-        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
       else
       {
         dc_sprintf(buf, "Someone got a weird character name in there: %s.", char_name);
-        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
     }
@@ -840,7 +840,7 @@ void util_archive(const QString char_name, CharacterPtr caller)
     if (caller)
       caller->sendln("That character does not exist.");
     else
-      DC::getInstance()->logentry(u"Attempt to archive a non-existent character."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+      dc_->logentry(u"Attempt to archive a non-existent character."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
   dc_sprintf(buf, "gzip -9 %s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -850,7 +850,7 @@ void util_archive(const QString char_name, CharacterPtr caller)
     if (caller)
       caller->send(u"%1\r\n"_s.arg(buf));
     else
-      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+      dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
   }
   dc_sprintf(buf, "%s/%c/%s.gz", SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -859,7 +859,7 @@ void util_archive(const QString char_name, CharacterPtr caller)
   dc_sprintf(buf, "Character archived: %s", char_name);
   if (caller)
     caller->send(u"%1\r\n"_s.arg(buf));
-  DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+  dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 void util_unarchive(QString char_name, CharacterPtr caller)
@@ -876,14 +876,14 @@ void util_unarchive(QString char_name, CharacterPtr caller)
       {
         dc_sprintf(buf, "Illegal unarchive attempt: %s by %s.", char_name,
                    qPrintable(caller->name()));
-        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
       else
       {
         dc_sprintf(buf, "Someone got a weird character name in there: %s.",
                    char_name);
-        DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
     }
@@ -904,7 +904,7 @@ void util_unarchive(QString char_name, CharacterPtr caller)
     if (caller)
       caller->send(u"%1\r\n"_s.arg(buf));
     else
-      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+      dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
   }
   dc_sprintf(buf, "%s/%s", ARCHIVE_DIR, char_name);
@@ -913,7 +913,7 @@ void util_unarchive(QString char_name, CharacterPtr caller)
   dc_sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
     caller->send(u"%1\r\n"_s.arg(buf));
-  DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
+  dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj)
@@ -936,17 +936,17 @@ bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj)
 
 qint32 DARK_AMOUNT(qint32 room)
 {
-  qint32 glow = DC::getInstance()->world[room].light;
+  qint32 glow = dc_->world[room].light;
 
   // indoors and cities are always lit
-  if (DC::getInstance()->world[room].sector_type == SECT_INSIDE ||
-      DC::getInstance()->world[room].sector_type == SECT_CITY)
+  if (dc_->world[room].sector_type == SECT_INSIDE ||
+      dc_->world[room].sector_type == SECT_CITY)
     glow += 3;
 
-  if (isSet(DC::getInstance()->world[room].room_flags, DARK))
+  if (isSet(dc_->world[room].room_flags, DARK))
     glow -= 2;
 
-  if (isSet(DC::getInstance()->world[room].room_flags, LIGHT_ROOM))
+  if (isSet(dc_->world[room].room_flags, LIGHT_ROOM))
     glow += 2;
 
   if (weather_info.sunlight == SUN_DARK)
@@ -1035,7 +1035,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 
   if (!sub || !obj)
   {
-    DC::getInstance()->logentry(u"Invalid pointer passed to CAN_SEE!"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Invalid pointer passed to CAN_SEE!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -1078,7 +1078,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 
   try
   {
-    if (DC::getInstance()->world[obj->in_room].sector_type == SECT_FOREST && IS_AFFECTED(obj, AFF_FOREST_MELD) && IS_AFFECTED(obj, AFF_HIDE))
+    if (dc_->world[obj->in_room].sector_type == SECT_FOREST && IS_AFFECTED(obj, AFF_FOREST_MELD) && IS_AFFECTED(obj, AFF_HIDE))
     {
       return false;
     }
@@ -1198,7 +1198,7 @@ bool check_blind(CharacterPtr ch)
   if (ch->isPlayer() && ch->player->holyLite)
     return false;
 
-  if (IS_AFFECTED(ch, AFF_BLIND) && number(0, 4)) // 20% chance of seeing
+  if (IS_AFFECTED(ch, AFF_BLIND) && dc_->number(0, 4)) // 20% chance of seeing
   {
     ch->sendln("You can't see a damn thing!");
     return true;
@@ -1219,7 +1219,7 @@ command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
 
   half_chop(argument, name, message);
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1313,7 +1313,7 @@ command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
+  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
@@ -1349,7 +1349,7 @@ command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   dc_sprintf(str, "**%s[%d]: %s\n",
-             qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
+             qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
@@ -1384,7 +1384,7 @@ command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number, argument);
+  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.");
@@ -1414,7 +1414,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, NO_MAGIC))
+  if (isSet(dc_->world[this->in_room].room_flags, NO_MAGIC))
   {
     this->sendln("You can't use magic here.");
     return ReturnValue::eFAILURE;
@@ -1451,7 +1451,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if (this->isPlayer())
   {
     x = GET_WIS(this);
-    quint64 percent = number(1, 100);
+    quint64 percent = dc_->number(1, 100);
     if (percent > x)
     {
       percent -= x;
@@ -1459,7 +1459,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     // Additional 5% chance of failure when recalling across continents
     location = victim->hometown;
-    if (location > 0 && DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[location].zone).continent)
+    if (location > 0 && dc_->zones.value(dc_->world[victim->in_room].zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
     {
       percent += 5;
     }
@@ -1504,7 +1504,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[location].room_flags, NOHOME))
+    if (isSet(dc_->world[location].room_flags, NOHOME))
     {
       victim->sendln("The gods reset your home.");
       location = real_room(START_ROOM);
@@ -1513,7 +1513,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     // make sure they arne't recalling into someone's chall
 
-    if (isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[location].room_flags, CLAN_ROOM))
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
@@ -1543,7 +1543,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if ((isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if ((isSet(dc_->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln("No recalling into a clan hall whilst Champion, go to the Tavern!.");
     location = real_room(START_ROOM);
@@ -1561,7 +1561,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     cf = 1 + ((level - 11) * .347f);
     cost = (qint32)(3440 * cf);
 
-    if (DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[location].zone).continent)
+    if (dc_->zones.value(dc_->world[victim->in_room].zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
     {
       // Cross-continent recalling costs twice as much
       cost *= 2;
@@ -1587,7 +1587,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (loop_ch = DC::getInstance()->world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
+  for (loop_ch = dc_->world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
     if (loop_ch == victim || loop_ch->fighting == victim)
       stop_fighting(loop_ch);
 
@@ -1625,14 +1625,14 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   */
   if (ch == 0)
   {
-    DC::getInstance()->logentry(u"do_quit received null character - problem!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"do_quit received null character - problem!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
+  if (!isSet(dc_->world[ch->in_room].room_flags, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
   {
     ch->sendln("This room doesn't feel...SAFE enough to do that.");
     return ReturnValue::eFAILURE;
@@ -1655,7 +1655,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+    if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
     {
       ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
       return ReturnValue::eFAILURE;
@@ -1681,7 +1681,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != cmd_t::SAVE_SILENTLY)
+    if (isSet(dc_->world[ch->in_room].room_flags, NO_QUIT) && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln("Something about this room makes it seem like a bad place to quit.");
       return ReturnValue::eFAILURE;
@@ -1693,7 +1693,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
+    if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1725,7 +1725,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   {
     fol_next = fol->next;
     if (fol->follower->isNonPlayer() &&
-        DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+        dc_->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false, u"do_quit/followers"_s);
@@ -1744,10 +1744,10 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 
   if (ch->cRooms)
   {
-    for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
+    for (obj = dc_->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (DC::getInstance()->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (dc_->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
         if (ch == (CharacterPtr)(obj->obj_flags.origin))
           extract_obj(obj);
     }
@@ -1775,7 +1775,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   if (cmd != cmd_t::SAVE_SILENTLY)
     clan_logout(ch);
 
-  DC::getInstance()->update_wizlist(ch);
+  dc_->update_wizlist(ch);
 
   if (ch->isPlayer() && ch->desc && !ch->desc->getPeerOriginalAddress().isNull())
   {
@@ -1857,7 +1857,7 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
       if (arguments.at(0) == "hints")
       {
         send("Saving hints.\r\n");
-        DC::getInstance()->save_hints();
+        dc_->save_hints();
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1873,7 +1873,7 @@ command_return_t do_home(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->isImmortalPlayer())
   {
-    if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+    if (!isSet(dc_->world[ch->in_room].room_flags, SAFE) ||
         ch->room().isArena())
     {
       send_to_char("This place doesn't sit right with you...not enough "
@@ -1882,7 +1882,7 @@ command_return_t do_home(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
+    if (isSet(dc_->world[ch->in_room].room_flags, NOHOME))
     {
       ch->sendln("Something prevents it.");
       return ReturnValue::eFAILURE;
@@ -1895,7 +1895,7 @@ command_return_t do_home(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM))
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1916,7 +1916,7 @@ command_return_t do_home(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ch->sendln("You now consider this place to be your home.");
-  ch->hometown = DC::getInstance()->world[ch->in_room].number;
+  ch->hometown = dc_->world[ch->in_room].number;
   return ReturnValue::eSUCCESS;
 }
 
@@ -2206,7 +2206,7 @@ void check_timer()
     }
     las = curr;
   }
-  DC::getInstance()->removeDead();
+  dc_->removeDead();
 }
 
 qint32 get_line(FILE *fl, QString buf)
@@ -2235,7 +2235,7 @@ qint32 get_line(FILE *fl, QString buf)
 // return value can include the from or to variable
 //
 /*
-qint32 number(qint32 from, qint32 to)
+qint32 dc_->number(qint32 from, qint32 to)
 {
   if (from == to)
     return to;
@@ -2244,7 +2244,7 @@ qint32 number(qint32 from, qint32 to)
   {
     QString buf;
     dc_sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
-    DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     produce_coredump();
     return to;
   }
@@ -2259,13 +2259,13 @@ qint32 number(qint32 from, qint32 to)
 qint32 random_percent_change(uint percentage, qint32 value)
 {
   qint32 diff = abs(round(value * (percentage / 100.0)));
-  return number(-diff, diff) + value;
+  return dc_->number(-diff, diff) + value;
 }
 
 // Weighted such that the worst and best values are less likely to occur
 qint32 random_percent_change(qint32 from, qint32 to, qint32 value)
 {
-  return round((number(from, to) / 100.0) * value) + value;
+  return round((ch->dc_->number(from, to) / 100.0) * value) + value;
 }
 
 bool is_in_game(CharacterPtr ch)
@@ -2273,7 +2273,7 @@ bool is_in_game(CharacterPtr ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    DC::getInstance()->logentry(u"nullptr args sent to is_pc_playing in utility.c!"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"nullptr args sent to is_pc_playing in utility.c!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -2299,13 +2299,13 @@ bool is_in_game(CharacterPtr ch)
 
 void produce_coredump(void *ptr)
 {
-  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
+  dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
 
   static qint32 counter = {};
 
   if (++counter > COREDUMP_MAX)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
     return;
   }
 
@@ -2318,11 +2318,11 @@ void produce_coredump(void *ptr)
   else if (pid > 0)
   {
     // Parent process
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
   }
   else
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
   }
 }
 
@@ -2366,11 +2366,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
+    dc_->logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
     dc_snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
@@ -2392,7 +2392,7 @@ void remove_character(QString name, BACKUP_TYPE backup)
     }
   }
 
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
     dc_snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0].toLatin1(), qPrintable(name));
   }
@@ -2443,7 +2443,7 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    DC::getInstance()->logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
+    dc_->logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, qPrintable(name));
     break;
   }
 
@@ -2471,7 +2471,7 @@ bool check_make_camp(qint32 room)
   CharacterPtr i, next_i;
   bool campok = false;
 
-  for (i = DC::getInstance()->world[room].people; i; i = next_i)
+  for (i = dc_->world[room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -2536,7 +2536,7 @@ void DC::update_make_camp_and_leadership(void)
 {
   affected_type af;
   qint32 bonus = {};
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
 
   std::for_each(character_list.begin(), character_list.end(),
                 [&af, &bonus](CharacterPtr i)
@@ -2637,8 +2637,8 @@ void unique_scan(CharacterPtr victim)
     {
       if (isSet(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
       {
-        if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[victim->equipment[k]->item_number].vnum()))
-          virtnums[DC::getInstance()->obj_index[victim->equipment[k]->item_number].vnum()] = 1;
+        if (virtnums.end() == virtnums.find(dc_->obj_index[victim->equipment[k]->item_number].vnum()))
+          virtnums[dc_->obj_index[victim->equipment[k]->item_number].vnum()] = 1;
         else
           found_items.push(victim->equipment[k]);
       }
@@ -2648,8 +2648,8 @@ void unique_scan(CharacterPtr victim)
         {
           if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
           {
-            if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[j->item_number].vnum()))
-              virtnums[DC::getInstance()->obj_index[j->item_number].vnum()] = 1;
+            if (virtnums.end() == virtnums.find(dc_->obj_index[j->item_number].vnum()))
+              virtnums[dc_->obj_index[j->item_number].vnum()] = 1;
             else
               found_items.push(j);
           }
@@ -2662,8 +2662,8 @@ void unique_scan(CharacterPtr victim)
   {
     if (isSet(i->obj_flags.more_flags, ITEM_UNIQUE))
     {
-      if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[i->item_number].vnum()))
-        virtnums[DC::getInstance()->obj_index[i->item_number].vnum()] = 1;
+      if (virtnums.end() == virtnums.find(dc_->obj_index[i->item_number].vnum()))
+        virtnums[dc_->obj_index[i->item_number].vnum()] = 1;
       else
         found_items.push(i);
     }
@@ -2675,8 +2675,8 @@ void unique_scan(CharacterPtr victim)
       {
         if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
         {
-          if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[j->item_number].vnum()))
-            virtnums[DC::getInstance()->obj_index[j->item_number].vnum()] = 1;
+          if (virtnums.end() == virtnums.find(dc_->obj_index[j->item_number].vnum()))
+            virtnums[dc_->obj_index[j->item_number].vnum()] = 1;
           else
             found_items.push(j);
         }
@@ -2686,10 +2686,10 @@ void unique_scan(CharacterPtr victim)
 
   if (!found_items.empty())
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", qPrintable(victim->name()));
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", qPrintable(victim->name()));
     while (!found_items.empty())
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }
@@ -2768,14 +2768,14 @@ bool champion_can_go(qint32 room)
     // Champions can't enter class restricted rooms
     for (qint32 c_class = 1; c_class < CLASS_MAX; c_class++)
     {
-      if (DC::getInstance()->world[room].allow_class[c_class] == true)
+      if (dc_->world[room].allow_class[c_class] == true)
       {
         return false;
       }
     }
 
     // Champions can't enter clan rooms
-    if (isSet(DC::getInstance()->world[room].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[room].room_flags, CLAN_ROOM))
     {
       return false;
     }
@@ -2857,7 +2857,7 @@ bool class_can_go(qint32 ch_class, qint32 room)
     // Determine if any class restrictions are in place
     for (qint32 c_class = 1; c_class < CLASS_MAX; c_class++)
     {
-      if (DC::getInstance()->world[room].allow_class[c_class] == true)
+      if (dc_->world[room].allow_class[c_class] == true)
       {
         classRestrictions = true;
       }
@@ -2865,7 +2865,7 @@ bool class_can_go(qint32 ch_class, qint32 room)
 
     if (classRestrictions)
     {
-      if (DC::getInstance()->world[room].allow_class[ch_class] != true)
+      if (dc_->world[room].allow_class[ch_class] != true)
       {
         return false;
       }
@@ -2989,7 +2989,7 @@ bool char_file_exists(QString name)
 
   QString filename;
 
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
     filename = fmt::format("{}/{}/{}", BSAVE_DIR, name[0], name);
   }
@@ -3038,13 +3038,13 @@ bool str_prefix(const QString astr, const QString bstr)
 {
   if (astr == nullptr)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr == nullptr)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 
@@ -3061,13 +3061,13 @@ bool str_prefix(QString astr, QString bstr)
 {
   if (astr.isEmpty())
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr.isEmpty())
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 
@@ -3116,7 +3116,7 @@ void special_log(QString message)
 
   if (!special_logfile.open(QIODevice::Append | QIODevice::Text))
   {
-    DC::getInstance()->logentry(u"Unable to open SPECIAL LOG FILE in special_log."_s, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    dc_->logentry(u"Unable to open SPECIAL LOG FILE in special_log."_s, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     return;
   }
 

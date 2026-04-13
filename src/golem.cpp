@@ -105,7 +105,7 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      qint32 vnum = DC::getInstance()->obj_index[curr->item_number].vnum();
+      qint32 vnum = dc_->obj_index[curr->item_number].vnum();
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
@@ -123,9 +123,9 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == DC::getInstance()->obj_index[curr->item_number].vnum())
+      if (golem_list[golemtype].components[i] == dc_->obj_index[curr->item_number].vnum())
       {
-        if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
+        if (ch->dc_->number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
           dc_sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", qPrintable(curr->short_description()));
           ch->send(buf);
@@ -156,7 +156,7 @@ void save_golem_data(CharacterPtr ch)
   dc_sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    DC::getInstance()->logentry(u"Error while opening file in save_golem_data[golem.cpp]."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Error while opening file in save_golem_data[golem.cpp]."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   CharacterPtr golem = ch->player->golem; // Just to make the code below cleaner.
@@ -188,11 +188,11 @@ void save_charmie_data(CharacterPtr ch)
       continue;
     }
 
-    // DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, qPrintable(ch->name()));
+    // dc_->logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, qPrintable(ch->name()));
     dc_sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), 0);
     if (!(fpfile = fopen(file, "w")))
     {
-      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
@@ -427,7 +427,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    DC::getInstance()->logentry(u"unexpected cmd set to %1 sent to do_golem_score"_s.arg(QString::number(static_cast<quint64>(cmd))));
+    dc_->logentry(u"unexpected cmd set to %1 sent to do_golem_score"_s.arg(QString::number(static_cast<quint64>(cmd))));
     return ReturnValue::eFAILURE;
   }
 
@@ -441,7 +441,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_sprintf(race, "%s", races[(qint32)ch->race].singular_name);
   if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
-    DC::getInstance()->logentry(u"do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60."_s.arg(qPrintable(master->name())).arg(ch->getLevel()).arg(ch->getLevel() + 19));
+    dc_->logentry(u"do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60."_s.arg(qPrintable(master->name())).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
     return ReturnValue::eSUCCESS;
@@ -630,7 +630,7 @@ qint32 spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 {
   follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && dc_->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);

@@ -65,7 +65,7 @@ command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  DC::getInstance()->free_help_from_memory();
+  dc_->free_help_from_memory();
   QFile help_keyword_file(HELP_KWRD_FILE);
   if (!help_keyword_file.open(QIODeviceBase::Text))
   {
@@ -109,14 +109,14 @@ command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("LOG removed.");
     REMOVE_BIT(vict->player->punish, PUNISH_LOG);
     dc_sprintf(buf2, "%s removed log on %s.", qPrintable(ch->name()), qPrintable(vict->name()));
-    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
     ch->sendln("LOG set.");
     SET_BIT(vict->player->punish, PUNISH_LOG);
     dc_sprintf(buf2, "%s just logged %s.", qPrintable(ch->name()), qPrintable(vict->name()));
-    DC::getInstance()->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -130,7 +130,7 @@ command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
   if (person.isEmpty())
   {
     QString buf;
-    const auto &character_list = DC::getInstance()->character_list;
+    const auto &character_list = dc_->character_list;
     for (const auto &victim : character_list)
     {
       if (victim->isNonPlayer())
@@ -335,9 +335,9 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
         quint64 change_count = {};
         bool first_npc_found = false;
         bool first_npc_debug_state = false;
-        for (const auto &c : DC::getInstance()->character_list)
+        for (const auto &c : dc_->character_list)
         {
-          if (c->isNonPlayer() && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].vnum() == vnum)
+          if (c->isNonPlayer() && c->mobdata && dc_->mob_index[c->mobdata->nr].vnum() == vnum)
           {
             if (!first_npc_found)
             {
@@ -431,7 +431,7 @@ command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
   QString log_buf = {};
   dc_sprintf(log_buf, "%s pardons %s for %s.",
              qPrintable(ch->name()), qPrintable(victim->name()), flag);
-  DC::getInstance()->logentry(log_buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(log_buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
@@ -698,7 +698,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     do_write_skillquest(ch, argument, cmd);
     break;
   default:
-    DC::getInstance()->logentry(u"Incorrect -i- in do_sqedit"_s, 0, DC::LogChannel::LOG_WORLD);
+    dc_->logentry(u"Incorrect -i- in do_sqedit"_s, 0, DC::LogChannel::LOG_WORLD);
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eSUCCESS;
@@ -786,7 +786,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (real_object(i) < 0)
       continue;
-    obj = DC::getInstance()->obj_index[real_object(i)].item;
+    obj = dc_->obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, TAKE) &&
@@ -802,7 +802,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = DC::getInstance()->obj_index[obj->item_number].vnum();
+              last_vnum[0][o] = dc_->obj_index[obj->item_number].vnum();
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -816,7 +816,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
               for (v = {}; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = DC::getInstance()->obj_index[obj->item_number].vnum();
+                  last_vnum[v][o] = dc_->obj_index[obj->item_number].vnum();
                   break;
                 }
             }
@@ -839,7 +839,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        dc_sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable((DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
+        dc_sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable((dc_->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
         //    else dc_sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     dc_sprintf(buf1, "%s\n", buf1);
@@ -916,7 +916,7 @@ command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (!str_cmp(arg, "vaults"))
   {
-    DC::getInstance()->reload_vaults();
+    dc_->reload_vaults();
     ch->sendln("Done!");
   }
   else
@@ -949,19 +949,19 @@ command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
   buf[0] = '\0';
   for (i = start, tot = 1; i <= end; i++)
   {
-    if (mob && (real_mobile(i) < 0 || !DC::getInstance()->mob_index[real_mobile(i)].mobprogs))
+    if (mob && (real_mobile(i) < 0 || !dc_->mob_index[real_mobile(i)].mobprogs))
       continue;
-    else if (!mob && (real_object(i) < 0 || !DC::getInstance()->obj_index[real_object(i)].mobprogs))
+    else if (!mob && (real_object(i) < 0 || !dc_->obj_index[real_object(i)].mobprogs))
       continue;
     if (tot++ > 100)
       break;
     if (mob)
     {
-      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg(((CharacterPtr)DC::getInstance()->mob_index[real_mobile(i)].item)->name()));
+      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg(((CharacterPtr)dc_->mob_index[real_mobile(i)].item)->name()));
     }
     else
     {
-      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg((DC::getInstance()->obj_index[real_object(i)].item)->name()));
+      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg((dc_->obj_index[real_object(i)].item)->name()));
     }
   }
   return ReturnValue::eSUCCESS;

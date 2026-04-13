@@ -363,7 +363,7 @@ private slots:
     VaultPtr vault = has_vault(ch.getNameC());
     if (vault)
     {
-      DC::getInstance()->vaults_.(ch.getNameC()); // free it up first..
+      dc_->vaults_.(ch.getNameC()); // free it up first..
     }
 
     rc = do_vault(&ch, u"list"_s);
@@ -572,7 +572,7 @@ private slots:
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    DC::getInstance()->vaults_.remove_vault(ch.name());
+    dc_->vaults_.remove_vault(ch.name());
 
     QCOMPARE(dc.character_list.erase(&ch), 1);
     ch.desc = {};
@@ -691,18 +691,18 @@ private slots:
         for (qint32 x = dc.world_file_list->firstnum; x <= dc.world_file_list->lastnum; x++)
         {
           write_one_room(lfw, x);
-          out << DC::getInstance()->world[x];
-          out2 << DC::getInstance()->world[x];
-          fstream_world_file << DC::getInstance()->world[x];
+          out << dc_->world[x];
+          out2 << dc_->world[x];
+          fstream_world_file << dc_->world[x];
           rooms_written++;
         }
       }
       else
       {
         write_one_room(lfw, 1);
-        out << DC::getInstance()->world[1];
-        out2 << DC::getInstance()->world[1];
-        fstream_world_file << DC::getInstance()->world[1];
+        out << dc_->world[1];
+        out2 << dc_->world[1];
+        fstream_world_file << dc_->world[1];
         rooms_written = 1;
       }
 
@@ -739,11 +739,11 @@ private slots:
       QTextStream in(&qf);
       qint32 room_nr = {};
 
-      Room original_room1 = DC::getInstance()->world[1];
-      qint32 new_room_nr = DC::getInstance()->read_one_room(fl, room_nr);
+      Room original_room1 = dc_->world[1];
+      qint32 new_room_nr = dc_->read_one_room(fl, room_nr);
       QCOMPARE(room_nr, 1);
       QCOMPARE(new_room_nr, 1);
-      Room new_room1 = DC::getInstance()->world[1];
+      Room new_room1 = dc_->world[1];
       QCOMPARE(new_room1, original_room1);
 
       // Room r1;
@@ -1047,23 +1047,23 @@ private slots:
 
     DC dc(cf);
     dc.boot_db();
-    auto obj = reinterpret_cast<ObjectPtr>(DC::getInstance()->obj_index[0].item);
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[0].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number), DC::getInstance()->obj_index[obj->item_number].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
+    auto obj = reinterpret_cast<ObjectPtr>(dc_->obj_index[0].item);
+    QCOMPARE(dc_->getObjectVNUM(obj), dc_->obj_index[0].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number), dc_->obj_index[obj->item_number].vnum());
+    QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
 
     bool ok = false;
-    DC::getInstance()->getObjectVNUM(obj, &ok);
+    dc_->getObjectVNUM(obj, &ok);
     QCOMPARE(ok, true);
     ok = false;
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number, &ok), dc_->obj_index[obj->item_number].vnum());
     QCOMPARE(ok, true);
-    QCOMPARE(DC::getInstance()->getObjectVNUM(DC::INVALID_RNUM, &ok), DC::INVALID_VNUM);
+    QCOMPARE(dc_->getObjectVNUM(DC::INVALID_RNUM, &ok), DC::INVALID_VNUM);
     QCOMPARE(ok, false);
 
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
+    QCOMPARE(dc_->getObjectVNUM(obj, nullptr), dc_->obj_index[0].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number, nullptr), dc_->obj_index[obj->item_number].vnum());
+    QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
   }
   void test_blackjack()
   {
@@ -1615,11 +1615,11 @@ private slots:
     QCOMPARE(get_obj_vnum(u"v1"_s), nullptr);
     QCOMPARE_NE(get_obj_vnum(u"v99"_s), nullptr);
 
-    QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(dc_->obj_index[get_obj_vnum(u"v99"_s)->item_number].vnum(), 99);
     QCOMPARE(get_obj_vnum(u"v99"_s)->carried_by, nullptr);
-    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(u"v1"_s)->item_number].vnum(), 1);
+    QCOMPARE(dc_->obj_index[get_objindex_vnum(u"v1"_s)->item_number].vnum(), 1);
     QCOMPARE(get_objindex_vnum(u"v1"_s)->carried_by, nullptr);
-    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(dc_->obj_index[get_objindex_vnum(u"v99"_s)->item_number].vnum(), 99);
     QCOMPARE(get_objindex_vnum(u"v99"_s)->carried_by, nullptr);
   }
 

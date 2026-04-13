@@ -81,7 +81,7 @@ command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+        dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense sees your eyegouge coming from a mile away.", ch, 0, victim, 0);
       act_to_victim("Your heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, 0);
@@ -197,7 +197,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
   }
 
-  qint32 itemp = number(1, 100);
+  qint32 itemp = dc_->number(1, 100);
   if (this->isPlayer() && victim->isPlayer())
   {
     if (victim->getLevel() > this->getLevel())
@@ -439,7 +439,7 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
   if (AWAKE(victim) && !skill_success(ch, victim, SKILL_CIRCLE))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, WEAR_WIELD);
   else if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-           number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+           dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
   {
     act_to_character("$N's heightened battlesense sees your circle coming from a mile away.", ch, 0, victim, 0);
     act_to_victim("Your heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, 0);
@@ -584,7 +584,7 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+        dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense sees your trip coming from a mile away.", ch, 0, victim, 0);
       act_to_victim("Your heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, 0);
@@ -609,10 +609,10 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
-  auto &arena = DC::getInstance()->arena_;
+  auto &arena = dc_->arena_;
   affected_type af;
 
-  if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) && ch->room().isArena() && arena.isPotato())
+  if ((ch->in_room >= 0 && ch->in_room <= dc_->top_of_world) && ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return ReturnValue::eFAILURE;
@@ -715,7 +715,7 @@ command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  auto &arena = DC::getInstance()->arena_;
+  auto &arena = dc_->arena_;
   if (!ch->canPerform(SKILL_HIDE))
   {
     if (cmd != cmd_t::LOOK)
@@ -723,14 +723,14 @@ command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) &&
+  if ((ch->in_room >= 0 && ch->in_room <= dc_->top_of_world) &&
       ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return ReturnValue::eFAILURE;
   }
 
-  for (auto curr = DC::getInstance()->world[ch->in_room].people; curr; curr = curr->next_in_room)
+  for (auto curr = dc_->world[ch->in_room].people; curr; curr = curr->next_in_room)
   {
     if (curr->fighting == ch)
     {
@@ -755,13 +755,13 @@ command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
     for (i = {}; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = {};
     i = {};
-    for (temp = DC::getInstance()->world[ch->in_room].people; temp; temp = temp->next_in_room)
+    for (temp = dc_->world[ch->in_room].people; temp; temp = temp->next_in_room)
     {
       if (ch == temp)
         continue;
       if (i >= MAX_HIDE)
         break;
-      if (number(1, 101) > a) // Failed.
+      if (ch->dc_->number(1, 101) > a) // Failed.
       {
         ch->player->hiding_from[i] = temp;
         ch->player->hide[i++] = false;
@@ -847,7 +847,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("No stealing permitted in safe areas!");
     return ReturnValue::eFAILURE;
@@ -904,7 +904,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return ReturnValue::eFAILURE;
     }
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
+    if (dc_->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
     {
       ch->send("You must earn that flag, no stealing allowed!");
       return ReturnValue::eFAILURE;
@@ -968,11 +968,11 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
             ch->save(cmd_t::SAVE_SILENTLY);
             if (!AWAKE(victim))
             {
-              //              if(number(1, 3) == 1)
+              //              if(ch->dc_->number(1, 3) == 1)
               victim->sendln("You dream of someone stealing your equipment...");
 
               // if i'm not a thief, or if I fail dex-roll wake up victim
-              //              if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
+              //              if(GET_CLASS(ch) != CLASS_THIEF || dc_->number(1, 100) > GET_DEX(ch))
               //              {
               //                ch->sendln("Oops...");
               if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
@@ -999,12 +999,12 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (victim->isPlayer())
           {
             QString log_buf = {};
-            dc_sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), DC::getInstance()->obj_index[obj->item_number].vnum(), qPrintable(victim->name()));
-            DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+            dc_sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), dc_->obj_index[obj->item_number].vnum(), qPrintable(victim->name()));
+            dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+              dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), dc_->obj_index[loop_obj->item_number].vnum());
           }
-          if (DC::getInstance()->obj_index[obj->item_number].vnum() != 76)
+          if (dc_->obj_index[obj->item_number].vnum() != 76)
           {
             obj_from_char(obj);
             has_item = search_char_for_item(ch, obj->item_number, false);
@@ -1166,18 +1166,18 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->send(buf);
         dc_sprintf(buf, "%s stole %s from %s while victim was asleep",
                    qPrintable(ch->name()), qPrintable(obj->short_description()), qPrintable(victim->name()));
-        DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+        dc_->logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (!victim->isNonPlayer())
         {
           victim->save(cmd_t::SAVE_SILENTLY);
           ch->save(cmd_t::SAVE_SILENTLY);
           if (!AWAKE(victim))
           {
-            //            if(number(1, 3) == 1)
+            //            if(ch->dc_->number(1, 3) == 1)
             victim->sendln("You dream of someone stealing your equipment...");
 
             // if i'm not a thief, or if I fail dex-roll wake up victim
-            //            if(number(1,101) > wakey)
+            //            if(ch->dc_->number(1,101) > wakey)
             //            {
             //              ch->sendln("Oops, that was clumsy...");
             if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
@@ -1299,7 +1299,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("No stealing permitted in safe areas!");
     return ReturnValue::eFAILURE;
@@ -1352,7 +1352,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
     set_cantquit(ch, victim);
     ch->sendln("Oops, that was clumsy...");
     ohoh = true;
-    if (number(0, 6))
+    if (ch->dc_->number(0, 6))
     {
       act_to_victim("You discover that $n has $s hands in your wallet.", ch, 0, victim, 0);
       act_to_room("$n tries to steal $B$5gold$R from $N.", ch, 0, victim, NOTVICT | INVIS_NULL);
@@ -1409,7 +1409,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
             affect_to_char(ch, &pthiefaf);
         }
       }
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", qPrintable(ch->name()), gold, qPrintable(victim->name()), GET_ROOM_VNUM(victim->in_room));
+      dc_->logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", qPrintable(ch->name()), gold, qPrintable(victim->name()), GET_ROOM_VNUM(victim->in_room));
     }
     else
     {
@@ -1456,7 +1456,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   //      has_lockpicks = true;
 
   for (j = {}; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || DC::getInstance()->obj_index[ch->equipment[j]->item_number].vnum() == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || dc_->obj_index[ch->equipment[j]->item_number].vnum() == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1555,7 +1555,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
       {
-        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
         {
           if (back->to_room == ch->in_room)
           {
@@ -1697,7 +1697,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
       dc_sprintf(buf, "%s slips %d coins to %s", qPrintable(ch->name()), amount,
                  qPrintable(vict->name()));
-      DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      dc_->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
       if (ch->isNonPlayer() || (ch->getLevel() < DEITY))
         ch->removeGold(amount);
@@ -1778,7 +1778,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
          container->obj_flags.value[0]) &&
-        (DC::getInstance()->obj_index[container->item_number].vnum() != 536 ||
+        (dc_->obj_index[container->item_number].vnum() != 536 ||
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
       ch->sendln("It won't fit...cheater.");
@@ -1793,7 +1793,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       act_to_room("$n slips $p in $P.", ch, obj, container, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (DC::getInstance()->obj_index[container->item_number].vnum() != 536)
+    if (dc_->obj_index[container->item_number].vnum() != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act_to_character("You slip $p in $P.", ch, obj, container, 0);
@@ -1805,7 +1805,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (vict->isNonPlayer() && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
+  if (vict->isNonPlayer() && dc_->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
   {
     act_to_character("$N graciously refuses your gift.", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
@@ -1850,7 +1850,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == 393)
+    if (dc_->obj_index[obj->item_number].vnum() == 393)
     {
       ch->sendln("Whoa, you almost dropped your hot potato!");
       return ReturnValue::eFAILURE;
@@ -1974,7 +1974,7 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -2003,7 +2003,7 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -2132,7 +2132,7 @@ command_return_t do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
     // the victim didn't die then affect victim with jab effect
     if (!(retval & ReturnValue::eVICT_DIED))
     {
-      if (number(0, 1))
+      if (ch->dc_->number(0, 1))
       {
         // victim's next target will be random
         af.modifier = 1;
@@ -2249,7 +2249,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
       else
       {
         obj = get_obj_in_list_vis(ch, item, victim->carrying);
-        if (number(0, 2) || !obj)
+        if (ch->dc_->number(0, 2) || !obj)
         {
           act_to_character("$N doesn't seem to be carrying anything like that.", ch, 0, victim, 0);
           return ReturnValue::eSUCCESS;
@@ -2261,7 +2261,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
           weight = true;
         }
       }
-      if (number(0, 1))
+      if (ch->dc_->number(0, 1))
         appraised += 10 - learned / 10;
       appraised -= 10 - learned / 10;
     }
@@ -2398,7 +2398,7 @@ command_return_t do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (vict->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < vict->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+        dc_->number(1, 100) < vict->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense sees your strike coming from a mile away.", ch, 0, vict, 0);
       act_to_victim("Your heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, 0);

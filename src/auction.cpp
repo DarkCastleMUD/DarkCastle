@@ -49,7 +49,7 @@ bool AuctionHouse::IsRace(qint32 vnum, QString israce)
   if (nr < 0)
     return false;
 
-  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (dc_->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -99,7 +99,7 @@ bool AuctionHouse::IsClass(qint32 vnum, QString isclass)
   if (nr < 0)
     return false;
 
-  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (dc_->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -180,7 +180,7 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
 
   ch->send(u"The new price of ticket %u (%s) is now %u.\r\n"_s.arg(ticket).arg(qPrintable(Item_it->item_name)).arg(new_price));
 
-  for (auto &vch : DC::getInstance()->world[ch->in_room].people_)
+  for (auto &vch : dc_->world[ch->in_room].people_)
   {
     if (vch != ch)
     {
@@ -188,7 +188,7 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
     }
   }
 
-  DC::getInstance()->logentry(u"VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n"_s.arg(qPrintable(ch->name())).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  dc_->logentry(u"VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n"_s.arg(qPrintable(ch->name())).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   Item_it->price = new_price;
   Save();
 }
@@ -241,7 +241,7 @@ void AuctionHouse::HandleDelete(QString name)
     plural = "s ";
   }
 
-  DC::getInstance()->logentry(u"%1 auction%2 belonging to %3 have been deleted."_s.arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
+  dc_->logentry(u"%1 auction%2 belonging to %3 have been deleted."_s.arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, DC::LogChannel::LOG_GOD);
 
   while (!tickets_to_delete.isEmpty())
   {
@@ -254,7 +254,7 @@ void AuctionHouse::HandleDelete(QString name)
     {
       if (unlink(obj_filename.str().c_str()) == -1)
       {
-        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       }
     }
 
@@ -285,7 +285,7 @@ void AuctionHouse::HandleRename(CharacterPtr ch, QString old_name, QString new_n
   {
     plural = "s ";
   }
-  DC::getInstance()->logentry(u"%1 auction%2 have been converted from %3 to %4."_s.arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(u"%1 auction%2 have been converted from %3 to %4."_s.arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), DC::LogChannel::LOG_GOD);
   Save();
 }
 
@@ -422,7 +422,7 @@ bool AuctionHouse::IsSlot(QString slot, qint32 vnum)
   if (nr < 0)
     return true;
 
-  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (dc_->obj_index[nr].item);
   switch (keyword)
   {
   case 0:
@@ -495,7 +495,7 @@ bool AuctionHouse::IsWearable(CharacterPtr ch, qint32 vnum)
   if (nr < 0)
     return true;
 
-  ObjectPtr obj = (DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (dc_->obj_index[nr].item);
   return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > ch->getLevel()));
 }
 
@@ -521,7 +521,7 @@ bool AuctionHouse::IsNoTrade(qint32 vnum)
   qint32 nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return isSet(((DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return isSet(((dc_->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -542,7 +542,7 @@ bool AuctionHouse::IsLevel(quint32 to, quint32 from, qint32 vnum)
   if ((nr = real_object(vnum)) < 0)
     return false;
 
-  eq_level = ((DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level;
+  eq_level = ((dc_->obj_index[nr].item))->obj_flags.eq_level;
 
   return (eq_level >= to && eq_level <= from);
 }
@@ -552,7 +552,7 @@ SEARCH BY NAME
 */
 bool AuctionHouse::IsName(QString name, qint32 vnum)
 {
-  ObjectPtr obj = DC::getInstance()->getObject(vnum);
+  ObjectPtr obj = dc_->getObject(vnum);
   if (!obj)
   {
     return false;
@@ -597,7 +597,7 @@ void AuctionHouse::AddRoom(CharacterPtr ch, qint32 room)
   {
     auction_rooms[room] = 1;
     ch->send(u"Done. Room %1 added to auction houses.\r\n"_s.arg(room));
-    DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just added room %d to auction houses.", qPrintable(ch->name()), room);
+    dc_->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just added room %d to auction houses.", qPrintable(ch->name()), room);
     Save();
     return;
   }
@@ -613,7 +613,7 @@ void AuctionHouse::RemoveRoom(CharacterPtr ch, qint32 room)
   if (1 == auction_rooms.remove(room))
   {
     ch->send(u"Done. Room %1 has been removed from auction houses.\r\n"_s.arg(room));
-    DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just removed room %d from auction houses.", qPrintable(ch->name()), room);
+    dc_->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s just removed room %d from auction houses.", qPrintable(ch->name()), room);
     Save();
     return;
   }
@@ -664,7 +664,7 @@ void AuctionHouse::Load()
   {
     QString buf;
     dc_sprintf(buf, "Unable to open the save file \"%s\" for Auction files!!", qPrintable(filename_));
-    DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(buf, 0, DC::LogChannel::LOG_MISC);
     return;
   }
   QTextStream in(&ah_file);
@@ -720,9 +720,9 @@ void AuctionHouse::Save()
   QMap<quint32, AuctionTicket>::iterator Item_it;
   QMap<qint32, qint32>::iterator room_it;
 
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
-    DC::getInstance()->logentry(u"Unable to save auction files because this is the testport!"_s, ANGEL, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Unable to save auction files because this is the testport!"_s, ANGEL, DC::LogChannel::LOG_MISC);
     return;
   }
   QSaveFile ah_file(filename_);
@@ -731,7 +731,7 @@ void AuctionHouse::Save()
   {
     QString buf;
     dc_sprintf(buf, "Unable to open/create the save file \"%s\" for Auction files!!", qPrintable(filename_));
-    DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   QTextStream out(&ah_file);
@@ -783,7 +783,7 @@ void AuctionHouse::Save()
   out << UncollectedGold;
 }
 
-AuctionHouse::AuctionHouse(QString filename, DC *dc)
+AuctionHouse::AuctionHouse(QString filename, DCPtr dc)
     : filename_(filename), dc_(dc)
 {
 }
@@ -931,7 +931,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     QString buf;
     dc_sprintf(buf, "Major screw up in auction(buy)! Item %s[VNum %d] belonging to %s could not be created!",
                qPrintable(Item_it->item_name), Item_it->vitem, qPrintable(Item_it->seller));
-    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -942,7 +942,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     QString buf;
     dc_sprintf(buf, "Major screw up in auction(buy)! Item %s[RNum %d] belonging to %s could not be created!",
                qPrintable(Item_it->item_name), rnum, qPrintable(Item_it->seller));
-    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -962,7 +962,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        ch->send(u"You need to have \"%s\"_s to buy a NO_TRADE item.\r\n"_s.arg(DC::getInstance()->obj_index[nr].item->short_description()));
+        ch->send(u"You need to have \"%s\"_s to buy a NO_TRADE item.\r\n"_s.arg(dc_->obj_index[nr].item->short_description()));
       return;
     }
     else
@@ -979,7 +979,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   {
     if (unlink(obj_filename.str().c_str()) == -1)
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       return;
     }
   }
@@ -996,7 +996,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
   ch->send(u"You have purchased %s for %u coins.\r\n"_s.arg(qPrintable(obj->short_description())).arg(Item_it->price));
 
-  for (auto &vch : DC::getInstance()->world[ch->in_room].people_)
+  for (auto &vch : dc_->world[ch->in_room].people_)
     if (vch != ch)
       vch->send(u"%s just purchased %s's %s\r\n"_s.arg(qPrintable(ch->name())).arg(qPrintable(Item_it->seller)).arg(qPrintable(obj->short_description())));
 
@@ -1006,17 +1006,17 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   Save();
   QString log_buf = {};
   dc_sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n", qPrintable(ch->name()), qPrintable(Item_it->seller), qPrintable(Item_it->item_name), Item_it->vitem, Item_it->price);
-  DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   obj_to_char(obj, ch);
   ch->save();
 
-  if (DC::getInstance()->cf.bport == false)
+  if (dc_->cf.bport == false)
   {
     errno = {};
     QFile auction_file(WEB_AUCTION_FILE);
     if (!auction_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", qPrintable(WEB_AUCTION_FILE), strerror(errno));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", qPrintable(WEB_AUCTION_FILE), strerror(errno));
       return;
     }
     QTextStream in(&auction_file);
@@ -1026,7 +1026,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
     if (!auction_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", qPrintable(WEB_AUCTION_FILE), strerror(errno));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", qPrintable(WEB_AUCTION_FILE), strerror(errno));
       return;
     }
     QTextStream out(&auction_file);
@@ -1035,7 +1035,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
   }
   else
   {
-    DC::getInstance()->logentry(u"bport mode: Not saving auction file to web dir."_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"bport mode: Not saving auction file to web dir."_s, 0, DC::LogChannel::LOG_MISC);
   }
 }
 
@@ -1115,7 +1115,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     QString log_buf = {};
     dc_sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\r\n",
                qPrintable(ch->name()), Item_it->price, qPrintable(Item_it->item_name), ticket);
-    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   }
   break;
   case AUC_EXPIRED: // intentional fallthrough
@@ -1131,11 +1131,11 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       QString buf;
       dc_sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!",
                  qPrintable(Item_it->item_name), Item_it->vitem, qPrintable(Item_it->seller));
-      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+      dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
 
-    if (isSet(((DC::getInstance()->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (isSet(((dc_->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1147,7 +1147,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       QString buf;
       dc_sprintf(buf, "Major screw up in auction(RemoveTicket)! Item %s[RNum %d] belonging to %s could not be created!",
                  qPrintable(Item_it->item_name), rnum, qPrintable(Item_it->seller));
-      DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+      dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
 
@@ -1155,7 +1155,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     QString log_buf = {};
     dc_sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
                qPrintable(ch->name()), ticket, qPrintable(Item_it->item_name), Item_it->price);
-    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     obj_to_char(obj, ch);
   }
   break;
@@ -1163,7 +1163,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
   {
     QString buf;
     dc_sprintf(buf, "%s just tried to cheat and collect ticket %u which didn't get erased properly!", qPrintable(ch->name()), ticket);
-    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     Items_For_Sale.remove(ticket);
 
     std::stringstream obj_filename;
@@ -1173,7 +1173,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     {
       if (unlink(obj_filename.str().c_str()) == -1)
       {
-        DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       }
     }
 
@@ -1181,7 +1181,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
   }
   break;
   default:
-    DC::getInstance()->logentry(u"Default case reached in Removeticket, contact a coder!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Default case reached in Removeticket, contact a coder!"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -1193,7 +1193,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
     QString buf;
     dc_sprintf(buf, "Major screw up in auction(cancel)! Ticket %d belonging to %s could not be removed!",
                ticket, qPrintable(Item_it->seller));
-    DC::getInstance()->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1204,7 +1204,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
   {
     if (unlink(obj_filename.str().c_str()) == -1)
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
     }
   }
 
@@ -1316,7 +1316,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
 
   if (options == LIST_MINE)
   {
-    Vault vault = DC::getInstance()->vaults_.has_vault(ch->name());
+    Vault vault = dc_->vaults_.has_vault(ch->name());
     if (vault)
     {
       qint32 max_items = vault.size_ / 100;
@@ -1329,7 +1329,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     qint32 nr = real_object(27909);
     if (nr >= 0)
     {
-      dc_sprintf(buf, "\r\n'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n", qPrintable(((DC::getInstance()->obj_index[nr].item))->short_description()));
+      dc_sprintf(buf, "\r\n'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n", qPrintable(((dc_->obj_index[nr].item))->short_description()));
       output_buf += buf;
     }
     output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";
@@ -1412,13 +1412,13 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     advertise = true;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(ch->name(), DC::getInstance()->obj_index[obj->item_number].vnum()))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(ch->name(), dc_->obj_index[obj->item_number].vnum()))
   {
     ch->send(u"You're selling %1 already and it's unique!\r\n"_s.arg(obj->short_description()));
     return;
   }
 
-  if (obj->short_description() != DC::getInstance()->obj_index[obj->item_number].item->short_description())
+  if (obj->short_description() != dc_->obj_index[obj->item_number].item->short_description())
   {
     ch->sendln("The Consignment broker informs you that he does not handle items that have been restrung.");
     return;
@@ -1453,7 +1453,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
   ItemsActive += 1;
 
   AuctionTicket NewTicket;
-  NewTicket.vitem = DC::getInstance()->obj_index[obj->item_number].vnum();
+  NewTicket.vitem = dc_->obj_index[obj->item_number].vnum();
   NewTicket.price = price;
   NewTicket.state = AUC_FOR_SALE;
   NewTicket.end_time = time(0) + auction_duration;
@@ -1500,7 +1500,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     else
     {
       ch->sendln("The Consignment Broker couldn't auction. Contact an imm.");
-      DC::getInstance()->logentry(u"CharacterPtr Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])"_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+      dc_->logentry(u"CharacterPtr Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])"_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
     }
   }
 
@@ -1513,7 +1513,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
   {
     dc_sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", qPrintable(ch->name()), qPrintable(obj->short_description()), price, qPrintable(NewTicket.buyer));
   }
-  DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+  dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
   // If this is a custom item we need it to continue existing otherwise we remove the clone
   if (fullSave(obj))
@@ -1534,7 +1534,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr obj;
   quint32 price;
 
-  if (!DC::getInstance()->TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
+  if (!dc_->TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
   {
     ch->sendln("You must be in an auction house to do this!");
     return ReturnValue::eFAILURE;
@@ -1573,7 +1573,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("What price do you want it?\r\nSyntax: vend modify <ticket> <new_price>");
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
+    dc_->TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
 
     return ReturnValue::eSUCCESS;
   }
@@ -1595,7 +1595,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("What name do you want to search for?\r\nSyntax: vend search name <keyword>");
         return ReturnValue::eSUCCESS;
       }
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1613,7 +1613,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
                      ch);
         return ReturnValue::eSUCCESS;
       }
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1630,7 +1630,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
                      ch);
         return ReturnValue::eSUCCESS;
       }
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1651,7 +1651,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("Class name needs to be at least 4 letters to search!");
         return ReturnValue::eSUCCESS;
       }
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1667,7 +1667,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
                      ch);
         return ReturnValue::eSUCCESS;
       }
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1685,9 +1685,9 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       level = atoi(buf);
       argument = one_argument(argument, buf);
       if (buf.isEmpty())
-        DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
+        dc_->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
       else
-        DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
+        dc_->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1708,12 +1708,12 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (buf == u"all"_s)
     {
-      DC::getInstance()->TheAuctionHouse.CollectTickets(ch);
+      dc_->TheAuctionHouse.CollectTickets(ch);
       return ReturnValue::eSUCCESS;
     }
     if (atoi(buf) > 0)
     {
-      DC::getInstance()->TheAuctionHouse.CollectTickets(ch, atoi(buf));
+      dc_->TheAuctionHouse.CollectTickets(ch, atoi(buf));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1730,7 +1730,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Buy what?\r\nSyntax: vend buy <ticket #>");
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.BuyItem(ch, atoi(buf));
+    dc_->TheAuctionHouse.BuyItem(ch, atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1745,10 +1745,10 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (buf == u"all"_s) // stupid cancel all didn't fit my design, but the boss wanted it
     {
-      DC::getInstance()->TheAuctionHouse.CancelAll(ch);
+      dc_->TheAuctionHouse.CancelAll(ch);
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.RemoveTicket(ch, atoi(buf));
+    dc_->TheAuctionHouse.RemoveTicket(ch, atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1764,19 +1764,19 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (buf == u"all"_s)
     {
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
     }
     else if (buf == u"mine"_s)
     {
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_MINE, "", 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_MINE, "", 0, 0);
     }
     else if (buf == u"private"_s)
     {
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_PRIVATE, "", 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_PRIVATE, "", 0, 0);
     }
     else if (buf == u"recent"_s)
     {
-      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_RECENT, "", 0, 0);
+      dc_->TheAuctionHouse.ListItems(ch, LIST_RECENT, "", 0, 0);
     }
     else
     {
@@ -1814,7 +1814,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     argument = one_argument(argument, buf); // private name
-    DC::getInstance()->TheAuctionHouse.AddItem(ch, obj, price, buf);
+    dc_->TheAuctionHouse.AddItem(ch, obj, price, buf);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1827,14 +1827,14 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Identify what?\r\nSyntax: vend identify <ticket>");
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.Identify(ch, atoi(buf));
+    dc_->TheAuctionHouse.Identify(ch, atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
   /*SHOW STATS*/
   if (ch->getLevel() >= 104 && buf == u"stats"_s)
   {
-    DC::getInstance()->TheAuctionHouse.ShowStats(ch);
+    dc_->TheAuctionHouse.ShowStats(ch);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1847,7 +1847,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Add what room?\r\nSyntax: vend addroom <vnum>");
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.AddRoom(ch, atoi(buf));
+    dc_->TheAuctionHouse.AddRoom(ch, atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1860,14 +1860,14 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Remove what room?\r\nSyntax: vend removeroom <vnum>");
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.RemoveRoom(ch, atoi(buf));
+    dc_->TheAuctionHouse.RemoveRoom(ch, atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
   /*LIST ROOMS*/
   if (ch->getLevel() >= 104 && buf == u"listrooms"_s)
   {
-    DC::getInstance()->TheAuctionHouse.ListRooms(ch);
+    dc_->TheAuctionHouse.ListRooms(ch);
     return ReturnValue::eSUCCESS;
   }
 

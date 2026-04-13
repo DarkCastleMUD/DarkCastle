@@ -230,7 +230,7 @@ void DC::weather_change(void)
   case 0:
     break;
   case 1:
-    switch (number(1, 3))
+    switch (ch->dc_->number(1, 3))
     {
     case 1:
       send_to_outdoor("A bitter chill sets in as billowing clouds form on the horizon.\r\n");
@@ -246,7 +246,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_CLOUDY;
     break;
   case 2:
-    switch (number(1, 2))
+    switch (ch->dc_->number(1, 2))
     {
     case 1:
       send_to_outdoor("Small circlets dot the ground as a light rain begins.\r\n");
@@ -258,7 +258,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_RAINING;
     break;
   case 3:
-    switch (number(1, 2))
+    switch (ch->dc_->number(1, 2))
     {
     case 1:
       send_to_outdoor("The southern sky slips into view as the clouds fade.\r\n");
@@ -270,7 +270,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_CLOUDLESS;
     break;
   case 4:
-    switch (number(1, 3))
+    switch (ch->dc_->number(1, 3))
     {
     case 1:
       send_to_outdoor("An eerie flash of lightning crackles across the sky.\r\n");
@@ -285,7 +285,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_LIGHTNING;
     break;
   case 5:
-    switch (number(1, 2))
+    switch (ch->dc_->number(1, 2))
     {
     case 1:
       send_to_outdoor("Like a hushed whisper, the pattering rain has lifted.\r\n");
@@ -297,7 +297,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_CLOUDY;
     break;
   case 6:
-    switch (number(1, 2))
+    switch (ch->dc_->number(1, 2))
     {
     case 1:
       send_to_outdoor("A last ominous rumble and the sky's energy is dispelled.\r\n");
@@ -309,7 +309,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_RAINING;
     break;
   case 7:
-    switch (number(1, 2))
+    switch (ch->dc_->number(1, 2))
     {
     case 1:
       send_to_outdoor("The clouds open up and send a torrent of rain to the planet.\r\n");
@@ -321,7 +321,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_HEAVY_RAIN;
     break;
   case 8:
-    switch (number(1, 2))
+    switch (ch->dc_->number(1, 2))
     {
     case 1:
       send_to_outdoor("The rain eases slightly, assailing the ground with less force.\r\n");
@@ -333,7 +333,7 @@ void DC::weather_change(void)
     weather_info.sky = SKY_RAINING;
     break;
   case 9:
-    switch (number(1, 3))
+    switch (ch->dc_->number(1, 3))
     {
     case 1:
       send_to_outdoor("The energy of the clouds increases as lightning bolts rain down.\r\n");

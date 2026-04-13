@@ -28,12 +28,12 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  const auto dc = DC::getInstance();
+  const auto dc = dc_;
   QString buffer, bestow_buffer, test_buffer;
   quint64 column{}, bestow_column{}, test_column = {};
   for (level_ v = level_(101); v <= getLevel(); ++v)
   {
-    for (auto &command : DC::getInstance()->CMD_.commands_)
+    for (auto &command : dc_->CMD_.commands_)
     {
       if (command.getMinimumLevel() == GIFTED_COMMAND && v == getLevel())
       {
@@ -142,7 +142,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     QString arg2 = arguments.at(1);
 
     zone_t zone_key = arg2.toULongLong(&ok);
-    auto &zones = DC::getInstance()->zones;
+    auto &zones = dc_->zones;
     if (ok == false || zones.contains(zone_key) == false)
     {
       if (zones.isEmpty())
@@ -166,15 +166,15 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       loc_nr = zone.getRealBottom();
     }
 
-    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(QString(DC::getInstance()->zones.value(zone_key).name().toStdString()))));
+    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(QString(dc_->zones.value(zone_key).name().toStdString()))));
 
-    if (loc_nr > DC::getInstance()->top_of_world || loc_nr < 0)
+    if (loc_nr > dc_->top_of_world || loc_nr < 0)
     {
       send("No room exists with that number.\r\n");
       return ReturnValue::eFAILURE;
     }
 
-    if (DC::getInstance()->rooms.contains(loc_nr))
+    if (dc_->rooms.contains(loc_nr))
     {
       location = loc_nr;
     }
@@ -182,7 +182,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     {
       if (can_modify_this_room(this, loc_nr))
       {
-        if (DC::getInstance()->create_one_room(this, loc_nr))
+        if (dc_->create_one_room(this, loc_nr))
         {
           sendln("You form order out of chaos.");
           location = loc_nr;
@@ -231,19 +231,19 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      if (loc_nr > DC::getInstance()->top_of_world || loc_nr < 0)
+      if (loc_nr > dc_->top_of_world || loc_nr < 0)
       {
         send("No room exists with that number.\r\n");
         return ReturnValue::eFAILURE;
       }
 
-      if (DC::getInstance()->rooms.contains(loc_nr))
+      if (dc_->rooms.contains(loc_nr))
         location = loc_nr;
       else
       {
         if (can_modify_this_room(this, loc_nr))
         {
-          if (DC::getInstance()->create_one_room(this, loc_nr))
+          if (dc_->create_one_room(this, loc_nr))
           {
             sendln("You form order out of chaos.");
             location = loc_nr;
@@ -264,7 +264,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   }
 
   /* a location has been found. */
-  if (isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) &&
+  if (isSet(dc_->world[location].room_flags, IMP_ONLY) &&
       level_ < OVERSEER)
   {
     send("That room is for implementers only.\r\n");
@@ -272,17 +272,17 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
+  if (isSet(dc_->world[location].room_flags, CLAN_ROOM) &&
       level_ < DEITY)
   {
     send("For your protection, 104-'s may not be in clanhalls.\r\n");
     return ReturnValue::eFAILURE;
   }
 
-  if ((isSet(DC::getInstance()->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
+  if ((isSet(dc_->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
   {
 
-    for (i = 0, pers = DC::getInstance()->world[location].people; pers;
+    for (i = 0, pers = dc_->world[location].people; pers;
          pers = pers->next_in_room, i++)
       ;
     if (i > 1)
@@ -295,7 +295,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   send("\r\n");
 
   if (!this->isNonPlayer())
-    for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = dc_->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
@@ -317,7 +317,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   move_char(this, location);
 
   if (!this->isNonPlayer())
-    for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = dc_->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
@@ -499,14 +499,14 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   /* a location has been found. */
-  if (isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+  if (isSet(dc_->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln("No.");
     return ReturnValue::eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
+  if (isSet(dc_->world[location].room_flags, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
     ch->sendln("For your protection, 104-'s may not be in clanhalls.");
@@ -518,8 +518,8 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 retval = ch->command_interpreter(command);
 
   /* check if the guy's still there */
-  for (target_mob = DC::getInstance()->world[location].people; target_mob; target_mob =
-                                                                               target_mob->next_in_room)
+  for (target_mob = dc_->world[location].people; target_mob; target_mob =
+                                                                 target_mob->next_in_room)
     if (ch == target_mob)
     {
       move_char(ch, original_loc);
@@ -710,7 +710,7 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
     send_to_char(buf1.c_str(), ch);
     ansi_color(NTEXT, ch);
 
-    for (auto &i : DC::getInstance()->connections_)
+    for (auto &i : dc_->connections_)
     {
       if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && i->character->isPlayer())
       {
@@ -733,7 +733,7 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+  for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
   {
     for (qsizetype j = {}; j < zone.cmd.size(); j++)
     {

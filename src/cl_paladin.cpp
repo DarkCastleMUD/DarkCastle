@@ -78,7 +78,7 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     ch->sendln("Your god refuses you.");
     duration = 1;
-    WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2 + number((quint64)1, (quint64)DC::PULSE_VIOLENCE / 2));
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2 + dc_->number((quint64)1, (quint64)DC::PULSE_VIOLENCE / 2));
   }
   else
   {
@@ -87,7 +87,7 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     if (isSet(retval, ReturnValue::eVICT_DIED) && !isSet(retval, ReturnValue::eCH_DIED))
     {
-      if (ch->has_skill(SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
+      if (ch->has_skill(SKILL_HARM_TOUCH) > 30 && dc_->number(1, 3) == 1)
       {
         QString dammsg;
         qint32 amount = ch->getLevel() * 10;
@@ -276,10 +276,10 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 
   // ch->send(u"behead chance: %d, enemy hp%: %f\r\n"_s.arg(chance).arg(enemy_hp));
 
-  if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
+  if ((ch->dc_->number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {
     if ((
-            (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
+            (vict->equipment[WEAR_NECK_1] && dc_->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && dc_->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
         !number(0, 1))
     { // tarrasque's leash..
       act_to_character("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, 0);

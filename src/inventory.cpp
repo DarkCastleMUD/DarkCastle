@@ -68,7 +68,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
     }
   }
 
-  if ((ch->isNonPlayer() || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER)) && DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+  if ((ch->isNonPlayer() || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER)) && dc_->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
   {
     ch->sendln("No champion flag for you, two years!");
     return;
@@ -83,7 +83,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-        logmortal(u"%1 looted %2[%3] from %4"_s.arg(ch->name()).arg(obj_object->short_description()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()));
+        logmortal(u"%1 looted %2[%3] from %4"_s.arg(ch->name()).arg(obj_object->short_description()).arg(dc_->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()));
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
@@ -130,9 +130,9 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
 
     if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
-      logobjects(u"%1 gets %2[%3] from %4[%5]"_s.arg(qPrintable(ch->name())).arg(obj_object->name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()).arg(DC::getInstance()->obj_index[sub_object->item_number].vnum()));
+      logobjects(u"%1 gets %2[%3] from %4[%5]"_s.arg(qPrintable(ch->name())).arg(obj_object->name()).arg(dc_->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()).arg(dc_->obj_index[sub_object->item_number].vnum()));
       for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(u"The %1[%2] contained %3[%4]"_s.arg(obj_object->short_description()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
+        logobjects(u"The %1[%2] contained %3[%4]"_s.arg(obj_object->short_description()).arg(dc_->obj_index[obj_object->item_number].vnum()).arg(loop_obj->short_description).arg(dc_->obj_index[loop_obj->item_number].vnum()));
     }
     move_obj(obj_object, ch);
     if (sub_object->carried_by == ch)
@@ -153,15 +153,15 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
     act_to_room("$n gets $p.", ch, obj_object, 0, INVIS_NULL);
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      logobjects(u"%1 gets %2[%3] from room %4"_s.arg(qPrintable(ch->name())).arg(obj_object->name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(ch->in_room));
+      logobjects(u"%1 gets %2[%3] from room %4"_s.arg(qPrintable(ch->name())).arg(obj_object->name()).arg(dc_->obj_index[obj_object->item_number].vnum()).arg(ch->in_room));
       for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(u"The %1 contained %2[%3]"_s.arg(obj_object->short_description()).arg(loop_obj->short_description()).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
+        logobjects(u"The %1 contained %2[%3]"_s.arg(obj_object->short_description()).arg(loop_obj->short_description()).arg(dc_->obj_index[loop_obj->item_number].vnum()));
     }
 
-    if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+    if (dc_->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
     {
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      buffer = u"\r\n##%1 has just picked up %2!\r\n"_s.arg(qPrintable(ch->name())).arg(static_cast<ObjectPtr>(DC::getInstance()->obj_index[obj_object->item_number].item)->short_description());
+      buffer = u"\r\n##%1 has just picked up %2!\r\n"_s.arg(qPrintable(ch->name())).arg(static_cast<ObjectPtr>(dc_->obj_index[obj_object->item_number].item)->short_description());
       send_info(buffer);
     }
   }
@@ -182,20 +182,20 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
     }
     bool tax = false;
 
-    if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
-                                                                                                        DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
+    if (dc_->zones.value(dc_->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
+                                                                            dc_->zones.value(dc_->world[ch->in_room].zone).clanowner)
     {
       qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
+      dc_->zones.value(dc_->world[ch->in_room].zone).addGold(cgold);
       if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer += u"Bounty: %2"_s.arg(cgold);
-        DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
+        dc_->zones.value(dc_->world[ch->in_room].zone).addGold(cgold);
       }
       else
-        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s.arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
+        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s.arg(get_clan(dc_->zones.value(dc_->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
     //           !isexact("pc",sub_object->name()) && ch->clan
@@ -379,7 +379,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     sub_object = {};
     found = false;
     fail = false;
-    for (obj_object = DC::getInstance()->world[ch->in_room].contents;
+    for (obj_object = dc_->world[ch->in_room].contents;
          obj_object;
          obj_object = next_obj)
     {
@@ -503,7 +503,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     found = false;
     fail = false;
     obj_object = get_obj_in_list_vis(ch, arg1,
-                                     DC::getInstance()->world[ch->in_room].contents);
+                                     dc_->world[ch->in_room].contents);
     if (obj_object)
     {
       if (obj_object->obj_flags.type_flag == ITEM_CONTAINER &&
@@ -601,7 +601,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     found = false;
     fail = false;
     sub_object = get_obj_in_list_vis(ch, arg2,
-                                     DC::getInstance()->world[ch->in_room].contents);
+                                     dc_->world[ch->in_room].contents);
     if (!sub_object)
     {
       sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
@@ -771,7 +771,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     found = false;
     fail = false;
     sub_object = get_obj_in_list_vis(ch, arg2,
-                                     DC::getInstance()->world[ch->in_room].contents);
+                                     dc_->world[ch->in_room].contents);
     if (!sub_object)
     {
       if (cmd == cmd_t::LOOT)
@@ -794,7 +794,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->name()) && !isexact(qPrintable(ch->name()), sub_object->name()))) || isexact(buffer, sub_object->name()))
           has_consent = true;
-        if (!isexact(qPrintable(ch->name()), sub_object->name()) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
+        if (!isexact(qPrintable(ch->name()), sub_object->name()) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(dc_->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
           has_consent = true;
         if (!has_consent && !isexact(qPrintable(ch->name()), sub_object->name()))
         {
@@ -860,10 +860,10 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
                   dc_sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
                              qPrintable(ch->name()),
                              obj_object->short_description,
-                             DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+                             dc_->obj_index[obj_object->item_number].vnum(),
                              qPrintable(sub_object->name()),
-                             DC::getInstance()->obj_index[sub_object->item_number].vnum());
-                  DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+                             dc_->obj_index[sub_object->item_number].vnum());
+                  dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
                   fail = true;
@@ -988,7 +988,7 @@ command_return_t do_consent(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
+  for (obj = dc_->object_list; obj; obj = obj->next)
   {
     if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || obj->name().isEmpty())
       continue;
@@ -1062,7 +1062,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
 
   alldot[0] = '\0';
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1155,13 +1155,13 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             QString log_buf = {};
-            dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
-            DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+            dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, dc_->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                                      tmp_object->short_description,
-                                      loop_obj->short_description,
-                                      DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+              dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+                        tmp_object->short_description,
+                        loop_obj->short_description,
+                        dc_->obj_index[loop_obj->item_number].vnum());
           }
 
           act_to_room("$n drops $p.", ch, tmp_object, 0, INVIS_NULL);
@@ -1223,13 +1223,13 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             QString log_buf = {};
-            dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
-            DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+            dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, dc_->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                                      tmp_object->short_description,
-                                      loop_obj->short_description,
-                                      DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+              dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+                        tmp_object->short_description,
+                        loop_obj->short_description,
+                        dc_->obj_index[loop_obj->item_number].vnum());
           }
 
           move_obj(tmp_object, ch->in_room);
@@ -1302,7 +1302,7 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 bits;
   QString allbuf;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1314,7 +1314,7 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (*arg2)
     {
-      if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, DC::getInstance()->world[ch->in_room].contents)))
+      if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, dc_->world[ch->in_room].contents)))
       {
         dc_sprintf(buffer, "You don't have a %s.\r\n", arg2);
         ch->send(buffer);
@@ -1345,7 +1345,7 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
           else
             ch->sendln("(This item is cursed, BTW.)");
         }
-        if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+        if (dc_->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
         {
           ch->sendln("You must display this flag for all to see!");
           return ReturnValue::eFAILURE;
@@ -1431,14 +1431,14 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
               if (((sub_object->obj_flags.weight) +
                    (obj_object->obj_flags.weight)) <=
                       (sub_object->obj_flags.value[0]) &&
-                  (DC::getInstance()->obj_index[sub_object->item_number].vnum() != 536 ||
+                  (dc_->obj_index[sub_object->item_number].vnum() != 536 ||
                    weight_in(sub_object) + obj_object->obj_flags.weight <= 200))
               {
                 if (bits == FIND_OBJ_INV)
                 {
                   obj_from_char(obj_object);
                   /* make up for above line */
-                  if (DC::getInstance()->obj_index[sub_object->item_number].vnum() != 536)
+                  if (dc_->obj_index[sub_object->item_number].vnum() != 536)
                     IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj_object);
                   obj_to_obj(obj_object, sub_object);
                 }
@@ -1451,23 +1451,23 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
                 {
                   act_to_room("$n attaches $p to $P.", ch, obj_object, sub_object, INVIS_NULL);
                   act_to_character("You attach $p to $P.", ch, obj_object, sub_object, 0);
-                  DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
-                                          qPrintable(ch->name()),
-                                          obj_object->short_description,
-                                          DC::getInstance()->obj_index[obj_object->item_number].vnum(),
-                                          sub_object->short_description,
-                                          DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                  dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+                            qPrintable(ch->name()),
+                            obj_object->short_description,
+                            dc_->obj_index[obj_object->item_number].vnum(),
+                            sub_object->short_description,
+                            dc_->obj_index[sub_object->item_number].vnum());
                 }
                 else
                 {
                   act_to_room("$n puts $p in $P.", ch, obj_object, sub_object, INVIS_NULL);
                   act_to_character("You put $p in $P.", ch, obj_object, sub_object, 0);
-                  DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
-                                          qPrintable(ch->name()),
-                                          obj_object->short_description,
-                                          DC::getInstance()->obj_index[obj_object->item_number].vnum(),
-                                          sub_object->short_description,
-                                          DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                  dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+                            qPrintable(ch->name()),
+                            obj_object->short_description,
+                            dc_->obj_index[obj_object->item_number].vnum(),
+                            sub_object->short_description,
+                            dc_->obj_index[sub_object->item_number].vnum());
                 }
 
                 return ReturnValue::eSUCCESS;
@@ -1541,12 +1541,12 @@ command_return_t Character::do_givealldot(QString name, QString target, cmd_t cm
 
 command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 {
-  auto &arena = DC::getInstance()->arena_;
+  auto &arena = dc_->arena_;
   command_return_t retval = {};
   CharacterPtr vict = {};
   ObjectPtr obj = {};
 
-  if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
+  if (isSet(dc_->world[in_room].room_flags, QUIET))
   {
     sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -1770,7 +1770,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if (vict->isNonPlayer() && (DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == QUEST_MASTER))
+  if (vict->isNonPlayer() && (dc_->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || dc_->mob_index[vict->mobdata->nr].vnum() == QUEST_MASTER))
   {
     act_to_character("$N graciously refuses your gift.", this, 0, vict, 0);
     return ReturnValue::eFAILURE;
@@ -1796,9 +1796,9 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      auto &arena = DC::getInstance()->arena_;
+      auto &arena = dc_->arena_;
       if (in_room == -1 ||
-          in_room > DC::getInstance()->top_of_world ||
+          in_room > dc_->top_of_world ||
           obj_name != u"potato"_s ||
           !room().isArena() ||
           !vict->room().isArena() ||
@@ -1819,9 +1819,9 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      auto &arena = DC::getInstance()->arena_;
+      auto &arena = dc_->arena_;
       if (in_room == -1 ||
-          in_room > DC::getInstance()->top_of_world ||
+          in_room > dc_->top_of_world ||
           obj_name != u"potato"_s ||
           !room().isArena() ||
           !vict->room().isArena() ||
@@ -1856,14 +1856,14 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   logobjects(u"%1 gives %2 to %3"_s.arg(qPrintable(this->name())).arg(obj->name()).arg(qPrintable(vict->name())));
   for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-    DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
-                            qPrintable(obj->short_description()),
-                            DC::getInstance()->obj_index[obj->item_number].vnum(),
-                            loop_obj->short_description,
-                            DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+              qPrintable(obj->short_description()),
+              dc_->obj_index[obj->item_number].vnum(),
+              loop_obj->short_description,
+              dc_->obj_index[loop_obj->item_number].vnum());
 
-  if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) && vict->isMortalPlayer() &&
-      vict->room().isArena() && arena.isPotato() && DC::getInstance()->obj_index[obj->item_number].vnum() == 393)
+  if ((vict->in_room >= 0 && vict->in_room <= dc_->top_of_world) && vict->isMortalPlayer() &&
+      vict->room().isArena() && arena.isPotato() && dc_->obj_index[obj->item_number].vnum() == 393)
   {
     vict->sendln("Here, have some for some potato lag!!");
     WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
@@ -2050,7 +2050,7 @@ bool search_container_for_vnum(ObjectPtr obj, qint32 vnum)
 
   for (ObjectPtr i = obj->contains; i; i = i->next_content)
   {
-    if (DC::getInstance()->obj_index[i->item_number].vnum() == vnum)
+    if (dc_->obj_index[i->item_number].vnum() == vnum)
     {
       return true;
     }
@@ -2130,7 +2130,7 @@ bool is_bracing(CharacterPtr bracee, room_direction_data *exit)
     return false;
 
   for (qint32 i = {}; i < 6; i++)
-    if (DC::getInstance()->world[bracee->in_room].dir_option[i] == exit)
+    if (dc_->world[bracee->in_room].dir_option[i] == exit)
       return true;
 
   if (bracee->in_room == exit->to_room)
@@ -2225,11 +2225,11 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
 
       /* now for opening the OTHER side of the door! */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             REMOVE_BIT(back->exit_info, EX_CLOSED);
-            if ((back->keyword) && !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
+            if ((back->keyword) && !isSet(dc_->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               dc_sprintf(buf, "The %s is opened from the other side.\r\n", qPrintable(fname(back->keyword)));
               send_to_room(buf, EXIT(ch, door)->to_room, true);
@@ -2239,17 +2239,17 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
                            EXIT(ch, door)->to_room, true);
           }
 
-      if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
-          (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
-          (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
-          (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
-          (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
-          (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
+      if ((isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
+          (isSet(dc_->world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
+          (isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
+          (isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
+          (isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
+          (isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
       {
         qint32 success = {};
 
         // opened the door that kept them from falling out
-        for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
+        for (victim = dc_->world[ch->in_room].people; victim; victim = next_vict)
         {
           next_vict = victim->next_in_room;
           if (victim->isNonPlayer() || IS_AFFECTED(victim, AFF_FLYING))
@@ -2333,12 +2333,12 @@ command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Ok.");
       /* now for closing the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             SET_BIT(back->exit_info, EX_CLOSED);
             if ((back->keyword) &&
-                !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
+                !isSet(dc_->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               dc_sprintf(buf, "The %s closes quietly.\r\n", qPrintable(fname(back->keyword)));
               send_to_room(buf, EXIT(ch, door)->to_room, true);
@@ -2385,7 +2385,7 @@ bool has_key(CharacterPtr ch, qint32 key)
   ObjectPtr obj = ch->equipment[WEAR_HOLD];
   if (obj && IS_KEY(obj))
   {
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == key)
+    if (dc_->obj_index[obj->item_number].vnum() == key)
     {
       return true;
     }
@@ -2393,7 +2393,7 @@ bool has_key(CharacterPtr ch, qint32 key)
 
   for (obj = ch->carrying; obj; obj = obj->next_content)
   {
-    if (IS_KEY(obj) && DC::getInstance()->obj_index[obj->item_number].vnum() == key)
+    if (IS_KEY(obj) && dc_->obj_index[obj->item_number].vnum() == key)
     {
       return true;
     }
@@ -2470,7 +2470,7 @@ command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("*Click*");
       /* now for locking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
             SET_BIT(back->exit_info, EX_LOCKED);
     }
@@ -2543,7 +2543,7 @@ command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("*click*");
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
             REMOVE_BIT(back->exit_info, EX_LOCKED);
 
@@ -2592,13 +2592,13 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
   if (!charge_moves(ch, SKILL_PALM))
     return ReturnValue::eSUCCESS;
 
-  if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+  if (dc_->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
   {
     if (ch->isNonPlayer() || ch->getLevel() <= 5)
       return ReturnValue::eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
 
-    ObjectPtr o = static_cast<ObjectPtr>(DC::getInstance()->obj_index[obj_object->item_number].item);
+    ObjectPtr o = static_cast<ObjectPtr>(dc_->obj_index[obj_object->item_number].item);
 
     if (o && o->short_description)
       send_info(u"\r\n##%1 has just picked up %2!\r\n"_s.arg(qPrintable(ch->name())).arg(o->short_description()));
@@ -2662,21 +2662,21 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
   QString log_buf = {};
   if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
-    //"%s palms %s[%d] from %s", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->name()));
+    //"%s palms %s[%d] from %s", qPrintable(ch->name()), obj_object->name(), dc_->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->name()));
 
-    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-                              DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+      dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                dc_->obj_index[loop_obj->item_number].vnum());
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
-    dc_sprintf(log_buf, "%s palms %s[%d] from room %d", qPrintable(ch->name()), obj_object->name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+    dc_sprintf(log_buf, "%s palms %s[%d] from room %d", qPrintable(ch->name()), obj_object->name(), dc_->obj_index[obj_object->item_number].vnum(),
                ch->in_room);
-    DC::getInstance()->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+    dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-                              DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+      dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                dc_->obj_index[loop_obj->item_number].vnum());
   }
 
   if (skill_success(ch, nullptr, SKILL_PALM))
@@ -2702,13 +2702,13 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
     dc_sprintf(buffer, "There was %d coins.\r\n",
                obj_object->obj_flags.value[0]);
     ch->send(buffer);
-    if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
-                                                                                                        DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
+    if (dc_->zones.value(dc_->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
+                                                                            dc_->zones.value(dc_->world[ch->in_room].zone).clanowner)
     {
       qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s.arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
-      DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
+      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s.arg(get_clan(dc_->zones.value(dc_->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
+      dc_->zones.value(dc_->world[ch->in_room].zone).addGold(cgold);
     }
 
     ch->addGold(obj_object->obj_flags.value[0]);

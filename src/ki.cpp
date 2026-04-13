@@ -104,7 +104,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   /*
-   if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (ch->getLevel() < IMPLEMENTER)) {
+   if ((isSet(dc_->world[ch->in_room].room_flags, SAFE)) && (ch->getLevel() < IMPLEMENTER)) {
    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
    "the universe.\r\n", ch);
    return ReturnValue::eFAILURE;
@@ -127,7 +127,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (ch->getLevel() < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE) && (ch->getLevel() < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
     ch->sendln(u"You feel at peace, calm, relaxed, one with yourself and the universe."_s));
     return ReturnValue::eFAILURE;
@@ -237,13 +237,13 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!tar_char)
       {
-        DC::getInstance()->logentry(u"Dammit Morc, fix that null tar_char thing in ki"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
+        dc_->logentry(u"Dammit Morc, fix that null tar_char thing in ki"_s, IMPLEMENTER, DC::LogChannel::LOG_BUG);
         send_to_char("If you triggered this message, you almost crashed the\r\ngame.  Tell a god what you did immediately.\r\n", ch);
         return ReturnValue::eFAILURE;
       }
 
     /* crasher right here */
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
+    if (isSet(dc_->world[ch->in_room].room_flags, NO_KI))
     {
       ch->sendln("You find yourself unable to focus your energy here.");
       return ReturnValue::eFAILURE;
@@ -265,7 +265,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Sorry, this power has not yet been implemented.");
     else
     {
-      if (!skill_success(ch, tar_char, spl + KI_OFFSET) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+      if (!skill_success(ch, tar_char, spl + KI_OFFSET) && !isSet(dc_->world[ch->in_room].room_flags, SAFE))
       {
         ch->sendln("You lost your concentration!");
         GET_KI(ch) -= use_ki(ch, spl) / 2;
@@ -291,7 +291,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 
       /* Imps ignore safe flags  */
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
-        if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
+        if (isSet(dc_->world[ch->in_room].room_flags, SAFE) && ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
         {
           tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
         }
@@ -342,7 +342,7 @@ qint32 Character::ki_gain_lookup(void)
 
   gain += age().year / 25;
 
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+  if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
     gain = (qint32)(gain * 1.25);
 
   qint32 multiplyer = 1;
@@ -369,14 +369,14 @@ qint32 Character::ki_gain_lookup(void)
 qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   qint32 success = {};
-  qint32 exit = number(0, 5); /* Chooses an exit */
+  qint32 exit = dc_->number(0, 5); /* Chooses an exit */
 
   extern QStringList dirswards;
   QString buf;
 
   if (!vict)
   {
-    DC::getInstance()->logentry(u"Serious problem in ki blast!"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Serious problem in ki blast!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -391,7 +391,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   else
     success -= 20; /* more than 300 pounds?! */
 
-  if (number(1, 101) > success || vict->affected_by_spell(SPELL_IRON_ROOTS)) /* 101 is complete failure */
+  if (ch->dc_->number(1, 101) > success || vict->affected_by_spell(SPELL_IRON_ROOTS)) /* 101 is complete failure */
   {
     act_to_room("$n fails to blast $N!", ch, 0, vict, NOTVICT);
     act_to_character("You fail to blast $N!", ch, 0, vict, 0);
@@ -402,8 +402,8 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   }
 
   if (CAN_GO(vict, exit) &&
-      !isSet(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
-      !isSet(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK) &&
+      !isSet(dc_->world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
+      !isSet(dc_->world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK) &&
       (!IS_AFFECTED(vict, AFF_CHAMPION) || champion_can_go(EXIT(vict, exit)->to_room)) &&
       class_can_go(GET_CLASS(vict), EXIT(vict, exit)->to_room))
   {
@@ -422,13 +422,13 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
         remove_memory(vict, 'f');
       }
       CharacterPtr tmp;
-      for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+      for (tmp = dc_->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
         if (tmp->fighting == vict)
           stop_fighting(tmp);
       stop_fighting(vict);
     }
 
-    move_char(vict, (DC::getInstance()->world[(ch)->in_room].dir_option[exit])->to_room);
+    move_char(vict, (dc_->world[(ch)->in_room].dir_option[exit])->to_room);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
     return ReturnValue::eSUCCESS;
@@ -454,12 +454,12 @@ qint32 ki_punch(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   if (!vict)
   {
-    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
   set_cantquit(ch, vict);
-  auto dam = number(500, 700);
+  auto dam = dc_->number(500, 700);
   auto manadam = GET_MANA(vict) / 4;
   qint32 retval = ReturnValue::eFAILURE;
 
@@ -468,7 +468,7 @@ qint32 ki_punch(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   if (vict->getHP() < 500000)
   {
     auto success_chance = (ch->getLevel() / 5) + (ch->has_skill(KI_OFFSET + KI_PUNCH) * 0.75) - (vict->getLevel() / 5);
-    if (number(1, 101) < success_chance)
+    if (ch->dc_->number(1, 101) < success_chance)
 
     {
       GET_MANA(vict) -= manadam;
@@ -521,11 +521,11 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   qint32 retval;
   CharacterPtr tmp_victim, temp;
 
-  dam = number(135, 165);
+  dam = dc_->number(135, 165);
   //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
   //  act("$n's eyes flash as $e pools the energy within $m!\r\nA burst of energy slams into you!\r\n",
   qint32 room = ch->in_room;
-  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
+  for (tmp_victim = dc_->world[ch->in_room].people; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
@@ -537,10 +537,10 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
         return retval;
       act_to_room("A burst of energy slams into you!", ch, 0, 0, 0);
     } // else
-    //		if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
+    //		if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
     //	tmp_victim->sendln("A crackle of energy echos past you.");
   }
-  qint32 dir = number(0, 5), distance = number(1, 3), i;
+  qint32 dir = dc_->number(0, 5), distance = dc_->number(1, 3), i;
   if (room > 0)
     for (i = {}; i < distance; i++)
     {
@@ -549,10 +549,10 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       room = EXIT_TO(room, dir);
       if (room == DC::NOWHERE)
         break;
-      for (tmp_victim = DC::getInstance()->world[room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room)
+      for (tmp_victim = dc_->world[room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room)
         tmp_victim->sendln("A crackle of energy echoes past you.");
     }
-  if (number(1, 4) == 4 && !ch->fighting)
+  if (ch->dc_->number(1, 4) == 4 && !ch->fighting)
   {
     QString dammsg;
     dc_sprintf(dammsg, "$B%d$R", dam);
@@ -571,7 +571,7 @@ qint32 ki_speed(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   if (!vict)
   {
-    DC::getInstance()->logentry(u"Null victim sent to ki speed"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Null victim sent to ki speed"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -602,7 +602,7 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 {
   if (!vict)
   {
-    DC::getInstance()->logentry(u"Null victim sent to ki purify"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Null victim sent to ki purify"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
   if (!arg)
@@ -665,7 +665,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
 {
   if (!victim)
   {
-    DC::getInstance()->logentry(u"Serious problem in ki disrupt!"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Serious problem in ki disrupt!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -697,7 +697,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
       success_chance = 1;
     }
 
-    if (success_chance >= number(1, 100))
+    if (success_chance >= dc_->number(1, 100))
     {
       disrupt_bingo = true;
     }
@@ -772,7 +772,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
 
   qint32 retval = {};
 
-  if (number(1, 100) <= get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != ch->getLevel() - 1)
+  if (ch->dc_->number(1, 100) <= get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != ch->getLevel() - 1)
   {
     // We've failed this time, so we'll make it easier for next time
     if (af)
@@ -965,7 +965,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
   }
 
   // Pick the lucky spell/affect to be removed
-  quint64 i = number((quint64)0, (quint64)aff_list.size() - 1);
+  quint64 i = dc_->number((quint64)0, (quint64)aff_list.size() - 1);
 
   try
   {
@@ -1073,7 +1073,7 @@ qint32 ki_stance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   ch->sendln("You take a defensive stance and try to aborb the energies seeking to harm you.");
 
   // chance of failure - can be meta'd past that point though
-  if (number(1, 100) > (GET_DEX(ch) * 4))
+  if (ch->dc_->number(1, 100) > (GET_DEX(ch) * 4))
   {
     ch->sendln("You accidently stub your toe and fall out of the defenseive stance.");
     return ReturnValue::eSUCCESS;
@@ -1115,7 +1115,7 @@ qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   chance = 75;
 
   // 101% is a complete failure
-  percent = number(1, 101);
+  percent = dc_->number(1, 101);
   if (percent > chance)
   {
     ch->sendln("Hopefully none of them noticed you trip on that rock.");
@@ -1126,7 +1126,7 @@ qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
     ch->sendln("You instruct your party on more graceful movement.");
     act_to_room("$n holds a quick tai chi class.", ch, 0, 0, 0);
 
-    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1215,7 +1215,7 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
   if (type[0] == 'k')
   {
     GET_KI(ch) -= amount;
-    temp = number(amount - amount / 10, amount + amount / 10); //+-10%
+    temp = dc_->number(amount - amount / 10, amount + amount / 10); //+-10%
     temp = (temp * learned) / 100;
     GET_KI(victim) += temp;
     if (GET_KI(victim) > GET_MAX_KI(victim))

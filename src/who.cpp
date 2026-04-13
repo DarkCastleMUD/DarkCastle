@@ -38,7 +38,7 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   QString tempbuffer;
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &d : dc_->connections_)
   {
     foundtarget = {};
 
@@ -142,7 +142,7 @@ command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
   bool foundtarget{};
   CharacterPtr i{};
   QString tempbuffer;
-  for (auto d = DC::getInstance()->connections_; d; d = conn->next)
+  for (auto d = dc_->connections_; d; d = conn->next)
   {
     foundtarget = false;
 
@@ -285,7 +285,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   QString buf;
   QString immbuf;
   bool hasholylight = this->isNonPlayer() ? false : player->holyLite;
-  for (auto d = DC::getInstance()->connections_; d; d = conn->next)
+  for (auto d = dc_->connections_; d; d = conn->next)
   {
     QString infoBuf;
     QString extraBuf;
@@ -507,12 +507,12 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->getLevel() <= MORTAL)
   {
-    const auto &character_list = DC::getInstance()->character_list;
+    const auto &character_list = dc_->character_list;
     for (const auto &tmp : character_list)
     {
       if (CAN_SEE(ch, tmp))
       {
-        if (tmp->room().isArena() && !isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
+        if (tmp->room().isArena() && !isSet(dc_->world[tmp->in_room].room_flags, NO_WHERE))
         {
           if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
             ch->send(u"%-20s - [%s$R]\r\n"_s.arg(qPrintable(tmp->name())).arg(qPrintable(clan->name())));
@@ -530,7 +530,7 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // If they're here that means they're a god
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &tmp : character_list)
   {
     if (CAN_SEE(ch, tmp))
@@ -562,17 +562,17 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->isImmortalPlayer() && *buf && buf == u"all"_s)
   { //  immortal noly, shows all
     ch->sendln("All Players:\r\n--------");
-    for (auto &d : DC::getInstance()->connections_)
+    for (auto &d : dc_->connections_)
     {
       if (conn->character && (conn->connected == Connection::states::PLAYING) && (CAN_SEE(ch, conn->character)) && (conn->character->in_room != DC::NOWHERE))
       {
         if (conn->original)
         { // If switched
-          ch->send(u"%-20s - %s$R [%d] In body of %s\r\n"_s.arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
+          ch->send(u"%-20s - %s$R [%d] In body of %s\r\n"_s.arg(qPrintable(conn->original->name())).arg(dc_->world[conn->character->in_room].name).arg(dc_->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
         }
         else
         {
-          ch->send(u"%-20s - %s$R [%d]\r\n"_s.arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
+          ch->send(u"%-20s - %s$R [%d]\r\n"_s.arg(qPrintable(conn->character->name())).arg(dc_->world[conn->character->in_room].name).arg(dc_->world[conn->character->in_room].number));
         }
       }
     } // for
@@ -580,7 +580,7 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (ch->isImmortalPlayer() && *buf)
   { // immortal only, shows ONE person
     ch->sendln("Search of Players:\r\n--------");
-    for (auto &d : DC::getInstance()->connections_)
+    for (auto &d : dc_->connections_)
     {
       if (conn->character && (conn->connected == Connection::states::PLAYING) && (CAN_SEE(ch, conn->character)) && (conn->character->in_room != DC::NOWHERE))
       {
@@ -588,14 +588,14 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
         { // If switched
           if (is_abbrev(buf, conn->original->name()))
           {
-            ch->send(u"%-20s - %s$R [%d] In body of %s\r\n"_s.arg(qPrintable(conn->original->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
+            ch->send(u"%-20s - %s$R [%d] In body of %s\r\n"_s.arg(qPrintable(conn->original->name())).arg(dc_->world[conn->character->in_room].name).arg(dc_->world[conn->character->in_room].number).arg(qPrintable(fname(conn->character->name()))));
           }
         }
         else
         {
           if (is_abbrev(buf, qPrintable(conn->character->name())))
           {
-            ch->send(u"%-20s - %s$R [%d]\r\n"_s.arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name).arg(DC::getInstance()->world[conn->character->in_room].number));
+            ch->send(u"%-20s - %s$R [%d]\r\n"_s.arg(qPrintable(conn->character->name())).arg(dc_->world[conn->character->in_room].name).arg(dc_->world[conn->character->in_room].number));
           }
         }
       }
@@ -603,22 +603,22 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   { // normal, mortal where
-    zonenumber = DC::getInstance()->world[ch->in_room].zone;
+    zonenumber = dc_->world[ch->in_room].zone;
     ch->sendln("Players in your vicinity:\r\n-------------------------");
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_WHERE))
+    if (isSet(dc_->world[ch->in_room].room_flags, NO_WHERE))
       return ReturnValue::eFAILURE;
-    for (auto &d : DC::getInstance()->connections_)
+    for (auto &d : dc_->connections_)
     {
       /*Don't show snooped mobs*/
       if (conn->character &&
           (conn->connected == Connection::states::PLAYING) &&
           (conn->character->in_room != DC::NOWHERE) &&
-          !isSet(DC::getInstance()->world[conn->character->in_room].room_flags, NO_WHERE) &&
+          !isSet(dc_->world[conn->character->in_room].room_flags, NO_WHERE) &&
           CAN_SEE(ch, conn->character) &&
           !conn->character->isNonPlayer())
       {
-        if (DC::getInstance()->world[conn->character->in_room].zone == zonenumber)
-          ch->send(u"%-20s - %s$R\r\n"_s.arg(qPrintable(conn->character->name())).arg(DC::getInstance()->world[conn->character->in_room].name));
+        if (dc_->world[conn->character->in_room].zone == zonenumber)
+          ch->send(u"%-20s - %s$R\r\n"_s.arg(qPrintable(conn->character->name())).arg(dc_->world[conn->character->in_room].name));
       }
     }
   }

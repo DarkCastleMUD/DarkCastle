@@ -50,7 +50,7 @@ qint32 call_for_help_in_room(CharacterPtr ch, qint32 iFriendId)
     return false;
 
   // Any friends in the room?  Call for help!   qint32 friends = {};
-  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (ally = dc_->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -95,7 +95,7 @@ qint32 protect(CharacterPtr ch, qint32 iFriendId)
     return ReturnValue::eFAILURE;
 
   // Any one I need to protect in the room?
-  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (ally = dc_->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -147,7 +147,7 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
   qint32 count = {};
 
   // Count the number of players in room
-  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
       count++;
 
@@ -155,10 +155,10 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
     return {};
 
   // Pick a random one
-  count = number(1, count);
+  count = dc_->number(1, count);
 
   // Find the "count" player and return them
-  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
     {
       if (count > 1)
@@ -180,7 +180,7 @@ void damage_all_players_in_room(CharacterPtr ch, qint32 damage)
   CharacterPtr next_vict = {};
   void inform_victim(CharacterPtr ch, CharacterPtr vict, qint32 dam);
 
-  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_vict)
+  for (vict = dc_->world[ch->in_room].people; vict; vict = next_vict)
   {
     // we need this here in case fight_kill moves our victim
     next_vict = vict->next_in_room;
@@ -211,7 +211,7 @@ void summon_all_of_mob_to_room(CharacterPtr ch, qint32 iFriendId)
   if (!ch)
     return;
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &victim : character_list)
   {
     if (!victim->isNonPlayer())
@@ -235,7 +235,7 @@ CharacterPtr find_mob_in_room(CharacterPtr ch, qint32 iFriendId)
     return {};
 
   // Is my friend in the room?
-  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (ally = dc_->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -270,7 +270,7 @@ qint32 sc_golem(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       cast_cure_critic};
   if (!(owner = ch->master) || !(ch->master->has_skill(SKILL_SPELLCRAFT) > 80))
     return ReturnValue::eFAILURE;
-  qint32 i = number(0, 4);
+  qint32 i = dc_->number(0, 4);
   SPELL_FUN *func = iron ? iron_list[i] : stone_list[i];
 
   if (i == 4)
@@ -316,7 +316,7 @@ qint32 fighter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       wielded = vict->equipment[WEAR_WIELD];
       if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
           (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
-        if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
+        if (vict == ch->fighting && ch->getLevel() > 9 && dc_->number(0, 2) == 0)
         {
           MOB_WAIT_STATE(ch) = 2;
           disarm(ch, vict);
@@ -324,12 +324,12 @@ qint32 fighter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
         }
     }
 
-  if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 3 && dc_->number(0, 2) == 0)
   {
     MOB_WAIT_STATE(ch) = 3;
     return do_bash(ch, u""_s, cmd_t::DEFAULT);
   }
-  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 2 && dc_->number(0, 1) == 0)
   {
     MOB_WAIT_STATE(ch) = 2;
     return ch->do_kick();
@@ -354,7 +354,7 @@ qint32 active_tarrasque(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
     return ReturnValue::eFAILURE;
 
   if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (ch->getLevel() > 30 && number(0, 2) == 0)
+    if (ch->getLevel() > 30 && dc_->number(0, 2) == 0)
     {
       if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
           (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
@@ -366,13 +366,13 @@ qint32 active_tarrasque(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
       }
     }
 
-  if (ch->getLevel() > 40 && number(0, 2) == 0)
+  if (ch->getLevel() > 40 && dc_->number(0, 2) == 0)
   {
     act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
-  if (ch->getLevel() > 40 && number(0, 1) == 0)
+  if (ch->getLevel() > 40 && dc_->number(0, 1) == 0)
   {
     act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
@@ -398,7 +398,7 @@ qint32 active_grandmaster(CharacterPtr ch, ObjectPtr obj, cmd_t command, const Q
     return ReturnValue::eFAILURE;
 
   if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (ch->getLevel() > 30 && number(0, 4) == 0)
+    if (ch->getLevel() > 30 && dc_->number(0, 4) == 0)
     {
       if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
           (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
@@ -411,20 +411,20 @@ qint32 active_grandmaster(CharacterPtr ch, ObjectPtr obj, cmd_t command, const Q
       }
     }
 
-  if (ch->getLevel() > 40 && number(0, 2) == 0)
+  if (ch->getLevel() > 40 && dc_->number(0, 2) == 0)
   {
     act("$n utters the words 'Burn them suckers'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
-  if (ch->getLevel() > 40 && number(0, 2) == 0)
+  if (ch->getLevel() > 40 && dc_->number(0, 2) == 0)
   {
     act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
   if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (ch->getLevel() > 40 && number(0, 1) == 0)
+    if (ch->getLevel() > 40 && dc_->number(0, 1) == 0)
     {
       act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
@@ -468,7 +468,7 @@ qint32 frosty(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  x = number((quint64)0, (quint64)FROSTY_YELL_TEXT_SIZE * 60);
+  x = dc_->number((quint64)0, (quint64)FROSTY_YELL_TEXT_SIZE * 60);
 
   if ((quint32)x < FROSTY_YELL_TEXT_SIZE)
   {
@@ -528,7 +528,7 @@ qint32 poet(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  x = number((quint64)0, (quint64)POET_SAY_TEXT_SIZE * 10);
+  x = dc_->number((quint64)0, (quint64)POET_SAY_TEXT_SIZE * 10);
 
   if ((quint32)x < POET_SAY_TEXT_SIZE)
   {
@@ -536,7 +536,7 @@ qint32 poet(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  x = number((quint64)0, (quint64)POET_EMOTE_TEXT_SIZE * 30);
+  x = dc_->number((quint64)0, (quint64)POET_EMOTE_TEXT_SIZE * 30);
 
   if ((quint32)x < POET_EMOTE_TEXT_SIZE)
   {
@@ -563,7 +563,7 @@ qint32 stcrew(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  x = number((quint64)0, (quint64)STCREW_EMOTE_TEXT_SIZE * 20);
+  x = dc_->number((quint64)0, (quint64)STCREW_EMOTE_TEXT_SIZE * 20);
 
   if ((quint32)x < STCREW_EMOTE_TEXT_SIZE)
   {
@@ -590,7 +590,7 @@ qint32 stofficer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  x = number((quint64)0, (quint64)OFFICER_EMOTE_TEXT_SIZE * 20);
+  x = dc_->number((quint64)0, (quint64)OFFICER_EMOTE_TEXT_SIZE * 20);
 
   if ((quint32)x < OFFICER_EMOTE_TEXT_SIZE)
   {
@@ -614,13 +614,13 @@ qint32 backstabber(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   if (ch->fighting)
   {
 
-    if (number(0, 6) == 0)
+    if (ch->dc_->number(0, 6) == 0)
       do_flee(ch, "");
 
     return ReturnValue::eSUCCESS;
   }
 
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
     if (tch->isPlayer())
@@ -683,7 +683,7 @@ qint32 white_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   if (!ch->fighting)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 6) > 1)
+  if (ch->dc_->number(0, 6) > 1)
     return ReturnValue::eFAILURE;
 
   act_to_room("$n breathes frost.", ch, 0, 0, 0);
@@ -708,7 +708,7 @@ qint32 black_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
 
   /* Find a dude to do evil things upon ! */
 
-  if (number(0, 6) > 1)
+  if (ch->dc_->number(0, 6) > 1)
     return ReturnValue::eFAILURE;
 
   act_to_room("$n breathes acid.", ch, 0, 0, 0);
@@ -728,7 +728,7 @@ qint32 red_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (!ch->fighting)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 6) > 1)
+  if (ch->dc_->number(0, 6) > 1)
     return ReturnValue::eFAILURE;
 
   act_to_room("$n breathes fire.", ch, 0, 0, 0);
@@ -748,7 +748,7 @@ qint32 green_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   if (!ch->fighting)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 6) > 1)
+  if (ch->dc_->number(0, 6) > 1)
     return ReturnValue::eFAILURE;
 
   act_to_room("$n breathes gas.", ch, 0, 0, 0);
@@ -777,7 +777,7 @@ qint32 brass_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   if (!ch->fighting)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 4) == 0)
+  if (ch->dc_->number(0, 4) == 0)
   {
     act_to_room("$n breathes gas.", ch, 0, 0, 0);
     return cast_gas_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
@@ -787,7 +787,7 @@ qint32 brass_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
 
   if (!vict)
   {
-    if (number(0, 2) == 0)
+    if (ch->dc_->number(0, 2) == 0)
     {
       vict = ch->fighting;
       if (vict == nullptr)
@@ -806,7 +806,7 @@ qint32 francis_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 {
   if (cmd != cmd_t::NORTH)
     return ReturnValue::eFAILURE;
-  if (DC::getInstance()->world[ch->in_room].number == 7077)
+  if (dc_->world[ch->in_room].number == 7077)
   {
     do_say(owner, "Oh no you don't!", cmd_t::DEFAULT);
     attack(owner, ch, 0);
@@ -831,7 +831,7 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   // 3 = south, 2 = east, 5 = up
   // 1 = north, 4  = west, 6 = down
 
-  switch (DC::getInstance()->world[ch->in_room].number)
+  switch (dc_->world[ch->in_room].number)
   {
   case 1978:
     dir_cmd = cmd_t::UP;
@@ -1019,7 +1019,7 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   qint32 clan_num = ch->clan;
   if (ch->isNonPlayer() && IS_AFFECTED(ch, AFF_CHARM))
   {
-    qint32 b = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    qint32 b = dc_->mob_index[ch->mobdata->nr].vnum();
     switch (b)
     {
     case 8:     // golem
@@ -1882,12 +1882,12 @@ qint32 chain_gossips(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 360) != 1)
+  if (ch->dc_->number(1, 360) != 1)
   {
     return ReturnValue::eFAILURE;
   }
 
-  x = number((quint64)0, (quint64)ChainSayText.size());
+  x = dc_->number((quint64)0, (quint64)ChainSayText.size());
 
   QString message;
   try
@@ -1915,7 +1915,7 @@ qint32 fido(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr
   if (IS_AFFECTED(ch, AFF_CHARM))
     return ReturnValue::eFAILURE;
 
-  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
+  for (i = dc_->world[ch->in_room].contents; i; i = i->next_content)
   {
     if (GET_ITEM_TYPE(i) == ITEM_CONTAINER && i->obj_flags.value[3])
     {
@@ -1949,12 +1949,12 @@ qint32 janitor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (IS_AFFECTED(ch, AFF_CHARM))
     return ReturnValue::eFAILURE;
 
-  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
+  for (i = dc_->world[ch->in_room].contents; i; i = i->next_content)
   {
     if (isSet(i->obj_flags.wear_flags, TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
         !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
-        DC::getInstance()->obj_index[i->item_number].vnum() != CHAMPION_ITEM)
+        dc_->obj_index[i->item_number].vnum() != CHAMPION_ITEM)
     {
       act_to_room("$n picks up some trash.", ch, 0, 0, 0);
       move_obj(i, ch);
@@ -1985,7 +1985,7 @@ qint32 mother_moat_and_moad(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QSt
     return ReturnValue::eFAILURE;
 
   // TODO - make this Crydragon proc into something better
-  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim; tmp_victim = temp)
+  for (tmp_victim = dc_->world[ch->in_room].people; tmp_victim; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((tmp_victim->isNonPlayer() || ch->isNonPlayer()) && (tmp_victim != ch))
@@ -2023,14 +2023,14 @@ qint32 adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
     return ReturnValue::eFAILURE;
 
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (tch->isPlayer() && number(0, 2) == 1 && CAN_SEE(ch, tch))
+  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
+    if (tch->isPlayer() && dc_->number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
   if (!tch)
     return ReturnValue::eFAILURE;
 
-  switch (number(0, 10))
+  switch (ch->dc_->number(0, 10))
   {
   case 3:
     act_to_room("$n utters the words 'garf'.", ch, 0, 0, 0);
@@ -2068,8 +2068,8 @@ qint32 mud_school_adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   if (!AWAKE(ch))
     return ReturnValue::eFAILURE;
 
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (tch->isPlayer() && number(0, 2) == 1 && CAN_SEE(ch, tch))
+  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
+    if (tch->isPlayer() && dc_->number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
   if (!tch)
@@ -2088,7 +2088,7 @@ qint32 mud_school_adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   "Hello....Hello, are you listening to me?",
   */
 
-  switch (number(0, 20))
+  switch (ch->dc_->number(0, 20))
   {
   case 15:
     do_say(ch, "What are you staring at?");
@@ -2134,7 +2134,7 @@ qint32 bee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * MAX<level_>(ch->getLevel(), 1))
+      dc_->number(0, 120) < 2 * MAX<level_>(ch->getLevel(), 1))
   {
     act("You sting $N!", ch, 0, ch->fighting, TO_CHAR, INVIS_NULL);
     act("$n stings at $N with its barbed stinger!", ch, 0,
@@ -2175,7 +2175,7 @@ qint32 apiary_worker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  x = number((quint64)0, (quint64)APIARY_WORKER_EMOTE_TEXT_SIZE * 25);
+  x = dc_->number((quint64)0, (quint64)APIARY_WORKER_EMOTE_TEXT_SIZE * 25);
 
   if ((quint32)x < APIARY_WORKER_EMOTE_TEXT_SIZE)
   {
@@ -2200,7 +2200,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
   if (cmd == cmd_t::LIST)
   { /* List */
     ch->sendln("Available pets are:");
-    for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
+    for (pet = dc_->world[pet_room].people; pet; pet = pet->next_in_room)
     {
       dc_sprintf(buf, "%8ld - %s\r\n", 3 * pet->exp, qPrintable(pet->short_description()));
       ch->send(buf);
@@ -2336,7 +2336,7 @@ qint32 hellstreamer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   }
 
   // removed && ch->getLevel() > 49
-  if (number(0, 2) == 0)
+  if (ch->dc_->number(0, 2) == 0)
   {
     act("$n utters the words 'Burn motherfucker!'.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
@@ -2371,7 +2371,7 @@ qint32 humaneater(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
     if (tch->isPlayer())
@@ -2459,7 +2459,7 @@ qint32 pir_slut(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Characte
     return ReturnValue::eFAILURE;
   if (IS_AFFECTED(ch, AFF_PARALYSIS))
     return ReturnValue::eFAILURE;
-  x = number((quint64)0, (quint64)PIR_SAY_TEXT_SIZE * 6);
+  x = dc_->number((quint64)0, (quint64)PIR_SAY_TEXT_SIZE * 6);
   if ((quint32)x < PIR_SAY_TEXT_SIZE)
   {
     do_say(ch, pir_slutSayText[x], cmd_t::DEFAULT);
@@ -2493,7 +2493,7 @@ qint32 clutchdrone_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStri
   if (!vict)
     return ReturnValue::eFAILURE;
 
-  if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > position_t::SITTING)
+  if (ch->getLevel() > 3 && dc_->number(0, 3) == 0 && GET_POS(vict) > position_t::SITTING)
   {
     retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH);
     if (isSet(retval, ReturnValue::eCH_DIED))
@@ -2509,7 +2509,7 @@ qint32 clutchdrone_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStri
 
     return ReturnValue::eSUCCESS;
   }
-  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 2 && dc_->number(0, 1) == 0)
   {
     return damage(ch, vict, ch->getLevel() >> 1, TYPE_HIT, SKILL_KICK);
   }
@@ -2567,7 +2567,7 @@ qint32 blindingparrot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * MAX<level_>(ch->getLevel(), 1))
+      dc_->number(0, 120) < 2 * MAX<level_>(ch->getLevel(), 1))
   {
     act("You peck $N!", ch, 0, ch->fighting, TO_CHAR, INVIS_NULL);
     act("$n pecks at $N with its beak!", ch, 0,
@@ -2591,13 +2591,13 @@ qint32 doorcloser(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     return ReturnValue::eFAILURE;
 
   /* but not every time */
-  if (number(0, 1))
+  if (ch->dc_->number(0, 1))
     return ReturnValue::eFAILURE;
 
   if ((EXIT(ch, 1) && !isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
       (EXIT(ch, 3) && !isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
-    if (number(0, 1))
+    if (ch->dc_->number(0, 1))
       do_say(ch, u"How the hell do these doors keep opening?"_s, cmd_t::DEFAULT);
     else
       do_say(ch, u"I coulda sworn I just closed this...."_s, cmd_t::DEFAULT);
@@ -2624,7 +2624,7 @@ qint32 panicprisoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   /* check for a guard */
   if ((vict = ch->get_char_room_vis("guard")))
   {
-    if (number(0, 1))
+    if (ch->dc_->number(0, 1))
       do_say(ch, u"Run!  It's the fuzz!"_s, cmd_t::DEFAULT);
     else
       do_say(ch, u"Uh oh, guard.  I'm off like a prom dress!"_s, cmd_t::DEFAULT);
@@ -2634,13 +2634,13 @@ qint32 panicprisoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 
   /* open any closed cells */
   /* but not every time */
-  if (number(0, 2))
+  if (ch->dc_->number(0, 2))
     return ReturnValue::eFAILURE;
 
   if ((EXIT(ch, 1) && isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
       (EXIT(ch, 3) && isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
-    if (number(0, 1))
+    if (ch->dc_->number(0, 1))
       do_say(ch, u"I must free my fellow prisoners!"_s, cmd_t::DEFAULT);
     else
       do_say(ch, u"Viva la resistance!"_s, cmd_t::DEFAULT);
@@ -2755,17 +2755,17 @@ qint32 marauder(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (ch->isPlayer() || vict->isPlayer())
       if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
           (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
-        if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
+        if (vict == ch->fighting && ch->getLevel() > 9 && dc_->number(0, 2) == 0)
         {
           disarm(ch, vict);
           return ReturnValue::eSUCCESS;
         }
 
-  if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 3 && dc_->number(0, 2) == 0)
   {
     return do_bash(ch, u""_s, cmd_t::DEFAULT);
   }
-  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 2 && dc_->number(0, 1) == 0)
   {
     return ch->do_kick();
   }
@@ -2790,7 +2790,7 @@ qint32 foggy_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
     return ReturnValue::eFAILURE;
 
   // do this 50% of the time
-  if (number(0, 1))
+  if (ch->dc_->number(0, 1))
     return ReturnValue::eFAILURE;
 
   act("$n glows in power and summons a horde of spirits to $s aid!",
@@ -2800,7 +2800,7 @@ qint32 foggy_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   mob = ch->getDC()->clone_mobile(real_mobile(22026));
   if (!mob)
   {
-    DC::getInstance()->logentry(u"Foggy combat mobile missing"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Foggy combat mobile missing"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   // put it in the room ch is in
@@ -2846,17 +2846,17 @@ qint32 iasenko_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   if (isSet(retval, ReturnValue::eSUCCESS) || isSet(retval, ReturnValue::eCH_DIED))
     return retval;
 
-  switch (number(1, 3))
+  switch (ch->dc_->number(1, 3))
   {
 
   case 1:
     // hitall
     act_to_room("$n begins to twitch as the fury of his ancestors takes form!", ch, 0, 0, INVIS_NULL);
     act_to_room("$n starts swinging like a MADMAN!", ch, 0, 0, INVIS_NULL);
-    dam = number(6, 800);
+    dam = dc_->number(6, 800);
     damage_all_players_in_room(ch, dam);
     act_to_room("$n starts swinging like a MADMAN!", ch, 0, 0, INVIS_NULL);
-    dam = number(6, 800);
+    dam = dc_->number(6, 800);
     damage_all_players_in_room(ch, dam);
     break;
 
@@ -2864,10 +2864,10 @@ qint32 iasenko_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
     // earthquake
     act_to_room("$n utters the words, 'kao naga chi'", ch, 0, 0, INVIS_NULL);
     act_to_room("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, INVIS_NULL);
-    dam = number(6, 400);
+    dam = dc_->number(6, 400);
     damage_all_players_in_room(ch, dam);
     act_to_room("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, INVIS_NULL);
-    dam = number(6, 400);
+    dam = dc_->number(6, 400);
     damage_all_players_in_room(ch, dam);
     break;
 
@@ -2919,7 +2919,7 @@ qint32 koban_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   }
 
   // full-heal Iasenko if he's hurt
-  if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)) && number(0, 1))
+  if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)) && dc_->number(0, 1))
   {
     act_to_room("$n calls on the souls of his fallen ancestors!", ch, 0, 0, INVIS_NULL);
     cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
@@ -2993,7 +2993,7 @@ qint32 kogiro_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   if (SOMEONE_DIED(retval) || isSet(retval, ReturnValue::eSUCCESS))
     return retval;
 
-  switch (number(1, 3))
+  switch (ch->dc_->number(1, 3))
   {
 
   case 1:
@@ -3008,7 +3008,7 @@ qint32 kogiro_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   case 2:
     // room punch
     act_to_room("$n starts swinging like a MADMAN!", ch, 0, 0, INVIS_NULL);
-    dam = number(6, 800);
+    dam = dc_->number(6, 800);
     damage_all_players_in_room(ch, dam);
     break;
 
@@ -3031,7 +3031,7 @@ qint32 takahashi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (number(1, 2))
+  switch (ch->dc_->number(1, 2))
   {
 
   case 1:
@@ -3070,24 +3070,24 @@ qint32 askari_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   if (SOMEONE_DIED(retval) || isSet(retval, ReturnValue::eSUCCESS))
     return retval;
 
-  switch (number(1, 2))
+  switch (ch->dc_->number(1, 2))
   {
 
   case 1:
     // hitall
     act_to_room("$n sizes you up, then swings with deadly acuracy!!", ch, 0, 0, INVIS_NULL);
     act_to_room("$n starts swinging like a MADMAN!", ch, 0, 0, INVIS_NULL);
-    dam = number(6, 800);
+    dam = dc_->number(6, 800);
     damage_all_players_in_room(ch, dam);
     act_to_room("$n starts swinging like a MADMAN!", ch, 0, 0, INVIS_NULL);
-    dam = number(6, 800);
+    dam = dc_->number(6, 800);
     damage_all_players_in_room(ch, dam);
     break;
 
   case 2:
     // wanna be arrow damage
     act_to_room("$n takes aim with his mighty longbow...at YOU!!", ch, 0, 0, INVIS_NULL);
-    dam = number(300, 800);
+    dam = dc_->number(300, 800);
     damage_all_players_in_room(ch, dam);
     break;
 
@@ -3104,7 +3104,7 @@ qint32 surimoto_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (number(1, 8))
+  switch (ch->dc_->number(1, 8))
   {
 
   case 1:
@@ -3115,7 +3115,7 @@ qint32 surimoto_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
   default:
     // wanna be arrow damage
     act_to_room("$n takes aim with his mighty longbow...at YOU!!", ch, 0, 0, INVIS_NULL);
-    dam = number(300, 800);
+    dam = dc_->number(300, 800);
     damage_all_players_in_room(ch, dam);
     break;
 
@@ -3132,7 +3132,7 @@ qint32 hiryushi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (number(1, 3))
+  switch (ch->dc_->number(1, 3))
   {
 
   case 1:
@@ -3147,7 +3147,7 @@ qint32 hiryushi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
 
   case 3:
     act_to_room("$n leaps back and readies a wand...", ch, 0, 0, INVIS_NULL);
-    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
+    for (victim = dc_->world[ch->in_room].people; victim; victim = victim->next_in_room)
     {
       if (victim->isNonPlayer())
         continue;
@@ -3168,7 +3168,7 @@ qint32 izumi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (number(1, 7))
+  switch (ch->dc_->number(1, 7))
   {
 
   case 1:
@@ -3207,7 +3207,7 @@ qint32 shogura_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
     return ki_disrupt(ch->getLevel(), ch, "", ch->fighting);
   }
 
-  switch (number(1, 2))
+  switch (ch->dc_->number(1, 2))
   {
 
   case 1:
@@ -3307,7 +3307,7 @@ qint32 gremlinthing(CharacterPtr ch)
     if (gol->hit < gol->max_hit)
     {
       do_emote(ch, u"climbs up its master's golem, hammering, tweaking and repairing.\r\n"_s, cmd_t::DEFAULT);
-      gol->hit += number(40, 60);
+      gol->hit += dc_->number(40, 60);
       if (gol->hit > gol->max_hit)
         gol->hit = gol->max_hit;
     }
@@ -3317,7 +3317,7 @@ qint32 gremlinthing(CharacterPtr ch)
 
 qint32 mage_familiar_gremlin(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
-  if (number(0, 1))
+  if (ch->dc_->number(0, 1))
     return ReturnValue::eFAILURE;
   return gremlinthing(ch);
 }
@@ -3329,7 +3329,7 @@ qint32 mage_familiar_gremlin_non(CharacterPtr ch, ObjectPtr obj,
     return ReturnValue::eFAILURE;
   if (!ch->master)
   {
-    DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3351,14 +3351,14 @@ qint32 mage_familiar_gremlin_non(CharacterPtr ch, ObjectPtr obj,
       return ReturnValue::eFAILURE;
     }
 
-    if (number(1, 500) == 1)
+    if (ch->dc_->number(1, 500) == 1)
     {
       act_to_room("$n chatters incessantly while magically fusing two small rocks together.", ch, 0, 0, 0);
       return ReturnValue::eFAILURE;
     }
   }
 
-  if (number(0, 4))
+  if (ch->dc_->number(0, 4))
     return ReturnValue::eFAILURE;
 
   return gremlinthing(ch);
@@ -3367,7 +3367,7 @@ qint32 mage_familiar_gremlin_non(CharacterPtr ch, ObjectPtr obj,
 qint32 mage_familiar_imp(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                          CharacterPtr owner)
 {
-  if (number(0, 1))
+  if (ch->dc_->number(0, 1))
     return cast_fireball(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 
   return ReturnValue::eFAILURE;
@@ -3384,7 +3384,7 @@ qint32 mage_familiar_imp_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QS
 
   if (!ch->master)
   {
-    DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3409,7 +3409,7 @@ qint32 mage_familiar_imp_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QS
       return ReturnValue::eFAILURE;
     }
 
-    if (number(1, 500) == 1)
+    if (ch->dc_->number(1, 500) == 1)
     {
       do_emote(ch, u"chitters about for a bit then settles down."_s, cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
@@ -3439,17 +3439,17 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
     for (dir = {}; *dirs[dir] != '\n'; dir++)
       if (!str_cmp(dirs[dir], arg2))
         break;
-    if (*dirs[dir] == '\n' || !DC::getInstance()->world[ch->in_room].dir_option[dir])
+    if (*dirs[dir] == '\n' || !dc_->world[ch->in_room].dir_option[dir])
     {
       ch->sendln("In what direction did you say?");
       return ReturnValue::eSUCCESS;
     }
     qint32 to_room = {};
     bool ts = IS_AFFECTED(ch, AFF_true_SIGHT);
-    if (!str_cmp(arg1, "far") && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
-      to_room = DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
+    if (!str_cmp(arg1, "far") && dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
+      to_room = dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
     if (!to_room)
-      to_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
+      to_room = dc_->world[ch->in_room].dir_option[dir]->to_room;
     if (!check_components(ch, 1, 44, 0, 0, 0, true))
     {
       ch->sendln("The owl requires a feeding to do this for you.");
@@ -3472,7 +3472,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
   {
     if (!ch->master)
     {
-      DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+      dc_->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       extract_char(ch, true);
       return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
     }
@@ -3497,7 +3497,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
         return ReturnValue::eFAILURE;
       }
 
-      if (number(1, 500) == 1)
+      if (ch->dc_->number(1, 500) == 1)
       {
         do_emote(ch, u"circles above, looking for mice."_s), cmd_t::DEFAULT);
         return ReturnValue::eFAILURE;
@@ -3518,7 +3518,7 @@ qint32 druid_familiar_chipmunk_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, co
 
   if (!ch->master)
   {
-    DC::getInstance()->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Familiar without a master."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (ReturnValue::eCH_DIED | ReturnValue::eSUCCESS);
   }
@@ -3543,13 +3543,13 @@ qint32 druid_familiar_chipmunk_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, co
       return ReturnValue::eFAILURE;
     }
 
-    if (number(1, 500) == 1)
+    if (ch->dc_->number(1, 500) == 1)
     {
       do_emote(ch, u"sqeaks with delight at a found nut."_s, cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
-    if (number(1, 100) == 1)
+    if (ch->dc_->number(1, 100) == 1)
     {
       ch->master->sendln(u"The presence of your chipmunk is soothing to your mind."_s);
       GET_MANA(ch->master) += 10;
@@ -3570,7 +3570,7 @@ qint32 bodyguard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (DC::getInstance()->mob_index[ch->mobdata->nr].vnum())
+  switch (dc_->mob_index[ch->mobdata->nr].vnum())
   {
   case 9511:                  // sura mutant
     return protect(ch, 9510); // laiger

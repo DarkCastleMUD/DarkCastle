@@ -24,7 +24,7 @@ command_return_t do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
   CharacterPtr k;
   QString buf;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -76,7 +76,7 @@ command_return_t do_found(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -347,7 +347,7 @@ command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -532,7 +532,7 @@ command_return_t do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
   CharacterPtr adios, k;
   follow_type *f, *next_f;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -634,7 +634,7 @@ command_return_t do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
   QString name;
   CharacterPtr leader;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;

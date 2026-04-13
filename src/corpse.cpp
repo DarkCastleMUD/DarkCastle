@@ -208,7 +208,7 @@ void save_corpses(void)
   }
 
   /* Scan the object list */
-  for (i = DC::getInstance()->object_list; i; i = next)
+  for (i = dc_->object_list; i; i = next)
   {
     next = i->next;
 
@@ -262,7 +262,7 @@ void DC::load_corpses(void)
     get_line_new(fp, line);
   }
   else
-    DC::getInstance()->logentry(u"No corpses in file to load"_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"No corpses in file to load"_s, 0, DC::LogChannel::LOG_MISC);
 
   while (!feof(fp) && !end)
   {
@@ -279,7 +279,7 @@ void DC::load_corpses(void)
       if (debug == 1)
       {
         dc_sprintf(buf3, " -Loading Object: %d", nr);
-        DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+        dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       /* we have the number, check it, load obj. */
       if (nr == -1)
@@ -309,7 +309,7 @@ void DC::load_corpses(void)
       if (debug == 1)
       {
         dc_sprintf(buf3, " -LINE: %s", line);
-        DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+        dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       sscanf(line, "%d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7);
       GET_OBJ_VAL(temp, 0) = t[1];
@@ -324,13 +324,13 @@ void DC::load_corpses(void)
       if (debug == 1)
       {
         dc_sprintf(buf3, " -LINE: %s", line);
-        DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+        dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       /* read line check for xap. */
       if (!dc_strcmp("XAP\n", line))
       { /* then this is a Xap Obj, requires special care */
         if (debug == 1)
-          DC::getInstance()->logentry(u"XAP Found"_s, 0, DC::LogChannel::LOG_MISC);
+          dc_->logentry(u"XAP Found"_s, 0, DC::LogChannel::LOG_MISC);
 
         temp->name(fread_string_new(fp));
         if (temp->name().isEmpty())
@@ -355,7 +355,7 @@ void DC::load_corpses(void)
           if (debug == 1)
           {
             dc_sprintf(buf3, "   -SHORT: %s\n", qPrintable(temp->short_description()));
-            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
 
@@ -368,7 +368,7 @@ void DC::load_corpses(void)
           if (debug == 1)
           {
             dc_sprintf(buf3, "   -DESC: %s\n", qPrintable(temp->long_description()));
-            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
 
@@ -382,20 +382,20 @@ void DC::load_corpses(void)
           if (debug == 1)
           {
             dc_snprintf(buf3, sizeof(buf3) - 1, "   -ACT_DESC: %s\n", qPrintable(temp->ActionDescription()));
-            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
         if (!get_line_new(fp, line) ||
             (sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
         {
-          DC::getInstance()->logentry(u"load_corpses: Format error in first numeric line (expecting 5 args)"_s, 0, DC::LogChannel::LOG_MISC);
+          dc_->logentry(u"load_corpses: Format error in first numeric line (expecting 5 args)"_s, 0, DC::LogChannel::LOG_MISC);
         }
         else
         {
           if (debug == 1)
           {
             dc_sprintf(buf3, "   -FLAGS: %s", line);
-            DC::getInstance()->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
+            dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
         temp->obj_flags.type_flag = t[0];
@@ -458,8 +458,8 @@ void DC::load_corpses(void)
         } /* exit our for loop */
         if (alloc_num_affects != temp->num_affects)
         {
-          DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
-                                  alloc_num_affects, temp->num_affects);
+          dc_->logf(0, DC::LogChannel::LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
+                    alloc_num_affects, temp->num_affects);
         }
       }
       else
@@ -473,7 +473,7 @@ void DC::load_corpses(void)
           continue;
         }
         if (debug == 1)
-          DC::getInstance()->logentry(u"XAP NOT Found"_s, 0, DC::LogChannel::LOG_MISC);
+          dc_->logentry(u"XAP NOT Found"_s, 0, DC::LogChannel::LOG_MISC);
       }
       if (temp != nullptr)
       {
@@ -482,7 +482,7 @@ void DC::load_corpses(void)
         if (IS_OBJ_STAT(temp, ITEM_PC_CORPSE))
         {
           /* scan our temp room for objects */
-          for (obj = DC::getInstance()->world[real_room(frozen_start_room)].contents; obj; obj = next_obj)
+          for (obj = dc_->world[real_room(frozen_start_room)].contents; obj; obj = next_obj)
           {
             next_obj = obj->next_content;
             if (obj)
@@ -568,8 +568,8 @@ ObjectPtr create_obj_new(void)
 {
   ObjectPtr obj = new Object;
   clear_object(obj);
-  obj->next = DC::getInstance()->object_list;
-  DC::getInstance()->object_list = obj;
+  obj->next = dc_->object_list;
+  dc_->object_list = obj;
   /* Corpse saving stuff */
   GET_OBJ_VROOM(obj) = DC::NOWHERE;
   GET_OBJ_TIMER(obj) = {};

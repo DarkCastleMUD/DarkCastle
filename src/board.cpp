@@ -546,8 +546,8 @@ command_return_t DC::save_boards(void)
   QSaveFile board_file("board/index");
   if (!board_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
-    DC::getInstance()->logentry(u"Unable to open/create save file for bulletin board index"_s, ANGEL,
-                                DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unable to open/create save file for bulletin board index"_s, ANGEL,
+                  DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   QTextStream stream(&board_file);
@@ -852,8 +852,8 @@ void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
 
   if (!the_file)
   {
-    DC::getInstance()->logentry(u"Unable to open/create save file for bulletin board"_s, ANGEL,
-                                DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unable to open/create save file for bulletin board"_s, ANGEL,
+                  DC::LogChannel::LOG_BUG);
     return;
   }
 

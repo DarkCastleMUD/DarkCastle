@@ -95,7 +95,7 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
 {
   if (arguments.isEmpty())
   {
-    if (DC::getInstance()->bans_)
+    if (dc_->bans_)
     {
       sendln("No sites are banned.");
       return ReturnValue::eSUCCESS;
@@ -105,7 +105,7 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
     sendln(u"%1  %2  %3  %4"_s.arg("-----------------------", -15).arg("---------------------------------", -8).arg("-------------------", -19).arg("---------------------------------", -16));
 
     QString buffer;
-    for (const auto &ban : DC::getInstance()->bans_.list())
+    for (const auto &ban : dc_->bans_.list())
     {
       sendln(u"%1  %2  %3  %4"_s.arg(ban.site(), -15).arg(Ban::ban_types.value(qsizetype(ban.type())), -8).arg(ban.date().toString(), -19).arg(ban.name(), -16));
     }
@@ -132,7 +132,7 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
     sendln("Flag must be ALL, SELECT, or NEW.");
     return ReturnValue::eSUCCESS;
   }
-  switch (DC::getInstance()->bans_.is_banned(site))
+  switch (dc_->bans_.is_banned(site))
   {
   case Ban::type_t::NOT:
     break;
@@ -149,11 +149,11 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
   ban.name(name());
   ban.date(QDateTime::fromSecsSinceEpoch(time(0)));
   ban.type(flag);
-  DC::getInstance()->bans_.add(ban);
+  dc_->bans_.add(ban);
 
   loggod(u"1s has banned %2 for %3 players."_s.arg(name()).arg(site).arg(Ban::ban_types.value(qsizetype(ban.type()))));
   sendln("Site banned.");
-  DC::getInstance()->bans_.save();
+  dc_->bans_.save();
   return ReturnValue::eSUCCESS;
 }
 
@@ -166,7 +166,7 @@ command_return_t Character::do_unban(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  switch (DC::getInstance()->bans_.is_banned(site))
+  switch (dc_->bans_.is_banned(site))
   {
   case Ban::type_t::NOT:
     sendln("That site is not currently banned.");
@@ -178,10 +178,10 @@ command_return_t Character::do_unban(QStringList arguments, cmd_t cmd)
     break;
   }
 
-  DC::getInstance()->bans_.remove(site);
+  dc_->bans_.remove(site);
   sendln("Site unbanned.");
   loggod(u"%1 removed the %2-player ban."_s.arg(name()).arg(site));
-  DC::getInstance()->bans_.save();
+  dc_->bans_.save();
 
   return ReturnValue::eSUCCESS;
 }

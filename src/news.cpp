@@ -61,7 +61,7 @@ void savenews()
   FILE *fl;
   if (!(fl = fopen("news.data", "w")))
   {
-    DC::getInstance()->logentry(u"Cannot open news file 'news.data'"_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Cannot open news file 'news.data'"_s, 0, DC::LogChannel::LOG_MISC);
     abort();
   }
   news_data *tmpnews;
@@ -76,7 +76,7 @@ void savenews()
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
-    DC::getInstance()->logentry(u"Cannot save news file to web dir."_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Cannot save news file to web dir."_s, 0, DC::LogChannel::LOG_MISC);
 }
 
 void DC::loadnews(void)

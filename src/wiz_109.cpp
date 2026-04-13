@@ -52,7 +52,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 
   new_new = conn->character;
   new_new->desc = {};
-  auto &character_list = DC::getInstance()->character_list;
+  auto &character_list = dc_->character_list;
   character_list.insert(new_new);
   new_new->add_to_bard_list();
 
@@ -67,7 +67,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   char_to_room(new_new, in_room);
   act_to_room("$n gestures sharply and $N comes into existence!", this, 0, new_new, 0);
   act_to_character("You linkload $N.", this, 0, new_new, 0);
-  DC::getInstance()->logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", qPrintable(this->name()), qPrintable(new_new->name()));
+  dc_->logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", qPrintable(this->name()), qPrintable(new_new->name()));
   return ReturnValue::eSUCCESS;
 }
 
@@ -83,8 +83,8 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
-    DC::getInstance()->logentry(u"Unable to open whassup.txt for adding in do_processes!"_s, IMPLEMENTER,
-                                DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unable to open whassup.txt for adding in do_processes!"_s, IMPLEMENTER,
+                  DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   if (dc_fprintf(fl, "~\n") < 0)
@@ -98,8 +98,8 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
-    DC::getInstance()->logentry(u"Unable to open whassup.txt for reading in do_processes!"_s, IMPLEMENTER,
-                                DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unable to open whassup.txt for reading in do_processes!"_s, IMPLEMENTER,
+                  DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   tmp = fread_string(fl, 0);
@@ -242,7 +242,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
 
   dc_sprintf(buf, "%s advances %s to level %d.", qPrintable(ch->name()),
              qPrintable(victim->name()), new_newlevel);
-  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   if (victim->getLevel() == 0)
     do_start(victim);
@@ -253,7 +253,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
       victim->incrementLevel();
       advance_level(victim, 0);
     }
-  DC::getInstance()->update_wizlist(victim);
+  dc_->update_wizlist(victim);
   return ReturnValue::eSUCCESS;
 }
 
@@ -310,22 +310,22 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
     remove_familiars(qPrintable(victim->name()), ZAPPED);
     if (cmd == cmd_t::DEFAULT) // cmd_t::DEFAULT = someone typed it. cmd_t::TRACK = rename.
-      DC::getInstance()->vaults_.remove_vault(qPrintable(victim->name()), ZAPPED);
+      dc_->vaults_.remove_vault(qPrintable(victim->name()), ZAPPED);
 
     victim->setLevel(1);
-    DC::getInstance()->update_wizlist(victim);
+    dc_->update_wizlist(victim);
 
     if (this->clan)
       remove_clan_member(this->clan, this);
 
-    DC::getInstance()->TheAuctionHouse.HandleDelete(victim->name());
+    dc_->TheAuctionHouse.HandleDelete(victim->name());
 
     do_quit(victim, "", cmd_t::SAVE_SILENTLY);
     remove_character(victim->name(), ZAPPED);
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    DC::getInstance()->logentry(u"%1 has deleted %2.\r\n"_s.arg(name()).arg(victim->name()), ANGEL, DC::LogChannel::LOG_GOD);
+    dc_->logentry(u"%1 has deleted %2.\r\n"_s.arg(name()).arg(victim->name()), ANGEL, DC::LogChannel::LOG_GOD);
   }
 
   else
@@ -355,7 +355,7 @@ command_return_t do_global(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     dc_sprintf(buf, "\r\n%s\r\n", argument + i);
-    for (point = DC::getInstance()->connections_; point; point = point->next)
+    for (point = dc_->connections_; point; point = point->next)
       if (!point->connected && point->character)
         point->character->send(buf);
   }
@@ -400,13 +400,13 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   {
     QString buffer = u"Shutdown by %1.\r\n"_s.arg(qPrintable(this->shortdesc_or_name()));
     send_to_all(buffer);
-    DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     _shutdown = 1;
-    DC::getInstance()->quit();
+    dc_->quit();
   }
   else if (arg1 == "hot")
   {
-    for (const auto &victim : DC::getInstance()->character_list)
+    for (const auto &victim : dc_->character_list)
     {
       if (victim->isPlayer())
       {
@@ -428,12 +428,12 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     do_not_save_corpses = 1;
     QString buffer = u"Hot reboot by %1.\r\n"_s.arg(qPrintable(this->shortdesc_or_name()));
     send_to_all(buffer);
-    DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
-    DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
     do_force({u"all"_s, u"save"_s});
-    if (!DC::getInstance()->write_hotboot_file())
+    if (!dc_->write_hotboot_file())
     {
-      DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
+      dc_->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
       this->sendln("Hot reboot failed.");
     }
   }
@@ -462,7 +462,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   else if (arg1 == "core")
   {
     produce_coredump(this);
-    DC::getInstance()->logentry(u"Corefile produced."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Corefile produced."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
   }
   else if (arg1 == "die")
   {
@@ -478,7 +478,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   }
   else if (arg1 == "check")
   {
-    for (const auto &victim : DC::getInstance()->character_list)
+    for (const auto &victim : dc_->character_list)
     {
       if (victim->isPlayer())
       {
@@ -551,7 +551,7 @@ command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
       exit(0);
     }
 
-    DC::getInstance()->logf(105, DC::LogChannel::LOG_MISC, "Starting testport.");
+    dc_->logf(105, DC::LogChannel::LOG_MISC, "Starting testport.");
     ch->sendln("Testport successfully started.");
   }
   else if (!str_cmp(arg1, "stop"))
@@ -563,7 +563,7 @@ command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
       exit(0);
     }
 
-    DC::getInstance()->logf(105, DC::LogChannel::LOG_MISC, "Shutdown testport under pid %d", child);
+    dc_->logf(105, DC::LogChannel::LOG_MISC, "Shutdown testport under pid %d", child);
     ch->sendln("Testport successfully shutdown.");
   }
 
@@ -634,7 +634,7 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", qPrintable(ch->name()), command);
+  dc_->logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", qPrintable(ch->name()), command);
 
   if (system(command))
   {

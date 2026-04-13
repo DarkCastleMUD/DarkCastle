@@ -34,7 +34,7 @@ bool verbose_mode = false;
 void test_handle_ansi(QString test)
 {
   // std::cerr <<  "Testing '" << test << "'" << std::endl;
-  CharacterPtr ch = new Character(DC::getInstance());
+  CharacterPtr ch = new Character(dc_);
   ch->player = new Player;
   ch->setType(Character::Type::Player);
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
@@ -65,19 +65,19 @@ bool test_rolls(quint8 total)
     {
       a = dice(3, 6);
       b = dice(6, 3);
-      stats.str[x] = MAX(12 + number(0, 1), MAX(a, b));
+      stats.str[x] = MAX(12 + dc_->number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      stats.dex[x] = MAX(12 + number(0, 1), MAX(a, b));
+      stats.dex[x] = MAX(12 + dc_->number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      stats.con[x] = MAX(12 + number(0, 1), MAX(a, b));
+      stats.con[x] = MAX(12 + dc_->number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      stats.tel[x] = MAX(12 + number(0, 1), MAX(a, b));
+      stats.tel[x] = MAX(12 + dc_->number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      stats.wis[x] = MAX(12 + number(0, 1), MAX(a, b));
+      stats.wis[x] = MAX(12 + dc_->number(0, 1), MAX(a, b));
       quint32 total = stats.str[x] + stats.dex[x] + stats.con[x] + stats.tel[x] + stats.wis[x];
       if (total >= 88)
       {
@@ -135,7 +135,7 @@ QString showObjectAffects(ObjectPtr obj)
 
 QString showObjectVault(ObjectPtr obj)
 {
-  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].vnum() << ":";
+  // std::cerr <<  dc_->obj_index[obj->item_number].vnum() << ":";
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
   // std::cerr <<  buf << ":";
 
@@ -156,7 +156,7 @@ QString showObjectVault(ObjectPtr obj)
 
 void showObject(CharacterPtr ch, ObjectPtr obj)
 {
-  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].vnum() << ":";
+  // std::cerr <<  dc_->obj_index[obj->item_number].vnum() << ":";
   QString buf;
 
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
@@ -228,25 +228,25 @@ qint32 main(qint32 argc, QString *argv)
     }
   }
 
-  DC::getInstance()->logentry(u"Loading the zones"_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Loading the zones"_s, 0, DC::LogChannel::LOG_MISC);
   debug.boot_zones();
 
-  DC::getInstance()->logentry(u"Loading the world."_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Loading the world."_s, 0, DC::LogChannel::LOG_MISC);
 
   debug.top_of_world_alloc = 2000;
 
   debug.boot_world();
 
-  DC::getInstance()->logentry(u"Renumbering the world."_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Renumbering the world."_s, 0, DC::LogChannel::LOG_MISC);
   renum_world();
 
-  DC::getInstance()->logentry(u"Generating object indices/loading all objects"_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Generating object indices/loading all objects"_s, 0, DC::LogChannel::LOG_MISC);
   debug.generate_obj_indices(&top_of_objt, debug.obj_index);
 
-  DC::getInstance()->logentry(u"Generating mob indices/loading all mobiles"_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Generating mob indices/loading all mobiles"_s, 0, DC::LogChannel::LOG_MISC);
   debug.generate_mob_indices(&top_of_mobt, debug.mob_index);
 
-  DC::getInstance()->logentry(u"renumbering zone table"_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"renumbering zone table"_s, 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
 
   class Connection *d = new Connection;
@@ -278,7 +278,7 @@ qint32 main(qint32 argc, QString *argv)
   conn->character = ch;
   conn->output = {};
 
-  auto &character_list = DC::getInstance()->character_list;
+  auto &character_list = dc_->character_list;
   character_list.insert(conn->character);
 
   conn->character->do_on_login_stuff();
@@ -409,7 +409,7 @@ qint32 main(qint32 argc, QString *argv)
                   obj = ch->equipment[iWear];
                   if (obj)
                   {
-                    if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum)
+                    if (vnum > 0 && dc_->obj_index[obj->item_number].vnum() == vnum)
                     {
                       showObject(ch, obj);
                     }
@@ -419,7 +419,7 @@ qint32 main(qint32 argc, QString *argv)
 
               for (ObjectPtr obj = ch->carrying; obj; obj = obj->next_content)
               {
-                if (vnum == 0 || (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum))
+                if (vnum == 0 || (vnum > 0 && dc_->obj_index[obj->item_number].vnum() == vnum))
                 {
                   showObject(ch, obj);
                 }
@@ -428,7 +428,7 @@ qint32 main(qint32 argc, QString *argv)
                 {
                   for (ObjectPtr container = obj->contains; container; container = container->next_content)
                   {
-                    if (vnum > 0 && DC::getInstance()->obj_index[container->item_number].vnum() == vnum)
+                    if (vnum > 0 && dc_->obj_index[container->item_number].vnum() == vnum)
                     {
                       showObject(ch, container);
                     }
@@ -444,7 +444,7 @@ qint32 main(qint32 argc, QString *argv)
       }
     }
 
-    for (const auto &c : DC::getInstance()->character_list)
+    for (const auto &c : dc_->character_list)
     {
       c->desc = d;
       do_score(c, "");
@@ -467,7 +467,7 @@ qint32 main(qint32 argc, QString *argv)
     }
     /*
         std::multimap<qint32, QString> hp_leaders;
-        for (auto& ch : DC::getInstance()->character_list)
+        for (auto& ch : dc_->character_list)
         {
           if (ch->isPlayer())
           {
@@ -496,7 +496,7 @@ qint32 main(qint32 argc, QString *argv)
     */
 
     // leaderboard.check_offline();
-    // // std::cerr <<  DC::getInstance()->character_list.size() << std::endl;
+    // // std::cerr <<  dc_->character_list.size() << std::endl;
     // do_leaderboard(ch, "");
     // conn->process_output();
 
@@ -507,7 +507,7 @@ qint32 main(qint32 argc, QString *argv)
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
         ObjectPtr obj = items->obj ? items->obj : get_obj(items->item_vnum);
-        if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum)
+        if (vnum > 0 && dc_->obj_index[obj->item_number].vnum() == vnum)
         {
           ch->send(showObjectVault(obj));
         }

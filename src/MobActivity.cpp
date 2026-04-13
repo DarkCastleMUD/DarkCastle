@@ -27,8 +27,8 @@ bool Path::isRoomConnected(qint32 room)
   qint32 i;
 
   for (i = {}; i < MAX_DIRS; i++)
-    if (DC::getInstance()->world[room].dir_option[i] && DC::getInstance()->world[room].dir_option[i]->to_room >= 0)
-      for (p = DC::getInstance()->world[DC::getInstance()->world[room].dir_option[i]->to_room].paths; p; p = p->next)
+    if (dc_->world[room].dir_option[i] && dc_->world[room].dir_option[i]->to_room >= 0)
+      for (p = dc_->world[dc_->world[room].dir_option[i]->to_room].paths; p; p = p->next)
         if (p->p == this)
           return true;
 
@@ -39,7 +39,7 @@ bool Path::isRoomPathed(qint32 room)
 {
   path_data *p;
 
-  for (p = DC::getInstance()->world[room].paths; p; p = p->next)
+  for (p = dc_->world[room].paths; p; p = p->next)
     if (p->p == this)
       return true;
 
@@ -88,21 +88,21 @@ bool Path::findRoom(qint32 from, qint32 to, qint32 steps, qint32 leastSteps, QSt
 
   for (qint32 i = {}; i < MAX_DIRS; i++)
   {
-    if (!DC::getInstance()->world[from].dir_option[i])
+    if (!dc_->world[from].dir_option[i])
       continue;
-    if (DC::getInstance()->world[from].dir_option[i]->to_room == DC::NOWHERE)
+    if (dc_->world[from].dir_option[i]->to_room == DC::NOWHERE)
       continue;
-    if (!isRoomPathed(DC::getInstance()->world[from].dir_option[i]->to_room))
+    if (!isRoomPathed(dc_->world[from].dir_option[i]->to_room))
       continue;
 
-    if (DC::getInstance()->world[from].dir_option[i]->to_room == to)
+    if (dc_->world[from].dir_option[i]->to_room == to)
     {
       *buf = dirs[i][0];
       *(buf + 1) = '\0';
       return true;
     }
 
-    if (findRoom(DC::getInstance()->world[from].dir_option[i]->to_room, to, steps + 1, leastSteps, buf + 1))
+    if (findRoom(dc_->world[from].dir_option[i]->to_room, to, steps + 1, leastSteps, buf + 1))
     {
       *buf = dirs[i][0];
       return true;
@@ -119,21 +119,21 @@ qint32 Path::leastSteps(qint32 from, qint32 to, qint32 val, qint32 *bestval)
 
   for (qint32 i = {}; i < MAX_DIRS; i++)
   {
-    if (!DC::getInstance()->world[from].dir_option[i])
+    if (!dc_->world[from].dir_option[i])
       continue;
-    if (DC::getInstance()->world[from].dir_option[i]->to_room == DC::NOWHERE)
+    if (dc_->world[from].dir_option[i]->to_room == DC::NOWHERE)
       continue;
-    if (!isRoomPathed(DC::getInstance()->world[from].dir_option[i]->to_room))
+    if (!isRoomPathed(dc_->world[from].dir_option[i]->to_room))
       continue;
 
-    if (DC::getInstance()->world[from].dir_option[i]->to_room == to)
+    if (dc_->world[from].dir_option[i]->to_room == to)
     {
       if (val < *bestval)
         *bestval = val;
       return val;
     }
     else
-      leastSteps(DC::getInstance()->world[from].dir_option[i]->to_room, to, val + 1, bestval);
+      leastSteps(dc_->world[from].dir_option[i]->to_room, to, val + 1, bestval);
   }
   return *bestval;
 }
@@ -170,10 +170,10 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
   }
   path_data *pa;
 
-  if (DC::getInstance()->world[room].paths)
+  if (dc_->world[room].paths)
   {
     path_data *t;
-    for (pa = DC::getInstance()->world[room].paths; pa; pa = pa->next)
+    for (pa = dc_->world[room].paths; pa; pa = pa->next)
     {
       if (isPathConnected(pa->p))
       {
@@ -211,8 +211,8 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
 
   pa = newPath();
   pa->p = this;
-  pa->next = DC::getInstance()->world[room].paths;
-  DC::getInstance()->world[room].paths = pa;
+  pa->next = dc_->world[room].paths;
+  dc_->world[room].paths = pa;
   (*this)[room] = {};
   if (ch)
     ch->sendln("Room successfully added to path.");
@@ -246,14 +246,14 @@ command_return_t do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  auto &zones = DC::getInstance()->zones;
-  qint32 i = DC::getInstance()->world[ch->in_room].zone;
+  auto &zones = dc_->zones;
+  qint32 i = dc_->world[ch->in_room].zone;
   if (zones.contains(i) == false)
   {
     return ReturnValue::eFAILURE;
   }
 
-  auto &zone = DC::getInstance()->zones[i];
+  auto &zone = dc_->zones[i];
   qint32 low = zone.getRealBottom(), high = zone.getRealTop();
 
   class Path *p;
@@ -464,20 +464,20 @@ qint32 find_closest_path(qint32 from, qint32 steps, QString buf, QMap<qint32, qi
 
   for (qint32 i = {}; i < MAX_DIRS; i++)
   {
-    if (!DC::getInstance()->world[from].dir_option[i])
+    if (!dc_->world[from].dir_option[i])
       continue;
-    if (DC::getInstance()->world[from].dir_option[i]->to_room == DC::NOWHERE)
+    if (dc_->world[from].dir_option[i]->to_room == DC::NOWHERE)
       continue;
-    if (z[DC::getInstance()->world[from].dir_option[i]->to_room] <= steps && z[DC::getInstance()->world[from].dir_option[i]->to_room] != 0)
+    if (z[dc_->world[from].dir_option[i]->to_room] <= steps && z[dc_->world[from].dir_option[i]->to_room] != 0)
       continue;
 
-    if (DC::getInstance()->world[DC::getInstance()->world[from].dir_option[i]->to_room].paths)
+    if (dc_->world[dc_->world[from].dir_option[i]->to_room].paths)
     {
       *buf = *dirs[i];
       *(buf + 1) = '\0';
-      return DC::getInstance()->world[from].dir_option[i]->to_room;
+      return dc_->world[from].dir_option[i]->to_room;
     }
-    if ((zenew = find_closest_path(DC::getInstance()->world[from].dir_option[i]->to_room, steps + 1, buf + 1, z)) != 0)
+    if ((zenew = find_closest_path(dc_->world[from].dir_option[i]->to_room, steps + 1, buf + 1, z)) != 0)
     {
       *buf = *dirs[i];
       return zenew;
@@ -491,7 +491,7 @@ qint32 Path::connectRoom(class Path *z)
   path_data *pa;
 
   for (QMap<qint32, qint32>::iterator iter = this->begin(); iter != this->end(); iter++)
-    for (pa = DC::getInstance()->world[(*iter).first].paths; pa; pa = pa->next)
+    for (pa = dc_->world[(*iter).first].paths; pa; pa = pa->next)
       if (pa->p == z)
         return (*iter).first;
 
@@ -504,31 +504,31 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
   static QString endbuf;
   endbuf[0] = buf[0] = '\0';
   class Path *start, *stop;
-  if (DC::getInstance()->world[from].paths)
+  if (dc_->world[from].paths)
   {
-    ch->send(u"Starting from path %s.\r\n"_s.arg(DC::getInstance()->world[from].paths->p->name));
+    ch->send(u"Starting from path %s.\r\n"_s.arg(dc_->world[from].paths->p->name));
   }
   else
   {
     QMap<qint32, qint32> z;
     from = find_closest_path(from, 1, &buf[0], z);
-    if (from && DC::getInstance()->world[from].paths)
-      ch->send(u"Starting from path %s.\r\n"_s.arg(DC::getInstance()->world[from].paths->p->name));
+    if (from && dc_->world[from].paths)
+      ch->send(u"Starting from path %s.\r\n"_s.arg(dc_->world[from].paths->p->name));
   }
   dc_strcat(endbuf, buf);
-  start = DC::getInstance()->world[from].paths->p;
-  if (DC::getInstance()->world[to].paths)
+  start = dc_->world[from].paths->p;
+  if (dc_->world[to].paths)
   {
-    ch->send(u"Ending in path %s.\r\n"_s.arg(DC::getInstance()->world[to].paths->p->name));
+    ch->send(u"Ending in path %s.\r\n"_s.arg(dc_->world[to].paths->p->name));
   }
   else
   {
     QMap<qint32, qint32> z;
     to = find_closest_path(to, 1, &buf[0], z);
-    if (to && DC::getInstance()->world[to].paths)
-      ch->send(u"Ending in path %s.\r\n"_s.arg(DC::getInstance()->world[to].paths->p->name));
+    if (to && dc_->world[to].paths)
+      ch->send(u"Ending in path %s.\r\n"_s.arg(dc_->world[to].paths->p->name));
   }
-  stop = DC::getInstance()->world[to].paths->p;
+  stop = dc_->world[to].paths->p;
   if (!start || !stop)
     return "Invalid path";
 

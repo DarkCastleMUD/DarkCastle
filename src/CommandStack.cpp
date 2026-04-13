@@ -54,7 +54,7 @@ CommandStack::~CommandStack()
   }
   else
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Attempt to decrement CommandStack::depth when already 0");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Attempt to decrement CommandStack::depth when already 0");
     produce_coredump();
   }
 }

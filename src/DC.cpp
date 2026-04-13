@@ -7,6 +7,7 @@
  */
 
 #include <cassert>
+#include <qcoreapplication.h>
 
 #include "DC/DC.h"
 #include "DC/db.h"
@@ -76,15 +77,6 @@ void DC::findLibrary(void)
 
 void DC::removeDead(void)
 {
-  while (!death_list.isEmpty())
-  {
-    auto &trace = death_list.first();
-    auto victim = death_list.firstKey();
-    trace.addTrack("DC::removeDeath");
-    free_char(victim, trace);
-    death_list.remove(death_list.firstKey());
-  }
-
   while (!obj_free_list.isEmpty())
   {
     auto obj = *obj_free_list.cbegin();
@@ -120,24 +112,14 @@ QString DC::getBuildTime(void)
 
 DCPtr DC::getInstance(void)
 {
-  DCPtr dc = dynamic_cast<DC *>(DC::instance());
-  assert(dc.isNull());
-  return dc;
+  return dynamic_cast<DC *>(DC::instance());
 }
 
 zone_t DC::getRoomZone(room_t room_nr)
 {
-  DCPtr dc = getInstance();
-  if (dc != nullptr)
-  {
-    for (auto [zone_key, zone] : dc->zones.asKeyValueRange())
-    {
-      if (room_nr >= zone.getRealBottom() && room_nr <= zone.getTop())
-      {
-        return zone_key;
-      }
-    }
-  }
+  for (auto [zone_key, zone] : zones.asKeyValueRange())
+    if (room_nr >= zone.getRealBottom() && room_nr <= zone.getTop())
+      return zone_key;
   return zone_t();
 }
 
@@ -309,14 +291,14 @@ ObjectPtr DC::getObject(vnum_t vnum)
     return {};
   }
 
-  return DC::getInstance()->obj_index[rnum].item;
+  return dc_->obj_index[rnum].item;
 }
 
 void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
   if (cf.verbose_mode)
   {
-    DC::getInstance()->logentry(str, god_level, type, vict);
+    dc_->logentry(str, god_level, type, vict);
   }
 }
 
@@ -358,7 +340,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
     arena.type = CHAOS; // -2
     dc_sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
     send_info(buf);
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", qPrintable(ch->name()));
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", qPrintable(ch->name()));
   }
 
   if (!dc_strcmp(arg4, "potato"))
@@ -525,8 +507,11 @@ qint32 dc_sprintf(QString &str, const QString format, ...)
 }
 
 Character::Character(DCPtr dc)
-    : dc_(dc)
+    : dc_(dc), QObject(dc)
 {
-  if (dc)
-    QObject(dynamic_cast<QObject *>(dc.data()));
+}
+
+Connection::Connection(DCPtr dc)
+    : QObject(dc), dc_(dc)
+{
 }

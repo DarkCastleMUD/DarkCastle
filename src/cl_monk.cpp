@@ -93,7 +93,7 @@ command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     // 1% bingo chance
-    if (number(1, 100) == 1 && !victim->isImmortalPlayer())
+    if (ch->dc_->number(1, 100) == 1 && !victim->isImmortalPlayer())
     {
       time(&time_raw_format);
       ptr_time = localtime(&time_raw_format);
@@ -177,7 +177,7 @@ command_return_t do_quivering_palm(CharacterPtr ch, const QString argument, cmd_
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
+  if (isSet(dc_->world[ch->in_room].room_flags, NO_KI))
   {
     ch->sendln("You find yourself unable to focus your energy here.");
     return ReturnValue::eFAILURE;
@@ -418,7 +418,7 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
         return retval;
       }
 
-      if (number(0, 1))
+      if (ch->dc_->number(0, 1))
       {
         victim->sendln("The hit knocks the sense back into you!");
         act_return ar = act_to_room("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, NOTVICT);
@@ -436,7 +436,7 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
     act_return ar;
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+        dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       ar = act_to_character("$N's heightened battlesense sees your stun coming from a mile away and $E easily blocks it.", ch, 0, victim, 0);
       retval = ar.retval;

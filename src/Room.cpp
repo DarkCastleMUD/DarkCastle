@@ -1,17 +1,13 @@
 #include "DC/DC.h"
 
 Room::Room(DCPtr dc)
-    : dc_(dc)
+    : dc_(dc), QObject(dc)
 {
-  if (dc_)
-    QObject(dynamic_cast<QObject *>(dc.data()));
 }
 
 Room::Room(room_t room_nr, DCPtr dc)
-    : number(room_nr), dc_(dc)
+    : number(room_nr), dc_(dc), QObject(dc)
 {
-  if (dc_)
-    QObject(dynamic_cast<QObject *>(dc.data()));
 }
 
 auto &operator<<(auto &out, const Room &room);
@@ -23,7 +19,7 @@ auto &operator<<(auto &out, const Room &room);
   }
 
   extra_descr_data *extra;
-  if (!DC::getInstance()->rooms.contains(room.number))
+  if (!dc_->rooms.contains(room.number))
     return out;
 
   out << "#" << room.number << "\n";

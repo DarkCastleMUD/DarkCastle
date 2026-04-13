@@ -44,7 +44,7 @@ qint32 load_quests(void)
 
   if (!(fl = fopen(QUEST_FILE, "r")))
   {
-    DC::getInstance()->logentry(u"Failed to open quest file for reading!"_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Failed to open quest file for reading!"_s, 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
@@ -85,7 +85,7 @@ qint32 save_quests(void)
 
   if (!(fl = fopen(QUEST_FILE, "w")))
   {
-    DC::getInstance()->logentry(u"Failed to open quest file for writing!"_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Failed to open quest file for writing!"_s, 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
@@ -222,7 +222,7 @@ void show_quest_info(CharacterPtr ch, qint32 num)
                      .arg(quest->reward)
                      .arg(quest->timer)
                      .arg(quest->mobnum)
-                     .arg(real_mobile(quest->mobnum) > 0 ? qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[real_mobile(quest->mobnum)].item))->short_description()) : "no current mob")
+                     .arg(real_mobile(quest->mobnum) > 0 ? qPrintable(((CharacterPtr)(dc_->mob_index[real_mobile(quest->mobnum)].item))->short_description()) : "no current mob")
                      .arg(quest->objnum)
                      .arg(quest->objkey)
                      .arg(quest->objshort)
@@ -352,7 +352,7 @@ qint32 show_one_quest(CharacterPtr ch, quest_info *quest, qint32 count)
 
       if (!amount)
       {
-        DC::getInstance()->logentry(u"Somebody passed a quest into here that they don't really have."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+        dc_->logentry(u"Somebody passed a quest into here that they don't really have."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
 
       ch->send(u" $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\r\n\r\n"_s.arg(quest->level).arg(amount).arg(quest->reward));
@@ -517,8 +517,8 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
   { // recurring quest
     while (++dontwannabeinthisforever < 100)
     {
-      mob = get_mob_vnum(number(1, 34000));
-      if (mob && (mob->getLevel() < 90) && DC::getInstance()->zones.value(DC::getInstance()->world[mob->in_room].zone).isNoHunt() == false && (mob->description().length() > 80))
+      mob = get_mob_vnum(ch->dc_->number(1, 34000));
+      if (mob && (mob->getLevel() < 90) && dc_->zones.value(dc_->world[mob->in_room].zone).isNoHunt() == false && (mob->description().length() > 80))
         break;
     }
     quest->hint1 = mob->description();
@@ -545,7 +545,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
   obj_to_char(obj, mob);
   wear(mob, obj, obj->keywordfind());
 
-  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", qPrintable(ch->name()), quest->number, quest->name, quest->cost, quest->brownie);
+  dc_->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", qPrintable(ch->name()), quest->number, quest->name, quest->cost, quest->brownie);
 
   ch->player->quest_current[count] = quest->number;
   ch->player->quest_current_ticksleft[count] = quest->timer;
@@ -592,7 +592,7 @@ qint32 cancel_quest(CharacterPtr ch, quest_info *quest)
       return ReturnValue::eEXTRA_VALUE;
   }
 
-  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", qPrintable(ch->name()), quest->number, quest->name);
+  dc_->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", qPrintable(ch->name()), quest->number, quest->name);
 
   ch->player->quest_cancel[count] = quest->number;
 
@@ -635,7 +635,7 @@ qint32 complete_quest(CharacterPtr ch, quest_info *quest)
     SETBIT(ch->player->quest_complete, quest->number);
   quest->active = false;
 
-  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", qPrintable(ch->name()), quest->number, quest->name, quest->reward);
+  dc_->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", qPrintable(ch->name()), quest->number, quest->name, quest->reward);
 
   return ReturnValue::eSUCCESS;
 }
@@ -702,7 +702,7 @@ void quest_update()
   ObjectPtr obj;
   quest_info *quest;
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
     if (!i->desc || i->isNonPlayer())
@@ -720,7 +720,7 @@ void quest_update()
             {
               stop_current_quest(i, quest);
 
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", qPrintable(i->name()), quest->number, quest->name);
+              dc_->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", qPrintable(i->name()), quest->number, quest->name);
 
               i->send(u"Time has expired for %1.  This quest has ended.\r\n"_s.arg(quest->name));
             }
@@ -746,7 +746,7 @@ void quest_update()
       }
     }
   }
-  DC::getInstance()->removeDead();
+  dc_->removeDead();
 }
 
 qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString name)
@@ -856,7 +856,7 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
     }
     break;
   default:
-    DC::getInstance()->logentry(u"Bug in quest_handler, how'd they get here?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Bug in quest_handler, how'd they get here?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   return retval;
@@ -1191,8 +1191,8 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
 
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", qPrintable(ch->name()), qPrintable(vict->name()),
-                              vict->player->quest_points, atoi(value));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", qPrintable(ch->name()), qPrintable(vict->name()),
+                vict->player->quest_points, atoi(value));
       ch->send(u"Setting %s's quest points from %d to %d.\r\n"_s.arg(qPrintable(vict->name())).arg(vict->player->quest_points).arg(atoi(value)));
 
       vict->player->quest_points = atoi(value);
@@ -1382,7 +1382,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     break;
   default:
-    DC::getInstance()->logentry(u"Screw up in do_edit_quest, whatsamaddahyou?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Screw up in do_edit_quest, whatsamaddahyou?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   return ReturnValue::eSUCCESS;
@@ -1426,7 +1426,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1435,7 +1435,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1444,7 +1444,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1453,7 +1453,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
       }
     }

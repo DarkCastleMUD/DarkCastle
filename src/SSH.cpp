@@ -8,7 +8,7 @@
 namespace SSH
 {
 
-  SSH::SSH(QObject *parent) : QObject(parent)
+  SSH::SSH(DCPtr dc) : QObject(dc), dc_(dc)
   {
   }
 
@@ -16,39 +16,39 @@ namespace SSH
   {
     QString buffer = {};
     getcwd(buffer, NAME_MAX - 1);
-    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "cwd is %s", buffer);
+    dc_->logf(0, DC::LogChannel::LOG_BUG, "cwd is %s", buffer);
     chdir("../lib");
 
     ssh_init();
     sshbind = ssh_bind_new();
     if (qint32 rc = ssh_bind_options_parse_config(sshbind, nullptr) < 0)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_parse_config returned %d", rc);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_parse_config returned %d", rc);
     }
 
     qint32 loglevel = SSH_LOG_TRACE;
     if (qint32 rc = ssh_bind_options_set(sshbind, ssh_bind_options_e::SSH_BIND_OPTIONS_LOG_VERBOSITY, &loglevel) < 0)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);
     }
 
     const QString rsahostkeyfilename = "ssh_host_rsa_key";
     if (qint32 rc = ssh_bind_options_set(sshbind, ssh_bind_options_e::SSH_BIND_OPTIONS_RSAKEY, &rsahostkeyfilename) < 0)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);
     }
 
     quint32 bindport = 6922;
     if (qint32 rc = ssh_bind_options_set(sshbind, ssh_bind_options_e::SSH_BIND_OPTIONS_BINDPORT, &bindport) < 0)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_options_set SSH_BIND_OPTIONS_BINDPORT returned %d", rc);
     }
 
     ssh_bind_set_blocking(sshbind, false);
 
     if (qint32 rc = ssh_bind_listen(sshbind) < 0)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_listen returned %d", rc);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "ssh_bind_listen returned %d", rc);
     }
   }
 

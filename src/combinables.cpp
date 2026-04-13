@@ -152,7 +152,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
     failure = 1;
   else
   {
-    percent = number(1, 101);
+    percent = dc_->number(1, 101);
     chance = determine_trade_skill_chance(learned, poison_vial_data[index].trivial);
 
     determine_trade_skill_increase(ch, SKILL_TRADE_POISON, learned, poison_vial_data[index].trivial);
@@ -226,7 +226,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   qint32 found = -1;
   for (qint32 i = {}; poison_vial_data[i].result != -1; i++)
-    if (poison_vial_data[i].result == DC::getInstance()->obj_index[vial->item_number].vnum())
+    if (poison_vial_data[i].result == dc_->obj_index[vial->item_number].vnum())
     {
       found = i;
       break;
@@ -274,7 +274,7 @@ qint32 valid_trade_skill_combine(ObjectPtr container, trade_data_type *data, Cha
   // take all the items in our container and put them in an array by vnum
   for (ObjectPtr j = container->contains; j; j = j->next_content)
     if (j->item_number >= 0)
-      current.push_back(DC::getInstance()->obj_index[j->item_number].vnum());
+      current.push_back(dc_->obj_index[j->item_number].vnum());
     else
       return -1; // only valid object ingrediants will match
 
@@ -427,13 +427,13 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!str_cmp(arg1, "load"))
     {
       b.load();
-      DC::getInstance()->logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d brew recipes.", b.size());
+      dc_->logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d brew recipes.", b.size());
       return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "save"))
     {
       b.save();
-      DC::getInstance()->logf(108, DC::LogChannel::LOG_WORLD, "Saved %d brew recipes.", b.size());
+      dc_->logf(108, DC::LogChannel::LOG_WORLD, "Saved %d brew recipes.", b.size());
       return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "list"))
@@ -541,7 +541,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   const QString potion_color;
   // Determine color to use in message based on herb used
-  switch (DC::getInstance()->obj_index[herbobj->item_number].vnum())
+  switch (dc_->obj_index[herbobj->item_number].vnum())
   {
   case 6301:
     potion_color = "$B$2green$R and $B$4red$R";
@@ -585,15 +585,15 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // Search for the current combination as a recipe
-  Brew::recipe r = {DC::getInstance()->obj_index[herbobj->item_number].vnum(),
+  Brew::recipe r = {dc_->obj_index[herbobj->item_number].vnum(),
                     liquidobj->obj_flags.value[2],
-                    DC::getInstance()->obj_index[containerobj->item_number].vnum()};
+                    dc_->obj_index[containerobj->item_number].vnum()};
   qint32 spell = b.find(r);
 
   //  ch->sendln(u"Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n"_s,
-  //	 DC::getInstance()->obj_index[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
+  //	 dc_->obj_index[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
   //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
-  //	 DC::getInstance()->obj_index[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
+  //	 dc_->obj_index[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
 
   if (spell == 0)
   {
@@ -701,7 +701,7 @@ void Brew::load(void)
   std::ifstream ifs(RECIPES_FILENAME, std::ios_base::in);
   if (!ifs.is_open())
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -728,7 +728,7 @@ void Brew::load(void)
   }
   catch (loadError &)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
   }
 }
 
@@ -737,7 +737,7 @@ void Brew::save(void)
   std::ofstream ofs(RECIPES_FILENAME, std::ios_base::trunc);
   if (!ofs.is_open())
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -754,7 +754,7 @@ void Brew::save(void)
   }
   catch (...)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
   }
 }
 
@@ -931,13 +931,13 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!str_cmp(arg1, "load"))
     {
       s.load();
-      DC::getInstance()->logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d scribe recipes.", s.size());
+      dc_->logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d scribe recipes.", s.size());
       return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "save"))
     {
       s.save();
-      DC::getInstance()->logf(108, DC::LogChannel::LOG_WORLD, "Saved %d scribe recipes.", s.size());
+      dc_->logf(108, DC::LogChannel::LOG_WORLD, "Saved %d scribe recipes.", s.size());
       return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "list"))
@@ -1052,10 +1052,10 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   // Search for the current combination as a recipe
-  Scribe::recipe r = {DC::getInstance()->obj_index[inkobj->item_number].vnum(),
-                      DC::getInstance()->obj_index[dustobj->item_number].vnum(),
-                      DC::getInstance()->obj_index[penobj->item_number].vnum(),
-                      DC::getInstance()->obj_index[paperobj->item_number].vnum()};
+  Scribe::recipe r = {dc_->obj_index[inkobj->item_number].vnum(),
+                      dc_->obj_index[dustobj->item_number].vnum(),
+                      dc_->obj_index[penobj->item_number].vnum(),
+                      dc_->obj_index[paperobj->item_number].vnum()};
   qint32 spell = s.find(r);
 
   act_to_character("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, 0);
@@ -1086,7 +1086,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     extract_obj(penobj);
     extract_obj(dustobj);
     // 50% of a failure causing 'wild magic' to be cast on self
-    if (number(1, 100) > 50)
+    if (ch->dc_->number(1, 100) > 50)
     {
       cast_wild_magic(ch->getLevel(), ch, "offense", 0, ch, 0, 0);
     }
@@ -1150,7 +1150,7 @@ void Scribe::load(void)
   std::ifstream ifs(RECIPES_FILENAME, std::ios_base::in);
   if (!ifs.is_open())
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -1178,7 +1178,7 @@ void Scribe::load(void)
   }
   catch (loadError &)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
   }
 }
 
@@ -1187,7 +1187,7 @@ void Scribe::save(void)
   std::ofstream ofs(RECIPES_FILENAME, std::ios_base::trunc);
   if (!ofs.is_open())
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -1204,7 +1204,7 @@ void Scribe::save(void)
   }
   catch (...)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
   }
 }
 

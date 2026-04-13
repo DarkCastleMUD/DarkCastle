@@ -136,7 +136,7 @@ qint32 DC::write_hotboot_file(void)
   class Connection *sd;
   if ((fp = fopen("hotboot", "w")) == nullptr)
   {
-    DC::getInstance()->logentry(u"Hotboot failed, unable to open hotboot file."_s), 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Hotboot failed, unable to open hotboot file."_s), 0, DC::LogChannel::LOG_MISC);
     return 0;
   }
   // std::for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
@@ -178,14 +178,14 @@ qint32 DC::write_hotboot_file(void)
     }
   }
   fclose(fp);
-  DC::getInstance()->logentry(u"Hotboot descriptor file successfully written."_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Hotboot descriptor file successfully written."_s, 0, DC::LogChannel::LOG_MISC);
 
   chdir("../bin/");
 
   QString cwd = get_current_dir_name();
   if (cwd != nullptr)
   {
-    DC::getInstance()->logentry(u"Hotbooting %1 at [%2]"_s.arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
+    dc_->logentry(u"Hotbooting %1 at [%2]"_s.arg(dc_->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
     free(cwd);
   }
 
@@ -195,7 +195,7 @@ qint32 DC::write_hotboot_file(void)
     QString execv_strerror = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
 
-    DC::getInstance()->logentry(u"Hotboot execv(%1, argv) failed with error: %2"_s.arg(applicationFilePath()).arg(execv_strerror), 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Hotboot execv(%1, argv) failed with error: %2"_s.arg(applicationFilePath()).arg(execv_strerror), 0, DC::LogChannel::LOG_MISC);
 
     // wipe the file since we can't use it anyway
     if (unlink("hotboot") == -1)
@@ -203,7 +203,7 @@ qint32 DC::write_hotboot_file(void)
       QString unlink_strerror = {};
       strerror_r(errno, unlink_strerror, sizeof(unlink_strerror));
 
-      DC::getInstance()->logentry(u"Hotboot unlink(\"hotboot\") failed with error: %1"_s.arg(unlink_strerror), 0, DC::LogChannel::LOG_MISC);
+      dc_->logentry(u"Hotboot unlink(\"hotboot\") failed with error: %1"_s.arg(unlink_strerror), 0, DC::LogChannel::LOG_MISC);
     }
 
     chdir(qPrintable(cf.library_directory));
@@ -268,7 +268,7 @@ qint32 DC::load_hotboot_descs(void)
       {
         if (write_to_descriptor(descriptor, str) == -1)
         {
-          DC::getInstance()->logentry(u"Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot."_s.arg(address).arg(character_name).arg(descriptor));
+          dc_->logentry(u"Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot."_s.arg(address).arg(character_name).arg(descriptor));
           close(descriptor);
           d = {};
           d = {};
@@ -278,8 +278,8 @@ qint32 DC::load_hotboot_descs(void)
       if (!d)
         continue;
 
-      conn->next = DC::getInstance()->connections_;
-      DC::getInstance()->connections_ = d;
+      conn->next = dc_->connections_;
+      dc_->connections_ = d;
     }
     hotboot_file.close();
   }
@@ -287,7 +287,7 @@ qint32 DC::load_hotboot_descs(void)
   unlink("hotboot"); // if the above unlink failed somehow(?),
                      // remove the hotboot file so that it dosen't think
                      // next reboot is another hotboot
-  DC::getInstance()->logentry(u"Successful hotboot file read."_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Successful hotboot file read."_s, 0, DC::LogChannel::LOG_MISC);
   return 1;
 }
 
@@ -350,7 +350,7 @@ void DC::finish_hotboot(void)
   class Connection *d;
   QString buf;
 
-  for (auto &conn : DC::getInstance()->connections_)
+  for (auto &conn : dc_->connections_)
   {
     write_to_descriptor(conn->descriptor, "Reconnecting your link to your character...\r\n");
 
@@ -367,7 +367,7 @@ void DC::finish_hotboot(void)
 
     conn->output.clear();
 
-    auto &character_list = DC::getInstance()->character_list;
+    auto &character_list = dc_->character_list;
     character_list.insert(conn->character);
 
     conn->character->do_on_login_stuff();
@@ -377,7 +377,7 @@ void DC::finish_hotboot(void)
     update_max_who();
   }
 
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &d : dc_->connections_)
   {
     do_look(conn->character, "");
     conn->character->save(cmd_t::SAVE_SILENTLY);
@@ -408,7 +408,7 @@ void DC::init_game(void)
 
     std::for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
                   {
-               DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Opening port %d.", port);
+               dc_->logf(0, DC::LogChannel::LOG_MISC, "Opening port %d.", port);
                qint32 listen_fd = init_socket(port);
                if (listen_fd >= 0)
                {
@@ -416,7 +416,7 @@ void DC::init_game(void)
                }
                else
                {
-                 DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Error opening port %d.", port);
+                 dc_->logf(0, DC::LogChannel::LOG_MISC, "Error opening port %d.", port);
                } });
   }
 
@@ -425,7 +425,7 @@ void DC::init_game(void)
 
   if (was_hotboot)
   {
-    DC::getInstance()->logentry(u"Connecting hotboot characters to their descriptiors"_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Connecting hotboot characters to their descriptiors"_s, 0, DC::LogChannel::LOG_MISC);
     finish_hotboot();
   }
 
@@ -435,11 +435,11 @@ void DC::init_game(void)
   // we got all the way through, let's turn auto-hotboot back on
   try_to_hotboot_on_crash = 1;
 
-  DC::getInstance()->logentry(u"Entering game loop."_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Entering game loop."_s, 0, DC::LogChannel::LOG_MISC);
 
   unlink("died_in_bootup");
 
-  if (DC::getInstance()->cf.bport == false)
+  if (dc_->cf.bport == false)
   {
     do_not_save_corpses = {};
   }
@@ -455,19 +455,19 @@ void DC::init_game(void)
 
   do_not_save_corpses = 1;
 
-  DC::getInstance()->logentry(u"Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
-  while (DC::getInstance()->connections_)
+  dc_->logentry(u"Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
+  while (dc_->connections_)
   {
-    close_socket(DC::getInstance()->connections_);
+    close_socket(dc_->connections_);
   }
 
   std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [](const qint32 &fd)
                 {
-             DC::getInstance()->logf(0, DC::LogChannel::LOG_MISC, "Closing fd %d.", fd);
+             dc_->logf(0, DC::LogChannel::LOG_MISC, "Closing fd %d.", fd);
              close(fd); });
 
-  DC::getInstance()->logentry(u"Goodbye."_s, 0, DC::LogChannel::LOG_MISC);
-  DC::getInstance()->logentry(u"Normal termination of game."_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Goodbye."_s, 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Normal termination of game."_s, 0, DC::LogChannel::LOG_MISC);
 }
 
 /*
@@ -812,7 +812,7 @@ void DC::game_loop(void)
   PerfTimers["output"].start();
 
   /* send queued output out to the operating system (ultimately to user) */
-  for (d = DC::getInstance()->connections_; d; d = next_d)
+  for (d = dc_->connections_; d; d = next_d)
   {
     next_d = conn->next;
     if ((FD_ISSET(conn->descriptor, &output_set) && !conn->output.isEmpty()) || conn->prompt_mode)
@@ -828,7 +828,7 @@ void DC::game_loop(void)
   gettimeofday(&now_time_, nullptr);
 
   // temp removing this since it's spamming the crap out of us
-  // else DC::getInstance()->logf(110, DC::LogChannel::LOG_BUG, "0 delay on pulse");
+  // else dc_->logf(110, DC::LogChannel::LOG_BUG, "0 delay on pulse");
   gettimeofday(&last_time_, nullptr);
   PerfTimers["gameloop"].stop();
 #ifdef TRACY
@@ -915,8 +915,8 @@ void DC::game_loop_init(void)
 
                  QString buf = u"Hot reboot by %1.\r\n"_s.arg("HTTP /shutdown/");
                  send_to_all(buf);
-                 DC::getInstance()->logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
-                 DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
+                 dc_->logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
+                 dc_->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
 
                  for (const auto &ch : dc->character_list)
                  {
@@ -928,7 +928,7 @@ void DC::game_loop_init(void)
 
                  if (!write_hotboot_file())
                  {
-                   DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
+                   dc_->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
                    return QHttpServerResponse("Failed.\r\n");
                  }
 
@@ -979,7 +979,7 @@ void DC::game_test_init(void)
   conn->character = ch;
   conn->output = {};
 
-  auto &character_list = DC::getInstance()->character_list;
+  auto &character_list = dc_->character_list;
   character_list.insert(conn->character);
 
   conn->character->do_on_login_stuff();
@@ -1126,7 +1126,7 @@ void DC::heartbeat(void)
   {
     PerfTimers["pulse_regen"].start();
     // random pulse timer for regen to make tick sleeping impossible
-    pulse_regen = number((quint64)DC::PULSE_REGEN - 8 * DC::PASSES_PER_SEC, (quint64)DC::PULSE_REGEN + 5 * DC::PASSES_PER_SEC);
+    pulse_regen = dc_->number((quint64)DC::PULSE_REGEN - 8 * DC::PASSES_PER_SEC, (quint64)DC::PULSE_REGEN + 5 * DC::PASSES_PER_SEC);
     point_update();
     pulse_takeover();
     affect_update(DC::PULSE_REGEN);
@@ -1504,9 +1504,9 @@ QString scramble_text(QString input)
   for (auto &c : input)
   {
     // only scramble letters, but not 'm' cause 'm' is used in ansi codes
-    if (number(1, 5) == 5 && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) && c != 'm')
+    if (ch->dc_->number(1, 5) == 5 && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) && c != 'm')
     {
-      c = number(0, 1) ? (QChar)number('a', 'z') : (QChar)number('A', 'Z');
+      c = dc_->number(0, 1) ? (QChar)number('a', 'z') : (QChar)number('A', 'Z');
     }
   }
 
@@ -1594,14 +1594,14 @@ qint32 DC::new_descriptor(qint32 s)
   newd.setPeerAddress(QHostAddress(inet_ntoa(peer.sin_addr)));
 
   /* determine if the site is banned */
-  if (DC::getInstance()->bans_.is_banned(newd.getPeerOriginalAddress().toString()) == Ban::type_t::ALL)
+  if (dc_->bans_.is_banned(newd.getPeerOriginalAddress().toString()) == Ban::type_t::ALL)
   {
     write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\r\n"
                               "Questions, please email us at:\r\n"
                               "imps@dcastle.org\r\n");
 
     close(desc);
-    DC::getInstance()->logentry(u"Connection attempt denied from [%1]"_s.arg(newd.getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
+    dc_->logentry(u"Connection attempt denied from [%1]"_s.arg(newd.getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
     newd = {};
     return 0;
   }
@@ -1612,7 +1612,7 @@ qint32 DC::new_descriptor(qint32 s)
   newd.idle_time = {};
   newd.wait = 1;
   newd.output = {};
-  newd.next = DC::getInstance()->connections_;
+  newd.next = dc_->connections_;
   newd.login_time = time(0);
   newd.astr = {};
   if (++last_desc == 1000)
@@ -1620,7 +1620,7 @@ qint32 DC::new_descriptor(qint32 s)
   newd.desc_num = last_desc;
 
   /* prepend to list */
-  DC::getInstance()->connections_ = newd;
+  dc_->connections_ = newd;
 
   newd.connected = Connection::states::PRE_DISPLAY_ENTRANCE;
   return 0;
@@ -1903,11 +1903,11 @@ qint32 process_input(class Connection *t)
     {
       if (t->character != nullptr && qPrintable(t->character->name()) != nullptr)
       {
-        DC::getInstance()->logentry(u"Connection broken by peer %1 playing %2."_s.arg(t->getPeerAddress().toString()).arg(qPrintable(t->character->name())), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        dc_->logentry(u"Connection broken by peer %1 playing %2."_s.arg(t->getPeerAddress().toString()).arg(qPrintable(t->character->name())), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
       else
       {
-        DC::getInstance()->logentry(u"Connection broken by peer %1 not playing a character."_s.arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        dc_->logentry(u"Connection broken by peer %1 not playing a character."_s.arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
       }
 
       return -1;
@@ -2220,11 +2220,11 @@ qint32 close_socket(class Connection *d)
 
       if (IS_AFFECTED(conn->character, AFF_CANTQUIT))
       {
-        logsocket(u"%1@%2 has disconnected from room %3 with CANTQUIT."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
+        logsocket(u"%1@%2 has disconnected from room %3 with CANTQUIT."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(dc_->world[conn->character->in_room].number));
       }
       else
       {
-        logsocket(u"%1@%2 has disconnected from room %3."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(DC::getInstance()->world[conn->character->in_room].number));
+        logsocket(u"%1@%2 has disconnected from room %3."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(dc_->world[conn->character->in_room].number));
       }
       conn->character->desc = {};
     }
@@ -2232,19 +2232,19 @@ qint32 close_socket(class Connection *d)
     {
       dc_sprintf(buf, "Losing player: %s.",
                  qPrintable(conn->character->name()) ? qPrintable(conn->character->name()) : "<null>");
-      DC::getInstance()->logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
+      dc_->logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
       if (conn->isEditing())
       {
         //		dc_sprintf(buf, "Suspicious: %s.",
         //			qPrintable(conn->character->name()));
-        //		DC::getInstance()->logentry(buf, 110, LOG_HMM);
+        //		dc_->logentry(buf, 110, LOG_HMM);
       }
       free_char(conn->character);
     }
   }
   //   Removed this log caues it's so fricken annoying
   //   else
-  //    DC::getInstance()->logentry(u"Losing descriptor without character."_s, ANGEL, DC::LogChannel::LOG_SOCKET);
+  //    dc_->logentry(u"Losing descriptor without character."_s, ANGEL, DC::LogChannel::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (conn->original && conn->original->desc)
@@ -2255,7 +2255,7 @@ qint32 close_socket(class Connection *d)
   if (d == next_d)
     next_d = conn->next;
 
-  DC::getInstance()->connections_.remove(d);
+  dc_->connections_.remove(d);
 
   if (conn->showstr_head)
     conn->showstr_head = {};
@@ -2265,7 +2265,7 @@ qint32 close_socket(class Connection *d)
   d = {};
   d = {};
 
-  /*  if(DC::getInstance()->connections_ == nullptr)
+  /*  if(dc_->connections_ == nullptr)
   {
     // if there is NOONE on (everyone got disconnected) loop through and
     // boot all of the linkdeads.  That way if the mud's link is cut, the
@@ -2286,7 +2286,7 @@ void DC::check_idle_passwords(void)
 {
   class Connection *d, *next_d;
 
-  for (d = DC::getInstance()->connections_; d; d = next_d)
+  for (d = dc_->connections_; d; d = next_d)
   {
     next_d = conn->next;
     if (conn->connected != Connection::states::GET_OLD_PASSWORD && conn->connected != Connection::states::GET_NAME)
@@ -2307,7 +2307,7 @@ void DC::check_idle_passwords(void)
 
 void DC::report_debug_logging()
 {
-  logentry(u"Name: [%1] Last cmd: [%2] Last room: [%3]"_s.arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
+  logentry(u"Name: [%1] Last cmd: [%2] Last room: [%3]"_s.arg(dc_->last_char_name).arg(dc_->last_processed_cmd).arg(dc_->last_char_room), ANGEL, DC::LogChannel::LOG_BUG);
 }
 
 void DC::crash_hotboot(void)
@@ -2332,10 +2332,10 @@ void DC::crash_hotboot(void)
     {
       write_to_descriptor(conn->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
-    DC::getInstance()->logentry(u"Attempting to hotboot from the crash."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Attempting to hotboot from the crash."_s, ANGEL, DC::LogChannel::LOG_BUG);
     write_hotboot_file();
     // we shouldn't return from there unless we failed
-    DC::getInstance()->logentry(u"Hotboot crash recovery failed.  Exiting."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Hotboot crash recovery failed.  Exiting."_s, ANGEL, DC::LogChannel::LOG_BUG);
     for (d = connections_; d && died_from_sigsegv < 2; d = conn->next)
     {
       write_to_descriptor(conn->descriptor, "Hotboot failed giving up.\r\n");
@@ -2351,18 +2351,18 @@ void DC::crash_hotboot(void)
 void crashill(qint32 sig)
 {
   report_debug_logging();
-  DC::getInstance()->logentry(u"Recieved SIGFPE (Illegal Instruction)"_s, ANGEL, DC::LogChannel::LOG_BUG);
-  DC::getInstance()->crash_hotboot();
-  DC::getInstance()->logentry(u"Mud exiting from SIGFPE."_s, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->logentry(u"Recieved SIGFPE (Illegal Instruction)"_s, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->crash_hotboot();
+  dc_->logentry(u"Mud exiting from SIGFPE."_s, ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
 void crashfpe(qint32 sig)
 {
   report_debug_logging();
-  DC::getInstance()->logentry(u"Recieved SIGFPE (Arithmetic Error)"_s, ANGEL, DC::LogChannel::LOG_BUG);
-  DC::getInstance()->crash_hotboot();
-  DC::getInstance()->logentry(u"Mud exiting from SIGFPE."_s, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->logentry(u"Recieved SIGFPE (Arithmetic Error)"_s, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->crash_hotboot();
+  dc_->logentry(u"Mud exiting from SIGFPE."_s, ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
@@ -2376,13 +2376,13 @@ void crashsig(qint32 sig)
   }
   if (died_from_sigsegv > 2)
   { // panic! try to log and get out
-    DC::getInstance()->logentry(u"Hit 'died_from_sigsegv > 2'"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Hit 'died_from_sigsegv > 2'"_s, ANGEL, DC::LogChannel::LOG_BUG);
     exit(0);
   }
   report_debug_logging();
-  DC::getInstance()->logentry(u"Recieved SIGSEGV (Segmentation fault)"_s, ANGEL, DC::LogChannel::LOG_BUG);
-  DC::getInstance()->crash_hotboot();
-  DC::getInstance()->logentry(u"Mud exiting from SIGSEGV."_s, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->logentry(u"Recieved SIGSEGV (Segmentation fault)"_s, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->crash_hotboot();
+  dc_->logentry(u"Mud exiting from SIGSEGV."_s, ANGEL, DC::LogChannel::LOG_BUG);
   exit(0);
 }
 
@@ -2391,8 +2391,8 @@ void unrestrict_game(qint32 sig)
   extern class ban_list_element *ban_list;
   extern qint32 num_invalid;
 
-  DC::getInstance()->logentry(u"Received SIGUSR2 - completely unrestricting game (emergent)"_s,
-                              ANGEL, DC::LogChannel::LOG_GOD);
+  dc_->logentry(u"Received SIGUSR2 - completely unrestricting game (emergent)"_s,
+                ANGEL, DC::LogChannel::LOG_GOD);
   ban_list = {};
   restrict = {};
   num_invalid = {};
@@ -2400,7 +2400,7 @@ void unrestrict_game(qint32 sig)
 
 void hupsig(qint32 sig)
 {
-  DC::getInstance()->logentry(u"Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."_s), 0, DC::LogChannel::LOG_MISC);
+  dc_->logentry(u"Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."_s), 0, DC::LogChannel::LOG_MISC);
   abort(); /* perhaps something more elegant should
             * substituted */
 }
@@ -2408,10 +2408,10 @@ void hupsig(qint32 sig)
 void sigusr1(qint32 sig)
 {
   do_not_save_corpses = 1;
-  DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
-  if (!DC::getInstance()->write_hotboot_file())
+  dc_->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
+  if (!dc_->write_hotboot_file())
   {
-    DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
   }
 }
 
@@ -2438,14 +2438,14 @@ void sigchld(qint32 sig)
 
 void signal_handler(qint32 signal, siginfo_t *si, void *)
 {
-  DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
-                                                             "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
-                                                             "qint32=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
-                                                             "fd=%d",
-                          si->si_signo, si->si_errno, si->si_code,
-                          si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value.sival_int,
-                          si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
-                          si->si_fd);
+  dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
+                                               "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
+                                               "qint32=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
+                                               "fd=%d",
+            si->si_signo, si->si_errno, si->si_code,
+            si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value.sival_int,
+            si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
+            si->si_fd);
 
   if (signal == SIGINT || signal == SIGTERM)
   {
@@ -2457,11 +2457,11 @@ void signal_handler(qint32 signal, siginfo_t *si, void *)
     extern command_return_t do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(u"Hot reboot by SIGHUP.\r\n"_s);
-    DC::getInstance()->logentry(u"Hot reboot by SIGHUP.\r\n"_s, ANGEL, DC::LogChannel::LOG_GOD);
-    DC::getInstance()->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
-    if (!DC::getInstance()->write_hotboot_file())
+    dc_->logentry(u"Hot reboot by SIGHUP.\r\n"_s, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_->logentry(u"Writing sockets to file for hotboot recovery."_s, 0, DC::LogChannel::LOG_MISC);
+    if (!dc_->write_hotboot_file())
     {
-      DC::getInstance()->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
+      dc_->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
     }
   }
 }
@@ -2632,7 +2632,7 @@ void send_to_all(QString message)
 
   if (!message.isEmpty())
   {
-    for (auto &i : DC::getInstance()->connections_)
+    for (auto &i : dc_->connections_)
     {
       if (!i->connected)
       {
@@ -2678,7 +2678,7 @@ void send_info(const QString messg)
   class Connection *i;
 
   if (messg)
-    for (auto &i : DC::getInstance()->connections_)
+    for (auto &i : dc_->connections_)
     {
       if (!(i->character) ||
           !isSet(i->character->misc, DC::LogChannel::CHANNEL_INFO))
@@ -2693,7 +2693,7 @@ void send_to_outdoor(QString messg)
   class Connection *i;
 
   if (messg)
-    for (auto &i : DC::getInstance()->connections_)
+    for (auto &i : dc_->connections_)
       if (!i->connected)
         if (OUTSIDE(i->character) && !is_busy(i->character))
           write_to_output(messg, i);
@@ -2704,9 +2704,9 @@ void send_to_zone(const QString messg, qint32 zone)
   class Connection *i = {};
   if (messg)
   {
-    for (auto &i : DC::getInstance()->connections_)
+    for (auto &i : dc_->connections_)
     {
-      if (!i->connected && !is_busy(i->character) && i->character->in_room != DC::NOWHERE && DC::getInstance()->world[i->character->in_room].zone == zone)
+      if (!i->connected && !is_busy(i->character) && i->character->in_room != DC::NOWHERE && dc_->world[i->character->in_room].zone == zone)
       {
         write_to_output(messg, i);
       }
@@ -2722,12 +2722,12 @@ void send_to_room(QString messg, qint32 room, bool awakeonly, CharacterPtr nta)
   if (room == DC::NOWHERE)
     return;
 
-  if (!DC::getInstance()->rooms.contains(room) || !DC::getInstance()->world[room].people)
+  if (!dc_->rooms.contains(room) || !dc_->world[room].people)
   {
     return;
   }
   if (!messg.isEmpty())
-    for (i = DC::getInstance()->world[room].people; i; i = i->next_in_room)
+    for (i = dc_->world[room].people; i; i = i->next_in_room)
       if (i->desc && !is_busy(i) && nta != i)
         if (!awakeonly || GET_POS(i) > position_t::SLEEPING)
           write_to_output(messg, i->desc);
@@ -2776,7 +2776,7 @@ const QString any_one_arg(const QString argument, QString first_arg)
 
 bool is_multi(CharacterPtr ch)
 {
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &d : dc_->connections_)
     if (conn->character && ch->name() != conn->character->name() && conn->getPeerOriginalAddress() == ch->desc->getPeerOriginalAddress())
       return true;
 
@@ -2790,7 +2790,7 @@ void warn_if_duplicate_ip(CharacterPtr ch)
 
   std::list<multiplayer> multi_list;
 
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &d : dc_->connections_)
   {
     if (conn->character && ch->name() != conn->character->name() && conn->getPeerOriginalAddress().toString() == ch->desc->getPeerOriginalAddress().toString())
     {
@@ -2820,7 +2820,7 @@ void warn_if_duplicate_ip(CharacterPtr ch)
 
   for (std::list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
-    DC::getInstance()->logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", qPrintable((*i).host.toString()), qPrintable((*i).name1), qPrintable((*i).name2));
+    dc_->logf(108, DC::LogChannel::LOG_WARNING, "MultipleIP: %s -> %s / %s ", qPrintable((*i).host.toString()), qPrintable((*i).name1), qPrintable((*i).name2));
   }
 }
 
@@ -2886,7 +2886,7 @@ Proxy::Proxy(QString h)
     else
     {
       inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Unrecognized PROXY inet protocol family in arg2 [%1]"_s.arg(arg2)));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Unrecognized PROXY inet protocol family in arg2 [%1]"_s.arg(arg2)));
     }
   }
 
@@ -2908,7 +2908,7 @@ Proxy::Proxy(QString h)
     source_port = arg5.toUInt(&ok);
     if (!ok)
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Invalid source port [%1]"_s.arg(arg5)));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Invalid source port [%1]"_s.arg(arg5)));
       return;
     }
   }
@@ -2921,7 +2921,7 @@ Proxy::Proxy(QString h)
     destination_port = arg6.toUInt(&ok);
     if (!ok)
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Invalid source port [%1]"_s.arg(arg6)));
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, qPrintable(u"Invalid source port [%1]"_s.arg(arg6)));
       return;
     }
 

@@ -158,18 +158,18 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   extern qint32 top_of_mobt;
   QMultiMap<level_, QString> results;
 
-  for (vnum_t vnum = {}; (vnum <= DC::getInstance()->mob_index[top_of_mobt].vnum()); ++vnum)
+  for (vnum_t vnum = {}; (vnum <= dc_->mob_index[top_of_mobt].vnum()); ++vnum)
   {
     auto nr = real_mobile(vnum);
     if (nr < 0)
       continue;
 
-    auto victim = (CharacterPtr)(DC::getInstance()->mob_index[nr].item);
+    auto victim = (CharacterPtr)(dc_->mob_index[nr].item);
     if ((arg1_level_ok && victim->getLevel() < arg1_level) ||
         (arg2_level_ok && victim->getLevel() < arg2_level))
       continue;
 
-    auto victim_qty = DC::getInstance()->mob_index[nr].qty;
+    auto victim_qty = dc_->mob_index[nr].qty;
     bool include_bard = false;
     if (ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
     {

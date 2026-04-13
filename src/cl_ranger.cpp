@@ -306,7 +306,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (DC::getInstance()->world[this->in_room].tracks_.size() < 1)
+  if (dc_->world[this->in_room].tracks_.size() < 1)
   {
     if (!hunting.isEmpty())
     {
@@ -329,7 +329,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     for (x = 1; x <= how_deep; x++)
     {
 
-      if ((x > DC::getInstance()->world[this->in_room].tracks_.size()) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
+      if ((x > dc_->world[this->in_room].tracks_.size()) || !(pScent = dc_->world[this->in_room].TrackItem(x)))
       {
         if (!hunting.isEmpty())
         {
@@ -358,7 +358,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
         if (this->isNonPlayer())
         {
           // temp disable tracking mobs into town
-          if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
+          if (dc_->zones.value(dc_->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(dc_->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
           {
             this->mobdata->last_direction = y;
             auto cmd_dir = getCommandFromDirection(y);
@@ -394,7 +394,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             return ReturnValue::eFAILURE;
           }
 
-          if (!isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
+          if (!isSet(dc_->world[this->in_room].room_flags, SAFE))
           {
             act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
                 this, 0, 0, TO_ROOM, 0);
@@ -433,7 +433,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
   for (x = 1; x <= how_deep; x++)
   {
-    if ((x > DC::getInstance()->world[this->in_room].tracks_.size()) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
+    if ((x > dc_->world[this->in_room].tracks_.size()) || !(pScent = dc_->world[this->in_room].TrackItem(x)))
     {
       if (x == 1)
         this->sendln("There are no distinct smells here.");
@@ -482,13 +482,13 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     else
       dc_strcpy(race, " non-descript race");
 
-    if (number(1, 101) >= (how_deep * 10))
+    if (ch->dc_->number(1, 101) >= (how_deep * 10))
       dc_strcpy(weight, "");
-    if (number(1, 101) >= (how_deep * 10))
+    if (ch->dc_->number(1, 101) >= (how_deep * 10))
       dc_strcpy(race, " non-descript race");
-    if (number(1, 101) >= (how_deep * 10))
+    if (ch->dc_->number(1, 101) >= (how_deep * 10))
       dc_strcpy(condition, "");
-    if (number(1, 101) >= (how_deep * 10))
+    if (ch->dc_->number(1, 101) >= (how_deep * 10))
       dc_strcpy(sex, "");
 
     if (x == 1)
@@ -535,12 +535,12 @@ command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
 
 qint32 pick_one(qint32 a, qint32 b)
 {
-  return number(1, 100) <= 50 ? a : b;
+  return dc_->number(1, 100) <= 50 ? a : b;
 }
 
 qint32 pick_one(qint32 a, qint32 b, qint32 c)
 {
-  qint32 x = number(1, 100);
+  qint32 x = dc_->number(1, 100);
 
   if (x > 66)
     return a;
@@ -552,7 +552,7 @@ qint32 pick_one(qint32 a, qint32 b, qint32 c)
 
 qint32 pick_one(qint32 a, qint32 b, qint32 c, qint32 d)
 {
-  qint32 x = number(1, 100);
+  qint32 x = dc_->number(1, 100);
 
   if (x > 75)
     return a;
@@ -709,7 +709,7 @@ command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (ch->affected_by_spell(SKILL_FORAGE))
   {
-    if (number(0, 1) == 0)
+    if (ch->dc_->number(0, 1) == 0)
       ch->sendln("You already foraged recently.  Give mother nature a break!");
     else
       ch->sendln("There's a limit to how often you can play with your nuts.  Give it some time.");
@@ -726,7 +726,7 @@ command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  qint32 pick = number(1, 100);
+  qint32 pick = dc_->number(1, 100);
   qint32 ovnum;
   qint32 lgroup = {};
 
@@ -746,12 +746,12 @@ command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     lgroup = 3;
   }
-  qint32 cur_sector = DC::getInstance()->world[ch->in_room].sector_type;
+  qint32 cur_sector = dc_->world[ch->in_room].sector_type;
 
   // If in a clan or safe room, set sector to inside so we fail forage
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) ||
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, INDOORS))
+  if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) ||
+      isSet(dc_->world[ch->in_room].room_flags, SAFE) ||
+      isSet(dc_->world[ch->in_room].room_flags, INDOORS))
   {
     cur_sector = SECT_INSIDE;
   }
@@ -853,7 +853,7 @@ void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, qint32 dir, ObjectPtr f
 {
   QString buf;
 
-  switch (number(1, 6))
+  switch (ch->dc_->number(1, 6))
   {
   case 1:
     ch->sendln("You miss your shot.");
@@ -875,7 +875,7 @@ void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, qint32 dir, ObjectPtr f
     break;
   }
 
-  switch (number(1, 3))
+  switch (ch->dc_->number(1, 3))
   {
   case 1:
     if (dir < 0)
@@ -950,19 +950,19 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
   if (dir < 0) // in the same room
     return ReturnValue::eSUCCESS;
 
-  if (number(0, 1))
+  if (ch->dc_->number(0, 1))
   {
     /* Send the mob in a random dir */
-    if (number(1, 2) == 1)
+    if (ch->dc_->number(1, 2) == 1)
     {
       do_say(victim, "Where are these fricken arrows coming from?!");
-      dir2 = number(0, 5);
+      dir2 = dc_->number(0, 5);
       if (CAN_GO(victim, dir2))
         if (EXIT(victim, dir2))
         {
           if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-                DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(victim, dir2)->to_room].zone).isTown()) &&
-              !isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
+                dc_->zones.value(dc_->world[EXIT(victim, dir2)->to_room].zone).isTown()) &&
+              !isSet(dc_->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
           /* send 1-6 since attempt move --cmd's it */
           {
             auto cmd_dir = getCommandFromDirection(dir2);
@@ -975,20 +975,20 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
   else
   {
     /* Send the mob after the fucker! */
-    if (number(1, 2) == 1)
+    if (ch->dc_->number(1, 2) == 1)
     {
       do_say(victim, "There he is!");
     }
     dir2 = rev_dir[dir];
     for (qint32 i = {}; i < 4; i++)
       if (!CAN_GO(ch, dir2))
-        dir2 = number(0, 5);
+        dir2 = dc_->number(0, 5);
     if (EXIT(victim, dir2))
     {
       if (CAN_GO(ch, dir2))
         if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-              DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(victim, dir2)->to_room].zone).isTown()))
-          if (!isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
+              dc_->zones.value(dc_->world[EXIT(victim, dir2)->to_room].zone).isTown()))
+          if (!isSet(dc_->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
           {
             /* dir+1 it since attempt_move will --cmd it */
             auto cmd_dir = getCommandFromDirection(dir2);
@@ -1003,9 +1003,9 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
               return do_flee(victim, u""_s);
           }
     }
-    if (number(1, 5) == 1)
+    if (ch->dc_->number(1, 5) == 1)
     {
-      if (number(0, 1))
+      if (ch->dc_->number(0, 1))
       {
         do_shout(victim, "Where the fuck are these arrows coming from?!");
       }
@@ -1034,7 +1034,7 @@ command_return_t do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
 
   if(0 > (victim->getHP() - dam))
   { // they aren't going to survive..life sucks
-   switch(number(1,2))
+   switch(ch->dc_->number(1,2))
    {
     case 1:
     ch->sendln(u"Your shot impales %1 through the heart!"_s.arg(qPrintable(victim->shortdesc_or_name())));
@@ -1172,7 +1172,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   target[MAX_STRING_LENGTH - 1] = '\0';
 
   /* make safe rooms checks */
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("You can't shoot arrows if yer in a safe room silly.");
     return ReturnValue::eFAILURE;
@@ -1272,10 +1272,10 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (dir >= 0)
       {
-        if (DC::getInstance()->world[cur_room].dir_option[dir] && !(DC::getInstance()->world[cur_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(DC::getInstance()->world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (dc_->world[cur_room].dir_option[dir] && !(dc_->world[cur_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(dc_->world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
-          new_room = DC::getInstance()->world[cur_room].dir_option[dir]->to_room;
-          if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
+          new_room = dc_->world[cur_room].dir_option[dir]->to_room;
+          if (isSet(dc_->world[new_room].room_flags, SAFE))
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             return ReturnValue::eFAILURE;
@@ -1294,11 +1294,11 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
       if (!victim && new_room && artype == 3 && dir >= 0)
       {
-        if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (dc_->world[new_room].dir_option[dir] && !(dc_->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(dc_->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
-          new_room = DC::getInstance()->world[new_room].dir_option[dir]->to_room;
+          new_room = dc_->world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);
-          if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
+          if (isSet(dc_->world[new_room].room_flags, SAFE))
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
@@ -1317,11 +1317,11 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
       if (!victim && new_room && artype == 3 && ch->affected_by_spell(SPELL_FARSIGHT) && dir >= 0)
       {
-        if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (dc_->world[new_room].dir_option[dir] && !(dc_->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(dc_->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
-          new_room = DC::getInstance()->world[new_room].dir_option[dir]->to_room;
+          new_room = dc_->world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);
-          if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
+          if (isSet(dc_->world[new_room].room_flags, SAFE))
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
@@ -1410,7 +1410,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() <= 2399)
+  if (victim->isNonPlayer() && dc_->mob_index[victim->mobdata->nr].vnum() >= 2300 && dc_->mob_index[victim->mobdata->nr].vnum() <= 2399)
   {
     ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
     extract_obj(found);
@@ -1419,7 +1419,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
   /* go ahead and shoot */
 
-  switch (number(1, 2))
+  switch (ch->dc_->number(1, 2))
   {
   case 1:
     if (dir >= 0)
@@ -1469,7 +1469,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
-      switch (number(1, 3))
+      switch (ch->dc_->number(1, 3))
       {
       case 1:
         if (dir < 0)
@@ -1565,7 +1565,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
       if (isSet(retval, ReturnValue::eCH_DIED))
       {
         ObjectPtr corpse, next;
-        for (corpse = DC::getInstance()->object_list; corpse; corpse = next)
+        for (corpse = dc_->object_list; corpse; corpse = next)
         {
           next = corpse->next;
           if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isexact(qPrintable(ch->name()), corpse->name()))
@@ -1615,7 +1615,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
         send_damage("The stray ice shards impale $n for | damage!",
                     victim, 0, 0, buffer, "The stray ice shards impale $n!",
                     TO_ROOM);
-        if (number(1, 100) < ch->has_skill(SKILL_ICE_ARROW) / 4)
+        if (ch->dc_->number(1, 100) < ch->has_skill(SKILL_ICE_ARROW) / 4)
         {
           act("Your body slows down for a second!", ch, 0, victim,
               TO_VICT, 0);
@@ -1661,7 +1661,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
             victim, 0, 0, buffer,
             "The magical stones surrounding the arrow smack hard into $n.",
             TO_ROOM);
-        if (number(1, 100) < ch->has_skill(SKILL_GRANITE_ARROW) / 4)
+        if (ch->dc_->number(1, 100) < ch->has_skill(SKILL_GRANITE_ARROW) / 4)
         {
           act("The stones knock you flat on your ass!", ch, 0, victim,
               TO_VICT, 0);
@@ -1685,7 +1685,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
   extract_obj(found);
 
-  DC::getInstance()->shooting_list_.insert(ch);
+  dc_->shooting_list_.insert(ch);
 
   if (ch->has_skill(SKILL_ARCHERY) < 51 || enchantmentused)
     ch->shotsthisround += DC::PULSE_VIOLENCE;

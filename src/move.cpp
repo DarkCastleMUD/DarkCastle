@@ -31,8 +31,8 @@ qint32 move_player(CharacterPtr ch, qint32 room)
   {
     retval = move_char(ch, real_room(START_ROOM));
     if (!isSet(retval, ReturnValue::eSUCCESS))
-      DC::getInstance()->logentry(u"Error in move_player(), Failure moving ch to start room. move_player_home_nofail"_s,
-                                  IMMORTAL, DC::LogChannel::LOG_BUG);
+      dc_->logentry(u"Error in move_player(), Failure moving ch to start room. move_player_home_nofail"_s,
+                    IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 
   return retval;
@@ -48,12 +48,12 @@ void move_player_home(CharacterPtr victim)
     victim->hometown = START_ROOM;
 
   // next four lines ping-pong people from meta to tavern to help lessen spam
-  if (DC::getInstance()->world[was_in].number == victim->hometown && victim->hometown == START_ROOM)
+  if (dc_->world[was_in].number == victim->hometown && victim->hometown == START_ROOM)
     move_player(victim, real_room(SECOND_START_ROOM));
-  else if (DC::getInstance()->world[was_in].number == victim->hometown || IS_AFFECTED(victim, AFF_CHAMPION))
+  else if (dc_->world[was_in].number == victim->hometown || IS_AFFECTED(victim, AFF_CHAMPION))
     move_player(victim, real_room(START_ROOM));
   // recalling into a clan room
-  else if (!isSet(DC::getInstance()->world[real_room(victim->hometown)].room_flags, CLAN_ROOM))
+  else if (!isSet(dc_->world[real_room(victim->hometown)].room_flags, CLAN_ROOM))
     move_player(victim, real_room(victim->hometown));
   // Clanroom else
   else
@@ -89,7 +89,7 @@ void move_player_home(CharacterPtr victim)
 void record_track_data(CharacterPtr ch, cmd_t cmd)
 {
   // Rangers outdoors leave no tracks
-  if (DC::getInstance()->world[ch->in_room].sector_type != SECT_INSIDE &&
+  if (dc_->world[ch->in_room].sector_type != SECT_INSIDE &&
       GET_CLASS(ch) == CLASS_RANGER)
     return;
 
@@ -101,7 +101,7 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
     return;
   }
 
-  if (DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_SWIM || DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_NOSWIM)
+  if (dc_->world[ch->in_room].sector_type == SECT_WATER_SWIM || dc_->world[ch->in_room].sector_type == SECT_WATER_NOSWIM)
     return;
 
   auto newScent = TracksPtr::create();
@@ -119,13 +119,13 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
 
   newScent->trackee = ch->name();
 
-  DC::getInstance()->world[ch->in_room].AddTrackItem(newScent);
+  dc_->world[ch->in_room].AddTrackItem(newScent);
 }
 
 // Removed this due to it being a funky cold medina. - Nocturnal 09/28/05
 // void do_muddy(CharacterPtr ch)
 //{
-//   short chance = number(0,30);
+//   short chance = dc_->number(0,30);
 //
 //   if(ch->isNonPlayer() || IS_AFFECTED(ch, AFF_FLYING) || ch->isImmortalPlayer() || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
 //     ; //poop on a stick!
@@ -146,7 +146,7 @@ command_return_t do_unstable(CharacterPtr ch)
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  short chance = number(0, 30);
+  short chance = dc_->number(0, 30);
 
   if (IS_AFFECTED(ch, AFF_FLYING) || IS_AFFECTED(ch, AFF_FREEFLOAT) ||
       ch->isImmortalPlayer())
@@ -162,7 +162,7 @@ command_return_t do_unstable(CharacterPtr ch)
   act_to_character("You fall flat on your ass.", ch, 0, 0, 0);
   ch->setSitting();
 
-  dc_sprintf(death_log, "%s slipped to death in room %d.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number);
+  dc_sprintf(death_log, "%s slipped to death in room %d.", qPrintable(ch->name()), dc_->world[ch->in_room].number);
   retval = noncombat_damage(ch, GET_MAX_HIT(ch) / 12, "You feel your back snap painfully and all goes dark...",
                             "$n's frail body snaps in half as $e is buffeted about the room.", death_log, KILL_FALL);
 
@@ -177,18 +177,18 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   qint32 target;
   QString damage;
   qint32 retval;
-  qint32 dam = number(50, 100);
+  qint32 dam = dc_->number(50, 100);
 
   if (IS_AFFECTED(ch, AFF_FLYING))
     return ReturnValue::eFAILURE;
 
   if (ch->getLevel() == 50)
-    dam = number(100, 200);
+    dam = dc_->number(100, 200);
 
   if (GET_MAX_HIT(ch) > 2000)
-    dam = number(400, 500);
+    dam = dc_->number(400, 500);
   else if (GET_MAX_HIT(ch) > 1000)
-    dam = number(200, 400);
+    dam = dc_->number(200, 400);
 
   if (ch->isImmortalPlayer())
   {
@@ -211,16 +211,16 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   if (!CAN_GO(ch, dir))
     return ReturnValue::eFAILURE;
 
-  target = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
+  target = dc_->world[ch->in_room].dir_option[dir]->to_room;
 
-  if (isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+  if (isSet(dc_->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
     return ReturnValue::eFAILURE;
 
-  if (isSet(DC::getInstance()->world[target].room_flags, TUNNEL))
+  if (isSet(dc_->world[target].room_flags, TUNNEL))
   {
     qint32 ppl = {};
     CharacterPtr k;
-    for (k = DC::getInstance()->world[target].people; k; k = k->next_in_room)
+    for (k = dc_->world[target].people; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
     if (ppl > 2)
@@ -230,11 +230,11 @@ command_return_t do_fall(CharacterPtr ch, short dir)
     }
   }
 
-  if (isSet(DC::getInstance()->world[target].room_flags, PRIVATE))
+  if (isSet(dc_->world[target].room_flags, PRIVATE))
   {
     qint32 ppl = {};
     CharacterPtr k;
-    for (k = DC::getInstance()->world[target].people; k; k = k->next_in_room)
+    for (k = dc_->world[target].people; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
     if (ppl > 4)
@@ -271,7 +271,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
     ch->sendln("You fall...");
     break;
   default:
-    DC::getInstance()->logentry(u"Default hit in do_fall"_s, IMMORTAL, DC::LogChannel::LOG_MORTAL);
+    dc_->logentry(u"Default hit in do_fall"_s, IMMORTAL, DC::LogChannel::LOG_MORTAL);
     break;
   }
 
@@ -285,7 +285,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
 
   do_look(ch, "\0");
 
-  dc_sprintf(damage, "%s's fall from %d was lethal and it killed them.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].number);
+  dc_sprintf(damage, "%s's fall from %d was lethal and it killed them.", qPrintable(ch->name()), dc_->world[ch->in_room].number);
   retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\r\n", "$n plummets into the room and hits the ground with a wet-sounding splat!",
                             damage, KILL_FALL);
 
@@ -297,7 +297,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
     act_to_room("$n plummets into the room and hits the floor HARD.", ch, 0, 0, 0);
   }
 
-  if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)))
+  if ((isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)))
   {
     return do_fall(ch, dir);
   }
@@ -332,9 +332,9 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   if (valid_dir)
     dir = *valid_dir;
 
-  if (ch == nullptr || ch->in_room < 1 || !valid_dir || DC::getInstance()->world[ch->in_room].dir_option[dir] == nullptr || DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room < 1)
+  if (ch == nullptr || ch->in_room < 1 || !valid_dir || dc_->world[ch->in_room].dir_option[dir] == nullptr || dc_->world[ch->in_room].dir_option[dir]->to_room < 1)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
     ch->send("There was an error performing that movement.\r\n");
     return ReturnValue::eFAILURE;
   }
@@ -348,152 +348,152 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
       if (learned > 90)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
+        if (dc_->world[ch->in_room].sector_type == SECT_UNDERWATER)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_UNDERWATER)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_UNDERWATER)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 80)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_MOUNTAIN)
+        if (dc_->world[ch->in_room].sector_type == SECT_MOUNTAIN)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 91)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_MOUNTAIN)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_MOUNTAIN)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 70)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_ARCTIC)
+        if (dc_->world[ch->in_room].sector_type == SECT_ARCTIC)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 81)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_ARCTIC)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_ARCTIC)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 60)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_HILLS)
+        if (dc_->world[ch->in_room].sector_type == SECT_HILLS)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 71)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_HILLS)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_HILLS)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 50)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_SWIM)
+        if (dc_->world[ch->in_room].sector_type == SECT_WATER_SWIM)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 61)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_WATER_SWIM)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_WATER_SWIM)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 40)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
+        if (dc_->world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 51)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_FROZEN_TUNDRA)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_FROZEN_TUNDRA)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 30)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
+        if (dc_->world[ch->in_room].sector_type == SECT_DESERT)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 41)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_DESERT)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_DESERT)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 20)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_BEACH)
+        if (dc_->world[ch->in_room].sector_type == SECT_BEACH)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 31)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_BEACH)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_BEACH)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 10)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_FOREST)
+        if (dc_->world[ch->in_room].sector_type == SECT_FOREST)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 21)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_FIELD)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_FIELD)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (learned > 0)
       {
-        if (DC::getInstance()->world[ch->in_room].sector_type == SECT_FIELD)
+        if (dc_->world[ch->in_room].sector_type == SECT_FIELD)
         {
-          mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
+          mvinroom = movement_loss[dc_->world[ch->in_room].sector_type] / 2;
           if (learned < 11)
             ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
         }
-        if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_FOREST)
-          mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
+        if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_FOREST)
+          mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type] / 2;
       }
 
       if (!mvinroom)
-        mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type];
+        mvinroom = movement_loss[dc_->world[ch->in_room].sector_type];
       if (!mvtoroom)
-        mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type];
+        mvtoroom = movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type];
       need_movement = (mvinroom + mvtoroom) / 2;
     }
     else
     {
-      need_movement = (movement_loss[DC::getInstance()->world[ch->in_room].sector_type] + movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type]) / 2;
+      need_movement = (movement_loss[dc_->world[ch->in_room].sector_type] + movement_loss[dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type]) / 2;
     }
 
     // if I'm trying to go "up" into a "fall down" room, etc.
     // it's OK to go east into a "fall north" room though
     // not ok, if room we're going to is AIR though
     auto cmd_to_dir = getDirectionFromCommand(cmd);
-    if (!IS_AFFECTED(ch, AFF_FLYING) && ((cmd == cmd_t::NORTH && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[NORTH]->to_room].room_flags, FALL_SOUTH)) ||
-                                         (cmd == cmd_t::EAST && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[EAST]->to_room].room_flags, FALL_WEST)) ||
-                                         (cmd == cmd_t::SOUTH && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[SOUTH]->to_room].room_flags, FALL_NORTH)) ||
-                                         (cmd == cmd_t::WEST && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[WEST]->to_room].room_flags, FALL_EAST)) ||
-                                         (cmd == cmd_t::UP && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[UP]->to_room].room_flags, FALL_DOWN)) ||
-                                         (cmd == cmd_t::DOWN && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[DOWN]->to_room].room_flags, FALL_UP)) ||
-                                         cmd_to_dir && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[*cmd_to_dir]->to_room].sector_type == SECT_AIR))
+    if (!IS_AFFECTED(ch, AFF_FLYING) && ((cmd == cmd_t::NORTH && isSet(dc_->world[dc_->world[ch->in_room].dir_option[NORTH]->to_room].room_flags, FALL_SOUTH)) ||
+                                         (cmd == cmd_t::EAST && isSet(dc_->world[dc_->world[ch->in_room].dir_option[EAST]->to_room].room_flags, FALL_WEST)) ||
+                                         (cmd == cmd_t::SOUTH && isSet(dc_->world[dc_->world[ch->in_room].dir_option[SOUTH]->to_room].room_flags, FALL_NORTH)) ||
+                                         (cmd == cmd_t::WEST && isSet(dc_->world[dc_->world[ch->in_room].dir_option[WEST]->to_room].room_flags, FALL_EAST)) ||
+                                         (cmd == cmd_t::UP && isSet(dc_->world[dc_->world[ch->in_room].dir_option[UP]->to_room].room_flags, FALL_DOWN)) ||
+                                         (cmd == cmd_t::DOWN && isSet(dc_->world[dc_->world[ch->in_room].dir_option[DOWN]->to_room].room_flags, FALL_UP)) ||
+                                         cmd_to_dir && dc_->world[dc_->world[ch->in_room].dir_option[*cmd_to_dir]->to_room].sector_type == SECT_AIR))
     {
       ch->sendln("You would need to fly to go there!");
       return ReturnValue::eFAILURE;
     }
 
     // fly doesn't work over water
-    if ((DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_NOSWIM) || (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_WATER_NOSWIM))
+    if ((dc_->world[ch->in_room].sector_type == SECT_WATER_NOSWIM) || (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_WATER_NOSWIM))
     {
       has_boat = false;
       // See if character is carrying a boat
@@ -514,7 +514,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
       }
     }
 
-    if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_WATER_NOSWIM && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_WATER_SWIM && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_UNDERWATER)
+    if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_WATER_NOSWIM && dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_WATER_SWIM && dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_UNDERWATER)
     {
       // It's NOT a water room and we don't have fly
       if (ch->race == RACE_FISH)
@@ -526,18 +526,18 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     }
   } // else if !FLYING
 
-  if (isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].room_flags, IMP_ONLY) &&
+  if (isSet(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].room_flags, IMP_ONLY) &&
       ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln("No.");
     return ReturnValue::eFAILURE;
   }
 
-  Room *rm = &(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room]);
+  Room *rm = &(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room]);
 
-  if (rm->sector_type != DC::getInstance()->world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL)
+  if (rm->sector_type != dc_->world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL)
   {
-    qint32 s2 = rm->sector_type, s1 = DC::getInstance()->world[ch->in_room].sector_type;
+    qint32 s2 = rm->sector_type, s1 = dc_->world[ch->in_room].sector_type;
     if ((s1 == SECT_CITY && (s2 != SECT_INSIDE && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_INSIDE && (s2 != SECT_CITY && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_PAVED_ROAD && (s2 != SECT_INSIDE && s2 != SECT_CITY)) || (s1 == SECT_FIELD && (s2 != SECT_HILLS && s2 != SECT_MOUNTAIN)) || (s1 == SECT_HILLS && (s2 != SECT_MOUNTAIN && s2 != SECT_FIELD)) || (s1 == SECT_MOUNTAIN && (s2 != SECT_HILLS && s2 != SECT_FIELD)) || (s1 == SECT_WATER_NOSWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_SWIM)) || (s1 == SECT_WATER_SWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_NOSWIM)) || (s1 == SECT_UNDERWATER && (s2 != SECT_WATER_NOSWIM && s2 != SECT_WATER_SWIM)) || (s1 == SECT_BEACH && (s2 != SECT_DESERT)) || (s1 == SECT_DESERT && (s2 != SECT_BEACH)) || (s1 == SECT_FROZEN_TUNDRA && (s2 != SECT_ARCTIC)) || (s1 == SECT_ARCTIC && (s2 != SECT_FROZEN_TUNDRA)) || (s1 == SECT_AIR) || (s1 == SECT_SWAMP))
     {
       ch->sendln("The ghost evaporates as you leave its habitat.");
@@ -597,7 +597,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     }
   }
 
-  if (ch->isPlayer() && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+  if (ch->isPlayer() && dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
     ch->sendln("You feel air trying to explode from your lungs as you swim around.");
     // ch->sendln("Underwater?!");
@@ -605,11 +605,11 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   }
 
   // if I'm STAY_NO_TOWN, don't enter a Zone::Flag::IS_TOWN zone no matter what
-  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].zone).isTown())
+  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && dc_->zones.value(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].zone).isTown())
     return ReturnValue::eFAILURE;
 
   qint32 a = {};
-  if ((a = ch->has_skill(SKILL_VIGOR)) && number(1, 101) < a / 10)
+  if ((a = ch->has_skill(SKILL_VIGOR)) && dc_->number(1, 101) < a / 10)
     need_movement /= 2; // No skill improvement here. Too easy.
 
   if (GET_MOVE(ch) < need_movement && ch->isPlayer())
@@ -664,7 +664,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   // Forest melded
   else
   {
-    if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_FOREST && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_SWAMP)
+    if (dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_FOREST && dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_SWAMP)
     {
       dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
       REMBIT(ch->affected_by, AFF_FOREST_MELD);
@@ -686,7 +686,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   was_in = ch->in_room;
   record_track_data(ch, cmd);
 
-  retval = move_char(ch, DC::getInstance()->world[was_in].dir_option[dir]->to_room);
+  retval = move_char(ch, dc_->world[was_in].dir_option[dir]->to_room);
 
   if (isSet(retval, ReturnValue::eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
   {
@@ -695,12 +695,12 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   }
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (dc_->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
       ch->sendln("The sounds around you fade to nothing as the silence takes hold...");
 
-  for (tmp_obj = DC::getInstance()->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = dc_->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (dc_->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
       ch->sendln("The noise around you returns as you leave the silenced area!");
 
   if (!isSet(retval, ReturnValue::eSUCCESS))
@@ -745,7 +745,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     }
   }
 
-  if (IS_AFFECTED(ch, AFF_SNEAK) || (IS_AFFECTED(ch, AFF_FOREST_MELD) && (DC::getInstance()->world[ch->in_room].sector_type == SECT_FOREST || DC::getInstance()->world[ch->in_room].sector_type == SECT_SWAMP)))
+  if (IS_AFFECTED(ch, AFF_SNEAK) || (IS_AFFECTED(ch, AFF_FOREST_MELD) && (dc_->world[ch->in_room].sector_type == SECT_FOREST || dc_->world[ch->in_room].sector_type == SECT_SWAMP)))
   {
     act_to_room("$n sneaks into the room.", ch, 0, 0, GODS);
     act_to_group("$n sneaks into the room.", ch, 0, 0, INVIS_NULL);
@@ -758,27 +758,27 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   // Elemental stuff goes HERE
   if (ch->isNonPlayer())
   {
-    qint32 a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    qint32 a = dc_->mob_index[ch->mobdata->nr].vnum();
     // code a bit repeaty, but whatever ;)
-    if (a == 88 && DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
+    if (a == 88 && dc_->world[ch->in_room].sector_type == SECT_UNDERWATER)
     {
       act_to_room("Unable to survive underwater, $n returns to the elemental plane of fire.", ch, 0, 0, 0);
       extract_char(ch, true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
-    if (a == 89 && DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
+    if (a == 89 && dc_->world[ch->in_room].sector_type == SECT_DESERT)
     {
       act_to_room("Unable to survive in the desert, $n returns to the elemental plane of water.", ch, 0, 0, 0);
       extract_char(ch, true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
-    if (a == 90 && DC::getInstance()->world[ch->in_room].sector_type == SECT_SWAMP)
+    if (a == 90 && dc_->world[ch->in_room].sector_type == SECT_SWAMP)
     {
       act_to_room("Unable to survive in the swamp, $n returns to the elemental plane of air.", ch, 0, 0, 0);
       extract_char(ch, true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
-    if (a == 91 && DC::getInstance()->world[ch->in_room].sector_type == SECT_AIR)
+    if (a == 91 && dc_->world[ch->in_room].sector_type == SECT_AIR)
     {
       act_to_room("Unable to survive in the air, $n returns to the elemental plane of earth.", ch, 0, 0, 0);
       extract_char(ch, true);
@@ -787,14 +787,14 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   }
   // Elemental stuff ends HERE
 
-  if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)))
+  if ((isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)))
   {
     retval = do_fall(ch, dir);
     if (SOMEONE_DIED(retval))
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE))
+  if (isSet(dc_->world[ch->in_room].room_flags, UNSTABLE))
   {
     retval = do_unstable(ch);
     if (SOMEONE_DIED(retval))
@@ -802,13 +802,13 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   }
 
   /*
-   if(isSet(DC::getInstance()->world[ch->in_room].sector_type, SECT_FIELD) &&
+   if(isSet(dc_->world[ch->in_room].sector_type, SECT_FIELD) &&
    weather_info.sky == SKY_HEAVY_RAIN && !number(0,19)) {
    do_muddy(ch);
    }
    */
   if ((GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
-    for (CharacterPtr tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (CharacterPtr tmp_ch = dc_->world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if (tmp_ch->isPlayer())
         continue;
@@ -868,7 +868,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
   }
   auto dir = *opt_dir;
 
-  if (!DC::getInstance()->world[ch->in_room].dir_option[dir])
+  if (!dc_->world[ch->in_room].dir_option[dir])
   {
     ch->sendln("You can't go that way.");
     return ReturnValue::eFAILURE;
@@ -899,7 +899,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
     }
     catch (...)
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
       return_val = ReturnValue::eFAILURE;
     }
 
@@ -940,7 +940,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
   }
   catch (...)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
     return_val = ReturnValue::eFAILURE;
   }
 
@@ -951,7 +951,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
     /*
      dc_sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
      qPrintable(ch->name()), SOMEONE_DIED(return_val), return_val);
-     DC::getInstance()->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
+     dc_->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
      */
     return return_val;
   }
@@ -971,7 +971,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
             k->follower->sendln("Your legs are too tired for running away!");
           continue; // keep going through the groupies
         }
-        if (is_retreat && k->follower->fighting && (number(1, 100) < 4) && k->follower->fighting->isNonPlayer())
+        if (is_retreat && k->follower->fighting && (ch->dc_->number(1, 100) < 4) && k->follower->fighting->isNonPlayer())
         {
 
           act_to_victim("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, nullptr, k->follower, 0);
@@ -997,7 +997,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
          dc_sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d",
          qPrintable(k->follower->name()), qPrintable(ch->name()), was_in, k->follower->in_room,
          GET_POS(k->follower), is_retreat);
-         DC::getInstance()->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
+         dc_->logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
          */
       }
     }
@@ -1027,7 +1027,7 @@ command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
   QString buf;
   qint32 retval;
 
-  for (k = DC::getInstance()->object_list; k; k = k->next)
+  for (k = dc_->object_list; k; k = k->next)
   {
     if (k->isPortal())
     {
@@ -1035,11 +1035,11 @@ command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
       {
         if (k->in_room != DC::NOWHERE && !k->hasPortalFlagNoLeave())
         {
-          if (k->getPortalDestinationRoom() == DC::getInstance()->world[ch->in_room].number || k->obj_flags.value[2] == DC::getInstance()->world[ch->in_room].zone)
+          if (k->getPortalDestinationRoom() == dc_->world[ch->in_room].number || k->obj_flags.value[2] == dc_->world[ch->in_room].zone)
           {
             ch->sendln("You exit the area.");
             act_to_room("$n has left the area.", ch, 0, 0, INVIS_NULL | STAYHIDE);
-            retval = move_char(ch, real_room(DC::getInstance()->world[k->in_room].number));
+            retval = move_char(ch, real_room(dc_->world[k->in_room].number));
             if (!isSet(retval, ReturnValue::eSUCCESS))
             {
               ch->sendln("You attempt to leave, but the door slams in your face!");
@@ -1080,7 +1080,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((portal = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)) == nullptr)
+  if ((portal = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room].contents)) == nullptr)
   {
     ch->sendln("Nothing here by that name.");
     return ReturnValue::eFAILURE;
@@ -1095,30 +1095,30 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
   {
     dc_sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
-    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
     ch->sendln("You can't enter that.");
     return ReturnValue::eFAILURE;
   }
 
-  if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+  if (dc_->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
     ch->sendln("You bravely attempt to plunge through the portal - let's hope you have gills!");
     return ReturnValue::eSUCCESS;
   }
 
-  if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
+  if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(dc_->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
   {
     ch->sendln("You may not enter a clanhall at your level.");
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isNonPlayer() && ch->master && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && ch->master && dc_->mob_index[ch->mobdata->nr].vnum() == 8)
   {
     sesame = ch->master;
-    if (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
     {
       // Is golem's master not a member of this clan
-      if (others_clan_room(sesame, &DC::getInstance()->world[real_room(portal->obj_flags.value[0])]) == true)
+      if (others_clan_room(sesame, &dc_->world[real_room(portal->obj_flags.value[0])]) == true)
       {
         ch->sendln("Your master is not from that clan.");
         act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
@@ -1147,7 +1147,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+  if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(dc_->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
   {
     ch->sendln("The portal's destination rebels against you.");
     act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
@@ -1178,7 +1178,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   default:
     dc_sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
-    DC::getInstance()->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
 
@@ -1220,7 +1220,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
 {
   if (!ch)
   {
-    DC::getInstance()->logentry(u"Error in move_char(), nullptr character"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Error in move_char(), nullptr character"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1231,8 +1231,8 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     // Couldn't move character from the room
     if (char_from_room(ch, stop_all_fighting) == 0)
     {
-      DC::getInstance()->logentry(u"Error in move_char(), character not DC::NOWHERE, but couldn't be moved."_s,
-                                  OVERSEER, DC::LogChannel::LOG_BUG);
+      dc_->logentry(u"Error in move_char(), character not DC::NOWHERE, but couldn't be moved."_s,
+                    OVERSEER, DC::LogChannel::LOG_BUG);
       return ReturnValue::eINTERNAL_ERROR;
     }
   }
@@ -1245,7 +1245,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     {
       qFatal("%s", qUtf8Printable(u"Error in move_char(), character stuck in DC::NOWHERE: %1.\n"_s.arg(qPrintable(ch->name()))));
     }
-    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", qPrintable(ch->name()), DC::getInstance()->world[dest].number);
+    dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", qPrintable(ch->name()), dc_->world[dest].number);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1266,7 +1266,7 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!(obj = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)))
+  if (!(obj = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room].contents)))
   {
     ch->sendln("Climb what?");
     return ReturnValue::eSUCCESS;
@@ -1282,7 +1282,7 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (real_room(dest) < 0)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", dc_->obj_index[obj->item_number].vnum());
     ch->sendln("You can't climb that.");
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
@@ -1308,7 +1308,7 @@ qint32 ambush(CharacterPtr ch)
   CharacterPtr i, next_i;
   qint32 retval;
 
-  for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1318,7 +1318,7 @@ qint32 ambush(CharacterPtr ch)
     if (GET_POS(i) <= position_t::RESTING ||
         GET_POS(i) == position_t::FIGHTING ||
         IS_AFFECTED(i, AFF_PARALYSIS) ||
-        (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) &&
+        (isSet(dc_->world[i->in_room].room_flags, SAFE) &&
          !IS_AFFECTED(ch, AFF_CANTQUIT)))
       continue;
     if (!i->isNonPlayer() && !i->desc) // don't work if I'm linkdead

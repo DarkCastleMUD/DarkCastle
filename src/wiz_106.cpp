@@ -23,7 +23,7 @@ command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
   ch->sendln("          Plats - Player");
   ch->sendln("          --------------");
 
-  for (const auto &d : DC::getInstance()->connections_)
+  for (const auto &d : dc_->connections_)
   {
     if ((conn->connected) || (!CAN_SEE(ch, conn->character)))
       continue;
@@ -73,7 +73,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
       if (getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
         sendln("Now doing that would just tick off the IMPS!");
-        DC::getInstance()->logentry(u"%1 just tried to force %2 to %3"_s.arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
+        dc_->logentry(u"%1 just tried to force %2 to %3"_s.arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
         return ReturnValue::eSUCCESS;
       }
       if ((getLevel() <= vict->getLevel()) && vict->isPlayer())
@@ -93,7 +93,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
         buf = fmt::format("{} just forced %s to %s.", qPrintable(name()),
                           qPrintable(vict->name()), to_force);
         vict->command_interpreter(to_force.c_str());
-        DC::getInstance()->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
+        dc_->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
       }
     }
   }
@@ -105,7 +105,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
       sendln("Not gonna happen.");
       return ReturnValue::eFAILURE;
     }
-    for (i = DC::getInstance()->connections_; i; i = next_i)
+    for (i = dc_->connections_; i; i = next_i)
     {
       next_i = i->next;
       if (i->character != ch && !i->connected)
@@ -126,7 +126,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
     }
     sendln("Ok.");
     buf = fmt::format("{} just forced all to {}.", qPrintable(name()), to_force);
-    DC::getInstance()->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -323,8 +323,8 @@ command_return_t test_casino(CharacterPtr ch)
   run_check(ch, &max_rc, do_look, u"table"_s, cmd_t::LOOK);
   run_check(ch, &max_rc, do_examine, u"table"_s, cmd_t::EXAMINE);
 
-  auto original_random = DC::getInstance()->random_;
-  DC::getInstance()->random_ = QRandomGenerator(1);
+  auto original_random = dc_->random_;
+  dc_->random_ = QRandomGenerator(1);
 
   run_check(ch, &max_rc, &Character::special, "", cmd_t::BET);
   run_check(ch, &max_rc, &Character::special, "-1", cmd_t::BET);
@@ -378,7 +378,7 @@ command_return_t test_casino(CharacterPtr ch)
 
   ch->player->bank = original_bank;
   ch->setGold(original_gold);
-  DC::getInstance()->random_ = original_random;
+  dc_->random_ = original_random;
   return max_rc;
 }
 

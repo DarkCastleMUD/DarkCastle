@@ -15,13 +15,13 @@ void Leaderboard::check(void)
   // check online players to the file and make sure the file is up to date
   qint32 i, j, k;
 
-  DC::getInstance()->currentType("leaderboard");
-  DC::getInstance()->currentName("NA");
-  DC::getInstance()->currentVNUM(0);
+  dc_->currentType("leaderboard");
+  dc_->currentName("NA");
+  dc_->currentVNUM(0);
 
   read_file();
 
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &d : dc_->connections_)
   {
     if (!conn->character || conn->character->getLevel() >= IMMORTAL || conn->character->isNonPlayer())
       continue;
@@ -391,9 +391,9 @@ void Leaderboard::check(void)
   write_file(LEADERBOARD_FILE);
 
   in_port_t port1 = {};
-  if (DC::getInstance()->cf.ports.size() > 0)
+  if (dc_->cf.ports.size() > 0)
   {
-    port1 = DC::getInstance()->cf.ports[0];
+    port1 = dc_->cf.ports[0];
   }
 
   write_file(u"%1%2/%3"_s.arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
@@ -478,11 +478,11 @@ void Leaderboard::check_offline(void)
   CharacterPtr ch;
   qint32 i, j, k;
 
-  DC::getInstance()->currentType("leaderboard");
-  DC::getInstance()->currentName("NA");
-  DC::getInstance()->currentVNUM(0);
+  dc_->currentType("leaderboard");
+  dc_->currentName("NA");
+  dc_->currentVNUM(0);
 
-  for (const auto &ch : DC::getInstance()->character_list)
+  for (const auto &ch : dc_->character_list)
   {
     if (!ch->isMortalPlayer())
       continue;
@@ -901,9 +901,9 @@ void Leaderboard::check_offline(void)
   write_file(LEADERBOARD_FILE);
 
   in_port_t port1 = {};
-  if (DC::getInstance()->cf.ports.size() > 0)
+  if (dc_->cf.ports.size() > 0)
   {
-    port1 = DC::getInstance()->cf.ports[0];
+    port1 = dc_->cf.ports[0];
   }
 
   write_file(u"%1%2/%3"_s.arg(HTDOCS_DIR).arg(port1).arg(LEADERBOARD_FILE));
@@ -990,7 +990,7 @@ void Leaderboard::read_file(void)
 
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
-    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
   }
   else
   {
@@ -1129,11 +1129,11 @@ void Leaderboard::read_file(void)
     }
     catch (error_eof &)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': eof reached prematurely", LEADERBOARD_FILE);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': eof reached prematurely", LEADERBOARD_FILE);
     }
     catch (error_negative_int &)
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative qint32 found where positive expected", LEADERBOARD_FILE);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative qint32 found where positive expected", LEADERBOARD_FILE);
     }
 
     fclose(fl);
@@ -1142,7 +1142,7 @@ void Leaderboard::read_file(void)
 
 void Leaderboard::write_file(QString filename)
 {
-  if (DC::getInstance()->cf.leaderboard_check == "suspend" || DC::getInstance()->cf.bport == true)
+  if (dc_->cf.leaderboard_check == "suspend" || dc_->cf.bport == true)
   {
     return;
   }
@@ -1152,7 +1152,7 @@ void Leaderboard::write_file(QString filename)
 
   if (!(fl = fopen(qPrintable(filename), "w")))
   {
-    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
+    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
     return;
   }
   for (i = {}; i < 5; i++)
@@ -1223,30 +1223,30 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     std::tie(arg1, remainder) = half_chop(argument);
     if (arg1 == "suspend")
     {
-      if (DC::getInstance()->cf.leaderboard_check == "suspend")
+      if (dc_->cf.leaderboard_check == "suspend")
       {
         ch->sendln("Leaderboard writes already suspended.");
       }
       else
       {
-        DC::getInstance()->cf.leaderboard_check = "suspend";
+        dc_->cf.leaderboard_check = "suspend";
         ch->sendln("Leaderboard writes suspended.");
-        DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
+        dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
     }
     else if (arg1 == "resume")
     {
-      if (DC::getInstance()->cf.leaderboard_check == "")
+      if (dc_->cf.leaderboard_check == "")
       {
         ch->sendln("Leaderboard writes already resumed.");
       }
       else
       {
-        DC::getInstance()->cf.leaderboard_check = "";
+        dc_->cf.leaderboard_check = "";
         ch->sendln("Leaderboard writes resumed.");
-        DC::getInstance()->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
+        dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
@@ -1288,7 +1288,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
-    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
     return ReturnValue::eFAILURE;
   }
   for (i = {}; i < 5; i++)
@@ -1405,7 +1405,7 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
   fclose(fl);
 
   // top 5 online
-  for (d = DC::getInstance()->connections_; d; d = conn->next)
+  for (d = dc_->connections_; d; d = conn->next)
   {
 
     if (!conn->character || conn->character->getLevel() >= IMMORTAL)
@@ -1842,14 +1842,14 @@ void Leaderboard::rename(QString oldname, QString newname)
   // lines is the number of lines rewritten back to leaderboard file
   // after a rename.. must sync up with # of outputs
 
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
     return;
   }
 
   if (!(fl = fopen(LEADERBOARD_FILE, "r")))
   {
-    DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
     abort();
   }
 
@@ -1871,15 +1871,15 @@ void Leaderboard::rename(QString oldname, QString newname)
     }
   }
 
-  if (DC::getInstance()->cf.leaderboard_check == "suspend")
+  if (dc_->cf.leaderboard_check == "suspend")
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", qPrintable(oldname), qPrintable(newname));
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", qPrintable(oldname), qPrintable(newname));
   }
   else
   {
     if (!(fl = fopen(LEADERBOARD_FILE, "w")))
     {
-      DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+      dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
       abort();
     }
 

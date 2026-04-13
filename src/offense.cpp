@@ -24,7 +24,7 @@ command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE; // just in case
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("This place is too peaceful for that.");
     return ReturnValue::eFAILURE;
@@ -55,7 +55,7 @@ command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  qint32 percent = number(1, 100);
+  qint32 percent = dc_->number(1, 100);
   if (percent > GET_WIS(ch))
     percent -= GET_WIS(ch);
 
@@ -351,10 +351,10 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
     vnum_t victim_vnum = victim_name.toULongLong(&ok);
     if (ok)
     {
-      CharacterPtr possible_victim = DC::getInstance()->world[in_room].people;
+      CharacterPtr possible_victim = dc_->world[in_room].people;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
-        if (possible_victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == victim_vnum)
+        if (possible_victim->isNonPlayer() && dc_->mob_index[victim->mobdata->nr].vnum() == victim_vnum)
         {
           victim = possible_victim;
           break;

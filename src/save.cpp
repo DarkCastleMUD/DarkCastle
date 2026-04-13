@@ -83,7 +83,7 @@ aliases_t read_char_aliases(FILE *fpsave)
     QString command = fread_alias_string(fpsave);
     if (keyword.isEmpty() || command.isEmpty())
     {
-      DC::getInstance()->logentry(u"Removing command alias [%1] because it's missing a keyword."_s.arg(command));
+      dc_->logentry(u"Removing command alias [%1] because it's missing a keyword."_s.arg(command));
       continue;
     }
 
@@ -99,7 +99,7 @@ QString fread_alias_string(FILE *fpsave)
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (read_count != 1)
   {
-    DC::getInstance()->logentry(u"fread_alias_string: fread() read %1 bytes instead of %2 at position %3"_s.arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
+    dc_->logentry(u"fread_alias_string: fread() read %1 bytes instead of %2 at position %3"_s.arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
     return QString();
   }
 
@@ -701,19 +701,19 @@ void read_skill(CharacterPtr ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    DC::getInstance()->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unable to read a skill from player file for %1."_s.arg(qPrintable(ch->name())), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -818,8 +818,8 @@ void save_char_obj_db(CharacterPtr ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
-    uchar.load_room = DC::getInstance()->world[this->in_room].number;
+  if (isSet(dc_->world[this->in_room].room_flags, SAFE))
+    uchar.load_room = dc_->world[this->in_room].number;
   else
     uchar.load_room = real_room(ch->hometown);
 
@@ -853,7 +853,7 @@ void save_char_obj_db(CharacterPtr ch)
     dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -887,7 +887,7 @@ void Character::save_char_obj(void)
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
     dc_sprintf(name, "%s/%c/%s", BSAVE_DIR, qPrintable(name())[0], qPrintable(name()));
   }
@@ -904,7 +904,7 @@ void Character::save_char_obj(void)
     QString log_buf = {};
     dc_sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -922,8 +922,8 @@ void Character::save_char_obj(void)
   }
   else
   {
-    if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
-      uchar.load_room = DC::getInstance()->world[in_room].number;
+    if (isSet(dc_->world[in_room].room_flags, SAFE))
+      uchar.load_room = dc_->world[in_room].number;
     else
       uchar.load_room = real_room(hometown);
   }
@@ -949,7 +949,7 @@ void Character::save_char_obj(void)
     dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
     send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -963,7 +963,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 {
   QString log_buf = u"Load_char_obj: %1"_s.arg(strsave);
   perror(qPrintable(log_buf));
-  DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+  dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }
@@ -994,7 +994,7 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
   clear_char(ch);
   ch->desc = d;
 
-  if (DC::getInstance()->cf.bport)
+  if (dc_->cf.bport)
   {
     strsave = u"%1/%2/%3"_s.arg(BSAVE_DIR).arg(name[0]).arg(name);
   }
@@ -1243,7 +1243,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if (!last_cont->equipped_by && DC::getInstance()->obj_index[last_cont->item_number].vnum() != 536)
+      if (!last_cont->equipped_by && dc_->obj_index[last_cont->item_number].vnum() != 536)
         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else
@@ -1326,7 +1326,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
 
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
-  object.item_number = DC::getInstance()->obj_index[obj->item_number].vnum();
+  object.item_number = dc_->obj_index[obj->item_number].vnum();
   object.timer = obj->obj_flags.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
@@ -1339,7 +1339,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = (DC::getInstance()->obj_index[obj->item_number].item);
+  standard_obj = (dc_->obj_index[obj->item_number].item);
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1423,7 +1423,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
 
     tmp_weight = obj->obj_flags.weight;
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
-    && DC::getInstance()->obj_index[obj->item->number].vnum() != 536)
+    && dc_->obj_index[obj->item->number].vnum() != 536)
       for (; loop_obj; loop_obj = loop_obj->next_content)
         tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
     if(tmp_weight      != standard_obj->obj_flags.weight)
@@ -1541,7 +1541,7 @@ void restore_weight(ObjectPtr obj)
 
   if (obj == nullptr)
     return;
-  if (DC::getInstance()->obj_index[obj->item_number].vnum() == 536)
+  if (dc_->obj_index[obj->item_number].vnum() == 536)
     return;
   restore_weight(obj->contains);
   restore_weight(obj->next_content);
@@ -1684,7 +1684,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
   st->hometown = hometown;
 
   //  gets set outside
-  //  st->load_room = DC::getInstance()->world[in_room].number;
+  //  st->load_room = dc_->world[in_room].number;
 
   //  st->gold      = getGold();
   st->gold = {}; // Moved

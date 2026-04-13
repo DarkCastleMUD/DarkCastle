@@ -89,7 +89,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!charge_moves(ch, SKILL_BATTERBRACE))
       return ReturnValue::eSUCCESS;
 
-    dam = number(100, 200) + 3 * (100 - skill);
+    dam = dc_->number(100, 200) + 3 * (100 - skill);
 
     ch->send(u"You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n"_s.arg(qPrintable(fname(exit->keyword))));
     act_to_room("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, 0);
@@ -123,8 +123,8 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       if (exit->bracee != nullptr)
       {
         battervbrace = true;
-        qint32 batterer = GET_STR(ch) + GET_CON(ch) + GET_DEX(ch) + number(1, 10);
-        qint32 bracee = GET_STR(exit->bracee) + GET_CON(exit->bracee) + GET_DEX(exit->bracee) + number(1, 10);
+        qint32 batterer = GET_STR(ch) + GET_CON(ch) + GET_DEX(ch) + dc_->number(1, 10);
+        qint32 bracee = GET_STR(exit->bracee) + GET_CON(exit->bracee) + GET_DEX(exit->bracee) + dc_->number(1, 10);
         if (batterer < bracee) // batterer fails (ch fails)
         {
           ch->decrementMove(100);
@@ -140,7 +140,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       SET_BIT(exit->exit_info, EX_BROKEN);
 
       if ((other_room = exit->to_room) != DC::NOWHERE)
-        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             REMOVE_BIT(back->exit_info, EX_CLOSED); // break other side of door
@@ -182,7 +182,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
         return retval;
       }
 
-      if (number(1, 100) > (40 - GET_DEX(ch)) + (100 - skill))
+      if (ch->dc_->number(1, 100) > (40 - GET_DEX(ch)) + (100 - skill))
       {
         ch->sendln("You manage to maintain your balance and admire your handywork.");
         act_to_room("$n manages to maintain $h balance and admires $s handywork.", ch, 0, exit->keyword, 0);
@@ -190,10 +190,10 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       else
       {
         if (CAN_GO(ch, door) &&
-            !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
+            !isSet(dc_->world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
             (!IS_AFFECTED(ch, AFF_CHAMPION) || champion_can_go(EXIT(ch, door)->to_room)) &&
             class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room) &&
-            !others_clan_room(ch, &DC::getInstance()->world[EXIT(ch, door)->to_room]))
+            !others_clan_room(ch, &dc_->world[EXIT(ch, door)->to_room]))
         {
           ch->sendln("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n");
           act_to_room("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, 0);
@@ -318,7 +318,7 @@ command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
       exit->bracee = ch;
       ch->brace_at = exit;
       if ((other_room = exit->to_room) != DC::NOWHERE)
-        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             ch->brace_exit = back;
@@ -475,7 +475,7 @@ command_return_t do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
           (!f->follower->fighting))
         continue;
 
-      if (number(1, 101) > ch->has_skill(SKILL_BATTLECRY))
+      if (ch->dc_->number(1, 101) > ch->has_skill(SKILL_BATTLECRY))
       {
         act_to_character("You look away sheepishly, unaffected by the rage.", f->follower, 0, 0, 0);
         act_to_room("$n looks away sheepishly, unaffected by the rage.", f->follower, 0, 0, 0);
@@ -723,7 +723,7 @@ command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+        dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense sees your headbutt coming from a mile away.", ch, 0, victim, 0);
       act_to_room("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, NOTVICT);
@@ -751,7 +751,7 @@ command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
-          ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].vnum() == 508)
+          ch->equipment[WEAR_HEAD] && dc_->obj_index[ch->equipment[WEAR_HEAD]->item_number].vnum() == 508)
       {
         act_to_room("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, NOTVICT);
         act_to_victim("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, 0);
@@ -1002,7 +1002,7 @@ command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1031,7 +1031,7 @@ command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
     af.modifier = {};
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1146,7 +1146,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (IS_AFFECTED(victim, AFF_STABILITY) && number(0, 3) == 0)
+    if (IS_AFFECTED(victim, AFF_STABILITY) && dc_->number(0, 3) == 0)
     {
       act_to_character("You bounce off of $N and crash into the ground.", ch, 0, victim, 0);
       act_to_room("$n bounces off of $N and crashes into the ground.", ch, 0, victim, NOTVICT);
@@ -1178,7 +1178,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (!dir)
-    dir = number(1, 6);
+    dir = dc_->number(1, 6);
   dir--;
   dampercent = {};
   if (ch->height > 102)
@@ -1212,7 +1212,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   else if (!victim_paralyzed && victim->affected_by_spell(SKILL_BATTLESENSE) &&
-           number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+           dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
   {
     act_to_character("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, 0);
     act_to_room("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, NOTVICT);
@@ -1229,8 +1229,8 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (CAN_GO(victim, dir) &&
            !victim->affected_by_spell(SPELL_IRON_ROOTS) &&
-           !isSet(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
-           !isSet(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
+           !isSet(dc_->world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
+           !isSet(dc_->world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
            (!IS_AFFECTED(victim, AFF_CHAMPION) || champion_can_go(EXIT(victim, dir)->to_room)) &&
            class_can_go(GET_CLASS(victim), EXIT(victim, dir)->to_room))
   {
@@ -1273,12 +1273,12 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
         CharacterPtr tmp;
-        for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+        for (tmp = dc_->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
           if (tmp->fighting == victim)
             stop_fighting(tmp);
         stop_fighting(victim);
       }
-      move_char(victim, (DC::getInstance()->world[(ch)->in_room].dir_option[dir])->to_room);
+      move_char(victim, (dc_->world[(ch)->in_room].dir_option[dir])->to_room);
     }
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return ReturnValue::eSUCCESS;
@@ -1360,12 +1360,12 @@ command_return_t do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
   // Success below.
 
   ch->decrementMove(40);
-  if (number(1, 101) > (5 + ch->has_skill(SKILL_PRIMAL_FURY) / 5))
+  if (ch->dc_->number(1, 101) > (5 + ch->has_skill(SKILL_PRIMAL_FURY) / 5))
   { // Str loss.
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
     ch->send("You lose one point of strength.");
-    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", qPrintable(ch->name()));
+    dc_->logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", qPrintable(ch->name()));
   }
 
   // rest already set

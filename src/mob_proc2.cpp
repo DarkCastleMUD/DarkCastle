@@ -416,7 +416,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   {
     dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
     ch->send("Available corpses (freshest first):\r\n$B");
-    for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
+    for (obj = dc_->object_list; obj; obj = obj->next)
     {
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
         continue;
@@ -462,7 +462,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     return ReturnValue::eSUCCESS;
   }
 
-  for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
+  for (obj = dc_->object_list; obj; obj = obj->next)
   {
     dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
 
@@ -656,7 +656,7 @@ const platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538, 539, 
 qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
 
-  qint32 mobvnum = DC::getInstance()->mob_index[owner->mobdata->nr].vnum();
+  qint32 mobvnum = dc_->mob_index[owner->mobdata->nr].vnum();
   qint32 o;
   QString buf;
   //  return ReturnValue::eFAILURE; //disabled for now
@@ -680,7 +680,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
 
     for (qint32 z = {}; z < 13 && platsmith_list[o].sales[z] != 0; z++)
     {
-      auto tmp = gl_item(DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+      auto tmp = gl_item(dc_->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
       ch->send(tmp);
     }
     return ReturnValue::eSUCCESS;

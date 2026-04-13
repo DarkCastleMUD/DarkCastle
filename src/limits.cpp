@@ -158,7 +158,7 @@ qint32 Character::mana_gain_lookup(void)
   if (this->mana_regen > 0)
     gain += this->mana_regen;
   if (this->in_room >= 0)
-    if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+    if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
       gain = (qint32)(gain * 1.25);
 
   if (this->mana_regen < 0)
@@ -244,7 +244,7 @@ qint32 Character::hit_gain(position_t position, bool improve)
     gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
 
   if (this->in_room >= 0)
-    if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+    if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
       gain = (qint32)(gain * 1.5);
   if (this->hit_regen < 0)
     gain += this->hit_regen;
@@ -309,7 +309,7 @@ qint32 Character::move_gain_lookup(qint32 extra)
     gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
 
   if (this->in_room >= 0)
-    if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+    if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
       gain = (qint32)(gain * 1.5);
   if (this->move_regen < 0)
     gain += this->move_regen;
@@ -438,81 +438,81 @@ void advance_level(CharacterPtr ch, bool is_conversion)
   {
   case CLASS_MAGIC_USER:
     add_ki += (effective_level % 2);
-    add_hp += number(3, 6);
-    add_mana += number(5, 10);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(3, 6);
+    add_mana += dc_->number(5, 10);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_CLERIC:
     add_ki += (effective_level % 2);
-    add_hp += number(4, 8);
-    add_mana += number(4, 8);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(4, 8);
+    add_mana += dc_->number(4, 8);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_THIEF:
     add_ki += (effective_level % 2);
-    add_hp += number(4, 11);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(4, 11);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_WARRIOR:
     add_ki += (effective_level % 2);
-    add_hp += number(14, 18);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(14, 18);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_ANTI_PAL:
     add_ki += (effective_level % 2);
-    add_hp += number(8, 12);
-    add_mana += number(3, 5);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(8, 12);
+    add_mana += dc_->number(3, 5);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_PALADIN:
     add_ki += (effective_level % 2);
-    add_hp += number(10, 14);
-    add_mana += number(2, 4);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(10, 14);
+    add_mana += dc_->number(2, 4);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_BARBARIAN:
     add_ki += (effective_level % 2);
-    add_hp += number(16, 20);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(16, 20);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_MONK:
     add_ki += 1;
-    add_hp += number(10, 14);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(10, 14);
+    add_moves += dc_->number(1, (effective_con / 2));
     GET_AC(ch) += -2;
     break;
 
   case CLASS_RANGER:
     add_ki += (effective_level % 2);
-    add_hp += number(8, 12);
-    add_mana += number(3, 5);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(8, 12);
+    add_mana += dc_->number(3, 5);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_BARD:
     add_ki += 1;
-    add_hp += number(6, 10);
+    add_hp += dc_->number(6, 10);
     add_mana += 0;
-    add_moves += number(1, (effective_con / 2));
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   case CLASS_DRUID:
     add_ki += (effective_level % 2);
     ;
-    add_hp += number(5, 9);
-    add_mana += number(4, 9);
-    add_moves += number(1, (effective_con / 2));
+    add_hp += dc_->number(5, 9);
+    add_mana += dc_->number(4, 9);
+    add_moves += dc_->number(1, (effective_con / 2));
     break;
 
   default:
-    DC::getInstance()->logentry(u"Unknown class in advance level?"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Unknown class in advance level?"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -575,12 +575,12 @@ void advance_level(CharacterPtr ch, bool is_conversion)
 
   if (effective_level > 10 && !isSet(ch->player->toggles, Player::PLR_REMORTED))
   {
-    auto &vault = DC::getInstance()->vaults_.has_vault(ch->name());
+    auto &vault = dc_->vaults_.has_vault(ch->name());
     if (vault)
     {
       ch->sendln("10 lbs has been added to your vault!");
       vault.size += 10;
-      DC::getInstance()->vaults_.save(vault.owner);
+      dc_->vaults_.save(vault.owner);
     }
   }
 
@@ -589,7 +589,7 @@ void advance_level(CharacterPtr ch, bool is_conversion)
   if (effective_level == 10)
   {
     ch->sendln("You have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information.");
-    DC::getInstance()->vaults_.add_new_vault(ch->name(), 0);
+    dc_->vaults_.add_new_vault(ch->name(), 0);
   }
   if (effective_level == 11)
     ch->sendln("It now costs you $B$5gold$R every time you recall.");
@@ -628,7 +628,7 @@ void gain_exp(CharacterPtr ch, qint64 gain)
   if (ch->isPlayer() && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
 
-  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8) // it's a golem
+  if (ch->isNonPlayer() && dc_->mob_index[ch->mobdata->nr].vnum() == 8) // it's a golem
     golem_gain_exp(ch);
 
   if (ch->isNonPlayer())
@@ -705,7 +705,7 @@ void gain_condition(CharacterPtr ch, qint32 condition, qint32 value)
   }
 
   // just for fun
-  if (1 == number(1, 2000))
+  if (1 == dc_->number(1, 2000))
   {
     ch->sendln("You are horny");
   }
@@ -720,7 +720,7 @@ void DC::food_update(void)
     if (i->affected_by_spell(SPELL_PARALYZE))
       continue;
     qint32 amt = -1;
-    if (i->equipment[WEAR_FACE] && DC::getInstance()->obj_index[i->equipment[WEAR_FACE]->item_number].vnum() == 536)
+    if (i->equipment[WEAR_FACE] && dc_->obj_index[i->equipment[WEAR_FACE]->item_number].vnum() == 536)
       amt = -3;
     gain_condition(i, FULL, amt);
     if (!GET_COND(i, FULL) && i->getLevel() < 60)
@@ -754,7 +754,7 @@ void DC::food_update(void)
       }
     }
   }
-  DC::getInstance()->removeDead();
+  dc_->removeDead();
 }
 
 // Update the HP of mobs and players
@@ -762,7 +762,7 @@ void DC::food_update(void)
 void DC::point_update(void)
 {
   /* characters */
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
     if (i->in_room == DC::NOWHERE)
@@ -778,13 +778,13 @@ void DC::point_update(void)
       for (o = {}; o < MAX_HIDE; o++)
         i->player->hiding_from[o] = {};
       o = {};
-      for (temp = DC::getInstance()->world[i->in_room].people; temp; temp = temp->next_in_room)
+      for (temp = dc_->world[i->in_room].people; temp; temp = temp->next_in_room)
       {
         if (i == temp)
           continue;
         if (o >= MAX_HIDE)
           break;
-        if (number(1, 101) > a) // Failed.
+        if (ch->dc_->number(1, 101) > a) // Failed.
         {
           i->player->hiding_from[o] = temp;
           i->player->hide[o++] = false;
@@ -824,7 +824,7 @@ void DC::update_corpses_and_portals(void)
   bool corpses_need_saving = false;
   void extract_obj(ObjectPtr obj); /* handler.c */
   /* objects */
-  for (j = DC::getInstance()->object_list; j; j = next_thing, proc++)
+  for (j = dc_->object_list; j; j = next_thing, proc++)
   {
     next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
@@ -882,10 +882,10 @@ void DC::update_corpses_and_portals(void)
       {
         if (j->carried_by)
           act_to_character("$p decays in your hands.", j->carried_by, j, 0, 0);
-        else if ((j->in_room != DC::NOWHERE) && (DC::getInstance()->world[j->in_room].people))
+        else if ((j->in_room != DC::NOWHERE) && (dc_->world[j->in_room].people))
         {
-          act_to_room("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, INVIS_NULL);
-          act_to_character("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, 0);
+          act_to_room("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people, j, 0, INVIS_NULL);
+          act_to_character("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people, j, 0, 0);
         }
         bool corpse_contained = j->contains != nullptr;
         for (jj = j->contains; jj; jj = next_thing2)
@@ -935,7 +935,7 @@ void DC::update_corpses_and_portals(void)
           }
           else
           {
-            DC::getInstance()->logentry(u"BIIIG problem in limits.c!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+            dc_->logentry(u"BIIIG problem in limits.c!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
             return;
           }
         }
@@ -949,13 +949,13 @@ void DC::update_corpses_and_portals(void)
       }
     }
   }
-  DC::getInstance()->removeDead();
+  dc_->removeDead();
   if (corpses_need_saving == true)
   {
     save_corpses();
   }
   // dc_sprintf(buf, "DEBUG: Processed Objects: %d", proc);
-  // DC::getInstance()->logentry(buf, 108, DC::LogChannel::LOG_BUG);
+  // dc_->logentry(buf, 108, DC::LogChannel::LOG_BUG);
   /* Now process the portals */
   // process_portals();
 }

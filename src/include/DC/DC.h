@@ -272,7 +272,7 @@ class PlayerConfig : public QObject
 {
   Q_OBJECT
 public:
-  explicit PlayerConfig(DC *dc);
+  explicit PlayerConfig(DCPtr dc);
   player_config_t::iterator begin();
   player_config_t::iterator end();
   player_config_t::const_iterator constBegin() const;
@@ -285,6 +285,7 @@ public:
 
 private:
   player_config_t config;
+  DCPtr dc_;
 };
 
 class class_data
@@ -755,7 +756,7 @@ T operator>>(T &stream, AuctionStates &at)
 class AuctionHouse
 {
 public:
-  AuctionHouse(QString in_file, DC *dc);
+  AuctionHouse(QString in_file, DCPtr dc);
   void CollectTickets(CharacterPtr ch, quint32 ticket = 0);
   void CancelAll(CharacterPtr ch);
   void AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QString buyer);
@@ -802,7 +803,7 @@ private:
   quint32 cur_index;
   QString filename_;
   QMap<quint32, AuctionTicket> Items_For_Sale;
-  DC *dc_;
+  DCPtr dc_;
 };
 
 class wizlist_info
@@ -1111,7 +1112,7 @@ public:
     GET_STATS
   };
 
-  Connection(QObject *parent) : QObject(parent) {}
+  Connection(DCPtr dc);
 
   Proxy proxy = {};
 
@@ -1217,6 +1218,7 @@ public:
   void setOutput(QString output_buffer);
   void appendOutput(QString output_buffer);
   QByteArray getOutput(void) const;
+  DCPtr dc_;
 
 private:
   QHostAddress peer_address_ = {};
@@ -1912,6 +1914,7 @@ public:
   qint32 player_id = {};
 #endif
   qint32 spec = {};
+  DCPtr dc_;
 
   bool getDebug(void) const
   {
@@ -2316,7 +2319,6 @@ private:
   move_t move_ = {};
   QString name_; // Keyword 'kill X'
   position_t position_ = {};
-  DCPtr dc_;
 };
 typedef QSet<CharacterPtr> character_list_t;
 void add_command_lag(CharacterPtr ch, cmd_t cmd, qint32 lag);
@@ -2699,7 +2701,7 @@ namespace SSH
   {
     Q_OBJECT
   public:
-    explicit SSH(QObject *parent = {});
+    explicit SSH(DCPtr dc);
     void setup(void);
     qint32 poll(void);
     void close(void);
@@ -2871,7 +2873,8 @@ public:
 class Shops
 {
 public:
-  explicit Shops(QObject *parent = {});
+  explicit Shops(DCPtr dc);
+  DCPtr dc_;
 };
 
 class Room : public QObject
@@ -4572,7 +4575,7 @@ class Clan : public QObject, public MinimumEntity
 {
   Q_OBJECT
 public:
-  Clan(DC *dc, QString clan_id = {});
+  Clan(DCPtr dc, QString clan_id = {});
   QString leader_;
   QString founder_;
   QString email_;
@@ -6030,9 +6033,9 @@ bool IS_MINLEVEL_NPC(auto ch, auto level) { return ch->getLevel() >= level && ch
 #define GET_OBJ_WEAR(obj) ((obj)->obj_flags.wear_flags)
 #define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
 #define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
-#define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? DC::getInstance()->obj_index[GET_OBJ_RNUM(obj)].vnum() : -1)
-#define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= DC::getInstance()->top_of_world)
-#define GET_ROOM_VNUM(rnum) ((qint32)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
+#define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? dc_->obj_index[GET_OBJ_RNUM(obj)].vnum() : -1)
+#define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= dc_->top_of_world)
+#define GET_ROOM_VNUM(rnum) ((qint32)(VALID_ROOM_RNUM(rnum) ? dc_->world[(rnum)].number : DC::NOWHERE))
 
 #define GET_TOGGLES(ch) ((ch)->player->toggles)
 
@@ -6175,12 +6178,12 @@ inline const short IS_ANONYMOUS(CharacterPtr ch)
 
 #define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? fname((obj)->name) : "something")
 
-#define IS_EXIT(room, door) (DC::getInstance()->world[(room)].dir_option[(door)])
-#define EXIT_TO(room, door) (DC::getInstance()->world[(room)].dir_option[(door)]->to_room)
-#define IS_OPEN(room, door) (!isSet(DC::getInstance()->world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
+#define IS_EXIT(room, door) (dc_->world[(room)].dir_option[(door)])
+#define EXIT_TO(room, door) (dc_->world[(room)].dir_option[(door)]->to_room)
+#define IS_OPEN(room, door) (!isSet(dc_->world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
 
-#define OUTSIDE(ch) (!isSet(DC::getInstance()->world[(ch)->in_room].room_flags, INDOORS))
-#define EXIT(ch, door) (DC::getInstance()->world[(ch)->in_room].dir_option[door])
+#define OUTSIDE(ch) (!isSet(dc_->world[(ch)->in_room].room_flags, INDOORS))
+#define EXIT(ch, door) (dc_->world[(ch)->in_room].dir_option[door])
 
 typedef quint64 zone_t;
 typedef quint64 room_t;
@@ -6333,7 +6336,7 @@ MatchType str_n_nosp_cmp_begin(T arg1, T arg2)
   }
 }
 
-// qint32 number(qint32 from, qint32 to);
+// qint32 dc_->number(qint32 from, qint32 to);
 
 qint32 dice(qint32 number, qint32 size, QRandomGenerator *rng = QRandomGenerator::global());
 
@@ -7595,6 +7598,11 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
+
+  bool IS_ARENA(auto room)
+  {
+    return isSet(world[room].room_flags, ARENA);
+  }
   void assign_rooms(void);
   void assign_objects(void);
   bool on_forbidden_name_list(QString name);
@@ -7703,6 +7711,25 @@ public:
 
   void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
+
+  template <typename T>
+  T number(T from, T to)
+  {
+    if (from == to)
+      return to;
+
+    if (from > to)
+    {
+      logentry(u"BACKWARDS usage: dc_->number(%1, %2)!"_s.arg(from).arg(to));
+      produce_coredump();
+      return to;
+    }
+
+    if (std::is_unsigned<T>::value)
+      return random_.bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
+    else if (std::is_signed<T>::value)
+      return random_.bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
+  }
 
   void clean_socials_from_memory(void);
   void remove_all_mobs_from_world(void);
@@ -7898,17 +7925,17 @@ auto &operator>>(auto &in, Room &room)
     if (room_nr)
     {
       /*
-      DC::getInstance()->currentVNUM(room_nr);
-      DC::getInstance()->currentType("Room");
-      DC::getInstance()->currentName(temp);
+      dc_->currentVNUM(room_nr);
+      dc_->currentType("Room");
+      dc_->currentName(temp);
 
-      if (room_nr >= DC::getInstance()->top_of_world_alloc)
+      if (room_nr >= dc_->top_of_world_alloc)
       {
-        DC::getInstance()->top_of_world_alloc = room_nr + 200;
+        dc_->top_of_world_alloc = room_nr + 200;
       }
 
-      if (DC::getInstance()->top_of_world < room_nr)
-        DC::getInstance()->top_of_world = room_nr;
+      if (dc_->top_of_world < room_nr)
+        dc_->top_of_world = room_nr;
       */
 
       room.paths_ = {};
@@ -7921,7 +7948,7 @@ auto &operator>>(auto &in, Room &room)
       room.description_ = description;
       room.tracks_ = {};
       room.denied = {};
-      // DC::getInstance()->total_rooms++;
+      // dc_->total_rooms++;
     }
     // Ignore recorded zone number since it may not longer be valid
     fread_int(in, -1, 64000); // zone nr
@@ -7933,7 +7960,7 @@ auto &operator>>(auto &in, Room &room)
 
       bool found = false;
       zone_t zone_nr = {};
-      for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+      for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
       {
         if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
         {
@@ -7945,12 +7972,12 @@ auto &operator>>(auto &in, Room &room)
       if (!found)
       {
         // QString error = u"Room %1 is outside of any zone."_s.arg(room_nr);
-        // DC::getInstance()->logentry(error);
-        // DC::getInstance()->logentry(u"Room outside of ANY zone.  ERROR"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+        // dc_->logentry(error);
+        // dc_->logentry(u"Room outside of ANY zone.  ERROR"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
       else
       {
-        auto &zone = DC::getInstance()->zones[zone_nr];
+        auto &zone = dc_->zones[zone_nr];
         if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
         {
           if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
@@ -8063,7 +8090,7 @@ auto &operator>>(auto &in, Room &room)
 }
 void write_object(ObjectPtr obj, auto &out)
 {
-  out << u"#%1\n"_s.arg(DC::getInstance()->obj_index[obj->item_number].vnum());
+  out << u"#%1\n"_s.arg(obj->dc_->obj_index[obj->item_number].vnum());
   string_to_file(out, obj->name());
   string_to_file(out, obj->short_description());
   string_to_file(out, obj->long_description());
@@ -8071,7 +8098,7 @@ void write_object(ObjectPtr obj, auto &out)
   out << obj->obj_flags;
   out << obj->ex_description;
   affects_to_file(out, obj);
-  out << DC::getInstance()->obj_index[obj->item_number].mobprogs_;
+  out << obj->dc_->obj_index[obj->item_number].mobprogs_;
   out << "S\n";
 }
 
@@ -8150,32 +8177,6 @@ public:
   void set_name(const CharacterPtr sender);
 };
 
-template <typename T>
-T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
-{
-  if (from == to)
-  {
-    return to;
-  }
-
-  if (from > to)
-  {
-
-    DC::getInstance()->logentry(u"BACKWARDS usage: number(%1, %2)!"_s.arg(from).arg(to));
-    produce_coredump();
-    return to;
-  }
-
-  if (std::is_unsigned<T>::value)
-  {
-    return rng->bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
-  }
-  else if (std::is_signed<T>::value)
-  {
-    return rng->bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
-  }
-}
-bool IS_ARENA(auto room) { return isSet(DC::getInstance()->world[room].room_flags, ARENA); }
 void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type = DC::PULSE_TIME);
 QString one_argument(QString arguments, QString &arg1);
 QString one_argumentnolow(QString arguments, QString &arg1);

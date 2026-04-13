@@ -75,7 +75,7 @@ const QStringList innate_skills =
 // command functions
 command_return_t do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  auto &arena = DC::getInstance()->arena_;
+  auto &arena = dc_->arena_;
   if (ch && ch->in_room > 0 &&
       ch->room().isArena() && arena.isPotato())
   {
@@ -262,7 +262,7 @@ qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (obj->affected[i].location == APPLY_DAMAGED)
     {
-      if (number(1, 101) < chance)
+      if (ch->dc_->number(1, 101) < chance)
       {
         ch->sendln("You failed to repair it!");
         act_to_room("$n fails to repair $p.", ch, obj, obj, 0);

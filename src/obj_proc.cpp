@@ -172,11 +172,11 @@ qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   {
     return ReturnValue::eFAILURE;
   }
-  if (!DC::getInstance()->world[obj->in_room].people)
+  if (!dc_->world[obj->in_room].people)
   {
     return ReturnValue::eFAILURE;
   }
-  ch = DC::getInstance()->world[obj->in_room].people;
+  ch = dc_->world[obj->in_room].people;
   for (index_cursor = &obj_emote_head; index_cursor; index_cursor = index_cursor->next)
   {
     if (real_room(index_cursor->room_number) == obj->in_room)
@@ -236,16 +236,16 @@ qint32 souldrainer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (vict->getHP() < 3500)
   {
     percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
-    chance = number(0, 101);
+    chance = dc_->number(0, 101);
     if (chance > (1.3 * percent))
     {
-      chance = number(0, 101);
+      chance = dc_->number(0, 101);
       if (chance > (2 * percent))
       {
-        chance = number(0, 101);
+        chance = dc_->number(0, 101);
         if (chance > (2 * percent))
         {
-          chance = number(0, 101);
+          chance = dc_->number(0, 101);
           if (chance > (2 * percent))
           {
             act("You feel your soul being drained as $n's magics swirl around you",
@@ -325,7 +325,7 @@ qint32 pushwand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     ObjectPtr curr;
     for (curr = ch->carrying; curr; curr = curr->next_content)
     {
-      if (DC::getInstance()->obj_index[curr->item_number].vnum() == 22427) // red dragon snout
+      if (dc_->obj_index[curr->item_number].vnum() == 22427) // red dragon snout
       {
         obj->obj_flags.value[2] = 5;
         ch->sendln("The wand absorbs the dragon snout and pulses with energy.");
@@ -356,7 +356,7 @@ qint32 dawnsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     ch->send("Dawn needs more time to recharge and is not ready to hear your prayer yet.");
     return ReturnValue::eSUCCESS;
   }
-  if (!ch->in_room || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (!ch->in_room || isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Something about this room blocks your command.");
     return ReturnValue::eSUCCESS;
@@ -366,7 +366,7 @@ qint32 dawnsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   ch->sendln("You whisper a prayer to Dawn and it responds in a brilliant flash of light!");
   CharacterPtr v;
   affected_type af;
-  for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
+  for (v = dc_->world[ch->in_room].people; v; v = v->next_in_room)
   {
     if (v == ch)
       continue;
@@ -399,7 +399,7 @@ qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     return ReturnValue::eFAILURE;
   ch = obj->equipped_by;
   QString buf;
-  if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET)))
+  if ((isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC) || isSet(dc_->world[ch->in_room].room_flags, QUIET)))
     return ReturnValue::eFAILURE;
 
   obj->obj_flags.timer--;
@@ -408,12 +408,12 @@ qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   obj->obj_flags.timer = 5;
 
   qint32 heal;
-  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
 
-    heal = 50 / 2 + ((GET_MAX_MOVE(tmp_char) * 2) / 100) + (number(0, 20) - 10);
+    heal = 50 / 2 + ((GET_MAX_MOVE(tmp_char) * 2) / 100) + (ch->dc_->number(0, 20) - 10);
     if (heal < 5)
       heal = 5;
 
@@ -485,7 +485,7 @@ qint32 lilithring(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
     return ReturnValue::eSUCCESS;
   }
 
-  if (!ch->in_room || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (!ch->in_room || isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("Something about this room blocks your command.");
     return ReturnValue::eSUCCESS;
@@ -548,13 +548,13 @@ qint32 orrowand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Characte
 
   for (curr = ch->carrying; curr; curr = curr->next_content)
   {
-    if (DC::getInstance()->obj_index[curr->item_number].vnum() == 17399)
+    if (dc_->obj_index[curr->item_number].vnum() == 17399)
       diamond = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27903 && firstP != nullptr)
+    else if (dc_->obj_index[curr->item_number].vnum() == 27903 && firstP != nullptr)
       secondP = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27903)
+    else if (dc_->obj_index[curr->item_number].vnum() == 27903)
       firstP = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27904)
+    else if (dc_->obj_index[curr->item_number].vnum() == 27904)
       vial = curr;
   }
 
@@ -563,22 +563,22 @@ qint32 orrowand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Characte
     ch->sendln("Recharge unsuccessful. Missing required components:");
     if (!firstP && real_object(27903))
     {
-      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27903)].item);
+      auto obj = static_cast<ObjectPtr>(dc_->obj_index[real_object(27903)].item);
       ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     if (!secondP && real_object(27903))
     {
-      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27903)].item);
+      auto obj = static_cast<ObjectPtr>(dc_->obj_index[real_object(27903)].item);
       ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     if (!vial && real_object(27904))
     {
-      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(27904)].item);
+      auto obj = static_cast<ObjectPtr>(dc_->obj_index[real_object(27904)].item);
       ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     if (!diamond && real_object(17399))
     {
-      auto obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[real_object(17399)].item);
+      auto obj = static_cast<ObjectPtr>(dc_->obj_index[real_object(17399)].item);
       ch->send(u"%1\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     }
     return ReturnValue::eSUCCESS;
@@ -610,22 +610,22 @@ qint32 holyavenger(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (vict->getHP() < 3500)
   {
     percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
-    chance = number(1, 100);
+    chance = dc_->number(1, 100);
     if (chance > (1.3 * percent))
     {
       percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
-      chance = number(1, 100);
+      chance = dc_->number(1, 100);
       if (chance > (2 * percent))
       {
-        chance = number(1, 100);
+        chance = dc_->number(1, 100);
         if (chance > (2 * percent))
         {
-          chance = number(1, 100);
+          chance = dc_->number(1, 100);
           if (chance > (2 * percent) && !isSet(vict->immune, ISR_SLASH))
           {
             if ((
-                    (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) ||
-                    (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
+                    (vict->equipment[WEAR_NECK_1] && dc_->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) ||
+                    (vict->equipment[WEAR_NECK_2] && dc_->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
                 !number(0, 1))
             { // tarrasque's leash..
               act_to_character("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, 0);
@@ -669,9 +669,9 @@ qint32 hooktippedsteelhalberd(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
   CharacterPtr victim;
   if (!(victim = ch->fighting))
     return ReturnValue::eFAILURE;
-  if (number(1, 101) > 2)
+  if (ch->dc_->number(1, 101) > 2)
     return ReturnValue::eFAILURE;
-  qint32 which = number(0, MAX_WEAR - 1);
+  qint32 which = dc_->number(0, MAX_WEAR - 1);
   if (!victim->equipment[which])
     return ReturnValue::eFAILURE; // Lucky
   qint32 i = damage_eq_once(victim->equipment[which]);
@@ -681,7 +681,7 @@ qint32 hooktippedsteelhalberd(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
     eq_destroyed(victim, victim->equipment[which], which);
   else
   {
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == 17904)
+    if (dc_->obj_index[obj->item_number].vnum() == 17904)
     {
       act_to_victim("$n's diamond war club cracks your $p!", ch, victim->equipment[which], victim, 0);
       act_to_room("$n smashes $m diamond war club into $N's $p and cracks it!", ch, victim->equipment[which], victim, NOTVICT);
@@ -1018,7 +1018,7 @@ qint32 search_assemble_items(qint32 vnum)
   // This should never happen
   if (vnum < 1)
   {
-    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\r\n", vnum);
+    dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\r\n", vnum);
     produce_coredump();
     return -1;
   }
@@ -1044,7 +1044,7 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
   // This should never happen
   if (item_index < 0)
   {
-    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\r\n", item_index);
+    dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\r\n", item_index);
     produce_coredump();
     return false;
   }
@@ -1062,8 +1062,8 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
     qint32 component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
-                              item_index, component_index, component_real, component_virt);
+      dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
+                item_index, component_index, component_real, component_virt);
 
       ch->sendln("There was an internal malfunction assembling your item. Contact an Immortal.");
       produce_coredump();
@@ -1079,7 +1079,7 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
   // If we get to this point then all components for item_index were found
   qint32 item_vnum = assemble_items[item_index].item;
   qint32 item_real = real_object(item_vnum);
-  ObjectPtr item = DC::getInstance()->obj_index[item_real].item;
+  ObjectPtr item = dc_->obj_index[item_real].item;
 
   // Check if the item to be assembled is marked UNIQUE but the player already has one
   if (isSet(item->obj_flags.more_flags, ITEM_UNIQUE))
@@ -1107,8 +1107,8 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
     qint32 component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
-                              item_index, component_index, component_real, component_virt);
+      dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
+                item_index, component_index, component_real, component_virt);
 
       ch->sendln("There was an internal malfunction assembling your item. Contact an Immortal.");
       return true;
@@ -1123,7 +1123,7 @@ bool assemble_item_index(CharacterPtr ch, qint32 item_index)
   ObjectPtr reward_item = clone_object(item_real);
   if (reward_item == 0)
   {
-    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
+    dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
     ch->sendln("There was an internal malfunction cloning the new item. Contact an Immortal.");
     return true;
   }
@@ -1151,7 +1151,7 @@ command_return_t do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
       // if we can see it
       if (CAN_SEE_OBJ(ch, obj, false))
       {
-        vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+        vnum = dc_->obj_index[obj->item_number].vnum();
         item_index = search_assemble_items(vnum);
 
         // check if it's a component of an item to be assembled
@@ -1209,7 +1209,7 @@ command_return_t do_assemble(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  vnum = dc_->obj_index[obj->item_number].vnum();
   item_index = search_assemble_items(vnum);
 
   // Object specified is not part of an item that can be assembled
@@ -1284,7 +1284,7 @@ qint32 gazeofgaiot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return ReturnValue::eSUCCESS;
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("That action is impossible to perform in these restrictive confinements.");
     return ReturnValue::eSUCCESS;
@@ -1304,7 +1304,7 @@ qint32 gazeofgaiot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   affect_to_char(ch, &af);
   act_to_character("You eyes glow red from hatred, and you discharge it all on $N.", ch, 0, victim, 0);
   act_to_victim("$n's eyes glow with hatred, and $e directs it all at you. OoO, scary!", ch, 0, victim, 0);
-  while (number(0, 1))
+  while (ch->dc_->number(0, 1))
     do_flee(victim, "");
   return ReturnValue::eSUCCESS;
 }
@@ -1505,7 +1505,7 @@ qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       };
   CharacterPtr v;
   ch->sendln("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!");
-  for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
+  for (v = dc_->world[ch->in_room].people; v; v = v->next_in_room)
   {
     if (GET_POS(v) != position_t::STANDING)
     {
@@ -1556,7 +1556,7 @@ qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     ch->sendln("Your soul is impure. Durendel ignores your contrition.");
     return ReturnValue::eSUCCESS;
   }
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("Something about this room prohibits your prayer from being heard.");
     return ReturnValue::eSUCCESS;
@@ -1564,7 +1564,7 @@ qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   ch->sendln("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!");
   act_to_room("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, 0);
   CharacterPtr v, vn;
-  for (v = DC::getInstance()->world[ch->in_room].people; v; v = vn)
+  for (v = dc_->world[ch->in_room].people; v; v = vn)
   {
     vn = v->next_in_room;
     if (GET_ALIGNMENT(v) > -350 || ARE_GROUPED(ch, v))
@@ -1668,7 +1668,7 @@ qint32 arenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     return ReturnValue::eFAILURE;
 
   // 20% of the time
-  if (number(1, 5) == 1)
+  if (ch->dc_->number(1, 5) == 1)
     return ReturnValue::eFAILURE;
 
   if (!obj || !obj->in_room || !ch)
@@ -1677,7 +1677,7 @@ qint32 arenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (ch->in_room != obj->in_room)
     return ReturnValue::eFAILURE;
 
-  if (move_char(ch, real_room(number(17800, 17949))) == 0)
+  if (move_char(ch, real_room(ch->dc_->number(17800, 17949))) == 0)
     return ReturnValue::eFAILURE;
 
   if (ch->fighting)
@@ -1703,11 +1703,11 @@ qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (cmd == cmd_t::UNDEFINED)
   {
     // move myself 10% of time
-    if (number(1, 10) > 1)
+    if (ch->dc_->number(1, 10) > 1)
       return ReturnValue::eFAILURE;
 
     while (room == 17840)
-      room = number(17800, 17849);
+      room = dc_->number(17800, 17849);
 
     move_obj(obj, real_room(room));
     return ReturnValue::eSUCCESS;
@@ -1719,7 +1719,7 @@ qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (ch->in_room != obj->in_room)
     return ReturnValue::eFAILURE;
 
-  if (!move_char(ch, real_room(number(17800, 17949))))
+  if (!move_char(ch, real_room(ch->dc_->number(17800, 17949))))
     return ReturnValue::eFAILURE;
 
   ch->sendln("A dimensional hole swallows you.\r\nYou reappear elsewhere.");
@@ -1811,7 +1811,7 @@ qint32 weenie_weedy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 1000) > 990)
+  if (ch->dc_->number(1, 1000) > 990)
   {
     if (obj->carried_by)
       send_to_room("Someone's weenie weedy doll says, 'BLARG!'\r\n", obj->carried_by->in_room);
@@ -1836,10 +1836,10 @@ qint32 stupid_message(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   if (!obj || obj->in_room == DC::NOWHERE)
     return ReturnValue::eFAILURE;
 
-  if (!DC::getInstance()->zones.value(DC::getInstance()->world[obj->in_room].zone).players)
+  if (!dc_->zones.value(dc_->world[obj->in_room].zone).players)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 10) == 1)
+  if (ch->dc_->number(1, 10) == 1)
     send_to_room("The shadows swirl to reveal a face before you.\r\n"
                  "It speaks suddenly, 'Only with the key can you unlock the masters name' "
                  "and then fades away.\r\n",
@@ -1863,7 +1863,7 @@ qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   {
     // TODO - should probably check to make sure these are valid rooms before we
     // use them.  Proc isn't used yet though, so no biggy.
-    for (vict = DC::getInstance()->world[real_room(i)].people; vict; vict = vict->next_in_room)
+    for (vict = dc_->world[real_room(i)].people; vict; vict = vict->next_in_room)
       if (vict->isNonPlayer())
         found = {};
       else
@@ -1885,7 +1885,7 @@ qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
                  "You hear the poping of a magical barrier dissapating.\r\n\r\n",
                  real_room(j));
 
-  REMOVE_BIT(DC::getInstance()->world[real_room(8699)].room_flags, IMP_ONLY);
+  REMOVE_BIT(dc_->world[real_room(8699)].room_flags, IMP_ONLY);
   return ReturnValue::eFAILURE;
 }
 
@@ -1896,10 +1896,10 @@ qint32 pagoda_shield_restorer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const Q
   if (cmd == cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE; // only restore if a player is in the room
 
-  if (!isSet(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY))
+  if (!isSet(dc_->world[obj->in_room].room_flags, IMP_ONLY))
   {
     send_to_room("You hear the 'pop' of a magical barrier springing up.\r\n\r\n", obj->in_room);
-    SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY);
+    SET_BIT(dc_->world[obj->in_room].room_flags, IMP_ONLY);
   }
 
   return ReturnValue::eFAILURE;
@@ -1940,13 +1940,13 @@ qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   if (cmd != cmd_t::PUSH) // push
     return ReturnValue::eFAILURE;
 
-  qint32 obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  qint32 obj_vnum = dc_->obj_index[obj->item_number].vnum();
 
   switch (obj_vnum)
   {
   case 26723: // transporter in star-trek
     send_to_room("You hear a chiming electrical noise as the transporter hums to life.\r\n", obj->in_room);
-    for (victim = DC::getInstance()->world[obj->in_room].people; victim; victim = next_vict)
+    for (victim = dc_->world[obj->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
       victim->sendln("Your body is pulled apart and reassembled elsewhere!");
@@ -1959,7 +1959,7 @@ qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
 
   default:
     ch->sendln("Whatever you pushed doesn't have an entry in the button push table.  Tell a god.");
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
     break;
   }
 
@@ -2103,7 +2103,7 @@ qint32 mana_box(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if ((GET_MANA(ch) + 8) < GET_MAX_MANA(ch))
     GET_MANA(ch) += 8;
 
-  if (0 == number(0, 10))
+  if (0 == dc_->number(0, 10))
     ch->sendln("The box's magical power eases your mind.");
 
   return ReturnValue::eSUCCESS;
@@ -2207,7 +2207,7 @@ qint32 teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     ch->sendln("The item seems to be recharging.");
     return ReturnValue::eSUCCESS;
   }
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("The box doesn't respond.");
     return ReturnValue::eSUCCESS;
@@ -2362,20 +2362,20 @@ qint32 pull_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   if (cmd != cmd_t::PULL) // pull
     return ReturnValue::eFAILURE;
 
-  qint32 obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  qint32 obj_vnum = dc_->obj_index[obj->item_number].vnum();
 
   switch (obj_vnum)
   {
   case 9529: // DK lever in captain's room
     // unlock the gate
-    REMOVE_BIT(DC::getInstance()->world[9531].dir_option[1]->exit_info, EX_LOCKED);
-    REMOVE_BIT(DC::getInstance()->world[9532].dir_option[3]->exit_info, EX_LOCKED);
+    REMOVE_BIT(dc_->world[9531].dir_option[1]->exit_info, EX_LOCKED);
+    REMOVE_BIT(dc_->world[9532].dir_option[3]->exit_info, EX_LOCKED);
     send_to_room("You hear a large clicking noise.\r\n", 9531, true);
     send_to_room("You hear a large clicking noise.\r\n", 9532, true);
     send_to_room("You hear a large clicking noise.\r\n", ch->in_room, true);
     break;
   case 29203:
-    if (DC::getInstance()->obj_index[real_object(29202)].qty > 0)
+    if (dc_->obj_index[real_object(29202)].qty > 0)
     {
       send_to_room("A compartment in the ceiling opens, but is it empty.\r\n", 29258, true);
       break;
@@ -2385,7 +2385,7 @@ qint32 pull_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     break;
   default:
     ch->sendln("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.");
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
     break;
   }
 
@@ -2415,9 +2415,9 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   if (obj->obj_flags.timer == 0)
   { // Just created - check if this is the first pass in existence and if so, repop zone 161
     bool first = true;
-    for (p = DC::getInstance()->object_list; p; p = p->next)
+    for (p = dc_->object_list; p; p = p->next)
     {
-      if (DC::getInstance()->obj_index[p->item_number].vnum() == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
+      if (dc_->obj_index[p->item_number].vnum() == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
       {
         first = false;
         break;
@@ -2425,8 +2425,8 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     }
     if (first && real_room(30000) != DC::NOWHERE)
     {
-      qint32 zone = DC::getInstance()->world[real_room(30000)].zone;
-      const auto &character_list = DC::getInstance()->character_list;
+      qint32 zone = dc_->world[real_room(30000)].zone;
+      const auto &character_list = dc_->character_list;
       for (const auto &tmp_victim : character_list)
       {
         // This should never happen but it has before so we must investigate without crashing the whole MUD
@@ -2439,7 +2439,7 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         {
           continue;
         }
-        if (DC::getInstance()->world[tmp_victim->in_room].zone == zone)
+        if (dc_->world[tmp_victim->in_room].zone == zone)
         {
           if (tmp_victim->isNonPlayer())
           {
@@ -2459,7 +2459,7 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         }
       }
 
-      DC::resetZone(DC::getInstance()->world[real_room(30000)].zone);
+      DC::resetZone(dc_->world[real_room(30000)].zone);
     }
   }
 
@@ -2468,10 +2468,10 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
   if (obj->obj_flags.timer >= 1800)
   {
     // once one expires, ALL expire.
-    for (p = DC::getInstance()->object_list; p; p = n)
+    for (p = dc_->object_list; p; p = n)
     {
       n = p->next;
-      if (DC::getInstance()->obj_index[p->item_number].vnum() == 30097)
+      if (dc_->obj_index[p->item_number].vnum() == 30097)
       {
         CharacterPtr v = {};
 
@@ -2489,7 +2489,7 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           v->sendln("The Szrildor daypass crumbles into dust.");
           extract_obj(p); // extract handles all variations of obj_from_char etc
 
-          if (v->isPlayer() && v->in_room && real_room(30000) > 0 && DC::getInstance()->world[v->in_room].zone == DC::getInstance()->world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
+          if (v->isPlayer() && v->in_room && real_room(30000) > 0 && dc_->world[v->in_room].zone == dc_->world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
           {
             if (v->getLevel() >= IMMORTAL)
             {
@@ -2533,14 +2533,14 @@ qint32 szrildor_pass_checks(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
     return ReturnValue::eFAILURE;
 
   qint32 count = {};
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
     if (i->isNonPlayer())
       continue;
     if (!i->in_room)
       continue;
-    if (real_room(30000) > 0 && DC::getInstance()->world[i->in_room].zone != DC::getInstance()->world[real_room(30000)].zone)
+    if (real_room(30000) > 0 && dc_->world[i->in_room].zone != dc_->world[real_room(30000)].zone)
       continue;
     if (i->getLevel() >= 100)
       continue;
@@ -2579,7 +2579,7 @@ qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (dc_->obj_index[obj->item_number].vnum())
   {
   case 11300:
   case 11301:
@@ -2610,7 +2610,7 @@ qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
   {
     obj->obj_flags.timer = time;
     quint64 tries = {};
-    while ((room = number(low, high)))
+    while ((room = dc_->number(low, high)))
     {
       // Give up after 100 tries
       if (tries++ > 100)
@@ -2621,10 +2621,10 @@ qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
       if (real_room(room) == DC::NOWHERE)
         continue;
       if (sector)
-        if (DC::getInstance()->world[real_room(room)].sector_type != sector)
+        if (dc_->world[real_room(room)].sector_type != sector)
           continue;
       ObjectPtr o;
-      for (o = DC::getInstance()->world[real_room(room)].contents; o; o = o->next_content)
+      for (o = dc_->world[real_room(room)].contents; o; o = o->next_content)
       {
         if (o->isPortal())
         {
@@ -2660,11 +2660,11 @@ qint32 no_magic_while_alive(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
   if (obj->in_room == DC::NOWHERE)
     return ReturnValue::eFAILURE;
 
-  CharacterPtr vict = DC::getInstance()->world[obj->in_room].people;
+  CharacterPtr vict = dc_->world[obj->in_room].people;
 
   for (; vict; vict = vict->next_in_room)
   {
-    if (vict->isNonPlayer() && (DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == 9544
+    if (vict->isNonPlayer() && (dc_->mob_index[vict->mobdata->nr].vnum() == 9544
                                 // to add a new mob to this list, just add || and the next check
                                 ))
       break;
@@ -2672,15 +2672,15 @@ qint32 no_magic_while_alive(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
 
   if (vict)
   {
-    if (!isSet(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
+    if (!isSet(dc_->world[obj->in_room].room_flags, NO_MAGIC))
       send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\r\n", obj->in_room);
-    SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
+    SET_BIT(dc_->world[obj->in_room].room_flags, NO_MAGIC);
   }
   else
   {
-    if (isSet(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
+    if (isSet(dc_->world[obj->in_room].room_flags, NO_MAGIC))
       send_to_room("With a large popping noise, the flow of magic returns to the room.\r\n", obj->in_room);
-    REMOVE_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
+    REMOVE_BIT(dc_->world[obj->in_room].room_flags, NO_MAGIC);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -2724,13 +2724,13 @@ qint32 boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
 
   // figure out which boat I am
   qint32 *boat_list = {};
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (dc_->obj_index[obj->item_number].vnum())
   {
   case 9531:
     boat_list = dk_boat;
     break;
   default:
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", dc_->obj_index[obj->item_number].vnum());
     break;
   }
 
@@ -2761,7 +2761,7 @@ qint32 boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
       if (obj->obj_flags.value[0] == -1) // at beginning
       {
         obj->obj_flags.value[0] = 1;
-        send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
+        send_to_boat(dc_->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
       }
     }
     else
@@ -2771,11 +2771,11 @@ qint32 boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
       if (obj->obj_flags.value[0] == boat_list[0]) // at beginning
       {
         obj->obj_flags.value[0] *= -1;
-        send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
+        send_to_boat(dc_->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
       }
     }
     send_to_room("The ship sails away.\r\n", obj->in_room, true);
-    send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship sails onwards.\r\n");
+    send_to_boat(dc_->obj_index[obj->item_number].vnum(), "The ship sails onwards.\r\n");
     obj_from_room(obj);
     obj_to_room(obj, move_to);
     send_to_room("A ship sails in.\r\n", obj->in_room, true);
@@ -2796,12 +2796,12 @@ qint32 leave_boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, C
     return ReturnValue::eFAILURE; // someone loaded me
 
   // switch off depending on what item we are
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (dc_->obj_index[obj->item_number].vnum())
   {
   case 9532: // dk boat ramp
     // find the dk boat (9531)
     i = real_object(9531);
-    for (obj2 = DC::getInstance()->object_list; obj2; obj2 = obj2->next)
+    for (obj2 = dc_->object_list; obj2; obj2 = obj2->next)
     {
       if (obj2->item_number == i)
         break;
@@ -2837,7 +2837,7 @@ qint32 leave_boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, C
     return ReturnValue::eSUCCESS;
     break;
   default:
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", dc_->obj_index[obj->item_number].vnum());
     break;
   }
 
@@ -2862,7 +2862,7 @@ qint32 mob_summoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     return ReturnValue::eFAILURE; // someone loaded me
 
   // see if we have any players in room
-  for (vict = DC::getInstance()->world[obj->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[obj->in_room].people; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
       break;
 
@@ -2887,7 +2887,7 @@ qint32 mob_summoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\r\n", BONEWRACK_ROOM, true);
       break;
     case 1:
-      send_to_zone("A loud roar echos audibly through the entire kingdom.\r\n", DC::getInstance()->world[obj->in_room].zone);
+      send_to_zone("A loud roar echos audibly through the entire kingdom.\r\n", dc_->world[obj->in_room].zone);
       break;
     case 2:
       send_to_room("The dragon $B$2Bonewrack$R flies in from above!\r\n", BONEWRACK_ROOM, true);
@@ -2946,7 +2946,7 @@ qint32 globe_of_darkness_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
   if (obj->obj_flags.value[0] < 1)
   {
     // time to kill myself
-    DC::getInstance()->world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
+    dc_->world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
     send_to_room("The globe of darkness fades brightening the room some.\r\n", obj->in_room, true);
     extract_obj(obj);
   }
@@ -2964,14 +2964,14 @@ qint32 hornoplenty(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   if (!obj || obj->contains)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 100))
+  if (ch->dc_->number(0, 100))
     return ReturnValue::eFAILURE;
 
   ObjectPtr newobj = {};
   qint32 objnum = real_object(3170); // chewy tuber
   if (objnum < 0)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Horn o plenty load obj incorrent.");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Horn o plenty load obj incorrent.");
     return ReturnValue::eFAILURE;
   }
 
@@ -2992,7 +2992,7 @@ qint32 gl_dragon_fire(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       ch->equipment[WEAR_SECOND_WIELD] != obj)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 100) > 5)
+  if (ch->dc_->number(1, 100) > 5)
     return ReturnValue::eFAILURE;
 
   ch->sendln("The head of your dragon staff animates and breathes $B$4fire$R all around you!");
@@ -3012,7 +3012,7 @@ qint32 dk_rend(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->equipment[WEAR_SECOND_WIELD] != obj)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 100) > 5)
+  if (ch->dc_->number(1, 100) > 5)
     return ReturnValue::eFAILURE;
 
   act("The $o rips deeply into $N rending $S body painfully!",
@@ -3035,7 +3035,7 @@ qint32 magic_missile_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString ar
   if (ch->equipment[WEAR_FEET] != obj)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 1))
+  if (ch->dc_->number(0, 1))
     return ReturnValue::eFAILURE;
 
   act("The $o around $n's feet glows briefly and releases a magic missle spell!",
@@ -3055,10 +3055,10 @@ qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStr
   if (ch->equipment[WEAR_SHIELD] != obj)
     return ReturnValue::eFAILURE;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (dc_->obj_index[obj->item_number].vnum())
   {
   case 2715: // shield of ares
-    if (number(0, 3))
+    if (ch->dc_->number(0, 3))
       return ReturnValue::eFAILURE;
 
     act_to_room("$n's $o glows yellow charging up with electrical energy.", ch, obj, ch->fighting, 0);
@@ -3066,14 +3066,14 @@ qint32 shield_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStr
     return spell_lightning_bolt((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
     break;
   case 555: // wicked boneshield
-    if (number(0, 9))
+    if (ch->dc_->number(0, 9))
       return ReturnValue::eFAILURE;
     act_to_room("The spikes $n's $o glimmer brightly.", ch, obj, ch->fighting, 0);
     ch->sendln("The spikes on your shield glimmer brightly.");
     return spell_cause_critical(ch->getLevel(), ch, ch->fighting, 0, 0);
     break;
   case 5208: // thalos beholder shield
-    if (number(0, 4))
+    if (ch->dc_->number(0, 4))
       return ReturnValue::eFAILURE;
 
     act_to_room("$n's $o begins to tremble violently upon contact with $N.", ch, obj, ch->fighting, NOTVICT);
@@ -3104,14 +3104,14 @@ qint32 generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString 
 
   if (obj->item_number < 0 || obj->item_number > top_of_objt)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
     return ReturnValue::eFAILURE;
   }
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (dc_->obj_index[obj->item_number].vnum())
   {
   case 16903: // valhalla hammer
-    if (number(1, 100) > GET_DEX(ch) / 4)
+    if (ch->dc_->number(1, 100) > GET_DEX(ch) / 4)
       break;
     ch->sendln("The hammer begins to hum and strikes out with the power of Thor!");
     act("$n's hammer begins to hum and strikes out with the power of Thor!",
@@ -3119,7 +3119,7 @@ qint32 generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString 
     return spell_lightning_bolt((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
 
   case 19327: // EC Icicle
-    if (number(1, 100) < GET_DEX(ch) / 4)
+    if (ch->dc_->number(1, 100) < GET_DEX(ch) / 4)
       break;
     ch->sendln("The Icicle begins to pulse repidly...");
     act("$n's $o begins to pulse rapidly...",
@@ -3151,7 +3151,7 @@ qint32 TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   // 1406 is the portal 'rock' you enter to get to Tohs
   qint32 searchnum = real_object(1406);
 
-  for (victim = DC::getInstance()->object_list; victim; victim = victim->next)
+  for (victim = dc_->object_list; victim; victim = victim->next)
     if (victim->item_number == searchnum)
       break;
 
@@ -3188,7 +3188,7 @@ qint32 gotta_dance_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   if (!obj->equipped_by)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 3))
+  if (ch->dc_->number(0, 3))
     return ReturnValue::eFAILURE;
 
   act_to_room("$n eyes widen and $e begins to shake violently.", obj->equipped_by, 0, 0, INVIS_NULL);
@@ -3211,7 +3211,7 @@ qint32 random_dir_boots(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   if (!obj->equipped_by)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 3))
+  if (ch->dc_->number(0, 3))
     return ReturnValue::eFAILURE;
 
   act_to_room("$n boots just keep on going!", obj->equipped_by, 0, 0, INVIS_NULL);
@@ -3242,7 +3242,7 @@ qint32 noremove_eq(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
   if (cmd == cmd_t::UNDEFINED && obj->obj_flags.value[3] <= 0)
   {
-    if (number(0, 4))
+    if (ch->dc_->number(0, 4))
       return ReturnValue::eSUCCESS;
     obj->equipped_by->send(u"The %s clamps down onto your body locking your equipment in place!\r\n"_s.arg(qPrintable(obj->short_description())));
     obj->obj_flags.value[3] = 5;
@@ -3268,10 +3268,10 @@ qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
 
   qint32 dam;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (dc_->obj_index[obj->item_number].vnum())
   {
   case 9806: // muddy gloves
-    if (number(0, 17))
+    if (ch->dc_->number(0, 17))
       return ReturnValue::eFAILURE;
 
     dam = dice(1, ch->getLevel());
@@ -3282,23 +3282,23 @@ qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
     break;
 
   case 4818:
-    if (number(0, 19))
+    if (ch->dc_->number(0, 19))
       return ReturnValue::eFAILURE;
     return spell_burning_hands(ch->getLevel(), ch, ch->fighting, nullptr, 50);
   case 4819:
-    if (number(0, 19))
+    if (ch->dc_->number(0, 19))
       return ReturnValue::eFAILURE;
     return spell_chill_touch(ch->getLevel(), ch, ch->fighting, nullptr, 50);
   case 21718:
     if (ch->affected_by_spell(BASE_SETS + SET_SAIYAN))
     {
-      if (number(0, 19))
+      if (ch->dc_->number(0, 19))
         return ReturnValue::eFAILURE;
       return spell_sparks(ch->getLevel(), ch, ch->fighting, nullptr, 0);
     }
     break;
   case 19503: // Gloves of the Dreamer
-    if (number(0, 17))
+    if (ch->dc_->number(0, 17))
       return ReturnValue::eFAILURE;
 
     act_to_room("$n's $o momentarily pulse with a $B$7white light$R.", ch, obj, 0, 0);
@@ -3306,7 +3306,7 @@ qint32 glove_combat_procs(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
     return spell_cure_serious(30, ch, ch, 0, 50);
     break;
   case 506:
-    if (number(0, 33) || !ch->fighting)
+    if (ch->dc_->number(0, 33) || !ch->fighting)
       return ReturnValue::eFAILURE;
     act_to_room("$n's $o begin pulse with a blinding white light for a moment.", ch, obj, 0, 0);
     ch->sendln("Your gloves begin to pulse with a blinding white light for a moment.");
@@ -3428,7 +3428,7 @@ qint32 chaosblade(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if ((++obj->obj_flags.timer) > 4)
   {
-    qint32 dam = number(175, 250);
+    qint32 dam = dc_->number(175, 250);
     obj->obj_flags.timer = {};
     if (GET_HIT(obj->equipped_by) * 30 / 1000 > dam)
     {
@@ -3470,7 +3470,7 @@ qint32 rubybrooch(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     {
       obj->obj_flags.timer = 40; // 40+ = can be removed
     }
-    qint32 dam = number(75, 150);
+    qint32 dam = dc_->number(75, 150);
     if (dam >= GET_HIT(obj->equipped_by))
     {
       dam = GET_HIT(obj->equipped_by) - 1;
@@ -3497,7 +3497,7 @@ qint32 eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 
   if ((++obj->obj_flags.timer) > 4)
   {
-    qint32 dam = number(175, 200);
+    qint32 dam = dc_->number(175, 200);
     obj->obj_flags.timer = {};
     if (GET_MANA(obj->equipped_by) * 30 / 1000 > dam)
     {
@@ -3666,14 +3666,14 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
         buf = "Are you going to just sit in the Tavern all day? Great... I'm owned by Avalios.";
         tmp.push_back(buf);
       }
-      if (isSet(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
+      if (isSet(dc_->world[vict->in_room].room_flags, SAFE))
       {
         buf = "Oh... I suppose we're just going to sit here and gossip for the next few hours, huh?";
         tmp.push_back(buf);
         buf = "While we're here, why don't we just talk about how badass we are on gossip....";
         tmp.push_back(buf);
       }
-      switch (DC::getInstance()->world[vict->in_room].sector_type)
+      switch (dc_->world[vict->in_room].sector_type)
       {
       case SECT_UNDERWATER:
         buf = "Aww man, I hate being under water. I'll rust!";
@@ -3694,7 +3694,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
 
     if (!tmp.empty())
     {
-      qint32 rnd = number((quint64)0, (quint64)tmp.size() - 1);
+      qint32 rnd = dc_->number((quint64)0, (quint64)tmp.size() - 1);
       QString buf2 = "$B$7Ghaerad, Sword of Legends says, '";
       dc_strcat(buf2, tmp[rnd].c_str());
       dc_strcat(buf2, "'$R\r\n");
@@ -3703,7 +3703,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
       if (rnd == unequip)
       {
 
-        if (vict->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
+        if (vict->equipment[WEAR_WIELD] && dc_->obj_index[vict->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
         {
 
           act("Your $p unequips itself.",
@@ -3719,7 +3719,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
             vict->equip_char(weapon, WEAR_WIELD);
           }
         }
-        else if (vict->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_SECOND_WIELD]->item_number].vnum() == 27997)
+        else if (vict->equipment[WEAR_SECOND_WIELD] && dc_->obj_index[vict->equipment[WEAR_SECOND_WIELD]->item_number].vnum() == 27997)
         {
 
           act_to_character("Your $p unequips itself.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, 0);
@@ -3728,7 +3728,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
         }
       }
     }
-    obj->obj_flags.value[0] = number(8, 10);
+    obj->obj_flags.value[0] = dc_->number(8, 10);
   }
 
   return ReturnValue::eFAILURE;
@@ -3739,7 +3739,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
 qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                   CharacterPtr invoker)
 {
-  auto &arena = DC::getInstance()->arena_;
+  auto &arena = dc_->arena_;
   qint32 dropped = {};
   CharacterPtr vict = {};
 
@@ -3763,14 +3763,14 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       vict->sendln("It's already been started!");
       return ReturnValue::eSUCCESS;
     }
-    if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) &&
+    if ((vict->in_room >= 0 && vict->in_room <= dc_->top_of_world) &&
         vict->room().isArena() && arena.isPotato() && arena.isOpened())
     {
       vict->sendln("Wait until the potato arena is open before you try blowing yourself up!");
       return ReturnValue::eSUCCESS;
     }
     vict->sendln("The potato starts getting really really hot and burns your hands!!");
-    obj->obj_flags.value[3] = number(1, 100);
+    obj->obj_flags.value[3] = dc_->number(1, 100);
     return ReturnValue::eSUCCESS;
   }
 
@@ -3825,7 +3825,7 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       vict->sendln("You can only give things to other players when you have a hot potato!");
       return ReturnValue::eSUCCESS;
     }
-    if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) &&
+    if ((vict->in_room >= 0 && vict->in_room <= dc_->top_of_world) &&
         vict->room().isArena() && arena.isPotato() && arena.isOpened() && vict->isMortalPlayer())
     {
       vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");
@@ -3833,7 +3833,7 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
 
     // if it's a player, go ahead
-    if (number(1, 100) > 90 && vict->getLevel() < 100)
+    if (ch->dc_->number(1, 100) > 90 && vict->getLevel() < 100)
       dropped = 1;
     else
       return ReturnValue::eFAILURE;
@@ -3858,7 +3858,7 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
 
     if (vict->isPlayer())
-      for (Connection *i = DC::getInstance()->connections_; i; i = i->next)
+      for (Connection *i = dc_->connections_; i; i = i->next)
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
           i->character->sendln("You hear a large BOOM from somewhere in the distance.");
 
@@ -3924,7 +3924,7 @@ qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QStrin
 
   if (obj->in_room <= 0)
   {
-    DC::getInstance()->logentry(u"Mortar round without a room?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Mortar round without a room?"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_obj(obj);
     return ReturnValue::eFAILURE;
   }
@@ -3932,10 +3932,10 @@ qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QStrin
   send_to_room("The mortar shell explodes ripping the area to shreds!\r\n", obj->in_room);
 
   for (qint32 i = {}; i < 6; i++)
-    if (DC::getInstance()->world[obj->in_room].dir_option[i] && DC::getInstance()->world[obj->in_room].dir_option[i]->to_room)
-      send_to_room("You hear a loud boom.\r\n", DC::getInstance()->world[obj->in_room].dir_option[i]->to_room);
+    if (dc_->world[obj->in_room].dir_option[i] && dc_->world[obj->in_room].dir_option[i]->to_room)
+      send_to_room("You hear a loud boom.\r\n", dc_->world[obj->in_room].dir_option[i]->to_room);
 
-  for (victim = DC::getInstance()->world[obj->in_room].people; victim; victim = next_v)
+  for (victim = dc_->world[obj->in_room].people; victim; victim = next_v)
   {
     next_v = victim->next_in_room;
     if (victim->isNonPlayer()) // only hurts players
@@ -3965,7 +3965,7 @@ qint32 godload_banshee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
     return ReturnValue::eFAILURE;
   if (!(vict = ch->fighting))
     return ReturnValue::eFAILURE;
-  if (number(1, 101) > 12)
+  if (ch->dc_->number(1, 101) > 12)
     return ReturnValue::eFAILURE;
   act_to_room("$n's instrument takes on a life of its own, sending out a piercing wail.", ch, 0, vict, 0);
   ch->sendln("Your instrument sends out a piercing wail.");
@@ -3980,7 +3980,7 @@ qint32 godload_claws(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
     return ReturnValue::eFAILURE;
   if (!(vict = ch->fighting))
     return ReturnValue::eFAILURE;
-  if (number(1, 101) > 5)
+  if (ch->dc_->number(1, 101) > 5)
     return ReturnValue::eFAILURE;
   act_to_room("$n's claws glow icy blue.", ch, 0, vict, 0);
   ch->sendln("Your claws glow icy blue.");
@@ -4108,7 +4108,7 @@ qint32 godload_wailka(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
 
   if (str_cmp(arg1, "suloaki"))
     return ReturnValue::eFAILURE;
-  if (isTimer(ch, SPELL_PARALYZE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isTimer(ch, SPELL_PARALYZE) || isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("The ring hums, but nothing happens.");
     return ReturnValue::eSUCCESS;
@@ -4177,7 +4177,7 @@ qint32 godload_leprosy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (ch->equipment[WEAR_FEET] != obj)
     return ReturnValue::eFAILURE;
 
-  if (number(0, 1))
+  if (ch->dc_->number(0, 1))
     return ReturnValue::eFAILURE;
 
   act("$n's $o release a cloud of disease!",
@@ -4334,15 +4334,15 @@ qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
   if (str_cmp(arg1, "door"))
     return ReturnValue::eFAILURE;
-  if (!isSet(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED))
+  if (!isSet(dc_->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED))
     return ReturnValue::eFAILURE;
-  REMOVE_BIT(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
-  REMOVE_BIT(DC::getInstance()->world[29265].dir_option[2]->exit_info, EX_CLOSED);
+  REMOVE_BIT(dc_->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
+  REMOVE_BIT(dc_->world[29265].dir_option[2]->exit_info, EX_CLOSED);
   act_to_room("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, 0);
   act_to_character("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, 0);
   CharacterPtr a, b, c;
   b = ch->getDC()->initiate_oproc(nullptr, obj);
-  for (a = DC::getInstance()->world[ch->in_room].people; a; a = c)
+  for (a = dc_->world[ch->in_room].people; a; a = c)
   {
     c = a->next_in_room; // 'cause mobs get freed
     if (a == b)
@@ -4389,9 +4389,9 @@ void destroy_spellcraft_glyphs(CharacterPtr ch)
   {
     if (GET_ITEM_TYPE(tmp_obj) == ITEM_CONTAINER)
       for (loop_obj = tmp_obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-        if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6353)
+        if (dc_->obj_index[tmp_obj->item_number].vnum() == 6351 || dc_->obj_index[tmp_obj->item_number].vnum() == 6352 || dc_->obj_index[tmp_obj->item_number].vnum() == 6353)
           move_obj(loop_obj, ch);
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6353)
+    if (dc_->obj_index[tmp_obj->item_number].vnum() == 6351 || dc_->obj_index[tmp_obj->item_number].vnum() == 6352 || dc_->obj_index[tmp_obj->item_number].vnum() == 6353)
       obj_from_char(tmp_obj);
   }
   ch->spellcraftglyph = {};
@@ -4548,7 +4548,7 @@ qint32 godload_grathelok(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   if (vict->getHP() > 100)
     return ReturnValue::eFAILURE;
 
-  switch (number(0, 1))
+  switch (ch->dc_->number(0, 1))
   {
   case 0:
     act_to_victim("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, 0);
@@ -4579,7 +4579,7 @@ qint32 goldenbatleth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   if (vict->getHP() > 40)
     return ReturnValue::eFAILURE;
 
-  switch (number(0, 1))
+  switch (ch->dc_->number(0, 1))
   {
   case 0:
     act_to_victim("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, 0);
@@ -4611,7 +4611,7 @@ qint32 godload_jaelgreth(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
       ch->equipment[WEAR_SECOND_WIELD] != obj)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 100) > 5)
+  if (ch->dc_->number(1, 100) > 5)
     return ReturnValue::eFAILURE;
 
   ch->sendln("You thrust your sacrificial blade into your victim, leeching their lifeforce!");
@@ -4667,11 +4667,11 @@ qint32 godload_foecrusher(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStri
       ch->equipment[WEAR_SECOND_WIELD] != obj)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 100) > 5)
+  if (ch->dc_->number(1, 100) > 5)
     return ReturnValue::eFAILURE;
 
   qint32 dam = 80;
-  switch (number(1, 2))
+  switch (ch->dc_->number(1, 2))
   {
   case 1:
     act("$n smashes $s hammer into your face!",
@@ -4689,7 +4689,7 @@ qint32 godload_foecrusher(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStri
     break;
   }
   CharacterPtr victim = ch->fighting;
-  dam = number(50, dam);
+  dam = dc_->number(50, dam);
 
   if (victim->affected_by_spell(SPELL_DIVINE_INTER) && dam > victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
     dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
@@ -4720,16 +4720,16 @@ qint32 godload_hydratail(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
       ch->equipment[WEAR_SECOND_WIELD] != obj)
     return ReturnValue::eFAILURE;
 
-  if (number(1, 100) > 10)
+  if (ch->dc_->number(1, 100) > 10)
     return ReturnValue::eFAILURE;
 
   qint32 damtype = {};
   QString dammsg;
-  qint32 dam = number(50, 100);
+  qint32 dam = dc_->number(50, 100);
   QString damtypeStr;
   dc_sprintf(dammsg, "$B%d$R", dam);
 
-  switch (number(1, 4))
+  switch (ch->dc_->number(1, 4))
   {
   case 1:
     damtypeStr = "$4$Bfiery$R";

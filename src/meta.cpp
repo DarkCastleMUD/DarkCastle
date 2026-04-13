@@ -1241,7 +1241,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       GET_AC(ch) -= 2;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", qPrintable(ch->name()));
+      dc_->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1263,7 +1263,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       ch->exp += 2000000;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", qPrintable(ch->name()));
+      dc_->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1437,44 +1437,44 @@ void Character::set_heightweight(void)
   switch (this->race)
   {
   case RACE_HUMAN:
-    this->height = number(66, 77);
-    this->weight = number(160, 200);
+    this->height = dc_->number(66, 77);
+    this->weight = dc_->number(160, 200);
     break;
   case RACE_ELVEN:
-    this->height = number(78, 101);
-    this->weight = number(120, 160);
+    this->height = dc_->number(78, 101);
+    this->weight = dc_->number(120, 160);
     break;
   case RACE_DWARVEN:
-    this->height = number(42, 65);
-    this->weight = number(140, 180);
+    this->height = dc_->number(42, 65);
+    this->weight = dc_->number(140, 180);
     break;
   case RACE_HOBBIT:
-    this->height = number(20, 41);
-    this->weight = number(40, 80);
+    this->height = dc_->number(20, 41);
+    this->weight = dc_->number(40, 80);
     break;
   case RACE_PIXIE:
-    this->height = number(12, 33);
-    this->weight = number(10, 40);
+    this->height = dc_->number(12, 33);
+    this->weight = dc_->number(10, 40);
     break;
   case RACE_GIANT:
-    this->height = number(106, 131);
-    this->weight = number(260, 300);
+    this->height = dc_->number(106, 131);
+    this->weight = dc_->number(260, 300);
     break;
   case RACE_GNOME:
-    this->height = number(42, 65);
-    this->weight = number(80, 120);
+    this->height = dc_->number(42, 65);
+    this->weight = dc_->number(80, 120);
     break;
   case RACE_ORC:
-    this->height = number(78, 101);
-    this->weight = number(200, 240);
+    this->height = dc_->number(78, 101);
+    this->weight = dc_->number(200, 240);
     break;
   case RACE_TROLL:
-    this->height = number(102, 123);
-    this->weight = number(240, 280);
+    this->height = dc_->number(102, 123);
+    this->weight = dc_->number(240, 280);
     break;
   }
-  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
-  DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
+  dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
+  dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
 }
 
 qint32 changecost(qint32 oldrace, qint32 newrace)
@@ -1778,22 +1778,22 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       if (choice == 3)
       {
         ch->height++;
-        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by 1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
+        dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by 1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
       }
       if (choice == 4)
       {
         ch->height--;
-        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by -1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
+        dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by -1 = %d", qPrintable(ch->name()), GET_HEIGHT(ch));
       }
       if (choice == 5)
       {
         ch->weight++;
-        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by 1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
+        dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by 1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
       }
       if (choice == 6)
       {
         ch->weight--;
-        DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
+        dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", qPrintable(ch->name()), GET_WEIGHT(ch));
       }
       return ReturnValue::eSUCCESS;
     }
@@ -1819,7 +1819,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       GET_AGE_METAS(ch) += 1;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", qPrintable(ch->name()));
+      dc_->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;
@@ -1846,7 +1846,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       GET_AGE_METAS(ch) -= 1;
       act_to_room("The Meta-physician touches $n.", ch, 0, 0, 0);
       act_to_character("The Meta-physician touches you.", ch, 0, 0, 0);
-      DC::getInstance()->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", qPrintable(ch->name()));
+      dc_->logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", qPrintable(ch->name()));
       ch->save();
 
       return ReturnValue::eSUCCESS;

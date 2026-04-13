@@ -470,7 +470,7 @@ void parse_action(parse_t action, QString str, class Connection *conn)
     break;
   default:
     write_to_output("Invalid option.\r\n", d);
-    DC::getInstance()->logentry(u"SYSERR: invalid command passed to parse_action"_s, OVERSEER, DC::LogChannel::LOG_MISC);
+    dc_->logentry(u"SYSERR: invalid command passed to parse_action"_s, OVERSEER, DC::LogChannel::LOG_MISC);
     return;
   }
 }
@@ -803,7 +803,7 @@ void new_string_add(class Connection *d, QString str)
       if (conn->connected == Connection::states::EXDSCR)
       {
         conn->connected = Connection::states::SELECT_MENU;
-        write_to_output(DC::getInstance()->menu, d);
+        write_to_output(dc_->menu, d);
       }
       else
         check_for_awaymsgs(ch);
@@ -842,7 +842,7 @@ void new_string_add(class Connection *d, QString str)
           else
           {
             conn->connected = Connection::states::SELECT_MENU;
-            write_to_output(DC::getInstance()->menu, d);
+            write_to_output(dc_->menu, d);
           }
         }
       }

@@ -27,7 +27,7 @@ qint32 FOUNTAINisPresent(CharacterPtr ch)
   ObjectPtr tmp;
   bool found = false;
 
-  for (tmp = DC::getInstance()->world[ch->in_room].contents;
+  for (tmp = dc_->world[ch->in_room].contents;
        tmp != nullptr && !found;
        tmp = tmp->next_content)
   {

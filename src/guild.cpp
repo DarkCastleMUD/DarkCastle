@@ -902,7 +902,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     }
 
     ch->sendln("You raise a level!");
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", qPrintable(ch->name()), pc_clss_types3[(qint32)GET_CLASS(ch)], ch->getLevel() + 1);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", qPrintable(ch->name()), pc_clss_types3[(qint32)GET_CLASS(ch)], ch->getLevel() + 1);
 
     ch->incrementLevel();
     advance_level(ch, 0);
@@ -1265,19 +1265,19 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     return;
   }
 
-  if (isSet(DC::getInstance()->world[in_room].room_flags, NOLEARN))
+  if (isSet(dc_->world[in_room].room_flags, NOLEARN))
   {
     return;
   }
 
-  if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
+  if (isSet(dc_->world[in_room].room_flags, SAFE))
   {
     return;
   }
 
   if (difficulty < 1)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", qPrintable(name()), difficulty, skill);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", qPrintable(name()), difficulty, skill);
     return; // Skill w/out difficulty.
   }
 
@@ -1286,7 +1286,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     return;
   }
 
-  if (skill == SKILL_COMBAT_MASTERY && number(0, 8) > 0)
+  if (skill == SKILL_COMBAT_MASTERY && dc_->number(0, 8) > 0)
   {
     return;
   }
@@ -1355,7 +1355,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     return;
   }
 
-  chance = number(1, 101);
+  chance = dc_->number(1, 101);
   if (learned < 15)
   {
     chance += 5;
@@ -1395,7 +1395,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     oi -= int_app[GET_INT(this)].hard_bonus;
     break;
   default:
-    DC::getInstance()->logentry(u"Illegal difficulty value sent to skill_increase_check"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Illegal difficulty value sent to skill_increase_check"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -1409,7 +1409,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
   if (skillname.isEmpty())
   {
     send(u"Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n"_s.arg(skill));
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", qPrintable(this->name()), skill, learned, difficulty);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", qPrintable(this->name()), skill, learned, difficulty);
     return;
   }
 

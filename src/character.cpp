@@ -98,8 +98,8 @@ void Player::toggleJoining(QString key)
     joining[key] = true;
 }
 
-PlayerConfig::PlayerConfig(QObject *parent)
-    : QObject(parent)
+PlayerConfig::PlayerConfig(DCPtr dc)
+    : QObject(dc), dc_(dc)
 {
   config["color.good"] = "green";
   config["color.bad"] = "red";
@@ -260,7 +260,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
   CharacterPtr charmie = dc_->clone_mobile(real_mobile(8));
   if (charmie == nullptr)
   {
-    DC::getInstance()->logentry(u"Error. clone_mobile(real_mobile(8)) returned nullptr."_s);
+    dc_->logentry(u"Error. clone_mobile(real_mobile(8)) returned nullptr."_s);
     return false;
   }
   charmie->setLevel(1);
@@ -275,14 +275,14 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
   QString message = u"Restored charmie for player %1 with file '%2'."_s.arg(player_name).arg(fullpath);
   send(message);
-  DC::getInstance()->logentry(message);
+  dc_->logentry(message);
 
   if (!previous)
   {
     QFile file(fullpath);
     if (file.rename(fullpath + ".restored"))
     {
-      DC::getInstance()->logentry(u"Renamed '%1' to '%2'."_s.arg(fullpath).arg(fullpath + ".restored"));
+      dc_->logentry(u"Renamed '%1' to '%2'."_s.arg(fullpath).arg(fullpath + ".restored"));
     }
   }
 
@@ -457,7 +457,7 @@ const QStringList Object::apply_types =
 
 Sockets::Sockets(CharacterPtr ch, QString searchkey)
 {
-  for (auto &conn : DC::getInstance()->connections_)
+  for (auto &conn : dc_->connections_)
   {
     if (!conn)
       continue;
@@ -636,7 +636,7 @@ level_ Character::getLevel(void) const
   if (level_ > 110)
   {
     produce_coredump();
-    DC::getInstance()->logentry(u"Warning: getLevel returned %1."_s.arg(QString::number(level_)));
+    dc_->logentry(u"Warning: getLevel returned %1."_s.arg(QString::number(level_)));
   }
 
   return level_;
@@ -649,7 +649,7 @@ void Character::setLevel(level_t level)
   if (level_ > 110)
   {
     produce_coredump();
-    DC::getInstance()->logentry(u"Warning: setLevel(%1)."_s.arg(QString::number(level_)));
+    dc_->logentry(u"Warning: setLevel(%1)."_s.arg(QString::number(level_)));
   }
 }
 
@@ -680,7 +680,7 @@ void Character::setType(const Type type)
 
 Room &Entity::room(void)
 {
-  return DC::getInstance()->world[in_room];
+  return dc_->world[in_room];
 }
 
 move_t Character::move_limit(void)
@@ -1001,15 +1001,15 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
   }
   else if (variable == "zone")
   {
-    const auto rm = DC::getInstance()->world[in_room];
+    const auto rm = dc_->world[in_room];
     value = QString::number(rm.zone);
     if (supports_color)
       color = RED;
   }
   else if (variable == "sector")
   {
-    if (DC::getInstance()->rooms.contains(in_room))
-      value = sector_types[DC::getInstance()->world[in_room].sector_type];
+    if (dc_->rooms.contains(in_room))
+      value = sector_types[dc_->world[in_room].sector_type];
   }
   else if (variable == "timeofday")
   {

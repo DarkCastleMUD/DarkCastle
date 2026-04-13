@@ -194,7 +194,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       }
 
       ch->sendln("This is broken.");
-      DC::getInstance()->logentry(u"do_string: broken"_s);
+      dc_->logentry(u"do_string: broken"_s);
       /*
       TODO
       if (mob->isNonPlayer())
@@ -213,7 +213,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
         return 1;
       }
       dc_sprintf(message, "%s just restrung short on %s", qPrintable(ch->name()), qPrintable(mob->name()));
-      DC::getInstance()->logentry(message, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+      dc_->logentry(message, IMPLEMENTER, DC::LogChannel::LOG_GOD);
       if (mob->isNonPlayer())
         ch->desc->hashstr = &mob->short_desc;
       else
@@ -544,7 +544,7 @@ const QString next_page(const QString str)
     {
       if (*(str + 1) == '\0')
       { // this should never happen
-        DC::getInstance()->logentry(u"String ended in $ in next_page"_s, ANGEL, DC::LogChannel::LOG_BUG);
+        dc_->logentry(u"String ended in $ in next_page"_s, ANGEL, DC::LogChannel::LOG_BUG);
         //*str = '\0'; // overwrite the $ so it doesn't mess up anything
         return {};
       }

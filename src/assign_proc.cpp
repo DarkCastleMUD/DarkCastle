@@ -68,14 +68,14 @@ void DC::assign_one_obj_non(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
-    DC::getInstance()->obj_non_combat_functions[vnum] = func;
+    dc_->obj_non_combat_functions[vnum] = func;
   }
 
   qint32 rnum = real_object(vnum);
 
   if (rnum >= 0)
   {
-    DC::getInstance()->obj_index[rnum].non_combat_func = func;
+    dc_->obj_index[rnum].non_combat_func = func;
   }
 }
 
@@ -83,14 +83,14 @@ void DC::assign_one_obj_com(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
-    DC::getInstance()->obj_combat_functions[vnum] = func;
+    dc_->obj_combat_functions[vnum] = func;
   }
 
   qint32 rnum = real_object(vnum);
 
   if (rnum >= 0)
   {
-    DC::getInstance()->obj_index[rnum].combat_func = func;
+    dc_->obj_index[rnum].combat_func = func;
   }
 }
 
@@ -652,5 +652,5 @@ void DC::assign_rooms(void)
 {
   ROOM_PROC pet_shops;
   if (real_room(3031) >= 0)
-    DC::getInstance()->world[real_room(3031)].funct = pet_shops;
+    dc_->world[real_room(3031)].funct = pet_shops;
 }

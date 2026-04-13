@@ -196,7 +196,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  DC::getInstance()->logentry(u"%1 has been bestowed %2 by %3."_s.arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(u"%1 has been bestowed %2 by %3."_s.arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
   this->sendln(u"%1 has been bestowed %2."_s.arg(qPrintable(victim->name())).arg(bc->name));
   this->sendln(u"%1 has bestowed %2 upon you."_s.arg(name()).arg(bc->name));
   return ReturnValue::eSUCCESS;
@@ -238,7 +238,7 @@ command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->send(buf);
     dc_sprintf(buf, "%s has had all commands revoked by %s.\r\n", qPrintable(vict->name()),
                qPrintable(ch->name()));
-    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     dc_sprintf(buf, "%s has revoked all commands from you.\r\n", qPrintable(ch->name()));
     vict->send(buf);
     return ReturnValue::eSUCCESS;
@@ -266,7 +266,7 @@ command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
   dc_snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name));
   ch->send(buf);
   dc_snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", qPrintable(vict->name()), qPrintable(DC::bestowable_god_commands[i].name), qPrintable(ch->name()));
-  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   dc_snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", qPrintable(ch->name()), qPrintable(DC::bestowable_god_commands[i].name));
   vict->send(buf);
   return ReturnValue::eSUCCESS;
@@ -282,14 +282,14 @@ command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     QString log_buf = {};
     dc_sprintf(log_buf, "Game has been wizlocked by %s.", qPrintable(ch->name()));
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game wizlocked.");
   }
   else
   {
     QString log_buf = {};
     dc_sprintf(log_buf, "Game has been un-wizlocked by %s.", qPrintable(ch->name()));
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
+    dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game un-wizlocked.");
   }
   return ReturnValue::eSUCCESS;
@@ -367,7 +367,7 @@ command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  DC::getInstance()->send_to_gods(command, lev_nr, DC::LogChannel::LOG_BUG);
+  dc_->send_to_gods(command, lev_nr, DC::LogChannel::LOG_BUG);
   return ReturnValue::eSUCCESS;
 }
 
@@ -425,12 +425,12 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       GET_PLATINUM(victim) -= 500;
       send(u"You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())).arg(GET_PLATINUM(victim)));
       victim->send(u"You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n"_s.arg(GET_PLATINUM(victim)));
-      DC::getInstance()->logentry(u"500 platinum removed from %1 for rename."_s.arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
+      dc_->logentry(u"500 platinum removed from %1 for rename."_s.arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
     }
   }
 
   QString strsave;
-  if (DC::getInstance()->cf.bport == false)
+  if (dc_->cf.bport == false)
   {
     strsave = u"%1/%2/%3"_s.arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
@@ -522,7 +522,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   // Copy the pfile
   QString buffer;
-  if (DC::getInstance()->cf.bport == false)
+  if (dc_->cf.bport == false)
   {
     buffer = u"cp %1/%2/%3 %4/%5/%6"_s.arg(SAVE_DIR).arg(victim->name()[0]).arg(qPrintable(victim->name())).arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
@@ -554,10 +554,10 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   }
 
   buffer = u"%1 renamed to %2."_s.arg(qPrintable(victim->name())).arg(newname);
-  DC::getInstance()->logentry(buffer, level_, DC::LogChannel::LOG_GOD);
+  dc_->logentry(buffer, level_, DC::LogChannel::LOG_GOD);
 
   // handle the renames
-  DC::getInstance()->TheAuctionHouse.HandleRename(this, qPrintable(victim->name()), newname);
+  dc_->TheAuctionHouse.HandleRename(this, qPrintable(victim->name()), newname);
 
   // Get rid of the existing one
   do_zap(victim->name().split(' '), cmd_t::TRACK);
@@ -665,7 +665,7 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  dc_sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::getInstance()->cf.bport == true ? "b" : "n");
+  dc_sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, dc_->cf.bport == true ? "b" : "n");
   ret = system(buf);
   // ret = bits, but I didn't use bits because I'm lazy and it only returns 2 values I gives a flyging fuck about!
   // if you change the script, you gotta change this too. - Rahz
@@ -847,7 +847,7 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   for (r = {}; r < top_of_objt; r++)
   {
-    obj = DC::getInstance()->obj_index[r].item;
+    obj = dc_->obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
@@ -857,7 +857,7 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     dc_sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
-               o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), DC::getInstance()->obj_index[r].vnum(), ac);
+               o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), dc_->obj_index[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)
@@ -931,7 +931,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
 command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
 {
   QString export_type, filename;
-  world_file_list_item *curr = DC::getInstance()->obj_file_list;
+  world_file_list_item *curr = dc_->obj_file_list;
 
   args = one_argument(args, export_type);
   one_argument(args, filename);
@@ -963,7 +963,7 @@ command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
     {
       for (qint32 x = curr->firstnum; x <= curr->lastnum; x++)
       {
-        write_object_csv(DC::getInstance()->obj_index[x].item, fout);
+        write_object_csv(dc_->obj_index[x].item, fout);
       }
       curr = curr->next;
     }
@@ -974,10 +974,10 @@ command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
   {
     std::stringstream errormsg;
     errormsg << "Exception while writing to " << filename << ".";
-    DC::getInstance()->logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
+    dc_->logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
   }
 
-  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
+  dc_->logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
 
   return ReturnValue::eSUCCESS;
 }
@@ -987,7 +987,7 @@ command_return_t do_world(CharacterPtr ch, QString args, cmd_t cmd)
 
   if (args == "rename")
   {
-    auto world = DC::getInstance()->world_file_list;
+    auto world = dc_->world_file_list;
     while (world != nullptr)
     {
       QString potential_filename = u"%1-%2.txt"_s.arg(world->firstnum).arg(world->lastnum);

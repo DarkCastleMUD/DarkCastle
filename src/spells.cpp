@@ -947,7 +947,7 @@ void affect_update(qint32 duration_type)
   if (duration_type != DC::PULSE_REGEN && duration_type != DC::PULSE_TIMER && duration_type != DC::PULSE_VIOLENCE && duration_type != DC::PULSE_TIME) // Default
     return;
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
     // This doesn't really belong here, but it beats creating an "update" just for it.
@@ -1014,7 +1014,7 @@ void affect_update(qint32 duration_type)
         if (af->type == SPELL_ETHEREAL_FOCUS)
         {
           // NOTICE:  this is a TEMP room flag
-          REMOVE_BIT(DC::getInstance()->world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+          REMOVE_BIT(dc_->world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
           act_to_room("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, nullptr, nullptr, NOTVICT);
         }
         affect_remove(i, af, 0);
@@ -1022,7 +1022,7 @@ void affect_update(qint32 duration_type)
     }
     continue;
   }
-  DC::getInstance()->removeDead();
+  dc_->removeDead();
 }
 
 // Sets any ISR's that go with a spell..  (ISR's arent saved)
@@ -1033,13 +1033,13 @@ void isr_set(CharacterPtr ch)
 
   if (!ch)
   {
-    DC::getInstance()->logentry(u"nullptr ch in isr_set!"_s, 0, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"nullptr ch in isr_set!"_s, 0, DC::LogChannel::LOG_BUG);
     return;
   }
 
   /*  why do we need this spamming the logs?
      dc_sprintf(buf, "isr_set ch %s", qPrintable(ch->name()));
-     DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_BUG);
+     dc_->logentry(buf, 0, DC::LogChannel::LOG_BUG);
   */
   for (afisr = ch->affected; afisr; afisr = afisr->next)
   {
@@ -1121,7 +1121,7 @@ void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 
   if (ch->master == nullptr)
   {
-    DC::getInstance()->logentry(u"Stop_follower: null ch_master!"_s, ARCHANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Stop_follower: null ch_master!"_s, ARCHANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   /*
@@ -1367,11 +1367,11 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
   CharacterPtr people;
   if (room > 0)
   {
-    people = DC::getInstance()->world[room].people;
+    people = dc_->world[room].people;
   }
   else
   {
-    people = DC::getInstance()->world[ch->in_room].people;
+    people = dc_->world[ch->in_room].people;
   }
 
   for (temp_char = people;
@@ -1452,8 +1452,8 @@ qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16
     break;
   }
 
-  save += number(1, 100);
-  spell_base += number(1, 100);
+  save += dc_->number(1, 100);
+  spell_base += dc_->number(1, 100);
   return (qint32)(save - spell_base);
 }
 
@@ -1734,7 +1734,7 @@ bool Character::skill_success(CharacterPtr victim, qint32 skillnum, qint32 mod)
     if (i > o) o = i+1;
   */
 
-  if (i > number(1, 100) || getLevel() >= IMMORTAL)
+  if (i > dc_->number(1, 100) || getLevel() >= IMMORTAL)
   {
     if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a + 500);
@@ -1808,8 +1808,8 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (dc_->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from casting!");
       return ReturnValue::eFAILURE;
@@ -1858,7 +1858,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send("Stick to singing bucko.");
       return ReturnValue::eFAILURE;
     }
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+    if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
     {
       ch->sendln("You find yourself unable to weave magic here.");
       return ReturnValue::eFAILURE;
@@ -1985,7 +1985,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             ch->sendln("Fire a lightning bolt where?");
             return ReturnValue::eFAILURE;
           }
-          if (!DC::getInstance()->world[ch->in_room].dir_option[dir])
+          if (!dc_->world[ch->in_room].dir_option[dir])
           {
             ch->sendln("The wall blocks your attempt.");
             return ReturnValue::eFAILURE;
@@ -2000,8 +2000,8 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             ch->sendln("You cannot concentrate enough to fire a bolt of lightning into another room!");
             return ReturnValue::eFAILURE;
           }
-          qint32 new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
-          if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE) || isSet(DC::getInstance()->world[new_room].room_flags, NO_MAGIC))
+          qint32 new_room = dc_->world[ch->in_room].dir_option[dir]->to_room;
+          if (isSet(dc_->world[new_room].room_flags, SAFE) || isSet(dc_->world[new_room].room_flags, NO_MAGIC))
           {
             ch->sendln("That room is protected from this harmful magic.");
             return ReturnValue::eFAILURE;
@@ -2032,8 +2032,8 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             return ReturnValue::eFAILURE;
           }
 
-          if (tar_char->isNonPlayer() && DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
-              DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() <= 2399)
+          if (tar_char->isNonPlayer() && dc_->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
+              dc_->mob_index[tar_char->mobdata->nr].vnum() <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
@@ -2204,7 +2204,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_ROOM))
           {
-            tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
+            tar_obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room].contents);
             if (tar_obj != nullptr)
               target_ok = true;
           }
@@ -2400,7 +2400,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         if (IS_AFFECTED(ch, AFF_CRIPPLE) && ch->affected_by_spell(SKILL_CRIPPLE))
           chance -= 1 + ch->affected_by_spell(SKILL_CRIPPLE)->modifier / 10;
 
-        if (!ch->isImmortalPlayer() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+        if (!ch->isImmortalPlayer() && dc_->number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(dc_->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
           ch->send(u"You lost your concentration and are unable to cast %s!\r\n"_s.arg(spells[spl - 1]));
@@ -2464,7 +2464,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           mana_cost = (use_mana(ch, spl) * rel);
           GET_MANA(ch) -= mana_cost;
         }
-        if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1, 5) < 3)
+        if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && dc_->number(1, 5) < 3)
           tar_char->sendln("Your sleep is restless.");
         ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty());
 
@@ -2475,34 +2475,34 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           {
             dc_sprintf(log_buf, "Multi: %s casted '%s' on %s", qPrintable(ch->name()),
                     get_skill_name(spl), qPrintable(tar_char->name()));
-            DC::getInstance()->logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
+            dc_->logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
           }*/
 
           // Wizard's eye (88) is ok to cast
           // Prize Arena
-          auto &arena = DC::getInstance()->arena_;
+          auto &arena = dc_->arena_;
           if (ch->room().isArena() && arena.isPrize() && spl != 88)
           {
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
-                                      qPrintable(ch->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
+              dc_->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
+                        qPrintable(ch->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
               return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", qPrintable(ch->name()),
-                                      qPrintable(ch->fighting->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
+              dc_->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", qPrintable(ch->name()),
+                        qPrintable(ch->fighting->name()), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()));
               return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", qPrintable(ch->name()),
-                                      get_skill_name(qPrintable(spl)), qPrintable(tar_char->name()), qPrintable(tar_char->fighting->name()));
+              dc_->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", qPrintable(ch->name()),
+                        get_skill_name(qPrintable(spl)), qPrintable(tar_char->name()), qPrintable(tar_char->fighting->name()));
               return ReturnValue::eFAILURE;
             }
           }
@@ -2514,35 +2514,35 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
-                                      qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
+              dc_->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
+                        qPrintable(ch->name()), qPrintable(get_clan_name(ch)), qPrintable(get_skill_name(spl)), qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
-                                      qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
-                                      qPrintable(ch->fighting->name()), get_clan_name(ch->fighting),
-                                      get_skill_name(qPrintable(spl)),
-                                      qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
+              dc_->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
+                        qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
+                        qPrintable(ch->fighting->name()), get_clan_name(ch->fighting),
+                        get_skill_name(qPrintable(spl)),
+                        qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
-                                      qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
-                                      get_skill_name(qPrintable(spl)),
-                                      qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)),
-                                      qPrintable(tar_char->fighting->name()), get_clan_name(tar_char->fighting));
+              dc_->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
+                        qPrintable(ch->name()), qPrintable(get_clan_name(ch)),
+                        get_skill_name(qPrintable(spl)),
+                        qPrintable(tar_char->name()), qPrintable(get_clan_name(tar_char)),
+                        qPrintable(tar_char->fighting->name()), get_clan_name(tar_char->fighting));
               return ReturnValue::eFAILURE;
             }
           }
         }
 
-        if (tar_char && IS_AFFECTED(tar_char, AFF_REFLECT) && number(0, 99) < tar_char->spell_reflect)
+        if (tar_char && IS_AFFECTED(tar_char, AFF_REFLECT) && dc_->number(0, 99) < tar_char->spell_reflect)
         {
           if (ch == tar_char || ARE_GROUPED(ch, tar_char))
           { // some idiot was shooting at himself
@@ -2558,7 +2558,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             tar_char = ch;
 
             // Ping-pong
-            if (IS_AFFECTED(tar_char, AFF_REFLECT) && number(0, 99) < tar_char->spell_reflect)
+            if (IS_AFFECTED(tar_char, AFF_REFLECT) && dc_->number(0, 99) < tar_char->spell_reflect)
             {
               act_to_character("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, 0);
               act_to_room("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, 0);

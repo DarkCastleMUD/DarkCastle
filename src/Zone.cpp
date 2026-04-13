@@ -213,7 +213,7 @@ zone_t getZoneKey(CharacterPtr ch, const QString input, bool *ok)
 
 bool isValidZoneKey(CharacterPtr ch, const zone_t zone_key)
 {
-  const auto dc = DC::getInstance();
+  const auto dc = dc_;
   if (!dc->zones.contains(zone_key))
   {
     if (ch)

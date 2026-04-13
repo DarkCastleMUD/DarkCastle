@@ -74,7 +74,7 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
     dc_sprintf(name, "%s has booted %s.", qPrintable(ch->name()), qPrintable(victim->name()));
-    DC::getInstance()->logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     if (type == u"boot"_s)
     {
@@ -171,7 +171,7 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Usage: release <#>");
     return ReturnValue::eFAILURE;
   }
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &d : dc_->connections_)
   {
     if (conn->descriptor == sdesc)
     {
@@ -228,7 +228,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   vict->save();
 
-  DC::getInstance()->logentry(u"%1 just forced %2 to save."_s.arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(u"%1 just forced %2 to save."_s.arg(qPrintable(ch->name())).arg(qPrintable(vict->name())), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return ReturnValue::eSUCCESS;
 }
@@ -276,7 +276,7 @@ command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
                 qPrintable(i->name()), ch_clan_name,
                 qPrintable(i->fighting->name()), victim_clan_name,
-                DC::getInstance()->world[i->in_room].number);
+                dc_->world[i->in_room].number);
     ch->send(buf);
   }
 
@@ -294,7 +294,7 @@ command_return_t do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr rch;
 
-  for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
+  for (rch = dc_->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
     if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
@@ -367,7 +367,7 @@ qint32 lookupRoom(CharacterPtr ch, QString str)
 
   qint32 room = atoi(str);
 
-  if (room == DC::NOWHERE || room > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(room))
+  if (room == DC::NOWHERE || room > dc_->top_of_world || !dc_->rooms.contains(room))
   {
     if (ch)
     {
@@ -418,7 +418,7 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
       bool found = false;
       for (c_class = 1; c_class < CLASS_MAX; c_class++)
       {
-        if (DC::getInstance()->rooms.contains(room) && DC::getInstance()->rooms[room].allow_class[c_class] == true)
+        if (dc_->rooms.contains(room) && dc_->rooms[room].allow_class[c_class] == true)
         {
           found = true;
           ch->send(u"%s "_s.arg(pc_clss_types[c_class]));
@@ -449,9 +449,9 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send(u"%s only rooms:\r\n"_s.arg(pc_clss_types[c_class]));
 
       qint32 cols = {};
-      for (qint32 r = {}; r < DC::getInstance()->top_of_world; r++)
+      for (qint32 r = {}; r < dc_->top_of_world; r++)
       {
-        if (DC::getInstance()->rooms.contains(r) && DC::getInstance()->rooms[r].allow_class[c_class] == true)
+        if (dc_->rooms.contains(r) && dc_->rooms[r].allow_class[c_class] == true)
         {
           ch->send(u"%1 "_s.arg(r, 5));
 
@@ -497,24 +497,24 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!DC::getInstance()->rooms.contains(room))
+  if (!dc_->rooms.contains(room))
   {
     ch->send(u"Room %1 does not exist.\r\n"_s.arg(room));
     return ReturnValue::eFAILURE;
   }
 
-  if (DC::getInstance()->rooms[room].allow_class[c_class] == true)
+  if (dc_->rooms[room].allow_class[c_class] == true)
   {
     ch->send(u"Removed %s class from room #%d's allow list.\r\n"_s.arg(pc_clss_types[c_class]).arg(room));
-    DC::getInstance()->rooms[room].allow_class[c_class] = false;
+    dc_->rooms[room].allow_class[c_class] = false;
   }
   else
   {
     ch->send(u"Added %s class to room #%d's allow list.\r\n"_s.arg(pc_clss_types[c_class]).arg(room));
-    DC::getInstance()->rooms[room].allow_class[c_class] = true;
+    dc_->rooms[room].allow_class[c_class] = true;
   }
 
-  DC::getInstance()->set_zone_modified_world(room);
+  dc_->set_zone_modified_world(room);
 
   old_room = ch->in_room;
   ch->in_room = room;

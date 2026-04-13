@@ -155,7 +155,7 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, auto vict_obj, Ch
   }
   if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FLAG_FORCE))
     return "";
-  if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
+  if (isSet(dc_->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
     return "";
   if ((send_to == (CharacterPtr)vict_obj) && (flags & NOTVICT))
     return "";
@@ -500,7 +500,7 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, auto vict_obj, Ch
             } /* if it's a code */
             else // It's unrecognized.  Shouldn't happen.
             {
-              DC::getInstance()->logentry(u"TokenList::Interpret() sent bad Token!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+              dc_->logentry(u"TokenList::Interpret() sent bad Token!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
             }
 #ifdef DEBUG_TOKEN
     // std::cerr << "Output after this loop: " << interp << std::endl;

@@ -90,10 +90,10 @@ public:
     if (ch_ && ch_->isPlayer() &&
         (isSet(ch_->player->punish, PUNISH_LOG) ||
          ch_->getLevel() >= 100 ||
-         (ch_->player->multi && !DC::getInstance()->cf.allow_multi)))
+         (ch_->player->multi && !dc_->cf.allow_multi)))
     {
       command_duration_.start();
-      DC::getInstance()->logentry(u"ch=%1 in=%2 cmd=\"%3\""_s.arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
+      dc_->logentry(u"ch=%1 in=%2 cmd=\"%3\""_s.arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
       logged_ = true;
     }
   }
@@ -105,7 +105,7 @@ public:
       command_duration_.stop();
       auto timediff = ((command_duration_.getDiff().tv_sec * 1000000.0) + command_duration_.getDiff().tv_usec) / 1000000.0;
       auto timediffStr = QString::number(timediff, 'f');
-      DC::getInstance()->logentry(u"ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6"_s.arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
+      dc_->logentry(u"ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6"_s.arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
     }
   }
 
@@ -127,7 +127,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      DC::getInstance()->logentry(u"Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4"_s.arg(cstack.getDepth()).arg(cstack.getMax()).arg(name()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
+      dc_->logentry(u"Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4"_s.arg(cstack.getDepth()).arg(cstack.getMax()).arg(name()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     return logcmd.setReturn(ReturnValue::eFAILURE, "cstack exceeded");
   }
@@ -188,9 +188,9 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
   // if we got this far, we're going to play with the command, so put
   // it into the debugging globals
-  DC::getInstance()->last_processed_cmd = pcomm;
-  DC::getInstance()->last_char_name = name();
-  DC::getInstance()->last_char_room = in_room;
+  dc_->last_processed_cmd = pcomm;
+  dc_->last_char_name = name();
+  dc_->last_char_room = in_room;
 
   if (!pcomm.isEmpty())
   {
@@ -201,7 +201,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       return logcmd.setReturn(retval, u"ReturnValue::eEXTRA_VALUE"_s);
   }
 
-  auto found = DC::getInstance()->CMD_.find(command);
+  auto found = dc_->CMD_.find(command);
   if (found.has_value())
   {
     if (getLevel() >= found->getMinimumLevel() && (found->getFunction1() != nullptr || found->getFunction1b() != nullptr || found->getFunction2() != nullptr || found->getFunction3() != nullptr))
@@ -311,7 +311,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
           dc_sprintf(buf, "You emerge from your hidden position...\r\n");
           act_to_character(buf, this, 0, 0,  0);
           }
-        if ((found->toggle_hide > 1) && (number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
+        if ((found->toggle_hide > 1) && (ch->dc_->number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
           REMBIT(this->affected_by, AFF_HIDE);
           dc_sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
           act_to_character(buf, this, 0, 0,  0);
@@ -806,8 +806,8 @@ std::tuple<QString, QString> last_argument(QString arguments)
   }
   catch (...)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
-                            arguments.c_str());
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
+              arguments.c_str());
   }
 
   return std::tuple<QString, QString>(QString(), QString());
@@ -883,18 +883,18 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   qint32 retval;
 
   /* special in room? */
-  if (DC::getInstance()->world[in_room].funct)
+  if (dc_->world[in_room].funct)
   {
-    if ((retval = (*DC::getInstance()->world[in_room].funct)(this, cmd, qPrintable(arguments))) != ReturnValue::eFAILURE)
+    if ((retval = (*dc_->world[in_room].funct)(this, cmd, qPrintable(arguments))) != ReturnValue::eFAILURE)
       return retval;
   }
 
   /* special in equipment list? */
   for (j = {}; j <= (MAX_WEAR - 1); j++)
     if (equipment[j] && this->equipment[j]->item_number >= 0)
-      if (DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)
+      if (dc_->obj_index[this->equipment[j]->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, qPrintable(arguments), this));
+        retval = ((*dc_->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, qPrintable(arguments), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -902,28 +902,28 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   /* special in inventory? */
   for (i = carrying; i; i = i->next_content)
     if (i->item_number >= 0)
-      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
+      if (dc_->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
+        retval = ((*dc_->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
 
   /* special in mobile present? */
-  for (k = DC::getInstance()->world[this->in_room].people; k; k = k->next_in_room)
+  for (k = dc_->world[this->in_room].people; k; k = k->next_in_room)
   {
     if (k->isNonPlayer())
     {
-      if (((CharacterPtr)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if (((CharacterPtr)dc_->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(this, 0, cmd, qPrintable(arguments), k);
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
-      else if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
+      else if (dc_->mob_index[k->mobdata->nr].non_combat_func)
       {
-        retval = ((*DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
-                                                                                  cmd, qPrintable(arguments), k));
+        retval = ((*dc_->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
+                                                                    cmd, qPrintable(arguments), k));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -931,11 +931,11 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   }
 
   /* special in object present? */
-  for (i = DC::getInstance()->world[this->in_room].contents; i; i = i->next_content)
+  for (i = dc_->world[this->in_room].contents; i; i = i->next_content)
     if (i->item_number >= 0)
-      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
+      if (dc_->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
+        retval = ((*dc_->obj_index[i->item_number].non_combat_func)(this, i, cmd, qPrintable(arguments), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -947,8 +947,8 @@ void Character::add_command_lag(cmd_t cmd, qint32 lag)
 {
   command_lag *cmdl;
   cmdl = new command_lag;
-  cmdl->next = DC::getInstance()->getCommandLag();
-  DC::getInstance()->setCommandLag(cmdl);
+  cmdl->next = dc_->getCommandLag();
+  dc_->setCommandLag(cmdl);
   cmdl->ch = this;
   cmdl->cmd_number = cmd;
   cmdl->lag = lag;
@@ -957,7 +957,7 @@ void Character::add_command_lag(cmd_t cmd, qint32 lag)
 bool Character::can_use_command(cmd_t cmd)
 {
   command_lag *cmdl;
-  for (cmdl = DC::getInstance()->getCommandLag(); cmdl; cmdl = cmdl->next)
+  for (cmdl = dc_->getCommandLag(); cmdl; cmdl = cmdl->next)
   {
 
     if (cmdl->ch == this && cmdl->cmd_number == cmd)
@@ -970,7 +970,7 @@ void DC::pulse_command_lag(void)
 {
   command_lag *cmdl{}, *cmdlp = {}, *cmdlnext = {};
 
-  for (cmdl = DC::getInstance()->getCommandLag(); cmdl; cmdl = cmdlnext)
+  for (cmdl = dc_->getCommandLag(); cmdl; cmdl = cmdlnext)
   {
     cmdlnext = cmdl->next;
     if ((cmdl->lag--) <= 0)
@@ -978,7 +978,7 @@ void DC::pulse_command_lag(void)
       if (cmdlp)
         cmdlp->next = cmdl->next;
       else
-        DC::getInstance()->setCommandLag(cmdl->next);
+        dc_->setCommandLag(cmdl->next);
 
       cmdl->ch = {};
       cmdl = {};

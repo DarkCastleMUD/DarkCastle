@@ -54,7 +54,7 @@ bool ishashed(QString arg)
   return false;
 }
 
-/* DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", qPrintable(ch->name())); */
+/* dc_->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", qPrintable(ch->name())); */
 void DC::logf(level_t level, DC::LogChannel type, QString cformat, ...)
 {
   va_list args;
@@ -64,7 +64,7 @@ void DC::logf(level_t level, DC::LogChannel type, QString cformat, ...)
   s = QString::vasprintf(qPrintable(cformat), args);
   va_end(args);
 
-  DC::getInstance()->logentry(s, level, type);
+  dc_->logentry(s, level, type);
 }
 
 QString handle_ansi_(QString s, CharacterPtr ch)

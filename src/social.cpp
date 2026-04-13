@@ -63,7 +63,7 @@ command_return_t Character::check_social(QString pcomm)
     break;
   }
 
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[this->in_room].room_flags, QUIET))
   {
     this->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return SOCIAL_true;
@@ -134,7 +134,7 @@ QString fread_social_string(FILE *fl)
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl))
   {
-    DC::getInstance()->logentry(u"Fread_social_string - unexpected EOF."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Fread_social_string - unexpected EOF."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     exit(0);
   }
 

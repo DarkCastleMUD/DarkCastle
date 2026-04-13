@@ -115,32 +115,32 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
       dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
                   qPrintable(ch->name()),
                   cnt,
-                  DC::getInstance()->mob_index[rnum].vnum(),
+                  dc_->mob_index[rnum].vnum(),
                   mob->short_desc,
-                  DC::getInstance()->world[ch->in_room].number,
-                  DC::getInstance()->world[ch->in_room].name);
+                  dc_->world[ch->in_room].number,
+                  dc_->world[ch->in_room].name);
     }
     else
     {
       dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
                   qPrintable(ch->name()),
                   cnt,
-                  DC::getInstance()->mob_index[rnum].vnum(),
+                  dc_->mob_index[rnum].vnum(),
                   mob->short_desc,
-                  DC::getInstance()->world[ch->in_room].number,
-                  DC::getInstance()->world[ch->in_room].name);
+                  dc_->world[ch->in_room].number,
+                  dc_->world[ch->in_room].name);
     }
-    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
     dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
                 qPrintable(ch->name()),
                 cnt,
-                DC::getInstance()->mob_index[rnum].vnum(),
-                DC::getInstance()->world[ch->in_room].number,
-                DC::getInstance()->world[ch->in_room].name);
-    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+                dc_->mob_index[rnum].vnum(),
+                dc_->world[ch->in_room].number,
+                dc_->world[ch->in_room].name);
+    dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
   }
 }
@@ -187,9 +187,9 @@ obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
                     cnt > 1 ? "copies" : "copy",
                     GET_OBJ_VNUM(obj),
                     qPrintable(obj->short_description()),
-                    DC::getInstance()->world[ch->in_room].number,
-                    DC::getInstance()->world[ch->in_room].name);
-  DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+                    dc_->world[ch->in_room].number,
+                    dc_->world[ch->in_room].name);
+  dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return obj_list;
 }
@@ -237,8 +237,8 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
                 random ? "randomized " : "",
                 GET_OBJ_VNUM(obj),
                 qPrintable(obj->short_description()),
-                DC::getInstance()->world[ch->in_room].number,
-                DC::getInstance()->world[ch->in_room].name);
+                dc_->world[ch->in_room].number,
+                dc_->world[ch->in_room].name);
   }
   else
   {
@@ -248,10 +248,10 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
                 random ? "randomized " : "",
                 GET_OBJ_VNUM(obj),
                 qPrintable(obj->short_description()),
-                DC::getInstance()->world[ch->in_room].number,
-                DC::getInstance()->world[ch->in_room].name);
+                dc_->world[ch->in_room].number,
+                dc_->world[ch->in_room].name);
   }
-  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 }
 
 //
@@ -281,8 +281,8 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
              (k->isPlayer() ? "PC" : "MOB"),
              qPrintable(k->name()),
-             (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
-             (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
+             (k->isNonPlayer() ? dc_->mob_index[k->mobdata->nr].vnum() : 0),
+             (k->in_room == DC::NOWHERE ? 0 : dc_->world[k->in_room].number),
              /* end of first line */
 
              (!k->short_description().isEmpty() ? qPrintable(k->short_description()) : "None"),
@@ -361,12 +361,12 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (k->isNonPlayer())
   {
-    if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
+    if (dc_->mob_index[k->mobdata->nr].non_combat_func)
       dc_strcpy(buf2, "Exists");
     else
       dc_strcpy(buf2, "None");
 
-    if (DC::getInstance()->mob_index[k->mobdata->nr].combat_func)
+    if (dc_->mob_index[k->mobdata->nr].combat_func)
       dc_strcpy(buf3, "Exists");
     else
       dc_strcpy(buf3, "None");
@@ -574,9 +574,9 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   {
     dc_sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
                (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
-               (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
+               (k->isNonPlayer() ? dc_->mob_index[k->mobdata->nr].vnum() : 0),
                (k->isNonPlayer() ? k->mobdata->nr : 0),
-               k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
+               k->in_room == DC::NOWHERE ? -1 : dc_->world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
     dc_strcat(buf, buf2);
@@ -586,7 +586,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   {
     dc_sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\r\n",
                (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
-               k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
+               k->in_room == DC::NOWHERE ? -1 : dc_->world[k->in_room].number);
   }
   ch->send(buf);
 
@@ -641,7 +641,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   {
     QString mobspec_status;
 
-    if (DC::getInstance()->mob_index[k->mobdata->nr].mobspec == nullptr)
+    if (dc_->mob_index[k->mobdata->nr].mobspec == nullptr)
     {
       mobspec_status = "none";
     }
@@ -650,7 +650,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
       mobspec_status = "exists";
     }
 
-    ch->sendln(u"$3Mobspec$R: %1  $3Progtypes$R: %2"_s.arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
+    ch->sendln(u"$3Mobspec$R: %1  $3Progtypes$R: %2"_s.arg(mobspec_status).arg(dc_->mob_index[k->mobdata->nr].progtypes));
   }
   dc_sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);
@@ -743,13 +743,13 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   if (k->isNonPlayer())
   {
     dc_strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
-    dc_strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
+    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
     ch->send(buf);
     dc_strcpy(buf, "$3Combat Special Proc$R: ");
-    dc_strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
+    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
     ch->send(buf);
     dc_strcpy(buf, "$3Mob Progs$R: ");
-    dc_strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].mobprogs ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].mobprogs ? "exists\r\n" : "none\r\n"));
     ch->send(buf);
   }
 
@@ -967,7 +967,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     }
 */
 
-  virt = (j->item_number >= 0) ? DC::getInstance()->obj_index[j->item_number].vnum() : 0;
+  virt = (j->item_number >= 0) ? dc_->obj_index[j->item_number].vnum() : 0;
   dc_sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
              qPrintable(j->name()), j->item_number, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
@@ -1028,7 +1028,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     dc_strcat(buf, "NOWHERE");
   else
   {
-    dc_sprintf(buf2, "%d", DC::getInstance()->world[j->in_room].number);
+    dc_sprintf(buf2, "%d", dc_->world[j->in_room].number);
     dc_strcat(buf, buf2);
   }
   dc_strcat(buf, "  $3In object$R: ");
@@ -1287,13 +1287,13 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
 
   dc_strcpy(buf, "\r\n$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    dc_strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->obj_index[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
   else
     dc_strcat(buf, "No\r\n");
   ch->send(buf);
   dc_strcpy(buf, "$3Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    dc_strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->obj_index[j->item_number].combat_func ? "exists\r\n" : "none\r\n"));
   else
     dc_strcat(buf, "No\r\n");
   ch->send(buf);
@@ -1404,16 +1404,16 @@ command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
   if (arg1 == "full")
   {
     ch->sendln("Performing full zone reset!");
-    QString buf = fmt::format("{} full repopped zone #{}.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].zone);
-    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
+    QString buf = fmt::format("{} full repopped zone #{}.", qPrintable(ch->name()), dc_->world[ch->in_room].zone);
+    dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::resetZone(dc_->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln("Resetting this entire zone!");
-    QString buf = fmt::format("{} repopped zone #{}.", qPrintable(ch->name()), DC::getInstance()->world[ch->in_room].zone);
-    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
+    QString buf = fmt::format("{} repopped zone #{}.", qPrintable(ch->name()), dc_->world[ch->in_room].zone);
+    dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    DC::resetZone(dc_->world[ch->in_room].zone);
   }
 
   return ReturnValue::eSUCCESS;
@@ -1422,7 +1422,7 @@ command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
 command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
-  qint32 zone = DC::getInstance()->world[ch->in_room].zone;
+  qint32 zone = dc_->world[ch->in_room].zone;
 
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1430,7 +1430,7 @@ command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
     // This should never happen but it has before so we must investigate without crashing the whole MUD
@@ -1443,7 +1443,7 @@ command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       continue;
     }
-    if (DC::getInstance()->world[tmp_victim->in_room].zone == zone)
+    if (dc_->world[tmp_victim->in_room].zone == zone)
     {
       if (tmp_victim->isNonPlayer())
       {
@@ -1462,7 +1462,7 @@ command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   ch->sendln("You have just caused the deion of countless creatures in ths area!");
   dc_sprintf(buf, "%s just CLEARED zone #%d!", qPrintable(ch->name()), zone);
-  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
@@ -1471,7 +1471,7 @@ command_return_t do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
   qint32 x = {};
   QString buf;
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
 
@@ -1481,10 +1481,10 @@ command_return_t do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (i->player->possesing)
       dc_sprintf(buf, "%14s -- [%d] %s  *possessing*\r\n", qPrintable(i->name()),
-                 (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+                 (qint32)(dc_->world[i->in_room].number), (dc_->world[i->in_room].name));
     else
       dc_sprintf(buf, "%14s -- [%d] %s\r\n", qPrintable(i->name()),
-                 (qint32)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+                 (qint32)(dc_->world[i->in_room].number), (dc_->world[i->in_room].name));
     ch->send(buf);
   }
 
@@ -1511,7 +1511,7 @@ command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     dc_sprintf(buf, "\r\n%s\r\n", argument + i);
-    for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
       vict->send(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -1563,7 +1563,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
     }
 
     dc_sprintf(buf, "%s restored %s.", qPrintable(ch->name()), qPrintable(victim->name()));
-    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     update_pos(victim);
     redo_hitpoints(victim);
@@ -1582,11 +1582,11 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
     {
       ch->sendln("You don't have the ability to do that!");
       dc_sprintf(buf, "%s tried to do a restore all!", qPrintable(ch->name()));
-      DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
       return ReturnValue::eFAILURE;
     }
-    for (auto &i : DC::getInstance()->connections_)
+    for (auto &i : dc_->connections_)
       if (i->character != ch && !i->connected)
       {
 
@@ -1613,7 +1613,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
         victim->save();
       }
     dc_sprintf(buf, "%s did a restore all!", qPrintable(ch->name()));
-    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("Trying to be Mister Popularity?");
   }
   return ReturnValue::eSUCCESS;
@@ -1686,9 +1686,9 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          dc_sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description);
         else
-          dc_sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     else
@@ -1699,7 +1699,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       }
       else
       {
-        dc_sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+        dc_sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     send_info(buf);
@@ -1777,7 +1777,7 @@ qint32 get_rand_obj(hunt_data *h)
   if (i < 0)
     return -1;
 
-  v = number(0, i);
+  v = dc_->number(0, i);
   qint32 c = h->itemsAvail[v];
   h->itemsAvail[v] = h->itemsAvail[i];
   h->itemsAvail[i] = -1;
@@ -1883,30 +1883,30 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
     CharacterPtr vict;
     while (1)
     {
-      mob = number(1, top_of_mobt);
-      qint32 vnum = DC::getInstance()->mob_index[mob].vnum(); // debug
-      if (!(DC::getInstance()->mob_index[mob].vnum() > 300 &&
-            (DC::getInstance()->mob_index[mob].vnum() < 2300 || DC::getInstance()->mob_index[mob].vnum() > 2499) &&
-            (DC::getInstance()->mob_index[mob].vnum() < 29200 || DC::getInstance()->mob_index[mob].vnum() > 29299) &&
-            (DC::getInstance()->mob_index[mob].vnum() < 5600 || DC::getInstance()->mob_index[mob].vnum() > 5699) &&
-            (DC::getInstance()->mob_index[mob].vnum() < 16200 || DC::getInstance()->mob_index[mob].vnum() > 16399) &&
-            (DC::getInstance()->mob_index[mob].vnum() < 1900 || DC::getInstance()->mob_index[mob].vnum() > 1999) &&
-            (DC::getInstance()->mob_index[mob].vnum() < 10500 || DC::getInstance()->mob_index[mob].vnum() > 10622) &&
-            (DC::getInstance()->mob_index[mob].vnum() < 8500 || DC::getInstance()->mob_index[mob].vnum() > 8699)))
+      mob = dc_->number(1, top_of_mobt);
+      qint32 vnum = dc_->mob_index[mob].vnum(); // debug
+      if (!(dc_->mob_index[mob].vnum() > 300 &&
+            (dc_->mob_index[mob].vnum() < 2300 || dc_->mob_index[mob].vnum() > 2499) &&
+            (dc_->mob_index[mob].vnum() < 29200 || dc_->mob_index[mob].vnum() > 29299) &&
+            (dc_->mob_index[mob].vnum() < 5600 || dc_->mob_index[mob].vnum() > 5699) &&
+            (dc_->mob_index[mob].vnum() < 16200 || dc_->mob_index[mob].vnum() > 16399) &&
+            (dc_->mob_index[mob].vnum() < 1900 || dc_->mob_index[mob].vnum() > 1999) &&
+            (dc_->mob_index[mob].vnum() < 10500 || dc_->mob_index[mob].vnum() > 10622) &&
+            (dc_->mob_index[mob].vnum() < 8500 || dc_->mob_index[mob].vnum() > 8699)))
         continue;
 
       // Skip mobs marked NO_HUNT
-      CharacterPtr m = static_cast<CharacterPtr>(DC::getInstance()->mob_index[mob].item);
+      CharacterPtr m = static_cast<CharacterPtr>(dc_->mob_index[mob].item);
       if (m && m->mobdata && ISSET(m->mobdata->actflags, ACT_NO_HUNT))
       {
         continue;
       }
 
-      if (DC::getInstance()->mob_index[mob].qty <= 0)
+      if (dc_->mob_index[mob].qty <= 0)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;
-      if (DC::getInstance()->zones.value(DC::getInstance()->world[vict->in_room].zone).isNoHunt())
+      if (dc_->zones.value(dc_->world[vict->in_room].zone).isNoHunt())
         continue;
 
       if (strlen(vict->short_desc) > 34)
@@ -1940,7 +1940,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
         p->next = in;
       else
         hunt_items_list = in;
-      qint32 vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+      qint32 vnum = dc_->obj_index[obj->item_number].vnum();
       dc_sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
                  qPrintable(obj->short_description()), i->mobname, qPrintable(ch->name()));
       send_info(buf);
@@ -1992,7 +1992,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
           ch->sendln("Brick turned into a non-existent item. Tell an imm.");
           break;
         }
-        if (DC::getInstance()->obj_index[oitem->item_number].vnum() < 27915 || DC::getInstance()->obj_index[oitem->item_number].vnum() > 27918)
+        if (dc_->obj_index[oitem->item_number].vnum() < 27915 || dc_->obj_index[oitem->item_number].vnum() > 27918)
           break;
         else
           obj = oitem; // Gold! Continue on to the next cases.
@@ -2033,14 +2033,14 @@ void pulse_hunts()
 
   try
   {
-    if (DC::getInstance()->world[6345] == Room())
+    if (dc_->world[6345] == Room())
     {
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
     }
 
     ObjectPtr obj, onext;
-    for (obj = DC::getInstance()->world[6345].contents; obj; obj = onext)
+    for (obj = dc_->world[6345].contents; obj; obj = onext)
     {
       onext = obj->next_content;
       extract_obj(obj);
@@ -2048,7 +2048,7 @@ void pulse_hunts()
   }
   catch (...)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
   }
 }
 
@@ -2073,11 +2073,11 @@ command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (dc_->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
 
     qint32 itemsleft = {};
@@ -2128,13 +2128,13 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     dc_sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     dc_sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 
@@ -2199,13 +2199,13 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     dc_sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     dc_sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    DC::getInstance()->logentry(buf, 100, DC::LogChannel::LOG_GOD);
+    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 

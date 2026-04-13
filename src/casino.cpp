@@ -127,7 +127,7 @@ void send_to_table(QString msg, table_data *tbl, player_data *plrSilent = {})
 
 bool charExists(CharacterPtr ch)
 {
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
 
   if (character_list.find(ch) != character_list.end())
   {
@@ -144,7 +144,7 @@ bool verify(player_data *plr)
   // make sure player didn't quit, die, or whatever
   // CharacterPtr ch;
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
 
   auto result = std::std::find_if(character_list.begin(), character_list.end(), [&plr](CharacterPtr const &ch)
                                   {
@@ -183,8 +183,8 @@ void shuffle_deck(cDeck *tDeck)
       }
 
   for (i = pos; i < tDeck->decks * 52; i++)
-    switch_cards(tDeck, i, number(pos, tDeck->decks * 52 - 1));
-  tDeck->pos = pos + number(tDeck->decks * 52 / 10, tDeck->decks * 52 / 4);
+    switch_cards(tDeck, i, dc_->number(pos, tDeck->decks * 52 - 1));
+  tDeck->pos = pos + dc_->number(tDeck->decks * 52 / 10, tDeck->decks * 52 / 4);
   if (tDeck->table)
     send_to_table("The dealer shuffles the deck.\r\n", tDeck->table);
   // shuffled
@@ -958,7 +958,7 @@ QString Character::createBlackjackPrompt(void)
   if (in_room < 21902 || in_room > 21905)
     if (in_room != 44)
       return {};
-  auto obj = DC::getInstance()->world[in_room].contents;
+  auto obj = dc_->world[in_room].contents;
   for (; obj; obj = obj->next_content)
   {
     if (obj->table)
@@ -1200,7 +1200,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     {
       CharacterPtr tmpch;
       qint32 i = {};
-      for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
+      for (tmpch = dc_->world[ch->in_room].people; tmpch;
            tmpch = tmpch->next_in_room)
         if (tmpch->isPlayer())
           i++;
@@ -1214,7 +1214,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     {
       CharacterPtr tmpch;
       qint32 i = {};
-      for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
+      for (tmpch = dc_->world[ch->in_room].people; tmpch;
            tmpch = tmpch->next_in_room)
         if (tmpch->isPlayer())
           i++;
@@ -1770,7 +1770,7 @@ qint32 handcompare(qint32 hand1[5], qint32 hand2[5])
     if (a == b)
       return 3; //
   }
-  DC::getInstance()->logentry(u"Error in handcompare."_s, 110, DC::LogChannel::LOG_MORTAL);
+  dc_->logentry(u"Error in handcompare."_s, 110, DC::LogChannel::LOG_MORTAL);
 
   return -1;
 }
@@ -1968,7 +1968,7 @@ const QStringList reel3 = {
 
 void save_slot_machines()
 {
-  if (DC::getInstance()->cf.bport == true)
+  if (dc_->cf.bport == true)
   {
     return;
   }
@@ -1977,13 +1977,13 @@ void save_slot_machines()
   QString buf;
   QString buf2;
 
-  curr = DC::getInstance()->obj_file_list;
+  curr = dc_->obj_file_list;
   while (curr && curr->filename != "21900-21999.obj")
     curr = curr->next;
 
   if (!curr)
   {
-    DC::getInstance()->logentry(u"Mess up in save_slot_machines, no object file."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Mess up in save_slot_machines, no object file."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1992,7 +1992,7 @@ void save_slot_machines()
   {
     for (qint32 x = curr->firstnum; x <= curr->lastnum; x++)
     {
-      write_object(lf, DC::getInstance()->obj_index[x].item);
+      write_object(lf, dc_->obj_index[x].item);
     }
     dc_fprintf(lf.file_handle_, "$~\n");
   }
@@ -2038,7 +2038,7 @@ void update_linked_slots(machine_data *machine)
   // Find all the slot machines
   for (qint32 i = 21906; i < 21918; i++)
   {
-    ObjectPtr slot_obj = DC::getInstance()->obj_index[real_object(i)].item;
+    ObjectPtr slot_obj = dc_->obj_index[real_object(i)].item;
 
     // Find all the slot machines linked to the same slot machine as us
     // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -2053,7 +2053,7 @@ void update_linked_slots(machine_data *machine)
         slot_obj->slot->jackpot = machine->jackpot;
 
       // Update instances of the original slot obj
-      for (ObjectPtr j = DC::getInstance()->object_list; j; j = j->next)
+      for (ObjectPtr j = dc_->object_list; j; j = j->next)
       {
         if (j->item_number == real_object(i))
         {
@@ -2089,7 +2089,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
 
   if (stop1 < 0 && charExists(machine->ch) && verify_slot(machine))
   {
-    stop1 = number(0, 19);
+    stop1 = dc_->number(0, 19);
     send_to_room("You hear a loud clunk as the first stopper snaps into place.\r\n", machine->obj->in_room);
     dc_sprintf(buf, "%s    |      |\r\n", reel1[stop1]);
     machine->ch->send(buf);
@@ -2097,7 +2097,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
   }
   else if (stop2 < 0 && charExists(machine->ch) && verify_slot(machine))
   {
-    stop2 = number(0, 19);
+    stop2 = dc_->number(0, 19);
     send_to_room("You hear a loud clunk as the second stopper snaps into place.\r\n", machine->obj->in_room);
     dc_sprintf(buf, "%s %s    |\r\n", reel1[stop1], reel2[stop2]);
     machine->ch->send(buf);
@@ -2106,7 +2106,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
   else if (charExists(machine->ch) && verify_slot(machine))
   {
     qint32 payout = {};
-    qint32 stop3 = number(0, 19);
+    qint32 stop3 = dc_->number(0, 19);
     send_to_room("You hear a loud clunk as the final stopper snaps into place.\r\n", machine->obj->in_room);
     dc_sprintf(buf, "%s %s %s\r\n", reel1[stop1], reel2[stop2], reel3[stop3]);
     machine->ch->send(buf);
@@ -2138,11 +2138,11 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        (DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
+        (dc_->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
         dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);
-        (DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description(buf);
+        (dc_->obj_index[machine->obj->item_number].item)->long_description(buf);
       }
     }
 
@@ -2153,8 +2153,8 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       dc_sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
       send_info(buf);
 
-      DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
-                              qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
+                qPrintable(machine->ch->name()), (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
       if (machine->gold)
         machine->ch->addGold((qint32)machine->jackpot);
       else
@@ -2166,13 +2166,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        (DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
+        (dc_->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
         dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);
-        // if(!ishashed(((ObjectPtr )DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description))
+        // if(!ishashed(((ObjectPtr )dc_->obj_index[machine->obj->item_number].item)->long_description))
         //    ((Object*)obj_index[machine->obj->item_number].item)->long_description={};
-        (DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description(buf);
+        (dc_->obj_index[machine->obj->item_number].item)->long_description(buf);
       }
     }
     else if (payout)
@@ -2264,7 +2264,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
           {
             ch->sendln("You don't have enough money to try to double your last win.");
           }
-          else if (number(0, 1))
+          else if (ch->dc_->number(0, 1))
           {
             ch->sendln("$BWinner!!$R The button lights up and the room is filled with whirring noises!");
             if (obj->slot->gold)
@@ -2534,7 +2534,7 @@ void send_roulette_message(wheel_data *wheel)
 
 void wheel_stop(wheel_data *wheel)
 {
-  qint32 num = number(0, 36);
+  qint32 num = dc_->number(0, 36);
   quint32 payout = {};
   QString buf;
 

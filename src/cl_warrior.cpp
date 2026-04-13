@@ -84,7 +84,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   }
   else
   {
-    if (victim->affected_by_spell(SKILL_BATTLESENSE) && number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) && dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense sees your kick coming from a mile away.", this, 0, victim, 0);
       act_to_victim("Your heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, 0);
@@ -105,9 +105,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
     if (SOMEONE_DIED(retval))
       return retval;
     // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-    if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
+    if (dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
     {
-      retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
+      retval = ((*dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
     }
     if (SOMEONE_DIED(retval))
       return retval;
@@ -136,9 +136,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
       if (SOMEONE_DIED(retval))
         return retval;
       // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-      if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
+      if (dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
+        retval = ((*dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
       }
     }
   }
@@ -230,7 +230,7 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, victim, SKILL_DEATHSTROKE, -25))
   {
     retval = damage(ch, victim, 0, attacktype, SKILL_DEATHSTROKE);
-    if (number(1, 100) > failchance)
+    if (ch->dc_->number(1, 100) > failchance)
     {
       ch->sendln("You manage to retain your balance!");
       return ReturnValue::eFAILURE;
@@ -249,7 +249,7 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+        dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense somehow notices your deathstroke coming from a mile away.", ch, 0, victim, 0);
       act_to_victim("Your heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, 0);
@@ -411,7 +411,7 @@ command_return_t do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
     SET_BIT(ch->combat, COMBAT_HITALL);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
-    const auto &character_list = DC::getInstance()->character_list;
+    const auto &character_list = dc_->character_list;
     std::for_each(character_list.begin(), character_list.end(), [&ch](CharacterPtr vict)
                   {
 			if (vict && vict != (CharacterPtr ) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
@@ -509,7 +509,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_AFFECTED(victim, AFF_STABILITY) && number(0, 3) == 0)
+  if (IS_AFFECTED(victim, AFF_STABILITY) && dc_->number(0, 3) == 0)
   {
     act_to_character("You bounce off of $N and crash into the ground.", ch, 0, victim, 0);
     act_to_victim("$n bounces off of you and crashes into the ground.", ch, 0, victim, 0);
@@ -572,7 +572,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+        dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense sees your bash coming from a mile away.", ch, 0, victim, 0);
       act_to_victim("Your heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, 0);
@@ -602,9 +602,9 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
   // if our shield has a combat proc and we hit them, let'um have it!
   if (hit && ch->equipment[WEAR_SHIELD])
   {
-    if (DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)
+    if (ch->dc_->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)
     {
-      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], cmd_t::UNDEFINED, "", ch));
+      retval = ((*ch->dc_->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], cmd_t::UNDEFINED, "", ch));
     }
   }
 
@@ -737,7 +737,7 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("You can't seem to work it loose.");
       return ReturnValue::eFAILURE;
     }
-    if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
+    if (dc_->obj_index[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\r\n", ch->in_room);
       return ReturnValue::eSUCCESS;
@@ -772,8 +772,8 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (((isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
-        (victim->isPlayer() || DC::getInstance()->mob_index[victim->mobdata->nr].vnum() > 2400 ||
-         DC::getInstance()->mob_index[victim->mobdata->nr].vnum() < 2300))
+        (victim->isPlayer() || dc_->mob_index[victim->mobdata->nr].vnum() > 2400 ||
+         dc_->mob_index[victim->mobdata->nr].vnum() < 2300))
       ch->sendln("You can't seem to work it loose.");
     else
       disarm(ch, victim);
@@ -844,8 +844,8 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch &&
-                                                          (tmp_ch->fighting != victim);
+  for (tmp_ch = dc_->world[in_room].people; tmp_ch &&
+                                            (tmp_ch->fighting != victim);
        tmp_ch = tmp_ch->next_in_room)
     ;
 
@@ -959,7 +959,7 @@ qint32 handle_any_guard(CharacterPtr ch)
   // search the room for my guard
   for (follow_type *curr = ch->guarded_by; curr;)
   {
-    for (auto vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (auto vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
         curr = {};
@@ -1128,7 +1128,7 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1157,7 +1157,7 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1195,17 +1195,17 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE) ||
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) || isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) ||
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) || isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) ||
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) || isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) ||
-      DC::getInstance()->world[ch->in_room].sector_type == SECT_CITY || DC::getInstance()->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, UNSTABLE) ||
+      isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) || isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) ||
+      isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) || isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) ||
+      isSet(dc_->world[ch->in_room].room_flags, FALL_UP) || isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) ||
+      dc_->world[ch->in_room].sector_type == SECT_CITY || dc_->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
   {
     ch->sendln("Something about this area inherently prohibits a rugged camp.");
     return ReturnValue::eFAILURE;
   }
 
-  for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1228,7 +1228,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1268,7 +1268,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 
     affect_to_char(ch, &af);
 
-    for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
+    for (i = dc_->world[ch->in_room].people; i; i = next_i)
     {
       next_i = i->next_in_room;
 
@@ -1488,7 +1488,7 @@ command_return_t do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("Stop trying to show off.");
     return ReturnValue::eFAILURE;

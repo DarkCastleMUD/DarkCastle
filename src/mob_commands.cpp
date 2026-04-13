@@ -68,19 +68,19 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
   mob_prog_data *mprg = {};
   qint32 i;
 
-  buf = QString::asprintf("$3Name$R: %s  $3Vnum$R: %llu.\r\n", qPrintable(victim->name()), DC::getInstance()->mob_index[victim->mobdata->nr].vnum());
+  buf = QString::asprintf("$3Name$R: %s  $3Vnum$R: %llu.\r\n", qPrintable(victim->name()), dc_->mob_index[victim->mobdata->nr].vnum());
   ch->send(buf);
 
   buf = QString::asprintf("$3Short description$R: %s\r\n$3Long  description$R: %s\r\n", qPrintable(victim->short_description()), qPrintable(victim->long_description()));
   ch->send(buf);
 
-  if (!(DC::getInstance()->mob_index[victim->mobdata->nr].progtypes))
+  if (!(dc_->mob_index[victim->mobdata->nr].progtypes))
   {
     ch->sendln("That mob has no programs set.");
     return;
   }
 
-  for (auto &mprg : DC::getInstance()->mob_index[victim->mobdata->nr].mobprogs_)
+  for (auto &mprg : dc_->mob_index[victim->mobdata->nr].mobprogs_)
   {
     buf = QString::asprintf("$3%d$R>$3$B", i);
     ch->send(buf);
@@ -117,7 +117,7 @@ command_return_t do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (CAN_GO(ch, door))
     {
-      ch->in_room = DC::getInstance()->world[was_in_room].dir_option[door]->to_room;
+      ch->in_room = dc_->world[was_in_room].dir_option[door]->to_room;
       if (ch->in_room == was_in_room)
         continue;
       MOBtrigger = false;
@@ -477,7 +477,7 @@ command_return_t do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  auto &arena = DC::getInstance()->arena_;
+  auto &arena = dc_->arena_;
   QString arg1 = {0};
   QString arg2 = {0};
   ObjectPtr obj;
@@ -505,7 +505,7 @@ command_return_t do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   obj = clone_object(realnum);
 
-  if (DC::getInstance()->obj_index[obj->item_number].vnum() == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
+  if (dc_->obj_index[obj->item_number].vnum() == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {
     return ReturnValue::eFAILURE;
   }
@@ -552,7 +552,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
     CharacterPtr vnext;
     ObjectPtr obj_next;
 
-    for (victim = DC::getInstance()->world[ch->in_room].people; victim != nullptr; victim = vnext)
+    for (victim = dc_->world[ch->in_room].people; victim != nullptr; victim = vnext)
     {
       vnext = victim->next_in_room;
       if (victim->isNonPlayer() && victim != ch)
@@ -561,7 +561,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
       }
     }
 
-    for (obj = DC::getInstance()->world[ch->in_room].contents; obj != nullptr; obj = obj_next)
+    for (obj = dc_->world[ch->in_room].contents; obj != nullptr; obj = obj_next)
     {
       obj_next = obj->next_content;
       extract_obj(obj);
@@ -572,7 +572,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = get_char_room(arg, ch->in_room)))
   {
-    if ((obj = get_obj_in_list(arg, DC::getInstance()->world[ch->in_room].contents)) ||
+    if ((obj = get_obj_in_list(arg, dc_->world[ch->in_room].contents)) ||
         (obj = get_obj_in_list(arg, ch->carrying)))
     {
       extract_obj(obj);
@@ -598,7 +598,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", qPrintable(ch->name()), qPrintable(victim->name()));
+    // dc_->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", qPrintable(ch->name()), qPrintable(victim->name()));
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }
@@ -688,7 +688,7 @@ command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (location == ch->in_room)
     return ReturnValue::eFAILURE; // zz
-  if (location > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(location))
+  if (location > dc_->top_of_world || !dc_->rooms.contains(location))
     location = {};
 
   if (ch->fighting != nullptr)
@@ -739,9 +739,9 @@ command_return_t do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->prog_error(u"do_mpat - No such location."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
-  if (location > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(location))
+  if (location > dc_->top_of_world || !dc_->rooms.contains(location))
   {
-    if (!DC::getInstance()->rooms.contains(1))
+    if (!dc_->rooms.contains(1))
     {
       ch->send(u"mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n"_s.arg(location));
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -835,7 +835,7 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!str_cmp(arg1, "all"))
   {
-    for (d = DC::getInstance()->connections_; d != nullptr; d = conn->next)
+    for (d = dc_->connections_; d != nullptr; d = conn->next)
     {
       if (conn->connected == Connection::states::PLAYING && conn->character != ch && conn->character->in_room == ch->in_room && CAN_SEE(ch, conn->character))
       {
@@ -865,7 +865,7 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
-    if (isSet(DC::getInstance()->world[location].room_flags, PRIVATE))
+    if (isSet(dc_->world[location].room_flags, PRIVATE))
     {
       ch->prog_error(u"Mptransfer - Private room."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -919,7 +919,7 @@ command_return_t do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!str_cmp(arg, "all"))
   {
-    for (auto tch : DC::getInstance()->world[ch->in_room].people_)
+    for (auto tch : dc_->world[ch->in_room].people_)
     {
       if (!tch->isImmortalPlayer() && CAN_SEE(ch, tch))
       {
@@ -1146,9 +1146,9 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   {
     if (this->isNonPlayer())
     {
-      qint32 num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
+      qint32 num = dc_->mob_index[this->mobdata->nr].vnum();
 
-      DC::getInstance()->logentry(u"Mob %1 lacking argument for mpsettemp."_s.arg(num));
+      dc_->logentry(u"Mob %1 lacking argument for mpsettemp."_s.arg(num));
     }
     return ReturnValue::eFAILURE;
   }
@@ -1167,7 +1167,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   if (!victim && type == 0)
     return ReturnValue::eFAILURE;
   if (!victim)
-    victim = DC::getInstance()->world[this->in_room].people;
+    victim = dc_->world[this->in_room].people;
 
   for (; victim; victim = victim->next_in_room)
   {
@@ -1421,7 +1421,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     CharacterPtr next_vict;
-    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
+    for (victim = dc_->world[ch->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
       if ((victim->isPlayer() && victim->getLevel() > MORTAL) || victim == ch)
@@ -1597,7 +1597,7 @@ command_return_t do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
     owner = (CharacterPtr)ch->beacon;
 
   if (!victim)
-    victim = DC::getInstance()->world[ch->in_room].people;
+    victim = dc_->world[ch->in_room].people;
   qint32 z = {};
   for (; victim;)
   {
@@ -1700,7 +1700,7 @@ command_return_t do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isNonPlayer())
   {
-    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    throwitem->target_mob_num = dc_->mob_index[ch->mobdata->nr].vnum();
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -1770,7 +1770,7 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  if (isSet(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+  if (isSet(dc_->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     ch->sendln("You find yourself unable to.");
@@ -1782,9 +1782,9 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  qint32 i = DC::getInstance()->world[ch->in_room].zone,
-         low = DC::getInstance()->zones.value(i).getRealBottom(),
-         high = DC::getInstance()->zones.value(i).getRealTop(),
+  qint32 i = dc_->world[ch->in_room].zone,
+         low = dc_->zones.value(i).getRealBottom(),
+         high = dc_->zones.value(i).getRealTop(),
          attempts = {};
 
   do
@@ -1792,7 +1792,7 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
     if ((*type && type == u"area"_s) ||
         (victim == ch && *person && person == u"area"_s))
     {
-      to_room = number(low, high);
+      to_room = dc_->number(low, high);
 
       // Check to see if we're in an endless loop
       if (attempts++ > high - low)
@@ -1802,17 +1802,17 @@ command_return_t do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      to_room = number<room_t>(1, DC::getInstance()->top_of_world);
+      to_room = number<room_t>(1, dc_->top_of_world);
     }
-  } while (!DC::getInstance()->rooms.contains(to_room) ||
-           isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
-           isSet(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
-           isSet(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||
-           isSet(DC::getInstance()->world[to_room].room_flags, ARENA) ||
-           (DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER && victim->race != RACE_FISH) ||
-           DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
-           ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
-           (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
+  } while (!dc_->rooms.contains(to_room) ||
+           isSet(dc_->world[to_room].room_flags, PRIVATE) ||
+           isSet(dc_->world[to_room].room_flags, IMP_ONLY) ||
+           isSet(dc_->world[to_room].room_flags, NO_TELEPORT) ||
+           isSet(dc_->world[to_room].room_flags, ARENA) ||
+           (dc_->world[to_room].sector_type == SECT_UNDERWATER && victim->race != RACE_FISH) ||
+           dc_->zones.value(dc_->world[to_room].zone).isNoTeleport() ||
+           ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (dc_->zones.value(dc_->world[to_room].zone).isTown()) : false) ||
+           (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
   act_to_room("$n slowly fades out of existence.", victim, 0, 0, 0);
@@ -1849,7 +1849,7 @@ command_return_t do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
       stop_fighting(vict);
     return ReturnValue::eSUCCESS;
   }
-  for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
+  for (rch = dc_->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
     if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
@@ -2143,19 +2143,19 @@ command_return_t do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     *lvali = i;
     //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
+    //  r, i, dc_->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalb)
   {
     *lvalb = (qint8)i;
     //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
+    //  r, i, dc_->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalui)
   {
     *lvalui = (quint32)i;
     //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
+    //  r, i, dc_->mob_index[ch->mobdata->nr].vnum() );
   }
 
   /*  vict->sendln(u"%d\r\n%d\r\n%d\r\n%d\r\n"_s,

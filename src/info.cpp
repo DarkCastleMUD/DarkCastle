@@ -693,7 +693,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
         if ((isSet(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == false ||
              ch->getLevel() > IMMORTAL) &&
             CAN_SEE_OBJ(ch, tmp_obj) &&
-            number(0ULL, MORTAL) < ch->getLevel())
+            dc_->number(0ULL, MORTAL) < ch->getLevel())
         {
           ch->show_obj_to_char(tmp_obj, 1);
           found = true;
@@ -728,7 +728,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
     Connection *d;
     CharacterPtr i;
 
-    for (auto &d : DC::getInstance()->connections_)
+    for (auto &d : dc_->connections_)
     {
       if (conn->connected || !conn->character)
         continue;
@@ -795,7 +795,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
     if (nr >= 0)
     {
-      this->send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(DC::getInstance()->mob_index[nr].vnum()).arg(qPrintable(((CharacterPtr)(DC::getInstance()->mob_index[nr].item))->short_description())));
+      this->send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(dc_->mob_index[nr].vnum()).arg(qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description())));
     }
   }
 
@@ -839,7 +839,7 @@ void Character::list_char_to_char(CharacterPtr list, qint32 mode)
     {
       if (known && skill_success(nullptr, SKILL_BLINDFIGHTING))
         this->sendln("Your blindfighting awareness alerts you to a presense in the area.");
-      else if (number(1, 10) == 1)
+      else if (ch->dc_->number(1, 10) == 1)
         this->sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
     }
   }
@@ -859,7 +859,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
   }
 
   if (!(cont = get_obj_in_list_vis(ch, container, vict->carrying)) ||
-      number(level_(0), MORTAL + 30) > ch->getLevel())
+      dc_->number(level_(0), MORTAL + 30) > ch->getLevel())
   {
     ch->sendln("You cannot see a container named that to peek into.");
     return;
@@ -882,7 +882,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
   }
 
   for (obj = cont->contains; obj; obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj) && number(level_(0), MORTAL + 30) < ch->getLevel())
+    if (CAN_SEE_OBJ(ch, obj) && dc_->number(level_(0), MORTAL + 30) < ch->getLevel())
     {
       ch->show_obj_to_char(obj, 1);
       found = true;
@@ -1001,13 +1001,13 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   const ObjectPtr vobj = {};
   if (obj->item_number >= 0)
   {
-    const qint32 vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+    const qint32 vnum = dc_->obj_index[obj->item_number].vnum();
     if (vnum >= 0)
     {
       const qint32 rn_of_vnum = real_object(vnum);
       if (rn_of_vnum >= 0)
       {
-        vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
+        vobj = dc_->obj_index[rn_of_vnum].item;
       }
     }
   }
@@ -1206,7 +1206,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
       send("Invalid VNUM.\r\n");
       return ReturnValue::eFAILURE;
     }
-    obj = DC::getInstance()->obj_index[rnum].item;
+    obj = dc_->obj_index[rnum].item;
 
     if (obj->isDark() && !isImmortalPlayer())
     {
@@ -1277,7 +1277,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
   else if (IS_DARK(ch->in_room) && (!ch->isNonPlayer() && !ch->player->holyLite))
   {
     ch->sendln("It is pitch black...");
-    ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
+    ch->list_char_to_char(dc_->world[ch->in_room].people, 0);
     ch->send("$R");
     // TODO - if have blindfighting, list some of the room exits sometimes
   }
@@ -1308,7 +1308,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
     case 5:
     {
       /* Check if there is an extra-desc with "up"(or whatever) and use that instead */
-      auto tmp_desc = find_ex_description(arg1, DC::getInstance()->world[ch->in_room].ex_description);
+      auto tmp_desc = find_ex_description(arg1, dc_->world[ch->in_room].ex_description);
       if (!tmp_desc.isEmpty())
       {
         page_string(ch->desc, qPrintable(tmp_desc), 0);
@@ -1370,11 +1370,11 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               temp = ((tmp_object->obj_flags.value[1] * 3) / tmp_object->obj_flags.value[0]);
               if (temp > 3)
               {
-                DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                                        "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                                        DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
-                                        tmp_object->obj_flags.value[1],
-                                        tmp_object->obj_flags.value[0]);
+                dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
+                          "Bug in object %d. v2: %d > v1: %d. Resetting.",
+                          dc_->obj_index[tmp_object->item_number].vnum(),
+                          tmp_object->obj_flags.value[1],
+                          tmp_object->obj_flags.value[0]);
                 tmp_object->obj_flags.value[1] =
                     tmp_object->obj_flags.value[0];
                 temp = 3;
@@ -1408,7 +1408,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               {
 
                 qint32 weight_in(ObjectPtr obj);
-                if (DC::getInstance()->obj_index[tmp_object->item_number].vnum() == 536)
+                if (dc_->obj_index[tmp_object->item_number].vnum() == 536)
                   temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                 else
                   temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
@@ -1425,11 +1425,11 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               else if (temp > 3)
               {
                 temp = 3;
-                DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                                        "Bug in object %d. Weight: %d v1: %d",
-                                        DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
-                                        tmp_object->obj_flags.weight,
-                                        tmp_object->obj_flags.value[0]);
+                dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
+                          "Bug in object %d. Weight: %d v1: %d",
+                          dc_->obj_index[tmp_object->item_number].vnum(),
+                          tmp_object->obj_flags.weight,
+                          tmp_object->obj_flags.value[0]);
               }
 
               if (NOT_KEYRING(tmp_object))
@@ -1507,7 +1507,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         /* Extra description in room?? */
         if (!found)
         {
-          auto tmp_desc = find_ex_description(arg2, DC::getInstance()->world[ch->in_room].ex_description);
+          auto tmp_desc = find_ex_description(arg2, dc_->world[ch->in_room].ex_description);
           if (!tmp_desc.isEmpty())
           {
             page_string(ch->desc, qPrintable(tmp_desc), 0);
@@ -1564,7 +1564,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
         if (!found)
         {
-          for (tmp_object = DC::getInstance()->world[ch->in_room].contents;
+          for (tmp_object = dc_->world[ch->in_room].contents;
                tmp_object && !found;
                tmp_object = tmp_object->next_content)
           {
@@ -1605,7 +1605,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
     break;
     case 8:
     { // look out
-      for (tmp_object = DC::getInstance()->object_list; tmp_object;
+      for (tmp_object = dc_->object_list; tmp_object;
            tmp_object = tmp_object->next)
       {
         if (tmp_object->isPortal() && tmp_object->getPortalDestinationRoom() == ch->in_room && tmp_object->in_room != DC::NOWHERE && tmp_object->isPortalTypePermanent())
@@ -1628,7 +1628,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         if (*arg2)
         {
           if ((tmp_object = get_obj_in_list_vis(ch, arg2,
-                                                DC::getInstance()->world[ch->in_room].contents)))
+                                                dc_->world[ch->in_room].contents)))
           {
             if (tmp_object->isPortal())
             {
@@ -1668,21 +1668,21 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
       ansi_color(GREY, ch);
       ansi_color(BOLD, ch);
-      send_to_char(DC::getInstance()->world[ch->in_room].name, ch);
+      send_to_char(dc_->world[ch->in_room].name, ch);
       ansi_color(NTEXT, ch);
       ansi_color(GREY, ch);
 
       // PUT SECTOR AND ROOMFLAG STUFF HERE
       if (!ch->isNonPlayer() && ch->player->holyLite)
       {
-        sprinttype(DC::getInstance()->world[ch->in_room].sector_type, sector_types,
+        sprinttype(dc_->world[ch->in_room].sector_type, sector_types,
                    sector_buf);
-        sprintbit((qint32)DC::getInstance()->world[ch->in_room].room_flags, room_bits,
+        sprintbit((qint32)dc_->world[ch->in_room].room_flags, room_bits,
                   rflag_buf);
         ch->send(u"\r\nLight[%d] <%s> [ %s]"_s.arg(DARK_AMOUNT(ch->in_room)).arg(sector_buf).arg(rflag_buf));
-        if (DC::getInstance()->world[ch->in_room].temp_room_flags)
+        if (dc_->world[ch->in_room].temp_room_flags)
         {
-          sprintbit((qint32)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
+          sprintbit((qint32)dc_->world[ch->in_room].temp_room_flags, temp_room_bits,
                     tempflag_buf);
           ch->send(u" [ %1]"_s.arg(tempflag_buf));
         }
@@ -1691,12 +1691,12 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       ch->sendln("");
 
       if (!ch->isNonPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
-        send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
+        send_to_char(dc_->world[ch->in_room].description, ch);
 
       ansi_color(BLUE, ch);
       ansi_color(BOLD, ch);
-      ch->list_obj_to_char(DC::getInstance()->world[ch->in_room].contents, 0, false);
-      ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
+      ch->list_obj_to_char(dc_->world[ch->in_room].contents, 0, false);
+      ch->list_char_to_char(dc_->world[ch->in_room].people, 0);
 
       dc_strcpy(buffer, "");
       *buffer = '\0';
@@ -1826,8 +1826,8 @@ command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (!ch->isNonPlayer() && ch->player->holyLite)
       dc_sprintf(buf + strlen(buf), "%s - %s [%d]\r\n", exits[door],
-                 DC::getInstance()->world[EXIT(ch, door)->to_room].name,
-                 DC::getInstance()->world[EXIT(ch, door)->to_room].number);
+                 dc_->world[EXIT(ch, door)->to_room].name,
+                 dc_->world[EXIT(ch, door)->to_room].number);
     else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
       if (isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
@@ -1839,7 +1839,7 @@ command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
       dc_sprintf(buf + strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
     else
       dc_sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
-                 DC::getInstance()->world[EXIT(ch, door)->to_room].name);
+                 dc_->world[EXIT(ch, door)->to_room].name);
   }
 
   ch->sendln("You scan around the exits to see where they lead.");
@@ -2358,13 +2358,13 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!argument.isEmpty())
   {
-    if (!DC::getInstance()->help_index_)
+    if (!dc_->help_index_)
     {
       ch->sendln("No help available.");
       return ReturnValue::eSUCCESS;
     }
     bot = {};
-    top = DC::getInstance()->top_of_helpt;
+    top = dc_->top_of_helpt;
 
     for (;;)
     {
@@ -2413,7 +2413,7 @@ command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
   qint32 immortal = {};
   qint32 total = {};
 
-  for (auto &d : DC::getInstance()->connections_)
+  for (auto &d : dc_->connections_)
   {
     if (conn->connected || !conn->character)
       continue;
@@ -2527,7 +2527,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 
   ch->sendln("-#-- Short Description ------- Room Number\n");
 
-  for (k = DC::getInstance()->object_list; k; k = k->next)
+  for (k = dc_->object_list; k; k = k->next)
   {
 
     // allow search by vnum
@@ -2547,34 +2547,34 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
     if (k->in_obj)
     {
       if (k->in_obj->in_room > DC::NOWHERE)
-        in_room = DC::getInstance()->world[k->in_obj->in_room].number;
+        in_room = dc_->world[k->in_obj->in_room].number;
       else if (k->in_obj->carried_by)
       {
         if (!CAN_SEE(ch, k->in_obj->carried_by))
           continue;
-        in_room = DC::getInstance()->world[k->in_obj->carried_by->in_room].number;
+        in_room = dc_->world[k->in_obj->carried_by->in_room].number;
       }
       else if (k->in_obj->equipped_by)
       {
         if (!CAN_SEE(ch, k->in_obj->equipped_by))
           continue;
-        in_room = DC::getInstance()->world[k->in_obj->equipped_by->in_room].number;
+        in_room = dc_->world[k->in_obj->equipped_by->in_room].number;
       }
     }
     else if (k->carried_by)
     {
       if (!CAN_SEE(ch, k->carried_by))
         continue;
-      in_room = DC::getInstance()->world[k->carried_by->in_room].number;
+      in_room = dc_->world[k->carried_by->in_room].number;
     }
     else if (k->equipped_by)
     {
       if (!CAN_SEE(ch, k->equipped_by))
         continue;
-      in_room = DC::getInstance()->world[k->equipped_by->in_room].number;
+      in_room = dc_->world[k->equipped_by->in_room].number;
     }
     else if (k->in_room > 0)
-      in_room = DC::getInstance()->world[k->in_room].number;
+      in_room = dc_->world[k->in_room].number;
     else
       in_room = {};
 
@@ -2645,7 +2645,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
   *buf2 = '\0';
   ch->sendln(" #   Short description          Room Number\n");
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
 
@@ -2669,7 +2669,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 
     count++;
     *buf = '\0';
-    dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), DC::getInstance()->world[i->in_room].number);
+    dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), dc_->world[i->in_room].number);
     if (strlen(buf) + strlen(buf2) + 3 >= MAX_STRING_LENGTH)
     {
       ch->sendln("LIST TRUNCATED...TOO LONG");
@@ -2807,18 +2807,18 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
     if (x < 0)
       x = {};
 
-    percent = number(1, 101);
+    percent = dc_->number(1, 101);
     if (percent > Learned)
     {
-      if (number(0, 1) == 0)
+      if (ch->dc_->number(0, 1) == 0)
       {
-        x -= number(1, 3);
+        x -= dc_->number(1, 3);
         if (x < 0)
           x = {};
       }
       else
       {
-        x += number(1, 3);
+        x += dc_->number(1, 3);
         if (x > 10)
           x = 10;
       }
@@ -2847,18 +2847,18 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
           x = {};
         if (x > 10)
           x = 10;
-        percent = number(1, 101);
+        percent = dc_->number(1, 101);
         if (percent > Learned)
         {
-          if (number(0, 1) == 0)
+          if (ch->dc_->number(0, 1) == 0)
           {
-            x -= number(1, 3);
+            x -= dc_->number(1, 3);
             if (x < 0)
               x = {};
           }
           else
           {
-            x += number(1, 3);
+            x += dc_->number(1, 3);
             if (x > 10)
               x = 10;
           }
@@ -2874,18 +2874,18 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
           x = {};
         if (x > 10)
           x = 10;
-        percent = number(1, 101);
+        percent = dc_->number(1, 101);
         if (percent > Learned)
         {
-          if (number(0, 1) == 0)
+          if (ch->dc_->number(0, 1) == 0)
           {
-            x -= number(1, 3);
+            x -= dc_->number(1, 3);
             if (x < 0)
               x = {};
           }
           else
           {
-            x += number(1, 3);
+            x += dc_->number(1, 3);
             if (x > 10)
               x = 10;
           }
@@ -2915,7 +2915,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
           x = (((x * y - x) / 2) + x);
         }
         else
-          x = number(0, 2);
+          x = dc_->number(0, 2);
       }
       x += GET_DAMROLL(victim);
 
@@ -2943,18 +2943,18 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
         x = 10;
       else
         x = 11;
-      percent = number(1, 101);
+      percent = dc_->number(1, 101);
       if (percent > Learned)
       {
-        if (number(0, 1) == 0)
+        if (ch->dc_->number(0, 1) == 0)
         {
-          x -= number(1, 4);
+          x -= dc_->number(1, 4);
           if (x < 0)
             x = {};
         }
         else
         {
-          x += number(1, 4);
+          x += dc_->number(1, 4);
           if (x > 11)
             x = 11;
         }
@@ -2995,18 +2995,18 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
       percent /= 10;
       x = percent;
 
-      percent = number(1, 101);
+      percent = dc_->number(1, 101);
       if (percent > Learned)
       {
-        if (number(0, 1) == 0)
+        if (ch->dc_->number(0, 1) == 0)
         {
-          x -= number(1, 3);
+          x -= dc_->number(1, 3);
           if (x < 0)
             x = {};
         }
         else
         {
-          x += number(1, 3);
+          x += dc_->number(1, 3);
           if (x > 10)
             x = 10;
         }
@@ -3095,7 +3095,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
   ch->sendln("You carefully search the surroundings...\r\n");
 
-  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
   {
     if (CAN_SEE(ch, vict) && ch != vict)
     {
@@ -3107,8 +3107,8 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (CAN_GO(ch, i))
     {
-      room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
-      if (room == &DC::getInstance()->world[ch->in_room])
+      room = &dc_->world[dc_->world[ch->in_room].dir_option[i]->to_room];
+      if (room == &dc_->world[ch->in_room])
         continue;
       if (isSet(room->room_flags, NO_SCAN))
       {
@@ -3120,9 +3120,9 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
           if (CAN_SEE(ch, vict))
           {
             if (IS_AFFECTED(vict, AFF_CAMOUFLAGUE) &&
-                DC::getInstance()->world[vict->in_room].sector_type != SECT_INSIDE &&
-                DC::getInstance()->world[vict->in_room].sector_type != SECT_CITY &&
-                DC::getInstance()->world[vict->in_room].sector_type != SECT_AIR)
+                dc_->world[vict->in_room].sector_type != SECT_INSIDE &&
+                dc_->world[vict->in_room].sector_type != SECT_CITY &&
+                dc_->world[vict->in_room].sector_type != SECT_AIR)
               continue;
 
             if (skill_success(ch, nullptr, SKILL_SCAN))
@@ -3135,11 +3135,11 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
       // Now we go one room further (reach out and touch someone)
 
       was_in = ch->in_room;
-      ch->in_room = DC::getInstance()->world[ch->in_room].dir_option[i]->to_room;
+      ch->in_room = dc_->world[ch->in_room].dir_option[i]->to_room;
 
       if (CAN_GO(ch, i))
       {
-        room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
+        room = &dc_->world[dc_->world[ch->in_room].dir_option[i]->to_room];
         if (isSet(room->room_flags, NO_SCAN))
         {
           ch->send(u"%35s -- a ways off %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
@@ -3150,9 +3150,9 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
             if (CAN_SEE(ch, vict))
             {
               if (IS_AFFECTED(vict, AFF_CAMOUFLAGUE) &&
-                  DC::getInstance()->world[vict->in_room].sector_type != SECT_INSIDE &&
-                  DC::getInstance()->world[vict->in_room].sector_type != SECT_CITY &&
-                  DC::getInstance()->world[vict->in_room].sector_type != SECT_AIR)
+                  dc_->world[vict->in_room].sector_type != SECT_INSIDE &&
+                  dc_->world[vict->in_room].sector_type != SECT_CITY &&
+                  dc_->world[vict->in_room].sector_type != SECT_AIR)
                 continue;
 
               if (skill_success(ch, nullptr, SKILL_SCAN, -10))
@@ -3164,10 +3164,10 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
         // Now if we have the farsight spell we go another room out
         if (IS_AFFECTED(ch, AFF_FARSIGHT))
         {
-          ch->in_room = DC::getInstance()->world[ch->in_room].dir_option[i]->to_room;
+          ch->in_room = dc_->world[ch->in_room].dir_option[i]->to_room;
           if (CAN_GO(ch, i))
           {
-            room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
+            room = &dc_->world[dc_->world[ch->in_room].dir_option[i]->to_room];
             if (isSet(room->room_flags, NO_SCAN))
             {
               ch->send(u"%35s -- extremely far off %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
@@ -3178,9 +3178,9 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
                 if (CAN_SEE(ch, vict))
                 {
                   if (IS_AFFECTED(vict, AFF_CAMOUFLAGUE) &&
-                      DC::getInstance()->world[vict->in_room].sector_type != SECT_INSIDE &&
-                      DC::getInstance()->world[vict->in_room].sector_type != SECT_CITY &&
-                      DC::getInstance()->world[vict->in_room].sector_type != SECT_AIR)
+                      dc_->world[vict->in_room].sector_type != SECT_INSIDE &&
+                      dc_->world[vict->in_room].sector_type != SECT_CITY &&
+                      dc_->world[vict->in_room].sector_type != SECT_AIR)
                     continue;
 
                   if (skill_success(ch, nullptr, SKILL_SCAN, -20))
@@ -3204,7 +3204,7 @@ command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 ntick;
   QString buf;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return 1;
@@ -3278,7 +3278,7 @@ void check_champion_and_website_who_list()
   qint32 addminute = {};
   QString name;
 
-  const auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = dc_->character_list;
   for (const auto &ch : character_list)
   {
 
@@ -3310,7 +3310,7 @@ void check_champion_and_website_who_list()
     }
     else
     {
-      DC::getInstance()->logentry(u"CHAMPION_ITEM obj not found. Please create one."_s, 0, DC::LogChannel::LOG_MISC);
+      dc_->logentry(u"CHAMPION_ITEM obj not found. Please create one."_s, 0, DC::LogChannel::LOG_MISC);
     }
   }
 
@@ -3343,7 +3343,7 @@ command_return_t do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (ch->desc && ch->in_room)
   {
-    qint32 sector = DC::getInstance()->world[ch->in_room].sector_type;
+    qint32 sector = dc_->world[ch->in_room].sector_type;
     switch (sector)
     {
     case SECT_INSIDE:
@@ -4117,7 +4117,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     old_count = obj_results.size();
 
     // search room
-    for (auto obj = DC::getInstance()->world[in_room].contents; obj; obj = obj->next_content)
+    for (auto obj = dc_->world[in_room].contents; obj; obj = obj->next_content)
     {
       if (CAN_SEE_OBJ(this, obj))
       {
@@ -4296,7 +4296,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   }
   else
   {
-    for (qint32 vnum = {}; vnum < DC::getInstance()->obj_index[top_of_objt].vnum(); ++vnum)
+    for (qint32 vnum = {}; vnum < dc_->obj_index[top_of_objt].vnum(); ++vnum)
     {
       qint32 rnum = {};
       // real_object returns -1 for missing VNUMs
@@ -4304,7 +4304,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       {
         continue;
       }
-      ObjectPtr obj = static_cast<ObjectPtr>(DC::getInstance()->obj_index[rnum].item);
+      ObjectPtr obj = static_cast<ObjectPtr>(dc_->obj_index[rnum].item);
       if (obj == nullptr)
       {
         continue;
@@ -4504,13 +4504,13 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     const ObjectPtr vobj = {};
     if (obj->item_number >= 0)
     {
-      const qint32 vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+      const qint32 vnum = dc_->obj_index[obj->item_number].vnum();
       if (vnum >= 0)
       {
         const qint32 rn_of_vnum = real_object(vnum);
         if (rn_of_vnum >= 0)
         {
-          vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
+          vobj = dc_->obj_index[rn_of_vnum].item;
         }
       }
     }
