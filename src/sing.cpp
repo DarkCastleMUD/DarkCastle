@@ -601,7 +601,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
             ch->sendln("You stop orchestrating all of your music.");
           else if (ch->songs.size() > 1 && *name)
           {
-            qint32 hold = old_search_block(name, 0, strlen(name), Character::song_names, 0);
+            qint32 hold = old_search_block(name, 0, dc_strlen(name), Character::song_names, 0);
             bool found = false;
             if (--hold < 0)
             {
@@ -688,7 +688,7 @@ void update_character_singing(CharacterPtr ch)
       if ((song_info[(*j).song_number].intrp_pointer()))
       {
         ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
-        if (ch->songs.empty())
+        if (ch->songs.isEmpty())
         {
           break;
         }
@@ -717,7 +717,7 @@ void update_character_singing(CharacterPtr ch)
         if ((song_info[(*j).song_number].intrp_pointer()))
         {
           ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
-          if (ch->songs.empty())
+          if (ch->songs.isEmpty())
           {
             break;
           }
@@ -740,7 +740,7 @@ void update_character_singing(CharacterPtr ch)
         if ((song_info[(*j).song_number].intrp_pointer()))
         {
           ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
-          if (ch->songs.empty())
+          if (ch->songs.isEmpty())
           {
             break;
           }
@@ -763,7 +763,7 @@ void update_character_singing(CharacterPtr ch)
           if ((song_info[(*j).song_number].intrp_pointer()))
           {
             ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
-            if (ch->songs.empty())
+            if (ch->songs.isEmpty())
             {
               break;
             }
@@ -808,7 +808,7 @@ void update_character_singing(CharacterPtr ch)
       if ((song_info[(*j).song_number].exec_pointer()))
       {
         retval = ((*song_info[(*j).song_number].exec_pointer())(ch->getLevel(), ch, nullptr, nullptr, learned));
-        if (ch->songs.empty())
+        if (ch->songs.isEmpty())
         {
           break;
         }
@@ -842,7 +842,7 @@ void update_bard_singing()
       continue;
     }
 
-    if (ch->songs.empty())
+    if (ch->songs.isEmpty())
     {
       continue;
     }
@@ -888,7 +888,7 @@ qint32 execute_song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg,
   affected_type af;
   QList<songInfo>::iterator i;
 
-  if (!ch || ch->songs.empty())
+  if (!ch || ch->songs.isEmpty())
   {
     dc_->logentry(u"Serious problem in execute_song_hypnotic_harmony!"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -1596,7 +1596,7 @@ qint32 song_stop(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim
 {
   if (origsing)
     return ReturnValue::eFAILURE;
-  if (ch->songs.empty())
+  if (ch->songs.isEmpty())
   {
     ch->sendln("Might wanna start the performance first...Hope this isn't indicative of your love life...");
     return ReturnValue::eFAILURE;
@@ -1606,7 +1606,7 @@ qint32 song_stop(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim
 
   if (!arg.isEmpty())
   { // sing 'stop' <song>
-    qint32 spl = old_search_block(arg, 0, strlen(arg), Character::song_names, 0);
+    qint32 spl = old_search_block(arg, 0, dc_strlen(arg), Character::song_names, 0);
     spl--; /* songs goes from 0+ not 1+ like spells */
 
     QList<songInfo>::iterator i;

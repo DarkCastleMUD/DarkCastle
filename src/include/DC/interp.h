@@ -34,7 +34,7 @@ std::tuple<QString, QString> half_chop(QString arguments, const QChar token = ' 
 void chop_half(QString str, QString arg1, QString arg2);
 void update_max_who(void);
 bool is_abbrev(QString abbrev, QString word);
-// bool is_abbrev(const QString &abbrev, const QString &word);
+// bool is_abbrev( QString abbrev,  QString word);
 // bool is_abbrev(const QString arg1, const QString arg2);
 
 QString ltrim(QString str);

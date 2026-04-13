@@ -467,8 +467,8 @@ command_return_t do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  victim = ch->getDC()->clone_mobile(realnum);
-  victim->hometown = ch->getDC()->world[ch->in_room].number;
+  victim = ch->dc_->clone_mobile(realnum);
+  victim->hometown = ch->dc_->world[ch->in_room].number;
   char_to_room(victim, ch->in_room);
   mprog_load_trigger(victim); // victim not used after, no selfpurge checks, leave the selfpurge of the mobprog that is causing this load intact as whatever it is
 
@@ -478,8 +478,8 @@ command_return_t do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto &arena = dc_->arena_;
-  QString arg1 = {0};
-  QString arg2 = {0};
+  QString arg1;
+  QString arg2;
   ObjectPtr obj;
   qint32 realnum;
 
@@ -816,7 +816,7 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
   QString arg1;
   QString arg2;
   qint32 location;
-  Connection *d;
+  ConnectionPtr d;
   CharacterPtr victim;
 
   if (ch->isPlayer())
@@ -988,7 +988,7 @@ command_return_t do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    if (strlen(first) >= MAX_THROW_NAME)
+    if (dc_strlen(first) >= MAX_THROW_NAME)
     {
       ch->prog_error(u"Mpthrow - Name too long."_s);
       return ReturnValue::eFAILURE;
@@ -1511,7 +1511,7 @@ command_return_t do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    if (strlen(first) >= MAX_THROW_NAME)
+    if (dc_strlen(first) >= MAX_THROW_NAME)
     {
       ch->prog_error(u"Mpthrow - Name too long."_s);
       return ReturnValue::eFAILURE;
@@ -1727,7 +1727,7 @@ command_return_t do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
   extern QString activeProgTmpBuf;
   throwitem->orig = (activeProg);
 
-  extern qint32 cIfs[256];
+  extern qint32 cIfs;
   throwitem->cPos = {};
   memcpy(&throwitem->ifchecks[0], &cIfs[0], sizeof(qint32) * 256);
 
@@ -2036,7 +2036,7 @@ QString expand_data(CharacterPtr ch, QString orig)
     if (lvalb)
       dc_sprintf(tmp, "%d", *lvalb);
     dc_strcat(buf, tmp);
-    i += strlen(tmp);
+    i += dc_strlen(tmp);
     z = (ptr - orig) + r + 1;
   }
 

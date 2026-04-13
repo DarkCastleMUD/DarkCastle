@@ -59,7 +59,7 @@ extern qint32 max_who;
 
 /* extern functions */
 
-void page_string(class Connection *d, const QString str, qint32 keep_internal);
+void page_string(ConnectionPtr d, const QString str, qint32 keep_internal);
 ClanPtr get_clan(CharacterPtr);
 extern qint32 getRealSpellDamage(CharacterPtr ch);
 
@@ -428,7 +428,7 @@ void show_spells(CharacterPtr i, CharacterPtr ch)
     strbuf = strbuf + "$B$1flying!";
   }
 
-  if (!strbuf.empty())
+  if (!strbuf.isEmpty())
   {
     if (i->isNonPlayer())
       strbuf = QString("$B$7-$1") + qPrintable(i->shortdesc_or_name()) + " has: " + strbuf + "$R\r\n";
@@ -725,7 +725,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
   if (!victim && name == "all")
   {
-    Connection *d;
+    ConnectionPtr d;
     CharacterPtr i;
 
     for (auto &d : dc_->connections_)
@@ -954,7 +954,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     return false;
   }
 
-  QString buf = {0}, buf2[256] = {0};
+  QString buf, buf2;
   qint32 i = 0, value = 0, bits = {};
   bool found = false;
 
@@ -1237,11 +1237,11 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
 
 command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
-  QString buffer = {0};
-  QString arg1 = {0};
-  QString arg2 = {0};
-  QString arg3 = {0};
-  QString tmpbuf = {0};
+  QString buffer;
+  QString arg1;
+  QString arg2;
+  QString arg3;
+  QString tmpbuf;
   qint32 keyword_no = {};
   qint32 j = 0, bits = 0, temp = {};
   qint32 door = 0, original_loc = {};
@@ -1317,7 +1317,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
       if (EXIT(ch, keyword_no))
       {
-        if (EXIT(ch, keyword_no)->general_description && strlen(EXIT(ch, keyword_no)->general_description))
+        if (EXIT(ch, keyword_no)->general_description && dc_strlen(EXIT(ch, keyword_no)->general_description))
         {
           send_to_char(EXIT(ch, keyword_no)->general_description, ch);
         }
@@ -1722,14 +1722,14 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         if (ch->isNonPlayer() || ch->player->holyLite)
         {
           if (is_closed && is_hidden)
-            dc_sprintf(buffer + strlen(buffer), "$B($R%s-closed$B)$R ",
+            dc_sprintf(buffer + dc_strlen(buffer), "$B($R%s-closed$B)$R ",
                        keywords[door]);
           else
-            dc_sprintf(buffer + strlen(buffer), "%s%s ",
+            dc_sprintf(buffer + dc_strlen(buffer), "%s%s ",
                        keywords[door], is_closed ? "-closed" : "");
         }
         else if (!(is_closed && is_hidden))
-          dc_sprintf(buffer + strlen(buffer), "%s%s ", keywords[door],
+          dc_sprintf(buffer + dc_strlen(buffer), "%s%s ", keywords[door],
                      is_closed ? "-closed" : "");
       }
       ansi_color(NTEXT, ch);
@@ -1825,7 +1825,7 @@ command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
       continue;
 
     if (!ch->isNonPlayer() && ch->player->holyLite)
-      dc_sprintf(buf + strlen(buf), "%s - %s [%d]\r\n", exits[door],
+      dc_sprintf(buf + dc_strlen(buf), "%s - %s [%d]\r\n", exits[door],
                  dc_->world[EXIT(ch, door)->to_room].name,
                  dc_->world[EXIT(ch, door)->to_room].number);
     else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
@@ -1833,12 +1833,12 @@ command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
       if (isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
         continue;
       else
-        dc_sprintf(buf + strlen(buf), "%s - (Closed)\r\n", exits[door]);
+        dc_sprintf(buf + dc_strlen(buf), "%s - (Closed)\r\n", exits[door]);
     }
     else if (IS_DARK(EXIT(ch, door)->to_room))
-      dc_sprintf(buf + strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
+      dc_sprintf(buf + dc_strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
     else
-      dc_sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
+      dc_sprintf(buf + dc_strlen(buf), "%s leads to %s.\r\n", exits[door],
                  dc_->world[EXIT(ch, door)->to_room].name);
   }
 
@@ -1966,7 +1966,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
     for (qint32 i = {}; i <= ISR_MAX; i++)
     {
       isrString = get_isr_string(immune, i);
-      if (!isrString.empty())
+      if (!isrString.isEmpty())
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
@@ -1984,7 +1984,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
     for (qint32 i = {}; i <= ISR_MAX; i++)
     {
       isrString = get_isr_string(suscept, i);
-      if (!isrString.empty())
+      if (!isrString.isEmpty())
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
@@ -2002,7 +2002,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
     for (qint32 i = {}; i <= ISR_MAX; i++)
     {
       isrString = get_isr_string(resist, i);
-      if (!isrString.empty())
+      if (!isrString.isEmpty())
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
@@ -2380,7 +2380,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
           if (*buf == '#')
             break;
           buf[80] = {};
-          if ((strlen(buffer) + strlen(buf)) >= MAX_STRING_LENGTH)
+          if ((dc_strlen(buffer) + dc_strlen(buf)) >= MAX_STRING_LENGTH)
             break;
           dc_strcat(buffer, buf);
           dc_strcat(buffer, "\r");
@@ -2406,7 +2406,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  class Connection *d;
+  ConnectionPtr d;
   CharacterPtr i;
   qint32 clss[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   qint32 race[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -2610,7 +2610,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
       dc_strcat(buf, " equipped by ");
       dc_strcat(buf, qPrintable(k->equipped_by->name()));
     }
-    if (strlen(buf2) + strlen(buf) + 3 >= MAX_STRING_LENGTH)
+    if (dc_strlen(buf2) + dc_strlen(buf) + 3 >= MAX_STRING_LENGTH)
     {
       ch->sendln("LIST TRUNCATED...TOO LONG");
       break;
@@ -2670,7 +2670,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
     count++;
     *buf = '\0';
     dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), dc_->world[i->in_room].number);
-    if (strlen(buf) + strlen(buf2) + 3 >= MAX_STRING_LENGTH)
+    if (dc_strlen(buf) + dc_strlen(buf2) + 3 >= MAX_STRING_LENGTH)
     {
       ch->sendln("LIST TRUNCATED...TOO LONG");
       break;
@@ -3706,7 +3706,7 @@ bool search_object(ObjectPtr obj, QList<Search> sl)
 
 command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 {
-  if (arguments.empty())
+  if (arguments.isEmpty())
   {
     arguments.append("help");
   }
@@ -4087,7 +4087,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     // Search equipment
     for (auto k = 0U; k < MAX_WEAR; k++)
     {
-      auto *obj = equipment[k];
+      auto obj = equipment[k];
       if (obj != nullptr)
       {
         if (CAN_SEE_OBJ(this, obj))
@@ -4156,7 +4156,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         vault_items_data *items;
         sorted_vault sv;
         sort_vault(*vault, sv);
-        if (!sv.vault_contents.empty())
+        if (!sv.vault_contents.isEmpty())
         {
           for (const auto &o_short_description : sv.vault_contents)
           {
@@ -4212,14 +4212,14 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       // search clan vault is able
 
       QString vault_name = u"clan%1"_s.arg(clan);
-      auto vault = has_vault(qPrintable(vault_name));
+      auto vault = dc_->vaults_->has_vault(qPrintable(vault_name));
       // search vault if able
       if (vault)
       {
         vault_items_data *items;
         sorted_vault sv;
         sort_vault(*vault, sv);
-        if (!sv.vault_contents.empty())
+        if (!sv.vault_contents.isEmpty())
         {
           for (const auto &o_short_description : sv.vault_contents)
           {
@@ -4341,7 +4341,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         obj_results.push_back({Search::locations::in_object_database, obj});
       }
     }
-    if (obj_results.empty())
+    if (obj_results.isEmpty())
     {
       send(u"Searching $B%1$R objects...No results found.\r\n"_s.arg(top_of_objt));
       return ReturnValue::eFAILURE;
@@ -4497,7 +4497,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
                       { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
     {
       // Because the color codes make the QString longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
-      custom_columns += u" [%1]"_s.arg(obj->short_description(), -(strlen(qPrintable(obj->short_description())) - nocolor_strlen(obj->short_description()) + max_short_description_size));
+      custom_columns += u" [%1]"_s.arg(obj->short_description(), -(dc_strlen(qPrintable(obj->short_description())) - nocolor_strlen(obj->short_description()) + max_short_description_size));
     }
 
     // Needed to show details or affects below

@@ -16,7 +16,7 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
   // {
   QString buf;
   QString output = "";
-  room_direction_data *curExits;
+  RoomDirectionPtr curExits;
   qint32 curZone = dc_->world[(ch)->in_room].zone;
   qint32 curRoom = ch->in_room;
   ObjectPtr portal;
@@ -290,7 +290,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->display_string_list(values);
     /*        for (i = 1; *values[i] != '\n'; i++)
             {
-                dc_sprintf(help + strlen(help), "%18s", values[i]);
+                dc_sprintf(help + dc_strlen(help), "%18s", values[i]);
                 if (!(i % 4))
                 {
                     dc_strcat(help, "\r\n");

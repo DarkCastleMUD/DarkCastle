@@ -18,7 +18,7 @@ ClanPtr get_clan(CharacterPtr);
 command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto arguments = QString(argument).split(' ');
-  Connection *d{};
+  ConnectionPtr d{};
   CharacterPtr k{}, i{};
   follow_type *f{};
   qint32 foundtarget{};
@@ -553,7 +553,7 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  class Connection *d;
+  ConnectionPtr d;
   qint32 zonenumber;
   QString buf;
 

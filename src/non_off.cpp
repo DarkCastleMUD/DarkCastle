@@ -353,7 +353,7 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (strlen(argument) > 40)
+  if (dc_strlen(argument) > 40)
   {
     ch->sendln("Title field too big.  40 characters max.");
     return ReturnValue::eFAILURE;
@@ -367,7 +367,7 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
 
   // TODO - decide if we still need this anymore since I think the $color code
   // keeps mortals from using $'s anyway  No idea why we don't let them use ?'s offhand
-  for (ctr = {}; (quint32)ctr <= strlen(argument); ctr++)
+  for (ctr = {}; (quint32)ctr <= dc_strlen(argument); ctr++)
   {
     if (((argument[ctr] == '$') && (argument[ctr + 1] == '$')) || ((argument[ctr] == '?') && (argument[ctr + 1] == '?')))
     {
@@ -1382,7 +1382,7 @@ void CVoteData::DisplayVote(CharacterPtr ch)
   QString buf;
   QList<SVoteData>::iterator answer_it;
   qint32 i = 1;
-  if (vote_question.empty())
+  if (vote_question.isEmpty())
   {
     ch->send("\r\nSorry! There are no active votes right now!\r\n\r\n");
     return;
@@ -1404,7 +1404,7 @@ void CVoteData::RemoveAnswer(CharacterPtr ch, quint32 answer)
     ch->sendln("You have to end the current vote before you can remove answers.");
     return;
   }
-  if (answers.empty())
+  if (answers.isEmpty())
   {
     ch->sendln("That answer doesn't exist!");
     return;
@@ -1426,12 +1426,12 @@ void CVoteData::StartVote(CharacterPtr ch)
     ch->sendln("There is already an active vote, you can't start another");
     return;
   }
-  if (vote_question.empty())
+  if (vote_question.isEmpty())
   {
     ch->sendln("You can't start a vote without a topic to vote on!");
     return;
   }
-  if (answers.empty())
+  if (answers.isEmpty())
   {
     ch->sendln("You can't start a vote without any answers!");
     return;
@@ -1649,7 +1649,7 @@ CVoteData::CVoteData()
     dc_->logentry(u"Error reading question from vote file."_s, 0, DC::LogChannel::LOG_MISC);
     return;
   }
-  buf[strlen(buf) - 1] = {};
+  buf[dc_strlen(buf) - 1] = {};
   vote_question = buf;
 
   // ANSWERS
@@ -1665,7 +1665,7 @@ CVoteData::CVoteData()
       return;
     }
 
-    buf[strlen(buf) - 1] = {};
+    buf[dc_strlen(buf) - 1] = {};
     tmp_vote_data.votes = num;
     tmp_vote_data.answer = buf;
     answers.push_back(tmp_vote_data);
@@ -1682,7 +1682,7 @@ CVoteData::CVoteData()
       this->Reset(nullptr);
       return;
     }
-    buf[strlen(buf) - 1] = {};
+    buf[dc_strlen(buf) - 1] = {};
     ip_voted[buf] = true;
   }
 
@@ -1697,7 +1697,7 @@ CVoteData::CVoteData()
       this->Reset(nullptr);
       return;
     }
-    buf[strlen(buf) - 1] = {};
+    buf[dc_strlen(buf) - 1] = {};
     char_voted[buf] = true;
   }
 
@@ -1728,7 +1728,7 @@ command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln("Sorry, there is nothing to vote on right now.");
     return ReturnValue::eSUCCESS;
   }
-  if (!strlen(buf))
+  if (!dc_strlen(buf))
   {
     dc_->DCVote.DisplayVote(ch);
     return ReturnValue::eSUCCESS;

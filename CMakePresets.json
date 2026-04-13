@@ -20,7 +20,8 @@
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
                 "CMAKE_COLOR_DIAGNOSTICS": "ON",
                 "CMAKE_CXX_STANDARD": "26",
-                "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_FLAGS": "-ferror-limit=10"
             }
         },
         {

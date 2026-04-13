@@ -50,8 +50,8 @@
 #include "DC/utility.h"
 #define d ->connected((d)->connected)
 
-bool is_bracing(CharacterPtr bracee, room_direction_data *exit);
-void show_question_race(Connection *d);
+bool is_bracing(CharacterPtr bracee, RoomDirectionPtr exit);
+void show_question_race(ConnectionPtr d);
 
 bool wizlock = false;
 
@@ -66,20 +66,20 @@ extern QString imotd;
 extern ObjectPtr object_list;
 
 qint32 _parse_email(QString arg);
-bool check_deny(class Connection *d, QString name);
+bool check_deny(ConnectionPtr d, QString name);
 void isr_set(CharacterPtr ch);
-bool check_reconnect(class Connection *d, QString name, bool fReconnect);
-bool check_playing(class Connection *d, QString name);
+bool check_reconnect(ConnectionPtr d, QString name, bool fReconnect);
+bool check_playing(ConnectionPtr d, QString name);
 QString str_str(QString first, QString second);
 bool apply_race_attributes(CharacterPtr ch, qint32 race = 0);
 bool check_race_attributes(CharacterPtr ch, qint32 race = 0);
-bool handle_get_race(Connection *d, QString arg);
-void show_question_race(Connection *d);
-void show_question_class(Connection *d);
-bool handle_get_class(Connection *d, QString arg);
+bool handle_get_race(ConnectionPtr d, QString arg);
+void show_question_race(ConnectionPtr d);
+void show_question_class(ConnectionPtr d);
+bool handle_get_class(ConnectionPtr d, QString arg);
 bool is_clss_race_compat(CharacterPtr ch, qint32 clss);
-void show_question_stats(Connection *d);
-bool handle_get_stats(Connection *d, QString arg);
+void show_question_stats(ConnectionPtr d);
+bool handle_get_stats(ConnectionPtr d, QString arg);
 
 bool is_race_eligible(CharacterPtr ch, qint32 race)
 {
@@ -594,7 +594,7 @@ void Character::do_on_login_stuff(void)
         skills_to_delete.push(curr.first);
       }
     }
-    while (skills_to_delete.empty() == false)
+    while (skills_to_delete.isEmpty() == false)
     {
       this->skills.erase(skills_to_delete.front());
       skills_to_delete.pop();
@@ -640,7 +640,7 @@ void Character::do_on_login_stuff(void)
     }
   }
 
-  while (!todelete.empty())
+  while (!todelete.isEmpty())
   {
     dc_->logentry(u"Deleting %1 from %2's vault access list.\n"_s.arg(todelete.front()).arg(qPrintable(this->name())), 0, DC::LogChannel::LOG_MORTAL);
     remove_vault_access(todelete.front(), vault);
@@ -697,7 +697,7 @@ void Character::roll_and_display_stats(void)
   WAIT_STATE(this, DC::PULSE_TIMER / 10);
 }
 
-qint32 DC::exceeded_connection_limit(class Connection *new_conn)
+qint32 DC::exceeded_connection_limit(ConnectionPtr new_conn)
 {
   if (new_conn->getPeerOriginalAddress().isNull() || new_conn->getPeerAddress().isLoopback())
   {
@@ -705,7 +705,7 @@ qint32 DC::exceeded_connection_limit(class Connection *new_conn)
   }
 
   quint64 count = {};
-  QSet<Connection *> to_close_list;
+  QSet<ConnectionPtr> to_close_list;
   for (auto d = connections_; d; d = conn->next)
   {
     if (new_conn->getPeerOriginalAddress() == conn->getPeerOriginalAddress())
@@ -772,7 +772,7 @@ void Character::set_hw(void)
 }
 
 // Deal with sockets that haven't logged in yet.
-void DC::nanny(class Connection *d, QString arg)
+void DC::nanny(ConnectionPtr d, QString arg)
 {
   auto badclssmsg = u"You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> "_s;
   auto ch = conn->character;
@@ -850,7 +850,7 @@ void DC::nanny(class Connection *d, QString arg)
     conn->connected = Connection::states::GET_NAME;
 
     // if they have already entered their name, drop through.  Otherwise stop and wait for input
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       break;
     }
@@ -964,7 +964,7 @@ void DC::nanny(class Connection *d, QString arg)
     // If -P option passed and one of your other characters is an imp, allow this character with that imp's password
     if (dc_->cf.allow_imp_password && dc_->isAllowedHost(conn->getPeerOriginalAddress()))
     {
-      for (Connection *ad = dc_->connections_; ad && ad != (Connection *)0x95959595; ad = ad->next)
+      for (ConnectionPtr ad = dc_->connections_; ad && ad != (ConnectionPtr)0x95959595; ad = ad->next)
       {
         if (ad != d && conn->getPeerOriginalAddress() == ad->getPeerOriginalAddress())
         {
@@ -1046,7 +1046,7 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::CONFIRM_NEW_NAME:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       write_to_output("Please type y or n: ", d);
       telnet_ga(d);
@@ -1131,7 +1131,7 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::GET_ANSI:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       conn->connected = Connection::states::QUESTION_ANSI;
       return;
@@ -1162,7 +1162,7 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::GET_NEW_SEX:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       write_to_output("That's not a sex.\r\n", d);
       conn->connected = Connection::states::QUESTION_SEX;
@@ -1665,7 +1665,7 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::SELECT_MENU:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       write_to_output(dc_->menu, d);
       telnet_ga(d);
@@ -1921,7 +1921,7 @@ void DC::nanny(class Connection *d, QString arg)
 // into their email address.
 qint32 _parse_email(QString arg)
 {
-  if (strlen(arg) < 4)
+  if (dc_strlen(arg) < 4)
     return 0;
 
   for (; *arg != '\0'; arg++)
@@ -1953,7 +1953,7 @@ bool DC::_parse_name(QString arg, QString name)
 }
 
 // Check for denial of service.
-bool check_deny(class Connection *d, QString name)
+bool check_deny(ConnectionPtr d, QString name)
 {
   FILE *fpdeny = {};
   QString strdeny;
@@ -1974,7 +1974,7 @@ bool check_deny(class Connection *d, QString name)
 }
 
 // Look for link-dead player to reconnect.
-bool check_reconnect(class Connection *d, QString name, bool fReconnect)
+bool check_reconnect(ConnectionPtr d, QString name, bool fReconnect)
 {
   const auto &character_list = d->dc_->character_list;
   for (const auto &tmp_ch : character_list)
@@ -2032,9 +2032,9 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 /*
  * Check if already playing (on an open descriptor.)
  */
-bool check_playing(class Connection *d, QString name)
+bool check_playing(ConnectionPtr d, QString name)
 {
-  class Connection *dold, *next_d;
+  ConnectionPtr dold, next_d;
   CharacterPtr compare = {};
 
   for (dold = dc_->connections_; dold; dold = next_d)
@@ -2456,7 +2456,7 @@ bool DC::on_forbidden_name_list(QString name)
     while (fgets(buf, MAX_STRING_LENGTH, nameList) && !found)
     {
       /* chop off trailing \n */
-      if ((i = strlen(buf)) > 0)
+      if ((i = dc_strlen(buf)) > 0)
         buf[i - 1] = '\0';
       if (!str_cmp(name, buf))
         found = true;
@@ -2466,7 +2466,7 @@ bool DC::on_forbidden_name_list(QString name)
   return found;
 }
 
-void show_question_race(Connection *d)
+void show_question_race(ConnectionPtr d)
 {
   if (d == nullptr || conn->character == nullptr)
   {
@@ -2497,7 +2497,7 @@ void show_question_race(Connection *d)
   telnet_ga(d);
 }
 
-bool handle_get_race(Connection *d, QString arg)
+bool handle_get_race(ConnectionPtr d, QString arg)
 {
   if (d == nullptr || conn->character == nullptr || arg == "")
   {
@@ -2534,7 +2534,7 @@ bool handle_get_race(Connection *d, QString arg)
   return true;
 }
 
-void show_question_class(Connection *d)
+void show_question_class(ConnectionPtr d)
 {
   if (d == nullptr || conn->character == nullptr)
   {
@@ -2571,7 +2571,7 @@ void show_question_class(Connection *d)
   telnet_ga(d);
 }
 
-bool handle_get_class(Connection *d, QString arg)
+bool handle_get_class(ConnectionPtr d, QString arg)
 {
   if (d == nullptr || conn->character == nullptr || arg == "")
   {
@@ -2646,7 +2646,7 @@ void stat_data::setMin(void)
   wis[0] = getMin(wis[0], races[race].mod_wis, MAX(races[race].min_wis, classes[clss].min_wis));
 }
 
-void show_question_stats(Connection *d)
+void show_question_stats(ConnectionPtr d)
 {
   if (d == nullptr || conn->character == nullptr)
   {
@@ -2751,7 +2751,7 @@ void show_question_stats(Connection *d)
   telnet_ga(d);
 }
 
-bool handle_get_stats(Connection *d, QString arg)
+bool handle_get_stats(ConnectionPtr d, QString arg)
 {
   if (arg != "+" && arg != "-" && arg != "confirm" && arg != "max")
   {

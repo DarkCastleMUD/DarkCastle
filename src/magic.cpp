@@ -4614,7 +4614,7 @@ void show_obj_class_size_mini(ObjectPtr obj, CharacterPtr ch)
 // TODO - make this use skill to affect amount of information provided
 qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
-  QString buf, buf2[256];
+  QString buf, buf2;
   qint32 i;
   bool found;
   qint32 value;
@@ -5302,7 +5302,7 @@ qint32 spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     return ReturnValue::eFAILURE;
   }
 
-  mob = ch->getDC()->clone_mobile(r_num);
+  mob = ch->dc_->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
   IS_CARRYING_W(mob) = {};
@@ -12063,7 +12063,7 @@ qint32 cast_companion(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
   }
 
   // Load up the standard fire ruler from elemental canyon (mob #19309) */
-  mob = ch->getDC()->clone_mobile(number);
+  mob = ch->dc_->clone_mobile(number);
   char_to_room(mob, ch->in_room);
 
   // I am not sure of a better way to do this, so I just set the duration
@@ -12300,7 +12300,7 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   // create golem
 
-  mob = ch->getDC()->clone_mobile(real_mobile(201));
+  mob = ch->dc_->clone_mobile(real_mobile(201));
   if (!mob)
   {
     ch->sendln("Warning: Load mob not found in create_corpse");
@@ -12761,7 +12761,7 @@ qint32 spell_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
     else
       k = k->next;
 
-  mob = ch->getDC()->clone_mobile(r_num);
+  mob = ch->dc_->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
   SETBIT(mob->affected_by, AFF_FAMILIAR);
@@ -14415,8 +14415,8 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   }
 
   CharacterPtr mob;
-  mob = ch->getDC()->clone_mobile(mobile);
-  mob->hometown = ch->getDC()->world[ch->in_room].number;
+  mob = ch->dc_->clone_mobile(mobile);
+  mob->hometown = ch->dc_->world[ch->in_room].number;
   char_to_room(mob, ch->in_room);
 
   ch->sendln("You call upon the spirits of this area, shifting into a trance-state.");
@@ -14541,7 +14541,7 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
     return ReturnValue::eFAILURE;
   }
 
-  mob = ch->getDC()->clone_mobile(r_num);
+  mob = ch->dc_->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
   mob->max_hit += skill * 5;
   mob->hit = mob->max_hit;

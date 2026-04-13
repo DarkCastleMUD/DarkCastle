@@ -388,13 +388,11 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       {
         auto c = strdup(qPrintable(command_arguments));
         retval = (*(found->getFunction1()))(this, c, found->getNumber());
-        free(c);
       }
       else if (found->getFunction1b())
       {
         auto c = strdup(qPrintable(command_arguments));
         retval = (*(found->getFunction1b()))(this, c, found->getNumber());
-        free(c);
       }
       else if (found->getFunction2())
       {
@@ -502,7 +500,7 @@ qint32 old_search_block(const QString argument, qint32 begin, qint32 length, con
   if (mode)
     while (!found && *(list.value(qPrintable(guess))) != '\n')
     {
-      found = ((quint32)length == strlen(list.value(qPrintable(guess))));
+      found = ((quint32)length == dc_strlen(list.value(qPrintable(guess))));
       for (search = {}; search < length && found; search++)
       {
         found = (*(argument + begin + search) == *(list.value(qPrintable(guess)) + search));
@@ -537,7 +535,7 @@ qint32 old_search_block(const QString argument, qint32 begin, qint32 length, con
   if (mode)
     while (!found && *(list[guess]) != '\n')
     {
-      found = ((quint32)length == strlen(list[guess]));
+      found = ((quint32)length == dc_strlen(list[guess]));
       for (search = {}; search < length && found; search++)
       {
         found = (*(argument + begin + search) == *(list[guess] + search));
@@ -676,7 +674,7 @@ void automail(QString name)
 
 bool is_abbrev(const QString &aabrev, const QString &word)
 {
-  if (aabrev.empty())
+  if (aabrev.isEmpty())
   {
     return false;
   }
@@ -842,7 +840,7 @@ void chop_half(QString str, QString arg1, QString arg2)
   qint32 i, j;
 
   // skip over trailing space
-  i = strlen(str) - 1;
+  i = dc_strlen(str) - 1;
   j = {};
   while (isspace(str[i]))
     i--;

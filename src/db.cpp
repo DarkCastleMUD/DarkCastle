@@ -200,7 +200,7 @@ bool operator==(extra_descr_data &edd1, extra_descr_data &edd2)
   return extra_descriptions1 == extra_descriptions2;
 }
 
-bool operator==(const room_direction_data &rdd1, const room_direction_data &rdd2)
+bool operator==(const RoomDirection &rdd1, const RoomDirection &rdd2)
 {
   return (rdd1.bracee == rdd2.bracee &&
           rdd1.exit_info == rdd2.exit_info &&
@@ -391,7 +391,7 @@ const QStringList funnybootmessages =
 
 void funny_boot_message()
 {
-  class Connection *d;
+  ConnectionPtr d;
 
   extern qint32 was_hotboot;
 
@@ -801,11 +801,11 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
     if (gods_each_level[current_level - IMMORTAL] == 0)
       continue;
 
-    line_length = strlen(names[current_level - IMMORTAL]);
+    line_length = dc_strlen(names[current_level - IMMORTAL]);
     sp = 79 - line_length;
     sp /= 2;
     space[sp + 1] = '\0';
-    dc_sprintf(buf + strlen(buf), "\r\n%s%s\r\n", space,
+    dc_sprintf(buf + dc_strlen(buf), "\r\n%s%s\r\n", space,
                names[current_level - IMMORTAL]);
     space[sp + 1] = ' ';
 
@@ -817,13 +817,13 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
         z = 1;
         if (!lines.isEmpty())
         {
-          line_length = strlen(lines) - 2;
-          lines[strlen(lines) - 2] = '\n';
-          lines[strlen(lines) - 1] = '\r';
+          line_length = dc_strlen(lines) - 2;
+          lines[dc_strlen(lines) - 2] = '\n';
+          lines[dc_strlen(lines) - 1] = '\r';
           sp = 79 - line_length;
           sp /= 2;
           space[sp + 1] = '\0';
-          dc_sprintf(buf + strlen(buf), "%s%s", space, lines);
+          dc_sprintf(buf + dc_strlen(buf), "%s%s", space, lines);
           space[sp + 1] = ' ';
           lines[0] = '\0';
         }
@@ -834,15 +834,15 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
 
       if (z++ % 5)
-        dc_sprintf(lines + strlen(lines), "%s, ", qPrintable(dc_->wizlist[x].getName()));
+        dc_sprintf(lines + dc_strlen(lines), "%s, ", qPrintable(dc_->wizlist[x].getName()));
       else
       {
-        dc_sprintf(lines + strlen(lines), "%s\r\n", qPrintable(dc_->wizlist[x].getName()));
-        line_length = strlen(lines) - 2;
+        dc_sprintf(lines + dc_strlen(lines), "%s\r\n", qPrintable(dc_->wizlist[x].getName()));
+        line_length = dc_strlen(lines) - 2;
         sp = 79 - line_length;
         sp /= 2;
         space[sp + 1] = '\0';
-        dc_sprintf(buf + strlen(buf), "%s%s", space, lines);
+        dc_sprintf(buf + dc_strlen(buf), "%s%s", space, lines);
         space[sp + 1] = ' ';
         lines[0] = '\0';
       }
@@ -1602,8 +1602,6 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
 
     return true;
   } // if == $
-    //  delete temp; /* cleanup the area containing the terminal $  */
-    // we no longer free temp, cause it's no longer used as a terminating character
   return false;
 }
 
@@ -2009,7 +2007,7 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir)
 
   if (room)
   {
-    dc_->world[room].dir_option[dir] = new room_direction_data;
+    dc_->world[room].dir_option[dir] = new RoomDirection;
   }
   QString general_description = fread_string(fl, 0);
 
@@ -2075,7 +2073,7 @@ qint32 DC::create_one_room(CharacterPtr ch, qint32 vnum)
 
   rp->number = vnum;
 
-  rp->zone = DC::getRoomZone(rp->number);
+  rp->zone = getRoomZone(rp->number);
 
   rp->sector_type = {};
   rp->room_flags = {};
@@ -2216,7 +2214,7 @@ void DC::free_zones_from_memory()
   for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
   {
     zone.name(QString());
-    zone.cmd.empty();
+    zone.cmd.isEmpty();
   }
 }
 
@@ -2388,8 +2386,8 @@ zone_t DC::read_one_zone(FILE *fl)
         skipper++;
 
       // kill terminating \n
-      if (buf[strlen(buf) - 1] == '\n')
-        buf[strlen(buf) - 1] = '\0';
+      if (buf[dc_strlen(buf) - 1] == '\n')
+        buf[dc_strlen(buf) - 1] = '\0';
 
       // if any, keep anything left
       if (!skipper.isEmpty())
@@ -2441,8 +2439,8 @@ zone_t DC::read_one_zone(FILE *fl)
       skipper++;
 
     // kill terminating \n
-    if (buf[strlen(buf) - 1] == '\n')
-      buf[strlen(buf) - 1] = '\0';
+    if (buf[dc_strlen(buf) - 1] == '\n')
+      buf[dc_strlen(buf) - 1] = '\0';
 
     // if any, keep anything left
     if (!skipper.isEmpty())
@@ -3831,12 +3829,11 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
 
   tmpptr = fread_string(fl, 1);
 
-  if (strlen(tmpptr) >= MAX_OBJ_SDESC_LENGTH)
+  if (dc_strlen(tmpptr) >= MAX_OBJ_SDESC_LENGTH)
   {
     tmpptr[MAX_OBJ_SDESC_LENGTH - 1] = {};
 
     obj->short_description(tmpptr);
-    free(tmpptr);
 
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", dc_->obj_index[nr].vnum());
   }
@@ -4120,7 +4117,7 @@ auto &operator<<(auto &stream, ObjectPtr obj)
   if (!obj)
     return stream;
 
-  stream << "#" << obj->getDC()->obj_index[obj->item_number].vnum() << "\n";
+  stream << "#" << obj->dc_->obj_index[obj->item_number].vnum() << "\n";
   string_to_file(stream, obj->name());
   string_to_file(stream, obj->short_description());
   string_to_file(stream, obj->long_description());
@@ -4157,9 +4154,9 @@ auto &operator<<(auto &stream, ObjectPtr obj)
            << obj->affected[i].modifier << "\n";
   }
 
-  if (obj->getDC()->obj_index[obj->item_number].mobprogs)
+  if (obj->dc_->obj_index[obj->item_number].mobprogs)
   {
-    write_mprog_recur(stream, obj->getDC()->obj_index[obj->item_number].mobprogs, false);
+    write_mprog_recur(stream, obj->dc_->obj_index[obj->item_number].mobprogs, false);
     stream << "|\n";
   }
 
@@ -5030,7 +5027,7 @@ void Zone::reset(ResetType reset_type)
 
 bool Zone::isEmpty(void)
 {
-  class Connection *i;
+  ConnectionPtr i;
 
   for (auto &i : dc_->connections_)
     if (i->connected == Connection::states::PLAYING && i->character && dc_->world[i->character->in_room].zone == id_)
@@ -5541,7 +5538,7 @@ void free_char(CharacterPtr ch)
     {
       // these won't be here if you free an unloaded character
       ch->player->skillchange = {};
-      if (!ch->player->ignoring.empty())
+      if (!ch->player->ignoring.isEmpty())
         ch->player->ignoring.clear();
       if (ch->player->golem)
         dc_->logentry(u"Error, golem not released properly"_s), ANGEL, DC::LogChannel::LOG_BUG);
@@ -5627,7 +5624,7 @@ qint32 file_to_string(const QString name, QString buf)
 
     if (!feof(fl))
     {
-      if (strlen(buf) + strlen(tmp) + 2 > MAX_STRING_LENGTH)
+      if (dc_strlen(buf) + dc_strlen(tmp) + 2 > MAX_STRING_LENGTH)
       {
         dc_->logentry(u"fl->strng: QString too big (db.c, file_to_string)"_s,
                       0, DC::LogChannel::LOG_BUG);
@@ -5636,8 +5633,8 @@ qint32 file_to_string(const QString name, QString buf)
       }
 
       dc_strcat(buf, tmp);
-      *(buf + strlen(buf) + 1) = '\0';
-      *(buf + strlen(buf)) = '\r';
+      *(buf + dc_strlen(buf) + 1) = '\0';
+      *(buf + dc_strlen(buf)) = '\r';
     }
   } while (!feof(fl));
 
@@ -5754,7 +5751,7 @@ void clear_char(CharacterPtr ch)
     return;
   }
 
-  *ch = Character(ch->getDC());
+  *ch = Character(ch->dc_);
   ch->in_room = DC::NOWHERE;
   ch->setStanding();
   ch->hometown = START_ROOM;
@@ -5763,11 +5760,8 @@ void clear_char(CharacterPtr ch)
 
 void clear_object(ObjectPtr obj)
 {
-  if (obj == nullptr)
-  {
+  if (!obj)
     return;
-  }
-
   *obj = {};
   obj->item_number = -1;
   obj->in_room = DC::NOWHERE;
@@ -6475,31 +6469,31 @@ bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2)
 }
 
 // Function to ensure an item is not bugged. If it is, replace it with the original.
-bool verify_item(ObjectPtr *obj)
+bool verify_item(ObjectPtr obj)
 {
   extern qint32 top_of_objt;
 
-  if ((*obj)->short_description() == (dc_->obj_index[(*obj)->item_number].item)->short_description())
+  if (obj->short_description() == (dc_->obj_index[obj->item_number].item)->short_description())
     return false;
 
   qint32 newitem = -1;
   for (qint32 i = 1;; i++)
   {
 
-    if ((*obj)->item_number - i < 0 && (*obj)->item_number + i > top_of_objt)
+    if (obj->item_number - i < 0 && obj->item_number + i > top_of_objt)
       break; // No item at all found, it's a restring or deleted.
 
-    if ((*obj)->item_number - i >= 0)
+    if (obj->item_number - i >= 0)
     {
-      obj_index_data *obj_index_entry = &dc_->obj_index[(*obj)->item_number - i];
+      obj_index_data *obj_index_entry = &dc_->obj_index[obj->item_number - i];
       if (obj_index_entry)
       {
         ObjectPtr obj_index_item = obj_index_entry->item;
         if (obj_index_item)
         {
-          if ((*obj)->short_description() == obj_index_item->short_description())
+          if (obj->short_description() == obj_index_item->short_description())
           {
-            newitem = (*obj)->item_number - i;
+            newitem = obj->item_number - i;
             break;
           }
         }
@@ -6514,10 +6508,10 @@ bool verify_item(ObjectPtr *obj)
       }
     }
 
-    if ((*obj)->item_number + i <= top_of_objt)
-      if ((*obj)->short_description() == (dc_->obj_index[(*obj)->item_number + i].item)->short_description())
+    if (obj->item_number + i <= top_of_objt)
+      if (obj->short_description() == (dc_->obj_index[obj->item_number + i].item)->short_description())
       {
-        newitem = (*obj)->item_number + i;
+        newitem = obj->item_number + i;
         break;
       }
   }

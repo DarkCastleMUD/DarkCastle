@@ -1,5 +1,4 @@
 
-#include "DC/levels.h"
 #include <cstring>
 #include <fstream>
 #include <sstream>
@@ -12,16 +11,9 @@
 #include <tracy/Tracy.hpp>
 #endif
 
-#include "DC/obj.h"
-#include "DC/structs.h"
+#include "DC/DC.h"
 #include "DC/db.h"
-
-#include "DC/DC.h"
-
-#include "DC/DC.h"
-#include "DC/act.h"
 #include "DC/handler.h"
-#include "DC/returnvals.h"
 #include "DC/interp.h"
 #include "DC/clan.h" // clan right
 #include "DC/inventory.h"
@@ -66,7 +58,7 @@ void vault_log(CharacterPtr ch, QString owner);
 QString clanVName(quint64 clan_id);
 void vault_search_usage(CharacterPtr ch);
 
-VaultPtr has_vault(QString name)
+VaultPtr Vaults::has_vault(QString name)
 {
   VaultPtr vault;
 
@@ -105,7 +97,7 @@ void remove_from_object_list(ObjectPtr obj)
   }
 }
 
-void save_vault(QString name)
+void Vaults::save_vault(QString name)
 {
   VaultPtr vault;
   vault_access_data *access;
@@ -161,7 +153,7 @@ void Character::vault_access(QString who)
   vault_access_data *access;
   VaultPtr vault = {};
 
-  if (!vault && !(vault = has_vault(name())))
+  if (!vault && !(vault = dc_->vaults_->has_vault(name())))
   {
     sendln("You don't seem to have a vault.");
     return;
@@ -187,7 +179,7 @@ void Character::vault_myaccess(QString arg)
 
   if (arg[0] != '\0')
   {
-    if (!(vault = has_vault(arg)))
+    if (!(vault = dc_->vaults_->has_vault(arg)))
     {
       sendln("No such player.");
       return;
@@ -218,7 +210,7 @@ void Character::vault_balance(QString owner)
   if (owner == name())
     self = true;
 
-  auto vault = has_vault(owner);
+  auto vault = dc_->vaults_->has_vault(owner);
   if (!vault)
   {
     if (self)
@@ -273,7 +265,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_strcpy(arg1, qPrintable(clanVName(ch->clan)));
 
   // show the contents of your or someone elses vault
-  if (!strncmp(arg, "list", strlen(arg)))
+  if (!strncmp(arg, "list", dc_strlen(arg)))
   {
     if (arg.isEmpty() 1)
       dc_sprintf(arg1, "%s", qPrintable(ch->name()));
@@ -281,7 +273,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 
     // show how much gold in vault
   }
-  else if (!strncmp(arg, "balance", strlen(arg)))
+  else if (!strncmp(arg, "balance", dc_strlen(arg)))
   {
     if (arg.isEmpty() 1)
       dc_sprintf(arg1, "%s", qPrintable(ch->name()));
@@ -289,23 +281,23 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 
     // show what vaults I have access to
   }
-  else if (!strncmp(arg, "myaccess", strlen(arg)))
+  else if (!strncmp(arg, "myaccess", dc_strlen(arg)))
   {
     ch->vault_myaccess(arg1);
 
     // show my current access, add access, or remove access
   }
-  else if (!strncmp(arg, "access", strlen(arg)))
+  else if (!strncmp(arg, "access", dc_strlen(arg)))
   {
     ch->vault_access(arg1);
   }
-  else if (ch->getLevel() > IMMORTAL && !strncmp(arg, "stats", strlen(arg)))
+  else if (ch->getLevel() > IMMORTAL && !strncmp(arg, "stats", dc_strlen(arg)))
   {
     ch->vault_stats(arg1);
 
     // show vault log
   }
-  else if (!strncmp(arg, "log", strlen(arg)))
+  else if (!strncmp(arg, "log", dc_strlen(arg)))
   {
     if (*arg1)
     {
@@ -368,7 +360,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You don't feel safe enough to manage your valuables.");
     return ReturnValue::eSUCCESS;
   }
-  else if (!strncmp(arg, "withdraw", strlen(arg)))
+  else if (!strncmp(arg, "withdraw", dc_strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
 
@@ -392,7 +384,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     ch->vault_withdraw(amount, arg2);
   }
-  else if (!strncmp(arg, "deposit", strlen(arg)))
+  else if (!strncmp(arg, "deposit", dc_strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
 
@@ -416,7 +408,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     vault_deposit(ch, amount, arg2);
   }
-  else if (!strncmp(arg, "put", strlen(arg)))
+  else if (!strncmp(arg, "put", dc_strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
     if (!str_cmp(arg2, "clan") && ch->clan)
@@ -432,7 +424,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 
     // get something from your or someone elses vault
   }
-  else if (!strncmp(arg, "get", strlen(arg)))
+  else if (!strncmp(arg, "get", dc_strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
     if (!str_cmp(arg2, "clan") && ch->clan)
@@ -491,7 +483,7 @@ void Character::vault_stats(QString name)
 
     dc_snprintf(buf1, sizeof(buf1), "%3d) %-15s $B$5%10lu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
                 count, qPrintable(vault->owner), vault->gold, items, unique, weight, vault->weight, vault->size, accesses, weight != vault->weight ? "$5mismatch$R" : "$1    none$R");
-    if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH * 4)
+    if ((dc_strlen(buf1) + dc_strlen(buf)) < MAX_STRING_LENGTH * 4)
       dc_strcat(buf, buf1);
     else
       skipped++;
@@ -523,7 +515,6 @@ void DC::reload_vaults(void)
       for (items = vault->items; items; items = titems)
       {
         titems = items->next;
-        free(items);
       }
     }
 
@@ -532,12 +523,10 @@ void DC::reload_vaults(void)
       for (access = vault->access; access; access = taccess)
       {
         taccess = access->next;
-        free(access);
       }
     }
 
     if (vault)
-      free(vault);
   }
 
   vault_table = {};
@@ -545,7 +534,7 @@ void DC::reload_vaults(void)
   load_vaults();
 }
 
-void rename_vault_owner(QString oldname, QString newname)
+void Vaults::rename_vault_owner(QString oldname, QString newname)
 {
   qint32 num = {};
 
@@ -606,7 +595,7 @@ void rename_vault_owner(QString oldname, QString newname)
 void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
 {
   QString src_filename;
-  QString dst_dir = {0};
+  QString dst_dir;
   QString syscmd;
   struct stat statbuf;
 
@@ -708,7 +697,6 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
       titems = items->next;
       if (items->obj)
         extract_obj(items->obj);
-      free(items);
     }
   }
 
@@ -717,7 +705,6 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
     for (access = vault->access; access; access = taccess)
     {
       taccess = access->next;
-      free(access);
     }
   }
 
@@ -733,7 +720,7 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
         vault_table = vault->next;
       else
         prev_vault->next = vault->next;
-      free(vault);
+
       vault = {};
       total_vaults--;
       return;
@@ -925,8 +912,6 @@ void DC::testing_load_vaults(void)
 void Character::add_vault_access(QString victim_name, VaultPtr vault)
 {
   vault_access_data *access;
-  class Connection d;
-
   if (!victim_name.isEmpty())
     victim_name[0] = victim_name[0].toUpper();
 
@@ -1243,7 +1228,6 @@ void access_remove(QString name, VaultPtr vault)
         prev_access->next = access->next;
       }
 
-      free(access);
       access = {};
       break;
     }
@@ -1428,7 +1412,7 @@ ObjectPtr exists_in_vault(VaultPtr vault, ObjectPtr obj)
   return 0;
 }
 
-void vault_get(CharacterPtr ch, QString object, QString owner)
+void Vaults::vault_get(CharacterPtr ch, QString object, QString owner)
 {
   QString sbuf;
   QString obj_list[100];
@@ -1455,7 +1439,7 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
     return;
   }
 
-  if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
+  if (!ch->dc_->has_vault_access(qPrintable(ch->name()), vault))
   {
     ch->send(u"You don't have permission to take %1's stuff.\r\n"_s.arg(owner));
     return;
@@ -1687,7 +1671,6 @@ void item_remove(ObjectPtr obj, VaultPtr vault)
         prev_item->next = item->next;
       }
 
-      free(item);
       item = {};
       vault->weight -= GET_OBJ_WEIGHT(get_obj(vnum));
       return;
@@ -1707,7 +1690,7 @@ qint32 search_vault_by_vnum(qint32 vnum, VaultPtr vault)
   return 0;
 }
 
-void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
+void Vaults::vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
 {
   if (!ch)
     return;
@@ -1728,7 +1711,7 @@ void vault_deposit(CharacterPtr ch, quint32 amount, QString owner)
     return;
   }
 
-  if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
+  if (!ch->dc_->has_vault_access(qPrintable(ch->name()), vault))
   {
     ch->send(u"You don't have permission to put $B$5gold$R in %1's vault.\r\n"_s.arg(owner));
     return;
@@ -1784,7 +1767,7 @@ void Character::vault_withdraw(quint32 amount, QString owner)
     return;
   }
 
-  if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
+  if (!ch->dc_->has_vault_access(qPrintable(ch->name()), vault))
   {
     ch->send(u"You don't have permission to put $B$5gold$R in %1's vault.\r\n"_s.arg(owner));
     return;
@@ -1882,7 +1865,7 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, VaultPtr vault, CharacterPtr
   return 1;
 }
 
-void vault_put(CharacterPtr ch, QString object, QString owner)
+void Vaults::vault_put(CharacterPtr ch, QString object, QString owner)
 {
   if (!ch)
     return;
@@ -1912,7 +1895,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
     return;
   }
 
-  if (!ch->getDC()->has_vault_access(qPrintable(ch->name()), vault))
+  if (!ch->dc_->has_vault_access(qPrintable(ch->name()), vault))
   {
     ch->send(u"You don't have permission to put things in %1's vault.\r\n"_s.arg(owner));
     return;
@@ -2096,7 +2079,7 @@ void Character::vault_list(QString owner)
   if (owner == qPrintable(this->name()))
     self = 1;
 
-  if (!(vault = has_vault(owner)))
+  if (!(vault = dc_->vaults_->has_vault(owner)))
   {
     if (self)
       send("You don't have a vault.\r\n");
@@ -2105,7 +2088,7 @@ void Character::vault_list(QString owner)
     return;
   }
 
-  if (!getDC()->has_vault_access(qPrintable(this->name()), vault))
+  if (!dc_->has_vault_access(qPrintable(this->name()), vault))
   {
     send(u"You don't have access to %1's vault.\r\n"_s.arg(owner));
     return;
@@ -2123,7 +2106,7 @@ void Character::vault_list(QString owner)
     vault->weight = sv.weight;
   }
 
-  if (sv.vault_contents.empty())
+  if (sv.vault_contents.isEmpty())
   {
     if (self)
     {
@@ -2310,7 +2293,7 @@ void logvault(QString message, QString name)
   time_t ct;
   FILE *ofile, *nfile;
   QString buf, line;
-  QString fname, nfname[256];
+  QString fname, nfname;
   qint32 lines = 1;
   QString mins, hours[5];
 
@@ -2653,7 +2636,7 @@ qint32 vault_search(CharacterPtr ch, const QString args)
   // now that we know what we're looking for, let's search through all the vaults to find it
   for (VaultPtr vault = vault_table; vault; vault = vault->next)
   {
-    if (vault && !vault->owner.isEmpty() && ch->getDC()->has_vault_access(ch, vault))
+    if (vault && !vault->owner.isEmpty() && ch->dc_->has_vault_access(ch, vault))
     {
       vaults_searched++;
       objects = {};

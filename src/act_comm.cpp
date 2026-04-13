@@ -366,7 +366,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
 
   if (args.isEmpty())
   {
-    if (ch->player->ignoring.empty())
+    if (ch->player->ignoring.isEmpty())
     {
       ch->send("Ignore who?\r\n");
       return ReturnValue::eSUCCESS;
@@ -417,7 +417,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
 
 bool is_ignoring(CharacterPtr ch, CharacterPtr victim)
 {
-  if (ch->isNonPlayer() || (victim->getLevel() >= IMMORTAL && victim->isPlayer()) || ch->player->ignoring.empty())
+  if (ch->isNonPlayer() || (victim->getLevel() >= IMMORTAL && victim->isPlayer()) || ch->player->ignoring.isEmpty())
   {
     return false;
   }
@@ -682,7 +682,7 @@ void DC::load_hints(void)
       if (buffer != nullptr)
       {
         hints_.push_back(buffer);
-        free(buffer);
+
       }
     }
 

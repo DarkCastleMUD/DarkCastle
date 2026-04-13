@@ -49,7 +49,7 @@ command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
-  class Connection *i;
+  ConnectionPtr i;
   QString buf3;
 
   if (ch->isPlayer() && ch->player->wizinvis)
@@ -115,13 +115,13 @@ command_return_t do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  QString type = {0};
-  QString name = {0};
-  QString arg2 = {0};
-  QString arg3 = {0};
-  QString qty = {0};
-  QString random = {0};
-  QString buf = {0};
+  QString type;
+  QString name;
+  QString arg2;
+  QString arg3;
+  QString qty;
+  QString random;
+  QString buf;
 
   QString c;
   qint32 x, number = 0, num = 0, cnt = 1;
@@ -1215,7 +1215,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     while ((argument = one_argument(argument, arg1)))
     {
       qint32 i;
-      if (strlen(arg1) < 2)
+      if (dc_strlen(arg1) < 2)
         break;
       fo = true;
       for (i = {}; *pc_clss_types2[i] != '\n'; i++)
@@ -1419,7 +1419,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     while ((argument = one_argument(argument, arg1)))
     {
       qint32 i;
-      if (strlen(arg1) < 2)
+      if (dc_strlen(arg1) < 2)
         break;
       fo = true;
 
@@ -1788,7 +1788,7 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
 
   QString arg1;
   std::tie(arg1, arguments) = half_chop(arguments);
-  if (arg1.empty())
+  if (arg1.isEmpty())
   {
     ch->send("Usage: transfer <name>\r\n");
     ch->send("       transfer all\r\n");
@@ -1797,7 +1797,7 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
 
   CharacterPtr victim = {};
   room_t source_room = {};
-  Connection *i = {};
+  ConnectionPtr i = {};
   if (arg1 == "all")
   {
     for (auto &i : dc_->connections_)
@@ -1940,7 +1940,7 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  // class Connection *i;
+  //  ConnectionPtr i;
   CharacterPtr victim;
   QString buf;
   qint32 target;
@@ -2478,7 +2478,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
   }
-  mob = ch->getDC()->clone_mobile(src);
+  mob = ch->dc_->clone_mobile(src);
   if (!mob)
   {
     ch->sendln("Failure. Unable to copy mobile.");

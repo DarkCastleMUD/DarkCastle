@@ -9,14 +9,8 @@
 
 #include <fmt/format.h>
 
-#include "DC/levels.h"
-#include "DC/wizard.h"
-#include "DC/spells.h"
-
-#include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/db.h"
-#include "DC/returnvals.h"
 #include "DC/DC.h"
 
 #ifdef BANDWIDTH
@@ -25,7 +19,6 @@
 
 command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 {
-  class Connection d;
   CharacterPtr new_new;
 
   if (arguments.isEmpty())
@@ -342,7 +335,7 @@ command_return_t do_global(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;
-  class Connection *point;
+  ConnectionPtr point;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -599,14 +592,14 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (strlen(arg1) > 19 || _parse_name(arg1, username))
+  if (dc_strlen(arg1) > 19 || _parse_name(arg1, username))
   {
     ch->sendln("Invalid username passed.");
     return ReturnValue::eFAILURE;
   }
 
   username[0] = UPPER(username[0]);
-  for (quint32 i = 1; i < strlen(username); i++)
+  for (quint32 i = 1; i < dc_strlen(username); i++)
   {
     username[i] = LOWER(username[i]);
   }
@@ -681,7 +674,7 @@ command_return_t do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isexact(type, "list"))
   {
-    if (victim->skills.empty())
+    if (victim->skills.isEmpty())
     {
       ch->send(fmt::format("{} has no skills.\r\n", qPrintable(victim->name())));
       return ReturnValue::eSUCCESS;

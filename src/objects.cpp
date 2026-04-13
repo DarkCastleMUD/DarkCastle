@@ -813,7 +813,7 @@ command_return_t do_name(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (strlen(arg) > 30)
+  if (dc_strlen(arg) > 30)
   {
     ch->sendln("Name too long, must be under 30 characters long.");
     return ReturnValue::eFAILURE;

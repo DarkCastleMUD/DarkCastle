@@ -1308,7 +1308,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
                    ch);
       return;
     }
-    if (strlen(text) > (PC_SHOP_SELL_MESS_SIZE - 20))
+    if (dc_strlen(text) > (PC_SHOP_SELL_MESS_SIZE - 20))
     {
       ch->sendln("That sell message is too long.");
       return;
@@ -1327,7 +1327,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
       ch->sendln("$3Syntax$R: design roomname <name>");
       return;
     }
-    if (strlen(text) > 60)
+    if (dc_strlen(text) > 60)
     {
       ch->sendln("That room name is too long (60 chars max).");
       return;
@@ -1854,7 +1854,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       return ReturnValue::eSUCCESS;
     }
 
-    if (arg1.empty())
+    if (arg1.isEmpty())
     {
       owner->tell(ch, "You have to type reroll <object keyword> to reroll that object.");
       return ReturnValue::eSUCCESS;

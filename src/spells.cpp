@@ -1351,11 +1351,11 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
   while (*(splwd + offs))
   {
     for (j = {}; *(syls[j].org); j++)
-      if (strncmp(syls[j].org, splwd + offs, strlen(syls[j].org)) == 0)
+      if (strncmp(syls[j].org, splwd + offs, dc_strlen(syls[j].org)) == 0)
       {
         dc_strcat(buf, syls[j].new_new);
-        if (strlen(syls[j].org))
-          offs += strlen(syls[j].org);
+        if (dc_strlen(syls[j].org))
+          offs += dc_strlen(syls[j].org);
         else
           ++offs;
       }
@@ -1964,9 +1964,9 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
         name[0] = '\0';
         one_argument(argument, name);
-        if (argument && strlen(argument) > strlen(name))
+        if (argument && dc_strlen(argument) > dc_strlen(name))
         {
-          *argument = LOWER(*(argument + strlen(name) + 1));
+          *argument = LOWER(*(argument + dc_strlen(name) + 1));
 
           if (*argument == 'n')
             dir = {};
@@ -2840,57 +2840,57 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     if (mage)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, skill_cost.find(i)->second);
     }
     else if (cleric)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, skill_cost.find(i)->second);
     }
     else if (thief)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*t_skills[thief].skillname), t_skills[thief].skillname + 1, skill_cost.find(i)->second);
     }
     else if (warrior)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*w_skills[warrior].skillname), w_skills[warrior].skillname + 1, skill_cost.find(i)->second);
     }
     else if (anti)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, skill_cost.find(i)->second);
     }
     else if (pal)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, skill_cost.find(i)->second);
     }
     else if (barb)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*b_skills[barb].skillname), b_skills[barb].skillname + 1, skill_cost.find(i)->second);
     }
     else if (monk)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*k_skills[monk].skillname), k_skills[monk].skillname + 1, skill_cost.find(i)->second);
     }
     else if (ranger)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, skill_cost.find(i)->second);
     }
     else if (bard)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*d_skills[bard].skillname), d_skills[bard].skillname + 1, skill_cost.find(i)->second);
     }
     else if (druid)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Moves:$R %-3d  $B$7Class:$R ",
                  UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, skill_cost.find(i)->second);
     }
     else
@@ -2919,7 +2919,7 @@ command_return_t do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%llu)",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%llu)",
                  UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
                  song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
                  "Brd", d_skills[i].levelavailable);
@@ -3024,32 +3024,32 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     if (mage)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
                  UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, spell_info[mage].min_usesmana());
     }
     else if (cleric)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
                  UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, spell_info[cleric].min_usesmana());
     }
     else if (anti)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
                  UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, spell_info[anti].min_usesmana());
     }
     else if (pal)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
                  UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, spell_info[pal].min_usesmana());
     }
     else if (ranger)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
                  UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, spell_info[ranger].min_usesmana());
     }
     else if (druid)
     {
-      dc_sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+      dc_sprintf(buf + dc_strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
                  UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, spell_info[druid].min_usesmana());
     }
     else

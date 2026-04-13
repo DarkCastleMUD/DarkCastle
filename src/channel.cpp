@@ -54,7 +54,7 @@ command_return_t do_say(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = ltrim(argument);
 
-  if (argument.empty())
+  if (argument.isEmpty())
     ch->sendln("Yes, but WHAT do you want to say?");
   else
   {
@@ -123,7 +123,7 @@ command_return_t do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
 
   std::tie(vict, message) = half_chop(argument);
 
-  if (vict.empty() || message.empty())
+  if (vict.isEmpty() || message.isEmpty())
   {
     ch->sendln("Say what to whom?  psay <target> <message>");
     return ReturnValue::eSUCCESS;
@@ -169,7 +169,7 @@ command_return_t do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf1;
-  class Connection *i;
+  ConnectionPtr i;
 
   if (ch->isNonPlayer())
     return ReturnValue::eSUCCESS;
@@ -222,7 +222,7 @@ command_return_t do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
 command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   QString buf2;
-  class Connection *i;
+  ConnectionPtr i;
   ObjectPtr tmp_obj;
   bool silence = false;
 
@@ -334,7 +334,7 @@ command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 
 command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 {
-  class Connection *i = {};
+  ConnectionPtr i = {};
   ObjectPtr tmp_obj = {};
   bool silence = false;
 
@@ -382,7 +382,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
   {
     QQueue<QString> tmp = auction_history;
     this->sendln("Here are the last 10 auctions:");
-    while (!tmp.empty())
+    while (!tmp.isEmpty())
     {
       act_to_victim(tmp.front(), this, 0, this, 0);
       tmp.pop();
@@ -431,7 +431,7 @@ command_return_t do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
-  class Connection *i;
+  ConnectionPtr i;
   ObjectPtr tmp_obj;
   bool silence = false;
 
@@ -508,7 +508,7 @@ command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
-  class Connection *i;
+  ConnectionPtr i;
   ObjectPtr tmp_obj;
   bool silence = false;
 
@@ -561,7 +561,7 @@ command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       QQueue<QString> tmp = trivia_history;
       ch->sendln("Here are the last 10 messages:");
-      while (!tmp.empty())
+      while (!tmp.isEmpty())
       {
         act_to_victim(tmp.front(), ch, 0, ch, 0);
         tmp.pop();
@@ -608,9 +608,9 @@ command_return_t do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString buf1 = {0};
-  QString buf2 = {0};
-  class Connection *i = {};
+  QString buf1;
+  QString buf2;
+  ConnectionPtr i = {};
   qint32 ctr = {};
 
   if ((GET_POS(ch) != position_t::SLEEPING) && (ch->getLevel() < MIN_GOD))
@@ -644,7 +644,7 @@ command_return_t do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  for (ctr = {}; (quint32)ctr <= strlen(argument); ctr++)
+  for (ctr = {}; (quint32)ctr <= dc_strlen(argument); ctr++)
   {
     if (argument[ctr] == '$')
     {
@@ -960,7 +960,7 @@ command_return_t do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = ltrim(argument);
 
-  if (argument.empty())
+  if (argument.isEmpty())
   {
     ch->sendln("Reply what?");
     if ((vict = get_char(ch->player->last_tell)) && CAN_SEE(ch, vict))
@@ -1166,7 +1166,7 @@ command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
-  class Connection *i;
+  ConnectionPtr i;
   ObjectPtr tmp_obj;
   bool silence = false;
 
@@ -1211,7 +1211,7 @@ command_return_t do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     QQueue<QString> tmp = newbie_history;
     ch->sendln("Here are the last 10 messages:");
-    while (!tmp.empty())
+    while (!tmp.isEmpty())
     {
       act_to_victim(tmp.front(), ch, 0, ch, 0);
       tmp.pop();

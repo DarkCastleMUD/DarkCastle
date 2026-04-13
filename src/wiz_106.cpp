@@ -9,7 +9,7 @@
 command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i;
-  class Connection *d;
+  ConnectionPtr d;
   QString arg;
   QString buf;
   qint32 minamt;

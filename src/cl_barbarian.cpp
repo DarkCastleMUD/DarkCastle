@@ -32,7 +32,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
   bool batterwins = false;
   QString type, dir;
   QString buf, buf2, dammsg[20];
-  room_direction_data *exit, *back;
+  RoomDirectionPtr exit, *back;
   qint32 other_room, door, dam, skill, retval;
 
   if (!(skill = ch->has_skill(SKILL_BATTERBRACE)))
@@ -221,7 +221,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
-  room_direction_data *back, *exit;
+  RoomDirectionPtr back, *exit;
   QString type, dir;
 
   argument_interpreter(argument, type, dir);

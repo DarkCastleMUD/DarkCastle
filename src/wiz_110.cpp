@@ -328,7 +328,7 @@ command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 
   one_argument(buf, name);
 
-  if (name.isEmpty() || strlen(name) > 10)
+  if (name.isEmpty() || dc_strlen(name) > 10)
   {
     ch->sendln("Password must be 10 characters or less.");
     return ReturnValue::eFAILURE;
@@ -451,7 +451,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
         isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       QString tmp = victim->equipment[iWear]->name();
-      qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
+      qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
@@ -467,7 +467,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           QString tmp = obj->name();
-          qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
+          qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
@@ -485,7 +485,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       QString tmp = u"%1"_s.arg(obj->name());
-      qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
+      qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
@@ -501,7 +501,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
         if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           QString tmp = u"%1"_s.arg(obj2->name());
-          qsizetype x = tmp.length() - strlen(qPrintable(victim->name())) - 1;
+          qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
@@ -590,7 +590,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 }
 command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  QString buf, type[256], arg1[256], err[256], arg2[256];
+  QString buf, type, arg1, err, arg2;
   qint32 range = 0, type_ok = 0, numrooms = {};
   qint32 ret;
 

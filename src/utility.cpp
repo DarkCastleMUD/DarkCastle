@@ -386,7 +386,7 @@ void dc_->logentry(QString str, quint64 god_level, DC::LogChannel type, Characte
   time_t t = time(0);
   const tm *lt = localtime(&t);
   QString tmstr = asctime(lt);
-  *(tmstr + strlen(tmstr) - 1) = '\0';
+  *(tmstr + dc_strlen(tmstr) - 1) = '\0';
 
   if (stream == STDIN_FILENO || type == DC::LogChannel::LOG_BUG)
   {
@@ -534,7 +534,7 @@ QString sprintbit(uint value[], const QStringList names)
         continue;
       }
 
-      if (!result.empty())
+      if (!result.isEmpty())
       {
         result += " ";
       }
@@ -542,7 +542,7 @@ QString sprintbit(uint value[], const QStringList names)
     }
   }
 
-  if (result.empty())
+  if (result.isEmpty())
   {
     result = "NoBits";
   }
@@ -673,7 +673,7 @@ QString sprintbit(quint32 vektor, const QStringList names)
         continue;
       }
 
-      if (!result.empty())
+      if (!result.isEmpty())
       {
         result += " ";
       }
@@ -692,7 +692,7 @@ QString sprintbit(quint32 vektor, const QStringList names)
       nr++;
   }
 
-  if (result.empty())
+  if (result.isEmpty())
     result = "NoBits";
 
   return result;
@@ -813,7 +813,7 @@ void util_archive(const QString char_name, CharacterPtr caller)
   // Ok, ok, we'll do some sanity checking on the
   // QString to make sure that it has no meta chars in
   // it.  Grumble. -Morc
-  for (i = {}; (quint32)i < strlen(char_name); i++)
+  for (i = {}; (quint32)i < dc_strlen(char_name); i++)
   {
     if (!isalpha(char_name[i]))
     {
@@ -868,7 +868,7 @@ void util_unarchive(QString char_name, CharacterPtr caller)
   QString buf2;
   qint32 i;
 
-  for (i = {}; (quint32)i < strlen(char_name); i++)
+  for (i = {}; (quint32)i < dc_strlen(char_name); i++)
   {
     if (!isalpha(char_name[i]))
     {
@@ -1990,14 +1990,14 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
 
   for (;;)
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       break;
     }
 
     QString arg1;
     std::tie(arg1, remainder_args) = half_chop(remainder_args);
-    if (arg1.empty())
+    if (arg1.isEmpty())
     {
       break;
     }
@@ -2080,7 +2080,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
 
   for (;;)
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       break;
     }
@@ -2088,7 +2088,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
     QString arg1;
     std::tie(arg1, remainder_args) = half_chop(remainder_args);
 
-    if (arg1.empty())
+    if (arg1.isEmpty())
     {
       break;
     }
@@ -2138,7 +2138,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
 
   for (;;)
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       break;
     }
@@ -2146,7 +2146,7 @@ void parse_bitstrings_into_int(const QStringList bits, QString remainder_args, C
     QString arg1;
     std::tie(arg1, remainder_args) = half_chop(remainder_args);
 
-    if (arg1.empty())
+    if (arg1.isEmpty())
     {
       break;
     }
@@ -2219,7 +2219,7 @@ qint32 get_line(FILE *fl, QString buf)
     lines++;
     fgets(temp, 256, fl);
     if (!temp.isEmpty())
-      temp[strlen(temp) - 1] = '\0';
+      temp[dc_strlen(temp) - 1] = '\0';
   } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 
   if (feof(fl))
@@ -2341,7 +2341,7 @@ const QString pluralize(qint32 qty, const QString ending)
 void remove_character(QString name, BACKUP_TYPE backup)
 {
   QString src_filename;
-  QString dst_dir = {0};
+  QString dst_dir;
   QString syscmd;
   struct stat statbuf;
 
@@ -2418,7 +2418,7 @@ void remove_character(QString name, BACKUP_TYPE backup)
 void remove_familiars(QString name, BACKUP_TYPE backup)
 {
   QString src_filename;
-  QString dst_dir = {0};
+  QString dst_dir;
   QString syscmd;
   struct stat statbuf;
 
@@ -2684,10 +2684,10 @@ void unique_scan(CharacterPtr victim)
     }
   }
 
-  if (!found_items.empty())
+  if (!found_items.isEmpty())
   {
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", qPrintable(victim->name()));
-    while (!found_items.empty())
+    while (!found_items.isEmpty())
     {
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
       found_items.pop();
@@ -2699,9 +2699,9 @@ QString replaceString(QString message, QString find, QString replace)
 {
   size_t j;
 
-  if (find.empty())
+  if (find.isEmpty())
     return message;
-  if (replace.empty())
+  if (replace.isEmpty())
     return message;
   if (find == replace)
     return message;
@@ -2836,7 +2836,7 @@ QString joinstring(QList<QString> joinme, QString delims, bool ignore_empty)
   quint32 joined = {};
   for (i = {}; i < joinme.size(); i++)
   {
-    if (ignore_empty && joinme[i].empty())
+    if (ignore_empty && joinme[i].isEmpty())
       continue;
 
     if (joined > 0)
@@ -2890,7 +2890,7 @@ QString find_profession(qint32 c_class, quint8 profession)
   {
     return "None";
   }
-  else if (profession_list[profession].empty())
+  else if (profession_list[profession].isEmpty())
   {
     return "Unknown";
   }

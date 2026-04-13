@@ -2191,7 +2191,7 @@ qint32 apiary_worker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 
 qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
 {
-  QString buf, pet_name[256];
+  QString buf, pet_name;
   qint32 pet_room;
   CharacterPtr pet;
 
@@ -2236,7 +2236,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
      * Should be some code here to defend against weird monsters
      * getting loaded into the pet shop back room.  -- Furey
      */
-    pet = ch->getDC()->clone_mobile(pet->mobdata->nr);
+    pet = ch->dc_->clone_mobile(pet->mobdata->nr);
     pet->exp = {};
     SETBIT(pet->affected_by, AFF_CHARM);
 
@@ -2797,7 +2797,7 @@ qint32 foggy_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
       ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   // create the mob
-  mob = ch->getDC()->clone_mobile(real_mobile(22026));
+  mob = ch->dc_->clone_mobile(real_mobile(22026));
   if (!mob)
   {
     dc_->logentry(u"Foggy combat mobile missing"_s, ANGEL, DC::LogChannel::LOG_BUG);

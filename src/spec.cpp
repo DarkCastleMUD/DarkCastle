@@ -73,7 +73,7 @@ command_return_t do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
           skills_to_delete.push(curr.first);
         }
       }
-      while (skills_to_delete.empty() == false)
+      while (skills_to_delete.isEmpty() == false)
       {
         ch->skills.erase(skills_to_delete.front());
         skills_to_delete.pop();

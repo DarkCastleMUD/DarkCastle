@@ -23,9 +23,8 @@ void DC::assign_mobiles(void)
 {
   assign_non_combat_procs();
   assign_combat_procs();
-
   boot_the_shops();
-  logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Booting player shops.");
+  logworld(u"Booting player shops."_s);
   boot_player_shops();
   assign_the_shopkeepers();
   assign_the_player_shopkeepers();
@@ -68,14 +67,14 @@ void DC::assign_one_obj_non(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
-    dc_->obj_non_combat_functions[vnum] = func;
+    obj_non_combat_functions[vnum] = func;
   }
 
   qint32 rnum = real_object(vnum);
 
   if (rnum >= 0)
   {
-    dc_->obj_index[rnum].non_combat_func = func;
+    obj_index[rnum].non_combat_func = func;
   }
 }
 
@@ -83,14 +82,14 @@ void DC::assign_one_obj_com(qint32 vnum, special_function func)
 {
   if (vnum >= 0)
   {
-    dc_->obj_combat_functions[vnum] = func;
+    obj_combat_functions[vnum] = func;
   }
 
   qint32 rnum = real_object(vnum);
 
   if (rnum >= 0)
   {
-    dc_->obj_index[rnum].combat_func = func;
+    obj_index[rnum].combat_func = func;
   }
 }
 
@@ -652,5 +651,5 @@ void DC::assign_rooms(void)
 {
   ROOM_PROC pet_shops;
   if (real_room(3031) >= 0)
-    dc_->world[real_room(3031)].funct = pet_shops;
+    world[real_room(3031)].funct = pet_shops;
 }

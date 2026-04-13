@@ -192,7 +192,7 @@ void save_corpses(void)
   FILE *fp;
   ObjectPtr i, next;
   qint32 location = {};
-  QString buf1 = {0};
+  QString buf1;
   extern command_return_t do_not_save_corpses;
 
   if (do_not_save_corpses == 1)
@@ -240,12 +240,12 @@ void DC::load_corpses(void)
   /* Oh, and a bunch of this code is from Patricks XAP obj's code    */
 
   FILE *fp;
-  QString line = {0};
+  QString line;
   qint32 t[15], zwei = {};
   qint32 nr, num_objs = {};
-  ObjectPtr temp = {}, *obj = {}, next_obj = {};
+  ObjectPtr temp = {}, obj = {}, next_obj = {};
   extra_descr_data *new_descr;
-  QString buf1 = {0}, buf2[256] = {0}, buf3[256] = {0};
+  QString buf1, buf2, buf3;
   bool end = false;
   qint32 number = -1;
   ObjectPtr money;
@@ -522,7 +522,7 @@ void DC::load_corpses(void)
 
 qint32 get_line_new(FILE *fl, QString buf)
 {
-  QString temp = {0};
+  QString temp;
   qint32 lines = 0, a = {};
 
   while (!feof(fl))
@@ -552,7 +552,7 @@ qint32 get_line_new(FILE *fl, QString buf)
     lines++;
     fgets(temp, 256, fl);
     if (!temp.isEmpty())
-      temp[strlen(temp) - 1] = '\0';
+      temp[dc_strlen(temp) - 1] = '\0';
   } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 
   if (feof(fl))

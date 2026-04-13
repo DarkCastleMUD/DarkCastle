@@ -519,7 +519,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   //  if (argument && *argument && !is_number(argument))
-  //   argument = one_argument(argument, skill+strlen(skill));
+  //   argument = one_argument(argument, skill+dc_strlen(skill));
   /*  if (!argument || argument.isEmpty())
     {
        send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"

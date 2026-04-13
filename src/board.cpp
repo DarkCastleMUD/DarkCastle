@@ -43,8 +43,7 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include "DC/clan.h"
 #include "DC/interp.h"
 
-#include <cstdio>  // FILE *
-#include <cstring> // memset()
+#include <cstdio> // FILE *
 #include <QString>
 #include <QMap>
 #include <qdebug.h>
@@ -546,8 +545,8 @@ command_return_t DC::save_boards(void)
   QSaveFile board_file("board/index");
   if (!board_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
-    dc_->logentry(u"Unable to open/create save file for bulletin board index"_s, ANGEL,
-                  DC::LogChannel::LOG_BUG);
+    logentry(u"Unable to open/create save file for bulletin board index"_s, ANGEL,
+             DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   QTextStream stream(&board_file);
@@ -581,7 +580,7 @@ qint32 board(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     return ReturnValue::eFAILURE;
   }
 
-  if (!arg)
+  if (arg.isEmpty())
     return ReturnValue::eFAILURE;
 
   if (!ch->desc)
@@ -666,16 +665,7 @@ void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort)
   new_msg.author = reserve->new_post.author;
   new_msg.title = reserve->new_post.title;
 
-  if (new_msg.date.empty()) // means they were editing Topic
-  {
-    if (!new_msg.text.empty() && !new_msg.title.empty())
-    {
-      reserve->board->second.msgs[0].text = new_msg.text;
-      reserve->board->second.msgs[0].title = new_msg.title;
-    }
-  }
-  else
-    reserve->board->second.msgs.push_back(new_msg);
+  reserve->board->msgs.push_back(new_msg);
   reserve = {};
 }
 
@@ -685,9 +675,9 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
   time_t timep; // clock time
   QString tmstr;
 
-  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
+  if (board->type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
-    if (ch->clan != board->second.owner)
+    if (ch->clan != board->owner)
     {
       ch->sendln("You aren't in the right clan bucko.");
       return;
@@ -698,13 +688,13 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
       return;
     }
   }
-  if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
+  if (board->type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
     return;
   }
 
-  if ((ch->getLevel() < board->second.min_write_level))
+  if ((ch->getLevel() < board->min_write_level))
   {
     send_to_char("You pick up a quill to write, but realize "
                  "you're not powerful enough\r\nto submit "
@@ -715,8 +705,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
 
   // skip blanks
 
-  for (; isspace(*arg); arg++)
-    ;
+  arg = arg.trimmed();
 
   if (arg.isEmpty())
   {
@@ -728,11 +717,10 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
 
   reserve->new_post.title = arg;
 
-  reserve->new_post.author = qPrintable(ch->name());
+  reserve->new_post.author = ch->name();
 
   timep = time(0);
   tmstr = asctime(localtime(&timep));
-  *(tmstr + strlen(tmstr) - 1) = '\0';
   dc_sprintf(buf, "%.10s", tmstr);
 
   reserve->new_post.date = buf;
@@ -770,7 +758,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   if (!(tmessage = atoi(number)))
     return ReturnValue::eFAILURE;
 
-  if (board->second.msgs.empty())
+  if (board->second.msgs.isEmpty())
   {
     ch->sendln("The board is empty!");
     return ReturnValue::eSUCCESS;
@@ -826,7 +814,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
 
 QString remove_slashr(QString unformatted)
 {
-  if (unformatted.empty())
+  if (unformatted.isEmpty())
     return "";
 
   QString write_me = unformatted;
@@ -984,7 +972,7 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
     return ReturnValue::eSUCCESS;
   }
 
-  if (board->second.msgs.empty())
+  if (board->second.msgs.isEmpty())
   {
     ch->sendln("The board is empty!");
     return ReturnValue::eSUCCESS;
@@ -1060,7 +1048,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   act_to_room("$n studies the board.", ch, 0, 0, INVIS_NULL);
 
   ch->sendln("This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>");
-  if (board->second.msgs.empty())
+  if (board->second.msgs.isEmpty())
     ch->sendln("The board is empty.");
   else
   {

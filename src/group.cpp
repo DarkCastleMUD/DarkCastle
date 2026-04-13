@@ -101,7 +101,7 @@ command_return_t do_found(CharacterPtr ch, QString argument, cmd_t cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (strlen(argument) > 50)
+  if (dc_strlen(argument) > 50)
   {
     ch->sendln("You gonna name your party? Or write a book?!  50 characters max.");
     return ReturnValue::eFAILURE;
@@ -307,7 +307,7 @@ void setup_group_buf(QString report, CharacterPtr j, CharacterPtr i)
 command_return_t do_group(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
-  QString buf, report[256];
+  QString buf, report;
   CharacterPtr victim, k, j;
   follow_type *f;
   bool found;
@@ -727,7 +727,7 @@ command_return_t do_autojoin(CharacterPtr ch, QString str_arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    if (ch->player->joining.empty())
+    if (ch->player->joining.isEmpty())
     {
       ch->send("You are not configured to auto-joining anyone.\r\n");
     }

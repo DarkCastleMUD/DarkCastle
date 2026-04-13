@@ -1774,7 +1774,7 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
     return ReturnValue::eSUCCESS;
   }
 
-  if (strlen(buf) > 80)
+  if (dc_strlen(buf) > 80)
   {
     ch->send("'The description cannot be longer than 80 characters. *beep*'\n");
     return ReturnValue::eSUCCESS;
@@ -1789,7 +1789,7 @@ qint32 restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   GET_PLATINUM(ch) -= (ch->getLevel());
 
   //  target_obj->short_description={};
-  //  target_obj->short_description =  dc_alloc(strlen(buf)+1, sizeof(QChar));
+  //  target_obj->short_description =  dc_alloc(dc_strlen(buf)+1, sizeof(QChar));
   //  dc_strcpy(target_obj->short_description, buf);
   QString zarg;
   dc_sprintf(zarg, "$B$7%s$R", buf);
@@ -3692,7 +3692,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
       }
     }
 
-    if (!tmp.empty())
+    if (!tmp.isEmpty())
     {
       qint32 rnd = dc_->number((quint64)0, (quint64)tmp.size() - 1);
       QString buf2 = "$B$7Ghaerad, Sword of Legends says, '";
@@ -3858,7 +3858,7 @@ qint32 hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
 
     if (vict->isPlayer())
-      for (Connection *i = dc_->connections_; i; i = i->next)
+      for (ConnectionPtr i = dc_->connections_; i; i = i->next)
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
           i->character->sendln("You hear a large BOOM from somewhere in the distance.");
 
@@ -4341,7 +4341,7 @@ qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
   act_to_room("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, 0);
   act_to_character("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, 0);
   CharacterPtr a, b, c;
-  b = ch->getDC()->initiate_oproc(nullptr, obj);
+  b = ch->dc_->initiate_oproc(nullptr, obj);
   for (a = dc_->world[ch->in_room].people; a; a = c)
   {
     c = a->next_in_room; // 'cause mobs get freed

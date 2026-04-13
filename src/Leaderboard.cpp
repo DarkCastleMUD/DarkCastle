@@ -1202,7 +1202,7 @@ qint32 Leaderboard::pdscore(CharacterPtr ch)
 
 command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  class Connection *d;
+  ConnectionPtr d;
   FILE *fl;
   QString buf, buf2;
   qint32 i, j, k, validclass = {};

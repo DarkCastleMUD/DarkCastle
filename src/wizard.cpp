@@ -53,7 +53,7 @@ qint32 number_or_name(QString *name, qint32 *num)
   QString ppos = {};
   QString number;
 
-  for (i = {}; i < strlen(*name); i++)
+  for (i = {}; i < dc_strlen(*name); i++)
   {
     if (*name[i] == '.')
     {
@@ -93,7 +93,7 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
     cnt = 1;
   for (i = 1; i <= cnt; i++)
   {
-    mob = ch->getDC()->clone_mobile(rnum);
+    mob = ch->dc_->clone_mobile(rnum);
     char_to_room(mob, ch->in_room);
     selfpurge = false;
     mprog_load_trigger(mob);
@@ -1521,7 +1521,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString buf;
-  class Connection *i;
+  ConnectionPtr i;
 
   void update_pos(CharacterPtr victim);
 
@@ -1853,14 +1853,14 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
   if (nullptr != pTime)
   {
 #ifdef __CYGWIN__
-    dc_snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\r\n",
+    dc_snprintf(tmp, dc_strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\r\n",
                 pTime->tm_mon + 1,
                 pTime->tm_mday,
                 pTime->tm_year + 1900,
                 pTime->tm_hour,
                 pTime->tm_min);
 #else
-    dc_snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\r\n",
+    dc_snprintf(tmp, dc_strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\r\n",
                 pTime->tm_mon + 1,
                 pTime->tm_mday,
                 pTime->tm_year + 1900,
@@ -1909,7 +1909,7 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
       if (dc_->zones.value(dc_->world[vict->in_room].zone).isNoHunt())
         continue;
 
-      if (strlen(vict->short_desc) > 34)
+      if (dc_strlen(vict->short_desc) > 34)
         continue; // They suck
 
       break;

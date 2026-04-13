@@ -6,20 +6,12 @@
 */
 #include "DC/obj.h"
 #include "DC/DC.h"
-#include "DC/structs.h"
 
-#include "DC/spells.h"
-#include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/fight.h"
 #include "DC/interp.h"
-#include "DC/act.h"
-#include <cstring>
-#include "DC/returnvals.h"
 #include "DC/inventory.h"
 #include "DC/punish.h"
-#include "DC/levels.h"
-#include "DC/utility.h"
 
 extern qint32 rev_dir[];
 
@@ -80,8 +72,7 @@ command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) && ch->dc_->number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act_to_character("$N's heightened battlesense sees your eyegouge coming from a mile away.", ch, 0, victim, 0);
       act_to_victim("Your heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, 0);
@@ -519,8 +510,7 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
        }
       }
     }
-  taken out!!  if we really don't want it, we can delete this block later.
-  */
+    */
   if (name.isEmpty() && ch->fighting)
   {
     victim = ch->fighting;
@@ -1438,7 +1428,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room, j;
   QString type, dir;
-  room_direction_data *back;
+  RoomDirectionPtr back;
   ObjectPtr obj;
   CharacterPtr victim;
   bool has_lockpicks = false;
@@ -1611,7 +1601,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Your criminal acts prohibit this action.");
       return ReturnValue::eFAILURE;
     }
-    if (strlen(obj_name) > 7)
+    if (dc_strlen(obj_name) > 7)
     {
       ch->sendln("Number field too large.  Try something smaller.");
       return ReturnValue::eFAILURE;

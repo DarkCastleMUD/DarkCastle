@@ -289,7 +289,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
   return true;
 }
 
-bool Character::validateName(QString name)
+bool DC::validateName(QString name)
 {
   if (name.isEmpty() || name.size() < Character::MIN_NAME_SIZE || name.size() > Character::MAX_NAME_SIZE)
   {
@@ -538,7 +538,7 @@ void Character::display_string_list(const QStringList list)
 
   for (qint32 i = 1; *list[i - 1] != '\n'; i++)
   {
-    dc_sprintf(buf + strlen(buf), "%18s", list[i - 1]);
+    dc_sprintf(buf + dc_strlen(buf), "%18s", list[i - 1]);
     if (!(i % 4))
     {
       strlcat(buf, "\r\n", MAX_STRING_LENGTH);

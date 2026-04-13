@@ -12,10 +12,7 @@
 #include "DC/DC.h"
 #include "DC/comm.h"
 #include "DC/handler.h"
-#include "DC/spells.h" // INTERNAL_SLEEPING
-#include "DC/act.h"    // TO_ROOM
 #include "DC/punish.h"
-#include "DC/utility.h"
 
 auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 {
@@ -65,8 +62,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   qint32 pot_low = 6362;
   qint32 pot_hi = 6379;
 
-  auto &arena = dc_->arena_;
-  if (arena.Low() > ch->getLevel() || arena.High() < ch->getLevel())
+  if (ch->dc_->arena_.Low() > ch->getLevel() || ch->dc_->arena_.High() < ch->getLevel())
   {
     ch->sendln("The arena is not open for anyone your level.");
     return ReturnValue::eFAILURE;
@@ -81,7 +77,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
     ch->sendln("They don't allow criminals in the arena.");
     return ReturnValue::eFAILURE;
   }
-  if (arena.isChaos() && !ch->clan)
+  if (ch->dc_->arena_.isChaos() && !ch->clan)
   {
     ch->sendln("Only clan members may join this arena.");
     return ReturnValue::eFAILURE;
@@ -91,12 +87,12 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
     ch->sendln("You are already there!");
     return ReturnValue::eFAILURE;
   }
-  if (arena.CurrentNumber() >= arena.Number() && arena.Number() > 0)
+  if (ch->dc_->arena_.CurrentNumber() >= ch->dc_->arena_.Number() && ch->dc_->arena_.Number() > 0)
   {
     ch->sendln("The arena is already full!");
     return ReturnValue::eFAILURE;
   }
-  if (arena.isHP() && GET_RAW_HIT(ch) > arena.HPLimit())
+  if (ch->dc_->arena_.isHP() && GET_RAW_HIT(ch) > ch->dc_->arena_.HPLimit())
   {
     ch->sendln("You are too strong for this arena!");
     return ReturnValue::eFAILURE;
@@ -113,7 +109,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
     ch->wake();
   }
 
-  arena.IncrementCurrentNumber();
+  ch->dc_->arena_.IncrementCurrentNumber();
   for (af = ch->affected; af; af = next_af)
   {
     next_af = af->next;
@@ -132,7 +128,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   act_to_room("$n disappears in a glorious flash of heroism.", ch, 0, 0, 0);
   while (send_to == DC::NOWHERE)
   {
-    if (arena.isPotato())
+    if (ch->dc_->arena_.isPotato())
     { // potato arena
       send_to = real_room(ch->dc_->number(pot_low, pot_hi));
     }

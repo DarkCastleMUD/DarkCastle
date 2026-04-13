@@ -172,7 +172,7 @@ command_return_t do_add_quest(CharacterPtr ch, QString name)
   quest->active = false;
   quest->cost = {};
 
-  if (quest_list.empty() == true)
+  if (quest_list.isEmpty() == true)
     quest->number = 1;
   else
     quest->number = quest_list.back()->number + 1;
@@ -913,7 +913,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
   QString new_arg = " ";
   CharacterPtr qmaster = get_mob_vnum(QUEST_MASTER);
 
-  if (arg && strlen(arg) > 0 && arg[0] != ' ')
+  if (arg && dc_strlen(arg) > 0 && arg[0] != ' ')
   {
     dc_strncat(new_arg, arg, sizeof(new_arg) - 1);
     arg = new_arg;

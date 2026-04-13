@@ -1264,7 +1264,7 @@ qint32 clan_email(CharacterPtr ch, QString arg)
 command_return_t do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr pch;
-  class Connection *desc;
+  ConnectionPtr desc;
   QString buf;
 
   if (!ch->clan)
@@ -1298,14 +1298,14 @@ command_return_t do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
   if (arg.isEmpty())
   {
     QQueue<QString> tmp = get_clan(ch)->ctell_history;
-    if (tmp.empty())
+    if (tmp.isEmpty())
     {
       ch->sendln("No one has said anything lately.");
       return ReturnValue::eFAILURE;
     }
 
     ch->sendln("Here are the last 10 ctells:");
-    while (!tmp.empty())
+    while (!tmp.isEmpty())
     {
       send_to_char((tmp.front()).c_str(), ch);
       tmp.pop();
@@ -1560,7 +1560,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
     dc_strcpy(buf, "\r\n");
     for (i = 1; *god_values[i - 1] != '\n'; i++)
     {
-      dc_sprintf(buf + strlen(buf), "%18s", god_values[i - 1]);
+      dc_sprintf(buf + dc_strlen(buf), "%18s", god_values[i - 1]);
       if (!(i % 4))
       {
         dc_strcat(buf, "\r\n");
@@ -1592,7 +1592,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
       ch->sendln("$3Syntax$R: clans create <clanname> <clannumber>");
       return;
     }
-    if (strlen(text) > 29)
+    if (dc_strlen(text) > 29)
     {
       ch->sendln("Clan name too long.");
       return;
@@ -1644,7 +1644,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
       return;
     }
 
-    if (strlen(last) > 29)
+    if (dc_strlen(last) > 29)
     {
       ch->sendln("Clan name too long.");
       return;
@@ -1664,7 +1664,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
       return;
     }
 
-    if (strlen(last) > 14)
+    if (dc_strlen(last) > 14)
     {
       ch->sendln("Clan leader name too long.");
       return;
@@ -1686,7 +1686,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln("Clan leader name changed.");
     break;
   }
-  case 3: /* delete */
+  case 3: // delete
   {
     arg = one_argumentnolow(arg, text);
     one_argumentnolow(arg, last);
@@ -2152,7 +2152,7 @@ void do_leader_clans(CharacterPtr ch, QString arg, cmd_t cmd)
           !isSet(pmember->rights(), right_required[i]))
         continue;
 
-      dc_sprintf(buf + strlen(buf), "%18s", mortal_values[i]);
+      dc_sprintf(buf + dc_strlen(buf), "%18s", mortal_values[i]);
       if (!(j % 4))
       {
         dc_strcat(buf, "\r\n");
@@ -2452,7 +2452,7 @@ command_return_t do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
 command_return_t do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ClanPtr clan;
-  class Connection *desc;
+  ConnectionPtr desc;
   CharacterPtr pch;
   QString buf;
   qint32 found;

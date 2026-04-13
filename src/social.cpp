@@ -142,7 +142,7 @@ QString fread_social_string(FILE *fl)
     return {};
 
   // strip the \n
-  *(buf + strlen(buf) - 1) = '\0';
+  *(buf + dc_strlen(buf) - 1) = '\0';
 
   rslt = (buf);
   return (rslt);

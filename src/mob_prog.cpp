@@ -95,7 +95,7 @@ bool SelfPurge::getState(void) const
 
 selfpurge_t selfpurge = {};
 
-qint32 cIfs[256]; // for MPPAUSE
+qint32 cIfs; // for MPPAUSE
 qint32 ifpos;
 
 // This 2 variables keep track of what command and line number a mprog script
@@ -3808,7 +3808,7 @@ qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
   }
   *point = '\0';
 
-  //  if(strlen(buf) > MAX_INPUT_LENGTH-1)
+  //  if(dc_strlen(buf) > MAX_INPUT_LENGTH-1)
   //    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", qPrintable(mob->name()));
 
   return mob->command_interpreter(buf, true);
@@ -3855,7 +3855,7 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
     return;
   }
 
-  // qint32 cIfs[256]; // for MPPAUSE
+  // qint32 cIfs; // for MPPAUSE
   // qint32 ifpos;
   ifpos = {};
   memset(&cIfs[0], 0, sizeof(qint32) * 256);
@@ -4004,7 +4004,7 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
         dc_strcpy(temp1, qPrintable(arg));
 
       list = temp1;
-      for (i = {}; i < (qint32)strlen(list); i++)
+      for (i = {}; i < (qint32)dc_strlen(list); i++)
         list[i] = LOWER(list[i]);
 
       if (!reverse)
@@ -4013,13 +4013,13 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
         dc_strcpy(temp2, mprg->arglist);
 
       dupl = temp2;
-      for (i = {}; i < (qint32)strlen(dupl); i++)
+      for (i = {}; i < (qint32)dc_strlen(dupl); i++)
         dupl[i] = LOWER(dupl[i]);
       if ((list[0] == 'p') && (list[1] == ' '))
       {
         list += 2;
         while ((start = strstr(dupl, list)))
-          if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(list)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
+          if ((start == dupl || *(start - 1) == ' ') && (*(end = start + dc_strlen(list)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
                                                          // allow punctuation at the end
                                                          || *end == '.' || *end == '?' || *end == '!'))
           {
@@ -4038,7 +4038,7 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
         for (; word[0] != '\0'; list = one_argument(list, word))
         {
           while ((start = strstr(dupl, word)))
-            if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(word)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
+            if ((start == dupl || *(start - 1) == ' ') && (*(end = start + dc_strlen(word)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
                                                            // allow punctuation at the end
                                                            || *end == '.' || *end == '?' || *end == '!'))
             {
@@ -4637,7 +4637,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
   temp->short_desc = obj->short_description;
   QString buf;
   dc_sprintf(buf, "%s", qPrintable(obj->name()));
-  for (qint32 i = strlen(buf) - 1; i > 0; i--)
+  for (qint32 i = dc_strlen(buf) - 1; i > 0; i--)
     if (buf[i] == ' ')
     {
       buf[i] = '\0';

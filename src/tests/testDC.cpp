@@ -205,7 +205,7 @@ private slots:
     QVERIFY(ch.isMortalPlayer());
     QVERIFY(!ch.isImmortalPlayer());
     QVERIFY(!ch.isNonPlayer());
-    QVERIFY(!dc.character_list.empty());
+    QVERIFY(!dc.character_list.isEmpty());
 
     do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "Lie still; you are DEAD.\r\n");
@@ -215,10 +215,10 @@ private slots:
     do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You raise your clear (?) voice towards the sky.\r\n");
     conn->output = {};
-    QVERIFY(ch.songs.empty());
+    QVERIFY(ch.songs.isEmpty());
 
     skill_results_t results = find_skills_by_name("flight_of_the_bumblebee");
-    QVERIFY(!results.empty());
+    QVERIFY(!results.isEmpty());
     QVERIFY(results.size() == 1);
     auto skillnum = results.begin()->second;
     QCOMPARE(ch.has_skill(skillnum), 0);
@@ -228,13 +228,13 @@ private slots:
     do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You raise your clear (?) voice towards the sky.\r\n");
     conn->output = {};
-    QVERIFY(ch.songs.empty());
+    QVERIFY(ch.songs.isEmpty());
 
     ch.setClass(10);
     do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You do not have enough ki!\r\n");
     conn->output = {};
-    QVERIFY(ch.songs.empty());
+    QVERIFY(ch.songs.isEmpty());
 
     ch.setLevel(60);
     ch.intel = 25;
@@ -243,49 +243,49 @@ private slots:
     do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You feel more competent in your flight of the bumblebee ability. It increased to 2 out of 75.\r\nYou forgot the words!\r\n");
     conn->output = {};
-    QVERIFY(ch.songs.empty());
+    QVERIFY(ch.songs.isEmpty());
 
     do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You begin to sing a lofty song...\r\n");
     conn->output = {};
-    QVERIFY(!ch.songs.empty());
+    QVERIFY(!ch.songs.isEmpty());
 
     do_sing(&ch, u"'flight of the bumblebee'"_s);
     QCOMPARE(conn->output, "You are already in the middle of another song!\r\n");
     conn->output = {};
-    QVERIFY(!ch.songs.empty());
+    QVERIFY(!ch.songs.isEmpty());
 
     update_bard_singing();
-    QVERIFY(!ch.songs.empty());
+    QVERIFY(!ch.songs.isEmpty());
     QCOMPARE(conn->output, "Singing [flight of the bumblebee]: * * * * \r\n");
     conn->output = {};
 
     update_bard_singing();
-    QVERIFY(!ch.songs.empty());
+    QVERIFY(!ch.songs.isEmpty());
     QCOMPARE(conn->output, "Singing [flight of the bumblebee]: * * * \r\n");
     conn->output = {};
 
     update_bard_singing();
-    QVERIFY(!ch.songs.empty());
+    QVERIFY(!ch.songs.isEmpty());
     QCOMPARE(conn->output, "Singing [flight of the bumblebee]: * * \r\n");
     conn->output = {};
 
     update_bard_singing();
-    QVERIFY(!ch.songs.empty());
+    QVERIFY(!ch.songs.isEmpty());
     QVERIFY(!ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
     QVERIFY(!IS_AFFECTED(&ch, AFF_FLYING));
     QCOMPARE(conn->output, "Singing [flight of the bumblebee]: * \r\n");
     conn->output = {};
 
     update_bard_singing();
-    QVERIFY(!ch.songs.empty());
+    QVERIFY(!ch.songs.isEmpty());
     QVERIFY(ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
     QVERIFY(IS_AFFECTED(&ch, AFF_FLYING));
     QCOMPARE(conn->output, "Your feet feel like air.\r\n");
     conn->output = {};
 
     update_bard_singing();
-    QVERIFY(ch.songs.empty());
+    QVERIFY(ch.songs.isEmpty());
     QVERIFY(ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
     QVERIFY(IS_AFFECTED(&ch, AFF_FLYING));
     QCOMPARE(conn->output, "");
@@ -1503,7 +1503,7 @@ private slots:
 
     p1.setClass(CLASS_MAGE);
     auto spell = find_skills_by_name("create_golem");
-    QVERIFY(!spell.empty());
+    QVERIFY(!spell.isEmpty());
 
     p1.learn_skill(spell.begin()->second, 100, 100);
     QCOMPARE(p1.desc->output, "");

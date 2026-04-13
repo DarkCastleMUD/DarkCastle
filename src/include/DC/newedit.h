@@ -18,4 +18,4 @@ enum class parse_t
 /* format modes for format_text */
 #define FORMAT_INDENT (1 << 0)
 
-void parse_action(parse_t action, QString string, class Connection *d);
+void parse_action(parse_t action, QString string, ConnectionPtr d);

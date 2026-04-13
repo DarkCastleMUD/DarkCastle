@@ -1221,7 +1221,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
   qint32 i;
   QString output_buf;
   QString state_output;
-  QString buf = {0};
+  QString buf;
 
   if (options == LIST_MINE)
     ch->sendln("Ticket-Buyer--------Price------Status--T--Item---------------------------");
@@ -1303,7 +1303,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     if (options == LIST_BY_SLOT)
       ch->send(u"\r\nThere are no %s items currently posted.\r\n"_s.arg(qPrintable(name)));
     else if (options == LIST_BY_SELLER)
-      ch->sendln(u"\r\n\"%s\"_s doesn't seem to be selling any public items.\r\n\r\nTo view private items, use \"vend list private\".\r\n").arg(qPrintable(name));
+      ch->sendln(u"\r\n\"%s\" doesn't seem to be selling any public items.\r\n\r\nTo view private items, use \"vend list private\".\r\n"_s).arg(name);
     else if (options == LIST_BY_CLASS)
       ch->send(u"\r\nThere are no \"%s\" wearable public items for sale.\r\n"_s.arg(qPrintable(name)));
     else if (options == LIST_MINE)
@@ -1316,10 +1316,10 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
 
   if (options == LIST_MINE)
   {
-    Vault vault = dc_->vaults_.has_vault(ch->name());
+    auto vault = dc_->vaults_.has_vault(ch->name());
     if (vault)
     {
-      qint32 max_items = vault.size_ / 100;
+      qint32 max_items = vault->size_ / 100;
       ch->send(u"\r\nYou are using %d of your %d available tickets.\r\n"_s.arg(i).arg(max_items));
     }
   }
@@ -1646,7 +1646,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
                      ch);
         return ReturnValue::eSUCCESS;
       }
-      if (strlen(buf) < 4)
+      if (dc_strlen(buf) < 4)
       {
         ch->sendln("Class name needs to be at least 4 letters to search!");
         return ReturnValue::eSUCCESS;

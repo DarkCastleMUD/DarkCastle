@@ -2258,7 +2258,7 @@ qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
     }
   }
 
-  if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && isSet(dc_->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty()))
+  if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && isSet(dc_->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.isEmpty()))
   {
     do_sing(ch, "stop");
   }
@@ -2699,7 +2699,7 @@ CharacterPtr get_char_room(const QString name, room_t room, bool careful)
       {
         if (partial_match)
         {
-          if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+          if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
             partial_match = i;
         }
         else
@@ -2744,7 +2744,7 @@ CharacterPtr get_char(QString name)
 			{
 				if (partial_match)
 				{
-					if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+					if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
 					partial_match = i;
 				}
 				else
@@ -3540,7 +3540,7 @@ void extract_char(CharacterPtr ch, bool pull)
 {
   t.addTrack("extract_char");
   CharacterPtr k, next_char;
-  class Connection *t_desc;
+  ConnectionPtr t_desc;
   qint32 l, was_in;
   /*CharacterPtr i;*/
   bool isGolem = false;
@@ -3883,7 +3883,7 @@ CharacterPtr Character::get_char_room_vis(QString name)
       {
         if (partial_match)
         {
-          if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+          if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
             partial_match = i;
         }
         else
@@ -3940,7 +3940,7 @@ CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
       {
         if (partial_match)
         {
-          if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+          if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
             partial_match = i;
         }
         else
@@ -4151,7 +4151,7 @@ CharacterPtr get_char_vis(CharacterPtr ch, QString name)
 			{
 				if (partial_match)
 				{
-					if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+					if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
 					partial_match = i;
 				}
 				else
@@ -4199,7 +4199,7 @@ CharacterPtr get_active_pc(QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
-  class Connection *d;
+  ConnectionPtr d;
 
   partial_match = {};
 
@@ -4230,7 +4230,7 @@ get_active_pc(const QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
-  class Connection *d;
+  ConnectionPtr d;
 
   partial_match = {};
 
@@ -4245,7 +4245,7 @@ get_active_pc(const QString name)
     {
       if (partial_match)
       {
-        if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+        if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
           partial_match = i;
       }
       else
@@ -4259,7 +4259,7 @@ get_active_pc(const QString name)
 CharacterPtr get_all_pc(QString name)
 {
   CharacterPtr i;
-  class Connection *d;
+  ConnectionPtr d;
 
   for (auto &d : dc_->connections_)
   {
@@ -4317,7 +4317,7 @@ CharacterPtr get_pc_vis(CharacterPtr ch, const QString name)
 			{
 				if (partial_match)
 				{
-					if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+					if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
 					partial_match = i;
 				}
 				else
@@ -4358,7 +4358,7 @@ CharacterPtr Character::get_active_pc_vis(QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
-  class Connection *d;
+  ConnectionPtr d;
 
   partial_match = {};
 
@@ -4378,7 +4378,7 @@ CharacterPtr Character::get_active_pc_vis(QString name)
       {
         if (partial_match)
         {
-          if (strlen(qPrintable(partial_match->name())) > strlen(qPrintable(i->name())))
+          if (dc_strlen(qPrintable(partial_match->name())) > dc_strlen(qPrintable(i->name())))
             partial_match = i;
         }
         else
@@ -4540,7 +4540,7 @@ ObjectPtr create_money(qint32 amount)
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
 
-qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, CharacterPtr *tar_ch, ObjectPtr *tar_obj, bool verbose)
+qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, CharacterPtr tar_ch, ObjectPtr tar_obj, bool verbose)
 {
   static const QStringList ignore = {"the", "in", "\n"};
 
@@ -4914,7 +4914,7 @@ skill_results_t find_skills_by_name(QString name)
 {
   skill_results_t results = {};
 
-  if (name.empty())
+  if (name.isEmpty())
   {
     return results;
   }
@@ -5074,21 +5074,21 @@ skill_results_t find_skills_by_name(QString name)
 qint32 find_skill_num(QString name)
 {
   qint32 i;
-  quint32 name_length = strlen(name);
+  quint32 name_length = dc_strlen(name);
 
   // try ki
   for (i = {}; *ki[i] != '\n'; i++)
-    if (name_length <= strlen(ki[i]) && str_n_nosp_equal(name, ki[i], name_length))
+    if (name_length <= dc_strlen(ki[i]) && str_n_nosp_equal(name, ki[i], name_length))
       return (i + KI_OFFSET);
 
   // try spells
   for (i = {}; *spells[i] != '\n'; i++)
-    if (name_length <= strlen(spells[i]) && str_n_nosp_equal(name, spells[i], name_length))
+    if (name_length <= dc_strlen(spells[i]) && str_n_nosp_equal(name, spells[i], name_length))
       return (i + 1);
 
   // try skills
   for (i = {}; *skills[i] != '\n'; i++)
-    if (name_length <= strlen(skills[i]) && str_n_nosp_equal(name, skills[i], name_length))
+    if (name_length <= dc_strlen(skills[i]) && str_n_nosp_equal(name, skills[i], name_length))
       return (i + SKILL_BASE);
 
   // try songs
@@ -5098,63 +5098,63 @@ qint32 find_skill_num(QString name)
 
   // sets?
   for (i = {}; *set_list[i].SetName != '\n'; i++)
-    if (name_length <= strlen(set_list[i].SetName) && str_n_nosp_equal(name, set_list[i].SetName, name_length))
+    if (name_length <= dc_strlen(set_list[i].SetName) && str_n_nosp_equal(name, set_list[i].SetName, name_length))
       return (i + BASE_SETS);
   // timers/other stuff
   switch (LOWER(*name))
   {
   case 'b':
-    if (name_length <= strlen("blood fury reuse timer") && str_n_nosp_equal(name, "blood fury reuse timer", name_length))
+    if (name_length <= dc_strlen("blood fury reuse timer") && str_n_nosp_equal(name, "blood fury reuse timer", name_length))
       return SKILL_BLOOD_FURY;
     break;
   case 'c':
-    if (name_length <= strlen("CANT_QUIT") && str_n_nosp_equal(name, "CANT_QUIT", name_length))
+    if (name_length <= dc_strlen("CANT_QUIT") && str_n_nosp_equal(name, "CANT_QUIT", name_length))
       return Character::PLAYER_CANTQUIT;
-    if (name_length <= strlen("clanarea claim timer") && str_n_nosp_equal(name, "clanarea claim timer", name_length))
+    if (name_length <= dc_strlen("clanarea claim timer") && str_n_nosp_equal(name, "clanarea claim timer", name_length))
       return SKILL_CLANAREA_CLAIM;
-    if (name_length <= strlen("clanarea challenge timer") && str_n_nosp_equal(name, "clanarea claim timer", name_length))
+    if (name_length <= dc_strlen("clanarea challenge timer") && str_n_nosp_equal(name, "clanarea claim timer", name_length))
       return SKILL_CLANAREA_CHALLENGE;
-    if (name_length <= strlen("cannot cast timer") && str_n_nosp_equal(name, "cannot cast timer", name_length))
+    if (name_length <= dc_strlen("cannot cast timer") && str_n_nosp_equal(name, "cannot cast timer", name_length))
       return SPELL_NO_CAST_TIMER;
-    if (name_length <= strlen("crazed assault reuse timer") && str_n_nosp_equal(name, "crazed assault reuse timer", name_length))
+    if (name_length <= dc_strlen("crazed assault reuse timer") && str_n_nosp_equal(name, "crazed assault reuse timer", name_length))
       return SKILL_CRAZED_ASSAULT;
     break;
   case 'd':
-    if (name_length <= strlen("DIRTY_THIEF/CANT_QUIT") && str_n_nosp_equal(name, "DIRTY_THIEF/CANT_QUIT", name_length))
+    if (name_length <= dc_strlen("DIRTY_THIEF/CANT_QUIT") && str_n_nosp_equal(name, "DIRTY_THIEF/CANT_QUIT", name_length))
       return Character::PLAYER_OBJECT_THIEF;
-    if (name_length <= strlen("divine intervention timer") && str_n_nosp_equal(name, "divine intervention timer", name_length))
+    if (name_length <= dc_strlen("divine intervention timer") && str_n_nosp_equal(name, "divine intervention timer", name_length))
       return SPELL_DIV_INT_TIMER;
     break;
   case 'g':
-    if (name_length <= strlen("GOLD_THIEF/CANT_QUIT") && str_n_nosp_equal(name, "GOLD_THIEF/CANT_QUIT", name_length))
+    if (name_length <= dc_strlen("GOLD_THIEF/CANT_QUIT") && str_n_nosp_equal(name, "GOLD_THIEF/CANT_QUIT", name_length))
       return Character::PLAYER_GOLD_THIEF;
     break;
   case 'h':
-    if (name_length <= strlen("harmtouch reuse timer") && str_n_nosp_equal(name, "harmtouch reuse timer", name_length))
+    if (name_length <= dc_strlen("harmtouch reuse timer") && str_n_nosp_equal(name, "harmtouch reuse timer", name_length))
       return SKILL_HARM_TOUCH;
-    if (name_length <= strlen("holy aura timer") && str_n_nosp_equal(name, "holy aura timer", name_length))
+    if (name_length <= dc_strlen("holy aura timer") && str_n_nosp_equal(name, "holy aura timer", name_length))
       return SPELL_HOLY_AURA_TIMER;
     break;
   case 'l':
-    if (name_length <= strlen("layhands reuse timer") && str_n_nosp_equal(name, "layhands reuse timer", name_length))
+    if (name_length <= dc_strlen("layhands reuse timer") && str_n_nosp_equal(name, "layhands reuse timer", name_length))
       return SKILL_LAY_HANDS;
     break;
   case 'n':
-    if (name_length <= strlen("natural selection") && str_n_nosp_equal(name, "natural selection", name_length))
+    if (name_length <= dc_strlen("natural selection") && str_n_nosp_equal(name, "natural selection", name_length))
       return SKILL_NAT_SELECT;
-    if (name_length <= strlen("natural select timer") && str_n_nosp_equal(name, "natural select timer", name_length))
+    if (name_length <= dc_strlen("natural select timer") && str_n_nosp_equal(name, "natural select timer", name_length))
       return SPELL_NAT_SELECT_TIMER;
     break;
   case 'p':
-    if (name_length <= strlen("profession") && str_n_nosp_equal(name, "profession", name_length))
+    if (name_length <= dc_strlen("profession") && str_n_nosp_equal(name, "profession", name_length))
       return SKILL_PROFESSION;
     break;
   case 'q':
-    if (name_length <= strlen("quiver reuse timer") && str_n_nosp_equal(name, "quiver reuse timer", name_length))
+    if (name_length <= dc_strlen("quiver reuse timer") && str_n_nosp_equal(name, "quiver reuse timer", name_length))
       return SKILL_QUIVERING_PALM;
     break;
   case 'v':
-    if (name_length <= strlen("vampiric aura timer") && str_n_nosp_equal(name, "vampiric aura timerr", name_length))
+    if (name_length <= dc_strlen("vampiric aura timer") && str_n_nosp_equal(name, "vampiric aura timerr", name_length))
       return SPELL_VAMPIRIC_AURA_TIMER;
     break;
   default:

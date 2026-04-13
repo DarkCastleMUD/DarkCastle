@@ -50,8 +50,8 @@ qint32 levenshtein(const QString s, const QString t)
   quint32 i, j, n, m, cost;
   quint32 d[MAX_HELP_KEYWORD_LENGTH + 1];
 
-  m = strlen(s);
-  n = strlen(t);
+  m = dc_strlen(s);
+  n = dc_strlen(t);
 
   // Zero Matrix
   for (i = {}; i <= m; i++)
@@ -86,7 +86,7 @@ command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
   extern QString new_ihelp;
   help_index_element_new *this_help;
   QString entry;
-  QString key1, key2[256], key3[256], key4[256], key5[256], rec_level[256];
+  QString key1, key2, key3, key4, key5, rec_level;
 
   if (!ch->desc)
     return ReturnValue::eFAILURE;
@@ -335,7 +335,7 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
       linenum += get_line_with_space(fl, line);
     }
 
-    if (strlen(tmpentry) > MAX_HELP_LENGTH)
+    if (dc_strlen(tmpentry) > MAX_HELP_LENGTH)
       tmpentry[MAX_HELP_LENGTH - 1] = '\0';
 
     if (!(new_help.entry = tmpentry))
@@ -485,7 +485,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   { // we are searching based on keywords, show as many as you find
-    minlen = strlen(argument);
+    minlen = dc_strlen(argument);
     show_help_header(ch);
     for (i = {}; i < dc_->new_top_of_helpt; i++)
     {
@@ -561,7 +561,7 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   { // we are searching based on keywords, show as many as you find
-    minlen = strlen(argument);
+    minlen = dc_strlen(argument);
     show_help_header(ch);
     for (i = {}; i < dc_->new_top_of_helpt; i++)
     {
@@ -712,7 +712,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!str_cmp(buf, "new"))
   { // New Help Entry
-    for (i = {}; i < (qint32)strlen(buf2); i++)
+    for (i = {}; i < (qint32)dc_strlen(buf2); i++)
       buf2[i] = UPPER(buf2[i]);
     new_help.keyword1 = buf2;
     new_help.keyword2 = u"NONE"_s;
@@ -753,11 +753,11 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       if ((key_id = atoi(buf3)))
       {
-        if (strlen(value) > MAX_HELP_KEYWORD_LENGTH)
+        if (dc_strlen(value) > MAX_HELP_KEYWORD_LENGTH)
         {
           value[MAX_HELP_KEYWORD_LENGTH - 1] = '\0';
         }
-        for (i = {}; i < (qint32)strlen(value); i++)
+        for (i = {}; i < (qint32)dc_strlen(value); i++)
           value[i] = UPPER(value[i]);
         switch (key_id)
         {
@@ -809,11 +809,11 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
     { // changing the related
       if (*buf2)
       {
-        if (strlen(buf2) > MAX_HELP_RELATED_LENGTH)
+        if (dc_strlen(buf2) > MAX_HELP_RELATED_LENGTH)
         {
           buf2[MAX_HELP_KEYWORD_LENGTH - 1] = '\0';
         }
-        for (i = {}; i < (qint32)strlen(buf2); i++)
+        for (i = {}; i < (qint32)dc_strlen(buf2); i++)
           buf2[i] = UPPER(buf2[i]);
         new_help_table[help_id].related = buf2;
         dc_sprintf(buf, "Related changed to '%s' for ID# %d.\r\n", buf2, help_id);
@@ -870,7 +870,7 @@ void show_hedit_usage(CharacterPtr ch)
 void save_help(CharacterPtr ch)
 {
   qint32 i;
-  QString file, buf[256];
+  QString file, buf;
 
   dc_sprintf(file, "%s", NEW_HELP_FILE);
   LegacyFile lf(".", file, "Couldn't open help file '%1' for saving.");
@@ -955,8 +955,8 @@ void help_string_to_file(FILE *f, QString str)
     }
   }
 
-  if (newbuf[strlen(newbuf) - 1] == '\n')
-    newbuf[strlen(newbuf) - 1] = '\0';
+  if (newbuf[dc_strlen(newbuf) - 1] == '\n')
+    newbuf[dc_strlen(newbuf) - 1] = '\0';
 
   dc_fprintf(f, "%s\n", newbuf);
 }
@@ -971,7 +971,7 @@ qint32 get_line_with_space(FILE *fl, QString buf)
     lines++;
     fgets(temp, 256, fl);
     if (!temp.isEmpty())
-      temp[strlen(temp) - 1] = '\0';
+      temp[dc_strlen(temp) - 1] = '\0';
   } while (!feof(fl) && *temp == '*');
   // } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
 

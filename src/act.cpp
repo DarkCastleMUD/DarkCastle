@@ -61,7 +61,7 @@ act_return act(
     qint16 destination, // Destination flags
     qint16 flags)
 {
-  class Connection *i;
+  ConnectionPtr i;
   qint32 retval = {};
   TokenList *tokens;
 
@@ -78,7 +78,7 @@ act_return act(
   // This shouldn't happen
   if (ch == 0)
   {
-    dc_->logentry(u"Error in act(), character equal to 0"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+    DC::getInstance()->logentry(u"Error in act(), character equal to 0"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     tokens = {};
     ar.retval = ReturnValue::eFAILURE;
     return ar;
@@ -111,7 +111,7 @@ act_return act(
   {
     if (ch->in_room >= 1)
     {
-      for (const auto &tmp_char : dc_->world[ch->in_room].people_)
+      for (const auto &tmp_char : ch->dc_->world[ch->in_room].people_)
       {
         // If they're not really playing, and no force flag, don't send
         if (tmp_char == ch)
@@ -140,19 +140,19 @@ act_return act(
   {
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
-      dc_->logentry(u"Error in act(), invalid value sent as 'destination'"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+      ch->dc_->logentry(u"Error in act(), invalid value sent as 'destination'"_s, OVERSEER, DC::LogChannel::LOG_BUG);
       tokens = {};
       ar.retval = ReturnValue::eFAILURE;
       return ar;
     }
-    for (auto &conn : dc_->connections_)
+    for (auto &conn : ch->dc_->connections_)
     {
       // Dropped link or they're not really playing and no force flag, don't send.
       if (!conn->character || conn->character == ch)
         continue;
       if (conn->character->in_room == DC::NOWHERE || ch->in_room == DC::NOWHERE)
         continue;
-      if ((destination == TO_ZONE) && dc_->world[conn->character->in_room].zone != dc_->world[ch->in_room].zone)
+      if ((destination == TO_ZONE) && ch->dc_->world[conn->character->in_room].zone != ch->dc_->world[ch->in_room].zone)
         continue;
       st_return = send_tokens(tokens, ch, obj, vict_obj, flags, conn->character);
       retval |= st_return.retval;

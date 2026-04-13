@@ -249,7 +249,7 @@ qint32 main(qint32 argc, QString *argv)
   dc_->logentry(u"renumbering zone table"_s, 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
 
-  class Connection *d = new Connection;
+  ConnectionPtr d = new Connection;
 
   /* Create 1 blank obj to be used when playerfile loads */
   debug.create_blank_item(1);

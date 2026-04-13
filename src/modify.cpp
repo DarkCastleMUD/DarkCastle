@@ -39,7 +39,7 @@ constexpr auto TP_OBJ = 1;
 constexpr auto TP_ERROR = 2;
 
 void check_for_awaymsgs(CharacterPtr ch);
-void page_string_dep(class Connection *d, const QString str, qint32 keep_internal);
+void page_string_dep(ConnectionPtr d, const QString str, qint32 keep_internal);
 
 const QStringList string_fields = {"name", "short", "long", "description", "title", "delete-description", "\n"};
 
@@ -53,7 +53,7 @@ const QStringList skill_fields = {"learned", "recognize", "\n"};
 //  go pick it up)  Note:  There's a "CON_SEND_MAIL" already defined....not sure
 //  why...
 
-void string_hash_add(class Connection *d, QString str)
+void string_hash_add(ConnectionPtr d, QString str)
 {
   QString scan;
   qint32 terminator = {};
@@ -73,16 +73,16 @@ void string_hash_add(class Connection *d, QString str)
   if (!(*conn->hashstr))
   {
 #ifdef LEAK_CHECK
-    (*conn->hashstr) = calloc(strlen(str) + 3, sizeof(QChar));
+    (*conn->hashstr) = calloc(dc_strlen(str) + 3, sizeof(QChar));
 #else
-    (*conn->hashstr) = dc_alloc(strlen(str) + 3, sizeof(QChar));
+    (*conn->hashstr) = dc_alloc(dc_strlen(str) + 3, sizeof(QChar));
 #endif
     dc_strcpy(*conn->hashstr, str);
   }
 
   else
   {
-    if (!(*conn->hashstr = realloc(*conn->hashstr, strlen(*conn->hashstr) + strlen(str) + 3)))
+    if (!(*conn->hashstr = realloc(*conn->hashstr, dc_strlen(*conn->hashstr) + dc_strlen(str) + 3)))
     {
       perror("string_hash_add: ");
       abort();
@@ -130,7 +130,7 @@ void quad_arg(QString arg, qint32 *type, QString name, qint32 *field, QString st
 
   /* field name and number */
   arg = one_argument(arg, buf);
-  if (!(*field = old_search_block(buf, 0, strlen(buf), string_fields, 0)))
+  if (!(*field = old_search_block(buf, 0, dc_strlen(buf), string_fields, 0)))
     return;
 
   /* string */
@@ -362,7 +362,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
   /* there was a string in the argument array */
   if (!string.isEmpty())
   {
-    for (ctr = {}; (quint32)ctr <= strlen(string); ctr++)
+    for (ctr = {}; (quint32)ctr <= dc_strlen(string); ctr++)
     {
       if (string[ctr] == '$')
       {
@@ -370,7 +370,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       }
     }
 
-    if (strlen(string) > (quint32)length[field - 1])
+    if (dc_strlen(string) > (quint32)length[field - 1])
     {
       ch->sendln("String too long - truncated.");
       *(string + length[field - 1]) = '\0';
@@ -605,7 +605,7 @@ qint32 count_pages(const QString str)
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string(const QString str, class Connection *d)
+void paginate_string(const QString str, ConnectionPtr d)
 {
   qint32 i;
 
@@ -618,7 +618,7 @@ void paginate_string(const QString str, class Connection *d)
   conn->showstr_page = {};
 }
 
-void page_string(class Connection *d, const QString str, qint32 keep_internal)
+void page_string(ConnectionPtr d, const QString str, qint32 keep_internal)
 {
   if (!d || !(conn->character))
     return;
@@ -639,7 +639,7 @@ void page_string(class Connection *d, const QString str, qint32 keep_internal)
   QString tmp;
   size_t pagebreak;
 
-  while (!print_me.empty())
+  while (!print_me.isEmpty())
   {
     pagebreak = print_me.find_first_of('\n', 3800); // find the first endline after 3800 chars
 
@@ -657,7 +657,7 @@ void page_string(class Connection *d, const QString str, qint32 keep_internal)
 }
 
 /* The depreciated call that gets the paging ball rolling... */
-void page_string_dep(class Connection *d, const QString str, qint32 keep_internal)
+void page_string_dep(ConnectionPtr d, const QString str, qint32 keep_internal)
 {
   if (!d)
     return;
@@ -681,7 +681,7 @@ void page_string_dep(class Connection *d, const QString str, qint32 keep_interna
 }
 
 /* The call that displays the next page. */
-void show_string(class Connection *d, const QString input)
+void show_string(ConnectionPtr d, const QString input)
 {
   QString buffer;
   QString buf;

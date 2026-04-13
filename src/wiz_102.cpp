@@ -99,7 +99,7 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
     connected = false;
 
     // must be done to clear out "d" before it is used
-    if (auto result = ch->getDC()->load_char_obj(name); result && *result)
+    if (auto result = ch->dc_->load_char_obj(name); result && *result)
     {
       auto conn = *result;
       vict = conn->character;
@@ -305,7 +305,7 @@ command_return_t do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
     }
 
     // must be done to clear out "d" before it is used
-    if (auto result = ch->getDC()->load_char_obj(name); result && *result)
+    if (auto result = ch->dc_->load_char_obj(name); result && *result)
     {
       auto conn = *result;
       auto vict = conn->character;
@@ -1112,7 +1112,6 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
               str = strdup(u" %1 list %2 1\r\n"_s.arg(z_key).arg(i + 1).toStdString().c_str());
             }
             do_zedit(ch, str);
-            free(str);
           }
           break;
         case 'G': // G, E, and O have obj # in arg1
@@ -1131,7 +1130,6 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
             }
 
             do_zedit(ch, str);
-            free(str);
           }
           break;
         case 'P': // P has obj # in arg1 and arg3
@@ -1149,7 +1147,6 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
             }
 
             do_zedit(ch, str);
-            free(str);
           }
           break;
         default:
@@ -1324,7 +1321,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
   // at this point target is the character's name
   // select is the field, and text is any args
 
-  if (select.empty() || target.empty())
+  if (select.isEmpty() || target.isEmpty())
   {
     send_to_char("$3Usage$R: sedit <character> <field> [args]\r\n"
                  "Use a field with no args to get help on that field.\r\n"
@@ -1362,7 +1359,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     skill_results_t results = find_skills_by_name(text);
 
-    if (results.empty())
+    if (results.isEmpty())
     {
       ch->send(fmt::format("Cannot find skill '{}' in master skill list.\r\n", text));
       return ReturnValue::eFAILURE;
@@ -1388,7 +1385,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
   case 0: /* add */
   {
-    if (text.empty())
+    if (text.isEmpty())
     {
       ch->send("$3Usage$R: sedit <character> add <skillname>\r\n"
                "This will give the skill to the character at learning 1.\r\n");
@@ -1411,7 +1408,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   case 1: /* remove */
   {
-    if (text.empty())
+    if (text.isEmpty())
     {
       ch->send("$3Usage$R: sedit <character> remove <skillname>\r\n"
                "This will remove the skill from the character.\r\n");
@@ -1435,7 +1432,7 @@ command_return_t do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   case 2: /* set */
   {
-    if (text.empty())
+    if (text.isEmpty())
     {
       ch->send("$3Usage$R: sedit <character> set <skillname> <amount>\r\n"
                "This will set the character's skill to amount.\r\n");
@@ -2440,7 +2437,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
               return ReturnValue::eFAILURE;
             }
     */
-    auto x = getDC()->create_blank_item(intval);
+    auto x = dc_->create_blank_item(intval);
     if (!x.has_value())
     {
       send(u"Could not create item '%1'.  Max index hit or obj already exists. %2\r\n"_s.arg(intval).arg(QVariant::fromValue(x.error()).toString()));
@@ -3905,7 +3902,7 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob_num = intval;
-    x = ch->getDC()->create_blank_mobile(intval);
+    x = ch->dc_->create_blank_mobile(intval);
     if (x < 0)
     {
       ch->send(u"Could not create mobile '%d'.  Max index hit or mob already exists.\r\n"_s.arg(intval));
@@ -4080,7 +4077,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   QString arg1;
   std::tie(arg1, remainder_args) = half_chop(QString(argument));
-  if (arg1.empty())
+  if (arg1.isEmpty())
   {
     ch->sendln("The field must be one of the following:");
     for (x = {};; x++)
@@ -4119,7 +4116,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* redit name */
   case 0:
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       ch->sendln("$3Syntax$R: redit name <Room Name>");
       return ReturnValue::eFAILURE;
@@ -4133,7 +4130,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* redit description */
   case 1:
   {
-    if (!remainder_args.empty())
+    if (!remainder_args.isEmpty())
     {
       QString description = remainder_args + "\r\n";
       dc_->world[ch->in_room].description = {};
@@ -4150,7 +4147,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     // redit exit
   case 2:
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       ch->sendln(QStringLiteral(
           "$3Syntax$R: <> is required. [] is optional.\r\n"
@@ -4237,7 +4234,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       if (is_abbrev(arg2.c_str(), dirs[x]))
         break;
     }
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       ch->send(u"Missing vnum of room you want to have %s exit connect to.\r\n"_s.arg(dirs[x]));
       return ReturnValue::eFAILURE;
@@ -4255,7 +4252,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     c = real_room(d);
 
-    if (!remainder_args.empty())
+    if (!remainder_args.isEmpty())
     {
       QString arg4;
       std::tie(arg4, remainder_args) = half_chop(remainder_args);
@@ -4268,7 +4265,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
         a = {};
       }
 
-      if (remainder_args.empty())
+      if (remainder_args.isEmpty())
       {
         return ReturnValue::eFAILURE;
       }
@@ -4316,7 +4313,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     else
     {
       ch->sendln("Creating new exit.");
-      CREATE(dc_->world[ch->in_room].dir_option[x], room_direction_data, 1);
+
       dc_->world[ch->in_room].dir_option[x]->general_description = {};
       dc_->world[ch->in_room].dir_option[x]->keyword = {};
     }
@@ -4324,7 +4321,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_->world[ch->in_room].dir_option[x]->exit_info = a;
     dc_->world[ch->in_room].dir_option[x]->key = b;
     dc_->world[ch->in_room].dir_option[x]->to_room = c;
-    if (!remainder_args.empty())
+    if (!remainder_args.isEmpty())
     {
       if (dc_->world[ch->in_room].dir_option[x]->keyword)
         dc_->world[ch->in_room].dir_option[x]->keyword = {};
@@ -4350,7 +4347,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
         SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
         QString tmp = strdup(buf.c_str());
         do_at(ch, tmp);
-        free(tmp);
+
         REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
       }
     }
@@ -4360,7 +4357,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* redit extra */
   case 3:
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       ch->send(u"$3Syntax$R: <> is required. [] is optional.\r\nredit extra                   - show this syntax and current keywords.\r\nredit extra <keywords ...>    - add or edit keywords.\r\nredit extra <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n"_s) = {};
       bool found = false;
@@ -4475,7 +4472,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     /* redit exdesc */
   case 4:
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       ch->sendln("$3Syntax$R: redit exdesc <direction>");
       return ReturnValue::eFAILURE;
@@ -4517,7 +4514,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   case 5:
   {
     a = false;
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       ch->sendln("$3Syntax$R: redit rflag <flags>");
       ch->sendln("$3Available room flags$R:");
@@ -4546,7 +4543,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   // sector
   case 6:
   {
-    if (remainder_args.empty())
+    if (remainder_args.isEmpty())
     {
       ch->sendln("$3Syntax$R: redit sector <sector>");
       ch->sendln("$3Available sector types$R:");
@@ -4583,7 +4580,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   break;
   case 7: // denymob
-    if (remainder_args.empty() || !is_number(remainder_args.c_str()))
+    if (remainder_args.isEmpty() || !is_number(remainder_args.c_str()))
     {
       ch->sendln("Syntax: redit denymob <vnum>\r\nDoing this on an already denied mob will allow it once more.");
       return ReturnValue::eFAILURE;
@@ -5672,7 +5669,7 @@ command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  i = strlen(name);
+  i = dc_strlen(name);
 
   if (i > 5)
     i = 5;

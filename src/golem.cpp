@@ -498,7 +498,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     for (qint32 i = {}; i <= ISR_MAX; i++)
     {
       isrString = get_isr_string(immune, i);
-      if (!isrString.empty())
+      if (!isrString.isEmpty())
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
@@ -515,7 +515,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     for (qint32 i = {}; i <= ISR_MAX; i++)
     {
       isrString = get_isr_string(suscept, i);
-      if (!isrString.empty())
+      if (!isrString.isEmpty())
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
@@ -532,7 +532,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     for (qint32 i = {}; i <= ISR_MAX; i++)
     {
       isrString = get_isr_string(resist, i);
-      if (!isrString.empty())
+      if (!isrString.isEmpty())
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",

@@ -136,7 +136,7 @@ qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0)
       continue;
     if (GET_POS(tmp) != position_t::STANDING)
       continue;
-    if (tmp->player == nullptr || tmp->player->joining.empty())
+    if (tmp->player == nullptr || tmp->player->joining.isEmpty())
       continue;
     if (!isexact(qPrintable(ch->name()), tmp->player->joining))
       continue;
@@ -171,7 +171,7 @@ qint32 check_joincharmie(CharacterPtr ch, qint32 skill = 0)
     return ReturnValue::eFAILURE;
   if (GET_POS(tmp) != position_t::STANDING)
     return ReturnValue::eFAILURE;
-  if (!tmp->player || tmp->player->joining.empty())
+  if (!tmp->player || tmp->player->joining.isEmpty())
     return ReturnValue::eFAILURE;
   if (!isexact("follower", tmp->player->joining) &&
       !isexact("followers", tmp->player->joining))
@@ -2942,13 +2942,13 @@ void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victi
   QString string1, string2;
 
   qint32 i, z = 0, y = {};
-  for (i = {}; i <= (qint32)strlen(buf); i++)
+  for (i = {}; i <= (qint32)dc_strlen(buf); i++)
   {
     if (*(buf + i) == '|')
     {
       string1[z] = '\0';
       dc_strcat(string1, dmg);
-      z += strlen(dmg);
+      z += dc_strlen(dmg);
     }
     else
     {

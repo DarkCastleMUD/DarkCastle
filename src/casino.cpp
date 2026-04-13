@@ -882,8 +882,8 @@ QString show_hand(qint32 hand_data[21], qint32 hide, bool ascii, bool showColor)
   static QString buf;
   qint32 i = {};
   buf[0] = '\0';
-  dc_sprintf(lineTwo, "%s%*s", lineTwo, (qint32)strlen(tempBuf) + padnext, " ");
-  dc_sprintf(lineTop, "%s%*s", lineTop, (qint32)strlen(tempBuf) + padnext, " ");
+  dc_sprintf(lineTwo, "%s%*s", lineTwo, (qint32)dc_strlen(tempBuf) + padnext, " ");
+  dc_sprintf(lineTop, "%s%*s", lineTop, (qint32)dc_strlen(tempBuf) + padnext, " ");
   if (padnext)
     padnext = {};
   while (hand_data[i] > 0)

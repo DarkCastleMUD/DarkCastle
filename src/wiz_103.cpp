@@ -157,7 +157,7 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString buf;
-  class Connection *d;
+  ConnectionPtr d;
   quint32 sdesc;
 
   if (ch->isNonPlayer())
@@ -207,7 +207,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   std::tie(name, argument) = half_chop(argument);
-  if (name.empty())
+  if (name.isEmpty())
   {
     ch->sendln("Who do you wish to force to save?");
     return ReturnValue::eFAILURE;
@@ -383,8 +383,8 @@ qint32 lookupRoom(CharacterPtr ch, QString str)
 command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 c_class = 0, room = 0, old_room = {};
-  QString arg1 = {0};
-  QString arg2 = {0};
+  QString arg1;
+  QString arg2;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;

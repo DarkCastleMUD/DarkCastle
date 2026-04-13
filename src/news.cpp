@@ -99,7 +99,7 @@ void DC::loadnews(void)
     nnews->news = fread_string(fl, 0);
     qint32 i, v = {};
     QString buf;
-    for (i = {}; i < (qint32)strlen(nnews->news); i++)
+    for (i = {}; i < (qint32)dc_strlen(nnews->news); i++)
     {
       buf[v++] = *(nnews->news + i);
     }
@@ -117,7 +117,7 @@ const QString newsify(QString string)
   tmp[0] = '\0';
   for (i = {}; *(string + i) != '\0'; i++)
   {
-    if (*(string + i) == '\n' && i < (qint32)(strlen(string) - 1))
+    if (*(string + i) == '\n' && i < (qint32)(dc_strlen(string) - 1))
     {
       tmp[a++] = '\0';
       dc_strcat(tmp, "\n              ");
@@ -166,7 +166,7 @@ command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
     else
       dc_sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
                  old);
-    if (strlen(buf) > MAX_STRING_LENGTH - 1000)
+    if (dc_strlen(buf) > MAX_STRING_LENGTH - 1000)
       break;
   }
   page_string(ch->desc, buf, 1);

@@ -117,7 +117,7 @@ DCPtr DC::getInstance(void)
 
 zone_t DC::getRoomZone(room_t room_nr)
 {
-  for (auto [zone_key, zone] : zones.asKeyValueRange())
+  for (auto [zone_key, zone] : zones_.asKeyValueRange())
     if (room_nr >= zone.getRealBottom() && room_nr <= zone.getTop())
       return zone_key;
   return zone_t();
@@ -237,7 +237,7 @@ bool DC::authenticate(QString username, QString password, quint64 level)
 {
   username = username.toLower();
   username[0] = username[0].toUpper();
-  if (!Character::validateName(username))
+  if (!validateName(username))
     return false;
 
   auto result = load_char_obj(username);
@@ -514,4 +514,31 @@ Character::Character(DCPtr dc)
 Connection::Connection(DCPtr dc)
     : QObject(dc), dc_(dc)
 {
+}
+
+RoomDirection::RoomDirection(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+QString ANA(ObjectPtr obj)
+{
+  if (!obj || obj->name().isEmpty())
+    return {};
+
+  if (u"aeiouyAEIOUY"_s.contains(obj->name()[0]))
+    return u"An"_s;
+  else
+    return u"A"_s;
+}
+
+QString SANA(ObjectPtr obj)
+{
+  if (!obj || obj->name().isEmpty())
+    return {};
+
+  if (u"aeiouyAEIOUY"_s.contains(obj->name()[0]))
+    return u"an"_s;
+  else
+    return u"a"_s;
 }

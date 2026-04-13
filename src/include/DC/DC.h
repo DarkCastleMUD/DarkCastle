@@ -3,6 +3,8 @@
  * Licensed under the LGPL.
  */
 #pragma once
+
+// #include <QtHttpServer/QHttpServer>
 #include <netinet/in.h>
 
 #include <expected>
@@ -18,7 +20,7 @@
 #include <QList>
 #include <QSet>
 #include <QString>
-#include <QtHttpServer/QHttpServer>
+#include <QtTypes>
 #include <QtConcurrent/QtConcurrent>
 #include <QThread>
 #include <qtmetamacros.h>
@@ -90,6 +92,20 @@ int dc_strcmp(T dst, const char *src)
   if (src)
     return dst.compare(src);
   return -1;
+}
+
+template <typename T>
+int dc_strcmp(const char *dst, T src)
+{
+  if (dst)
+    return src.compare(dst);
+  return -1;
+}
+
+template <typename T>
+qsizetype dc_strlen(T dst)
+{
+  return dst.length();
 }
 
 enum class cmd_t
@@ -312,7 +328,7 @@ public:
 class strcasecmp_compare
 {
 public:
-  bool operator()(const QString &l, const QString &r) const
+  bool operator()(QString l, QString r) const
   {
     return l.compare(r, Qt::CaseInsensitive);
   }
@@ -1058,6 +1074,7 @@ private:
   quint16 destination_port = {};
 };
 
+using ConnectionPtr = QPointer<class Connection>;
 class Connection : public QObject
 {
   Q_OBJECT
@@ -1123,7 +1140,6 @@ public:
   qint32 web_connected = {};
   qint32 wait = {};          /* wait for how many loops	*/
   QString showstr_head = {}; /* for paging through texts	*/
-  const QString *showstr_vector = {};
   qint32 showstr_count = {};
   qint32 showstr_page = {};
   bool new_newline = {}; /* prepend newline in output	*/
@@ -1137,9 +1153,9 @@ public:
   QQueue<QString> input = {};  /* queue of unprocessed input	*/
   CharacterPtr character = {}; /* linked to character		*/
   CharacterPtr original = {};  /* for switch / return		*/
-  Connection *snooping = {};   /* Who is this character snooping       */
-  Connection *snoop_by = {};   /* And who is snooping this character   */
-  Connection *next = {};       /* link to next descriptor	*/
+  ConnectionPtr snooping = {}; // Who is this character snooping
+  ConnectionPtr snoop_by = {}; // And who is snooping this character
+  ConnectionPtr next = {};     // link to next descriptor
   qint32 tick_wait = {};       /* # ticks desired to wait	*/
   qint32 reallythere = {};     /* Goddamm #&@$*% sig 13 (hack) */
   qint32 prompt_mode = {};
@@ -1206,7 +1222,7 @@ public:
   {
     return connected == Connection::states::PLAYING;
   }
-  [[nodiscard]] inline QString name(void) { return name_; }
+  [[nodiscard]] inline QString name(void) const { return name_; }
   inline QString name(QString s)
   {
     name_ = s;
@@ -1225,7 +1241,6 @@ private:
   quint16 peer_port_ = {};
   QString name_; /* Copy of the player name	*/
 };
-using ConnectionPtr = QPointer<Connection>;
 
 enum class attribute_t : quint8
 {
@@ -1326,16 +1341,20 @@ auto &operator<<(auto &out, extra_descr_data *currdesc)
   return out;
 }
 
-class room_direction_data
+class RoomDirection : public QObject
 {
+  Q_OBJECT
 public:
+  RoomDirection(DCPtr dc);
   QString general_description; /* When look DIR.                  */
   QString keyword;             /* for open/close                  */
   qint16 exit_info;            /* Exit info                       */
   CharacterPtr bracee;         /* This is who is bracing the door */
   qint16 key;                  /* Key's number (-1 for no key)    */
   qint16 to_room;              /* Where direction leeds (NOWHERE) */
+  DCPtr dc_;
 };
+using RoomDirectionPtr = QPointer<RoomDirection>;
 
 const auto MAX_DIRS = 6;
 constexpr auto CLASS_MAX = 13;
@@ -1586,13 +1605,12 @@ public:
   static constexpr qsizetype MIN_NAME_SIZE = 3;
   static constexpr qsizetype MAX_NAME_SIZE = 12;
   static const QList<qint32> wear_to_item_wear;
-  bool validateName(QString name);
 
   class Mobile *mobdata = {};
   class Player *player = {};
   ObjectPtr objdata = {};
 
-  Connection *desc = {}; // nullptr normally for mobs
+  ConnectionPtr desc = {}; // nullptr normally for mobs
 
   QString title_;
 
@@ -1925,7 +1943,7 @@ public:
     debug_ = state;
   }
 
-  class room_direction_data *brace_at{}, *brace_exit{}; // exits affected by brace
+  RoomDirectionPtr brace_at, brace_exit;
   time_t first_damage = {};
   quint64 damage_done = {};
   quint64 damages = {};
@@ -1939,7 +1957,7 @@ public:
   bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
   qint32 char_to_store_variable_data(FILE *fpsave);
   void display_string_list(QStringList list);
-  void display_string_list(const QString *list);
+  void display_string_list(QString list);
   bool charge_moves(qint32 skill, double modifier = 1);
   void check_maxes(void);
   qint32 check_charmiejoin(void);
@@ -2436,7 +2454,7 @@ class Database
 {
 public:
   Database(void);
-  Database(const QString &name, const QString &hostname = "", const QString &type = "QPSQL");
+  Database(QString name, QString hostname = "", QString type = "QPSQL");
   QSqlDatabase getQSqlDatabase(void) { return database_; }
   QString getName(void) { return name_; }
   QString getHostname(void) { return hostname_; }
@@ -2455,7 +2473,7 @@ private:
 class Table
 {
 public:
-  Table(Database &database, const QString &name = "");
+  Table(Database &database, QString name = "");
   Database &getDatabase(void) { return database_; }
   QString getName(void) { return name_; }
   Column column(QString name, QString type);
@@ -2468,7 +2486,7 @@ private:
 class Column
 {
 public:
-  Column(Table &table, const QString &name = "", const QString &type = "");
+  Column(Table &table, QString name = "", QString type = "");
   Table &getTable(void) { return table_; }
   QString getName(void) { return name_; }
   QString getType(void) { return type_; }
@@ -2879,6 +2897,7 @@ public:
 
 class Room : public QObject
 {
+  Q_OBJECT
 public:
   class Tracks
   {
@@ -2930,11 +2949,11 @@ public:
   QSharedPointer<class Zone> zonePtr = {};
   qint32 sector_type = {}; // sector type (move/hide)
   deny_data *denied = {};
-  QString name_;                                  // Rooms name 'You are ...'
-  QString description_;                           // Shown when entered
-  extra_descr_data *ex_description = {};          // for examine/look
-  room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
-  quint32 room_flags = {};                        // DEATH, DARK ... etc
+  QString name_;                              // Rooms name 'You are ...'
+  QString description_;                       // Shown when entered
+  extra_descr_data *ex_description = {};      // for examine/look
+  RoomDirectionPtr dir_option[MAX_DIRS] = {}; // Directions
+  quint32 room_flags = {};                    // DEATH, DARK ... etc
   constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }
   constexpr auto isNoHome() const -> bool { return isSet(room_flags, NOHOME); }
   constexpr auto isNoMob() const -> bool { return isSet(room_flags, NO_MOB); }
@@ -2979,6 +2998,8 @@ public:
   QList<Tracks> tracks_;            // beginning of the list of scents
   qint32 iFlags = {};               // Internal flags. These do NOT save.
   QList<path_data> paths_;
+  DCPtr dc_;
+
   bool allow_class[CLASS_MAX] = {};
 
   void AddTrackItem(Tracks &newTrack);
@@ -3001,63 +3022,6 @@ public:
     funct,
     alllow_class
   };
-  /*
-          static auto compare(Room &r1, Room &r2) -> std::expected<bool, room_errors_t>
-          {
-              for (qint32 direction = {}; direction < MAX_DIRS; ++direction)
-              {
-                  if (r1.dir_option[direction] == r2.dir_option[direction])
-                  {
-                      continue;
-                  }
-                  else if (r1.dir_option[direction] && r2.dir_option[direction] &&
-                           *r1.dir_option[direction] == *r2.dir_option[direction])
-                  {
-                      continue;
-                  }
-                  else
-                  {
-                      return std::unexpected(Room::room_errors_t::direction);
-                  }
-              }
-              if (r1.number != r2.number)
-                  return std::unexpected(Room::room_errors_t::number);
-              if (r1.zone != r2.zone)
-                  return std::unexpected(Room::room_errors_t::zone);
-              if (r1.zonePtr != r2.zonePtr)
-                  return std::unexpected(Room::room_errors_t::zonePtr);
-              if (r1.sector_type != r2.sector_type)
-                  return std::unexpected(Room::room_errors_t::sector_type);
-              if (r1.denied != r2.denied)
-                  return std::unexpected(Room::room_errors_t::denied);
-              if (QString(r1.name) != QString(r2.name))
-                  return std::unexpected(Room::room_errors_t::name);
-              if (QString(r1.description) != QString(r2.description))
-                  return std::unexpected(Room::room_errors_t::description);
-              if (r1.ex_description != r2.ex_description)
-                  return std::unexpected(Room::room_errors_t::ex_description);
-              if (r1.room_flags != r2.room_flags)
-                  return std::unexpected(Room::room_errors_t::room_flags);
-              if (r1.temp_room_flags != r2.temp_room_flags)
-                  return std::unexpected(Room::room_errors_t::temp_room_flags);
-              if (r1.light != r2.light)
-                  return std::unexpected(Room::room_errors_t::light);
-              if (r1.funct != r2.funct)
-                  return std::unexpected(Room::room_errors_t::funct);
-              // r1.contents == r2.contents &&
-              // r1.people == r2.people &&
-              // r1.tracks_.size() == r2.tracks_.size() &&
-              // r1.tracks == r2.tracks &&
-              // r1.iFlags == r2.iFlags &&
-              // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
-              if (memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)))
-                  return std::unexpected(Room::room_errors_t::alllow_class);
-
-              return true;
-          }
-      */
-private:
-  DCPtr dc_;
 };
 auto &operator<<(auto &out, const Room &room);
 bool operator==(const Room &r1, const Room &r2);
@@ -3792,6 +3756,7 @@ public:
   }
   bool TypeString(QString type);
   ~Object();
+  DCPtr dc_;
 
 private:
   QString owner_;
@@ -4661,8 +4626,8 @@ qint32 hit_limit(CharacterPtr ch);
 QString get_skill_name(qint32 skillnum);
 void gain_exp_regardless(CharacterPtr ch, qint32 gain);
 void advance_level(CharacterPtr ch, bool is_conversion);
-qint32 close_socket(class Connection *d);
-void page_string(class Connection *d, const QString str, qint32 keep_internal);
+qint32 close_socket(ConnectionPtr d);
+void page_string(ConnectionPtr d, const QString str, qint32 keep_internal);
 void gain_exp(CharacterPtr ch, qint64 gain);
 void redo_hitpoints(CharacterPtr ch); /* Rua's put in  */
 void redo_mana(CharacterPtr ch);      /* Rua's put in  */
@@ -4753,7 +4718,7 @@ QByteArray handle_ansi(QByteArray, CharacterPtr ch);
 QString handle_ansi(QString, CharacterPtr ch);
 QString handle_ansi(QString s, CharacterPtr ch);
 QString handle_ansi_(QString s, CharacterPtr ch);
-void show_string(class Connection *d, const QString input);
+void show_string(ConnectionPtr d, const QString input);
 qint32 get_saves(CharacterPtr ch, qint32 savetype);
 
 constexpr auto MAX_THROW_NAME = 60;
@@ -4777,8 +4742,8 @@ public:
   CharacterPtr rndm; // $r
 
   // new mppause crap below..
-  CharacterPtr tMob;    // it should NOT throw it to another similar mob :P
-  qint32 ifchecks[256]; // Let's hope noone nests more ifs than that.
+  CharacterPtr tMob; // it should NOT throw it to another similar mob :P
+  qint32 ifchecks;   // Let's hope noone nests more ifs than that.
   qint32 startPos;
   qint32 cPos;
   QString orig;
@@ -5097,7 +5062,7 @@ void extract_char(CharacterPtr ch, bool pull);
 typedef QMap<QString, quint64> skill_results_t;
 skill_results_t find_skills_by_name(QString name);
 CharacterPtr get_pc_vis(CharacterPtr ch, QString name);
-qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, CharacterPtr *tar_ch, ObjectPtr *tar_obj, bool verbose = false);
+qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, CharacterPtr tar_ch, ObjectPtr tar_obj, bool verbose = false);
 bool is_wearing(CharacterPtr ch, ObjectPtr item);
 
 bool objExists(ObjectPtr obj);
@@ -5117,7 +5082,7 @@ void randomize_object(ObjectPtr obj);
 std::ofstream &operator<<(std::ofstream &out, ObjectPtr obj);
 std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj);
 void copySaveData(ObjectPtr new_obj, ObjectPtr obj);
-bool verify_item(ObjectPtr *obj);
+bool verify_item(ObjectPtr obj);
 bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2);
 bool has_random(ObjectPtr obj);
 class pulse_data
@@ -5988,8 +5953,8 @@ auto HMHR(auto ch)
   return (ch)->sex ? (((ch)->sex == 1) ? "him" : "her") : "it";
 }
 
-// #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
-// #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
+QString ANA(ObjectPtr obj);
+QString SANA(ObjectPtr obj);
 
 bool IS_FAMILIAR(auto ch) { return IS_AFFECTED(ch, AFF_FAMILIAR); }
 
@@ -6183,7 +6148,6 @@ inline const short IS_ANONYMOUS(CharacterPtr ch)
 #define IS_OPEN(room, door) (!isSet(dc_->world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
 
 #define OUTSIDE(ch) (!isSet(dc_->world[(ch)->in_room].room_flags, INDOORS))
-#define EXIT(ch, door) (dc_->world[(ch)->in_room].dir_option[door])
 
 typedef quint64 zone_t;
 typedef quint64 room_t;
@@ -6249,7 +6213,7 @@ const auto SECT_MAX_SECT = 15; // update this if you add more
 #define IS_GOOD(ch) (GET_ALIGNMENT(ch) >= 350)
 #define IS_EVIL(ch) (GET_ALIGNMENT(ch) <= -350)
 #define IS_NEUTRAL(ch) (!IS_GOOD(ch) && !IS_EVIL(ch))
-#define IS_SINGING(ch) (!((ch)->songs.empty()))
+#define IS_SINGING(ch) (!((ch)->songs.isEmpty()))
 
 enum MatchType
 {
@@ -6716,7 +6680,7 @@ public:
 
 class skill_stuff
 {
-  const QString name_;
+  QString name_;
   qint32 difficulty_;
 
 public:
@@ -7547,7 +7511,7 @@ public:
   static const QString menu;
 
   QList<game_portal> game_portals_;
-  QList<ConnectionPtr> connections_; /* master desc list */
+  QList<ConnectionPtr> connections_; // master desc list
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
   character_list_t character_list;
@@ -7588,7 +7552,7 @@ public:
   static QString getBuildVersion();
   static QString getBuildTime();
   static DCPtr getInstance();
-  static zone_t getRoomZone(room_t room_nr);
+  zone_t getRoomZone(room_t room_nr);
   static QString getZoneName(zone_t zone_key);
   static void setZoneClanOwner(zone_t zone_key, qint32 clan_key);
   static void setZoneClanGold(zone_t zone_key, gold_t gold);
@@ -7599,6 +7563,7 @@ public:
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
 
+  bool validateName(QString name);
   bool IS_ARENA(auto room)
   {
     return isSet(world[room].room_flags, ARENA);
@@ -7898,8 +7863,8 @@ private:
   void game_loop_init(void);
   void game_loop(void);
   qint32 init_socket(in_port_t port);
-  qint32 exceeded_connection_limit(Connection *new_conn);
-  void nanny(Connection *d, QString arg = "");
+  qint32 exceeded_connection_limit(ConnectionPtr new_conn);
+  void nanny(ConnectionPtr d, QString arg = "");
   void object_activity(quint64 pulse_type);
 };
 bool CAN_GO(auto ch, auto door)
@@ -7960,7 +7925,7 @@ auto &operator>>(auto &in, Room &room)
 
       bool found = false;
       zone_t zone_nr = {};
-      for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
+      for (auto [zone_key, zone] : room.dc_->zones.asKeyValueRange())
       {
         if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
         {
@@ -7977,7 +7942,7 @@ auto &operator>>(auto &in, Room &room)
       }
       else
       {
-        auto &zone = dc_->zones[zone_nr];
+        auto &zone = room.dc_->zones[zone_nr];
         if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
         {
           if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
@@ -8118,7 +8083,7 @@ public:
     set_name(sender);
   }
 
-  ChannelMessage(const CharacterPtr sender, const DC::LogChannel type, const QString &msg)
+  ChannelMessage(const CharacterPtr sender, const DC::LogChannel type, QString msg)
       : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
   {
     set_wizinvis(sender);
@@ -8180,3 +8145,67 @@ public:
 void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type = DC::PULSE_TIME);
 QString one_argument(QString arguments, QString &arg1);
 QString one_argumentnolow(QString arguments, QString &arg1);
+RoomDirectionPtr EXIT(CharacterPtr ch, qsizetype door)
+{
+  return ch->dc_->world[ch->in_room].dir_option[door];
+}
+
+constexpr auto BASE_STAT = 0;
+// #define NOTHING      0
+constexpr auto ACT_SPEC = 1;
+constexpr auto ACT_SENTINEL = 2;
+constexpr auto ACT_SCAVENGER = 3;
+constexpr auto ACT_NOTRACK = 4;
+constexpr auto ACT_NICE_THIEF = 5;
+constexpr auto ACT_AGGRESSIVE = 6;
+constexpr auto ACT_STAY_ZONE = 7;
+constexpr auto ACT_WIMPY = 8;
+/* aggressive only attack sleeping players */
+constexpr auto ACT_2ND_ATTACK = 9;
+constexpr auto ACT_3RD_ATTACK = 10;
+constexpr auto ACT_4TH_ATTACK = 11;
+/* Each attack bit must be set to get up */
+/* 4 attacks                             */
+/*
+ * For ACT_AGGRESSIVE_XXX, you must also set ACT_AGGRESSIVE
+ * These switches can be combined, if none are selected, then
+ * the mobile will attack any alignment (same as if all 3 were set)
+ */
+constexpr auto ACT_AGGR_EVIL = 12;
+constexpr auto ACT_AGGR_GOOD = 13;
+constexpr auto ACT_AGGR_NEUT = 14;
+constexpr auto ACT_UNDEAD = 15;
+constexpr auto ACT_STUPID = 16;
+constexpr auto ACT_CHARM = 17;
+constexpr auto ACT_HUGE = 18;
+constexpr auto ACT_DODGE = 19;
+constexpr auto ACT_PARRY = 20;
+constexpr auto ACT_RACIST = 21;
+constexpr auto ACT_FRIENDLY = 22;
+constexpr auto ACT_STAY_NO_TOWN = 23;
+constexpr auto ACT_NOMAGIC = 24;
+constexpr auto ACT_DRAINY = 25;
+constexpr auto ACT_BARDCHARM = 26;
+constexpr auto ACT_NOKI = 27;
+constexpr auto ACT_NOMATRIX = 28;
+constexpr auto ACT_BOSS = 29;
+constexpr auto ACT_NOHEADBUTT = 30;
+constexpr auto ACT_NOATTACK = 31;
+// #define CHECKTHISACT      32 //Do not change unless ASIZE changes
+constexpr auto ACT_SWARM = 33;
+constexpr auto ACT_TINY = 34;
+constexpr auto ACT_NODISPEL = 35;
+constexpr auto ACT_POISONOUS = 36;
+constexpr auto ACT_NO_GOLD_BONUS = 37;
+constexpr auto ACT_NO_HUNT = 38;
+// #define CHECKTHISACT      64 //Do not chance unless ASIZE changes
+
+void write_to_output(const QString txt, ConnectionPtr t);
+void write_to_output(QByteArray txt, ConnectionPtr d);
+void write_to_output(QString txt, ConnectionPtr d);
+void write_to_output(QString txt, ConnectionPtr t);
+void new_string_add(ConnectionPtr d, QString str);
+void telnet_ga(ConnectionPtr d);
+void telnet_sga(ConnectionPtr d);
+void telnet_echo_off(ConnectionPtr d);
+void telnet_echo_on(ConnectionPtr d);

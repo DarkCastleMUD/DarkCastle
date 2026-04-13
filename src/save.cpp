@@ -124,7 +124,7 @@ void fwrite_var_string(const QString str, FILE *fpsave)
 
   if (str)
   {
-    tmp_size = strlen(str) + 1; // count the null terminator
+    tmp_size = dc_strlen(str) + 1; // count the null terminator
   }
 
   fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
@@ -263,7 +263,7 @@ void Player::save(FILE *fpsave, time_data tmpage)
     fwrite(&(kimetas), sizeof(kimetas), 1, fpsave);
   }
   // autojoinin'
-  if (!joining.empty())
+  if (!joining.isEmpty())
   {
     fwrite("JIN", sizeof(QChar), 3, fpsave);
     fwrite_var_string(getJoining(), fpsave);
@@ -335,7 +335,7 @@ void Player::save(FILE *fpsave, time_data tmpage)
       }
     }
   }
-  if (ignoring.empty() == false)
+  if (ignoring.isEmpty() == false)
   {
     for (const auto &name : ignoring)
     {
@@ -555,7 +555,7 @@ bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
     if (var_string != nullptr)
     {
       QString name = var_string;
-      if (name.empty() == false)
+      if (name.isEmpty() == false)
       {
         ignore_entry ie = {true, 0};
         fread(&ie.ignored_count, sizeof(ie.ignored_count), 1, fpsave);
@@ -858,7 +858,7 @@ void save_char_obj_db(CharacterPtr ch)
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   VaultPtr vault;
-  if ((vault = has_vault(qPrintable(ch->name()))))
+  if ((vault = dc_->vaults_->has_vault(qPrintable(ch->name()))))
     save_vault(vault->owner);
   */
 }
@@ -871,8 +871,8 @@ void Character::save_char_obj(void)
   char_file_u4 uchar = {};
   time_data tmpage;
   FILE *fpsave = {};
-  QString strsave = {0};
-  QString name = {0};
+  QString strsave;
+  QString name;
 
   memset(&tmpage, 0, sizeof(tmpage));
 
@@ -954,7 +954,7 @@ void Character::save_char_obj(void)
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   VaultPtr vault;
-  if ((vault = has_vault(name())))
+  if ((vault = dc_->vaults_->has_vault(name())))
     save_vault(vault->owner);
 }
 
@@ -1473,21 +1473,21 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
   if (!obj->name().isEmpty() && obj->name() != standard_obj->name())
   {
     fwrite("NAM", sizeof(QChar), 3, fpsave);
-    length = strlen(qPrintable(obj->name()));
+    length = dc_strlen(qPrintable(obj->name()));
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(qPrintable(obj->name()), sizeof(QChar), length, fpsave);
   }
   if (obj->long_description && dc_strcmp(obj->long_description, standard_obj->long_description))
   {
     fwrite("DES", sizeof(QChar), 3, fpsave);
-    length = strlen(obj->long_description);
+    length = dc_strlen(obj->long_description);
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->long_description, sizeof(QChar), length, fpsave);
   }
   if (obj->short_description && dc_strcmp(qPrintable(obj->short_description()), standard_obj->short_description))
   {
     fwrite("SDE", sizeof(QChar), 3, fpsave);
-    length = strlen(obj->short_description);
+    length = dc_strlen(obj->short_description);
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(qPrintable(obj->short_description()), sizeof(QChar), length, fpsave);
   }

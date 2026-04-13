@@ -391,7 +391,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (strlen(arg) > 72)
+  if (dc_strlen(arg) > 72)
   {
     ch->sendln("Poof message too long, must be under 72 characters long.");
     return ReturnValue::eFAILURE;
@@ -399,7 +399,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 
   nope = {};
 
-  for (ctr = {}; (quint32)ctr <= strlen(arg); ctr++)
+  for (ctr = {}; (quint32)ctr <= dc_strlen(arg); ctr++)
   {
     if (arg[ctr] == '%')
     {
@@ -432,7 +432,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
     dc_strcpy(buf, _convert);
 
   /* No reason to assign _convert[1] every time through, is there? */
-  for (ctr = 1; (quint32)ctr < strlen(arg); ctr++)
+  for (ctr = 1; (quint32)ctr < dc_strlen(arg); ctr++)
   {
     _convert[0] = arg[ctr];
 
@@ -644,7 +644,7 @@ command_return_t do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1 = {};
-  Connection *i = {};
+  ConnectionPtr i = {};
 
   if (ch->isNonPlayer())
   {
@@ -660,7 +660,7 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
   argument = ltrim(argument);
   argument = rtrim(argument);
 
-  if (argument.empty())
+  if (argument.isEmpty())
   {
     QQueue<QString> tmp;
     if (cmd == cmd_t::IMMORT)
@@ -679,7 +679,7 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    while (!tmp.empty())
+    while (!tmp.isEmpty())
     {
       ch->send(tmp.front());
       tmp.pop();
@@ -774,14 +774,12 @@ command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->send(u"Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n"_s.arg(j + 1).arg(zone_key).arg(amt).arg(max));
         QString buffer = strdup(u"%1 list %2 1"_s.arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
-        free(buffer);
       }
       else
       {
         ch->send(u"Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n"_s.arg(j + 1).arg(zone_key).arg(amt).arg(max));
         QString buffer = strdup(u"%1 list %2 1"_s.arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
-        free(buffer);
       }
     }
   }
